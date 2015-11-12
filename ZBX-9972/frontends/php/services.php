@@ -134,40 +134,40 @@ if (isset($_REQUEST['form'])) {
 			];
 		}
 
-		$service_request = ['name' => true, 'triggerid' => true, 'algorithm' => true, 'goodsla' => true,
+		$request = ['name' => true, 'triggerid' => true, 'algorithm' => true, 'goodsla' => true,
 			'sortorder' => true, 'parentid' => true, 'dependencies' => true
 		];
-		$service_request = array_intersect_key($_REQUEST, $service_request);
+		$request = array_intersect_key($_REQUEST, $request);
 
-		$service_request['dependencies'] = $dependencies;
-		$service_request['showsla'] = getRequest('showsla', SERVICE_SHOW_SLA_OFF);
-		$service_request['times'] = getRequest('times', []);
+		$request['dependencies'] = $dependencies;
+		$request['showsla'] = getRequest('showsla', SERVICE_SHOW_SLA_OFF);
+		$request['times'] = getRequest('times', []);
 
 		if (isset($service['serviceid'])) {
-			$service_request['serviceid'] = $service['serviceid'];
+			$request['serviceid'] = $service['serviceid'];
 
-			$result = API::Service()->update($service_request);
+			$result = API::Service()->update($request);
 
-			$message_success = _('Service updated');
-			$message_failed = _('Cannot update service');
-			$audit_action = AUDIT_ACTION_UPDATE;
+			$messageSuccess = _('Service updated');
+			$messageFailed = _('Cannot update service');
+			$auditAction = AUDIT_ACTION_UPDATE;
 		}
 		else {
-			$result = API::Service()->create($service_request);
+			$result = API::Service()->create($request);
 
-			$message_success = _('Service created');
-			$message_failed = _('Cannot add service');
-			$audit_action = AUDIT_ACTION_ADD;
+			$messageSuccess = _('Service created');
+			$messageFailed = _('Cannot add service');
+			$auditAction = AUDIT_ACTION_ADD;
 		}
 
 		if ($result) {
 			$serviceid = (isset($service['serviceid'])) ? $service['serviceid'] : reset($result['serviceids']);
-			add_audit($audit_action, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
+			add_audit($auditAction, AUDIT_RESOURCE_IT_SERVICE, 'Name ['.$_REQUEST['name'].'] id ['.$serviceid.']');
 			unset($_REQUEST['form']);
 		}
 
 		$result = DBend($result);
-		show_messages($result, $message_success, $message_failed);
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	// validate and get service times
 	elseif (isset($_REQUEST['add_service_time']) && isset($_REQUEST['new_service_time'])) {
@@ -264,7 +264,7 @@ if (isset($_REQUEST['form'])) {
  * Display parent services list
  */
 if (isset($_REQUEST['pservices'])) {
-	$parent_services = API::Service()->get([
+	$parentServices = API::Service()->get([
 		'output' => ['serviceid', 'name', 'algorithm'],
 		'selectTrigger' => ['triggerid', 'description', 'expression'],
 		'preservekeys' => true,
@@ -273,10 +273,10 @@ if (isset($_REQUEST['pservices'])) {
 
 	if (isset($service)) {
 		// unset unavailable parents
-		$child_services_ids = get_service_children($service['serviceid']);
-		$child_services_ids[] = $service['serviceid'];
-		foreach ($child_services_ids as $child_service_id) {
-			unset($parent_services[$child_service_id]);
+		$childServicesIds = get_service_children($service['serviceid']);
+		$childServicesIds[] = $service['serviceid'];
+		foreach ($childServicesIds as $childServiceId) {
+			unset($parentServices[$childServiceId]);
 		}
 
 		$data = ['service' => $service];
@@ -286,26 +286,26 @@ if (isset($_REQUEST['pservices'])) {
 	}
 
 	// expand trigger descriptions
-	$triggers = zbx_objectValues($parent_services, 'trigger');
+	$triggers = zbx_objectValues($parentServices, 'trigger');
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
-	foreach ($parent_services as $key => $parent_service) {
-		$parent_services[$key]['trigger'] = !empty($parent_service['trigger'])
-			? $triggers[$parent_service['trigger']['triggerid']]['description']
+	foreach ($parentServices as $key => $parentService) {
+		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
+			? $triggers[$parentService['trigger']['triggerid']]['description']
 			: '';
 	}
 
-	$data['db_pservices'] = $parent_services;
+	$data['db_pservices'] = $parentServices;
 
 	// render view
-	$services_view = new CView('configuration.services.parent.list', $data);
-	$services_view->render();
-	$services_view->show();
+	$servicesView = new CView('configuration.services.parent.list', $data);
+	$servicesView->render();
+	$servicesView->show();
 }
 /*
  * Display child services list
  */
 elseif (isset($_REQUEST['cservices'])) {
-	$child_services = API::Service()->get([
+	$childServices = API::Service()->get([
 		'output' => ['serviceid', 'name', 'algorithm'],
 		'selectTrigger' => ['triggerid', 'description', 'expression'],
 		'preservekeys' => true,
@@ -314,10 +314,10 @@ elseif (isset($_REQUEST['cservices'])) {
 
 	if (isset($service)) {
 		// unset unavailable parents
-		$child_services_ids = get_service_children($service['serviceid']);
-		$child_services_ids[] = $service['serviceid'];
-		foreach ($child_services_ids as $child_service_id) {
-			unset($child_services[$child_service_id]);
+		$childServicesIds = get_service_children($service['serviceid']);
+		$childServicesIds[] = $service['serviceid'];
+		foreach ($childServicesIds as $childServiceId) {
+			unset($childServices[$childServiceId]);
 		}
 
 		$data = ['service' => $service];
@@ -327,20 +327,20 @@ elseif (isset($_REQUEST['cservices'])) {
 	}
 
 	// expand trigger descriptions
-	$triggers = zbx_objectValues($child_services, 'trigger');
+	$triggers = zbx_objectValues($childServices, 'trigger');
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
-	foreach ($child_services as $key => $child_service) {
-		$child_services[$key]['trigger'] = !empty($child_service['trigger'])
-			? $triggers[$child_service['trigger']['triggerid']]['description']
+	foreach ($childServices as $key => $childService) {
+		$childServices[$key]['trigger'] = !empty($childService['trigger'])
+			? $triggers[$childService['trigger']['triggerid']]['description']
 			: '';
 	}
 
-	$data['db_cservices'] = $child_services;
+	$data['db_cservices'] = $childServices;
 
 	// render view
-	$services_view = new CView('configuration.services.child.list', $data);
-	$services_view->render();
-	$services_view->show();
+	$servicesView = new CView('configuration.services.child.list', $data);
+	$servicesView->render();
+	$servicesView->show();
 }
 /*
  * Display
@@ -377,7 +377,7 @@ elseif (isset($_REQUEST['form'])) {
 		// get children
 		$data['children'] = [];
 		if ($service['dependencies']) {
-			$child_services = API::Service()->get([
+			$childServices = API::Service()->get([
 				'serviceids' => zbx_objectValues($service['dependencies'], 'servicedownid'),
 				'selectTrigger' => ['triggerid', 'description', 'expression'],
 				'output' => ['name', 'triggerid'],
@@ -385,15 +385,15 @@ elseif (isset($_REQUEST['form'])) {
 			]);
 
 			// expand trigger descriptions
-			$triggers = zbx_objectValues($child_services, 'trigger');
+			$triggers = zbx_objectValues($childServices, 'trigger');
 			$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
 			foreach ($service['dependencies'] as $dependency) {
-				$child_service = $child_services[$dependency['servicedownid']];
+				$childService = $childServices[$dependency['servicedownid']];
 				$data['children'][] = [
-					'name' => $child_service['name'],
-					'triggerid' => $child_service['triggerid'],
-					'trigger' => !empty($child_service['triggerid'])
-							? $triggers[$child_service['trigger']['triggerid']]['description']
+					'name' => $childService['name'],
+					'triggerid' => $childService['triggerid'],
+					'trigger' => !empty($childService['triggerid'])
+							? $triggers[$childService['trigger']['triggerid']]['description']
 							: '',
 					'serviceid' => $dependency['servicedownid'],
 					'soft' => $dependency['soft'],
@@ -433,9 +433,9 @@ elseif (isset($_REQUEST['form'])) {
 	}
 
 	// render view
-	$services_view = new CView('configuration.services.edit', $data);
-	$services_view->render();
-	$services_view->show();
+	$servicesView = new CView('configuration.services.edit', $data);
+	$servicesView->render();
+	$servicesView->show();
 }
 else {
 	// services
@@ -460,9 +460,9 @@ else {
 	}
 	unset($service);
 
-	$tree_data = [];
-	createServiceConfigurationTree($services, $tree_data);
-	$tree = new CServiceTree('service_conf_tree', $tree_data, [
+	$treeData = [];
+	createServiceConfigurationTree($services, $treeData);
+	$tree = new CServiceTree('service_conf_tree', $treeData, [
 		'caption' => _('Service'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')
@@ -474,9 +474,9 @@ else {
 	$data = ['tree' => $tree];
 
 	// render view
-	$services_view = new CView('configuration.services.list', $data);
-	$services_view->render();
-	$services_view->show();
+	$servicesView = new CView('configuration.services.list', $data);
+	$servicesView->render();
+	$servicesView->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';
