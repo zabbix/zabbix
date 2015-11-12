@@ -574,28 +574,24 @@ class CAction extends CApiService {
 	 * Update actions
 	 *
 	 * @param array $actions multidimensional array with actions data
-	 * 		$actions[0,...]['actionid']
-	 * 		$actions[0,...]['esc_period']
-	 * 		$actions[0,...]['eventsource']
-	 * 		$actions[0,...]['name']
-	 * 		$actions[0,...]['def_longdata'] OPTIONAL
-	 * 		$actions[0,...]['def_shortdata'] OPTIONAL
-	 * 		$actions[0,...]['r_longdata'] OPTIONAL
-	 * 		$actions[0,...]['r_shortdata'] OPTIONAL
-	 * 		$actions[0,...]['recovery_msg'] OPTIONAL
-	 * 		$actions[0,...]['status'] OPTIONAL
-	 * 		$actions[0,...]['filter'] OPTIONAL
-	 * 		$actions[0,...]['operations'] OPTIONAL
-	 *
-	 * @return bool
+	 * @param array $actions[0,...]['actionid']
+	 * @param array $actions[0,...]['expression']
+	 * @param array $actions[0,...]['description']
+	 * @param array $actions[0,...]['type'] OPTIONAL
+	 * @param array $actions[0,...]['priority'] OPTIONAL
+	 * @param array $actions[0,...]['status'] OPTIONAL
+	 * @param array $actions[0,...]['comments'] OPTIONAL
+	 * @param array $actions[0,...]['url'] OPTIONAL
+	 * @param array $actions[0,...]['filter'] OPTIONAL
+	 * @return boolean
 	 */
 	public function update($actions) {
 		$actions = zbx_toArray($actions);
 		$actions = zbx_toHash($actions, 'actionid');
-		$action_ids = array_keys($actions);
+		$actionIds = array_keys($actions);
 
-		$actions_db = $this->get([
-			'actionids'        => $action_ids,
+		$actionsDb = $this->get([
+			'actionids'        => $actionIds,
 			'editable'         => true,
 			'output'           => API_OUTPUT_EXTEND,
 			'preservekeys'     => true,
@@ -608,114 +604,115 @@ class CAction extends CApiService {
 			'r_longdata' => true
 		];
 
-		$this->validateUpdate($actions, $actions_db);
+		$this->validateUpdate($actions, $actionsDb);
 
-		$operations_to_create = [];
-		$operations_to_update = [];
-		$operation_ids_for_delete = [];
+		$operationsToCreate = [];
+		$operationsToUpdate = [];
+		$operationIdsForDelete = [];
 
-		$actions_update_data = [];
+		$actionsUpdateData = [];
 
-		$new_action_conditions = null;
-		foreach ($actions as $action_id => $action) {
-			$action_db = $actions_db[$action_id];
+		$newActionConditions = null;
+		foreach ($actions as $actionId => $action) {
+			$actionDb = $actionsDb[$actionId];
 
-			$action_update_values = array_intersect_key($action, $update_fields);
-			if (!count($action_update_values) && !isset($action['filter'])
+			$actionUpdateValues = array_intersect_key($action, $update_fields);
+			if (!count($actionUpdateValues) && !isset($action['filter'])
 					&& !isset($action['operations'])) {
 				continue;
 			}
 
 			if (isset($action['filter'])) {
-				$action_filter = $action['filter'];
+				$actionFilter = $action['filter'];
 
 				// set formula to empty string of not custom expression
-				if ($action_filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					$action_update_values['formula'] = '';
+				if ($actionFilter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					$actionUpdateValues['formula'] = '';
 				}
 
-				$action_update_values['evaltype'] = $action_filter['evaltype'];
+				$actionUpdateValues['evaltype'] = $actionFilter['evaltype'];
 			}
 
 			if (isset($action['operations'])) {
-				$operations_db = $action_db['operations'];
-				$operations_db = zbx_toHash($operations_db, 'operationid');
+				$operationsDb = $actionDb['operations'];
+				$operationsDb = zbx_toHash($operationsDb, 'operationid');
 
 				foreach ($action['operations'] as $operation) {
 					if (!isset($operation['operationid'])) {
 						$operation['actionid'] = $action['actionid'];
-						$operations_to_create[] = $operation;
+						$operationsToCreate[] = $operation;
 					}
 					else {
-						$operation_id = $operation['operationid'];
+						$operationId = $operation['operationid'];
 
-						if (isset($operations_db[$operation_id])) {
-							$operations_to_update[] = $operation;
-							unset($operations_db[$operation_id]);
+						if (isset($operationsDb[$operationId])) {
+							$operationsToUpdate[] = $operation;
+							unset($operationsDb[$operationId]);
 						}
 					}
 				}
-				$operation_ids_for_delete = array_merge($operation_ids_for_delete, array_keys($operations_db));
+				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$actions_update_data[] = ['values' => $action_update_values, 'where' => ['actionid' => $action_id]];
+			$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
 		}
-		if ($actions_update_data != []) {
-			DB::update($this->tableName, $actions_update_data);
+
+		if ($actionsUpdateData != []) {
+			DB::update('actions', $actionsUpdateData);
 		}
 
 		// add, update and delete operations
-		$this->addOperations($operations_to_create);
-		$this->updateOperations($operations_to_update, $actions_db);
-		if (!empty($operation_ids_for_delete)) {
-			$this->deleteOperations($operation_ids_for_delete);
+		$this->addOperations($operationsToCreate);
+		$this->updateOperations($operationsToUpdate, $actionsDb);
+		if (!empty($operationIdsForDelete)) {
+			$this->deleteOperations($operationIdsForDelete);
 		}
 
 		// set actionid for all conditions and group by actionid into $newActionConditions
-		$new_action_conditions = null;
-		foreach ($actions as $action_id => $action) {
+		$newActionConditions = null;
+		foreach ($actions as $actionId => $action) {
 			if (isset($action['filter'])) {
-				if ($new_action_conditions === null) {
-					$new_action_conditions = [];
+				if ($newActionConditions === null) {
+					$newActionConditions = [];
 				}
 
-				$new_action_conditions[$action_id] = [];
+				$newActionConditions[$actionId] = [];
 				foreach ($action['filter']['conditions'] as $condition) {
 					$condition['actionid'] = $actionId;
-					$new_action_conditions[$action_id][] = $condition;
+					$newActionConditions[$actionId][] = $condition;
 				}
 			}
 		}
 
 		// if we have any conditions, fetch current conditions from db and do replace by position and group result
 		// by actionid into $actionConditions
-		$action_conditions = [];
-		if ($new_action_conditions !== null) {
-			$existing_conditions = DBfetchArray(DBselect(
+		$actionConditions = [];
+		if ($newActionConditions !== null) {
+			$existingConditions = DBfetchArray(DBselect(
 				'SELECT conditionid,actionid,conditiontype,operator,value'.
 				' FROM conditions'.
-				' WHERE '.dbConditionInt('actionid', $action_ids).
+				' WHERE '.dbConditionInt('actionid', $actionIds).
 				' ORDER BY conditionid'
 			));
-			$existing_action_conditions = [];
-			foreach ($existing_conditions as $condition) {
-				$existing_action_conditions[$condition['actionid']][] = $condition;
+			$existingActionConditions = [];
+			foreach ($existingConditions as $condition) {
+				$existingActionConditions[$condition['actionid']][] = $condition;
 			}
 
-			$conditions = DB::replaceByPosition('conditions', $existing_action_conditions, $new_action_conditions);
+			$conditions = DB::replaceByPosition('conditions', $existingActionConditions, $newActionConditions);
 			foreach ($conditions as $condition) {
-				$action_conditions[$condition['actionid']][] = $condition;
+				$actionConditions[$condition['actionid']][] = $condition;
 			}
 		}
 
 		// update formulas for user expressions using new conditions
-		foreach ($actions as $action_id => $action) {
+		foreach ($actions as $actionId => $action) {
 			if (isset($action['filter']) && $action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$this->updateFormula($action_id, $action['filter']['formula'], $action_conditions[$action_id]);
+				$this->updateFormula($actionId, $action['filter']['formula'], $actionConditions[$actionId]);
 			}
 		}
 
-		return ['actionids' => $action_ids];
+		return ['actionids' => $actionIds];
 	}
 
 	/**
