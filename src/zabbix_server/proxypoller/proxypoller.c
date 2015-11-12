@@ -408,6 +408,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"

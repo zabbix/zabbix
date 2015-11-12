@@ -421,31 +421,31 @@ if ($admin) {
 
 			$applications_link = [
 				new CLink(_('Applications'), 'applications.php?'.$link),
-				CViewHelper::showNum($host['applications'])
+				CViewHelper::showNum($template['applications'])
 			];
 			$items_link = [
 				new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-				CViewHelper::showNum($host['items'])
+				CViewHelper::showNum($template['items'])
 			];
 			$triggers_link = [
 				new CLink(_('Triggers'), 'triggers.php?'.$link),
-				CViewHelper::showNum($host['triggers'])
+				CViewHelper::showNum($template['triggers'])
 			];
 			$graphs_link = [
 				new CLink(_('Graphs'), 'graphs.php?'.$link),
-				CViewHelper::showNum($host['graphs'])
+				CViewHelper::showNum($template['graphs'])
 			];
 			$screensLink = [
 				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
-				CViewHelper::showNum($host['screens'])
+				CViewHelper::showNum($template['screens'])
 			];
 			$discoveryLink = [
 				new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-				CViewHelper::showNum($host['discoveries'])
+				CViewHelper::showNum($template['discoveries'])
 			];
 			$httpTestsLink = [
 				new CLink(_('Web'), 'httpconf.php?'.$link),
-				CViewHelper::showNum($host['httpTests'])
+				CViewHelper::showNum($template['httpTests'])
 			];
 		}
 		else {

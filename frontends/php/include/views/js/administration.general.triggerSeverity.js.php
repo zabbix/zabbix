@@ -11,7 +11,8 @@ $schema = DB::getSchema('config');
 				'buttons': [
 					{
 						'title': '<?= _('Cancel') ?>',
-						'class': 'btn-alt',
+						'cancel': true,
+						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
 						'action': function() {}
 					},
 					{
