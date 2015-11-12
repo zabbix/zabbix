@@ -170,7 +170,23 @@ pre {
 		family: $font-stack-mono;
 		size: $font-mono-size;
 	}
-	display: block;
+	//display: block;
+	@extend %space-pre-wrap;
+
+	a {
+		@extend %space-pre-wrap;
+	}
+
+	td {
+		@extend %space-pre-wrap;
+	}
+
+	span {
+		@extend %space-pre-wrap;
+	}
+}
+
+%space-pre-wrap {
 	white-space: pre-wrap;
 	word-wrap: break-word;
 }
@@ -343,6 +359,7 @@ ul.top-nav-icons {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
 	    width: auto;
 		padding: 0 12px 0 27px;
+		-webkit-transform-style: preserve-3d;
 	}
 
 	form {
@@ -1820,6 +1837,7 @@ $icon-widget-btn: (
 	height: 28px;
 	min-height: 0;
 	padding: 0;
+	-webkit-transform-style: preserve-3d;
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
