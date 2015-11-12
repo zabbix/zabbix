@@ -69,9 +69,9 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Returns data that is passed to $this->service->create().
-	 * This method should have inner arrays as much as in costomProvider().
+	 * This method should have inner arrays as much as in templateProvider().
 	 *
-	 * @param int $data_number	number providet from costumeProvider()
+	 * @param int $data_number	number providet from templateProvider()
 	 * @param array $names		service names
 	 *
 	 * @return array
@@ -89,9 +89,9 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Returns incorrect data (in terms of IT services update() options) for testIncorectUpdate().
-	 * This method should have inner arrays as much as in costomProvider().
+	 * This method should have inner arrays as much as in templateProvider().
 	 *
-	 * @param int $data_number	number providet from costumeProvider()
+	 * @param int $data_number	number providet from templateProvider()
 	 * @param array $ids		ids that are created by testCreate()
 	 *
 	 * @return array
@@ -111,9 +111,9 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Returns data that is passed to $this->service->update().
-	 * This method should have inner arrays as much as in costomProvider().
+	 * This method should have inner arrays as much as in templateProvider().
 	 *
-	 * @param int $data_number	number providet from costumeProvider()
+	 * @param int $data_number	number providet from templateProvider()
 	 * @param array $ids		ids that are created by testCreate()
 	 *
 	 * @return array
@@ -134,7 +134,7 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @return array of arrays
 	 */
-	public function costomeProvider() {
+	public function templateProvider() {
 		return [
 			[0],
 			[1]
@@ -143,8 +143,6 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Tests connection to database.
-	 *
-	 * @test
 	 */
 	public function testConnection() {
 		global $DB;
@@ -155,8 +153,6 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Test $this->service->get() with incorect values.
-	 *
-	 * @test
 	 *
 	 * @dataProvider incorrectGetProvider()
 	 *
@@ -172,9 +168,7 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Tests $this->service->create() and stores ids in static $created_ids.
 	 *
-	 * @test
-	 *
-	 * @dataProvider costomeProvider
+	 * @dataProvider templateProvider
 	 *
 	 * @depends testConnection
 	 *
@@ -200,8 +194,6 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Tests $this->service->get() filtering by names that are created in testCreate().
 	 *
-	 * @test
-	 *
 	 * @depends testCreate
 	 */
 	public function testGet() {
@@ -218,9 +210,7 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Tests $this->service->update() with ids that are created in testCreate().
 	 *
-	 * @test
-	 *
-	 * @dataProvider costomeProvider
+	 * @dataProvider templateProvider
 	 *
 	 * @depends testCreate
 	 *
@@ -237,9 +227,7 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * Tests $this->service->update() with ids that are created in testCreate().
 	 *
-	 * @test
-	 *
-	 * @dataProvider costomeProvider
+	 * @dataProvider templateProvider
 	 *
 	 * @depends testCreate
 	 *
@@ -258,8 +246,6 @@ class CServiceTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Tests $this->service->delete() with ids that are created in testCreate().
-	 *
-	 * @test
 	 *
 	 * @depends testCreate
 	 */

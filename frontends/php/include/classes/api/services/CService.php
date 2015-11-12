@@ -52,7 +52,6 @@ class CService extends CApiService {
 	 * Get services.
 	 *
 	 * Allowed options:
-	 * - serviceids                     - fetch the services with the given IDs;
 	 * - parentids                      - fetch the services that are hardlinked to the given parent services;
 	 * - childids                       - fetch the services that are hardlinked to the given child services;
 	 * - countOutput                    - return the number of the results as an integer;
@@ -111,6 +110,8 @@ class CService extends CApiService {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $services
+	 *
+	 * @return void
 	 */
 	protected function validateCreate(array $services) {
 		foreach ($services as $service) {
@@ -196,6 +197,8 @@ class CService extends CApiService {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $services
+	 *
+	 * @return void
 	 */
 	public function validateUpdate(array $services) {
 		foreach ($services as $service) {
@@ -223,7 +226,7 @@ class CService extends CApiService {
 			if (array_key_exists('sortorder', $service)) {
 				$this->checkSortOrder($service);
 			}
-			if (array_key_exists('triggerid', $service)) {
+			if (array_key_exists('triggerid', $service)){
 				$this->checkTriggerId($service);
 			}
 			if (array_key_exists('status', $service)) {
@@ -331,6 +334,8 @@ class CService extends CApiService {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $serviceIds
+	 *
+	 * @return void
 	 */
 	public function validateDelete($serviceIds) {
 		if (!$serviceIds) {
@@ -364,6 +369,8 @@ class CService extends CApiService {
 	 * @throws APIException if the input is invalid
 	 *
 	 * @param array $dependencies
+	 *
+	 * @return void
 	 */
 	protected function validateAddDependencies(array $dependencies) {
 		if (!$dependencies) {
@@ -428,6 +435,8 @@ class CService extends CApiService {
 	 * @throws APIException if the given input is invalid
 	 *
 	 * @param array $serviceIds
+	 *
+	 * @return void
 	 */
 	protected function validateDeleteDependencies(array $serviceIds) {
 		if (!$serviceIds) {
@@ -442,7 +451,7 @@ class CService extends CApiService {
 	 *
 	 * @param array $serviceIds
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public function deleteDependencies($serviceIds) {
 		$serviceIds = zbx_toArray($serviceIds);
@@ -461,6 +470,8 @@ class CService extends CApiService {
 	 * @throws APIException if the given input is invalid
 	 *
 	 * @param array $serviceTimes
+	 *
+	 * @return void
 	 */
 	public function validateAddTimes(array $serviceTimes) {
 		foreach ($serviceTimes as $serviceTime) {
@@ -496,6 +507,8 @@ class CService extends CApiService {
 	 * @throws APIException if the given input is invalid
 	 *
 	 * @param array $serviceIds
+	 *
+	 * @return void
 	 */
 	protected function validateDeleteTimes(array $serviceIds) {
 		if (!$serviceIds) {
@@ -642,7 +655,7 @@ class CService extends CApiService {
 	 *
 	 * @param array $serviceIds
 	 *
-	 * @return bool
+	 * @return boolean
 	 */
 	public function deleteTimes($serviceIds) {
 		$serviceIds = zbx_toArray($serviceIds);
@@ -690,6 +703,8 @@ class CService extends CApiService {
 	 * Deletes the dependencies of the parent services on the given services.
 	 *
 	 * @param $serviceIds
+	 *
+	 * @return void
 	 */
 	protected function deleteParentDependencies($serviceIds) {
 		DB::delete('services_links', [
@@ -840,7 +855,7 @@ class CService extends CApiService {
 	 *
 	 * @param array $childServiceIds
 	 * @param $output
-	 * @param bool $soft             if set to true, will return only soft-linked dependencies
+	 * @param boolean $soft             if set to true, will return only soft-linked dependencies
 	 *
 	 * @return array    an array of service links sorted by "sortorder" in ascending order
 	 */
@@ -885,9 +900,11 @@ class CService extends CApiService {
 	 * @throws APIException if the name is missing
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkName(array $service) {
-		if (!isset($service['name']) || !is_string($service['name']) || $service['name'] === '') {
+		if (!isset($service['name']) || zbx_empty($service['name'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty name.'));
 		}
 	}
@@ -898,6 +915,8 @@ class CService extends CApiService {
 	 * @throws APIException if the name is missing or invalid
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkAlgorithm(array $service) {
 		if (!isset($service['algorithm']) || !serviceAlgorythm($service['algorithm'])) {
@@ -911,6 +930,8 @@ class CService extends CApiService {
 	 * @throws APIException if the name is missing or is not a boolean value
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkShowSla(array $service) {
 		$showSlaValues = [
@@ -928,6 +949,8 @@ class CService extends CApiService {
 	 * @throws APIException if the value is missing, or is out of bounds
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkGoodSla(array $service) {
 		if ((!empty($service['showsla']) && empty($service['goodsla']))
@@ -944,6 +967,8 @@ class CService extends CApiService {
 	 * @throws APIException if the value is missing, or is out of bounds
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkSortOrder(array $service) {
 		if (!isset($service['sortorder']) || !zbx_is_int($service['sortorder'])
@@ -959,6 +984,8 @@ class CService extends CApiService {
 	 * @throws APIException if the value is incorrect
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkTriggerId(array $service) {
 		if (!empty($service['triggerid']) && !zbx_is_int($service['triggerid'])) {
@@ -972,6 +999,8 @@ class CService extends CApiService {
 	 * @throws APIException if the value is incorrect
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkParentId(array $service) {
 		if (!empty($service['parentid']) && !zbx_is_int($service['parentid'])) {
@@ -994,6 +1023,8 @@ class CService extends CApiService {
 	 * @throws APIException if the value is incorrect
 	 *
 	 * @param array $service
+	 *
+	 * @return void
 	 */
 	protected function checkStatus(array $service) {
 		if (!empty($service['status']) && !zbx_is_int($service['status'])) {
@@ -1007,6 +1038,8 @@ class CService extends CApiService {
 	 * @throws APIException if the user doesn't have permission to access any of the triggers
 	 *
 	 * @param array $services
+	 *
+	 * @return void
 	 */
 	protected function checkTriggerPermissions(array $services) {
 		$triggerIds = [];
@@ -1026,6 +1059,8 @@ class CService extends CApiService {
 	 * @throws APIException if at least one of the services doesn't exist
 	 *
 	 * @param array $serviceIds
+	 *
+	 * @return void
 	 */
 	protected function checkServicePermissions(array $serviceIds) {
 		if (!$this->isReadable($serviceIds)) {
@@ -1039,6 +1074,8 @@ class CService extends CApiService {
 	 * @throws APIException if at least one of the services has a child service
 	 *
 	 * @param array $serviceIds
+	 *
+	 * @return void
 	 */
 	protected function checkThatServicesDontHaveChildren(array $serviceIds) {
 		$child = API::getApiService()->select('services_links', [
@@ -1069,6 +1106,8 @@ class CService extends CApiService {
 	 * @throws APIException if the dependency is invalid
 	 *
 	 * @param array $dependency
+	 *
+	 * @return void
 	 */
 	protected function checkDependency(array $dependency) {
 		if (idcmp($dependency['serviceid'], $dependency['dependsOnServiceid'])) {
@@ -1100,6 +1139,8 @@ class CService extends CApiService {
 	 * @throws APIException if at a least one service is hard linked to another service
 	 *
 	 * @param array $dependencies
+	 *
+	 * @return void
 	 */
 	protected function checkForHardlinkedDependencies(array $dependencies) {
 		// only check hard dependencies
@@ -1141,6 +1182,8 @@ class CService extends CApiService {
 	 * @throws APIException if at least one of the parent services is linked to a trigger
 	 *
 	 * @param array $dependencies
+	 *
+	 * @return void
 	 */
 	protected function checkThatParentsDontHaveTriggers(array $dependencies) {
 		$parentServiceIds = array_unique(zbx_objectValues($dependencies, 'serviceid'));
@@ -1163,6 +1206,8 @@ class CService extends CApiService {
 	 * @throws APIException if at least one cycle is possible
 	 *
 	 * @param array $depsToValid	dependency list to be validated
+	 *
+	 * @return void
 	 */
 	protected function checkForCircularityInDependencies($depsToValid) {
 		$dbDeps = API::getApiService()->select('services_links', [
@@ -1195,6 +1240,8 @@ class CService extends CApiService {
 	 * @param int $depId	dependency to id
 	 * @param ref $arr	reference to graph structure. Structure is associative array with keys as "from id"
 	 *			and values as arrays with keys and values as "to id".
+	 *
+	 * @return void
 	 */
 	protected function dfCircularitySearch($id, $depId, &$arr) {
 		if ($id == $depId) {
@@ -1214,6 +1261,8 @@ class CService extends CApiService {
 	 * @throws APIException if the service time is invalid
 	 *
 	 * @param array $serviceTime
+	 *
+	 * @return void
 	 */
 	protected function checkTime(array $serviceTime) {
 		if (empty($serviceTime['serviceid'])) {
