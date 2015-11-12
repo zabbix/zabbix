@@ -192,6 +192,14 @@ $itemFormList->addRow(_('Private key file'),
 $itemFormList->addRow(_('Password'),
 	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_SMALL_SIZE, 'no', 64), false, 'row_password'
 );
+$itemFormList->addRow(_('Attempts'),
+	new CTextArea('params_at',
+		$this->data['params'],
+		array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)
+	),
+	false,
+	'label_params_attempts'
+);
 $itemFormList->addRow(_('Executed script'),
 	new CTextArea('params_es', $this->data['params'], array('rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH)),
 	false, 'label_executed_script'
@@ -584,6 +592,9 @@ zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_secur
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_securityname');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'snmpv3_securitylevel');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'row_snmpv3_securitylevel');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'label_params_attempts');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'label_params_attempts');
+zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'label_params_attempts');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV1, 'port');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV2C, 'port');
 zbx_subarray_push($this->data['typeVisibility'], ITEM_TYPE_SNMPV3, 'port');

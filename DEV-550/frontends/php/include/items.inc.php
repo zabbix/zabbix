@@ -1312,6 +1312,10 @@ function httpItemExists($items) {
 
 function getParamFieldNameByType($itemType) {
 	switch ($itemType) {
+		case ITEM_TYPE_SNMPV1:
+		case ITEM_TYPE_SNMPV2C:
+		case ITEM_TYPE_SNMPV3:
+			return 'params_at';
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:
@@ -1327,6 +1331,10 @@ function getParamFieldNameByType($itemType) {
 
 function getParamFieldLabelByType($itemType) {
 	switch ($itemType) {
+		case ITEM_TYPE_SNMPV1:
+		case ITEM_TYPE_SNMPV2C:
+		case ITEM_TYPE_SNMPV3:
+			return _('Attempts');
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
 		case ITEM_TYPE_JMX:

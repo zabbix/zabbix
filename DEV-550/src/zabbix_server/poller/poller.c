@@ -600,6 +600,9 @@ static int	get_values(unsigned char poller_type)
 					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
+
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
+						&items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				break;
 			case ITEM_TYPE_SSH:
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
