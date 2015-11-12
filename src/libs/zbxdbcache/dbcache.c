@@ -2251,7 +2251,8 @@ static void	DCvacuum_text()
 				DCmove_text(&cache->history[f].value_orig.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				DCmove_text(&cache->history[f].value_orig.str);
+				if (NULL != cache->history[f].value_orig.str)
+					DCmove_text(&cache->history[f].value_orig.str);
 				if (NULL != cache->history[f].value.str)
 					DCmove_text(&cache->history[f].value.str);
 				break;
