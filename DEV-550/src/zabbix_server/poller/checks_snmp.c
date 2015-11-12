@@ -195,7 +195,7 @@ static int	get_attempt_interval(int attempt, const zbx_vector_ptr_t *specs)
 		const zbx_snmp_timeout_spec_t	*spec = (const zbx_snmp_timeout_spec_t *)specs->values[i];
 
 		if (spec->attempts >= attempt)
-			return spec->timeout;
+			return spec->interval;
 
 		attempt -= spec->attempts;
 	}
@@ -1101,7 +1101,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
-	struct snmp_pdu		*pdu, *response;
+	struct snmp_pdu		*pdu, *backup_pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
@@ -1190,6 +1190,14 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 retry:
 		ss->timeout = get_attempt_timeout(attempt, timeout_specs) * 1000 * 1000;
 
+		if (attempt_count > attempt && NULL == (backup_pdu = snmp_clone_pdu(pdu)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "snmp_clone_pdu(): cannot clone PDU object."));
+			ret = NOTSUPPORTED;
+			snmp_free_pdu(pdu);
+			break;
+		}
+
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
@@ -1197,20 +1205,27 @@ retry:
 				" errstat:%ld max_vars:%d", __function_name, attempt, status, ss->s_snmp_errno,
 				NULL == response ? (long)-1 : response->errstat, max_vars);
 
-		if (STAT_TIMEOUT == status && attempt_count > attempt)
+		if (attempt_count > attempt)
 		{
-			int	interval;
+			if (STAT_TIMEOUT == status)
+			{
+				int	interval;
 
-			if (NULL != response)
-				snmp_free_pdu(response);
+				if (NULL != response)
+					snmp_free_pdu(response);
 
-			interval = get_attempt_interval(attempt, timeout_specs);
+				interval = get_attempt_interval(attempt, timeout_specs);
 
-			if (0 != interval)
-				zbx_sleep(interval);
+				if (0 != interval)
+					zbx_sleep(interval);
 
-			attempt++;
-			goto retry;
+				attempt++;
+				pdu = backup_pdu;
+
+				goto retry;
+			}
+
+			snmp_free_pdu(backup_pdu);
 		}
 
 		if (1 < max_vars &&
@@ -1354,7 +1369,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
 	oid			parsed_oids[MAX_SNMP_ITEMS][MAX_OID_LEN];
 	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
-	struct snmp_pdu		*pdu, *response;
+	struct snmp_pdu		*pdu, *backup_pdu, *response;
 	struct variable_list	*var;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __function_name, num, level);
@@ -1406,26 +1421,41 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 retry:
 	ss->timeout = get_attempt_timeout(attempt, timeout_specs) * 1000 * 1000;
 
+	if (attempt_count > attempt && NULL == (backup_pdu = snmp_clone_pdu(pdu)))
+	{
+		zbx_strlcpy(error, "snmp_clone_pdu(): cannot clone PDU object.", max_error_len);
+		ret = NOTSUPPORTED;
+		snmp_free_pdu(pdu);
+		goto out;
+	}
+
 	status = snmp_synch_response(ss, pdu, &response);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() attempt:%d status:%d s_snmp_errno:%d errstat:%ld"
 			" mapping_num:%d", __function_name, attempt, status, ss->s_snmp_errno,
 			NULL == response ? (long)-1 : response->errstat, mapping_num);
 
-	if (STAT_TIMEOUT == status && attempt_count > attempt)
+	if (attempt_count > attempt)
 	{
-		int	interval;
+		if (STAT_TIMEOUT == status)
+		{
+			int	interval;
 
-		if (NULL != response)
-			snmp_free_pdu(response);
+			if (NULL != response)
+				snmp_free_pdu(response);
 
-		interval = get_attempt_interval(attempt, timeout_specs);
+			interval = get_attempt_interval(attempt, timeout_specs);
 
-		if (0 != interval)
-			zbx_sleep(interval);
+			if (0 != interval)
+				zbx_sleep(interval);
 
-		attempt++;
-		goto retry;
+			attempt++;
+			pdu = backup_pdu;
+
+			goto retry;
+		}
+
+		snmp_free_pdu(backup_pdu);
 	}
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
