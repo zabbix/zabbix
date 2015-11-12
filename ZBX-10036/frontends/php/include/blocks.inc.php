@@ -755,9 +755,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 
 		// clock
+		$link_host = reset($trigger['hosts']);
 		$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
 			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
-				'&show_unknown=1&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
+				'&show_unknown=1&hostid='.$link_host['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
 				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
