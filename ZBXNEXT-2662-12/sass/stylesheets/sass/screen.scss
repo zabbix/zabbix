@@ -2058,7 +2058,6 @@ $form-icon-btn: (
 
 .drag-icon {
 	margin-left: -9px;
-	cursor: move;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
@@ -3472,6 +3471,10 @@ $browser-logos: (
 
 .cursor-move {
 	cursor: move;
+
+	* {
+		cursor: move;;
+	}
 }
 
 .cursor-pointer {
