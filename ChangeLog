@@ -3,7 +3,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
-.......PS. [ZBX-9931] removed 2 KB constraint for item keys in server requests to Zabbix agents (viktors)
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
