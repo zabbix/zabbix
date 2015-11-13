@@ -1034,9 +1034,10 @@ function replace_template_dependencies($deps, $hostid) {
 function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
 	$data = array();
 	$hostNames = array();
+	$trcounter = array();
 
 	foreach ($triggers as $trigger) {
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
+		$trigger_name = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
 
 		foreach ($trigger['hosts'] as $host) {
 			// triggers may belong to hosts that are filtered out and shouldn't be displayed, skip them
@@ -1046,25 +1047,27 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 			$hostNames[$host['hostid']] = $host['name'];
 
-			// a little tricky check for attempt to overwrite active trigger (value=1) with
-			// inactive or active trigger with lower priority.
-			if (!isset($data[$trigger['description']][$host['name']])
-					|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-						|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-							&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
-				$data[$trigger['description']][$host['name']] = array(
-					'groupid' => $trigger['groupid'],
-					'hostid' => $host['hostid'],
-					'triggerid' => $trigger['triggerid'],
-					'value' => $trigger['value'],
-					'lastchange' => $trigger['lastchange'],
-					'priority' => $trigger['priority'],
-					'flags' => $trigger['flags'],
-					'url' => $trigger['url'],
-					'hosts' => $trigger['hosts'],
-					'items' => $trigger['items']
-				);
+			if (!array_key_exists($host['name'], $trcounter)) {
+				$trcounter[$host['name']] = array();
 			}
+
+			if (!array_key_exists($trigger_name, $trcounter[$host['name']])) {
+				$trcounter[$host['name']][$trigger_name] = 0;
+			}
+
+			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = array(
+				'groupid' => $trigger['groupid'],
+				'hostid' => $host['hostid'],
+				'triggerid' => $trigger['triggerid'],
+				'value' => $trigger['value'],
+				'lastchange' => $trigger['lastchange'],
+				'priority' => $trigger['priority'],
+				'flags' => $trigger['flags'],
+				'url' => $trigger['url'],
+				'hosts' => $trigger['hosts'],
+				'items' => $trigger['items']
+			);
+			$trcounter[$host['name']][$trigger_name]++;
 		}
 	}
 
@@ -1089,26 +1092,30 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
-		foreach ($data as $description => $triggerHosts) {
-			$columns = array(nbsp($description));
+		foreach ($data as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$columns = array(nbsp($trigger_name));
 
-			foreach ($hostNames as $hostName) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+				foreach ($hostNames as $hostName) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
+
+				$triggerTable->addRow($columns);
 			}
-
-			$triggerTable->addRow($columns);
 		}
 	}
 	else {
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 
-		foreach ($data as $description => $triggerHosts) {
-			$header[] = new CCol($description, 'vertical_rotation');
+		foreach ($data as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$header[] = new CCol($trigger_name, 'vertical_rotation');
+			}
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
@@ -1121,12 +1128,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
-			foreach ($data as $triggerHosts) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+			foreach ($data as $trigger_data) {
+				foreach ($trigger_data as $trigger_hosts) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
 			}
 
 			$triggerTable->addRow($columns);
