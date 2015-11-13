@@ -55,7 +55,16 @@ $fields = [
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_status' =>		[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null],
+	'filter_priority' =>	[T_ZBX_INT, O_OPT, null,
+		IN([
+			-1, TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
+		]), null
+	],
+	'filter_state' =>		[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null],
+	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
+		IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null
+	],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -390,15 +399,21 @@ else {
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	if (hasRequest('filter_set')) {
+		CProfile::update('web.triggers.filter_priority', getRequest('filter_priority', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.triggers.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.triggers.filter_priority');
+		CProfile::delete('web.triggers.filter_state');
 		CProfile::delete('web.triggers.filter_status');
 	}
 
 	$config = select_config();
 
 	$data = [
+		'filter_priority' => CProfile::get('web.triggers.filter_priority', -1),
+		'filter_state' => CProfile::get('web.triggers.filter_state', -1),
 		'filter_status' => CProfile::get('web.triggers.filter_status', -1),
 		'triggers' => [],
 		'sort' => $sortField,
@@ -431,14 +446,25 @@ else {
 			$options['output'] = ['triggerid', $sortField];
 		}
 
-		switch ($data['filter_status']) {
-			case TRIGGER_STATUS_ENABLED:
+		if ($data['filter_priority'] != -1) {
+			$options['filter']['priority'] = $data['filter_priority'];
+		}
+
+		switch ($data['filter_state']) {
+			case TRIGGER_STATE_NORMAL:
+				$options['filter']['state'] = TRIGGER_STATE_NORMAL;
 				$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 				break;
 
-			case TRIGGER_STATUS_DISABLED:
-				$options['filter']['status'] = TRIGGER_STATUS_DISABLED;
+			case TRIGGER_STATE_UNKNOWN:
+				$options['filter']['state'] = TRIGGER_STATE_UNKNOWN;
+				$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 				break;
+
+			default:
+				if ($data['filter_status'] != -1) {
+					$options['filter']['status'] = $data['filter_status'];
+				}
 		}
 
 		if ($data['pageFilter']->hostid > 0) {

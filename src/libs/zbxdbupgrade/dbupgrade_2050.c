@@ -706,6 +706,18 @@ static int	DBpatch_2050071(void)
 	return DBmodify_field_type("hostmacro", &field);
 }
 
+static int	DBpatch_2050072(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles"
+			" set idx='web.triggers.filter_status',value_int=case when value_int=0 then 0 else -1 end"
+			" where idx='web.triggers.showdisabled'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -776,5 +788,6 @@ DBPATCH_ADD(2050068, 0, 1)
 DBPATCH_ADD(2050069, 0, 1)
 DBPATCH_ADD(2050070, 0, 1)
 DBPATCH_ADD(2050071, 0, 1)
+DBPATCH_ADD(2050072, 0, 1)
 
 DBPATCH_END()
