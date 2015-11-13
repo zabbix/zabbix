@@ -21,7 +21,6 @@ frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
 frontends/php/favicon.ico -text svneol=unset#image/x-icon
 frontends/php/fonts/DejaVuSans.ttf -text
-frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
 frontends/php/images/general/arrow_up.png -text
 frontends/php/images/general/no_icon.png -text
