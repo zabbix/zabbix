@@ -51,8 +51,11 @@ $fields = [
 	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
-	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'visible' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	// filter
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_status' =>		[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -84,7 +87,6 @@ $fields = [
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
 
@@ -387,17 +389,22 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.triggers.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.triggers.filter_status');
+	}
+
 	$config = select_config();
 
 	$data = [
-		'showdisabled' => getRequest('showdisabled', 1),
+		'filter_status' => CProfile::get('web.triggers.filter_status', -1),
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => $config
 	];
-
-	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter([
 		'groups' => ['with_hosts_and_templates' => true, 'editable' => true],
@@ -424,9 +431,16 @@ else {
 			$options['output'] = ['triggerid', $sortField];
 		}
 
-		if (empty($data['showdisabled'])) {
-			$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
+		switch ($data['filter_status']) {
+			case TRIGGER_STATUS_ENABLED:
+				$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
+				break;
+
+			case TRIGGER_STATUS_DISABLED:
+				$options['filter']['status'] = TRIGGER_STATUS_DISABLED;
+				break;
 		}
+
 		if ($data['pageFilter']->hostid > 0) {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
