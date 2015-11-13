@@ -3,6 +3,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9931] fixed server key item length limitation, now there is no length limitation (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
