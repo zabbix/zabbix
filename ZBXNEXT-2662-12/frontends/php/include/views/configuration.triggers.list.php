@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
+
 if (!$this->data['hostid']) {
 	$create_button = (new CSubmit('form', _('Create trigger (select host first)')))->setEnabled(false);
 }
@@ -27,13 +30,26 @@ else {
 
 $filter = (new CFilter('web.triggers.filter.state'))
 	->addColumn(
-		(new CFormList())->addRow(_('Status'),
-			(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
-				->addValue(_('all'), -1)
-				->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
-				->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
-				->setModern(true)
-		)
+		(new CFormList())
+			->addRow(_('Severity'),
+				new CSeverity([
+					'name' => 'filter_priority', 'value' => (int) $this->data['filter_priority'], 'all' => true
+				])
+			)
+			->addRow(_('State'),
+				(new CRadioButtonList('filter_state', (int) $this->data['filter_state']))
+					->addValue(_('all'), -1)
+					->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
+					->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
+					->setModern(true)
+			)
+			->addRow(_('Status'),
+				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
+					->addValue(_('all'), -1)
+					->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
+					->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
+					->setModern(true)
+			)
 	)
 	->addNavigator();
 
