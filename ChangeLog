@@ -713,6 +713,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.11
