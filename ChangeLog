@@ -4,7 +4,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
-...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 ..F....... [ZBX-9992] fixed forecast() function info index for trigger expression constructor (gleb)
 .......PS. [ZBX-10061] fixed possible server and proxy crash on attempt to clean up text cache if log item meta update packets are present in history cache (gleb)
 ...G...... [ZBX-10045] fixed first proc.cpu.util[] request returning empty value which was treated as network error by server (wiper)
@@ -251,6 +251,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.7
@@ -265,7 +266,6 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 ........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
@@ -963,6 +963,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
@@ -978,7 +979,6 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
