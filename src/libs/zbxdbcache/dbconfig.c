@@ -1487,7 +1487,7 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* non-empty new PSKid and value */
 
-		zbx_strlower(row[29]);
+		zbx_strlower(row[30]);
 
 		if (1 == found && NULL != host->tls_dc_psk)	/* 'host' record has non-empty PSK */
 		{
