@@ -4,7 +4,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
-...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
