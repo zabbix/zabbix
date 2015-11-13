@@ -17,6 +17,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 ........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
@@ -728,6 +729,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)

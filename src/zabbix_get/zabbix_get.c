@@ -104,11 +104,11 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 {
 	zbx_sock_t	s;
 	int		ret;
-	char		request[1024];
+	char		*request;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
 	{
-		zbx_snprintf(request, sizeof(request), "%s\n", key);
+		request = zbx_dsprintf(NULL, "%s\n", key);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
@@ -126,6 +126,8 @@ static void	get_value(const char *source_ip, const char *host, unsigned short po
 				}
 			}
 		}
+
+		zbx_free(request);
 
 		zbx_tcp_close(&s);
 	}
