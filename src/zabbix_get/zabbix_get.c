@@ -207,8 +207,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	zbx_socket_t	s;
 	int		ret;
 	ssize_t		bytes_received = -1;
-	char		*tls_arg1, *tls_arg2;
-	char		request[1024];
+	char		*tls_arg1, *tls_arg2, *request;
 
 	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
 	{
@@ -229,7 +228,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
-		zbx_snprintf(request, sizeof(request), "%s\n", key);
+		request = zbx_dsprintf(NULL, "%s\n", key);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
@@ -253,6 +252,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 				ret = FAIL;
 			}
 		}
+
+		zbx_free(request);
 
 		zbx_tcp_close(&s);
 
