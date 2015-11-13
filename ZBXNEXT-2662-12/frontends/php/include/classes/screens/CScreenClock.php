@@ -27,61 +27,60 @@ class CScreenClock extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$time_offset = null;
-		$title = null;
-		$time_zone = null;
 		$error = null;
+		$timeOffset = null;
+		$timeZone = null;
 
 		switch ($this->screenitem['style']) {
 			case TIME_TYPE_HOST:
 				$items = API::Item()->get([
-					'output' => ['itemid', 'value_type'],
+					'itemids' => $this->screenitem['resourceid'],
 					'selectHosts' => ['host'],
-					'itemids' => [$this->screenitem['resourceid']]
+					'output' => ['itemid', 'value_type']
 				]);
+				$item = reset($items);
+				$host = reset($item['hosts']);
 
-				if ($items) {
-					$item = $items[0];
-					$title = $item['hosts'][0]['host'];
-					unset($items, $item['hosts']);
-
-					$last_value = Manager::History()->getLast([$item]);
-
-					if ($last_value) {
-						$last_value = $last_value[$item['itemid']][0];
-
-//						$time = DateTime::createFromFormat('Y-m-d,H:i:s.???,P', $last_value['value']);
-						$time = new DateTime($last_value['value']);
-
-						if ($time !== false) {
-							$time_zone = 'GMT '.$time->format('P');
-
-							$diff = time() - $last_value['clock'];
-							$time_offset = $time->getTimestamp() + $diff;
-						}
-						else {
-							$error = _('No data');
-						}
-					}
-					else {
-						$error = _('No data');
-					}
+				$lastValue = Manager::History()->getLast([$item]);
+				if ($lastValue) {
+					$lastValue = reset($lastValue[$item['itemid']]);
+					$item['lastvalue'] = $lastValue['value'];
+					$item['lastclock'] = $lastValue['clock'];
 				}
 				else {
-					$error = _('No data');
+					$item['lastvalue'] = '0';
+					$item['lastclock'] = '0';
+				}
+
+				$timeType = $host['host'];
+				preg_match('/([+-]{1})([\d]{1,2}):([\d]{1,2})/', $item['lastvalue'], $arr);
+
+				if (!empty($arr)) {
+					$timeZone = $arr[2] * SEC_PER_HOUR + $arr[3] * SEC_PER_MIN;
+					if ($arr[1] == '-') {
+						$timeZone = 0 - $timeZone;
+					}
+				}
+
+				if ($lastvalue = strtotime($item['lastvalue'])) {
+					$diff = (time() - $item['lastclock']);
+					$timeOffset = $lastvalue + $diff;
+				}
+				else {
+					$error = _('NO DATA');
 				}
 				break;
-
 			case TIME_TYPE_SERVER:
-				$title = _('Server');
-
-				$time = new DateTime();
-				$time_offset = time();
-				$time_zone = 'GMT '.$time->format('P');
+				$error = null;
+				$timeType = _('SERVER');
+				$timeOffset = time();
+				$timeZone = date('Z');
 				break;
-
 			default:
-				$title = _('Local');
+				$error = null;
+				$timeType = _('LOCAL');
+				$timeOffset = null;
+				$timeZone = null;
 				break;
 		}
 
@@ -89,14 +88,16 @@ class CScreenClock extends CScreenBase {
 			$this->screenitem['width'] = $this->screenitem['height'];
 		}
 
-		$item = (new CClock(/*$this->action*/))
-			->setWidth($this->screenitem['width'])
-			->setHeight($this->screenitem['height'])
-			->setTimeZone($time_zone)
-			->setTitle($title);
-//		$item->setTimeError($error);
-//		$item->setTimeOffset($timeOffset);
+		$item = new CFlashClock($this->screenitem['width'], $this->screenitem['height'], $this->action);
+		$item->setTimeError($error);
+		$item->setTimeType($timeType);
+		$item->setTimeZone($timeZone);
+		$item->setTimeOffset($timeOffset);
 
-		return $this->getOutput($item);
+		$flashclockOverDiv = (new CDiv())
+			->addClass('flashclock')
+			->setAttribute('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
+
+		return $this->getOutput([$item, $flashclockOverDiv]);
 	}
 }

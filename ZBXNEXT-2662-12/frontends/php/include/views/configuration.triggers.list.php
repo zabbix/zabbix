@@ -25,18 +25,6 @@ else {
 	$create_button = new CSubmit('form', _('Create trigger'));
 }
 
-$filter = (new CFilter('web.triggers.filter.state'))
-	->addColumn(
-		(new CFormList())->addRow(_('Status'),
-			(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
-				->addValue(_('all'), -1)
-				->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
-				->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
-				->setModern(true)
-		)
-	)
-	->addNavigator();
-
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls((new CForm('get'))
@@ -52,8 +40,6 @@ $widget = (new CWidget())
 if ($this->data['hostid']) {
 	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));
 }
-
-$widget->addItem($filter);
 
 // create form
 $triggersForm = (new CForm())
