@@ -18,7 +18,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-9932] changed zabbix_get item key buffer from static to dynamic (viktors)
+...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
