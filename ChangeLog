@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] fixed limitation for zabbix_get item key length, now there is no length limitation (viktors)
 ..F....... [ZBX-9992] fixed forecast() function info index for trigger expression constructor (gleb)
 .......PS. [ZBX-10061] fixed possible server and proxy crash on attempt to clean up text cache if log item meta update packets are present in history cache (gleb)
@@ -249,6 +250,7 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.7
@@ -960,6 +962,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
