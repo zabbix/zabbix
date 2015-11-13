@@ -89,14 +89,14 @@ foreach my $service (keys(%services))
 		$services{$service}{'delay'} = $cfg_dns_delay;
 		$services{$service}{'minns'} = $cfg_dns_minns;
 		$services{$service}{'valuemaps'} = $cfg_dns_valuemaps;
-		$services{$service}{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
+		$services{$service}{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]';	# 0 - down, 1 - up
 		$services{$service}{'key_rtt'} = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	}
 	elsif ($service eq 'rdds')
 	{
 		$services{$service}{'delay'} = get_macro_rdds_delay();
 		$services{$service}{'valuemaps'} = get_valuemaps($service);
-		$services{$service}{'key_status'} = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+		$services{$service}{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
 		$services{$service}{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 		$services{$service}{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 		$services{$service}{'key_43_upd'} = 'rsm.rdds.43.upd[{$RSM.TLD}]';
@@ -108,7 +108,7 @@ foreach my $service (keys(%services))
 	{
 		$services{$service}{'delay'} = get_macro_epp_delay();
 		$services{$service}{'valuemaps'} = get_valuemaps($service);
-		$services{$service}{'key_status'} = 'rsm.epp[{$RSM.TLD},'; # 0 - down, 1 - up
+		$services{$service}{'key_status'} = 'rsm.epp[{$RSM.TLD},';	# 0 - down, 1 - up
 		$services{$service}{'key_ip'} = 'rsm.epp.ip[{$RSM.TLD}]';
 		$services{$service}{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
 	}
@@ -373,7 +373,7 @@ foreach (keys(%$servicedata))
 		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') or opt('debug'));
+		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') || opt('debug'));
 
 		if (opt('dry-run'))
 		{
@@ -395,7 +395,7 @@ foreach (keys(%$servicedata))
 		my $alarmed_status = AH_ALARMED_NO;
 		if (scalar(@$incidents) != 0)
 		{
-			if ($incidents->[0]->{'false_positive'} == 0 and not defined($incidents->[0]->{'end'}))
+			if ($incidents->[0]->{'false_positive'} == 0 && !defined($incidents->[0]->{'end'}))
 			{
 				$alarmed_status = AH_ALARMED_YES;
 			}
@@ -443,14 +443,14 @@ foreach (keys(%$servicedata))
 			my $start = $event_start;
 			my $end = $event_end;
 
-			if (defined($service_from) and $service_from > $event_start)
+			if (defined($service_from) && $service_from > $event_start)
 			{
 				$start = $service_from;
 			}
 
 			if (defined($service_till))
 			{
-				if (not defined($event_end) or (defined($event_end) and $service_till < $event_end))
+				if (!defined($event_end) || (defined($event_end) && $service_till < $event_end))
 				{
 					$end = $service_till;
 				}
@@ -489,7 +489,7 @@ foreach (keys(%$servicedata))
 				#   |.....................................|...................................|
 				#   0 seconds <--zero or more minutes--> 30                                  59
 				#
-				$result->{'start'} = $clock - $delay + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
+				$result->{'start'} = $clock - $delay + RESULT_TIMESTAMP_SHIFT + 1;	# we need to start at 0
 				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
 
 				if (opt('dry-run'))
@@ -535,7 +535,7 @@ foreach (keys(%$servicedata))
 			my $values_from = $test_results[0]->{'start'};
 			my $values_till = $test_results[$test_results_count - 1]->{'end'};
 
-			if ($service eq 'dns' or $service eq 'dnssec')
+			if ($service eq 'dns' || $service eq 'dnssec')
 			{
 				my $minns = $services{$service}{'minns'};
 
@@ -544,34 +544,30 @@ foreach (keys(%$servicedata))
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
 				{
-					my $nsips_ref = $values_ref->{$probe};
-
 					dbg("probe:$probe");
 
-					foreach my $nsip (keys(%$nsips_ref))
+					foreach my $nsip (keys(%{$values_ref->{$probe}}))
 					{
-						my $endvalues_ref = $nsips_ref->{$nsip};
-
 						my ($ns, $ip) = split(',', $nsip);
 
-						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $nsip:") if (opt('debug'));
+						dbg("  ", scalar(keys(%{$values_ref->{$probe}->{$nsip}})), " values for $nsip:") if (opt('debug'));
 
 						my $test_result_index = 0;
 
-						foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
+						foreach my $clock (sort(keys(%{$values_ref->{$probe}->{$nsip}})))	# must be sorted by clock
 						{
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								no_status_result($service, $avail_key, $probe, $clock, $nsip);
+								no_cycle_result($service, $avail_key, $probe, $clock, $nsip);
 								next;
 							}
 
 							# move to corresponding test result
-							$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+							$test_result_index++ while ($test_result_index < $test_results_count && $clock > $test_results[$test_result_index]->{'end'});
 
 							if ($test_result_index == $test_results_count)
 							{
-								no_status_result($service, $avail_key, $probe, $clock, $nsip);
+								no_cycle_result($service, $avail_key, $probe, $clock, $nsip);
 								next;
 							}
 
@@ -584,7 +580,7 @@ foreach (keys(%$servicedata))
 							}
 							else
 							{
-								push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip});
+								push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $values_ref->{$probe}->{$nsip}->{$clock}, 'ip' => $ip});
 							}
 						}
 					}
@@ -597,8 +593,7 @@ foreach (keys(%$servicedata))
 					{
 						my $found = 0;
 
-						my $probes_ref = $tr_ref->{'probes'};
-						foreach my $tr_ref_probe (keys(%$probes_ref))
+						foreach my $tr_ref_probe (keys(%{$tr_ref->{'probes'}}))
 						{
 							if ($tr_ref_probe eq $probe)
 							{
@@ -609,13 +604,13 @@ foreach (keys(%$servicedata))
 							}
 						}
 
-						$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+						$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
 					}
 				}
 
 				# get results from probes: number of working Name Servers
 				my $itemids_ref = get_service_status_itemids($tld, $services{$service}{'key_status'});
-				my $statuses_ref = get_probe_statuses($itemids_ref, $values_from, $values_till);
+				my $statuses_ref = get_test_results($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
 				{
@@ -626,17 +621,16 @@ foreach (keys(%$servicedata))
 					delete($tr_ref->{'start'});
 					delete($tr_ref->{'end'});
 
-					my $probes_ref = $tr_ref->{'probes'};
-					foreach my $probe (keys(%$probes_ref))
+					foreach my $probe (keys(%{$tr_ref->{'probes'}}))
 					{
 						foreach my $status_ref (@{$statuses_ref->{$probe}})
 						{
 							next if ($status_ref->{'clock'} < $tr_start);
 							last if ($status_ref->{'clock'} > $tr_end);
 
-							if (not defined($probes_ref->{$probe}->{'status'}))
+							if (!defined($tr_ref->{'probes'}->{$probe}->{'status'}))
 							{
-								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} >= $minns ? "Up" : "Down");
+								$tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} >= $minns ? "Up" : "Down");
 							}
 						}
 					}
@@ -661,34 +655,33 @@ foreach (keys(%$servicedata))
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
 				{
-					my $subservices_ref = $values_ref->{$probe};
-
 					dbg("probe:$probe");
 
-					foreach my $subservice (keys(%$subservices_ref))
+					foreach my $subservice (keys(%{$values_ref->{$probe}}))
 					{
 						my $test_result_index = 0;
 
-						foreach my $endvalues_ref (@{$subservices_ref->{$subservice}})
+						foreach my $subservice_values_ref (@{$values_ref->{$probe}->{$subservice}})
 						{
-							my $clock = $endvalues_ref->{'clock'};
+							my $clock = $subservice_values_ref->{'clock'};
 
 							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								no_status_result($subservice, $avail_key, $probe, $clock);
+								no_cycle_result($subservice, $avail_key, $probe, $clock);
 								next;
 							}
 
 							# move to corresponding test result
-							$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+							$test_result_index++ while ($test_result_index < $test_results_count && $clock > $test_results[$test_result_index]->{'end'});
 
 							if ($test_result_index == $test_results_count)
 							{
-								no_status_result($subservice, $avail_key, $probe, $clock);
+								no_cycle_result($subservice, $avail_key, $probe, $clock);
 								next;
 							}
 
 							my $tr_ref = $test_results[$test_result_index];
+
 							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = undef;	# the status is set later
 
 							if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
@@ -697,7 +690,7 @@ foreach (keys(%$servicedata))
 							}
 							else
 							{
-								push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $endvalues_ref);
+								push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $subservice_values_ref);
 							}
 						}
 					}
@@ -708,15 +701,11 @@ foreach (keys(%$servicedata))
 				{
 					foreach my $tr_ref (@test_results)
 					{
-						my $subservices_ref = $tr_ref->{+JSON_RDDS_SUBSERVICE};
-
-						foreach my $subservice (keys(%$subservices_ref))
+						foreach my $subservice (keys(%{$tr_ref->{+JSON_RDDS_SUBSERVICE}}))
 						{
-							my $probes_ref = $subservices_ref->{$subservice};
-
 							my $found = 0;
 
-							foreach my $tr_ref_probe (keys(%$probes_ref))
+							foreach my $tr_ref_probe (keys(%{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}}))
 							{
 								if ($tr_ref_probe eq $probe)
 								{
@@ -725,14 +714,14 @@ foreach (keys(%$servicedata))
 								}
 							}
 
-							$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
 						}
 					}
 				}
 
 				# get results from probes: working services (rdds43, rdds80)
 				my $itemids_ref = get_service_status_itemids($tld, $services{$service}{'key_status'});
-				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+				my $statuses_ref = get_test_results($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
 				{
@@ -743,24 +732,20 @@ foreach (keys(%$servicedata))
 					delete($tr_ref->{'start'});
 					delete($tr_ref->{'end'});
 
-					my $subservices_ref = $tr_ref->{+JSON_RDDS_SUBSERVICE};
-
-					foreach my $subservice (keys(%$subservices_ref))
+					foreach my $subservice (keys(%{$tr_ref->{+JSON_RDDS_SUBSERVICE}}))
 					{
-						my $probes_ref = $subservices_ref->{$subservice};
-
-						foreach my $probe (keys(%$probes_ref))
+						foreach my $probe (keys(%{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}}))
 						{
 							foreach my $status_ref (@{$statuses_ref->{$probe}})
 							{
 								next if ($status_ref->{'clock'} < $tr_start);
 								last if ($status_ref->{'clock'} > $tr_end);
 
-								if (not defined($probes_ref->{$probe}->{'status'}))
+								if (!defined($tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'}))
 								{
-									my $service_only = ($subservice eq JSON_RDDS_43 ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+									my $service_only = ($subservice eq JSON_RDDS_43 ? 2 : 3);	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
 
-									$probes_ref->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
+									$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = (($status_ref->{'value'} == 1 || $status_ref->{'value'} == $service_only) ? "Up" : "Down");
 								}
 							}
 						}
@@ -787,28 +772,27 @@ foreach (keys(%$servicedata))
 
 				foreach my $probe (keys(%$values_ref))
 				{
-					my $endvalues_ref = $values_ref->{$probe};
-
 					my $test_result_index = 0;
 
-					foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
+					foreach my $clock (sort(keys(%{$values_ref->{$probe}})))	# must be sorted by clock
 					{
 						if ($clock < $test_results[$test_result_index]->{'start'})
 						{
-							no_status_result($service, $avail_key, $probe, $clock);
+							no_cycle_result($service, $avail_key, $probe, $clock);
 							next;
 						}
 
 						# move to corresponding test result
-						$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+						$test_result_index++ while ($test_result_index < $test_results_count && $clock > $test_results[$test_result_index]->{'end'});
 
 						if ($test_result_index == $test_results_count)
 						{
-							no_status_result($service, $avail_key, $probe, $clock);
+							no_cycle_result($service, $avail_key, $probe, $clock);
 							next;
 						}
 
 						my $tr_ref = $test_results[$test_result_index];
+
 						$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
 
 						if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
@@ -817,7 +801,7 @@ foreach (keys(%$servicedata))
 						}
 						else
 						{
-							$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+							$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $values_ref->{$probe}->{$clock};
 						}
 					}
 				}
@@ -829,8 +813,7 @@ foreach (keys(%$servicedata))
 					{
 						my $found = 0;
 
-						my $probes_ref = $tr_ref->{'probes'};
-						foreach my $tr_ref_probe (keys(%$probes_ref))
+						foreach my $tr_ref_probe (keys(%{$tr_ref->{'probes'}}))
 						{
 							if ($tr_ref_probe eq $probe)
 							{
@@ -841,35 +824,33 @@ foreach (keys(%$servicedata))
 							}
 						}
 
-						$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+						$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
 					}
 				}
 
 				# get results from probes: EPP down (0) or up (1)
 				my $itemids_ref = get_service_status_itemids($tld, $services{$service}{'key_status'});
-                                my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+                                my $statuses_ref = get_test_results($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
                                 {
-                                        # set status
-                                        my $tr_start = $tr_ref->{'start'};
-                                        my $tr_end = $tr_ref->{'end'};
+					# set status
+					my $tr_start = $tr_ref->{'start'};
+					my $tr_end = $tr_ref->{'end'};
 
-                                        delete($tr_ref->{'start'});
-                                        delete($tr_ref->{'end'});
+					delete($tr_ref->{'start'});
+					delete($tr_ref->{'end'});
 
-                                        my $probes_ref = $tr_ref->{'probes'};
-
-					foreach my $probe (keys(%$probes_ref))
+					foreach my $probe (keys(%{$tr_ref->{'probes'}}))
 					{
 						foreach my $status_ref (@{$statuses_ref->{$probe}})
 						{
 							next if ($status_ref->{'clock'} < $tr_start);
 							last if ($status_ref->{'clock'} > $tr_end);
 
-							if (not defined($probes_ref->{$probe}->{'status'}))
+							if (!defined($tr_ref->{'probes'}->{$probe}->{'status'}))
 							{
-								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} == 1 ? "Up" : "Down");
+								$tr_ref->{'probes'}->{$probe}->{'status'} = ($status_ref->{'value'} == 1 ? "Up" : "Down");
 							}
 						}
 					}
@@ -897,7 +878,7 @@ foreach (keys(%$servicedata))
 # unset TLD (for the logs)
 $tld = undef;
 
-if (defined($continue_file) and not opt('dry-run'))
+if (defined($continue_file) && !opt('dry-run'))
 {
 	unless (write_file($continue_file, $till) == SUCCESS)
 	{
@@ -908,7 +889,7 @@ if (defined($continue_file) and not opt('dry-run'))
 	dbg("last update: ", ts_str($till));
 }
 
-unless (opt('dry-run') or opt('tld'))
+unless (opt('dry-run') || opt('tld'))
 {
 	__update_false_positives();
 }
@@ -991,20 +972,20 @@ sub __validate_input
 {
 	if (opt('service'))
 	{
-		if (getopt('service') ne 'dns' and getopt('service') ne 'dnssec' and getopt('service') ne 'rdds' and getopt('service') ne 'epp')
+		if (getopt('service') ne 'dns' && getopt('service') ne 'dnssec' && getopt('service') ne 'rdds' && getopt('service') ne 'epp')
 		{
 			print("Error: \"", getopt('service'), "\" - unknown service\n");
 			usage();
 		}
 	}
 
-	if (opt('tld') and opt('ignore-file'))
+	if (opt('tld') && opt('ignore-file'))
 	{
 		print("Error: options --tld and --ignore-file cannot be used together\n");
 		usage();
 	}
 
-	if (opt('continue') and opt('from'))
+	if (opt('continue') && opt('from'))
         {
                 print("Error: options --continue and --from cannot be used together\n");
                 usage();
@@ -1012,7 +993,7 @@ sub __validate_input
 
 	if (opt('probe'))
 	{
-		if (not opt('dry-run'))
+		if (!opt('dry-run'))
 		{
 			print("Error: option --probe can only be used together with --dry-run\n");
 			usage();

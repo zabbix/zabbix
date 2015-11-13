@@ -86,8 +86,8 @@ our @EXPORT = qw($result $dbh $tld
 		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
 		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
-		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_status_result
-		get_service_status_itemids get_probe_statuses
+		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
+		get_service_status_itemids get_test_results
 		sql_time_condition get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
 		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
@@ -2472,7 +2472,7 @@ sub get_epp_test_values
 	return \%result;
 }
 
-sub no_status_result
+sub no_cycle_result
 {
 	my $service = shift;
 	my $avail_key = shift;
@@ -2480,7 +2480,7 @@ sub no_status_result
 	my $clock = shift;
 	my $details = shift;
 
-	wrn("Service availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
+	wrn(uc($service), " availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
 		"performed at ", ts_str($clock), " ($clock) on probe $probe. This means the test period was not" .
 		" handled by SLV availability cron job ($avail_key). This may happen e. g. if cron was not running" .
 		" at some point. In order to fix this problem please run".
@@ -2532,33 +2532,40 @@ sub get_service_status_itemids
 	return \%result;
 }
 
+# Get test results from the probes. The result is unsigned integer:
+#
+# - DNS test	: number of working Name Servers
+# - RDDS test	: 3 (only RDDS80), 2 (only RDDS43), 1 (Up) or 0 (Down)
+# - EPP test	: 1 (Up) or 0 (Down)
+#
+# Result is formatted the following way:
 #
 # {
 #     'Probe1' =>
 #     [
 #         {
 #             'clock' => 1234234234,
-#             'value' => 'Up'
+#             'value' => 1
 #         },
 #         {
 #             'clock' => 1234234294,
-#             'value' => 'Up'
+#             'value' => 1
 #         }
 #     ],
 #     'Probe2' =>
 #     [
 #         {
 #             'clock' => 1234234234,
-#             'value' => 'Down'
+#             'value' => 0
 #         },
 #         {
 #             'clock' => 1234234294,
-#             'value' => 'Up'
+#             'value' => 1
 #         }
 #     ]
 # }
 #
-sub get_probe_statuses
+sub get_test_results
 {
 	my $itemids_ref = shift;
 	my $from = shift;
