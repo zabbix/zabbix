@@ -1559,14 +1559,20 @@ int	get_host_availability_data(struct zbx_json *j)
 void	process_host_availability(struct zbx_json_parse *jp)
 {
 	const char		*__function_name = "process_host_availability";
+	const char		*field_available[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_AVAILABLE,
+						ZBX_PROTO_TAG_SNMP_AVAILABLE, ZBX_PROTO_TAG_IPMI_AVAILABLE,
+						ZBX_PROTO_TAG_JMX_AVAILABLE};
+	const char		*field_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
+						ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
+						ZBX_PROTO_TAG_JMX_ERROR};
 	zbx_uint64_t		hostid;
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p = NULL;
-	char			*sql = NULL, *tmp = NULL, *error_esc;
-	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, sql_offset_tmp,
-				tmp_alloc = 129;
-	int			availability_alloc = 0, availability_num = 0;
-	zbx_host_availability_t	*availability = NULL;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 129;
+	zbx_host_availability_t	*ha = NULL;
+	zbx_vector_ptr_t	hosts;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1580,12 +1586,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
 		goto out;
 
-	sql = zbx_malloc(sql, sql_alloc);
-	tmp = zbx_malloc(tmp, tmp_alloc);
+	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
 
-	DBbegin();
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_vector_ptr_create(&hosts);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
 	{
@@ -1602,131 +1605,65 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
-		sql_offset_tmp = sql_offset;
+		ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
+		zbx_host_availability_init(ha, hostid);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_AVAILABLE, &tmp, &tmp_alloc))
+		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, field_available[i], &tmp, &tmp_alloc))
+				continue;
 
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_ZABBIX;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			ha->agents[i].available = atoi(tmp);
+			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_AVAILABLE;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, &tmp, &tmp_alloc))
+		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, field_error[i], &tmp, &tmp_alloc))
+				continue;
 
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_SNMPv1;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			ha->agents[i].error = zbx_strdup(NULL, tmp);
+			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, &tmp, &tmp_alloc))
+		if (SUCCEED != zbx_host_availability_is_set(ha))
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_IPMI;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, &tmp, &tmp_alloc))
-		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_JMX;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		sql_offset--;
-
-		if (',' != sql[sql_offset])
-		{
+			zbx_free(ha);
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
-			sql_offset = sql_offset_tmp;
-			sql[sql_offset] = '\0';
-			continue;
 		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", hostid);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		else
+			zbx_vector_ptr_append(&hosts, ha);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
+	{
+		int	i;
+		char	*sql = NULL;
+		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		sql = zbx_malloc(sql, sql_alloc);
+
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < hosts.values_num; i++)
+		{
+			zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 		DBexecute("%s", sql);
+		DBcommit();
 
-	DBcommit();
+		zbx_free(sql);
+	}
 
-	if (NULL != availability)
-		DChost_update_availability(availability, availability_num);
-out:
-	zbx_free(availability);
+	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
+	zbx_vector_ptr_destroy(&hosts);
+
 	zbx_free(tmp);
-	zbx_free(sql);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
