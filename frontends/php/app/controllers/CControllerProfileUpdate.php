@@ -44,6 +44,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hostinventories.filter.state':
 				case 'web.hostscreen.filter.state':
 				case 'web.history.filter.state':
+				case 'web.httpconf.filter.state':
 				case 'web.httpdetails.filter.state':
 				case 'web.hosts.filter.state':
 				case 'web.items.filter.state':
