@@ -50,8 +50,7 @@ $filter = (new CFilter('web.triggers.filter.state'))
 					->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 					->setModern(true)
 			)
-	)
-	->addNavigator();
+	);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))

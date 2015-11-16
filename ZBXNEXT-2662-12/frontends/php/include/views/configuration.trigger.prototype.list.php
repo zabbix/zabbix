@@ -28,19 +28,6 @@ $widget = (new CWidget())
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
-/*
-$widget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink(
-		$this->data['showdisabled'] ? _('Hide disabled trigger prototypes') : _('Show disabled trigger prototypes'),
-		'trigger_prototypes.php?'.
-			'showdisabled='.($this->data['showdisabled'] ? 0 : 1).
-			'&parent_discoveryid='.$this->data['parent_discoveryid']
-	),
-	' ]'
-));
-*/
-
 // create form
 $triggersForm = (new CForm())
 	->setName('triggersForm')
