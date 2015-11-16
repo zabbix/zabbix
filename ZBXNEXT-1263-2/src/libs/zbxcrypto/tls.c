@@ -496,7 +496,8 @@ static void	zbx_tls_parameter_not_empty(char **param)
  ******************************************************************************/
 #define ZBX_TLS_VALIDATION_INVALID	0
 #define ZBX_TLS_VALIDATION_DEPENDENCY	1
-#define ZBX_TLS_VALIDATION_UTF8		2
+#define ZBX_TLS_VALIDATION_REQUIREMENT	2
+#define ZBX_TLS_VALIDATION_UTF8		3
 static void	zbx_tls_validation_error(int type, char **param1, char **param2)
 {
 	if (ZBX_TLS_VALIDATION_INVALID == type)
@@ -538,6 +539,30 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2)
 		else
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" is defined, but \"%s\" is not defined",
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param2));
+		}
+	}
+	else if (ZBX_TLS_VALIDATION_REQUIREMENT == type)
+	{
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SENDER))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" or \"%s\" value requires \"%s\" or \"%s\","
+					" but neither of them is defined",
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param2),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param2));
+		}
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_GET))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" value requires \"%s\", but it is not defined",
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param1),
+					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param2));
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" value requires \"%s\", but it is not defined",
 					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param1),
 					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_CONFIG_FILE, param2));
 		}
@@ -722,25 +747,28 @@ void	zbx_tls_validate_config(void)
 		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
 		/* (i.e. 'ServerActive' is not specified). */
 
-		if ((NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_PSK_FILE) && NULL == CONFIG_TLS_CONNECT)
+		if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_CONNECT)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "certificate or PSK is configured but parameter \"TLSConnect\" is"
-					" not defined");
-			goto out;
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &CONFIG_TLS_CERT_FILE,
+					&CONFIG_TLS_CONNECT);
+		}
+
+		if (NULL != CONFIG_TLS_PSK_FILE && NULL == CONFIG_TLS_CONNECT)
+		{
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &CONFIG_TLS_PSK_FILE,
+					&CONFIG_TLS_CONNECT);
 		}
 
 		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_CERT) && NULL == CONFIG_TLS_CERT_FILE)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSConnect\" value requires a certificate but it is not"
-					" configured");
-			goto out;
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &CONFIG_TLS_CONNECT,
+					&CONFIG_TLS_CERT_FILE);
 		}
 
 		if (0 != (configured_tls_connect_mode & ZBX_TCP_SEC_TLS_PSK) && NULL == CONFIG_TLS_PSK_FILE)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSConnect\" value requires a PSK but it is not"
-					" configured");
-			goto out;
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &CONFIG_TLS_CONNECT,
+					&CONFIG_TLS_PSK_FILE);
 		}
 	}
 
@@ -750,32 +778,30 @@ void	zbx_tls_validate_config(void)
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
-		if ((NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_PSK_FILE) && NULL == CONFIG_TLS_ACCEPT)
+		if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_ACCEPT)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "certificate or PSK is configured but parameter \"TLSAccept\" is not"
-					" defined");
-			goto out;
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &CONFIG_TLS_CERT_FILE,
+					&CONFIG_TLS_ACCEPT);
+		}
+
+		if (NULL != CONFIG_TLS_PSK_FILE && NULL == CONFIG_TLS_ACCEPT)
+		{
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &CONFIG_TLS_PSK_FILE,
+					&CONFIG_TLS_ACCEPT);
 		}
 
 		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_CERT) && NULL == CONFIG_TLS_CERT_FILE)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSAccept\" value requires a certificate but it is not"
-					" configured");
-			goto out;
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &CONFIG_TLS_ACCEPT,
+					&CONFIG_TLS_CERT_FILE);
 		}
 
 		if (0 != (configured_tls_accept_modes & ZBX_TCP_SEC_TLS_PSK) && NULL == CONFIG_TLS_PSK_FILE)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"TLSAccept\" value requires a PSK but it is not"
-					" configured");
-			goto out;
+			zbx_tls_validation_error(ZBX_TLS_VALIDATION_REQUIREMENT, &CONFIG_TLS_ACCEPT,
+					&CONFIG_TLS_PSK_FILE);
 		}
 	}
-
-	return;
-out:
-	zbx_tls_free();
-	exit(EXIT_FAILURE);
 }
 #endif	/* defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 
