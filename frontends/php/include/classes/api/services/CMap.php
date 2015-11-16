@@ -34,6 +34,7 @@ class CMap extends CMapElement {
 	 * Get map data.
 	 *
 	 * @param array  $options
+	 * @param array  $options['userids']					User IDs
 	 * @param array  $options['groupids']					HostGroup IDs
 	 * @param array  $options['hostids']					Host IDs
 	 * @param bool   $options['monitored_hosts']			only monitored Hosts
@@ -56,7 +57,7 @@ class CMap extends CMapElement {
 	 */
 	public function get(array $options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
+		$user_data = self::$userData;
 
 		$sqlParts = [
 			'select'	=> ['sysmaps' => 's.sysmapid'],
@@ -68,6 +69,7 @@ class CMap extends CMapElement {
 
 		$defOptions = [
 			'sysmapids'					=> null,
+			'userids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
 			// filter
@@ -96,6 +98,13 @@ class CMap extends CMapElement {
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
 			$sqlParts['where']['sysmapid'] = dbConditionInt('s.sysmapid', $options['sysmapids']);
+		}
+
+		// userids
+		if ($options['userids'] !== null) {
+			zbx_value2array($options['userids']);
+
+			$sqlParts['where'][] = dbConditionInt('s.userid', $options['userids']);
 		}
 
 		// search
@@ -135,7 +144,7 @@ class CMap extends CMapElement {
 			}
 		}
 
-		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($result) {
 				$linkTriggers = [];
 
@@ -288,148 +297,426 @@ class CMap extends CMapElement {
 		return $result;
 	}
 
-	public function checkInput(&$maps, $method) {
-		$create = ($method == 'create');
-		$update = ($method == 'update');
-		$delete = ($method == 'delete');
-
-		// permissions
-		if ($update || $delete) {
-			$mapDbFields = ['sysmapid' => null];
-
-			$dbMaps = $this->get([
-				'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
-				'output' => API_OUTPUT_EXTEND,
-				'editable' => true,
-				'preservekeys' => true,
-				'selectLinks' => API_OUTPUT_EXTEND,
-				'selectSelements' => API_OUTPUT_EXTEND,
-				'selectUrls' => API_OUTPUT_EXTEND
-			]);
-		}
-		else {
-			$mapDbFields = [
-				'name' => null,
-				'width' => null,
-				'height' => null,
-				'urls' => [],
-				'selements' => [],
-				'links' => []
-			];
+	/**
+	 * Validates the input parameters for the delete() method.
+	 *
+	 * @throws APIException if the input is invalid
+	 *
+	 * @param array $sysmapids
+	 */
+	protected function validateDelete($sysmapids) {
+		if (!$sysmapids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$mapNames = [];
+		$user_data = self::$userData;
 
-		foreach ($maps as &$map) {
-			if (!check_db_fields($mapDbFields, $map)) {
+		$db_maps = $this->get([
+			'output' => ['sysmapid', 'userid'],
+			'sysmapids' => $sysmapids
+		]);
+
+		foreach ($db_maps as $db_map) {
+			if (!array_key_exists($db_map['sysmapid'], $sysmapids)
+					|| ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
+						&& $user_data['userid'] != $db_map['userid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+	}
+
+	/**
+	 * Validate the input parameters for the create() method.
+	 *
+	 * @param array $maps		maps data array
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateCreate($maps) {
+		$user_data = self::$userData;
+
+		$map_db_fields = [
+			'name' => null,
+			'width' => null,
+			'height' => null,
+			'urls' => [],
+			'selements' => [],
+			'links' => []
+		];
+
+		$map_names = [];
+
+		foreach ($maps as $map) {
+			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
 
-			if ($update || $delete) {
-				if (!isset($dbMaps[$map['sysmapid']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-				}
-
-				$dbMap = array_merge($dbMaps[$map['sysmapid']], $map);
-			}
-			else {
-				$dbMap = $map;
+			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
+					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
 			}
 
-			if (isset($map['name'])) {
-				if (isset($mapNames[$map['name']])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%s".', $dbMap['name']));
+			if (array_key_exists('name', $map)) {
+				if (array_key_exists($map['name'], $map_names)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%s".', $map['name']));
 				}
 				else {
-					$mapNames[$map['name']] = $update ? $map['sysmapid'] : 1;
+					$map_names[$map['name']] = true;
 				}
 			}
 
-			if (isset($map['width']) && ($map['width'] > 65535 || $map['width'] < 1)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map width value for map "%s".', $dbMap['name']));
+			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map width value for map "%s".', $map['name']));
 			}
 
-			if (isset($map['height']) && ($map['height'] > 65535 || $map['height'] < 1)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $dbMap['name']));
+			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $map['name']));
 			}
 
-			// labels
-			$mapLabels = ['label_type' => ['typeName' => _('icon')]];
+			// Map labels.
+			$map_labels = ['label_type' => ['typeName' => _('icon')]];
 
-			if (isset($dbMap['label_format']) && $dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
-				$mapLabels['label_type_hostgroup'] = ['string' => 'label_string_hostgroup', 'typeName' => _('host group')];
-				$mapLabels['label_type_host'] = ['string' => 'label_string_host', 'typeName' => _('host')];
-				$mapLabels['label_type_trigger'] = ['string' => 'label_string_trigger', 'typeName' => _('trigger')];
-				$mapLabels['label_type_map'] = ['string' => 'label_string_map', 'typeName' => _('map')];
-				$mapLabels['label_type_image'] = ['string' => 'label_string_image', 'typeName' => _('image')];
+			if (array_key_exists('label_format', $map) && $map['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
+				$map_labels['label_type_hostgroup'] = [
+					'string' => 'label_string_hostgroup',
+					'typeName' => _('host group')
+				];
+				$map_labels['label_type_host'] = [
+					'string' => 'label_string_host',
+					'typeName' => _('host')
+				];
+				$map_labels['label_type_trigger'] = [
+					'string' => 'label_string_trigger',
+					'typeName' => _('trigger')
+				];
+				$map_labels['label_type_map'] = [
+					'string' => 'label_string_map',
+					'typeName' => _('map')
+				];
+				$map_labels['label_type_image'] = [
+					'string' => 'label_string_image',
+					'typeName' => _('image')
+				];
 			}
 
-			foreach ($mapLabels as $labelName => $labelData) {
-				if (!isset($map[$labelName])) {
+			foreach ($map_labels as $label_name => $label_data) {
+				if (!array_key_exists($label_name, $map)) {
 					continue;
 				}
 
-				if (sysmapElementLabel($map[$labelName]) === false) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
+				if (sysmapElementLabel($map[$label_name]) === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect %1$s label type value for map "%2$s".', $label_data['typeName'], $map['name'])
+					);
 				}
 
-				if ($map[$labelName] == MAP_LABEL_TYPE_CUSTOM) {
-					if (!isset($labelData['string'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
+				if ($map[$label_name] == MAP_LABEL_TYPE_CUSTOM) {
+					if (!array_key_exists('string', $label_data)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect %1$s label type value for map "%2$s".', $label_data['typeName'], $map['name'])
+						);
 					}
 
-					if (!isset($map[$labelData['string']]) || zbx_empty($map[$labelData['string']])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Custom label for map "%2$s" elements of type "%1$s" may not be empty.', $labelData['typeName'], $dbMap['name']));
+					if (!array_key_exists($label_data['string'], $map) || zbx_empty($map[$label_data['string']])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Custom label for map "%2$s" elements of type "%1$s" may not be empty.',
+								$label_data['typeName'],
+								$map['name']
+							)
+						);
 					}
 				}
 
-				if ($labelName == 'label_type_image' && $map[$labelName] == MAP_LABEL_TYPE_STATUS) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
+				if ($label_name == 'label_type_image' && $map[$label_name] == MAP_LABEL_TYPE_STATUS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect %1$s label type value for map "%2$s".', $label_data['typeName'], $map['name'])
+					);
 				}
 
-				if ($labelName == 'label_type' || $labelName == 'label_type_host') {
+				if ($label_name === 'label_type' || $label_name === 'label_type_host') {
 					continue;
 				}
 
-				if ($map[$labelName] == MAP_LABEL_TYPE_IP) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect %1$s label type value for map "%2$s".', $labelData['typeName'], $dbMap['name']));
+				if ($map[$label_name] == MAP_LABEL_TYPE_IP) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect %1$s label type value for map "%2$s".', $label_data['typeName'], $map['name'])
+					);
 				}
 			}
 
-			// validating grid options
+			// Validating grid options.
 			$possibleGridSizes = [20, 40, 50, 75, 100];
 
-			if ($update || $create) {
-				// grid size
-				if (isset($map['grid_size']) && !in_array($map['grid_size'], $possibleGridSizes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s".', $map['grid_size'], implode('", "', $possibleGridSizes)));
-				}
+			// Grid size.
+			if (array_key_exists('grid_size', $map) && !in_array($map['grid_size'], $possibleGridSizes)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s".',
+					$map['grid_size'],
+					implode('", "', $possibleGridSizes)
+				));
+			}
 
-				// grid auto align
-				if (isset($map['grid_align']) && $map['grid_align'] != SYSMAP_GRID_ALIGN_ON && $map['grid_align'] != SYSMAP_GRID_ALIGN_OFF) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_align". Choices are: "%2$s" and "%3$s"', $map['grid_align'], SYSMAP_GRID_ALIGN_ON, SYSMAP_GRID_ALIGN_OFF));
-				}
+			// Grid auto align.
+			if (array_key_exists('grid_align', $map) && $map['grid_align'] != SYSMAP_GRID_ALIGN_ON
+					&& $map['grid_align'] != SYSMAP_GRID_ALIGN_OFF) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Value "%1$s" is invalid for parameter "grid_align". Choices are: "%2$s" and "%3$s"',
+					$map['grid_align'],
+					SYSMAP_GRID_ALIGN_ON,
+					SYSMAP_GRID_ALIGN_OFF
+				));
+			}
 
-				// grid show
-				if (isset($map['grid_show']) && $map['grid_show'] != SYSMAP_GRID_SHOW_ON && $map['grid_show'] != SYSMAP_GRID_SHOW_OFF) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s" and "%3$s".', $map['grid_show'], SYSMAP_GRID_SHOW_ON, SYSMAP_GRID_SHOW_OFF));
+			// Grid show.
+			if (array_key_exists('grid_show', $map) && $map['grid_show'] != SYSMAP_GRID_SHOW_ON
+					&& $map['grid_show'] != SYSMAP_GRID_SHOW_OFF) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s" and "%3$s".',
+					$map['grid_show'],
+					SYSMAP_GRID_SHOW_ON,
+					SYSMAP_GRID_SHOW_OFF
+				));
+			}
+
+			// Urls.
+			if (array_key_exists('urls', $map) && $map['urls']) {
+				$url_names = zbx_toHash($map['urls'], 'name');
+
+				foreach ($map['urls'] as $url) {
+					if ($url['name'] === '' || $url['url'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('URL should have both "name" and "url" fields for map "%s".', $map['name'])
+						);
+					}
+
+					if (!array_key_exists($url['name'], $url_names)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('URL name should be unique for map "%s".', $map['name'])
+						);
+					}
+
+					unset($url_names[$url['name']]);
 				}
 			}
 
-			// urls
-			if (isset($map['urls']) && !empty($map['urls'])) {
+			// Map selement links.
+			if (array_key_exists('links', $map) && $map['links']) {
+				$selementids = zbx_objectValues($map['selements'], 'selementid');
+
+				foreach ($map['links'] as $link) {
+					if (!in_array($link['selementid1'], $selementids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							$link['selementid1'],
+							$map['name']
+						));
+					}
+
+					if (!in_array($link['selementid2'], $selementids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							$link['selementid2'],
+							$map['name']
+						));
+					}
+				}
+			}
+		}
+
+		if ($map_names) {
+			$exist_db_maps = $this->get([
+				'output' => ['sysmapid', 'name'],
+				'filter' => ['name' => array_keys($map_names)],
+				'nopermissions' => true
+			]);
+
+			foreach ($exist_db_maps as $exist_db_map) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Map with name "%s" already exists.', $exist_db_map['name'])
+				);
+			}
+		}
+	}
+
+	/**
+	 * Validate the input parameters for the update() method.
+	 *
+	 * @param array $maps			maps data array
+	 * @param array $maps			db maps data array
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateUpdate(array $maps, $db_maps) {
+		$user_data = self::$userData;
+		$map_db_fields = ['sysmapid' => null];
+		$map_names = [];
+
+		foreach ($maps as &$map) {
+			if (!check_db_fields($map_db_fields, $map)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
+			}
+
+			if (!array_key_exists($map['sysmapid'], $db_maps)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+
+			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
+					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+			}
+
+			$exist_db_map = array_merge($db_maps[$map['sysmapid']], $map);
+
+			if (array_key_exists('name', $map)) {
+				if (array_key_exists($map['name'], $map_names)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Duplicate map name for map "%s".', $exist_db_map['name'])
+					);
+				}
+				else {
+					$map_names[$map['name']] = $map['sysmapid'];
+				}
+			}
+
+			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect map width value for map "%s".', $exist_db_map['name'])
+				);
+			}
+
+			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect map height value for map "%s".', $exist_db_map['name'])
+				);
+			}
+
+			// Map labels.
+			$map_labels = ['label_type' => ['typeName' => _('icon')]];
+
+			if (array_key_exists('label_format', $exist_db_map)
+					&& $exist_db_map['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
+				$map_labels['label_type_hostgroup'] = [
+					'string' => 'label_string_hostgroup',
+					'typeName' => _('host group')
+				];
+				$map_labels['label_type_host'] = [
+					'string' => 'label_string_host',
+					'typeName' => _('host')
+				];
+				$map_labels['label_type_trigger'] = [
+					'string' => 'label_string_trigger',
+					'typeName' => _('trigger')
+				];
+				$map_labels['label_type_map'] = [
+					'string' => 'label_string_map',
+					'typeName' => _('map')
+				];
+				$map_labels['label_type_image'] = [
+					'string' => 'label_string_image',
+					'typeName' => _('image')
+				];
+			}
+
+			foreach ($map_labels as $label_name => $labelData) {
+				if (!array_key_exists($label_name, $map)) {
+					continue;
+				}
+
+				if (sysmapElementLabel($map[$label_name]) === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect %1$s label type value for map "%2$s".',
+						$labelData['typeName'],
+						$exist_db_map['name']
+					));
+				}
+
+				if ($map[$label_name] == MAP_LABEL_TYPE_CUSTOM) {
+					if (!array_key_exists('string', $labelData)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect %1$s label type value for map "%2$s".',
+							$labelData['typeName'],
+							$exist_db_map['name']
+						));
+					}
+
+					if (!array_key_exists($labelData['string'], $map) || zbx_empty($map[$labelData['string']])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Custom label for map "%2$s" elements of type "%1$s" may not be empty.',
+							$labelData['typeName'],
+							$exist_db_map['name']
+						));
+					}
+				}
+
+				if ($label_name === 'label_type_image' && $map[$label_name] == MAP_LABEL_TYPE_STATUS) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect %1$s label type value for map "%2$s".',
+						$labelData['typeName'],
+						$exist_db_map['name']
+					));
+				}
+
+				if ($label_name === 'label_type' || $label_name === 'label_type_host') {
+					continue;
+				}
+
+				if ($map[$label_name] == MAP_LABEL_TYPE_IP) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect %1$s label type value for map "%2$s".',
+						$labelData['typeName'],
+						$exist_db_map['name']
+					));
+				}
+			}
+
+			// Validating grid options.
+			$possibleGridSizes = [20, 40, 50, 75, 100];
+
+			// Grid size.
+			if (array_key_exists('grid_size', $map) && !in_array($map['grid_size'], $possibleGridSizes)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s".',
+					$map['grid_size'],
+					implode('", "', $possibleGridSizes)
+				));
+			}
+
+			// Grid auto align.
+			if (array_key_exists('grid_align', $map) && $map['grid_align'] != SYSMAP_GRID_ALIGN_ON
+					&& $map['grid_align'] != SYSMAP_GRID_ALIGN_OFF) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Value "%1$s" is invalid for parameter "grid_align". Choices are: "%2$s" and "%3$s"',
+					$map['grid_align'],
+					SYSMAP_GRID_ALIGN_ON,
+					SYSMAP_GRID_ALIGN_OFF
+				));
+			}
+
+			// Grid show.
+			if (array_key_exists('grid_show', $map) && $map['grid_show'] != SYSMAP_GRID_SHOW_ON
+					&& $map['grid_show'] != SYSMAP_GRID_SHOW_OFF) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Value "%1$s" is invalid for parameter "grid_show". Choices are: "%2$s" and "%3$s".',
+					$map['grid_show'],
+					SYSMAP_GRID_SHOW_ON,
+					SYSMAP_GRID_SHOW_OFF
+				));
+			}
+
+			// Urls.
+			if (array_key_exists('urls', $map) && !empty($map['urls'])) {
 				$urlNames = zbx_toHash($map['urls'], 'name');
 
 				foreach ($map['urls'] as $url) {
 					if ($url['name'] === '' || $url['url'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL should have both "name" and "url" fields for map "%s".', $dbMap['name'])
+							_s('URL should have both "name" and "url" fields for map "%s".', $exist_db_map['name'])
 						);
 					}
 
-					if (!isset($urlNames[$url['name']])) {
+					if (!array_key_exists($url['name'], $urlNames)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL name should be unique for map "%s".', $dbMap['name'])
+							_s('URL name should be unique for map "%s".', $exist_db_map['name'])
 						);
 					}
 
@@ -437,22 +724,24 @@ class CMap extends CMapElement {
 				}
 			}
 
-			// map selement links
-			if (!empty($map['links'])) {
-				$selementIds = zbx_objectValues($dbMap['selements'], 'selementid');
+			// Map selement links.
+			if (array_key_exists('links', $map) && $map['links']) {
+				$selementids = zbx_objectValues($exist_db_map['selements'], 'selementid');
 
 				foreach ($map['links'] as $link) {
-					if (!in_array($link['selementid1'], $selementIds)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-								$link['selementid1'], $dbMap['name']
+					if (!in_array($link['selementid1'], $selementids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							$link['selementid1'],
+							$exist_db_map['name']
 						));
 					}
 
-					if (!in_array($link['selementid2'], $selementIds)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-								$link['selementid2'], $dbMap['name']
+					if (!in_array($link['selementid2'], $selementids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
+							$link['selementid2'],
+							$exist_db_map['name']
 						));
 					}
 				}
@@ -460,21 +749,20 @@ class CMap extends CMapElement {
 		}
 		unset($map);
 
-		// exists
-		if (($create || $update) && $mapNames) {
-			$existDbMaps = $this->get([
-				'filter' => ['name' => array_keys($mapNames)],
+		if ($map_names) {
+			$exist_db_maps = $this->get([
+				'filter' => ['name' => array_keys($map_names)],
 				'output' => ['sysmapid', 'name'],
 				'nopermissions' => true
 			]);
-			foreach ($existDbMaps as $dbMap) {
-				if ($create || bccomp($mapNames[$dbMap['name']], $dbMap['sysmapid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists.', $dbMap['name']));
+			foreach ($exist_db_maps as $exist_db_map) {
+				if (bccomp($map_names[$exist_db_map['name']], $exist_db_map['sysmapid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Map with name "%s" already exists.', $exist_db_map['name'])
+					);
 				}
 			}
 		}
-
-		return ($update || $delete) ? $dbMaps : true;
 	}
 
 	/**
@@ -497,73 +785,82 @@ class CMap extends CMapElement {
 	public function create($maps) {
 		$maps = zbx_toArray($maps);
 
-		$this->checkInput($maps, __FUNCTION__);
+		$this->validateCreate($maps);
 
-		$sysmapIds = DB::insert('sysmaps', $maps);
+		foreach ($maps as &$map) {
+			$map['userid'] = array_key_exists('userid', $map) ? $map['userid'] : self::$userData['userid'];
+		}
+		unset($map);
 
-		$newUrls = [];
-		$newSelements = [];
-		$newLinks = [];
+		$sysmapids = DB::insert('sysmaps', $maps);
 
-		foreach ($sysmapIds as $key => $sysmapId) {
-			foreach ($maps[$key]['urls'] as $url) {
-				$url['sysmapid'] = $sysmapId;
-				$newUrls[] = $url;
+		$urls = [];
+		$selements = [];
+		$links = [];
+
+		foreach ($sysmapids as $key => $sysmapid) {
+			if (array_key_exists('urls', $maps[$key])) {
+				foreach ($maps[$key]['urls'] as $url) {
+					$url['sysmapid'] = $sysmapid;
+					$urls[] = $url;
+				}
 			}
 
-			foreach ($maps[$key]['selements'] as $snum => $selement) {
-				$maps[$key]['selements'][$snum]['sysmapid'] = $sysmapId;
+			if (array_key_exists('selements', $maps[$key])) {
+				foreach ($maps[$key]['selements'] as $snum => $selement) {
+					$maps[$key]['selements'][$snum]['sysmapid'] = $sysmapid;
+				}
+
+				$selements += $maps[$key]['selements'];
 			}
 
-			$newSelements = array_merge($newSelements, $maps[$key]['selements']);
+			if (array_key_exists('links', $maps[$key])) {
+				foreach ($maps[$key]['links'] as $lnum => $link) {
+					$maps[$key]['links'][$lnum]['sysmapid'] = $sysmapid;
+				}
 
-			foreach ($maps[$key]['links'] as $lnum => $link) {
-				$maps[$key]['links'][$lnum]['sysmapid'] = $sysmapId;
+				$links += $maps[$key]['links'];
 			}
-
-			$newLinks = array_merge($newLinks, $maps[$key]['links']);
 		}
 
-		DB::insert('sysmap_url', $newUrls);
+		DB::insert('sysmap_url', $urls);
 
-		if ($newSelements) {
-			$selementids = $this->createSelements($newSelements);
+		if ($selements) {
+			$selementids = $this->createSelements($selements);
 
-			if ($newLinks) {
-				// links
-				$mapVirtSelements = [];
+			if ($links) {
+				$map_virt_selements = [];
 				foreach ($selementids['selementids'] as $key => $selementid) {
-					$mapVirtSelements[$newSelements[$key]['selementid']] = $selementid;
+					$map_virt_selements[$selements[$key]['selementid']] = $selementid;
 				}
 
-				foreach ($newLinks as $key => $link) {
-					$newLinks[$key]['selementid1'] = $mapVirtSelements[$link['selementid1']];
-					$newLinks[$key]['selementid2'] = $mapVirtSelements[$link['selementid2']];
+				foreach ($links as $key => $link) {
+					$links[$key]['selementid1'] = $map_virt_selements[$link['selementid1']];
+					$links[$key]['selementid2'] = $map_virt_selements[$link['selementid2']];
 				}
-				unset($mapVirtSelements);
+				unset($map_virt_selements);
 
-				$linkIds = $this->createLinks($newLinks);
+				$linkids = $this->createLinks($links);
 
-				// linkTriggers
-				$newLinkTriggers = [];
-				foreach ($linkIds['linkids'] as $key => $linkId) {
-					if (!isset($newLinks[$key]['linktriggers'])) {
+				$link_triggers = [];
+				foreach ($linkids['linkids'] as $key => $linkId) {
+					if (!array_key_exists('linktriggers', $links[$key])) {
 						continue;
 					}
 
-					foreach ($newLinks[$key]['linktriggers'] as $linktrigger) {
-						$linktrigger['linkid'] = $linkId;
-						$newLinkTriggers[] = $linktrigger;
+					foreach ($links[$key]['linktriggers'] as $link_trigger) {
+						$link_trigger['linkid'] = $linkId;
+						$link_triggers[] = $link_trigger;
 					}
 				}
 
-				if ($newLinkTriggers) {
-					$this->createLinkTriggers($newLinkTriggers);
+				if ($link_triggers) {
+					$this->createLinkTriggers($link_triggers);
 				}
 			}
 		}
 
-		return ['sysmapids' => $sysmapIds];
+		return ['sysmapids' => $sysmapids];
 	}
 
 	/**
@@ -585,229 +882,250 @@ class CMap extends CMapElement {
 	 */
 	public function update(array $maps) {
 		$maps = zbx_toArray($maps);
-		$sysmapIds = zbx_objectValues($maps, 'sysmapid');
+		$sysmapids = zbx_objectValues($maps, 'sysmapid');
 
-		$dbMaps = $this->checkInput($maps, __FUNCTION__);
+		$db_maps = $this->get([
+			'output' => API_OUTPUT_EXTEND,
+			'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
+			'selectLinks' => API_OUTPUT_EXTEND,
+			'selectSelements' => API_OUTPUT_EXTEND,
+			'selectUrls' => API_OUTPUT_EXTEND,
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
-		$updateMaps = [];
-		$urlIdsToDelete = $urlsToUpdate = $urlsToAdd = [];
-		$selementsToDelete = $selementsToUpdate = $selementsToAdd = [];
-		$linksToDelete = $linksToUpdate = $linksToAdd = [];
+		$db_maps = $this->validateUpdate($maps, $db_maps);
+
+		$update_maps = [];
+		$url_ids_to_delete = [];
+		$urls_to_update = [];
+		$urls_to_add = [];
+		$selements_to_delete = [];
+		$selements_to_update = [];
+		$selements_to_add = [];
+		$links_to_delete = [];
+		$links_to_update = [];
+		$links_to_add = [];
 
 		foreach ($maps as $map) {
-			$updateMaps[] = [
+			$update_maps[] = [
 				'values' => $map,
 				'where' => ['sysmapid' => $map['sysmapid']],
 			];
 
-			$dbMap = $dbMaps[$map['sysmapid']];
+			$db_map = $db_maps[$map['sysmapid']];
 
-			// urls
-			if (isset($map['urls'])) {
-				$urlDiff = zbx_array_diff($map['urls'], $dbMap['urls'], 'name');
+			// Urls
+			if (array_key_exists('urls', $map)) {
+				$url_diff = zbx_array_diff($map['urls'], $db_map['urls'], 'name');
 
-				foreach ($urlDiff['both'] as $updateUrl) {
-					$urlsToUpdate[] = [
+				foreach ($url_diff['both'] as $updateUrl) {
+					$urls_to_update[] = [
 						'values' => $updateUrl,
 						'where' => ['name' => $updateUrl['name'], 'sysmapid' => $map['sysmapid']]
 					];
 				}
 
-				foreach ($urlDiff['first'] as $newUrl) {
-					$newUrl['sysmapid'] = $map['sysmapid'];
-					$urlsToAdd[] = $newUrl;
+				foreach ($url_diff['first'] as $new_url) {
+					$new_url['sysmapid'] = $map['sysmapid'];
+					$urls_to_add[] = $new_url;
 				}
 
-				$urlIdsToDelete = array_merge($urlIdsToDelete, zbx_objectValues($urlDiff['second'], 'sysmapurlid'));
+				$url_ids_to_delete = array_merge($url_ids_to_delete,
+					zbx_objectValues($url_diff['second'], 'sysmapurlid')
+				);
 			}
 
-			// elements
-			if (isset($map['selements'])) {
-				$selementDiff = zbx_array_diff($map['selements'], $dbMap['selements'], 'selementid');
+			// Map elements.
+			if (array_key_exists('selements', $map)) {
+				$selement_diff = zbx_array_diff($map['selements'], $db_map['selements'], 'selementid');
 
-				// we need sysmapid for add operations
-				foreach ($selementDiff['first'] as $newSelement) {
-					$newSelement['sysmapid'] = $map['sysmapid'];
-					$selementsToAdd[] = $newSelement;
+				// We need sysmapid for add operations.
+				foreach ($selement_diff['first'] as $new_selement) {
+					$new_selement['sysmapid'] = $map['sysmapid'];
+					$selements_to_add[] = $new_selement;
 				}
 
-				$selementsToUpdate = array_merge($selementsToUpdate, $selementDiff['both']);
-				$selementsToDelete = array_merge($selementsToDelete, $selementDiff['second']);
+				$selements_to_update = array_merge($selements_to_update, $selement_diff['both']);
+				$selements_to_delete = array_merge($selements_to_delete, $selement_diff['second']);
 			}
 
-			// links
-			if (isset($map['links'])) {
-				$linkDiff = zbx_array_diff($map['links'], $dbMap['links'], 'linkid');
+			// Links.
+			if (array_key_exists('links', $map)) {
+				$link_diff = zbx_array_diff($map['links'], $db_map['links'], 'linkid');
 
-				// we need sysmapId for add operations
-				foreach ($linkDiff['first'] as $newLink) {
+				// We need sysmapId for add operations.
+				foreach ($link_diff['first'] as $newLink) {
 					$newLink['sysmapid'] = $map['sysmapid'];
 
-					$linksToAdd[] = $newLink;
+					$links_to_add[] = $newLink;
 				}
 
-				$linksToUpdate = array_merge($linksToUpdate, $linkDiff['both']);
-				$linksToDelete = array_merge($linksToDelete, $linkDiff['second']);
+				$links_to_update = array_merge($links_to_update, $link_diff['both']);
+				$links_to_delete = array_merge($links_to_delete, $link_diff['second']);
 			}
 		}
 
-		DB::update('sysmaps', $updateMaps);
+		DB::update('sysmaps', $update_maps);
 
-		// urls
-		DB::insert('sysmap_url', $urlsToAdd);
-		DB::update('sysmap_url', $urlsToUpdate);
+		// Urls.
+		DB::insert('sysmap_url', $urls_to_add);
+		DB::update('sysmap_url', $urls_to_update);
 
-		if ($urlIdsToDelete) {
-			DB::delete('sysmap_url', ['sysmapurlid' => $urlIdsToDelete]);
+		if ($url_ids_to_delete) {
+			DB::delete('sysmap_url', ['sysmapurlid' => $url_ids_to_delete]);
 		}
 
-		// selements
-		$newSelementIds = ['selementids' => []];
-		if ($selementsToAdd) {
-			$newSelementIds = $this->createSelements($selementsToAdd);
+		// Selements.
+		$new_selementids = ['selementids' => []];
+		if ($selements_to_add) {
+			$new_selementids = $this->createSelements($selements_to_add);
 		}
 
-		if ($selementsToUpdate) {
-			$this->updateSelements($selementsToUpdate);
+		if ($selements_to_update) {
+			$this->updateSelements($selements_to_update);
 		}
 
-		if ($selementsToDelete) {
-			$this->deleteSelements($selementsToDelete);
+		if ($selements_to_delete) {
+			$this->deleteSelements($selements_to_delete);
 		}
 
-		// links
-		if ($linksToAdd || $linksToUpdate) {
-			$selementsNames = [];
-			foreach ($newSelementIds['selementids'] as $key => $selementId) {
-				$selementsNames[$selementsToAdd[$key]['selementid']] = $selementId;
+		// Links.
+		if ($links_to_add || $links_to_update) {
+			$selements_names = [];
+			foreach ($new_selementids['selementids'] as $key => $selementId) {
+				$selements_names[$selements_to_add[$key]['selementid']] = $selementId;
 			}
 
-			foreach ($selementsToUpdate as $selement) {
-				$selementsNames[$selement['selementid']] = $selement['selementid'];
+			foreach ($selements_to_update as $selement) {
+				$selements_names[$selement['selementid']] = $selement['selementid'];
 			}
 
-			foreach ($linksToAdd as $key => $link) {
-				if (isset($selementsNames[$link['selementid1']])) {
-					$linksToAdd[$key]['selementid1'] = $selementsNames[$link['selementid1']];
+			foreach ($links_to_add as $key => $link) {
+				if (array_key_exists($link['selementid1'], $selements_names)) {
+					$links_to_add[$key]['selementid1'] = $selements_names[$link['selementid1']];
 				}
-				if (isset($selementsNames[$link['selementid2']])) {
-					$linksToAdd[$key]['selementid2'] = $selementsNames[$link['selementid2']];
-				}
-			}
-
-			foreach ($linksToUpdate as $key => $link) {
-				if (isset($selementsNames[$link['selementid1']])) {
-					$linksToUpdate[$key]['selementid1'] = $selementsNames[$link['selementid1']];
-				}
-				if (isset($selementsNames[$link['selementid2']])) {
-					$linksToUpdate[$key]['selementid2'] = $selementsNames[$link['selementid2']];
+				if (array_key_exists($link['selementid2'], $selements_names)) {
+					$links_to_add[$key]['selementid2'] = $selements_names[$link['selementid2']];
 				}
 			}
 
-			unset($selementsNames);
+			foreach ($links_to_update as $key => $link) {
+				if (array_key_exists($link['selementid1'], $selements_names)) {
+					$links_to_update[$key]['selementid1'] = $selements_names[$link['selementid1']];
+				}
+				if (array_key_exists($link['selementid2'], $selements_names)) {
+					$links_to_update[$key]['selementid2'] = $selements_names[$link['selementid2']];
+				}
+			}
+
+			unset($selements_names);
 		}
 
-		$newLinkIds = $updateLinkIds = ['linkids' => []];
+		$new_linkids = ['linkids' => []];
+		$update_linkids = ['linkids' => []];
 
-		if ($linksToAdd) {
-			$newLinkIds = $this->createLinks($linksToAdd);
+		if ($links_to_add) {
+			$new_linkids = $this->createLinks($links_to_add);
 		}
 
-		if ($linksToUpdate) {
-			$updateLinkIds = $this->updateLinks($linksToUpdate);
+		if ($links_to_update) {
+			$update_linkids = $this->updateLinks($links_to_update);
 		}
 
-		if ($linksToDelete) {
-			$this->deleteLinks($linksToDelete);
+		if ($links_to_delete) {
+			$this->deleteLinks($links_to_delete);
 		}
 
-		// link triggers
-		$linkTriggersToDelete = $linkTriggersToUpdate = $linkTriggersToAdd = [];
+		// Link triggers.
+		$link_triggers_to_delete = [];
+		$link_triggers_to_update = [];
+		$link_triggers_to_add = [];
 
-		foreach ($newLinkIds['linkids'] as $key => $linkId) {
-			if (!isset($linksToAdd[$key]['linktriggers'])) {
+		foreach ($new_linkids['linkids'] as $key => $linkid) {
+			if (!array_key_exists('linktriggers', $links_to_add[$key])) {
 				continue;
 			}
 
-			foreach ($linksToAdd[$key]['linktriggers'] as $linkTrigger) {
-				$linkTrigger['linkid'] = $linkId;
-				$linkTriggersToAdd[] = $linkTrigger;
+			foreach ($links_to_add[$key]['linktriggers'] as $link_trigger) {
+				$link_trigger['linkid'] = $linkid;
+				$link_triggers_to_add[] = $link_trigger;
 			}
 		}
 
-		$dbLinks = [];
+		$db_links = [];
 
-		$linkTriggerResource = DBselect(
-			'SELECT slt.* FROM sysmaps_link_triggers slt WHERE '.dbConditionInt('slt.linkid', $updateLinkIds['linkids'])
+		$link_trigger_resource = DBselect(
+			'SELECT slt.* FROM sysmaps_link_triggers slt WHERE '.dbConditionInt('slt.linkid', $update_linkids['linkids'])
 		);
-		while ($dbLinkTrigger = DBfetch($linkTriggerResource)) {
-			zbx_subarray_push($dbLinks, $dbLinkTrigger['linkid'], $dbLinkTrigger);
+		while ($db_link_trigger = DBfetch($link_trigger_resource)) {
+			zbx_subarray_push($db_links, $db_link_trigger['linkid'], $db_link_trigger);
 		}
 
-		foreach ($updateLinkIds['linkids'] as $key => $linkId) {
-			if (!isset($linksToUpdate[$key]['linktriggers'])) {
+		foreach ($update_linkids['linkids'] as $key => $linkid) {
+			if (!array_key_exists('linktriggers', $links_to_update[$key])) {
 				continue;
 			}
 
-			$dbLinkTriggers = isset($dbLinks[$linkId]) ? $dbLinks[$linkId] : [];
-			$dbLinkTriggersDiff = zbx_array_diff($linksToUpdate[$key]['linktriggers'], $dbLinkTriggers, 'linktriggerid');
+			$db_link_triggers = array_key_exists($linkid, $db_links) ? $db_links[$linkid] : [];
+			$db_link_triggers_diff = zbx_array_diff($links_to_update[$key]['linktriggers'],
+				$db_link_triggers, 'linktriggerid'
+			);
 
-			foreach ($dbLinkTriggersDiff['first'] as $newLinkTrigger) {
-				$newLinkTrigger['linkid'] = $linkId;
-				$linkTriggersToAdd[] = $newLinkTrigger;
+			foreach ($db_link_triggers_diff['first'] as $new_link_trigger) {
+				$new_link_trigger['linkid'] = $linkid;
+				$link_triggers_to_add[] = $new_link_trigger;
 			}
 
-			$linkTriggersToUpdate = array_merge($linkTriggersToUpdate, $dbLinkTriggersDiff['both']);
-			$linkTriggersToDelete = array_merge($linkTriggersToDelete, $dbLinkTriggersDiff['second']);
+			$link_triggers_to_update = array_merge($link_triggers_to_update, $db_link_triggers_diff['both']);
+			$link_triggers_to_delete = array_merge($link_triggers_to_delete, $db_link_triggers_diff['second']);
 		}
 
-		if ($linkTriggersToDelete) {
-			$this->deleteLinkTriggers($linkTriggersToDelete);
+		if ($link_triggers_to_delete) {
+			$this->deleteLinkTriggers($link_triggers_to_delete);
 		}
 
-		if ($linkTriggersToAdd) {
-			$this->createLinkTriggers($linkTriggersToAdd);
+		if ($link_triggers_to_add) {
+			$this->createLinkTriggers($link_triggers_to_add);
 		}
 
-		if ($linkTriggersToUpdate) {
-			$this->updateLinkTriggers($linkTriggersToUpdate);
+		if ($link_triggers_to_update) {
+			$this->updateLinkTriggers($link_triggers_to_update);
 		}
 
-		return ['sysmapids' => $sysmapIds];
+		return ['sysmapids' => $sysmapids];
 	}
 
 	/**
 	 * Delete Map.
 	 *
-	 * @param array $sysmapIds
+	 * @param array $sysmapids
 	 *
 	 * @return array
 	 */
-	public function delete(array $sysmapIds) {
-		$maps = zbx_toObject($sysmapIds, 'sysmapid');
-
-		$this->checkInput($maps, __FUNCTION__);
+	public function delete(array $sysmapids) {
+		$this->validateDelete($sysmapids);
 
 		DB::delete('sysmaps_elements', [
-			'elementid' => $sysmapIds,
+			'elementid' => $sysmapids,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
 		]);
 		DB::delete('screens_items', [
-			'resourceid' => $sysmapIds,
+			'resourceid' => $sysmapids,
 			'resourcetype' => SCREEN_RESOURCE_MAP
 		]);
 		DB::delete('profiles', [
 			'idx' => 'web.maps.sysmapid',
-			'value_id' => $sysmapIds
+			'value_id' => $sysmapids
 		]);
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.sysmapids',
 			'source' => 'sysmapid',
-			'value_id' => $sysmapIds
+			'value_id' => $sysmapids
 		]);
-		DB::delete('sysmaps', ['sysmapid' => $sysmapIds]);
+		DB::delete('sysmaps', ['sysmapid' => $sysmapids]);
 
-		return ['sysmapids' => $sysmapIds];
+		return ['sysmapids' => $sysmapids];
 	}
 
 	private function expandUrlMacro($url, $selement) {
