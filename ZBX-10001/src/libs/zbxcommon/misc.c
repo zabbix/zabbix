@@ -447,7 +447,7 @@ void	__zbx_zbx_setproctitle_warning(int level, const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_setproctitle                                                 *
+ * Function: __zbx_zbx_setproctitle                                           *
  *                                                                            *
  * Purpose: set process title when LOG_LEVEL_DEBUG                            *
  *                                                                            *
