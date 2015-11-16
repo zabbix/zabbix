@@ -403,24 +403,21 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_setproctitle                                                 *
+ * Function: __zbx_zbx_setproctitle_resolve                                   *
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Eugene Grigorjev, Viktors Tjarve                                   *
  *                                                                            *
  ******************************************************************************/
-void	__zbx_zbx_setproctitle(const char *fmt, ...)
+void	__zbx_zbx_setproctitle_resolve(int level, const char *fmt, va_list args)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	char	title[MAX_STRING_LEN];
-	va_list	args;
 
-	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
-	va_end(args);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
+	zabbix_log(level, "%s", title);
 #endif
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
@@ -428,6 +425,42 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	setproctitle_set_status(title);
 #endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: __zbx_zbx_setproctitle_warning                                   *
+ *                                                                            *
+ * Purpose: set process title when LOG_LEVEL_WARNING                          *
+ *                                                                            *
+ * Author: Viktors Tjarve                                                     *
+ *                                                                            *
+ ******************************************************************************/
+void	__zbx_zbx_setproctitle_warning(int level, const char *fmt, ...)
+{
+	va_list	args;
+
+	va_start(args, fmt);
+	__zbx_zbx_setproctitle_resolve(level, fmt, args);
+	va_end(args);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_setproctitle                                                 *
+ *                                                                            *
+ * Purpose: set process title when LOG_LEVEL_DEBUG                            *
+ *                                                                            *
+ * Author: Eugene Grigorjev, Viktors Tjarve                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	__zbx_zbx_setproctitle(int level, const char *fmt, ...)
+{
+	va_list	args;
+
+	va_start(args, fmt);
+	__zbx_zbx_setproctitle_resolve(level, fmt, args);
+	va_end(args);
 }
 
 /******************************************************************************

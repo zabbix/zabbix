@@ -879,11 +879,13 @@ void	zbx_strarr_add(char ***arr, const char *entry);
 void	zbx_strarr_free(char **arr);
 
 #ifdef HAVE___VA_ARGS__
-#	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(LOG_LEVEL_DEBUG, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#	define zbx_setproctitle_warning(fmt, ...) __zbx_zbx_setproctitle_warning(LOG_LEVEL_WARNING, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #else
 #	define zbx_setproctitle __zbx_zbx_setproctitle
 #endif
-void	__zbx_zbx_setproctitle(const char *fmt, ...);
+void	__zbx_zbx_setproctitle(int level, const char *fmt, ...);
+void	__zbx_zbx_setproctitle_warning(int level, const char *fmt, ...);
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
