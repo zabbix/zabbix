@@ -57,22 +57,37 @@ class CMacrosResolverGeneral {
 
 		// Replace user macros with string 'macro' to make values search easier.
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$text = substr_replace($expression, 'macro', $pos, strlen($macro));
+			$expression = substr_replace($expression, 'macro', $pos, strlen($macro));
 		}
 
 		// Replace functionids with string 'function' to make values search easier.
 		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
 
 		// Search for numeric values in expression.
-		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
+		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $constants, PREG_OFFSET_CAPTURE);
+		$constants = $constants[0];
 
+		$values = [];
+		foreach ($constants as $constant) {
+			$values[$constant[1]] = $constant[0];
+		}
+
+		$values = zbx_array_merge($values, $matched_macros);
+		ksort($values);
+		$values = array_values($values);
+
+		$usermacros = [];
 		foreach ($references as $reference => &$value) {
 			$i = (int) $reference[1] - 1;
-			$value = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
+			$value = array_key_exists($i, $values) ? $values[$i] : '';
+
+			if (in_array($value, $matched_macros)) {
+				$usermacros[$value] =  null;
+			}
 		}
 		unset($value);
 
-		return $references;
+		return ['references' => $references, 'usermacros' => $usermacros];
 	}
 
 	/**
