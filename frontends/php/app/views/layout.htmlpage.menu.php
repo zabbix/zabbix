@@ -20,38 +20,38 @@
 
 $page_menu = (new CTag('header', true))->setAttribute('role', 'banner');
 $page_menu_div = (new CDiv())
-	->addClass('nav')
+	->addClass(ZBX_STYLE_NAV)
 	->setAttribute('role', 'navigation');
 
-$top_menu_items = (new CList($data['menu']['main_menu']))->addClass('top-nav');
+$top_menu_items = (new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV);
 
 // 1st level menu
 $top_menu = (new CDiv($top_menu_items))
-	->addClass('top-nav-container')
+	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
 	->setId('mmenu');
 
 $icons = (new CList())
-	->addClass('top-nav-icons')
+	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
 			->addItem([
 				(new CTextBox('search', '', false, 255))
 					->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
 					->setAttribute('autocomplete', 'off')
-					->addClass('search'),
-				(new CSubmitButton(SPACE))->addClass('btn-search')
+					->addClass(ZBX_STYLE_SEARCH),
+				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
 			])
 	)
 	->addItem(
 		(new CLink('Share', 'https://share.zabbix.com/'))
-			->addClass('top-nav-zbbshare')
+			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
 			->removeSID()
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Zabbix Share'))
 	)
 	->addItem(
 		(new CLink(SPACE, 'http://www.zabbix.com/documentation/'))
-			->addClass('top-nav-help')
+			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->removeSID()
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Help'))
@@ -60,14 +60,14 @@ $icons = (new CList())
 if (!$data['user']['is_guest']) {
 	$icons->addItem(
 		(new CLink(SPACE, 'profile.php'))
-			->addClass('top-nav-profile')
+			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 			->setAttribute('title', getUserFullname($data['user']))
 	);
 }
 
 $icons->addItem(
 	(new CLink(SPACE, 'index.php?reconnect=1'))
-		->addClass('top-nav-signout')
+		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setAttribute('title', _('Sign out'))
 );
 
@@ -79,7 +79,7 @@ $page_menu_div->addItem($top_menu);
 $menu_divs = [];
 $menu_selected = false;
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-	$sub_menu_row = (new CList())->addClass('top-subnav');
+	$sub_menu_row = (new CList())->addClass(ZBX_STYLE_TOP_SUBNAV);
 	foreach ($sub_menu as $id => $sub_page) {
 		if (empty($sub_page['menu_text'])) {
 			$sub_page['menu_text'] = SPACE;
@@ -96,14 +96,14 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 
 		$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->removeSID();
 		if ($sub_page['selected']) {
-			$sub_menu_item->addClass('selected');
+			$sub_menu_item->addClass(ZBX_STYLE_SELECTED);
 		}
 
 		$sub_menu_row->addItem($sub_menu_item);
 	}
 
 	$sub_menu_div = (new CDiv($sub_menu_row))
-		->addClass('top-subnav-container')
+		->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
 		->setId('sub_'.$label)
 		->onMouseover('javascript: MMenu.submenu_mouseOver();')
 		->onMouseout('javascript: MMenu.mouseOut();');
