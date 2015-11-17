@@ -380,20 +380,20 @@ function make_system_status($filter, $backurl) {
 			}
 
 			if (in_array($filter['extAck'], [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
-
-				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
 				}
+
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 			}
 
 			if (in_array($filter['extAck'], [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
 					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
-
-				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
 				}
+
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 			}
 		}
 	}
@@ -716,7 +716,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// unknown triggers
-		$unknown = SPACE;
+		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = makeUnknownIcon($trigger['error']);
 		}
@@ -816,7 +816,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 	foreach ($triggers as $trigger) {
 		// unknown triggers
-		$unknown = SPACE;
+		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = makeUnknownIcon($trigger['error']);
 		}
