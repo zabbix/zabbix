@@ -229,7 +229,7 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, zbx_vector
 		if (0 != c)											\
 			continue;										\
 														\
-		if (0 < deleted++ && block_start < left_index - 1)						\
+		if (0 < deleted++)										\
 		{												\
 			memmove(&left->values[block_start - deleted], &left->values[block_start],		\
 							(left_index - 1 - block_start) * sizeof(__type));	\
