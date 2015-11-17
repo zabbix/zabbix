@@ -1196,8 +1196,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	const char		*__function_name = "DBdelete_graphs";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset;
-	int			num;
+	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	profileids, screen_itemids;
 	zbx_uint64_t		resource_type = SCREEN_RESOURCE_GRAPH;
 	const char		*profile_idx =  "web.favorite.graphids";
@@ -1212,23 +1211,6 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	zbx_vector_uint64_create(&profileids);
 	zbx_vector_uint64_create(&screen_itemids);
 
-	do	/* add child graphs (auto-created) */
-	{
-		num = graphids->values_num;
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct graphid"
-				" from graph_discovery"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid",
-				graphids->values, graphids->values_num);
-
-		DBselect_uint64(sql, graphids);
-		zbx_vector_uint64_uniq(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-	while (num != graphids->values_num);
-
-	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from screens_items */
@@ -1266,6 +1248,41 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_graph_hierarchy                                         *
+ *                                                                            *
+ * Purpose: delete parent graphs and auto-created childs from database        *
+ *                                                                            *
+ * Parameters: graphids - [IN] array of graph id's from database              *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	children_graphids;
+
+	if (0 == graphids->values_num)
+		return;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&children_graphids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graph_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", graphids->values,
+			graphids->values_num);
+
+	DBselect_uint64(sql, &children_graphids);
+	zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBdelete_graphs(&children_graphids);
+	DBdelete_graphs(graphids);
+
+	zbx_vector_uint64_destroy(&children_graphids);
 }
 
 /******************************************************************************
@@ -1325,7 +1342,7 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 	}
 	DBfree_result(result);
 
-	DBdelete_graphs(&graphids);
+	DBdelete_graph_hierarchy(&graphids);
 clean:
 	zbx_vector_uint64_destroy(&graphids);
 	zbx_free(sql);
@@ -1745,7 +1762,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
 
 	DBselect_uint64(sql, &graphids);
 
-	DBdelete_graphs(&graphids);
+	DBdelete_graph_hierarchy(&graphids);
 
 	zbx_vector_uint64_destroy(&graphids);
 	zbx_free(sql);
