@@ -210,6 +210,45 @@ int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, __type val
 	return FAIL;												\
 }														\
 														\
+														\
+void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, zbx_vector_ ## __id ## _t *right,	\
+									zbx_compare_func_t compare_func)	\
+{														\
+	int	c, block_start, deleted = 0, left_index = 0, right_index = 0;					\
+														\
+	while (left_index < left->values_num && right_index < right->values_num)				\
+	{													\
+		c = compare_func(&left->values[left_index], &right->values[right_index]);			\
+														\
+		if (0 > c)											\
+		{												\
+			left_index++;										\
+		}												\
+		else if (0 < c)											\
+		{												\
+			right_index++;										\
+		}												\
+		else												\
+		{												\
+			if (0 < deleted++)									\
+			{											\
+				memmove(&left->values[block_start - deleted], &left->values[block_start],	\
+								(left_index - block_start) * sizeof(__type));	\
+			}											\
+														\
+			block_start = ++left_index;								\
+			right_index++;										\
+		}												\
+	}													\
+														\
+	if (0 < deleted)											\
+	{													\
+		memmove(&left->values[block_start - deleted], &left->values[block_start],			\
+							(left->values_num - block_start) * sizeof(__type));	\
+		left->values_num -= deleted;									\
+	}													\
+}														\
+														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\
 {														\
 	if ((int)size > vector->values_alloc)									\

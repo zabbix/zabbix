@@ -1007,7 +1007,7 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
-	int			num, i;
+	int			i;
 	zbx_vector_uint64_t	profileids, selementids;
 	const char		*profile_idx = "web.events.filter.triggerid";
 
@@ -1018,23 +1018,6 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	zbx_vector_uint64_create(&profileids);
 	zbx_vector_uint64_create(&selementids);
-
-	/* add child triggers (auto-created) */
-	do
-	{
-		num = triggerids->values_num;
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct triggerid"
-				" from trigger_discovery"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid",
-				triggerids->values, triggerids->values_num);
-
-		DBselect_uint64(sql, triggerids);
-		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-	while (num != triggerids->values_num);
 
 	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
 
@@ -1080,6 +1063,41 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBdelete_trigger_hierarchy                                       *
+ *                                                                            *
+ * Purpose: delete parent triggers and auto-created childs from database      *
+ *                                                                            *
+ * Parameters: triggerids - [IN] trigger identificators from database         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	children_triggerids;
+
+	if (0 == triggerids->values_num)
+		return;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&children_triggerids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct triggerid from trigger_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", triggerids->values,
+			triggerids->values_num);
+
+	DBselect_uint64(sql, &children_triggerids);
+	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBdelete_triggers(&children_triggerids);
+	DBdelete_triggers(triggerids);
+
+	zbx_vector_uint64_destroy(&children_triggerids);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_triggers_by_itemids                                     *
  *                                                                            *
  * Purpose: delete triggers by itemid                                         *
@@ -1111,7 +1129,7 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 
 	DBselect_uint64(sql, &triggerids);
 
-	DBdelete_triggers(&triggerids);
+	DBdelete_trigger_hierarchy(&triggerids);
 
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
@@ -1773,7 +1791,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
 
 	DBselect_uint64(sql, &triggerids);
 
-	DBdelete_triggers(&triggerids);
+	DBdelete_trigger_hierarchy(&triggerids);
 
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
