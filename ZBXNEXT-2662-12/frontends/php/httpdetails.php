@@ -102,14 +102,13 @@ while ($item = DBfetch($query)) {
 // fetch HTTP item history
 $itemHistory = Manager::History()->getLast($items);
 
+$http_test_name = CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']);
+
 /*
  * Display
  */
 $widget = (new CWidget())
-	->setTitle(
-		_('Details of web scenario').': '.
-		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
-	)
+	->setTitle(_('Details of web scenario').': '.$http_test_name)
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
@@ -274,7 +273,7 @@ $graphInScreen = new CScreenBase([
 $graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
 
 $src = 'chart3.php?height=150'.
-	'&name='._('Speed').
+	'&name='.$http_test_name.': '._('Speed').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
 	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
@@ -315,7 +314,7 @@ $graphTimeScreen = new CScreenBase([
 ]);
 
 $src = 'chart3.php?height=150'.
-	'&name='._('Response time').
+	'&name='.$http_test_name.': '._('Response time').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
 	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
