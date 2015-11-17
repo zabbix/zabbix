@@ -268,6 +268,10 @@ typedef struct
 	int		ipmi_disable_until;
 	int		jmx_errors_from;
 	int		jmx_disable_until;
+
+	/* timestamp of last availability status (available/error) field change on any interface */
+	int		availability_ts;
+
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	available;
@@ -441,6 +445,7 @@ ZBX_DC_CONFIG_TABLE;
 
 typedef struct
 {
+	int			availability_update_ts;
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		numitems;
@@ -1485,6 +1490,7 @@ done:
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
+			host->availability_ts = now;
 
 			DCstrpool_replace(0, &host->error, row[25]);
 			DCstrpool_replace(0, &host->snmp_error, row[26]);
@@ -4168,6 +4174,8 @@ void	init_configuration_cache(void)
 
 	config->config = NULL;
 
+	config->availability_update_ts = 0;
+
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
 
@@ -6005,7 +6013,7 @@ static int	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char
  *           updated leaving only flags identifying changed fields.           *
  *                                                                            *
  ******************************************************************************/
-static int	DChost_set_agent_availability(ZBX_DC_HOST *dc_host, unsigned char agent_type,
+static int	DChost_set_agent_availability(ZBX_DC_HOST *dc_host, int now, unsigned char agent_type,
 		zbx_agent_availability_t *agent)
 {
 	switch (agent_type)
@@ -6028,7 +6036,13 @@ static int	DChost_set_agent_availability(ZBX_DC_HOST *dc_host, unsigned char age
 			break;
 	}
 
-	return (ZBX_FLAGS_AGENT_STATUS_NONE == agent->flags ? FAIL : SUCCEED);
+	if (ZBX_FLAGS_AGENT_STATUS_NONE == agent->flags)
+		return FAIL;
+
+	if (0 != (agent->flags & (ZBX_FLAGS_AGENT_STATUS_AVAILABLE | ZBX_FLAGS_AGENT_STATUS_ERROR)))
+		dc_host->availability_ts = now;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -6049,9 +6063,10 @@ static int	DChost_set_agent_availability(ZBX_DC_HOST *dc_host, unsigned char age
  *           updated leaving only flags identifying changed fields.           *
  *                                                                            *
  ******************************************************************************/
-static int	DChost_set_availability(ZBX_DC_HOST *dc_host, zbx_host_availability_t *ha)
+static int	DChost_set_availability(ZBX_DC_HOST *dc_host, int now, zbx_host_availability_t *ha)
 {
-	int	updated = 0;
+	int		updated = 0, i;
+	unsigned char	flags = 0;
 
 	updated += DCagent_set_availability(&ha->agents[ZBX_AGENT_ZABBIX], &dc_host->available,
 			&dc_host->error, &dc_host->errors_from, &dc_host->disable_until);
@@ -6062,7 +6077,16 @@ static int	DChost_set_availability(ZBX_DC_HOST *dc_host, zbx_host_availability_t
 	updated += DCagent_set_availability(&ha->agents[ZBX_AGENT_JMX], &dc_host->jmx_available,
 			&dc_host->jmx_error, &dc_host->jmx_errors_from, &dc_host->jmx_disable_until);
 
-	return (0 == updated ? FAIL : SUCCEED);
+	if (0 == updated)
+		return FAIL;
+
+	for (i = 0; i < ZBX_AGENT_MAX; i++)
+		flags |= ha->agents[i].flags;
+
+	if (0 != (flags & (ZBX_FLAGS_AGENT_STATUS_AVAILABLE | ZBX_FLAGS_AGENT_STATUS_ERROR)))
+		dc_host->availability_ts = now;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -6163,6 +6187,45 @@ int	zbx_host_availability_is_set(const zbx_host_availability_t *ha)
 	return FAIL;
 }
 
+/**************************************************************************************
+ *                                                                                    *
+ * Host availability update example                                                   *
+ *                                                                                    *
+ *                                                                                    *
+ *               |            UnreachablePeriod                                       *
+ *               |               (conf file)                                          *
+ *               |              ______________                                        *
+ *               |             /              \                                       *
+ *               |             p     p     p     p       p       p                    *
+ *               |             o     o     o     o       o       o                    *
+ *               |             l     l     l     l       l       l                    *
+ *               |             l     l     l     l       l       l                    *
+ *               | n                                                                  *
+ *               | e           e     e     e     e       e       e                    *
+ *     agent     | w   p   p   r     r     r     r       r       r       p   p   p    *
+ *       polls   |     o   o   r     r     r     r       r       r       o   o   o    *
+ *               | h   l   l   o     o     o     o       o       o       l   l   l    *
+ *               | o   l   l   r     r     r     r       r       r       l   l   l    *
+ *               | s                                                                  *
+ *               | t   ok  ok  E1    E1    E2    E1      E1      E2      ok  ok  ok   *
+ *  --------------------------------------------------------------------------------  *
+ *  available    | 0   1   1   1     1     1     2       2       2       0   0   0    *
+ *               |                                                                    *
+ *  error        | ""  ""  ""  ""    ""    ""    E1      E1      E2      ""  ""  ""   *
+ *               |                                                                    *
+ *  errors_from  | 0   0   0   T4    T4    T4    T4      T4      T4      0   0   0    *
+ *               |                                                                    *
+ *  disable_until| 0   0   0   T5    T6    T7    T8      T9      T10     0   0   0    *
+ *  --------------------------------------------------------------------------------  *
+ *   timestamps  | T1  T2  T3  T4    T5    T6    T7      T8      T9     T10 T11 T12   *
+ *               |  \_/ \_/ \_/ \___/ \___/ \___/ \_____/ \_____/ \_____/ \_/ \_/     *
+ *               |   |   |   |    |     |     |      |       |       |     |   |      *
+ *  polling      |  item delay   UnreachableDelay    UnavailableDelay     item |      *
+ *      periods  |                 (conf file)         (conf file)         delay      *
+ *                                                                                    *
+ *                                                                                    *
+ **************************************************************************************/
+
 /******************************************************************************
  *                                                                            *
  * Function: DChost_activate                                                  *
@@ -6171,6 +6234,7 @@ int	zbx_host_availability_is_set(const zbx_host_availability_t *ha)
  *                                                                            *
  * Parameters: hostid     - [IN] the host identifier                          *
  *             agent_type - [IN] the agent type (see ZBX_AGENT_* defines)     *
+ *             ts         - [IN] the last timestamp                           *
  *             in         - [IN/OUT] IN: the caller's agent availability data *
  *                                  OUT: the agent availability data in cache *
  *                                       before changes                       *
@@ -6180,9 +6244,12 @@ int	zbx_host_availability_is_set(const zbx_host_availability_t *ha)
  *               FAIL    - the host was already activated or activation       *
  *                         failed                                             *
  *                                                                            *
+ * Comments: The host availability fields are updated according to the above  *
+ *           schema.                                                          *
+ *                                                                            *
  ******************************************************************************/
-int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, zbx_agent_availability_t *in,
-		zbx_agent_availability_t *out)
+int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out)
 {
 	int		ret = FAIL;
 	ZBX_DC_HOST	*dc_host;
@@ -6207,7 +6274,7 @@ int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, zbx_agent_ava
 
 	DChost_get_agent_availability(dc_host, agent_type, in);
 	zbx_agent_availability_init(out, HOST_AVAILABLE_TRUE, "", 0, 0);
-	DChost_set_agent_availability(dc_host, agent_type, out);
+	DChost_set_agent_availability(dc_host, ts->sec, agent_type, out);
 
 	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
 		ret = SUCCEED;
@@ -6216,46 +6283,6 @@ unlock:
 out:
 	return ret;
 }
-
-/**************************************************************************************
- *                                                                                    *
- * Host availability update example                                                   *
- *                                                                                    *
- *                                                                                    *
- *               |            UnreachablePeriod                                       *
- *               |               (conf file)                                          *
- *               |              ______________                                        *
- *               |             /              \                                       *
- *               |             p     p     p     p       p       p                    *
- *               |             o     o     o     o       o       o                    *
- *               |             l     l     l     l       l       l                    *
- *               |             l     l     l     l       l       l                    *
- *               |                                                                    *
- *               | n           e     e     e     e       e       e                    *
- *               | e   p   p   r     r     r     r       r       r       p   p   p    *
- *     agent     | w   o   o   r     r     r     r       r       r       o   o   o    *
- *       polls   |     l   l   o     o     o     o       o       o       l   l   l    *
- *               | h   l   l   r     r     r     r       r       r       l   l   l    *
- *               | o                                                                  *
- *               | s   o   o   E     E     E     E       E       E       o   o   o    *
- *               | t   k   k   1     1     2     1       1       2       k   k   k    *
- *  --------------------------------------------------------------------------------  *
- *  available    | 0   1   1   1     1     1     2       2       2       0   0   0    *
- *               |                                                                    *
- *  error        | ""  ""  ""  ""    ""    ""    E1      E1      E2      ""  ""  ""   *
- *               |                                                                    *
- *  errors_from  | 0   0   0   T4    T4    T4    T4      T4      T4      0   0   0    *
- *               |                                                                    *
- *  disable_until| 0   0   0   T5    T6    T7    T8      T9      T10     0   0   0    *
- *  --------------------------------------------------------------------------------  *
- *   timestamps  | T1  T2  T3  T4    T5    T6    T7      T8      T9     T10 T11 T12   *
- *               |  \_/ \_/ \_/ \___/ \___/ \___/ \_____/ \_____/ \_____/ \_/ \_/     *
- *               |   |   |   |    |     |     |      |       |       |     |   |      *
- *  polling      |  item delay   UnreachableDelay    UnavailableDelay     item |      *
- *      periods  |                 (conf file)         (conf file)         delay      *
- *                                                                                    *
- *                                                                                    *
- **************************************************************************************/
 
 /******************************************************************************
  *                                                                            *
@@ -6345,7 +6372,7 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_t
 	}
 
 	zbx_agent_availability_init(out, available, error, errors_from, disable_until);
-	DChost_set_agent_availability(dc_host, agent_type, out);
+	DChost_set_agent_availability(dc_host, ts->sec, agent_type, out);
 
 	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
 		ret = SUCCEED;
@@ -6373,7 +6400,9 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 	int			i;
 	ZBX_DC_HOST		*dc_host;
 	zbx_host_availability_t	*ha;
-	int			ret = FAIL;
+	int			ret = FAIL, now;
+
+	now = time(NULL);
 
 	LOCK_CACHE;
 
@@ -6393,7 +6422,7 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 			continue;
 		}
 
-		if (SUCCEED == DChost_set_availability(dc_host, ha))
+		if (SUCCEED == DChost_set_availability(dc_host, now, ha))
 			ret = SUCCEED;
 	}
 
@@ -7975,7 +8004,7 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 
 		if (SUCCEED == zbx_host_availability_is_set(ha))
 		{
-			DChost_set_availability(host, ha);
+			DChost_set_availability(host, now, ha);
 
 			if (SUCCEED == zbx_host_availability_is_set(ha))
 			{
@@ -7996,3 +8025,78 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 
 	return 0 == hosts->values_num ? FAIL : SUCCEED;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_hosts_availability                                         *
+ *                                                                            *
+ * Purpose: gets availability data for hosts with ability data changed int    *
+ *          period from last availability update to the specified timestamp   *
+ *                                                                            *
+ * Parameters: hosts - [OUT] changed host availability data                   *
+ *             ts    - [OUT] the availability diff timestamp                  *
+ *                                                                            *
+ * Return value: SUCCEED - availability was changed for at least one host     *
+ *               FAIL    - no host availability was changed                   *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
+{
+	const char		*__function_name = "DCget_hosts_availability";
+	ZBX_DC_HOST		*host;
+	zbx_hashset_iter_t	iter;
+	zbx_host_availability_t	*ha = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	*ts = time(NULL);
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+
+	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		if (config->availability_update_ts <= host->availability_ts && host->availability_ts < *ts)
+		{
+			ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
+			zbx_host_availability_init(ha, host->hostid);
+
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_ZABBIX], host->available, host->error,
+					host->errors_from, host->disable_until);
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_SNMP], host->snmp_available, host->snmp_error,
+					host->snmp_errors_from, host->snmp_disable_until);
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_IPMI], host->ipmi_available, host->ipmi_error,
+					host->ipmi_errors_from, host->ipmi_disable_until);
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_JMX], host->jmx_available, host->jmx_error,
+					host->jmx_errors_from, host->jmx_disable_until);
+
+			zbx_vector_ptr_append(hosts, ha);
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
+
+	return 0 == hosts->values_num ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_set_availability_update_ts                                   *
+ *                                                                            *
+ * Purpose: sets timestamp of the last availability update                    *
+ *                                                                            *
+ * Parameter: ts - [IN] the last availability update timestamp                *
+ *                                                                            *
+ * Comments: This function is used only by proxies when preparing host        *
+ *           availability data to be sent to server.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_set_availability_update_ts(int ts)
+{
+	/* this data can't be accessed simultaneously from multiple processes - locking is not necessary */
+	config->availability_update_ts = ts;
+}
+
