@@ -401,10 +401,11 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
-int	DChost_activate(zbx_uint64_t hostid, unsigned char agent, zbx_agent_availability_t *in, zbx_agent_availability_t *out);
+int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out);
 
-int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
-		zbx_agent_availability_t *out, const char *error);
+int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error);
 
 void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
 void	DCset_delta_items(zbx_hashset_t *items);
@@ -459,10 +460,13 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability();
+int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
 
 void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
 void	zbx_host_availability_clean(zbx_host_availability_t *availability);
 void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
+
+void	zbx_set_availability_update_ts();
 
 #endif

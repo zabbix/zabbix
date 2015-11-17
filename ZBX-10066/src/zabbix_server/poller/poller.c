@@ -318,7 +318,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 	if (FAIL == host_get_availability(&item->host, agent, &in))
 		goto out;
 
-	if (FAIL == DChost_activate(item->host.hostid, agent, &in.agents[agent], &out.agents[agent]))
+	if (FAIL == DChost_activate(item->host.hostid, agent, ts, &in.agents[agent], &out.agents[agent]))
 		goto out;
 
 	if (FAIL == db_host_update_availability(&out))

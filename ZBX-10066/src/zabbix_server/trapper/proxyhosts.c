@@ -71,7 +71,7 @@ void	send_host_availability(zbx_socket_t *sock)
 	const char	*__function_name = "send_host_availability";
 
 	struct zbx_json	j;
-	int		ret = FAIL;
+	int		ret = FAIL, ts;
 	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -84,7 +84,7 @@ void	send_host_availability(zbx_socket_t *sock)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	get_host_availability_data(&j);
+	get_host_availability_data(&j, &ts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
@@ -96,6 +96,8 @@ void	send_host_availability(zbx_socket_t *sock)
 
 	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
 		goto out;
+
+	zbx_set_availability_update_ts(ts);
 
 	ret = SUCCEED;
 out:
