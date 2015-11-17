@@ -291,6 +291,8 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, __type va
 									zbx_compare_func_t compare_func);	\
 int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, __type value,				\
 									zbx_compare_func_t compare_func);	\
+void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, zbx_vector_ ## __id ## _t *right,	\
+									zbx_compare_func_t compare_func);	\
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
