@@ -632,7 +632,7 @@ zbx_agent_availability_t;
 
 typedef struct
 {
-	zbx_uint64_t		hostid;
+	zbx_uint64_t			hostid;
 
 	zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
 }

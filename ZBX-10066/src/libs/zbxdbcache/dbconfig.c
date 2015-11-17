@@ -6217,6 +6217,46 @@ out:
 	return ret;
 }
 
+/**************************************************************************************
+ *                                                                                    *
+ * Host availability update example                                                   *
+ *                                                                                    *
+ *                                                                                    *
+ *               |            UnreachablePeriod                                       *
+ *               |               (conf file)                                          *
+ *               |              ______________                                        *
+ *               |             /              \                                       *
+ *               |             p     p     p     p       p       p                    *
+ *               |             o     o     o     o       o       o                    *
+ *               |             l     l     l     l       l       l                    *
+ *               |             l     l     l     l       l       l                    *
+ *               |                                                                    *
+ *               | n           e     e     e     e       e       e                    *
+ *               | e   p   p   r     r     r     r       r       r       p   p   p    *
+ *     agent     | w   o   o   r     r     r     r       r       r       o   o   o    *
+ *       polls   |     l   l   o     o     o     o       o       o       l   l   l    *
+ *               | h   l   l   r     r     r     r       r       r       l   l   l    *
+ *               | o                                                                  *
+ *               | s   o   o   E     E     E     E       E       E       o   o   o    *
+ *               | t   k   k   1     1     2     1       1       2       k   k   k    *
+ *  --------------------------------------------------------------------------------  *
+ *  available    | 0   1   1   1     1     1     2       2       2       0   0   0    *
+ *               |                                                                    *
+ *  error        | ""  ""  ""  ""    ""    ""    E1      E1      E2      ""  ""  ""   *
+ *               |                                                                    *
+ *  errors_from  | 0   0   0   T4    T4    T4    T4      T4      T4      0   0   0    *
+ *               |                                                                    *
+ *  disable_until| 0   0   0   T5    T6    T7    T8      T9      T10     0   0   0    *
+ *  --------------------------------------------------------------------------------  *
+ *   timestamps  | T1  T2  T3  T4    T5    T6    T7      T8      T9     T10 T11 T12   *
+ *               |  \_/ \_/ \_/ \___/ \___/ \___/ \_____/ \_____/ \_____/ \_/ \_/     *
+ *               |   |   |   |    |     |     |      |       |       |     |   |      *
+ *  polling      |  item delay   UnreachableDelay    UnavailableDelay     item |      *
+ *      periods  |                 (conf file)         (conf file)         delay      *
+ *                                                                                    *
+ *                                                                                    *
+ **************************************************************************************/
+
 /******************************************************************************
  *                                                                            *
  * Function: DChost_deactivate                                                *
@@ -6236,12 +6276,18 @@ out:
  *               FAIL    - the host was already deactivated or deactivation   *
  *                         failed                                             *
  *                                                                            *
+ * Comments: The host availability fields are updated according to the above  *
+ *           schema.                                                          *
+ *                                                                            *
  ******************************************************************************/
 int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
-		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error)
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg)
 {
-	int		ret = FAIL;
+	int		ret = FAIL, errors_from,disable_until;
+	const char	*error;
+	unsigned char	available;
 	ZBX_DC_HOST	*dc_host;
+
 
 	/* don't try deactivating host if the unreachable delay has not passed since the first error */
 	if (CONFIG_UNREACHABLE_DELAY > ts->sec - in->errors_from)
@@ -6262,16 +6308,21 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_t
 	}
 
 	DChost_get_agent_availability(dc_host, agent_type, in);
-	zbx_agent_availability_init(out, in->available, error, in->errors_from, in->disable_until);
 
-	if (0 == out->errors_from)
+	available = in->available;
+	error = in->error;
+
+	if (0 == in->errors_from)
 	{
 		/* first error, schedule next unreachable check */
-		out->errors_from = ts->sec;
-		out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+		errors_from = ts->sec;
+		disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 	}
 	else
 	{
+		errors_from = in->errors_from;
+		disable_until = in->disable_until;
+
 		/* Check if other pollers haven't already attempted deactivating host. */
 		/* In that case should wait the initial unreachable delay before       */
 		/* trying to make it unavailable.                                      */
@@ -6281,18 +6332,19 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_t
 			if (CONFIG_UNREACHABLE_PERIOD > ts->sec - out->errors_from)
 			{
 				/* leave host available, schedule next unreachable check */
-				out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+				disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 			}
 			else
 			{
 				/* make host unavailable, schedule next unavailable check */
-				out->disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
-				out->available = HOST_AVAILABLE_FALSE;
+				disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
+				available = HOST_AVAILABLE_FALSE;
+				error = error_msg;
 			}
 		}
 	}
 
-
+	zbx_agent_availability_init(out, available, error, errors_from, disable_until);
 	DChost_set_agent_availability(dc_host, agent_type, out);
 
 	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
