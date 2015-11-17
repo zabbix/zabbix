@@ -220,25 +220,22 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, zbx_vector
 	{													\
 		c = compare_func(&left->values[left_index], &right->values[right_index]);			\
 														\
-		if (0 > c)											\
-		{												\
+		if (0 >= c)											\
 			left_index++;										\
-		}												\
-		else if (0 < c)											\
-		{												\
-			right_index++;										\
-		}												\
-		else												\
-		{												\
-			if (0 < deleted++)									\
-			{											\
-				memmove(&left->values[block_start - deleted], &left->values[block_start],	\
-								(left_index - block_start) * sizeof(__type));	\
-			}											\
 														\
-			block_start = ++left_index;								\
+		if (0 <= c)											\
 			right_index++;										\
+														\
+		if (0 != c)											\
+			continue;										\
+														\
+		if (0 < deleted++ && block_start < left_index - 1)						\
+		{												\
+			memmove(&left->values[block_start - deleted], &left->values[block_start],		\
+							(left_index - 1 - block_start) * sizeof(__type));	\
 		}												\
+														\
+		block_start = left_index;									\
 	}													\
 														\
 	if (0 < deleted)											\
