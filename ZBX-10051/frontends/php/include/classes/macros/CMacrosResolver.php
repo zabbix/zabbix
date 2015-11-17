@@ -414,8 +414,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$references = $this->resolveTriggerReferences($trigger['expression'], $matched_macros['references']);
 
 				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-					? array_merge($macro_values[$triggerid], $references)
-					: $references;
+					? array_merge($macro_values[$triggerid], $references['references'])
+					: $references['references'];
+
+				if ($references['usermacros']) {
+					$usermacros[$triggerid]['macros'] = array_key_exists($triggerid, $usermacros)
+						? $usermacros[$triggerid]['macros'] + $references['usermacros']
+						: $references['usermacros'];
+				}
 			}
 		}
 
@@ -454,6 +460,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach ($macro_values as $triggerid => $macro) {
 			$trigger = &$triggers[$triggerid];
+
+			foreach ($macro as $macro_name => $macro_value) {
+				if (array_key_exists($macro_value, $macro_values[$triggerid])) {
+					$macro_values[$triggerid][$macro_name] = $macro_values[$triggerid][$macro_value];
+				}
+			}
 
 			$matched_macros = $this->getMacroPositions($trigger['description'], $types);
 
