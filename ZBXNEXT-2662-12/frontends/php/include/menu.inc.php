@@ -346,7 +346,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			}
 
 			$row = [
-				'menu_text' => isset($sub_page['label']) ? $sub_page['label'] : '',
+				'menu_text' => array_key_exists('label', $sub_page) ? $sub_page['label'] : '',
 				'menu_url' => $sub_page['url'],
 				'menu_action' => array_key_exists('action', $sub_page) ? $sub_page['action'] : null,
 				'selected' => false

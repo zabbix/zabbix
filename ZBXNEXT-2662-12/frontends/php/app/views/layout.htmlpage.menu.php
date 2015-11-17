@@ -18,18 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$page_menu = (new CTag('header', true))->setAttribute('role', 'banner');
-$page_menu_div = (new CDiv())
-	->addClass(ZBX_STYLE_NAV)
-	->setAttribute('role', 'navigation');
-
-$top_menu_items = (new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV);
-
-// 1st level menu
-$top_menu = (new CDiv($top_menu_items))
-	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
-	->setId('mmenu');
-
 $icons = (new CList())
 	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
@@ -71,20 +59,27 @@ $icons->addItem(
 		->setAttribute('title', _('Sign out'))
 );
 
-$top_menu->addItem($icons);
+// 1st level menu
+$top_menu = (new CDiv())
+	->addItem(
+		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
+	)
+	->addItem($icons)
+	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
+	->setId('mmenu');
 
-$page_menu_div->addItem($top_menu);
+$sub_menu_div = (new CDiv())
+	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
+	->onMouseover('javascript: MMenu.submenu_mouseOver();')
+	->onMouseout('javascript: MMenu.mouseOut();');
 
 // 2nd level menu
-$menu_divs = [];
-$menu_selected = false;
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-	$sub_menu_row = (new CList())->addClass(ZBX_STYLE_TOP_SUBNAV);
-	foreach ($sub_menu as $id => $sub_page) {
-		if (empty($sub_page['menu_text'])) {
-			$sub_page['menu_text'] = SPACE;
-		}
+	$sub_menu_row = (new CList())
+		->addClass(ZBX_STYLE_TOP_SUBNAV)
+		->setId('sub_'.$label);
 
+	foreach ($sub_menu as $id => $sub_page) {
 		$url = new CUrl($sub_page['menu_url']);
 		if ($sub_page['menu_action'] !== null) {
 			$url->setArgument('action', $sub_page['menu_action']);
@@ -102,30 +97,29 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		$sub_menu_row->addItem($sub_menu_item);
 	}
 
-	$sub_menu_div = (new CDiv($sub_menu_row))
-		->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
-		->setId('sub_'.$label)
-		->onMouseover('javascript: MMenu.submenu_mouseOver();')
-		->onMouseout('javascript: MMenu.mouseOut();');
-
-	if ($data['menu']['selected'] == $label) {
-		$menu_selected = true;
-		$sub_menu_div->setAttribute('style', 'display: block;');
+	if ($data['menu']['selected'] === $label) {
+		$sub_menu_row->setAttribute('style', 'display: block;');
 		insert_js('MMenu.def_label = '.zbx_jsvalue($label));
 	}
 	else {
-		$sub_menu_div->setAttribute('style', 'display: none;');
+		$sub_menu_row->setAttribute('style', 'display: none;');
 	}
-	$menu_divs[] = $sub_menu_div;
+	$sub_menu_div->addItem($sub_menu_row);
 }
 
-$sub_menu_div = (new CDiv(SPACE))
-	->setId('sub_empty')
-	->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
+if ($data['server_name'] !== '') {
+	$sub_menu_div->addItem(
+		(new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
+	);
+}
 
-$menu_divs[] = $sub_menu_div;
-
-$page_menu_div->addItem($menu_divs);
-$page_menu
-	->addItem($page_menu_div)
+(new CTag('header', true))
+	->setAttribute('role', 'banner')
+	->addItem(
+		(new CDiv())
+			->addItem($top_menu)
+			->addItem($sub_menu_div)
+			->addClass(ZBX_STYLE_NAV)
+			->setAttribute('role', 'navigation')
+	)
 	->show();

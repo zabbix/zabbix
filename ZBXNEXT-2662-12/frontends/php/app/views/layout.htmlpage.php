@@ -48,7 +48,10 @@ function local_generateHeader($data) {
 	echo $pageHeader->getOutput();
 
 	if ($data['fullscreen'] == 0) {
+		global $ZBX_SERVER_NAME;
+
 		$pageMenu = new CView('layout.htmlpage.menu', [
+			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 			'menu' => [
 				'main_menu' => $main_menu,
 				'sub_menus' => $sub_menus,
