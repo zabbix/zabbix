@@ -1694,30 +1694,22 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
-	$msg_box = (new CDiv($title))
-		->addClass($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD);
-
-	if ($show_close_box) {
-		$id = $good ? 'global-message-good' : 'global-message-bad';
-		$msg_box->setId($id);
-	}
+	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+	$msg_box = (new CDiv($title))->addClass($class);
 
 	if ($messages) {
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
 
 		if ($title !== null) {
-			$link = (new CLink(_('Details')))
+			$link = (new CSpan(_('Details')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->removeSID()
-				->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
+				->onClick('javascript: showHide($(this).next(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));');
 			$msg_details->addItem($link);
 		}
 
 		$list = new CList();
 		if ($title !== null) {
-			$list
-				->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
-				->setId('msg-messages');
+			$list->addClass(ZBX_STYLE_MSG_DETAILS_BORDER);
 
 			if (!$show_details) {
 				$list->setAttribute('style', 'display: none;');
@@ -1725,7 +1717,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		}
 		foreach ($messages as $message) {
 			foreach (explode("\n", $message['message']) as $message_part) {
-				$list->addItem(/*$message['type'].'&nbsp;'.*/$message_part);
+				$list->addItem($message_part);
 			}
 		}
 		$msg_details->addItem($list);
@@ -1736,7 +1728,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	if ($show_close_box) {
 		$msg_box->addItem((new CSpan())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: showHide("'.$id.'", IE ? "block" : "");')
+			->onClick('javascript: $(this).closest(\'.'.$class.'\').remove();')
 			->setAttribute('title', _('Close')));
 	}
 
