@@ -997,7 +997,6 @@ int	iprange_validate(const zbx_iprange_t *range, const int *address);
 zbx_uint64_t	iprange_volume(const zbx_iprange_t *range);
 
 /* time related functions */
-double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
