@@ -133,8 +133,9 @@ p {
 
 pre {
   font-family: "Courier New", Courier, monospace;
-  font-size: 1em;
-  display: block;
+  font-size: 1em; }
+
+pre, pre a, pre td, pre span {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
@@ -235,7 +236,8 @@ ul.top-nav-icons {
   ul.top-nav-icons .top-nav-zbbshare {
     background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
     width: auto;
-    padding: 0 12px 0 27px; }
+    padding: 0 12px 0 27px;
+    -webkit-transform-style: preserve-3d; }
   ul.top-nav-icons form {
     position: relative; }
   ul.top-nav-icons input {
@@ -502,18 +504,22 @@ footer, .footer {
     border-radius: 0 2px 2px 0; }
   .table-paging a.paging-selected, .paging-selected.radio-switch {
     color: #fff;
-    border-color: #4f4f4f;
-    background-color: #4f4f4f; }
+    border-color: #768d99;
+    background-color: #69808d;
+    position: relative;
+    z-index: 1; }
     .table-paging a.paging-selected:hover, .paging-selected.radio-switch:hover {
-      background-color: #454545; }
+      color: #f2f2f2;
+      background-color: #5e737e;
+      border-color: #5e737e; }
     .table-paging a.paging-selected:focus, .paging-selected.radio-switch:focus {
-      background-color: #454545;
-      border-color: #768d99;
-      position: relative; }
+      color: #f2f2f2;
+      background-color: #5e737e;
+      border-color: #5e737e; }
     .table-paging a.paging-selected:active, .paging-selected.radio-switch:active {
-      background-color: #454545;
-      border-color: #768d99;
-      position: relative; }
+      color: #f2f2f2;
+      background-color: #5e737e;
+      border-color: #5e737e; }
 
 .treeview-plus {
   font-size: 1.167em;
@@ -997,8 +1003,10 @@ footer, .footer {
     z-index: 1; }
   .radio-segmented input[type="radio"]:checked + label {
     color: #fff;
-    border-color: #4f4f4f;
-    background-color: #4f4f4f; }
+    border-color: #768d99;
+    background-color: #69808d;
+    position: relative;
+    z-index: 1; }
   .radio-segmented input[type="radio"]:checked:focus + label {
     border-color: #768d99;
     position: relative;
@@ -1243,6 +1251,7 @@ button {
   height: 28px;
   min-height: 0;
   padding: 0;
+  -webkit-transform-style: preserve-3d;
   opacity: 0.5;
   filter: alpha(opacity=50);
   -webkit-transition: opacity 0.2s ease-out;
@@ -1393,7 +1402,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .drag-icon {
   margin-left: -9px;
-  cursor: move;
   background: url(../img/icon-sprite.svg) no-repeat -6px -762px; }
 
 .setup-container {
@@ -1569,6 +1577,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 1000;
   padding: 5px 15px 5px 25px;
   min-width: 166px;
+  max-width: 250px;
   background-color: #2b2b2b;
   border: 1px solid #383838;
   border-bottom-color: #353535;
@@ -1576,8 +1585,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   -moz-box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
   .action-menu li {
-    display: block;
-    white-space: nowrap; }
+    display: block; }
     .action-menu li div {
       border-top: 1px solid #383838;
       margin: 5px -15px 5px -25px; }
@@ -1776,10 +1784,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .notif-body h4 {
     display: block;
     max-width: 250px;
-    padding-bottom: 0.083em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; }
+    padding-bottom: 0.083em; }
   .notif-body p {
     margin: 0.25em 0 0 0; }
   .notif-body li {
@@ -2311,7 +2316,7 @@ td.active-bg {
 .cursor-pointer {
   cursor: pointer; }
 
-.overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.action-menu .action-menu-item, .action-menu h3, .notif-body h4, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -2406,18 +2411,16 @@ The default font face is Arial. Type size and line height should be set in relat
 ##Headings
 
 ```html_example
-<h1>Main Heading</h1>
-<h2>Section Header</h2>
-<h3>Contextual Menu Heading</h3>
+<h1>Main Heading</h1><br>
+<h2>Section Header</h2><br>
+<h3>Contextual Menu Heading</h3><br>
 <h4>Widget and Dialog Heading</h4>
 ```
 
 ##Paragraphs
 
 ```html_example
-<h2>Default Text</h2>
 <p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
-<h2>Grey Text</h2>
 <p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
 ```
 */
@@ -2428,11 +2431,7 @@ title: Tables
 name: table
 ---
 
-Tables tables: sdfsdfsfs
-
-##Default Table
-
-Default table:
+Tables are used to display only tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
 
 ```html_example
 <div class="overflow-table">
@@ -2512,7 +2511,7 @@ Default table:
 
 ##Table with Pagination
 
-Pagnation is used to  
+Pagination is used to separate large amounts of tabular data into descrete peices. Pagination control is used to progress 
 
 ```html_example
 <div class="overflow-table">
@@ -2594,8 +2593,6 @@ Pagnation is used to
 ```
 
 ##Table with No Results
-
-Table with no results:
 
 ```html_example
 <div class="overflow-table">
@@ -3162,13 +3159,13 @@ name: links
 A link is used to navigate through different parts of the front-end. Action links are used to call out any additional content, like contextual menus and popovers.
 
 ```html_example
-<a href="#">Default link</a>
-<a href="#" class="grey link-alt">Alternative link</a>
-<a href="#" class="green link-alt">Alternative link</a>
-<a href="#" class="red link-alt">Alternative link</a>
-<span class="link-action">Action link</span>
-<span class="green link-action">Action link</span>
-<span class="yellow link-action">Action link</span>
+<p><a href="#">Default link</a></p>
+<p><a href="#" class="grey link-alt">Alternative link</a></p>
+<p><a href="#" class="green link-alt">Alternative link</a></p>
+<p><a href="#" class="red link-alt">Alternative link</a></p>
+<p><span class="link-action">Action link</span></p>
+<p><span class="green link-action">Action link</span></p>
+<p><span class="yellow link-action">Action link</span></p>
 <span class="red link-action">Action link</span>
 ```
 */
