@@ -519,6 +519,31 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		// Check if deleted users have a map.
+		$user_maps = API::Map()->get([
+			'output' => ['name', 'userid'],
+			'userid' => $userIds,
+			'limit' => 1
+		]);
+
+		if ($user_maps) {
+			// Get first problem user and map.
+			$user_map = reset($user_maps);
+
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userid' => $user_map['userid'],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is map "%2$s" owner.', $db_user['alias'], $user_map['name'])
+			);
+		}
+
 		$this->checkPermissions($userIds);
 		$this->checkDeleteCurrentUser($userIds);
 		$this->checkDeleteInternal($userIds);
