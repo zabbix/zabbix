@@ -59,7 +59,7 @@ class CMap extends CMapElement {
 		$result = [];
 		$user_data = self::$userData;
 
-		$sqlParts = [
+		$sql_parts = [
 			'select'	=> ['sysmaps' => 's.sysmapid'],
 			'from'		=> ['sysmaps' => 'sysmaps s'],
 			'where'		=> [],
@@ -94,39 +94,62 @@ class CMap extends CMapElement {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		// Editable + permission check.
+		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
+			$user_groups = getUserGroupsByUserId($user_data['userid']);
+
+			$sql_parts['where'][] = '(EXISTS ('.
+					'SELECT NULL'.
+					' FROM sysmap_user su'.
+					' WHERE s.sysmapid=su.sysmapid'.
+						' AND su.userid='.$user_data['userid'].
+						' AND su.permission>='.$permission.
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM sysmap_usrgrp sg'.
+					' WHERE s.sysmapid=sg.sysmapid'.
+						' AND '.dbConditionInt('sg.usrgrpid', $user_groups).
+						' AND sg.permission>='.$permission.
+				')'.
+			')';
+		}
+
 		// sysmapids
 		if (!is_null($options['sysmapids'])) {
 			zbx_value2array($options['sysmapids']);
-			$sqlParts['where']['sysmapid'] = dbConditionInt('s.sysmapid', $options['sysmapids']);
+			$sql_parts['where']['sysmapid'] = dbConditionInt('s.sysmapid', $options['sysmapids']);
 		}
 
 		// userids
 		if ($options['userids'] !== null) {
 			zbx_value2array($options['userids']);
 
-			$sqlParts['where'][] = dbConditionInt('s.userid', $options['userids']);
+			$sql_parts['where'][] = dbConditionInt('s.userid', $options['userids']);
 		}
 
 		// search
 		if (!is_null($options['search'])) {
-			zbx_db_search('sysmaps s', $options, $sqlParts);
+			zbx_db_search('sysmaps s', $options, $sql_parts);
 		}
 
 		// filter
 		if (!is_null($options['filter'])) {
-			$this->dbFilter('sysmaps s', $options, $sqlParts);
+			$this->dbFilter('sysmaps s', $options, $sql_parts);
 		}
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
+			$sql_parts['limit'] = $options['limit'];
 		}
 
 		$sysmapids = [];
 
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 		while ($sysmap = DBfetch($res)) {
 			if ($options['countOutput']) {
 				$result = $sysmap['rowscount'];
@@ -313,13 +336,13 @@ class CMap extends CMapElement {
 
 		$db_maps = $this->get([
 			'output' => ['sysmapid', 'userid'],
-			'sysmapids' => $sysmapids
+			'sysmapids' => $sysmapids,
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
-		foreach ($db_maps as $db_map) {
-			if (!array_key_exists($db_map['sysmapid'], $sysmapids)
-					|| ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
-						&& $user_data['userid'] != $db_map['userid'])) {
+		foreach ($sysmapids as $sysmapid) {
+			if (!array_key_exists($sysmapid, $db_maps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
@@ -551,11 +574,12 @@ class CMap extends CMapElement {
 		$map_db_fields = ['sysmapid' => null];
 		$map_names = [];
 
-		foreach ($maps as &$map) {
+		foreach ($maps as $map) {
 			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
 
+			// Permission check.
 			if (!array_key_exists($map['sysmapid'], $db_maps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
@@ -565,12 +589,12 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
 			}
 
-			$exist_db_map = array_merge($db_maps[$map['sysmapid']], $map);
+			$map = array_merge($db_maps[$map['sysmapid']], $map);
 
 			if (array_key_exists('name', $map)) {
 				if (array_key_exists($map['name'], $map_names)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Duplicate map name for map "%s".', $exist_db_map['name'])
+						_s('Duplicate map name for map "%s".', $map['name'])
 					);
 				}
 				else {
@@ -580,21 +604,21 @@ class CMap extends CMapElement {
 
 			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map width value for map "%s".', $exist_db_map['name'])
+					_s('Incorrect map width value for map "%s".', $map['name'])
 				);
 			}
 
 			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map height value for map "%s".', $exist_db_map['name'])
+					_s('Incorrect map height value for map "%s".', $map['name'])
 				);
 			}
 
 			// Map labels.
 			$map_labels = ['label_type' => ['typeName' => _('icon')]];
 
-			if (array_key_exists('label_format', $exist_db_map)
-					&& $exist_db_map['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
+			if (array_key_exists('label_format', $map)
+					&& $map['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
 				$map_labels['label_type_hostgroup'] = [
 					'string' => 'label_string_hostgroup',
 					'typeName' => _('host group')
@@ -626,7 +650,7 @@ class CMap extends CMapElement {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Incorrect %1$s label type value for map "%2$s".',
 						$labelData['typeName'],
-						$exist_db_map['name']
+						$map['name']
 					));
 				}
 
@@ -635,7 +659,7 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Incorrect %1$s label type value for map "%2$s".',
 							$labelData['typeName'],
-							$exist_db_map['name']
+							$map['name']
 						));
 					}
 
@@ -643,7 +667,7 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Custom label for map "%2$s" elements of type "%1$s" may not be empty.',
 							$labelData['typeName'],
-							$exist_db_map['name']
+							$map['name']
 						));
 					}
 				}
@@ -652,7 +676,7 @@ class CMap extends CMapElement {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Incorrect %1$s label type value for map "%2$s".',
 						$labelData['typeName'],
-						$exist_db_map['name']
+						$map['name']
 					));
 				}
 
@@ -664,7 +688,7 @@ class CMap extends CMapElement {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Incorrect %1$s label type value for map "%2$s".',
 						$labelData['typeName'],
-						$exist_db_map['name']
+						$map['name']
 					));
 				}
 			}
@@ -710,13 +734,13 @@ class CMap extends CMapElement {
 				foreach ($map['urls'] as $url) {
 					if ($url['name'] === '' || $url['url'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL should have both "name" and "url" fields for map "%s".', $exist_db_map['name'])
+							_s('URL should have both "name" and "url" fields for map "%s".', $map['name'])
 						);
 					}
 
 					if (!array_key_exists($url['name'], $urlNames)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL name should be unique for map "%s".', $exist_db_map['name'])
+							_s('URL name should be unique for map "%s".', $map['name'])
 						);
 					}
 
@@ -726,14 +750,14 @@ class CMap extends CMapElement {
 
 			// Map selement links.
 			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = zbx_objectValues($exist_db_map['selements'], 'selementid');
+				$selementids = zbx_objectValues($map['selements'], 'selementid');
 
 				foreach ($map['links'] as $link) {
 					if (!in_array($link['selementid1'], $selementids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Link selementid1 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid1'],
-							$exist_db_map['name']
+							$map['name']
 						));
 					}
 
@@ -741,7 +765,7 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Link selementid2 field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
 							$link['selementid2'],
-							$exist_db_map['name']
+							$map['name']
 						));
 					}
 				}
@@ -894,7 +918,7 @@ class CMap extends CMapElement {
 			'preservekeys' => true
 		]);
 
-		$db_maps = $this->validateUpdate($maps, $db_maps);
+		$this->validateUpdate($maps, $db_maps);
 
 		$update_maps = [];
 		$url_ids_to_delete = [];
@@ -915,7 +939,7 @@ class CMap extends CMapElement {
 
 			$db_map = $db_maps[$map['sysmapid']];
 
-			// Urls
+			// Urls.
 			if (array_key_exists('urls', $map)) {
 				$url_diff = zbx_array_diff($map['urls'], $db_map['urls'], 'name');
 
