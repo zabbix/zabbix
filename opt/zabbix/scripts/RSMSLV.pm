@@ -155,7 +155,7 @@ sub get_macro_rdds_rtt_low
 
 sub get_macro_dns_udp_delay
 {
-	my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
+	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
 
 	my $item_param = 'RSM.DNS.UDP.DELAY';
 
@@ -168,7 +168,7 @@ sub get_macro_dns_udp_delay
 
 sub get_macro_dns_tcp_delay
 {
-	my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
+	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
 
 	my $item_param = 'RSM.DNS.TCP.DELAY';
 
@@ -181,7 +181,7 @@ sub get_macro_dns_tcp_delay
 
 sub get_macro_rdds_delay
 {
-	my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
+	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
 
 	my $item_param = 'RSM.RDDS.DELAY';
 
@@ -194,7 +194,7 @@ sub get_macro_rdds_delay
 
 sub get_macro_epp_delay
 {
-	my $value_time = (shift or time() - AVAIL_SHIFT_BACK);
+	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
 
 	my $item_param = 'RSM.EPP.DELAY';
 
@@ -885,7 +885,7 @@ sub get_interval_bounds
 	my $delay = shift;
 	my $clock = shift;
 
-	$clock = time() unless ($clock);
+	$clock = int(time()) unless ($clock);
 
 	my $from = truncate_from($clock, $delay);
 	my $till = $from + $delay - 1;
@@ -910,7 +910,7 @@ sub get_rollweek_bounds
 	else
 	{
 		# select till current time
-		$till = time() - ROLLWEEK_SHIFT_BACK;
+		$till = int(time()) - ROLLWEEK_SHIFT_BACK;
 
 		$till = truncate_from($till);
 		$from = $till - $rollweek_seconds;
@@ -3551,9 +3551,7 @@ sub optkeys
 
 sub ts_str
 {
-	my $ts = shift;
-
-	$ts = time() unless ($ts);
+	my $ts = shift || time();
 
 	my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ts);
 
@@ -3622,7 +3620,7 @@ my $log_open = 0;
 
 sub __func
 {
-	my $depth = 3;
+	my $depth = 4;
 
 	my $func = (caller($depth))[3];
 
