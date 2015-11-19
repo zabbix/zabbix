@@ -97,7 +97,7 @@ void	send_host_availability(zbx_socket_t *sock)
 	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
 		goto out;
 
-	zbx_set_availability_update_ts(ts);
+	zbx_set_availability_diff_ts(ts);
 
 	ret = SUCCEED;
 out:

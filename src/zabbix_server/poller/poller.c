@@ -304,7 +304,7 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 {
 	const char		*__function_name = "activate_host";
 	zbx_host_availability_t	in, out;
-	unsigned char		agent;
+	unsigned char		agent_type;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__function_name, item->host.hostid, item->itemid, (int)item->type);
@@ -312,19 +312,19 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 	zbx_host_availability_init(&in, item->host.hostid);
 	zbx_host_availability_init(&out,item->host.hostid);
 
-	if (ZBX_AGENT_UNKNOWN == (agent = host_availability_agent_by_item_type(item->type)))
+	if (ZBX_AGENT_UNKNOWN == (agent_type = host_availability_agent_by_item_type(item->type)))
 		goto out;
 
-	if (FAIL == host_get_availability(&item->host, agent, &in))
+	if (FAIL == host_get_availability(&item->host, agent_type, &in))
 		goto out;
 
-	if (FAIL == DChost_activate(item->host.hostid, agent, ts, &in.agents[agent], &out.agents[agent]))
+	if (FAIL == DChost_activate(item->host.hostid, agent_type, ts, &in.agents[agent_type], &out.agents[agent_type]))
 		goto out;
 
 	if (FAIL == db_host_update_availability(&out))
 		goto out;
 
-	if (HOST_AVAILABLE_TRUE == in.agents[agent].available)
+	if (HOST_AVAILABLE_TRUE == in.agents[agent_type].available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
 				zbx_agent_type_string(item->type), item->host.host);

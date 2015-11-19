@@ -3177,7 +3177,10 @@ void	DCupdate_hosts_availability()
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-	DBexecute("%s", sql);
+
+	if (16 < sql_offset)
+		DBexecute("%s", sql);
+
 	DBcommit();
 
 	zbx_free(sql);

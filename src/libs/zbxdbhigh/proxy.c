@@ -1549,7 +1549,10 @@ void	process_host_availability(struct zbx_json_parse *jp)
 		}
 
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-		DBexecute("%s", sql);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+
 		DBcommit();
 
 		zbx_free(sql);

@@ -63,7 +63,7 @@ static void	host_availability_sender(struct zbx_json *j)
 					get_ip_by_socket(&sock), error);
 		}
 		else
-			zbx_set_availability_update_ts(ts);
+			zbx_set_availability_diff_ts(ts);
 
 		zbx_free(error);
 		disconnect_server(&sock);
