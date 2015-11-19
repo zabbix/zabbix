@@ -142,39 +142,6 @@ function BR() {
 	return new CTag('br');
 }
 
-function get_table_header($columnLeft, $columnRights = SPACE) {
-	$rights = [];
-
-	if ($columnRights) {
-		if (!is_array($columnRights)) {
-			$columnRights = [$columnRights];
-		}
-
-		foreach ($columnRights as $columnRight) {
-			$rights[] = (new CDiv($columnRight))->addClass('floatright');
-		}
-
-		$rights = array_reverse($rights);
-	}
-
-	$table = (new CTable())
-		->addRow([
-			(new CCol($columnLeft))
-				->addClass('header_l')
-				->addClass('left'),
-			(new CCol($rights))
-				->addClass('header_r')
-				->addClass('right')
-		]);
-
-	return $table;
-}
-
-function show_table_header($columnLeft, $columnRights = SPACE){
-	$table = get_table_header($columnLeft, $columnRights);
-	$table->show();
-}
-
 function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favourite':

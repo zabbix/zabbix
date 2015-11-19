@@ -59,7 +59,7 @@ foreach ($this->data['db_cservices'] as $service) {
 		$service['trigger']]
 	);
 }
-$servicesChildTable->setFooter((new CCol(new CButton('select', _('Select'))))->addClass('right'));
+$servicesChildTable->setFooter(new CCol(new CButton('select', _('Select'))));
 
 // append table to form
 $servicesChildForm->addItem($servicesChildTable);
