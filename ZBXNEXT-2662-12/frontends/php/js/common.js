@@ -440,24 +440,12 @@ function redirect(uri, method, needle) {
 	return false;
 }
 
-function showHide(obj, style) {
-	if (typeof(style) == 'undefined') {
-		style = 'inline';
-	}
-	if (is_string(obj)) {
-		obj = document.getElementById(obj);
-	}
-	if (!obj) {
-		throw 'showHide(): Object not found.';
-	}
-
-	if (obj.style.display != 'none') {
-		obj.style.display = 'none';
-		return 0;
+function showHide(obj) {
+	if (jQuery(obj).is(':hidden')) {
+		jQuery(obj).css('display', 'block');
 	}
 	else {
-		obj.style.display = style;
-		return 1;
+		jQuery(obj).css('display', 'none');
 	}
 }
 
