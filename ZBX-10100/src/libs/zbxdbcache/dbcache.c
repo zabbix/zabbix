@@ -2326,6 +2326,7 @@ retry:
 		f -= ZBX_HISTORY_SIZE;
 	history = &cache->history[f];
 	history->num = 1;
+	history->meta = 0;
 	history->keep_history = 0;
 	history->keep_trends = 0;
 
