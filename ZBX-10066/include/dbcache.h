@@ -467,6 +467,6 @@ void	zbx_host_availability_clean(zbx_host_availability_t *availability);
 void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
-void	zbx_set_availability_update_ts();
+void	zbx_set_availability_diff_ts(int ts);
 
 #endif

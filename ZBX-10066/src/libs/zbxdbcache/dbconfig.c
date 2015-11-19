@@ -445,7 +445,9 @@ ZBX_DC_CONFIG_TABLE;
 
 typedef struct
 {
-	int			availability_update_ts;
+	/* timestamp of the last host availability diff sent to sever, used only by proxies */
+	int			availability_diff_ts;
+
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		numitems;
@@ -4174,7 +4176,7 @@ void	init_configuration_cache(void)
 
 	config->config = NULL;
 
-	config->availability_update_ts = 0;
+	config->availability_diff_ts = 0;
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -5934,36 +5936,32 @@ static void	DChost_get_agent_availability(const ZBX_DC_HOST *dc_host, unsigned c
 	{
 		case ZBX_AGENT_ZABBIX:
 			agent->available = dc_host->available;
-			agent->error =
-					zbx_strdup(agent->error, dc_host->error);
+			agent->error = zbx_strdup(agent->error, dc_host->error);
 			agent->errors_from = dc_host->errors_from;
 			agent->disable_until = dc_host->disable_until;
 			break;
 		case ZBX_AGENT_SNMP:
 			agent->available = dc_host->snmp_available;
-			agent->error =
-					zbx_strdup(agent->error, dc_host->snmp_error);
+			agent->error = zbx_strdup(agent->error, dc_host->snmp_error);
 			agent->errors_from = dc_host->snmp_errors_from;
 			agent->disable_until = dc_host->snmp_disable_until;
 			break;
 		case ZBX_AGENT_IPMI:
 			agent->available = dc_host->ipmi_available;
-			agent->error =
-					zbx_strdup(agent->error, dc_host->ipmi_error);
+			agent->error = zbx_strdup(agent->error, dc_host->ipmi_error);
 			agent->errors_from = dc_host->ipmi_errors_from;
 			agent->disable_until = dc_host->ipmi_disable_until;
 			break;
 		case ZBX_AGENT_JMX:
 			agent->available = dc_host->jmx_available;
-			agent->error =
-					zbx_strdup(agent->error, dc_host->jmx_error);
+			agent->error = zbx_strdup(agent->error, dc_host->jmx_error);
 			agent->errors_from = dc_host->jmx_errors_from;
 			agent->disable_until = dc_host->jmx_disable_until;
 			break;
 	}
 }
 
-static int	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char *available, const char **error,
+static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char *available, const char **error,
 		int *errors_from, int *disable_until)
 {
 #define AGENT_AVAILABILITY_ASSIGN(flags, mask, dst, src)	\
@@ -5991,8 +5989,6 @@ static int	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char
 
 #undef AGENT_AVAILABILITY_ASSIGN_STR
 #undef AGENT_AVAILABILITY_ASSIGN
-
-	return (ZBX_FLAGS_AGENT_STATUS_NONE == av->flags ? 0 : 1);
 }
 
 /******************************************************************************
@@ -6065,23 +6061,23 @@ static int	DChost_set_agent_availability(ZBX_DC_HOST *dc_host, int now, unsigned
  ******************************************************************************/
 static int	DChost_set_availability(ZBX_DC_HOST *dc_host, int now, zbx_host_availability_t *ha)
 {
-	int		updated = 0, i;
-	unsigned char	flags = 0;
+	int		i;
+	unsigned char	flags = ZBX_FLAGS_AGENT_STATUS_NONE;
 
-	updated += DCagent_set_availability(&ha->agents[ZBX_AGENT_ZABBIX], &dc_host->available,
-			&dc_host->error, &dc_host->errors_from, &dc_host->disable_until);
-	updated += DCagent_set_availability(&ha->agents[ZBX_AGENT_SNMP], &dc_host->snmp_available,
-			&dc_host->snmp_error, &dc_host->snmp_errors_from, &dc_host->snmp_disable_until);
-	updated += DCagent_set_availability(&ha->agents[ZBX_AGENT_IPMI], &dc_host->ipmi_available,
-			&dc_host->ipmi_error, &dc_host->ipmi_errors_from, &dc_host->ipmi_disable_until);
-	updated += DCagent_set_availability(&ha->agents[ZBX_AGENT_JMX], &dc_host->jmx_available,
-			&dc_host->jmx_error, &dc_host->jmx_errors_from, &dc_host->jmx_disable_until);
-
-	if (0 == updated)
-		return FAIL;
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_ZABBIX], &dc_host->available, &dc_host->error,
+			&dc_host->errors_from, &dc_host->disable_until);
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_SNMP], &dc_host->snmp_available, &dc_host->snmp_error,
+			&dc_host->snmp_errors_from, &dc_host->snmp_disable_until);
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_IPMI], &dc_host->ipmi_available, &dc_host->ipmi_error,
+			&dc_host->ipmi_errors_from, &dc_host->ipmi_disable_until);
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_JMX], &dc_host->jmx_available, &dc_host->jmx_error,
+			&dc_host->jmx_errors_from, &dc_host->jmx_disable_until);
 
 	for (i = 0; i < ZBX_AGENT_MAX; i++)
 		flags |= ha->agents[i].flags;
+
+	if (ZBX_FLAGS_AGENT_STATUS_NONE == flags)
+		return FAIL;
 
 	if (0 != (flags & (ZBX_FLAGS_AGENT_STATUS_AVAILABLE | ZBX_FLAGS_AGENT_STATUS_ERROR)))
 		dc_host->availability_ts = now;
@@ -6353,10 +6349,10 @@ int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_t
 		/* Check if other pollers haven't already attempted deactivating host. */
 		/* In that case should wait the initial unreachable delay before       */
 		/* trying to make it unavailable.                                      */
-		if (CONFIG_UNREACHABLE_DELAY <= ts->sec - out->errors_from)
+		if (CONFIG_UNREACHABLE_DELAY <= ts->sec - errors_from)
 		{
 			/* repeating error */
-			if (CONFIG_UNREACHABLE_PERIOD > ts->sec - out->errors_from)
+			if (CONFIG_UNREACHABLE_PERIOD > ts->sec - errors_from)
 			{
 				/* leave host available, schedule next unreachable check */
 				disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
@@ -8004,9 +8000,7 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 
 		if (SUCCEED == zbx_host_availability_is_set(ha))
 		{
-			DChost_set_availability(host, now, ha);
-
-			if (SUCCEED == zbx_host_availability_is_set(ha))
+			if (SUCCEED == DChost_set_availability(host, now, ha))
 			{
 				zbx_vector_ptr_append(hosts, ha);
 				ha = NULL;
@@ -8057,7 +8051,7 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		if (config->availability_update_ts <= host->availability_ts && host->availability_ts < *ts)
+		if (config->availability_diff_ts <= host->availability_ts && host->availability_ts < *ts)
 		{
 			ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
 			zbx_host_availability_init(ha, host->hostid);
@@ -8077,6 +8071,8 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 
 	UNLOCK_CACHE;
 
+	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
 
 	return 0 == hosts->values_num ? FAIL : SUCCEED;
@@ -8094,9 +8090,9 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
  *           availability data to be sent to server.                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_set_availability_update_ts(int ts)
+void	zbx_set_availability_diff_ts(int ts)
 {
 	/* this data can't be accessed simultaneously from multiple processes - locking is not necessary */
-	config->availability_update_ts = ts;
+	config->availability_diff_ts = ts;
 }
 

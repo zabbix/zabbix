@@ -599,11 +599,13 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 int	zbx_db_get_database_type(void);
 
-
+/* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
 typedef struct
 {
+	/* flags specifying which fields are set, see ZBX_FLAGS_AGENT_STATUS_* defines */
 	unsigned char	flags;
 
+	/* agent availability fields */
 	unsigned char	available;
 	char		*error;
 	int		errors_from;
@@ -627,7 +629,6 @@ zbx_agent_availability_t;
 #define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
 #define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
 #define ZBX_AGENT_UNKNOWN 	255
-
 #define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
 typedef struct
