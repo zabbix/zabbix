@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10100] fixed issue when collected values could be left unsaved to the database (dimir)
 ........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
