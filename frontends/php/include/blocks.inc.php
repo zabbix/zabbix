@@ -511,12 +511,10 @@ function make_status_of_zbx() {
 		$reqs = $frontendSetup->checkRequirements();
 		foreach ($reqs as $req) {
 			if ($req['result'] != CFrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
-				$table->addRow([
-					(new CSpan($req['name']))->addClass($class),
-					(new CSpan($req['current']))->addClass($class),
-					(new CSpan($req['error']))->addClass($class)
-				]);
+				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? ZBX_STYLE_ORANGE : ZBX_STYLE_RED;
+				$table->addRow(
+					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass($class)
+				);
 			}
 		}
 	}
