@@ -17,17 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
+#ifndef ZABBIX_SYSINFO_COMMON_CPU_H
+#define ZABBIX_SYSINFO_COMMON_CPU_H
 
-class GeneralInformation
-{
-	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "12 November 2015";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "2.4.8rc1";
+#include "sysinfo.h"
 
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
-	}
-}
+int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#endif	/* ZABBIX_SYSINFO_COMMON_CPU_H */

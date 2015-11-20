@@ -4,6 +4,8 @@
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	</td>
 	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="64" value="#{iface.ip}" />
@@ -62,7 +64,7 @@
 				jQuery('.interface-bulk', domRow).remove();
 			}
 
-			if (hostInterface.locked) {
+			if (hostInterface.locked > 0) {
 				addNotDraggableIcon(domRow);
 			}
 			else {
@@ -159,7 +161,7 @@
 				checked_main: ''
 			};
 
-			if (hostInterface.items) {
+			if (hostInterface.items > 0) {
 				attrs.disabled = 'disabled="disabled"';
 			}
 

@@ -2108,7 +2108,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		orig_value[MAX_BUFFER_LEN], *value_esc;
+	char		*value_esc, *value_tmp;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __function_name, value, valuemapid);
@@ -2129,9 +2129,9 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	{
 		del_zeroes(row[0]);
 
-		strscpy(orig_value, value);
-
-		zbx_snprintf(value, max_len, "%s (%s)", row[0], orig_value);
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
+		zbx_strlcpy_utf8(value, value_tmp, max_len);
+		zbx_free(value_tmp);
 
 		ret = SUCCEED;
 	}

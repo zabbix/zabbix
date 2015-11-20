@@ -36,10 +36,12 @@ $fields = array(
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'border' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',		null),
-	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{} > 0',		null)
+	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(20, 65535),	null),
+	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null)
 );
-check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 /*
  * Permissions
@@ -86,8 +88,7 @@ foreach ($dbGraph['gitems'] as $gItem) {
 		$gItem['yaxisside'],
 		$gItem['calc_fnc'],
 		$gItem['color'],
-		$gItem['drawtype'],
-		$gItem['type']
+		$gItem['drawtype']
 	);
 }
 

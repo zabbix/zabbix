@@ -511,7 +511,7 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *             value      - [IN] received value from agent                    *
  *                                                                            *
  ******************************************************************************/
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts)
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts)
 {
 	const char		*__function_name = "lld_process_discovery_rule";
 

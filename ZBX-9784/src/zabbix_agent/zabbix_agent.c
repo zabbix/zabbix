@@ -247,7 +247,7 @@ int	main(int argc, char **argv)
 
 			init_result(&result);
 
-			process(s_in.buffer, 0, &result);
+			process(s_in.buffer, PROCESS_WITH_ALIAS, &result);
 
 			if (NULL == (value = GET_TEXT_RESULT(&result)))
 				value = GET_MSG_RESULT(&result);

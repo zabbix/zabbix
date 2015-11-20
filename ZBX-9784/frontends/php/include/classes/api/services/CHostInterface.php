@@ -255,6 +255,13 @@ class CHostInterface extends CApiService {
 		));
 
 		foreach ($interfaces as &$interface) {
+			if (!array_key_exists('useip', $interface)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'No connection mode selected for interface with IP "%1$s".',
+					$interface['ip']
+				));
+			}
+
 			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}

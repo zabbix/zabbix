@@ -96,7 +96,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hVR:";
+static char	shortopts[] = "c:hVR:";
 
 /* end of COMMAND LINE OPTIONS */
 

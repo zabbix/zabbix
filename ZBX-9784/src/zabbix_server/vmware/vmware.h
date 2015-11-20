@@ -32,6 +32,11 @@
 #define ZBX_VMWARE_STATE_UPDATING	0x100
 #define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
 
+/* the vmware performance counter state */
+#define ZBX_VMWARE_COUNTER_NEW		0x00
+#define ZBX_VMWARE_COUNTER_READY	0x01
+#define ZBX_VMWARE_COUNTER_UPDATING	0x10
+
 /* performance counter data */
 typedef struct
 {
@@ -42,6 +47,9 @@ typedef struct
 	/*    pair->first  - instance               */
 	/*    pair->second - value                  */
 	zbx_vector_ptr_pair_t	values;
+
+	/* the counter state, see ZBX_VMAWRE_COUNTER_* defines */
+	unsigned char		state;
 }
 zbx_vmware_perf_counter_t;
 

@@ -532,6 +532,30 @@ void	zbx_strlcat(char *dst, const char *src, size_t siz)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_strlcpy_utf8                                                 *
+ *                                                                            *
+ * Purpose: copies utf-8 string + terminating zero character into specified   *
+ *          buffer                                                            *
+ *                                                                            *
+ * Return value: the number of copied bytes excluding terminating zero        *
+ *               character.                                                   *
+ *                                                                            *
+ * Comments: If the source string is larger than destination buffer then the  *
+ *           string is truncated after last valid utf-8 character rather than *
+ *           byte.                                                            *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size)
+{
+	size = zbx_strlen_utf8_nbytes(src, size - 1);
+	memcpy(dst, src, size);
+	dst[size] = '\0';
+
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dvsprintf                                                    *
  *                                                                            *
  * Purpose: dynamical formatted output conversion                             *

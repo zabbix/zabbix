@@ -286,12 +286,15 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			OPERATION_TYPE_HOST_DISABLE => 0
 		);
 		if (isset($uniqOperations[$new_operation['operationtype']])) {
-			foreach ($_REQUEST['operations'] as $operation) {
-				if (isset($uniqOperations[$operation['operationtype']])) {
+			$uniqOperations[$new_operation['operationtype']]++;
+			foreach ($_REQUEST['operations'] as $operationId => $operation) {
+				if (array_key_exists($operation['operationtype'], $uniqOperations)
+					&& (!array_key_exists('id', $new_operation)
+						|| bccomp($new_operation['id'], $operationId) != 0)) {
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
-			if ($uniqOperations[$new_operation['operationtype']]) {
+			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
 				info(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();

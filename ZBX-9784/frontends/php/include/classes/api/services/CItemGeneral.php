@@ -211,6 +211,12 @@ abstract class CItemGeneral extends CApiService {
 				foreach ($this->fieldRules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
+
+						// For templated item and fields that should not be modified, use the value from DB.
+						if (array_key_exists($field, $dbItems[$item['itemid']])
+								&& array_key_exists($field, $fullItem)) {
+							$fullItem[$field] = $dbItems[$item['itemid']][$field];
+						}
 					}
 				}
 
@@ -321,10 +327,18 @@ abstract class CItemGeneral extends CApiService {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
+				if ($fullItem['delay'] < 0 || $fullItem['delay'] > SEC_PER_DAY) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Item will not be refreshed. Please enter a correct update interval.')
+					);
+				}
+
 				$nextCheck = calculateItemNextCheck(0, $fullItem['delay'], $fullItem['delay_flex'], time());
+
 				if ($nextCheck == ZBX_JAN_2038) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Item will not be refreshed. Please enter a correct update interval.'));
+						_('Item will not be refreshed. Please enter a correct update interval.')
+					);
 				}
 			}
 

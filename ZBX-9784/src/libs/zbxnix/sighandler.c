@@ -31,7 +31,7 @@ int	sig_exiting = 0;
  *                                                                            *
  * Function: fatal_signal_handler                                             *
  *                                                                            *
- * Purpose: handle fatal signals: SIGILL, SIGILL, SIGSEGV, SIGBUS             *
+ * Purpose: handle fatal signals: SIGILL, SIGFPE, SIGSEGV, SIGBUS             *
  *                                                                            *
  ******************************************************************************/
 static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)

@@ -36,12 +36,14 @@ $fields = array(
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{} >= 0',	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{} > 0',	null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(20, 65535),	null),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{} > 0',	null),
 	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 	'batch' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
 );
-check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 $itemIds = getRequest('itemids');
 

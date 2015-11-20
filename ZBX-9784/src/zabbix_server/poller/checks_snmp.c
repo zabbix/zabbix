@@ -24,11 +24,54 @@
 
 #ifdef HAVE_NETSNMP
 
+/*
+ * SNMP Dynamic Index Cache
+ * ========================
+ *
+ * Description
+ * -----------
+ *
+ * Zabbix caches the whole index table for the particular OID separately based on:
+ *   * IP address;
+ *   * port;
+ *   * community string (SNMPv2c);
+ *   * context, security name (SNMPv3).
+ *
+ * Zabbix revalidates each index before using it to get a value and rebuilds the index cache for the OID if the
+ * index is invalid.
+ *
+ * Example
+ * -------
+ *
+ * OID for getting memory usage of process by PID (index):
+ *   HOST-RESOURCES-MIB::hrSWRunPerfMem:<PID>
+ *
+ * OID for getting PID (index) by process name (value):
+ *   HOST-RESOURCES-MIB::hrSWRunPath:<PID> <NAME>
+ *
+ * SNMP OID as configured in Zabbix to get memory usage of "snmpd" process:
+ *   HOST-RESOURCES-MIB::hrSWRunPerfMem["index","HOST-RESOURCES-MIB::hrSWRunPath", "snmpd"]
+ *
+ * 1. Zabbix walks hrSWRunPath table and caches all <PID> and <NAME> pairs of particular SNMP agent/user.
+ * 2. Before each GET request Zabbix revalidates the cached <PID> by getting its <NAME> from hrSWRunPath table.
+ * 3. If the names match then Zabbix uses the cached <PID> in the GET request for the hrSWRunPerfMem.
+ *    Otherwise Zabbix rebuilds the hrSWRunPath cache for the particular agent/user (see 1.).
+ *
+ * Implementation
+ * --------------
+ *
+ * The cache is implemented using hash tables. In ERD:
+ * zbx_snmpidx_main_key_t -------------------------------------------0< zbx_snmpidx_mapping_t
+ * (OID, host, <v2c: community|v3: (context, security name)>)           (index, value)
+ */
+
 typedef struct
 {
 	char		*addr;
 	unsigned short	port;
 	char		*oid;
+	char		*community_context;	/* community (SNMPv1 or v2c) or contextName (SNMPv3) */
+	char		*security_name;		/* only SNMPv3, empty string in case of other versions */
 	zbx_hashset_t	*mappings;
 }
 zbx_snmpidx_main_key_t;
@@ -40,7 +83,7 @@ typedef struct
 }
 zbx_snmpidx_mapping_t;
 
-static zbx_hashset_t	snmpidx;
+static zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
@@ -51,6 +94,8 @@ static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 	hash = ZBX_DEFAULT_STRING_HASH_FUNC(main_key->addr);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&main_key->port, sizeof(main_key->port), hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(main_key->oid, strlen(main_key->oid), hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(main_key->community_context, strlen(main_key->community_context), hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(main_key->security_name, strlen(main_key->security_name), hash);
 
 	return hash;
 }
@@ -67,6 +112,12 @@ static int	__snmpidx_main_key_compare(const void *d1, const void *d2)
 
 	ZBX_RETURN_IF_NOT_EQUAL(main_key1->port, main_key2->port);
 
+	if (0 != (ret = strcmp(main_key1->community_context, main_key2->community_context)))
+		return ret;
+
+	if (0 != (ret = strcmp(main_key1->security_name, main_key2->security_name)))
+		return ret;
+
 	return strcmp(main_key1->oid, main_key2->oid);
 }
 
@@ -76,6 +127,8 @@ static void	__snmpidx_main_key_clean(void *data)
 
 	zbx_free(main_key->addr);
 	zbx_free(main_key->oid);
+	zbx_free(main_key->community_context);
+	zbx_free(main_key->security_name);
 	zbx_hashset_destroy(main_key->mappings);
 	zbx_free(main_key->mappings);
 }
@@ -103,7 +156,48 @@ static void	__snmpidx_mapping_clean(void *data)
 	zbx_free(mapping->index);
 }
 
-static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, char **idx, size_t *idx_alloc)
+static char	*get_item_community_context(const DC_ITEM *item)
+{
+	if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type)
+		return item->snmp_community;
+	else if (ITEM_TYPE_SNMPv3 == item->type)
+		return item->snmpv3_contextname;
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
+
+static char	*get_item_security_name(const DC_ITEM *item)
+{
+	if (ITEM_TYPE_SNMPv3 == item->type)
+		return item->snmpv3_securityname;
+
+	return "";
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_get_snmp_index                                             *
+ *                                                                            *
+ * Purpose: retrieve index that matches value from the relevant index cache   *
+ *                                                                            *
+ * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ *                              IP address, port, community string, context,  *
+ *                              security name                                 *
+ *             oid       - [IN] OID of the table which contains the indexes   *
+ *             value     - [IN] value for which to look up the index          *
+ *             idx       - [IN/OUT] destination pointer for the               *
+ *                                  heap-(re)allocated index                  *
+ *             idx_alloc - [IN/OUT] size of the (re)allocated index           *
+ *                                                                            *
+ * Return value: FAIL    - dynamic index cache is empty or cache does not     *
+ *                         contain index matching the value                   *
+ *               SUCCEED - idx contains the found index,                      *
+ *                         idx_alloc contains the current size of the         *
+ *                         heap-(re)allocated idx                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	cache_get_snmp_index(const DC_ITEM *item, const char *oid, const char *value, char **idx, size_t *idx_alloc)
 {
 	const char		*__function_name = "cache_get_snmp_index";
 
@@ -119,7 +213,10 @@ static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, cha
 
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
-	main_key_local.oid = oid;
+	main_key_local.oid = (char *)oid;
+
+	main_key_local.community_context = get_item_community_context(item);
+	main_key_local.security_name = get_item_security_name(item);
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 		goto end;
@@ -136,7 +233,21 @@ end:
 	return ret;
 }
 
-static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, const char *idx)
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_put_snmp_index                                             *
+ *                                                                            *
+ * Purpose: store the index-value pair in the relevant index cache            *
+ *                                                                            *
+ * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ *                              IP address, port, community string, context,  *
+ *                              security name                                 *
+ *             oid       - [IN] OID of the table which contains the indexes   *
+ *             value     - [IN] value part of the index-value pair            *
+ *             idx       - [IN] index part of the index-value pair            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cache_put_snmp_index(const DC_ITEM *item, const char *oid, const char *value, const char *idx)
 {
 	const char		*__function_name = "cache_put_snmp_index";
 
@@ -154,12 +265,18 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
-	main_key_local.oid = oid;
+	main_key_local.oid = (char *)oid;
+
+	main_key_local.community_context = get_item_community_context(item);
+	main_key_local.security_name = get_item_security_name(item);
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 	{
 		main_key_local.addr = zbx_strdup(NULL, item->interface.addr);
 		main_key_local.oid = zbx_strdup(NULL, oid);
+
+		main_key_local.community_context = zbx_strdup(NULL, get_item_community_context(item));
+		main_key_local.security_name = zbx_strdup(NULL, get_item_security_name(item));
 
 		main_key_local.mappings = zbx_malloc(NULL, sizeof(zbx_hashset_t));
 		zbx_hashset_create_ext(main_key_local.mappings, 100,
@@ -185,6 +302,21 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_del_snmp_index_subtree                                     *
+ *                                                                            *
+ * Purpose: delete index-value mappings from the specified index cache        *
+ *                                                                            *
+ * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ *                              IP address, port, community string, context,  *
+ *                              security name                                 *
+ *             oid       - [IN] OID of the table which contains the indexes   *
+ *                                                                            *
+ * Comments: does nothing if the index cache is empty or if it does not       *
+ *           contain the cache for the specified OID                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 {
 	const char		*__function_name = "cache_del_snmp_index_subtree";
@@ -199,6 +331,9 @@ static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
 	main_key_local.oid = (char *)oid;
+
+	main_key_local.community_context = get_item_community_context(item);
+	main_key_local.security_name = get_item_security_name(item);
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 		goto end;
@@ -530,7 +665,6 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 		strval_dyn[var->val_len] = '\0';
 	}
 
-	zbx_lrtrim(strval_dyn, ZBX_WHITESPACE);
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, ZBX_NULL2STR(strval_dyn));
 
@@ -563,7 +697,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		}
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_UNSIGNED64 == var->type ||
+	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_OPAQUE_U64 == var->type ||
 			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
 #else
 	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type ||
@@ -572,13 +706,17 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	{
 		SET_UI64_RESULT(result, (unsigned long)*var->val.integer);
 	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_COUNTER64 == var->type || ASN_OPAQUE_COUNTER64 == var->type)
+#else
 	else if (ASN_COUNTER64 == var->type)
+#endif
 	{
 		SET_UI64_RESULT(result, (((zbx_uint64_t)var->val.counter64->high) << 32) +
 				(zbx_uint64_t)var->val.counter64->low);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_INTEGER == var->type || ASN_INTEGER64 == var->type)
+	else if (ASN_INTEGER == var->type || ASN_OPAQUE_I64 == var->type)
 #else
 	else if (ASN_INTEGER == var->type)
 #endif
@@ -591,11 +729,11 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			ret = NOTSUPPORTED;
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_FLOAT == var->type)
+	else if (ASN_OPAQUE_FLOAT == var->type)
 	{
 		SET_DBL_RESULT(result, *var->val.floatVal);
 	}
-	else if (ASN_DOUBLE == var->type)
+	else if (ASN_OPAQUE_DOUBLE == var->type)
 	{
 		SET_DBL_RESULT(result, *var->val.doubleVal);
 	}
@@ -1462,7 +1600,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		ret = zbx_snmp_get_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type, num, 0,
 				error, max_error_len, max_succeed, min_fail);
 
-		if (SUCCEED != ret)
+		if (SUCCEED != ret && NOTSUPPORTED != ret)
 			goto exit;
 
 		for (i = 0; i < to_verify_num; i++)

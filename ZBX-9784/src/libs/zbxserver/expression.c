@@ -1342,7 +1342,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
-			char	tmp[MAX_STRING_LEN];
+			char	tmp[MAX_BUFFER_LEN];
 
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
@@ -2288,7 +2288,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
-		expand_trigger_description_constants(data, event->trigger.expression);
+	{
+		char	*expression;
+
+		expression = zbx_strdup(NULL, event->trigger.expression);
+
+		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, &expression,
+				MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+
+		expand_trigger_description_constants(data, expression);
+
+		zbx_free(expression);
+	}
 
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
@@ -4173,7 +4184,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 			key_type = ZBX_KEY_TYPE_OID;
 			break;
 		default:
-			assert(0);
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
