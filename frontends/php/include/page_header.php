@@ -229,7 +229,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 }
 
 // unset multiple variables
-unset($ZBX_MENU, $table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
+unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
 	zbx_add_post_js('initMessages({});');
