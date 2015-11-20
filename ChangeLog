@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 ..F....... [ZBX-10006] changed color of hovered host name for disabled host in search result (vitalijs)
 .......PS. [ZBX-10100] fixed issue when collected values could be left unsaved to the database (dimir)
 ........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
@@ -252,6 +253,7 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 
@@ -964,6 +966,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
@@ -2297,6 +2300,7 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.16
