@@ -403,7 +403,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_setproctitle                                                 *
+ * Function: __zbx_zbx_setproctitle                                           *
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
@@ -414,13 +414,14 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	char	title[MAX_STRING_LEN];
+	const char	*__function_name = "__zbx_zbx_setproctitle";
 	va_list	args;
 
 	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() title:'%s'", __function_name, title);
 #endif
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
