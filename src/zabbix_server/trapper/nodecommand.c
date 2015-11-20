@@ -125,7 +125,8 @@ finish:
 	if (SUCCEED != zbx_tcp_send_raw(sock, send))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send); alarm(0);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send);
+	alarm(0);
 
 	zbx_json_free(&j);
 	zbx_free(result);
