@@ -482,8 +482,6 @@ char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
-void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
-
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
