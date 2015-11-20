@@ -67,7 +67,7 @@ if ($data['maps']) {
 	]));
 }
 else {
-	$mapTable = (new CTable())->setNoDataMessage(_('No maps found.'));
+	$mapTable = (new CTableInfo())->setNoDataMessage(_('No maps found.'));
 }
 
 $controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
