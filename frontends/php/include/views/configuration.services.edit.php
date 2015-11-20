@@ -92,7 +92,6 @@ $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $
  * Dependencies tab
  */
 $servicesChildTable = (new CTable())
-	->setNoDataMessage(_('No dependencies defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setId('service_children')
 	->setHeader([_('Services'), _('Soft'), _('Trigger'), _('Action')]);
@@ -136,7 +135,6 @@ $servicesDependenciesFormList->addRow(
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = (new CTable())
-	->setNoDataMessage(_('No times defined. Work 24x7.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
 
