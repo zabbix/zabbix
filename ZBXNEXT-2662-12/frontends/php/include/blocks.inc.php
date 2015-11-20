@@ -507,9 +507,7 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$frontendSetup = new CFrontendSetup();
-		$reqs = $frontendSetup->checkRequirements();
-		foreach ($reqs as $req) {
+		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
 			if ($req['result'] != CFrontendSetup::CHECK_OK) {
 				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? ZBX_STYLE_ORANGE : ZBX_STYLE_RED;
 				$table->addRow(
