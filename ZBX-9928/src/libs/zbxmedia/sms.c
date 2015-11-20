@@ -166,17 +166,19 @@ static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, 
 		{
 			ebuf += nbytes;
 			*ebuf = '\0';
+
 			nbytes_total += nbytes;
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Read attempt #%d from GSM modem [%s]", i, ebuf - nbytes);
 		}
 
-		do
+		while (0 < nbytes_total)
 		{
 			if (0 == isspace(ebuf[-nbytes_total]))
 				goto check_result;
+
+			nbytes_total--;
 		}
-		while (0 < --nbytes_total);
 	}
 
 	/* nul terminate the string and see if we got an OK response */
