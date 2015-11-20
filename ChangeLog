@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10001] fixed duplicating log file entries from housekeeper (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 ..F....... [ZBX-10006] changed color of hovered host name for disabled host in search result (vitalijs)
 .......PS. [ZBX-10100] fixed issue when collected values could be left unsaved to the database (dimir)
