@@ -365,6 +365,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
+		$triggers = $this->resolveTriggerExpressionUserMacro($triggers);
+
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
 			$matched_macros = $this->extractMacros([$trigger['description']], $types);
