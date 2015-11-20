@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+..F....... [ZBX-10006] changed color of hovered host name for disabled host in search result (vitalijs)
 .......PS. [ZBX-10100] fixed issue when collected values could be left unsaved to the database (dimir)
 ........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
