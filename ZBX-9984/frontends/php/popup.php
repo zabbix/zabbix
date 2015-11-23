@@ -201,7 +201,8 @@ $fields = [
 	'writeonly' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'noempty' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'select' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'submitParent' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'submitParent' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'templateid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null]
 ];
 
 // unset disabled item types
@@ -720,8 +721,14 @@ elseif ($srctbl == 'templates') {
 
 	$data = [];
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
+	$templateid = getRequest('templateid');
 
 	foreach ($templates as &$template) {
+		// dont show itself
+		if ($template['templateid'] == $templateid) {
+			continue;
+		}
+
 		if ($multiselect) {
 			$checkBox = new CCheckBox('templates['.$template['templateid'].']', $template['templateid']);
 		}
