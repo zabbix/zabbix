@@ -25,43 +25,39 @@ class CSetParserTest extends CParserTest {
 		return new CSetParser(['<', '>', '<>', 'and', 'or']);
 	}
 
-	public function validProvider() {
+	public function testProvider() {
 		return [
-			['<', 0, '<', 1],
-			['<=', 0, '<', 1],
-			['>', 0, '>', 1],
-			['>=', 0, '>', 1],
-			['<>', 0, '<>', 2],
-			['<>=', 0, '<>', 2],
-			['and', 0, 'and', 3],
-			['and this', 0, 'and', 3],
-			['or', 0, 'or', 2],
-			['or this', 0, 'or', 2],
+			['<', 0, CParser::PARSE_SUCCESS, '<'],
+			['<=', 0, CParser::PARSE_SUCCESS_CONT, '<'],
+			['>', 0, CParser::PARSE_SUCCESS, '>'],
+			['>=', 0, CParser::PARSE_SUCCESS_CONT, '>'],
+			['<>', 0, CParser::PARSE_SUCCESS, '<>'],
+			['<>=', 0, CParser::PARSE_SUCCESS_CONT, '<>'],
+			['and', 0, CParser::PARSE_SUCCESS, 'and'],
+			['and this', 0, CParser::PARSE_SUCCESS_CONT, 'and'],
+			['or', 0, CParser::PARSE_SUCCESS, 'or'],
+			['or this', 0, CParser::PARSE_SUCCESS_CONT, 'or'],
 
-			['prefix<', 6, '<', 1],
-			['prefix<=', 6, '<', 1],
-			['prefix>', 6, '>', 1],
-			['prefix>=', 6, '>', 1],
-			['prefix<>', 6, '<>', 2],
-			['prefix<>=', 6, '<>', 2],
-			['prefixand', 6, 'and', 3],
-			['prefixand this', 6, 'and', 3],
-			['prefixor', 6, 'or', 2],
-			['prefixor this', 6, 'or', 2],
+			['prefix<', 6, CParser::PARSE_SUCCESS, '<'],
+			['prefix<=', 6, CParser::PARSE_SUCCESS_CONT, '<'],
+			['prefix>', 6, CParser::PARSE_SUCCESS, '>'],
+			['prefix>=', 6, CParser::PARSE_SUCCESS_CONT, '>'],
+			['prefix<>', 6, CParser::PARSE_SUCCESS, '<>'],
+			['prefix<>=', 6, CParser::PARSE_SUCCESS_CONT, '<>'],
+			['prefixand', 6, CParser::PARSE_SUCCESS, 'and'],
+			['prefixand this', 6, CParser::PARSE_SUCCESS_CONT, 'and'],
+			['prefixor', 6, CParser::PARSE_SUCCESS, 'or'],
+			['prefixor this', 6, CParser::PARSE_SUCCESS_CONT, 'or'],
 
-			['><', 0, '>', 1],
-		];
-	}
+			['><', 0, CParser::PARSE_SUCCESS_CONT, '>'],
 
-	public function invalidProvider() {
-		return [
-			['', 0, 0],
-			['an', 0, 2],
-			['anor', 0, 4],
-			['+<', 0, 0],
+			['', 0, CParser::PARSE_FAIL, ''],
+			['an', 0, CParser::PARSE_FAIL, ''],
+			['anor', 0, CParser::PARSE_FAIL, ''],
+			['+<', 0, CParser::PARSE_FAIL, ''],
 
-			['prefixand', 5, 5],
-			['prefixand', 7, 9],
+			['prefixand', 5, CParser::PARSE_FAIL, ''],
+			['prefixand', 7, CParser::PARSE_FAIL, '']
 		];
 	}
 }

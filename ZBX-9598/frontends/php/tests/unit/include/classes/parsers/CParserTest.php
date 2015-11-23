@@ -21,10 +21,7 @@
 
 abstract class CParserTest extends PHPUnit_Framework_TestCase {
 
-	protected $resultClassName = 'CParserResult';
-
-	abstract public function validProvider();
-	abstract public function invalidProvider();
+	abstract public function testProvider();
 
 	/**
 	 * Return an instance of the tested parser.
@@ -34,36 +31,27 @@ abstract class CParserTest extends PHPUnit_Framework_TestCase {
 	abstract protected function getParser();
 
 	/**
-	 * @dataProvider validProvider
+	 * @dataProvider testProvider
 	 *
 	 * @param $string
 	 * @param $pos
-	 * @param $expectedMatch
-	 * @param $expectedLength
+	 * @param $expected_rc
+	 * @param $expected_match
 	 */
-	public function testParseValid($string, $pos, $expectedMatch, $expectedLength) {
-		$result = $this->getParser()->parse($string, $pos);
-
-		$this->assertEquals($this->resultClassName, get_class($result));
-		$this->assertSame($expectedMatch, $result->match);
-		$this->assertSame($expectedLength, $result->length);
-		$this->assertSame($string, $result->source);
-		$this->assertSame($pos, $result->pos);
-	}
-
-	/**
-	 * @dataProvider invalidProvider
-	 *
-	 * @param $string
-	 * @param $pos
-	 * @param $expectedEndPos
-	 */
-	public function testParseInvalid($string, $pos, $expectedEndPos) {
+	public function testParseValid($string, $pos, $expected_rc, $expected_match) {
 		$parser = $this->getParser();
 
-		$result = $parser->parse($string, $pos);
-
-		$this->assertSame(false, $result);
-		$this->assertSame($expectedEndPos, $parser->getPos());
+		$this->assertSame(
+			[
+				'rc' => $expected_rc,
+				'match' => $expected_match,
+				'length' => strlen($expected_match)
+			],
+			[
+				'rc' => $parser->parse($string, $pos),
+				'match' => $parser->getMatch(),
+				'length' => $parser->getLength()
+			]
+		);
 	}
 }

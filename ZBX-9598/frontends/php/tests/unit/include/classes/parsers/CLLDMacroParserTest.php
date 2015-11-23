@@ -18,30 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
- * Class for storing the result returned by the function macro parser.
- */
-class CFunctionMacroParserResult extends CParserResult {
 
-	/**
-	 * Array containing information about the parsed function macro.
-	 *
-	 * Example:
-	 *   array(
-	 *     'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *     'pos' => 0,
-	 *     'host' => 'Zabbix server',
-	 *     'item' => 'agent.ping',
-	 *     'function' => 'last(0)',
-	 *     'functionName' => 'last',
-	 *     'functionParam' => '0',
-	 *     'functionParamList' => array (0 => '0')
-	 *   )
-	 *
-	 * @deprecated  implement tokens instead
-	 *
-	 * @var array
-	 */
-	public $expression = [];
+class CLLDMacroParserTest extends CParserTest {
 
+	protected function getParser() {
+		return new CLLDMacroParser();
+	}
+
+	public function testProvider() {
+		return [
+			['{#M}', 0, CParser::PARSE_SUCCESS, '{#M}'],
+			['{#MACRO12.A_Z}', 0, CParser::PARSE_SUCCESS, '{#MACRO12.A_Z}'],
+			['{#MACRO} = 0', 0, CParser::PARSE_SUCCESS_CONT, '{#MACRO}'],
+			['not {#MACRO} = 0', 4, CParser::PARSE_SUCCESS_CONT, '{#MACRO}'],
+
+			['', 0, CParser::PARSE_FAIL, ''],
+			['A', 0, CParser::PARSE_FAIL, ''],
+			['{A', 0, CParser::PARSE_FAIL, ''],
+			['{#', 0, CParser::PARSE_FAIL, ''],
+			['{#}', 0, CParser::PARSE_FAIL, ''],
+			['{#A', 0, CParser::PARSE_FAIL, ''],
+			['{#a}', 0, CParser::PARSE_FAIL, ''],
+			['{#+}', 0, CParser::PARSE_FAIL, '']
+		];
+	}
 }

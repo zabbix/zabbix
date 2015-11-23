@@ -1586,6 +1586,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_handle_log();
+
 		if (time(NULL) >= nextsend)
 		{
 			send_buffer(activechk_args.host, activechk_args.port);

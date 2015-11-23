@@ -441,6 +441,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("collector [processing data]");
 #ifdef _WINDOWS
 		collect_perfstat();

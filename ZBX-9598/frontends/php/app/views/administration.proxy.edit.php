@@ -34,7 +34,7 @@ $proxyForm = (new CForm())
 	->addVar('proxyid', $data['proxyid'])
 	->addVar('tls_accept', $data['tls_accept']);
 
-if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
+if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interfaceid', $data)) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
 
