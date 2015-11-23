@@ -567,7 +567,9 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
 					goto skip;
+				}
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[1]);
@@ -583,7 +585,9 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 			{
 				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				{
 					goto skip;
+				}
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 			}
