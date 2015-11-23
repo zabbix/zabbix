@@ -39,8 +39,8 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-extern unsigned char	process_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #ifndef _WINDOWS
 static int		shm_id;
