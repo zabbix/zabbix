@@ -833,6 +833,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		else
 			zbx_sleep_loop(sleeptime);
 
+		zbx_handle_log();
+
 		time_slept = zbx_time() - sec;
 
 		hk_period = get_housekeeping_period(time_slept);

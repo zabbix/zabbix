@@ -120,6 +120,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s, configured_tls_accept_modes)))

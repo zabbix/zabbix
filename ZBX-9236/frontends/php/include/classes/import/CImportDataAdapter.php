@@ -169,6 +169,15 @@ class CImportDataAdapter {
 	}
 
 	/**
+	 * Get value maps from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getValueMaps() {
+		return array_key_exists('value_maps', $this->data) ? $this->data['value_maps'] : [];
+	}
+
+	/**
 	 * Get items from the imported data.
 	 *
 	 * @return array
