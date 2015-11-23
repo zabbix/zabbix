@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:18+0200\n"
+"POT-Creation-Date: 2015-11-01 00:13+0200\n"
 "PO-Revision-Date: 2014-06-09 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -603,7 +603,7 @@ msgstr "Chyba aplikácie."
 msgid "Application updated"
 msgstr "Aplikácia bola aktualizovaná"
 
-#: api/classes/CItemGeneral.php:343
+#: api/classes/CItemGeneral.php:349
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
@@ -1603,7 +1603,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Host \"%1$s\" použitý v obrazovke \"%2$s\" nebol nájdený."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:600 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -1781,7 +1781,7 @@ msgstr "Nie je možné nastaviť \"templateid\" pre aplikáciu \"%1$s\"."
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
 msgstr "Nie je možné nastaviť \"templateid\" pre graf \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:223
+#: api/classes/CItemGeneral.php:229
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
 msgstr "Nie je možné nastaviť \"templateid\" pre položku \"%1$s\"."
@@ -2101,7 +2101,7 @@ msgstr "Kontrola už existuje."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Skontrolujte časť výrazu začínajúcu od \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:262
+#: api/classes/CItemGeneral.php:268
 msgid "Check the key, please. Default example was passed."
 msgstr "Skontrolujte prosím kľúč. Bol zadaný predvolený kľúč z príkladu."
 
@@ -4246,7 +4246,7 @@ msgstr "Popis chyby: obmedzenie definované v \"include/defines.inc.php\", konš
 msgid "Error description: empty response received."
 msgstr "Popis chyby: prijatá prázdna odpoveď."
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:273
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr "Chyba v kľúči položky: \"%s\"."
@@ -6020,12 +6020,12 @@ msgstr "Neplatné polia pre spúšťač."
 msgid "Incorrect file upload."
 msgstr "Nahraný neplatný súbor."
 
-#: api/classes/CItemGeneral.php:769
+#: api/classes/CItemGeneral.php:775
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Neplatný flexibilný interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:758
+#: api/classes/CItemGeneral.php:764
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Neplatný flexibilný interval v položke \"%1$s\". Flexibilný interval musí byť reťazec."
@@ -6562,7 +6562,7 @@ msgstr "Taliansky (it_IT)"
 msgid "Item"
 msgstr "Položka"
 
-#: api/classes/CItemGeneral.php:593
+#: api/classes/CItemGeneral.php:599
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Položka \"%1$s\" už existuje na \"%2$s\", zdedená z inej šablóny."
@@ -6593,7 +6593,7 @@ msgstr "Položka \"%1$s\" na \"%2$s\": aplikácia \"%3$s\" neexistuje."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Položka \"%1$s\" preskočená - používateľské pravidlo."
 
-#: api/classes/CItemGeneral.php:335
+#: api/classes/CItemGeneral.php:341
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
@@ -6629,44 +6629,44 @@ msgstr "Prototypy položiek pre"
 msgid "Item updated"
 msgstr "Položka aktualizovaná"
 
-#: api/classes/CItemGeneral.php:246
+#: api/classes/CItemGeneral.php:252
 msgid "Item uses host interface from non-parent host."
 msgstr "Položka používa rozhranie z nie nadriadeného hosta."
 
-#: api/classes/CItemGeneral.php:249
+#: api/classes/CItemGeneral.php:255
 msgid "Item uses incorrect interface type."
 msgstr "Položka používa neplatný typ rozhrania."
 
-#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:308 api/classes/CItemGeneral.php:318
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Položka nebude akutalizovaná. Zadajte prosím správny interval aktualizacií."
 
-#: api/classes/CItemGeneral.php:386
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako zisťovacie pravidlo."
 
-#: api/classes/CItemGeneral.php:392
+#: api/classes/CItemGeneral.php:398
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka vytvorená z prototypu položky."
 
-#: api/classes/CItemGeneral.php:389
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako prototyp položky."
 
-#: api/classes/CItemGeneral.php:383
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka."
 
-#: api/classes/CItemGeneral.php:395
+#: api/classes/CItemGeneral.php:401
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako neznámy element položky."
 
-#: api/classes/CItemGeneral.php:735
+#: api/classes/CItemGeneral.php:741
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
@@ -6828,7 +6828,7 @@ msgstr "Ponechať trendy (v dňoch)"
 msgid "Key"
 msgstr "Kľúč"
 
-#: api/classes/CItemGeneral.php:277
+#: api/classes/CItemGeneral.php:283
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Kľúč \"%1$s\" nevybral <grpmax|grpmin|grpsum|grpavg>[\"Skupina(y)\", \"Kľúč položky\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -8107,7 +8107,7 @@ msgstr "Nie je špecifikovaný typ autentifikácie pre príkaz akcie \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Nie je špecifikované používateľské meno autentifikácie pre príkaz akcie \"%s\"."
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "No authentication user name specified."
 msgstr "Nie je špecifikované používateľské meno autentifikácie."
 
@@ -8313,7 +8313,7 @@ msgstr "Žiadne definované obrázky."
 msgid "No interface found"
 msgstr "Nenájdené žiadne rozhranie"
 
-#: api/classes/CItemGeneral.php:243
+#: api/classes/CItemGeneral.php:249
 msgid "No interface found."
 msgstr "Nenájdené žiadne rozhranie."
 
@@ -8464,7 +8464,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
-#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
+#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:222
 #: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:541
@@ -8490,7 +8490,7 @@ msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom pre akciu príkazu \"%s\"."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:333
 msgid "No private key file specified."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom."
 
@@ -8507,7 +8507,7 @@ msgstr "Žiadne proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom pre akciu príkazu \"%s\"."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:330
 msgid "No public key file specified."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom."
 
@@ -10328,7 +10328,7 @@ msgstr "SNMP rozhrania"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:285
+#: api/classes/CItemGeneral.php:291
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap kľúč je neplatný."
 
@@ -12194,11 +12194,11 @@ msgstr "Typ kalkulácie"
 msgid "Type of information"
 msgstr "Typ informácií"
 
-#: api/classes/CItemGeneral.php:295
+#: api/classes/CItemGeneral.php:301
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Typ informácie musí byť \"Log\" pre log kľúč."
 
-#: api/classes/CItemGeneral.php:291
+#: api/classes/CItemGeneral.php:297
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Typ informácie musí byť \"Numeric (float)\" pre agregované položky."
 

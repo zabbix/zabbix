@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:18+0200\n"
+"POT-Creation-Date: 2015-11-01 00:13+0200\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -598,7 +598,7 @@ msgstr "Uygulama hatası."
 msgid "Application updated"
 msgstr "Uygulama güncellendi"
 
-#: api/classes/CItemGeneral.php:343
+#: api/classes/CItemGeneral.php:349
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "\"%1$s\" Kimlik ID'li uygulama \"%2$s\" üzerinde geçerli değil."
@@ -1596,7 +1596,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "\"%2$s\" ekranında kullanılan \"%1$s\" ana bilgisayarı bulunamıyor."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:600 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -1772,7 +1772,7 @@ msgstr "\"%1$s\" uygulaması için \"templateid\" ayarlanamıyor."
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
 msgstr "\"%1$s\" grafiği için \"templateid\" ayarlanamıyor."
 
-#: api/classes/CItemGeneral.php:223
+#: api/classes/CItemGeneral.php:229
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
 msgstr "\"%1$s\" öğesi için \"templateid\" ayarlanamıyor."
@@ -2092,7 +2092,7 @@ msgstr "Zaten var olanı kontrol et."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "\"%1$s\" dan başlayan ifade parçasını kontrol et."
 
-#: api/classes/CItemGeneral.php:262
+#: api/classes/CItemGeneral.php:268
 msgid "Check the key, please. Default example was passed."
 msgstr "Anahtarı kontrol edin lütfen.Öntanımlı örnek kullanıldı."
 
@@ -4235,7 +4235,7 @@ msgstr "Hata açıklaması: \"include/defines.inc.php\" içinde tanımlı ZBX_SC
 msgid "Error description: empty response received."
 msgstr "Hata açıklaması: boş yanıt alındı."
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:273
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr "Öğe anahtarında hata: \"%s\"."
@@ -6009,12 +6009,12 @@ msgstr "Tetik için geçersiz alanlar."
 msgid "Incorrect file upload."
 msgstr "Geçersiz dosya yüklemesi."
 
-#: api/classes/CItemGeneral.php:769
+#: api/classes/CItemGeneral.php:775
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:758
+#: api/classes/CItemGeneral.php:764
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
@@ -6551,7 +6551,7 @@ msgstr ""
 msgid "Item"
 msgstr "Öğe"
 
-#: api/classes/CItemGeneral.php:593
+#: api/classes/CItemGeneral.php:599
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
@@ -6582,7 +6582,7 @@ msgstr ""
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:335
+#: api/classes/CItemGeneral.php:341
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "\"%1$s:%2$s\" öğesi geçersiz porta sahip: \"%3$s\"."
@@ -6618,44 +6618,44 @@ msgstr ""
 msgid "Item updated"
 msgstr "Öğe güncellendi"
 
-#: api/classes/CItemGeneral.php:246
+#: api/classes/CItemGeneral.php:252
 msgid "Item uses host interface from non-parent host."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:249
+#: api/classes/CItemGeneral.php:255
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:308 api/classes/CItemGeneral.php:318
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Öğe yenilenmeyecek. Lütfen doğru bir güncelleme zaman aralığı giriniz."
 
-#: api/classes/CItemGeneral.php:386
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:392
+#: api/classes/CItemGeneral.php:398
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:389
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:383
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:395
+#: api/classes/CItemGeneral.php:401
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:735
+#: api/classes/CItemGeneral.php:741
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -6817,7 +6817,7 @@ msgstr "Yönelimleri sakla (gün olarak)"
 msgid "Key"
 msgstr "Anahtar"
 
-#: api/classes/CItemGeneral.php:277
+#: api/classes/CItemGeneral.php:283
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr ""
@@ -8092,7 +8092,7 @@ msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama tipi belirtil
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı ismi belirtilmemiş."
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "No authentication user name specified."
 msgstr "Kimlik doğrulaması için herhangi bir kullanıcı adı belirtilmedi."
 
@@ -8298,7 +8298,7 @@ msgstr ""
 msgid "No interface found"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:243
+#: api/classes/CItemGeneral.php:249
 msgid "No interface found."
 msgstr ""
 
@@ -8449,7 +8449,7 @@ msgstr "Sistem erişimi için izin yok."
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
-#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
+#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:222
 #: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:541
@@ -8475,7 +8475,7 @@ msgstr "Refere edilen obje için izin yk veya mevcut değil!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir özel anahtar dosyası belirtilmemiş."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:333
 msgid "No private key file specified."
 msgstr ""
 
@@ -8492,7 +8492,7 @@ msgstr "Vekil sunucu yok"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir genel anahtar dosyası belirtilmemiş."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:330
 msgid "No public key file specified."
 msgstr ""
 
@@ -10313,7 +10313,7 @@ msgstr "SNMP arabirimleri"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:285
+#: api/classes/CItemGeneral.php:291
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap anahtarı geçerli değil."
 
@@ -12176,11 +12176,11 @@ msgstr "Hesaplamanın tipi"
 msgid "Type of information"
 msgstr "Bilginin tipi"
 
-#: api/classes/CItemGeneral.php:295
+#: api/classes/CItemGeneral.php:301
 msgid "Type of information must be \"Log\" for log key."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:291
+#: api/classes/CItemGeneral.php:297
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr ""
 

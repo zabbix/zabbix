@@ -1,9 +1,23 @@
+Changes for 2.0.17rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16
+
+2.0.16rc1 was released as 2.0.16 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.16rc1
 
 New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
