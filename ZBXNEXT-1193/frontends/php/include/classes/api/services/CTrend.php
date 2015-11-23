@@ -48,6 +48,7 @@ class CTrend extends CApiService {
 		$items = API::Item()->get([
 			'output' => ['itemid', 'value_type'],
 			'itemids' => $options['itemids'],
+			'webitems' => true,
 			'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
 		]);
 
@@ -78,22 +79,26 @@ class CTrend extends CApiService {
 		}
 
 		if ($options['countOutput'] === null) {
-			$sql_limit  = (zbx_ctype_digit($options['limit']) && $options['limit']) ? $options['limit'] : null;
-
-			// Always select at least "itemid" field.
-			$sql_fields = 'itemid,';
+			$sql_limit  = ($options['limit'] && zbx_ctype_digit($options['limit'])) ? $options['limit'] : null;
 
 			if (is_array($options['output'])) {
+				// Always select at least "itemid" field.
+				$sql_fields = 't.itemid,';
+
 				foreach ($options['output'] as $field) {
 					if ($this->hasField($field, 'trends') && $this->hasField($field, 'trends_uint')
 							&& $field !== 'itemid') {
-						$sql_fields .= $field.',';
+						$sql_fields .= 't.'.$field.',';
 					}
 				}
 				$sql_fields = substr($sql_fields, 0, -1);
 			}
 			elseif ($options['output'] == API_OUTPUT_EXTEND) {
-				$sql_fields .= '*';
+				$sql_fields = 't.*';
+			}
+			else {
+				// Invalid output method (string). Select only "itemid" instead of everything.
+				$sql_fields = 't.itemid';
 			}
 
 			$cnt = 0;
@@ -103,7 +108,7 @@ class CTrend extends CApiService {
 				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($float_itemids));
 
 				$res = DBselect(
-					'SELECT t.'.$sql_fields.
+					'SELECT '.$sql_fields.
 					' FROM trends AS t'.
 					' WHERE '.implode(' AND ', $sql_where),
 					$sql_limit
@@ -123,7 +128,7 @@ class CTrend extends CApiService {
 				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($uint_itemids));
 
 				$res = DBselect(
-					'SELECT t.'.$sql_fields.
+					'SELECT '.$sql_fields.
 					' FROM trends_uint AS t'.
 					' WHERE '.implode(' AND ', $sql_where),
 					$sql_limit
@@ -175,7 +180,7 @@ class CTrend extends CApiService {
 				);
 			}
 
-			while ($data = DBfetch($res)) {
+			if ($data = DBfetch($res)) {
 				$result = $data['rowscount'];
 			}
 		}
