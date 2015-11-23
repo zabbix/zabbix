@@ -3,6 +3,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
