@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:20+0200\n"
+"POT-Creation-Date: 2015-11-01 00:14+0200\n"
 "PO-Revision-Date: 2014-09-02 10:34+0300\n"
 "Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -642,7 +642,7 @@ msgstr "應用集 錯誤."
 msgid "Application updated"
 msgstr "應用集已更新"
 
-#: api/classes/CItemGeneral.php:406
+#: api/classes/CItemGeneral.php:412
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
@@ -2165,7 +2165,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:242
+#: api/classes/CItemGeneral.php:248
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
@@ -2619,7 +2619,7 @@ msgstr ""
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:282
+#: api/classes/CItemGeneral.php:288
 msgid "Check the key, please. Default example was passed."
 msgstr "請檢查鍵值. 用的是預設的例子."
 
@@ -6962,7 +6962,7 @@ msgstr "不正確的自變數傳給方法."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:393
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -7040,12 +7040,12 @@ msgstr "不正確的觸發器欄位."
 msgid "Incorrect file upload."
 msgstr "不正確的檔案上傳."
 
-#: api/classes/CItemGeneral.php:849
+#: api/classes/CItemGeneral.php:855
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "不正確的彈性間隔\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:838
+#: api/classes/CItemGeneral.php:844
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在項目\"%1$s\"中不正確的彈性間隔. 彈性間隔必須是一個字串."
@@ -7265,7 +7265,7 @@ msgstr "不正確的埠範圍."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:396
+#: api/classes/CItemGeneral.php:402
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -7766,7 +7766,7 @@ msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略過項目\"%1$s\"-用戶規則."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:384
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "項目\"%1$s:%2$s\"有無效的埠: \"%3$s\"."
@@ -7860,44 +7860,44 @@ msgstr "項目原型之於"
 msgid "Item updated"
 msgstr "項目已更新"
 
-#: api/classes/CItemGeneral.php:266
+#: api/classes/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
 msgstr "項目使用來自非上層主機的主機介面."
 
-#: api/classes/CItemGeneral.php:269
+#: api/classes/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
 msgstr "項目使用不正確的介面類型."
 
-#: api/classes/CItemGeneral.php:326 api/classes/CItemGeneral.php:336
+#: api/classes/CItemGeneral.php:332 api/classes/CItemGeneral.php:342
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為探索規則."
 
-#: api/classes/CItemGeneral.php:455
+#: api/classes/CItemGeneral.php:461
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為創建自項目原型的項目."
 
-#: api/classes/CItemGeneral.php:452
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目原型."
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目."
 
-#: api/classes/CItemGeneral.php:458
+#: api/classes/CItemGeneral.php:464
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為未知的項目組件."
 
-#: api/classes/CItemGeneral.php:815
+#: api/classes/CItemGeneral.php:821
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
@@ -8037,7 +8037,7 @@ msgstr "保留失去的資源期間(日記)"
 msgid "Key"
 msgstr "鍵值"
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:312
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "鍵值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -9451,11 +9451,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:366
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:372
+#: api/classes/CItemGeneral.php:378
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9516,7 +9516,7 @@ msgstr "沒有指定給動作操作命令\"%s\"的認證類型."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的認證用戶名稱."
 
-#: api/classes/CItemGeneral.php:343
+#: api/classes/CItemGeneral.php:349
 msgid "No authentication user name specified."
 msgstr "沒有指定的認證用戶名稱"
 
@@ -9726,7 +9726,7 @@ msgstr ""
 msgid "No interface found"
 msgstr "沒有找到介面"
 
-#: api/classes/CItemGeneral.php:263
+#: api/classes/CItemGeneral.php:269
 msgid "No interface found."
 msgstr "沒有找到介面."
 
@@ -9889,7 +9889,7 @@ msgstr "沒有系統存取的許可權"
 #: api/classes/CHttpTest.php:610 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
-#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
+#: api/classes/CItemGeneral.php:240 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:470 api/classes/CMaintenance.php:487
@@ -9919,7 +9919,7 @@ msgstr "沒有所說的物件的許可權或其不存在!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的私有金鑰."
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:357
 msgid "No private key file specified."
 msgstr "沒有指定的私有金鑰."
 
@@ -9940,7 +9940,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的公開金鑰檔."
 
-#: api/classes/CItemGeneral.php:348
+#: api/classes/CItemGeneral.php:354
 msgid "No public key file specified."
 msgstr "沒有指定的公開金鑰檔"
 
@@ -11969,7 +11969,7 @@ msgstr "SNMP介面"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:360
+#: api/classes/CItemGeneral.php:366
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap 鍵值是無效的"
 
@@ -13979,11 +13979,11 @@ msgstr "計算方式"
 msgid "Type of information"
 msgstr "數據類型"
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "Type of information must be \"Log\" for log key."
 msgstr "日誌鍵值的資訊類型必須是\"Log\" ."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:320
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "整合性項目的資訊的類型必須是\"Numeric (float)\"."
 
