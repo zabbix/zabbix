@@ -297,12 +297,6 @@ keyPressed: function(e){
 			this.setNeedleByHighLight(e);
 			this.hideSuggests(e);
 			break;
-		case(key==13):
-			Event.stop(e);
-			this.selectSuggest(e);
-			break;
-		case(key == 37 || key == 39 || key == 9): // left, right, tab
-			break;
 		case(key==38): // up
 			this.keyUp(e);
 			break;
