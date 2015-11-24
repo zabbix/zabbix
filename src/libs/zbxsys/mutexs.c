@@ -290,3 +290,26 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	return SUCCEED;
 }
+
+#ifdef _WINDOWS
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mutex_create_per_process_name                                *
+ *                                                                            *
+ * Purpose: Appends PID to the prefix of the mutex                            *
+ *                                                                            *
+ * Parameters: prefix - mutex type                                            *
+ *                                                                            *
+ * Return value: Dynamically allocated, NUL terminated name of the mutex      *
+ *                                                                            *
+ ******************************************************************************/
+ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
+{
+	ZBX_MUTEX_NAME name = zbx_malloc(NULL, sizeof(TCHAR) * MAX_PATH);
+
+	(void)_sntprintf(name, MAX_PATH, TEXT("%s_PID_%ld"), prefix, GetCurrentProcessId());
+	name[MAX_PATH - 1] = '\0';
+
+	return name;
+}
+#endif
