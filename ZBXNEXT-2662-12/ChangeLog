@@ -3,6 +3,8 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+...G...... [ZBX-10031] fixed logging of occasionally incorrect process information during agent's start-up on Windows (Sandis)
 .......PS. [ZBX-10001] fixed duplicating log file entries from housekeeper (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 ..F....... [ZBX-10006] changed color of hovered host name for disabled host in search result (vitalijs)
@@ -254,6 +256,7 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
@@ -967,6 +970,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
