@@ -87,7 +87,7 @@ class CUser extends CApiService {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			if (!$options['editable']) {
 				$sqlParts['from']['users_groups'] = 'users_groups ug';
 				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 				$sqlParts['where'][] = 'ug.usrgrpid IN ('.

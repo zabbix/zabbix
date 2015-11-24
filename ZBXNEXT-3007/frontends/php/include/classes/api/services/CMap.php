@@ -85,6 +85,8 @@ class CMap extends CMapElement {
 			'selectLinks'				=> null,
 			'selectIconMap'				=> null,
 			'selectUrls'				=> null,
+			'selectUsers'				=> null,
+			'selectUserGroups'			=> null,
 			'countOutput'				=> null,
 			'expandUrls' 				=> null,
 			'preservekeys'				=> null,
@@ -96,7 +98,15 @@ class CMap extends CMapElement {
 
 		// Editable + permission check.
 		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+			$public_maps = '';
+
+			if ($options['editable']) {
+				$permission = PERM_READ_WRITE;
+			}
+			else {
+				$permission = PERM_READ;
+				$public_maps = ' OR s.private='.SYSMAP_PUBLIC;
+			}
 
 			$user_groups = getUserGroupsByUserId($user_data['userid']);
 
@@ -114,6 +124,8 @@ class CMap extends CMapElement {
 						' AND '.dbConditionInt('sg.usrgrpid', $user_groups).
 						' AND sg.permission>='.$permission.
 				')'.
+				' OR s.userid='.$user_data['userid'].
+				$public_maps.
 			')';
 		}
 
@@ -396,6 +408,70 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $map['name']));
 			}
 
+			// Map user shares.
+			if (array_key_exists('users', $map)) {
+				$shared_userids = [];
+				foreach ($map['users'] as $share) {
+					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+							&& $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
+						);
+					}
+
+					if ($share['userid'] == $user_data['userid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share with yourself.'));
+					}
+
+					$shared_userids[$share['userid']] = $share['userid'];
+				}
+
+				if ($shared_userids) {
+					$db_users = API::User()->get([
+						'userids' => $shared_userids,
+						'countOutput' => true
+					]);
+
+					if (count($shared_userids) != $db_users) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect user ID defined for map "%1$s".', $map['name'])
+						);
+					}
+				}
+
+				unset($shared_userids);
+			}
+
+			// Map user group shares.
+			if (array_key_exists('user_groups', $map)) {
+				$shared_user_groupids = [];
+				foreach ($map['user_groups'] as $share) {
+					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+							&& $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
+						);
+					}
+
+					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
+				}
+
+				if ($shared_user_groupids) {
+					$db_user_groups = API::UserGroup()->get([
+						'usrgrpids' => $shared_user_groupids,
+						'countOutput' => true
+					]);
+
+					if (count($shared_userids) != $db_user_groups) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect user group ID defined for map "%1$s".', $map['name'])
+						);
+					}
+				}
+
+				unset($shared_user_groupids);
+			}
+
 			// Map labels.
 			$map_labels = ['label_type' => ['typeName' => _('icon')]];
 
@@ -614,6 +690,68 @@ class CMap extends CMapElement {
 				);
 			}
 
+			// Map user shares.
+			if (array_key_exists('users', $map)) {
+				$shared_userids = [];
+				foreach ($map['users'] as $share) {
+					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
+						);
+					}
+
+					if ($share['userid'] == $user_data['userid']) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share with yourself.'));
+					}
+
+					$shared_userids[$share['userid']] = $share['userid'];
+				}
+
+				if ($shared_userids) {
+					$db_users = API::User()->get([
+						'userids' => $shared_userids,
+						'countOutput' => true
+					]);
+
+					if (count($shared_userids) != $db_users) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect user ID defined for map "%1$s".', $map['name'])
+						);
+					}
+				}
+
+				unset($shared_userids);
+			}
+
+			// Map user group shares.
+			if (array_key_exists('user_groups', $map)) {
+				$shared_user_groupids = [];
+				foreach ($map['user_groups'] as $share) {
+					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
+						);
+					}
+
+					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
+				}
+
+				if ($shared_user_groupids) {
+					$db_user_groups = API::UserGroup()->get([
+						'usrgrpids' => $shared_user_groupids,
+						'countOutput' => true
+					]);
+
+					if (count($shared_userids) != $db_user_groups) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect user group ID defined for map "%1$s".', $map['name'])
+						);
+					}
+				}
+
+				unset($shared_user_groupids);
+			}
+
 			// Map labels.
 			$map_labels = ['label_type' => ['typeName' => _('icon')]];
 
@@ -818,11 +956,35 @@ class CMap extends CMapElement {
 
 		$sysmapids = DB::insert('sysmaps', $maps);
 
+		$shared_users = [];
+		$shared_user_groups = [];
 		$urls = [];
 		$selements = [];
 		$links = [];
 
 		foreach ($sysmapids as $key => $sysmapid) {
+			// Map user shares.
+			if (array_key_exists('users', $maps[$key])) {
+				foreach ($maps[$key]['users'] as $user) {
+					$shared_users[] = [
+						'sysmapid' => $sysmapid,
+						'userid' => $user['userid'],
+						'permission' => $user['permission']
+					];
+				}
+			}
+
+			// Map user group shares.
+			if (array_key_exists('user_groups', $maps[$key])) {
+				foreach ($maps[$key]['user_groups'] as $user_group) {
+					$shared_user_groups[] = [
+						'sysmapid' => $sysmapid,
+						'usrgrpid' => $user_group['usrgrpid'],
+						'permission' => $user_group['permission']
+					];
+				}
+			}
+
 			if (array_key_exists('urls', $maps[$key])) {
 				foreach ($maps[$key]['urls'] as $url) {
 					$url['sysmapid'] = $sysmapid;
@@ -847,6 +1009,8 @@ class CMap extends CMapElement {
 			}
 		}
 
+		DB::insert('sysmap_user', $shared_users);
+		DB::insert('sysmap_usrgrp', $shared_user_groups);
 		DB::insert('sysmap_url', $urls);
 
 		if ($selements) {
@@ -913,7 +1077,9 @@ class CMap extends CMapElement {
 			'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectUrls' => API_OUTPUT_EXTEND,
+			'selectUrls' => ['sysmapid', 'sysmapurlid'],
+			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
+			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -930,6 +1096,12 @@ class CMap extends CMapElement {
 		$links_to_delete = [];
 		$links_to_update = [];
 		$links_to_add = [];
+		$shared_userids_to_delete = [];
+		$shared_users_to_update = [];
+		$shared_users_to_add = [];
+		$shared_user_groupids_to_delete = [];
+		$shared_user_groups_to_update = [];
+		$shared_user_groups_to_add = [];
 
 		foreach ($maps as $map) {
 			$update_maps[] = [
@@ -938,6 +1110,50 @@ class CMap extends CMapElement {
 			];
 
 			$db_map = $db_maps[$map['sysmapid']];
+
+			// Map user shares.
+			if (array_key_exists('users', $map)) {
+				$user_shares_diff = zbx_array_diff($map['users'], $db_map['users'], 'userid');
+
+				foreach ($user_shares_diff['both'] as $update_user_share) {
+					$shared_users_to_update[] = [
+						'values' => $update_user_share,
+						'where' => ['userid' => $update_user_share['userid'], 'sysmapid' => $map['sysmapid']]
+					];
+				}
+
+				foreach ($user_shares_diff['first'] as $new_shared_user) {
+					$new_shared_user['sysmapid'] = $map['sysmapid'];
+					$shared_users_to_add[] = $new_shared_user;
+				}
+
+				$shared_userids_to_delete = array_merge($shared_userids_to_delete,
+					zbx_objectValues($user_shares_diff['second'], 'sysmapuserid')
+				);
+			}
+
+			// Map user group shares.
+			if (array_key_exists('user_groups', $map)) {
+				$user_group_shares_diff = zbx_array_diff($map['user_groups'], $db_map['user_groups'],
+					'usrgrpid'
+				);
+
+				foreach ($user_group_shares_diff['both'] as $update_user_share) {
+					$shared_users_to_update[] = [
+						'values' => $update_user_share,
+						'where' => ['usrgrpid' => $update_user_share['usrgrpid'], 'sysmapid' => $map['sysmapid']]
+					];
+				}
+
+				foreach ($user_group_shares_diff['first'] as $new_shared_user) {
+					$new_shared_user['sysmapid'] = $map['sysmapid'];
+					$shared_users_to_add[] = $new_shared_user;
+				}
+
+				$shared_user_groupids_to_delete = array_merge($shared_user_groupids_to_delete,
+					zbx_objectValues($user_group_shares_diff['second'], 'sysmapuserid')
+				);
+			}
 
 			// Urls.
 			if (array_key_exists('urls', $map)) {
@@ -991,6 +1207,22 @@ class CMap extends CMapElement {
 		}
 
 		DB::update('sysmaps', $update_maps);
+
+		// User shares.
+		DB::insert('sysmap_user', $shared_users_to_add);
+		DB::update('sysmap_user', $shared_users_to_update);
+
+		if ($shared_userids_to_delete) {
+			DB::delete('sysmap_user', ['sysmapuserid' => $shared_userids_to_delete]);
+		}
+
+		// User group shares.
+		DB::insert('sysmap_usrgrp', $shared_user_groups_to_add);
+		DB::update('sysmap_usrgrp', $shared_user_groups_to_update);
+
+		if ($shared_user_groupids_to_delete) {
+			DB::delete('sysmap_usrgrp', ['sysmapusrgrpid' => $shared_user_groupids_to_delete]);
+		}
 
 		// Urls.
 		DB::insert('sysmap_url', $urls_to_add);
@@ -1325,6 +1557,34 @@ class CMap extends CMapElement {
 
 			$links = $this->unsetExtraFields($links, ['sysmapid', 'sysmapurlid'], $options['selectUrls']);
 			$result = $relationMap->mapMany($result, $links, 'urls');
+		}
+
+		// Adding user shares.
+		if ($options['selectUsers'] !== null) {
+			$users = API::getApiService()->select('sysmap_user', [
+				'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid', 'permission']),
+				'filter' => ['sysmapid' => $sysmapIds],
+				'preservekeys' => true
+			]);
+			$relationMap = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
+
+			$users = $this->unsetExtraFields($users, ['sysmapid', 'sysmapuserid'], $options['selectUsers']);
+			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		// Adding user group shares.
+		if ($options['selectUserGroups'] !== null) {
+			$user_groups = API::getApiService()->select('sysmap_usrgrp', [
+				'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid', 'permission']),
+				'filter' => ['sysmapid' => $sysmapIds],
+				'preservekeys' => true
+			]);
+			$relationMap = $this->createRelationMap($user_groups, 'sysmapid', 'sysmapusrgrpid');
+
+			$user_groups = $this->unsetExtraFields($user_groups, ['sysmapid', 'sysmapusrgrpid'],
+				$options['selectUserGroups']
+			);
+			$result = $relationMap->mapMany($result, $user_groups, 'user_groups');
 		}
 
 		return $result;
