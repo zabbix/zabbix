@@ -958,22 +958,19 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:%s", __function_name, metric->key);
 
-	if (0 != (ZBX_METRIC_FLAG_LOG & metric->flags))
+	/* meta information update is needed if:                                              */
+	/* - lastlogsize or mtime changed since we last sent within this check                */
+	/* - nothing was sent during this check and state changed from notsupported to normal */
+	/* - nothing was sent during this check and it's a new metric                         */
+	if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
+			(lastlogsize_last == lastlogsize_sent && mtime_last == mtime_sent &&
+					(old_state != metric->state ||
+					0 != (ZBX_METRIC_FLAG_NEW & metric->flags))))
 	{
-		/* meta information update is needed if:                                              */
-		/* - lastlogsize or mtime changed since we last sent within this check                */
-		/* - nothing was sent during this check and state changed from notsupported to normal */
-		/* - nothing was sent during this check and it's a new metric                         */
-		if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
-				(lastlogsize_last == lastlogsize_sent && mtime_last == mtime_sent &&
-						(old_state != metric->state ||
-						0 != (ZBX_METRIC_FLAG_NEW & metric->flags))))
-		{
-			/* needs meta information update */
-			ret = SUCCEED;
-		}
+		/* needs meta information update */
+		ret = SUCCEED;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
