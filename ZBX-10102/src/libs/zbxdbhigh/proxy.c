@@ -2190,7 +2190,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		int *processed)
 {
 	const char		*__function_name = "process_mass_data";
-	AGENT_RESULT		agent;
+	AGENT_RESULT		result;
 	DC_ITEM			*items = NULL;
 	zbx_host_key_t		*keys = NULL;
 	size_t			i;
@@ -2242,8 +2242,12 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			continue;
 
 		/* empty values are only allowed for meta information update packets */
-		if (ITEM_VALUE_TYPE_LOG != items[i].value_type && NULL == values[i].value)
+		if (NULL == values[i].value &&
+				ITEM_VALUE_TYPE_LOG != items[i].value_type && 0 == (ZBX_AV_FLAG_LOG & values[i].flags))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", items[i].key_orig);
 			continue;
+		}
 
 		if (ITEM_TYPE_AGGREGATE == items[i].type || ITEM_TYPE_CALCULATED == items[i].type)
 			continue;
@@ -2359,23 +2363,33 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
-					items[i].state, values[i].value);
+					items[i].state, values[i].value, NULL);
 
 			if (NULL != processed)
 				(*processed)++;
 		}
 		else
 		{
-			init_result(&agent);
+			int	res = SUCCEED;
 
-			if (SUCCEED == set_result_type(&agent, items[i].value_type,
-					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type, values[i].value))
+			init_result(&result);
+
+			if (NULL != values[i].value || ITEM_VALUE_TYPE_LOG == items[i].value_type)
 			{
+				res = set_result_type(&result, items[i].value_type,
+						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
+						values[i].value);
+			}
+
+			if (SUCCEED == res)
+			{
+				zbx_log_meta_t	*log_meta = NULL;	/* for log items with value type non-log */
+
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 				{
 					zbx_log_t	*log;
 
-					log = agent.logs[0];
+					log = result.logs[0];
 
 					log->timestamp = values[i].timestamp;
 					if (NULL != values[i].source)
@@ -2387,32 +2401,42 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 					log->logeventid = values[i].logeventid;
 					log->lastlogsize = values[i].lastlogsize;
 					log->mtime = values[i].mtime;
-					log->meta = values[i].meta;
+					log->meta = (0 == (values[i].flags & ZBX_AV_FLAG_META) ? 0 : 1);
 
 					if (NULL != log->value)
 						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
 				}
+				else if (values[i].flags & ZBX_AV_FLAG_LOG)	/* log item with value type non-log */
+				{
+					log_meta = zbx_malloc(NULL, sizeof(zbx_log_meta_t));
+
+					log_meta->lastlogsize = values[i].lastlogsize;
+					log_meta->mtime = values[i].mtime;
+					log_meta->meta = (0 == (values[i].flags & ZBX_AV_FLAG_META) ? 0 : 1);
+				}
 
 				items[i].state = ITEM_STATE_NORMAL;
-				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
-						&values[i].ts, items[i].state, NULL);
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
+						&values[i].ts, items[i].state, NULL, log_meta);
+
+				zbx_free(log_meta);
 
 				if (NULL != processed)
 					(*processed)++;
 			}
-			else if (ISSET_MSG(&agent))
+			else if (ISSET_MSG(&result))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
-						items[i].host.host, items[i].key_orig, agent.msg);
+						items[i].host.host, items[i].key_orig, result.msg);
 
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, agent.msg);
+						&values[i].ts, items[i].state, result.msg, NULL);
 			}
 			else
-				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
+				THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
 
-			free_result(&agent);
+			free_result(&result);
 		}
 
 		itemids[num] = items[i].itemid;
@@ -2576,15 +2600,19 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 
 			if (ITEM_STATE_NOTSUPPORTED == av->state)
 			{
-				/* unsupported items cannot have NULL-string error message */
+				/* unsupported items cannot have empty error message */
 				continue;
 			}
 
-			av->meta = 1;
+			av->flags |= ZBX_AV_FLAG_META;
 		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
+		{
+			av->flags |= ZBX_AV_FLAG_LOG;	/* log item */
+
 			is_uint64(tmp, &av->lastlogsize);
+		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
 			av->mtime = atoi(tmp);

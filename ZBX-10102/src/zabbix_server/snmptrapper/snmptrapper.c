@@ -183,7 +183,7 @@ next:
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-						ts, items[i].state, NULL);
+						ts, items[i].state, NULL, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -192,7 +192,7 @@ next:
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						ts, items[i].state, results[i].msg);
+						ts, items[i].state, results[i].msg, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;

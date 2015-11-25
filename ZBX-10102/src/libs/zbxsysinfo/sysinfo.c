@@ -760,6 +760,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 			if (SUCCEED != is_double(c))
 				break;
+
 			value_double = atof(c);
 
 			SET_DBL_RESULT(result, value_double);
