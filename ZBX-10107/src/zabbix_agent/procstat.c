@@ -990,7 +990,7 @@ int	zbx_procstat_collector_started()
  * Return value: This function calls exit() on shared memory errors.          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_init()
+void	zbx_procstat_init(zbx_dshm_t *procstat)
 {
 	char	*errmsg = NULL;
 
@@ -1013,7 +1013,7 @@ void	zbx_procstat_init()
  * Purpose: destroys process statistics collector                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_destroy()
+void	zbx_procstat_destroy(zbx_dshm_t *procstat)
 {
 	char	*errmsg = NULL;
 
