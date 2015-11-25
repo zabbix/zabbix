@@ -706,7 +706,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].state, NULL);
+					items[i].state, NULL, NULL);
 
 			if (0 != ISSET_LOG(&results[i]))
 			{
@@ -728,7 +728,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					items[i].state, results[i].msg);
+					items[i].state, results[i].msg, NULL);
 		}
 
 		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
