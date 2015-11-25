@@ -118,7 +118,7 @@ else {
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	zbx_add_post_js($data['interfaces']
 		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
-		: 'hostInterfacesManager.addNew(' . INTERFACE_TYPE_AGENT . ');');
+		: 'hostInterfacesManager.addNew('.INTERFACE_TYPE_AGENT.');');
 
 	$ifTab = (new CTable())
 		->setHeader([
@@ -142,10 +142,11 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		]))->setId('agentInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_AGENT)
 			->addClass('interface_add')
 			->setAttribute('data-type', INTERFACE_TYPE_AGENT))
-		->addRow(new CRow((new CCol())->setColSpan(8)))
+		->addRow(new CRow((new CCol())->setColSpan(8)));
+
 
 		// SNMP interfaces
-		->addRow((new CRow([
+	$ifTab->addRow((new CRow([
 			(new CCol(
 				_('SNMP')
 			))->setRowSpan(1)->addClass('interface_name'),
@@ -155,10 +156,10 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		]))->setId('SNMPInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_SNMP)
 			->addClass('interface_add')
 			->setAttribute('data-type', INTERFACE_TYPE_SNMP))
-		->addRow(new CRow((new CCol())->setColSpan(8)))
+		->addRow(new CRow((new CCol())->setColSpan(8)));
 
 		// JMX interfaces
-		->addRow((new CRow([
+	$ifTab->addRow((new CRow([
 			(new CCol(
 				_('JMX')
 			))->setRowSpan(1)->addClass('interface_name'),
@@ -168,10 +169,10 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		]))->setId('JMXInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_JMX)
 			->addClass('interface_add')
 			->setAttribute('data-type', INTERFACE_TYPE_JMX))
-		->addRow(new CRow((new CCol())->setColSpan(8)))
+		->addRow(new CRow((new CCol())->setColSpan(8)));
 
 		// IPMI interfaces
-		->addRow((new CRow([
+	$ifTab->addRow((new CRow([
 			(new CCol(
 				_('IPMI')
 			))->setRowSpan(1)->addClass('interface_name'),
