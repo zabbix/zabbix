@@ -199,8 +199,10 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 	switch (dwWaitResult)
 	{
 		case WAIT_OBJECT_0:
-		case WAIT_ABANDONED:
 			break;
+		case WAIT_ABANDONED:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 		default:
 			zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
