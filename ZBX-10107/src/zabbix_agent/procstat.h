@@ -46,8 +46,8 @@ typedef struct
 }
 zbx_procstat_util_t;
 
-void	zbx_procstat_init(zbx_dshm_t *procstat);
-void	zbx_procstat_destroy(zbx_dshm_t *procstat);
+void	zbx_procstat_init();
+void	zbx_procstat_destroy();
 int	zbx_procstat_collector_started();
 int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
 		int period, int type, double *value, char **errmsg);

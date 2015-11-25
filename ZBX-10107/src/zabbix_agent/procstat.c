@@ -984,13 +984,10 @@ int	zbx_procstat_collector_started()
  *                                                                            *
  * Purpose: initializes process statistics collector                          *
  *                                                                            *
- * Parameters: shm - [IN] the dynamic shared memory segment used by process   *
- *                        statistics collector                                *
- *                                                                            *
  * Return value: This function calls exit() on shared memory errors.          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_init(zbx_dshm_t *procstat)
+void	zbx_procstat_init()
 {
 	char	*errmsg = NULL;
 
@@ -1013,7 +1010,7 @@ void	zbx_procstat_init(zbx_dshm_t *procstat)
  * Purpose: destroys process statistics collector                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_destroy(zbx_dshm_t *procstat)
+void	zbx_procstat_destroy()
 {
 	char	*errmsg = NULL;
 

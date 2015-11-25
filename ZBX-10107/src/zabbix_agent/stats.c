@@ -193,7 +193,7 @@ void	init_collector_data()
 	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
-	zbx_procstat_init(&collector->procstat);
+	zbx_procstat_init();
 #endif
 
 	if (FAIL == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
@@ -229,7 +229,7 @@ void	free_collector_data()
 		return;
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
-	zbx_procstat_destroy(&collector->procstat);
+	zbx_procstat_destroy();
 #endif
 
 	if (ZBX_NONEXISTENT_SHMID != collector->diskstat_shmid)
