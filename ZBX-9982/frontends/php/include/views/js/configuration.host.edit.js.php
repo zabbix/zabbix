@@ -32,7 +32,6 @@
 	</td>
 	<td class="interface-default interface_data">
 		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
-		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP?> interface-control interface_data">
 		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" #{*attrs.disabled}><?= _('Remove') ?></button>
@@ -46,10 +45,10 @@
 
 		var rowTemplate = new Template(jQuery('#hostInterfaceRow').html()),
 			ports = {
-				agent: 10050,
-				snmp: 161,
-				jmx: 12345,
-				ipmi: 623
+				<?= INTERFACE_TYPE_AGENT ?>: 10050,
+				<?= INTERFACE_TYPE_SNMP ?>: 161,
+				<?= INTERFACE_TYPE_JMX ?>: 12345,
+				<?= INTERFACE_TYPE_IPMI ?>: 623
 			},
 			allHostInterfaces = {};
 
@@ -129,14 +128,23 @@
 		}
 
 		function addDraggableIcon(domElement) {
+			var dragInterfaceType;
 			domElement.draggable({
-				helper: 'clone',
+				helper: function() {
+					var row = jQuery(this).clone(),
+						interfaceid = row.data('interfaceid');
+					jQuery('#interfaces_' + interfaceid + '_useip_0, #interfaces_' + interfaceid + '_useip_1', row).attr('name', '');
+
+					return row;
+				},
 				axis: 'y',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				revert: 'invalid',
+				revert: function(event, ui) {
+					return (event !== false && dragInterfaceType != jQuery(this).data('type')) ? false : true;
+				},
 				start: function(event, ui) {
-					ui.helper.css({'z-index': '1000'});
 					ui.helper.addClass('<?= ZBX_STYLE_CURSOR_MOVE ?>');
+					dragInterfaceType = jQuery(this).data('type');
 					jQuery('.interface_name', ui.helper).remove();
 					jQuery('.interface_data', this).css({'visibility': 'hidden'});
 				},
@@ -146,9 +154,7 @@
 					resetMainInterfaces();
 
 					jQuery('.interface_data', this).css({'visibility': ''});
-					jQuery(ui.helper).css({'z-index': ''});
-
-					jQuery('#interfaces_' + hostInterfaceId + '_useip_' + hostInterface.useip).prop('checked', true);
+					//jQuery('#interfaces_' + hostInterfaceId + '_useip_' + hostInterface.useip).prop('checked', true);
 				}
 			});
 		}
@@ -168,21 +174,19 @@
 				);
 		}
 
-		function setDroppable() {
-			jQuery('.interface_row, .interface_add').droppable({
+		function setDroppable(selector) {
+			jQuery(selector).droppable({
 				tolerance: 'pointer',
 				drop: function(event, ui) {
 					var interfaceId = ui.draggable.data('interfaceid'),
 						dragInterfaceType = allHostInterfaces[interfaceId].type,
 						dropInterfaceType = jQuery(this).data('type'),
-						dragRow = jQuery('#hostInterfaceRow_' + interfaceId),
-						objInterfaceName = jQuery('.interface_name', dragRow);
+						objInterfaceName = jQuery('.interface_name', '#hostInterfaceRow_' + interfaceId);
 
 					if (dragInterfaceType == dropInterfaceType) {
 						return;
 					}
 
-					ui.helper.remove();
 					if (dropInterfaceType == <?= INTERFACE_TYPE_SNMP ?>) {
 						if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + interfaceId)).length == 0) {
 							var bulkDiv = jQuery('<div>', {
@@ -226,7 +230,7 @@
 				},
 				activate: function(event, ui) {
 					var interfaceId = ui.draggable.data('interfaceid');
-					jQuery('.interface_row:not(.interface_type_' + allHostInterfaces[interfaceId].type + '), .interface_add:not(.interface_type_' + allHostInterfaces[interfaceId].type + ')')
+					jQuery('.interface_row, .interface_add').not('.interface_type_' + allHostInterfaces[interfaceId].type)
 						.addClass('<?= ZBX_STYLE_DRAG_DROP_AREA ?>');
 				},
 				deactivate: function(event, ui) {
@@ -273,8 +277,9 @@
 					footerRowId = '#IPMIInterfacesFooter';
 					break;
 				default:
-					throw new Error('Unknown host interface type ' + hostInterfaceType);
+					throw new Error('Unknown host interface type: ' + hostInterfaceType);
 			}
+
 			return footerRowId;
 		}
 
@@ -282,7 +287,7 @@
 			var newInterface = {
 				isNew: true,
 				useip: 1,
-				type: getHostInterfaceNumericType(hostInterfaceType),
+				type: parseInt(hostInterfaceType),
 				port: ports[hostInterfaceType],
 				ip: '127.0.0.1'
 			};
@@ -348,7 +353,6 @@
 				: jQuery('.interface_name', jQuery('.interface_type_' + type));
 
 			jQuery('.interface_type_' + type).first().prepend(domElement);
-			console.log(domElement);
 		}
 
 		return {
@@ -359,8 +363,9 @@
 					increaseRowspan('.interface_type_' + hostInterfaces[i].type);
 					moveRowspan(hostInterfaces[i].type);
 				}
+
 				resetMainInterfaces();
-				setDroppable();
+				setDroppable('.interface_row, .interface_add');
 			},
 
 			addNew: function(type) {
@@ -368,19 +373,20 @@
 
 				allHostInterfaces[hostInterface.interfaceid] = hostInterface;
 				renderHostInterfaceRow(hostInterface);
-				increaseRowspan('.interface_type_' + hostInterface.type);
-				moveRowspan(hostInterface.type)
+				increaseRowspan('.interface_type_' + type);
+				moveRowspan(type)
 				resetMainInterfaces();
-				setDroppable();
+				setDroppable('#hostInterfaceRow_' + hostInterface.interfaceid);
 			},
 
 			remove: function(hostInterfaceId) {
-				var rows = jQuery('.interface_type_' + allHostInterfaces[hostInterfaceId].type);
+				var type = allHostInterfaces[hostInterfaceId].type,
+					rows = jQuery('.interface_type_' + type);
 				decreaseRowspan(rows.first());
 
 				if (jQuery('.interface_name', '#hostInterfaceRow_' + hostInterfaceId).length != 0) {
 					jQuery('#hostInterfaceRow_' + hostInterfaceId).remove();
-					moveRowspan(rows.data('type'), jQuery('.interface_name', rows));
+					moveRowspan(type, jQuery('.interface_name', rows));
 				}
 				else {
 					jQuery('#hostInterfaceRow_' + hostInterfaceId).remove();
@@ -406,10 +412,6 @@
 					allHostInterfaces[hostInterfaceId].main = '1';
 					allHostInterfaces[oldMainInterfaceId].main = '0';
 				}
-			},
-
-			setUseipForInterface: function(hostInterfaceId, useip) {
-				allHostInterfaces[hostInterfaceId].useip = useip;
 			},
 
 			disable: function() {
@@ -438,13 +440,6 @@
 			hostInterfacesManager.setMainInterface(interfaceId);
 		});
 
-		// when we start dragging row, all radio buttons are unchecked for some reason, we store radio buttons values
-		// to restore them when drag is ended
-		jQuery('#hostlist').on('click', 'input[type=radio].interface-useip', function() {
-			var interfaceId = jQuery(this).attr('id').match(/\d+/);
-			hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
-		});
-
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			// If certificate is selected or checked.
 			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
@@ -466,16 +461,16 @@
 		});
 
 		jQuery('#addAgentInterface').on('click', function() {
-			hostInterfacesManager.addNew('agent');
+			hostInterfacesManager.addNew(<?= INTERFACE_TYPE_AGENT ?>);
 		});
 		jQuery('#addSNMPInterface').on('click', function() {
-			hostInterfacesManager.addNew('snmp');
+			hostInterfacesManager.addNew(<?= INTERFACE_TYPE_SNMP ?>);
 		});
 		jQuery('#addJMXInterface').on('click', function() {
-			hostInterfacesManager.addNew('jmx');
+			hostInterfacesManager.addNew(<?= INTERFACE_TYPE_JMX ?>);
 		});
 		jQuery('#addIPMIInterface').on('click', function() {
-			hostInterfacesManager.addNew('ipmi');
+			hostInterfacesManager.addNew(<?= INTERFACE_TYPE_IPMI ?>);
 		});
 
 		// radio button of inventory modes was clicked
@@ -538,25 +533,4 @@
 		});
 	});
 
-	function getHostInterfaceNumericType(typeName) {
-		var typeNum;
-
-		switch (typeName) {
-			case 'agent':
-				typeNum = <?= INTERFACE_TYPE_AGENT ?>;
-				break;
-			case 'snmp':
-				typeNum = <?= INTERFACE_TYPE_SNMP ?>;
-				break;
-			case 'jmx':
-				typeNum = <?= INTERFACE_TYPE_JMX ?>;
-				break;
-			case 'ipmi':
-				typeNum = <?= INTERFACE_TYPE_IPMI ?>;
-				break;
-			default:
-				throw new Error('Unknown host interface type name.');
-		}
-		return typeNum;
-	}
 </script>
