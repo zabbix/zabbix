@@ -163,6 +163,12 @@ jQuery(function($) {
 				}
 			}
 
+			// SCREEN_RESOURCE_WEBDETAILS
+			else if (screen.resourcetype == 21) {
+				ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
+				this.refreshHtml(id, ajaxUrl);
+			}
+
 			// others
 			else {
 				this.refreshHtml(id, ajaxUrl);
