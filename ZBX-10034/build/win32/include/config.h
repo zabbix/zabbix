@@ -72,3 +72,6 @@
 
 /* define to 1 if you have the <errno.h> header file */
 #define HAVE_ERRNO_H 1
+
+/* define to 1 if you have the <tchar.h> header file */
+#define HAVE_TCHAR_H 1

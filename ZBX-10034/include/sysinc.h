@@ -434,4 +434,8 @@
 #	include <dlfcn.h>
 #endif
 
+#ifdef HAVE_TCHAR_H
+#	include <tchar.h>
+#endif
+
 #endif

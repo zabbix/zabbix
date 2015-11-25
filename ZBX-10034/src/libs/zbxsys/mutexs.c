@@ -302,13 +302,30 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
  *                                                                            *
  * Return value: Dynamically allocated, NUL terminated name of the mutex      *
  *                                                                            *
+ * Comments: The mutex name must be shorter than MAX_PATH characters,         *
+ *           otherwise the function calls exit()                              *
+ *                                                                            *
  ******************************************************************************/
 ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
 {
-	ZBX_MUTEX_NAME name = zbx_malloc(NULL, sizeof(TCHAR) * MAX_PATH);
+	ZBX_MUTEX_NAME	name = ZBX_MUTEX_NULL;
+	int		size;
+	LPCTSTR		format = TEXT("%s_PID_%ld");
+	DWORD		pid = GetCurrentProcessId();
 
-	(void)_sntprintf(name, MAX_PATH, TEXT("%s_PID_%ld"), prefix, GetCurrentProcessId());
-	name[MAX_PATH - 1] = '\0';
+	/* exit if the mutex name length exceed the maximum allowed */
+	size = _sctprintf(format, prefix, pid);
+	if (MAX_PATH < size)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	size = size + 1; /* for terminating '\0' */
+
+	name = zbx_malloc(NULL, sizeof(TCHAR) * size);
+	(void)_sntprintf(name, size, format, prefix, pid);
+	name[size - 1] = '\0';
 
 	return name;
 }
