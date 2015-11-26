@@ -69,16 +69,19 @@ jQuery(function($) {
 			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
-			ajaxUrl.setArgument('pageFile', screen.pageFile);
-			ajaxUrl.setArgument('screenid', screen.screenid);
-			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
-			ajaxUrl.setArgument('groupid', screen.groupid);
-			ajaxUrl.setArgument('hostid', screen.hostid);
-			ajaxUrl.setArgument('profileIdx', empty(screen.profileIdx) ? null : screen.profileIdx);
 			ajaxUrl.setArgument('profileIdx2', empty(screen.profileIdx2) ? null : screen.profileIdx2);
-			ajaxUrl.setArgument('updateProfile', empty(screen.updateProfile) ? null : +screen.updateProfile);
-			ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
-			ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+
+			if (screen.resourcetype != 21) {
+				ajaxUrl.setArgument('pageFile', screen.pageFile);
+				ajaxUrl.setArgument('screenid', screen.screenid);
+				ajaxUrl.setArgument('screenitemid', screen.screenitemid);
+				ajaxUrl.setArgument('groupid', screen.groupid);
+				ajaxUrl.setArgument('hostid', screen.hostid);
+				ajaxUrl.setArgument('profileIdx', empty(screen.profileIdx) ? null : screen.profileIdx);
+				ajaxUrl.setArgument('updateProfile', empty(screen.updateProfile) ? null : +screen.updateProfile);
+				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
+				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+			}
 
 			// SCREEN_RESOURCE_GRAPH
 			// SCREEN_RESOURCE_SIMPLE_GRAPH
