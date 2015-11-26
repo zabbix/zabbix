@@ -22,6 +22,7 @@
 class CControllerReportServices extends CController {
 
 	const YEAR_LEFT_SHIFT = 5;
+
 	private $service = null;
 
 	protected function init() {
@@ -49,14 +50,18 @@ class CControllerReportServices extends CController {
 			return false;
 		}
 
-		$service = API::Service()->get([
+		$services = API::Service()->get([
 			'output' => ['serviceid', 'name', 'showsla', 'goodsla'],
-			'serviceids' => $this->getInput('serviceid')
+			'serviceids' => [$this->getInput('serviceid')]
 		]);
 
-		$this->service = reset($service);
+		if (!$services) {
+			return false;
+		}
 
-		return (bool)$this->service;
+		$this->service = $services[0];
+
+		return true;
 	}
 
 	protected function doAction() {
@@ -65,18 +70,19 @@ class CControllerReportServices extends CController {
 			'period' => $this->getInput('period', 'yearly'),
 			'service' => $this->service,
 			'year' => $this->getInput('year', date('Y')),
-			'YEAR_LEFT_SHIFT' => $this::YEAR_LEFT_SHIFT
+			'YEAR_LEFT_SHIFT' => self::YEAR_LEFT_SHIFT
 		];
 
 		switch ($data['period']) {
 			case 'yearly':
-				$from = date('Y') - $this::YEAR_LEFT_SHIFT;
+				$from = date('Y') - self::YEAR_LEFT_SHIFT;
 				$to = date('Y');
 
 				function get_time($year, $y) {
 					return mktime(0, 0, 0, 1, 1, $y);
 				}
 				break;
+
 			case 'monthly':
 				$from = 1;
 				$to = 12;
@@ -85,16 +91,8 @@ class CControllerReportServices extends CController {
 					return mktime(0, 0, 0, $m, 1, $year);
 				}
 				break;
-			case 'daily':
-				$from = 1;
-				$to = DAY_IN_YEAR;
 
-				function get_time($year, $d) {
-					return mktime(0, 0, 0, 1, $d, $year);
-				}
-				break;
 			case 'weekly':
-			default:
 				$from = 0;
 				$to = 52;
 
@@ -107,16 +105,27 @@ class CControllerReportServices extends CController {
 					return strtotime("+$w week", $beg);
 				}
 				break;
+
+			case 'daily':
+				$from = 1;
+				$to = DAY_IN_YEAR;
+
+				function get_time($year, $d) {
+					return mktime(0, 0, 0, 1, $d, $year);
+				}
+				break;
 		}
 
+		$now = time();
 		$intervals = [];
+
 		for ($t = $from; $t <= $to; $t++) {
-			if (($start = get_time($data['year'], $t)) > time()) {
+			if (($start = get_time($data['year'], $t)) > $now) {
 				break;
 			}
 
-			if (($end = get_time($data['year'], $t + 1)) > time()) {
-				$end = time();
+			if (($end = get_time($data['year'], $t + 1)) > $now) {
+				$end = $now;
 			}
 
 			$intervals[] = [
@@ -126,7 +135,7 @@ class CControllerReportServices extends CController {
 		}
 
 		$sla = API::Service()->getSla([
-			'serviceids' => $this->service['serviceid'],
+			'serviceids' => [$this->service['serviceid']],
 			'intervals' => $intervals
 		]);
 		$data['sla'] = reset($sla);
