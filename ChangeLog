@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+...G...... [ZBX-10107] fixed compilation warnings for function calls without a real prototype (viktors)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ...G...... [ZBX-10031] fixed logging of occasionally incorrect process information during agent's start-up on Windows (Sandis)
 .......PS. [ZBX-10001] fixed duplicating log file entries from housekeeper (viktors)
