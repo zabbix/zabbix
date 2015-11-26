@@ -38,12 +38,15 @@ if ($data['period'] != 'yearly') {
 	$controls->addItem([_('Year'), SPACE, new CComboBox('year', $data['year'], 'submit();', $years)]);
 }
 
+$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
+
 $widget->setControls(
 	(new CForm())
 		->cleanItems()
 		->setMethod('get')
 		->addVar('action', 'report.services')
 		->addVar('serviceid', $data['service']['serviceid'])
+		->addVar('fullscreen', $data['fullscreen'])
 		->addItem($controls)
 );
 
