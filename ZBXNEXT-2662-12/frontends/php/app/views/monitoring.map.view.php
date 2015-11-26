@@ -56,9 +56,13 @@ if ($data['maps']) {
 	$imgMap = (new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']))
 		->setMap($actionMap->getName());
 
-	$mapTable = (new CTable())
-		->addRow($actionMap)
-		->addRow($imgMap);
+	$mapTable = (new CDiv())
+		->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+		->addItem(
+			(new CTable())
+				->addRow($actionMap)
+				->addRow($imgMap)
+		);
 
 	$controls->addItem(get_icon('favourite', [
 		'fav' => 'web.favorite.sysmapids',
