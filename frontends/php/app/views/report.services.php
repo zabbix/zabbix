@@ -18,109 +18,110 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$widget = (new CWidget())->setTitle(_('IT services availability report').':'.SPACE.$data['service']['name']);
+$widget = (new CWidget())->setTitle(_('IT services availability report').': '.$data['service']['name']);
 
-$controls = new CList();
-
-$form = (new CForm())
-	->setMethod('get')
-	->addVar('action', 'report.services')
-	->addVar('serviceid', $data['service']['serviceid']);
-
-$controls->addItem([
-	SPACE._('Period').SPACE,
-	new CComboBox('period', $data['period'], 'submit()', [
-		'daily' => _('Daily'),
-		'weekly' => _('Weekly'),
-		'monthly' => _('Monthly'),
-		'yearly' => _('Yearly')
-	])
-]);
+$controls = (new CList())
+	->addItem([_('Period'), SPACE,
+		new CComboBox('period', $data['period'], 'submit()', [
+			'daily' => _('Daily'),
+			'weekly' => _('Weekly'),
+			'monthly' => _('Monthly'),
+			'yearly' => _('Yearly')
+		])
+	]);
 
 if ($data['period'] != 'yearly') {
-	$cmbYear = new CComboBox('year', $data['year'], 'submit();');
-
+	$years = [];
 	for ($y = (date('Y') - $data['YEAR_LEFT_SHIFT']); $y <= date('Y'); $y++) {
-		$cmbYear->addItem($y, $y);
+		$years[$y] = $y;
 	}
-	$controls->addItem([SPACE._('Year').SPACE, $cmbYear]);
+	$controls->addItem([_('Year'), SPACE, new CComboBox('year', $data['year'], 'submit();', $years)]);
 }
 
-$form->addItem($controls);
-$widget->setControls($form);
+$widget->setControls(
+	(new CForm())
+		->cleanItems()
+		->setMethod('get')
+		->addVar('action', 'report.services')
+		->addVar('serviceid', $data['service']['serviceid'])
+		->addItem($controls)
+);
+
+$header = [
+	'yearly' => [_('Year'), null, _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')],
+	'monthly' => [_('Month'), null, _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')],
+	'weekly' => [_('From'), _('Till'), _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')],
+	'daily' => [_('Day'), null, _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')]
+];
 
 // create table
-$table = new CTableInfo();
-switch ($data['period']) {
-	case 'yearly':
-		$header = [_('Year'), _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')];
-		break;
-	case 'monthly':
-		$header = [_('Month'), _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')];
-		break;
-	case 'daily':
-		$header = [_('Day'), _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')];
-		break;
-	case 'weekly':
-		$header = [_('From'), _('Till'), _('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')];
-		break;
-}
-$table->setHeader($header);
+$table = (new CTableInfo())->setHeader($header[$data['period']]);
 
 order_result($data['sla']['sla'], 'from', ZBX_SORT_DOWN);
 
 foreach ($data['sla']['sla'] as $sla) {
-	$ok = (new CSpan(
-		sprintf('%dd %dh %dm',
-			$sla['okTime'] / SEC_PER_DAY,
-			($sla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
-			($sla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
-		)))->addClass(ZBX_STYLE_GREEN);
-
-	$problems = (new CSpan(
-		sprintf('%dd %dh %dm',
-			$sla['problemTime'] / SEC_PER_DAY,
-			($sla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
-			($sla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
-		)))->addClass(ZBX_STYLE_RED);
-
-	$downtime = sprintf('%dd %dh %dm',
-		$sla['downtimeTime'] / SEC_PER_DAY,
-		($sla['downtimeTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
-		($sla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
-	);
-
-	$percentage = (new CSpan(sprintf('%2.4f', $sla['sla'])))
-		->addClass($sla['sla'] >= $data['service']['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
-
 	switch ($data['period']) {
 		case 'yearly':
 			$from = zbx_date2str(_x('Y', DATE_FORMAT_CONTEXT), $sla['from']);
 			$to = null;
 			break;
+
 		case 'monthly':
 			$from =  zbx_date2str(_x('F', DATE_FORMAT_CONTEXT), $sla['from']);
 			$to = null;
 			break;
+
 		case 'daily':
 			$from = zbx_date2str(DATE_FORMAT, $sla['from']);
 			$to = null;
 			break;
+
 		case 'weekly':
 			$from = zbx_date2str(DATE_TIME_FORMAT, $sla['from']);
 			$to = zbx_date2str(DATE_TIME_FORMAT, $sla['to']);
 			break;
 	}
 
-	$table->addRow([
-		$from,
-		$to,
-		$sla['okTime'] == 0 ? '' : $ok,
-		$sla['problemTime'] == 0 ? '' : $problems,
-		$sla['downtimeTime'] ==0 ? '' : (new CSpan($downtime))->addClass(ZBX_STYLE_GREY),
-		($data['service']['showsla']) ? $percentage : '',
-		($data['service']['showsla']) ? new CSpan($data['service']['goodsla']) : ''
-	]);
+	$ok = ($sla['okTime'] != 0)
+		? (new CSpan(
+			sprintf('%dd %dh %dm',
+				$sla['okTime'] / SEC_PER_DAY,
+				($sla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
+				($sla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
+			)
+		))->addClass(ZBX_STYLE_GREEN)
+		: '';
+
+	$problems = ($sla['problemTime'] != 0)
+		? (new CSpan(
+			sprintf('%dd %dh %dm',
+				$sla['problemTime'] / SEC_PER_DAY,
+				($sla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
+				($sla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
+			)
+		))->addClass(ZBX_STYLE_RED)
+		: '';
+
+	$downtime = ($sla['downtimeTime'] != 0)
+		? (new CSpan(
+			sprintf('%dd %dh %dm',
+				$sla['downtimeTime'] / SEC_PER_DAY,
+				($sla['downtimeTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
+				($sla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
+			)
+		))->addClass(ZBX_STYLE_GREY)
+		: '';
+
+	$percentage = $data['service']['showsla']
+		? (new CSpan(sprintf('%2.4f', $sla['sla'])))
+			->addClass($sla['sla'] >= $data['service']['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
+		: '';
+
+	$goodsla = $data['service']['showsla'] ? $data['service']['goodsla'] : '';
+
+	$table->addRow([$from, $to, $ok, $problems, $downtime, $percentage, $goodsla]);
 }
 
-$widget->addItem($table)->show();
+$widget
+	->addItem($table)
+	->show();
