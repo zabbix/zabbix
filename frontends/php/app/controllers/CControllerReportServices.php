@@ -30,9 +30,9 @@ class CControllerReportServices extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'serviceid' =>		'fatal|required|db services.serviceid',
-			'period' =>			'in daily,weekly,monthly,yearly',
-			'year' =>			'int32'
+			'serviceid' =>	'fatal|required|db services.serviceid',
+			'period' =>		'in daily,weekly,monthly,yearly',
+			'year' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
