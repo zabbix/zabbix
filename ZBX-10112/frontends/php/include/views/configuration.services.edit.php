@@ -98,7 +98,8 @@ foreach ($this->data['children'] as $child) {
 		array(
 			$childrenLink,
 			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
-			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
+			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid']),
+			new CVar('children['.$child['serviceid'].'][trigger]', $child['trigger'])
 		),
 		new CCheckBox(
 			'children['.$child['serviceid'].'][soft]',
