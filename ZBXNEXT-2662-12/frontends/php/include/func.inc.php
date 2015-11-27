@@ -1735,6 +1735,24 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	return $msg_box;
 }
 
+/**
+ * Returns the message box when messages are present; null otherwise
+ *
+ * @global array $ZBX_MESSAGES
+ *
+ * @return CDiv|null
+ */
+function getMessages()
+{
+	global $ZBX_MESSAGES;
+
+	$message_box = isset($ZBX_MESSAGES) && $ZBX_MESSAGES ? makeMessageBox(false, $ZBX_MESSAGES) : null;
+
+	$ZBX_MESSAGES = [];
+
+	return $message_box;
+}
+
 function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
