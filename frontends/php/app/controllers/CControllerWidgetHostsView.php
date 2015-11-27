@@ -42,6 +42,7 @@ class CControllerWidgetHostsView extends CController {
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
+			'trigger_name' => '',
 			'extAck' => 0
 		];
 
@@ -97,11 +98,12 @@ class CControllerWidgetHostsView extends CController {
 			$severity = CProfile::get('web.dashconf.triggers.severity', null);
 			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
 			$filter['severity'] = zbx_toHash($filter['severity']);
+			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
 
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = [
+		$this->setResponse(new CControllerResponseData([
 			'filter' => $filter,
 			'config' => [
 				'severity_name_0' => $config['severity_name_0'],
@@ -110,10 +112,10 @@ class CControllerWidgetHostsView extends CController {
 				'severity_name_3' => $config['severity_name_3'],
 				'severity_name_4' => $config['severity_name_4'],
 				'severity_name_5' => $config['severity_name_5']
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
 			]
-		];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		]));
 	}
 }

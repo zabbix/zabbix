@@ -80,8 +80,8 @@ foreach ($data['scripts'] as $script) {
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
-		$script['userGroupName'] === null ?  _('All') : $script['userGroupName'],
-		$script['hostGroupName'] === null ?  _('All') : $script['hostGroupName'],
+		($script['userGroupName'] === null) ? _('All') : $script['userGroupName'],
+		($script['hostGroupName'] === null) ? _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
 	]);
 }

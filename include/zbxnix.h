@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2015 Zabbix SIA
@@ -18,31 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_ZBXNIX_H
+#define ZABBIX_ZBXNIX_H
 
-class CRadioButton extends CTag {
+int    zbx_coredump_disable(void);
 
-	public function __construct($name, $value, $checked = false) {
-		parent::__construct('input');
-		$this->setAttribute('name', $name);
-		$this->setAttribute('value', $value);
-		$this->setAttribute('type', 'radio');
-		if ($checked) {
-			$this->setAttribute('checked', 'checked');
-		}
-	}
-
-	/**
-	 * Enable or disable the element.
-	 *
-	 * @param bool $value
-	 */
-	public function setEnabled($value) {
-		if ($value) {
-			$this->removeAttribute('disabled');
-		}
-		else {
-			$this->setAttribute('disabled', 'disabled');
-		}
-		return $this;
-	}
-}
+#endif	/* ZABBIX_ZBXNIX_H */

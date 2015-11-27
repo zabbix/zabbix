@@ -14,7 +14,7 @@
 		</select>
 	</td>
 	<td>
-		<input class="input text" id="iconmap_mappings_#{iconmappingid}_expression" name="iconmap[mappings][#{iconmappingid}][expression]" value="" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="64" type="text" />
+		<input id="iconmap_mappings_#{iconmappingid}_expression" name="iconmap[mappings][#{iconmappingid}][expression]" value="" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="64" type="text" />
 	</td>
 	<td>
 		<select class="mappingIcon" id="iconmap_mappings_#{iconmappingid}_iconid" name="iconmap[mappings][#{iconmappingid}][iconid]" autocomplete="off">
@@ -28,7 +28,7 @@
 		<?php $iconid = key($this->data['iconList']) ?>
 		<img class="pointer preview" name="Preview" alt="Preview" src="imgstore.php?iconid=<?= $iconid ?>&width=24&height=24" data-image-full="imgstore.php?iconid=<?= $iconid ?>" border="0">
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button class="<?= ZBX_STYLE_BTN_LINK ?> removeMapping" type="button" id="remove" name="remove">Remove</button>
 	</td>
 </tr>
@@ -92,7 +92,7 @@
 			})
 			.delegate('img.preview', 'click', function(e) {
 				var img = $('<img>', {src: $(this).data('imageFull')});
-				hintBox.showStaticHint(e, this, img, '', '', true);
+				hintBox.showStaticHint(e, this, img, '', true);
 			});
 
 		addMappindButton.click(function() {

@@ -33,14 +33,16 @@ $fields = [
 	'from' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
 	'stime' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
 	'name' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
-	'width' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'width' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	null],
 	'height' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
 	'graphtype' =>	[T_ZBX_INT, O_OPT, null,		IN('2,3'),			null],
 	'graph3d' =>	[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
 	'legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
 	'items' =>		[T_ZBX_STR, O_OPT, null,		null,				null]
 ];
-$isDataValid = check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 $items = getRequest('items', []);
 asort_by_key($items, 'sortorder');
@@ -83,33 +85,31 @@ foreach ($items as $item) {
 /*
  * Display
  */
-if ($isDataValid) {
-	navigation_bar_calc();
+navigation_bar_calc();
 
-	$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader(getRequest('name', ''));
+$graph = new CPieGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+$graph->setHeader(getRequest('name', ''));
 
-	if (!empty($_REQUEST['graph3d'])) {
-		$graph->switchPie3D();
-	}
-	$graph->showLegend(getRequest('legend', 0));
-
-	if (isset($_REQUEST['period'])) {
-		$graph->setPeriod($_REQUEST['period']);
-	}
-	if (isset($_REQUEST['from'])) {
-		$graph->setFrom($_REQUEST['from']);
-	}
-	if (isset($_REQUEST['stime'])) {
-		$graph->setSTime($_REQUEST['stime']);
-	}
-	$graph->setWidth(getRequest('width', 400));
-	$graph->setHeight(getRequest('height', 300));
-
-	foreach ($items as $item) {
-		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
-	}
-	$graph->draw();
+if (!empty($_REQUEST['graph3d'])) {
+	$graph->switchPie3D();
 }
+$graph->showLegend(getRequest('legend', 0));
+
+if (isset($_REQUEST['period'])) {
+	$graph->setPeriod($_REQUEST['period']);
+}
+if (isset($_REQUEST['from'])) {
+	$graph->setFrom($_REQUEST['from']);
+}
+if (isset($_REQUEST['stime'])) {
+	$graph->setSTime($_REQUEST['stime']);
+}
+$graph->setWidth(getRequest('width', 400));
+$graph->setHeight(getRequest('height', 300));
+
+foreach ($items as $item) {
+	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+}
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -18,55 +18,30 @@
 **/
 
 #include "common.h"
-
-#include <sys/time.h>
-#include <time.h>
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
- * Function: time_diff                                                        *
+ * Function: zbx_coredump_disable                                             *
  *                                                                            *
- * Purpose: calculate time difference in seconds                              *
+ * Purpose: disable core dump                                                 *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
+ * Return value: SUCCEED - core dump disabled                                 *
+ *               FAIL - error                                                 *
  *                                                                            *
  ******************************************************************************/
-double time_diff(struct timeval *from, struct timeval *to)
+int	zbx_coredump_disable(void)
 {
-	double msec;
-	double diff;
+	struct rlimit	limit;
 
-	/* from<=to */
-	if( (from->tv_sec < to->tv_sec) || (from->tv_sec == to->tv_sec && from->tv_usec <= to->tv_usec))
+	limit.rlim_cur = 0;
+	limit.rlim_max = 0;
+
+	if (0 != setrlimit(RLIMIT_CORE, &limit))
 	{
-		msec = (double)(to->tv_usec-from->tv_usec)/1000000;
-
-		if(msec >= 0)
-		{
-			diff = to->tv_sec - from->tv_sec + msec;
-		}
-		else
-		{
-			diff = to->tv_sec - from->tv_sec - (msec + 1);
-		}
-	}
-	/* from>to */
-	else
-	{
-		msec = (double)(from->tv_usec-to->tv_usec)/1000000;
-
-		if(msec >= 0)
-		{
-			diff = from->tv_sec - to->tv_sec + msec;
-		}
-		else
-		{
-			diff = from->tv_sec - to->tv_sec - (msec + 1);
-		}
-		diff = 0.0 - diff;
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set resource limit: %s", zbx_strerror(errno));
+		return FAIL;
 	}
 
-	return diff;
+	return SUCCEED;
 }

@@ -34,5 +34,6 @@ void	op_host_add(const DB_EVENT *event);
 void	op_host_del(const DB_EVENT *event);
 void	op_host_enable(const DB_EVENT *event);
 void	op_host_disable(const DB_EVENT *event);
+void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode);
 
 #endif

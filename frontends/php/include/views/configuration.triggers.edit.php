@@ -150,23 +150,6 @@ if ($this->data['input_method'] == IM_TREE) {
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
-			if (!$this->data['limited']) {
-				$deleteUrl = (new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('javascript:'.
-						' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-							' delete_expression("'.$e['id'] .'");'.
-							' document.forms["'.$triggersForm->getName().'"].submit();'.
-						' }'
-					);
-				$triggerCheckbox = (new CCheckBox('expr_target_single', $e['id']))
-					->setChecked($i == 0)
-					->onClick('check_target(this);');
-			}
-			else {
-				$triggerCheckbox = null;
-			}
-
 			if (!isset($e['expression']['levelErrors'])) {
 				$errorImg = '';
 			}
@@ -200,7 +183,27 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			$expressionTable->addRow(
-				new CRow([$triggerCheckbox, $e['list'], isset($deleteUrl) ? $deleteUrl : null, $errorImg])
+				new CRow([
+					!$this->data['limited']
+						? (new CCheckBox('expr_target_single', $e['id']))
+							->setChecked($i == 0)
+							->onClick('check_target(this);')
+						: null,
+					$e['list'],
+					!$this->data['limited']
+						? (new CCol(
+							(new CButton(null, _('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->onClick('javascript:'.
+									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+										' delete_expression("'.$e['id'] .'");'.
+										' document.forms["'.$triggersForm->getName().'"].submit();'.
+									' }'
+								)
+						))->addClass(ZBX_STYLE_NOWRAP)
+						: null,
+					$errorImg
+				])
 			);
 		}
 	}
@@ -270,7 +273,6 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
-	->setNoDataMessage(_('No dependencies defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 

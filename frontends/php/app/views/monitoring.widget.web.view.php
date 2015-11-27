@@ -41,15 +41,7 @@ $availableHosts = API::Host()->get([
 ]);
 $availableHostIds = array_keys($availableHosts);
 
-$table = (new CTableInfo())
-	->setHeader([
-		_('Host group'),
-		_('Ok'),
-		_('Failed'),
-		_('Unknown')
-	]);
-
-$data = [];
+$table_data = [];
 
 // fetch links between HTTP tests and host groups
 $result = DbFetchArray(DBselect(
@@ -65,40 +57,45 @@ $result = DbFetchArray(DBselect(
 $httpTestData = Manager::HttpTest()->getLastData(zbx_objectValues($result, 'httptestid'));
 
 foreach ($result as $row) {
+	if (!array_key_exists($row['groupid'], $table_data)) {
+		$table_data[$row['groupid']] = [
+			'ok' => 0,
+			'failed' => 0,
+			'unknown' => 0
+		];
+	}
+
 	if (isset($httpTestData[$row['httptestid']]) && $httpTestData[$row['httptestid']]['lastfailedstep'] !== null) {
-		if ($httpTestData[$row['httptestid']]['lastfailedstep'] != 0) {
-			$data[$row['groupid']]['failed'] = isset($data[$row['groupid']]['failed'])
-				? ++$data[$row['groupid']]['failed']
-				: 1;
-		}
-		else {
-			$data[$row['groupid']]['ok'] = isset($data[$row['groupid']]['ok'])
-				? ++$data[$row['groupid']]['ok']
-				: 1;
-		}
+		$table_data[$row['groupid']][$httpTestData[$row['httptestid']]['lastfailedstep'] != 0 ? 'failed' : 'ok']++;
 	}
 	else {
-		$data[$row['groupid']]['unknown'] = isset($data[$row['groupid']]['unknown'])
-			? ++$data[$row['groupid']]['unknown']
-			: 1;
+		$table_data[$row['groupid']]['unknown']++;
 	}
 }
 
+$table = (new CTableInfo())->setHeader([_('Host group'), _('Ok'), _('Failed'), _('Unknown')]);
+
 foreach ($groups as $group) {
-	if (!empty($data[$group['groupid']])) {
+	if (array_key_exists($group['groupid'], $table_data)) {
 		$table->addRow([
 			new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
-			(new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_GREEN),
-			(new CSpan(empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed']))
-				->addClass(empty($data[$group['groupid']]['failed']) ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
-			(new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown']))
-				->addClass(ZBX_STYLE_GREY)
+			(new CSpan($table_data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_GREEN),
+			(new CSpan($table_data[$group['groupid']]['failed']))
+				->addClass($table_data[$group['groupid']]['failed'] == 0 ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+			(new CSpan($table_data[$group['groupid']]['unknown']))->addClass(ZBX_STYLE_GREY)
 		]);
 	}
 }
 
-echo (new CJson())->encode([
+$output = [
 	'header' => _('Web monitoring'),
-	'body' =>  (new CDiv($table))->toString(),
-	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+	'body' => (new CDiv($table))->toString(),
+	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

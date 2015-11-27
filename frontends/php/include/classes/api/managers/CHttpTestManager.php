@@ -895,6 +895,8 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function updateStepsReal($httpTest, $websteps) {
+		$item_key_parser = new CItemKey();
+
 		// get all used keys
 		$webstepids = zbx_objectValues($websteps, 'httpstepid');
 		$dbKeys = DBfetchArrayAssoc(DBselect(
@@ -925,13 +927,12 @@ class CHttpTestManager {
 
 				if (isset($httpTest['name']) || isset($webstep['name'])) {
 					if (!isset($httpTest['name']) || !isset($webstep['name'])) {
-						$key = new CItemKey($stepitem['key_']);
-						$params = $key->getParameters();
+						$item_key_parser->parse($stepitem['key_']);
 						if (!isset($httpTest['name'])) {
-							$httpTest['name'] = $params[0];
+							$httpTest['name'] = $item_key_parser->getParam(0);
 						}
 						if (!isset($webstep['name'])) {
-							$webstep['name'] = $params[1];
+							$webstep['name'] = $item_key_parser->getParam(1);
 						}
 					}
 

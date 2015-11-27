@@ -21,6 +21,8 @@
 #include "sysinfo.h"
 #include "log.h"
 
+#include <uvm/uvm_extern.h>
+
 static int			mib[] = {CTL_VM, VM_UVMEXP2};
 static size_t			len;
 static struct uvmexp_sysctl	uvm;

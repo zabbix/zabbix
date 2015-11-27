@@ -205,17 +205,17 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 
 	if ($this->data['templated']) {
-		$removeButton = '';
 		$dragHandler = '';
+		$removeButton = '';
 	}
 	else {
+		$dragHandler = (new CCol(
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->onClick('javascript: removeStep(this);')
 			->setAttribute('remove_step', $stepid);
-		$dragHandler = (new CCol(
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 	}
 
 	$stepsTable->addRow(
@@ -227,7 +227,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 			$url,
 			htmlspecialchars($step['required']),
 			$step['status_codes'],
-			$removeButton
+			(new CCol($removeButton))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
 			->setId('steps_'.$stepid)

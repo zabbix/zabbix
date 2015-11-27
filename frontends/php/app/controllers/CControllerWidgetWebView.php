@@ -90,11 +90,11 @@ class CControllerWidgetWebView extends CController {
 			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
 		}
 
-		$data = [
-			'filter' => $filter
-		];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData([
+			'filter' => $filter,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

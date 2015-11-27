@@ -70,11 +70,6 @@ foreach ($this->data['slides'] as $key => $slides) {
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		->setAttribute('placeholder', _('default'));
 
-	$removeButton = (new CButton('remove_'.$key, _('Remove')))
-		->onClick('javascript: removeSlide(this);')
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->setAttribute('remove_slide', $key);
-
 	$slideTable->addRow(
 		(new CRow([
 			(new CCol(
@@ -83,7 +78,12 @@ foreach ($this->data['slides'] as $key => $slides) {
 			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
 			$name,
 			$delay,
-			$removeButton
+			(new CCol(
+				(new CButton('remove_'.$key, _('Remove')))
+					->onClick('javascript: removeSlide(this);')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('remove_slide', $key)
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
 			->setId('slides_'.$key)

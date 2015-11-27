@@ -174,8 +174,9 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for process */
-#define PROCESS_LOCAL_COMMAND	1
-#define PROCESS_MODULE_COMMAND	2
+#define PROCESS_LOCAL_COMMAND	0x1
+#define PROCESS_MODULE_COMMAND	0x2
+#define PROCESS_WITH_ALIAS	0x4
 
 void	init_metrics();
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
@@ -214,6 +215,11 @@ zbx_uint64_t	get_kstat_numeric_value(const kstat_named_t *kn);
 int	GET_SENSOR(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXFILES(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	KERNEL_MAXPROC(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#ifdef ZBX_PROCSTAT_COLLECTOR
+int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
+#endif
+
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -272,5 +278,12 @@ typedef struct
 	int		(*function)();
 }
 MODE_FUNCTION;
+
+/* the fields used by proc queries */
+#define ZBX_SYSINFO_PROC_NONE		0x0000
+#define ZBX_SYSINFO_PROC_PID		0x0001
+#define ZBX_SYSINFO_PROC_NAME		0x0002
+#define ZBX_SYSINFO_PROC_CMDLINE	0x0004
+#define ZBX_SYSINFO_PROC_USER		0x0008
 
 #endif

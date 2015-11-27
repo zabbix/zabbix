@@ -1012,7 +1012,7 @@ function getSelementsInfo($sysmap, array $options = []) {
 
 		foreach ($triggersFromMonitoredHosts as $triggerId => $trigger) {
 			foreach ($trigger['hosts'] as $host) {
-				$hostd = $host['hostid'];
+				$hostId = $host['hostid'];
 
 				if (isset($hostIdToSelementIds[$hostId])) {
 					foreach ($hostIdToSelementIds[$hostId] as $selementId) {

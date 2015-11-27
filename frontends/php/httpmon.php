@@ -173,7 +173,7 @@ if ($pageFilter->hostsSelected) {
 
 		$cpsan = new CSpan($httpTest['hostname']);
 		if ($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
-			$cpsan->addClass('not-monitored');
+			$cpsan->addClass(ZBX_STYLE_RED);
 		};
 		$table->addRow(new CRow([
 			($_REQUEST['hostid'] > 0) ? null : $cpsan,

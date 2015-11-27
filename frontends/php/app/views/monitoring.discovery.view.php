@@ -106,11 +106,13 @@ foreach ($data['drules'] as $drule) {
 				];
 			}
 
-			$class = 'active';
-			$time = 'lastup';
 			if ($dservice['status'] == DSVC_STATUS_DISABLED) {
-				$class = 'inactive';
+				$class = ZBX_STYLE_INACTIVE_BG;
 				$time = 'lastdown';
+			}
+			else {
+				$class = ZBX_STYLE_ACTIVE_BG;
+				$time = 'lastup';
 			}
 
 			$key_ = $dservice['key_'];
@@ -164,10 +166,10 @@ foreach ($data['drules'] as $drule) {
 
 				$hintTable = (new CTableInfo())->setAttribute('style', 'width: auto;');
 
-				if ($class == 'active') {
+				if ($class == ZBX_STYLE_ACTIVE_BG) {
 					$hintTable->setHeader(_('Uptime'));
 				}
-				elseif ($class == 'inactive') {
+				else {
 					$hintTable->setHeader(_('Downtime'));
 				}
 				$timeColumn = (new CCol(zbx_date2age($h_data['services'][$name]['time'])))->addClass($class);

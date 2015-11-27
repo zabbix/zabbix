@@ -81,8 +81,6 @@ class CTabView extends CDiv {
 	public function toString($destroy = true) {
 		// No header if we have only one Tab
 		if (count($this->tabs) == 1) {
-			$this->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
-
 			$tab = reset($this->tabs);
 			$this->addItem($tab);
 		}

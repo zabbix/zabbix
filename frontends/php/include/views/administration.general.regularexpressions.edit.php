@@ -75,7 +75,7 @@ foreach ($data['expressions'] as $i => $expression) {
 		$button_cell[] = new CVar('expressions['.$i.'][expressionid]', $expression['expressionid']);
 	}
 
-	$row[] = $button_cell;
+	$row[] = (new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP);
 
 	$exprTable->addRow(
 		(new CRow($row))

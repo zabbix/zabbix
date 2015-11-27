@@ -49,7 +49,8 @@ foreach ($this->data['proxies'] as $proxy) {
 $discoveryFormList
 	->addRow(_('Discovery by proxy'), $proxyComboBox)
 	->addRow(_('IP range'),
-		(new CTextBox('iprange', $this->data['drule']['iprange']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Delay (in sec)'),
 		(new CNumericBox('delay', $this->data['drule']['delay'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)

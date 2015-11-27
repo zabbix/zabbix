@@ -366,9 +366,7 @@ $conditionFormList->addRow(_('New condition'),
 					$condition
 				])
 			)
-			->addRow(
-				(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			)
+			->addRow((new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK))
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -450,31 +448,33 @@ if ($this->data['action']['operations']) {
 				$details,
 				$esc_delay_txt,
 				$esc_period_txt,
-				(new CCol([
-					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-					SPACE, SPACE,
-					[
-						(new CButton('remove', _('Remove')))
-							->onClick('javascript: removeOperation('.$operationid.');')
-							->addClass(ZBX_STYLE_BTN_LINK),
-						new CVar('operations['.$operationid.']', $operation)
-					]
-				]))->addClass(ZBX_STYLE_NOWRAP)
+				(new CCol(
+					new CHorList([
+						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						[
+							(new CButton('remove', _('Remove')))
+								->onClick('javascript: removeOperation('.$operationid.');')
+								->addClass(ZBX_STYLE_BTN_LINK),
+							new CVar('operations['.$operationid.']', $operation)
+						]
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
 			];
 		}
 		else {
 			$operationRow = [
 				$details,
-				(new CCol([
-					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-					SPACE, SPACE,
-					[
-						(new CButton('remove', _('Remove')))
-							->onClick('javascript: removeOperation('.$operationid.');')
-							->addClass(ZBX_STYLE_BTN_LINK),
-						new CVar('operations['.$operationid.']', $operation)
-					]
-				]))->addClass(ZBX_STYLE_NOWRAP)
+				(new CCol(
+					new CHorList([
+						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						[
+							(new CButton('remove', _('Remove')))
+								->onClick('javascript: removeOperation('.$operationid.');')
+								->addClass(ZBX_STYLE_BTN_LINK),
+							new CVar('operations['.$operationid.']', $operation)
+						]
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
 			];
 		}
 		$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
@@ -911,6 +911,17 @@ if (!empty($this->data['new_operation'])) {
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]);
 			break;
+
+		case OPERATION_TYPE_HOST_INVENTORY:
+			$newOperationsTable->addRow([_('Inventory mode'),
+				(new CRadioButtonList('new_operation[opinventory][inventory_mode]',
+					(int) $data['new_operation']['opinventory']['inventory_mode']
+				))
+					->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+					->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+					->setModern(true)
+			]);
+			break;
 	}
 
 	// append operation conditions to form list
@@ -1053,27 +1064,29 @@ if (!empty($this->data['new_operation'])) {
 		}
 		$newOperationConditionTable->addRow(new CCol($rowCondition));
 
-		$newOperationConditionFooter = [
-			(new CSubmit('add_opcondition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-			SPACE, SPACE,
-			(new CSubmit('cancel_new_opcondition', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
-		];
-
 		$newOperationsTable->addRow([_('Operation condition'),
-			(new CDiv([$newOperationConditionTable, $newOperationConditionFooter]))
+			(new CDiv([
+				$newOperationConditionTable,
+				new CHorList([
+					(new CSubmit('add_opcondition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
+					(new CSubmit('cancel_new_opcondition', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+				])
+			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		]);
 	}
 
-	$footer = [
-		(new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-		(new CSubmit('cancel_new_operation', _('Cancel')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addStyle('margin-left: 8px')
-	];
 	$operationFormList->addRow(_('Operation details'),
-		(new CDiv([$newOperationsTable, $footer]))
+		(new CDiv([
+			$newOperationsTable,
+			new CHorList([
+				(new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add')))
+					->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSubmit('cancel_new_operation', _('Cancel')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+			])
+		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);

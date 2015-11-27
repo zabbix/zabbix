@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2015 Zabbix SIA
@@ -18,30 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
- * Class for storing the result returned by the function macro parser.
- */
-class CFunctionMacroParserResult extends CParserResult {
+#ifndef ZABBIX_TLS_TCP_H
+#define ZABBIX_TLS_TCP_H
 
-	/**
-	 * Array containing information about the parsed function macro.
-	 *
-	 * Example:
-	 *   array(
-	 *     'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *     'pos' => 0,
-	 *     'host' => 'Zabbix server',
-	 *     'item' => 'agent.ping',
-	 *     'function' => 'last(0)',
-	 *     'functionName' => 'last',
-	 *     'functionParam' => '0',
-	 *     'functionParamList' => array (0 => '0')
-	 *   )
-	 *
-	 * @deprecated  implement tokens instead
-	 *
-	 * @var array
-	 */
-	public $expression = [];
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2);
+int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept);
+void	zbx_tls_close(zbx_socket_t *s);
+#endif
 
-}
+#if defined(HAVE_OPENSSL)
+void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset);
+#endif
+
+#endif	/* ZABBIX_TLS_TCP_H */

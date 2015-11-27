@@ -256,6 +256,8 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 	show_messages($result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -270,7 +272,7 @@ if (isset($_REQUEST['form'])) {
 			'status' => getRequest('status', HOST_STATUS_MONITORED),
 			'templates' => [],
 			'inventory' => [
-				'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED)
+				'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode'])
 			],
 			'groupPrototypes' => getRequest('group_prototypes', [])
 		],
@@ -318,6 +320,10 @@ if (isset($_REQUEST['form'])) {
 	if (getRequest('hostid') && !getRequest('form_refresh')) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
+		if (!array_key_exists('inventory_mode', $data['host_prototype']['inventory'])) {
+			$data['host_prototype']['inventory']['inventory_mode'] = HOST_INVENTORY_DISABLED;
+		}
+
 		$data['groups'] = API::HostGroup()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'groupids' => zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid'),
@@ -361,8 +367,6 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$config = select_config();
 
 	$data = [
 		'form' => getRequest('form'),

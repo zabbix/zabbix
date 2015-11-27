@@ -77,26 +77,4 @@ class CImg extends CTag {
 		}
 		return $this;
 	}
-
-	public function preload() {
-		$id = $this->getAttribute('id');
-		if (empty($id)) {
-			$id = 'img'.uniqid();
-			$this->setId($id);
-		}
-
-		insert_js(
-			'jQuery('.CJs::encodeJson($this->toString()).').load(function() {
-				var parent = jQuery("#'.$id.'preloader").parent();
-				jQuery("#'.$id.'preloader").remove();
-				jQuery(parent).append(jQuery(this));
-			});',
-			true
-		);
-
-		$this->addClass('preloader');
-		$this->setId($id.'preloader');
-		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
-		return $this;
-	}
 }

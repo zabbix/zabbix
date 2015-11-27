@@ -65,46 +65,34 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST || $this->data['copy_type'] ==
 $targets = [];
 if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 	foreach ($this->data['hosts'] as $host) {
-		array_push(
-			$targets,
-			[
-				(new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
-					->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid'])),
-				SPACE,
-				$host['name'],
-				BR()
-			]
+		$targets[] = new CLabel([
+			(new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
+				->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid'])), $host['name']],
+			'copy_targetid['.$host['hostid'].']'
 		);
+		$targets[] = BR();
 	}
 } elseif ($this->data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
 	foreach ($this->data['templates'] as $template) {
-		array_push(
-			$targets,
-			[
-				(new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
-					->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid'])),
-				SPACE,
-				$template['name'],
-				BR()
-			]
+		$targets[] = new CLabel([
+			(new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
+				->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid'])), $template['name']],
+			'copy_targetid['.$template['templateid'].']'
 		);
+		$targets[] = BR();
 	}
 } else {
 	foreach ($this->data['groups'] as $group) {
-		array_push(
-			$targets,
-			[
-				(new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
-					->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid'])),
-				SPACE,
-				$group['name'],
-				BR()
-			]
+		$targets[] = new CLabel([
+			(new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
+				->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid'])), $group['name']],
+			'copy_targetid['.$group['groupid'].']'
 		);
+		$targets[] = BR();
 	}
 }
-if (empty($targets)) {
-	array_push($targets, BR());
+if ($targets) {
+	array_pop($targets);
 }
 $triggersFormList->addRow(_('Target'), $targets);
 
