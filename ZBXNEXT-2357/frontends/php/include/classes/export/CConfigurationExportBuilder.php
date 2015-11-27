@@ -101,6 +101,12 @@ class CConfigurationExportBuilder {
 				'ipmi_privilege' => $host['ipmi_privilege'],
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
+				'tls_connect' => $host['tls_connect'],
+				'tls_accept' => $host['tls_accept'],
+				'tls_issuer' => $host['tls_issuer'],
+				'tls_subject' => $host['tls_subject'],
+				'tls_psk_identity' => $host['tls_psk_identity'],
+				'tls_psk' => $host['tls_psk'],
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
@@ -199,6 +205,46 @@ class CConfigurationExportBuilder {
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $this->formatMapElements($map['selements']),
 				'links' => $this->formatMapLinks($map['links'])
+			];
+		}
+	}
+
+	/**
+	 * Format mappings.
+	 *
+	 * @param array $mappings
+	 *
+	 * @return array
+	 */
+	protected function formatMappings(array $mappings) {
+		$result = [];
+
+		CArrayHelper::sort($mappings, ['value']);
+
+		foreach ($mappings as $mapping) {
+			$result[] = [
+				'value' => $mapping['value'],
+				'newvalue' => $mapping['newvalue']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format value maps.
+	 *
+	 * @param array $valuemaps
+	 */
+	public function buildValueMaps(array $valuemaps) {
+		$this->data['value_maps'] = [];
+
+		CArrayHelper::sort($valuemaps, ['name']);
+
+		foreach ($valuemaps as $valuemap) {
+			$this->data['value_maps'][] = [
+				'name' => $valuemap['name'],
+				'mappings' => $this->formatMappings($valuemap['mappings'])
 			];
 		}
 	}

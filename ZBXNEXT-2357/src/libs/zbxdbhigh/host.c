@@ -1038,6 +1038,9 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
 
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
 	{
@@ -1049,9 +1052,6 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBget_profiles_by_source_idxs_values(&profileids, NULL, &profile_idx, 1, triggerids);
 	if (0 != profileids.values_num)
@@ -4731,7 +4731,7 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 		zbx_free(tmp);
 		tmp = strdup(row[4]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,  NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL,  NULL, NULL,
 				&tmp, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(tmp, &db_port) || db_port != port)
 			continue;
@@ -4995,7 +4995,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
-
 
 /******************************************************************************
  *                                                                            *

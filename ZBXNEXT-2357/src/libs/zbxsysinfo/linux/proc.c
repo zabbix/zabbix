@@ -23,6 +23,8 @@
 #include "log.h"
 #include "stats.h"
 
+extern int	CONFIG_TIMEOUT;
+
 typedef struct
 {
 	pid_t		pid;
@@ -37,7 +39,6 @@ typedef struct
 	char		*cmdline;
 }
 zbx_sysinfo_proc_t;
-
 
 /******************************************************************************
  *                                                                            *
@@ -54,7 +55,6 @@ void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 
 	zbx_free(proc);
 }
-
 
 static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
@@ -1049,7 +1049,6 @@ out:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: proc_match_name                                                  *
@@ -1331,8 +1330,9 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp;
 	char		*errmsg = NULL;
-	int		period, type, ret;
+	int		period, type;
 	double		value;
+	zbx_timespec_t	ts_timeout, ts;
 
 	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15)] */
 	/*                   0          1           2            3             4          */
@@ -1397,7 +1397,10 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED != (ret = zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg)))
+	zbx_timespec(&ts_timeout);
+	ts_timeout.sec += CONFIG_TIMEOUT;
+
+	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg))
 	{
 		/* zbx_procstat_get_* functions will return FAIL when either a collection   */
 		/* error was registered or if less than 2 data samples were collected.      */
@@ -1407,9 +1410,19 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, errmsg);
 			return SYSINFO_RET_FAIL;
 		}
+
+		zbx_timespec(&ts);
+
+		if (0 > zbx_timespec_compare(&ts_timeout, &ts))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for collector data."));
+			return SYSINFO_RET_FAIL;
+		}
+
+		sleep(1);
 	}
-	else
-		SET_DBL_RESULT(result, value);
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }

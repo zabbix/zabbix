@@ -159,8 +159,7 @@ foreach ($items as $item) {
 		isset($item['yaxisside']) ? $item['yaxisside'] : null,
 		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
 		isset($item['color']) ? $item['color'] : null,
-		isset($item['drawtype']) ? $item['drawtype'] : null,
-		isset($item['type']) ? $item['type'] : null
+		isset($item['drawtype']) ? $item['drawtype'] : null
 	);
 }
 

@@ -188,7 +188,7 @@ $data['triggers'] = API::Trigger()->get([
 	'preservekeys' => true
 ]);
 
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrl($data['triggers']);
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 $hostIds = [];
 

@@ -327,7 +327,7 @@ int	telnet_test_login(ZBX_SOCKET socket_fd)
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR != rc)
 		ret = SUCCEED;
@@ -355,7 +355,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() login prompt:'%.*s'", __function_name, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -375,7 +375,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'", __function_name, offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() password prompt:'%.*s'", __function_name, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -398,7 +398,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'", __function_name, offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() prompt:'%.*s'", __function_name, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -447,7 +447,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	}
 
 	convert_telnet_to_unix_eol(buf, &offset);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'", __function_name, offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() command output:'%.*s'", __function_name, (int)offset, buf);
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
@@ -480,7 +480,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 	telnet_rm_echo(buf, &offset, "\n", 1);
 	telnet_rm_prompt(buf, &offset);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() stripped command output:'%.*s'", __function_name, offset, buf);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() stripped command output:'%.*s'", __function_name, (int)offset, buf);
 
 	if (MAX_BUFFER_LEN == offset)
 		offset--;

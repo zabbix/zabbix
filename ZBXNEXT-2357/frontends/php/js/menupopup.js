@@ -637,7 +637,6 @@ function getMenuPopupServiceConfiguration(options) {
 	}
 
 	return [{
-		label: sprintf(t('Service "%1$s"'), options.name),
 		items: items
 	}];
 }
@@ -932,7 +931,7 @@ jQuery(function($) {
 	 * Menu popup.
 	 *
 	 * @param array  sections				menu sections
-	 * @param string sections[n]['label']	section title
+	 * @param string sections[n]['label']	(optional) section title
 	 * @param array  sections[n]['items']	section menu data (see createMenuItem() for available options)
 	 * @param object event					menu popup call event
 	 *
@@ -978,8 +977,10 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					var h3 = $('<h3>').text(section.label);
-					var sectionItem = $('<li>').append(h3);
+					if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
+						var h3 = $('<h3>').text(section.label);
+						var sectionItem = $('<li>').append(h3);
+					}
 
 					// add section delimited for all sections except first one
 					if (i > 0) {

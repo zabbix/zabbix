@@ -574,7 +574,7 @@ function appendZero(val) {
 }
 
 /**
- * Trims selected elements values.
+ * Trims selected element values.
  *
  * @param array selectors
  */

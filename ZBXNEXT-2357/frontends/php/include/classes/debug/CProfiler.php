@@ -112,9 +112,11 @@ class CProfiler {
 	}
 
 	/**
-	 * Output profiling data.
+	 * Make profiling data.
+	 *
+	 * @return CPre
 	 */
-	public function show() {
+	public function make() {
 		global $DB;
 
 		$debug = [];
@@ -182,12 +184,18 @@ class CProfiler {
 			$debug[] = BR();
 		}
 
-		$debug = (new CPre())
+		return (new CPre())
 			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
 			->setAttribute('name', 'zbx_debug_info')
 			->addStyle('display: none;')
-			->addItem($debug)
-			->show();
+			->addItem($debug);
+	}
+
+	/**
+	 * Output profiling data.
+	 */
+	public function show() {
+		return $this->make()->show();
 	}
 
 	/**

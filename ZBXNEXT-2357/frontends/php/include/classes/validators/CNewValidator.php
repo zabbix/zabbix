@@ -84,7 +84,9 @@ class CNewValidator {
 				 */
 				case 'not_empty':
 					if (array_key_exists($field, $this->input) && $this->input[$field] === '') {
-						$this->addError($fatal, _s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty'))
+						);
 						return false;
 					}
 					break;
@@ -152,6 +154,22 @@ class CNewValidator {
 							);
 							return false;
 						}
+					}
+					break;
+
+				/*
+				 * 'array_db' => array(
+				 *     'table' => <table_name>,
+				 *     'field' => <field_name>
+				 * )
+				 */
+				case 'array':
+					if (array_key_exists($field, $this->input) && !is_array($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+						);
+
+						return false;
 					}
 					break;
 

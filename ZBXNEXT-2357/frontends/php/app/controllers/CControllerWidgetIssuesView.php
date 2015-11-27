@@ -46,45 +46,46 @@ class CControllerWidgetIssuesView extends CController {
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
-			if ($filter['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0) == 0) {
-				// null mean all groups
-				$filter['groupids'] = null;
-			}
-			else {
+			if (CProfile::get('web.dashconf.groups.grpswitch', 0) == 1) {
 				$filter['groupids'] = zbx_objectValues(CFavorite::get('web.dashconf.groups.groupids'), 'value');
-				$hideHostGroupIds = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
+				$groupids_hidden = zbx_objectValues(CFavorite::get('web.dashconf.groups.hide.groupids'), 'value');
 
-				if ($hideHostGroupIds) {
+				if (!$filter['groupids']) {
+					// null mean all groups
+					$filter['groupids'] = null;
+				}
+
+				if ($groupids_hidden) {
 					// get all groups if no selected groups defined
-					if (!$filter['groupids']) {
-						$dbHostGroups = API::HostGroup()->get([
-							'output' => ['groupid']
-						]);
-						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
+					if ($filter['groupids'] === null) {
+						$filter['groupids'] = array_keys(
+							API::HostGroup()->get([
+								'output' => [],
+								'preservekeys' => true
+							])
+						);
 					}
 
-					$filter['groupids'] = array_diff($filter['groupids'], $hideHostGroupIds);
+					$filter['groupids'] = array_diff($filter['groupids'], $groupids_hidden);
 
 					// get available hosts
-					$dbAvailableHosts = API::Host()->get([
-						'groupids' => $filter['groupids'],
-						'output' => ['hostid']
-					]);
-					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
+					$hostids_available = array_keys(
+						API::Host()->get([
+							'output' => [],
+							'groupids' => $filter['groupids'],
+							'preservekeys' => true
+						])
+					);
 
-					$dbDisabledHosts = API::Host()->get([
-						'groupids' => $hideHostGroupIds,
-						'output' => ['hostid']
-					]);
-					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
+					$hostids_hidden = array_keys(
+						API::Host()->get([
+							'output' => [],
+							'groupids' => $groupids_hidden,
+							'preservekeys' => true
+						])
+					);
 
-					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
-				}
-				else {
-					if (!$filter['groupids']) {
-						// null mean all groups
-						$filter['groupids'] = null;
-					}
+					$filter['hostids'] = array_diff($hostids_available, $hostids_hidden);
 				}
 			}
 
@@ -102,11 +103,11 @@ class CControllerWidgetIssuesView extends CController {
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = [
-			'filter' => $filter
-		];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData([
+			'filter' => $filter,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

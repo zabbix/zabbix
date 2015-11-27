@@ -87,8 +87,7 @@ foreach ($dbGraph['gitems'] as $gItem) {
 		$gItem['yaxisside'],
 		$gItem['calc_fnc'],
 		$gItem['color'],
-		$gItem['drawtype'],
-		$gItem['type']
+		$gItem['drawtype']
 	);
 }
 

@@ -26,12 +26,12 @@
 
 #include "proxyconfig.h"
 #include "../servercomms.h"
+#include "../../libs/zbxcrypto/tls.h"
 
 #define CONFIG_PROXYCONFIG_RETRY	120	/* seconds */
 
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-
 
 void	zbx_proxyconfig_sigusr_handler(int flags)
 {
@@ -65,7 +65,7 @@ static void	process_configuration_sync(size_t *data_size)
 	/* reset the performance metric */
 	*data_size = 0;
 
-	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
+	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY);	/* retry till have a connection */
 
 	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
 	{
@@ -143,9 +143,12 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -154,6 +157,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		sec = zbx_time();

@@ -428,7 +428,17 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add value map names that need association with a database value map id.
+	 * Add value map association with valuemap ID.
+	 *
+	 * @param string $name
+	 * @param string $valuemapid
+	 */
+	public function addValueMapRef($name, $valuemapid) {
+		$this->valueMapsRefs[$name] = $valuemapid;
+	}
+
+	/**
+	 * Add value map names that need association with a database value map ID.
 	 *
 	 * @param array $valueMaps
 	 */
@@ -741,15 +751,19 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Select value map ids for previously added value map names.
+	 * Select value map IDs for previously added value map names.
 	 */
 	protected function selectValueMaps() {
-		if (!empty($this->valueMaps)) {
+		if ($this->valueMaps) {
 			$this->valueMapsRefs = [];
 
-			$dbitems = DBselect('SELECT v.name,v.valuemapid FROM valuemaps v WHERE '.dbConditionString('v.name', $this->valueMaps));
-			while ($dbItem = DBfetch($dbitems)) {
-				$this->valueMapsRefs[$dbItem['name']] = $dbItem['valuemapid'];
+			$valuemaps = API::ValueMap()->get([
+				'output' => ['valeumapid', 'name'],
+				'filter' => ['name' => $this->valueMaps]
+			]);
+
+			foreach ($valuemaps as $valuemap) {
+				$this->valueMapsRefs[$valuemap['name']] = $valuemap['valuemapid'];
 			}
 
 			$this->valueMaps = [];
@@ -776,10 +790,11 @@ class CImportReferencer {
 				'editable' => true
 			]);
 
+			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
+
 			foreach ($dbTriggers as $dbTrigger) {
-				$dbTriggerExpression = explode_exp($dbTrigger['expression']);
-				if (isset($this->triggers[$dbTrigger['description']][$dbTriggerExpression])) {
-					$this->triggersRefs[$dbTrigger['description']][$dbTriggerExpression] = $dbTrigger['triggerid'];
+				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
+					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
 				}
 			}
 		}

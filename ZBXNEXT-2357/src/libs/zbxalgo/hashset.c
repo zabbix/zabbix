@@ -238,6 +238,11 @@ void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 	return (NULL != entry ? entry->data : NULL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a hashset entry using comparison with the given data       *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 {
 	int			slot;
@@ -279,6 +284,51 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
 
 				prev_entry = entry;
 				entry = entry->next;
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: remove a hashset entry using a data pointer returned to the user  *
+ *          by zbx_hashset_insert[_ext]() and zbx_hashset_search() functions  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data)
+{
+	int			slot;
+	ZBX_HASHSET_ENTRY_T	*data_entry, *iter_entry;
+
+	if (0 == hs->num_slots)
+		return;
+
+	data_entry = (ZBX_HASHSET_ENTRY_T *)((const char *)data - offsetof(ZBX_HASHSET_ENTRY_T, data));
+
+	slot = data_entry->hash % hs->num_slots;
+	iter_entry = hs->slots[slot];
+
+	if (NULL != iter_entry)
+	{
+		if (iter_entry == data_entry)
+		{
+			hs->slots[slot] = data_entry->next;
+			__hashset_free_entry(hs, data_entry);
+			hs->num_data--;
+		}
+		else
+		{
+			while (NULL != iter_entry->next)
+			{
+				if (iter_entry->next == data_entry)
+				{
+					iter_entry->next = data_entry->next;
+					__hashset_free_entry(hs, data_entry);
+					hs->num_data--;
+					break;
+				}
+
+				iter_entry = iter_entry->next;
 			}
 		}
 	}

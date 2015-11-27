@@ -375,6 +375,13 @@ class API {
 	}
 
 	/**
+	 * @return CValueMap
+	 */
+	public static function ValueMap() {
+		return self::getApi('valuemap');
+	}
+
+	/**
 	 * @return CHttpTest
 	 */
 	public static function HttpTest() {

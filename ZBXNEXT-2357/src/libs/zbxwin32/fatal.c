@@ -25,9 +25,11 @@
 
 #pragma comment(lib, "DbgHelp.lib")
 
-#define STACKWALK_MAX_NAMELEN 4096
+#define STACKWALK_MAX_NAMELEN	4096
 
 #define ZBX_LSHIFT(value, bits)	(((unsigned __int64)value) << bits)
+
+extern const char	*progname;
 
 #ifdef _M_X64
 
@@ -143,9 +145,8 @@ static void	print_backtrace(CONTEXT *pctx)
 
 	if (0 != GetModuleFileNameEx(hProcess, NULL, szProcessName, ARRSIZE(szProcessName)))
 	{
-		char			*ptr;
-		extern const char	*progname;
-		int			path_alloc = 0, path_offset = 0;
+		char	*ptr;
+		int	path_alloc = 0, path_offset = 0;
 
 		process_name = zbx_unicode_to_utf8(szProcessName);
 

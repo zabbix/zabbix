@@ -37,7 +37,7 @@ static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *para
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (1 == defaults_on_empty && '\0' == *parameter)
@@ -93,7 +93,7 @@ static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parame
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (SUCCEED == is_uint64(parameter, value))
@@ -124,7 +124,7 @@ static int	get_function_parameter_float(zbx_uint64_t hostid, const char *paramet
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		int		digits;
@@ -176,7 +176,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (NULL == (*value = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
+	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
 			value, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED == ret)
@@ -2558,7 +2558,7 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		orig_value[MAX_BUFFER_LEN], *value_esc;
+	char		*value_esc, *value_tmp;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() value:'%s' valuemapid:" ZBX_FS_UI64, __function_name, value, valuemapid);
@@ -2579,9 +2579,9 @@ static int	replace_value_by_map(char *value, size_t max_len, zbx_uint64_t valuem
 	{
 		del_zeroes(row[0]);
 
-		strscpy(orig_value, value);
-
-		zbx_snprintf(value, max_len, "%s (%s)", row[0], orig_value);
+		value_tmp = zbx_dsprintf(NULL, "%s (%s)", row[0], value);
+		zbx_strlcpy_utf8(value, value_tmp, max_len);
+		zbx_free(value_tmp);
 
 		ret = SUCCEED;
 	}

@@ -236,7 +236,7 @@ if ($type == SHOW_TRIGGERS) {
 
 	$triggers = API::Trigger()->get($options);
 
-	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 	// Pass already filtered 'groupid' to menu pop-up "Events" link.
 	foreach ($triggers as &$trigger) {

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2015 Zabbix SIA
@@ -18,30 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/**
- * Class for storing the result returned by the function macro parser.
- */
-class CFunctionMacroParserResult extends CParserResult {
+#ifndef ZABBIX_ZBXNIX_H
+#define ZABBIX_ZBXNIX_H
 
-	/**
-	 * Array containing information about the parsed function macro.
-	 *
-	 * Example:
-	 *   array(
-	 *     'expression' => '{Zabbix server:agent.ping.last(0)}',
-	 *     'pos' => 0,
-	 *     'host' => 'Zabbix server',
-	 *     'item' => 'agent.ping',
-	 *     'function' => 'last(0)',
-	 *     'functionName' => 'last',
-	 *     'functionParam' => '0',
-	 *     'functionParamList' => array (0 => '0')
-	 *   )
-	 *
-	 * @deprecated  implement tokens instead
-	 *
-	 * @var array
-	 */
-	public $expression = [];
+int    zbx_coredump_disable(void);
 
-}
+#endif	/* ZABBIX_ZBXNIX_H */

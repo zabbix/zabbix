@@ -657,104 +657,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
-{
-	const char	*__function_name = "DBadd_trend";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		hour, num;
-	double		value_min, value_avg, value_max;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	hour = clock - clock % SEC_PER_HOUR;
-
-	result = DBselect("select num,value_min,value_avg,value_max from trends where itemid=" ZBX_FS_UI64 " and clock=%d",
-			itemid, hour);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		num = atoi(row[0]);
-		value_min = atof(row[1]);
-		value_avg = atof(row[2]);
-		value_max = atof(row[3]);
-		if (value < value_min)
-			value_min = value;
-		if (value > value_max)
-			value_max = value;
-		value_avg = (num * value_avg + value) / (num + 1);
-		num++;
-
-		DBexecute("update trends"
-				" set num=%d,"
-				"value_min=" ZBX_FS_DBL ","
-				"value_avg=" ZBX_FS_DBL ","
-				"value_max=" ZBX_FS_DBL
-				" where itemid=" ZBX_FS_UI64
-					" and clock=%d",
-				num, value_min, value_avg, value_max, itemid, hour);
-	}
-	else
-	{
-		DBexecute("insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
-				" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
-				itemid, hour, 1, value, value, value);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
-{
-	const char	*__function_name = "DBadd_trend_uint";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		hour, num;
-	zbx_uint64_t	value_min, value_avg, value_max;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	hour = clock - clock % SEC_PER_HOUR;
-
-	result = DBselect("select num,value_min,value_avg,value_max from trends_uint where itemid=" ZBX_FS_UI64 " and clock=%d",
-		itemid, hour);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		num = atoi(row[0]);
-		ZBX_STR2UINT64(value_min, row[1]);
-		ZBX_STR2UINT64(value_avg, row[2]);
-		ZBX_STR2UINT64(value_max, row[3]);
-		if (value < value_min)
-			value_min = value;
-		if (value > value_max)
-			value_max = value;
-		value_avg = (num * value_avg + value) / (num + 1);
-		num++;
-
-		DBexecute("update trends_uint"
-				" set num=%d,"
-				"value_min=" ZBX_FS_UI64 ","
-				"value_avg=" ZBX_FS_UI64 ","
-				"value_max=" ZBX_FS_UI64
-				" where itemid=" ZBX_FS_UI64
-					" and clock=%d",
-				num, value_min, value_avg, value_max, itemid, hour);
-	}
-	else
-	{
-		DBexecute("insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
-				" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				itemid, hour, 1, value, value, value);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 int	DBget_row_count(const char *table_name)
 {
 	const char	*__function_name = "DBget_row_count";
@@ -834,28 +736,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 char	*DBdyn_escape_like_pattern(const char *src)
 {
 	return zbx_db_dyn_escape_like_pattern(src);
-}
-
-void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
-{
-	ZBX_STR2UINT64(item->itemid, row[0]);
-	item->key = row[1];
-	item->host_name = row[2];
-	item->type = atoi(row[3]);
-	item->history = atoi(row[4]);
-	item->trends = atoi(row[13]);
-	item->value_type = atoi(row[6]);
-
-	ZBX_STR2UINT64(item->hostid, row[5]);
-	item->delta = atoi(row[7]);
-
-	item->units = row[8];
-	item->multiplier = atoi(row[9]);
-	item->formula = row[10];
-	item->state = (unsigned char)atoi(row[11]);
-	ZBX_DBROW2UINT64(item->valuemapid, row[12]);
-
-	item->data_type = atoi(row[14]);
 }
 
 const ZBX_TABLE	*DBget_table(const char *tablename)
