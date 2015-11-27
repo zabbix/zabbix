@@ -94,49 +94,61 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 
 	// Zabbix agent interfaces
 	$row = (new CRow(
-			(new CCol(_('Agent')))->addClass('interface_name')
-				->setRowSpan(1)
-		))->setId('agentInterfacesFooter')
+		(new CCol(_('Agent')))
+			->addClass('interface_name')
+			->setRowSpan(1)
+	))
+		->setId('agentInterfacesFooter')
 		->addClass('interface_type_'.INTERFACE_TYPE_AGENT);
 	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
+		$row
+			->addItem(new CCol())
+			->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row)->addRow((new CCol())->setColSpan(8));
 
 	// SNMP interfaces
 	$row = (new CRow(
-			(new CCol(_('SNMP')))->addClass('interface_name')
-				->setRowSpan(1)
-		))->setId('SNMPInterfacesFooter')
+		(new CCol(_('SNMP')))
+			->addClass('interface_name')
+			->setRowSpan(1)
+	))
+		->setId('SNMPInterfacesFooter')
 		->addClass('interface_type_'.INTERFACE_TYPE_SNMP);
 	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
+		$row
+			->addItem(new CCol())
+			->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row)->addRow((new CCol())->setColSpan(8));
 
 	// JMX interfaces
 	$row = (new CRow(
-			(new CCol(_('JMX')))->addClass('interface_name')
-				->setRowSpan(1)
-		))->setId('JMXInterfacesFooter')
+		(new CCol(_('JMX')))
+			->addClass('interface_name')
+			->setRowSpan(1)
+	))
+		->setId('JMXInterfacesFooter')
 		->addClass('interface_type_'.INTERFACE_TYPE_JMX);
 	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
+		$row
+			->addItem(new CCol())
+			->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row)->addRow((new CCol())->setColSpan(8));
 
 	// IPMI interfaces
 	$row = (new CRow(
-			(new CCol(_('IPMI')))->addClass('interface_name')
-				->setRowSpan(1)
-		))->setId('IPMIInterfacesFooter')
+			(new CCol(_('IPMI')))
+			->addClass('interface_name')
+			->setRowSpan(1)
+	))
+		->setId('IPMIInterfacesFooter')
 		->addClass('interface_type_'.INTERFACE_TYPE_IPMI);
 	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
-		$row->addItem(new CCol());
-		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
+		$row
+			->addItem(new CCol())
+			->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
 

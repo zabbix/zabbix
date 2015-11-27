@@ -130,59 +130,53 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			new CColHeader(_('Default')),
 			new CColHeader()
 		])
-
-		// Zabbix agent interfaces
 		->addRow((new CRow([
-			(new CCol(
-				_('Agent')
-			))->setRowSpan(1)->addClass('interface_name'),
-			(new CCol(
-				(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(8)
-		]))->setId('agentInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_AGENT)
-			->addClass('interface_add')
-			->setAttribute('data-type', INTERFACE_TYPE_AGENT))
-		->addRow(new CRow((new CCol())->setColSpan(8)));
-
-
-		// SNMP interfaces
-	$ifTab->addRow((new CRow([
-			(new CCol(
-				_('SNMP')
-			))->setRowSpan(1)->addClass('interface_name'),
-			(new CCol(
-				(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(8)
-		]))->setId('SNMPInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_SNMP)
-			->addClass('interface_add')
-			->setAttribute('data-type', INTERFACE_TYPE_SNMP))
-		->addRow(new CRow((new CCol())->setColSpan(8)));
-
-		// JMX interfaces
-	$ifTab->addRow((new CRow([
-			(new CCol(
-				_('JMX')
-			))->setRowSpan(1)->addClass('interface_name'),
-			(new CCol(
-				(new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(8)
-		]))->setId('JMXInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_JMX)
-			->addClass('interface_add')
-			->setAttribute('data-type', INTERFACE_TYPE_JMX))
-		->addRow(new CRow((new CCol())->setColSpan(8)));
-
-		// IPMI interfaces
-	$ifTab->addRow((new CRow([
-			(new CCol(
-				_('IPMI')
-			))->setRowSpan(1)->addClass('interface_name'),
-			(new CCol(
-				(new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(8)
-		]))->setId('IPMIInterfacesFooter')->addClass('interface_type_'.INTERFACE_TYPE_IPMI)
-			->addClass('interface_add')
-			->setAttribute('data-type', INTERFACE_TYPE_IPMI))
-		->setId('interface-table');
+				(new CCol(_('Agent')))
+					->setRowSpan(1)
+					->addClass('interface_name'),
+				(new CCol((new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
+			]))
+				->setId('agentInterfacesFooter')
+				->addClass('interface_type_'.INTERFACE_TYPE_AGENT)
+				->addClass('interface_add')
+				->setAttribute('data-type', INTERFACE_TYPE_AGENT)
+		)
+		->addRow(new CRow((new CCol())->setColSpan(8)))
+		->addRow((new CRow([
+				(new CCol(_('SNMP')))
+					->setRowSpan(1)
+					->addClass('interface_name'),
+				(new CCol((new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
+			]))
+				->setId('SNMPInterfacesFooter')
+				->addClass('interface_type_'.INTERFACE_TYPE_SNMP)
+				->addClass('interface_add')
+				->setAttribute('data-type', INTERFACE_TYPE_SNMP)
+		)
+		->addRow(new CRow((new CCol())->setColSpan(8)))
+		->addRow((new CRow([
+				(new CCol(_('JMX')))
+					->setRowSpan(1)
+					->addClass('interface_name'),
+				(new CCol((new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
+			]))
+				->setId('JMXInterfacesFooter')
+				->addClass('interface_type_'.INTERFACE_TYPE_JMX)
+				->addClass('interface_add')
+				->setAttribute('data-type', INTERFACE_TYPE_JMX)
+		)
+		->addRow(new CRow((new CCol())->setColSpan(8)))
+		->addRow((new CRow([
+				(new CCol(_('IPMI')))
+					->setRowSpan(1)
+					->addClass('interface_name'),
+				(new CCol((new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
+			]))
+				->setId('IPMIInterfacesFooter')
+				->addClass('interface_type_'.INTERFACE_TYPE_IPMI)
+				->addClass('interface_add')
+				->setAttribute('data-type', INTERFACE_TYPE_IPMI)
+		);
 
 	$hostList->addRow([_('Interfaces')],
 		(new CDiv($ifTab))
