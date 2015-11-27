@@ -47,13 +47,27 @@ class CControllerWebView extends CController {
 		if ($this->getUserType() < USER_TYPE_ZABBIX_USER) {
 			return false;
 		}
-		if ($this->hasInput('groupid') && $this->getInput('groupid') != 0
-				&& !API::HostGroup()->isReadable([$this->getInput('groupid')])) {
-			return false;
+
+		if ($this->hasInput('groupid') && $this->getInput('groupid') != 0) {
+			$groups = API::HostGroup()->get([
+				'output' => [],
+				'groupids' => [$this->getInput('groupid')]
+			]);
+
+			if (!$groups) {
+				return false;
+			}
 		}
-		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0
-				&& !API::Host()->isReadable([$this->getInput('hostid')])) {
-			return false;
+
+		if ($this->hasInput('hostid') && $this->getInput('hostid') != 0) {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'hostids' => [$this->getInput('hostid')]
+			]);
+
+			if (!$hosts) {
+				return false;
+			}
 		}
 
 		return true;
@@ -83,8 +97,8 @@ class CControllerWebView extends CController {
 				'with_monitored_items' => true,
 				'with_httptests' => true
 			],
-			'hostid' => $this->getInput('hostid', 0),
-			'groupid' => $this->getInput('groupid', 0),
+			'hostid' => $this->hasInput('hostid') ? $this->getInput('hostid') : null,
+			'groupid' => $this->hasInput('groupid') ? $this->getInput('groupid') : null,
 		]);
 
 		$data['hostid']= $data['pageFilter']->hostid;
