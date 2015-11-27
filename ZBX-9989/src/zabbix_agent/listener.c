@@ -28,8 +28,9 @@
 #include "sysinfo.h"
 #include "log.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -120,6 +121,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("listener #%d [waiting for connection]", process_num);
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s, configured_tls_accept_modes)))

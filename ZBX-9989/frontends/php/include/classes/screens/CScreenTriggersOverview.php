@@ -63,7 +63,7 @@ class CScreenTriggersOverview extends CScreenBase {
 
 		$triggers = API::Trigger()->get($options);
 
-		$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+		$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 		/*
 		 * Each screen cell with "Triggers overview" depends on one specific group which in this case is 'resourceid'.

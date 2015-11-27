@@ -587,6 +587,8 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
 		sec = zbx_time();

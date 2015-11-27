@@ -753,10 +753,15 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
 			$css = getSeverityStyle($item['severity']);
-			$ack = get_last_event_by_triggerid($item['triggerid']);
-			$ack = ($ack['acknowledged'] == 1)
-				? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
-				: null;
+
+			// Display event acknowledgement.
+			$config = select_config();
+			if ($config['event_ack_enable']) {
+				$ack = get_last_event_by_triggerid($item['triggerid']);
+				$ack = ($ack['acknowledged'] == 1)
+					? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
+					: null;
+			}
 		}
 
 		if ($item['value'] !== null) {
@@ -1213,7 +1218,7 @@ function getNextDelayInterval(array $flexible_intervals, $now, &$next_interval) 
  * @param array $flexible_intervals		array of flexible intervals
  * @param int $now						current timestamp
  *
- * @return array
+ * @return int
  */
 function calculateItemNextCheck($seed, $delay, $flexible_intervals, $now) {
 	/*
@@ -1264,24 +1269,6 @@ function calculateItemNextCheck($seed, $delay, $flexible_intervals, $now) {
 	return $nextCheck;
 }
 
-/**
- * Check if given character is a valid key id char
- * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
- * don't forget to take look in there before changing anything
- *
- * @author Konstantin Buravcov
- * @param string $char
- * @return bool
- */
-function isKeyIdChar($char) {
-	return (
-		($char >= 'a' && $char <= 'z')
-		|| $char == '.' || $char == '_' || $char == '-'
-		|| ($char >= 'A' && $char <= 'Z')
-		|| ($char >= '0' && $char <= '9')
-	);
-}
-
 /*
  * Description:
  *	Function returns true if http items exists in the $items array.
@@ -1326,16 +1313,19 @@ function getParamFieldLabelByType($itemType) {
 	}
 }
 
-/**
+/*
  * Quoting $param if it contain special characters.
  *
  * @param string $param
+ * @param bool   $forced
  *
  * @return string
  */
-function quoteItemKeyParam($param) {
-	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ']'))) {
-		return $param;
+function quoteItemKeyParam($param, $forced = false) {
+	if (!$forced) {
+		if (!isset($param[0]) || ($param[0] != '"' && false === strpbrk($param, ',]'))) {
+			return $param;
+		}
 	}
 
 	return '"'.str_replace('"', '\\"', $param).'"';
