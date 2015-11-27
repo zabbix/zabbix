@@ -116,10 +116,10 @@ class CControllerWebView extends CController {
 				'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
 				'limit' => $config['search_limit'] + 1
 			];
-			if ($data['hostid'] > 0) {
+			if ($data['hostid'] != 0) {
 				$options['hostids'] = $data['hostid'];
 			}
-			elseif ($data['groupid'] > 0) {
+			elseif ($data['groupid'] != 0) {
 				$options['groupids'] = $data['groupid'];
 			}
 			$httptests = API::HttpTest()->get($options);
@@ -137,17 +137,18 @@ class CControllerWebView extends CController {
 			order_result($httptests, $sortField, $sortOrder);
 
 			// fetch the latest results of the web scenario
-			$lastHttpTestData = Manager::HttpTest()->getLastData(array_keys($httptests));
+			$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
 
 			foreach ($httptests as &$httptest) {
-				if (isset($lastHttpTestData[$httptest['httptestid']])) {
-					$httptest['lastcheck'] = $lastHttpTestData[$httptest['httptestid']]['lastcheck'];
-					$httptest['lastfailedstep'] = $lastHttpTestData[$httptest['httptestid']]['lastfailedstep'];
-					$httptest['error'] = $lastHttpTestData[$httptest['httptestid']]['error'];
+				if (array_key_exists($httptest['httptestid'], $last_httptest_data)) {
+					$httptest['lastcheck'] = $last_httptest_data[$httptest['httptestid']]['lastcheck'];
+					$httptest['lastfailedstep'] = $last_httptest_data[$httptest['httptestid']]['lastfailedstep'];
+					$httptest['error'] = $last_httptest_data[$httptest['httptestid']]['error'];
 				}
 
 				$data['httptests'][] = $httptest;
 			}
+			unset($httptest);
 		}
 
 		$response = new CControllerResponseData($data);
