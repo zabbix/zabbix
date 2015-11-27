@@ -85,7 +85,7 @@ $details_screen_params = [
 	'resourcetype' => SCREEN_RESOURCE_WEBDETAILS,
 	'mode' => SCREEN_MODE_JS,
 	'dataId' => 'webdetails',
-	'profileIdx2' => $httptest['httptestid'],
+	'profileIdx2' => $httptest['httptestid']
 ];
 
 $widget = (new CWidget())
