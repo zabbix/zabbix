@@ -142,7 +142,6 @@ class CUiWidget extends CDiv {
 	 */
 	protected function build() {
 		$body = (new CDiv($this->body))
-			->addClass('body')
 			->setId($this->id);
 
 		$this->cleanItems();

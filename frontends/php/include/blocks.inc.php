@@ -454,7 +454,7 @@ function make_system_status($filter, $backurl) {
 		$table->addRow($groupRow);
 	}
 
-	return new CDiv($table);
+	return $table;
 }
 
 function make_status_of_zbx() {
@@ -517,7 +517,7 @@ function make_status_of_zbx() {
 		}
 	}
 
-	return new CDiv($table);
+	return $table;
 }
 
 /**
@@ -777,10 +777,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
-		->addStyle('text-align: right; padding-right: 3px;');
+	$info = _n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount);
 
-	return new CDiv([$table, $infoDiv]);
+	return [$table, $info];
 }
 
 /**
