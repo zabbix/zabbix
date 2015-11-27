@@ -129,8 +129,7 @@ while ($dbGraphItem = DBfetch($dbGraphItems)) {
 		$dbGraphItem['yaxisside'],
 		$dbGraphItem['calc_fnc'],
 		$dbGraphItem['color'],
-		$dbGraphItem['drawtype'],
-		$dbGraphItem['type']
+		$dbGraphItem['drawtype']
 	);
 }
 

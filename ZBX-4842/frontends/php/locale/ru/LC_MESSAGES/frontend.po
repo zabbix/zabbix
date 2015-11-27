@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 12:50+0300\n"
-"PO-Revision-Date: 2015-08-30 18:01+0300\n"
+"POT-Creation-Date: 2015-11-26 04:51+0200\n"
+"PO-Revision-Date: 2015-10-20 20:48+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1440950493.0\n"
+"X-POOTLE-MTIME: 1445366923.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -133,11 +133,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ВВЕДЕНО КАК МАССОВОЕ ПОДТВЕРЖДЕНИЕ]----"
 
-#: include/triggers.inc.php:2250 include/triggers.inc.php:2251
-#: include/triggers.inc.php:2252 include/triggers.inc.php:2254
-#: include/triggers.inc.php:2256 include/triggers.inc.php:2259
-#: include/triggers.inc.php:2262 include/triggers.inc.php:2263
-#: include/triggers.inc.php:2274
+#: include/triggers.inc.php:2260 include/triggers.inc.php:2261
+#: include/triggers.inc.php:2262 include/triggers.inc.php:2264
+#: include/triggers.inc.php:2266 include/triggers.inc.php:2269
+#: include/triggers.inc.php:2272 include/triggers.inc.php:2273
+#: include/triggers.inc.php:2284
 msgid "0 or 1"
 msgstr "0 или 1"
 
@@ -187,7 +187,7 @@ msgstr "AES"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "ПОДТВЕРЖДЕНИЯ ОПОВЕЩЕНИЙ"
 
-#: include/triggers.inc.php:1689
+#: include/triggers.inc.php:1699
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
@@ -655,7 +655,7 @@ msgstr "Ошибка приложения."
 msgid "Application updated"
 msgstr "Группа элементов данных обновлена"
 
-#: api/classes/CItemGeneral.php:397
+#: api/classes/CItemGeneral.php:412
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Группа элементов данных с ID \"%1$s\" недоступна для \"%2$s\"."
@@ -2234,7 +2234,7 @@ msgstr "Не удалось отправить команду, проверьт�
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для группы узлов сети \"%2$s\"."
 
-#: api/classes/CItemGeneral.php:242
+#: api/classes/CItemGeneral.php:248
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для элемента данных \"%2$s\"."
@@ -2431,8 +2431,8 @@ msgstr "Не удалось обновить группу"
 msgid "Cannot update group."
 msgstr "Не удалось обновить группу."
 
-#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1048
-#: api/classes/CHostGroup.php:1189
+#: api/classes/CHostGroup.php:960 api/classes/CHostGroup.php:1065
+#: api/classes/CHostGroup.php:1206
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не удалось обновить группы для обнаруженного узла сети \"%1$s\"."
@@ -2629,7 +2629,7 @@ msgid "Change password"
 msgstr "Изменить пароль"
 
 #: include/forms.inc.php:431 include/items.inc.php:125
-#: include/triggers.inc.php:2227 include/views/configuration.item.edit.php:224
+#: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Символ"
@@ -2688,7 +2688,7 @@ msgstr "Проверка производительности сервиса. 0 
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr "Проверка работоспособности агента. Всегда возвращает 1. Может быть использован как TCP ping."
 
-#: api/classes/CItemGeneral.php:282
+#: api/classes/CItemGeneral.php:288
 msgid "Check the key, please. Default example was passed."
 msgstr "Пожалуйста, проверьте ключ. Пример по умолчанию был показан."
 
@@ -3475,7 +3475,7 @@ msgstr "Пользовательские слайды"
 msgid "Czech (cs_CZ)"
 msgstr "Чешский (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1368
 msgid "D"
 msgstr "D"
 
@@ -3574,7 +3574,7 @@ msgstr "Данные"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr "Статистика использования кэша данных. Кэш - одно из значений (режимы: all, float, uint, str, log, text), history (режимы: pfree, total, used, free), trend (режимы: pfree, total, used, free), text (режимы: pfree, total, used, free)."
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2511
+#: include/classes/graphdraw/CLineGraphDraw.php:2508
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -4183,11 +4183,11 @@ msgstr "Запрещено"
 msgid "Dependencies"
 msgstr "Зависимости"
 
-#: include/triggers.inc.php:1407 tr_status.php:611
+#: include/triggers.inc.php:1417 tr_status.php:611
 msgid "Dependent"
 msgstr "Зависимость"
 
-#: include/triggers.inc.php:1387
+#: include/triggers.inc.php:1397
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:595
@@ -4397,8 +4397,8 @@ msgstr "Деактивировать выбранные триггеры?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1634
-#: include/triggers.inc.php:2483 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1644
+#: include/triggers.inc.php:2493 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
@@ -4957,7 +4957,7 @@ msgstr "Активировать выбранные триггеры?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2480
+#: include/items.inc.php:206 include/triggers.inc.php:2490
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -5039,7 +5039,7 @@ msgstr "Функция подтверждения событий деактив�
 msgid "Event details"
 msgstr "Детали события"
 
-#: include/triggers.inc.php:1632
+#: include/triggers.inc.php:1642
 msgid "Event generation"
 msgstr "Генерация события"
 
@@ -5108,7 +5108,7 @@ msgstr "Выполнение WMI запроса и возврат первого
 msgid "Execute on"
 msgstr "Выполнять на"
 
-#: include/items.inc.php:1333 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1363 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Выполняемый скрипт"
 
@@ -5147,7 +5147,7 @@ msgstr "Экспортировать выбранное"
 msgid "Export to CSV"
 msgstr "Экспорт в CSV"
 
-#: include/triggers.inc.php:1631
+#: include/triggers.inc.php:1641
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5408,7 +5408,7 @@ msgstr "Переменные интервалы"
 msgid "For guest, password must be empty"
 msgstr "Пароль для Гостя должен быть пустым"
 
-#: include/items.inc.php:1337 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1367 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Формула"
 
@@ -5542,7 +5542,7 @@ msgstr "Получение времени загрузки полной веб-�
 msgid "Giga"
 msgstr "Гига"
 
-#: include/triggers.inc.php:1764 tr_testexpr.php:35
+#: include/triggers.inc.php:1774 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "Заданное выражение не является макросом"
 
@@ -5887,8 +5887,8 @@ msgstr "Группы в обслуживании"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1377
-#: include/classes/graphdraw/CLineGraphDraw.php:1436
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1433
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -6075,8 +6075,8 @@ msgstr "Выравнивание по горизонтали"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1276
-#: include/triggers.inc.php:1628
+#: include/setup.inc.php:365 include/triggers.inc.php:1282
+#: include/triggers.inc.php:1638
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
@@ -6403,7 +6403,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Узел сети с таким же видимым именем \"%s\" уже существует."
 
 #: hostinventoriesoverview.php:85 hosts.php:772 include/forms.inc.php:225
-#: include/forms.inc.php:916 include/items.inc.php:728
+#: include/forms.inc.php:916 include/items.inc.php:754
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -6564,7 +6564,7 @@ msgstr "Уровень привилегии IPMI"
 #: disc_prototypes.php:100 host_discovery.php:97
 #: include/views/configuration.item.edit.php:173 items.php:107
 msgid "IPMI sensor"
-msgstr "Сенсор IPMI"
+msgstr "IPMI датчик"
 
 #: include/views/configuration.host.massupdate.php:242
 msgid "IPMI username"
@@ -7045,7 +7045,7 @@ msgstr "Для метода предоставлены некорректные 
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Некорректный протокол аутентификации для правила обнаружения \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:393
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Некорректный протокол аутентификации для элемента данных \"%1$s\"."
@@ -7123,17 +7123,17 @@ msgstr "Некорректные поля для триггера."
 msgid "Incorrect file upload."
 msgstr "Некорректный загружаемый файл."
 
-#: api/classes/CItemGeneral.php:840
+#: api/classes/CItemGeneral.php:855
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Некорректный переменный интервал \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:829
+#: api/classes/CItemGeneral.php:844
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Некорректный переменный интервал у элемента данных \"%1$s\". Переменный интервал должен быть строкой."
 
-#: include/triggers.inc.php:617 include/triggers.inc.php:1765
+#: include/triggers.inc.php:617 include/triggers.inc.php:1775
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Использована некорректная функция"
@@ -7348,7 +7348,7 @@ msgstr "Некорректный диапазон портов."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Некорректный приватный протокол для правила обнаружения \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:402
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Некорректный приватный протокол для элемента данных \"%1$s\"."
@@ -7849,7 +7849,7 @@ msgstr "Элемент данных \"%1$s\" в \"%2$s\": группа элем�
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Элемент данных \"%1$s\" пропущен - правило пользователя."
 
-#: api/classes/CItemGeneral.php:369
+#: api/classes/CItemGeneral.php:384
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "У элемента данных \"%1$s:%2$s\" ошибочный порт \"%3$s\"."
@@ -7951,44 +7951,44 @@ msgstr "Прототипы элементов данных для"
 msgid "Item updated"
 msgstr "Элемент данных обновлен"
 
-#: api/classes/CItemGeneral.php:266
+#: api/classes/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
 msgstr "Элемент данных использует интерфейс не от родительского узла сети."
 
-#: api/classes/CItemGeneral.php:269
+#: api/classes/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
 msgstr "Элемент данных использует некорректный тип интерфейса."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:332 api/classes/CItemGeneral.php:342
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Элемент данных не обновлен. Пожалуйста, введите корректный интервал обновления."
 
-#: api/classes/CItemGeneral.php:440
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правило обнаружения."
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:461
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных созданный из прототипа элементов данных."
 
-#: api/classes/CItemGeneral.php:443
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как прототип элемента данных."
 
-#: api/classes/CItemGeneral.php:437
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных."
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:464
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
 
-#: api/classes/CItemGeneral.php:806
+#: api/classes/CItemGeneral.php:821
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
@@ -8000,7 +8000,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует."
 
 #: hosts.php:815 hosts.php:906 include/html.inc.php:425
-#: include/html.inc.php:429 include/items.inc.php:711
+#: include/html.inc.php:429 include/items.inc.php:735
 #: include/reports.inc.php:120 include/reports.inc.php:263
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:274
@@ -8128,7 +8128,7 @@ msgstr "Период сохранения потерянных ресурсов 
 msgid "Key"
 msgstr "Ключ"
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:312
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не совпадает с <grpmax|grpmin|grpsum|grpavg>[\"Группа(ы) узлов сети\", \"Ключ элемента данных\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
@@ -8460,7 +8460,7 @@ msgid "Location longitude"
 msgstr "Размещение (долгота)"
 
 #: include/forms.inc.php:432 include/items.inc.php:127
-#: include/triggers.inc.php:2228 include/views/configuration.item.edit.php:225
+#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Журнал (лог)"
@@ -8496,7 +8496,7 @@ msgstr "Формат времени в журнале (логе)"
 
 #: include/views/administration.general.other.edit.php:38
 msgid "Log unmatched SNMP traps"
-msgstr "Записывать несовпадающие SNMP трапы"
+msgstr "Журналировать не совпадающие SNMP трапы"
 
 #: include/classes/class.cserverinfo.php:43
 msgid "Logged in as"
@@ -9278,13 +9278,13 @@ msgstr "Переместить"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1633
+#: include/triggers.inc.php:1643
 msgid "Multiple PROBLEM events"
 msgstr "Множественные события ПРОБЛЕМА"
 
 #: include/views/configuration.triggers.edit.php:244
 msgid "Multiple PROBLEM events generation"
-msgstr "Многократная генерация событий ПРОБЛЕМА"
+msgstr "Формирование множественных событий ПРОБЛЕМА"
 
 #: jsLoader.php:166
 msgid "Mute"
@@ -9498,7 +9498,7 @@ msgid "Next"
 msgstr "Следующая"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2442 include/triggers.inc.php:1635
+#: include/func.inc.php:2442 include/triggers.inc.php:1645
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9559,11 +9559,11 @@ msgstr "Услуги IT не найдены."
 msgid "No JMX interfaces found."
 msgstr "Интерфейсы JMX не найдены."
 
-#: api/classes/CItemGeneral.php:357
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP OID specified."
 msgstr "SNMP OID не указан."
 
-#: api/classes/CItemGeneral.php:363
+#: api/classes/CItemGeneral.php:378
 msgid "No SNMP community specified."
 msgstr "SNMP community не указан."
 
@@ -9624,7 +9624,7 @@ msgstr "В операции действия для команды \"%s\" не �
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операции действия для команды \"%s\" не указано имя пользователя для аутентификации."
 
-#: api/classes/CItemGeneral.php:334
+#: api/classes/CItemGeneral.php:349
 msgid "No authentication user name specified."
 msgstr "Для аутентификации не указано имя пользователя."
 
@@ -9834,7 +9834,7 @@ msgstr "Изображения не найдены."
 msgid "No interface found"
 msgstr "Интерфейс не найден"
 
-#: api/classes/CItemGeneral.php:263
+#: api/classes/CItemGeneral.php:269
 msgid "No interface found."
 msgstr "Интерфейс не найден."
 
@@ -9874,7 +9874,7 @@ msgstr "Нет элемента данных с itemid=\"%1$s\"."
 msgid "No items defined."
 msgstr "Элементы данных не заданы."
 
-#: include/items.inc.php:702 include/views/configuration.item.list.php:58
+#: include/items.inc.php:726 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:116 popup.php:1138
 msgid "No items found."
 msgstr "Элементы данных не найдены."
@@ -9985,9 +9985,9 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
 #: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:529
-#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:977
-#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1136
-#: api/classes/CHostGroup.php:1238 api/classes/CHostGroup.php:1265
+#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:994
+#: api/classes/CHostGroup.php:1024 api/classes/CHostGroup.php:1153
+#: api/classes/CHostGroup.php:1255 api/classes/CHostGroup.php:1282
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
@@ -9997,7 +9997,7 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CHttpTest.php:610 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
-#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
+#: api/classes/CItemGeneral.php:240 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:470 api/classes/CMaintenance.php:487
@@ -10027,7 +10027,7 @@ msgstr "Нет прав доступа к запрашиваемому объе�
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не указан файл приватного ключа для команды \"%s\" в операции действия."
 
-#: api/classes/CItemGeneral.php:342
+#: api/classes/CItemGeneral.php:357
 msgid "No private key file specified."
 msgstr "Файл приватного ключа не указан."
 
@@ -10048,7 +10048,7 @@ msgstr "ID прокси не задан."
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не указан файл публичного ключа для команды \"%s\" в операции действия."
 
-#: api/classes/CItemGeneral.php:339
+#: api/classes/CItemGeneral.php:354
 msgid "No public key file specified."
 msgstr "Файл публичного ключа не указан."
 
@@ -10136,7 +10136,7 @@ msgstr "Нет триггера с triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Триггеры не заданы."
 
-#: include/triggers.inc.php:1239
+#: include/triggers.inc.php:1244
 #: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
@@ -10176,7 +10176,7 @@ msgstr "Веб-сценарии не найдены."
 #: include/blocks.inc.php:197 include/blocks.inc.php:399
 #: include/blocks.inc.php:931 include/blocks.inc.php:1106
 #: include/blocks.inc.php:1204 include/classes/screens/CScreenEvents.php:40
-#: include/page_header.php:324 include/triggers.inc.php:1625
+#: include/page_header.php:324 include/triggers.inc.php:1635
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10242,7 +10242,7 @@ msgid "None"
 msgstr "Пусто"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1632 popup.php:1509
+#: include/triggers.inc.php:1642 popup.php:1509
 msgid "Normal"
 msgstr "Нормальный"
 
@@ -10480,14 +10480,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr "Количество виртуальных машин на VMware гипервизоре, <url> - URL службы VMware, <uuid> - имя хоста VMware гипервизора"
 
 #: include/forms.inc.php:430 include/items.inc.php:123
-#: include/triggers.inc.php:2226 include/views/configuration.item.edit.php:223
+#: include/triggers.inc.php:2236 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Числовой (с плавающей точкой)"
 
-#: include/triggers.inc.php:2225 include/triggers.inc.php:2241
-#: include/triggers.inc.php:2245 include/triggers.inc.php:2255
-#: include/triggers.inc.php:2260 include/triggers.inc.php:2264
+#: include/triggers.inc.php:2235 include/triggers.inc.php:2251
+#: include/triggers.inc.php:2255 include/triggers.inc.php:2265
+#: include/triggers.inc.php:2270 include/triggers.inc.php:2274
 msgid "Numeric (integer 64bit)"
 msgstr "Числовой (целое 64бит)"
 
@@ -10527,7 +10527,7 @@ msgstr "OOB роутер"
 msgid "OOB subnet mask"
 msgstr "OOB маска подсети"
 
-#: include/triggers.inc.php:1689
+#: include/triggers.inc.php:1699
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
@@ -10592,8 +10592,8 @@ msgstr "Мигание триггеров при изменении состоя
 msgid "Once"
 msgstr "Один раз"
 
-#: api/classes/CHostGroup.php:1145 api/classes/CHostGroup.php:1154
-#: api/classes/CHostGroup.php:1247
+#: api/classes/CHostGroup.php:1162 api/classes/CHostGroup.php:1171
+#: api/classes/CHostGroup.php:1264
 msgid "One of the objects is left without a host group."
 msgstr "Один из объектов остался без группы узлов сети."
 
@@ -12080,7 +12080,7 @@ msgstr "Интерфейсы SNMP"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:366
 msgid "SNMP trap key is invalid."
 msgstr "Ключ SNMP trap ошибочный."
 
@@ -12104,7 +12104,7 @@ msgstr "SNMPv3 агент"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Количество SQL: %s (selects: %s | executes: %s)"
 
-#: include/items.inc.php:1335 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1365 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr "SQL запрос"
 
@@ -12672,7 +12672,7 @@ msgstr "Сессия завершена, пожалуйста, зайдите п
 
 #: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
-#: include/triggers.inc.php:1630 include/views/configuration.item.list.php:137
+#: include/triggers.inc.php:1640 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
@@ -13466,7 +13466,7 @@ msgid "Test string"
 msgstr "Тестовая строка"
 
 #: include/forms.inc.php:433 include/items.inc.php:129
-#: include/triggers.inc.php:2229 include/views/configuration.item.edit.php:226
+#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Текст"
@@ -13755,8 +13755,8 @@ msgid "Trends"
 msgstr "Динамика изменений"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
-#: include/maps.inc.php:26 include/triggers.inc.php:1629
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:477
+#: include/maps.inc.php:26 include/triggers.inc.php:1639
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13965,7 +13965,7 @@ msgstr "Значение триггера"
 
 #: hosts.php:816 hosts.php:908 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
-#: include/triggers.inc.php:1251
+#: include/triggers.inc.php:1256
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:521
@@ -14104,11 +14104,11 @@ msgstr "Тип вычисления"
 msgid "Type of information"
 msgstr "Тип информации"
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Для ключа журнала тип информации должен быть \"Журнал (лог)\"."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:320
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Для агрегатных элементов данных тип информации должен быть \"Числовой (с плавающей точкой)\"."
 
@@ -14248,7 +14248,7 @@ msgstr "Единица измерения"
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:165 include/triggers.inc.php:184
-#: include/triggers.inc.php:2480 include/triggers.inc.php:2486
+#: include/triggers.inc.php:2490 include/triggers.inc.php:2496
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14266,11 +14266,11 @@ msgstr "Неизвестная ошибка"
 msgid "Unknown function."
 msgstr "Неизвестная функция."
 
-#: include/triggers.inc.php:1763 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1773 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Неизвестный элемент данных узла сети, такого элемента данных нет у выбранного узла сети"
 
-#: include/triggers.inc.php:1762 tr_testexpr.php:33
+#: include/triggers.inc.php:1772 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Неизвестный узел сети, такого узла сети нет в системе"
 
@@ -14287,7 +14287,7 @@ msgstr "Неизвестный ресурс"
 msgid "Unknown step failed: %1$s"
 msgstr "Ошибка в неизвестном шаге: %1$s"
 
-#: include/items.inc.php:901
+#: include/items.inc.php:931
 msgid "Unknown value type"
 msgstr "Неизвестный тип значения"
 
@@ -14814,11 +14814,11 @@ msgstr "Размер ballooned памяти виртуальной машины 
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Размер зарезервированого хранилища для витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
+msgstr "Размер зарезервированого хранилища для виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Размер сжатой памяти витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
+msgstr "Размер сжатой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -14874,7 +14874,7 @@ msgstr "Использование процессора виртуальной �
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Размер разделяемой памяти вируальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
+msgstr "Размер разделяемой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15394,7 +15394,7 @@ msgid "Y axis MAX value"
 msgstr "МАКС значение оси Y"
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:708
+#: include/classes/graphdraw/CLineGraphDraw.php:705
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "МАКС значение оси Y должно быть больше чем МИН значение оси Y."
 
@@ -15446,7 +15446,7 @@ msgstr "Ежегодно"
 #: events.php:839 include/blocks.inc.php:751
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2442
-#: include/triggers.inc.php:1635
+#: include/triggers.inc.php:1645
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
@@ -15545,7 +15545,7 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/page_footer.php:103 include/views/general.browserwarning.php:60
+#: include/page_footer.php:103 include/views/general.browserwarning.php:61
 #: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
@@ -15675,7 +15675,7 @@ msgid "agent"
 msgstr "агент"
 
 #: include/classes/class.cpagefilter.php:940
-#: include/classes/graphdraw/CLineGraphDraw.php:1852
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15726,8 +15726,8 @@ msgstr "авторегистрация"
 msgid "auto-registered host"
 msgstr "автоматически зарегистрированный узел сети"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1834
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15772,14 +15772,14 @@ msgstr "d M Y H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1374
-#: include/classes/graphdraw/CLineGraphDraw.php:1427
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1424
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1396
-#: include/classes/graphdraw/CLineGraphDraw.php:1411
-#: include/classes/graphdraw/CLineGraphDraw.php:1430
+#: include/classes/graphdraw/CLineGraphDraw.php:1393
+#: include/classes/graphdraw/CLineGraphDraw.php:1408
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15909,7 +15909,7 @@ msgstr "элемент данных"
 msgid "key is empty"
 msgstr "ключ пустой"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
+#: include/classes/graphdraw/CLineGraphDraw.php:1829
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
@@ -15949,16 +15949,16 @@ msgstr "обслуживании"
 msgid "map"
 msgstr "карта сети"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1835
-#: include/classes/graphdraw/CLineGraphDraw.php:1849
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "макс"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1846
+#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1843
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -15994,7 +15994,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr "новый"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1927
+#: include/classes/graphdraw/CLineGraphDraw.php:1924
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"
