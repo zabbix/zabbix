@@ -48,7 +48,6 @@ if (!empty($this->data['hostid'])) {
 
 // create table
 $itemTable = (new CTableInfo())
-	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'))
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
@@ -67,7 +66,14 @@ $itemTable = (new CTableInfo())
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
 
+if (!$this->data['filterSet']) {
+	$itemTable->setNoDataMessage(_('Specify some filter condition to see the items.'));
+}
+
 $current_time = time();
+
+$this->data['itemTriggers'] =
+	CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], ['html' => true]);
 
 foreach ($this->data['items'] as $item) {
 	// description
@@ -169,13 +175,12 @@ foreach ($this->data['items'] as $item) {
 			$trigger['error'] = '';
 		}
 
-		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
-			triggerExpression($trigger, true),
+			$trigger['expression'],
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);

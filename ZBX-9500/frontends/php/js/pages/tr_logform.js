@@ -87,10 +87,9 @@ function add_logexpr() {
 	var classattr = IE ? 'className' : 'class';
 
 	var tr = document.createElement('tr');
-	document.getElementById('exp_list').firstChild.appendChild(tr);
+	document.getElementById('exp_list').getElementsByTagName('tbody')[0].appendChild(tr);
 
 	tr.setAttribute('id', 'logtr' + logexpr_count);
-
 	var td = document.createElement('td');
 	tr.appendChild(td);
 	td.appendChild(document.createTextNode(expression));
@@ -140,12 +139,13 @@ function add_logexpr() {
 	td.appendChild(img);
 
 	var td = document.createElement('td');
+	td.setAttribute(classattr, 'nowrap');
 	tr.appendChild(td);
 
 	var url = document.createElement('button');
 	url.setAttribute('onclick', 'javascript: remove_expression("logtr' + logexpr_count + '");');
 	url.setAttribute(classattr, 'btn-link');
-	url.appendChild(document.createTextNode(locale['S_DELETE']));
+	url.appendChild(document.createTextNode(locale['S_REMOVE']));
 
 	td.appendChild(url);
 
@@ -308,7 +308,7 @@ function add_keyword(bt_type) {
 	var classattr = IE ? 'className' : 'class';
 
 	var tr = document.createElement('tr');
-	document.getElementById('key_list').firstChild.appendChild(tr);
+	document.getElementById('key_list').getElementsByTagName('tbody')[0].appendChild(tr);
 
 	tr.setAttribute('id', 'keytr' + key_count);
 
@@ -340,12 +340,13 @@ function add_keyword(bt_type) {
 
 	// delete
 	var td = document.createElement('td');
+	td.setAttribute(classattr, 'nowrap');
 	tr.appendChild(td);
 
 	var url = document.createElement('button');
 	url.setAttribute('onclick', 'javascript: remove_keyword("keytr' + key_count + '");');
 	url.setAttribute(classattr, 'btn-link');
-	url.appendChild(document.createTextNode(locale['S_DELETE']));
+	url.appendChild(document.createTextNode(locale['S_REMOVE']));
 
 	td.appendChild(url);
 

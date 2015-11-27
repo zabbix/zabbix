@@ -405,14 +405,14 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	$_REQUEST['stime'] = getRequest('stime');
 
 	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
-		show_message(_n('Minimum time period to display is %1$s hour.',
-			'Minimum time period to display is %1$s hours.',
-			(int) ZBX_MIN_PERIOD / SEC_PER_HOUR
+		show_error_message(_n('Minimum time period to display is %1$s minute.',
+			'Minimum time period to display is %1$s minutes.',
+			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
 		));
 		$_REQUEST['period'] = ZBX_MIN_PERIOD;
 	}
 	elseif ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
-		show_message(_n('Maximum time period to display is %1$s day.',
+		show_error_message(_n('Maximum time period to display is %1$s day.',
 			'Maximum time period to display is %1$s days.',
 			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
 		));

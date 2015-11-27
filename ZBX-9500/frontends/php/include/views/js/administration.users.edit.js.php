@@ -1,4 +1,17 @@
 <script type="text/javascript">
+	function removeMedia(index) {
+		// table row
+		jQuery('#user_medias_' + index).remove();
+		// hidden variables
+		jQuery('#user_medias_' + index + '_mediaid').remove();
+		jQuery('#user_medias_' + index + '_mediatypeid').remove();
+		jQuery('#user_medias_' + index + '_period').remove();
+		jQuery('#user_medias_' + index + '_sendto').remove();
+		jQuery('#user_medias_' + index + '_severity').remove();
+		jQuery('#user_medias_' + index + '_active').remove();
+		jQuery('#user_medias_' + index + '_description').remove();
+	}
+
 	jQuery(document).ready(function() {
 		jQuery('#autologout_visible').bind('click', function() {
 			if (this.checked) {

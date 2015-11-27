@@ -53,6 +53,7 @@ if (!empty($this->data['graphid'])) {
 	]);
 
 	$chartTable = (new CTable())
+		->setAttribute('style', 'width: 100%;')
 		->addRow($screen->get());
 
 	$chartsWidget->addItem($chartTable);

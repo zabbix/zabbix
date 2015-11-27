@@ -25,7 +25,6 @@ $commentWidget = (new CWidget())->setTitle(_('Comments'));
 
 // create form
 $commentForm = (new CForm())
-	->setName('commentForm')
 	->addVar('triggerid', $this->data['triggerid']);
 
 // create form list

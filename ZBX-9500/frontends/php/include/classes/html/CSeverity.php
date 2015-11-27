@@ -21,8 +21,6 @@
 
 class CSeverity extends CList {
 
-	const CONTROL_CLASS_NAME = 'trigger-severity-radio';
-
 	/**
 	 * @param string $options['name']
 	 * @param int    $options['value']
@@ -32,8 +30,7 @@ class CSeverity extends CList {
 
 		$id = zbx_formatDomId($options['name']);
 
-		$this->addClass(ZBX_STYLE_LIST_HOR_CHECK_RADIO);
-		$this->addClass(self::CONTROL_CLASS_NAME);
+		$this->addClass(ZBX_STYLE_RADIO_SEGMENTED);
 		$this->setId($id);
 
 		if (!array_key_exists('value', $options)) {
@@ -50,45 +47,10 @@ class CSeverity extends CList {
 			}
 
 			parent::addItem(
-				(new CListItem(
-					new CLabel([$radio, getSeverityName($severity, $config)], $options['name'].'_'.$severity)
-				))
-					->setAttribute('data-severity-style', getSeverityStyle($severity))
-					->setAttribute('area-pressed', $severity === $options['value'] ? 'true' : 'false')
+				(new CListItem([
+					$radio, new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity)
+				]))->addClass(getSeverityStyle($severity))
 			);
-		}
-
-		static $js_initialized = false;
-
-		if (!$js_initialized) {
-			insert_js(
-				'jQuery(".'.self::CONTROL_CLASS_NAME.' li").mouseenter(function() {'."\n".
-				'	jQuery(".'.self::CONTROL_CLASS_NAME.' li").each(function() {'."\n".
-				'		var obj = jQuery(this);'."\n".
-				''."\n".
-				'		if (obj.attr("area-pressed") == "false") {'."\n".
-				'			obj.removeClass(obj.data("severity-style"));'."\n".
-				'		}'."\n".
-				'	});'."\n".
-				''."\n".
-				'	var obj = jQuery(this);'."\n".
-				''."\n".
-				'	obj.addClass(obj.data("severity-style"));'."\n".
-				'})'."\n".
-				'.mouseleave(function() {'."\n".
-				'	jQuery(".'.self::CONTROL_CLASS_NAME.' [area-pressed=\"true\"]").trigger("mouseenter");'."\n".
-				'});'."\n".
-				''."\n".
-				'jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]").change(function() {'."\n".
-				'	jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]").not(":checked").closest("li").attr("area-pressed", "false");'."\n".
-				'	jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]:checked").closest("li").attr("area-pressed", "true");'."\n".
-				'	jQuery(".'.self::CONTROL_CLASS_NAME.' li[area-pressed=\"true\"]").trigger("mouseenter");'."\n".
-				'});'."\n".
-				''."\n".
-				'jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]:checked").trigger("change");'
-			, true);
-
-			$js_initialized = true;
 		}
 	}
 }

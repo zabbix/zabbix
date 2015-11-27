@@ -74,7 +74,7 @@ class CRadioButtonList extends CList {
 
 	public function toString($destroy = true) {
 		if ($this->modern) {
-			$this->addClass('radio-segmented');
+			$this->addClass(ZBX_STYLE_RADIO_SEGMENTED);
 		}
 		else {
 			$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL

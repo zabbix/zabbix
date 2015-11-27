@@ -48,8 +48,6 @@ function DBconnect(&$error) {
 		$result = false;
 	}
 	else {
-		$DB['TYPE'] = strtoupper($DB['TYPE']);
-
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
 				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);

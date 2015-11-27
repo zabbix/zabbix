@@ -54,12 +54,8 @@ function audit_resource2str($resource_type = null) {
 		natsort($resources);
 		return $resources;
 	}
-	elseif (isset($resources[$resource_type])) {
-		return $resources[$resource_type];
-	}
-	else {
-		return _('Unknown resource');
-	}
+
+	return isset($resources[$resource_type]) ? $resources[$resource_type] : _('Unknown resource');
 }
 
 function add_audit($action, $resourcetype, $details) {

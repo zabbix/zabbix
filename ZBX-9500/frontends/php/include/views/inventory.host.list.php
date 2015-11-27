@@ -76,7 +76,8 @@ foreach ($this->data['hosts'] as $host) {
 
 	$row = [
 		(new CLink($host['name'], '?hostid='.$host['hostid'].url_param('groupid')))
-			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? 'not-monitored' : ''),
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+			->removeSID(),
 		$hostGroups,
 		zbx_str2links($host['inventory']['name']),
 		zbx_str2links($host['inventory']['type']),

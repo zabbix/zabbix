@@ -455,12 +455,16 @@ zbx_group_status_type_t;
 /* group internal flag */
 #define ZBX_INTERNAL_GROUP		1
 
-/* daemon type */
-#define ZBX_DAEMON_TYPE_SERVER		0x01
-#define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
-#define ZBX_DAEMON_TYPE_PROXY_PASSIVE	0x04
-#define ZBX_DAEMON_TYPE_PROXY		0x06	/* ZBX_DAEMON_TYPE_PROXY_ACTIVE | ZBX_DAEMON_TYPE_PROXY_PASSIVE */
-#define ZBX_DAEMON_TYPE_AGENT		0x08
+/* program type */
+#define ZBX_PROGRAM_TYPE_SERVER		0x01
+#define ZBX_PROGRAM_TYPE_PROXY_ACTIVE	0x02
+#define ZBX_PROGRAM_TYPE_PROXY_PASSIVE	0x04
+#define ZBX_PROGRAM_TYPE_PROXY		0x06	/* ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
+#define ZBX_PROGRAM_TYPE_AGENTD		0x08
+#define ZBX_PROGRAM_TYPE_AGENT		0x10
+#define ZBX_PROGRAM_TYPE_SENDER		0x20
+#define ZBX_PROGRAM_TYPE_GET		0x40
+const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
 typedef enum
@@ -594,6 +598,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_TEMPLATE_REMOVE	7
 #define OPERATION_TYPE_HOST_ENABLE	8
 #define OPERATION_TYPE_HOST_DISABLE	9
+#define OPERATION_TYPE_HOST_INVENTORY	10
 
 /* algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
@@ -676,6 +681,8 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
+
+void	*zbx_guaranteed_memset(void *v, int c, size_t n);
 
 #define zbx_free(ptr)		\
 				\
@@ -787,26 +794,28 @@ int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
+#define ZBX_SIZE_T_MAX	(~(size_t)0)
+
 #define is_ushort(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0, 0xFFFF)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
 
 #define is_uint32(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0xFFFFFFFF)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
 
 #define is_uint64(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define is_uint64_n(str, n, value) \
 	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define is_uint31(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFF)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
 
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFE)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFE)
 
 #define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+	is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned int), min, max)
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);
@@ -855,13 +864,11 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now);
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *custom_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
-size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
@@ -924,6 +931,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c);
 #define strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 void	zbx_strlcat(char *dst, const char *src, size_t siz);
+size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);
 
@@ -956,7 +964,6 @@ int	is_ip(const char *ip);
 void	zbx_on_exit(void); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
-int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(const char *list, const char *ip);
 
 /* IP range support */
@@ -987,7 +994,6 @@ int	iprange_validate(const zbx_iprange_t *range, const int *address);
 zbx_uint64_t	iprange_volume(const zbx_iprange_t *range);
 
 /* time related functions */
-double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
@@ -1002,10 +1008,8 @@ int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
-void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num);
-void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
@@ -1094,9 +1098,29 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
+int	zbx_strcmp_null(const char *s1, const char *s2);
+
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r);
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length);
+char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
+
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
+
+#define ZBX_DO_NOT_SEND_RESPONSE	0
+#define ZBX_SEND_RESPONSE		1
+
+/* Do not forget to synchronize HOST_TLS_* definitions with DB schema ! */
+#define HOST_TLS_ISSUER_LEN		4096				/* for up to 1024 UTF-8 characters */
+#define HOST_TLS_ISSUER_LEN_MAX		(HOST_TLS_ISSUER_LEN + 1)
+#define HOST_TLS_SUBJECT_LEN		4096				/* for up to 1024 UTF-8 characters */
+#define HOST_TLS_SUBJECT_LEN_MAX	(HOST_TLS_SUBJECT_LEN + 1)
+#define HOST_TLS_PSK_IDENTITY_LEN	512				/* for up to 128 UTF-8 characters */
+#define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
+#define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
+#define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 
 #endif

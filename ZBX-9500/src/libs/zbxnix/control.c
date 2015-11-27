@@ -88,8 +88,8 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 
 			if (FAIL == is_ushort(proc_num, &num) || 0 == num)
 			{
-				zbx_error("invalid log level control target: invalid or unsupported process number "
-						"\"%s\"", proc_num);
+				zbx_error("invalid log level control target: invalid or unsupported process number"
+						" \"%s\"", proc_num);
 				zbx_free(proc_name);
 				return FAIL;
 			}
@@ -100,6 +100,7 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
 		*scope = ZBX_RTC_LOG_SCOPE_PROC | proc_type;
 		*data = num;
 	}
+
 	return SUCCEED;
 }
 
@@ -110,16 +111,16 @@ static int	parse_log_level_options(const char *opt, size_t len, int *scope, int 
  * Purpose: parse runtime control options and create a runtime control        *
  *          message                                                           *
  *                                                                            *
- * Parameters: opt         - [IN] the command line argument                   *
- *             daemon_type - [IN] the daemon type                             *
- *             message     - [OUT] the message containing options for log     *
- *                                 level change or cache reload               *
+ * Parameters: opt          - [IN] the command line argument                  *
+ *             program_type - [IN] the program type                           *
+ *             message      - [OUT] the message containing options for log    *
+ *                                  level change or cache reload              *
  *                                                                            *
  * Return value: SUCCEED - the message was created successfully               *
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
+int	parse_rtc_options(const char *opt, unsigned char program_type, int *message)
 {
 	int	scope, data, command;
 
@@ -129,7 +130,6 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 
 		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), &scope, &data))
 			return FAIL;
-
 	}
 	else if (0 == strncmp(opt, ZBX_LOG_LEVEL_DECREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
 	{
@@ -138,13 +138,15 @@ int	parse_rtc_options(const char *opt, unsigned char daemon_type, int *message)
 		if (SUCCEED != parse_log_level_options(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), &scope, &data))
 			return FAIL;
 	}
-	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
+			0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
 	{
 		command = ZBX_RTC_CONFIG_CACHE_RELOAD;
 		scope = 0;
 		data = 0;
 	}
-	else if (ZBX_DAEMON_TYPE_AGENT != daemon_type && 0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
+	else if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)) &&
+			0 == strcmp(opt, ZBX_HOUSEKEEPER_EXECUTE))
 	{
 		command = ZBX_RTC_HOUSEKEEPER_EXECUTE;
 		scope = 0;

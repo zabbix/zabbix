@@ -102,7 +102,10 @@ class CFilter extends CTag {
 			jQuery("#filter-space").toggle();
 			jQuery("#filter-mode").toggleClass("filter-active");
 			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
-			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-down") ? 0 : 1);'
+			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-up") ? 1 : 0);
+			if (jQuery(".multiselect").length > 0 && jQuery("#filter-arrow").hasClass("arrow-up")) {
+				jQuery(".multiselect").multiSelect("resize");
+			}'
 		);
 
 		$switch = (new CDiv())

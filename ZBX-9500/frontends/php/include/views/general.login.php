@@ -36,7 +36,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 <div class="signin-container">
 	<h1>Sign in</h1>
 	<form action="index.php" method="post">
-	<input type="hidden" name="request" class="input hidden" value="<?= $request; ?>" />
+	<input type="hidden" name="request" value="<?= $request; ?>" />
 		<ul>
 			<li>
 				<label for="name"><?= _('Username'); ?></label><input id="name" name="name" autofocus="" type="text">

@@ -26,6 +26,14 @@ class CConfigFile {
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
+	private static $supported_db_types = [
+		ZBX_DB_DB2 => true,
+		ZBX_DB_MYSQL => true,
+		ZBX_DB_ORACLE => true,
+		ZBX_DB_POSTGRESQL => true,
+		ZBX_DB_SQLITE3 => true
+	];
+
 	public $configFile = null;
 	public $config = [];
 	public $error = '';
@@ -58,27 +66,32 @@ class CConfigFile {
 		include($this->configFile);
 		ob_end_clean();
 
-		// config file in plain php is bad
-		$dbs = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3];
 		if (!isset($DB['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
-		elseif (isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs)) {
-			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+
+		if (!array_key_exists($DB['TYPE'], self::$supported_db_types)) {
+			self::exception(
+				'Incorrect value "'.$DB['TYPE'].'" for DB type. Possible values '.
+				implode(', ', array_keys(self::$supported_db_types)).'.'
+			);
 		}
-		elseif (!isset($DB['DATABASE'])) {
+
+		if (!array_key_exists($DB['TYPE'], CFrontendSetup::getSupportedDatabases())) {
+			self::exception(
+				'DB type "'.$DB['TYPE'].'" is not supported by current setup. Possible values '.
+				implode(', ', array_keys(CFrontendSetup::getSupportedDatabases())).'.'
+			);
+		}
+
+		if (!isset($DB['DATABASE'])) {
 			self::exception('DB database is not set.');
 		}
 
 		$this->setDefaults();
 
-		if (isset($DB['TYPE'])) {
-			$this->config['DB']['TYPE'] = $DB['TYPE'];
-		}
-
-		if (isset($DB['DATABASE'])) {
-			$this->config['DB']['DATABASE'] = $DB['DATABASE'];
-		}
+		$this->config['DB']['TYPE'] = $DB['TYPE'];
+		$this->config['DB']['DATABASE'] = $DB['DATABASE'];
 
 		if (isset($DB['SERVER'])) {
 			$this->config['DB']['SERVER'] = $DB['SERVER'];
@@ -190,15 +203,18 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 	}
 
 	protected function check() {
-		$dbs = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3];
-
 		if (!isset($this->config['DB']['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
-		elseif (!in_array($this->config['DB']['TYPE'], $dbs)) {
-			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+
+		if (!array_key_exists($this->config['DB']['TYPE'], self::$supported_db_types)) {
+			self::exception(
+				'Incorrect value "'.$this->config['DB']['TYPE'].'" for DB type. Possible values '.
+				implode(', ', array_keys(self::$supported_db_types)).'.'
+			);
 		}
-		elseif (!isset($this->config['DB']['DATABASE'])) {
+
+		if (!isset($this->config['DB']['DATABASE'])) {
 			self::exception('DB database is not set.');
 		}
 	}

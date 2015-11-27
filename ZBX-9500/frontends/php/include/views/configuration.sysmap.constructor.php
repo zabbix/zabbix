@@ -69,7 +69,7 @@ $container = (new CDiv())->setId('sysmap_cnt');
 
 $sysmapWidget->addItem($menu)->addItem(
 	(new CDiv())
-		->addClass('table-forms-container')
+		->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 		->addItem($backgroundImageTable)
 		->addItem($container)
 );

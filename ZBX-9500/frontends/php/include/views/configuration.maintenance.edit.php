@@ -110,12 +110,13 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol([
-			(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-			(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addStyle('margin-left: 8px')
-		]))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol(
+			new CHorList([
+				(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+			])
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -147,15 +148,15 @@ if (isset($_REQUEST['new_timeperiod'])) {
 		$saveLabel = _('Add');
 	}
 
-	$footer = [
-		(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
-		(new CSubmit('cancel_new_timeperiod', _('Cancel')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addStyle('margin-left: 8px')
-	];
-
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		(new CDiv([get_timeperiod_form(), $footer]))
+		(new CDiv([
+			get_timeperiod_form(),
+			new CHorList([
+				(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSubmit('cancel_new_timeperiod', _('Cancel')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+			])
+		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);

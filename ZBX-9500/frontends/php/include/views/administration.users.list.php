@@ -106,15 +106,6 @@ foreach ($this->data['users'] as $user) {
 				: ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_GREEN);
 	}
 
-	// user type style
-	$userTypeStyle = ZBX_STYLE_GREEN;
-	if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
-		$userTypeStyle = ZBX_STYLE_ORANGE;
-	}
-	if ($user['type'] == USER_TYPE_SUPER_ADMIN) {
-		$userTypeStyle = ZBX_STYLE_RED;
-	}
-
 	// gui access style
 	$guiAccessStyle = ZBX_STYLE_GREEN;
 	if ($user['gui_access'] == GROUP_GUI_ACCESS_INTERNAL) {

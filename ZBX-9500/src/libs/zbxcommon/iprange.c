@@ -21,6 +21,57 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: iprange_is_whitespace_character                                  *
+ *                                                                            *
+ * Purpose: checks if the specified character is allowed whitespace character *
+ *          that can be used before or after iprange definition               *
+ *                                                                            *
+ * Parameters: value - [IN] the character to check                            *
+ *                                                                            *
+ * Return value: SUCCEED - the value is whitespace character                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	iprange_is_whitespace_character(unsigned char value)
+{
+	switch (value)
+	{
+		case ' ':
+		case '\r':
+		case '\n':
+		case '\t':
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: iprange_address_length                                           *
+ *                                                                            *
+ * Purpose: calculates the length of address data without trailing whitespace *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	iprange_address_length(const char *address)
+{
+	size_t		len;
+	const char	*ptr;
+
+	len = strlen(address);
+	ptr = address + len - 1;
+
+	while (0 < len && SUCCEED == iprange_is_whitespace_character(*ptr))
+	{
+		ptr--;
+		len--;
+	}
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: iprange_apply_mask                                               *
  *                                                                            *
  * Purpose: applies a bit mask to the parsed v4 or v6 IP range                *
@@ -86,16 +137,19 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 
 	iprange->type = ZBX_IPRANGE_V4;
 
+	/* ignore trailing whitespace characters */
+	len = iprange_address_length(address);
+
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_range(end + 1, &bits, 0, 30))
+		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(int), 0, 30))
 			return FAIL;
 
 		iprange->mask = 1;
 	}
 	else
 	{
-		end = address + strlen(address);
+		end = address + len;
 		iprange->mask = 0;
 	}
 
@@ -168,16 +222,19 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 
 	iprange->type = ZBX_IPRANGE_V6;
 
+	/* ignore trailing whitespace characters */
+	len = iprange_address_length(address);
+
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_range(end + 1, &bits, 0, 128))
+		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(int), 0, 128))
 			return FAIL;
 
 		iprange->mask = 1;
 	}
 	else
 	{
-		end = address + strlen(address);
+		end = address + len;
 		iprange->mask = 0;
 	}
 
@@ -293,6 +350,10 @@ check_fill:
  ******************************************************************************/
 int	iprange_parse(zbx_iprange_t *iprange, const char *address)
 {
+	/* ignore leading whitespace characters */
+	while (SUCCEED == iprange_is_whitespace_character(*address))
+		address++;
+
 	if (NULL != strchr(address, '.'))
 		return iprangev4_parse(iprange, address);
 	else

@@ -24,7 +24,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private $macroSize = 30;
 	private $macroMaxLength = 64;
 	private $macroPlaceholder = '\{\$MACRO\}';
-	private $macroClass = 'input text macro';
+	private $macroClass = 'macro';
 
 	private $valueSize = 40;
 	private $valueMaxLength = 255;

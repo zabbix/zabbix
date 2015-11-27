@@ -34,6 +34,7 @@
 		<link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
 		<meta name="msapplication-TileImage" content="ms-tile-144x144.png">
 		<meta name="msapplication-TileColor" content="#d40000">
+		<meta name="msapplication-config" content="none"/>
 		<link rel="stylesheet" type="text/css" href="styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 	</head>
 	<body>

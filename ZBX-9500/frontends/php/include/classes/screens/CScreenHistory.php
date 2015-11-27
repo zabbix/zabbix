@@ -195,36 +195,39 @@ class CScreenHistory extends CScreenBase {
 							}
 						}
 
-						$row = [nbsp(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']))];
+						$row = [];
+
+						$row[] = (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock'])))
+							->addClass($color);
 
 						if ($isManyItems) {
-							$row[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
+							$row[] = (new CCol($host['name'].NAME_DELIMITER.$item['name_expanded']))
+								->addClass($color);
 						}
 
 						if ($useLogItem) {
-							$row[] = ($data['timestamp'] == 0)
-								? ''
-								: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp']);
+							$row[] = (new CCol(
+								($data['timestamp'] != 0)
+									? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp'])
+									: ''
+							))->addClass($color);
 
 							// if this is a eventLog item, showing additional info
 							if ($useEventLogItem) {
-								$row[] = ($data['source'] === '') ? '' : $data['source'];
-								$row[] = ($data['severity'] == 0)
-									? ''
-									: (new CCol(get_item_logtype_description($data['severity'])))
-										->addClass(get_item_logtype_style($data['severity']));
-								$row[] = ($data['logeventid'] == 0) ? '' : $data['logeventid'];
+								$row[] = (new CCol($data['source']))->addClass($color);
+								$row[] = ($data['severity'] != 0)
+									? (new CCol(get_item_logtype_description($data['severity'])))
+										->addClass(get_item_logtype_style($data['severity']))
+									: '';
+								$row[] = (new CCol(
+									($data['logeventid'] != 0) ? $data['logeventid'] : ''
+								))->addClass($color);
 							}
 						}
 
-						$row[] = new CPre(zbx_nl2br($data['value']));
+						$row[] = (new CCol(new CPre(zbx_nl2br($data['value']))))->addClass($color);
 
-						$newRow = new CRow($row);
-						if (!is_null($color)) {
-							$newRow->addClass($color);
-						}
-
-						$historyTable->addRow($newRow);
+						$historyTable->addRow($row);
 					}
 					else {
 						$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']).' '. $data['clock'].' '.

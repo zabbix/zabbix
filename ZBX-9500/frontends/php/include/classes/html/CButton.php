@@ -32,14 +32,6 @@ class CButton extends CTag implements CButtonInterface {
 	}
 
 	/**
-	 * @see CButtonInterface::main()
-	 */
-	public function main() {
-		$this->addClass('main');
-		return $this;
-	}
-
-	/**
 	 * Enable or disable the element.
 	 *
 	 * @param bool $value

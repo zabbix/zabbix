@@ -88,10 +88,10 @@ class CTweenBox {
 
 		$add_btn = (new CButton('add', (new CSpan())->addClass('arrow-left')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
+			->onClick('moveListBoxSelectedItem("'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
 		$rmv_btn = (new CButton('remove', (new CSpan())->addClass('arrow-right')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
+			->onClick('moveListBoxSelectedItem("'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
 		$grp_tab->addRow([$this->lbox, (new CCol([$add_btn, BR(), $rmv_btn]))->addClass(ZBX_STYLE_CENTER), $this->rbox]);
 		return $grp_tab;

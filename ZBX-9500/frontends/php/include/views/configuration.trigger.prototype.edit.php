@@ -145,23 +145,6 @@ if ($this->data['input_method'] == IM_TREE) {
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
-			if (!$this->data['limited']) {
-				$deleteUrl = (new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('javascript:'.
-						' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-							' delete_expression("'.$e['id'] .'");'.
-							' document.forms["'.$triggersForm->getName().'"].submit();'.
-						' }'
-					);
-				$triggerCheckbox = (new CCheckBox('expr_target_single',$e['id']))
-					->setChecked($i == 0)
-					->onClick('check_target(this);');
-			}
-			else {
-				$triggerCheckbox = null;
-			}
-
 			if (!isset($e['expression']['levelErrors'])) {
 				$errorImg = '';
 			}
@@ -195,7 +178,27 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			$expressionTable->addRow(
-				new CRow([$triggerCheckbox, $e['list'], isset($deleteUrl) ? $deleteUrl : null, $errorImg])
+				new CRow([
+					!$this->data['limited']
+						? (new CCheckBox('expr_target_single',$e['id']))
+							->setChecked($i == 0)
+							->onClick('check_target(this);')
+						: null,
+					$e['list'],
+					!$this->data['limited']
+						? (new CCol(
+							(new CButton(null, _('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->onClick('javascript:'.
+									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+										' delete_expression("'.$e['id'] .'");'.
+										' document.forms["'.$triggersForm->getName().'"].submit();'.
+									' }'
+								)
+						))->addClass(ZBX_STYLE_NOWRAP)
+						: null,
+					$errorImg
+				])
 			);
 		}
 	}
@@ -267,7 +270,6 @@ $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
-	->setNoDataMessage(_('No dependencies defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
@@ -290,29 +292,30 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	}
 
 	$row = new CRow([$description,
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 
 	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = (new CButton('add_dep_trigger', _('Add')))
-	->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-			'&with_triggers=1&normal_only=1&noempty=1");')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick('return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
-			url_param('parent_discoveryid').'&multiselect=1");')
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addStyle('margin-left: 8px');
 $dependenciesFormList->addRow(_('Dependencies'),
 	(new CDiv([
 		$dependenciesTable,
-		$addButton,
-		$addPrototypeButton
+		new CHorList([
+			(new CButton('add_dep_trigger', _('Add')))
+				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
+					'&multiselect=1&with_triggers=1&normal_only=1&noempty=1");')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
+				->onClick('return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
+					url_param('parent_discoveryid').'&multiselect=1");')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		])
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

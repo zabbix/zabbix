@@ -117,12 +117,15 @@ class CTag extends CObject {
 	}
 
 	public function addClass($class) {
-		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
-			$this->attributes['class'] = $class;
+		if ($class !== null) {
+			if (!array_key_exists('class', $this->attributes) || $this->attributes['class'] === '') {
+				$this->attributes['class'] = $class;
+			}
+			else {
+				$this->attributes['class'] .= ' '.$class;
+			}
 		}
-		else {
-			$this->attributes['class'] .= ' '.$class;
-		}
+
 		return $this;
 	}
 
@@ -152,16 +155,20 @@ class CTag extends CObject {
 	}
 
 	/**
-	 * Adds a hint box to the elemt.
+	 * Adds a hint box to the element.
 	 *
-	 * @param string|array|CTag     $text          hint content
-	 * @param string                $spanClass     wrap the content in a span element and assign a this class to the span
-	 * @param bool                  $freezeOnCLick if set to true, it will be possible to "freeze" the hint box via a mouse
-	 *                                          click
+	 * @param string|array|CTag		$text				Hint content.
+	 * @param string				$span_class			Wrap the content in a span element and assign this class
+	 *													to the span.
+	 * @param bool					$freeze_on_click	If set to true, it will be possible to "freeze" the hint box
+	 *													via a mouse click.
+	 * @param string				$styles				Custom css styles.
+	 *													Syntax:
+	 *														property1: value1; property2: value2; property(n): value(n)
 	 *
 	 * @return bool
 	 */
-	public function setHint($text, $spanClass = '', $freezeOnClick = true) {
+	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
 		if (empty($text)) {
 			return $this;
 		}
@@ -169,10 +176,16 @@ class CTag extends CObject {
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->onMouseover('hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
-		if ($freezeOnClick) {
-			$this->onClick('hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
+		$this->onMouseover(
+			'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$span_class.'", "'.$styles.'");'
+		);
+
+		if ($freeze_on_click) {
+			$this->onClick(
+				'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$span_class.'", false, "'.$styles.'");'
+			);
 		}
+
 		return $this;
 	}
 

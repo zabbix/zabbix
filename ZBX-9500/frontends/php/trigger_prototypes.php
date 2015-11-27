@@ -172,27 +172,28 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		// Update only changed fields.
 
-		$oldTriggerPrototype = API::TriggerPrototype()->get([
+		$old_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
 		]);
-		if (!$oldTriggerPrototype) {
+		if (!$old_trigger_prototypes) {
 			access_deny();
 		}
 
-		$oldTriggerPrototype = reset($oldTriggerPrototype);
-		$oldTriggerPrototype['dependencies'] = zbx_toHash(
-			zbx_objectValues($oldTriggerPrototype['dependencies'], 'triggerid')
+		$old_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($old_trigger_prototypes);
+
+		$old_trigger_prototype = reset($old_trigger_prototypes);
+		$old_trigger_prototype['dependencies'] = zbx_toHash(
+			zbx_objectValues($old_trigger_prototype['dependencies'], 'triggerid')
 		);
-		$oldTriggerPrototype['expression'] = explode_exp($oldTriggerPrototype['expression']);
 
 		$newDependencies = $trigger['dependencies'];
-		$oldDependencies = $oldTriggerPrototype['dependencies'];
+		$oldDependencies = $old_trigger_prototype['dependencies'];
 
-		unset($trigger['dependencies'], $oldTriggerPrototype['dependencies']);
+		unset($trigger['dependencies'], $old_trigger_prototype['dependencies']);
 
-		$triggerToUpdate = array_diff_assoc($trigger, $oldTriggerPrototype);
+		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger_prototype);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
 
 		// dependencies
@@ -391,8 +392,6 @@ else {
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid'],
 		'selectHosts' => ['hostid', 'host'],
-		'selectItems' => ['itemid', 'type', 'hostid', 'key_', 'status', 'flags'],
-		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);

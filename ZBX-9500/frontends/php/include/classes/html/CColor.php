@@ -21,7 +21,7 @@
 
 class CColor extends CDiv {
 
-	public function __construct($name, $value) {
+	public function __construct($name, $value, $insert_color_picker = true) {
 		parent::__construct([
 			(new CColorCell('lbl_'.$name, $value))
 				->setTitle('#'.$value)
@@ -34,6 +34,8 @@ class CColor extends CDiv {
 
 		$this->addClass(ZBX_STYLE_INPUT_COLOR_PICKER);
 
-		insert_show_color_picker_javascript();
+		if ($insert_color_picker) {
+			insert_show_color_picker_javascript();
+		}
 	}
 }
