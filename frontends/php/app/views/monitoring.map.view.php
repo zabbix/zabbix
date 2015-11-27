@@ -19,6 +19,9 @@
 **/
 
 
+$this->addJsFile('js/gtlc.js');
+$this->addJsFile('js/flickerfreescreen.js');
+
 $mapWidget = (new CWidget())->setTitle(_('Maps'));
 
 $headerMapForm = (new CForm('get'))->cleanItems();
@@ -44,7 +47,11 @@ if ($data['maps']) {
 		// check for permissions
 		if (isset($data['maps'][$parent['sysmapid']])) {
 			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new CLink($parent['name'], 'zabbix.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].'&severity_min='.$data['severity_min']);
+			$parentMaps[] = new CLink(
+				$parent['name'],
+				'zabbix.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].
+					'&severity_min='.$data['severity_min']
+			);
 		}
 	}
 	if (!empty($parentMaps)) {
@@ -52,13 +59,18 @@ if ($data['maps']) {
 		$controls->addItem($parentMaps);
 	}
 
-	$actionMap = getActionMapBySysmap($data['map'], ['severity_min' => $data['severity_min']]);
-	$imgMap = (new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']))
-		->setMap($actionMap->getName());
-
-	$mapTable = (new CTable())
-		->addRow($actionMap)
-		->addRow($imgMap);
+	$mapTable = CScreenBuilder::getScreen([
+		'resourcetype' => SCREEN_RESOURCE_MAP,
+		'mode' => SCREEN_MODE_PREVIEW,
+		'dataId' => 'mapimg',
+		'screenitem' => [
+			'screenitemid' => $data['sysmapid'],
+			'screenid' => null,
+			'resourceid' => $data['sysmapid'],
+			'width' => null,
+			'height' => null
+		]
+	])->get();
 
 	$controls->addItem(get_icon('favourite', [
 		'fav' => 'web.favorite.sysmapids',
