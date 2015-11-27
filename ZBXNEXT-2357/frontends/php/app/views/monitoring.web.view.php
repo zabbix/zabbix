@@ -41,12 +41,17 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['httptests'] as $httptest) {
-	if (isset($httptest['lastfailedstep']) && $httptest['lastfailedstep'] !== null) {
-		$hostname = new CSpan($httptest['hostname']);
+	if ($data['hostid'] == 0) {
+		$hostname = $httptest['hostname'];
 		if ($httptest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
-			$hostname->addClass(ZBX_STYLE_RED);
+			$hostname = (new CSpan($hostname))->addClass(ZBX_STYLE_RED);
 		};
+	}
+	else {
+		$hostname = null;
+	}
 
+	if (isset($httptest['lastfailedstep']) && $httptest['lastfailedstep'] !== null) {
 		$lastcheck = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httptest['lastcheck']);
 
 		if ($httptest['lastfailedstep'] != 0) {
@@ -54,38 +59,32 @@ foreach ($data['httptests'] as $httptest) {
 			$error = ($httptest['error'] === null) ? _('Unknown error') : $httptest['error'];
 
 			if ($httpstep) {
-				$status['msg'] = _s(
+				$status = new CSpan(_s(
 					'Step "%1$s" [%2$s of %3$s] failed: %4$s',
-					$httpstep['name'],
-					$httptest['lastfailedstep'],
-					$httptest['steps'],
-					$error
-				);
+					$httpstep['name'], $httptest['lastfailedstep'], $httptest['steps'], $error
+				));
 			}
 			else {
-				$status['msg'] = _s('Unknown step failed: %1$s', $error);
+				$status = new CSpan(_s('Unknown step failed: %1$s', $error));
 			}
-
-			$status['style'] = ZBX_STYLE_RED;
+			$status->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$status['msg'] = _('OK');
-			$status['style'] = ZBX_STYLE_GREEN;
+			$status = (new CSpan(_('OK')))->addClass(ZBX_STYLE_GREEN);
 		}
 	}
 	// no history data exists
 	else {
 		$lastcheck = (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED);
-		$status['msg'] = _('Unknown');
-		$status['style'] = ZBX_STYLE_GREY;
+		$status = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_GREY);
 	}
 
 	$table->addRow(new CRow([
-		($data['hostid'] > 0) ? null : $hostname,
+		$hostname,
 		new CLink($httptest['name'], 'httpdetails.php?httptestid='.$httptest['httptestid']),
 		$httptest['steps'],
 		$lastcheck,
-		(new CSpan($status['msg']))->addClass($status['style'])
+		$status
 	]));
 }
 
