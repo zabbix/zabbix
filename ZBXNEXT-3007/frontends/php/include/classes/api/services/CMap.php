@@ -383,13 +383,19 @@ class CMap extends CMapElement {
 		$map_names = [];
 
 		foreach ($maps as $map) {
+			$userids = [];
+
 			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
 
-			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
-					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+			if (array_key_exists('userid', $map)) {
+				if ($map['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+				}
+
+				$userids[$map['userid']] = $map['userid'];
 			}
 
 			if (array_key_exists('name', $map)) {
@@ -411,7 +417,6 @@ class CMap extends CMapElement {
 
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
-				$shared_userids = [];
 				foreach ($map['users'] as $share) {
 					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
 							&& $share['permission'] == PERM_READ) {
@@ -424,23 +429,22 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share with yourself.'));
 					}
 
-					$shared_userids[$share['userid']] = $share['userid'];
+					$userids[$share['userid']] = $share['userid'];
 				}
+			}
 
-				if ($shared_userids) {
-					$db_users = API::User()->get([
-						'userids' => $shared_userids,
-						'countOutput' => true
-					]);
+			// Users validation.
+			if ($userids) {
+				$db_users = API::User()->get([
+					'userids' => $userids,
+					'countOutput' => true
+				]);
 
-					if (count($shared_userids) != $db_users) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect user ID defined for map "%1$s".', $map['name'])
-						);
-					}
+				if (count($userids) != $db_users) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect user ID defined for map "%1$s".', $map['name'])
+					);
 				}
-
-				unset($shared_userids);
 			}
 
 			// Map user group shares.
@@ -463,7 +467,7 @@ class CMap extends CMapElement {
 						'countOutput' => true
 					]);
 
-					if (count($shared_userids) != $db_user_groups) {
+					if (count($shared_user_groupids) != $db_user_groups) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect user group ID defined for map "%1$s".', $map['name'])
 						);
@@ -652,6 +656,7 @@ class CMap extends CMapElement {
 		$map_names = [];
 
 		foreach ($maps as $map) {
+			$userids = [];
 			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
@@ -661,9 +666,13 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
-					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+			if (array_key_exists('userid', $map)) {
+				if ($map['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+				}
+
+				$userids[$map['userid']] = $map['userid'];
 			}
 
 			$map = array_merge($db_maps[$map['sysmapid']], $map);
@@ -693,7 +702,6 @@ class CMap extends CMapElement {
 
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
-				$shared_userids = [];
 				foreach ($map['users'] as $share) {
 					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -705,23 +713,21 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share with yourself.'));
 					}
 
-					$shared_userids[$share['userid']] = $share['userid'];
+					$userids[$share['userid']] = $share['userid'];
 				}
+			}
 
-				if ($shared_userids) {
-					$db_users = API::User()->get([
-						'userids' => $shared_userids,
-						'countOutput' => true
-					]);
+			if ($userids) {
+				$db_users = API::User()->get([
+					'userids' => $userids,
+					'countOutput' => true
+				]);
 
-					if (count($shared_userids) != $db_users) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect user ID defined for map "%1$s".', $map['name'])
-						);
-					}
+				if (count($userids) != $db_users) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect user ID defined for map "%1$s".', $map['name'])
+					);
 				}
-
-				unset($shared_userids);
 			}
 
 			// Map user group shares.
@@ -743,7 +749,7 @@ class CMap extends CMapElement {
 						'countOutput' => true
 					]);
 
-					if (count($shared_userids) != $db_user_groups) {
+					if (count($shared_user_groupids) != $db_user_groups) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect user group ID defined for map "%1$s".', $map['name'])
 						);
