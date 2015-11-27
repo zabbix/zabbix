@@ -33,7 +33,6 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
-
 void	zbx_proxyconfig_sigusr_handler(int flags)
 {
 	if (ZBX_RTC_CONFIG_CACHE_RELOAD == ZBX_RTC_GET_MSG(flags))
@@ -66,7 +65,7 @@ static void	process_configuration_sync(size_t *data_size)
 	/* reset the performance metric */
 	*data_size = 0;
 
-	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY); /* retry till have a connection */
+	connect_to_server(&sock, 600, CONFIG_PROXYCONFIG_RETRY);	/* retry till have a connection */
 
 	if (SUCCEED != get_data_from_server(&sock, ZBX_PROTO_VALUE_PROXY_CONFIG, &error))
 	{
@@ -158,6 +157,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
 		sec = zbx_time();

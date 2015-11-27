@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 include dirname(__FILE__).'/js/conf.import.js.php';
 
 $rulesTable = (new CTable())
@@ -35,9 +36,13 @@ $titles = [
 	'triggers' => _('Triggers'),
 	'graphs' => _('Graphs'),
 	'screens' => _('Screens'),
-	'maps' => _('Maps'),
-	'images' => _('Images')
+	'maps' => _('Maps')
 ];
+
+if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+	$titles['images'] = _('Images');
+	$titles['valueMaps'] = _('Value mappings');
+}
 
 foreach ($titles as $key => $title) {
 	$cbExist = null;
@@ -48,12 +53,14 @@ foreach ($titles as $key => $title) {
 		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
 			->setChecked($data['rules'][$key]['updateExisting']);
 
-		if ($key == 'images') {
-			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-				continue;
-			}
+		if ($key === 'images') {
+			$cbExist->onClick('updateWarning(this, '.CJs::encodeJson(_('Images for all maps will be updated!')).')');
+		}
 
-			$cbExist->onClick('if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
+		if ($key === 'valueMaps') {
+			$cbExist->onClick(
+				'updateWarning(this, '.CJs::encodeJson(_('Value mappings for value maps will be updated!')).')'
+			);
 		}
 	}
 
@@ -77,24 +84,22 @@ foreach ($titles as $key => $title) {
 }
 
 // form list
-$importFormList = (new CFormList())
+$form_list = (new CFormList())
 	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab
-$importTab = (new CTabView())->addTab('importTab', _('Import'), $importFormList);
+$tab_view = (new CTabView())->addTab('importTab', _('Import'), $form_list);
 
 // form
-$importTab->setFooter(makeFormFooter(
+$tab_view->setFooter(makeFormFooter(
 	new CSubmit('import', _('Import')),
 	[new CRedirectButton(_('Cancel'), $data['backurl'])]
 ));
 
 $form = (new CForm('post', null, 'multipart/form-data'))
 	->addVar('backurl', $data['backurl'])
-	->addItem($importTab);
+	->addItem($tab_view);
 
 // widget
-$importWidget = (new CWidget())->addItem($form);
-
-return $importWidget;
+return (new CWidget())->addItem($form);

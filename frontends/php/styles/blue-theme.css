@@ -1989,10 +1989,10 @@ td.active-bg {
   color: #0e4123; }
 
 .info-bg, .info-bg input[type="radio"]:checked + label {
-  color: #00268d; }
+  color: #00268e; }
 
 .log-info-bg {
-  color: #00268d;
+  color: #00268e;
   background-color: #7499ff; }
 
 .average-bg, .average-bg input[type="radio"]:checked + label {
@@ -2179,7 +2179,7 @@ td.active-bg {
   position: absolute;
   top: 0;
   right: -12px;
-  color: #45555d;
+  color: #45565d;
   background-color: #acbbc2;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;

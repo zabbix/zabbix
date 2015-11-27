@@ -19,31 +19,114 @@
 **/
 
 
-class CMacroParserTest extends CParserTest {
+class CMacroParserTest extends PHPUnit_Framework_TestCase {
 
-	protected function getParser() {
-		return new CMacroParser('#');
-	}
-
-	public function validProvider() {
+	public function testProvider() {
 		return [
-			['{#M}', 0, '{#M}', 4],
-			['{#MACRO12.A_Z}', 0, '{#MACRO12.A_Z}', 14],
-			['{#MACRO} = 0', 0, '{#MACRO}', 8],
-			['not {#MACRO} = 0', 4, '{#MACRO}', 8],
+			[[], '{HOST.HOST}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{HOST.HOST}',
+				'macro' => 'HOST.HOST',
+				'n' => 0
+			]],
+			[[], 'chunk{HOST.HOST}', 5, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{HOST.HOST}',
+				'macro' => 'HOST.HOST',
+				'n' => 0
+			]],
+			[[], 'chunk{HOST.HOST}chunk2', 5, [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '{HOST.HOST}',
+				'macro' => 'HOST.HOST',
+				'n' => 0
+			]],
+			[['allow_reference' => true], '{HOST.HOST}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{HOST.HOST}',
+				'macro' => 'HOST.HOST',
+				'n' => 0
+			]],
+			[['allow_reference' => true], '{HOST.HOST2}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{HOST.HOST2}',
+				'macro' => 'HOST.HOST',
+				'n' => 2
+			]],
+
+			[[], '', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[[], '{}', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[[], '{', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[[], '{{HOST.HOST}abc', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[[], '{HOST.HOST', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[['allow_reference' => true], '{HOST.HOST', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[['allow_reference' => true], '{HOST.HOST1', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[['allow_reference' => true], '{HOST.HOST0}', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]],
+			[['allow_reference' => true], '{5}', 0, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'macro' => '',
+				'n' => 0
+			]]
 		];
 	}
 
-	public function invalidProvider() {
-		return [
-			['', 0, 0],
-			['A', 0, 0],
-			['{A', 0, 1],
-			['{#', 0, 2],
-			['{#}', 0, 2],
-			['{#A', 0, 3],
-			['{#a}', 0, 2],
-			['{#+}', 0, 2],
-		];
+	/**
+	 * @dataProvider testProvider
+	 *
+	 * @param string $source
+	 * @param int    $pos
+	 * @param array  $expected
+	*/
+	public function testParse($options, $source, $pos, $expected) {
+		$macro_parser = new CMacroParser(['{HOST.HOST}', '{HOST.IP}', '{ITEM.VALUE}'], $options);
+
+		$this->assertSame($expected, [
+			'rc' => $macro_parser->parse($source, $pos),
+			'match' => $macro_parser->getMatch(),
+			'macro' => $macro_parser->getMacro(),
+			'n' => $macro_parser->getN()
+		]);
+		$this->assertSame(strlen($expected['match']), $macro_parser->getLength());
 	}
 }

@@ -26,10 +26,23 @@ $widget = (new CWidget())
 		->addItem((new CList())
 			->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
 			->addItem(new CSubmit('form', _('Create value map')))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=valuemap")'))
 		)
 	);
 
-$valuemap_table = (new CTableInfo())->setHeader([_('Name'), _('Value map')]);
+$form = (new CForm())
+	->setName('valuemap_form');
+
+$table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_valuemaps'))
+				->onClick("checkAll('".$form->getName()."', 'all_valuemaps', 'valuemapids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		_('Value map'),
+		_('Used in items')
+	]);
 
 foreach ($data['valuemaps'] as $valuemap) {
 	$mappings = [];
@@ -40,12 +53,23 @@ foreach ($data['valuemaps'] as $valuemap) {
 	}
 	array_pop($mappings);
 
-	$valuemap_table->addRow([
+	$table->addRow([
+		new CCheckBox('valuemapids['.$valuemap['valuemapid'].']', $valuemap['valuemapid']),
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
-		$mappings
+		$mappings,
+		$valuemap['used_in_items'] ? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN) : ''
 	]);
 }
 
-$widget->addItem($valuemap_table);
+$form->addItem([
+	$table,
+	$data['paging'],
+	new CActionButtonList('action', 'valuemapids', [
+		'valuemap.export' => ['name' => _('Export')],
+		'valuemap.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected value maps?')]
+	])
+]);
+
+$widget->addItem($form);
 
 return $widget;

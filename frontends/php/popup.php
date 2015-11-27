@@ -1132,17 +1132,18 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 		}
 		$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
-		if (count($trigger['dependencies']) > 0) {
-			$description = [
-				$description,
-				BR(),
-				bold(_('Depends on')),
-				BR()
-			];
+		if ($trigger['dependencies']) {
+			$description = [$description, BR(), bold(_('Depends on')), BR()];
 
-			foreach ($trigger['dependencies'] as $dependency) {
-				$description[] = [CMacrosResolverHelper::resolveTriggerName($dependency), BR()];
+			$dependencies = CMacrosResolverHelper::resolveTriggerNames(
+				zbx_toHash($trigger['dependencies'], 'triggerid')
+			);
+
+			foreach ($dependencies as $dependency) {
+				$description[] = $dependency['description'];
+				$description[] = BR();
 			}
+			array_pop($description);
 		}
 
 		$table->addRow([
