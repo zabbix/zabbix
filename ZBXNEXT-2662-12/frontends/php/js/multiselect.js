@@ -750,9 +750,9 @@ jQuery(function($) {
 			end = text.indexOf(search, end);
 
 			if (end > start) {
-				li.append(
-					item.name.substring(start, end)
-				);
+				li.append($('<span>', {
+					text: item.name.substring(start, end)
+				}));
 			}
 
 			li.append($('<span>', {
@@ -765,9 +765,9 @@ jQuery(function($) {
 		}
 
 		if (end < item.name.length) {
-			li.append(
-				item.name.substring(end, item.name.length)
-			);
+			li.append($('<span>', {
+				text: item.name.substring(end, item.name.length)
+			}));
 		}
 
 		$('.available ul', obj).append(li);
