@@ -75,7 +75,6 @@
 			else {
 				addDraggable(domRow);
 			}
-			addDroppable(domRow)
 		}
 
 		function resetMainInterfaces() {
@@ -131,12 +130,12 @@
 		}
 
 		/**
-		 * Select draggable elements and do dragging
+		 * Enable and do dragging to selected elements.
 		 *
 		 * @param object domElement
 		 */
 		function addDraggable(domElement) {
-			var dragInterfaceType = domElement.data('type'),
+			var dragInterfaceType,
 				interfaceid = domElement.data('interfaceid');
 			domElement.draggable({
 				helper: function() {
@@ -149,10 +148,13 @@
 				axis: 'y',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				revert: function(event, ui) {
+console.log(jQuery(this).data('type') + ' + ' + dragInterfaceType);
+
 					return (event !== false && dragInterfaceType != jQuery(this).data('type')) ? false : true;
 				},
 				start: function(event, ui) {
 					ui.helper.addClass('<?= ZBX_STYLE_CURSOR_MOVE ?>');
+					dragInterfaceType = jQuery(this).data('type')
 					jQuery('.interface_name', ui.helper).remove();
 					jQuery('.interface_data', this).css({'visibility': 'hidden'});
 				},
@@ -179,8 +181,13 @@
 				);
 		}
 
-		function addDroppable(domElement) {
-			domElement.droppable({
+		/*
+		 * Enable droppable for selected elements.
+		 *
+		 * @param objects domElements
+		 */
+		function addDroppable(domElements) {
+			domElements.droppable({
 				tolerance: 'pointer',
 				drop: function(event, ui) {
 					var interfaceid = ui.draggable.data('interfaceid'),
@@ -331,7 +338,7 @@
 		}
 
 		/*
-		 * Increase rowspan of row
+		 * Increase rowspan of row.
 		 *
 		 * @param objects domRows
 		 */
@@ -342,7 +349,7 @@
 		}
 
 		/*
-		 * Decreases rowspan of row
+		 * Decreases rowspan of row.
 		 *
 		 * @param object domRow
 		 */
@@ -376,6 +383,7 @@
 				}
 
 				resetMainInterfaces();
+				addDroppable(jQuery('.interface_row, .interface_add'));
 			},
 
 			addNew: function(type) {
@@ -386,6 +394,7 @@
 				increaseRowspan(jQuery('.interface_type_' + type));
 				moveInterfaceName(type)
 				resetMainInterfaces();
+				addDroppable(jQuery('#hostInterfaceRow_' + hostInterface.interfaceid));
 			},
 
 			remove: function(hostInterfaceId) {
