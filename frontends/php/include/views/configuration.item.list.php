@@ -72,6 +72,9 @@ if (!$this->data['filterSet']) {
 
 $current_time = time();
 
+$this->data['itemTriggers'] =
+	CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], ['html' => true]);
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
@@ -172,13 +175,12 @@ foreach ($this->data['items'] as $item) {
 			$trigger['error'] = '';
 		}
 
-		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
-			triggerExpression($trigger, true),
+			$trigger['expression'],
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);

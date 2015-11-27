@@ -21,8 +21,15 @@
 
 $widget = make_latest_issues($data['filter'], 'zabbix.php?action=dashboard.view');
 
-echo (new CJson())->encode([
+$output = [
 	'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 	'body' => $widget->toString(),
 	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

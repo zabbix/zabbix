@@ -588,7 +588,6 @@ void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: op_groups_add                                                    *

@@ -21,6 +21,8 @@
 #include "cfg.h"
 #include "log.h"
 
+extern unsigned char	program_type;
+
 char	*CONFIG_FILE		= NULL;
 
 char	*CONFIG_LOG_FILE	= NULL;
@@ -373,8 +375,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	FILE		*file;
 	int		i, lineno, param_valid;
-	char		line[MAX_STRING_LEN + 1], *parameter, *value;
+	char		line[MAX_STRING_LEN + 3], *parameter, *value;
 	zbx_uint64_t	var;
+	size_t		len;
 #ifdef _WINDOWS
 	wchar_t		*wcfg_file;
 #endif
@@ -399,8 +402,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
-			/* only 2048 character (inc. '\n' or '\0') single lines supported in the config file */
-			if(MAX_STRING_LEN <= strlen(line))
+			/* check if line length exceeds limit (max. 2048 bytes) */
+			len = strlen(line);
+			if (MAX_STRING_LEN < len && NULL == strchr("\r\n", line[MAX_STRING_LEN]))
 				goto line_too_long;
 
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
@@ -520,7 +524,7 @@ cannot_open:
 	goto error;
 line_too_long:
 	fclose(file);
-	zbx_error("line %d exceeds %d byte length limit in config file \"%s\"", lineno, MAX_STRING_LEN - 1, cfg_file);
+	zbx_error("line %d exceeds %d byte length limit in config file \"%s\"", lineno, MAX_STRING_LEN, cfg_file);
 	goto error;
 non_utf8:
 	fclose(file);
@@ -548,4 +552,28 @@ error:
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict);
+}
+
+int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
+{
+	if (0 != value)
+	{
+		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
+				parameter, get_program_type_string(program_type), feature);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature)
+{
+	if (NULL != value)
+	{
+		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
+				parameter, get_program_type_string(program_type), feature);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }

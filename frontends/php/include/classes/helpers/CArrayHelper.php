@@ -209,17 +209,13 @@ class CArrayHelper {
 				if (isset($uniqueValues[$uniqueByValue]) && isset($uniqueValues[$uniqueByValue][$value])) {
 					return $array;
 				}
-				else {
-					$uniqueValues[$uniqueByValue][$value] = $value;
-				}
+				$uniqueValues[$uniqueByValue][$value] = $value;
 			}
 			else {
 				if (isset($uniqueValues[$value])) {
 					return $array;
 				}
-				else {
-					$uniqueValues[$value] = $value;
-				}
+				$uniqueValues[$value] = $value;
 			}
 		}
 	}

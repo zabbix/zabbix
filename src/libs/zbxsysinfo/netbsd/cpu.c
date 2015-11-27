@@ -22,6 +22,8 @@
 #include "stats.h"
 #include "log.h"
 
+#include <uvm/uvm_extern.h>
+
 static int	get_cpu_num()
 {
 #ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU	/* NetBSD 3.1 i386; NetBSD 4.0 i386 */
