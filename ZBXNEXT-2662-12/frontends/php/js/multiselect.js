@@ -504,7 +504,9 @@ jQuery(function($) {
 					});
 				}
 
-				obj.parent().append($('<div class="multiselect-button"></div>').append(popupButton));
+				obj.parent().append($('<div>', {
+					'class': 'multiselect-button'
+				}).append(popupButton));
 			}
 		});
 	};
