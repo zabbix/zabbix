@@ -97,7 +97,7 @@ class CMap extends CMapElement {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// Editable + permission check.
-		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
 			$public_maps = '';
 
 			if ($options['editable']) {
