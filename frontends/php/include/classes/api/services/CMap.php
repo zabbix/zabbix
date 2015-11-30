@@ -426,7 +426,7 @@ class CMap extends CMapElement {
 					}
 
 					if ($share['userid'] == $user_data['userid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share with yourself.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -442,7 +442,7 @@ class CMap extends CMapElement {
 
 				if (count($userids) != $db_users) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect user ID defined for map "%1$s".', $map['name'])
+						_s('Incorrect user ID specified for map "%1$s".', $map['name'])
 					);
 				}
 			}
@@ -469,7 +469,7 @@ class CMap extends CMapElement {
 
 					if (count($shared_user_groupids) != $db_user_groups) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect user group ID defined for map "%1$s".', $map['name'])
+							_s('Incorrect user group ID specified for map "%1$s".', $map['name'])
 						);
 					}
 				}
@@ -710,7 +710,7 @@ class CMap extends CMapElement {
 					}
 
 					if ($share['userid'] == $user_data['userid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share with yourself.'));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -725,7 +725,7 @@ class CMap extends CMapElement {
 
 				if (count($userids) != $db_users) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect user ID defined for map "%1$s".', $map['name'])
+						_s('Incorrect user ID specified for map "%1$s".', $map['name'])
 					);
 				}
 			}
@@ -751,7 +751,7 @@ class CMap extends CMapElement {
 
 					if (count($shared_user_groupids) != $db_user_groups) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect user group ID defined for map "%1$s".', $map['name'])
+							_s('Incorrect user group ID specified for map "%1$s".', $map['name'])
 						);
 					}
 				}
