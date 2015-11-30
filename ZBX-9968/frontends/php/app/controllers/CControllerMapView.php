@@ -107,11 +107,8 @@ class CControllerMapView extends CController {
 
 		if ($data['maps']) {
 			$maps = API::Map()->get([
-				'output' => API_OUTPUT_EXTEND,
-				'selectSelements' => API_OUTPUT_EXTEND,
-				'selectLinks' => API_OUTPUT_EXTEND,
-				'sysmapids' => $this->sysmapid,
-				'expandUrls' => true
+				'output' => ['severity_min'],
+				'sysmapids' => $this->sysmapid
 			]);
 			$data['map'] = $maps[0];
 
