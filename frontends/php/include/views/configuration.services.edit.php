@@ -57,7 +57,7 @@ $servicesFormList->addRow(_('Parent service'), [
 
 // append algorithm to form list
 $servicesFormList->addRow(_('Status calculation algorithm'),
-	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorythm())
+	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorithm())
 );
 
 // append SLA to form list
