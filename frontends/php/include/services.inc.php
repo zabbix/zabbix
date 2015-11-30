@@ -66,14 +66,15 @@ function get_service_children($serviceid, $soft = 0) {
  */
 function createServiceConfigurationTree(array $services, &$tree, array $parentService = [], array $service = [], array $dependency = []) {
 	if (!$service) {
-		$caption = (new CLink(_('root'), '#'))
-			->setMenuPopup(CMenuPopupHelper::getServiceConfiguration(null, _('root'), false));
-
 		$serviceNode = [
 			'id' => 0,
 			'parentid' => 0,
-			'caption' => $caption,
+			'caption' => _('root'),
 			'trigger' => [],
+			'action' => new CHorList([
+				(new CLink(_('Add child'), 'services.php?form=1&parentname='._('root')))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+			]),
 			'algorithm' => SPACE,
 			'description' => SPACE
 		];
@@ -97,9 +98,6 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		$tree = [$serviceNode];
 	}
 	else {
-		// caption
-		$caption = new CLink($service['name'], '#');
-
 		// service is deletable only if it has no hard dependency
 		$deletable = true;
 		foreach ($service['dependencies'] as $dep) {
@@ -109,11 +107,22 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			}
 		}
 
-		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration($service['serviceid'], $service['name'], $deletable));
-
 		$serviceNode = [
 			'id' => $service['serviceid'],
-			'caption' => $caption,
+			'caption' => (new CLink($service['name'], 'services.php?form=1&serviceid='.$service['serviceid']))
+				->removeSID(),
+			'action' => new CHorList([
+				(new CLink(_('Add child'),
+					'services.php?form=1&parentid='.$service['serviceid'].'&parentname='.$service['name']
+				))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->removeSID(),
+				$deletable
+					? (new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))
+						->onClick('return Confirm('.CJs::encodeJson(_s('Delete service "%1$s"?', $service['name'])).')')
+						->addClass(ZBX_STYLE_LINK_ACTION)
+					: null
+			]),
 			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
 			'algorithm' => serviceAlgorithm($service['algorithm'])
