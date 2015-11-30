@@ -110,10 +110,18 @@ class CScreenActions extends CScreenBase {
 
 		order_result($alerts, $sortfield, $sortorder);
 
-		if ($alerts) {
+		$userids = [];
+
+		foreach ($alerts as $alert) {
+			if ($alert['userid'] != 0) {
+				$userids[$alert['userid']] = true;
+			}
+		}
+
+		if ($userids) {
 			$dbUsers = API::User()->get([
 				'output' => ['userid', 'alias', 'name', 'surname'],
-				'userids' => zbx_objectValues($alerts, 'userid'),
+				'userids' => array_keys($userids),
 				'preservekeys' => true
 			]);
 		}
@@ -157,7 +165,7 @@ class CScreenActions extends CScreenBase {
 				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			}
 
-			$recipient = $alert['userid']
+			$recipient = $alert['userid'] != 0
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
