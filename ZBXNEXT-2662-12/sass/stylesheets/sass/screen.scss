@@ -275,6 +275,7 @@ nav {
 		padding: 10px 13px;
 		color: $link-main-nav-color;
 		text-decoration: none;
+		cursor: pointer;
 
 		&:link {
 			color: $link-main-nav-color;
@@ -2739,7 +2740,10 @@ $form-icon-btn: (
 	}
 
 	.nothing-to-show {
-		text-align: center !important;
+
+		td {
+			text-align: center !important;
+		}
 	}
 }
 
@@ -3543,6 +3547,7 @@ $browser-logos: (
 	margin: 2em 0;
 	position: relative;
 	text-align: center;
+	display: inline-block;
 }
 
 .time-zone {
