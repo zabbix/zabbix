@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+..F....... [ZBX-10079] documented system.run returning '1' with nowait parameter in the item key helper (Richlv)
 ...G...... [ZBX-10107] fixed compilation warnings for function calls without a real prototype (viktors)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ...G...... [ZBX-10031] fixed logging of occasionally incorrect process information during agent's start-up on Windows (Sandis)
