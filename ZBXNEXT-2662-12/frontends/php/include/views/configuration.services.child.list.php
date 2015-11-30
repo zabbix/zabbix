@@ -55,7 +55,7 @@ foreach ($this->data['db_cservices'] as $service) {
 	$servicesChildTable->addRow([
 		$cb,
 		[$prefix, $description],
-		serviceAlgorythm($service['algorithm']),
+		serviceAlgorithm($service['algorithm']),
 		$service['trigger']]
 	);
 }

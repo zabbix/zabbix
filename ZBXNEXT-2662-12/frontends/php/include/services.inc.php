@@ -19,18 +19,18 @@
 **/
 
 
-function serviceAlgorythm($algorythm = null) {
-	$algorythms = [
+function serviceAlgorithm($algorithm = null) {
+	$algorithms = [
 		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
 		SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
 		SERVICE_ALGORITHM_NONE => _('Do not calculate')
 	];
 
-	if ($algorythm === null) {
-		return $algorythms;
+	if ($algorithm === null) {
+		return $algorithms;
 	}
-	elseif (isset($algorythms[$algorythm])) {
-		return $algorythms[$algorythm];
+	elseif (isset($algorithms[$algorithm])) {
+		return $algorithms[$algorithm];
 	}
 	else {
 		return false;
@@ -116,7 +116,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			'caption' => $caption,
 			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
-			'algorithm' => serviceAlgorythm($service['algorithm'])
+			'algorithm' => serviceAlgorithm($service['algorithm'])
 		];
 	}
 
