@@ -37,13 +37,13 @@ class CScreenClock extends CScreenBase {
 			case TIME_TYPE_HOST:
 				$items = API::Item()->get([
 					'output' => ['itemid', 'value_type'],
-					'selectHosts' => ['host'],
+					'selectHosts' => ['name'],
 					'itemids' => [$this->screenitem['resourceid']]
 				]);
 
 				if ($items) {
 					$item = $items[0];
-					$title = $item['hosts'][0]['host'];
+					$title = $item['hosts'][0]['name'];
 					unset($items, $item['hosts']);
 
 					$last_value = Manager::History()->getLast([$item]);
