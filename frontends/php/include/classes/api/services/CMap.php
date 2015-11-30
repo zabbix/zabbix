@@ -425,7 +425,7 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if ($share['userid'] == $user_data['userid']) {
+					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
 					}
 
@@ -709,7 +709,7 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if ($share['userid'] == $user_data['userid']) {
+					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
 					}
 
