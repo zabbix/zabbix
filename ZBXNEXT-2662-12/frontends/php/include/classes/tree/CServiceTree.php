@@ -38,7 +38,7 @@ class CServiceTree extends CTree {
 		$class = null;
 		$config = select_config();
 
-		if ($colName == 'status' && zbx_is_int($this->tree[$rowId][$colName]) && $this->tree[$rowId]['id'] > 0) {
+		if ($colName === 'status' && zbx_is_int($this->tree[$rowId][$colName]) && $this->tree[$rowId]['id'] > 0) {
 			$status = $this->tree[$rowId][$colName];
 
 			// do not show the severity for information and unclassified triggers

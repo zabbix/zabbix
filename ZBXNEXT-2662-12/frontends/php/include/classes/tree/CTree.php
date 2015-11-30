@@ -105,19 +105,23 @@ class CTree {
 
 	private function makeCell($id) {
 		$td = new CCol();
-		$level = max(1, $this->tree[$id]['Level']);
-		$td->setAttribute('style', 'padding-left:'. (2 * $level) .'em;');
+
+		$caption = new CSpan();
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
-			$div = (new CDiv((new CSpan())->addClass('arrow-right')))
+			$caption->addItem((new CDiv((new CSpan())->addClass('arrow-right')))
 				->addClass('treeview')
 				->onClick($this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);')
-				->setId('idi_'.$id);
-
-			$td->addItem($div);
+				->setId('idi_'.$id)
+			);
 		}
+		$caption->addItem($this->tree[$id]['caption']);
 
-		$td->addItem($this->tree[$id]['caption']);
+		if ($this->tree[$id]['Level'] != 0) {
+			$level = $this->tree[$id]['Level'];
+			$caption->setAttribute('style', 'padding-left:'.(2 * $level).'em;');
+		}
+		$td->addItem($caption);
 
 		return $td;
 	}

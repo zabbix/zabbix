@@ -585,63 +585,6 @@ function getMenuPopupRefresh(options) {
 }
 
 /**
- * Get menu popup service configuration section data.
- *
- * @param string options['serviceid']		service id
- * @param string options['name']			service name
- * @param bool   options['deletable']		service has dependencies and cannot be deleted
- *
- * @return array
- */
-function getMenuPopupServiceConfiguration(options) {
-	var items = [];
-
-	if (options.serviceid === null) {
-		// add
-		items[items.length] = {
-			label: t('Add child'),
-			url: new Curl('services.php?form=1&parentname=' + options.name).getUrl()
-		};
-	}
-	else {
-		// add
-		items[items.length] = {
-			label: t('Add child'),
-			url: new Curl('services.php?form=1&parentid=' + options.serviceid + '&parentname=' + options.name).getUrl()
-		};
-
-		// edit
-		items[items.length] = {
-			label: t('Edit'),
-			url: new Curl('services.php?form=1&serviceid=' + options.serviceid).getUrl()
-		};
-
-		var del = {
-				label: t('Delete')
-			};
-
-		// delete
-		if (options.deletable) {
-			del.clickCallback = function() {
-				jQuery(this).closest('.action-menu').fadeOut(100);
-
-				if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
-					window.location = new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl();
-				}
-			};
-		}
-		else {
-			del.disabled = true;
-		}
-		items[items.length] = del;
-	}
-
-	return [{
-		items: items
-	}];
-}
-
-/**
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id

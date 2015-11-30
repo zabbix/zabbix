@@ -85,10 +85,6 @@ jQuery(function($) {
 				data = getMenuPopupRefresh(data);
 				break;
 
-			case 'serviceConfiguration':
-				data = getMenuPopupServiceConfiguration(data);
-				break;
-
 			case 'trigger':
 				data = getMenuPopupTrigger(data);
 				break;
