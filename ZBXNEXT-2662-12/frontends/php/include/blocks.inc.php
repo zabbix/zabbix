@@ -639,22 +639,17 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	// indicator of sort field
 	if ($showSortIndicator) {
-		$sortDiv = (new CDiv(SPACE))
-			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor')
-			->addStyle('float: left');
-		$hostHeaderDiv = (new CDiv([_('Host'), SPACE]))
-			->addStyle('float: left');
-		$issueHeaderDiv = (new CDiv([_('Issue'), SPACE]))
-			->addStyle('float: left');
-		$lastChangeHeaderDiv = (new CDiv([_('Time'), SPACE]))
-			->addStyle('float: left');
+		$sort_div = (new CDiv())
+			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 	}
 
 	$table = (new CTableInfo())
 		->setHeader([
-			($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
-			($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
-			($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
+			($showSortIndicator && $filter['sortfield'] === 'hostname') ? [_('Host'), $sort_div] : _('Host'),
+			($showSortIndicator && $filter['sortfield'] === 'priority') ? [_('Issue'), $sort_div] : _('Issue'),
+			($showSortIndicator && $filter['sortfield'] === 'lastchange')
+				? [_('Last change'), $sort_div]
+				: _('Last change'),
 			_('Age'),
 			_('Info'),
 			$config['event_ack_enable'] ? _('Ack') : null,

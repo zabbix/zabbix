@@ -502,10 +502,10 @@ class CScreenBuilder {
 					->addClass($halign)
 					->addClass($valign)
 					->addClass('screenitem');
-				if (!empty($screenitem['colspan'])) {
+				if ($screenitem['colspan'] > 1) {
 					$newColumn->setColSpan($screenitem['colspan']);
 				}
-				if (!empty($screenitem['rowspan'])) {
+				if ($screenitem['rowspan'] > 1) {
 					$newColumn->setRowSpan($screenitem['rowspan']);
 				}
 				$newColumns[] = $newColumn;
