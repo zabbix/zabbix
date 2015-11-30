@@ -35,10 +35,17 @@ class CScreenClock extends CScreenBase {
 
 		switch ($this->screenitem['style']) {
 			case TIME_TYPE_HOST:
+				$itemid = $this->screenitem['resourceid'];
+
+				if (!empty($this->hostid)) {
+					$new_itemid = get_same_item_for_host($itemid, $this->hostid);
+					$itemid = !empty($new_itemid) ? $new_itemid : '';
+				}
+
 				$items = API::Item()->get([
 					'output' => ['itemid', 'value_type'],
 					'selectHosts' => ['name'],
-					'itemids' => [$this->screenitem['resourceid']]
+					'itemids' => [$itemid]
 				]);
 
 				if ($items) {
