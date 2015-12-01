@@ -304,11 +304,30 @@ else {
 
 	// get maps
 	$data['maps'] = API::Map()->get([
-		'editable' => true,
 		'output' => ['sysmapid', 'name', 'width', 'height'],
 		'sortfield' => $sortField,
-		'limit' => $config['search_limit'] + 1
+		'limit' => $config['search_limit'] + 1,
+		'preservekeys' => true
 	]);
+
+	$user_type = CWebUser::getType();
+	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		$editable_maps = API::Map()->get([
+			'output' => ['sysmapid', 'name', 'width', 'height'],
+			'editable' => true,
+			'sortfield' => $sortField,
+			'limit' => $config['search_limit'] + 1,
+			'preservekeys' => true
+		]);
+
+		foreach ($data['maps'] as &$map) {
+			if (array_key_exists($map['sysmapid'], $editable_maps)) {
+				$map['editable'] = true;
+			}
+		}
+		unset($map);
+	}
+
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging

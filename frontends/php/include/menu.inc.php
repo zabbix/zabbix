@@ -70,11 +70,9 @@ $ZBX_MENU = [
 				'sub_pages' => ['slides.php']
 			],
 			[
-				'url' => 'zabbix.php',
-				'action' => 'map.view',
-				'active_if' => ['map.view'],
+				'url' => 'sysmaps.php',
 				'label' => _('Maps'),
-				'sub_pages' => ['map.php']
+				'sub_pages' => ['image.php', 'sysmap.php', 'map.php']
 			],
 			[
 				'url' => 'zabbix.php',
@@ -211,11 +209,6 @@ $ZBX_MENU = [
 			[
 				'url' => 'slideconf.php',
 				'label' => _('Slide shows'),
-			],
-			[
-				'url' => 'sysmaps.php',
-				'label' => _('Maps'),
-				'sub_pages' => ['image.php', 'sysmap.php']
 			],
 			[
 				'url' => 'discoveryconf.php',
