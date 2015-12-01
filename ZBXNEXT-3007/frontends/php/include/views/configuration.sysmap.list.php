@@ -44,12 +44,23 @@ $sysmapTable = (new CTableInfo())
 	]);
 
 foreach ($this->data['maps'] as $map) {
+	$user_type = CWebUser::getType();
+	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
+			|| array_key_exists('editable', $map)) {
+		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
+		$edit = new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']);
+	}
+	else {
+		$checkbox = (new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']))
+			->setAttribute('disabled', 'disabled');
+		$edit = '';
+	}
 	$sysmapTable->addRow([
-		new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']),
+		$checkbox,
 		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
 		$map['width'],
 		$map['height'],
-		new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']),
+		$edit,
 	]);
 }
 
