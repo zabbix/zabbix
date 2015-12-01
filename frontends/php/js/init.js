@@ -24,7 +24,7 @@ jQuery(function($) {
 		createSuggest('search');
 	}
 
-	if (IE || KQ) {
+	if (IE) {
 		setTimeout(function () { $('[autofocus]').focus(); }, 10);
 	}
 
