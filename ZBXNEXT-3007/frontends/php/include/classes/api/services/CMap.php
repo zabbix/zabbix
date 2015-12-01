@@ -398,30 +398,57 @@ class CMap extends CMapElement {
 				$userids[$map['userid']] = $map['userid'];
 			}
 
-			if (array_key_exists('name', $map)) {
-				if (array_key_exists($map['name'], $map_names)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%1$s".', $map['name']));
-				}
-				else {
-					$map_names[$map['name']] = true;
-				}
+			if (array_key_exists($map['name'], $map_names)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%1$s".', $map['name']));
+			}
+			else {
+				$map_names[$map['name']] = true;
 			}
 
-			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
+			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map width value for map "%1$s".', $map['name'])
+					_s('Incorrect width value for map "%1$s".', $map['name'])
 				);
 			}
 
-			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
+			if ($map['height'] > 65535 || $map['height'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map height value for map "%1$s".', $map['name'])
+					_s('Incorrect height value for map "%1$s".', $map['name'])
+				);
+			}
+
+			if (array_key_exists('private', $map) && $map['private'] != SYSMAP_PUBLIC
+					&& $map['private'] != SYSMAP_PRIVATE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect private value for map "%1$s".', $map['name'])
 				);
 			}
 
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
+				$required_fields = ['userid', 'permission'];
 				foreach ($map['users'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Missing sharing options: %1$s for map "%2$s".',
+							implode(', ', $missing_keys),
+							$map['name'])
+						);
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Sharing option "%1$s" is missing a value for map "%2$s".',
+									$field,
+									$map['name']
+								));
+							}
+						}
+					}
+
 					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -435,7 +462,7 @@ class CMap extends CMapElement {
 
 					if ($share['permission'] != PERM_READ && $share['permission'] != PERM_READ_WRITE) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect permission type for map "%1$s".', $map['name'])
+							_s('Incorrect permission value for map "%1$s".', $map['name'])
 						);
 					}
 
@@ -460,7 +487,28 @@ class CMap extends CMapElement {
 			// Map user group shares.
 			if (array_key_exists('user_groups', $map)) {
 				$shared_user_groupids = [];
+				$required_fields = ['usrgrpid', 'permission'];
 				foreach ($map['user_groups'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing sharing options: %1$s for map "%2$s".',
+							implode(', ', $missing_keys),
+							$map['name'])
+						);
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Field "%1$s" is missing a value for map "%2$s".',
+									$field,
+									$map['name']
+								));
+							}
+						}
+					}
+
 					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -687,32 +735,58 @@ class CMap extends CMapElement {
 
 			$map = array_merge($db_maps[$map['sysmapid']], $map);
 
-			if (array_key_exists('name', $map)) {
-				if (array_key_exists($map['name'], $map_names)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Duplicate map name for map "%1$s".', $map['name'])
-					);
-				}
-				else {
-					$map_names[$map['name']] = $map['sysmapid'];
-				}
+			if (array_key_exists($map['name'], $map_names)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate map name for map "%1$s".', $map['name'])
+				);
+			}
+			else {
+				$map_names[$map['name']] = $map['sysmapid'];
 			}
 
-			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
+			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map width value for map "%1$s".', $map['name'])
+					_s('Incorrect width value for map "%1$s".', $map['name'])
 				);
 			}
 
-			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
+			if ($map['height'] > 65535 || $map['height'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map height value for map "%1$s".', $map['name'])
+					_s('Incorrect height value for map "%1$s".', $map['name'])
+				);
+			}
+
+			if ($map['private'] != SYSMAP_PUBLIC && $map['private'] != SYSMAP_PRIVATE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect private value for map "%1$s".', $map['name'])
 				);
 			}
 
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
+				$required_fields = ['userid', 'permission'];
 				foreach ($map['users'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Missing sharing options: %1$s for map "%2$s".',
+							implode(', ', $missing_keys),
+							$map['name'])
+						);
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Sharing option "%1$s" is missing a value for map "%2$s".',
+									$field,
+									$map['name']
+								));
+							}
+						}
+					}
+
 					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
@@ -725,7 +799,7 @@ class CMap extends CMapElement {
 
 					if ($share['permission'] != PERM_READ && $share['permission'] != PERM_READ_WRITE) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect permission type for map "%1$s".', $map['name'])
+							_s('Incorrect permission value for map "%1$s".', $map['name'])
 						);
 					}
 
@@ -749,7 +823,29 @@ class CMap extends CMapElement {
 			// Map user group shares.
 			if (array_key_exists('user_groups', $map)) {
 				$shared_user_groupids = [];
+				$required_fields = ['usrgrpid', 'permission'];
 				foreach ($map['user_groups'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Missing sharing options: %1$s for map "%2$s".',
+							implode(', ', $missing_keys),
+							$map['name'])
+						);
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Sharing option "%1$s" is missing a value for map "%2$s".',
+									$field,
+									$map['name']
+								));
+							}
+						}
+					}
+
 					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
