@@ -1055,7 +1055,7 @@ footer {
 	margin-top: 1px;
 	border: 1px solid $action-border-color;
 	border-top: none;
-	min-width: 165px;
+	//min-width: 165px;
 	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
