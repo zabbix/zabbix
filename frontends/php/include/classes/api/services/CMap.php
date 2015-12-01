@@ -400,7 +400,7 @@ class CMap extends CMapElement {
 
 			if (array_key_exists('name', $map)) {
 				if (array_key_exists($map['name'], $map_names)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%s".', $map['name']));
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%1$s".', $map['name']));
 				}
 				else {
 					$map_names[$map['name']] = true;
@@ -408,11 +408,15 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map width value for map "%s".', $map['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect map width value for map "%1$s".', $map['name'])
+				);
 			}
 
 			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect map height value for map "%s".', $map['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect map height value for map "%1$s".', $map['name'])
+				);
 			}
 
 			// Map user shares.
@@ -427,6 +431,12 @@ class CMap extends CMapElement {
 
 					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
+					}
+
+					if ($share['permission'] != PERM_READ && $share['permission'] != PERM_READ_WRITE) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect permission type for map "%1$s".', $map['name'])
+						);
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -589,13 +599,13 @@ class CMap extends CMapElement {
 				foreach ($map['urls'] as $url) {
 					if ($url['name'] === '' || $url['url'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL should have both "name" and "url" fields for map "%s".', $map['name'])
+							_s('URL should have both "name" and "url" fields for map "%1$s".', $map['name'])
 						);
 					}
 
 					if (!array_key_exists($url['name'], $url_names)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL name should be unique for map "%s".', $map['name'])
+							_s('URL name should be unique for map "%1$s".', $map['name'])
 						);
 					}
 
@@ -636,7 +646,7 @@ class CMap extends CMapElement {
 
 			foreach ($exist_db_maps as $exist_db_map) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Map with name "%s" already exists.', $exist_db_map['name'])
+					_s('Map with name "%1$s" already exists.', $exist_db_map['name'])
 				);
 			}
 		}
@@ -680,7 +690,7 @@ class CMap extends CMapElement {
 			if (array_key_exists('name', $map)) {
 				if (array_key_exists($map['name'], $map_names)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Duplicate map name for map "%s".', $map['name'])
+						_s('Duplicate map name for map "%1$s".', $map['name'])
 					);
 				}
 				else {
@@ -690,13 +700,13 @@ class CMap extends CMapElement {
 
 			if (array_key_exists('width', $map) && ($map['width'] > 65535 || $map['width'] < 1)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map width value for map "%s".', $map['name'])
+					_s('Incorrect map width value for map "%1$s".', $map['name'])
 				);
 			}
 
 			if (array_key_exists('height', $map) && ($map['height'] > 65535 || $map['height'] < 1)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect map height value for map "%s".', $map['name'])
+					_s('Incorrect map height value for map "%1$s".', $map['name'])
 				);
 			}
 
@@ -711,6 +721,12 @@ class CMap extends CMapElement {
 
 					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
+					}
+
+					if ($share['permission'] != PERM_READ && $share['permission'] != PERM_READ_WRITE) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect permission type for map "%1$s".', $map['name'])
+						);
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -879,13 +895,13 @@ class CMap extends CMapElement {
 				foreach ($map['urls'] as $url) {
 					if ($url['name'] === '' || $url['url'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL should have both "name" and "url" fields for map "%s".', $map['name'])
+							_s('URL should have both "name" and "url" fields for map "%1$s".', $map['name'])
 						);
 					}
 
 					if (!array_key_exists($url['name'], $urlNames)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('URL name should be unique for map "%s".', $map['name'])
+							_s('URL name should be unique for map "%1$s".', $map['name'])
 						);
 					}
 
@@ -927,7 +943,7 @@ class CMap extends CMapElement {
 			foreach ($exist_db_maps as $exist_db_map) {
 				if (bccomp($map_names[$exist_db_map['name']], $exist_db_map['sysmapid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Map with name "%s" already exists.', $exist_db_map['name'])
+						_s('Map with name "%1$s" already exists.', $exist_db_map['name'])
 					);
 				}
 			}
