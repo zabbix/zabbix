@@ -201,6 +201,9 @@ switch ($data['method']) {
 			$options['graphid'] = !empty($data['graphid']) ? $data['graphid'] : null;
 			$options['profileIdx2'] = $options['graphid'];
 		}
+		elseif ($options['resourcetype'] == SCREEN_RESOURCE_DISCOVERY) {
+			$options['data'] = $data['data'];
+		}
 
 		$screenBase = CScreenBuilder::getScreen($options);
 		if (!empty($screenBase)) {

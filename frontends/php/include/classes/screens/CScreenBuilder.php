@@ -279,6 +279,9 @@ class CScreenBuilder {
 				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
 
+			case SCREEN_RESOURCE_DISCOVERY:
+				return new CScreenDiscovery($options);
+
 			default:
 				return null;
 		}
