@@ -2711,8 +2711,8 @@ $form-icon-btn: (
 	width: 100%;
 
 	td {
-		text-align: center;
-		vertical-align: middle;
+		//text-align: center;
+		//vertical-align: middle;
 		padding: 8px 5px;
 	}
 
@@ -2764,12 +2764,24 @@ $form-icon-btn: (
 	vertical-align: top;
 }
 
+.right {
+	text-align: right;
+}
+
 .bottom {
 	vertical-align: bottom;
 }
 
 .left {
 	text-align: left;
+}
+
+.center {
+	text-align: center;
+}
+
+.middle {
+	vertical-align: middle;
 }
 
 
