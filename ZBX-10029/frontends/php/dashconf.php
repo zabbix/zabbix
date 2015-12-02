@@ -95,7 +95,10 @@ if (hasRequest('update')) {
 		CProfile::update('web.dashconf.triggers.name', getRequest('trigger_name', ''), PROFILE_TYPE_STR);
 
 		// events
-		CProfile::update('web.dashconf.events.extAck', getRequest('extAck', 0), PROFILE_TYPE_INT);
+		$config = select_config();
+		if ($config['event_ack_enable']) {
+			CProfile::update('web.dashconf.events.extAck', getRequest('extAck', 0), PROFILE_TYPE_INT);
+		}
 	}
 
 	jSredirect(ZBX_DEFAULT_URL);

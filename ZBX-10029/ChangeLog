@@ -1,6 +1,30 @@
+Changes for 3.0.0alpha5
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10029] fixed running remote command on Current host twice if it is within specified Host or Host group targets (gleb)
+..F....... [ZBX-10079] documented system.run returning '1' with nowait parameter in the item key helper (Richlv)
+...G...... [ZBX-10107] fixed compilation warnings for function calls without a real prototype (viktors)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+...G...... [ZBX-10031] fixed logging of occasionally incorrect process information during agent's start-up on Windows (Sandis)
+.......PS. [ZBX-10001] fixed duplicating log file entries from housekeeper (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+..F....... [ZBX-10006] changed color of hovered host name for disabled host in search result (vitalijs)
+.......PS. [ZBX-10100] fixed issue when collected values could be left unsaved to the database (dimir)
+........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
+..F....... [ZBX-9992] fixed forecast() function info index for trigger expression constructor (gleb)
+.......PS. [ZBX-10061] fixed possible server and proxy crash on attempt to clean up text cache if log item meta update packets are present in history cache (gleb)
+...G...... [ZBX-10045] fixed first proc.cpu.util[] request returning empty value which was treated as network error by server (wiper)
+.......PS. [ZBX-1916] improved host availability handling by resetting it for disabled hosts, interfaces without enabled items and hosts monitored by offline proxies (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0alpha4
 
 New features:
+..F....... [ZBX-9985] fixed template search results (vitalijs)
 ..F....... [ZBXNEXT-1762] added years, months and half of months periods displaying on graphs X axis (Oleg)
 A.F....... [ZBXNEXT-1679] implemented value map import/export (Ivo)
 ..F....... [ZBXNEXT-1679] added checkbox column in value map list view and bulk "Delete" button (Ivo)
@@ -18,6 +42,8 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+...G...... [ZBX-2966] fixed handling of possible negative value of vfs.fs.size check (dimir)
+..F....... [ZBX-9977] fixed inconsistent display of acknowledge-related elements when acknowledgement is disabled in configuration (Gunars)
 ..F....... [ZBX-9964] fixed undefined index "inventory_mode" in host prototype edit form (Gunars)
 ..F....... [ZBXNEXT-1762] fixed time interval calculation and displaying issues in line graphs (Oleg)
 ..F....... [ZBX-9949] fixed undefined index in proxy edit form (Gunars)
@@ -69,7 +95,6 @@ A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule whe
 ..F....... [ZBX-9883] fixed host assignment for proxy (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
-........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -229,6 +254,22 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.8rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.7
+
+2.4.7rc1 was released as 2.4.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.7rc1
 
 New features:
@@ -250,7 +291,7 @@ A......... [ZBX-9340] fixed "data" property not being returned by API when error
 A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule when full cloning a host (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
-........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
+........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -927,6 +968,23 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.12rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+.......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
+...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
+..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.11
+
+2.2.11rc1 was released as 2.2.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.11rc1
 
 New features:
@@ -944,7 +1002,7 @@ A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seco
 A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
-........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
+........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -2243,6 +2301,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16
+
+2.0.16rc1 was released as 2.0.16 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.16rc1

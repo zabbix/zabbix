@@ -753,10 +753,15 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 
 		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
 			$css = getSeverityStyle($item['severity']);
-			$ack = get_last_event_by_triggerid($item['triggerid']);
-			$ack = ($ack['acknowledged'] == 1)
-				? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
-				: null;
+
+			// Display event acknowledgement.
+			$config = select_config();
+			if ($config['event_ack_enable']) {
+				$ack = get_last_event_by_triggerid($item['triggerid']);
+				$ack = ($ack['acknowledged'] == 1)
+					? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
+					: null;
+			}
 		}
 
 		if ($item['value'] !== null) {
