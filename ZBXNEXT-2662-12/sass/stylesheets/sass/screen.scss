@@ -2369,7 +2369,9 @@ $form-icon-btn: (
 		height: 24px;
 		line-height: 24px;
 		cursor: pointer;
+		color: $font-color;
 		text-decoration: none;
+		border: none;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
