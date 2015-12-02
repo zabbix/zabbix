@@ -23,12 +23,11 @@ class CClock extends CDiv {
 
 	private $width;
 	private $height;
-	private $header;
+	private $time_zone_string;
 	private $footer;
 	private $time;
 	private $time_zone_offset;
 	private $error;
-	private $id;
 
 	public function __construct() {
 		parent::__construct();
@@ -37,12 +36,11 @@ class CClock extends CDiv {
 
 		$this->width = 150;
 		$this->height = 150;
-		$this->header = null;
+		$this->time_zone_string = null;
 		$this->footer = null;
 		$this->time = null;
 		$this->time_zone_offset = null;
 		$this->error = null;
-		$this->id = uniqid();
 	}
 
 	public function setWidth($value) {
@@ -57,8 +55,8 @@ class CClock extends CDiv {
 		return $this;
 	}
 
-	public function setHeader($value) {
-		$this->header = $value;
+	public function setTimeZoneString($value) {
+		$this->time_zone_string = $value;
 
 		return $this;
 	}
@@ -155,45 +153,37 @@ class CClock extends CDiv {
 	}
 
 	private function build() {
-		$header = null;
-		$footer = null;
+		$clock = (new CTag('svg', true))
+			->addItem($this->makeClockFace())
+			->addItem($this->makeClockHands())
+			->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+			->setAttribute('viewBox', '0 0 100 100')
+			->setAttribute('width', (string) $this->width)
+			->setAttribute('height', (string) $this->height);
 
 		if ($this->error !== null) {
-			$header = (new CDiv($this->error))
-				->addClass(ZBX_STYLE_TIME_ZONE)
-				->addClass(ZBX_STYLE_RED);
-		}
-		elseif ($this->header !== null) {
-			$header = (new CDiv($this->header))
-				->addClass(ZBX_STYLE_TIME_ZONE)
-				->addClass(ZBX_STYLE_GREY);
-		}
-
-		if ($this->footer !== null) {
-			$footer = (new CDiv($this->footer))
-				->addClass(ZBX_STYLE_LOCAL_CLOCK)
-				->addClass(ZBX_STYLE_GREY);
+			$clock->addClass('disabled');
 		}
 
 		$this->addItem([
-			$header,
-			(new CTag('svg', true))
-				->addItem($this->makeClockFace())
-				->addItem($this->makeClockHands())
-				->setAttribute('xmlns', 'http://www.w3.org/2000/svg')
-				->setAttribute('viewBox', '0 0 100 100')
-				->setAttribute('width', (string) $this->width)
-				->setAttribute('height', (string) $this->height)
-				->setId($this->id),
-			$footer
+			(new CDiv($this->error))
+				->addClass(ZBX_STYLE_TIME_ZONE)
+				->addClass($this->error !== null ? ZBX_STYLE_RED : ZBX_STYLE_GREY),
+			$clock,
+			(new CDiv($this->footer))
+				->addClass(ZBX_STYLE_LOCAL_CLOCK)
+				->addClass(ZBX_STYLE_GREY)
 		]);
+
+		$this->setId(uniqid());
 
 		$options = [
 			'time' => $this->time,
+			'time_zone_string' => $this->time_zone_string,
 			'time_zone_offset' => $this->time_zone_offset
 		];
 
-		if (!defined('ZBX_CLOCK')) {
+		if (!defined('ZBX_CLOCK') && $this->error === null) {
 			define('ZBX_CLOCK', 1);
 
 			insert_js("
@@ -202,6 +192,7 @@ jQuery(function($) {
 	 * Create clock element.
 	 *
 	 * @param int    options['time']				time in seconds
+	 * @param int    options['time_zone_string']	time zone string like 'GMT+02:00'
 	 * @param int    options['time_zone_offset']	time zone offset in seconds
 	 *
 	 * @return object
@@ -243,6 +234,14 @@ jQuery(function($) {
 				now.setTime(now.getTime() - time_offset);
 			}
 
+			var header = now.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, \"$1\");
+
+			if (options.time_zone_string !== null) {
+				header = header + ' ' + options.time_zone_string;
+			}
+
+			$('.time-zone', obj).text(header);
+
 			var h = now.getHours() % 12,
 				m = now.getMinutes(),
 				s = now.getSeconds();
@@ -260,7 +259,9 @@ jQuery(function($) {
 			");
 		}
 
-		zbx_add_post_js('jQuery("#'.$this->id.'").zbx_clock('.CJs::encodeJson($options).');');
+		if ($this->error === null) {
+			zbx_add_post_js('jQuery("#'.$this->getId().'").zbx_clock('.CJs::encodeJson($options).');');
+		}
 	}
 
 	public function toString($destroy = true) {

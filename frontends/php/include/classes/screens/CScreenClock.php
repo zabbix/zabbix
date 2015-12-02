@@ -29,7 +29,7 @@ class CScreenClock extends CScreenBase {
 	public function get() {
 		$time = null;
 		$title = null;
-		$time_zone = null;
+		$time_zone_string = null;
 		$time_zone_offset = null;
 		$error = null;
 
@@ -58,15 +58,15 @@ class CScreenClock extends CScreenBase {
 					if ($last_value) {
 						$last_value = $last_value[$item['itemid']][0];
 
-						$now = new DateTime($last_value['value']);
+						try {
+							$now = new DateTime($last_value['value']);
 
-						if ($now !== false) {
-							$time_zone = 'GMT '.$now->format('P');
+							$time_zone_string = 'GMT'.$now->format('P');
 							$time_zone_offset = $now->format('Z');
 
 							$time = time() - ($last_value['clock'] - $now->getTimestamp());
 						}
-						else {
+						catch (Exception $e) {
 							$error = _('No data');
 						}
 					}
@@ -84,7 +84,7 @@ class CScreenClock extends CScreenBase {
 
 				$now = new DateTime();
 				$time = $now->getTimestamp();
-				$time_zone = 'GMT '.$now->format('P');
+				$time_zone_string = 'GMT'.$now->format('P');
 				$time_zone_offset = $now->format('Z');
 				break;
 
@@ -100,7 +100,7 @@ class CScreenClock extends CScreenBase {
 		$item = (new CClock())
 			->setWidth($this->screenitem['width'])
 			->setHeight($this->screenitem['height'])
-			->setHeader($time_zone)
+			->setTimeZoneString($time_zone_string)
 			->setFooter($title);
 
 		if ($error !== null) {
