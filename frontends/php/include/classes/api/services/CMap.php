@@ -382,6 +382,10 @@ class CMap extends CMapElement {
 
 		$map_names = [];
 
+		$private_validator = new CLimitedSetValidator([
+			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
+		]);
+
 		foreach ($maps as $map) {
 			$userids = [];
 
@@ -418,13 +422,9 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists('private', $map)) {
-				$private_validator = new CLimitedSetValidator([
-					'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
-				]);
-
 				if (!$private_validator->validate($map['private'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for int field "private".', $map['private'])
+						_s('Incorrect private value for map "%1$s".', $map['name'])
 					);
 				}
 			}
@@ -718,6 +718,10 @@ class CMap extends CMapElement {
 		$map_db_fields = ['sysmapid' => null];
 		$map_names = [];
 
+		$private_validator = new CLimitedSetValidator([
+			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
+		]);
+
 		foreach ($maps as $map) {
 			$userids = [];
 			if (!check_db_fields($map_db_fields, $map)) {
@@ -761,14 +765,8 @@ class CMap extends CMapElement {
 				);
 			}
 
-			$private_validator = new CLimitedSetValidator([
-				'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
-			]);
-
 			if (!$private_validator->validate($map['private'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for int field "private".', $map['private'])
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect private value for map "%1$s".', $map['name']));
 			}
 
 			// Map user shares.
