@@ -1821,8 +1821,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .screen-table {
   width: 100%; }
   .screen-table td {
-    text-align: center;
-    vertical-align: middle;
     padding: 8px 5px; }
   .screen-table .table-forms {
     text-align: left; }
@@ -1850,11 +1848,20 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .top {
   vertical-align: top; }
 
+.right {
+  text-align: right; }
+
 .bottom {
   vertical-align: bottom; }
 
 .left {
   text-align: left; }
+
+.center {
+  text-align: center; }
+
+.middle {
+  vertical-align: middle; }
 
 .graph-selection {
   position: absolute;
@@ -2360,13 +2367,15 @@ td.active-bg {
   top: -1.55em;
   left: 0;
   right: 0;
-  position: absolute; }
+  position: absolute;
+  white-space: nowrap; }
 
 .local-clock {
   margin: auto;
   left: 0;
   right: 0;
-  position: absolute; }
+  position: absolute;
+  white-space: nowrap; }
 
 .clock-face {
   fill: #ebebeb; }
