@@ -181,7 +181,8 @@ nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hove
   .top-nav a {
     padding: 10px 13px;
     color: rgba(255, 255, 255, 0.75);
-    text-decoration: none; }
+    text-decoration: none;
+    cursor: pointer; }
     .top-nav a:link {
       color: rgba(255, 255, 255, 0.75); }
     .top-nav a:visited {
@@ -723,7 +724,6 @@ footer, .footer {
   margin-top: 1px;
   border: 1px solid #383838;
   border-top: none;
-  min-width: 165px;
   max-height: 400px;
   overflow-y: auto;
   -webkit-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);
@@ -1563,6 +1563,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       display: block;
       float: left;
       padding: 0; }
+      .dashbrd-widget-head ul li select {
+        margin: 4px 0; }
 
 .dashbrd-widget-foot {
   text-align: right;
@@ -1594,7 +1596,9 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     height: 24px;
     line-height: 24px;
     cursor: pointer;
+    color: #f2f2f2;
     text-decoration: none;
+    border: none;
     padding: 0 15px 0 25px;
     margin: 0 -15px 0 -25px;
     position: relative;
@@ -1837,7 +1841,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     padding: 8px; }
   .screen-table .dashbrd-widget-foot {
     margin: 0; }
-  .screen-table .nothing-to-show {
+  .screen-table .nothing-to-show td {
     text-align: center !important; }
 
 .dashed-border td {
@@ -2348,7 +2352,8 @@ td.active-bg {
 .clock {
   margin: 2em 0;
   position: relative;
-  text-align: center; }
+  text-align: center;
+  display: inline-block; }
 
 .time-zone {
   margin: auto;
