@@ -441,7 +441,7 @@ class CMap extends CMapElement {
 					$missing_keys = checkRequiredKeys($share, $required_fields);
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Missing sharing options: %1$s for map "%2$s".',
+							'User sharing is missing parameters: %1$s for map "%2$s".',
 							implode(', ', $missing_keys),
 							$map['name'])
 						);
@@ -477,6 +477,11 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
 					}
 
+					if (array_key_exists($share['userid'], $userids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Duplicate userid "%1$s" in users for map "%2$s".', $share['userid'], $map['name']));
+					}
+
 					$userids[$share['userid']] = $share['userid'];
 				}
 			}
@@ -503,10 +508,11 @@ class CMap extends CMapElement {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
 					if ($missing_keys) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Missing sharing options: %1$s for map "%2$s".',
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'User group sharing is missing parameters: %1$s for map "%2$s".',
 							implode(', ', $missing_keys),
-							$map['name'])
-						);
+							$map['name']
+						));
 					}
 					else {
 						foreach ($required_fields as $field) {
@@ -533,6 +539,14 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
 						);
+					}
+
+					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Duplicate usrgrpid "%1$s" in user groups for map "%2$s".',
+							$share['usrgrpid'],
+							$map['name']
+						));
 					}
 
 					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
@@ -797,7 +811,7 @@ class CMap extends CMapElement {
 					$missing_keys = checkRequiredKeys($share, $required_fields);
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Missing sharing options: %1$s for map "%2$s".',
+							'User sharing is missing parameters: %1$s for map "%2$s".',
 							implode(', ', $missing_keys),
 							$map['name'])
 						);
@@ -832,6 +846,11 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
 					}
 
+					if (array_key_exists($share['userid'], $userids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Duplicate userid "%1$s" in users for map "%2$s".', $share['userid'], $map['name']));
+					}
+
 					$userids[$share['userid']] = $share['userid'];
 				}
 			}
@@ -858,7 +877,7 @@ class CMap extends CMapElement {
 					$missing_keys = checkRequiredKeys($share, $required_fields);
 					if ($missing_keys) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Missing sharing options: %1$s for map "%2$s".',
+							'User group sharing is missing parameters: %1$s for map "%2$s".',
 							implode(', ', $missing_keys),
 							$map['name'])
 						);
@@ -887,6 +906,14 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
 						);
+					}
+
+					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Duplicate usrgrpid "%1$s" in user groups for map "%2$s".',
+							$share['usrgrpid'],
+							$map['name']
+						));
 					}
 
 					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
