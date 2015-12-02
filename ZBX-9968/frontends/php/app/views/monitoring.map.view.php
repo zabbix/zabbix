@@ -22,9 +22,9 @@
 $this->addJsFile('js/gtlc.js');
 $this->addJsFile('js/flickerfreescreen.js');
 
-$mapWidget = (new CWidget())->setTitle(_('Maps'));
+$widget = (new CWidget())->setTitle(_('Maps'));
 
-$headerMapForm = (new CForm('get'))->cleanItems();
+$form = (new CForm('get'))->cleanItems();
 
 $controls = new CList();
 
@@ -34,7 +34,7 @@ if ($data['maps']) {
 		$maps[$sysmapid] = $map['name'];
 	}
 
-	$headerMapForm->addVar('action', 'map.view')
+	$form->addVar('action', 'map.view')
 		->addVar('fullscreen', $data['fullscreen']);
 
 	$controls
@@ -42,24 +42,24 @@ if ($data['maps']) {
 		->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
 
 	// get map parent maps
-	$parentMaps = [];
+	$parent_maps = [];
 	foreach (getParentMaps($data['sysmapid']) as $parent) {
 		// check for permissions
 		if (isset($data['maps'][$parent['sysmapid']])) {
-			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new CLink(
+			$parent_maps[] = SPACE.SPACE;
+			$parent_maps[] = new CLink(
 				$parent['name'],
 				'zabbix.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].
 					'&severity_min='.$data['severity_min']
 			);
 		}
 	}
-	if (!empty($parentMaps)) {
-		array_unshift($parentMaps, _('Upper level maps').':');
-		$controls->addItem($parentMaps);
+	if (!empty($parent_maps)) {
+		array_unshift($parent_maps, _('Upper level maps').':');
+		$controls->addItem($parent_maps);
 	}
 
-	$mapTable = CScreenBuilder::getScreen([
+	$table = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_MAP,
 		'mode' => SCREEN_MODE_PREVIEW,
 		'dataId' => 'mapimg',
@@ -79,12 +79,12 @@ if ($data['maps']) {
 	]));
 }
 else {
-	$mapTable = (new CTable())->setNoDataMessage(_('No maps found.'));
+	$table = (new CTable())->setNoDataMessage(_('No maps found.'));
 }
 
 $controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$headerMapForm->addItem($controls);
-$mapWidget->setControls($headerMapForm)
-	->addItem($mapTable)
+$form->addItem($controls);
+$widget->setControls($form)
+	->addItem($table)
 	->show();
