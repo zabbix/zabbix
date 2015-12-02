@@ -162,7 +162,7 @@ class CClock extends CDiv {
 			->setAttribute('height', (string) $this->height);
 
 		if ($this->error !== null) {
-			$clock->addClass('disabled');
+			$clock->addClass(ZBX_STYLE_DISABLED);
 		}
 
 		$this->addItem([
