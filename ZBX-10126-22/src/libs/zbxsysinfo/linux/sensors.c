@@ -81,6 +81,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 	}
 }
 
+#ifndef KERNEL_2_4
 /*********************************************************************************
  *                                                                               *
  * Function: sysfs_read_attr                                                     *
@@ -257,6 +258,7 @@ out:
 
 	return ret;
 }
+#endif
 
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
 {
