@@ -458,6 +458,14 @@ class CMap extends CMapElement {
 						}
 					}
 
+					if (!$permission_validator->validate($share['permission'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect permission value "%1$s" in users for map "%2$s".',
+							$share['permission'],
+							$map['name']
+						));
+					}
+
 					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -467,14 +475,6 @@ class CMap extends CMapElement {
 
 					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
-					}
-
-					if (!$permission_validator->validate($share['permission'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect permission value "%1$s" in users for map "%2$s".',
-							$share['permission'],
-							$map['name']
-						));
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -520,19 +520,19 @@ class CMap extends CMapElement {
 						}
 					}
 
-					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
-							&& $share['permission'] == PERM_READ) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
-						);
-					}
-
 					if (!$permission_validator->validate($share['permission'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Incorrect permission value "%1$s" in user groups for map "%2$s".',
 							$share['permission'],
 							$map['name']
 						));
+					}
+
+					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+							&& $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
+						);
 					}
 
 					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
@@ -812,6 +812,14 @@ class CMap extends CMapElement {
 						}
 					}
 
+					if (!$permission_validator->validate($share['permission'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect permission value "%1$s" in users for map "%2$s".',
+							$share['permission'],
+							$map['name']
+						));
+					}
+
 					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
@@ -820,14 +828,6 @@ class CMap extends CMapElement {
 
 					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
-					}
-
-					if (!$permission_validator->validate($share['permission'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect permission value "%1$s" in users for map "%2$s".',
-							$share['permission'],
-							$map['name']
-						));
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -873,18 +873,18 @@ class CMap extends CMapElement {
 						}
 					}
 
-					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
-						);
-					}
-
 					if (!$permission_validator->validate($share['permission'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Incorrect permission value "%1$s" in user groups for map "%2$s".',
 							$share['permission'],
 							$map['name']
 						));
+					}
+
+					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
+						);
 					}
 
 					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
