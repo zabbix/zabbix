@@ -428,7 +428,7 @@ class CMap extends CMapElement {
 			if (array_key_exists('private', $map)) {
 				if (!$private_validator->validate($map['private'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect private value for map "%1$s".', $map['name'])
+						_s('Incorrect private value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 					);
 				}
 			}
@@ -784,7 +784,9 @@ class CMap extends CMapElement {
 			}
 
 			if (!$private_validator->validate($map['private'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect private value for map "%1$s".', $map['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect private value "%1$s" for map "%2$s".', $map['private'], $map['name'])
+				);
 			}
 
 			// Map user shares.
