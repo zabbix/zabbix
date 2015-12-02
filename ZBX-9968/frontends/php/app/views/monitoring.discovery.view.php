@@ -22,14 +22,14 @@
 $this->addJsFile('js/gtlc.js');
 $this->addJsFile('js/flickerfreescreen.js');
 
-$discoveryWidget = (new CWidget())->setTitle(_('Status of discovery'));
+$widget = (new CWidget())->setTitle(_('Status of discovery'));
 
 // create header form
 $controls = (new CList())
 	->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()])
 	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$discoveryWidget->setControls(
+$widget->setControls(
 	(new CForm('get'))
 		->setName('slideHeaderForm')
 		->addVar('action', 'discovery.view')
@@ -48,4 +48,4 @@ $discovery_table = CScreenBuilder::getScreen([
 	]
 ])->get();
 
-$discoveryWidget->addItem($discovery_table)->show();
+$widget->addItem($discovery_table)->show();
