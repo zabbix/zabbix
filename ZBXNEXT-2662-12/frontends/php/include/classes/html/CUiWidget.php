@@ -133,7 +133,7 @@ class CUiWidget extends CDiv {
 	 */
 	public function setFooter($list) {
 		$this->footer = $list;
-		$this->footer->addClass('dashbrd-widget-foot');
+		$this->footer->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 		return $this;
 	}
 

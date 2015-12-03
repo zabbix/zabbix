@@ -126,9 +126,11 @@ class CScreenHostTriggers extends CScreenBase {
 			$item->addItem([SPACE._('Host').SPACE, $hostsComboBox]);
 		}
 
-		$output = new CUiWidget('hat_trstatus',
-			make_latest_issues($params, $this->pageFile.'?screenid='.$this->screenid)
-		);
+		list($table, $info) = make_latest_issues($params, $this->pageFile.'?screenid='.$this->screenid);
+
+		$output = new CUiWidget('hat_trstatus', [
+			$table, (new CList([$info]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT)
+		]);
 		$output->setDoubleHeader([_('HOST ISSUES'), SPACE, '['.zbx_date2str(TIME_FORMAT_SECONDS).']', SPACE],
 			$item
 		);
