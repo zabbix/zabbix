@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * A class to display web scenario details as a screen element by given "httptestid".
+ */
 class CScreenWebDetails extends CScreenBase {
 
 	/**
@@ -31,19 +34,19 @@ class CScreenWebDetails extends CScreenBase {
 
 		$httptest = API::HttpTest()->get([
 			'output' => ['httptestid', 'name', 'hostid'],
-			'httptestids' => $this->profileIdx2,
 			'selectSteps' => ['httpstepid', 'name', 'no'],
+			'httptestids' => $this->profileIdx2,
 			'preservekeys' => true
 		]);
 		$httptest = reset($httptest);
 
 		if (!$httptest) {
-			$messages = [];
-			$messages[] = [
+			$messages = [[
 				'type' => 'error',
 				'message' => _('No permissions to referred object or it does not exist!')
-			];
-			return $this->getOutput(makeMessageBox(false,$messages, null, false, false));
+			]];
+
+			return $this->getOutput(makeMessageBox(false, $messages, null, false, false));
 		}
 
 		$httptest['lastfailedstep'] = 0;
@@ -66,6 +69,7 @@ class CScreenWebDetails extends CScreenBase {
 		));
 
 		$step_items = [];
+
 		foreach ($items as $item) {
 			$step_items[$item['httpstepid']][$item['type']] = $item;
 		}
@@ -90,6 +94,7 @@ class CScreenWebDetails extends CScreenBase {
 		];
 
 		order_result($httptest['steps'], 'no');
+
 		foreach ($httptest['steps'] as $step_data) {
 			$items_by_type = $step_items[$step_data['httpstepid']];
 
