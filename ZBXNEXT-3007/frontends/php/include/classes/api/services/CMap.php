@@ -427,10 +427,11 @@ class CMap extends CMapElement {
 				}
 			}
 
+			$userids = [];
+
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
 				$required_fields = ['userid', 'permission'];
-				$userids = [];
 
 				foreach ($map['users'] as $share) {
 					// Check required parameters.
@@ -795,10 +796,11 @@ class CMap extends CMapElement {
 				);
 			}
 
+			$userids = [];
+
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
 				$required_fields = ['userid', 'permission'];
-				$userids = [];
 
 				foreach ($map['users'] as $share) {
 					// Check required parameters.
