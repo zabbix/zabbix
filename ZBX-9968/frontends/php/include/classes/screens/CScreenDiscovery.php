@@ -19,6 +19,9 @@
 **/
 
 
+/**
+ * A class to display discovery table as a screen element.
+ */
 class CScreenDiscovery extends CScreenBase {
 
 	/**
@@ -37,7 +40,7 @@ class CScreenDiscovery extends CScreenBase {
 	public function __construct(array $options = []) {
 		parent::__construct($options);
 
-		$this->data = isset($options['data']) ? $options['data'] : null;
+		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
 	}
 
 	/**
@@ -95,8 +98,8 @@ class CScreenDiscovery extends CScreenBase {
 		$services = [];
 		foreach ($dservices as $dservice) {
 			$key_ = $dservice['key_'];
-			if (!zbx_empty($key_)) {
-				if (isset($macros[$key_])) {
+			if ($key_ !== '') {
+				if (array_key_exists($key_, $macros)) {
 					$key_ = $macros[$key_]['value'];
 				}
 				$key_ = ': '.$key_;
@@ -151,9 +154,7 @@ class CScreenDiscovery extends CScreenBase {
 				}
 
 				// $primary_ip stores the primary host ip of the dhost
-				if (isset($primary_ip)) {
-					unset($primary_ip);
-				}
+				$primary_ip = '';
 
 				foreach ($dhosts[$dhost['dhostid']]['dservices'] as $dservice) {
 					$dservice = $dservices[$dservice['dserviceid']];
@@ -165,7 +166,7 @@ class CScreenDiscovery extends CScreenBase {
 						$hostName = $host['name'];
 					}
 
-					if (isset($primary_ip)) {
+					if ($primary_ip !== '') {
 						if ($primary_ip === $dservice['ip']) {
 							$htype = 'primary';
 						}
@@ -178,7 +179,7 @@ class CScreenDiscovery extends CScreenBase {
 						$htype = 'primary';
 					}
 
-					if (!isset($discovery_info[$dservice['ip']])) {
+					if (!array_key_exists($dservice['ip'], $discovery_info)) {
 						$discovery_info[$dservice['ip']] = [
 							'ip' => $dservice['ip'],
 							'dns' => $dservice['dns'],
@@ -199,8 +200,8 @@ class CScreenDiscovery extends CScreenBase {
 					}
 
 					$key_ = $dservice['key_'];
-					if (!zbx_empty($key_)) {
-						if (isset($macros[$key_])) {
+					if ($key_ !== '') {
+						if (array_key_exists($key_, $macros)) {
 							$key_ = $macros[$key_]['value'];
 						}
 						$key_ = NAME_DELIMITER.$key_;
@@ -216,7 +217,7 @@ class CScreenDiscovery extends CScreenBase {
 				}
 			}
 
-			if ($druleid == 0 && !empty($discovery_info)) {
+			if ($druleid == 0 && $discovery_info) {
 				$col = new CCol(
 					[bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')']
 				);
@@ -232,7 +233,7 @@ class CScreenDiscovery extends CScreenBase {
 					$h_data['type'] == 'primary'
 						? (new CSpan($ip.$dns))->addClass($h_data['class'])
 						: new CSpan(SPACE.SPACE.$ip.$dns),
-					new CSpan(empty($h_data['host']) ? '' : $h_data['host']),
+					new CSpan(array_key_exists('host', $h_data) ? $h_data['host'] : ''),
 					(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 						? ''
 						: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])))
@@ -246,7 +247,7 @@ class CScreenDiscovery extends CScreenBase {
 					$hint = (new CDiv(SPACE))->addClass($class);
 
 					$hint_table = null;
-					if (isset($h_data['services'][$name])) {
+					if (array_key_exists($name, $h_data['services'])) {
 						$class = $h_data['services'][$name]['class'];
 						$time = $h_data['services'][$name]['time'];
 
