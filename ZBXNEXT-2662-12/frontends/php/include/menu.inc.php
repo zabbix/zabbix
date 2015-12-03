@@ -51,7 +51,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'label' => _('Overview')
 				],
 				[
-					'url' => 'httpmon.php',
+					'url' => 'zabbix.php',
+					'action' => 'web.view',
+					'active_if' => ['web.view'],
 					'label' => _('Web'),
 					'sub_pages' => ['httpdetails.php']
 				],
@@ -97,8 +99,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'srv_status.php',
+					'active_if' => ['report.services'],
 					'label' => _('IT services'),
-					'sub_pages' => ['report3.php', 'chart5.php']
+					'sub_pages' => ['chart5.php']
 				],
 				[
 					'url' => 'chart3.php'
