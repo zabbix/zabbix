@@ -30,7 +30,10 @@ $screenBuilder = new CScreenBuilder([
 	'mode' => SCREEN_MODE_EDIT,
 	'updateProfile' => false
 ]);
-$screenWidget->addItem($screenBuilder->show());
+
+$screenWidget->addItem(
+	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+);
 
 $screenBuilder->insertInitScreenJs($this->data['screenid']);
 $screenBuilder->insertProcessObjectsJs();
