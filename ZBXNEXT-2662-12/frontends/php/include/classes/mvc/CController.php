@@ -216,7 +216,7 @@ class CController {
 	 * @return var
 	 */
 	public function getInputs(&$var, $names) {
-		foreach($names as $name) {
+		foreach ($names as $name) {
 			if ($this->hasInput($name)) {
 				$var[$name] = $this->getInput($name);
 			}

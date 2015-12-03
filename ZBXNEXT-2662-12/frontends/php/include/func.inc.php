@@ -2080,13 +2080,13 @@ function set_image_header($format = null) {
 	}
 
 	if (IMAGE_FORMAT_JPEG == $format) {
-		header('Content-type:  image/jpeg');
+		header('Content-type: image/jpeg');
 	}
 	if (IMAGE_FORMAT_TEXT == $format) {
-		header('Content-type:  text/html');
+		header('Content-type: text/html');
 	}
 	else {
-		header('Content-type:  image/png');
+		header('Content-type: image/png');
 	}
 
 	header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');
