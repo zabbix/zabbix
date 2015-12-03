@@ -391,19 +391,13 @@ class CMap extends CMapElement {
 		]);
 
 		foreach ($maps as $map) {
-			$userids = [];
-
 			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
 
-			if (array_key_exists('userid', $map)) {
-				if ($map['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
-						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
-				}
-
-				$userids[$map['userid']] = $map['userid'];
+			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
+					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
 			}
 
 			if (array_key_exists($map['name'], $map_names)) {
@@ -436,6 +430,8 @@ class CMap extends CMapElement {
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
 				$required_fields = ['userid', 'permission'];
+				$userids = [];
+
 				foreach ($map['users'] as $share) {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
@@ -484,6 +480,10 @@ class CMap extends CMapElement {
 
 					$userids[$share['userid']] = $share['userid'];
 				}
+			}
+
+			if (array_key_exists('userid', $map)) {
+				$userids[$map['userid']] = $map['userid'];
 			}
 
 			// Users validation.
@@ -755,7 +755,6 @@ class CMap extends CMapElement {
 		]);
 
 		foreach ($maps as $map) {
-			$userids = [];
 			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
@@ -765,13 +764,9 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			if (array_key_exists('userid', $map)) {
-				if ($map['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
-						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
-				}
-
-				$userids[$map['userid']] = $map['userid'];
+			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
+					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
 			}
 
 			$map = array_merge($db_maps[$map['sysmapid']], $map);
@@ -806,6 +801,8 @@ class CMap extends CMapElement {
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
 				$required_fields = ['userid', 'permission'];
+				$userids = [];
+
 				foreach ($map['users'] as $share) {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
@@ -855,6 +852,11 @@ class CMap extends CMapElement {
 				}
 			}
 
+			if (array_key_exists('userid', $map)) {
+				$userids[$map['userid']] = $map['userid'];
+			}
+
+			// Users validation.
 			if ($userids) {
 				$db_users = API::User()->get([
 					'userids' => $userids,
