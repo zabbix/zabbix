@@ -158,7 +158,7 @@ class ZBase {
 		// new MVC processing, otherwise we continue execution old style
 		if (hasRequest('action')) {
 			$router = new CRouter(getRequest('action'));
-			if ($router->getController() <> null) {
+			if ($router->getController() !== null) {
 				CProfiler::getInstance()->start();
 				$this->processRequest();
 				exit;
@@ -285,7 +285,7 @@ class ZBase {
 	 */
 	protected function setErrorHandler() {
 		function zbx_err_handler($errno, $errstr, $errfile, $errline) {
-			// necessary to surpress errors when calling with error control operator like @function_name()
+			// necessary to suppress errors when calling with error control operator like @function_name()
 			if (error_reporting() === 0) {
 				return true;
 			}
