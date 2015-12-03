@@ -3883,14 +3883,13 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
-				ZBX_FS_SIZE_T ")", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T ")",
+				__function_name,
 				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx)),
 				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx)),
 				gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx)),
 				gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx)),
-				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)),
-				(zbx_fs_size_t)gnutls_cipher_get_key_size(gnutls_cipher_get(s->tls_ctx)));
+				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)));
 	}
 
 	return SUCCEED;
@@ -4602,14 +4601,13 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
-				ZBX_FS_SIZE_T ")", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T ")",
+				__function_name,
 				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx)),
 				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx)),
 				gnutls_cipher_get_name(gnutls_cipher_get(s->tls_ctx)),
 				gnutls_mac_get_name(gnutls_mac_get(s->tls_ctx)),
-				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)),
-				(zbx_fs_size_t)gnutls_cipher_get_key_size(gnutls_cipher_get(s->tls_ctx)));
+				(zbx_fs_size_t)gnutls_mac_get_key_size(gnutls_mac_get(s->tls_ctx)));
 	}
 
 	return SUCCEED;
