@@ -133,7 +133,7 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		(new CLink(_('Web'), 'httpmon.php?hostid='.$data['host']['hostid'].url_param('groupid')))
+		(new CLink(_('Web'), 'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')))
 			->removeSID(),
 		(new CLink(_('Latest data'),
 			'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$data['host']['hostid']
