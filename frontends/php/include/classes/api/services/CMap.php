@@ -369,6 +369,10 @@ class CMap extends CMapElement {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate($maps) {
+		if (!$maps) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$user_data = self::$userData;
 
 		$map_db_fields = [
@@ -740,6 +744,10 @@ class CMap extends CMapElement {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $maps, $db_maps) {
+		if (!$maps) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
 		$user_data = self::$userData;
 		$map_db_fields = ['sysmapid' => null];
 		$map_names = [];
