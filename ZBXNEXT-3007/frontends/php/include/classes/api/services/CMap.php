@@ -439,8 +439,8 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'User sharing is missing parameters: %1$s for map "%2$s".',
 							implode(', ', $missing_keys),
-							$map['name'])
-						);
+							$map['name']
+						));
 					}
 					else {
 						foreach ($required_fields as $field) {
@@ -469,13 +469,10 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
-					}
-
 					if (array_key_exists($share['userid'], $userids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Duplicate userid "%1$s" in users for map "%2$s".', $share['userid'], $map['name']));
+							_s('Duplicate userid "%1$s" in users for map "%2$s".', $share['userid'], $map['name'])
+						);
 					}
 
 					$userids[$share['userid']] = $share['userid'];
@@ -764,7 +761,7 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
+			if (array_key_exists('userid', $map) && $map['userid'] != $db_maps[$map['sysmapid']]['userid']
 					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
 			}
@@ -810,8 +807,8 @@ class CMap extends CMapElement {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'User sharing is missing parameters: %1$s for map "%2$s".',
 							implode(', ', $missing_keys),
-							$map['name'])
-						);
+							$map['name']
+						));
 					}
 					else {
 						foreach ($required_fields as $field) {
@@ -839,13 +836,10 @@ class CMap extends CMapElement {
 						);
 					}
 
-					if ($share['userid'] == $user_data['userid'] && $map['userid'] == $user_data['userid']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('You cannot share map with yourself.'));
-					}
-
 					if (array_key_exists($share['userid'], $userids)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Duplicate userid "%1$s" in users for map "%2$s".', $share['userid'], $map['name']));
+							_s('Duplicate userid "%1$s" in users for map "%2$s".', $share['userid'], $map['name'])
+						);
 					}
 
 					$userids[$share['userid']] = $share['userid'];
