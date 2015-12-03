@@ -152,7 +152,7 @@ class CScreenBase {
 		$this->dataId = !empty($options['dataId']) ? $options['dataId'] : null;
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
 
-		if ($this->resourcetype != SCREEN_RESOURCE_WEBDETAILS) {
+		if ($this->resourcetype != SCREEN_RESOURCE_WEB_DETAILS) {
 			$this->isTemplatedScreen = isset($options['isTemplatedScreen']) ? $options['isTemplatedScreen'] : false;
 			$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
 			$this->action = !empty($options['action']) ? $options['action'] : null;
@@ -298,7 +298,7 @@ class CScreenBase {
 			'profileIdx2' => $this->profileIdx2,
 		];
 
-		if ($this->resourcetype != SCREEN_RESOURCE_WEBDETAILS) {
+		if ($this->resourcetype != SCREEN_RESOURCE_WEB_DETAILS) {
 			$jsData += [
 				'pageFile' => $this->pageFile,
 				'timestamp' => $this->timestamp,

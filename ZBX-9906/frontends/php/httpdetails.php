@@ -82,7 +82,7 @@ $itemids = zbx_objectValues($itemids, 'itemid');
  * Display
  */
 $details_screen_params = [
-	'resourcetype' => SCREEN_RESOURCE_WEBDETAILS,
+	'resourcetype' => SCREEN_RESOURCE_WEB_DETAILS,
 	'mode' => SCREEN_MODE_JS,
 	'dataId' => 'webdetails',
 	'profileIdx2' => $httptest['httptestid']

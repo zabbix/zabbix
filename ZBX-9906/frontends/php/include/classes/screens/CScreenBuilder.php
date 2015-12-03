@@ -279,7 +279,7 @@ class CScreenBuilder {
 				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
 
-			case SCREEN_RESOURCE_WEBDETAILS:
+			case SCREEN_RESOURCE_WEB_DETAILS:
 				return new CScreenWebDetails($options);
 
 			default:
