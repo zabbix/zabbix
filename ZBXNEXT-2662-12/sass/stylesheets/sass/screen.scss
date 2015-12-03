@@ -276,6 +276,7 @@ nav {
 		color: $link-main-nav-color;
 		text-decoration: none;
 		cursor: pointer;
+		outline: 0;
 
 		&:link {
 			color: $link-main-nav-color;
@@ -1593,9 +1594,9 @@ select {
 	}
 
 	&.select-multiple {
-		padding: 4px 5px;
+		//padding: 4px 5px;
 		width: 300px;
-		height: auto;
+		//height: auto;
 	}
 
 	&[disabled] {
@@ -2416,6 +2417,7 @@ $form-icon-btn: (
 		height: 24px;
 		line-height: 24px;
 		color: $font-alt-color;
+		border: none;
 		cursor: default;
 	}
 
@@ -3562,7 +3564,7 @@ $browser-logos: (
 
 // Analog Clock
 .clock {
-	margin: 1em 0;
+	//margin: 1em 0;
 	//position: relative;
 	text-align: center;
 	display: inline-block;
