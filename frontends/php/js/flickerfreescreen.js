@@ -166,7 +166,7 @@ jQuery(function($) {
 				}
 			}
 
-			// SCREEN_RESOURCE_WEBD_ETAILS
+			// SCREEN_RESOURCE_WEB_DETAILS
 			else if (screen.resourcetype == 21) {
 				ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
 				this.refreshHtml(id, ajaxUrl);
