@@ -166,7 +166,7 @@ jQuery(function($) {
 				}
 			}
 
-			// SCREEN_RESOURCE_WEBDETAILS
+			// SCREEN_RESOURCE_WEBD_ETAILS
 			else if (screen.resourcetype == 21) {
 				ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
 				this.refreshHtml(id, ajaxUrl);
@@ -198,7 +198,7 @@ jQuery(function($) {
 			for (var id in this.screens) {
 				var screen = this.screens[id];
 
-				if (!empty(screen.id)) {
+				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
 					screen.timeline.period = period;
 					screen.timeline.stime = stime;
 					screen.timeline.isNow = isNow;
