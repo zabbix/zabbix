@@ -51,6 +51,36 @@ jQuery(function($) {
 
 		refresh: function(id, isSelfRefresh) {
 			var screen = this.screens[id];
+			var ajaxParams = ['mode', 'resourcetype', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx',
+				'profileIdx2', 'updateProfile', 'screenitemid'];
+			var parametersConfig = [
+				// mode			screenid		hostid	pageFile		profileIdx2		screenitemid
+				//		resourcetype	groupid					profileIdx		updateProfile	timeline
+				// 0	1		2		3		4		5		6		7		8		9		10
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_GRAPH
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SIMPLE_GRAPH
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_MAP
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_PLAIN_TEXT
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HOSTS_INFO
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_TRIGGERS_INFO
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SERVER_INFO
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_CLOCK
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SCREEN
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_TRIGGERS_OVERVIEW
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_DATA_OVERVIEW
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_URL
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_ACTIONS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_EVENTS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SYSTEM_STATUS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HOST_TRIGGERS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HISTORY
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_CHART
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_LLD_GRAPH
+				[],
+				[true,	true,	false,	false,	false,	false,	false,	false,	false,	false, false] // SCREEN_RESOURCE_DISCOVERY
+			];
 
 			if (empty(screen.id)) {
 				return;
@@ -66,19 +96,21 @@ jQuery(function($) {
 			var ajaxUrl = new Curl('jsrpc.php');
 			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
 			ajaxUrl.setArgument('method', 'screen.get');
-			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
-			ajaxUrl.setArgument('flickerfreeScreenId', id);
-			ajaxUrl.setArgument('pageFile', screen.pageFile);
-			ajaxUrl.setArgument('screenid', screen.screenid);
-			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
-			ajaxUrl.setArgument('groupid', screen.groupid);
-			ajaxUrl.setArgument('hostid', screen.hostid);
-			ajaxUrl.setArgument('profileIdx', empty(screen.profileIdx) ? null : screen.profileIdx);
-			ajaxUrl.setArgument('profileIdx2', empty(screen.profileIdx2) ? null : screen.profileIdx2);
-			ajaxUrl.setArgument('updateProfile', empty(screen.updateProfile) ? null : +screen.updateProfile);
-			ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
-			ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+
+			var requiredParams = parametersConfig[screen.resourcetype];
+
+			for (var i = 0; i < ajaxParams.length; i++) {
+				if (requiredParams[i]) {
+					ajaxUrl.setArgument(ajaxParams[i], empty(screen[ajaxParams[i]]) ? null : screen[ajaxParams[i]]);
+				}
+			}
+
+			// timeline params
+			if (requiredParams[10]) {
+				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
+				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+			}
 
 			// SCREEN_RESOURCE_GRAPH
 			// SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -165,7 +197,6 @@ jQuery(function($) {
 
 			// SCREEN_RESOURCE_DISCOVERY
 			else if (screen.resourcetype == 22) {
-				ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
 				ajaxUrl.setArgument('data', empty(screen.data) ? null : screen.data);
 				this.refreshHtml(id, ajaxUrl);
 			}
