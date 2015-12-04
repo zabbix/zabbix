@@ -435,6 +435,10 @@ class CMap extends CMapElement {
 
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
+				if (!is_array($map['users'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
 				$required_fields = ['userid', 'permission'];
 
 				foreach ($map['users'] as $share) {
@@ -504,8 +508,13 @@ class CMap extends CMapElement {
 
 			// Map user group shares.
 			if (array_key_exists('user_groups', $map)) {
+				if (!is_array($map['user_groups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
 				$shared_user_groupids = [];
 				$required_fields = ['usrgrpid', 'permission'];
+
 				foreach ($map['user_groups'] as $share) {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
@@ -696,6 +705,10 @@ class CMap extends CMapElement {
 				}
 			}
 
+			if (array_key_exists('selements', $map) && !is_array($map['selements'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
 			// Map selement links.
 			if (array_key_exists('links', $map) && $map['links']) {
 				$selementids = zbx_objectValues($map['selements'], 'selementid');
@@ -759,10 +772,13 @@ class CMap extends CMapElement {
 		$permission_validator = new CLimitedSetValidator([
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
-
 		foreach ($maps as $map) {
 			if (!check_db_fields($map_db_fields, $map)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
+			}
+
+			if (!is_int($map['sysmapid']) && !is_string($map['sysmapid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			// Permission check.
@@ -808,6 +824,10 @@ class CMap extends CMapElement {
 
 			// Map user shares.
 			if (array_key_exists('users', $map)) {
+				if (!is_array($map['users'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
 				$required_fields = ['userid', 'permission'];
 
 				foreach ($map['users'] as $share) {
@@ -876,8 +896,13 @@ class CMap extends CMapElement {
 
 			// Map user group shares.
 			if (array_key_exists('user_groups', $map)) {
+				if (!is_array($map['user_groups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
 				$shared_user_groupids = [];
 				$required_fields = ['usrgrpid', 'permission'];
+
 				foreach ($map['user_groups'] as $share) {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
@@ -1073,6 +1098,10 @@ class CMap extends CMapElement {
 
 					unset($urlNames[$url['name']]);
 				}
+			}
+
+			if (array_key_exists('selements', $map) && !is_array($map['selements'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
 			// Map selement links.
