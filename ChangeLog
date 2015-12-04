@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ...G...... [ZBX-10018] fixed inconsistent messages in debug log when UserParameter terminated by timeout (viktors)
 ........S. [ZBX-10029] fixed running remote command on Current host twice if it is within specified Host or Host group targets (gleb)
 ..F....... [ZBX-10079] documented system.run returning '1' with nowait parameter in the item key helper (Richlv)
@@ -262,6 +263,7 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
@@ -976,6 +978,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
