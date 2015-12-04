@@ -1094,6 +1094,8 @@ static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
 	DBdelete_triggers(triggerids);
 
 	zbx_vector_uint64_destroy(&children_triggerids);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -1283,6 +1285,8 @@ static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
 	DBdelete_graphs(graphids);
 
 	zbx_vector_uint64_destroy(&children_graphids);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
