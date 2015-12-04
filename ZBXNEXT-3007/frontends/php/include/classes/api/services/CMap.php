@@ -777,10 +777,6 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
 			}
 
-			if (!is_int($map['sysmapid']) && !is_string($map['sysmapid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
 			// Permission check.
 			if (!array_key_exists($map['sysmapid'], $db_maps)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
