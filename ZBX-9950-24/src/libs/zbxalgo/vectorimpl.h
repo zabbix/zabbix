@@ -211,7 +211,7 @@ int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, __type val
 }														\
 														\
 														\
-void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, zbx_vector_ ## __id ## _t *right,	\
+void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_vector_ ## __id ## _t *right,\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	c, block_start, deleted = 0, left_index = 0, right_index = 0;					\
@@ -231,7 +231,7 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, zbx_vector
 														\
 		if (0 < deleted++)										\
 		{												\
-			memmove(&left->values[block_start - deleted], &left->values[block_start],		\
+			memmove(&left->values[block_start - deleted + 1], &left->values[block_start],		\
 							(left_index - 1 - block_start) * sizeof(__type));	\
 		}												\
 														\
