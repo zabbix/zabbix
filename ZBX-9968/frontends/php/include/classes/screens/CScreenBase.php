@@ -163,55 +163,52 @@ class CScreenBase {
 			'isFlickerfree'		=> ['idx' => 0, 'default_value' => true],
 			'mode'				=> ['idx' => 1, 'default_value' => SCREEN_MODE_SLIDESHOW],
 			'timestamp'			=> ['idx' => 2, 'default_value' => time()],
-			'resourcetype'		=> ['idx' => 3, 'default_value' => true],
+			'resourcetype'		=> ['idx' => 3, 'default_value' => null],
 			'isTemplatedScreen'	=> ['idx' => 4, 'default_value' => false],
 			'screenid'			=> ['idx' => 5, 'default_value' => null],
 			'action'			=> ['idx' => 6, 'default_value' => null],
 			'groupid'			=> ['idx' => 7, 'default_value' => null],
 			'hostid'			=> ['idx' => 8, 'default_value' => 0],
-			'dataId'			=> ['idx' => 9, 'default_value' => null],
-			'pageFile'			=> ['idx' => 10, 'default_value' => null],
-			'profileIdx'		=> ['idx' => 11, 'default_value' => ''],
-			'profileIdx2'		=> ['idx' => 12, 'default_value' => null],
-			'updateProfile'		=> ['idx' => 13, 'default_value' => true],
-			'timeline'			=> ['idx' => 14, 'default_value' => null],
-			'screenitem'		=> ['idx' => 15, 'default_value' => []]
+			'pageFile'			=> ['idx' => 9, 'default_value' => null],
+			'profileIdx'		=> ['idx' => 10, 'default_value' => ''],
+			'profileIdx2'		=> ['idx' => 11, 'default_value' => null],
+			'updateProfile'		=> ['idx' => 12, 'default_value' => true],
+			'timeline'			=> ['idx' => 13, 'default_value' => null],
 		];
 
 		$this->parameters_config = [
-			// screen								isFlickerfree	timestamp		isTemplatedScreen	action		hostid	dataId	pageFile		profileIdx2		timeline
-			// 												mode			resourcetype	screenid		groupid							profileIdx		updateProfile	screenitem
-			//										0		1		2		3		4		5		6		7		8		9		10		11		12		13		14		15
-			SCREEN_RESOURCE_GRAPH				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_SIMPLE_GRAPH		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_MAP					=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_PLAIN_TEXT			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_HOSTS_INFO			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_TRIGGERS_INFO		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_SERVER_INFO			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_CLOCK				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_SCREEN				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_TRIGGERS_OVERVIEW	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_DATA_OVERVIEW		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_URL					=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_ACTIONS				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_EVENTS				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_SYSTEM_STATUS		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_HOST_TRIGGERS		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_HISTORY				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_CHART				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_LLD_SIMPLE_GRAPH	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_LLD_GRAPH			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
-			SCREEN_RESOURCE_DISCOVERY			=> [true,	true,	true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	false,	false,	false,	false]
+			// screen								isFlickerfree	timestamp		isTemplatedScreen	action		hostid	pageFile		profileIdx2		timeline
+			// 												mode			resourcetype	screenid		groupid					profileIdx		updateProfile
+			//										0		1		2		3		4		5		6		7		8		9		10		11		12		13
+			SCREEN_RESOURCE_GRAPH				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_SIMPLE_GRAPH		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_MAP					=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_PLAIN_TEXT			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_HOSTS_INFO			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_TRIGGERS_INFO		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_SERVER_INFO			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_CLOCK				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_SCREEN				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_TRIGGERS_OVERVIEW	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_DATA_OVERVIEW		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_URL					=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_ACTIONS				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_EVENTS				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_SYSTEM_STATUS		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_HOST_TRIGGERS		=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_HISTORY				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_CHART				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_LLD_SIMPLE_GRAPH	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_LLD_GRAPH			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_DISCOVERY			=> [true,	true,	true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	false,	false]
 		];
 
-		$parameters = $this->parameters;
-
+		$this->dataId = array_key_exists('dataId', $options) ? $options['dataId'] : null;
 		$this->resourcetype = array_key_exists('resourcetype', $options) ? $options['resourcetype'] : null;
 
 		// get screenitem if its required or resource type is null
-		$this->screenitem = $parameters['screenitem']['default_value'];
+		$this->screenitem = [];
 		if (array_key_exists('screenitem', $options)) {
 			$this->screenitem = (array) $options['screenitem'];error_log(3);
 		}
@@ -221,9 +218,9 @@ class CScreenBase {
 					'screenitemids' => $options['screenitemid'],
 					'hostids' => $this->hostid,
 					'output' => API_OUTPUT_EXTEND
-				]);error_log(1);
+				]);
 			}
-			else {error_log(2);
+			else {
 				$this->screenitem = API::ScreenItem()->get([
 					'screenitemids' => $options['screenitemid'],
 					'output' => API_OUTPUT_EXTEND
@@ -232,7 +229,6 @@ class CScreenBase {
 
 			$this->screenitem = (array) reset($this->screenitem);
 		}
-		unset($parameters['screenitem']);
 
 		// get resourcetype
 		if ($this->resourcetype === null && array_key_exists('resourcetype',$this->screenitem)) {
@@ -241,20 +237,20 @@ class CScreenBase {
 
 		$required_params = $this->parameters_config[$this->resourcetype];
 
-		foreach ($parameters as $pname => $pdata) {
+		foreach ($this->parameters as $pname => $pdata) {
 			if ($required_params[$pdata['idx']]) {
 				$this->$pname = array_key_exists($pname, $options) ? $options[$pname] : $pdata['default_value'];
 			}
 		}
 
 		// get page file
-		if ($required_params[$parameters['pageFile']['idx']] && $this->pageFile === null) {
+		if ($required_params[$this->parameters['pageFile']['idx']] && $this->pageFile === null) {
 			global $page;
 			$this->pageFile = $page['file'];
 		}
 
 		// calculate timeline
-		if ($required_params[$parameters['timeline']['idx']] && $this->timeline === null) {
+		if ($required_params[$this->parameters['timeline']['idx']] && $this->timeline === null) {
 			$this->timeline = $this->calculateTime([
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
@@ -265,12 +261,12 @@ class CScreenBase {
 		}
 
 		// get screenid
-		if ($required_params[$parameters['screenid']['idx']] && $this->screenid === null && $this->screenitem) {
+		if ($required_params[$this->parameters['screenid']['idx']] && $this->screenid === null && $this->screenitem) {
 			$this->screenid = $this->screenitem['screenid'];
 		}
 
 		// create action url
-		if ($required_params[$parameters['action']['idx']] && $this->action === null && $this->screenitem) {
+		if ($required_params[$this->parameters['action']['idx']] && $this->action === null && $this->screenitem) {
 			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.
 				$this->screenitem['screenitemid'];
 		}
@@ -353,6 +349,7 @@ class CScreenBase {
 		];
 
 		$required_params = $this->parameters_config[$this->resourcetype];
+		//$parameters = $this->parameters;
 
 		foreach ($this->parameters as $pname => $pdata) {
 			if ($required_params[$pdata['idx']]) {
@@ -360,7 +357,7 @@ class CScreenBase {
 			}
 		}
 
-		if ($required_params[$this->parameters['screenitem']['idx']]) {
+		if ($this->screenitem) {
 			$jsData['screenitemid'] = array_key_exists('screenitemid', $this->screenitem)
 				? $this->screenitem['screenitemid']
 				: null;
