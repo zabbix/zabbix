@@ -85,9 +85,11 @@ static void	process_listener(zbx_socket_t *s)
 				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, CONFIG_TIMEOUT);
 			}
 			else
+			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED "]");
 
 				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, CONFIG_TIMEOUT);
+			}
 		}
 
 		free_result(&result);
