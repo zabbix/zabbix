@@ -4932,6 +4932,7 @@ const char	*zbx_tls_connection_type_name(unsigned int type)
 	}
 }
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_get_attr_cert                                            *
@@ -5044,7 +5045,9 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	return SUCCEED;
 }
+#endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_get_attr_psk                                             *
@@ -5086,6 +5089,7 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	return SUCCEED;
 }
+#endif
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 /******************************************************************************
