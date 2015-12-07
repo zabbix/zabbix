@@ -2754,7 +2754,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 		/* server processes low-level discovery (lld) items while proxy stores their values in db */
 		if (0 != (ZBX_PROGRAM_TYPE_SERVER & program_type))
-			lld_process_discovery_rule(itemid, value->text, ts);
+			lld_process_discovery_rule(itemid, value->text);
 		else
 			dc_local_add_history_lld(itemid, ts, value->text);
 
