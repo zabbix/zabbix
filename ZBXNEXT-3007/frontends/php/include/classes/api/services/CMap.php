@@ -405,7 +405,7 @@ class CMap extends CMapElement {
 			}
 
 			if (array_key_exists($map['name'], $map_names)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate map name for map "%1$s".', $map['name']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate "name" value "%1$s" for map.', $map['name']));
 			}
 			else {
 				$map_names[$map['name']] = true;
@@ -413,20 +413,20 @@ class CMap extends CMapElement {
 
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect width value for map "%1$s".', $map['name'])
+					_s('Incorrect "width" value for map "%1$s".', $map['name'])
 				);
 			}
 
 			if ($map['height'] > 65535 || $map['height'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect height value for map "%1$s".', $map['name'])
+					_s('Incorrect "height" value for map "%1$s".', $map['name'])
 				);
 			}
 
 			if (array_key_exists('private', $map)) {
 				if (!$private_validator->validate($map['private'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect private value "%1$s" for map "%2$s".', $map['private'], $map['name'])
+						_s('Incorrect "private" value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 					);
 				}
 			}
@@ -465,7 +465,7 @@ class CMap extends CMapElement {
 
 					if (!$permission_validator->validate($share['permission'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect permission value "%1$s" in users for map "%2$s".',
+							'Incorrect "permission" value "%1$s" in users for map "%2$s".',
 							$share['permission'],
 							$map['name']
 						));
@@ -539,7 +539,7 @@ class CMap extends CMapElement {
 
 					if (!$permission_validator->validate($share['permission'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect permission value "%1$s" in user groups for map "%2$s".',
+							'Incorrect "permission" value "%1$s" in user groups for map "%2$s".',
 							$share['permission'],
 							$map['name']
 						));
@@ -791,7 +791,7 @@ class CMap extends CMapElement {
 
 			if (array_key_exists($map['name'], $map_names)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate map name for map "%1$s".', $map['name'])
+					_s('Duplicate "name" value "%1$s" for map.', $map['name'])
 				);
 			}
 			else {
@@ -800,19 +800,19 @@ class CMap extends CMapElement {
 
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect width value for map "%1$s".', $map['name'])
+					_s('Incorrect "width" value for map "%1$s".', $map['name'])
 				);
 			}
 
 			if ($map['height'] > 65535 || $map['height'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect height value for map "%1$s".', $map['name'])
+					_s('Incorrect "height" value for map "%1$s".', $map['name'])
 				);
 			}
 
 			if (!$private_validator->validate($map['private'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect private value "%1$s" for map "%2$s".', $map['private'], $map['name'])
+					_s('Incorrect "private" value "%1$s" for map "%2$s".', $map['private'], $map['name'])
 				);
 			}
 
@@ -850,7 +850,7 @@ class CMap extends CMapElement {
 
 					if (!$permission_validator->validate($share['permission'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect permission value "%1$s" in users for map "%2$s".',
+							'Incorrect "permission" value "%1$s" in users for map "%2$s".',
 							$share['permission'],
 							$map['name']
 						));
@@ -923,7 +923,7 @@ class CMap extends CMapElement {
 
 					if (!$permission_validator->validate($share['permission'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Incorrect permission value "%1$s" in user groups for map "%2$s".',
+							'Incorrect "permission" value "%1$s" in user groups for map "%2$s".',
 							$share['permission'],
 							$map['name']
 						));
@@ -1353,15 +1353,15 @@ class CMap extends CMapElement {
 				);
 
 				foreach ($user_group_shares_diff['both'] as $update_user_share) {
-					$shared_users_to_update[] = [
+					$shared_user_groups_to_update[] = [
 						'values' => $update_user_share,
 						'where' => ['usrgrpid' => $update_user_share['usrgrpid'], 'sysmapid' => $map['sysmapid']]
 					];
 				}
 
-				foreach ($user_group_shares_diff['first'] as $new_shared_user) {
-					$new_shared_user['sysmapid'] = $map['sysmapid'];
-					$shared_users_to_add[] = $new_shared_user;
+				foreach ($user_group_shares_diff['first'] as $new_shared_user_group) {
+					$new_shared_user_group['sysmapid'] = $map['sysmapid'];
+					$shared_user_groups_to_add[] = $new_shared_user_group;
 				}
 
 				$shared_user_groupids_to_delete = array_merge($shared_user_groupids_to_delete,
