@@ -1365,7 +1365,7 @@ class CMap extends CMapElement {
 				}
 
 				$shared_user_groupids_to_delete = array_merge($shared_user_groupids_to_delete,
-					zbx_objectValues($user_group_shares_diff['second'], 'sysmapuserid')
+					zbx_objectValues($user_group_shares_diff['second'], 'sysmapusrgrpid')
 				);
 			}
 
