@@ -134,14 +134,19 @@ if (isset($_REQUEST['form'])) {
 			];
 		}
 
-		$request = ['name' => true, 'triggerid' => true, 'algorithm' => true, 'goodsla' => true,
-			'sortorder' => true, 'parentid' => true, 'dependencies' => true
+		$request = [
+			'name' => getRequest('name'),
+			'triggerid' => getRequest('triggerid'),
+			'algorithm' => getRequest('algorithm'),
+			'showsla' => getRequest('showsla', SERVICE_SHOW_SLA_OFF),
+			'sortorder' => getRequest('sortorder'),
+			'times' => getRequest('times', []),
+			'parentid' => getRequest('parentid'),
+			'dependencies' => $dependencies
 		];
-		$request = array_intersect_key($_REQUEST, $request);
-
-		$request['dependencies'] = $dependencies;
-		$request['showsla'] = getRequest('showsla', SERVICE_SHOW_SLA_OFF);
-		$request['times'] = getRequest('times', []);
+		if(hasRequest('goodsla') === true) {
+			$request['goodsla'] = getRequest('goodsla');
+		}
 
 		if (isset($service['serviceid'])) {
 			$request['serviceid'] = $service['serviceid'];
