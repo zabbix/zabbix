@@ -1379,7 +1379,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 				(NULL == error ? "database error" : error));
 	}
 	else
+	{
 		DCsync_configuration();
+		DCupdate_hosts_availability();
+	}
 
 	zbx_free(error);
 
@@ -1717,7 +1720,8 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	DBcommit();
 
-	DChost_update_availability(availability, availability_num);
+	if (NULL != availability)
+		DChost_update_availability(availability, availability_num);
 out:
 	zbx_free(availability);
 	zbx_free(tmp);
