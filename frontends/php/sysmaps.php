@@ -251,7 +251,8 @@ if (isset($_REQUEST['form'])) {
 				'expandproblem' => getRequest('expandproblem', 0),
 				'show_unack' => getRequest('show_unack', 0),
 				'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-				'urls' => getRequest('urls', [])
+				'urls' => getRequest('urls', []),
+				'private' => getRequest('private', 1)
 			]
 		];
 	}
