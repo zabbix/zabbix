@@ -1291,7 +1291,7 @@ class CMap extends CMapElement {
 			'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 			'selectLinks' => API_OUTPUT_EXTEND,
 			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectUrls' => ['sysmapid', 'sysmapurlid'],
+			'selectUrls' => ['sysmapid', 'sysmapurlid', 'name', 'url'],
 			'selectUsers' => ['sysmapuserid', 'sysmapid', 'userid', 'permission'],
 			'selectUserGroups' => ['sysmapusrgrpid', 'sysmapid', 'usrgrpid', 'permission'],
 			'editable' => true,
@@ -1670,7 +1670,7 @@ class CMap extends CMapElement {
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($selements, 'sysmapid', 'selementid');
+			$relation_map = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
 			// add selement URLs
 			if ($this->outputIsRequested('urls', $options['selectSelements'])) {
@@ -1713,7 +1713,7 @@ class CMap extends CMapElement {
 			}
 
 			$selements = $this->unsetExtraFields($selements, ['sysmapid', 'selementid'], $options['selectSelements']);
-			$result = $relationMap->mapMany($result, $selements, 'selements');
+			$result = $relation_map->mapMany($result, $selements, 'selements');
 		}
 
 		// adding icon maps
@@ -1723,7 +1723,7 @@ class CMap extends CMapElement {
 				'filter' => ['sysmapid' => $sysmapIds]
 			]);
 
-			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
+			$relation_map = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
 
 			$iconMaps = API::IconMap()->get([
 				'output' => $this->outputExtend($options['selectIconMap'], ['iconmapid']),
@@ -1733,7 +1733,7 @@ class CMap extends CMapElement {
 
 			$iconMaps = $this->unsetExtraFields($iconMaps, ['iconmapid'], $options['selectIconMap']);
 
-			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
+			$result = $relation_map->mapOne($result, $iconMaps, 'iconmap');
 		}
 
 		// adding links
@@ -1743,21 +1743,21 @@ class CMap extends CMapElement {
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($links, 'sysmapid', 'linkid');
+			$relation_map = $this->createRelationMap($links, 'sysmapid', 'linkid');
 
 			// add link triggers
 			if ($this->outputIsRequested('linktriggers', $options['selectLinks'])) {
 				$linkTriggers = DBFetchArrayAssoc(DBselect(
 					'SELECT DISTINCT slt.*'.
 					' FROM sysmaps_link_triggers slt'.
-					' WHERE '.dbConditionInt('slt.linkid', $relationMap->getRelatedIds())
+					' WHERE '.dbConditionInt('slt.linkid', $relation_map->getRelatedIds())
 				), 'linktriggerid');
 				$linkTriggerRelationMap = $this->createRelationMap($linkTriggers, 'linkid', 'linktriggerid');
 				$links = $linkTriggerRelationMap->mapMany($links, $linkTriggers, 'linktriggers');
 			}
 
 			$links = $this->unsetExtraFields($links, ['sysmapid', 'linkid'], $options['selectLinks']);
-			$result = $relationMap->mapMany($result, $links, 'links');
+			$result = $relation_map->mapMany($result, $links, 'links');
 		}
 
 		// adding urls
@@ -1767,38 +1767,72 @@ class CMap extends CMapElement {
 				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
+			$relation_map = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
 
 			$links = $this->unsetExtraFields($links, ['sysmapid', 'sysmapurlid'], $options['selectUrls']);
-			$result = $relationMap->mapMany($result, $links, 'urls');
+			$result = $relation_map->mapMany($result, $links, 'urls');
 		}
 
 		// Adding user shares.
 		if ($options['selectUsers'] !== null) {
-			$users = API::getApiService()->select('sysmap_user', [
-				'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid', 'permission']),
-				'filter' => ['sysmapid' => $sysmapIds],
+			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
+			// Get all allowed groups.
+			$related_groups = API::User()->get([
+				'output' => ['userid'],
+				'userids' => $relation_map->getRelatedIds(),
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
 
-			$users = $this->unsetExtraFields($users, ['sysmapid', 'sysmapuserid'], $options['selectUsers']);
-			$result = $relationMap->mapMany($result, $users, 'users');
+			$related_userids = zbx_objectValues($related_groups, 'userid');
+
+			$users = API::getApiService()->select('sysmap_user', [
+				'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid']),
+				'filter' => ['sysmapid' => $sysmapIds, 'userid' => $related_userids],
+				'preservekeys' => true
+			]);
+
+			$relation_map = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
+
+			$users = $this->unsetExtraFields($users, ['userid', 'permission'], $options['selectUsers']);
+
+			foreach ($users as &$user) {
+				unset($user['sysmapuserid'], $user['sysmapid']);
+			}
+			unset($user);
+
+			$result = $relation_map->mapMany($result, $users, 'users');
 		}
 
 		// Adding user group shares.
 		if ($options['selectUserGroups'] !== null) {
-			$user_groups = API::getApiService()->select('sysmap_usrgrp', [
-				'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid', 'permission']),
-				'filter' => ['sysmapid' => $sysmapIds],
+			$relation_map = $this->createRelationMap($result, 'sysmapid', 'usrgrpid', 'sysmap_usrgrp');
+			// Get all allowed groups.
+			$related_groups = API::UserGroup()->get([
+				'output' => ['usrgrpid'],
+				'usrgrpids' => $relation_map->getRelatedIds(),
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($user_groups, 'sysmapid', 'sysmapusrgrpid');
 
-			$user_groups = $this->unsetExtraFields($user_groups, ['sysmapid', 'sysmapusrgrpid'],
+			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
+
+			$user_groups = API::getApiService()->select('sysmap_usrgrp', [
+				'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid']),
+				'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $related_groupids],
+				'preservekeys' => true
+			]);
+
+			$relation_map = $this->createRelationMap($user_groups, 'sysmapid', 'sysmapusrgrpid');
+
+			$user_groups = $this->unsetExtraFields($user_groups, ['usrgrpid', 'permission'],
 				$options['selectUserGroups']
 			);
-			$result = $relationMap->mapMany($result, $user_groups, 'user_groups');
+
+			foreach ($user_groups as &$user_group) {
+				unset($user_group['sysmapusrgrpid'], $user_group['sysmapid']);
+			}
+			unset($user_group);
+
+			$result = $relation_map->mapMany($result, $user_groups, 'user_groups');
 		}
 
 		return $result;
