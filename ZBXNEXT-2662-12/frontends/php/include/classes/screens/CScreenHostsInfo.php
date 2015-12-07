@@ -27,6 +27,94 @@ class CScreenHostsInfo extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		return $this->getOutput(new CHostsInfo($this->screenitem['resourceid'], $this->screenitem['style']));
+		$header = _('Hosts info').SPACE;
+
+		if ($this->screenitem['resourceid'] != 0) {
+			$group = get_hostgroup_by_groupid($this->screenitem['resourceid']);
+			$header .= _('Group').SPACE.'&quot;'.$group['name'].'&quot;';
+		}
+		else {
+			$header .= _('All groups');
+		}
+
+		$total = 0;
+
+		// fetch accessible host ids
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'preservekeys' => true
+		]);
+		$hostids = array_keys($hosts);
+
+		if ($this->screenitem['resourceid'] != 0) {
+			$cond_from = ',hosts_groups hg';
+			$cond_where = ' AND hg.hostid=h.hostid AND hg.groupid='.zbx_dbstr($this->screenitem['resourceid']);
+		}
+		else {
+			$cond_from = '';
+			$cond_where = '';
+		}
+
+		$db_host_cnt = DBselect(
+			'SELECT COUNT(DISTINCT h.hostid) AS cnt'.
+			' FROM hosts h'.$cond_from.
+			' WHERE h.available='.HOST_AVAILABLE_TRUE.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+				' AND '.dbConditionInt('h.hostid', $hostids).
+				$cond_where
+		);
+
+		$host_cnt = DBfetch($db_host_cnt);
+		$avail = $host_cnt['cnt'];
+		$total += $host_cnt['cnt'];
+
+		$db_host_cnt = DBselect(
+			'SELECT COUNT(DISTINCT h.hostid) AS cnt'.
+			' FROM hosts h'.$cond_from.
+			' WHERE h.available='.HOST_AVAILABLE_FALSE.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+				' AND '.dbConditionInt('h.hostid', $hostids).
+				$cond_where
+		);
+
+		$host_cnt = DBfetch($db_host_cnt);
+		$notav = $host_cnt['cnt'];
+		$total += $host_cnt['cnt'];
+
+		$db_host_cnt = DBselect(
+			'SELECT COUNT(DISTINCT h.hostid) AS cnt'.
+			' FROM hosts h'.$cond_from.
+			' WHERE h.available='.HOST_AVAILABLE_UNKNOWN.
+				' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+				' AND '.dbConditionInt('h.hostid', $hostids).
+				$cond_where
+		);
+
+		$host_cnt = DBfetch($db_host_cnt);
+		$uncn = $host_cnt['cnt'];
+		$total += $host_cnt['cnt'];
+
+		$avail = (new CCol($avail.'  '._('Available')))->addClass(ZBX_STYLE_GREEN);
+		$notav = (new CCol($notav.'  '._('Not available')))->addClass(ZBX_STYLE_RED);
+		$uncn = (new CCol($uncn.'  '._('Unknown')))->addClass(ZBX_STYLE_GREY);
+		$total = new CCol($total.'  '._('Total'));
+
+		$table = new CTableInfo();
+
+		if ($this->screenitem['style'] == STYLE_HORIZONTAL) {
+			$table->addRow([$avail, $notav, $uncn, $total]);
+		}
+		else {
+			$table->addRow($avail);
+			$table->addRow($notav);
+			$table->addRow($uncn);
+			$table->addRow($total);
+		}
+
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput((new CUiWidget(uniqid(), [$table, $footer]))->setHeader($header));
 	}
 }
