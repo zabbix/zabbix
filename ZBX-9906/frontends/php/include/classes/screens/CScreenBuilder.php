@@ -281,8 +281,8 @@ class CScreenBuilder {
 				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
 
-			case SCREEN_RESOURCE_WEB_DETAILS:
-				return new CScreenWebDetails($options);
+			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
+				return new CScreenHttpTestDetails($options);
 
 			default:
 				return null;

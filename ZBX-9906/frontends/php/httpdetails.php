@@ -76,9 +76,9 @@ if (!$httptest) {
 
 // Create details widget.
 $details_screen_params = [
-	'resourcetype' => SCREEN_RESOURCE_WEB_DETAILS,
+	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
 	'mode' => SCREEN_MODE_JS,
-	'dataId' => 'webdetails',
+	'dataId' => 'httptest_details',
 	'profileIdx2' => $httptest['httptestid']
 ];
 
