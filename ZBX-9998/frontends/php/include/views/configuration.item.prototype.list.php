@@ -95,8 +95,8 @@ foreach ($this->data['items'] as $item) {
 		$description,
 		$item['key_'],
 		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
-		convertUnitsS(SEC_PER_DAY * $item['history']),
-		($item['trends'] !== '') ? convertUnitsS(SEC_PER_DAY * $item['trends']) : '',
+		$item['history']._x('d', 'day short'),
+		($item['trends'] !== '') ? $item['trends']._x('d', 'day short') : '',
 		item_type2str($item['type']),
 		$applications,
 		$status
