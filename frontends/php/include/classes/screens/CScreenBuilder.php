@@ -346,9 +346,9 @@ class CScreenBuilder {
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$newColumns = [''];
+			$newColumns = [(new CCol())->addClass(ZBX_STYLE_CELL_WIDTH)];
 
-			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
+			for ($i = 0, $size = $this->screen['hsize']; $i < $size; $i++) {
 				$newColumns[] = (new CCol(
 					(new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
@@ -359,6 +359,17 @@ class CScreenBuilder {
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
+
+			$newColumns[] = (new CCol(
+				(new CDiv('+'))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->onClick('javascript: location.href = "screenedit.php?config=1'.
+						'&screenid='.$this->screen['screenid'].'&add_col='.$this->screen['hsize'].'";'
+					)
+			))
+				->addClass(ZBX_STYLE_CENTER)
+				->addClass(ZBX_STYLE_MIDDLE)
+				->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$screenTable->addRow($newColumns);
 		}

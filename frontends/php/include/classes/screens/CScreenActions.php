@@ -121,7 +121,7 @@ class CScreenActions extends CScreenBase {
 		$sort_div = (new CSpan())->addClass(($sortorder === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 		// create alert table
-		$actionTable = (new CTableInfo())
+		$table = (new CTableInfo())
 			->setHeader([
 				($sortfield === 'clock') ? [('Time'), $sort_div] : _('Time'),
 				_('Action'),
@@ -158,7 +158,7 @@ class CScreenActions extends CScreenBase {
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
-			$actionTable->addRow([
+			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$actions[$alert['actionid']]['name'],
 				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
@@ -169,6 +169,10 @@ class CScreenActions extends CScreenBase {
 			]);
 		}
 
-		return $this->getOutput($actionTable);
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput((new CUiWidget(uniqid(), [$table, $footer]))->setHeader(_('Action log')));
 	}
 }

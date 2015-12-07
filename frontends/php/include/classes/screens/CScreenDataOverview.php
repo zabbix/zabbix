@@ -44,6 +44,12 @@ class CScreenDataOverview extends CScreenBase {
 			$applicationIds = zbx_objectValues($applications, 'applicationid');
 		}
 
-		return $this->getOutput(getItemsDataOverview($hostids, $applicationIds, $this->screenitem['style']));
+		$table = getItemsDataOverview($hostids, $applicationIds, $this->screenitem['style']);
+
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput((new CUiWidget(uniqid(), [$table, $footer]))->setHeader(_('Data overview')));
 	}
 }
