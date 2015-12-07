@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+..F....... [ZBX-9906] fixed automatic refreshing of WEB scenario details (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ...G...... [ZBX-10018] fixed inconsistent messages in debug log when UserParameter terminated by timeout (viktors)
 ........S. [ZBX-10029] fixed running remote command on Current host twice if it is within specified Host or Host group targets (gleb)
