@@ -1038,6 +1038,9 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
 
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
 	{
@@ -1049,9 +1052,6 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBget_profiles_by_source_idxs_values(&profileids, NULL, &profile_idx, 1, triggerids);
 	if (0 != profileids.values_num)
