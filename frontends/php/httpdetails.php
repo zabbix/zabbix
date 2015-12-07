@@ -75,14 +75,12 @@ if (!$httptest) {
 }
 
 // Create details widget.
-$details_screen_params = [
+$details_screen = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
 	'mode' => SCREEN_MODE_JS,
 	'dataId' => 'httptest_details',
 	'profileIdx2' => $httptest['httptestid']
-];
-
-$details_screen = CScreenBuilder::getScreen($details_screen_params);
+]);
 
 (new CWidget())
 	->setTitle(
