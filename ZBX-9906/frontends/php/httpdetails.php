@@ -74,13 +74,7 @@ if (!$httptest) {
 	access_deny();
 }
 
-$httptest_manager = new CHttpTestManager();
-$itemids = $httptest_manager->getHttpStepItems($httptest['httptestid']);
-$itemids = zbx_objectValues($itemids, 'itemid');
-
-/*
- * Display
- */
+// Create details widget.
 $details_screen_params = [
 	'resourcetype' => SCREEN_RESOURCE_WEB_DETAILS,
 	'mode' => SCREEN_MODE_JS,
@@ -88,7 +82,9 @@ $details_screen_params = [
 	'profileIdx2' => $httptest['httptestid']
 ];
 
-$widget = (new CWidget())
+$details_screen = CScreenBuilder::getScreen($details_screen_params);
+
+(new CWidget())
 	->setTitle(
 		_('Details of web scenario').': '.
 		CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name'])
@@ -99,17 +95,13 @@ $widget = (new CWidget())
 			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		)
-	);
+	)
+	->addItem($details_screen->get())
+	->show();
 
-$details_screen = CScreenBuilder::getScreen($details_screen_params);
-$widget->addItem($details_screen->get())->show();
-$details_js = (new CScreenBase($details_screen_params))->insertFlickerfreeJs();
+(new CScreenBase($details_screen_params))->insertFlickerfreeJs();
 
 echo BR();
-
-// create graphs widget
-$graphs_widget = (new CWidget())
-	->addItem((new CFilter('web.httpdetails.filter.state'))->addNavigator());
 
 $graphs = [];
 
@@ -130,6 +122,11 @@ $graph_in = new CScreenBase([
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime')
 ]);
+
+$httptest_manager = new CHttpTestManager();
+$itemids = $httptest_manager->getHttpStepItems($httptest['httptestid']);
+$itemids = zbx_objectValues($itemids, 'itemid');
+
 $graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemids));
 
 $src = 'chart3.php?height=150'.
@@ -208,7 +205,9 @@ $graph_time->insertFlickerfreeJs();
 // scroll
 CScreenBuilder::insertScreenStandardJs(['timeline' => $graph_in->timeline]);
 
-$graphs_widget
+// Create graphs widget.
+(new CWidget())
+	->addItem((new CFilter('web.httpdetails.filter.state'))->addNavigator())
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 
