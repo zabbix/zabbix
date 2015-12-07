@@ -45,7 +45,7 @@ if ($data['maps']) {
 	$parent_maps = [];
 	foreach (getParentMaps($data['sysmapid']) as $parent) {
 		// check for permissions
-		if (isset($data['maps'][$parent['sysmapid']])) {
+		if (array_key_exists([$parent['sysmapid']], $data['maps'])) {
 			$parent_maps[] = SPACE.SPACE;
 			$parent_maps[] = new CLink(
 				$parent['name'],
@@ -54,7 +54,7 @@ if ($data['maps']) {
 			);
 		}
 	}
-	if (!empty($parent_maps)) {
+	if ($parent_maps) {
 		array_unshift($parent_maps, _('Upper level maps').':');
 		$controls->addItem($parent_maps);
 	}

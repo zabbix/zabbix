@@ -79,7 +79,7 @@ jQuery(function($) {
 				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_LLD_GRAPH
 				[],
-				[true,	true,	false,	false,	false,	false,	false,	false,	false,	false, false] // SCREEN_RESOURCE_DISCOVERY
+				[true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	false] // SCREEN_RESOURCE_DISCOVERY
 			];
 
 			if (empty(screen.id)) {
