@@ -1092,9 +1092,9 @@ class CHttpTestManager {
 	}
 
 	/**
-	 * Get httptest step items by httptestid.
+	 * Get httptest step items by "httptestid".
 	 *
-	 * @param str $httptestid		ID of httptest
+	 * @param string $httptestid		ID of a web scenario
 	 *
 	 * @return array
 	 */

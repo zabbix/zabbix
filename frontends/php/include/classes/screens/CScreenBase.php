@@ -288,7 +288,7 @@ class CScreenBase {
 	 *
 	 * @param array $data
 	 */
-	public function insertFlickerfreeJs($data = []) {
+	public function insertFlickerfreeJs(array $data = []) {
 		$jsData = [
 			'id' => $this->getDataId(),
 			'isFlickerfree' => $this->isFlickerfree,
