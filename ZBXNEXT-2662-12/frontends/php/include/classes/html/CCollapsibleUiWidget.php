@@ -65,6 +65,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 */
 	protected function build() {
 		$body = (new CDiv($this->body))
+			->addClass('body')
 			->setId($this->id);
 
 		if (!$this->expanded) {
