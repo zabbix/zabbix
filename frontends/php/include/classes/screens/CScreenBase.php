@@ -133,7 +133,7 @@ class CScreenBase {
 	 *
 	 * @var array
 	 */
-	public $parameters_config;
+	public $required_parameters;
 
 	/**
 	 * Init screen data.
@@ -177,7 +177,12 @@ class CScreenBase {
 			'dataId'			=> ['idx' => 14, 'default_value' => null]
 		];
 
-		$this->parameters_config = [
+		/*
+		 * Define screen required parameters
+		 *
+		 * Keep in sync with flickerfreescreen.js
+		 */
+		$this->required_parameters = [
 			// screen								isFlickerfree	timestamp		isTemplatedScreen	action		hostid	pageFile		profileIdx2		timeline
 			//												mode			resourcetype	screenid		groupid					profileIdx		updateProfile	dataId
 			//										0		1		2		3		4		5		6		7		8		9		10		11		12		13		14
@@ -210,7 +215,7 @@ class CScreenBase {
 		// get screenitem if its required or resource type is null
 		$this->screenitem = [];
 		if (array_key_exists('screenitem', $options)) {
-			$this->screenitem = (array) $options['screenitem'];error_log(3);
+			$this->screenitem = (array) $options['screenitem'];
 		}
 		elseif (array_key_exists('screenitemid', $options)) {
 			if ($this->hostid != 0) {
@@ -235,22 +240,22 @@ class CScreenBase {
 			$this->resourcetype = $this->screenitem['resourcetype'];
 		}
 
-		$required_params = $this->parameters_config[$this->resourcetype];
+		$is_required = $this->required_parameters[$this->resourcetype];
 
 		foreach ($this->parameters as $pname => $pdata) {
-			if ($required_params[$pdata['idx']]) {
+			if ($is_required[$pdata['idx']]) {
 				$this->$pname = array_key_exists($pname, $options) ? $options[$pname] : $pdata['default_value'];
 			}
 		}
 
 		// get page file
-		if ($required_params[$this->parameters['pageFile']['idx']] && $this->pageFile === null) {
+		if ($is_required[$this->parameters['pageFile']['idx']] && $this->pageFile === null) {
 			global $page;
 			$this->pageFile = $page['file'];
 		}
 
 		// calculate timeline
-		if ($required_params[$this->parameters['timeline']['idx']] && $this->timeline === null) {
+		if ($is_required[$this->parameters['timeline']['idx']] && $this->timeline === null) {
 			$this->timeline = $this->calculateTime([
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
@@ -261,12 +266,12 @@ class CScreenBase {
 		}
 
 		// get screenid
-		if ($required_params[$this->parameters['screenid']['idx']] && $this->screenid === null && $this->screenitem) {
+		if ($is_required[$this->parameters['screenid']['idx']] && $this->screenid === null && $this->screenitem) {
 			$this->screenid = $this->screenitem['screenid'];
 		}
 
 		// create action url
-		if ($required_params[$this->parameters['action']['idx']] && $this->action === null && $this->screenitem) {
+		if ($is_required[$this->parameters['action']['idx']] && $this->action === null && $this->screenitem) {
 			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.
 				$this->screenitem['screenitemid'];
 		}
@@ -348,14 +353,14 @@ class CScreenBase {
 			'interval' => CWebUser::$data['refresh'],
 		];
 
-		$required_params = $this->parameters_config[$this->resourcetype];
+		$is_required = $this->required_parameters[$this->resourcetype];
 		$parameters = $this->parameters;
 
 		// unset redundant parameters
 		unset($parameters['isTemplatedScreen'], $parameters['action'], $parameters['dataId']);
 
 		foreach ($parameters as $pname => $pdata) {
-			if ($required_params[$pdata['idx']]) {
+			if ($is_required[$pdata['idx']]) {
 				$jsData[$pname] = $this->$pname;
 			}
 		}
@@ -366,7 +371,7 @@ class CScreenBase {
 				: null;
 		}
 
-		if ($required_params[$this->parameters['screenid']['idx']]) {
+		if ($is_required[$this->parameters['screenid']['idx']]) {
 			$jsData['screenid'] = array_key_exists('screenid', $this->screenitem)
 				? $this->screenitem['screenid']
 				: $this->screenid;
