@@ -99,8 +99,6 @@ $details_screen = CScreenBuilder::getScreen($details_screen_params);
 	->addItem($details_screen->get())
 	->show();
 
-(new CScreenBase($details_screen_params))->insertFlickerfreeJs();
-
 echo BR();
 
 $graphs = [];
