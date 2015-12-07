@@ -53,6 +53,12 @@ jQuery(function($) {
 			var screen = this.screens[id];
 			var ajaxParams = ['mode', 'resourcetype', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx',
 				'profileIdx2', 'updateProfile', 'screenitemid'];
+
+			/*
+			 * Define screen required parameters
+			 *
+			 * Keep in sync with CScreenBase
+			 */
 			var parametersConfig = [
 				// mode			screenid		hostid	pageFile		profileIdx2		screenitemid
 				//		resourcetype	groupid					profileIdx		updateProfile	timeline
