@@ -188,7 +188,7 @@ class CScreenBuilder {
 		}
 
 		if (zbx_empty($options['resourcetype'])
-				&& isset($options['screenitem'])
+				&& array_key_exists('screenitem', $options)
 				&& !zbx_empty($options['screenitem']['resourcetype'])) {
 			$options['resourcetype'] = $options['screenitem']['resourcetype'];
 		}
