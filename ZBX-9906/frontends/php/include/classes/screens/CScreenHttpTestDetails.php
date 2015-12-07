@@ -77,7 +77,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 		// fetch HTTP item history
 		$item_history = Manager::History()->getLast($items);
 
-		$httpdetails_table = (new CTableInfo())
+		$table = (new CTableInfo())
 			->setHeader([
 				_('Step'),
 				_('Speed'),
@@ -166,7 +166,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 				$resp = UNKNOWN_VALUE;
 			}
 
-			$httpdetails_table->addRow([
+			$table->addRow([
 				CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $step_data['name']),
 				$speed,
 				$resp_time,
@@ -190,7 +190,7 @@ class CScreenHttpTestDetails extends CScreenBase {
 			$status['style'] = ZBX_STYLE_GREEN;
 		}
 
-		$httpdetails_table->addRow([
+		$table->addRow([
 			bold(_('TOTAL')),
 			SPACE,
 			bold(($total_time['value']) ? formatHistoryValue($total_time['value'], $total_time) : UNKNOWN_VALUE),
@@ -198,6 +198,6 @@ class CScreenHttpTestDetails extends CScreenBase {
 			(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
 		]);
 
-		return $this->getOutput($httpdetails_table);
+		return $this->getOutput($table);
 	}
 }
