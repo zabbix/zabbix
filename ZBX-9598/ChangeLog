@@ -1,8 +1,18 @@
 Changes for 3.0.0alpha5
 
 New features:
+....I..... [ZBXNEXT-3037] removed unused fields "gridview" and "legendview" from "graph_theme" table (Sasha)
+..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+..F....... [ZBX-9906] fixed automatic refreshing of WEB scenario details (Gunars)
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+...G...... [ZBX-10018] fixed inconsistent messages in debug log when UserParameter terminated by timeout (viktors)
+........S. [ZBX-10029] fixed running remote command on Current host twice if it is within specified Host or Host group targets (gleb)
+..F....... [ZBX-10079] documented system.run returning '1' with nowait parameter in the item key helper (Richlv)
+...G...... [ZBX-10107] fixed compilation warnings for function calls without a real prototype (viktors)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+...G...... [ZBX-10031] fixed logging of occasionally incorrect process information during agent's start-up on Windows (Sandis)
 .......PS. [ZBX-10001] fixed duplicating log file entries from housekeeper (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 ..F....... [ZBX-10006] changed color of hovered host name for disabled host in search result (vitalijs)
@@ -254,6 +264,8 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
@@ -967,6 +979,8 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
