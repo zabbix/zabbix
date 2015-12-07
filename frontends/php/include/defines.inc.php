@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.0.0alpha5');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050073);
+define('ZABBIX_DB_VERSION',		2050078);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
