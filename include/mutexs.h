@@ -25,10 +25,10 @@
 #	define ZBX_MUTEX		HANDLE
 #	define ZBX_MUTEX_NULL		NULL
 
-#	define ZBX_MUTEX_NAME		LPTSTR
+#	define ZBX_MUTEX_NAME		wchar_t *
 
-#	define ZBX_MUTEX_LOG		zbx_mutex_create_per_process_name(TEXT("ZBX_MUTEX_LOG"))
-#	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(TEXT("ZBX_MUTEX_PERFSTAT"))
+#	define ZBX_MUTEX_LOG		zbx_mutex_create_per_process_name(L"ZBX_MUTEX_LOG")
+#	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT")
 
 #else	/* not _WINDOWS */
 
