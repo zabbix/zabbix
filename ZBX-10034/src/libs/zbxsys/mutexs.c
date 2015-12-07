@@ -310,11 +310,11 @@ ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
 {
 	ZBX_MUTEX_NAME	name = ZBX_MUTEX_NULL;
 	int		size;
-	LPCTSTR		format = TEXT("%s_PID_%ld");
+	wchar_t		*format = L"%s_PID_%lx";
 	DWORD		pid = GetCurrentProcessId();
 
 	/* exit if the mutex name length exceed the maximum allowed */
-	size = _sctprintf(format, prefix, pid);
+	size = _scwprintf(format, prefix, pid);
 	if (MAX_PATH < size)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -323,9 +323,9 @@ ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
 
 	size = size + 1; /* for terminating '\0' */
 
-	name = zbx_malloc(NULL, sizeof(TCHAR) * size);
-	(void)_sntprintf(name, size, format, prefix, pid);
-	name[size - 1] = '\0';
+	name = zbx_malloc(NULL, sizeof(wchar_t) * size);
+	(void)_snwprintf(name, size, format, prefix, pid);
+	name[size - 1] = L'\0';
 
 	return name;
 }
