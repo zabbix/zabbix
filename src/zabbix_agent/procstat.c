@@ -363,7 +363,7 @@ static size_t	procstat_strdup(void *base, const char *str)
  *           shared memory segement operation failure.                        *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_reattach()
+static void	procstat_reattach(void)
 {
 	char	*errmsg = NULL;
 
@@ -434,7 +434,7 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
  *          one process statistics query has been made).                      *
  *                                                                            *
  ******************************************************************************/
-static int	procstat_running()
+static int	procstat_running(void)
 {
 	if (ZBX_NONEXISTENT_SHMID == collector->procstat.shmid)
 		return FAIL;
@@ -970,7 +970,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
  *          collector has been initialized)                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_procstat_collector_started()
+int	zbx_procstat_collector_started(void)
 {
 	if (NULL == collector)
 		return FAIL;
@@ -984,13 +984,10 @@ int	zbx_procstat_collector_started()
  *                                                                            *
  * Purpose: initializes process statistics collector                          *
  *                                                                            *
- * Parameters: shm - [IN] the dynamic shared memory segment used by process   *
- *                        statistics collector                                *
- *                                                                            *
  * Return value: This function calls exit() on shared memory errors.          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_init()
+void	zbx_procstat_init(void)
 {
 	char	*errmsg = NULL;
 
@@ -1013,7 +1010,7 @@ void	zbx_procstat_init()
  * Purpose: destroys process statistics collector                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_destroy()
+void	zbx_procstat_destroy(void)
 {
 	char	*errmsg = NULL;
 
@@ -1122,7 +1119,7 @@ out:
  * Purpose: performs process statistics collection                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_collect()
+void	zbx_procstat_collect(void)
 {
 	/* identifies current collection iteration */
 	static int			runid = 1;

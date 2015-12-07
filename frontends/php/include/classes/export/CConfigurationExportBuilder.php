@@ -210,6 +210,46 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format mappings.
+	 *
+	 * @param array $mappings
+	 *
+	 * @return array
+	 */
+	protected function formatMappings(array $mappings) {
+		$result = [];
+
+		CArrayHelper::sort($mappings, ['value']);
+
+		foreach ($mappings as $mapping) {
+			$result[] = [
+				'value' => $mapping['value'],
+				'newvalue' => $mapping['newvalue']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format value maps.
+	 *
+	 * @param array $valuemaps
+	 */
+	public function buildValueMaps(array $valuemaps) {
+		$this->data['value_maps'] = [];
+
+		CArrayHelper::sort($valuemaps, ['name']);
+
+		foreach ($valuemaps as $valuemap) {
+			$this->data['value_maps'][] = [
+				'name' => $valuemap['name'],
+				'mappings' => $this->formatMappings($valuemap['mappings'])
+			];
+		}
+	}
+
+	/**
 	 * For each host interface an unique reference must be created and then added for all items, discovery rules
 	 * and item prototypes that use the interface.
 	 *

@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0alpha4');
+define('ZABBIX_VERSION',		'3.0.0alpha5');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050071);
+define('ZABBIX_DB_VERSION',		2050076);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -553,6 +553,8 @@ define('SCREEN_RESOURCE_HISTORY',			17);
 define('SCREEN_RESOURCE_CHART',				18);
 define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
 define('SCREEN_RESOURCE_LLD_GRAPH',			20);
+// used in Monitoring > Web > Details (httpdetails.php)
+define('SCREEN_RESOURCE_HTTPTEST_DETAILS',		21);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -930,12 +932,12 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
-define('SEC_PER_MIN',	60);
-define('SEC_PER_HOUR',	3600);
-define('SEC_PER_DAY',	86400);
-define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
-define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
-define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+define('SEC_PER_MIN',			60);
+define('SEC_PER_HOUR',			3600);
+define('SEC_PER_DAY',			86400);
+define('SEC_PER_WEEK',			604800);
+define('SEC_PER_MONTH',			2592000);
+define('SEC_PER_YEAR',			31536000);
 
 define('ZBX_JAN_2038', 2145916800);
 
