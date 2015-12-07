@@ -22,7 +22,7 @@
 /**
  * A class to display web scenario details as a screen element by given "httptestid".
  */
-class CScreenWebDetails extends CScreenBase {
+class CScreenHttpTestDetails extends CScreenBase {
 
 	/**
 	 * Process screen.
@@ -30,7 +30,7 @@ class CScreenWebDetails extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$this->dataId = 'webdetails';
+		$this->dataId = 'httptest_details';
 
 		$httptest = API::HttpTest()->get([
 			'output' => ['httptestid', 'name', 'hostid'],
