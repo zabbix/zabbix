@@ -46,12 +46,12 @@ typedef struct
 }
 zbx_procstat_util_t;
 
-void	zbx_procstat_init();
-void	zbx_procstat_destroy();
-int	zbx_procstat_collector_started();
+void	zbx_procstat_init(void);
+void	zbx_procstat_destroy(void);
+int	zbx_procstat_collector_started(void);
 int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
 		int period, int type, double *value, char **errmsg);
-void	zbx_procstat_collect();
+void	zbx_procstat_collect(void);
 
 #endif	/* ZBX_PROCSTAT_COLLECTOR */
 

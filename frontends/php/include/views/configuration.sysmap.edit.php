@@ -143,21 +143,19 @@ $map_tab->addRow(_('Icon label location'), new CComboBox('label_location', $data
 	]
 ));
 
-// Append show unack to form list.
-$show_unack = new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
-	EXTACK_OPTION_ALL => _('All'),
-	EXTACK_OPTION_BOTH => _('Separated'),
-	EXTACK_OPTION_UNACK => _('Unacknowledged only'),
-]);
-$show_unack->setEnabled($data['config']['event_ack_enable']);
-if (!$data['config']['event_ack_enable']) {
-	$show_unack->setAttribute('title', _('Acknowledging disabled'));
-}
-$map_tab
-	->addRow(_('Problem display'), $show_unack)
-	->addRow(_('Minimum trigger severity'),
-		new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
+if ($data['config']['event_ack_enable']) {
+	// Append show unack to form list.
+	$map_tab->addRow(_('Problem display'),
+		new CComboBox('show_unack', $data['sysmap']['show_unack'], null, [
+			EXTACK_OPTION_ALL => _('All'),
+			EXTACK_OPTION_BOTH => _('Separated'),
+			EXTACK_OPTION_UNACK => _('Unacknowledged only'),
+		])
 	);
+}
+$map_tab->addRow(_('Minimum trigger severity'),
+	new CSeverity(['name' => 'severity_min', 'value' => (int) $data['sysmap']['severity_min']])
+);
 
 // Create url table.
 $url_table = (new CTable())
