@@ -186,17 +186,27 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
 	struct sembuf	sem_lock;
+#else
+	DWORD   dwWaitResult;
 #endif
 
 	if (ZBX_MUTEX_NULL == *mutex)
 		return;
 
 #ifdef _WINDOWS
-	if (WAIT_OBJECT_0 != WaitForSingleObject(*mutex, INFINITE))
+	dwWaitResult = WaitForSingleObject(*mutex, INFINITE);
+
+	switch (dwWaitResult)
 	{
-		zbx_error("[file:'%s',line:%d] lock failed: %s",
+		case WAIT_OBJECT_0:
+			break;
+		case WAIT_ABANDONED:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		default:
+			zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
-		exit(EXIT_FAILURE);
+			exit(EXIT_FAILURE);
 	}
 #else
 	sem_lock.sem_num = *mutex;
@@ -290,3 +300,43 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	return SUCCEED;
 }
+
+#ifdef _WINDOWS
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mutex_create_per_process_name                                *
+ *                                                                            *
+ * Purpose: Appends PID to the prefix of the mutex                            *
+ *                                                                            *
+ * Parameters: prefix - mutex type                                            *
+ *                                                                            *
+ * Return value: Dynamically allocated, NUL terminated name of the mutex      *
+ *                                                                            *
+ * Comments: The mutex name must be shorter than MAX_PATH characters,         *
+ *           otherwise the function calls exit()                              *
+ *                                                                            *
+ ******************************************************************************/
+ZBX_MUTEX_NAME  zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix)
+{
+	ZBX_MUTEX_NAME	name = ZBX_MUTEX_NULL;
+	int		size;
+	wchar_t		*format = L"%s_PID_%lx";
+	DWORD		pid = GetCurrentProcessId();
+
+	/* exit if the mutex name length exceed the maximum allowed */
+	size = _scwprintf(format, prefix, pid);
+	if (MAX_PATH < size)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	size = size + 1; /* for terminating '\0' */
+
+	name = zbx_malloc(NULL, sizeof(wchar_t) * size);
+	(void)_snwprintf_s(name, sizeof(wchar_t) * size, size, format, prefix, pid);
+	name[size - 1] = L'\0';
+
+	return name;
+}
+#endif
