@@ -186,17 +186,27 @@ void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex)
 {
 #ifndef _WINDOWS
 	struct sembuf	sem_lock;
+#else
+	DWORD   dwWaitResult;
 #endif
 
 	if (ZBX_MUTEX_NULL == *mutex)
 		return;
 
 #ifdef _WINDOWS
-	if (WAIT_OBJECT_0 != WaitForSingleObject(*mutex, INFINITE))
+	dwWaitResult = WaitForSingleObject(*mutex, INFINITE);
+
+	switch (dwWaitResult)
 	{
-		zbx_error("[file:'%s',line:%d] lock failed: %s",
+		case WAIT_OBJECT_0:
+			break;
+		case WAIT_ABANDONED:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+		default:
+			zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, strerror_from_system(GetLastError()));
-		exit(EXIT_FAILURE);
+			exit(EXIT_FAILURE);
 	}
 #else
 	sem_lock.sem_num = *mutex;
