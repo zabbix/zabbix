@@ -3,6 +3,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
 ..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
