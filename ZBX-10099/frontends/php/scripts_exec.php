@@ -38,7 +38,6 @@ $fields = array(
 check_fields($fields);
 
 ob_end_flush();
-flush();
 
 $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
