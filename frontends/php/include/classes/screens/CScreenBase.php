@@ -149,72 +149,75 @@ class CScreenBase {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
-		$this->isTemplatedScreen = isset($options['isTemplatedScreen']) ? $options['isTemplatedScreen'] : false;
-		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
-		$this->action = !empty($options['action']) ? $options['action'] : null;
-		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
-		$this->hostid = isset($options['hostid']) ? $options['hostid'] : 0;
 		$this->dataId = !empty($options['dataId']) ? $options['dataId'] : null;
-
-		// get page file
-		if (!empty($options['pageFile'])) {
-			$this->pageFile = $options['pageFile'];
-		}
-		else {
-			global $page;
-			$this->pageFile = $page['file'];
-		}
-
-		// calculate timeline
-		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
-		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
-		$this->timeline = !empty($options['timeline']) ? $options['timeline'] : null;
-		if (empty($this->timeline)) {
-			$this->timeline = $this->calculateTime([
-				'profileIdx' => $this->profileIdx,
-				'profileIdx2' => $this->profileIdx2,
-				'updateProfile' => $this->updateProfile,
-				'period' => !empty($options['period']) ? $options['period'] : null,
-				'stime' => !empty($options['stime']) ? $options['stime'] : null
-			]);
-		}
 
-		// get screenitem
-		if (!empty($options['screenitem'])) {
-			$this->screenitem = $options['screenitem'];
-		}
-		elseif (!empty($options['screenitemid'])) {
-			if ($this->hostid != 0) {
-				$this->screenitem = API::TemplateScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'hostids' => $this->hostid,
-					'output' => API_OUTPUT_EXTEND
-				]);
+		if ($this->resourcetype != SCREEN_RESOURCE_HTTPTEST_DETAILS) {
+			$this->isTemplatedScreen = isset($options['isTemplatedScreen']) ? $options['isTemplatedScreen'] : false;
+			$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
+			$this->action = !empty($options['action']) ? $options['action'] : null;
+			$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
+			$this->hostid = isset($options['hostid']) ? $options['hostid'] : 0;
+
+			// get page file
+			if (!empty($options['pageFile'])) {
+				$this->pageFile = $options['pageFile'];
 			}
 			else {
-				$this->screenitem = API::ScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND
+				global $page;
+				$this->pageFile = $page['file'];
+			}
+
+			// calculate timeline
+			$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
+			$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
+			$this->timeline = !empty($options['timeline']) ? $options['timeline'] : null;
+			if (empty($this->timeline)) {
+				$this->timeline = $this->calculateTime([
+					'profileIdx' => $this->profileIdx,
+					'profileIdx2' => $this->profileIdx2,
+					'updateProfile' => $this->updateProfile,
+					'period' => !empty($options['period']) ? $options['period'] : null,
+					'stime' => !empty($options['stime']) ? $options['stime'] : null
 				]);
 			}
 
-			$this->screenitem = reset($this->screenitem);
-		}
+			// get screenitem
+			if (!empty($options['screenitem'])) {
+				$this->screenitem = $options['screenitem'];
+			}
+			elseif (!empty($options['screenitemid'])) {
+				if ($this->hostid != 0) {
+					$this->screenitem = API::TemplateScreenItem()->get([
+						'screenitemids' => $options['screenitemid'],
+						'hostids' => $this->hostid,
+						'output' => API_OUTPUT_EXTEND
+					]);
+				}
+				else {
+					$this->screenitem = API::ScreenItem()->get([
+						'screenitemids' => $options['screenitemid'],
+						'output' => API_OUTPUT_EXTEND
+					]);
+				}
 
-		// get screenid
-		if (empty($this->screenid) && !empty($this->screenitem)) {
-			$this->screenid = $this->screenitem['screenid'];
-		}
+				$this->screenitem = reset($this->screenitem);
+			}
 
-		// get resourcetype
-		if (is_null($this->resourcetype) && !empty($this->screenitem['resourcetype'])) {
-			$this->resourcetype = $this->screenitem['resourcetype'];
-		}
+			// get screenid
+			if (empty($this->screenid) && !empty($this->screenitem)) {
+				$this->screenid = $this->screenitem['screenid'];
+			}
 
-		// create action url
-		if (empty($this->action)) {
-			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.$this->screenitem['screenitemid'];
+			// get resourcetype
+			if (is_null($this->resourcetype) && !empty($this->screenitem['resourcetype'])) {
+				$this->resourcetype = $this->screenitem['resourcetype'];
+			}
+
+			// create action url
+			if (empty($this->action)) {
+				$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.$this->screenitem['screenitemid'];
+			}
 		}
 	}
 
@@ -285,25 +288,30 @@ class CScreenBase {
 	 *
 	 * @param array $data
 	 */
-	public function insertFlickerfreeJs($data = []) {
+	public function insertFlickerfreeJs(array $data = []) {
 		$jsData = [
 			'id' => $this->getDataId(),
 			'isFlickerfree' => $this->isFlickerfree,
-			'pageFile' => $this->pageFile,
 			'resourcetype' => $this->resourcetype,
 			'mode' => $this->mode,
-			'timestamp' => $this->timestamp,
 			'interval' => CWebUser::$data['refresh'],
-			'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
-			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
-			'groupid' => $this->groupid,
-			'hostid' => $this->hostid,
-			'timeline' => $this->timeline,
-			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
-			'updateProfile' => $this->updateProfile,
-			'data' => !empty($data) ? $data : null
 		];
+
+		if ($this->resourcetype != SCREEN_RESOURCE_HTTPTEST_DETAILS) {
+			$jsData += [
+				'pageFile' => $this->pageFile,
+				'timestamp' => $this->timestamp,
+				'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
+				'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
+				'groupid' => $this->groupid,
+				'hostid' => $this->hostid,
+				'timeline' => $this->timeline,
+				'profileIdx' => $this->profileIdx,
+				'updateProfile' => $this->updateProfile,
+				'data' => !empty($data) ? $data : null
+			];
+		}
 
 		zbx_add_post_js('window.flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
 	}
