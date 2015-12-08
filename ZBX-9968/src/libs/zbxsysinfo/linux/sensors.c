@@ -20,7 +20,7 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
 #define DEVICE_DIR	"/sys/class/hwmon"
@@ -46,7 +46,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 
 	zbx_fclose(f);
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 	if (1 == sscanf(line, "%*f\t%*f\t%lf\n", &value))
 	{
 #else
@@ -75,6 +75,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
 	}
 }
 
+#ifndef KERNEL_2_4
 /*********************************************************************************
  *                                                                               *
  * Function: sysfs_read_attr                                                     *
@@ -251,12 +252,13 @@ out:
 
 	return ret;
 }
+#endif
 
 static void	get_device_sensors(int do_task, const char *device, const char *name, double *aggr, int *cnt)
 {
 	char	sensorname[MAX_STRING_LEN];
 
-#if defined(KERNEL_2_4)
+#ifdef KERNEL_2_4
 	if (ZBX_DO_ONE == do_task)
 	{
 		zbx_snprintf(sensorname, sizeof(sensorname), "%s/%s/%s", DEVICE_DIR, device, name);
