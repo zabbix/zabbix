@@ -308,7 +308,6 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		//background-color: $main-nav-bg-color;
 
 		.search-suggest {
 			min-width: 186px;
@@ -516,10 +515,6 @@ article {
 		padding: 0 5px 0 0;
 		vertical-align: middle;
 
-		//&:last-child {
-		//	margin: 0;
-		//}
-
 		span {
 			padding: 4px 7px;
 		}
@@ -535,7 +530,6 @@ article {
 
 	.selected {
 		background-color: $ui-bg-color;
-		//border: 1px solid $ui-border-color;
 		@include box-shadow(inset 0 0 0 1px $ui-border-color);
 		@include border-radius(2px);
 	}
@@ -1014,7 +1008,6 @@ footer {
 }
 
 .multiselect-button {
-	//float: left;
 	display: inline-block;
 	vertical-align: top;
 }
@@ -1056,7 +1049,6 @@ footer {
 	margin-top: 1px;
 	border: 1px solid $action-border-color;
 	border-top: none;
-	//min-width: 165px;
 	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
@@ -1938,16 +1930,9 @@ button[disabled] {
 	margin: 0 14px 0 0;
 }
 
-//.tabs-nav-container {
-//	height: 36px;
-//	line-height: 36px;
-//	margin: 0 0 15px 0;
-//}
-
 .ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
-	//margin: -10px -10px 10px -10px;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
@@ -1979,7 +1964,6 @@ button[disabled] {
 
 			a {
 				padding: 11px 13px 9px 13px;
-				//background-color: $ui-bg-color;
 				background-color: $transparent;
 				color: $font-color;
 				text-decoration: none;
@@ -1993,7 +1977,6 @@ button[disabled] {
 			a {
 				cursor: default;
 				color: $btn-disabled-font-color;
-				//background-color: $ui-bg-color;
 				background-color: $transparent;
 			}
 		}
@@ -2475,11 +2458,9 @@ $form-icon-btn: (
 
 	.table-forms-td-left {
 		text-align: left;
-	//	width: auto;
 	}
 
 	.table-forms-td-right {
-		//width: auto;
 
 		td {
 			vertical-align: middle;
@@ -2710,8 +2691,6 @@ $form-icon-btn: (
 	width: 100%;
 
 	td {
-		//text-align: center;
-		//vertical-align: middle;
 		padding: 8px 5px;
 	}
 
@@ -3504,13 +3483,6 @@ $browser-logos: (
 	cursor: move;
 }
 
-tr.cursor-move {
-	
-	> input {
-		cursor: move;
-	}
-}
-
 .cursor-pointer {
 	cursor: pointer;
 }
@@ -3571,26 +3543,17 @@ tr.cursor-move {
 
 // Analog Clock
 .clock {
-	//margin: 1em 0;
-	//position: relative;
 	text-align: center;
 	display: inline-block;
 }
 
 .time-zone {
 	margin: 0 0 .5em 0;
-	//top: -1.55em;
-	//left: 0;
-	//right: 0;
-	//position: absolute;
 	white-space: nowrap;
 }
 
 .local-clock {
 	margin: .5em 0 0 0;
-	//left: 0;
-	//right: 0;
-	//position: absolute;
 	white-space: nowrap;
 }
 
