@@ -3,6 +3,10 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 
@@ -33,7 +37,7 @@ A......... [ZBX-9340] fixed "data" property not being returned by API when error
 A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule when full cloning a host (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
-........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
+........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -715,6 +719,9 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
@@ -742,7 +749,7 @@ A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seco
 A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
-........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
+........S. [ZBX-9643] fixed resolving of {TRIGGER.NAME} macro in action messages (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -2048,6 +2055,7 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.16
