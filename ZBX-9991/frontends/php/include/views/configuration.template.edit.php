@@ -75,8 +75,8 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 }
 else {
 	$groups = get_request('groups', array());
-	if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && !uint_in_array($_REQUEST['groupid'], $groups)) {
-		array_push($groups, $_REQUEST['groupid']);
+	if (!hasRequest('form_refresh') && (getRequest('groupid') > 0) && !uint_in_array(getRequest('groupid'), $groups)) {
+		$groups[] = getRequest('groupid');
 	}
 	$hosts_linked_to = get_request('hosts', array());
 }
