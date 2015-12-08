@@ -5,6 +5,12 @@ New features:
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
+...G...... [ZBX-10033] fixed Windows agent printing an incorrect error message in case of abandoned lock (Sandis)
+...G...... [ZBX-10034] fixed agent start-up failures within Windows session due to common locks abandoned by other agents (Sandis)
+..F....... [ZBX-10036] fixed showing all hosts in dashboard last 20 issues when trigger expression contains several hosts (Gunars)
 ..F....... [ZBX-9906] fixed automatic refreshing of WEB scenario details (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ...G...... [ZBX-10018] fixed inconsistent messages in debug log when UserParameter terminated by timeout (viktors)
@@ -264,6 +270,9 @@ Changes for 2.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -979,6 +988,8 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
