@@ -719,12 +719,14 @@ footer {
 		color: $font-color;
 		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
+		z-index: 10;
 		position: relative;
 	}
 
 	&:active {
 		color: $font-color;
 		background-color: $btn-form-hover-color;
+		z-index: 10;
 		position: relative;
 	}
 
@@ -737,29 +739,29 @@ footer {
 	}
 
 	&.paging-selected {
-		color: $white;
-		border-color: $btn-border-color;//$form-border-color;
-		background-color: $btn-bg-color;//$ui-bg-selected-color;	
+		color: $font-selected-color;
+		border-color: $ui-bg-selected-color;//$form-border-color;
+		background-color: $ui-bg-selected-color;	
 		position: relative;
 		z-index: 1;
 
 		&:hover {
-			//background-color: darken($ui-bg-selected-color, 4%);
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			background-color: darken($ui-bg-selected-color, 4%);
+			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:focus {
-			//background-color: darken($ui-bg-selected-color, 4%);
-			//border-color: $form-border-focus-color;
-			//position: relative;
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			background-color: darken($ui-bg-selected-color, 4%);
+			border-color: $form-border-focus-color;
+			position: relative;
+			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
-			//background-color: darken($ui-bg-selected-color, 4%);
-			//border-color: $form-border-focus-color;
-			//position: relative;
-			@include btn-hover-active($btn-font-color, $btn-bg-color);
+			background-color: darken($ui-bg-selected-color, 4%);
+			border-color: $form-border-focus-color;
+			position: relative;
+			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 }
@@ -907,13 +909,19 @@ footer {
 	position: relative;
 	height: 18px;
 	padding: 0 4px;
+	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
 	a {
-		color: $font-color;
+		//color: $font-color;
+		color: $font-selected-color;
 		text-decoration: none;
 		cursor: default;
+	}
+
+	sup {
+		color: lighten($ui-bg-selected-color, 25%);
 	}
 }
 
@@ -1414,6 +1422,7 @@ footer {
 }
 
 .radio-segmented {
+	white-space: nowrap;
 
 	li {
 		position: relative;
@@ -1469,8 +1478,8 @@ footer {
 
 		&:checked + label {
 			color: $white;
-			border-color: $btn-border-color;//$form-border-color;
-			background-color: $btn-bg-color;//$ui-bg-selected-color;	
+			border-color: $ui-bg-selected-color;//$btn-border-color;//$form-border-color;
+			background-color: $ui-bg-selected-color;//$btn-bg-color;	
 			position: relative;
 			z-index: 1;
 		}
@@ -1867,29 +1876,33 @@ $icon-widget-btn: (
 
 %form-disabled {
 	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color;
+	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
 }
 
 .disabled {
 	cursor: default !important;
-	@include opacity(0.4);
+	@include opacity(0.35);
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
 
 	.subfilter-disable-btn {
 		cursor: default;
-		color: darken($ui-bg-selected-color, 15%);
+		color: darken($ui-bg-selected-color, 25%);
 		background-color: $ui-bg-selected-color;
 
 		&:hover {
-			color: darken($ui-bg-selected-color, 15%);
+			color: darken($ui-bg-selected-color, 35%);
 		}
 
 		&:focus {
-			color: darken($ui-bg-selected-color, 15%);
+			color: darken($ui-bg-selected-color, 35%);
 		}
 
 		&:active {
-			color: darken($ui-bg-selected-color, 15%);
+			color: darken($ui-bg-selected-color, 35%);
 		}
 	}
 }
@@ -3321,22 +3334,26 @@ a.overlay-close-btn {
 	position: absolute;
 	top: 0;
 	right: -12px;
-	color: darken($ui-bg-selected-color, 40%);
+	//color: darken($ui-bg-selected-color, 40%);
+	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
 	@include border-radius(2px);
 	@include opacity(1);
 
 	&:hover {
-		color: darken($ui-bg-selected-color, 65%);
+		//color: darken($ui-bg-selected-color, 65%);
+		color: darken($font-selected-color, 5%);
 	}
 
 	&:focus {
-		color: darken($ui-bg-selected-color, 55%);
+		//color: darken($ui-bg-selected-color, 55%);
+		color: darken($font-selected-color, 10%);
 	}
 
 	&:active {
-		color: darken($ui-bg-selected-color, 55%);
+		//color: darken($ui-bg-selected-color, 55%);
+		color: darken($font-selected-color, 10%);
 	}
 }
 
@@ -3481,6 +3498,13 @@ $browser-logos: (
 
 .cursor-move {
 	cursor: move;
+}
+
+.cursor-move td {
+	
+	> * {
+		cursor: move;
+	}
 }
 
 .cursor-pointer {
