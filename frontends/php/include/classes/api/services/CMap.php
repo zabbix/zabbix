@@ -197,7 +197,6 @@ class CMap extends CMapElement {
 				if ($linkTriggers) {
 					$trigOptions = [
 						'triggerids' => $linkTriggers,
-						'editable' => $options['editable'],
 						'output' => ['triggerid'],
 						'preservekeys' => true
 					];
@@ -238,7 +237,6 @@ class CMap extends CMapElement {
 				if ($hostsToCheck) {
 					$allowedHosts = API::Host()->get([
 						'hostids' => $hostsToCheck,
-						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => ['hostid']
 					]);
@@ -258,7 +256,6 @@ class CMap extends CMapElement {
 				if ($mapsToCheck) {
 					$allowedMaps = $this->get([
 						'sysmapids' => $mapsToCheck,
-						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => ['sysmapid']
 					]);
@@ -278,7 +275,6 @@ class CMap extends CMapElement {
 				if ($triggersToCheck) {
 					$allowedTriggers = API::Trigger()->get([
 						'triggerids' => $triggersToCheck,
-						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => ['triggerid']
 					]);
@@ -298,7 +294,6 @@ class CMap extends CMapElement {
 				if ($hostGroupsToCheck) {
 					$allowedHostGroups = API::HostGroup()->get([
 						'groupids' => $hostGroupsToCheck,
-						'editable' => $options['editable'],
 						'preservekeys' => true,
 						'output' => ['groupid']
 					]);
