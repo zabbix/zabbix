@@ -3,6 +3,7 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
