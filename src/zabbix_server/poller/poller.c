@@ -79,8 +79,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_JMX);
 			break;
 		default:
-			/* we should never end up here */
-			assert(0);
+			zbx_error("unknown item type: %d", type);
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	/*************************************************************************
@@ -506,13 +506,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
  *                                                                            *
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
- * Parameters:                                                                *
+ * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
  *                                                                            *
  * Return value: number of items processed                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: processes single item at a time except for Java, SNMP items,     *
+ *           see DCconfig_get_poller_items()                                  *
  *                                                                            *
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
@@ -690,7 +691,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
-				assert(0);
+				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
 		if (SUCCEED == errcodes[i])
