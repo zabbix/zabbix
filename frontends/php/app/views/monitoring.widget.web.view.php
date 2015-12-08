@@ -78,7 +78,7 @@ $table = (new CTableInfo())->setHeader([_('Host group'), _('Ok'), _('Failed'), _
 foreach ($groups as $group) {
 	if (array_key_exists($group['groupid'], $table_data)) {
 		$table->addRow([
-			new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
+			new CLink($group['name'], 'zabbix.php?action=web.view&groupid='.$group['groupid'].'&hostid=0'),
 			(new CSpan($table_data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_GREEN),
 			(new CSpan($table_data[$group['groupid']]['failed']))
 				->addClass($table_data[$group['groupid']]['failed'] == 0 ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
