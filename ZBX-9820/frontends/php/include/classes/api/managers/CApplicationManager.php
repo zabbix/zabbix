@@ -341,7 +341,7 @@ class CApplicationManager {
 		));
 
 		// remove Monitoring > Latest data toggle profile values related to given applications
-		CProfile::delete('web.latest.toggle', $applicationIds);
+		DB::delete('profiles', array('idx' => 'web.latest.toggle', 'idx2' => $applicationIds));
 
 		DB::delete('applications', array('applicationid' => $applicationIds));
 	}
