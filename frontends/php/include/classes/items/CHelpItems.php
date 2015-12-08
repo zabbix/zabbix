@@ -218,7 +218,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
-					'description' => _('Run specified command on the host. Returns text result of the command')
+					'description' => _('Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)')
 				],
 				[
 					'key' => 'system.stat[resource,<type>]',
@@ -500,7 +500,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
-					'description' => _('Run specified command on the host. Returns text result of the command')
+					'description' => _('Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)')
 				],
 				[
 					'key' => 'system.stat[resource,<type>]',

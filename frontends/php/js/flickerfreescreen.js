@@ -52,40 +52,40 @@ jQuery(function($) {
 		refresh: function(id, isSelfRefresh) {
 			var screen = this.screens[id];
 			var ajaxParams = ['mode', 'resourcetype', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx',
-				'profileIdx2', 'updateProfile', 'screenitemid'];
+				'profileIdx2', 'updateProfile', 'screenitemid', 'data'];
 
 			/*
 			 * Define screen required parameters
 			 *
 			 * Keep in sync with CScreenBase
 			 */
-			var parametersConfig = [
-				// mode			screenid		hostid	pageFile		profileIdx2		screenitemid
-				//		resourcetype	groupid					profileIdx		updateProfile	timeline
+			var requiredParameters = [
+				// mode			screenid		hostid	pageFile		profileIdx2		screenitemid	timeline
+				//		resourcetype	groupid					profileIdx		updateProfile	data
 				// 0	1		2		3		4		5		6		7		8		9		10
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_GRAPH
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SIMPLE_GRAPH
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_MAP
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_PLAIN_TEXT
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HOSTS_INFO
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_TRIGGERS_INFO
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SERVER_INFO
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_CLOCK
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SCREEN
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_TRIGGERS_OVERVIEW
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_DATA_OVERVIEW
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_URL
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_ACTIONS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_EVENTS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_SYSTEM_STATUS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HOST_TRIGGERS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_HISTORY
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_CHART
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	true], // SCREEN_RESOURCE_LLD_GRAPH
-				[],
-				[true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	false] // SCREEN_RESOURCE_DISCOVERY
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_GRAPH
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SIMPLE_GRAPH
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_MAP
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_PLAIN_TEXT
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HOSTS_INFO
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_TRIGGERS_INFO
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SERVER_INFO
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_CLOCK
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SCREEN
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_TRIGGERS_OVERVIEW
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_DATA_OVERVIEW
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_URL
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_ACTIONS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_EVENTS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SYSTEM_STATUS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HOST_TRIGGERS
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HISTORY
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_CHART
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
+				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_LLD_GRAPH
+				[true,	true,	false,	false,	false,	false,	false,	true,	false,	false,	false,	false], // SCREEN_RESOURCE_HTTPTEST_DETAILS
+				[true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	true,	false] // SCREEN_RESOURCE_DISCOVERY
 			];
 
 			if (empty(screen.id)) {
@@ -104,16 +104,16 @@ jQuery(function($) {
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
 
-			var requiredParams = parametersConfig[screen.resourcetype];
+			var isRequired = requiredParameters[screen.resourcetype];
 
 			for (var i = 0; i < ajaxParams.length; i++) {
-				if (requiredParams[i]) {
+				if (isRequired[i]) {
 					ajaxUrl.setArgument(ajaxParams[i], empty(screen[ajaxParams[i]]) ? null : screen[ajaxParams[i]]);
 				}
 			}
 
 			// timeline params
-			if (requiredParams[10]) {
+			if (isRequired[11]) {
 				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}
@@ -201,12 +201,6 @@ jQuery(function($) {
 				}
 			}
 
-			// SCREEN_RESOURCE_DISCOVERY
-			else if (screen.resourcetype == 22) {
-				ajaxUrl.setArgument('data', empty(screen.data) ? null : screen.data);
-				this.refreshHtml(id, ajaxUrl);
-			}
-
 			// others
 			else {
 				this.refreshHtml(id, ajaxUrl);
@@ -233,7 +227,7 @@ jQuery(function($) {
 			for (var id in this.screens) {
 				var screen = this.screens[id];
 
-				if (!empty(screen.id)) {
+				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
 					screen.timeline.period = period;
 					screen.timeline.stime = stime;
 					screen.timeline.isNow = isNow;

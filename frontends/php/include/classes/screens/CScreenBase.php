@@ -207,6 +207,7 @@ class CScreenBase {
 			SCREEN_RESOURCE_CHART				=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
 			SCREEN_RESOURCE_LLD_SIMPLE_GRAPH	=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
 			SCREEN_RESOURCE_LLD_GRAPH			=> [true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true,	true],
+			SCREEN_RESOURCE_HTTPTEST_DETAILS	=> [true,	true,	true,	true,	false,	false,	false,	false,	false,	false,	false,	true,	false,	false,	true],
 			SCREEN_RESOURCE_DISCOVERY			=> [true,	true,	true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	false,	false,	true]
 		];
 
@@ -228,7 +229,7 @@ class CScreenBase {
 			else {
 				$this->screenitem = API::ScreenItem()->get([
 					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND
+					'output' => API_OUTPUT_EXTEND - Change
 				]);
 			}
 
@@ -347,7 +348,7 @@ class CScreenBase {
 	 *
 	 * @param array $data
 	 */
-	public function insertFlickerfreeJs($data = []) {
+	public function insertFlickerfreeJs(array $data = []) {
 		$jsData = [
 			'id' => $this->getDataId(),
 			'interval' => CWebUser::$data['refresh'],
