@@ -3,6 +3,10 @@ Changes for 2.2.12rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
+...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
+........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 .......PS. [ZBX-9931] removed 2KB item key length limitation when sent to agent (viktors)
 ...G...... [ZBX-9932] removed 1KB zabbix_get item key length limitation (viktors)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
@@ -1336,6 +1340,7 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.16
