@@ -219,17 +219,21 @@ class CScreenBase {
 			$this->screenitem = (array) $options['screenitem'];
 		}
 		elseif (array_key_exists('screenitemid', $options)) {
+			$screenitem_output = ['screenitemid', 'screenid', 'resourcetype', 'resourceid', 'width', 'height',
+				'elements', 'halign', 'valign', 'style', 'url', 'dynamic', 'sort_triggers', 'application',
+				'max_columns'];
+
 			if ($this->hostid != 0) {
 				$this->screenitem = API::TemplateScreenItem()->get([
+					'output' => $screenitem_output,
 					'screenitemids' => $options['screenitemid'],
-					'hostids' => $this->hostid,
-					'output' => API_OUTPUT_EXTEND
+					'hostids' => $this->hostid
 				]);
 			}
 			else {
 				$this->screenitem = API::ScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND - Change
+					'output' => $screenitem_output,
+					'screenitemids' => $options['screenitemid']
 				]);
 			}
 
