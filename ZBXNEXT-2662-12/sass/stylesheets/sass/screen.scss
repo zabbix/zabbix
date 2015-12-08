@@ -1357,13 +1357,10 @@ footer {
 	}
 }
 
-.center {
-	text-align: center;
-}
-
 .table-forms-separator {
 	display: inline-block;
 	padding: 5px;
+	position: relative;
 	border: 1px solid $table-border-color;
 	@include box-sizing(border-box);
 }
@@ -2738,9 +2735,12 @@ $form-icon-btn: (
 	}
 
 	.dashbrd-widget-head {
-		font-weight: normal;
 		text-align: left;
 		padding: 8px;
+
+		li {
+			line-height: 2.9em;
+		}
 	}
 
 	.dashbrd-widget-foot {
@@ -3502,6 +3502,13 @@ $browser-logos: (
 
 .cursor-move {
 	cursor: move;
+}
+
+tr.cursor-move {
+	
+	> input {
+		cursor: move;
+	}
 }
 
 .cursor-pointer {
