@@ -68,7 +68,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
 int	zbx_mutex_destroy(ZBX_MUTEX *mutex);
 
 #ifdef _WINDOWS
-ZBX_MUTEX_NAME	zbx_mutex_create_per_process_name(ZBX_MUTEX_NAME prefix);
+ZBX_MUTEX_NAME	zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix);
 #endif
 
 #endif	/* ZABBIX_MUTEXS_H */
