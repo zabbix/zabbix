@@ -455,69 +455,6 @@ static int	DBpatch_2050045(void)
 	return DBadd_field("applications", &field);
 }
 
-static int	DBpatch_2050046(void)
-{
-	return DBdrop_table("graph_theme");
-}
-
-static int	DBpatch_2050047(void)
-{
-	const ZBX_TABLE table =
-		{"graph_theme",	"graphthemeid",	0,
-			{
-				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"legendview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_2050048(void)
-{
-	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
-}
-
-static int	DBpatch_2050049(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-			"insert into graph_theme"
-			" values (1,'blue-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
-				"'429E47','E33734','EBEBEB',1,1)"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2050050(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-			"insert into graph_theme"
-			" values (2,'dark-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
-				"'59DB8F','E45959','333333',1,1)"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 static int	DBpatch_2050051(void)
 {
 	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -706,6 +643,67 @@ static int	DBpatch_2050071(void)
 	return DBmodify_field_type("hostmacro", &field);
 }
 
+static int	DBpatch_2050072(void)
+{
+	return DBdrop_table("graph_theme");
+}
+
+static int	DBpatch_2050073(void)
+{
+	const ZBX_TABLE table =
+		{"graph_theme",	"graphthemeid",	0,
+			{
+				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050074(void)
+{
+	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
+}
+
+static int	DBpatch_2050075(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (1,'blue-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
+				"'429E47','E33734','EBEBEB')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050076(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (2,'dark-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
+				"'59DB8F','E45959','333333')"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -750,11 +748,6 @@ DBPATCH_ADD(2050042, 0, 1)
 DBPATCH_ADD(2050043, 0, 1)
 DBPATCH_ADD(2050044, 0, 1)
 DBPATCH_ADD(2050045, 0, 1)
-DBPATCH_ADD(2050046, 0, 1)
-DBPATCH_ADD(2050047, 0, 1)
-DBPATCH_ADD(2050048, 0, 1)
-DBPATCH_ADD(2050049, 0, 1)
-DBPATCH_ADD(2050050, 0, 1)
 DBPATCH_ADD(2050051, 0, 1)
 DBPATCH_ADD(2050052, 0, 1)
 DBPATCH_ADD(2050053, 0, 1)
@@ -776,5 +769,10 @@ DBPATCH_ADD(2050068, 0, 1)
 DBPATCH_ADD(2050069, 0, 1)
 DBPATCH_ADD(2050070, 0, 1)
 DBPATCH_ADD(2050071, 0, 1)
+DBPATCH_ADD(2050072, 0, 1)
+DBPATCH_ADD(2050073, 0, 1)
+DBPATCH_ADD(2050074, 0, 1)
+DBPATCH_ADD(2050075, 0, 1)
+DBPATCH_ADD(2050076, 0, 1)
 
 DBPATCH_END()
