@@ -3547,19 +3547,19 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'userid' => array(
+			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid',
-			),
-			'private' => array(
+			],
+			'private' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1',
-			),
+			],
 		],
 	],
 	'sysmaps_elements' => [
@@ -3847,19 +3847,19 @@ return [
 				'ref_table' => 'sysmaps',
 				'ref_field' => 'sysmapid',
 			],
-			'userid' => array(
+			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid',
-			),
-			'permission' => array(
+			],
+			'permission' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '2',
-			),
+			],
 		],
 	],
 	'sysmap_usrgrp' => [
@@ -3877,19 +3877,19 @@ return [
 				'ref_table' => 'sysmaps',
 				'ref_field' => 'sysmapid',
 			],
-			'usrgrpid' => array(
+			'usrgrpid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'users_groups',
+				'ref_table' => 'usrgrp',
 				'ref_field' => 'usrgrpid',
-			),
-			'permission' => array(
+			],
+			'permission' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '2',
-			),
+			],
 		],
 	],
 	'maintenances_hosts' => [
