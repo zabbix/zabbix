@@ -63,9 +63,7 @@ abstract class CGraphDraw {
 			'gridbordercolor' => 'ACBBC2',
 			'nonworktimecolor' => 'EBEBEB',
 			'leftpercentilecolor' => '429E47',
-			'righttpercentilecolor' => 'E33734',
-			'legendview' => '1',
-			'gridview' => '1'
+			'righttpercentilecolor' => 'E33734'
 		];
 		$this->applyGraphTheme();
 	}
