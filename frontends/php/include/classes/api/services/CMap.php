@@ -507,15 +507,15 @@ class CMap extends CMapElement {
 			}
 
 			// Map user group shares.
-			if (array_key_exists('user_groups', $map)) {
-				if (!is_array($map['user_groups'])) {
+			if (array_key_exists('userGroups', $map)) {
+				if (!is_array($map['userGroups'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 				}
 
 				$shared_user_groupids = [];
 				$required_fields = ['usrgrpid', 'permission'];
 
-				foreach ($map['user_groups'] as $share) {
+				foreach ($map['userGroups'] as $share) {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
 					if ($missing_keys) {
@@ -891,15 +891,15 @@ class CMap extends CMapElement {
 			}
 
 			// Map user group shares.
-			if (array_key_exists('user_groups', $map)) {
-				if (!is_array($map['user_groups'])) {
+			if (array_key_exists('userGroups', $map)) {
+				if (!is_array($map['userGroups'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 				}
 
 				$shared_user_groupids = [];
 				$required_fields = ['usrgrpid', 'permission'];
 
-				foreach ($map['user_groups'] as $share) {
+				foreach ($map['userGroups'] as $share) {
 					// Check required parameters.
 					$missing_keys = checkRequiredKeys($share, $required_fields);
 					if ($missing_keys) {
@@ -1189,8 +1189,8 @@ class CMap extends CMapElement {
 			}
 
 			// Map user group shares.
-			if (array_key_exists('user_groups', $maps[$key])) {
-				foreach ($maps[$key]['user_groups'] as $user_group) {
+			if (array_key_exists('userGroups', $maps[$key])) {
+				foreach ($maps[$key]['userGroups'] as $user_group) {
 					$shared_user_groups[] = [
 						'sysmapid' => $sysmapid,
 						'usrgrpid' => $user_group['usrgrpid'],
@@ -1347,8 +1347,8 @@ class CMap extends CMapElement {
 			}
 
 			// Map user group shares.
-			if (array_key_exists('user_groups', $map)) {
-				$user_group_shares_diff = zbx_array_diff($map['user_groups'], $db_map['user_groups'],
+			if (array_key_exists('userGroups', $map)) {
+				$user_group_shares_diff = zbx_array_diff($map['userGroups'], $db_map['userGroups'],
 					'usrgrpid'
 				);
 
@@ -1774,7 +1774,7 @@ class CMap extends CMapElement {
 		}
 
 		// Adding user shares.
-		if ($options['selectUsers'] !== null) {
+		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
 			// Get all allowed groups.
 			$related_groups = API::User()->get([
@@ -1793,10 +1793,10 @@ class CMap extends CMapElement {
 
 			$relation_map = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
 
-			$users = $this->unsetExtraFields($users, ['userid', 'permission'], $options['selectUsers']);
+			$users = $this->unsetExtraFields($users, ['sysmapuserid', 'userid', 'permission'], $options['selectUsers']);
 
 			foreach ($users as &$user) {
-				unset($user['sysmapuserid'], $user['sysmapid']);
+				unset($user['sysmapid']);
 			}
 			unset($user);
 
@@ -1804,7 +1804,7 @@ class CMap extends CMapElement {
 		}
 
 		// Adding user group shares.
-		if ($options['selectUserGroups'] !== null) {
+		if ($options['selectUserGroups'] !== null && $options['selectUserGroups'] != API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'usrgrpid', 'sysmap_usrgrp');
 			// Get all allowed groups.
 			$related_groups = API::UserGroup()->get([
@@ -1823,16 +1823,16 @@ class CMap extends CMapElement {
 
 			$relation_map = $this->createRelationMap($user_groups, 'sysmapid', 'sysmapusrgrpid');
 
-			$user_groups = $this->unsetExtraFields($user_groups, ['usrgrpid', 'permission'],
+			$user_groups = $this->unsetExtraFields($user_groups, ['sysmapusrgrpid', 'usrgrpid', 'permission'],
 				$options['selectUserGroups']
 			);
 
 			foreach ($user_groups as &$user_group) {
-				unset($user_group['sysmapusrgrpid'], $user_group['sysmapid']);
+				unset($user_group['sysmapid']);
 			}
 			unset($user_group);
 
-			$result = $relation_map->mapMany($result, $user_groups, 'user_groups');
+			$result = $relation_map->mapMany($result, $user_groups, 'userGroups');
 		}
 
 		return $result;
