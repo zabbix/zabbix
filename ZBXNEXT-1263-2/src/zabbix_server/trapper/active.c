@@ -167,9 +167,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
 			ip += 7;
 
-		alarm(CONFIG_TIMEOUT);
+		zbx_alarm_on(CONFIG_TIMEOUT);
 		zbx_gethost_by_ip(ip, dns, sizeof(dns));
-		alarm(0);
+		zbx_alarm_off();
 
 		DBbegin();
 
@@ -320,12 +320,12 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, buffer);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
 		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
 		ret = SUCCEED;
-	alarm(0);
+	zbx_alarm_off();
 
 	zbx_free(buffer);
 out:
@@ -588,12 +588,12 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, json.buffer);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send(sock, json.buffer))
 		strscpy(error, zbx_socket_strerror());
 	else
 		ret = SUCCEED;
-	alarm(0);
+	zbx_alarm_off();
 
 	zbx_json_free(&json);
 

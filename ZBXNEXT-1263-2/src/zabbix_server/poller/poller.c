@@ -427,9 +427,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			alarm(CONFIG_TIMEOUT);
+			zbx_alarm_on(CONFIG_TIMEOUT);
 			res = get_value_agent(item, result);
-			alarm(0);
+			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
@@ -448,9 +448,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
-			alarm(CONFIG_TIMEOUT);
+			zbx_alarm_on(CONFIG_TIMEOUT);
 			res = get_value_db(item, result);
-			alarm(0);
+			zbx_alarm_off();
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
@@ -466,18 +466,18 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_SSH:
 #ifdef HAVE_SSH2
-			alarm(CONFIG_TIMEOUT);
+			zbx_alarm_on(CONFIG_TIMEOUT);
 			res = get_value_ssh(item, result);
-			alarm(0);
+			zbx_alarm_off();
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			alarm(CONFIG_TIMEOUT);
+			zbx_alarm_on(CONFIG_TIMEOUT);
 			res = get_value_telnet(item, result);
-			alarm(0);
+			zbx_alarm_off();
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
@@ -655,9 +655,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
-		alarm(CONFIG_TIMEOUT);
+		zbx_alarm_on(CONFIG_TIMEOUT);
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num);
-		alarm(0);
+		zbx_alarm_off();
 	}
 	else if (1 == num)
 	{

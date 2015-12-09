@@ -1124,3 +1124,6 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 
 #endif
+
+unsigned int	zbx_alarm_on(unsigned int seconds);
+unsigned int	zbx_alarm_off(void);

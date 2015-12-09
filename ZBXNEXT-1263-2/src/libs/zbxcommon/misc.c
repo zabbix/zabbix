@@ -28,6 +28,8 @@
 #define ZBX_SCHEDULER_FILTER_MINUTE	3
 #define ZBX_SCHEDULER_FILTER_SECOND	4
 
+extern volatile sig_atomic_t	zbx_timed_out;
+
 typedef struct zbx_scheduler_filter_t
 {
 	int				start;
@@ -2920,3 +2922,21 @@ fail:
 
 	return res;
 }
+
+#if !defined(_WINDOWS)
+unsigned int	zbx_alarm_on(unsigned int seconds)
+{
+	zbx_timed_out = 0;
+
+	return alarm(seconds);
+}
+
+unsigned int	zbx_alarm_off(void)
+{
+	unsigned int	ret;
+
+	ret = alarm(0);
+	zbx_timed_out = 0;
+	return ret;
+}
+#endif
