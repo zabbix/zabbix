@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha5
 
 New features:
+A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBX-9998] changed output of history and trends in item list and item prototype list from #y #m #d format to #d format (vitalijs)
 ..F....... [ZBX-9981] fixed validation for zabbix.conf.php saving in write protected directory (vitalijs)
 ....I..... [ZBXNEXT-3037] removed unused fields "gridview" and "legendview" from "graph_theme" table (Sasha)
