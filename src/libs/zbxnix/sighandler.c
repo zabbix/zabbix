@@ -25,6 +25,8 @@
 #include "sigcommon.h"
 #include "../../libs/zbxcrypto/tls.h"
 
+extern volatile sig_atomic_t	zbx_timed_out;
+
 int	sig_parent_pid = -1;
 int	sig_exiting = 0;
 
@@ -60,6 +62,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	zbx_timed_out = 1;	/* set a global flag */
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 }
 

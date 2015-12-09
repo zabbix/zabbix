@@ -68,7 +68,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			host, get_ip_by_socket(sock), (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 	{
@@ -76,7 +76,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 				host, get_ip_by_socket(sock), zbx_socket_strerror());
 	}
 
-	alarm(0);
+	zbx_alarm_off();
 clean:
 	zbx_json_free(&j);
 out:

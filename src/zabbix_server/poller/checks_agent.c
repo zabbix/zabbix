@@ -24,6 +24,8 @@
 
 #include "checks_agent.h"
 
+extern volatile sig_atomic_t	zbx_timed_out;
+
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
 #endif
@@ -83,7 +85,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		}
 #else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent but"
-				"support for TLS was not compiled into %s.", get_program_type_string(program_type)));
+				" support for TLS was not compiled into %s.", get_program_type_string(program_type)));
 		ret = NETWORK_ERROR;
 		goto out;
 #endif
@@ -100,8 +102,10 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			ret = NETWORK_ERROR;
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			ret = SUCCEED;
-		else
+		else if (1 == zbx_timed_out)
 			ret = TIMEOUT_ERROR;
+		else
+			ret = NETWORK_ERROR;
 
 		zbx_free(buffer);
 	}

@@ -49,6 +49,8 @@ unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
 int		process_num;
 int		server_num	= 0;
 
+volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
+
 const char	*help_message[] = {
 	"A Zabbix executable for monitoring of various server parameters, to be started",
 	"upon request by inetd.",
@@ -282,7 +284,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	zbx_tcp_init(&s_in, (ZBX_SOCKET)fileno(stdin));
 	zbx_tcp_init(&s_out, (ZBX_SOCKET)fileno(stdout));
@@ -318,7 +320,7 @@ int	main(int argc, char **argv)
 
 	fflush(stdout);
 
-	alarm(0);
+	zbx_alarm_off();
 
 	zbx_on_exit();
 

@@ -54,8 +54,9 @@
 #	define ZBX_TLS_CIPHERSUITE_ALL	2			/* select ciphersuites with certificate and PSK */
 #endif
 
-extern unsigned int	configured_tls_connect_mode;
-extern unsigned int	configured_tls_accept_modes;
+extern volatile sig_atomic_t	zbx_timed_out;
+extern unsigned int		configured_tls_connect_mode;
+extern unsigned int		configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;
@@ -3423,7 +3424,9 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
-
+#if defined(_WINDOWS)
+	double		sec;
+#endif
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __function_name,
@@ -3555,8 +3558,24 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		}
 	}
 
+#if defined(_WINDOWS)
+	zbx_timed_out = 0;
+	sec = zbx_time();
+#endif
 	while (0 != (res = ssl_handshake(s->tls_ctx)))
 	{
+#if defined(_WINDOWS)
+		if (s->timeout < zbx_time() - sec)
+			zbx_timed_out = 1;
+#endif
+		if (1 == zbx_timed_out)
+		{
+			*error = zbx_strdup(*error, "ssl_handshake() timed out");
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+
 		if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
 		{
 			if (POLARSSL_ERR_X509_CERT_VERIFY_FAILED == res)
@@ -3640,7 +3659,9 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	const char		*__function_name = "zbx_tls_connect";
 	int			ret = FAIL, res;
 	gnutls_x509_crt_t	peer_cert = NULL;
-
+#if defined(_WINDOWS)
+	double			sec;
+#endif
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __function_name,
@@ -3782,8 +3803,22 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 	/* TLS handshake */
 
+#if defined(_WINDOWS)
+	zbx_timed_out = 0;
+	sec = zbx_time();
+#endif
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx)))
 	{
+#if defined(_WINDOWS)
+		if (s->timeout < zbx_time() - sec)
+			zbx_timed_out = 1;
+#endif
+		if (1 == zbx_timed_out)
+		{
+			*error = zbx_strdup(*error, "gnutls_handshake() timed out");
+			goto out;
+		}
+
 		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 		{
 			continue;
@@ -3921,6 +3956,9 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+#if defined(_WINDOWS)
+	double		sec;
+#endif
 	char		psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
@@ -4007,10 +4045,23 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	/* TLS handshake */
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-
+#if defined(_WINDOWS)
+	zbx_timed_out = 0;
+	sec = zbx_time();
+#endif
 	if (1 != (res = SSL_connect(s->tls_ctx)))
 	{
 		int	error_code;
+
+#if defined(_WINDOWS)
+		if (s->timeout < zbx_time() - sec)
+			zbx_timed_out = 1;
+#endif
+		if (1 == zbx_timed_out)
+		{
+			*error = zbx_strdup(*error, "SSL_connect() timed out");
+			goto out;
+		}
 
 		error_code = SSL_get_error(s->tls_ctx, res);
 

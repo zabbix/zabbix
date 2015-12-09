@@ -638,10 +638,10 @@ static int	process_trap(zbx_socket_t *sock, char *s)
 
 		process_mass_data(sock, 0, &av, 1, NULL);
 
-		alarm(CONFIG_TIMEOUT);
+		zbx_alarm_on(CONFIG_TIMEOUT);
 		if (SUCCEED != zbx_tcp_send_raw(sock, "OK"))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
-		alarm(0);
+		zbx_alarm_off();
 	}
 
 	return ret;
