@@ -29,42 +29,33 @@ class CTrend extends CApiService {
 	}
 
 	public function get($options = []) {
-		$result = [];
-
 		$default_options = [
-			'itemids'					=> null,
+			'itemids'		=> null,
 			// filter
-			'time_from'					=> null,
-			'time_till'					=> null,
+			'time_from'		=> null,
+			'time_till'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'countOutput'				=> null,
-			'limit'						=> null
+			'output'		=> API_OUTPUT_EXTEND,
+			'countOutput'	=> null,
+			'limit'			=> null
 		];
 
 		$options = zbx_array_merge($default_options, $options);
 
-		// Check if items have read permissions.
-		$items = API::Item()->get([
-			'output' => ['itemid', 'value_type'],
-			'itemids' => $options['itemids'],
-			'webitems' => true,
-			'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
-		]);
+		$itemids = ['trends' => [], 'trends_uint' => []];
 
-		if (!$items) {
-			return ($options['countOutput'] === null) ? [] : 0;
-		}
+		if ($options['itemids']) {
+			// Check if items have read permissions.
+			$items = API::Item()->get([
+				'output' => ['itemid', 'value_type'],
+				'itemids' => $options['itemids'],
+				'webitems' => true,
+				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
+			]);
 
-		$float_itemids = [];
-		$uint_itemids = [];
-
-		foreach ($items as $item) {
-			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
-				$float_itemids[$item['itemid']] = true;
-			}
-			else {
-				$uint_itemids[$item['itemid']] = true;
+			foreach ($items as $item) {
+				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) ? 'trends' : 'trends_uint';
+				$itemids[$sql_from][$item['itemid']] = true;
 			}
 		}
 
@@ -79,109 +70,72 @@ class CTrend extends CApiService {
 		}
 
 		if ($options['countOutput'] === null) {
-			$sql_limit  = ($options['limit'] && zbx_ctype_digit($options['limit'])) ? $options['limit'] : null;
+			$sql_limit = ($options['limit'] && zbx_ctype_digit($options['limit'])) ? $options['limit'] : null;
+
+			$sql_fields = [];
 
 			if (is_array($options['output'])) {
-				// Always select at least "itemid" field.
-				$sql_fields = 't.itemid,';
-
 				foreach ($options['output'] as $field) {
-					if ($this->hasField($field, 'trends') && $this->hasField($field, 'trends_uint')
-							&& $field !== 'itemid') {
-						$sql_fields .= 't.'.$field.',';
+					if ($this->hasField($field, 'trends') && $this->hasField($field, 'trends_uint')) {
+						$sql_fields[] = 't.'.$field;
 					}
 				}
-				$sql_fields = substr($sql_fields, 0, -1);
 			}
 			elseif ($options['output'] == API_OUTPUT_EXTEND) {
-				$sql_fields = 't.*';
-			}
-			else {
-				// Invalid output method (string). Select only "itemid" instead of everything.
-				$sql_fields = 't.itemid';
+				$sql_fields[] = 't.*';
 			}
 
-			$cnt = 0;
+			// An empty field set or invalid output method (string). Select only "itemid" instead of everything.
+			if (!$sql_fields) {
+				$sql_fields[] = 't.itemid';
+			}
 
-			// Select data from "trends".
-			if ($float_itemids) {
-				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($float_itemids));
+			$result = [];
 
-				$res = DBselect(
-					'SELECT '.$sql_fields.
-					' FROM trends AS t'.
-					' WHERE '.implode(' AND ', $sql_where),
-					$sql_limit
-				);
-
-				while ($data = DBfetch($res)) {
-					$result[] = $data;
+			foreach (['trends', 'trends_uint'] as $sql_from) {
+				if ($sql_limit !== null && $sql_limit <= 0) {
+					break;
 				}
 
-				$cnt = count($result);
-			}
+				if ($itemids[$sql_from]) {
+					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($itemids[$sql_from]));
 
-			$sql_limit -= $cnt;
+					$res = DBselect(
+						'SELECT '.implode(',', $sql_fields).
+						' FROM '.$sql_from.' AS t'.
+						' WHERE '.implode(' AND ', $sql_where),
+						$sql_limit
+					);
 
-			// Select data from "trends_uint" and merge results.
-			if ($uint_itemids && $sql_limit > 0) {
-				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($uint_itemids));
+					while ($row = DBfetch($res)) {
+						$result[] = $row;
+					}
 
-				$res = DBselect(
-					'SELECT '.$sql_fields.
-					' FROM trends_uint AS t'.
-					' WHERE '.implode(' AND ', $sql_where),
-					$sql_limit
-				);
-
-				while ($data = DBfetch($res)) {
-					$result[] = $data;
+					if ($sql_limit !== null) {
+						$sql_limit -= count($result);
+					}
 				}
 			}
+
+			$result = $this->unsetExtraFields($result, ['itemid'], $options['output']);
 		}
 		else {
-			if ($float_itemids && $uint_itemids) {
-				// Select data from both "trends" and "trends_uint" tables.
+			$result = 0;
 
-				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($float_itemids));
+			foreach (['trends', 'trends_uint'] as $sql_from) {
+				if ($itemids[$sql_from]) {
+					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($itemids[$sql_from]));
 
-				$sql = 'SELECT ('.
-					'SELECT COUNT(t.itemid)'.
-					' FROM trends AS t'.
-					' WHERE '.implode(' AND ', $sql_where);
+					$res = DBselect(
+						'SELECT COUNT(*) AS rowscount'.
+						' FROM '.$sql_from.' AS t'.
+						' WHERE '.implode(' AND ', $sql_where)
+					);
 
-				$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($uint_itemids));
-
-				$sql .= ') + ('.
-						'SELECT COUNT(t.itemid)'.
-						' FROM trends_uint AS t'.
-						' WHERE '.implode(' AND ', $sql_where).
-					') AS rowscount FROM dual';
-
-				$res = DBselect($sql);
-			}
-			else {
-				// Select data from either one of the tables.
-
-				if ($float_itemids) {
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($float_itemids));
-					$sql_from = 'trends';
+					if ($row = DBfetch($res)) {
+						$result += $row['rowscount'];
+					}
 				}
-				else {
-					$sql_where['itemid'] = dbConditionInt('t.itemid', array_keys($uint_itemids));
-					$sql_from = 'trends_uint';
-
-				}
-
-				$res = DBselect(
-					'SELECT COUNT(t.itemid) AS rowscount'.
-					' FROM '.$sql_from.' AS t'.
-					' WHERE '.implode(' AND ', $sql_where)
-				);
-			}
-
-			if ($data = DBfetch($res)) {
-				$result = $data['rowscount'];
 			}
 		}
 
