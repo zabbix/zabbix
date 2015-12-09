@@ -44,7 +44,7 @@ class CTrend extends CApiService {
 
 		$itemids = ['trends' => [], 'trends_uint' => []];
 
-		if ($options['itemids']) {
+		if ($options['itemids'] === null || $options['itemids']) {
 			// Check if items have read permissions.
 			$items = API::Item()->get([
 				'output' => ['itemid', 'value_type'],
