@@ -33,6 +33,7 @@ class CFrontendSetup {
 	const MIN_PHP_MAX_INPUT_TIME = 300;
 	const MIN_PHP_GD_VERSION = '2.0';
 	const MIN_PHP_LIBXML_VERSION = '2.6.15';
+	const REQUIRED_PHP_ARG_SEPARATOR_OUTPUT = '&';
 
 	/**
 	 * Check OK, setup can continue.
@@ -87,6 +88,7 @@ class CFrontendSetup {
 		$result[] = $this->checkPhpSession();
 		$result[] = $this->checkPhpSessionAutoStart();
 		$result[] = $this->checkPhpGettext();
+		$result[] = $this->checkPhpArgSeparatorOutput();
 
 		return $result;
 	}
@@ -618,6 +620,23 @@ class CFrontendSetup {
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
 			'error' => _('PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available.')
+		];
+	}
+
+	/**
+	 * Checks for arg_separator.output
+	 *
+	 * @return array
+	 */
+	public function checkPhpArgSeparatorOutput() {
+		$current = ini_get('arg_separator.output');
+
+		return [
+			'name' => _('PHP arg_separator.output'),
+			'current' => htmlspecialchars($current),
+			'required' => htmlspecialchars(self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT),
+			'result' => ($current === self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT) ? self::CHECK_OK : self::CHECK_FATAL,
+			'error' => _s('PHP arg_separator.output must be equal to "%1$s"', self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT)
 		];
 	}
 }
