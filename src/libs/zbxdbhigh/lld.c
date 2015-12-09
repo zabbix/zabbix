@@ -511,7 +511,7 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *             value      - [IN] received value from agent                    *
  *                                                                            *
  ******************************************************************************/
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value)
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts)
 {
 	const char		*__function_name = "lld_process_discovery_rule";
 
@@ -526,7 +526,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value)
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
 	lld_filter_t		filter;
-	zbx_timespec_t		ts;
+	zbx_timespec_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
@@ -580,18 +580,18 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value)
 
 	error = zbx_strdup(error, "");
 
-	zbx_timespec(&ts);
-	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts.sec);
+	zbx_timespec(&now);
+	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, now.sec);
 	lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
 	lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
-	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, ts.sec);
+	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, now.sec);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				lld_ruleid, zbx_host_key_string(lld_ruleid));
 
-		add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, &ts, ITEM_STATE_NORMAL,
+		add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
 				NULL, NULL, 0, 0);
 		process_events();
 
