@@ -195,14 +195,14 @@ class CMap extends CMapElement {
 				}
 
 				if ($linkTriggers) {
-					$trigOptions = [
-						'triggerids' => $linkTriggers,
+					$all_triggers = API::Trigger()->get([
 						'output' => ['triggerid'],
+						'triggerids' => $linkTriggers,
 						'preservekeys' => true
-					];
-					$allTriggers = API::Trigger()->get($trigOptions);
+					]);
+
 					foreach ($linkTriggers as $id => $triggerid) {
-						if (!isset($allTriggers[$triggerid])) {
+						if (!array_key_exists($triggerid, $all_triggers)) {
 							unset($result[$id], $sysmapids[$id]);
 						}
 					}
@@ -214,7 +214,12 @@ class CMap extends CMapElement {
 				$hostGroupsToCheck = [];
 
 				$selements = [];
-				$dbSelements = DBselect('SELECT se.* FROM sysmaps_elements se WHERE '.dbConditionInt('se.sysmapid', $sysmapids));
+				$dbSelements = DBselect(
+					'SELECT se.*'.
+					' FROM sysmaps_elements se'.
+					' WHERE '.dbConditionInt('se.sysmapid', $sysmapids)
+				);
+
 				while ($selement = DBfetch($dbSelements)) {
 					$selements[$selement['selementid']] = $selement;
 
@@ -236,13 +241,13 @@ class CMap extends CMapElement {
 
 				if ($hostsToCheck) {
 					$allowedHosts = API::Host()->get([
+						'output' => ['hostid'],
 						'hostids' => $hostsToCheck,
-						'preservekeys' => true,
-						'output' => ['hostid']
+						'preservekeys' => true
 					]);
 
 					foreach ($hostsToCheck as $elementid) {
-						if (!isset($allowedHosts[$elementid])) {
+						if (!array_key_exists($elementid, $allowedHosts)) {
 							foreach ($selements as $selementid => $selement) {
 								if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST
 										&& bccomp($selement['elementid'], $elementid) == 0) {
@@ -255,13 +260,13 @@ class CMap extends CMapElement {
 
 				if ($mapsToCheck) {
 					$allowedMaps = $this->get([
+						'output' => ['sysmapid'],
 						'sysmapids' => $mapsToCheck,
-						'preservekeys' => true,
-						'output' => ['sysmapid']
+						'preservekeys' => true
 					]);
 
 					foreach ($mapsToCheck as $elementid) {
-						if (!isset($allowedMaps[$elementid])) {
+						if (!array_key_exists($elementid, $allowedMaps)) {
 							foreach ($selements as $selementid => $selement) {
 								if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP
 										&& bccomp($selement['elementid'], $elementid) == 0) {
@@ -293,13 +298,13 @@ class CMap extends CMapElement {
 
 				if ($hostGroupsToCheck) {
 					$allowedHostGroups = API::HostGroup()->get([
+						'output' => ['groupid'],
 						'groupids' => $hostGroupsToCheck,
-						'preservekeys' => true,
-						'output' => ['groupid']
+						'preservekeys' => true
 					]);
 
 					foreach ($hostGroupsToCheck as $elementid) {
-						if (!isset($allowedHostGroups[$elementid])) {
+						if (!array_key_exists($elementid, $allowedHostGroups)) {
 							foreach ($selements as $selementid => $selement) {
 								if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP
 										&& bccomp($selement['elementid'], $elementid) == 0) {
@@ -331,19 +336,17 @@ class CMap extends CMapElement {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $sysmapids
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete($sysmapids) {
+	protected function validateDelete(array $sysmapids) {
 		if (!$sysmapids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$user_data = self::$userData;
-
 		$db_maps = $this->get([
-			'output' => ['sysmapid', 'userid'],
+			'output' => ['sysmapid'],
 			'sysmapids' => $sysmapids,
 			'editable' => true,
 			'preservekeys' => true
@@ -363,7 +366,7 @@ class CMap extends CMapElement {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate($maps) {
+	protected function validateCreate(array $maps) {
 		if (!$maps) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
@@ -379,7 +382,34 @@ class CMap extends CMapElement {
 			'links' => []
 		];
 
-		$map_names = [];
+		// Validate mandatory fields and map name.
+		foreach ($maps as $map) {
+			if (!check_db_fields($map_db_fields, $map)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
+			}
+		}
+
+		// Check for duplicate names.
+		$duplicate = CArrayHelper::findDuplicate($maps, 'name');
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "name" value "%1$s" for map.', $duplicate['name'])
+			);
+		}
+
+		// Check if map already exists.
+		$db_maps = $this->get([
+			'output' => ['sysmapid', 'name'],
+			'filter' => ['name' => zbx_objectValues($maps, 'name')],
+			'nopermissions' => true,
+			'limit' => 1
+		]);
+
+		if ($db_maps) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Map "%1$s" already exists.', $db_maps[0]['name'])
+			);
+		}
 
 		$private_validator = new CLimitedSetValidator([
 			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
@@ -389,23 +419,9 @@ class CMap extends CMapElement {
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
 
+		// Continue to check 2 more mandatory fields and other optional fields.
 		foreach ($maps as $map) {
-			if (!check_db_fields($map_db_fields, $map)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
-			}
-
-			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
-					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
-			}
-
-			if (array_key_exists($map['name'], $map_names)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Duplicate "name" value "%1$s" for map.', $map['name']));
-			}
-			else {
-				$map_names[$map['name']] = true;
-			}
-
+			// Check mandatory fields "width" and "height".
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect "width" value for map "%1$s".', $map['name'])
@@ -418,6 +434,13 @@ class CMap extends CMapElement {
 				);
 			}
 
+			// Check if owner can be set.
+			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
+					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+			}
+
+			// Check for invalid "private" values.
 			if (array_key_exists('private', $map)) {
 				if (!$private_validator->validate($map['private'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -727,38 +750,81 @@ class CMap extends CMapElement {
 				}
 			}
 		}
-
-		if ($map_names) {
-			$exist_db_maps = $this->get([
-				'output' => ['sysmapid', 'name'],
-				'filter' => ['name' => array_keys($map_names)],
-				'nopermissions' => true
-			]);
-
-			foreach ($exist_db_maps as $exist_db_map) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Map with name "%1$s" already exists.', $exist_db_map['name'])
-				);
-			}
-		}
 	}
 
 	/**
 	 * Validate the input parameters for the update() method.
 	 *
 	 * @param array $maps			maps data array
-	 * @param array $maps			db maps data array
+	 * @param array $db_maps		db maps data array
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $maps, $db_maps) {
+	protected function validateUpdate(array $maps, array $db_maps) {
 		if (!$maps) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		$user_data = self::$userData;
-		$map_db_fields = ['sysmapid' => null];
-		$map_names = [];
+
+		// Validate given IDs.
+		$this->checkObjectIds($maps, 'sysmapid',
+			_('No "%1$s" given for map.'),
+			_('Empty map ID.'),
+			_('Incorrect map ID.')
+		);
+
+		$check_names = [];
+
+		foreach ($maps as $map) {
+			// Check if this map exists and user has write permissions.
+			if (!array_key_exists($map['sysmapid'], $db_maps)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			// Validate "name" field.
+			if (array_key_exists('name', $map)) {
+				if (is_array($map['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($map['name'] === '' || $map['name'] === null || $map['name'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Map name cannot be empty.'));
+				}
+
+				if ($db_maps[$map['sysmapid']]['name'] !== $map['name']) {
+					$check_names[] = $map;
+				}
+			}
+		}
+
+		if ($check_names) {
+			// Check for duplicate names.
+			$duplicate = CArrayHelper::findDuplicate($check_names, 'name');
+			if ($duplicate) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate "name" value "%1$s" for map.', $duplicate['name'])
+				);
+			}
+
+			$db_map_names = $this->get([
+				'output' => ['sysmapid', 'name'],
+				'filter' => ['name' => zbx_objectValues($check_names, 'name')],
+				'nopermissions' => true
+			]);
+			$db_map_names = zbx_toHash($db_map_names, 'name');
+
+			// Check for existing names.
+			foreach ($check_names as $map) {
+				if (array_key_exists($map['name'], $db_map_names)
+						&& bccomp($db_map_names[$map['name']]['sysmapid'], $map['sysmapid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Map "%1$s" already exists.', $map['name'])
+					);
+				}
+			}
+		}
 
 		$private_validator = new CLimitedSetValidator([
 			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
@@ -767,16 +833,9 @@ class CMap extends CMapElement {
 		$permission_validator = new CLimitedSetValidator([
 			'values' => [PERM_READ, PERM_READ_WRITE]
 		]);
+
 		foreach ($maps as $map) {
-			if (!check_db_fields($map_db_fields, $map)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for sysmap.'));
-			}
-
-			// Permission check.
-			if (!array_key_exists($map['sysmapid'], $db_maps)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-
+			// Check if owner can be set.
 			if (array_key_exists('userid', $map) && $map['userid'] != $db_maps[$map['sysmapid']]['userid']
 					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
@@ -784,15 +843,7 @@ class CMap extends CMapElement {
 
 			$map = array_merge($db_maps[$map['sysmapid']], $map);
 
-			if (array_key_exists($map['name'], $map_names)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Duplicate "name" value "%1$s" for map.', $map['name'])
-				);
-			}
-			else {
-				$map_names[$map['name']] = $map['sysmapid'];
-			}
-
+			// Check "width" and "height" fields.
 			if ($map['width'] > 65535 || $map['width'] < 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Incorrect "width" value for map "%1$s".', $map['name'])
@@ -1115,22 +1166,6 @@ class CMap extends CMapElement {
 							$map['name']
 						));
 					}
-				}
-			}
-		}
-		unset($map);
-
-		if ($map_names) {
-			$exist_db_maps = $this->get([
-				'filter' => ['name' => array_keys($map_names)],
-				'output' => ['sysmapid', 'name'],
-				'nopermissions' => true
-			]);
-			foreach ($exist_db_maps as $exist_db_map) {
-				if (bccomp($map_names[$exist_db_map['name']], $exist_db_map['sysmapid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Map with name "%1$s" already exists.', $exist_db_map['name'])
-					);
 				}
 			}
 		}
