@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha5
 
 New features:
+..F....... [ZBX-9981] fixed validation for zabbix.conf.php saving in write protected directory (vitalijs)
 ....I..... [ZBXNEXT-3037] removed unused fields "gridview" and "legendview" from "graph_theme" table (Sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
