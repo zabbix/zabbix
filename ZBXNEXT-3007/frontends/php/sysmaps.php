@@ -34,6 +34,7 @@ else {
 	$page['title'] = _('Configuration of network maps');
 	$page['file'] = 'sysmaps.php';
 	$page['type'] = detect_page_type(PAGE_TYPE_HTML);
+	$page['scripts'] = ['multiselect.js'];
 
 	$isExportData = false;
 }
@@ -68,6 +69,10 @@ $fields = [
 	'label_location' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 3),	'isset({add}) || isset({update})'],
 	'urls' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
 	'severity_min' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), null],
+	'userid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'private' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
+	'users' =>					[T_ZBX_INT, O_OPT, null,	null,			null],
+	'userGroups' =>				[T_ZBX_INT, O_OPT, null,	null,			null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"map.export","map.massdelete"'),		null],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
@@ -91,7 +96,9 @@ if (hasRequest('sysmapid')) {
 		'sysmapids' => getRequest('sysmapid'),
 		'editable' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectUrls' => API_OUTPUT_EXTEND
+		'selectUrls' => API_OUTPUT_EXTEND,
+		'selectUsers' => ['userid', 'permission'],
+		'selectUserGroups' => ['usrgrpid', 'permission']
 	]);
 	if (empty($sysmap)) {
 		access_deny();
@@ -148,7 +155,11 @@ if (hasRequest('add') || hasRequest('update')) {
 		'label_location' => getRequest('label_location'),
 		'show_unack' => getRequest('show_unack', 0),
 		'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-		'urls' => getRequest('urls', [])
+		'urls' => getRequest('urls', []),
+		'userid' => getRequest('userid'),
+		'private' => getRequest('private', 1),
+		'users' => getRequest('users', []),
+		'userGroups' => getRequest('userGroups', [])
 	];
 
 	foreach ($map['urls'] as $unum => $url) {
@@ -223,42 +234,86 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action'
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
-	if (!isset($_REQUEST['sysmapid']) || isset($_REQUEST['form_refresh'])) {
-		$data = [
-			'sysmap' => [
-				'sysmapid' => getRequest('sysmapid'),
-				'name' => getRequest('name', ''),
-				'width' => getRequest('width', 800),
-				'height' => getRequest('height', 600),
-				'backgroundid' => getRequest('backgroundid', 0),
-				'iconmapid' => getRequest('iconmapid', 0),
-				'label_format' => getRequest('label_format', 0),
-				'label_type_host' => getRequest('label_type_host', 2),
-				'label_type_hostgroup' => getRequest('label_type_hostgroup', 2),
-				'label_type_trigger' => getRequest('label_type_trigger', 2),
-				'label_type_map' => getRequest('label_type_map', 2),
-				'label_type_image' => getRequest('label_type_image', 2),
-				'label_string_host' => getRequest('label_string_host', ''),
-				'label_string_hostgroup' => getRequest('label_string_hostgroup', ''),
-				'label_string_trigger' => getRequest('label_string_trigger', ''),
-				'label_string_map' => getRequest('label_string_map', ''),
-				'label_string_image' => getRequest('label_string_image', ''),
-				'label_type' => getRequest('label_type', 0),
-				'label_location' => getRequest('label_location', 0),
-				'highlight' => getRequest('highlight', 0),
-				'markelements' => getRequest('markelements', 0),
-				'expandproblem' => getRequest('expandproblem', 0),
-				'show_unack' => getRequest('show_unack', 0),
-				'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-				'urls' => getRequest('urls', []),
-				'private' => getRequest('private', 1)
-			]
+if (hasRequest('form')) {
+	$user_groupids = [];
+	$current_userid = CWebUser::$data['userid'];
+
+	if (!hasRequest('sysmapid') || hasRequest('form_refresh')) {
+		// Map owner
+		$map_owner = getRequest('userid', $current_userid);
+		$userids[$map_owner] = $map_owner;
+
+		foreach (getRequest('users', []) as $user) {
+			$userids[$user['userid']] = $user['userid'];
+		}
+
+		foreach (getRequest('userGroups', []) as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+		}
+	}
+	else {
+		// Map owner.
+		$userids[$sysmap['userid']] = $sysmap['userid'];
+
+		foreach ($sysmap['users'] as $user) {
+			$userids[$user['userid']] = $user['userid'];
+		}
+
+		foreach ($sysmap['userGroups'] as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+		}
+	}
+
+	$data['users'] = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'userids' => $userids,
+		'preservekeys' => true
+	]);
+
+	$data['user_groups'] = API::UserGroup()->get([
+		'output' => ['usrgrpid', 'name'],
+		'userids' => $user_groupids,
+		'preservekeys' => true
+	]);
+
+	if (!hasRequest('sysmapid') || hasRequest('form_refresh')) {
+		$data['sysmap'] = [
+			'sysmapid' => getRequest('sysmapid'),
+			'name' => getRequest('name', ''),
+			'width' => getRequest('width', 800),
+			'height' => getRequest('height', 600),
+			'backgroundid' => getRequest('backgroundid', 0),
+			'iconmapid' => getRequest('iconmapid', 0),
+			'label_format' => getRequest('label_format', 0),
+			'label_type_host' => getRequest('label_type_host', 2),
+			'label_type_hostgroup' => getRequest('label_type_hostgroup', 2),
+			'label_type_trigger' => getRequest('label_type_trigger', 2),
+			'label_type_map' => getRequest('label_type_map', 2),
+			'label_type_image' => getRequest('label_type_image', 2),
+			'label_string_host' => getRequest('label_string_host', ''),
+			'label_string_hostgroup' => getRequest('label_string_hostgroup', ''),
+			'label_string_trigger' => getRequest('label_string_trigger', ''),
+			'label_string_map' => getRequest('label_string_map', ''),
+			'label_string_image' => getRequest('label_string_image', ''),
+			'label_type' => getRequest('label_type', 0),
+			'label_location' => getRequest('label_location', 0),
+			'highlight' => getRequest('highlight', 0),
+			'markelements' => getRequest('markelements', 0),
+			'expandproblem' => getRequest('expandproblem', 0),
+			'show_unack' => getRequest('show_unack', 0),
+			'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+			'urls' => getRequest('urls', []),
+			'userid' => getRequest('userid', $current_userid),
+			'private' => getRequest('private', 1),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
 		];
 	}
 	else {
-		$data = ['sysmap' => $sysmap];
+		$data['sysmap'] = $sysmap;
 	}
+
+	$data['form_refresh'] = getRequest('form_refresh');
 
 	// config
 	$data['config'] = select_config();

@@ -25,7 +25,9 @@ $widget = (new CWidget())->setTitle(_('Network maps'));
 
 $tabs = new CTabView();
 
-$tabs->setSelected(0);
+if (!$data['form_refresh']) {
+	$tabs->setSelected(0);
+}
 
 // Create sysmap form.
 $form = (new CForm())
@@ -36,10 +38,23 @@ if (array_key_exists('sysmapid', $data['sysmap'])) {
 	$form->addVar('sysmapid', $data['sysmap']['sysmapid']);
 }
 
+$map_ownerid = $data['sysmap']['userid'];
+
 // Create sysmap form list.
 $map_tab = (new CFormList())
 	->addRow(_('Owner'),
-		'Admin'
+		(new CMultiSelect([
+			'name' => 'userid',
+			'selectedLimit' => 1,
+			'objectName' => 'users',
+			'data' => [[
+				'id' => $map_ownerid,
+				'name' => getUserFullname($data['users'][$map_ownerid])
+			]],
+			'popup' => [
+				'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['sysmap']['name']))
@@ -218,20 +233,48 @@ $map_tab->addRow(_('URLs'),
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-$sharing_tab = (new CFormList('proxyFormList'))
+$tabs->addTab('sysmap_tab', _('Map'), $map_tab);
+
+// User sharing table.
+$user_list = (new CTable())
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('List of user shares'), _('Action')]);
+
+$add_user_btn = (new CButton(null, _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")')
+	->addClass(ZBX_STYLE_BTN_LINK);
+$user_list->addRow(
+	(new CRow(
+		(new CCol($add_user_btn))->setColSpan(2)
+	))->setId('user_list_footer')
+);
+
+// User group sharing table.
+$user_group_list = (new CTable())
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('List of user group shares'), _('Action')]);
+
+$add_user_group_btn = (new CButton(null, _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")')
+	->addClass(ZBX_STYLE_BTN_LINK);
+$user_group_list->addRow(
+	(new CRow(
+		(new CCol($add_user_group_btn))->setColSpan(2)
+	))->setId('user_group_list_footer')
+);
+
+$sharing_tab = (new CFormList('sharing_form'))
 	->addRow(_('Type'),
 	(new CRadioButtonList('private', (int) $data['sysmap']['private']))
 		->addValue(_('Private'), SYSMAP_PRIVATE)
 		->addValue(_('Public'), SYSMAP_PUBLIC)
 		->setModern(true)
-	);
-
-$constructor_tab = '';
+	)
+	->addRow(_('Users'), $add_user_btn)
+	->addRow(_('User groups'), $add_user_group_btn);
 
 // Append data to form.
-$tabs->addTab('sysmapTab', _('Map'), $map_tab)
-	->addTab('sharingTab', _('Sharing'), $sharing_tab)
-	->addTab('constructorTab', _('Constructor'), $constructor_tab);
+$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
 
 // Append buttons to form.
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {
