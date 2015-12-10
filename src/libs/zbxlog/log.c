@@ -21,6 +21,7 @@
 #include "log.h"
 #include "mutexs.h"
 #include "threads.h"
+#include "cfg.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "service.h"
@@ -287,13 +288,10 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	wchar_t	*wevent_source;
 #endif
 	log_level = level;
-
-	if (LOG_TYPE_FILE == type && NULL == filename)
-		type = LOG_TYPE_SYSLOG;
+	log_type = type;
 
 	if (LOG_TYPE_SYSLOG == type)
 	{
-		log_type = LOG_TYPE_SYSLOG;
 #ifdef _WINDOWS
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
@@ -322,9 +320,14 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			exit(EXIT_FAILURE);
 		}
 
-		log_type = LOG_TYPE_FILE;
 		strscpy(log_filename, filename);
 		zbx_fclose(log_file);
+	}
+	else if (LOG_TYPE_CONSOLE == type)
+	{
+		fflush(stderr);
+		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
+			zbx_error("cannot redirect stderr to stdout: %s", zbx_strerror(errno));
 	}
 
 	return SUCCEED;
@@ -459,6 +462,35 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 
+	if (LOG_TYPE_CONSOLE == log_type)
+	{
+		lock_log();
+
+		get_time(&tm, &milliseconds);
+
+		fprintf(stdout,
+				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
+				zbx_get_thread_id(),
+				tm->tm_year + 1900,
+				tm->tm_mon + 1,
+				tm->tm_mday,
+				tm->tm_hour,
+				tm->tm_min,
+				tm->tm_sec,
+				milliseconds
+				);
+
+		va_start(args, fmt);
+		vfprintf(stdout, fmt, args);
+		va_end(args);
+
+		fprintf(stdout, "\n");
+
+		unlock_log();
+
+		return;
+	}
+
 	va_start(args, fmt);
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
 	va_end(args);
@@ -553,6 +585,60 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		unlock_log();
 	}
+}
+
+int	zbx_get_log_type(const char *logtype)
+{
+	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_UNDEFINED, ZBX_OPTION_LOGTYPE_SYSLOG,
+					ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
+	size_t		i;
+
+	for (i = 1; i < ARRSIZE(logtypes); i++)
+	{
+		if (0 == strcmp(logtype, logtypes[i]))
+			return i;
+	}
+
+	return LOG_TYPE_UNDEFINED;
+}
+
+int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
+{
+	int	ret = SUCCEED;
+
+	if (LOG_TYPE_UNDEFINED == CONFIG_LOG_TYPE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'", CONFIG_LOG_TYPE_STR);
+		ret = FAIL;
+	}
+
+	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" 'console' parameter can be used only with --foreground"
+				" command line option");
+		ret = FAIL;
+	}
+
+	if (NULL != CONFIG_LOG_FILE && '\0' != *CONFIG_LOG_FILE)
+	{
+		if (LOG_TYPE_FILE != CONFIG_LOG_TYPE)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"LogFile\" parameter can be used only with \"LogType\" 'file'"
+					" parameter");
+			ret = FAIL;
+		}
+	}
+	else
+	{
+		if (LOG_TYPE_FILE == CONFIG_LOG_TYPE)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" 'file' parameter requires \"LogFile\" parameter"
+					" to be set");
+			ret = FAIL;
+		}
+	}
+
+	return ret;
 }
 
 /******************************************************************************

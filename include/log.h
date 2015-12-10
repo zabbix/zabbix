@@ -32,6 +32,12 @@
 #define LOG_TYPE_UNDEFINED	0
 #define LOG_TYPE_SYSLOG		1
 #define LOG_TYPE_FILE		2
+#define LOG_TYPE_CONSOLE	3
+
+#define ZBX_OPTION_LOGTYPE_UNDEFINED	"undefined"
+#define ZBX_OPTION_LOGTYPE_SYSLOG	"syslog"
+#define ZBX_OPTION_LOGTYPE_FILE		"file"
+#define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
 typedef enum
 {
@@ -78,3 +84,7 @@ void		zbx_redirect_stdio(const char *filename);
 
 void		zbx_handle_log(void);
 #endif
+
+int	zbx_get_log_type(const char *logtype);
+int	zbx_validate_log_parameters(ZBX_TASK_EX *task);
+

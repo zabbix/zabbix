@@ -25,6 +25,8 @@ extern unsigned char	program_type;
 
 char	*CONFIG_FILE		= NULL;
 
+char	*CONFIG_LOG_TYPE_STR	= NULL;
+int	CONFIG_LOG_TYPE		= LOG_TYPE_UNDEFINED;
 char	*CONFIG_LOG_FILE	= NULL;
 int	CONFIG_LOG_FILE_SIZE	= 1;
 int	CONFIG_ALLOW_ROOT	= 0;
