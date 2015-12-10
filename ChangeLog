@@ -8,6 +8,7 @@ A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+..F....... [ZBX-10139] fixed possible PHP and SQL errors on the dashdoard and screens (Sasha)
 ..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
 ..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
 ........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
