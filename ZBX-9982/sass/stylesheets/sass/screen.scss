@@ -21,7 +21,7 @@ body {
 }
 
 a {
-
+  
 	&:link {
 		color: $link-color;
 		text-decoration: none;
@@ -47,6 +47,11 @@ a {
 	&:active {
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
+	}
+
+	img {
+		border: none;
+		vertical-align: top;
 	}
 }
 
@@ -165,7 +170,23 @@ pre {
 		family: $font-stack-mono;
 		size: $font-mono-size;
 	}
-	display: block;
+	//display: block;
+	@extend %space-pre-wrap;
+
+	a {
+		@extend %space-pre-wrap;
+	}
+
+	td {
+		@extend %space-pre-wrap;
+	}
+
+	span {
+		@extend %space-pre-wrap;
+	}
+}
+
+%space-pre-wrap {
 	white-space: pre-wrap;
 	word-wrap: break-word;
 }
@@ -254,6 +275,8 @@ nav {
 		padding: 10px 13px;
 		color: $link-main-nav-color;
 		text-decoration: none;
+		cursor: pointer;
+		outline: 0;
 
 		&:link {
 			color: $link-main-nav-color;
@@ -285,7 +308,6 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		background-color: $main-nav-bg-color;
 
 		.search-suggest {
 			min-width: 186px;
@@ -338,6 +360,7 @@ ul.top-nav-icons {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
 	    width: auto;
 		padding: 0 12px 0 27px;
+		-webkit-transform-style: preserve-3d;
 	}
 
 	form {
@@ -492,10 +515,6 @@ article {
 		padding: 0 5px 0 0;
 		vertical-align: middle;
 
-		//&:last-child {
-		//	margin: 0;
-		//}
-
 		span {
 			padding: 4px 7px;
 		}
@@ -511,7 +530,6 @@ article {
 
 	.selected {
 		background-color: $ui-bg-color;
-		//border: 1px solid $ui-border-color;
 		@include box-shadow(inset 0 0 0 1px $ui-border-color);
 		@include border-radius(2px);
 	}
@@ -677,7 +695,7 @@ footer {
 }
 
 .radio-switch {
-	cursor: pointer;
+	cursor: default;
 	background-color: $form-bg-color;
 	@extend %paging-btn;
 }
@@ -701,12 +719,14 @@ footer {
 		color: $font-color;
 		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
+		z-index: 10;
 		position: relative;
 	}
 
 	&:active {
 		color: $font-color;
 		background-color: $btn-form-hover-color;
+		z-index: 10;
 		position: relative;
 	}
 
@@ -719,24 +739,29 @@ footer {
 	}
 
 	&.paging-selected {
-		color: $white;
-		border-color: $form-border-color;
-		background-color: $ui-bg-selected-color;
+		color: $font-selected-color;
+		border-color: $ui-bg-selected-color;//$form-border-color;
+		background-color: $ui-bg-selected-color;	
+		position: relative;
+		z-index: 1;
 
 		&:hover {
 			background-color: darken($ui-bg-selected-color, 4%);
+			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:focus {
 			background-color: darken($ui-bg-selected-color, 4%);
 			border-color: $form-border-focus-color;
 			position: relative;
+			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
 			background-color: darken($ui-bg-selected-color, 4%);
 			border-color: $form-border-focus-color;
 			position: relative;
+			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 }
@@ -884,13 +909,19 @@ footer {
 	position: relative;
 	height: 18px;
 	padding: 0 4px;
+	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
 	a {
-		color: $font-color;
+		//color: $font-color;
+		color: $font-selected-color;
 		text-decoration: none;
 		cursor: default;
+	}
+
+	sup {
+		color: lighten($ui-bg-selected-color, 25%);
 	}
 }
 
@@ -985,7 +1016,6 @@ footer {
 }
 
 .multiselect-button {
-	//float: left;
 	display: inline-block;
 	vertical-align: top;
 }
@@ -1027,7 +1057,6 @@ footer {
 	margin-top: 1px;
 	border: 1px solid $action-border-color;
 	border-top: none;
-	min-width: 165px;
 	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
@@ -1197,6 +1226,10 @@ footer {
 	border: 1px solid $ui-border-color;
 	padding: 10px;
 	text-align: left;
+
+	> .ui-tabs-nav {
+		margin: -10px -10px 10px -10px;
+	}
 }
 
 .form-btns {
@@ -1282,6 +1315,10 @@ footer {
 		vertical-align: middle;
 		width: 85%;
 
+		th {
+			padding: 0;
+		}
+
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1320,13 +1357,10 @@ footer {
 	}
 }
 
-.center {
-	text-align: center;
-}
-
 .table-forms-separator {
 	display: inline-block;
 	padding: 5px;
+	position: relative;
 	border: 1px solid $table-border-color;
 	@include box-sizing(border-box);
 }
@@ -1351,7 +1385,7 @@ footer {
 
 	li {
 		display: block;
-		padding: 0.3em 0;
+		padding: .3em 0;
 	}
 
 	label {
@@ -1378,6 +1412,7 @@ footer {
 	li {
 		display: inline-block;
 		margin-right: 15px;
+		padding: .3em 0 0 0;
 
 		&:last-child {
 			margin-right: 0;
@@ -1387,6 +1422,7 @@ footer {
 }
 
 .radio-segmented {
+	white-space: nowrap;
 
 	li {
 		position: relative;
@@ -1426,9 +1462,10 @@ footer {
 			}
 
 			&:active {
-				color: $white;
+				//color: $white;
 				border-color: $form-border-color;
-				background-color: $ui-bg-selected-color;
+				//background-color: $ui-bg-selected-color;
+				background-color: $btn-form-hover-color;
 			}
 		}
 
@@ -1441,8 +1478,10 @@ footer {
 
 		&:checked + label {
 			color: $white;
-			border-color: $form-border-color;
-			background-color: $ui-bg-selected-color;	
+			border-color: $ui-bg-selected-color;//$btn-border-color;//$form-border-color;
+			background-color: $ui-bg-selected-color;//$btn-bg-color;	
+			position: relative;
+			z-index: 1;
 		}
 
 		&:checked:focus + label {
@@ -1553,9 +1592,9 @@ select {
 	}
 
 	&.select-multiple {
-		padding: 4px 5px;
+		//padding: 4px 5px;
 		width: 300px;
-		height: auto;
+		//height: auto;
 	}
 
 	&[disabled] {
@@ -1781,7 +1820,7 @@ $icon-widget-btn: (
 	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
-	wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
+	//wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
@@ -1793,9 +1832,9 @@ $icon-widget-btn: (
         background: $bgimage;
         @extend %btn-widget;
 
-        @if $icon-widget-btn == 'wizard-action' {
-        	height: 12px!important;
-        }
+        //@if $icon-widget-btn == 'wizard-action' {
+        //	height: 12px!important;
+        //}
     }
 }
 
@@ -1805,6 +1844,7 @@ $icon-widget-btn: (
 	height: 28px;
 	min-height: 0;
 	padding: 0;
+	-webkit-transform-style: preserve-3d;
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
@@ -1836,29 +1876,33 @@ $icon-widget-btn: (
 
 %form-disabled {
 	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color;
+	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
 }
 
 .disabled {
 	cursor: default !important;
-	@include opacity(0.4);
+	@include opacity(0.35);
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
 
 	.subfilter-disable-btn {
 		cursor: default;
-		color: darken($ui-bg-selected-color, 15%);
+		color: darken($ui-bg-selected-color, 25%);
 		background-color: $ui-bg-selected-color;
 
 		&:hover {
-			color: darken($ui-bg-selected-color, 15%);
+			color: darken($ui-bg-selected-color, 35%);
 		}
 
 		&:focus {
-			color: darken($ui-bg-selected-color, 15%);
+			color: darken($ui-bg-selected-color, 35%);
 		}
 
 		&:active {
-			color: darken($ui-bg-selected-color, 15%);
+			color: darken($ui-bg-selected-color, 35%);
 		}
 	}
 }
@@ -1899,16 +1943,9 @@ button[disabled] {
 	margin: 0 14px 0 0;
 }
 
-.tabs-nav-container {
-	height: 36px;
-	line-height: 36px;
-	margin: 0 0 15px 0;
-}
-
 .ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
-	margin: -10px -10px 10px -10px;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
@@ -1940,7 +1977,7 @@ button[disabled] {
 
 			a {
 				padding: 11px 13px 9px 13px;
-				background-color: $ui-bg-color;
+				background-color: $transparent;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
@@ -1953,7 +1990,7 @@ button[disabled] {
 			a {
 				cursor: default;
 				color: $btn-disabled-font-color;
-				background-color: $ui-bg-color;
+				background-color: $transparent;
 			}
 		}
 	}
@@ -1963,7 +2000,8 @@ $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
+	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -622px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -2022,7 +2060,6 @@ $form-icon-btn: (
 
 .drag-icon {
 	margin-left: -9px;
-	cursor: move;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
@@ -2281,6 +2318,10 @@ $form-icon-btn: (
 			display: block;
 			float: left;
 			padding: 0;
+
+			select {
+				margin: 4px 0;
+			}
 		}
 	}
 }
@@ -2302,6 +2343,7 @@ $form-icon-btn: (
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
+	max-width: 250px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -2309,7 +2351,6 @@ $form-icon-btn: (
 
 	li {
 		display: block;
-		white-space: nowrap;
 
 		div {
 			border-top: 1px solid $table-border-color;
@@ -2322,10 +2363,13 @@ $form-icon-btn: (
 		height: 24px;
 		line-height: 24px;
 		cursor: pointer;
+		color: $font-color;
 		text-decoration: none;
+		border: none;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
+		@extend %overflow-ellipsis; 
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
@@ -2366,12 +2410,14 @@ $form-icon-btn: (
 		height: 24px;
 		line-height: 24px;
 		color: $font-alt-color;
+		border: none;
 		cursor: default;
 	}
 
 	h3 {
 		height: 24px;
 		line-height: 24px;
+		@extend %overflow-ellipsis;
 	}
 }
 
@@ -2425,11 +2471,9 @@ $form-icon-btn: (
 
 	.table-forms-td-left {
 		text-align: left;
-	//	width: auto;
 	}
 
 	.table-forms-td-right {
-		//width: auto;
 
 		td {
 			vertical-align: middle;
@@ -2614,9 +2658,7 @@ $form-icon-btn: (
 		display: block;
 		max-width: 250px;
 		padding-bottom: 0.083em;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		@extend %overflow-ellipsis;
 	}
 
 	p {
@@ -2662,8 +2704,6 @@ $form-icon-btn: (
 	width: 100%;
 
 	td {
-		text-align: center;
-		vertical-align: middle;
 		padding: 8px 5px;
 	}
 
@@ -2687,9 +2727,12 @@ $form-icon-btn: (
 	}
 
 	.dashbrd-widget-head {
-		font-weight: normal;
 		text-align: left;
 		padding: 8px;
+
+		li {
+			line-height: 2.9em;
+		}
 	}
 
 	.dashbrd-widget-foot {
@@ -2697,7 +2740,10 @@ $form-icon-btn: (
 	}
 
 	.nothing-to-show {
-		text-align: center !important;
+
+		td {
+			text-align: center !important;
+		}
 	}
 }
 
@@ -2712,12 +2758,24 @@ $form-icon-btn: (
 	vertical-align: top;
 }
 
+.right {
+	text-align: right;
+}
+
 .bottom {
 	vertical-align: bottom;
 }
 
 .left {
 	text-align: left;
+}
+
+.center {
+	text-align: center;
+}
+
+.middle {
+	vertical-align: middle;
 }
 
 
@@ -2782,7 +2840,7 @@ $form-icon-btn: (
 	// Shadow covers
 	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
-	/// Shadows
+	// Shadows
 	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
@@ -3276,22 +3334,26 @@ a.overlay-close-btn {
 	position: absolute;
 	top: 0;
 	right: -12px;
-	color: darken($ui-bg-selected-color, 40%);
+	//color: darken($ui-bg-selected-color, 40%);
+	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
 	@include border-radius(2px);
 	@include opacity(1);
 
 	&:hover {
-		color: darken($ui-bg-selected-color, 65%);
+		//color: darken($ui-bg-selected-color, 65%);
+		color: darken($font-selected-color, 5%);
 	}
 
 	&:focus {
-		color: darken($ui-bg-selected-color, 55%);
+		//color: darken($ui-bg-selected-color, 55%);
+		color: darken($font-selected-color, 10%);
 	}
 
 	&:active {
-		color: darken($ui-bg-selected-color, 55%);
+		//color: darken($ui-bg-selected-color, 55%);
+		color: darken($font-selected-color, 10%);
 	}
 }
 
@@ -3423,7 +3485,6 @@ $browser-logos: (
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color,5%);
-		border-radius: 6px;
 	}
 }
 
@@ -3437,6 +3498,13 @@ $browser-logos: (
 
 .cursor-move {
 	cursor: move;
+}
+
+.cursor-move td {
+	
+	> * {
+		cursor: move;
+	}
 }
 
 .cursor-pointer {
@@ -3496,3 +3564,907 @@ $browser-logos: (
 .uppercase {
 	text-transform: $font-transform;
 }
+
+// Analog Clock
+.clock {
+	text-align: center;
+	display: inline-block;
+}
+
+.time-zone {
+	margin: 0 0 .5em 0;
+	white-space: nowrap;
+}
+
+.local-clock {
+	margin: .5em 0 0 0;
+	white-space: nowrap;
+}
+
+.clock-face {
+	fill: $clock-face-color;
+}
+
+.clock-hand {
+	fill: $clock-hand-color;
+}
+
+.clock-hand-sec {
+	fill: $clock-hand-sec-color;
+}
+
+.clock-lines {
+	fill: $clock-lines-color;
+}
+
+/*doc
+---
+//title: About
+name: about
+category: About
+---
+
+##About the Zabbix Styleguide
+
+The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel every time there is a need to implement an already existing UI pattern, developers can consult with the styleguide.
+
+* A common design language inside the company and community
+* More modular approach to design, reusable components
+* A single source of information for front-end developers
+
+May the force be with you!
+*/
+
+/*doc
+---
+//title: Components
+name: components
+category: Components
+---
+*/
+
+/*doc
+---
+parent: components
+title: Typography
+name: typography
+---
+
+The default font face is Arial. Type size and line height should be set in relative units: ems.
+
+##Headings
+
+```html_example
+<h1>Main Heading</h1><br>
+<h2>Section Header</h2><br>
+<h3>Contextual Menu Heading</h3><br>
+<h4>Widget and Dialog Heading</h4>
+```
+
+##Paragraphs
+
+```html_example
+<p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
+<p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Tables
+name: table
+---
+
+Tables are used to display only tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Test host</a></td>
+            <td><a href="">Applications</a></td>
+            <td><a href="">Items</a></td>
+            <td><a href="">Triggers</a></td>
+            <td><a href="">Graphs</a></td>
+            <td><a href="">Discovery</a></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr class="row-selected">
+            <td><input type="checkbox" checked=""></td>
+            <td><a href="">Zabbix server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Main server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Backup server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+
+##Table with Pagination
+
+Pagination is used to separate large amounts of tabular data into descrete peices. Pagination control is used to progress 
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Test host</a></td>
+            <td><a href="">Applications</a></td>
+            <td><a href="">Items</a></td>
+            <td><a href="">Triggers</a></td>
+            <td><a href="">Graphs</a></td>
+            <td><a href="">Discovery</a></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr class="row-selected">
+            <td><input type="checkbox" checked=""></td>
+            <td><a href="">Zabbix server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Main server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Backup server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+<div class="table-paging">
+   <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
+</div>
+```
+
+##Table with No Results
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr class="nothing-to-show">
+            <td colspan="11">We couldn't find any results</td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+
+##Tables with Elements and Highlights
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Example</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>Alerts</td>
+            <td>asdasasdasd</td>
+            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
+         </tr>
+         <tr>
+            <td>Icons</td>
+            <td>asdasasdasd</td>
+            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
+         </tr>
+         <tr>
+            <td>Links with icons</td>
+            <td>asdasasdasd</td>
+            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
+         </tr>
+         <tr>
+            <td>Labels</td>
+            <td>asdasasdasd</td>
+            <td>
+               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
+               <div class="status-container"><span class="status-red">label</span></div>
+            </td>
+         </tr>
+         <tr>
+            <td>Tree</td>
+            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
+            <td>
+               <div class="treeview"><span class="arrow-right"></span></div>
+               <a href="#">Collapsed</a> 
+               <div class="treeview"><span class="arrow-down"></span></div>
+               <a href="#">Expanded</a>
+            </td>
+         </tr>
+          <tr>
+            <td>Severity</td>
+            <td>asdasd</td>
+            <td class="normal-bg">
+               <span class="link-action">25</span> 
+            </td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Forms
+name: forms
+---
+
+Forms contain UI elements that are used to submit information. Some form elements have primary and secondary functionality.
+
+##Primary Button
+
+```html_example
+<button type="button">Primary Button</button>
+<button type="button" disabled>Primary Button</button>
+```
+
+##Secondary Button
+
+```html_example
+<button type="button" class="btn-alt">Secondary Button</button>
+<button type="button" class="btn-alt" disabled>Secondary Button</button>
+```
+
+##Form Button
+
+```html_example
+<button type="button" class="btn-grey">Form Button</button>
+<button type="button" class="btn-grey" disabled>Form Button</button>
+```
+
+##Link Button
+
+```html_example
+<button type="button" class="btn-link">Link Button</button>
+<button type="button" class="btn-link" disabled>Link Button</button>
+```
+
+##Icon Button
+
+```html_example
+<button type="button" class="btn-max" title="Maximize"></button>
+<button type="button" class="btn-max" title="Maximize" disabled></button>
+```
+
+##Inputs
+
+Text on html5 input types 
+
+```html_example
+<input type="text" placeholder="Text">
+<div class="red">You can't leave this empty.</div>
+<input type="text" disabled>
+<input type="text" readonly>
+```
+
+```html_example
+<input type="text"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+```
+
+##Selects
+
+```html_example
+<select>
+   <option>Select options</option>
+   <option>Option 1</option>
+   <option>Option 2</option>
+   <option>Option 3</option>
+</select>
+<select disabled>
+   <option>Select options</option>
+   <option>Option 1</option>
+   <option>Option 2</option>
+   <option>Option 3</option>
+</select>
+```
+
+## Radios
+
+```html_example
+<label for="Radio"><input type="radio" id="Radio">I am a radio</label>
+<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
+```
+
+## Segmented Radio Controls
+
+```html_example
+<p>
+<ul class="radio-segmented">
+   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
+</ul>
+</p>
+```
+
+## Checkboxes
+
+```html_example
+<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
+<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
+```
+
+## Radio and Checkbox Lists
+
+```html_example
+<ul class="list-check-radio">
+   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+</ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Dialogs
+name: dialog
+---
+
+Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clickng/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
+
+##Alert Dialogs
+
+Alert dialogs are used to urgently inform the user about a certain situation. Primary action button, labeled with the specific action, should be furthest to the right and continue the process. Secondary action button should be placed to the left of the primary action button and return the user to the general screen. Avoid labeling buttons with *No*, *Ok*, *Confirm*, *Done* and asking equally uninformative questions like *Are you sure?*
+
+```html_example
+<div class="overlay-dialogue">
+   <!--<span class="overlay-close-btn"></span>-->
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Delete the selected item?</h4>
+   </div>
+   <div class="overlay-dialogue-body">Some explanatory information</div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
+</div>
+
+<div class="overlay-dialogue">
+   <!--<span class="overlay-close-btn"></span>-->
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Delete the selected item?</h4>
+   </div>
+   <div class="overlay-dialogue-body"></div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
+</div>
+```
+
+##Dialogs with Scrollable Content
+
+In exceptional cases dialogs may contain additional information inside a scrollable area.
+
+```html_example
+<div class="overlay-dialogue" style="max-width: 500px">
+   <span class="overlay-close-btn"></span>
+   <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments.
+   </div>
+   <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Duration</th>
+            <th>Age</th>
+            <th>Ack</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>2015-09-08 13:47:58</td>
+            <td><span class="red">PROBLEM</span></td>
+            <td>15d 23h 45m</td>
+            <td>15d 23h 45m</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-05 06:14:58</td>
+            <td><span class="green">OK</span></td>
+            <td>1m 4d 7h</td>
+            <td>1m 20d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-05 05:32:58</td>
+            <td><span class="red">PROBLEM</span></td>
+            <td>42m</td>
+            <td>1m 20d 8h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-04 06:11:58</td>
+            <td><span class="green">OK</span></td>
+            <td>23h 21m</td>
+            <td>1m 21d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-04 05:38:58</td>
+            <td><span class="red">PROBLEM</span></td>
+            <td>33m</td>
+            <td>1m 21d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+
+##Contextual Dialogs
+
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
+
+```html_example
+<ul class="action-menu"">
+   <li>
+      <h3>Favourite screens</h3>
+   </li>
+   <li><span class="action-menu-item">Add</span></li>
+   <li>
+      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
+      <ul class="action-menu" style="top: 47px; left: 203px;">
+         <li><span class="action-menu-item">Zabbix server</span></li>
+      </ul>
+   </li>
+   <li><span class="action-menu-item">Remove all</span></li>
+   <li>
+      <div></div>
+   </li>
+   <li>
+      <h3>Favourite slide shows</h3>
+   </li>
+   <li><span class="action-menu-item selected">Add</span></li>
+   <li><span class="action-menu-item-disabled">Remove</span></li>
+   <li><span class="action-menu-item-disabled">Remove all</span></li>
+</ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Notifications
+name: notifications
+---
+
+Notificatiions are used to provide feedback after certain actions or give information.
+
+##Success Notification
+
+Success notification appears after an action has been completed without errors. Has green background.
+
+```html_example
+<div class="msg-good">
+   Well done! You successfully added new parameters.
+   <div class="msg-details">
+      <span class="link-action">Details</span>
+      <ul class="msg-details-border">
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+      </ul>
+   </div>
+   <span class="overlay-close-btn" title="Close"></span>
+</div>
+```
+
+##Error Notification
+
+Error notification appears after an action has been completed with errors or an error in general. Has red background.
+
+```html_example
+<div class="msg-bad">
+   Oh snap! Check form fields and try submitting again.
+   <div class="msg-details">
+      <span class="link-action">Details</span>
+      <ul class="msg-details-border">
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+      </ul>
+   </div>
+   <span class="overlay-close-btn" title="Close"></span>
+</div>
+```
+
+##Global Notification
+
+Global notification
+
+```html_example
+<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Icons
+name: icons
+---
+
+Icons:
+
+```html_example
+example
+```
+*/
+
+/*doc
+---
+parent: components
+title: Datepickers
+name: date
+---
+
+Datepickers are used to select a single date or a date range.
+
+```html_example
+<div class="overlay-dialogue calendar">
+   <div class="calendar-header">
+      <div class="calendar-year">
+         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
+      </div>
+      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+   </div>
+   <table>
+      <thead>
+         <tr>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+            <th>S</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td class="grey">29</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+         </tr>
+         <tr>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+         </tr>
+         <tr>
+            <td>14</td>
+            <td>15</td>
+            <td class="selected">16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+         </tr>
+         <tr>
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+            <td>27</td>
+         </tr>
+         <tr>
+            <td>28</td>
+            <td>29</td>
+            <td>30</td>
+            <td>31</td>
+            <td class="grey">1</td>
+            <td class="grey">2</td>
+            <td class="grey">3</td>
+         </tr>
+         <tr>
+            <td class="grey">4</td>
+            <td class="grey">5</td>
+            <td class="grey">6</td>
+            <td class="grey">7</td>
+            <td class="grey">8</td>
+            <td class="grey">9</td>
+            <td class="grey">10</td>
+         </tr>
+      </tbody>
+   </table>
+   <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
+   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Navigation
+name: navigation
+---
+
+##Main Navigation
+
+Main navigation is used to jump between high level sections of the application.
+
+```html_example
+<nav role="navigation">
+   <div class="top-nav-container">
+      <ul class="top-nav">
+         <li class="selected"><a href="#">Monitoring</a></li>
+         <li><a href="#">Inventory</a></li>
+         <li><a href="#">Reports</a></li>
+         <li><a href="#">Configuration</a></li>
+         <li><a href="#">Administration</a></li>
+      </ul>
+      <!--<ul class="top-nav-icons">
+         <li>
+            <form><input type="text"><button type="button" class="btn-search"></button></form>
+         </li>
+         <li><a href="#" class="top-nav-help" title="Help"></a></li>
+         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
+         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
+         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
+      </ul>-->
+   </div>
+   <div class="top-subnav-container">
+      <ul class="top-subnav">
+         <li><a href="#" class="selected">Dashboard</a></li>
+         <li><a href="#">Overview</a></li>
+         <li><a href="#">Web</a></li>
+         <li><a href="#">Latest data</a></li>
+         <li><a href="#">Triggers</a></li>
+         <li><a href="#">Events</a></li>
+         <li><a href="#">Graphs</a></li>
+         <li><a href="#">Screens</a></li>
+         <li><a href="#">Maps</a></li>
+         <li><a href="#">Discovery</a></li>
+         <li><a href="#">IT services</a></li>
+      </ul>
+      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
+   </div>
+</nav>
+```
+
+##Object Navigation
+
+```html_example
+<ul class="object-group">
+   <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
+   <li class="green">Enabled</li>
+   <li>
+      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+   </li>
+   <li><span><b><a href="#">Discovery</a></b></span></li>
+   <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
+   <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
+   <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
+   <li><span><a href="#">Graphs</a>&nbsp;<sup>11</sup></span></li>
+   <li><span><a href="#">Discovery rules</a>&nbsp;<sup>2</sup></span></li>
+   <li><span><a href="#">Web scenarios</a></span></li>
+</ul>
+```
+
+##Tabs
+
+Tabs are used to switch between 
+
+```html_example
+<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Links
+name: links
+---
+
+A link is used to navigate through different parts of the front-end. Action links are used to call out any additional content, like contextual menus and popovers.
+
+```html_example
+<p><a href="#">Default link</a></p>
+<p><a href="#" class="grey link-alt">Alternative link</a></p>
+<p><a href="#" class="green link-alt">Alternative link</a></p>
+<p><a href="#" class="red link-alt">Alternative link</a></p>
+<p><span class="link-action">Action link</span></p>
+<p><span class="green link-action">Action link</span></p>
+<p><span class="yellow link-action">Action link</span></p>
+<span class="red link-action">Action link</span>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Labels
+name: labels
+---
+
+Labels add information.
+
+```html_example
+<div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Spinners
+name: spinners
+---
+
+Spinners are used to show data retrieval or an ongoing computation. Use spinners to make UI look more fast and responsive.
+
+```html_example
+<div class="preloader-container">
+   <div class="preloader"></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Widgets
+name: widgets
+---
+
+Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*.
+
+```html_example
+<div class="dashbrd-widget">
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Favorite screens</h4>
+      <ul>
+         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
+         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
+         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
+      </ul>
+   </div>
+   <table class="list-table">
+      <tbody>
+         <tr>
+            <td><a href="#">Zabbix server</a></td>
+         </tr>
+         <tr>
+            <td><a href="#">My 2nd megaserver</a></td>
+         </tr>
+      </tbody>
+   </table>
+   <ul class="dashbrd-widget-foot">
+      <li><a href="#">Screens</a></li>
+      <li><a href="#">Slide shows</a></li>
+   </ul>
+</div>
+```
+*/

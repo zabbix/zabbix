@@ -181,7 +181,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$hostList->addRow([_('Interfaces')],
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_HOST_INTERFACE_WIDTH.'px; position:relative;')
+			->setAttribute('style', 'min-width: '.ZBX_HOST_INTERFACE_WIDTH.'px;')
 	);
 
 }

@@ -148,13 +148,13 @@
 				axis: 'y',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				revert: function(event, ui) {
-console.log(jQuery(this).data('type') + ' + ' + dragInterfaceType);
-
 					return (event !== false && dragInterfaceType != jQuery(this).data('type')) ? false : true;
 				},
 				start: function(event, ui) {
+					dragInterfaceType = jQuery(this).data('type');
+
 					ui.helper.addClass('<?= ZBX_STYLE_CURSOR_MOVE ?>');
-					dragInterfaceType = jQuery(this).data('type')
+					ui.helper.css({'z-index': '1000'});
 					jQuery('.interface_name', ui.helper).remove();
 					jQuery('.interface_data', this).css({'visibility': 'hidden'});
 				},
@@ -381,7 +381,6 @@ console.log(jQuery(this).data('type') + ' + ' + dragInterfaceType);
 					increaseRowspan(jQuery('.interface_type_' + hostInterfaces[i].type));
 					moveInterfaceName(hostInterfaces[i].type);
 				}
-
 				resetMainInterfaces();
 				addDroppable(jQuery('.interface_row, .interface_add'));
 			},
