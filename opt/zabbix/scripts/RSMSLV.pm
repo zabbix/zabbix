@@ -2106,7 +2106,6 @@ sub get_epp_str_itemids
 sub get_dns_test_values
 {
 	my $dns_items_ref = shift;
-	my $valuemaps_ref = shift;
 	my $start = shift;
 	my $end = shift;
 
@@ -2161,7 +2160,7 @@ sub get_dns_test_values
 				next;
 			}
 
-			$result{$probe}->{$nsip}->{$clock} = get_detailed_result($valuemaps_ref, $value);
+			$result{$probe}->{$nsip}->{$clock} = $value;
 		}
 	}
 
@@ -2260,7 +2259,6 @@ sub get_rdds_test_values
 {
 	my $rdds_dbl_items_ref = shift;
 	my $rdds_str_items_ref = shift;
-	my $valuemaps_ref = shift;
 	my $start = shift;
 	my $end = shift;
 
@@ -2325,7 +2323,7 @@ sub get_rdds_test_values
 			fail("unknown RDDS port in item (id:$itemid)");
 		}
 
-		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($valuemaps_ref, $value) : int($value);
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? $value : int($value);
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
@@ -2402,7 +2400,6 @@ sub get_epp_test_values
 {
 	my $epp_dbl_items_ref = shift;
 	my $epp_str_items_ref = shift;
-	my $valuemaps_ref = shift;
 	my $start = shift;
 	my $end = shift;
 
@@ -2449,7 +2446,7 @@ sub get_epp_test_values
 
 		my $type = __get_epp_dbl_type($key);
 
-		$result{$probe}->{$clock}->{$type} = get_detailed_result($valuemaps_ref, $value);
+		$result{$probe}->{$clock}->{$type} = $value;
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");

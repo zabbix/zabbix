@@ -539,7 +539,7 @@ foreach (keys(%$servicedata))
 			{
 				my $minns = $services{$service}{'minns'};
 
-				my $values_ref = get_dns_test_values($dns_items_ref, $services{$service}{'valuemaps'}, $values_from, $values_till);
+				my $values_ref = get_dns_test_values($dns_items_ref, $values_from, $values_till);
 
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
@@ -580,7 +580,12 @@ foreach (keys(%$servicedata))
 							}
 							else
 							{
-								push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $values_ref->{$probe}->{$nsip}->{$clock}, 'ip' => $ip});
+								push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}},
+									{
+										'clock' => $clock,
+										'rtt' => get_detailed_result($services{$service}{'valuemaps'}, $values_ref->{$probe}->{$nsip}->{$clock}),
+										'ip' => $ip
+									});
 							}
 						}
 					}
@@ -650,7 +655,7 @@ foreach (keys(%$servicedata))
 			}
 			elsif ($service eq 'rdds')
 			{
-				my $values_ref = get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $services{$service}{'valuemaps'}, $values_from, $values_till);
+				my $values_ref = get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);
 
 				# run through values from probes (ordered by clock)
 				foreach my $probe (keys(%$values_ref))
@@ -690,6 +695,8 @@ foreach (keys(%$servicedata))
 							}
 							else
 							{
+								$subservice_values_ref->{'rtt'} = get_detailed_result($services{$service}{'valuemaps'}, $subservice_values_ref->{'rtt'});
+
 								push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $subservice_values_ref);
 							}
 						}
@@ -766,9 +773,7 @@ foreach (keys(%$servicedata))
 			}
 			elsif ($service eq 'epp')
 			{
-				dbg("EPP results calculation is not implemented yet");
-
-				my $values_ref = get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $services{$service}{'valuemaps'}, $values_from, $values_till);
+				my $values_ref = get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
 
 				foreach my $probe (keys(%$values_ref))
 				{
@@ -801,6 +806,11 @@ foreach (keys(%$servicedata))
 						}
 						else
 						{
+							foreach my $type (keys(%{$values_ref->{$probe}->{$clock}}))
+							{
+								$values_ref->{$probe}->{$clock}->{$type} = get_detailed_result($services{$service}{'valuemaps'}, $values_ref->{$probe}->{$clock}->{$type});
+							}
+
 							$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $values_ref->{$probe}->{$clock};
 						}
 					}
