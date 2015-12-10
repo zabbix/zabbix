@@ -65,11 +65,11 @@ switch ($srctbl) {
 		break;
 	case 'usrgrp':
 		$page['title'] = _('User groups');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
 	case 'users':
 		$page['title'] = _('Users');
-		$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+		$min_user_type = USER_TYPE_ZABBIX_USER;
 		break;
 	case 'items':
 		$page['title'] = _('Items');
@@ -637,37 +637,51 @@ elseif ($srctbl == 'users') {
 	$users = API::User()->get($options);
 	order_result($users, 'alias');
 
-	foreach ($users as &$user) {
-		$alias = (new CLink($user['alias'], 'javascript:void(0);'))
-			->removeSID()
-			->setId('spanid'.$user['userid']);
+	$data = [];
+	$parentid = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
-		if (isset($srcfld2) && $srcfld2 == 'fullname') {
-			$user[$srcfld2] = getUserFullname($user);
+	foreach ($users as &$user) {
+		if ($multiselect) {
+			$checkBox = new CCheckBox('users['.$user['userid'].']', $user['userid']);
 		}
 
-		if ($multiselect) {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).');';
+		// Check for existing.
+		if (array_key_exists($user['userid'], $excludeids)) {
+			if ($multiselect) {
+				$checkBox->setChecked(1);
+				$checkBox->setEnabled(false);
+			}
+			$alias = $user['alias'];
 		}
 		else {
-			$values = [
-				$dstfld1 => $user[$srcfld1]
-			];
-			if (isset($srcfld2)) {
-				$values[$dstfld2] = $user[$srcfld2];
-			}
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
-		}
-		$alias->onClick($js_action.' jQuery(this).removeAttr("onclick");');
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).', '.
+				$parentid.');';
 
-		$table->addRow([
-			$multiselect
-				? new CCheckBox('users['.zbx_jsValue($user[$srcfld1]).']', $user['userid'])
-				: null,
-			$alias,
-			$user['name'],
-			$user['surname']
-		]);
+			$alias = (new CLink($user['alias'], 'javascript:void(0);'))
+				->removeSID()
+				->setId('spanid'.$user['userid'])
+				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
+
+			if (isset($srcfld1)) {
+				if ($srcfld1 === 'userid') {
+					$data[$user['userid']]['id'] = $user['userid'];
+				}
+				elseif ($srcfld1 === 'alias') {
+					$data[$user['userid']]['name'] = $user['alias'];
+				}
+			}
+
+			if (isset($srcfld2)) {
+				if ($srcfld2 === 'fullname') {
+					$data[$user['userid']]['name'] = getUserFullname($user);
+				}
+				elseif (array_key_exists($srcfld2, $user)) {
+					$data[$user['userid']][$srcfld2] = $user[$srcfld2];
+				}
+			}
+		}
+
+		$table->addRow([$multiselect ? $checkBox : null, $alias, $user['name'], $user['surname']]);
 	}
 	unset($user);
 
@@ -675,12 +689,12 @@ elseif ($srctbl == 'users') {
 		$table->setFooter(
 			new CCol(
 				(new CButton('select', _('Select')))
-					->onClick("javascript: addSelectedValues('users', ".zbx_jsvalue($reference).');')
+					->onClick("javascript: addSelectedValues('users', ".zbx_jsvalue($reference).', '.$parentid.');')
 			)
 		);
-
-		insert_js('var popupReference = '.zbx_jsvalue($users, true).';');
 	}
+
+	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
 
 	$form->addItem($table);
 	$widget->addItem($form)->show();
@@ -735,13 +749,13 @@ elseif ($srctbl == 'templates') {
 			$name = $template['name'];
 		}
 		else {
-			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
 				$parentId.');';
 
 			$name = (new CLink($template['name'], 'javascript:void(0);'))
 				->removeSID()
 				->setId('spanid'.$template['templateid'])
-				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 			$data[$template['templateid']] = [
 				'id' => $template['templateid'],
@@ -817,13 +831,13 @@ elseif ($srctbl == 'hosts') {
 			$name = $host['name'];
 		}
 		else {
-			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 				$parentId.');';
 
 			$name = (new CLink($host['name'], 'javascript:void(0);'))
 				->removeSID()
 				->setId('spanid'.$host['hostid'])
-				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 			$data[$host['hostid']] = [
 				'id' => $host['hostid'],
@@ -900,13 +914,13 @@ elseif ($srctbl == 'host_templates') {
 			$name = $host['name'];
 		}
 		else {
-			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
 				$parentId.');';
 
 			$name = (new CLink($host['name'], 'javascript:void(0);'))
 				->removeSID()
 				->setId('spanid'.$host['hostid'])
-				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 			$data[$host['hostid']] = [
 				'id' => $host['hostid'],
@@ -979,13 +993,13 @@ elseif ($srctbl == 'host_groups') {
 			$name = $hostgroup['name'];
 		}
 		else {
-			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
+			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 				$parentId.');';
 
 			$name = (new CLink($hostgroup['name'], 'javascript:void(0);'))
 				->removeSID()
 				->setId('spanid'.$hostgroup['groupid'])
-				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 			$data[$hostgroup['groupid']] = [
 				'id' => $hostgroup['groupid'],
@@ -1369,14 +1383,14 @@ elseif ($srctbl == 'applications') {
 			->removeSID()
 			->setId('spanid'.$app['applicationid']);
 
-		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
+		$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
 			$parentId.');';
 
 		if ($multiselect) {
 			$checkBox = new CCheckBox('applications['.zbx_jsValue('applicationid').']', $app['applicationid']);
 		}
 
-		$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		$data[$app['applicationid']] = [
 			'id' => $app['applicationid'],
