@@ -179,28 +179,15 @@ class CPieGraphDraw extends CGraphDraw {
 			if (!$trendsEnabled || (($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)))) {
 				$this->dataFrom = 'history';
 
-				$sql = 'SELECT itemid,'.
-						'AVG(value) AS avg,MIN(value) AS min,'.
-						'MAX(value) AS max,MAX(clock) AS clock';
+				$sql_select = 'AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
+				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
 			}
 			else {
 				$this->dataFrom = 'trends';
 
-				$sql = 'SELECT itemid,'.
-						'AVG(value_avg) AS avg,MIN(value_min) AS min,'.
-						'MAX(value_max) AS max,MAX(clock) AS clock';
+				$sql_select = 'AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
+				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 			}
-
-			$sqlFrom = $this->dataFrom;
-			if ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-				$sqlFrom .='_uint';
-			}
-
-			$sql .= ' FROM '.$sqlFrom.
-					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND clock>='.zbx_dbstr($from_time).
-						' AND clock<='.zbx_dbstr($to_time).
-					' GROUP BY itemid';
 
 			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
 				? $history[$item['itemid']][0]['value'] : null;
@@ -208,7 +195,14 @@ class CPieGraphDraw extends CGraphDraw {
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
-			$result = DBselect($sql);
+			$result = DBselect(
+				'SELECT itemid,'.$sql_select.',MAX(clock) AS clock'.
+				' FROM '.$sql_from.
+				' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+					' AND clock>='.zbx_dbstr($from_time).
+					' AND clock<='.zbx_dbstr($to_time).
+				' GROUP BY itemid'
+			);
 			while ($row = DBfetch($result)) {
 				$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
 				$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
