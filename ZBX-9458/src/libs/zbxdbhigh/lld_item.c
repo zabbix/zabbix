@@ -522,7 +522,6 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *                                                                            *
  * Parameters: data   - [IN/OUT] the expression                               *
  *             jp_row - [IN] the lld data row                                 *
- *             out  - [OUT] the function data in string format                *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
@@ -537,12 +536,14 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 
 	for (e = *data; '\0' != *e; e += len)
 	{
+		/* get function data or jump over part of the string that is not a function */
 		if (FAIL == zbx_function_parse(&funcdata, e, &len))
 		{
 			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
 			continue;
 		}
 
+		/* substitute LLD macros in the part of the string that was jumped over */
 		if (0 != tmp_offset)
 		{
 			size_t	tmp_len;
@@ -558,8 +559,10 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 			tmp_offset = 0;
 		}
 
+		/* substitute LLD macros in function parameters (if any) */
 		if (0 < funcdata.nparam)
 		{
+			/* substitute LLD macro in the item key (first parameter) the same way as elsewhere */
 			if (SUCCEED == parse_host_key(funcdata.params[0], &host, &key))
 			{
 				zbx_free(funcdata.params[0]);
@@ -573,24 +576,26 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 				}
 				else
 				{
-
 					funcdata.params[0] = key;
 					key = NULL;
 				}
 			}
 
+			/* substitute LLD macros in the rest of the parameters (simple replacement) */
 			for (i = 1; i < funcdata.nparam; i++)
 				substitute_discovery_macros(&funcdata.params[i], jp_row);
 		}
 
+		/* substitue the original function in the string with the new one (with substitued LLD macros) */
 		zbx_function_tostr(&funcdata, e, len, &func);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
 
+		/* cleanup */
 		zbx_free(func);
-
 		zbx_function_clean(&funcdata);
 	}
 
+	/* substitute the LLD macros in the remainder of the string that was jumped over */
 	if (0 != tmp_offset)
 	{
 		substitute_discovery_macros(&tmp, jp_row);

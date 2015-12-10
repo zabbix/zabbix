@@ -3267,6 +3267,11 @@ static int	function_parse_name(const char *expr, size_t *length, size_t *next_po
 		*length = ptr - expr;
 		ret = SUCCEED;
 	}
+	else
+	{
+		/* function name was not found */
+		*length = 0;
+	}
 
 	*next_pos = ptr - expr;
 
@@ -3281,7 +3286,7 @@ static int	function_parse_name(const char *expr, size_t *length, size_t *next_po
  *                                                                            *
  * Parameters: expr      - [IN] the function expression, starting with the    *
  *                             parameter to parse: "p1",p2 ...                *
- *             length   - [OUT] the parameter length including enclosing      *
+ *             length    - [OUT] the parameter length including enclosing     *
  *                              quotes and excluding trailing whitespace      *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
@@ -3335,7 +3340,7 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
  *                                                                            *
  * Parameters: expr      - [IN] the function expression, starting with the    *
  *                             parameter to parse: p1,p2 ...                  *
- *             length   - [OUT] the parameter length excluding the trailing   *
+ *             length    - [OUT] the parameter length excluding the trailing  *
  *                              whitespace                                    *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
@@ -3391,16 +3396,18 @@ out:
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
-static int function_parse_param(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+static int	function_parse_param(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
 	int		ret;
 	const char	*ptr = expr;
 
+	/* skip the leading whitespace */
 	while (' ' == *(++ptr))
 		;
 
 	*param_pos = ptr - expr;
 
+	/* parse the parameter */
 	if ('"' == *ptr)
 		ret = function_parse_quoted_param(ptr, length, sep_pos);
 	else
@@ -3414,7 +3421,7 @@ static int function_parse_param(const char *expr, size_t *param_pos, size_t *len
 
 /******************************************************************************
  *                                                                            *
- * Function: function_unqote_param_dyn                                        *
+ * Function: function_unquote_param_dyn                                       *
  *                                                                            *
  * Purpose: unquotes function parameter                                       *
  *                                                                            *
@@ -3425,7 +3432,7 @@ static int function_parse_param(const char *expr, size_t *param_pos, size_t *len
  *               caller.                                                      *
  *                                                                            *
  ******************************************************************************/
-static char	*function_unqote_param_dyn(const char *param, size_t len)
+static char	*function_unquote_param_dyn(const char *param, size_t len)
 {
 	char	*out;
 
@@ -3600,6 +3607,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 
 	memset(func, '\0', sizeof(zbx_function_t));
 
+	/* FAIL if the expression doesn't start with a function name */
 	if (FAIL == function_parse_name(ptr, &len, &next_pos))
 	{
 		*length = next_pos + 1;
@@ -3608,9 +3616,13 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 
 	next_func = next_pos;
 
+	/* copy the function name from expression to the function data */
 	zbx_strncpy_alloc(&func->name, &offset, &alloc, ptr, len);
+
+	/* initial allocation for function data parameters */
 	func->params = (char **)zbx_malloc(NULL, sizeof(char *) * params_alloc);
 
+	/* parse and prepare (quote, escape, copy to function data) the function parameters */
 	do
 	{
 		ptr += next_pos;
@@ -3632,7 +3644,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 			func->params = (char **)zbx_realloc(func->params, sizeof(char *) * params_alloc);
 		}
 
-		func->params[func->nparam++] = function_unqote_param_dyn(ptr + param_pos, len);
+		func->params[func->nparam++] = function_unquote_param_dyn(ptr + param_pos, len);
 	}
 	while (')' != ptr[next_pos]);
 
