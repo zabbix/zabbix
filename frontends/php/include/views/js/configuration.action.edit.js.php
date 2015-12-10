@@ -12,13 +12,13 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opmsgUserRowTPL">
-<tr id="opmsgUserRow_#{userid}">
+<tr id="opmsgUserRow_#{id}">
 	<td>
-		<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
-		<span>#{fullname}</span>
+		<input name="new_operation[opmessage_usr][#{id}][userid]" type="hidden" value="#{id}" />
+		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{userid}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{id}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -118,7 +118,7 @@
 
 			switch (list.object) {
 				case 'userid':
-					if (jQuery('#opmsgUserRow_' + value.userid).length) {
+					if (jQuery('#opmsgUserRow_' + value.id).length) {
 						continue;
 					}
 
