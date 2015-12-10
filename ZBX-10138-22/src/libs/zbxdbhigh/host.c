@@ -4945,6 +4945,46 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBdelete_hosts_with_prototypes                                   *
+ *                                                                            *
+ * Purpose: delete hosts from database, check if there are any host           *
+ *          prototypes and delete them first                                  *
+ *                                                                            *
+ * Parameters: hostids - [IN] host identificators from database               *
+ *                                                                            *
+ ******************************************************************************/
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
+{
+	const char		*__function_name = "DBdelete_hosts_with_prototypes";
+
+	zbx_vector_uint64_t	host_prototypeids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&host_prototypeids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hd.hostid"
+			" from items i,host_discovery hd"
+			" where i.itemid=hd.parent_itemid"
+			" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &host_prototypeids);
+
+	DBdelete_host_prototypes(&host_prototypeids);
+
+	zbx_vector_uint64_destroy(&host_prototypeids);
+
+	DBdelete_hosts(hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBadd_interface                                                  *
  *                                                                            *
  * Purpose: add new interface to specified host                               *
