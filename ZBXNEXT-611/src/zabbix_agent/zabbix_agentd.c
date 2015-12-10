@@ -842,6 +842,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	int		i, j = 0;
+#ifdef _WINDOWS
+	DWORD		res;
+#endif
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -849,9 +852,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
-#ifdef _WINDOWS
-	DWORD		res;
-#endif
 	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1108,7 +1108,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_STOP_SERVICE:
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
-				zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, CONFIG_HOSTNAME);
@@ -1116,7 +1116,7 @@ int	main(int argc, char **argv)
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
 			else
-				zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 
 			zbx_free_config();
 

@@ -325,9 +325,11 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	}
 	else if (LOG_TYPE_CONSOLE == type)
 	{
+#ifndef _WINDOWS
 		fflush(stderr);
 		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
 			zbx_error("cannot redirect stderr to stdout: %s", zbx_strerror(errno));
+#endif
 	}
 
 	return SUCCEED;

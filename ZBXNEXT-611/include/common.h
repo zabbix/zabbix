@@ -748,8 +748,6 @@ typedef enum
 }
 zbx_task_t;
 
-#define ZBX_TASK_FLAG_FOREGROUND	1
-
 #define ZBX_RTC_LOG_LEVEL_INCREASE	1
 #define ZBX_RTC_LOG_LEVEL_DECREASE	2
 #define ZBX_RTC_HOUSEKEEPER_EXECUTE	3
@@ -764,6 +762,7 @@ typedef enum
 zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
+#define ZBX_TASK_FLAG_FOREGROUND      0x02
 
 typedef struct
 {
