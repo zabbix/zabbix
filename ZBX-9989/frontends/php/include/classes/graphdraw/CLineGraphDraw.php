@@ -236,29 +236,16 @@ class CLineGraphDraw extends CGraphDraw {
 						&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))) {
 				$this->dataFrom = 'history';
 
-				$sql = 'SELECT itemid,'.$calc_field.' AS i,'.
-						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,'.
-						'MAX(value) AS max,MAX(clock) AS clock';
+				$sql_select = 'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,MAX(value) AS max';
+				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'history_uint' : 'history';
 			}
 			else {
 				$this->dataFrom = 'trends';
 				$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
 
-				$sql = 'SELECT itemid,'.$calc_field.' AS i,'.
-						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
-						'MAX(value_max) AS max,MAX(clock) AS clock';
+				$sql_select = 'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,MAX(value_max) AS max';
+				$sql_from = ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) ? 'trends_uint' : 'trends';
 			}
-
-			$sqlFrom = $this->dataFrom;
-			if ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-				$sqlFrom .='_uint';
-			}
-
-			$sql .= ' FROM '.$sqlFrom.
-					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND clock>='.zbx_dbstr($from_time).
-						' AND clock<='.zbx_dbstr($to_time).
-					' GROUP BY itemid,'.$calc_field;
 
 			if (!isset($this->data[$this->items[$i]['itemid']])) {
 				$this->data[$this->items[$i]['itemid']] = [];
@@ -276,7 +263,14 @@ class CLineGraphDraw extends CGraphDraw {
 			$curr_data['avg'] = null;
 			$curr_data['clock'] = null;
 
-			$result = DBselect($sql);
+			$result = DBselect(
+				'SELECT itemid,'.$calc_field.' AS i,'.$sql_select.',MAX(clock) AS clock'.
+				' FROM '.$sql_from.
+				' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+					' AND clock>='.zbx_dbstr($from_time).
+					' AND clock<='.zbx_dbstr($to_time).
+				' GROUP BY itemid,'.$calc_field
+			);
 			while ($row = DBfetch($result)) {
 				$idx = $row['i'] - 1;
 				if ($idx < 0) {
