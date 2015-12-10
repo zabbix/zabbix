@@ -2909,40 +2909,6 @@ a.blue {
 	@extend .blue;
 }
 
-
-
-/*.progress-bar-container {
-	display: inline-block;
-	height: 16px;
-	position: relative;
-	white-space: nowrap;
-
-	a {
-		border: none;
-	}
-
-	.progress-bar-bg {
-		display: inline-block;
-		height: 100%;
-		@include border-radius(0);
-
-		&:only-of-type {
-			@include border-radius(2px)
-		}
-
-		&:first-of-type:not(:only-of-type) {
-			@include border-radius(2px 0 0 2px);
-		}
-
-		&:last-of-type:not(:only-of-type) {
-			text-align: right;
-			@include border-radius(0 2px 2px 0);
-		}
-	}
-}
-*/
-
-
 .progress-bar-container {
 	display: inline-block;
 	height: 16px;
@@ -2952,7 +2918,7 @@ a.blue {
 	&:hover {
 
 		.progress-bar-label {
-			display: inline-block;
+			display: block;
 		}
 	}
 
@@ -2967,18 +2933,20 @@ a.blue {
 }
 
 .progress-bar-label {
-	//display: inline-block;
 	display: none;
-	position: absolute;
 	color: $font-color;
 	font-size: $font-h3-size;
 
-	&:first-of-type {
-		left: .25em;
-	}
+	span {
+		position: absolute;
 
-	&:last-of-type {
-		right: .25em;
+		&:first-child {
+			left: .25em;
+		}
+
+		&:last-child {
+			right: .25em;
+		}
 	}
 }
 
