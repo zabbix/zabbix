@@ -30,7 +30,7 @@ $filterColumn->addRow(_('Recipient'), [
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
+			'&dstfld1=alias&srctbl=users&srcfld1=alias");'
 		)
 ]);
 
