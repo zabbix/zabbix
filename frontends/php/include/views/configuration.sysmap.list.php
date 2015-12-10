@@ -40,7 +40,8 @@ $sysmapTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
-		_('Map')
+		_('Action'),
+		_('Constructor')
 	]);
 
 foreach ($this->data['maps'] as $map) {
@@ -48,19 +49,22 @@ foreach ($this->data['maps'] as $map) {
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
 			|| array_key_exists('editable', $map)) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
-		$edit = new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']);
+		$action = new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form');
+		$constructor = new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']);
 	}
 	else {
 		$checkbox = (new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']))
 			->setAttribute('disabled', 'disabled');
-		$edit = '';
+		$action = '';
+		$constructor = '';
 	}
 	$sysmapTable->addRow([
 		$checkbox,
-		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
+		new CLink($map['name'], 'zabbix.php?action=map.view&sysmapid='.$map['sysmapid']),
 		$map['width'],
 		$map['height'],
-		$edit,
+		$action,
+		$constructor
 	]);
 }
 
