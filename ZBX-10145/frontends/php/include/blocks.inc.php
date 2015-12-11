@@ -579,7 +579,8 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'sortfield' => $sort_field,
 		'sortorder' => $sort_order,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'expandComment' => true
 	]));
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
