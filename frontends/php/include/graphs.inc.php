@@ -259,7 +259,9 @@ function get_min_itemclock_by_itemid($itemIds) {
 				$sqlFrom = 'history';
 		}
 
-		$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE '.dbConditionInt('ht.itemid', $items);
+		foreach ($items as $itemid) {
+			$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE ht.itemid='.zbx_dbstr($itemid);
+		}
 	}
 
 	$dbMin = DBfetch(DBselect(
