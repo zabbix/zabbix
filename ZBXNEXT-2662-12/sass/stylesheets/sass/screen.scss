@@ -1511,6 +1511,10 @@ label {
 }
 
 input {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	
 	&[type="text"] {
 		@extend %form-input-height-padding;
@@ -1591,10 +1595,24 @@ select {
 		color: $font-color;
 	}
 
-	&.select-multiple {
-		//padding: 4px 5px;
+	//&.select-multiple {
+	//	padding: 4px 5px;
+	//	width: 300px;
+	//	height: auto;
+
+	//	option {
+	//		padding: 0;
+	//	}
+	//}
+
+	&[multiple] {
+		padding: 4px 5px;
 		width: 300px;
-		//height: auto;
+		height: auto;
+
+		option {
+			padding: 0;
+		}
 	}
 
 	&[disabled] {
@@ -1631,10 +1649,10 @@ select {
 }
 
 %form-input-style {
-	font: {
-		family: $font-stack;
-		size: $font-form-size;
-	}
+	//font: {
+	//	family: $font-stack;
+		//size: $font-form-size;
+	//}
 	border: 1px solid $form-border-color;
 	color: $font-color;
 	background-color: $form-bg-color;
