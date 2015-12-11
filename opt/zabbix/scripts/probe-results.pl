@@ -29,10 +29,12 @@ my $till = $ARGV[3];
 
 my $host = "$tld $probe";
 
-print("Test results:\n");
+print("\n**********\n");
+print("* CYCLES *\n");
+print("**********\n\n");
 
 my $rows_ref = db_select(
-    "select h.itemid,h.clock,h.value,i2.key_".
+    "select h.itemid,h.clock,h.ns,h.value,i2.key_".
     " from history_uint h, items i2".
     " where i2.itemid=h.itemid".
         " and i2.itemid in".
@@ -44,19 +46,25 @@ my $rows_ref = db_select(
         " and h.clock between $from and $till".
         " order by h.clock,i2.key_");
 
+printf("%-34s%-11s%-80s %s\n", "CLOCK", "NANOSEC", "ITEM", "VALUE");
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 foreach my $row_ref (@$rows_ref)
 {
     my $itemid = $row_ref->[0];
     my $clock = $row_ref->[1];
-    my $value = $row_ref->[2];
-    my $key = $row_ref->[3];
+    my $ns = $row_ref->[2];
+    my $value = $row_ref->[3];
+    my $key = $row_ref->[4];
 
-    print(ts_full($clock), "\t$key\t$value\n");
+    printf("%s  %s  %-80s %s\n", ts_full($clock), $ns, $key, $value);
 }
 
-print("Tests:\n");
+print("\n*********\n");
+print("* TESTS *\n");
+print("*********\n\n");
+
 $rows_ref = db_select(
-    "select h.itemid,h.clock,h.value,i2.key_".
+    "select h.itemid,h.clock,h.ns,h.value,i2.key_".
     " from history h, items i2".
     " where i2.itemid=h.itemid".
         " and i2.itemid in".
@@ -68,13 +76,16 @@ $rows_ref = db_select(
         " and h.clock between $from and $till".
         " order by h.clock,i2.key_");
 
+printf("%-34s%-11s%-80s %s\n", "CLOCK", "NANOSEC", "ITEM", "VALUE");
+print("------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
 foreach my $row_ref (@$rows_ref)
-{   
+{
     my $itemid = $row_ref->[0];
     my $clock = $row_ref->[1];
-    my $value = $row_ref->[2];
-    my $key = $row_ref->[3];
+    my $ns = $row_ref->[2];
+    my $value = $row_ref->[3];
+    my $key = $row_ref->[4];
 
-    print(ts_full($clock), "\t$key\t$value\n");
+    printf("%s  %s  %-80s %s\n", ts_full($clock), $ns, $key, $value);
 }
 
