@@ -156,7 +156,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'show_unack' => getRequest('show_unack', 0),
 		'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'urls' => getRequest('urls', []),
-		'userid' => getRequest('userid'),
+		'userid' => getRequest('userid', ''),
 		'private' => getRequest('private', 1),
 		'users' => getRequest('users', []),
 		'userGroups' => getRequest('userGroups', [])
@@ -272,7 +272,7 @@ if (hasRequest('form')) {
 
 	$data['user_groups'] = API::UserGroup()->get([
 		'output' => ['usrgrpid', 'name'],
-		'userids' => $user_groupids,
+		'usrgrpids' => $user_groupids,
 		'preservekeys' => true
 	]);
 
@@ -303,7 +303,7 @@ if (hasRequest('form')) {
 			'show_unack' => getRequest('show_unack', 0),
 			'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 			'urls' => getRequest('urls', []),
-			'userid' => getRequest('userid', $current_userid),
+			'userid' => getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid),
 			'private' => getRequest('private', 1),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])

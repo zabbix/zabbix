@@ -506,7 +506,7 @@ class CMap extends CMapElement {
 				}
 			}
 
-			if (array_key_exists('userid', $map)) {
+			if (array_key_exists('userid', $map) && $map['userid']) {
 				$userids[$map['userid']] = $map['userid'];
 			}
 
@@ -918,7 +918,7 @@ class CMap extends CMapElement {
 				}
 			}
 
-			if (array_key_exists('userid', $map)) {
+			if (array_key_exists('userid', $map) && $map['userid']) {
 				$userids[$map['userid']] = $map['userid'];
 			}
 

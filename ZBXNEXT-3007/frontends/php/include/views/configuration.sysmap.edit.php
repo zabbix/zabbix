@@ -40,6 +40,16 @@ if (array_key_exists('sysmapid', $data['sysmap'])) {
 
 $map_ownerid = $data['sysmap']['userid'];
 
+if ($map_ownerid) {
+	$owner_data = [[
+		'id' => $map_ownerid,
+		'name' => getUserFullname($data['users'][$map_ownerid])
+	]];
+}
+else {
+	$owner_data = [];
+}
+
 // Create sysmap form list.
 $map_tab = (new CFormList())
 	->addRow(_('Owner'),
@@ -47,10 +57,7 @@ $map_tab = (new CFormList())
 			'name' => 'userid',
 			'selectedLimit' => 1,
 			'objectName' => 'users',
-			'data' => [[
-				'id' => $map_ownerid,
-				'name' => getUserFullname($data['users'][$map_ownerid])
-			]],
+			'data' => $owner_data,
 			'popup' => [
 				'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
 			]
@@ -235,33 +242,67 @@ $map_tab->addRow(_('URLs'),
 
 $tabs->addTab('sysmap_tab', _('Map'), $map_tab);
 
-// User sharing table.
-$user_list = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('List of user shares'), _('Action')]);
+// User group sharing table.
+$user_group_shares_table = (new CTable())
+	->setHeader([_('User groups'), _('Permissions'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
 
-$add_user_btn = (new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$user_list->addRow(
+$add_user_group_btn = ([(new CButton(null, _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
+		'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
+	)
+	->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$user_group_shares_table->addRow(
 	(new CRow(
-		(new CCol($add_user_btn))->setColSpan(2)
+		(new CCol($add_user_group_btn))->setColSpan(3)
+	))->setId('user_group_list_footer')
+);
+
+$user_groups = [];
+
+foreach ($data['sysmap']['userGroups'] as $user_group) {
+	$user_groupid = $user_group['usrgrpid'];
+	$user_groups[$user_groupid] = [
+		'usrgrpid' => $user_groupid,
+		'name' => $data['user_groups'][$user_groupid]['name'],
+		'permission' => $user_group['permission']
+	];
+}
+
+$js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $user_groups]).');';
+
+// User sharing table.
+$user_shares_table = (new CTable())
+	->setHeader([_('Users'), _('Permissions'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
+
+$add_user_btn = ([(new CButton(null, _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
+		'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
+	)
+	->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$user_shares_table->addRow(
+	(new CRow(
+		(new CCol($add_user_btn))->setColSpan(3)
 	))->setId('user_list_footer')
 );
 
-// User group sharing table.
-$user_group_list = (new CTable())
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('List of user group shares'), _('Action')]);
+$users = [];
 
-$add_user_group_btn = (new CButton(null, _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$user_group_list->addRow(
-	(new CRow(
-		(new CCol($add_user_group_btn))->setColSpan(2)
-	))->setId('user_group_list_footer')
-);
+foreach ($data['sysmap']['users'] as $user) {
+	$userid = $user['userid'];
+	$users[$userid] = [
+		'id' => $userid,
+		'name' => getUserFullname($data['users'][$userid]),
+		'permission' => $user['permission']
+	];
+}
+
+$js_insert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+
+zbx_add_post_js($js_insert);
 
 $sharing_tab = (new CFormList('sharing_form'))
 	->addRow(_('Type'),
@@ -270,8 +311,16 @@ $sharing_tab = (new CFormList('sharing_form'))
 		->addValue(_('Public'), SYSMAP_PUBLIC)
 		->setModern(true)
 	)
-	->addRow(_('Users'), $add_user_btn)
-	->addRow(_('User groups'), $add_user_group_btn);
+	->addRow(_('List of user group shares'),
+		(new CDiv($user_group_shares_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
+	->addRow(_('List of user shares'),
+		(new CDiv($user_shares_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	);
 
 // Append data to form.
 $tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
