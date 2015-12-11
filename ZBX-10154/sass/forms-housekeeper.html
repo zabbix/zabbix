@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="header-title">
+	<h1>Housekeeping</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div>
+		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
+	<form>
+	<div class="table-forms-container">
+	
+	<ul class="ui-tabs-nav"><li><a href="#">Host</a></li><li><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li class="ui-tabs-active"><a href="#">Host inventory</a></li></ul>
+
+		<ul class="table-forms">
+		<li>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"><h4>Events and alerts</h4></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Enable internal housekeeping</label></div><div class="table-forms-td-right"><input type="checkbox" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Trigger data storage period</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Internal data storage period</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Network discovery data storage period</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Auto-registration data storage period</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Data storage period (in days)</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"><h4>IT services</h4></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Enable internal housekeeping</label></div><div class="table-forms-td-right"><input type="checkbox" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Data storage period</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"><h4>IT services</h4></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Enable internal housekeeping</label></div><div class="table-forms-td-right"><input type="checkbox" id="HostName"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Data storage period</label></div><div class="table-forms-td-right"><input type="number" id="HostName" value="365" style="width: 55px" disabled><div class="form-input-margin"></div>days</div>
+		</li>
+		</ul>
+	</div>
+	</form>
+	</div>
+	<div class="footer">
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+	</div>
+</body>
+</html>
