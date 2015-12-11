@@ -199,17 +199,19 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			24 * DAY_IN_YEAR => 'yearly'
 		];
 
-		$caption = [new CLink(
-			$service['name'],
-			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
-		)];
+		$caption = (new CLink($service['name'],
+			'zabbix.php?action=report.services'.'&serviceid='.$service['serviceid'].'&period='.$periods[$period]
+		))->removeSID();
+
 		$trigger = $service['trigger'];
 		if ($trigger) {
-			$url = new CLink($trigger['description'],
-				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
-			);
-			$caption[] = ' - ';
-			$caption[] = $url;
+			$caption = [
+				$caption,
+				' - ',
+				(new CLink($trigger['description'],
+					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
+				))->removeSID()
+			];
 		}
 
 		// reason
