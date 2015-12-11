@@ -609,7 +609,7 @@ if ($srctbl == 'usrgrp') {
 /*
  * Users
  */
-elseif ($srctbl == 'users') {
+elseif ($srctbl === 'users') {
 	$form = (new CForm())
 		->setName('userform')
 		->setId('users');
@@ -631,9 +631,11 @@ elseif ($srctbl == 'users') {
 		'output' => ['alias', 'name', 'surname', 'type', 'theme', 'lang'],
 		'preservekeys' => true
 	];
-	if (!is_null($writeonly)) {
+
+	if ($writeonly !== null) {
 		$options['editable'] = true;
 	}
+
 	$users = API::User()->get($options);
 	order_result($users, 'alias');
 
@@ -648,19 +650,21 @@ elseif ($srctbl == 'users') {
 		// Check for existing.
 		if (array_key_exists($user['userid'], $excludeids)) {
 			if ($multiselect) {
-				$checkBox->setChecked(1);
-				$checkBox->setEnabled(false);
+				$checkBox
+					->setChecked(true)
+					->setEnabled(false);
 			}
+
 			$alias = $user['alias'];
 		}
 		else {
 			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).', '.
-				$parentid.');';
+				$parentid.'); jQuery(this).removeAttr("onclick");';
 
 			$alias = (new CLink($user['alias'], 'javascript:void(0);'))
 				->removeSID()
 				->setId('spanid'.$user['userid'])
-				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
+				->onClick($js_action);
 
 			if (isset($srcfld1)) {
 				if ($srcfld1 === 'userid') {
