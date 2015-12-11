@@ -40,8 +40,7 @@ $sysmapTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
-		_('Action'),
-		_('Constructor')
+		(new CColHeader(_('Actions')))->setColSpan(2)
 	]);
 
 foreach ($this->data['maps'] as $map) {
@@ -50,7 +49,7 @@ foreach ($this->data['maps'] as $map) {
 			|| array_key_exists('editable', $map)) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
 		$action = new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form');
-		$constructor = new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']);
+		$constructor = new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid']);
 	}
 	else {
 		$checkbox = (new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']))

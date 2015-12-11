@@ -647,41 +647,29 @@ elseif ($srctbl === 'users') {
 			$checkBox = new CCheckBox('users['.$user['userid'].']', $user['userid']);
 		}
 
-		// Check for existing.
-		if (array_key_exists($user['userid'], $excludeids)) {
-			if ($multiselect) {
-				$checkBox
-					->setChecked(true)
-					->setEnabled(false);
-			}
+		$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).', '.
+			$parentid.'); jQuery(this).removeAttr("onclick");';
 
-			$alias = $user['alias'];
+		$alias = (new CLink($user['alias'], 'javascript:void(0);'))
+			->removeSID()
+			->setId('spanid'.$user['userid'])
+			->onClick($js_action);
+
+		if (isset($srcfld1)) {
+			if ($srcfld1 === 'userid') {
+				$data[$user['userid']]['id'] = $user['userid'];
+			}
+			elseif ($srcfld1 === 'alias') {
+				$data[$user['userid']]['name'] = $user['alias'];
+			}
 		}
-		else {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($user['userid']).', '.
-				$parentid.'); jQuery(this).removeAttr("onclick");';
 
-			$alias = (new CLink($user['alias'], 'javascript:void(0);'))
-				->removeSID()
-				->setId('spanid'.$user['userid'])
-				->onClick($js_action);
-
-			if (isset($srcfld1)) {
-				if ($srcfld1 === 'userid') {
-					$data[$user['userid']]['id'] = $user['userid'];
-				}
-				elseif ($srcfld1 === 'alias') {
-					$data[$user['userid']]['name'] = $user['alias'];
-				}
+		if (isset($srcfld2)) {
+			if ($srcfld2 === 'fullname') {
+				$data[$user['userid']]['name'] = getUserFullname($user);
 			}
-
-			if (isset($srcfld2)) {
-				if ($srcfld2 === 'fullname') {
-					$data[$user['userid']]['name'] = getUserFullname($user);
-				}
-				elseif (array_key_exists($srcfld2, $user)) {
-					$data[$user['userid']][$srcfld2] = $user[$srcfld2];
-				}
+			elseif (array_key_exists($srcfld2, $user)) {
+				$data[$user['userid']][$srcfld2] = $user[$srcfld2];
 			}
 		}
 
