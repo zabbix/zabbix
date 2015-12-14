@@ -3689,7 +3689,7 @@ title: Typography
 name: typography
 ---
 
-The default font face is Arial. Type size and line height should be set in relative units: ems.
+The default font face is Arial. Relative units (em) should be used to set the type size and line height.
 
 ##Headings
 
@@ -3795,7 +3795,7 @@ Tables are used to display only tabular data. All tables are declared with the `
 
 ##Table with Pagination
 
-Pagination is used to separate large amounts of tabular data into descrete peices. Pagination control is used to progress 
+Pagination is used to separate large amounts of tabular data into descrete peices.
 
 ```html_example
 <div class="overflow-table">
@@ -3877,6 +3877,8 @@ Pagination is used to separate large amounts of tabular data into descrete peice
 ```
 
 ##Table with No Results
+
+When there are no results an explanatory text should be shown. 
 
 ```html_example
 <div class="overflow-table">
@@ -3971,7 +3973,7 @@ title: Forms
 name: forms
 ---
 
-Forms contain UI elements that are used to submit information. Some form elements have primary and secondary functionality.
+Forms contain UI elements that are used to submit information.
 
 ##Primary Button
 
@@ -4013,14 +4015,29 @@ Forms contain UI elements that are used to submit information. Some form element
 Text on html5 input types 
 
 ```html_example
-<input type="text" placeholder="Text">
-<div class="red">You can't leave this empty.</div>
-<input type="text" disabled>
-<input type="text" readonly>
-```
-
-```html_example
-<input type="text"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+<ul class="table-forms">
+   <li>
+      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
+      <div class="table-forms-td-right">
+         <input type="text" placeholder="Text" id="DefaultInput">
+         <div class="red">You can't leave this empty.</div>
+      </div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
+      <div class="table-forms-td-right">
+         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+      </div>
+   </li>
+</ul>
 ```
 
 ##Selects
@@ -4081,7 +4098,7 @@ title: Dialogs
 name: dialog
 ---
 
-Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clickng/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
+Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clicking/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
 
 ##Alert Dialogs
 
@@ -4173,7 +4190,7 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
 
 ```html_example
-<ul class="action-menu"">
+<ul class="action-menu">
    <li>
       <h3>Favourite screens</h3>
    </li>
@@ -4249,7 +4266,7 @@ Error notification appears after an action has been completed with errors or an 
 
 ##Global Notification
 
-Global notification
+Global notification.
 
 ```html_example
 <div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
@@ -4266,7 +4283,7 @@ name: icons
 Icons:
 
 ```html_example
-example
+<div class="icon-help"></div>
 ```
 */
 
@@ -4433,7 +4450,7 @@ Main navigation is used to jump between high level sections of the application.
 
 ##Tabs
 
-Tabs are used to switch between 
+Tabs are used to reveal a set of information 
 
 ```html_example
 <ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
@@ -4447,7 +4464,7 @@ title: Links
 name: links
 ---
 
-A link is used to navigate through different parts of the front-end. Action links are used to call out any additional content, like contextual menus and popovers.
+A link is used to navigate through different parts of the front-end. *Alternative* links are used to indicate a particular state or type. *Action* links are used call out any additional content, like contextual menus and popovers.
 
 ```html_example
 <p><a href="#">Default link</a></p>
@@ -4468,7 +4485,7 @@ title: Labels
 name: labels
 ---
 
-Labels add information.
+Labels add information. Different colors 
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
@@ -4478,11 +4495,11 @@ Labels add information.
 /*doc
 ---
 parent: components
-title: Spinners
-name: spinners
+title: Progress Indicators
+name: progress
 ---
 
-Spinners are used to show data retrieval or an ongoing computation. Use spinners to make UI look more fast and responsive.
+Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
 
 ```html_example
 <div class="preloader-container">
