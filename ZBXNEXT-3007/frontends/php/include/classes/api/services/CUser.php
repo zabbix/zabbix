@@ -558,7 +558,13 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids);
 
-		// delete action operation msg
+		// Get users for audit log.
+		$db_users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => $userids
+		]);
+
+		// Delete action operation msg.
 		$db_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
@@ -567,7 +573,7 @@ class CUser extends CApiService {
 
 		DB::delete('opmessage_usr', ['userid' => $userids]);
 
-		// delete empty operations
+		// Delete empty operations.
 		$del_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
@@ -585,6 +591,13 @@ class CUser extends CApiService {
 		$actionids = zbx_objectValues($del_operations, 'actionid');
 		if ($actionids) {
 			$this->disableActionsWithoutOperations($actionids);
+		}
+
+		// Audit log.
+		foreach ($db_users as $db_user) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER,
+				'User alias ['.$db_user['alias'].'] name ['.$db_user['name'].'] surname ['.$db_user['surname'].']'
+			);
 		}
 
 		return ['userids' => $userids];
