@@ -784,7 +784,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (0 != history[i].value_undef)
+		if (0 != history[i].value_undef || 0 != history[i].meta)
 			continue;
 
 		itemids[item_num] = history[i].itemid;
