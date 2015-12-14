@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.sysmap.edit.js.php';
+require_once dirname(__FILE__).'/js/monitoring.sysmap.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Network maps'));
 
