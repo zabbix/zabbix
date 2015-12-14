@@ -330,10 +330,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	zbx_free(buffer);
 out:
 	if (FAIL == ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to [%s]: %s",
-				get_ip_by_socket(sock), error);
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to \"%s\": %s", sock->peer, error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -599,7 +596,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	goto out;
 error:
-	zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to [%s]: %s", get_ip_by_socket(sock), error);
+	zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to \"%s\": %s", sock->peer, error);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);

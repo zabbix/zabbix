@@ -2387,22 +2387,21 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 
-		*error = zbx_dsprintf(*error, "cannot get connection attributes for connection from %s",
-				get_ip_by_socket(sock));
+		*error = zbx_dsprintf(*error, "cannot get connection attributes for connection from %s", sock->peer);
 		return FAIL;
 	}
 
 	/* simplified match, not compliant with RFC 4517, 4518 */
 	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER && 0 != strcmp(CONFIG_TLS_SERVER_CERT_ISSUER, attr.issuer))
 	{
-		*error = zbx_dsprintf(*error, "certificate issuer does not match for %s", get_ip_by_socket(sock));
+		*error = zbx_dsprintf(*error, "certificate issuer does not match for %s", sock->peer);
 		return FAIL;
 	}
 
 	/* simplified match, not compliant with RFC 4517, 4518 */
 	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT && 0 != strcmp(CONFIG_TLS_SERVER_CERT_SUBJECT, attr.subject))
 	{
-		*error = zbx_dsprintf(*error, "certificate subject does not match for %s", get_ip_by_socket(sock));
+		*error = zbx_dsprintf(*error, "certificate subject does not match for %s", sock->peer);
 		return FAIL;
 	}
 
@@ -4911,7 +4910,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 			if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 				continue;
 
-			zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() returned: %d %s", res, gnutls_strerror(res));
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() with %s returned: %d %s",
+					s->peer, res, gnutls_strerror(res));
 
 			if (0 != gnutls_error_is_fatal(res))
 				break;
@@ -4949,8 +4949,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 
 			error_code = SSL_get_error(s->tls_ctx, res);
 			zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-			zabbix_log(LOG_LEVEL_WARNING, "TLS shutdown with %s returned error code %d: %s",
-					get_ip_by_socket(s), error_code, info_buf);
+			zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s returned error code %d: %s",
+					s->peer, error_code, info_buf);
 			zbx_free(error);
 		}
 
