@@ -4988,7 +4988,7 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_lock_triggers_by_itemids                                *
+ * Function: DCconfig_lock_triggers_by_history_items                          *
  *                                                                            *
  * Purpose: Lock triggers for specified items so that multiple processes do   *
  *          not process one trigger simultaneously. Otherwise, this leads to  *
@@ -4996,11 +4996,11 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *          started and not cancelled, because they are not seen in parallel  *
  *          transactions.                                                     *
  *                                                                            *
- * Parameters: itemids     - [IN/OUT] list of item IDs a history syncer       *
+ * Parameters: history_items - [IN/OUT] list of history items history syncer  *
  *                                    wishes to take for processing; on       *
- *                                    output, the elements are set to 0 if    *
- *                                    the corresponding item cannot be taken  *
- *             itemids_num - [IN] number of such item IDs                     *
+ *                                    output, the item locked field is set    *
+ *                                    to 0 if the corresponding item cannot   *
+ *                                    be taken                                *
  *             triggerids  - [OUT] list of trigger IDs that this function has *
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
@@ -5023,19 +5023,25 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *           timer processes use to lock and unlock triggers.                 *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids)
+void	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids)
 {
 	int			i, j;
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
+	zbx_hc_item_t		*history_item;
 
 	zbx_vector_uint64_clear(triggerids);
 
 	LOCK_CACHE;
 
-	for (i = 0; i < itemids_num; i++)
+	for (i = 0; i < history_items->values_num; i++)
 	{
-		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
+		history_item = (zbx_hc_item_t *)history_items->values[i];
+
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &history_item->itemid)))
+			continue;
+
+		if (NULL == dc_item->triggers)
 			continue;
 
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
@@ -5045,7 +5051,7 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 
 			if (1 == dc_trigger->locked)
 			{
-				itemids[i] = 0;
+				history_item->locked = 1;
 				goto next;
 			}
 		}
@@ -5085,6 +5091,30 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 		dc_trigger->locked = 0;
 	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_unlock_all_triggers                                     *
+ *                                                                            *
+ * Purpose: Unlocks all locked triggers before doing full history sync at     *
+ *          program exit                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_unlock_all_triggers()
+{
+	int			i;
+	ZBX_DC_TRIGGER		*dc_trigger;
+	zbx_hashset_iter_t	iter;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->triggers, &iter);
+
+	while (NULL != (dc_trigger = zbx_hashset_iter_next(&iter)))
+		dc_trigger->locked = 0;
 
 	UNLOCK_CACHE;
 }
