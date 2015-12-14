@@ -512,21 +512,21 @@ class CUser extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 *
-	 * @param array $userIds
+	 * @param array $userids
 	 */
-	protected function validateDelete(array $userIds) {
-		if (!$userIds) {
+	protected function validateDelete(array $userids) {
+		if (!$userids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions($userIds);
-		$this->checkDeleteCurrentUser($userIds);
-		$this->checkDeleteInternal($userIds);
+		$this->checkPermissions($userids);
+		$this->checkDeleteCurrentUser($userids);
+		$this->checkDeleteInternal($userids);
 
 		// Check if deleted users have a map.
 		$user_maps = API::Map()->get([
 			'output' => ['name', 'userid'],
-			'userid' => $userIds,
+			'userids' => $userids,
 			'limit' => 1
 		]);
 
@@ -536,7 +536,7 @@ class CUser extends CApiService {
 
 			$db_users = $this->get([
 				'output' => ['alias'],
-				'userid' => $user_map['userid'],
+				'userids' => $user_map['userid'],
 				'limit' => 1
 			]);
 
