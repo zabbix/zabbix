@@ -481,6 +481,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		goto out;
 	}
 #endif
+	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
+
 	ret = SUCCEED;
 out:
 	if (NULL != ai)
@@ -583,6 +585,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 #endif
+	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
+
 	return SUCCEED;
 }
 #endif	/* HAVE_IPV6 */
@@ -1220,21 +1224,19 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	s->socket = accepted_socket;	/* replace socket to accepted */
 	s->accepted = 1;
 
+	zbx_strlcpy(s->peer, get_ip_by_socket(s), sizeof(s->peer));	/* save peer IP address */
+
 	/* if the 1st byte is 0x16 then assume it's a TLS connection */
 	if (1 == recv(s->socket, &buf, 1, MSG_PEEK) && '\x16' == buf)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (0 != (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 		{
-			char	*error = NULL, ip[64];
-
-			/* Get peer IP address for diagnostic logging before TLS stuff. Connection can be shut down */
-			/* during TLS handshake and it will not be possible to get peer IP address anymore. */
-			zbx_strlcpy(ip, get_ip_by_socket(s), sizeof(ip));
+			char	*error = NULL;
 
 			if (SUCCEED != zbx_tls_accept(s, &error, tls_accept))
 			{
-				zbx_set_socket_strerror("from %s: %s", ip, error);
+				zbx_set_socket_strerror("from %s: %s", s->peer, error);
 				zbx_tcp_unaccept(s);
 				zbx_free(error);
 				return FAIL;
@@ -1242,12 +1244,12 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		}
 		else
 		{
-			zbx_set_socket_strerror("from %s: TLS connections are not allowed", get_ip_by_socket(s));
+			zbx_set_socket_strerror("from %s: TLS connections are not allowed", s->peer);
 			zbx_tcp_unaccept(s);
 			return FAIL;
 		}
 #else
-		zbx_set_socket_strerror("from %s: support for TLS was not compiled in", get_ip_by_socket(s));
+		zbx_set_socket_strerror("from %s: support for TLS was not compiled in", s->peer);
 		zbx_tcp_unaccept(s);
 		return FAIL;
 #endif
@@ -1256,8 +1258,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	{
 		if (0 == (tls_accept & ZBX_TCP_SEC_UNENCRYPTED))
 		{
-			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed",
-					get_ip_by_socket(s));
+			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed", s->peer);
 			zbx_tcp_unaccept(s);
 			return FAIL;
 		}
@@ -1648,7 +1649,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s"
 					" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
-					expected_len, get_ip_by_socket(s), (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
+					expected_len, s->peer, (zbx_uint64_t)ZBX_MAX_RECV_DATA_SIZE);
 			total_bytes = FAIL;
 			goto cleanup;
 		}
