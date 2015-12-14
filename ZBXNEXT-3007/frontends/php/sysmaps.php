@@ -235,8 +235,9 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid')) || (hasRequest('action'
  * Display
  */
 if (hasRequest('form')) {
-	$user_groupids = [];
 	$current_userid = CWebUser::$data['userid'];
+	$userids[$current_userid] = $current_userid;
+	$user_groupids = [];
 
 	if (!hasRequest('sysmapid') || hasRequest('form_refresh')) {
 		// Map owner
@@ -313,6 +314,7 @@ if (hasRequest('form')) {
 		$data['sysmap'] = $sysmap;
 	}
 
+	$data['current_user_userid'] = $current_userid;
 	$data['form_refresh'] = getRequest('form_refresh');
 
 	// config

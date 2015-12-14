@@ -32,7 +32,9 @@ if (!$data['form_refresh']) {
 // Create sysmap form.
 $form = (new CForm())
 	->setName('map.edit.php')
-	->addVar('form', getRequest('form', 1));
+	->addVar('form', getRequest('form', 1))
+	->addVar('current_user_userid', $data['current_user_userid'])
+	->addVar('current_user_fullname', getUserFullname($data['users'][$data['current_user_userid']]));
 
 if (array_key_exists('sysmapid', $data['sysmap'])) {
 	$form->addVar('sysmapid', $data['sysmap']['sysmapid']);
