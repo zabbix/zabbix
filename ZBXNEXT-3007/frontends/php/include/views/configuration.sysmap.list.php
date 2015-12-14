@@ -48,7 +48,7 @@ foreach ($this->data['maps'] as $map) {
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
 			|| array_key_exists('editable', $map)) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
-		$action = new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form');
+		$action = new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid']);
 		$constructor = new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid']);
 	}
 	else {
