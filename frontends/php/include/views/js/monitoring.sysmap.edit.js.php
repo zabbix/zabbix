@@ -79,6 +79,21 @@
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#name').focus();
+
+			// Remove user and user group shares.
+			jQuery('[id^=user_group_shares_], [id^=user_shares_]').remove();
+
+			// Set private.
+			jQuery('input[name=private][value=' + <?= SYSMAP_PRIVATE ?> + ']').prop('checked', true);
+
+			// Switch to first tab so multiselect is visible and only then add data and resize.
+			jQuery('#tab_sysmap_tab').trigger('click');
+
+			// Set current user as owner.
+			jQuery('#userid').multiSelect('addData', {
+				'id': jQuery('#current_user_userid').val(),
+				'name': jQuery('#current_user_fullname').val()
+			});
 		});
 	});
 
