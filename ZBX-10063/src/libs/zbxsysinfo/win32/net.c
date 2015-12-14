@@ -22,6 +22,186 @@
 #include "log.h"
 #include "zbxjson.h"
 
+/* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */
+/* pointer to GetIfEntry2() we have to expand NETIOPAPI_API macro manually since */
+/* part of it must be toghether with the pointer name in the parentheses.        */
+typedef NETIO_STATUS (NETIOAPI_API_ *pGetIfEntry2_t)(PMIB_IF_ROW2 Row);
+
+static pGetIfEntry2_t	pGetIfEntry2 = NULL;
+
+typedef struct
+{
+	MIB_IFROW	*ifRowBeforeVista;	/* 32-bit counters */
+	MIB_IF_ROW2	*ifRowAfterVista;	/* 64-bit counters */
+}
+zbx_ifrow_t;
+
+static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
+{
+
+	HMODULE		module;
+
+	if (NULL == pGetIfEntry2)
+	{
+		if (NULL != (module = GetModuleHandle(L"iphlpapi.dll")))
+		{
+			if (NULL == (pGetIfEntry2 = (pGetIfEntry2_t)GetProcAddress(module, "GetIfEntry2")))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "GetProcAddress failed with error: %s",
+						strerror_from_system(GetLastError()));
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "GetModuleHandle failed with error: %s",
+					strerror_from_system(GetLastError()));
+		}
+	}
+
+	if (NULL != pGetIfEntry2)
+		pIfRow->ifRowAfterVista = zbx_malloc(pIfRow->ifRowAfterVista, sizeof(MIB_IF_ROW2));
+	else
+		pIfRow->ifRowBeforeVista = zbx_malloc(pIfRow->ifRowBeforeVista, sizeof(MIB_IFROW));
+}
+
+static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
+{
+	zbx_free(pIfRow->ifRowBeforeVista);
+	zbx_free(pIfRow->ifRowAfterVista);
+}
+
+static DWORD	zbx_ifrow_get_index(const zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InterfaceIndex;
+	else
+		return pIfRow->ifRowBeforeVista->dwIndex;
+}
+
+static void	zbx_ifrow_set_index(zbx_ifrow_t *pIfRow, DWORD index)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+	{
+		pIfRow->ifRowAfterVista->InterfaceLuid.Value = 0;
+		pIfRow->ifRowAfterVista->InterfaceIndex = index;
+	}
+	else
+		pIfRow->ifRowBeforeVista->dwIndex = index;
+}
+
+static DWORD	zbx_ifrow_get_if_entry(zbx_ifrow_t *pIfRow)
+{
+	/* on success both functions return 0 (NO_ERROR and STATUS_SUCCESS) */
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pGetIfEntry2(pIfRow->ifRowAfterVista);
+	else
+		return GetIfEntry(pIfRow->ifRowBeforeVista);
+}
+
+static DWORD	zbx_ifrow_get_type(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->Type;
+	else
+		return pIfRow->ifRowBeforeVista->dwType;
+}
+
+static DWORD	zbx_ifrow_get_admin_status(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->AdminStatus;
+	else
+		return pIfRow->ifRowBeforeVista->dwAdminStatus;
+}
+
+static ULONG64	zbx_ifrow_get_in_octets(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InOctets;
+	else
+		return pIfRow->ifRowBeforeVista->dwInOctets;
+}
+
+static ULONG64	zbx_ifrow_get_in_ucast_pkts(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InUcastPkts;
+	else
+		return pIfRow->ifRowBeforeVista->dwInUcastPkts;
+}
+
+static ULONG64	zbx_ifrow_get_in_nucast_pkts(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InNUcastPkts;
+	else
+		return pIfRow->ifRowBeforeVista->dwInNUcastPkts;
+}
+
+static ULONG64	zbx_ifrow_get_in_errors(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InErrors;
+	else
+		return pIfRow->ifRowBeforeVista->dwInErrors;
+}
+
+static ULONG64	zbx_ifrow_get_in_discards(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InDiscards;
+	else
+		return pIfRow->ifRowBeforeVista->dwInDiscards;
+}
+
+static ULONG64	zbx_ifrow_get_in_unknown_protos(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->InUnknownProtos;
+	else
+		return pIfRow->ifRowBeforeVista->dwInUnknownProtos;
+}
+
+static ULONG64	zbx_ifrow_get_out_octets(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->OutOctets;
+	else
+		return pIfRow->ifRowBeforeVista->dwOutOctets;
+}
+
+static ULONG64	zbx_ifrow_get_out_ucast_pkts(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->OutUcastPkts;
+	else
+		return pIfRow->ifRowBeforeVista->dwOutUcastPkts;
+}
+
+static ULONG64	zbx_ifrow_get_out_nucast_pkts(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->OutNUcastPkts;
+	else
+		return pIfRow->ifRowBeforeVista->dwOutNUcastPkts;
+}
+
+static ULONG64	zbx_ifrow_get_out_errors(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->OutErrors;
+	else
+		return pIfRow->ifRowBeforeVista->dwOutErrors;
+}
+
+static ULONG64	zbx_ifrow_get_out_discards(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pIfRow->ifRowAfterVista->OutDiscards;
+	else
+		return pIfRow->ifRowBeforeVista->dwOutDiscards;
+}
+
 /*
  * returns interface description encoded in UTF-8 format
  */
@@ -49,10 +229,18 @@ static char	*get_if_description(MIB_IFROW *pIfRow)
 	return utf8_descr;
 }
 
+static char	*zbx_ifrow_get_utf8_description(zbx_ifrow_t *pIfRow)
+{
+	if (NULL != pIfRow->ifRowAfterVista)
+		return zbx_unicode_to_utf8(pIfRow->ifRowAfterVista->Description);
+	else
+		return get_if_description(pIfRow->ifRowBeforeVista);
+}
+
 /*
  * returns interface statistics by IP address or interface name
  */
-static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
+static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 {
 	DWORD		dwSize, dwRetVal, i, j;
 	int		ret = FAIL;
@@ -101,15 +289,15 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 	{
 		char	*utf8_descr;
 
-		pIfRow->dwIndex = pIfTable->table[i].dwIndex;
-		if (NO_ERROR != (dwRetVal = GetIfEntry(pIfRow)))
+		zbx_ifrow_set_index(ifrow, pIfTable->table[i].dwIndex);
+		if (NO_ERROR != (dwRetVal = zbx_ifrow_get_if_entry(ifrow)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "GetIfEntry failed with error: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_get_if_entry failed with error: %s",
 					strerror_from_system(dwRetVal));
 			continue;
 		}
 
-		utf8_descr = get_if_description(pIfRow);
+		utf8_descr = zbx_ifrow_get_utf8_description(ifrow);
 		if (0 == strcmp(if_name, utf8_descr))
 			ret = SUCCEED;
 		zbx_free(utf8_descr);
@@ -119,7 +307,7 @@ static int	get_if_stats(const char *if_name, MIB_IFROW *pIfRow)
 
 		for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
 		{
-			if (pIPAddrTable->table[j].dwIndex == pIfRow->dwIndex)
+			if (pIPAddrTable->table[j].dwIndex == zbx_ifrow_get_index(ifrow))
 			{
 				in_addr.S_un.S_addr = pIPAddrTable->table[j].dwAddr;
 				zbx_snprintf(ip, sizeof(ip), "%s", inet_ntoa(in_addr));
@@ -144,12 +332,16 @@ clean:
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
-	MIB_IFROW	pIfRow;
+	zbx_ifrow_t	ifrow = {NULL, NULL};
+	int		ret = SYSINFO_RET_OK;
+
+	zbx_ifrow_init(&ifrow);
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if_name = get_rparam(request, 0);
@@ -158,41 +350,51 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
-	if (FAIL == get_if_stats(if_name, &pIfRow))
+	if (FAIL == get_if_stats(if_name, &ifrow))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-		SET_UI64_RESULT(result, pIfRow.dwInOctets);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_octets(&ifrow));
 	else if (0 == strcmp(mode, "packets"))
-		SET_UI64_RESULT(result, pIfRow.dwInUcastPkts + pIfRow.dwInNUcastPkts);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_ucast_pkts(&ifrow) + zbx_ifrow_get_in_nucast_pkts(&ifrow));
 	else if (0 == strcmp(mode, "errors"))
-		SET_UI64_RESULT(result, pIfRow.dwInErrors);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_errors(&ifrow));
 	else if (0 == strcmp(mode, "dropped"))
-		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_discards(&ifrow) + zbx_ifrow_get_in_unknown_protos(&ifrow));
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
-	return SYSINFO_RET_OK;
+clean:
+	zbx_ifrow_clean(&ifrow);
+
+	return ret;
 }
 
 int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
-	MIB_IFROW	pIfRow;
+	zbx_ifrow_t	ifrow = {NULL, NULL};
+	int		ret = SYSINFO_RET_OK;
+
+	zbx_ifrow_init(&ifrow);
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if_name = get_rparam(request, 0);
@@ -201,41 +403,51 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
-	if (FAIL == get_if_stats(if_name, &pIfRow))
+	if (FAIL == get_if_stats(if_name, &ifrow))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-		SET_UI64_RESULT(result, pIfRow.dwOutOctets);
+		SET_UI64_RESULT(result, zbx_ifrow_get_out_octets(&ifrow));
 	else if (0 == strcmp(mode, "packets"))
-		SET_UI64_RESULT(result, pIfRow.dwOutUcastPkts + pIfRow.dwOutNUcastPkts);
+		SET_UI64_RESULT(result, zbx_ifrow_get_out_ucast_pkts(&ifrow) + zbx_ifrow_get_out_nucast_pkts(&ifrow));
 	else if (0 == strcmp(mode, "errors"))
-		SET_UI64_RESULT(result, pIfRow.dwOutErrors);
+		SET_UI64_RESULT(result, zbx_ifrow_get_out_errors(&ifrow));
 	else if (0 == strcmp(mode, "dropped"))
-		SET_UI64_RESULT(result, pIfRow.dwOutDiscards);
+		SET_UI64_RESULT(result, zbx_ifrow_get_out_discards(&ifrow));
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
-	return SYSINFO_RET_OK;
+clean:
+	zbx_ifrow_clean(&ifrow);
+
+	return ret;
 }
 
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
-	MIB_IFROW	pIfRow;
+	zbx_ifrow_t	ifrow = {NULL, NULL};
+	int		ret = SYSINFO_RET_OK;
+
+	zbx_ifrow_init(&ifrow);
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if_name = get_rparam(request, 0);
@@ -244,41 +456,49 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
-	if (FAIL == get_if_stats(if_name, &pIfRow))
+	if (FAIL == get_if_stats(if_name, &ifrow))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))	/* default parameter */
-		SET_UI64_RESULT(result, pIfRow.dwInOctets + pIfRow.dwOutOctets);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_octets(&ifrow) + zbx_ifrow_get_out_octets(&ifrow));
 	else if (0 == strcmp(mode, "packets"))
-		SET_UI64_RESULT(result, pIfRow.dwInUcastPkts + pIfRow.dwInNUcastPkts +
-				pIfRow.dwOutUcastPkts + pIfRow.dwOutNUcastPkts);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_ucast_pkts(&ifrow) + zbx_ifrow_get_in_nucast_pkts(&ifrow) +
+				zbx_ifrow_get_out_ucast_pkts(&ifrow) + zbx_ifrow_get_out_nucast_pkts(&ifrow));
 	else if (0 == strcmp(mode, "errors"))
-		SET_UI64_RESULT(result, pIfRow.dwInErrors + pIfRow.dwOutErrors);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_errors(&ifrow) + zbx_ifrow_get_out_errors(&ifrow));
 	else if (0 == strcmp(mode, "dropped"))
-		SET_UI64_RESULT(result, pIfRow.dwInDiscards + pIfRow.dwInUnknownProtos +
-				pIfRow.dwOutDiscards);
+		SET_UI64_RESULT(result, zbx_ifrow_get_in_discards(&ifrow) + zbx_ifrow_get_in_unknown_protos(&ifrow) +
+				zbx_ifrow_get_out_discards(&ifrow));
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
 	}
 
-	return SYSINFO_RET_OK;
+clean:
+	zbx_ifrow_clean(&ifrow);
+
+	return ret;
 }
 
 int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DWORD		dwSize, dwRetVal, i;
 	int		ret = SYSINFO_RET_FAIL;
+
 	/* variables used for GetIfTable and GetIfEntry */
 	MIB_IFTABLE	*pIfTable = NULL;
-	MIB_IFROW	pIfRow;
+	zbx_ifrow_t	ifrow = {NULL, NULL};
+
 	struct zbx_json	j;
 	char 		*utf8_descr;
 
@@ -305,23 +525,27 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
+	zbx_ifrow_init(&ifrow);
+
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
-		pIfRow.dwIndex = pIfTable->table[i].dwIndex;
-		if (NO_ERROR != (dwRetVal = GetIfEntry(&pIfRow)))
+		zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
+		if (NO_ERROR != (dwRetVal = zbx_ifrow_get_if_entry(&ifrow)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "GetIfEntry failed with error: %s", strerror_from_system(dwRetVal));
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_get_if_entry failed with error: %s", strerror_from_system(dwRetVal));
 			continue;
 		}
 
 		zbx_json_addobject(&j, NULL);
 
-		utf8_descr = get_if_description(&pIfRow);
+		utf8_descr = zbx_ifrow_get_utf8_description(&ifrow);
 		zbx_json_addstring(&j, "{#IFNAME}", utf8_descr, ZBX_JSON_TYPE_STRING);
 		zbx_free(utf8_descr);
 
 		zbx_json_close(&j);
 	}
+
+	zbx_ifrow_clean(&ifrow);
 
 	zbx_json_close(&j);
 
@@ -371,7 +595,6 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 	int		ret = SYSINFO_RET_FAIL;
 	/* variables used for GetIfTable and GetIfEntry */
 	MIB_IFTABLE	*pIfTable = NULL;
-	MIB_IFROW	pIfRow;
 	/* variables used for GetIpAddrTable */
 	MIB_IPADDRTABLE	*pIPAddrTable = NULL;
 	IN_ADDR		in_addr;
@@ -418,26 +641,30 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (pIfTable->dwNumEntries > 0)
 	{
+		zbx_ifrow_t	ifrow = {NULL, NULL};
+
+		zbx_ifrow_init(&ifrow);
+
 		for (i = 0; i < (int)pIfTable->dwNumEntries; i++)
 		{
-			char	*utf8_descr;
+			char		*utf8_descr;
 
-			pIfRow.dwIndex = pIfTable->table[i].dwIndex;
-			if (NO_ERROR != (dwRetVal = GetIfEntry(&pIfRow)))
+			zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
+			if (NO_ERROR != (dwRetVal = zbx_ifrow_get_if_entry(&ifrow)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "GetIfEntry failed with error: %s",
+				zabbix_log(LOG_LEVEL_ERR, "zbx_ifrow_get_if_entry failed with error: %s",
 						strerror_from_system(dwRetVal));
 				continue;
 			}
 
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-					"%-25s", get_if_type_string(pIfRow.dwType));
+					"%-25s", get_if_type_string(zbx_ifrow_get_type(&ifrow)));
 
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-					" %-8s", get_if_adminstatus_string(pIfRow.dwAdminStatus));
+					" %-8s", get_if_adminstatus_string(zbx_ifrow_get_admin_status(&ifrow)));
 
 			for (j = 0; j < pIPAddrTable->dwNumEntries; j++)
-				if (pIPAddrTable->table[j].dwIndex == pIfRow.dwIndex)
+				if (pIPAddrTable->table[j].dwIndex == zbx_ifrow_get_index(&ifrow))
 				{
 					in_addr.S_un.S_addr = pIPAddrTable->table[j].dwAddr;
 					zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
@@ -448,10 +675,12 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (j == pIPAddrTable->dwNumEntries)
 				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, " -");
 
-			utf8_descr = get_if_description(&pIfRow);
+			utf8_descr = zbx_ifrow_get_utf8_description(&ifrow);
 			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, " %s\n", utf8_descr);
 			zbx_free(utf8_descr);
 		}
+
+		zbx_ifrow_clean(&ifrow);
 	}
 
 	SET_TEXT_RESULT(result, buf);
