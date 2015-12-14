@@ -340,7 +340,7 @@ if (hasRequest('form')) {
 	order_result($data['iconMaps'], 'name');
 
 	// render view
-	$mapView = new CView('configuration.sysmap.edit', $data);
+	$mapView = new CView('monitoring.sysmap.edit', $data);
 	$mapView->render();
 	$mapView->show();
 }
@@ -390,7 +390,7 @@ else {
 	$data['paging'] = getPagingLine($data['maps'], $sortOrder);
 
 	// render view
-	$mapView = new CView('configuration.sysmap.list', $data);
+	$mapView = new CView('monitoring.sysmap.list', $data);
 	$mapView->render();
 	$mapView->show();
 }
