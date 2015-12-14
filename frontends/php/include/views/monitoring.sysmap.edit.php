@@ -50,6 +50,8 @@ else {
 	$owner_data = [];
 }
 
+$user_type = CWebUser::getType();
+
 // Create sysmap form list.
 $map_tab = (new CFormList())
 	->addRow(_('Owner'),
@@ -58,6 +60,7 @@ $map_tab = (new CFormList())
 			'selectedLimit' => 1,
 			'objectName' => 'users',
 			'data' => $owner_data,
+			'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 			'popup' => [
 				'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
 			]
