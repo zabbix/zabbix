@@ -670,14 +670,14 @@ class CMacrosResolverGeneral {
 						case 'ITEM.VALUE':
 							if ($events) {
 								$trigger = $triggers[$func['triggerid']];
-								$value = item_get_history($item, $trigger['clock'], $trigger['ns']);
+								$value = item_get_history($func, $trigger['clock'], $trigger['ns']);
 
 								$replace = ($value === null)
 									? UNRESOLVED_MACRO_STRING
-									: formatHistoryValue($value, $item);
+									: formatHistoryValue($value, $func);
 							}
 							else {
-								$replace = $this->getItemLastValueMacro($lastValue, $item);
+								$replace = $this->getItemLastValueMacro($lastValue, $func);
 							}
 							break;
 					}
