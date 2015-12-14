@@ -510,9 +510,9 @@ class CUser extends CApiService {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $userids
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateDelete(array $userids) {
 		if (!$userids) {
@@ -526,8 +526,7 @@ class CUser extends CApiService {
 		// Check if deleted users have a map.
 		$user_maps = API::Map()->get([
 			'output' => ['name', 'userid'],
-			'userids' => $userids,
-			'limit' => 1
+			'userids' => $userids
 		]);
 
 		if ($user_maps) {
@@ -536,7 +535,7 @@ class CUser extends CApiService {
 
 			$db_users = $this->get([
 				'output' => ['alias'],
-				'userids' => $user_map['userid'],
+				'userids' => [$user_map['userid']],
 				'limit' => 1
 			]);
 
