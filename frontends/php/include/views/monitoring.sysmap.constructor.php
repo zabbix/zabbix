@@ -19,7 +19,7 @@
 **/
 
 
-include('include/views/js/configuration.sysmaps.js.php');
+include('include/views/js/monitoring.sysmaps.js.php');
 
 $sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
