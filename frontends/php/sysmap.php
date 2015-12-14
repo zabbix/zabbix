@@ -202,7 +202,7 @@ if ($data['iconList']) {
 }
 
 // render view
-$sysmapView = new CView('configuration.sysmap.constructor', $data);
+$sysmapView = new CView('monitoring.sysmap.constructor', $data);
 $sysmapView->render();
 $sysmapView->show();
 
