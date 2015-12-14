@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha5
 
 New features:
+........S. [ZBXNEXT-3055] changed LLD lost resources deletion time calculation logic to avoid issues with invalid discovery item time stamps (gleb)
 A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBX-9998] changed output of history and trends in item list and item prototype list from #y #m #d format to #d format (vitalijs)
 ..F....... [ZBX-9981] fixed validation for zabbix.conf.php saving in write protected directory (vitalijs)
