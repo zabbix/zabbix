@@ -64,7 +64,7 @@ class CScreenHostTriggers extends CScreenBase {
 
 			$header = (new CDiv([
 				new CTag('h4', true, _('Host issues')),
-				(new CList())->addItem($hosts[0]['name'])
+				(new CList())->addItem([_('Host'), ':', SPACE, $hosts[0]['name']])
 			]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
 
 			$params['hostids'] = $this->screenitem['resourceid'];

@@ -27,9 +27,18 @@ class CScreenTriggersInfo extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$header = $this->screenitem['resourceid'] == 0
-			? _('All groups')
-			: _('Group').SPACE.'&quot;'.get_hostgroup_by_groupid($this->screenitem['resourceid'])['name'].'&quot;';
+		$header = (new CDiv([
+			new CTag('h4', true, _('Triggers info'))
+		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
+
+		if ($this->screenitem['resourceid'] != 0) {
+			$groups = API::HostGroup()->get([
+				'output' => ['name'],
+				'groupids' => [$this->screenitem['resourceid']]
+			]);
+
+			$header->addItem((new CList())->addItem([_('Host'), ':', SPACE, $groups[0]['name']]));
+		}
 
 		$table = (new CTriggersInfo($this->screenitem['resourceid']))->setOrientation($this->screenitem['style']);
 
@@ -37,6 +46,6 @@ class CScreenTriggersInfo extends CScreenBase {
 			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
 			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 
-		return $this->getOutput((new CUiWidget(uniqid(), [$table, $footer]))->setHeader($header));
+		return $this->getOutput(new CUiWidget(uniqid(), [$header, $table, $footer]));
 	}
 }
