@@ -40,35 +40,59 @@ if (array_key_exists('sysmapid', $data['sysmap'])) {
 	$form->addVar('sysmapid', $data['sysmap']['sysmapid']);
 }
 
-$map_ownerid = $data['sysmap']['userid'];
-
-if ($map_ownerid) {
-	$owner_data = [[
-		'id' => $map_ownerid,
-		'name' => getUserFullname($data['users'][$map_ownerid])
-	]];
-}
-else {
-	$owner_data = [];
-}
-
 $user_type = CWebUser::getType();
 
 // Create sysmap form list.
-$map_tab = (new CFormList())
-	->addRow(_('Owner'),
-		(new CMultiSelect([
-			'name' => 'userid',
-			'selectedLimit' => 1,
-			'objectName' => 'users',
-			'data' => $owner_data,
-			'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
-			'popup' => [
-				'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	)
-	->addRow(_('Name'),
+$map_tab = (new CFormList());
+
+// Map owner.
+$multi_select_data = [
+	'name' => 'userid',
+	'selectedLimit' => 1,
+	'objectName' => 'users',
+	'popup' => [
+		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+	]
+];
+
+$map_ownerid = $data['sysmap']['userid'];
+
+if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users'])) {
+	if ($map_ownerid) {
+		$owner_data = [[
+			'id' => $map_ownerid,
+			'name' => getUserFullname($data['users'][$map_ownerid])
+		]];
+	}
+	else {
+		$owner_data = [];
+	}
+
+	$multi_select_data['data'] = $owner_data;
+
+	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		$multi_select_data['disabled'] = true;
+	}
+
+	$map_tab->addRow(_('Owner'),
+		(new CMultiSelect($multi_select_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+}
+else {
+	$multiselect_userid = (new CMultiSelect($multi_select_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
+		$map_tab->addRow(_('Owner'), $multiselect_userid);
+		$map_tab->addRow('', _('Inaccessible user'), 'inaccessible_user');
+	}
+	else {
+		$map_tab->addRow(_('Owner'), [(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
+			(new CSpan($multiselect_userid))->addStyle('display: none;')->setId('multiselect_userid_wrapper')
+		]);
+	}
+}
+
+$map_tab->addRow(_('Name'),
 		(new CTextBox('name', $data['sysmap']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')

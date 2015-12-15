@@ -841,6 +841,9 @@ class CMap extends CMapElement {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
 			}
 
+			// Unset extra field.
+			unset($db_maps[$map['sysmapid']]['userid']);
+
 			$map = array_merge($db_maps[$map['sysmapid']], $map);
 
 			// Check "width" and "height" fields.

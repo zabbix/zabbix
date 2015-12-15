@@ -95,8 +95,8 @@
 
 		// clone button
 		$('#clone').click(function() {
-			// Remove buttons and sharing options.
-			$('#sysmapid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_]').remove();
+			// Remove buttons, sharing options and inaccessible user message.
+			$('#sysmapid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_], #inaccessible_user').remove();
 			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
@@ -107,6 +107,8 @@
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
 			$('#tab_sysmap_tab').trigger('click');
+
+			$('#multiselect_userid_wrapper').show();
 
 			// Set current user as owner.
 			$('#userid').multiSelect('addData', {

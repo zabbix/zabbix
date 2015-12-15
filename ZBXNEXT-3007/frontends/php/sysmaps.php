@@ -173,6 +173,19 @@ if (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		// TODO check permission by new value.
 		$map['sysmapid'] = getRequest('sysmapid');
+
+		// Map update with inaccessible user.
+		if ($map['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			$user_exist = API::User()->get([
+				'output' => ['userid'],
+				'userids' => [$sysmap['userid']]
+			]);
+
+			if (!$user_exist) {
+				unset($map['userid']);
+			}
+		}
+
 		$result = API::Map()->update($map);
 
 		$messageSuccess = _('Network map updated');
