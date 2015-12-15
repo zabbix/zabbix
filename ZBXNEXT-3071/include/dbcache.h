@@ -51,8 +51,8 @@ extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE;
 
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
@@ -338,10 +338,10 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TREND_USED		12
 #define ZBX_STATS_TREND_FREE		13
 #define ZBX_STATS_TREND_PFREE		14
-#define ZBX_STATS_TEXT_TOTAL		15
-#define ZBX_STATS_TEXT_USED		16
-#define ZBX_STATS_TEXT_FREE		17
-#define ZBX_STATS_TEXT_PFREE		18
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	15
+#define ZBX_STATS_HISTORY_INDEX_USED	16
+#define ZBX_STATS_HISTORY_INDEX_FREE	17
+#define ZBX_STATS_HISTORY_INDEX_PFREE	18
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -466,12 +466,16 @@ void	zbx_config_clean(zbx_config_t *cfg);
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
 
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
+#define ZBX_HC_ITEM_STATUS_LOCKED	1
+#define ZBX_HC_ITEM_STATUS_QUEUED	2
+
 struct zbx_hc_data_t;
 
 typedef struct
 {
 	zbx_uint64_t		itemid;
-	unsigned char		locked;
+	unsigned char		status;
 
 	struct zbx_hc_data_t	*tail;
 	struct zbx_hc_data_t	*head;
