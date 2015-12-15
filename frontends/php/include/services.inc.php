@@ -235,60 +235,45 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		}
 
 		// sla
-		$sla = '-';
-		$sla2 = '-';
+		$sla = '';
+		$sla2 = '';
 		if ($service['showsla'] && $slaValues['sla'] !== null) {
-			$slaGood = $slaValues['sla'];
-			$slaBad = 100 - $slaValues['sla'];
-
-			$p = min($slaBad, 20);
+			$sla_good = $slaValues['sla'];
+			$sla_bad = 100 - $slaValues['sla'];
 
 			$width = 160;
-			$widthRed = $width * $p / 20;
-			$widthGreen = $width - $widthRed;
+			$width_red = $width * min($sla_bad, 20) / 20;
+			$width_green = $width - $width_red;
 
-			$chart1 = null;
-			if ($widthGreen > 0) {
-				$chart1 = (new CDiv())
-					->addClass('sla-bar-part')
-					->addClass('sla-green')
-					->setAttribute('style', 'width: '.$widthGreen.'px;');
-			}
-			$chart2 = null;
-			if ($widthRed > 0) {
-				$chart2 = (new CDiv())
-					->addClass('sla-bar-part')
-					->addClass('sla-red')
-					->setAttribute('style', 'width: '.$widthRed.'px;');
-			}
-			$bar = new CLink([
-				$chart1,
-				$chart2,
-				(new CDiv('80%'))
-					->addClass('sla-bar-legend')
-					->addClass('sla-bar-legend-start'),
-				(new CDiv('100%'))
-					->addClass('sla-bar-legend')
-					->addClass('sla-bar-legend-end')
-			], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
-			$bar = (new CDiv($bar))
-				->addClass('sla-bar')
-				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
-
-			$slaBar = [
-				$bar,
-				(new CSpan(sprintf('%.4f', $slaBad)))
-					->addClass('sla-value')
-					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
+			$sla = [
+				(new CDiv(
+					new CLink([
+						(new CSpan([new CSpan('80%'), new CSpan('100%')]))->addClass(ZBX_STYLE_PROGRESS_BAR_LABEL),
+						$width_green > 0
+							? (new CSpan())
+								->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
+								->addClass(ZBX_STYLE_GREEN_BG)
+								->setAttribute('style', 'width: '.$width_green.'px;')
+							: null,
+						$width_red > 0
+							? (new CSpan())
+								->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
+								->addClass(ZBX_STYLE_RED_BG)
+								->setAttribute('style', 'width: '.$width_red.'px;')
+							: null
+					], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'))
+				))
+					->addClass(ZBX_STYLE_PROGRESS_BAR_CONTAINER)
+					->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.')),
+				(new CSpan(sprintf('%.4f', $sla_bad)))
+					->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 			];
 
-			$sla = (new CDiv($slaBar))->addClass('invisible');
 			$sla2 = [
-				(new CSpan(sprintf('%.4f', $slaGood)))
-					->addClass('sla-value')
-					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-				'/',
-				(new CSpan(sprintf('%.4f', $service['goodsla'])))->addClass('sla-value')
+				(new CSpan(sprintf('%.4f', $sla_good)))
+					->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
+				' / ',
+				sprintf('%.4f', $service['goodsla'])
 			];
 		}
 
