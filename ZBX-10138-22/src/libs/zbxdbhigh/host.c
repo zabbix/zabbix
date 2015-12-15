@@ -4969,13 +4969,14 @@ void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
 			"select hd.hostid"
 			" from items i,host_discovery hd"
 			" where i.itemid=hd.parent_itemid"
-			" and");
+				" and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
 
 	DBselect_uint64(sql, &host_prototypeids);
 
 	DBdelete_host_prototypes(&host_prototypeids);
 
+	zbx_free(sql);
 	zbx_vector_uint64_destroy(&host_prototypeids);
 
 	DBdelete_hosts(hostids);
