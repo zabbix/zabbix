@@ -40,7 +40,7 @@ $sysmapTable = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
-		(new CColHeader(_('Actions')))->setColSpan(2)
+		_('Actions')
 	]);
 
 foreach ($this->data['maps'] as $map) {
@@ -48,7 +48,7 @@ foreach ($this->data['maps'] as $map) {
 	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
 			|| array_key_exists('editable', $map)) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
-		$action = new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid']);
+		$action = new CLink(_('Properties'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid']);
 		$constructor = new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid']);
 	}
 	else {
@@ -62,8 +62,7 @@ foreach ($this->data['maps'] as $map) {
 		new CLink($map['name'], 'zabbix.php?action=map.view&sysmapid='.$map['sysmapid']),
 		$map['width'],
 		$map['height'],
-		$action,
-		$constructor
+		new CHorList([$action, $constructor])
 	]);
 }
 
