@@ -1601,6 +1601,10 @@ select {
 
 	option {
 		color: $font-color;
+
+		&[disabled] {
+			@extend %form-disabled;
+		}
 	}
 
 	//&.select-multiple {
@@ -3710,6 +3714,8 @@ The default font face is Arial. Relative units (em) should be used to set the ty
 
 ##Paragraphs
 
+Paragraphs are used to visually separate blocks of multiple sentences.
+
 ```html_example
 <p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
 <p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
@@ -3723,7 +3729,7 @@ title: Tables
 name: table
 ---
 
-Tables are used to display only tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
 
 ```html_example
 <div class="overflow-table">
@@ -3886,7 +3892,7 @@ Pagination is used to separate large amounts of tabular data into descrete peice
 
 ##Table with No Results
 
-When there are no results an explanatory text should be shown. 
+An explanatory text should be 
 
 ```html_example
 <div class="overflow-table">
@@ -3917,6 +3923,8 @@ When there are no results an explanatory text should be shown.
 
 ##Tables with Elements and Highlights
 
+Besides textual information tables may contain other elements like icons. Table cells may be highlighted with various colors, for example to indicate severity level.
+
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
@@ -3929,7 +3937,7 @@ When there are no results an explanatory text should be shown.
       </thead>
       <tbody>
          <tr>
-            <td>Alerts</td>
+            <td>Alert labels</td>
             <td>asdasasdasd</td>
             <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
          </tr>
