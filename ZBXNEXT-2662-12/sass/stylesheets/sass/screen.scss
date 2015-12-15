@@ -1473,7 +1473,7 @@ footer {
 			border-color: $form-border-focus-color;
 			background-color: $btn-form-hover-color;
 			position: relative;
-			z-index: 1;
+			z-index: 2;
 		}
 
 		&:checked + label {
@@ -1487,7 +1487,7 @@ footer {
 		&:checked:focus + label {
 			border-color: $form-border-focus-color;	
 			position: relative;
-			z-index: 1;
+			z-index: 2;
 		}
 
 		&:checked[disabled] + label {
@@ -1570,6 +1570,10 @@ input {
 }
 
 textarea {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	padding: 4px 5px;
 	overflow: auto;
 	@extend %form-input-style;
@@ -1586,6 +1590,10 @@ textarea {
 }
 
 select {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
@@ -1608,7 +1616,7 @@ select {
 	&[multiple] {
 		padding: 4px 5px;
 		width: 300px;
-		height: auto;
+		height: 150px;
 
 		option {
 			padding: 0;
@@ -2321,10 +2329,10 @@ $form-icon-btn: (
 .dashbrd-widget-head {
 	position: relative;
 	padding: 8px 60px 8px 10px;
-	font-weight: bold;
 
 	h4 {
 		color: h4-widget-color($font-color);
+		font-weight: bold;
 	}
 
 	ul {
