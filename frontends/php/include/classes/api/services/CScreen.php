@@ -132,7 +132,7 @@ class CScreen extends CApiService {
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'] && $screenids) {
 			$db_screen_items = DBselect(
-				'SELECT si.screenid,si.resourcetype,si.resourceid'.
+				'SELECT si.screenid,si.resourcetype,si.resourceid,si.style'.
 				' FROM screens_items si'.
 				' WHERE '.dbConditionInt('si.screenid', array_keys($screenids)).
 					' AND '.dbConditionInt('si.resourcetype', array(
