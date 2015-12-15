@@ -1,53 +1,73 @@
 <script type="text/x-jquery-tmpl" id="user_group_row_tpl">
-<tr id="user_group_shares_#{usrgrpid}">
-	<td>
-		<input name="userGroups[#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
-		<span>#{name}</span>
-	</td>
-	<td>
-		<ul class="radio-segmented">
-			<li>
-				<input type="radio" id="user_group_#{usrgrpid}_permission_<?= PERM_READ ?>" name="userGroups[#{usrgrpid}][permission]" value="<?= PERM_READ ?>">
-				<label for="user_group_#{usrgrpid}_permission_<?= PERM_READ ?>"><?= _('Read-only') ?></label>
-			</li><li>
-				<input type="radio" id="user_group_#{usrgrpid}_permission_<?= PERM_READ_WRITE ?>" name="userGroups[#{usrgrpid}][permission]" value="<?= PERM_READ_WRITE ?>">
-				<label for="user_group_#{usrgrpid}_permission_<?= PERM_READ_WRITE ?>"><?= _('Read-write') ?></label>
-			</li>
-		</ul>
-	</td>
-	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeUserGroupShares('#{usrgrpid}');"><?= _('Remove') ?></button>
-	</td>
-</tr>
+	<?= (new CRow([
+			new CCol([
+				(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+				(new CSpan('#{name}')),
+			]),
+			new CCol(
+				(new CTag('ul', false, [
+					new CTag('li', false, [
+						(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ))
+							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ),
+						(new CTag('label', false, _('Read-only')))
+							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ)
+					]),
+					new CTag('li', false, [
+						(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ_WRITE))
+							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE),
+						(new CTag('label', false, _('Read-write')))
+							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
+					])
+				]))->addClass('radio-segmented')
+			),
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('removeUserGroupShares("#{usrgrpid}");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('user_group_shares_#{usrgrpid}')
+			->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="user_row_tpl">
-<tr id="user_shares_#{id}">
-	<td>
-		<input name="users[#{id}][userid]" type="hidden" value="#{id}" />
-		<span>#{name}</span>
-	</td>
-	<td>
-		<ul class="radio-segmented">
-			<li>
-				<input type="radio" id="user_#{id}_permission_<?= PERM_READ ?>" name="users[#{id}][permission]" value="<?= PERM_READ ?>">
-				<label for="user_#{id}_permission_<?= PERM_READ ?>"><?= _('Read-only') ?></label>
-			</li><li>
-				<input type="radio" id="user_#{id}_permission_<?= PERM_READ_WRITE ?>" name="users[#{id}][permission]" value="<?= PERM_READ_WRITE ?>">
-				<label for="user_#{id}_permission_<?= PERM_READ_WRITE ?>"><?= _('Read-write') ?></label>
-			</li>
-		</ul>
-	</td>
-	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeUserShares('#{id}');"><?= _('Remove') ?></button>
-	</td>
-</tr>
+	<?= (new CRow([
+			new CCol([
+				(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+				(new CSpan('#{name}')),
+			]),
+			new CCol(
+				(new CTag('ul', false, [
+					new CTag('li', false, [
+						(new CInput('radio', 'users[#{id}][permission]', PERM_READ))
+							->setId('user_#{id}_permission_'.PERM_READ),
+						(new CTag('label', false, _('Read-only')))
+							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ)
+					]),
+					new CTag('li', false, [
+						(new CInput('radio', 'users[#{id}][permission]', PERM_READ_WRITE))
+							->setId('user_#{id}_permission_'.PERM_READ_WRITE),
+						(new CTag('label', false, _('Read-write')))
+							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
+					])
+				]))->addClass('radio-segmented')
+			),
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('removeUserShares("#{id}");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('user_shares_#{id}')
+			->toString()
+	?>
 </script>
 
 <script type="text/javascript">
-	function toggleAdvancedLabels(toggle) {
-		var inputs = ['label_type_hostgroup', 'label_type_host', 'label_type_trigger', 'label_type_map', 'label_type_image'];
+	inputs = ['label_type_hostgroup', 'label_type_host', 'label_type_trigger', 'label_type_map', 'label_type_image'];
 
+	function toggleAdvancedLabels(toggle) {
 		jQuery.each(inputs, function() {
 			jQuery('#' + this).parentsUntil('ul').toggle(toggle);
 		});
@@ -56,43 +76,42 @@
 	}
 
 	function toggleCustomLabel(e) {
-		jQuery(e.target).parent().find('textarea').toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?php echo MAP_LABEL_TYPE_CUSTOM; ?>');
+		jQuery(e.target)
+			.parent()
+			.find('textarea')
+			.toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?= MAP_LABEL_TYPE_CUSTOM ?>');
 	}
 
-	jQuery(document).ready(function() {
-		jQuery('#label_format').click(function() {
-			toggleAdvancedLabels(jQuery('#label_format:checked').length != 0);
+	jQuery(function($) {
+		$('#label_format').click(function() {
+			toggleAdvancedLabels($('#label_format:checked').length != 0);
 		});
 
-		var inputs = ['label_type_hostgroup', 'label_type_host', 'label_type_trigger', 'label_type_map', 'label_type_image'];
-
-		jQuery.each(inputs, function() {
-			jQuery('#' + this).change(toggleCustomLabel);
+		$.each(inputs, function() {
+			$('#' + this).change(toggleCustomLabel);
 		});
 
-		toggleAdvancedLabels(jQuery('#label_format:checked').length != 0);
+		toggleAdvancedLabels($('#label_format:checked').length != 0);
 
 		// clone button
-		jQuery('#clone').click(function() {
-			jQuery('#sysmapid, #delete, #clone').remove();
-			jQuery('#update')
+		$('#clone').click(function() {
+			// Remove buttons and sharing options.
+			$('#sysmapid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_]').remove();
+			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
-			jQuery('#name').focus();
+			$('#name').focus();
 
-			// Remove user and user group shares.
-			jQuery('[id^=user_group_shares_], [id^=user_shares_]').remove();
-
-			// Set private.
-			jQuery('input[name=private][value=' + <?= SYSMAP_PRIVATE ?> + ']').prop('checked', true);
+			// Set map to private.
+			$('input[name=private][value=' + <?= SYSMAP_PRIVATE ?> + ']').prop('checked', true);
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
-			jQuery('#tab_sysmap_tab').trigger('click');
+			$('#tab_sysmap_tab').trigger('click');
 
 			// Set current user as owner.
-			jQuery('#userid').multiSelect('addData', {
-				'id': jQuery('#current_user_userid').val(),
-				'name': jQuery('#current_user_fullname').val()
+			$('#userid').multiSelect('addData', {
+				'id': $('#current_user_userid').val(),
+				'name': $('#current_user_fullname').val()
 			});
 		});
 	});
@@ -154,16 +173,10 @@
 	}
 
 	function removeUserGroupShares(usrgrpid) {
-		var row = jQuery('#user_group_shares_' + usrgrpid);
-		var rowParent = row.parent();
-
-		row.remove();
+		jQuery('#user_group_shares_' + usrgrpid).remove();
 	}
 
 	function removeUserShares(userid) {
-		var row = jQuery('#user_shares_' + userid);
-		var rowParent = row.parent();
-
-		row.remove();
+		jQuery('#user_shares_' + userid).remove();
 	}
 </script>
