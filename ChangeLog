@@ -1,6 +1,7 @@
 Changes for 2.2.12rc1
 
 New features:
+A......... [ZBX-9859] improved performance of screen.get methodfor an unprivileged user (Sasha)
 
 Bug fixes:
 ..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
