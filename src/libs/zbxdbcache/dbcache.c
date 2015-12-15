@@ -32,8 +32,8 @@
 #include "zbxalgo.h"
 #include "valuecache.h"
 
-static zbx_mem_info_t	*hc_base_mem = NULL;
-static zbx_mem_info_t	*hc_data_mem = NULL;
+static zbx_mem_info_t	*hc_index_mem = NULL;
+static zbx_mem_info_t	*hc_mem = NULL;
 static zbx_mem_info_t	*trend_mem = NULL;
 
 #define	LOCK_CACHE	zbx_mutex_lock(&cache_lock)
@@ -224,73 +224,97 @@ void	*DCget_stats(int request)
 {
 	static zbx_uint64_t	value_uint;
 	static double		value_double;
+	void			*ret;
+
+	LOCK_CACHE;
 
 	switch (request)
 	{
 		case ZBX_STATS_HISTORY_COUNTER:
 			value_uint = cache->stats.history_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_FLOAT_COUNTER:
 			value_uint = cache->stats.history_float_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_UINT_COUNTER:
 			value_uint = cache->stats.history_uint_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_STR_COUNTER:
 			value_uint = cache->stats.history_str_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_LOG_COUNTER:
 			value_uint = cache->stats.history_log_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_TEXT_COUNTER:
 			value_uint = cache->stats.history_text_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_NOTSUPPORTED_COUNTER:
 			value_uint = cache->stats.notsupported_counter;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_TOTAL:
-			value_uint = CONFIG_HISTORY_CACHE_SIZE;
-			return &value_uint;
-/*	TODO: retrieve history cache memory statistics from memory allocator*/
+			value_uint = hc_mem->total_size;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_USED:
-			value_uint = 0;
-			return &value_uint;
+			value_uint = hc_mem->used_size;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_FREE:
-			value_uint = 0;
-			return &value_uint;
+			value_uint = hc_mem->total_size - hc_mem->used_size;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_HISTORY_PFREE:
-			value_double = 0;
-/* 	*/
-			return &value_double;
+			value_double = (double)(hc_mem->total_size - hc_mem->used_size) / hc_mem->total_size;
+			ret = (void *)&value_double;
+			break;
 		case ZBX_STATS_TREND_TOTAL:
 			value_uint = trend_mem->orig_size;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_TREND_USED:
 			value_uint = trend_mem->orig_size - trend_mem->free_size;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_TREND_FREE:
 			value_uint = trend_mem->free_size;
-			return &value_uint;
+			ret = (void *)&value_uint;
+			break;
 		case ZBX_STATS_TREND_PFREE:
 			value_double = 100 * ((double)trend_mem->free_size / trend_mem->orig_size);
-			return &value_double;
-/* TODO: remove history text cache statistics */
-		case ZBX_STATS_TEXT_TOTAL:
-			value_uint = CONFIG_TEXT_CACHE_SIZE;
-			return &value_uint;
-		case ZBX_STATS_TEXT_USED:
-			value_uint = 0;
-			return &value_uint;
-		case ZBX_STATS_TEXT_FREE:
-			value_uint = 0;
-			return &value_uint;
-		case ZBX_STATS_TEXT_PFREE:
-			value_double = 0;
-			return &value_double;
+			ret = (void *)&value_double;
+			break;
+		case ZBX_STATS_HISTORY_INDEX_TOTAL:
+			value_uint = hc_index_mem->total_size;
+			ret = (void *)&value_uint;
+			break;
+		case ZBX_STATS_HISTORY_INDEX_USED:
+			value_uint = hc_index_mem->used_size;
+			ret = (void *)&value_uint;
+			break;
+		case ZBX_STATS_HISTORY_INDEX_FREE:
+			value_uint = hc_index_mem->total_size - hc_index_mem->used_size;
+			ret = (void *)&value_uint;
+			break;
+		case ZBX_STATS_HISTORY_INDEX_PFREE:
+			value_double = (double)(hc_index_mem->total_size - hc_index_mem->used_size) /
+					hc_index_mem->total_size;
+			ret = (void *)&value_double;
+			break;
 
 		default:
-			return NULL;
+			ret = NULL;
 	}
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1924,6 +1948,9 @@ int	DCsync_history(int sync_type)
 
 		UNLOCK_CACHE;
 
+		if (0 == history_items.values_num)
+			break;
+
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
 
@@ -2281,8 +2308,8 @@ void	dc_flush_history()
  * history cache storage                                                      *
  *                                                                            *
  ******************************************************************************/
-ZBX_MEM_FUNC_IMPL(__hc_base, hc_base_mem)
-ZBX_MEM_FUNC_IMPL(__hc_data, hc_data_mem)
+ZBX_MEM_FUNC_IMPL(__hc_index, hc_index_mem)
+ZBX_MEM_FUNC_IMPL(__hc, hc_mem)
 
 typedef struct zbx_hc_data_t
 {
@@ -2313,6 +2340,7 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
 	const zbx_hc_item_t	*item1 = (const zbx_hc_item_t *)e1->data;
 	const zbx_hc_item_t	*item2 = (const zbx_hc_item_t *)e2->data;
 
+	/* compare by timestamp of the oldest value */
 	return zbx_timespec_compare(&item1->tail->ts, &item2->tail->ts);
 }
 
@@ -2320,7 +2348,7 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Function: hc_free_data                                                     *
  *                                                                            *
- * Purpose: free history item data                                            *
+ * Purpose: free history item data allocated in history cache                 *
  *                                                                            *
  * Parameters: data - [IN] history item data                                  *
  *                                                                            *
@@ -2332,30 +2360,30 @@ static void	hc_free_data(zbx_hc_data_t *data)
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 			if (NULL != data->value.str)
-				__hc_data_mem_free_func(data->value.str);
+				__hc_mem_free_func(data->value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (NULL != data->value.log)
 			{
 				if (NULL != data->value.log->value)
-					__hc_data_mem_free_func(data->value.log->value);
+					__hc_mem_free_func(data->value.log->value);
 
 				if (NULL != data->value.log->source)
-					__hc_data_mem_free_func(data->value.log->source);
+					__hc_mem_free_func(data->value.log->source);
 
-				__hc_data_mem_free_func(data->value.log);
+				__hc_mem_free_func(data->value.log);
 			}
 			break;
 	}
 
-	__hc_data_mem_free_func(data);
+	__hc_mem_free_func(data);
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: hc_queue_item                                                    *
  *                                                                            *
- * Purpose: free history item data                                            *
+ * Purpose: put back item into history queue                                  *
  *                                                                            *
  * Parameters: data - [IN] history item data                                  *
  *                                                                            *
@@ -2384,7 +2412,7 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
 
 	if (NULL == (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)))
 	{
-		zbx_hc_item_t	item_local = {itemid};
+		zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL};
 
 		item = (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 	}
@@ -2394,20 +2422,20 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Function: hc_data_mem_value_str_dup                                        *
+ * Function: hc_mem_value_str_dup                                             *
  *                                                                            *
- * Purpose: copies string value to history data memory                        *
+ * Purpose: copies string value to history cache                              *
  *                                                                            *
  * Parameters: str - [IN] the string value                                    *
  *                                                                            *
  * Return value: the copied string or NULL if there was not enough memory     *
  *                                                                            *
  ******************************************************************************/
-static char	*hc_data_mem_value_str_dup(const dc_value_str_t *str)
+static char	*hc_mem_value_str_dup(const dc_value_str_t *str)
 {
 	char	*ptr;
 
-	if (NULL == (ptr = (char *)__hc_data_mem_malloc_func(NULL, str->len + 1)))
+	if (NULL == (ptr = (char *)__hc_mem_malloc_func(NULL, str->len + 1)))
 		return NULL;
 
 	memcpy(ptr, &string_values[str->pvalue], str->len + 1);
@@ -2422,12 +2450,15 @@ static char	*hc_data_mem_value_str_dup(const dc_value_str_t *str)
  * Purpose: clones string value into history data memory                      *
  *                                                                            *
  * Parameters: dst - [IN/OUT] a reference to the cloned value                 *
- *             str - [IN] the string value                                    *
+ *             str - [IN] the string value to clone                           *
  *                                                                            *
  * Return value: SUCCESS - either there was no need to clone the string       *
  *                         (it was empty or already cloned) or the string was *
  *                          cloned successfully                               *
  *               FAIL    - not enough memory                                  *
+ *                                                                            *
+ * Comments: This function can be called in loop with the same dst value      *
+ *           until it finishes cloning string value.                          *
  *                                                                            *
  ******************************************************************************/
 static int	hc_clone_history_str_data(char **dst, const dc_value_str_t *str)
@@ -2438,7 +2469,7 @@ static int	hc_clone_history_str_data(char **dst, const dc_value_str_t *str)
 	if (NULL != *dst)
 		return SUCCEED;
 
-	if (NULL != (*dst = hc_data_mem_value_str_dup(str)))
+	if (NULL != (*dst = hc_mem_value_str_dup(str)))
 		return SUCCEED;
 
 	return FAIL;
@@ -2451,7 +2482,7 @@ static int	hc_clone_history_str_data(char **dst, const dc_value_str_t *str)
  * Purpose: clones log value into history data memory                         *
  *                                                                            *
  * Parameters: dst        - [IN/OUT] a reference to the cloned value          *
- *             item_value - [IN] the log value                                *
+ *             item_value - [IN] the log value to clone                       *
  *                                                                            *
  * Return value: SUCCESS - the log value was cloned successfully              *
  *               FAIL    - not enough memory                                  *
@@ -2464,8 +2495,8 @@ static int	hc_clone_history_log_data(zbx_log_value_t **dst, const dc_item_value_
 {
 	if (NULL == *dst)
 	{
-		/* using realloc instead of malloc just to suppres 'not used' warning for realloc */
-		if (NULL == (*dst = (zbx_log_value_t *)__hc_data_mem_realloc_func(NULL, sizeof(zbx_log_value_t))))
+		/* using realloc instead of malloc just to suppress 'not used' warning for realloc */
+		if (NULL == (*dst = (zbx_log_value_t *)__hc_mem_realloc_func(NULL, sizeof(zbx_log_value_t))))
 			return FAIL;
 
 		memset(*dst, 0, sizeof(zbx_log_value_t));
@@ -2504,7 +2535,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 {
 	if (NULL == *data)
 	{
-		if (NULL == (*data = (zbx_hc_data_t *)__hc_data_mem_malloc_func(NULL, sizeof(zbx_hc_data_t))))
+		if (NULL == (*data = (zbx_hc_data_t *)__hc_mem_malloc_func(NULL, sizeof(zbx_hc_data_t))))
 			return FAIL;
 
 		memset(*data, 0, sizeof(zbx_hc_data_t));
@@ -2512,7 +2543,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 
 	if (ITEM_STATE_NOTSUPPORTED == item_value->state)
 	{
-		if (NULL == ((*data)->value.err = hc_data_mem_value_str_dup(&item_value->value.value_str)))
+		if (NULL == ((*data)->value.str = hc_mem_value_str_dup(&item_value->value.value_str)))
 			return FAIL;
 
 		(*data)->ts = item_value->ts;
@@ -2526,7 +2557,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_value->flags))
 	{
-		if (NULL == ((*data)->value.str = hc_data_mem_value_str_dup(&item_value->value.value_str)))
+		if (NULL == ((*data)->value.str = hc_mem_value_str_dup(&item_value->value.value_str)))
 			return FAIL;
 
 		(*data)->ts = item_value->ts;
@@ -2534,6 +2565,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		(*data)->value_type = ITEM_VALUE_TYPE_TEXT;
 
 		cache->stats.history_text_counter++;
+		cache->stats.history_counter++;
 
 		return SUCCEED;
 	}
@@ -2581,6 +2613,61 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 	cache->stats.history_counter++;
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: hc_add_item_values                                               *
+ *                                                                            *
+ * Purpose: adds item values to the history cache                             *
+ *                                                                            *
+ * Parameters: item_values      - [IN] the item values to add                 *
+ *             item_values_num  - [IN] the number of item values to add       *
+ *                                                                            *
+ * Comments: If the history cache is full this function will wait until       *
+ *           history syncers processes values freeing enough space to store   *
+ *           the new value.                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num)
+{
+	dc_item_value_t	*item_value;
+	int		i;
+	zbx_hc_item_t	*item;
+
+	for (i = 0; i < item_values_num; i++)
+	{
+		int		update_queue;
+		zbx_hc_data_t	*data = NULL;
+
+		item_value = &item_values[i];
+
+		while (SUCCEED != hc_clone_history_data(&data, item_value))
+		{
+			UNLOCK_CACHE;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "History buffer is full. Sleeping for 1 second.");
+			sleep(1);
+
+			LOCK_CACHE;
+		}
+
+		item = hc_get_item(item_value->itemid);
+
+		/* new items must be inserted in queue */
+		update_queue = (NULL == item->tail);
+
+		if (NULL == item->head)
+			item->tail = data;
+		else
+			item->head->next = data;
+
+		item->head = data;
+
+		if (0 != update_queue)
+			hc_queue_item(item);
+
+	}
 }
 
 /******************************************************************************
@@ -2645,70 +2732,14 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 
 /******************************************************************************
  *                                                                            *
- * Function: hc_add_item_values                                               *
- *                                                                            *
- * Purpose: adds item values to the history cache                             *
- *                                                                            *
- * Parameters: item_values      - [IN] the item values to add                 *
- *             item_values_num  - [IN] the number of item values to add       *
- *                                                                            *
- * Comments: If the history cache is full this function will wait until       *
- *           history syncers processes values freeing enough space to store   *
- *           the new value.                                                   *
- *                                                                            *
- ******************************************************************************/
-static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num)
-{
-	dc_item_value_t	*item_value;
-	int		i;
-	zbx_hc_item_t	*item;
-
-	for (i = 0; i < item_values_num; i++)
-	{
-		int		update_queue;
-		zbx_hc_data_t	*data = NULL;
-
-		item_value = &item_values[i];
-		item = hc_get_item(item_value->itemid);
-
-		while (SUCCEED != hc_clone_history_data(&data, item_value))
-		{
-			UNLOCK_CACHE;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "History buffer is full. Sleeping for 1 second.");
-			sleep(1);
-
-			LOCK_CACHE;
-
-			item = hc_get_item(item_value->itemid);
-		}
-
-		/* new items must be inserted in queue */
-		update_queue = (NULL == item->tail);
-
-		if (NULL == item->head)
-			item->tail = data;
-		else
-			item->head->next = data;
-
-		item->head = data;
-
-		if (0 != update_queue)
-			hc_queue_item(item);
-
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: hc_pop_items                                                     *
  *                                                                            *
- * Purpose: pops the next batch of history values from cache for processing   *
+ * Purpose: pops the next batch of history items from cache for processing    *
  *                                                                            *
  * Parameters: history_items - [OUT] the locked history items                 *
  *                                                                            *
  * Comments: The history_items must be returned back to history cache with    *
- *           hc_push_history() function after they have been processed.       *
+ *           hc_push_items() function after they have been processed.         *
  *                                                                            *
  ******************************************************************************/
 static void	hc_pop_items(zbx_vector_ptr_t *history_items)
@@ -2749,7 +2780,7 @@ static int	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history
 	{
 		item = (zbx_hc_item_t *)history_items->values[i];
 
-		if (0 != item->locked)
+		if (ZBX_HC_ITEM_STATUS_LOCKED == item->status)
 			continue;
 
 		hc_copy_history_data(&history[history_num++], item->itemid, item->tail);
@@ -2766,9 +2797,9 @@ static int	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history
  *                                                                            *
  * Parameters: history_items - [IN] the locked history items                  *
  *                                                                            *
- * Return value: timestamp of the next history item to sync                   *
+ * Return value: time of the next history item to sync                        *
  *                                                                            *
- * Comments: This function removes processed history data from history cache. *
+ * Comments: This function removes processed value from history cache.        *
  *           If there are no more data for this item, the the item itself is  *
  *           removed from history index.                                      *
  *                                                                            *
@@ -2784,7 +2815,8 @@ static int	hc_push_items(zbx_vector_ptr_t *history_items)
 	{
 		item = (zbx_hc_item_t *)history_items->values[i];
 
-		if (0 == item->locked)
+		/* only not locked items have been processed */
+		if (ZBX_HC_ITEM_STATUS_LOCKED != item->status)
 		{
 			data_next = item->tail->next;
 
@@ -2797,7 +2829,7 @@ static int	hc_push_items(zbx_vector_ptr_t *history_items)
 			}
 		}
 		else
-			item->locked = 0;
+			item->status = ZBX_HC_ITEM_STATUS_NORMAL;
 
 		hc_queue_item(item);
 	}
@@ -2832,23 +2864,26 @@ static void	hc_update_history_queue()
 	zbx_hc_item_t		*item;
 	int			i;
 
+	/* if all items have been queued - nothing to update */
 	if (cache->history_items.num_data == cache->history_queue.elems_num)
 		return;
 
+	/* mark queued items */
 	for (i = 0; i < cache->history_queue.elems_num; i++)
 	{
 		item = (zbx_hc_item_t *)cache->history_queue.elems[i].data;
-		item->locked = 2;
+		item->status = ZBX_HC_ITEM_STATUS_QUEUED;
 	}
 
 	zbx_hashset_iter_reset(&cache->history_items, &iter);
 
+	/* queue unmarked items */
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (2 != item->locked)
+		if (ZBX_HC_ITEM_STATUS_QUEUED != item->status)
 			hc_queue_item(item);
 
-		item->locked = 0;
+		item->status = ZBX_HC_ITEM_STATUS_NORMAL;
 	}
 }
 
@@ -2919,13 +2954,12 @@ static void	init_trend_cache()
 void	init_database_cache()
 {
 	const char	*__function_name = "init_database_cache";
-	key_t		hc_base_shm_key, hc_data_shm_key;
-	size_t		sz_hc_base, sz_hc_data;
+	key_t		hc_shm_key, hc_index_shm_key;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (-1 == (hc_base_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_ID)) ||
-			-1 == (hc_data_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_DATA_ID)))
+	if (-1 == (hc_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_ID)) ||
+			-1 == (hc_index_shm_key = zbx_ftok(CONFIG_FILE, ZBX_IPC_HISTORY_INDEX_ID)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create IPC keys for history cache");
 		exit(EXIT_FAILURE);
@@ -2943,33 +2977,26 @@ void	init_database_cache()
 		exit(EXIT_FAILURE);
 	}
 
-	sz_hc_base = CONFIG_HISTORY_CACHE_SIZE * 0.25;
-	sz_hc_base = ZBX_SIZE_T_ALIGN8(sz_hc_base);
-	sz_hc_data = CONFIG_HISTORY_CACHE_SIZE - sz_hc_base;
-	sz_hc_data = ZBX_SIZE_T_ALIGN8(sz_hc_data);
-
-	/* history cache data */
-	zbx_mem_create(&hc_data_mem, hc_data_shm_key, ZBX_NO_MUTEX, sz_hc_data, "history cache data size",
+	/* history cache */
+	zbx_mem_create(&hc_mem, hc_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_CACHE_SIZE, "history cache size",
 			"HistoryCacheSize", 1);
 
-	/* history cache */
-	zbx_mem_create(&hc_base_mem, hc_base_shm_key, ZBX_NO_MUTEX, sz_hc_base, "history cache size",
-			"HistoryCacheSize", 0);
+	/* history index cache*/
+	zbx_mem_create(&hc_index_mem, hc_index_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_INDEX_CACHE_SIZE,
+			"history index cache size", "HistoryIndexCacheSize", 0);
 
-	cache = (ZBX_DC_CACHE *)__hc_base_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
+	cache = (ZBX_DC_CACHE *)__hc_index_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 	memset(cache, 0, sizeof(ZBX_DC_CACHE));
 
-	cache->history_num = 0;
-
-	ids = (ZBX_DC_IDS *)__hc_base_mem_malloc_func(NULL, sizeof(ZBX_DC_IDS));
+	ids = (ZBX_DC_IDS *)__hc_index_mem_malloc_func(NULL, sizeof(ZBX_DC_IDS));
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	zbx_hashset_create_ext(&cache->history_items, ZBX_HC_ITEMS_INIT_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
-			__hc_base_mem_malloc_func, __hc_base_mem_realloc_func, __hc_base_mem_free_func);
+			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
 
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
-			__hc_base_mem_malloc_func, __hc_base_mem_realloc_func, __hc_base_mem_free_func);
+			__hc_index_mem_malloc_func, __hc_index_mem_realloc_func, __hc_index_mem_free_func);
 
 	/* trend cache */
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
@@ -3023,8 +3050,8 @@ void	free_database_cache()
 
 	cache = NULL;
 
-	zbx_mem_destroy(hc_data_mem);
-	zbx_mem_destroy(hc_base_mem);
+	zbx_mem_destroy(hc_mem);
+	zbx_mem_destroy(hc_index_mem);
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		zbx_mem_destroy(trend_mem);

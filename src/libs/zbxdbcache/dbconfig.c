@@ -5051,7 +5051,7 @@ void	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zb
 
 			if (1 == dc_trigger->locked)
 			{
-				history_item->locked = 1;
+				history_item->status = ZBX_HC_ITEM_STATUS_LOCKED;
 				goto next;
 			}
 		}
@@ -5105,7 +5105,6 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
  ******************************************************************************/
 void	DCconfig_unlock_all_triggers()
 {
-	int			i;
 	ZBX_DC_TRIGGER		*dc_trigger;
 	zbx_hashset_iter_t	iter;
 
