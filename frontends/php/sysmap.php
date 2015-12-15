@@ -117,11 +117,13 @@ if (PAGE_TYPE_HTML != $page['type']) {
  */
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
-		'sysmapids' => $_REQUEST['sysmapid'],
-		'editable' => true,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['sysmapid', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
+			'iconmapid'
+		],
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
+		'sysmapids' => getRequest('sysmapid'),
+		'editable' => true,
 		'preservekeys' => true
 	]);
 	if (empty($sysmap)) {
