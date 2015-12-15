@@ -15,7 +15,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			<input type="hidden" name="conditions[#{rowNum}][formulaid]" value="#{formulaId}">
 		</td>
 		<td>
-			<input class="macro" type="text" id="conditions_#{rowNum}_macro" name="conditions[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{#MACRO}" data-formulaid="#{formulaId}">
+			<input class="macro uppercase" type="text" id="conditions_#{rowNum}_macro" name="conditions[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{#MACRO}" data-formulaid="#{formulaId}">
 		</td>
 		<td>
 			<span><?= _('matches') ?></span>
@@ -69,14 +69,12 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 
 				$('#expression').toggle(!show_formula);
 				$('#formula').toggle(show_formula);
-				if (show_formula) {
+				if (!show_formula) {
 					updateExpression();
 				}
 			});
 
 			$('#evaltype').trigger('change');
-
-			updateExpression();
 		});
 	})(jQuery);
 </script>
