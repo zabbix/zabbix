@@ -187,7 +187,9 @@ class CScreenBuilder {
 			$options['screenitem'] = reset($options['screenitem']);
 		}
 
-		if (zbx_empty($options['resourcetype']) && !zbx_empty($options['screenitem']['resourcetype'])) {
+		if (zbx_empty($options['resourcetype'])
+				&& array_key_exists('screenitem', $options)
+				&& !zbx_empty($options['screenitem']['resourcetype'])) {
 			$options['resourcetype'] = $options['screenitem']['resourcetype'];
 		}
 
@@ -278,6 +280,9 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
+
+			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
+				return new CScreenHttpTestDetails($options);
 
 			default:
 				return null;
