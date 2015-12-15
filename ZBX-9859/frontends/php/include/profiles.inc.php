@@ -115,7 +115,7 @@ class CProfile {
 		}
 
 		// remove from DB
-		DBexecute('DELETE FROM profiles WHERE idx='.zbx_dbstr($idx).' AND '.dbConditionString('idx2', $idx2));
+		DB::delete('profiles', array('idx' => $idx, 'idx2' => $idx2, 'userid' => self::$userDetails['userid']));
 
 		// remove from cache
 		if (!is_null(self::$profiles)) {

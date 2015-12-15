@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:14+0200\n"
+"POT-Creation-Date: 2015-11-26 04:51+0200\n"
 "PO-Revision-Date: 2015-09-01 10:09+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -127,11 +127,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[ACKNOWLEDGE MASSIVO]----"
 
-#: include/triggers.inc.php:2250 include/triggers.inc.php:2251
-#: include/triggers.inc.php:2252 include/triggers.inc.php:2254
-#: include/triggers.inc.php:2256 include/triggers.inc.php:2259
-#: include/triggers.inc.php:2262 include/triggers.inc.php:2263
-#: include/triggers.inc.php:2274
+#: include/triggers.inc.php:2260 include/triggers.inc.php:2261
+#: include/triggers.inc.php:2262 include/triggers.inc.php:2264
+#: include/triggers.inc.php:2266 include/triggers.inc.php:2269
+#: include/triggers.inc.php:2272 include/triggers.inc.php:2273
+#: include/triggers.inc.php:2284
 msgid "0 or 1"
 msgstr "0 o 1"
 
@@ -181,7 +181,7 @@ msgstr "AES"
 msgid "ALARM ACKNOWLEDGES"
 msgstr "ALLARMI CON ACKNOWLEDGE"
 
-#: include/triggers.inc.php:1689
+#: include/triggers.inc.php:1699
 #: include/views/configuration.action.edit.php:111
 #: include/views/configuration.action.edit.php:997
 #: include/views/configuration.triggers.edit.php:106 tr_logform.php:294
@@ -2592,7 +2592,7 @@ msgid "Change password"
 msgstr "Cambia password"
 
 #: include/forms.inc.php:431 include/items.inc.php:125
-#: include/triggers.inc.php:2227 include/views/configuration.item.edit.php:224
+#: include/triggers.inc.php:2237 include/views/configuration.item.edit.php:224
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "Carattere"
@@ -4145,11 +4145,11 @@ msgstr "Nega"
 msgid "Dependencies"
 msgstr "Dipendenze"
 
-#: include/triggers.inc.php:1407 tr_status.php:611
+#: include/triggers.inc.php:1417 tr_status.php:611
 msgid "Dependent"
 msgstr "Subordinato"
 
-#: include/triggers.inc.php:1387
+#: include/triggers.inc.php:1397
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
 #: tr_status.php:595
@@ -4359,8 +4359,8 @@ msgstr "Disabilitare trigger selezionati?"
 
 #: auditlogs.php:152 dashboard.php:270 include/discovery.inc.php:122
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1634
-#: include/triggers.inc.php:2483 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1644
+#: include/triggers.inc.php:2493 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:97
 #: include/views/administration.usergroups.list.php:59
 #: include/views/administration.usergroups.list.php:84
@@ -4917,7 +4917,7 @@ msgstr "Abilitare trigger selezionati?"
 
 #: auditlogs.php:149 dashboard.php:270 include/discovery.inc.php:121
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2480
+#: include/items.inc.php:206 include/triggers.inc.php:2490
 #: include/views/administration.mediatypes.edit.php:96
 #: include/views/administration.mediatypes.list.php:96
 #: include/views/administration.usergroups.edit.php:65
@@ -4999,7 +4999,7 @@ msgstr "Aggiunta acknowledge eventi disabilitata"
 msgid "Event details"
 msgstr "Dettagli evento"
 
-#: include/triggers.inc.php:1632
+#: include/triggers.inc.php:1642
 msgid "Event generation"
 msgstr "Generazione evento"
 
@@ -5068,7 +5068,7 @@ msgstr "Esegue query WMI e restituisce il primo oggetto selezionato."
 msgid "Execute on"
 msgstr "Esegui su"
 
-#: include/items.inc.php:1333 include/views/configuration.item.edit.php:195
+#: include/items.inc.php:1363 include/views/configuration.item.edit.php:195
 msgid "Executed script"
 msgstr "Script eseguito"
 
@@ -5107,7 +5107,7 @@ msgstr "Esporta selezionati"
 msgid "Export to CSV"
 msgstr "Esporta in CSV"
 
-#: include/triggers.inc.php:1631
+#: include/triggers.inc.php:1641
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5368,7 +5368,7 @@ msgstr "Intervalli flessibili"
 msgid "For guest, password must be empty"
 msgstr "Per l'account guest, la password deve essere vuota"
 
-#: include/items.inc.php:1337 include/views/configuration.item.edit.php:207
+#: include/items.inc.php:1367 include/views/configuration.item.edit.php:207
 msgid "Formula"
 msgstr "Formula"
 
@@ -5502,7 +5502,7 @@ msgstr "Ottieni il tempo di caricamento di tutta la pagina WEB. Il percorso di d
 msgid "Giga"
 msgstr "Giga"
 
-#: include/triggers.inc.php:1764 tr_testexpr.php:35
+#: include/triggers.inc.php:1774 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "L'espressione fornita non è una macro"
 
@@ -6035,8 +6035,8 @@ msgstr "Allinea in orizzontale"
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/forms.inc.php:567 include/html.inc.php:383 include/maps.inc.php:24
-#: include/setup.inc.php:365 include/triggers.inc.php:1276
-#: include/triggers.inc.php:1628
+#: include/setup.inc.php:365 include/triggers.inc.php:1282
+#: include/triggers.inc.php:1638
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:61
 #: include/views/configuration.graph.list.php:54
@@ -6359,7 +6359,7 @@ msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Un host con lo stesso nome visibile \"%s\" esiste già."
 
 #: hostinventoriesoverview.php:85 hosts.php:772 include/forms.inc.php:225
-#: include/forms.inc.php:916 include/items.inc.php:728
+#: include/forms.inc.php:916 include/items.inc.php:754
 #: include/menu.inc.php:112 include/menu.inc.php:168
 #: include/reports.inc.php:384 include/views/administration.proxy.edit.php:88
 #: include/views/administration.proxy.list.php:52
@@ -7089,7 +7089,7 @@ msgstr "Intervallo flessibile \"%1$s\" errato."
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Intervallo flessibile errato nell'item \"%1$s\". L'intervallo flessibile deve essere una stringa."
 
-#: include/triggers.inc.php:617 include/triggers.inc.php:1765
+#: include/triggers.inc.php:617 include/triggers.inc.php:1775
 #: tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "Funzione errata utilizzata"
@@ -7952,7 +7952,7 @@ msgid "Item with key \"%1$s\" already exists."
 msgstr "Item con chiave \"%1$s\" già esistente."
 
 #: hosts.php:815 hosts.php:906 include/html.inc.php:425
-#: include/html.inc.php:429 include/items.inc.php:711
+#: include/html.inc.php:429 include/items.inc.php:735
 #: include/reports.inc.php:120 include/reports.inc.php:263
 #: include/views/configuration.application.list.php:99
 #: include/views/configuration.graph.edit.php:274
@@ -8410,7 +8410,7 @@ msgid "Location longitude"
 msgstr "Longitudine della posizione"
 
 #: include/forms.inc.php:432 include/items.inc.php:127
-#: include/triggers.inc.php:2228 include/views/configuration.item.edit.php:225
+#: include/triggers.inc.php:2238 include/views/configuration.item.edit.php:225
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "Log"
@@ -9220,7 +9220,7 @@ msgstr "Sposta"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1633
+#: include/triggers.inc.php:1643
 msgid "Multiple PROBLEM events"
 msgstr "Eventi PROBLEMA multipli"
 
@@ -9440,7 +9440,7 @@ msgid "Next"
 msgstr "Successivo"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2442 include/triggers.inc.php:1635
+#: include/func.inc.php:2442 include/triggers.inc.php:1645
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9816,7 +9816,7 @@ msgstr "Nessun item con itemid=\"%1$s\"."
 msgid "No items defined."
 msgstr "Nessun item definito."
 
-#: include/items.inc.php:702 include/views/configuration.item.list.php:58
+#: include/items.inc.php:726 include/views/configuration.item.list.php:58
 #: include/views/monitoring.overview.php:116 popup.php:1138
 msgid "No items found."
 msgstr "Nessun item trovato."
@@ -10078,7 +10078,7 @@ msgstr "Nessun trigger con triggerid \"%1$s\"."
 msgid "No triggers defined."
 msgstr "Nessun trigger definito."
 
-#: include/triggers.inc.php:1239
+#: include/triggers.inc.php:1244
 #: include/views/configuration.triggers.list.php:104 popup.php:1019
 #: report2.php:397 report5.php:56 tr_status.php:365
 msgid "No triggers found."
@@ -10118,7 +10118,7 @@ msgstr "Nessun Web Scenario trovato."
 #: include/blocks.inc.php:197 include/blocks.inc.php:399
 #: include/blocks.inc.php:931 include/blocks.inc.php:1106
 #: include/blocks.inc.php:1204 include/classes/screens/CScreenEvents.php:40
-#: include/page_header.php:324 include/triggers.inc.php:1625
+#: include/page_header.php:324 include/triggers.inc.php:1635
 #: include/views/administration.general.iconmap.list.php:24
 #: include/views/administration.general.regularexpressions.list.php:31
 #: include/views/administration.general.valuemapping.list.php:24
@@ -10184,7 +10184,7 @@ msgid "None"
 msgstr "Nessuno"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1632 popup.php:1509
+#: include/triggers.inc.php:1642 popup.php:1509
 msgid "Normal"
 msgstr "Normale"
 
@@ -10422,14 +10422,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr "Numero di macchine virtuali su VMware hypervisor, <url> - servizio VMware URL, <uuid> - VMware hypervisor nome host"
 
 #: include/forms.inc.php:430 include/items.inc.php:123
-#: include/triggers.inc.php:2226 include/views/configuration.item.edit.php:223
+#: include/triggers.inc.php:2236 include/views/configuration.item.edit.php:223
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "Numerico (float)"
 
-#: include/triggers.inc.php:2225 include/triggers.inc.php:2241
-#: include/triggers.inc.php:2245 include/triggers.inc.php:2255
-#: include/triggers.inc.php:2260 include/triggers.inc.php:2264
+#: include/triggers.inc.php:2235 include/triggers.inc.php:2251
+#: include/triggers.inc.php:2255 include/triggers.inc.php:2265
+#: include/triggers.inc.php:2270 include/triggers.inc.php:2274
 msgid "Numeric (integer 64bit)"
 msgstr "Numerico (intero 64bit)"
 
@@ -10469,7 +10469,7 @@ msgstr "Router OOB"
 msgid "OOB subnet mask"
 msgstr "Maschera sottorete OOB"
 
-#: include/triggers.inc.php:1689
+#: include/triggers.inc.php:1699
 #: include/views/configuration.action.edit.php:112
 #: include/views/configuration.action.edit.php:998
 #: include/views/configuration.triggers.edit.php:113 tr_logform.php:295
@@ -12044,7 +12044,7 @@ msgstr "Agente SNMPv3"
 msgid "SQL count: %s (selects: %s | executes: %s)"
 msgstr "Conteggio SQL: %s (selezioni: %s | esecuzioni: %s)"
 
-#: include/items.inc.php:1335 include/views/configuration.item.edit.php:199
+#: include/items.inc.php:1365 include/views/configuration.item.edit.php:199
 msgid "SQL query"
 msgstr "Query SQL"
 
@@ -12612,7 +12612,7 @@ msgstr "Sessione terminata, rieffettua il login, per favore."
 
 #: events.php:588 events.php:601 include/classes/screens/CScreenEvents.php:44
 #: include/classes/screens/CScreenHistory.php:168
-#: include/triggers.inc.php:1630 include/views/configuration.item.list.php:137
+#: include/triggers.inc.php:1640 include/views/configuration.item.list.php:137
 #: include/views/configuration.triggers.edit.php:247
 #: include/views/configuration.triggers.list.php:108
 #: include/views/configuration.triggers.massupdate.php:70 popup.php:1024
@@ -13406,7 +13406,7 @@ msgid "Test string"
 msgstr "Stringa di test"
 
 #: include/forms.inc.php:433 include/items.inc.php:129
-#: include/triggers.inc.php:2229 include/views/configuration.item.edit.php:226
+#: include/triggers.inc.php:2239 include/views/configuration.item.edit.php:226
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "Testo"
@@ -13693,7 +13693,7 @@ msgstr "Trend"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:477
-#: include/maps.inc.php:26 include/triggers.inc.php:1629
+#: include/maps.inc.php:26 include/triggers.inc.php:1639
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -13898,7 +13898,7 @@ msgstr "Valore trigger"
 
 #: hosts.php:816 hosts.php:908 include/forms.inc.php:612
 #: include/html.inc.php:450 include/html.inc.php:454 include/menu.inc.php:52
-#: include/triggers.inc.php:1251
+#: include/triggers.inc.php:1256
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:52
 #: include/views/configuration.host.edit.php:521
@@ -14181,7 +14181,7 @@ msgstr "Unità"
 #: include/perm.inc.php:53 include/regexp.inc.php:206
 #: include/screens.inc.php:55 include/triggers.inc.php:62
 #: include/triggers.inc.php:165 include/triggers.inc.php:184
-#: include/triggers.inc.php:2480 include/triggers.inc.php:2486
+#: include/triggers.inc.php:2490 include/triggers.inc.php:2496
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14199,11 +14199,11 @@ msgstr "Errore sconosciuto"
 msgid "Unknown function."
 msgstr "Funzione sconosciuta."
 
-#: include/triggers.inc.php:1763 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1773 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host sconosciuto, nessun item di questo tipo nell'host selezionato"
 
-#: include/triggers.inc.php:1762 tr_testexpr.php:33
+#: include/triggers.inc.php:1772 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "Host sconosciuto, nessun host di questo tipo presente nel sistema"
 
@@ -14220,7 +14220,7 @@ msgstr "Risorsa sconosciuta"
 msgid "Unknown step failed: %1$s"
 msgstr "Passo sconosciuto fallito: %1$s"
 
-#: include/items.inc.php:901
+#: include/items.inc.php:931
 msgid "Unknown value type"
 msgstr "Tipo valore sconosciuto"
 
@@ -15375,7 +15375,7 @@ msgstr "Per anni"
 #: events.php:839 include/blocks.inc.php:751
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
 #: include/events.inc.php:383 include/func.inc.php:2442
-#: include/triggers.inc.php:1635
+#: include/triggers.inc.php:1645
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
 msgid "Yes"
