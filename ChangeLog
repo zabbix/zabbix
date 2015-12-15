@@ -9,6 +9,7 @@ A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
 ........S. [ZBX-10067] fixed false event generation on log item meta information update (dimir)
 ..F....... [ZBX-10139] fixed possible PHP and SQL errors on the dashdoard and screens (Sasha)
 ..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
