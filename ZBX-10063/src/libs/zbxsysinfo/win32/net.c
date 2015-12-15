@@ -27,8 +27,14 @@
 /* part of it must be toghether with the pointer name in the parentheses.        */
 typedef NETIO_STATUS (NETIOAPI_API_ *pGetIfEntry2_t)(PMIB_IF_ROW2 Row);
 
+/* GetIfEntry2() is available since Windows Vista and Windows Server 2008. In    */
+/* earlier Windows releases this pointer remains set to NULL and GetIfEntry() is */
+/* used dirrectly instead.                                                       */
 static pGetIfEntry2_t	pGetIfEntry2 = NULL;
 
+/* GetIfEntry2() and GetIfEntry() work with different MIB interface structures.  */
+/* Use zbx_ifrow_t variables and zbx_ifrow_*() functions below instead of        */
+/* version specific MIB interface API.                                           */
 typedef struct
 {
 	MIB_IFROW	*ifRowBeforeVista;	/* 32-bit counters */
@@ -36,12 +42,28 @@ typedef struct
 }
 zbx_ifrow_t;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ifrow_init                                                   *
+ *                                                                            *
+ * Purpose: initialize the zbx_ifrow_t variable                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pIfRow      - [IN/OUT] pointer to zbx_ifrow_t variable with all        *
+ *                            members set to NULL                             *
+ *                                                                            *
+ * Comments: allocates memory, call zbx_ifrow_clean() with the same pointer   *
+ *           to free it                                                       *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 {
 
 	HMODULE		module;
+	static	char	check_done = FALSE;
 
-	if (NULL == pGetIfEntry2)
+	/* check (once) if GetIfEntry2() is available on this system */
+	if (FALSE == check_done)
 	{
 		if (NULL != (module = GetModuleHandle(L"iphlpapi.dll")))
 		{
@@ -56,20 +78,65 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 			zabbix_log(LOG_LEVEL_DEBUG, "GetModuleHandle failed with error: %s",
 					strerror_from_system(GetLastError()));
 		}
+
+		check_done = TRUE;
 	}
 
+	/* allocate the relevant MIB interface structure */
 	if (NULL != pGetIfEntry2)
 		pIfRow->ifRowAfterVista = zbx_malloc(pIfRow->ifRowAfterVista, sizeof(MIB_IF_ROW2));
 	else
 		pIfRow->ifRowBeforeVista = zbx_malloc(pIfRow->ifRowBeforeVista, sizeof(MIB_IFROW));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ifrow_clean                                                  *
+ *                                                                            *
+ * Purpose: clean the zbx_ifrow_t variable                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pIfRow      - [IN/OUT] pointer to initialized zbx_ifrow_t variable     *
+ *                                                                            *
+ * Comments: sets the members to NULL so the variable can be reused           *
+ *                                                                            *
+ ******************************************************************************/
 static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 {
 	zbx_free(pIfRow->ifRowBeforeVista);
 	zbx_free(pIfRow->ifRowAfterVista);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ifrow_call_get_if_entry                                      *
+ *                                                                            *
+ * Purpose: call either GetIfEntry() or GetIfEntry2() based on the Windows    *
+ *          release to fill the passed MIB interface structure.               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pIfRow      - [IN/OUT] pointer to initialized zbx_ifrow_t variable     *
+ *                                                                            *
+ * Comments: the index of the interface must be set with                      *
+ *           zbx_ifrow_set_index(), otherwise this function will return error *
+ *                                                                            *
+ ******************************************************************************/
+static DWORD	zbx_ifrow_call_get_if_entry(zbx_ifrow_t *pIfRow)
+{
+	/* on success both functions return 0 (NO_ERROR and STATUS_SUCCESS) */
+	if (NULL != pIfRow->ifRowAfterVista)
+		return pGetIfEntry2(pIfRow->ifRowAfterVista);
+	else
+		return GetIfEntry(pIfRow->ifRowBeforeVista);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Generic accessor functions for the release specific MIB interface          *
+ * structure members. The return value type determined by the context in      *
+ * which the functions are called.                                            *
+ *                                                                            *
+ ******************************************************************************/
 static DWORD	zbx_ifrow_get_index(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
@@ -89,16 +156,7 @@ static void	zbx_ifrow_set_index(zbx_ifrow_t *pIfRow, DWORD index)
 		pIfRow->ifRowBeforeVista->dwIndex = index;
 }
 
-static DWORD	zbx_ifrow_get_if_entry(zbx_ifrow_t *pIfRow)
-{
-	/* on success both functions return 0 (NO_ERROR and STATUS_SUCCESS) */
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pGetIfEntry2(pIfRow->ifRowAfterVista);
-	else
-		return GetIfEntry(pIfRow->ifRowBeforeVista);
-}
-
-static DWORD	zbx_ifrow_get_type(zbx_ifrow_t *pIfRow)
+static DWORD	zbx_ifrow_get_type(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->Type;
@@ -106,7 +164,7 @@ static DWORD	zbx_ifrow_get_type(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwType;
 }
 
-static DWORD	zbx_ifrow_get_admin_status(zbx_ifrow_t *pIfRow)
+static DWORD	zbx_ifrow_get_admin_status(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->AdminStatus;
@@ -114,7 +172,7 @@ static DWORD	zbx_ifrow_get_admin_status(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwAdminStatus;
 }
 
-static ULONG64	zbx_ifrow_get_in_octets(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_in_octets(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->InOctets;
@@ -122,7 +180,7 @@ static ULONG64	zbx_ifrow_get_in_octets(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwInOctets;
 }
 
-static ULONG64	zbx_ifrow_get_in_ucast_pkts(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_in_ucast_pkts(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->InUcastPkts;
@@ -130,7 +188,7 @@ static ULONG64	zbx_ifrow_get_in_ucast_pkts(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwInUcastPkts;
 }
 
-static ULONG64	zbx_ifrow_get_in_nucast_pkts(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_in_nucast_pkts(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->InNUcastPkts;
@@ -138,7 +196,7 @@ static ULONG64	zbx_ifrow_get_in_nucast_pkts(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwInNUcastPkts;
 }
 
-static ULONG64	zbx_ifrow_get_in_errors(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_in_errors(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->InErrors;
@@ -146,7 +204,7 @@ static ULONG64	zbx_ifrow_get_in_errors(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwInErrors;
 }
 
-static ULONG64	zbx_ifrow_get_in_discards(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_in_discards(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->InDiscards;
@@ -154,7 +212,7 @@ static ULONG64	zbx_ifrow_get_in_discards(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwInDiscards;
 }
 
-static ULONG64	zbx_ifrow_get_in_unknown_protos(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_in_unknown_protos(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->InUnknownProtos;
@@ -162,7 +220,7 @@ static ULONG64	zbx_ifrow_get_in_unknown_protos(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwInUnknownProtos;
 }
 
-static ULONG64	zbx_ifrow_get_out_octets(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_out_octets(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->OutOctets;
@@ -170,7 +228,7 @@ static ULONG64	zbx_ifrow_get_out_octets(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwOutOctets;
 }
 
-static ULONG64	zbx_ifrow_get_out_ucast_pkts(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_out_ucast_pkts(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->OutUcastPkts;
@@ -178,7 +236,7 @@ static ULONG64	zbx_ifrow_get_out_ucast_pkts(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwOutUcastPkts;
 }
 
-static ULONG64	zbx_ifrow_get_out_nucast_pkts(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_out_nucast_pkts(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->OutNUcastPkts;
@@ -186,7 +244,7 @@ static ULONG64	zbx_ifrow_get_out_nucast_pkts(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwOutNUcastPkts;
 }
 
-static ULONG64	zbx_ifrow_get_out_errors(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_out_errors(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->OutErrors;
@@ -194,7 +252,7 @@ static ULONG64	zbx_ifrow_get_out_errors(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwOutErrors;
 }
 
-static ULONG64	zbx_ifrow_get_out_discards(zbx_ifrow_t *pIfRow)
+static ULONG64	zbx_ifrow_get_out_discards(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return pIfRow->ifRowAfterVista->OutDiscards;
@@ -202,39 +260,46 @@ static ULONG64	zbx_ifrow_get_out_discards(zbx_ifrow_t *pIfRow)
 		return pIfRow->ifRowBeforeVista->dwOutDiscards;
 }
 
-/*
- * returns interface description encoded in UTF-8 format
- */
-static char	*get_if_description(MIB_IFROW *pIfRow)
-{
-	static wchar_t *(*mb_to_unicode)(const char *) = NULL;
-	wchar_t 	*wdescr;
-	char		*utf8_descr;
-
-	if (NULL == mb_to_unicode)
-	{
-		const OSVERSIONINFOEX	*vi;
-
-		/* starting with Windows Vista (Windows Server 2008) the interface description */
-		/* is encoded in OEM codepage while earlier versions used ANSI codepage */
-		if (NULL != (vi = zbx_win_getversion()) && 6 <= vi->dwMajorVersion)
-			mb_to_unicode = zbx_oemcp_to_unicode;
-		else
-			mb_to_unicode = zbx_acp_to_unicode;
-	}
-	wdescr = mb_to_unicode(pIfRow->bDescr);
-	utf8_descr = zbx_unicode_to_utf8(wdescr);
-	zbx_free(wdescr);
-
-	return utf8_descr;
-}
-
-static char	*zbx_ifrow_get_utf8_description(zbx_ifrow_t *pIfRow)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ifrow_get_utf8_description                                   *
+ *                                                                            *
+ * Purpose: returns interface description encoded in UTF-8 format             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     pIfRow      - [IN] pointer to initialized zbx_ifrow_t variable         *
+ *                                                                            *
+ * Comments: returns pointer do dynamically-allocated memory, caller must     *
+ *           free it                                                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 {
 	if (NULL != pIfRow->ifRowAfterVista)
 		return zbx_unicode_to_utf8(pIfRow->ifRowAfterVista->Description);
 	else
-		return get_if_description(pIfRow->ifRowBeforeVista);
+	{
+		static wchar_t *(*mb_to_unicode)(const char *) = NULL;
+		wchar_t 	*wdescr;
+		char		*utf8_descr;
+
+		if (NULL == mb_to_unicode)
+		{
+			const OSVERSIONINFOEX	*vi;
+
+			/* starting with Windows Vista (Windows Server 2008) the interface description */
+			/* is encoded in OEM codepage while earlier versions used ANSI codepage */
+			if (NULL != (vi = zbx_win_getversion()) && 6 <= vi->dwMajorVersion)
+				mb_to_unicode = zbx_oemcp_to_unicode;
+			else
+				mb_to_unicode = zbx_acp_to_unicode;
+		}
+		wdescr = mb_to_unicode(pIfRow->ifRowBeforeVista->bDescr);
+		utf8_descr = zbx_unicode_to_utf8(wdescr);
+		zbx_free(wdescr);
+
+		return utf8_descr;
+	}
 }
 
 /*
@@ -290,9 +355,9 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 		char	*utf8_descr;
 
 		zbx_ifrow_set_index(ifrow, pIfTable->table[i].dwIndex);
-		if (NO_ERROR != (dwRetVal = zbx_ifrow_get_if_entry(ifrow)))
+		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(ifrow)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_get_if_entry failed with error: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_call_get_if_entry failed with error: %s",
 					strerror_from_system(dwRetVal));
 			continue;
 		}
@@ -530,9 +595,10 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	for (i = 0; i < pIfTable->dwNumEntries; i++)
 	{
 		zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
-		if (NO_ERROR != (dwRetVal = zbx_ifrow_get_if_entry(&ifrow)))
+		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_get_if_entry failed with error: %s", strerror_from_system(dwRetVal));
+			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_call_get_if_entry failed with error: %s",
+					strerror_from_system(dwRetVal));
 			continue;
 		}
 
@@ -650,9 +716,9 @@ int	NET_IF_LIST(AGENT_REQUEST *request, AGENT_RESULT *result)
 			char		*utf8_descr;
 
 			zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
-			if (NO_ERROR != (dwRetVal = zbx_ifrow_get_if_entry(&ifrow)))
+			if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "zbx_ifrow_get_if_entry failed with error: %s",
+				zabbix_log(LOG_LEVEL_ERR, "zbx_ifrow_call_get_if_entry failed with error: %s",
 						strerror_from_system(dwRetVal));
 				continue;
 			}
