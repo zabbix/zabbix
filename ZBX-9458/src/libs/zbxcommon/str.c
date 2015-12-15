@@ -3476,12 +3476,16 @@ static char	*function_unquote_param_dyn(const char *param, size_t len)
  *                                                                            *
  * Return value: The length of quoted (if necessary) parameter. The quoting   *
  *               is applied either if it was initially forced with quoted     *
- *               parameter or if it contains ,) characters.                   *
+ *               parameter or if it starts with ' ' or '"' character or       *
+ *               contains ',' or ')' characters.                              *
  *                                                                            *
  ******************************************************************************/
 static int	function_quoted_param_len(const char *param, int *quoted)
 {
 	int	len = 0, quotes = 0;
+
+	if (' ' == *param || '"' == *param)
+		*quoted = 1;
 
 	for(;'\0' != *param; param++)
 	{
@@ -3518,7 +3522,8 @@ static int	function_quoted_param_len(const char *param, int *quoted)
  * Return value: The quoted parameter. This value must be freed by the caller.*
  *                                                                            *
  * Comments: The parameter is quoted if the quoted parameter is 1 or the      *
- *           parameter contains ,) characters. Otherwise it is simply dupped. *
+ *           parameter starts with ' ' or '"' character or contains ','  or   *
+ *           ')' characters.                                                  *
  *                                                                            *
  ******************************************************************************/
 static char	*function_quote_param_dyn(const char *param, int quoted)
@@ -3653,6 +3658,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 	return SUCCEED;
 }
 
+#include "log.h"
 /******************************************************************************
  *                                                                            *
  * Function: zbx_function_tostr                                               *
@@ -3713,7 +3719,9 @@ int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr
 		offset = next_pos - right;
 
 		quoted = ('"' == (*out)[param_pos] ? 1 : 0);
+
 		param = function_quote_param_dyn(func->params[index++], quoted);
+
 		zbx_replace_string(out, param_pos, &right, param);
 		zbx_free(param);
 

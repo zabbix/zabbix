@@ -586,7 +586,7 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 				substitute_discovery_macros(&funcdata.params[i], jp_row);
 		}
 
-		/* substitue the original function in the string with the new one (with substitued LLD macros) */
+		/* substitute the original function in the string with the new one (with substituted LLD macros) */
 		zbx_function_tostr(&funcdata, e, len, &func);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
 
