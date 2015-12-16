@@ -704,6 +704,13 @@ static int	DBpatch_2050076(void)
 	return FAIL;
 }
 
+static int	DBpatch_2050077(void)
+{
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("proxy_history", "meta", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -774,5 +781,6 @@ DBPATCH_ADD(2050073, 0, 1)
 DBPATCH_ADD(2050074, 0, 1)
 DBPATCH_ADD(2050075, 0, 1)
 DBPATCH_ADD(2050076, 0, 1)
+DBPATCH_ADD(2050077, 0, 1)
 
 DBPATCH_END()
