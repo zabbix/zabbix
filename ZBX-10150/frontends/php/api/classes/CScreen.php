@@ -81,6 +81,14 @@ class CScreen extends CZBXAPI {
 		);
 		$options = zbx_array_merge($defOptions, $options);
 
+		if ($options['countOutput'] !== null) {
+			$count_output = true;
+			$options['countOutput'] = null;
+		}
+		else {
+			$count_output = false;
+		}
+
 		// screenids
 		if (!is_null($options['screenids'])) {
 			zbx_value2array($options['screenids']);
@@ -119,31 +127,21 @@ class CScreen extends CZBXAPI {
 		$sqlParts = $this->applyQueryNodeOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 		while ($screen = DBfetch($res)) {
-			if ($options['countOutput'] !== null) {
-				if ($options['groupCount'] !== null) {
-					$result[] = $screen;
-				}
-				else {
-					$result = $screen['rowscount'];
-				}
+			$screenids[$screen['screenid']] = true;
+
+			if (!isset($result[$screen['screenid']])) {
+				$result[$screen['screenid']]= array();
 			}
-			else {
-				$screenids[$screen['screenid']] = true;
 
-				if (!isset($result[$screen['screenid']])) {
-					$result[$screen['screenid']]= array();
+			if (isset($screen['screenitemid']) && $options['selectScreenItems'] === null) {
+				if (!isset($result[$screen['screenid']]['screenitems'])) {
+					$result[$screen['screenid']]['screenitems'] = array();
 				}
-
-				if (isset($screen['screenitemid']) && $options['selectScreenItems'] === null) {
-					if (!isset($result[$screen['screenid']]['screenitems'])) {
-						$result[$screen['screenid']]['screenitems'] = array();
-					}
-					$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
-					unset($screen['screenitemid']);
-				}
-
-				$result[$screen['screenid']] += $screen;
+				$result[$screen['screenid']]['screenitems'][] = array('screenitemid' => $screen['screenitemid']);
+				unset($screen['screenitemid']);
 			}
+
+			$result[$screen['screenid']] += $screen;
 		}
 
 		// editable + PERMISSION CHECK
@@ -371,8 +369,13 @@ class CScreen extends CZBXAPI {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
-			return $result;
+		if ($count_output) {
+			if ($options['groupCount'] !== null) {
+				return array(array('rowscount' => count($result)));
+			}
+			else {
+				return count($result);
+			}
 		}
 
 		if ($result) {
