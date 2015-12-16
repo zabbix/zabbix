@@ -1954,17 +1954,21 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .progress-bar-bg {
   height: 100%;
   display: inline-block; }
+  .progress-bar-bg.green-bg, .progress-bar-bg.normal-bg, .progress-bar-bg.active-bg {
+    background-color: #34af67; }
+  .progress-bar-bg.red-bg {
+    background-color: #d64e4e; }
 
 .progress-bar-label {
   display: none;
-  color: #1f2c33;
+  color: #fff;
   font-size: 0.917em; }
   .progress-bar-label span {
     position: absolute; }
     .progress-bar-label span:first-child {
-      left: .25em; }
+      left: .35em; }
     .progress-bar-label span:last-child {
-      right: .25em; }
+      right: .35em; }
 
 .status-container {
   display: inline-block;
@@ -2640,7 +2644,7 @@ Pagination is used to separate large amounts of tabular data into descrete peice
 
 ##Table with No Results
 
-An explanatory text should be 
+In cases when no data can be shown, table should be accompanied by an explanatory text. It should not be left blank.
 
 ```html_example
 <div class="overflow-table">
@@ -3269,7 +3273,7 @@ title: Widgets
 name: widgets
 ---
 
-Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*.
+Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*. Widgets can be collapsed and expanded.
 
 ```html_example
 <div class="dashbrd-widget">
