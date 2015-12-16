@@ -701,6 +701,14 @@ footer {
 	position: relative;
 }
 
+.table-stats {
+	color: $font-alt-color;
+	display: inline-block;
+    padding: 4px 0;
+    position: absolute;
+    right: 5px;
+}
+
 .radio-switch {
 	cursor: default;
 	background-color: $form-bg-color;
@@ -2948,7 +2956,7 @@ a.blue {
 
 .progress-bar-container {
 	display: inline-block;
-	height: 14px;
+	height: 16px;
 	white-space: nowrap;
 	position: relative;
 	top: 2px;
@@ -3682,14 +3690,6 @@ tr.cursor-move {
 
 .clock-lines {
 	fill: $clock-lines-color;
-}
-
-.table-stats {
-	color: $font-alt-color;
-	display: inline-block;
-    padding: 4px 0;
-    position: absolute;
-    right: 5px;
 }
 
 /*doc
