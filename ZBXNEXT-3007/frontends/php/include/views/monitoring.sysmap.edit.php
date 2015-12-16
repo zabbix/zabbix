@@ -50,6 +50,7 @@ $multiselect_data = [
 	'name' => 'userid',
 	'selectedLimit' => 1,
 	'objectName' => 'users',
+	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
 	'popup' => [
 		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
 	]
@@ -71,11 +72,6 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 	}
 
 	$multiselect_data['data'] = $owner_data;
-
-	// Disable multiselect because only administrators can set map owner.
-	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
-		$multiselect_data['disabled'] = true;
-	}
 
 	// Append multiselect to map tab.
 	$map_tab->addRow(_('Owner'),
