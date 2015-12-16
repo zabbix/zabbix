@@ -142,8 +142,9 @@ else {
 			'caption' => _('Service'),
 			'status' => _('Status'),
 			'reason' => _('Reason'),
-			'sla' => _('Problem time'),
-			'sla2' => nbsp(_('SLA').' / '._('Acceptable SLA'))
+			'sla' => (new CColHeader(_('Problem time')))->setColSpan(2),
+			'sla2' => null,
+			'sla3' => nbsp(_('SLA').' / '._('Acceptable SLA'))
 		]
 	);
 

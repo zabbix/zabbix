@@ -78,13 +78,12 @@ class CTree {
 	}
 
 	private function makeRow($id) {
-		$td = $this->makeCell($id);
+		$tr = (new CRow())->setId('id_'.$id);
+		if ($this->tree[$id]['parentid'] != 0) {
+			$tr->setAttribute('style', 'display: none;');
+		}
 
-		$tr = new CRow();
-		$tr->addItem($td);
-		$tr->setId('id_'.$id);
-		$tr->setAttribute('style', $this->tree[$id]['parentid'] != '0' ? 'display: none;' : '');
-
+		$tr->addItem($this->makeCell($id));
 		foreach ($this->fields as $value) {
 			$tr->addItem($this->makeCol($id, $value));
 		}

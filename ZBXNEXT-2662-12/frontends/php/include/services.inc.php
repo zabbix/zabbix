@@ -162,14 +162,13 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	if (!$service) {
 		$serviceNode = [
 			'id' => 0,
-			'parentid' => 0,
 			'caption' => _('root'),
-			'status' => SPACE,
-			'sla' => SPACE,
-			'sla2' => SPACE,
-			'trigger' => [],
-			'reason' => SPACE,
-			'graph' => SPACE,
+			'reason' => '',
+			'sla' => '',
+			'sla2' => '',
+			'sla3' => '',
+			'parentid' => 0,
+			'status' => ''
 		];
 
 		$service = $serviceNode;
@@ -224,19 +223,20 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		}
 
 		// reason
-		$problemList = '';
-		if ($serviceSla['problems']) {
-			$problemList = (new CList())->addClass('service-problems');
-			foreach ($serviceSla['problems'] as $problemTrigger) {
-				$problemList->addItem(new CLink($problemTrigger['description'],
-					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
-				));
+		$reason = [];
+		foreach ($serviceSla['problems'] as $problemTrigger) {
+			if ($reason) {
+				$reason[] = ', ';
 			}
+			$reason[] = new CLink($problemTrigger['description'],
+				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
+			);
 		}
 
 		// sla
 		$sla = '';
 		$sla2 = '';
+		$sla3 = '';
 		if ($service['showsla'] && $slaValues['sla'] !== null) {
 			$sla_good = $slaValues['sla'];
 			$sla_bad = 100 - $slaValues['sla'];
@@ -245,31 +245,30 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			$width_red = $width * min($sla_bad, 20) / 20;
 			$width_green = $width - $width_red;
 
-			$sla = [
-				(new CDiv(
-					new CLink([
-						(new CSpan([new CSpan('80%'), new CSpan('100%')]))->addClass(ZBX_STYLE_PROGRESS_BAR_LABEL),
-						$width_green > 0
-							? (new CSpan())
-								->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
-								->addClass(ZBX_STYLE_GREEN_BG)
-								->setAttribute('style', 'width: '.$width_green.'px;')
-							: null,
-						$width_red > 0
-							? (new CSpan())
-								->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
-								->addClass(ZBX_STYLE_RED_BG)
-								->setAttribute('style', 'width: '.$width_red.'px;')
-							: null
-					], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'))
-				))
-					->addClass(ZBX_STYLE_PROGRESS_BAR_CONTAINER)
-					->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.')),
-				(new CSpan(sprintf('%.4f', $sla_bad)))
-					->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
-			];
+			$sla = (new CDiv(
+				new CLink([
+					(new CSpan([new CSpan('80%'), new CSpan('100%')]))->addClass(ZBX_STYLE_PROGRESS_BAR_LABEL),
+					$width_green > 0
+						? (new CSpan())
+							->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
+							->addClass(ZBX_STYLE_GREEN_BG)
+							->setAttribute('style', 'width: '.$width_green.'px;')
+						: null,
+					$width_red > 0
+						? (new CSpan())
+							->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
+							->addClass(ZBX_STYLE_RED_BG)
+							->setAttribute('style', 'width: '.$width_red.'px;')
+						: null
+				], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'))
+			))
+				->addClass(ZBX_STYLE_PROGRESS_BAR_CONTAINER)
+				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
 
-			$sla2 = [
+			$sla2 = (new CSpan(sprintf('%.4f', $sla_bad)))
+				->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+
+			$sla3 = [
 				(new CSpan(sprintf('%.4f', $sla_good)))
 					->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 				' / ',
@@ -280,10 +279,10 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		$serviceNode = [
 			'id' => $service['serviceid'],
 			'caption' => $caption,
-			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
-			'reason' => $problemList,
+			'reason' => $reason,
 			'sla' => $sla,
 			'sla2' => $sla2,
+			'sla3' => $sla3,
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
 			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : ''
 		];
