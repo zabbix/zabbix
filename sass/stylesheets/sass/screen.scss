@@ -2956,10 +2956,8 @@ a.blue {
 
 .progress-bar-container {
 	display: inline-block;
-	height: 16px;
 	white-space: nowrap;
 	position: relative;
-	top: 2px;
 
 	&:hover {
 
@@ -2974,8 +2972,10 @@ a.blue {
 }
 
 .progress-bar-bg {
-	height: 100%;
-	display: inline-block;
+	padding: 3px 0 2px 0;
+    font-size: $font-h3-size;
+    line-height: 1em;
+    display: inline-block;
 
 	&.green-bg {
 		background-color: darken(desaturate($alt-green, 10%), 16%);
