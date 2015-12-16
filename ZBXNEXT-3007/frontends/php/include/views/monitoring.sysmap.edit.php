@@ -45,8 +45,8 @@ $user_type = CWebUser::getType();
 // Create sysmap form list.
 $map_tab = (new CFormList());
 
-// Map owner.
-$multi_select_data = [
+// Map owner multiselect.
+$multiselect_data = [
 	'name' => 'userid',
 	'selectedLimit' => 1,
 	'objectName' => 'users',
@@ -57,7 +57,9 @@ $multi_select_data = [
 
 $map_ownerid = $data['sysmap']['userid'];
 
+// If don't exist map owner or allowed to display it.
 if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users'])) {
+	// Map owner data.
 	if ($map_ownerid) {
 		$owner_data = [[
 			'id' => $map_ownerid,
@@ -68,26 +70,33 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 		$owner_data = [];
 	}
 
-	$multi_select_data['data'] = $owner_data;
+	$multiselect_data['data'] = $owner_data;
 
+	// Only administrators can set map owner.
 	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
-		$multi_select_data['disabled'] = true;
+		$multiselect_data['disabled'] = true;
 	}
 
+	// Append multiselect to map tab.
 	$map_tab->addRow(_('Owner'),
-		(new CMultiSelect($multi_select_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 else {
-	$multiselect_userid = (new CMultiSelect($multi_select_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
+	// Administrators can change map owner, but don't see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$map_tab->addRow(_('Owner'), $multiselect_userid);
-		$map_tab->addRow('', _('Inaccessible user'), 'inaccessible_user');
+		$map_tab->addRow(_('Owner'), $multiselect_userid)
+			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {
-		$map_tab->addRow(_('Owner'), [(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
-			(new CSpan($multiselect_userid))->addStyle('display: none;')->setId('multiselect_userid_wrapper')
+		// For regular users ang guests displayed only information message.
+		$map_tab->addRow(_('Owner'), [
+			(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
+			(new CSpan($multiselect_userid))
+				->addStyle('display: none;')
+				->setId('multiselect_userid_wrapper')
 		]);
 	}
 }
