@@ -49,48 +49,41 @@ class CControllerMapView extends CController {
 			return false;
 		}
 
-		$maps = API::Map()->get([
-			'output' => ['sysmapid', 'name'],
-			'preservekeys' => true
-		]);
-		order_result($maps, 'name');
-
 		$sysmapid = null;
+		$options = ['output' => ['sysmapid']];
+
 		if ($this->hasInput('mapname')) {
-			$mapname = $this->getInput('mapname');
-
-			foreach ($maps as $map) {
-				if ($map['name'] === $mapname) {
-					$sysmapid = $map['sysmapid'];
-					break;
-				}
-			}
+			// Get map by name.
+			$options['search']['name'] = $this->getInput('mapname');
 		}
-		else if ($this->hasInput('sysmapid')) {
-			$sysmapid = $this->getInput('sysmapid');
-
-			if (!array_key_exists($sysmapid, $maps)) {
-				$sysmapid = null;
-			}
+		elseif ($this->hasInput('sysmapid')) {
+			// Get map by sysmapid from request.
+			$options['sysmapids'] = [$this->getInput('sysmapid', 0)];
 		}
 		else {
-			$sysmapid = CProfile::get('web.maps.sysmapid', 0);
+			// Get map by sysmapid from profile.
+			$options['sysmapids'] = [CProfile::get('web.maps.sysmapid', 0)];
+		}
 
-			if ($sysmapid != 0 && !array_key_exists($sysmapid, $maps)) {
-				$sysmapid = 0;
-			}
+		$sysmaps = API::Map()->get($options);
 
-			if ($sysmapid == 0) {
-				redirect('sysmaps.php');
-			}
+		if ($sysmaps) {
+			$sysmap = reset($sysmaps);
+			$sysmapid = $sysmap['sysmapid'];
 		}
 
 		if ($sysmapid === null) {
-			return false;
+			if (!$this->hasInput('mapname') && !$this->hasInput('sysmapid')) {
+				// Redirect to map list.
+				redirect('sysmaps.php');
+			}
+			else {
+				// No permissions.
+				return false;
+			}
 		}
 
 		$this->sysmapid = $sysmapid;
-		$this->maps = $maps;
 
 		return true;
 	}
@@ -100,11 +93,10 @@ class CControllerMapView extends CController {
 
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
-			'sysmapid' => $this->sysmapid,
-			'maps' => $this->maps
+			'sysmapid' => $this->sysmapid
 		];
 
-		if ($data['maps']) {
+		if ($data['sysmapid']) {
 			$maps = API::Map()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
