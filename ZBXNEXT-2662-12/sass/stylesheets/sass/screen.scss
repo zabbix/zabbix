@@ -489,7 +489,7 @@ ul.top-nav-icons {
 		bottom: 6px;
 
 		li {
-			display: block;
+			display: inline-block;
 			float: left;
 			position: relative;
 			padding: 0 0 0 14px;
@@ -686,12 +686,19 @@ footer {
 	background-color: $ui-bg-color;
 	margin-top: -1px;
 	padding: 7px 5px;
+	overflow: hidden;
+	position: relative;
 	border: 1px solid $ui-border-color;
 	border-top-color: $table-border-color;
 
 	a {
 		@extend %paging-btn;
 	}
+}
+
+.paging-btn-container {
+	min-height: 24px;
+	position: relative;
 }
 
 .radio-switch {
@@ -730,11 +737,11 @@ footer {
 		position: relative;
 	}
 
-	&:first-child {
+	&:first-of-type {
 		@include border-radius(2px 0 0 2px);
 	}
 
-	&:last-child {
+	&:last-of-type {
 		@include border-radius(0 2px 2px 0);
 	}
 
@@ -2941,9 +2948,10 @@ a.blue {
 
 .progress-bar-container {
 	display: inline-block;
-	height: 16px;
+	height: 14px;
 	white-space: nowrap;
 	position: relative;
+	top: 2px;
 
 	&:hover {
 
@@ -3674,6 +3682,14 @@ tr.cursor-move {
 
 .clock-lines {
 	fill: $clock-lines-color;
+}
+
+.table-stats {
+	color: $font-alt-color;
+	display: inline-block;
+    padding: 4px 0;
+    position: absolute;
+    right: 5px;
 }
 
 /*doc
