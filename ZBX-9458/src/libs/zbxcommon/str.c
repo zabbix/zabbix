@@ -3476,7 +3476,7 @@ static char	*function_unquote_param_dyn(const char *param, size_t len)
  *                                                                            *
  * Return value: The length of quoted (if necessary) parameter. The quoting   *
  *               is applied either if it was initially forced with quoted     *
- *               parameter or if it starts with ' ' or '"' character or       *
+ *               parameter, or if it starts with ' ' or '"' character, or     *
  *               contains ',' or ')' characters.                              *
  *                                                                            *
  ******************************************************************************/
@@ -3521,9 +3521,10 @@ static int	function_quoted_param_len(const char *param, int *quoted)
  *                                                                            *
  * Return value: The quoted parameter. This value must be freed by the caller.*
  *                                                                            *
- * Comments: The parameter is quoted if the quoted parameter is 1 or the      *
- *           parameter starts with ' ' or '"' character or contains ','  or   *
- *           ')' characters.                                                  *
+ * Comments: The 'param' is quoted if either of the following is true:        *
+ *           * the 'quoted' parameter is 1;                                   *
+ *           * the 'param' starts with ' ' or '"' character;                  *
+ *           * the 'param' contains ',' or ')' character.                     *
  *                                                                            *
  ******************************************************************************/
 static char	*function_quote_param_dyn(const char *param, int quoted)
@@ -3658,7 +3659,6 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 	return SUCCEED;
 }
 
-#include "log.h"
 /******************************************************************************
  *                                                                            *
  * Function: zbx_function_tostr                                               *
