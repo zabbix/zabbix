@@ -1909,7 +1909,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		int		logeventid;
 		int		mtime;
 		unsigned char	state;
-		unsigned char	meta;
+		unsigned char	flags;
 	}
 	zbx_history_data_t;
 
@@ -1940,7 +1940,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 try_again:
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id,itemid,clock,ns,timestamp,source,severity,"
-				"value,logeventid,state,lastlogsize,mtime,meta"
+				"value,logeventid,state,lastlogsize,mtime,flags"
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64
 			" order by id",
@@ -1994,7 +1994,7 @@ try_again:
 		ZBX_STR2UCHAR(hd->state, row[9]);
 		ZBX_STR2UINT64(hd->lastlogsize, row[10]);
 		hd->mtime = atoi(row[11]);
-		ZBX_STR2UCHAR(hd->meta, row[12]);
+		ZBX_STR2UCHAR(hd->flags, row[12]);
 
 		len1 = strlen(row[5]) + 1;
 		len2 = strlen(row[7]) + 1;
@@ -2045,7 +2045,7 @@ try_again:
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
 
 		/* meta information update record does not need those */
-		if (0 == hd->meta)
+		if (0 == (ZBX_AV_FLAG_META & hd->flags))
 		{
 			if (0 != hd->timestamp)
 				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
@@ -2068,7 +2068,7 @@ try_again:
 		if (0 != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
-		if (ITEM_VALUE_TYPE_LOG == dc_items[i].value_type)
+		if (ITEM_VALUE_TYPE_LOG == dc_items[i].value_type || 0 != (ZBX_AV_FLAG_LOG_OTHER & hd->flags))
 		{
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
@@ -2243,7 +2243,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 
 		/* empty values are only allowed for meta information update packets */
 		if (NULL == values[i].value &&
-				ITEM_VALUE_TYPE_LOG != items[i].value_type && 0 == (ZBX_AV_FLAG_LOG & values[i].flags))
+				ITEM_VALUE_TYPE_LOG != items[i].value_type && 0 == (ZBX_AV_FLAG_LOG_OTHER & values[i].flags))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", items[i].key_orig);
 			continue;
@@ -2406,7 +2406,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 					if (NULL != log->value)
 						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
 				}
-				else if (values[i].flags & ZBX_AV_FLAG_LOG)	/* log item with value type non-log */
+				else if (values[i].flags & ZBX_AV_FLAG_LOG_OTHER)	/* log item with value type non-log */
 				{
 					log_meta = zbx_malloc(NULL, sizeof(zbx_log_meta_t));
 
@@ -2609,7 +2609,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
 		{
-			av->flags |= ZBX_AV_FLAG_LOG;	/* log item */
+			av->flags |= ZBX_AV_FLAG_LOG_OTHER;	/* log item */
 
 			is_uint64(tmp, &av->lastlogsize);
 		}
