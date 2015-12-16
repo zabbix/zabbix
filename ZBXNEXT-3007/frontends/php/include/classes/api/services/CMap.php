@@ -435,9 +435,14 @@ class CMap extends CMapElement {
 			}
 
 			// Check if owner can be set.
-			if (array_key_exists('userid', $map) && $map['userid'] != $user_data['userid']
-					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+			if (array_key_exists('userid', $map)) {
+				if ($map['userid'] === '' || $map['userid'] === null || $map['userid'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Map owner cannot be empty.'));
+				}
+				elseif ($map['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+				}
 			}
 
 			// Check for invalid "private" values.
@@ -836,9 +841,14 @@ class CMap extends CMapElement {
 
 		foreach ($maps as $map) {
 			// Check if owner can be set.
-			if (array_key_exists('userid', $map) && $map['userid'] != $db_maps[$map['sysmapid']]['userid']
-					&& $user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+			if (array_key_exists('userid', $map)) {
+				if ($map['userid'] === '' || $map['userid'] === null || $map['userid'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Map owner cannot be empty.'));
+				}
+				elseif ($map['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set map owner.'));
+				}
 			}
 
 			// Unset extra field.
