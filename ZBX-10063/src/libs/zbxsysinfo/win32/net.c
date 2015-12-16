@@ -37,8 +37,8 @@ static pGetIfEntry2_t	pGetIfEntry2 = NULL;
 /* version specific MIB interface API.                                           */
 typedef struct
 {
-	MIB_IFROW	*ifRowBeforeVista;	/* 32-bit counters */
-	MIB_IF_ROW2	*ifRowAfterVista;	/* 64-bit counters */
+	MIB_IFROW	*ifRow;		/* 32-bit counters */
+	MIB_IF_ROW2	*ifRow2;	/* 64-bit counters, supported since Windows Vista, Server 2008 */
 }
 zbx_ifrow_t;
 
@@ -84,9 +84,9 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 
 	/* allocate the relevant MIB interface structure */
 	if (NULL != pGetIfEntry2)
-		pIfRow->ifRowAfterVista = zbx_malloc(pIfRow->ifRowAfterVista, sizeof(MIB_IF_ROW2));
+		pIfRow->ifRow2 = zbx_malloc(pIfRow->ifRow2, sizeof(MIB_IF_ROW2));
 	else
-		pIfRow->ifRowBeforeVista = zbx_malloc(pIfRow->ifRowBeforeVista, sizeof(MIB_IFROW));
+		pIfRow->ifRow = zbx_malloc(pIfRow->ifRow, sizeof(MIB_IFROW));
 }
 
 /******************************************************************************
@@ -103,8 +103,8 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
  ******************************************************************************/
 static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 {
-	zbx_free(pIfRow->ifRowBeforeVista);
-	zbx_free(pIfRow->ifRowAfterVista);
+	zbx_free(pIfRow->ifRow);
+	zbx_free(pIfRow->ifRow2);
 }
 
 /******************************************************************************
@@ -124,10 +124,10 @@ static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 static DWORD	zbx_ifrow_call_get_if_entry(zbx_ifrow_t *pIfRow)
 {
 	/* on success both functions return 0 (NO_ERROR and STATUS_SUCCESS) */
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pGetIfEntry2(pIfRow->ifRowAfterVista);
+	if (NULL != pIfRow->ifRow2)
+		return pGetIfEntry2(pIfRow->ifRow2);
 	else
-		return GetIfEntry(pIfRow->ifRowBeforeVista);
+		return GetIfEntry(pIfRow->ifRow);
 }
 
 /******************************************************************************
@@ -139,125 +139,125 @@ static DWORD	zbx_ifrow_call_get_if_entry(zbx_ifrow_t *pIfRow)
  ******************************************************************************/
 static DWORD	zbx_ifrow_get_index(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InterfaceIndex;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InterfaceIndex;
 	else
-		return pIfRow->ifRowBeforeVista->dwIndex;
+		return pIfRow->ifRow->dwIndex;
 }
 
 static void	zbx_ifrow_set_index(zbx_ifrow_t *pIfRow, DWORD index)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
+	if (NULL != pIfRow->ifRow2)
 	{
-		pIfRow->ifRowAfterVista->InterfaceLuid.Value = 0;
-		pIfRow->ifRowAfterVista->InterfaceIndex = index;
+		pIfRow->ifRow2->InterfaceLuid.Value = 0;
+		pIfRow->ifRow2->InterfaceIndex = index;
 	}
 	else
-		pIfRow->ifRowBeforeVista->dwIndex = index;
+		pIfRow->ifRow->dwIndex = index;
 }
 
 static DWORD	zbx_ifrow_get_type(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->Type;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->Type;
 	else
-		return pIfRow->ifRowBeforeVista->dwType;
+		return pIfRow->ifRow->dwType;
 }
 
 static DWORD	zbx_ifrow_get_admin_status(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->AdminStatus;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->AdminStatus;
 	else
-		return pIfRow->ifRowBeforeVista->dwAdminStatus;
+		return pIfRow->ifRow->dwAdminStatus;
 }
 
 static ULONG64	zbx_ifrow_get_in_octets(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InOctets;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InOctets;
 	else
-		return pIfRow->ifRowBeforeVista->dwInOctets;
+		return pIfRow->ifRow->dwInOctets;
 }
 
 static ULONG64	zbx_ifrow_get_in_ucast_pkts(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InUcastPkts;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InUcastPkts;
 	else
-		return pIfRow->ifRowBeforeVista->dwInUcastPkts;
+		return pIfRow->ifRow->dwInUcastPkts;
 }
 
 static ULONG64	zbx_ifrow_get_in_nucast_pkts(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InNUcastPkts;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InNUcastPkts;
 	else
-		return pIfRow->ifRowBeforeVista->dwInNUcastPkts;
+		return pIfRow->ifRow->dwInNUcastPkts;
 }
 
 static ULONG64	zbx_ifrow_get_in_errors(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InErrors;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InErrors;
 	else
-		return pIfRow->ifRowBeforeVista->dwInErrors;
+		return pIfRow->ifRow->dwInErrors;
 }
 
 static ULONG64	zbx_ifrow_get_in_discards(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InDiscards;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InDiscards;
 	else
-		return pIfRow->ifRowBeforeVista->dwInDiscards;
+		return pIfRow->ifRow->dwInDiscards;
 }
 
 static ULONG64	zbx_ifrow_get_in_unknown_protos(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->InUnknownProtos;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->InUnknownProtos;
 	else
-		return pIfRow->ifRowBeforeVista->dwInUnknownProtos;
+		return pIfRow->ifRow->dwInUnknownProtos;
 }
 
 static ULONG64	zbx_ifrow_get_out_octets(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->OutOctets;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->OutOctets;
 	else
-		return pIfRow->ifRowBeforeVista->dwOutOctets;
+		return pIfRow->ifRow->dwOutOctets;
 }
 
 static ULONG64	zbx_ifrow_get_out_ucast_pkts(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->OutUcastPkts;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->OutUcastPkts;
 	else
-		return pIfRow->ifRowBeforeVista->dwOutUcastPkts;
+		return pIfRow->ifRow->dwOutUcastPkts;
 }
 
 static ULONG64	zbx_ifrow_get_out_nucast_pkts(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->OutNUcastPkts;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->OutNUcastPkts;
 	else
-		return pIfRow->ifRowBeforeVista->dwOutNUcastPkts;
+		return pIfRow->ifRow->dwOutNUcastPkts;
 }
 
 static ULONG64	zbx_ifrow_get_out_errors(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->OutErrors;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->OutErrors;
 	else
-		return pIfRow->ifRowBeforeVista->dwOutErrors;
+		return pIfRow->ifRow->dwOutErrors;
 }
 
 static ULONG64	zbx_ifrow_get_out_discards(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return pIfRow->ifRowAfterVista->OutDiscards;
+	if (NULL != pIfRow->ifRow2)
+		return pIfRow->ifRow2->OutDiscards;
 	else
-		return pIfRow->ifRowBeforeVista->dwOutDiscards;
+		return pIfRow->ifRow->dwOutDiscards;
 }
 
 /******************************************************************************
@@ -275,8 +275,8 @@ static ULONG64	zbx_ifrow_get_out_discards(const zbx_ifrow_t *pIfRow)
  ******************************************************************************/
 static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 {
-	if (NULL != pIfRow->ifRowAfterVista)
-		return zbx_unicode_to_utf8(pIfRow->ifRowAfterVista->Description);
+	if (NULL != pIfRow->ifRow2)
+		return zbx_unicode_to_utf8(pIfRow->ifRow2->Description);
 	else
 	{
 		static wchar_t *(*mb_to_unicode)(const char *) = NULL;
@@ -294,7 +294,7 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 			else
 				mb_to_unicode = zbx_acp_to_unicode;
 		}
-		wdescr = mb_to_unicode(pIfRow->ifRowBeforeVista->bDescr);
+		wdescr = mb_to_unicode(pIfRow->ifRow->bDescr);
 		utf8_descr = zbx_unicode_to_utf8(wdescr);
 		zbx_free(wdescr);
 
@@ -398,14 +398,13 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
-	int		ret = SYSINFO_RET_OK;
+	int		ret = SYSINFO_RET_FAIL;
 
 	zbx_ifrow_init(&ifrow);
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
@@ -415,14 +414,12 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
 	if (FAIL == get_if_stats(if_name, &ifrow))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
@@ -437,10 +434,10 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
+	ret = SYSINFO_RET_OK;
 clean:
 	zbx_ifrow_clean(&ifrow);
 
@@ -451,14 +448,13 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
-	int		ret = SYSINFO_RET_OK;
+	int		ret = SYSINFO_RET_FAIL;
 
 	zbx_ifrow_init(&ifrow);
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
@@ -468,14 +464,12 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
 	if (FAIL == get_if_stats(if_name, &ifrow))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
@@ -490,10 +484,10 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
+	ret = SYSINFO_RET_OK;
 clean:
 	zbx_ifrow_clean(&ifrow);
 
@@ -504,14 +498,13 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*if_name, *mode;
 	zbx_ifrow_t	ifrow = {NULL, NULL};
-	int		ret = SYSINFO_RET_OK;
+	int		ret = SYSINFO_RET_FAIL;
 
 	zbx_ifrow_init(&ifrow);
 
 	if (2 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
@@ -521,14 +514,12 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
 	if (FAIL == get_if_stats(if_name, &ifrow))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain network interface information."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
@@ -545,10 +536,10 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
-		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
+	ret = SYSINFO_RET_OK;
 clean:
 	zbx_ifrow_clean(&ifrow);
 
