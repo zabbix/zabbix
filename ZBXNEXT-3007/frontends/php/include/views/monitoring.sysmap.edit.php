@@ -57,7 +57,7 @@ $multiselect_data = [
 
 $map_ownerid = $data['sysmap']['userid'];
 
-// If don't exist map owner or allowed to display it.
+// If map owner does not exist or is not allowed to display.
 if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users'])) {
 	// Map owner data.
 	if ($map_ownerid) {
@@ -72,7 +72,7 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 
 	$multiselect_data['data'] = $owner_data;
 
-	// Only administrators can set map owner.
+	// Disable multiselect because only administrators can set map owner.
 	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 		$multiselect_data['disabled'] = true;
 	}
@@ -85,13 +85,13 @@ if (!$map_ownerid || $map_ownerid && array_key_exists($map_ownerid, $data['users
 else {
 	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-	// Administrators can change map owner, but don't see users from other groups.
+	// Administrators can change map owner, but cannot see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
 		$map_tab->addRow(_('Owner'), $multiselect_userid)
 			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {
-		// For regular users ang guests displayed only information message.
+		// For regular users and guests, only information message is displayed without multiselect.
 		$map_tab->addRow(_('Owner'), [
 			(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
 			(new CSpan($multiselect_userid))
