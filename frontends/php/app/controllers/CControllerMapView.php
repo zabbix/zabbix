@@ -80,9 +80,8 @@ class CControllerMapView extends CController {
 				$sysmapid = 0;
 			}
 
-			if ($sysmapid == 0 && $maps) {
-				$map = reset($maps);
-				$sysmapid = $map['sysmapid'];
+			if ($sysmapid == 0) {
+				redirect('sysmaps.php');
 			}
 		}
 

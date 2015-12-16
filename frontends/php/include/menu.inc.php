@@ -72,10 +72,11 @@ $ZBX_MENU = [
 				'sub_pages' => ['slides.php']
 			],
 			[
-				'url' => 'sysmaps.php',
-				'label' => _('Maps'),
+				'url' => 'zabbix.php',
+				'action' => 'web.view',
 				'active_if' => ['map.view'],
-				'sub_pages' => ['image.php', 'sysmap.php', 'map.php']
+				'label' => _('Maps'),
+				'sub_pages' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php']
 			],
 			[
 				'url' => 'zabbix.php',
