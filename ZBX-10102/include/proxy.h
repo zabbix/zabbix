@@ -28,8 +28,8 @@
 
 #define ZBX_MAX_HRECORDS	1000
 
-#define ZBX_AV_FLAG_META	0x1	/* meta information update (log size and mtime) */
-#define ZBX_AV_FLAG_LOG		0x2	/* log item: log, logrt, eventlog */
+#define ZBX_AV_FLAG_META		0x1	/* meta information update (log size and mtime) */
+#define ZBX_AV_FLAG_LOG_OTHER		0x2	/* log item with value type non-log */
 
 typedef struct
 {
