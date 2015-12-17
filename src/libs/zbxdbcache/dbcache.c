@@ -3004,12 +3004,12 @@ void	init_database_cache()
 	}
 
 	/* history cache */
-	zbx_mem_create(&hc_mem, hc_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_CACHE_SIZE, "history cache size",
+	zbx_mem_create(&hc_mem, hc_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_CACHE_SIZE, "history cache",
 			"HistoryCacheSize", 1);
 
 	/* history index cache*/
 	zbx_mem_create(&hc_index_mem, hc_index_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_INDEX_CACHE_SIZE,
-			"history index cache size", "HistoryIndexCacheSize", 0);
+			"history index cache", "HistoryIndexCacheSize", 0);
 
 	cache = (ZBX_DC_CACHE *)__hc_index_mem_malloc_func(NULL, sizeof(ZBX_DC_CACHE));
 	memset(cache, 0, sizeof(ZBX_DC_CACHE));
