@@ -29,9 +29,7 @@ $filterColumn->addRow(_('Recipient'), [
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
-		->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-		)
+		->onClick('return PopUp("popup.php?dstfrm=zbx_filter&dstfld1=alias&srctbl=users&srcfld1=alias");')
 ]);
 
 $filterForm->addColumn($filterColumn);
