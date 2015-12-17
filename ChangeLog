@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha5
 
 New features:
+A.F.I..... [ZBXNEXT-3007] implemented support of public and private maps with ability to share them with other users and user groups (Oleg)
 ...G...... [ZBX-10063] improved net.if.* on Windows to get values from 64-bit counters if available (Sandis)
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 ........S. [ZBXNEXT-3055] changed LLD lost resources deletion time calculation logic to avoid issues with invalid discovery item time stamps (gleb)
