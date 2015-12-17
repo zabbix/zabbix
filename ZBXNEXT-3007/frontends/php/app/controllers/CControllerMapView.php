@@ -58,7 +58,7 @@ class CControllerMapView extends CController {
 		}
 		elseif ($this->hasInput('sysmapid')) {
 			// Get map by sysmapid from request.
-			$options['sysmapids'] = [$this->getInput('sysmapid', 0)];
+			$options['sysmapids'] = [$this->getInput('sysmapid')];
 		}
 		else {
 			// Get map by sysmapid from profile.
