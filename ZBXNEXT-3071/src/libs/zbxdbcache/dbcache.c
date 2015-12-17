@@ -3023,9 +3023,6 @@ void	init_database_cache()
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		init_trend_cache();
 
-	cache->last_ts.sec = 0;
-	cache->last_ts.ns = 0;
-
 	if (NULL == sql)
 		sql = zbx_malloc(sql, sql_alloc);
 
