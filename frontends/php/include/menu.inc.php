@@ -76,7 +76,7 @@ $ZBX_MENU = [
 				'action' => 'map.view',
 				'active_if' => ['map.view'],
 				'label' => _('Maps'),
-				'sub_pages' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php']
+				'sub_pages' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']
 			],
 			[
 				'url' => 'zabbix.php',
