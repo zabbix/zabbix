@@ -316,7 +316,7 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
-int	DCsync_history(int sync_type);
+int	DCsync_history(int sync_type, int *sync_num);
 void	init_database_cache();
 void	free_database_cache();
 
