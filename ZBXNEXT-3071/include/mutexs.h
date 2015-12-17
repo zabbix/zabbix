@@ -53,7 +53,6 @@
 #	define ZBX_MUTEX_PROCSTAT	12
 #	define ZBX_MUTEX_COUNT		13
 
-
 #	define ZBX_MUTEX_MAX_TRIES	20	/* seconds */
 
 #endif	/* _WINDOWS */
