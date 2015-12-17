@@ -2159,7 +2159,9 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *
 		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
 	else
 		item_value->value.value_str.len = 0;
+
 	item_value->timestamp = timestamp;
+
 	if (NULL != source && '\0' != *source)
 		item_value->source.len = zbx_db_strlen_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
 	else
@@ -2377,16 +2379,19 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
  ******************************************************************************/
 static void	hc_free_data(zbx_hc_data_t *data)
 {
-	switch (data->value_type)
+	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			if (NULL != data->value.str)
+		__hc_mem_free_func(data->value.str);
+	}
+	else
+	{
+		switch (data->value_type)
+		{
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
 				__hc_mem_free_func(data->value.str);
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != data->value.log)
-			{
+				break;
+			case ITEM_VALUE_TYPE_LOG:
 				if (NULL != data->value.log->value)
 					__hc_mem_free_func(data->value.log->value);
 
@@ -2394,8 +2399,8 @@ static void	hc_free_data(zbx_hc_data_t *data)
 					__hc_mem_free_func(data->value.log->source);
 
 				__hc_mem_free_func(data->value.log);
-			}
-			break;
+				break;
+		}
 	}
 
 	__hc_mem_free_func(data);
@@ -2457,10 +2462,11 @@ static char	*hc_mem_value_str_dup(const dc_value_str_t *str)
 {
 	char	*ptr;
 
-	if (NULL == (ptr = (char *)__hc_mem_malloc_func(NULL, str->len + 1)))
+	if (NULL == (ptr = (char *)__hc_mem_malloc_func(NULL, str->len)))
 		return NULL;
 
-	memcpy(ptr, &string_values[str->pvalue], str->len + 1);
+	memcpy(ptr, &string_values[str->pvalue], str->len - 1);
+	ptr[str->len - 1] = '\0';
 
 	return ptr;
 }
@@ -2572,7 +2578,6 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			return FAIL;
 
 		(*data)->state = ITEM_STATE_NOTSUPPORTED;
-		(*data)->value_type = ITEM_VALUE_TYPE_TEXT;
 
 		cache->stats.notsupported_counter++;
 
