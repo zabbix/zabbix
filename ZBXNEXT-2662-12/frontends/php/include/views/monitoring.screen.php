@@ -122,8 +122,6 @@ else {
 		'timeline' => $screenBuilder->timeline,
 		'profileIdx' => $screenBuilder->profileIdx
 	]);
-
-	$screenWidget->addItem(BR());
 }
 
 return $screenWidget;
