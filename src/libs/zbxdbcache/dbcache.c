@@ -1892,24 +1892,31 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Purpose: writes updates and new data from pool to database                 *
  *                                                                            *
- * Return value: number of synced values                                      *
+ * Return value: the timestamp of next history queue value to sync,           *
+ *               0 if the queue is empty or most of items are locked by       *
+ *               triggers.
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	DCsync_history(int sync_type)
+int	DCsync_history(int sync_type, int *total_num)
 {
+/* the maximum time spent syncing history */
+#define ZBX_HC_SYNC_TIME_MAX		SEC_PER_MIN
+
+/* the minimum processed item percentage of sync candidates to continue syncing */
+#define ZBX_HC_SYNC_PROCESSED_PCNT	10
+
 	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
-	int			history_num;
-	int			syncs;
-	int			total_num = 0;
-	int			next_sync, max_delay;
-	time_t			now = 0;
+	int			history_num, candidate_num, next_sync;
+	time_t			sync_start = 0, now;
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_ptr_t	history_items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
+
+	*total_num = 0;
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
@@ -1922,11 +1929,12 @@ int	DCsync_history(int sync_type)
 		hc_update_history_queue();
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
-		now = time(NULL);
 	}
 
 	if (0 == cache->history_num)
 		goto finish;
+
+	sync_start = time(NULL);
 
 	if (NULL == history)
 		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
@@ -1936,9 +1944,6 @@ int	DCsync_history(int sync_type)
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
-
-	syncs = cache->history_num / ZBX_SYNC_MAX;
-	max_delay = (int)time(NULL) - CONFIG_HISTSYNCER_FREQUENCY;
 
 	do
 	{
@@ -1993,18 +1998,36 @@ int	DCsync_history(int sync_type)
 
 		UNLOCK_CACHE;
 
-		total_num += history_num;
+		*total_num += history_num;
+		candidate_num = history_items.values_num;
 
-		if (ZBX_SYNC_FULL == sync_type && time(NULL) - now >= 10)
+		now = time(NULL);
+
+		if (ZBX_SYNC_FULL == sync_type && now - sync_start >= 10)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-					(double)total_num / (cache->history_num + total_num) * 100);
-			now = time(NULL);
+					(double)*total_num / (cache->history_num + *total_num) * 100);
+			sync_start = time(NULL);
 		}
 
 		zbx_vector_ptr_clear(&history_items);
+
+		if (ZBX_HC_SYNC_PROCESSED_PCNT > history_num * 100 / candidate_num)
+		{
+			/* Stop sync if only small percentage of sync candidates were processed     */
+			/* (meaning most of sync candidates are locked by triggers).                */
+			/* In this case is better to wait a bit for other syncers to unlock items   */
+			/* rather than trying and failing to sync locked items over and over again. */
+
+			next_sync = 0;
+			break;
+		}
+
+		/* Exit from sync loop if we have spent too much time here */
+		/* unless we are doing full sync. This is done to allow    */
+		/* syncer process to update their statistics.              */
 	}
-	while (--syncs > 0 || sync_type == ZBX_SYNC_FULL || (next_sync != 0 && next_sync < max_delay));
+	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
 
 	zbx_vector_ptr_destroy(&history_items);
 	zbx_vector_uint64_destroy(&triggerids);
@@ -2012,7 +2035,7 @@ finish:
 	if (ZBX_SYNC_FULL == sync_type)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 
-	return total_num;
+	return next_sync;
 }
 
 static void	DCcheck_ns(zbx_timespec_t *ts)
@@ -2841,7 +2864,6 @@ static int	hc_push_items(zbx_vector_ptr_t *history_items)
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
 		item = (zbx_hc_item_t *)elem->data;
 
-		/* TODO: when priorities are added we should return 0 if next item in queue is priority item */
 		next_sync = item->tail->ts.sec;
 	}
 
@@ -3022,9 +3044,11 @@ void	init_database_cache()
  ******************************************************************************/
 static void	DCsync_all()
 {
+	int	sync_num;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In DCsync_all()");
 
-	DCsync_history(ZBX_SYNC_FULL);
+	DCsync_history(ZBX_SYNC_FULL, &sync_num);
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		DCsync_trends();
 
