@@ -1260,7 +1260,7 @@ int	parse_host_key(char *exp, char **host, char **key)
 				 */
 		{
 			*p = '\0';
-			*host = strdup(s);
+			*host = zbx_strdup(NULL, s);
 			*p++ = ':';
 
 			s = p;
@@ -1271,7 +1271,7 @@ int	parse_host_key(char *exp, char **host, char **key)
 			break;
 	}
 
-	*key = strdup(s);
+	*key = zbx_strdup(NULL, s);
 
 	return SUCCEED;
 }
@@ -3590,3 +3590,501 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
 	return arg_esc;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: function_parse_name                                              *
+ *                                                                            *
+ * Purpose: parses function name                                              *
+ *                                                                            *
+ * Parameters: expr     - [IN] the function expression: func(p1, p2,...)      *
+ *             length   - [OUT] the function name length                      *
+ *             next_pos - [OUT] position of the next character after function *
+ *                              name. For valid expressions it should be '('. *
+ *                                                                            *
+ * Return value: SUCCEED - the function name was successfully parsed          *
+ *               FAIL    - failed to parse function name                      *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_parse_name(const char *expr, size_t *length, size_t *next_pos)
+{
+	const char	*ptr;
+	int		ret = FAIL;
+
+	for (ptr = expr; SUCCEED == is_function_char(*ptr); ptr++)
+		;
+
+	if (ptr != expr && '(' == *ptr)
+	{
+		*length = ptr - expr;
+		ret = SUCCEED;
+	}
+	else
+	{
+		/* function name was not found */
+		*length = 0;
+	}
+
+	*next_pos = ptr - expr;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_parse_quoted_param                                      *
+ *                                                                            *
+ * Purpose: parses quoted parameter                                           *
+ *                                                                            *
+ * Parameters: expr      - [IN] the function expression, starting with the    *
+ *                             parameter to parse: "p1",p2 ...                *
+ *             length    - [OUT] the parameter length including enclosing     *
+ *                              quotes and excluding trailing whitespace      *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or ')') position.                       *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter was successfully parsed              *
+ *               FAIL    - failed to parse parameter                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_parse_quoted_param(const char *expr, size_t *length, size_t *sep_pos)
+{
+	const char	*ptr;
+
+	for (ptr = expr + 1; '"' != *ptr; ptr++)
+	{
+		switch (*ptr)
+		{
+			case '\0':
+				return FAIL;
+			case '\\':
+				if ('"' == ptr[1])
+					ptr++;
+				break;
+
+		}
+	}
+
+	*length = ++ptr - expr;
+
+	/* skip trailing whitespace to find the next parameter */
+	while (' ' == *ptr)
+		ptr++;
+
+	switch (*ptr)
+	{
+		case ',':
+		case ')':
+			*sep_pos = ptr - expr;
+			break;
+		default:
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_parse_unquoted_param                                    *
+ *                                                                            *
+ * Purpose: parses unquoted parameter                                         *
+ *                                                                            *
+ * Parameters: expr      - [IN] the function expression, starting with the    *
+ *                             parameter to parse: p1,p2 ...                  *
+ *             length    - [OUT] the parameter length excluding the trailing  *
+ *                              whitespace                                    *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or ')') position.                       *
+ *                               0 if there are no more parameters to parse.  *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter was successfully parsed              *
+ *               FAIL    - failed to parse parameter                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_parse_unquoted_param(const char *expr, size_t *length, size_t *sep_pos)
+{
+	const char	*ptr;
+
+	for (ptr = expr; ; ptr++)
+	{
+		switch (*ptr)
+		{
+			case '\0':
+				return FAIL;
+			case ',':
+			case ')':
+				*sep_pos = ptr - expr;
+				goto out;
+		}
+	}
+out:
+	/* trim the trailing whitespace */
+	while (ptr > expr && ' ' == *(ptr - 1) )
+		ptr--;
+
+	*length = ptr - expr;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_parse_param                                             *
+ *                                                                            *
+ * Purpose: parses function parameter                                         *
+ *                                                                            *
+ * Parameters: expr      - [IN] the function expression, starting with the    *
+ *                             parameter separator: (p1,p2 ... or ,p2,p3 ...  *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length excluding trailing      *
+ *                               whitespace                                   *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or ')') position.                       *
+ *                               0 if there are no more parameters to parse.  *
+ *                                                                            *
+ * Return value: SUCCEED - the parameter was successfully parsed              *
+ *               FAIL    - failed to parse parameter                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_parse_param(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	int		ret;
+	const char	*ptr = expr;
+
+	/* skip the leading whitespace */
+	while (' ' == *(++ptr))
+		;
+
+	*param_pos = ptr - expr;
+
+	/* parse the parameter */
+	if ('"' == *ptr)
+		ret = function_parse_quoted_param(ptr, length, sep_pos);
+	else
+		ret = function_parse_unquoted_param(ptr, length, sep_pos);
+
+	/* adjust next_pos to be relative from expression, not parameter start */
+	*sep_pos += *param_pos;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_unquote_param_dyn                                       *
+ *                                                                            *
+ * Purpose: unquotes function parameter                                       *
+ *                                                                            *
+ * Parameters: param - [IN] the parameter to unquote                          *
+ *             len   - [IN] the parameter length                              *
+ *                                                                            *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static char	*function_unquote_param_dyn(const char *param, size_t len)
+{
+	char	*out;
+
+	out = (char *)zbx_malloc(NULL, len + 1);
+
+	if (0 == len || '"' != *param)
+	{
+		/* unquoted parameter - simply copy it */
+		memcpy(out, param, len);
+		out[len] = '\0';
+	}
+	else
+	{
+		/* quoted parameter - remove enclosing " and replace \" with " */
+		const char	*pin;
+		char		*pout = out;
+
+		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
+		{
+			if ('\\' == pin[0] && '"' == pin[1])
+				pin++;
+
+			*pout++ = *pin;
+		}
+
+		*pout = '\0';
+	}
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_quoted_param_len                                        *
+ *                                                                            *
+ * Purpose: calculates length of the function parameter                       *
+ *                                                                            *
+ * Parameters: param  - [IN] the parameter                                    *
+ *             quoted - [IN/OUT] 1 - the parameter must be quoted,            *
+ *                               0 - otherwise                                *
+ *                                                                            *
+ * Return value: The length of quoted (if necessary) parameter. The quoting   *
+ *               is applied either if it was initially forced with quoted     *
+ *               parameter, or if it starts with ' ' or '"' character, or     *
+ *               contains ',' or ')' characters.                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	function_quoted_param_len(const char *param, int *quoted)
+{
+	int	len = 0, quotes = 0;
+
+	if (' ' == *param || '"' == *param)
+		*quoted = 1;
+
+	for(;'\0' != *param; param++)
+	{
+		switch (*param)
+		{
+			case '"':
+				quotes++;
+				break;
+			case ',':
+			case ')':
+				*quoted = 1;
+				break;
+		}
+
+		len++;
+	}
+
+	if (0 != quoted)
+		len += 2 + quotes;
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: function_quote_param_dyn                                         *
+ *                                                                            *
+ * Purpose: quotes function parameter                                         *
+ *                                                                            *
+ * Parameters: param  - [IN] the parameter to unquote                         *
+ *             quoted - [IN] 1 - the parameter must be quoted,                *
+ *                           0 - the quoting is optional                      *
+ *                                                                            *
+ * Return value: The quoted parameter. This value must be freed by the caller.*
+ *                                                                            *
+ * Comments: The 'param' is quoted if either of the following is true:        *
+ *           * the 'quoted' parameter is 1;                                   *
+ *           * the 'param' starts with ' ' or '"' character;                  *
+ *           * the 'param' contains ',' or ')' character.                     *
+ *                                                                            *
+ ******************************************************************************/
+static char	*function_quote_param_dyn(const char *param, int quoted)
+{
+	int	len;
+	char	*out;
+
+	len = function_quoted_param_len(param, &quoted);
+
+	out = zbx_malloc(NULL, len + 1);
+
+	if (0 == quoted)
+	{
+		/* quoting is not required, simply copy the parameter */
+		memcpy(out, param, len);
+		out[len] = '\0';
+	}
+	else
+	{
+		/* quoting is required - apply the enclosing quotes and escape " with \" sequences */
+		const char	*pin = param;
+		char		*pout = out;
+
+		*pout++ = '"';
+
+		while ('\0' != *pin)
+		{
+			if ('"' == *pin)
+				*pout++ = '\\';
+			*pout++ = *pin++;
+		}
+
+		*pout++ = '"';
+		*pout = '\0';
+	}
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_function_clean                                               *
+ *                                                                            *
+ * Purpose: frees resources allocated by the function data                    *
+ *                                                                            *
+ * Parameters: func - [IN] the function data                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_function_clean(zbx_function_t *func)
+{
+	int	i;
+
+	zbx_free(func->name);
+
+	for (i = 0; i < func->nparam; i++)
+		zbx_free(func->params[i]);
+
+	zbx_free(func->params);
+	func->nparam = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_function_parse                                               *
+ *                                                                            *
+ * Purpose: parses expression into function data                              *
+ *                                                                            *
+ * Parameters: func   - [OUT] the function data                               *
+ *             expr   - [IN] the expression to parse                          *
+ *             length - [OUT] the length of parsed data.                      *
+ *                                                                            *
+ * Return value: SUCCEED - the expression was successfully parsed             *
+ *               FAIL    - the expression does not start with a function      *
+ *                                                                            *
+ * Comments: If the function fails, the number of characters returned in      *
+ *           length are guaranteed not to be a part of another function.      *
+ *           So even if zbx_function_parse() failed the cursor can be safely  *
+ *           moved by length characters.                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
+{
+	size_t		alloc = 0, offset = 0, param_pos, next_pos, len, next_func;
+	const char	*ptr = expr;
+	int		params_alloc = 8;
+
+	memset(func, '\0', sizeof(zbx_function_t));
+
+	/* FAIL if the expression doesn't start with a function name */
+	if (FAIL == function_parse_name(ptr, &len, &next_pos))
+	{
+		*length = next_pos + 1;
+		return FAIL;
+	}
+
+	next_func = next_pos;
+
+	/* copy the function name from expression to the function data */
+	zbx_strncpy_alloc(&func->name, &offset, &alloc, ptr, len);
+
+	/* initial allocation for function data parameters */
+	func->params = (char **)zbx_malloc(NULL, sizeof(char *) * params_alloc);
+
+	/* parse and prepare (quote, escape, copy to function data) the function parameters */
+	do
+	{
+		ptr += next_pos;
+
+		if (SUCCEED != function_parse_param(ptr, &param_pos, &len, &next_pos))
+		{
+			zbx_function_clean(func);
+			*length = next_func;
+			return FAIL;
+		}
+
+		/* if the only parameter is empty - it's a function without parameters */
+		if (0 == len && ')' == ptr[next_pos] && 0 == func->nparam)
+			break;
+
+		if (params_alloc == func->nparam)
+		{
+			params_alloc *= 2;
+			func->params = (char **)zbx_realloc(func->params, sizeof(char *) * params_alloc);
+		}
+
+		func->params[func->nparam++] = function_unquote_param_dyn(ptr + param_pos, len);
+	}
+	while (')' != ptr[next_pos]);
+
+	*length = ptr - expr + next_pos + 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_function_tostr                                               *
+ *                                                                            *
+ * Purpose: converts function data into string format based on the specified  *
+ *          expression                                                        *
+ *                                                                            *
+ * Parameters: func     - [IN] the function data                              *
+ *             expr     - [IN] the template expression                        *
+ *             expr_len - [IN] the expression length                          *
+ *             out      - [OUT] the function data in string format            *
+ *                                                                            *
+ * Return value: SUCCEED - the function was successfully converted            *
+ *               FAIL    - failed to parse expression                         *
+ *                                                                            *
+ * Comments: The function data is converted by replacing function name and    *
+ *           parameters with name and corresponding parameters from function  *
+ *           data.                                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out)
+{
+	int		ret = FAIL, index = 0, quoted;
+	size_t		right, len, offset, next_pos, param_pos, next_offset;
+	char		*param;
+
+	*out = zbx_malloc(NULL, expr_len + 1);
+	memcpy(*out, expr, expr_len);
+	(*out)[expr_len] = '\0';
+
+	if (FAIL == function_parse_name(*out, &len, &next_pos))
+		goto out;
+
+	/* calculate offset from the last name character to the first parameter */
+	offset = next_pos - len;
+	right = len - 1;
+	zbx_replace_string(out, 0, &right, func->name);
+
+	/* recalculate first parameter position in the updated expression */
+	next_pos = right + offset + 1;
+
+	do
+	{
+		if (SUCCEED != function_parse_param(*out + next_pos, &param_pos, &len, &next_offset))
+			goto out;
+
+		/* the param_pos and next_offset values are relative offsets from next_pos, */
+		/* convert to the absolute positions from the expression start              */
+		param_pos += next_pos;
+		next_pos += next_offset;
+
+		/* if the only parameter is empty - it's a function without parameters */
+		if (')' == (*out)[next_pos] && 0 == len &&  0 == func->nparam)
+			break;
+
+		/* calculate parameter last character position and the offset to the next parameter */
+		right = param_pos + len - 1;
+		offset = next_pos - right;
+
+		quoted = ('"' == (*out)[param_pos] ? 1 : 0);
+
+		param = function_quote_param_dyn(func->params[index++], quoted);
+
+		zbx_replace_string(out, param_pos, &right, param);
+		zbx_free(param);
+
+		/* recalculate next parameter position in the updated expression */
+		next_pos = right + offset;
+	}
+	while (')' != (*out)[next_pos]);
+
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+		zbx_free(*out);
+
+	return ret;
+}
