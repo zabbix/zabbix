@@ -307,7 +307,6 @@ void	*DCget_stats(int request)
 					hc_index_mem->total_size;
 			ret = (void *)&value_double;
 			break;
-
 		default:
 			ret = NULL;
 	}
