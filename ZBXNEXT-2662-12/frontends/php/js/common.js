@@ -355,18 +355,6 @@ function get_scroll_pos() {
 	return [scrOfX, scrOfY];
 }
 
-function insertInElement(element_name, text, tagName) {
-	var elems = (IE)
-		? $$(tagName + '[name=' + element_name + ']')
-		: document.getElementsByName(element_name);
-
-	for (var key = 0; key < elems.length; key++) {
-		if (typeof(elems[key]) != 'undefined' && !is_null(elems[key])) {
-			$(elems[key]).update(text);
-		}
-	}
-}
-
 function openWinCentered(url, name, width, height, params) {
 	var top = Math.ceil((screen.height - height) / 2),
 		left = Math.ceil((screen.width - width) / 2);
