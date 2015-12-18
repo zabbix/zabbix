@@ -531,15 +531,18 @@ function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
 	// get map parent maps
 	$parent_sysmaps = get_parent_sysmaps($sysmapid);
 	if ($parent_sysmaps) {
-		$list->addItem(_('Upper level maps').':');
+		$hor_list = new CHorList();
 
 		foreach ($parent_sysmaps as $parent_sysmap) {
-			$list->addItem(
+			$hor_list->addItem(
 				new CLink($parent_sysmap['name'], 'zabbix.php?action=map.view'.
 					'&sysmapid='.$parent_sysmap['sysmapid'].'&fullscreen='.$fullscreen.'&severity_min='.$severity_min
 				)
 			);
 		}
+
+		$list->addItem(new CSpan(_('Upper level maps').':'));
+		$list->addItem($hor_list);
 	}
 
 	return $list;
