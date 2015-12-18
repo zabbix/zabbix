@@ -293,10 +293,20 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
 
 	if ($is_template) {
-		$list->addItem([
-			new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid')),
-			' / ',
+		$template = (new CSpan())->addItem(
 			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
+		);
+
+		if ($current_element === '') {
+			$template->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$list->addItem([
+			(new CSpan())->addItem(
+				new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
+			),
+			'/',
+			$template
 		]);
 
 		$db_host['hostid'] = $db_host['templateid'];
@@ -332,10 +342,20 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$list->addItem([
-			new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid')),
-			' / ',
+		$host = (new CSpan())->addItem(
 			new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid'])
+		);
+
+		if ($current_element === '') {
+			$host->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$list->addItem([
+			(new CSpan())->addItem(
+				new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))
+			),
+			'/',
+			$host
 		]);
 		$list->addItem($status);
 		$list->addItem(getHostAvailabilityTable($db_host));
@@ -422,13 +442,23 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem($http_tests);
 	}
 	else {
-		$list->addItem([
-			new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid')),
-			' / ',
+		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
 				CHtml::encode($db_discovery_rule['name']),
 				'host_discovery.php?form=update&itemid='.$db_discovery_rule['itemid']
 			)
+		);
+
+		if ($current_element == 'discoveries') {
+			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$list->addItem([
+			(new CSpan())->addItem(
+				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid'))
+			),
+			'/',
+			$discovery_rule
 		]);
 
 		// item prototypes
