@@ -3974,7 +3974,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 	next_func = next_pos;
 
 	/* copy the function name from expression to the function data */
-	zbx_strncpy_alloc(&func->name, &offset, &alloc, ptr, len);
+	zbx_strncpy_alloc(&func->name, &alloc, &offset, ptr, len);
 
 	/* initial allocation for function data parameters */
 	func->params = (char **)zbx_malloc(NULL, sizeof(char *) * params_alloc);
