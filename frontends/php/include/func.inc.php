@@ -1457,103 +1457,125 @@ function getPageNumber() {
  * @param array  $items				list of items
  * @param string $sortorder			the order in which items are sorted ASC or DESC
  *
- * @return CTable
+ * @return CDiv
  */
 function getPagingLine(&$items, $sortorder) {
 	global $page;
 
-	$config = select_config();
-
-	$searchLimit = '';
-	if ($config['search_limit'] < count($items)) {
-		if ($sortorder == ZBX_SORT_UP) {
-			array_pop($items);
-		}
-		else {
-			array_shift($items);
-		}
-
-		$searchLimit = '+';
-	}
-
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
 	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
-
-	if ($pagesCount == 1) {
-		return null;
-	}
-
 	$currentPage = getPageNumber();
+
 	if ($currentPage < 1) {
 		$currentPage = 1;
 	}
-
-	if ($currentPage > $pagesCount) {
+	elseif ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 
 	$start = ($currentPage - 1) * $rowsPerPage;
+	$tags = [];
 
-	// For MVC pages $page is not set
-	if (isset($page['file'])) {
-		CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	if ($pagesCount > 1) {
+		// For MVC pages $page is not set
+		if (isset($page['file'])) {
+			CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+		}
+		elseif (isset($_REQUEST['action'])) {
+			CProfile::update('web.paging.lastpage', $_REQUEST['action'], PROFILE_TYPE_STR);
+			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+		}
+
+		// viewed pages (better to use not odd)
+		$pagingNavRange = 11;
+
+		$endPage = $currentPage + floor($pagingNavRange / 2);
+		if ($endPage < $pagingNavRange) {
+			$endPage = $pagingNavRange;
+		}
+		if ($endPage > $pagesCount) {
+			$endPage = $pagesCount;
+		}
+
+		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
+
+		$url = CUrlFactory::getContextUrl();
+		if ($startPage > 1) {
+			$url->setArgument('page', 1);
+			$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
+		}
+
+		if ($currentPage > 1) {
+			$url->setArgument('page', $currentPage - 1);
+			$tags[] = (new CLink(
+				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
+			))->removeSID();
+		}
+
+		for ($p = $startPage; $p <= $endPage; $p++) {
+			$url->setArgument('page', $p);
+			$link = (new CLink($p, $url->getUrl()))->removeSID();
+			if ($p == $currentPage) {
+				$link->addClass(ZBX_STYLE_PAGING_SELECTED);
+			}
+
+			$tags[] = $link;
+		}
+
+		if ($currentPage < $pagesCount) {
+			$url->setArgument('page', $currentPage + 1);
+			$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl()))->removeSID();
+		}
+
+		if ($p < $pagesCount) {
+			$url->setArgument('page', $pagesCount);
+			$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
+		}
 	}
-	elseif (isset($_REQUEST['action'])) {
-		CProfile::update('web.paging.lastpage', $_REQUEST['action'], PROFILE_TYPE_STR);
-		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+
+	if ($pagesCount == 1) {
+		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $itemsCount);
+	}
+	else {
+		$config = select_config();
+
+		$end = $start + $rowsPerPage;
+		if ($end > $itemsCount) {
+			$end = $itemsCount;
+		}
+		$total = $itemsCount;
+
+		if ($config['search_limit'] < $itemsCount) {
+			if ($sortorder == ZBX_SORT_UP) {
+				array_pop($items);
+			}
+			else {
+				array_shift($items);
+			}
+
+			$total .= '+';
+		}
+
+		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
 	}
 
 	// trim array with items to contain items for current page
 	$items = array_slice($items, $start, $rowsPerPage, true);
 
-	// viewed pages (better to use not odd)
-	$pagingNavRange = 11;
-
-	$endPage = $currentPage + floor($pagingNavRange / 2);
-	if ($endPage < $pagingNavRange) {
-		$endPage = $pagingNavRange;
-	}
-	if ($endPage > $pagesCount) {
-		$endPage = $pagesCount;
-	}
-
-	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
-
-	$tags = [];
-
-	$url = CUrlFactory::getContextUrl();
-	if ($startPage > 1) {
-		$url->setArgument('page', 1);
-		$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
-	}
-
-	if ($currentPage > 1) {
-		$url->setArgument('page', $currentPage - 1);
-		$tags[] = (new CLink(
-			(new CSpan())->addClass('arrow-left'), $url->getUrl()
-		))->removeSID();
-	}
-
-	for ($p = $startPage; $p <= $endPage; $p++) {
-		$url->setArgument('page', $p);
-		$tags[] = (new CLink($p, $url->getUrl()))
-			->addClass($p == $currentPage ? 'paging-selected' : null)
-			->removeSID();
-	}
-
-	if ($currentPage < $pagesCount) {
-		$url->setArgument('page', $currentPage + 1);
-		$tags[] = (new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl()))->removeSID();
-	}
-
-	if ($p < $pagesCount) {
-		$url->setArgument('page', $pagesCount);
-		$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
-	}
-
-	return (new CDiv($tags))->addClass('table-paging');
+	return (new CDiv())
+		->addClass(ZBX_STYLE_TABLE_PAGING)
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				->addItem($tags)
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_TABLE_STATS)
+						->addItem($table_stats)
+				)
+		);
 }
 
 /************* MATH *************/
