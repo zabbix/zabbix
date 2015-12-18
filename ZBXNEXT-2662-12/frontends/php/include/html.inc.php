@@ -293,7 +293,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
 
 	if ($is_template) {
-		$template = (new CSpan())->addItem(
+		$template = new CSpan(
 			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
 		);
 
@@ -302,7 +302,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$list->addItem([
-			(new CSpan())->addItem(
+			new CSpan(
 				new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
 			),
 			'/',
@@ -342,18 +342,14 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
-		$host = (new CSpan())->addItem(
-			new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid'])
-		);
+		$host = new CSpan(new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid']));
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);
 		}
 
 		$list->addItem([
-			(new CSpan())->addItem(
-				new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))
-			),
+			new CSpan(new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))),
 			'/',
 			$host
 		]);
@@ -503,6 +499,46 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 			}
 			$list->addItem($host_prototypes);
+		}
+	}
+
+	return $list;
+}
+
+/**
+ * Create CDiv with sysmap information
+ *
+ * @param int    $sysmapid
+ * @param string $name
+ *
+ * @return object
+ */
+function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
+	$list = (new CList())
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All maps'), 'sysmaps.php')),
+			'/',
+			(new CSpan())
+				->addClass(ZBX_STYLE_SELECTED)
+				->addItem(
+					new CLink($name, 'zabbix.php?action=map.view&sysmapid='.$sysmapid.'&fullscreen='.$fullscreen.
+						'&severity_min='.$severity_min
+					)
+				)
+		]);
+
+	// get map parent maps
+	$parent_sysmaps = get_parent_sysmaps($sysmapid);
+	if ($parent_sysmaps) {
+		$list->addItem(_('Upper level maps').':');
+
+		foreach ($parent_sysmaps as $parent_sysmap) {
+			$list->addItem(
+				new CLink($parent_sysmap['name'], 'zabbix.php?action=map.view'.
+					'&sysmapid='.$parent_sysmap['sysmapid'].'&fullscreen='.$fullscreen.'&severity_min='.$severity_min
+				)
+			);
 		}
 	}
 

@@ -92,30 +92,27 @@ class CControllerMapView extends CController {
 		CProfile::update('web.maps.sysmapid', $this->sysmapid, PROFILE_TYPE_ID);
 
 		$data = [
-			'fullscreen' => $this->getInput('fullscreen', 0),
-			'sysmapid' => $this->sysmapid
+			'fullscreen' => $this->getInput('fullscreen', 0)
 		];
 
-		if ($data['sysmapid']) {
-			$maps = API::Map()->get([
-				'output' => API_OUTPUT_EXTEND,
-				'selectSelements' => API_OUTPUT_EXTEND,
-				'selectLinks' => API_OUTPUT_EXTEND,
-				'sysmapids' => $this->sysmapid,
-				'expandUrls' => true
-			]);
-			$data['map'] = $maps[0];
+		$maps = API::Map()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'selectSelements' => API_OUTPUT_EXTEND,
+			'selectLinks' => API_OUTPUT_EXTEND,
+			'sysmapids' => [$this->sysmapid],
+			'expandUrls' => true
+		]);
+		$data['map'] = $maps[0];
 
-			$data['pageFilter'] = new CPageFilter([
-				'severitiesMin' => [
-					'default' => $data['map']['severity_min'],
-					'mapId' => $data['sysmapid']
-				],
-				'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
-			]);
+		$data['pageFilter'] = new CPageFilter([
+			'severitiesMin' => [
+				'default' => $data['map']['severity_min'],
+				'mapId' => $this->sysmapid
+			],
+			'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
+		]);
 
-			$data['severity_min'] = $data['pageFilter']->severityMin;
-		}
+		$data['severity_min'] = $data['pageFilter']->severityMin;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Network maps'));
