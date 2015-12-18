@@ -628,12 +628,13 @@ if (!empty($this->data['new_operation'])) {
 
 			$users = API::User()->get([
 				'userids' => $userids,
-				'output' => ['alias', 'name', 'surname']
+				'output' => ['userid', 'alias', 'name', 'surname']
 			]);
 			order_result($users, 'alias');
 
 			foreach ($users as &$user) {
-				$user['fullname'] = getUserFullname($user);
+				$user['id'] = $user['userid'];
+				$user['name'] = getUserFullname($user);
 			}
 			unset($user);
 
