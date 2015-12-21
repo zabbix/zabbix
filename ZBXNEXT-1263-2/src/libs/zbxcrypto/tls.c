@@ -2923,6 +2923,51 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 #elif defined(HAVE_OPENSSL)
+static const char	*zbx_ctx_name(SSL_CTX *param)
+{
+	if (ctx_cert == param)
+		return "certificate-based encryption";
+	if (ctx_psk == param)
+		return "PSK-based encryption";
+	if (ctx_all == param)
+		return "certificate- and PSK-based encryption";
+
+	THIS_SHOULD_NEVER_HAPPEN;
+
+	return "unknown 'ctx_...' parameter";
+}
+
+static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
+{
+	const char	*__function_name = "zbx_set_ecdhe_parameters",
+			*msg = "Perfect Forward Secrecy ECDHE ciphersuites will not be available for";
+	EC_KEY		*ecdh = NULL;
+	long		res;
+	int		ret = SUCCEED;
+
+	/* use curve secp256r1/prime256v1/NIST P-256 */
+
+	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): EC_KEY_new_by_curve_name() failed. %s %s",
+				__function_name, msg, zbx_ctx_name(ctx));
+		return FAIL;
+	}
+
+	SSL_CTX_set_options(ctx, SSL_OP_SINGLE_ECDH_USE);
+
+	if (1 != (res = SSL_CTX_set_tmp_ecdh(ctx, ecdh)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): SSL_CTX_set_tmp_ecdh() returned %ld. %s %s",
+				__function_name, res, msg, zbx_ctx_name(ctx));
+		ret = FAIL;
+	}
+
+	EC_KEY_free(ecdh);
+
+	return ret;
+}
+
 void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
@@ -3132,42 +3177,6 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
 	}
 
-	/* set up ciphersuites */
-
-	if (NULL != ctx_cert)
-	{
-		if (1 != SSL_CTX_set_cipher_list(ctx_cert, "EECDH+aRSA+AES128:RSA+aRSA+AES128"))
-		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of certificate"
-					" ciphersuites:");
-			goto out;
-		}
-
-		zbx_log_ciphersuites(__function_name, "certificate", ctx_cert);
-	}
-
-	if (NULL != ctx_psk)
-	{
-		if (1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
-		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
-			goto out;
-		}
-
-		zbx_log_ciphersuites(__function_name, "PSK", ctx_psk);
-	}
-
-	if (NULL != ctx_all)
-	{
-		if (1 != SSL_CTX_set_cipher_list(ctx_all, "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA"))
-		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of all ciphersuites:");
-			goto out;
-		}
-
-		zbx_log_ciphersuites(__function_name, "certificate and PSK", ctx_all);
-	}
-
 	/* set up PSK global variables for client callback if PSK comes only from configuration file or command line */
 
 	if (NULL != ctx_psk && 0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_SENDER |
@@ -3179,10 +3188,40 @@ void	zbx_tls_init_child(void)
 		psk_len_for_cb = my_psk_len;
 	}
 
-	/* set up info and PSK callbacks */
-
 	if (NULL != ctx_cert)
+	{
+		const char	*ciphers;
+
 		SSL_CTX_set_info_callback(ctx_cert, zbx_openssl_info_cb);
+
+		/* we're using blocking sockets, deal with renegotiations automatically */
+		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
+
+		/* use server ciphersuite preference, do not use RFC 4507 ticket extension */
+		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
+
+		/* do not connect to unpatched servers */
+		SSL_CTX_clear_options(ctx_cert, SSL_OP_LEGACY_SERVER_CONNECT);
+
+		/* disable session caching */
+		SSL_CTX_set_session_cache_mode(ctx_cert, SSL_SESS_CACHE_OFF);
+
+		/* try to enable ECDH ciphersuites */
+		if (SUCCEED == zbx_set_ecdhe_parameters(ctx_cert))
+			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128";
+		else
+			ciphers = "RSA+aRSA+AES128";
+
+		/* set up ciphersuites */
+		if (1 != SSL_CTX_set_cipher_list(ctx_cert, ciphers))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of certificate"
+					" ciphersuites:");
+			goto out;
+		}
+
+		zbx_log_ciphersuites(__function_name, "certificate", ctx_cert);
+	}
 
 	if (NULL != ctx_psk)
 	{
@@ -3196,45 +3235,49 @@ void	zbx_tls_init_child(void)
 
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 			SSL_CTX_set_psk_server_callback(ctx_psk, zbx_psk_server_cb);
-	}
 
-	if (NULL != ctx_all)
-	{
-		SSL_CTX_set_info_callback(ctx_all, zbx_openssl_info_cb);
-
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
-			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
-	}
-
-	if (NULL != ctx_cert)
-	{
-		/* we're using blocking sockets, deal with renegotiations automatically */
-		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
-
-		/* use server ciphersuite preference, do not use RFC 4507 ticket extension */
-		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
-
-		/* do not connect to unpatched servers */
-		SSL_CTX_clear_options(ctx_cert, SSL_OP_LEGACY_SERVER_CONNECT);
-
-		/* disable session caching */
-		SSL_CTX_set_session_cache_mode(ctx_cert, SSL_SESS_CACHE_OFF);
-	}
-
-	if (NULL != ctx_psk)
-	{
 		SSL_CTX_set_mode(ctx_psk, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_options(ctx_psk, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
+
+		/* OpenSSL does not support ECDHE-PSK ciphersuites before version 1.1.0 */
+
+		if (1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
+			goto out;
+		}
+
+		zbx_log_ciphersuites(__function_name, "PSK", ctx_psk);
 	}
 
 	if (NULL != ctx_all)
 	{
+		const char	*ciphers;
+
+		SSL_CTX_set_info_callback(ctx_all, zbx_openssl_info_cb);
+
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
+			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
+
 		SSL_CTX_set_mode(ctx_all, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_options(ctx_all, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 		SSL_CTX_clear_options(ctx_all, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_all, SSL_SESS_CACHE_OFF);
+
+		if (SUCCEED == zbx_set_ecdhe_parameters(ctx_all))
+			ciphers = "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA";
+		else
+			ciphers = "RSA+aRSA+AES128:PSK-AES128-CBC-SHA";
+
+		if (1 != SSL_CTX_set_cipher_list(ctx_all, ciphers))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of all ciphersuites:");
+			goto out;
+		}
+
+		zbx_log_ciphersuites(__function_name, "certificate and PSK", ctx_all);
 	}
 
 #ifndef _WINDOWS
