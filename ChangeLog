@@ -14,6 +14,7 @@ A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ..F....... [ZBXNEXT-2662] fixed trimming of leading and trailing spaces in the proxy encription-related fields (Sasha)
 ..F....... [ZBX-10022] fixed a web scenario name into the graphs (Sasha)
@@ -305,6 +306,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
@@ -1027,6 +1029,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
