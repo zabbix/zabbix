@@ -4,6 +4,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
