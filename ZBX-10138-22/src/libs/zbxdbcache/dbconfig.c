@@ -4302,6 +4302,29 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCconfig_unlock_all_triggers                                     *
+ *                                                                            *
+ * Purpose: Unlocks all locked triggers before doing full history sync at     *
+ *          program exit                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_unlock_all_triggers()
+{
+	ZBX_DC_TRIGGER		*dc_trigger;
+	zbx_hashset_iter_t	iter;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->triggers, &iter);
+
+	while (NULL != (dc_trigger = zbx_hashset_iter_next(&iter)))
+		dc_trigger->locked = 0;
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_triggers_by_itemids                                 *
  *                                                                            *
  * Purpose: get enabled triggers for specified items                          *

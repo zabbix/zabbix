@@ -1,8 +1,13 @@
 Changes for 2.2.12rc1
 
 New features:
+A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
+..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
 ..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
 ..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
@@ -1341,6 +1346,8 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 
 --------------------------------------------------------------------------------
