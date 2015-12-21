@@ -53,7 +53,7 @@ require_once dirname(__FILE__).'/../page_header.php';
 		</ul>
 	</form>
 </div>
-<div class="signin-links"><a target="_blank" href="http://www.zabbix.com/documentation/"><?= _('Help'); ?></a>&nbsp;&nbsp;•&nbsp;&nbsp;<a target="_lbank" href="http://www.zabbix.com/support.php"><?= _('Support'); ?></a></div>
+<div class="signin-links"><a target="_blank" href="http://www.zabbix.com/documentation/3.0/"><?= _('Help'); ?></a>&nbsp;&nbsp;•&nbsp;&nbsp;<a target="_lbank" href="http://www.zabbix.com/support.php"><?= _('Support'); ?></a></div>
 </div>
 
 <?= makePageFooter(false, false)->toString() ?>
