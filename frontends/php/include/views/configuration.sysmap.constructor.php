@@ -19,7 +19,7 @@
 **/
 
 
-include('include/views/js/monitoring.sysmaps.js.php');
+include('include/views/js/configuration.sysmaps.js.php');
 
 // create menu
 $menu = (new CList())
@@ -85,3 +85,5 @@ return (new CWidget())
 			->addItem($backgroundImageTable)
 			->addItem($container)
 	);
+
+

@@ -812,6 +812,29 @@ static int	DBpatch_2050089(void)
 	return DBadd_foreign_key("sysmap_usrgrp", 2, &field);
 }
 
+static int	DBpatch_2050090(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles"
+			" set idx='web.triggers.filter_status',value_int=case when value_int=0 then 0 else -1 end"
+			" where idx='web.triggers.showdisabled'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050091(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles"
+			" set idx='web.httpconf.filter_status',value_int=case when value_int=0 then 0 else -1 end"
+			" where idx='web.httpconf.showdisabled'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(2050)
@@ -895,5 +918,7 @@ DBPATCH_ADD(2050086, 0, 1)
 DBPATCH_ADD(2050087, 0, 1)
 DBPATCH_ADD(2050088, 0, 1)
 DBPATCH_ADD(2050089, 0, 1)
+DBPATCH_ADD(2050090, 0, 1)
+DBPATCH_ADD(2050091, 0, 1)
 
 DBPATCH_END()

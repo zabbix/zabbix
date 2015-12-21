@@ -107,7 +107,7 @@ $eventTab = (new CTable())
 		]),
 		new CDiv([
 			$config['event_ack_enable']
-				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event)))
+				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event['acknowledges'])))
 					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
 					->setHeader(_('Acknowledges'), [], false, 'tr_events.php')
 				: null,

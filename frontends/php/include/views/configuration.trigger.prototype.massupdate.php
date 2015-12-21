@@ -51,7 +51,6 @@ $triggersFormList = (new CFormList('triggersFormList'))
 
 // append dependencies to form list
 $dependenciesTable = (new CTable())
-	->setNoDataMessage(_('No dependencies defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
