@@ -74,6 +74,8 @@ if (!$httptest) {
 	access_deny();
 }
 
+$http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
+
 // Create details widget.
 $details_screen = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
@@ -83,10 +85,7 @@ $details_screen = CScreenBuilder::getScreen([
 ]);
 
 (new CWidget())
-	->setTitle(
-		_('Details of web scenario').': '.
-		CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name'])
-	)
+	->setTitle(_('Details of web scenario').': '.$http_test_name)
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
@@ -126,7 +125,7 @@ $itemids = zbx_objectValues($itemids, 'itemid');
 $graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemids));
 
 $src = 'chart3.php?height=150'.
-	'&name='._('Speed').
+	'&name='.$http_test_name.': '._('Speed').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
 	'&httptestid='.$httptest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
@@ -169,7 +168,7 @@ $graph_time = new CScreenBase([
 ]);
 
 $src = 'chart3.php?height=150'.
-	'&name='._('Response time').
+	'&name='.$http_test_name.': '._('Response time').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
 	'&httptestid='.$httptest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.

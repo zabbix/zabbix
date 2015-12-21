@@ -105,7 +105,7 @@ switch ($page['type']) {
 
 		// page title
 		$pageTitle = '';
-		if (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME)) {
+		if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
 			$pageTitle = $ZBX_SERVER_NAME.NAME_DELIMITER;
 		}
 		$pageTitle .= isset($page['title']) ? $page['title'] : _('Zabbix');
@@ -208,6 +208,7 @@ session_write_close();
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
+		'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 		'menu' => [
 			'main_menu' => $main_menu,
 			'sub_menus' => $sub_menus,
@@ -228,7 +229,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 }
 
 // unset multiple variables
-unset($ZBX_MENU, $table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
+unset($table, $top_page_row, $menu_table, $main_menu_row, $sub_menu_table, $sub_menu_rows);
 
 if ($page['type'] == PAGE_TYPE_HTML && $showGuiMessaging) {
 	zbx_add_post_js('initMessages({});');

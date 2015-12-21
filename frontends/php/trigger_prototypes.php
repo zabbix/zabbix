@@ -46,7 +46,6 @@ $fields = [
 	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_dependency' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -80,7 +79,6 @@ $fields = [
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
 
@@ -128,9 +126,6 @@ if ($triggerPrototypeIds) {
 		access_deny();
 	}
 }
-
-$showDisabled = getRequest('showdisabled', 0);
-CProfile::update('web.triggers.showdisabled', $showDisabled, PROFILE_TYPE_INT);
 
 /*
  * Actions
@@ -361,15 +356,12 @@ else {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'discovery_rule' => $discoveryRule,
 		'hostid' => $discoveryRule['hostid'],
-		'showdisabled' => getRequest('showdisabled', 1),
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => $config,
 		'dependencyTriggers' => []
 	];
-
-	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
 	$options = [
@@ -379,9 +371,6 @@ else {
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	];
-	if (empty($data['showdisabled'])) {
-		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
-	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 
 	order_result($data['triggers'], $sortField, $sortOrder);
