@@ -215,7 +215,6 @@ $map_tab->addRow(_('Minimum trigger severity'),
 
 // Create url table.
 $url_table = (new CTable())
-	->setNoDataMessage(_('No URLs defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('URL'), _('Element'), _('Action')]);
 if (empty($data['sysmap']['urls'])) {

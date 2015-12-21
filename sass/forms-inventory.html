@@ -20,7 +20,7 @@
 	<header role="banner">
 		<div class="nav" role="navigation">
 			<div class="top-nav-container">
-			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<ul class="top-nav"><li class="selected"><a tabindex="1">Monitoring</a></li><li><a tabindex="2">Inventory</a></li><li><a tabindex="3">Reports</a></li><li><a tabindex="3">Configuration</a></li><li><a tabindex="4">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -40,7 +40,7 @@
 
 		<ul class="table-forms">
 		<li>
-		<div class="table-forms-td-left"></div><div class="table-forms-td-right"><span class="radio-switch paging-selected">Disabled</span><span class="radio-switch">Manual</span><span class="radio-switch">Automatic</span></div>
+		<div class="table-forms-td-left"></div><div class="table-forms-td-right"><!--<span class="radio-switch paging-selected">Disabled</span><span class="radio-switch">Manual</span><span class="radio-switch">Automatic</span>--><ul class="radio-segmented"><li><input type="radio" id="Disabled" checked><label for="Disabled">Disabled</label></li><li><input type="radio" id="Manual"><label for="Manual">Manual</label></li><li><input type="radio" id="Auto"><label for="Auto">Automatic</label></li></ul></div>
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="HostName">Type</label></div><div class="table-forms-td-right"><div class="input-help-wrapper"><input type="text" id="HostName"><span class="help-icon"></span></div><div class="red">You can't leave this empty.</div></div>

@@ -341,24 +341,6 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for service configuration menu popup.
-	 *
-	 * @param string $serviceId		service id
-	 * @param string $name			service name
-	 * @param bool   $deletable		services without dependencies can be deleted
-	 *
-	 * @return array
-	 */
-	public static function getServiceConfiguration($serviceId, $name, $deletable) {
-		return [
-			'type' => 'serviceConfiguration',
-			'serviceid' => $serviceId,
-			'name' => $name,
-			'deletable' => $deletable
-		];
-	}
-
-	/**
 	 * Prepare data for trigger menu popup.
 	 *
 	 * @param array  $trigger							trigger data
