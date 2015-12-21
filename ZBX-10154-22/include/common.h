@@ -1074,4 +1074,16 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
 
+typedef struct
+{
+	char	*name;
+	char	**params;
+	int	nparam;
+}
+zbx_function_t;
+
+void	zbx_function_clean(zbx_function_t *func);
+int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
+int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
+
 #endif
