@@ -489,14 +489,10 @@ ul.top-nav-icons {
 		bottom: 6px;
 
 		li {
-			display: inline-block;
+			display: block;
 			float: left;
 			position: relative;
 			padding: 0 0 0 14px;
-
-			a {
-				line-height: 2.1em;
-			}
 		}
 	}
 }
@@ -4482,7 +4478,7 @@ Main navigation is used to jump between high level sections of the application.
    <li>
       <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
    </li>
-   <li><span><b><a href="#">Discovery</a></b></span></li>
+   <li><span class="selected"><a href="#">Discovery</a></span></li>
    <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
    <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
    <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
@@ -4494,7 +4490,7 @@ Main navigation is used to jump between high level sections of the application.
 
 ##Tabs
 
-Tabs are used to reveal a set of information 
+Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
 
 ```html_example
 <ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
