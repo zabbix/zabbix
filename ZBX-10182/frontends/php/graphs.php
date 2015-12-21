@@ -533,6 +533,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = 0;
 		$data['visible'] = getRequest('visible');
 		$data['items'] = getRequest('items', []);
+		$data['templates'] = [];
 
 		if (isset($data['visible']['percent_left'])) {
 			$data['percent_left'] = getRequest('percent_left', 0);

@@ -46,81 +46,102 @@ if (!empty($this->data['graphid'])) {
 
 // create form list
 $graphFormList = new CFormList('graphFormList');
-if (!empty($this->data['templates'])) {
+$has_templates = ($this->data['templates'] != []);
+if ($has_templates === true) {
 	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
+}
+
+$form_fields = ['graph_type' => new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()),
+	'show_legend' => new CCheckBox('show_legend'),
+	'show_working_period' => new CCheckBox('show_work_period'),
+	'show_triggers' => new ccheckbox('show_triggers'),
+	'percent_left_checkbox' => new CCheckBox('visible[percent_left]'),
+	'percent_right_checkbox' => new CCheckBox('visible[percent_right]'),
+	'yaxis_min_data' => new CComboBox('ymin_type', $this->data['ymin_type'], null, [
+		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
+		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
+		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
+	]),
+	'yaxis_max_data' => new CComboBox('ymax_type', $this->data['ymax_type'], null, [
+		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
+		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
+		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
+	])
+];
+if ($has_templates) {
+	$form_fields['graph_type']->setAttribute('disabled', 'disabled');
+	$form_fields['show_legend']->setAttribute('disabled', 'disabled');
+	$form_fields['show_working_period']->setAttribute('disabled', 'disabled');
+	$form_fields['show_triggers']->setAttribute('disabled', 'disabled');
+	$form_fields['percent_left_checkbox']->setAttribute('disabled', 'disabled');
+	$form_fields['percent_right_checkbox']->setAttribute('disabled', 'disabled');
+	$form_fields['yaxis_min_data']->setAttribute('disabled', 'disabled');
+	$form_fields['yaxis_max_data']->setAttribute('disabled', 'disabled');
 }
 
 $graphFormList
 	->addRow(_('Name'),
-		(new CTextBox('name', $this->data['name']))
+		(new CTextBox('name', $this->data['name'], $has_templates))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Width'),
-		(new CNumericBox('width', $this->data['width'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('width', $this->data['width'], 5, $has_templates))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Height'),
-		(new CNumericBox('height', $this->data['height'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-	)
-	->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
-	->addRow(_('Show legend'), (new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1));
+		(new CNumericBox('height', $this->data['height'], 5, $has_templates))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
+$graphFormList
+	->addRow(_('Graph type'), $form_fields['graph_type'])
+	->addRow(_('Show legend'), $form_fields['show_legend']->setChecked($this->data['show_legend'] == 1));
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {
-	$graphFormList->addRow(_('Show working time'),
-		(new CCheckBox('show_work_period'))->setChecked($this->data['show_work_period'] == 1)
-	);
-	$graphFormList->addRow(_('Show triggers'),
-		(new CCheckBox('show_triggers'))->setChecked($this->data['show_triggers'] == 1)
-	);
+	$graphFormList->addRow(_('Show working time'), $form_fields['show_working_period']->setChecked($this->data['show_work_period'] == 1));
+	$graphFormList->addRow(_('Show triggers'), $form_fields['show_triggers']->setchecked($this->data['show_triggers'] == 1)
+);
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		// percent left
-		$percentLeftTextBox = (new CTextBox('percent_left', $this->data['percent_left'], false, 7))
+		$percentLeftTextBox = (new CTextBox('percent_left', $this->data['percent_left'], $has_templates, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
-		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
-			->setChecked(true)
+		$form_fields['percent_left_checkbox']->setChecked(true)
 			->onClick('javascript: showHideVisible("percent_left");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
-			$percentLeftCheckbox->setChecked(1);
+			$form_fields['percent_left_checkbox']->setChecked(1);
 		}
 		elseif ($this->data['percent_left'] == 0) {
 			$percentLeftTextBox->addStyle('visibility: hidden;');
-			$percentLeftCheckbox->setChecked(0);
+			$form_fields['percent_left_checkbox']->setChecked(0);
 		}
 
-		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, SPACE, $percentLeftTextBox]);
+		$graphFormList->addRow(_('Percentile line (left)'), [$form_fields['percent_left_checkbox'], SPACE, $percentLeftTextBox]);
 
 		// percent right
-		$percentRightTextBox = (new CTextBox('percent_right', $this->data['percent_right'], false, 7))
+		$percentRightTextBox = (new CTextBox('percent_right', $this->data['percent_right'], $has_templates, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
-		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
-			->setChecked(true)
+		$form_fields['percent_right_checkbox']->setChecked(true)
 			->onClick('javascript: showHideVisible("percent_right");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
-			$percentRightCheckbox->setChecked(1);
+			$form_fields['percent_right_checkbox']->setChecked(1);
 		}
 		elseif ($this->data['percent_right'] == 0) {
 			$percentRightTextBox->addStyle('visibility: hidden;');
-			$percentRightCheckbox->setChecked(0);
+			$form_fields['percent_right_checkbox']->setChecked(0);
 		}
 
-
-		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, SPACE, $percentRightTextBox]);
+		$graphFormList->addRow(_('Percentile line (right)'), [$form_fields['percent_right_checkbox'], SPACE, $percentRightTextBox]);
 	}
 
-	$yaxisMinData = [];
-	$yaxisMinData[] = new CComboBox('ymin_type', $this->data['ymin_type'], null, [
-		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
-		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
-		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	]);
+	$yaxisMinData = [$form_fields['yaxis_min_data']];
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin'], $has_templates))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
@@ -136,7 +157,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $has_templates))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -172,16 +193,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
 
-	$yaxisMaxData = [];
-	$yaxisMaxData[] = new CComboBox('ymax_type', $this->data['ymax_type'], null, [
-		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
-		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
-		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	]);
+	$yaxisMaxData = [$form_fields['yaxis_max_data']];
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax'], $has_templates))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
@@ -197,7 +213,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $has_templates))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
