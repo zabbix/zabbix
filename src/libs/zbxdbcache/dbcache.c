@@ -1895,6 +1895,10 @@ int	DCsync_history(int sync_type)
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
+		/* unlock all triggers before full sync so no items are locked by triggers */
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			DCconfig_unlock_all_triggers();
+
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 		now = time(NULL);
 		cache->itemids_num = 0;
