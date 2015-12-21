@@ -1547,6 +1547,9 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 		else
 			zbx_strncpy_alloc(&s->buffer, &allocated, &buf_dyn_bytes, s->buf_stat, nbytes);
 
+		if (ZBX_TCP_EXPECT_SIZE == expect && buf_stat_bytes + buf_dyn_bytes == expected_len)
+			break;
+
 		if (ZBX_TCP_EXPECT_SIZE == expect || ZBX_TCP_EXPECT_CLOSE == expect)
 			continue;
 
@@ -1601,6 +1604,10 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			}
 
 			expect = ZBX_TCP_EXPECT_SIZE;
+
+			if (buf_stat_bytes + buf_dyn_bytes == expected_len)
+				break;
+
 			continue;
 		}
 
@@ -1634,7 +1641,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			}
 			else
 			{
-				if (0 == strncmp(s->buffer, "<req>", ZBX_CONST_STRLEN("<req>")))
+				if (0 != strncmp(s->buffer, "<req>", ZBX_CONST_STRLEN("<req>")))
 					break;
 
 				expect = ZBX_TCP_EXPECT_NOTHING;
