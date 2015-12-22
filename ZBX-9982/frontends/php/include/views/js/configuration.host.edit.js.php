@@ -382,7 +382,7 @@
 					moveInterfaceName(hostInterfaces[i].type);
 				}
 				resetMainInterfaces();
-				addDroppable(jQuery('.interface_row, .interface_add'));
+				addDroppable(jQuery('.interface_row'));
 			},
 
 			addNew: function(type) {
@@ -438,6 +438,10 @@
 					.removeAttr('name');
 				jQuery('.interface_row').find('input[type="text"]').attr('readonly', true);
 				jQuery('.interface_row').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
+			},
+
+			addDroppable: function(domElements) {
+				addDroppable(domElements);
 			}
 		}
 	}());

@@ -119,6 +119,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	zbx_add_post_js($data['interfaces']
 		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew('.INTERFACE_TYPE_AGENT.');');
+	zbx_add_post_js('hostInterfacesManager.addDroppable(jQuery(".interface_add"))');
 
 	$ifTab = (new CTable())
 		->setHeader([
