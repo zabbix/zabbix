@@ -380,20 +380,20 @@ function make_system_status($filter, $backurl) {
 			}
 
 			if (in_array($filter['extAck'], [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
-
-				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
 				}
+
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 			}
 
 			if (in_array($filter['extAck'], [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
 					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
-
-				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
 				}
+
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 			}
 		}
 	}
@@ -454,7 +454,7 @@ function make_system_status($filter, $backurl) {
 		$table->addRow($groupRow);
 	}
 
-	return new CDiv($table);
+	return $table;
 }
 
 function make_status_of_zbx() {
@@ -507,21 +507,17 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$frontendSetup = new CFrontendSetup();
-		$reqs = $frontendSetup->checkRequirements();
-		foreach ($reqs as $req) {
+		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
 			if ($req['result'] != CFrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
-				$table->addRow([
-					(new CSpan($req['name']))->addClass($class),
-					(new CSpan($req['current']))->addClass($class),
-					(new CSpan($req['error']))->addClass($class)
-				]);
+				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? ZBX_STYLE_ORANGE : ZBX_STYLE_RED;
+				$table->addRow(
+					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass($class)
+				);
 			}
 		}
 	}
 
-	return new CDiv($table);
+	return $table;
 }
 
 /**
@@ -618,25 +614,16 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	// indicator of sort field
 	if ($show_sort_indicator) {
-		$sort_div = (new CDiv(SPACE))
-			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN)
-				? 'icon_sortdown default_cursor'
-				: 'icon_sortup default_cursor')
-			->addStyle('float: left');
-		$host_header = (new CDiv([_('Host'), SPACE]))
-			->addStyle('float: left');
-		$issue_header = (new CDiv([_('Issue'), SPACE]))
-			->addStyle('float: left');
-		$last_change_header = (new CDiv([_('Time'), SPACE]))
-			->addStyle('float: left');
+		$sort_div = (new CDiv())
+			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 	}
 
 	$table = (new CTableInfo())
 		->setHeader([
-			($show_sort_indicator && ($filter['sortfield'] === 'hostname')) ? [$host_header, $sort_div] : _('Host'),
-			($show_sort_indicator && ($filter['sortfield'] === 'priority')) ? [$issue_header, $sort_div] : _('Issue'),
-			($show_sort_indicator && ($filter['sortfield'] === 'lastchange'))
-				? [$last_change_header, $sort_div]
+			($show_sort_indicator && $filter['sortfield'] === 'hostname') ? [_('Host'), $sort_div] : _('Host'),
+			($show_sort_indicator && $filter['sortfield'] === 'priority') ? [_('Issue'), $sort_div] : _('Issue'),
+			($show_sort_indicator && $filter['sortfield'] === 'lastchange')
+				? [_('Last change'), $sort_div]
 				: _('Last change'),
 			_('Age'),
 			_('Info'),
@@ -781,11 +768,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$info_div = (new CDiv(
-		_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggers_total_count)
-	))->addStyle('text-align: right; padding-right: 3px;');
+	$info = _n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggers_total_count);
 
-	return new CDiv([$table, $info_div]);
+	return [$table, $info];
 }
 
 /**
@@ -817,7 +802,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 	foreach ($triggers as $trigger) {
 		// unknown triggers
-		$unknown = SPACE;
+		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = makeUnknownIcon($trigger['error']);
 		}

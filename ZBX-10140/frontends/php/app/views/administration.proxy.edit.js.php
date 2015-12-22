@@ -48,7 +48,10 @@
 
 		// Trim spaces on submit and depending on checkboxes, create a value for hidden field 'tls_accept'.
 		$('#proxyForm').submit(function() {
-			$(this).trimValues(['#host', '#ip', '#dns', '#port', '#description']);
+			$(this).trimValues([
+				'#host', '#ip', '#dns', '#port', '#description', '#tls_psk_identity', '#tls_psk', '#tls_issuer',
+				'#tls_subject'
+			]);
 			$('#tls_accept').val(getTlsAccept());
 		});
 
