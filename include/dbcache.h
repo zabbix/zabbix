@@ -362,7 +362,7 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
-void	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
+int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers();
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -466,8 +466,8 @@ void	zbx_config_clean(zbx_config_t *cfg);
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
 
-#define ZBX_HC_ITEM_STATUS_NORMAL	0
-#define ZBX_HC_ITEM_STATUS_LOCKED	1
+#define ZBX_HC_ITEM_STATUS_AVAILABLE	0
+#define ZBX_HC_ITEM_STATUS_BUSY		1
 #define ZBX_HC_ITEM_STATUS_QUEUED	2
 
 struct zbx_hc_data_t;

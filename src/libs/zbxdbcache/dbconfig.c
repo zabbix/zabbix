@@ -5022,10 +5022,12 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *           Also see function DCconfig_get_time_based_triggers(), which      *
  *           timer processes use to lock and unlock triggers.                 *
  *                                                                            *
+ * Return value: the number of items available for processing (unlocked).     *
+ *                                                                            *
  ******************************************************************************/
-void	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids)
+int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids)
 {
-	int			i, j;
+	int			i, j, locked_num = 0;
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
 	zbx_hc_item_t		*history_item;
@@ -5051,7 +5053,8 @@ void	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zb
 
 			if (1 == dc_trigger->locked)
 			{
-				history_item->status = ZBX_HC_ITEM_STATUS_LOCKED;
+				locked_num++;
+				history_item->status = ZBX_HC_ITEM_STATUS_BUSY;
 				goto next;
 			}
 		}
@@ -5068,6 +5071,8 @@ next:;
 	}
 
 	UNLOCK_CACHE;
+
+	return history_items->values_num - locked_num;
 }
 
 /******************************************************************************
