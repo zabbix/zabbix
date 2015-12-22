@@ -364,6 +364,7 @@ void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num)
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
+void	DCconfig_unlock_all_triggers();
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num);
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
@@ -454,4 +455,14 @@ void	zbx_idset_free(zbx_idset_t *idset);
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
+/* flags to specify which host interfaces have enabled items */
+#define ZBX_FLAG_INTERFACE_NONE		0x00
+#define ZBX_FLAG_INTERFACE_AGENT	0x01
+#define ZBX_FLAG_INTERFACE_SNMP		0x02
+#define ZBX_FLAG_INTERFACE_IPMI		0x04
+#define ZBX_FLAG_INTERFACE_JMX		0x08
+#define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
+
+int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
+void	DCupdate_hosts_availability();
 #endif

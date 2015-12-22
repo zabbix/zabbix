@@ -909,7 +909,7 @@ elseif (hasRequest('form')) {
 			// Host inventory
 			$data['inventory_mode'] = array_key_exists('inventory_mode', $dbHost['inventory'])
 				? $dbHost['inventory']['inventory_mode']
-				: $config['default_inventory_mode'];
+				: HOST_INVENTORY_DISABLED;
 			$data['host_inventory'] = $dbHost['inventory'];
 			unset($data['host_inventory']['inventory_mode']);
 

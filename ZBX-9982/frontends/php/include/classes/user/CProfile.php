@@ -195,7 +195,7 @@ class CProfile {
 	 */
 	protected static function deleteValues($idx, array $idx2) {
 		// remove from DB
-		DB::delete('profiles', ['idx' => $idx, 'idx2' => $idx2]);
+		DB::delete('profiles', ['idx' => $idx, 'idx2' => $idx2, 'userid' => self::$userDetails['userid']]);
 	}
 
 	/**

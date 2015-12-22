@@ -482,8 +482,6 @@ char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
-void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
-
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
@@ -503,6 +501,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);

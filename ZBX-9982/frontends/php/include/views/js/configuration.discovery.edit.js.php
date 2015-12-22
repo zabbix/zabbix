@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
 	<?= (new CRow([
 			(new CCol(
-				(new CSpan('#{name}'))->addClass('bold')
+				new CSpan('#{name}')
 			))->setId('dcheckCell_#{dcheckid}'),
 			new CHorList([
 				(new CButton(null, _('Edit')))
@@ -277,7 +277,7 @@
 				}
 
 				// update check name
-				jQuery('#dcheckCell_' + value.dcheckid + ' .bold').text(value['name']);
+				jQuery('#dcheckCell_' + value.dcheckid + ' span').text(value['name']);
 			}
 
 			// update device uniqueness criteria
@@ -534,6 +534,7 @@
 						'buttons': [
 							{
 								'title': '<?= _('Cancel') ?>',
+								'cancel': true,
 								'focused': true,
 								'action': function() {}
 							}
@@ -602,6 +603,7 @@
 						'buttons': [
 							{
 								'title': '<?= _('Cancel') ?>',
+								'cancel': true,
 								'focused': true,
 								'action': function() {}
 							}
@@ -616,12 +618,22 @@
 			jQuery('#add_new_dcheck').prop('disabled', false);
 
 			if (validationErrors.length) {
+				var content = jQuery('<span>');
+
+				for (var i = 0; i < validationErrors.length; i++) {
+					if (content.html() !== '') {
+						content.append(jQuery('<br>'));
+					}
+					content.append(jQuery('<span>').text(validationErrors[i]));
+				}
+
 				overlayDialogue({
 					'title': '<?= _('Discovery check error') ?>',
-					'content': jQuery('<span>').text(validationErrors.join('\n') + "\n" + 'sdfkjsdhfkhsd'),
+					'content': content,
 					'buttons': [
 						{
 							'title': '<?= _('Cancel') ?>',
+							'cancel': true,
 							'focused': true,
 							'action': function() {}
 						}

@@ -380,20 +380,20 @@ function make_system_status($filter, $backurl) {
 			}
 
 			if (in_array($filter['extAck'], [EXTACK_OPTION_ALL, EXTACK_OPTION_BOTH])) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
-
-				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < 30) {
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers'][] = $trigger;
 				}
+
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count']++;
 			}
 
 			if (in_array($filter['extAck'], [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH])
 					&& isset($trigger['event']) && !$trigger['event']['acknowledged']) {
-				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
-
-				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < 30) {
+				if ($groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack'] < ZBX_WIDGET_ROWS) {
 					$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['triggers_unack'][] = $trigger;
 				}
+
+				$groups[$group['groupid']]['tab_priority'][$trigger['priority']]['count_unack']++;
 			}
 		}
 	}
@@ -454,7 +454,7 @@ function make_system_status($filter, $backurl) {
 		$table->addRow($groupRow);
 	}
 
-	return new CDiv($table);
+	return $table;
 }
 
 function make_status_of_zbx() {
@@ -507,21 +507,17 @@ function make_status_of_zbx() {
 
 	// check requirements
 	if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
-		$frontendSetup = new CFrontendSetup();
-		$reqs = $frontendSetup->checkRequirements();
-		foreach ($reqs as $req) {
+		foreach ((new CFrontendSetup())->checkRequirements() as $req) {
 			if ($req['result'] != CFrontendSetup::CHECK_OK) {
-				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
-				$table->addRow([
-					(new CSpan($req['name']))->addClass($class),
-					(new CSpan($req['current']))->addClass($class),
-					(new CSpan($req['error']))->addClass($class)
-				]);
+				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? ZBX_STYLE_ORANGE : ZBX_STYLE_RED;
+				$table->addRow(
+					(new CRow([$req['name'], $req['current'], $req['error']]))->addClass($class)
+				);
 			}
 		}
 	}
 
-	return new CDiv($table);
+	return $table;
 }
 
 /**
@@ -543,15 +539,15 @@ function make_status_of_zbx() {
  */
 function make_latest_issues(array $filter = [], $backurl) {
 	// hide the sort indicator if no sortfield and sortorder are given
-	$showSortIndicator = isset($filter['sortfield']) || isset($filter['sortorder']);
+	$show_sort_indicator = isset($filter['sortfield']) || isset($filter['sortorder']);
 
 	if (isset($filter['sortfield']) && $filter['sortfield'] !== 'lastchange') {
-		$sortField = [$filter['sortfield'], 'lastchange'];
-		$sortOrder = [$filter['sortorder'], ZBX_SORT_DOWN];
+		$sort_field = [$filter['sortfield'], 'lastchange'];
+		$sort_order = [$filter['sortorder'], ZBX_SORT_DOWN];
 	}
 	else {
-		$sortField = ['lastchange'];
-		$sortOrder = [ZBX_SORT_DOWN];
+		$sort_field = ['lastchange'];
+		$sort_order = [ZBX_SORT_DOWN];
 	}
 
 	$options = [
@@ -570,14 +566,14 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'output' => [
 			'triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error', 'state'
 		],
-		'selectHosts' => ['hostid', 'name'],
+		'selectHosts' => ['hostid'],
 		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
 			? true
 			: null,
 		'skipDependent' => true,
-		'sortfield' => $sortField,
-		'sortorder' => $sortOrder,
+		'sortfield' => $sort_field,
+		'sortorder' => $sort_order,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,
 		'preservekeys' => true
 	]));
@@ -585,93 +581,71 @@ function make_latest_issues(array $filter = [], $backurl) {
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
-	$triggersTotalCount = API::Trigger()->get(array_merge($options, [
+	$triggers_total_count = API::Trigger()->get(array_merge($options, [
 		'countOutput' => true
 	]));
 
 	// get acknowledges
-	$eventIds = [];
+	$hostids = [];
+	$eventids = [];
 	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $host) {
+			$hostids[$host['hostid']] = true;
+		}
+
 		if ($trigger['lastEvent']) {
-			$eventIds[] = $trigger['lastEvent']['eventid'];
+			$eventids[] = $trigger['lastEvent']['eventid'];
 		}
 	}
-	if ($eventIds) {
-		$eventAcknowledges = API::Event()->get([
+
+	$config = select_config();
+
+	if ($config['event_ack_enable'] && $eventids) {
+		$event_acknowledges = API::Event()->get([
 			'output' => ['eventid'],
-			'eventids' => $eventIds,
+			'eventids' => $eventids,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);
 	}
 
-	foreach ($triggers as $tnum => $trigger) {
-		// if trigger is lost (broken expression) we skip it
-		if (empty($trigger['hosts'])) {
-			unset($triggers[$tnum]);
-			continue;
-		}
-
-		$host = reset($trigger['hosts']);
-		$trigger['hostid'] = $host['hostid'];
-		$trigger['hostname'] = $host['name'];
-
-		if ($trigger['lastEvent']) {
-			$trigger['lastEvent']['acknowledges'] = isset($eventAcknowledges[$trigger['lastEvent']['eventid']])
-				? $eventAcknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
-				: null;
-		}
-
-		$triggers[$tnum] = $trigger;
-	}
-
-	$hostIds = zbx_objectValues($triggers, 'hostid');
-
-	// get hosts
-	$hosts = API::Host()->get([
-		'hostids' => $hostIds,
-		'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
-		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'preservekeys' => true
-	]);
-
 	// actions
-	$actions = makeEventsActions($eventIds);
-
-	$config = select_config();
+	$actions = makeEventsActions($eventids);
 
 	// indicator of sort field
-	if ($showSortIndicator) {
-		$sortDiv = (new CDiv(SPACE))
-			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor')
-			->addStyle('float: left');
-		$hostHeaderDiv = (new CDiv([_('Host'), SPACE]))
-			->addStyle('float: left');
-		$issueHeaderDiv = (new CDiv([_('Issue'), SPACE]))
-			->addStyle('float: left');
-		$lastChangeHeaderDiv = (new CDiv([_('Time'), SPACE]))
-			->addStyle('float: left');
+	if ($show_sort_indicator) {
+		$sort_div = (new CDiv())
+			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 	}
 
 	$table = (new CTableInfo())
 		->setHeader([
-			($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
-			($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
-			($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
+			($show_sort_indicator && $filter['sortfield'] === 'hostname') ? [_('Host'), $sort_div] : _('Host'),
+			($show_sort_indicator && $filter['sortfield'] === 'priority') ? [_('Issue'), $sort_div] : _('Issue'),
+			($show_sort_indicator && $filter['sortfield'] === 'lastchange')
+				? [_('Last change'), $sort_div]
+				: _('Last change'),
 			_('Age'),
 			_('Info'),
 			$config['event_ack_enable'] ? _('Ack') : null,
 			_('Actions')
 		]);
 
-	$scripts = API::Script()->getScriptsByHosts($hostIds);
+	$hostids = array_keys($hostids);
+
+	$scripts = API::Script()->getScriptsByHosts($hostids);
+
+	// get hosts
+	$hosts = API::Host()->get([
+		'hostids' => $hostids,
+		'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'preservekeys' => true
+	]);
 
 	$maintenanceids = [];
-
-	foreach ($triggers as $trigger) {
-		$host = $hosts[$trigger['hostid']];
-
+	foreach ($hosts as $host) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			$maintenanceids[$host['maintenanceid']] = true;
 		}
@@ -687,36 +661,43 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	// triggers
 	foreach ($triggers as $trigger) {
-		$host = $hosts[$trigger['hostid']];
+		$host_list = [];
+		foreach ($trigger['hosts'] as $trigger_host) {
+			$host = $hosts[$trigger_host['hostid']];
 
-		$host_name = (new CSpan($host['name']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+			$host_name = (new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenance_icon = (new CSpan())
-				->addClass(ZBX_STYLE_ICON_MAINT)
-				->addClass(ZBX_STYLE_CURSOR_POINTER);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenance_icon = (new CSpan())
+					->addClass(ZBX_STYLE_ICON_MAINT)
+					->addClass(ZBX_STYLE_CURSOR_POINTER);
 
-			if (array_key_exists($host['maintenanceid'], $maintenances)) {
-				$maintenance = $maintenances[$host['maintenanceid']];
+				if (array_key_exists($host['maintenanceid'], $maintenances)) {
+					$maintenance = $maintenances[$host['maintenanceid']];
 
-				$hint = $maintenance['name'].' ['.($host['maintenance_type']
-					? _('Maintenance without data collection')
-					: _('Maintenance with data collection')).']';
+					$hint = $maintenance['name'].' ['.($host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
 
-				if ($maintenance['description']) {
-					$hint .= "\n".$maintenance['description'];
+					if ($maintenance['description']) {
+						$hint .= "\n".$maintenance['description'];
+					}
+
+					$maintenance_icon->setHint($hint);
 				}
 
-				$maintenance_icon->setHint($hint);
+				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 
-			$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
+			$host_list[] = $host_name;
+			$host_list[] = ', ';
 		}
+		array_pop($host_list);
 
 		// unknown triggers
-		$unknown = SPACE;
+		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = makeUnknownIcon($trigger['error']);
 		}
@@ -739,9 +720,14 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		if ($config['event_ack_enable']) {
-			$ack = $trigger['lastEvent']
-				? getEventAckState($trigger['lastEvent'], $backurl)
-				: (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
+			if ($trigger['lastEvent']) {
+				$trigger['lastEvent']['acknowledges'] =
+					$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
+
+				$ack = getEventAckState($trigger['lastEvent'], $backurl);
+			}
+			else
+				$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$ack = null;
@@ -756,35 +742,35 @@ function make_latest_issues(array $filter = [], $backurl) {
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 
 		// clock
+		$link_host = reset($trigger['hosts']);
 		$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
 			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
-				'&show_unknown=1&hostid='.$trigger['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
+				'&show_unknown=1&hostid='.$link_host['hostid'].'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).
 				'&period='.ZBX_PERIOD_DEFAULT
 		);
 
 		// actions
-		$actionHint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+		$action_hint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
 			? $actions[$trigger['lastEvent']['eventid']]
 			: SPACE;
 
 		$table->addRow([
-			(new CCol($host_name))->addClass(ZBX_STYLE_NOWRAP),
+			(new CCol($host_list)),
 			$description,
 			$clock,
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			(new CCol($actionHint))->addClass(ZBX_STYLE_NOWRAP)
+			(new CCol($action_hint))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
-		->addStyle('text-align: right; padding-right: 3px;');
+	$info = _n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggers_total_count);
 
-	return new CDiv([$table, $infoDiv]);
+	return [$table, $info];
 }
 
 /**
@@ -816,7 +802,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 	foreach ($triggers as $trigger) {
 		// unknown triggers
-		$unknown = SPACE;
+		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = makeUnknownIcon($trigger['error']);
 		}

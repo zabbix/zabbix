@@ -686,12 +686,27 @@ footer {
 	background-color: $ui-bg-color;
 	margin-top: -1px;
 	padding: 7px 5px;
+	overflow: hidden;
+	position: relative;
 	border: 1px solid $ui-border-color;
 	border-top-color: $table-border-color;
 
 	a {
 		@extend %paging-btn;
 	}
+}
+
+.paging-btn-container {
+	min-height: 24px;
+	position: relative;
+}
+
+.table-stats {
+	color: $font-alt-color;
+	display: inline-block;
+    padding: 4px 0;
+    position: absolute;
+    right: 5px;
 }
 
 .radio-switch {
@@ -730,11 +745,11 @@ footer {
 		position: relative;
 	}
 
-	&:first-child {
+	&:first-of-type {
 		@include border-radius(2px 0 0 2px);
 	}
 
-	&:last-child {
+	&:last-of-type {
 		@include border-radius(0 2px 2px 0);
 	}
 
@@ -1473,7 +1488,7 @@ footer {
 			border-color: $form-border-focus-color;
 			background-color: $btn-form-hover-color;
 			position: relative;
-			z-index: 1;
+			z-index: 2;
 		}
 
 		&:checked + label {
@@ -1487,7 +1502,7 @@ footer {
 		&:checked:focus + label {
 			border-color: $form-border-focus-color;	
 			position: relative;
-			z-index: 1;
+			z-index: 2;
 		}
 
 		&:checked[disabled] + label {
@@ -1511,6 +1526,10 @@ label {
 }
 
 input {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	
 	&[type="text"] {
 		@extend %form-input-height-padding;
@@ -1566,6 +1585,10 @@ input {
 }
 
 textarea {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	padding: 4px 5px;
 	overflow: auto;
 	@extend %form-input-style;
@@ -1582,6 +1605,10 @@ textarea {
 }
 
 select {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
@@ -1589,12 +1616,30 @@ select {
 
 	option {
 		color: $font-color;
+
+		&[disabled] {
+			@extend %form-disabled;
+		}
 	}
 
-	&.select-multiple {
-		//padding: 4px 5px;
+	//&.select-multiple {
+	//	padding: 4px 5px;
+	//	width: 300px;
+	//	height: auto;
+
+	//	option {
+	//		padding: 0;
+	//	}
+	//}
+
+	&[multiple] {
+		padding: 4px 5px;
 		width: 300px;
-		//height: auto;
+		height: 150px;
+
+		option {
+			padding: 0;
+		}
 	}
 
 	&[disabled] {
@@ -1631,10 +1676,10 @@ select {
 }
 
 %form-input-style {
-	font: {
-		family: $font-stack;
-		size: $font-form-size;
-	}
+	//font: {
+	//	family: $font-stack;
+		//size: $font-form-size;
+	//}
 	border: 1px solid $form-border-color;
 	color: $font-color;
 	background-color: $form-bg-color;
@@ -2303,10 +2348,10 @@ $form-icon-btn: (
 .dashbrd-widget-head {
 	position: relative;
 	padding: 8px 60px 8px 10px;
-	font-weight: bold;
 
 	h4 {
 		color: h4-widget-color($font-color);
+		font-weight: bold;
 	}
 
 	ul {
@@ -2909,6 +2954,56 @@ a.blue {
 	@extend .blue;
 }
 
+.progress-bar-container {
+	display: inline-block;
+	white-space: nowrap;
+	position: relative;
+
+	&:hover {
+
+		.progress-bar-label {
+			display: block;
+		}
+	}
+
+	a {
+		border: none;
+	}
+}
+
+.progress-bar-bg {
+	padding: 3px 0 2px 0;
+    font-size: $font-h3-size;
+    line-height: 1em;
+    display: inline-block;
+
+	&.green-bg {
+		background-color: darken(desaturate($alt-green, 10%), 16%);
+	}
+
+	&.red-bg {
+		background-color: darken(desaturate($alt-red, 10%), 5%);
+	}
+}
+
+.progress-bar-label {
+	display: none;
+	color: $white;
+	font-size: $font-h3-size;
+
+	span {
+		position: absolute;
+
+		&:first-child {
+			left: .35em;
+		}
+
+		&:last-child {
+			right: .35em;
+		}
+	}
+}
+
 .status-container {
 	display: inline-block;
 	white-space: nowrap;
@@ -3500,9 +3595,9 @@ $browser-logos: (
 	cursor: move;
 }
 
-.cursor-move td {
-	
-	> * {
+tr.cursor-move {
+
+	td * {
 		cursor: move;
 	}
 }
@@ -3630,7 +3725,7 @@ title: Typography
 name: typography
 ---
 
-The default font face is Arial. Type size and line height should be set in relative units: ems.
+The default font face is Arial. Relative units (em) should be used to set the type size and line height.
 
 ##Headings
 
@@ -3642,6 +3737,8 @@ The default font face is Arial. Type size and line height should be set in relat
 ```
 
 ##Paragraphs
+
+Paragraphs are used to visually separate blocks of multiple sentences.
 
 ```html_example
 <p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
@@ -3656,7 +3753,7 @@ title: Tables
 name: table
 ---
 
-Tables are used to display only tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
 
 ```html_example
 <div class="overflow-table">
@@ -3736,7 +3833,7 @@ Tables are used to display only tabular data. All tables are declared with the `
 
 ##Table with Pagination
 
-Pagination is used to separate large amounts of tabular data into descrete peices. Pagination control is used to progress 
+Pagination is used to separate large amounts of tabular data into descrete peices.
 
 ```html_example
 <div class="overflow-table">
@@ -3819,6 +3916,8 @@ Pagination is used to separate large amounts of tabular data into descrete peice
 
 ##Table with No Results
 
+In cases when no data can be shown, table should be accompanied by an explanatory text. It should not be left blank.
+
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
@@ -3848,6 +3947,8 @@ Pagination is used to separate large amounts of tabular data into descrete peice
 
 ##Tables with Elements and Highlights
 
+Besides textual information tables may contain other elements like icons. Table cells may be highlighted with various colors, for example to indicate severity level.
+
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
@@ -3860,7 +3961,7 @@ Pagination is used to separate large amounts of tabular data into descrete peice
       </thead>
       <tbody>
          <tr>
-            <td>Alerts</td>
+            <td>Alert labels</td>
             <td>asdasasdasd</td>
             <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
          </tr>
@@ -3912,7 +4013,7 @@ title: Forms
 name: forms
 ---
 
-Forms contain UI elements that are used to submit information. Some form elements have primary and secondary functionality.
+Forms contain UI elements that are used to submit information.
 
 ##Primary Button
 
@@ -3954,14 +4055,29 @@ Forms contain UI elements that are used to submit information. Some form element
 Text on html5 input types 
 
 ```html_example
-<input type="text" placeholder="Text">
-<div class="red">You can't leave this empty.</div>
-<input type="text" disabled>
-<input type="text" readonly>
-```
-
-```html_example
-<input type="text"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+<ul class="table-forms">
+   <li>
+      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
+      <div class="table-forms-td-right">
+         <input type="text" placeholder="Text" id="DefaultInput">
+         <div class="red">You can't leave this empty.</div>
+      </div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
+      <div class="table-forms-td-right">
+         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+      </div>
+   </li>
+</ul>
 ```
 
 ##Selects
@@ -4022,7 +4138,7 @@ title: Dialogs
 name: dialog
 ---
 
-Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clickng/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
+Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clicking/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
 
 ##Alert Dialogs
 
@@ -4114,7 +4230,7 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
 
 ```html_example
-<ul class="action-menu"">
+<ul class="action-menu">
    <li>
       <h3>Favourite screens</h3>
    </li>
@@ -4190,7 +4306,7 @@ Error notification appears after an action has been completed with errors or an 
 
 ##Global Notification
 
-Global notification
+Global notification.
 
 ```html_example
 <div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
@@ -4207,7 +4323,7 @@ name: icons
 Icons:
 
 ```html_example
-example
+<div class="icon-help"></div>
 ```
 */
 
@@ -4362,7 +4478,7 @@ Main navigation is used to jump between high level sections of the application.
    <li>
       <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
    </li>
-   <li><span><b><a href="#">Discovery</a></b></span></li>
+   <li><span class="selected"><a href="#">Discovery</a></span></li>
    <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
    <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
    <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
@@ -4374,7 +4490,7 @@ Main navigation is used to jump between high level sections of the application.
 
 ##Tabs
 
-Tabs are used to switch between 
+Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
 
 ```html_example
 <ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
@@ -4388,7 +4504,7 @@ title: Links
 name: links
 ---
 
-A link is used to navigate through different parts of the front-end. Action links are used to call out any additional content, like contextual menus and popovers.
+A link is used to navigate through different parts of the front-end. *Alternative* links are used to indicate a particular state or type. *Action* links are used call out any additional content, like contextual menus and popovers.
 
 ```html_example
 <p><a href="#">Default link</a></p>
@@ -4409,7 +4525,7 @@ title: Labels
 name: labels
 ---
 
-Labels add information.
+Labels add information. Different colors 
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
@@ -4419,11 +4535,11 @@ Labels add information.
 /*doc
 ---
 parent: components
-title: Spinners
-name: spinners
+title: Progress Indicators
+name: progress
 ---
 
-Spinners are used to show data retrieval or an ongoing computation. Use spinners to make UI look more fast and responsive.
+Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
 
 ```html_example
 <div class="preloader-container">
@@ -4439,7 +4555,7 @@ title: Widgets
 name: widgets
 ---
 
-Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*.
+Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*. Widgets can be collapsed and expanded.
 
 ```html_example
 <div class="dashbrd-widget">

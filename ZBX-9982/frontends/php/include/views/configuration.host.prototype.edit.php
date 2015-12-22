@@ -224,7 +224,6 @@ $tmplList = new CFormList();
 
 if ($hostPrototype['templateid']) {
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
@@ -246,7 +245,6 @@ else {
 	$ignoreTemplates = [];
 
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
