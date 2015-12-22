@@ -347,7 +347,7 @@ static int	DBpatch_2050032(void)
 
 static int	DBpatch_2050033(void)
 {
-	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_prototype", 1, &field);
 }
@@ -355,7 +355,7 @@ static int	DBpatch_2050033(void)
 static int	DBpatch_2050034(void)
 {
 	const ZBX_FIELD	field = {"templateid", NULL, "application_prototype", "application_prototypeid",
-			0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_prototype", 2, &field);
 }
@@ -391,14 +391,14 @@ static int	DBpatch_2050037(void)
 static int	DBpatch_2050038(void)
 {
 	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
-			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_application_prototype", 1, &field);
 }
 
 static int	DBpatch_2050039(void)
 {
-	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("item_application_prototype", 2, &field);
 }
@@ -434,7 +434,7 @@ static int	DBpatch_2050042(void)
 
 static int	DBpatch_2050043(void)
 {
-	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_discovery", 1, &field);
@@ -443,7 +443,7 @@ static int	DBpatch_2050043(void)
 static int	DBpatch_2050044(void)
 {
 	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
-			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+			0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("application_discovery", 2, &field);
 }
@@ -486,8 +486,7 @@ static int	DBpatch_2050053(void)
 
 static int	DBpatch_2050054(void)
 {
-	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-			ZBX_FK_CASCADE_DELETE};
+	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("opinventory", 1, &field);
 }
@@ -704,6 +703,138 @@ static int	DBpatch_2050076(void)
 	return FAIL;
 }
 
+static int	DBpatch_2050077(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_2050078(void)
+{
+	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
+	if (ZBX_DB_OK > DBexecute("update sysmaps set userid=(select min(userid) from users where type=3)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050079(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("sysmaps", &field);
+}
+
+static int	DBpatch_2050080(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("sysmaps", 3, &field);
+}
+
+static int	DBpatch_2050081(void)
+{
+	const ZBX_FIELD field = {"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_2050082(void)
+{
+	const ZBX_TABLE table =
+		{"sysmap_user",	"sysmapuserid",	0,
+			{
+				{"sysmapuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050083(void)
+{
+	return DBcreate_index("sysmap_user", "sysmap_user_1", "sysmapid,userid", 1);
+}
+
+static int	DBpatch_2050084(void)
+{
+	const ZBX_FIELD	field = {"sysmapid", NULL, "sysmaps", "sysmapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_user", 1, &field);
+}
+
+static int	DBpatch_2050085(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_user", 2, &field);
+}
+
+static int	DBpatch_2050086(void)
+{
+	const ZBX_TABLE table =
+		{"sysmap_usrgrp", "sysmapusrgrpid", 0,
+			{
+				{"sysmapusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"sysmapid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050087(void)
+{
+	return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_1", "sysmapid,usrgrpid", 1);
+}
+
+static int	DBpatch_2050088(void)
+{
+	const ZBX_FIELD	field = {"sysmapid", NULL, "sysmaps", "sysmapid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_usrgrp", 1, &field);
+}
+
+static int	DBpatch_2050089(void)
+{
+	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("sysmap_usrgrp", 2, &field);
+}
+
+static int	DBpatch_2050090(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles"
+			" set idx='web.triggers.filter_status',value_int=case when value_int=0 then 0 else -1 end"
+			" where idx='web.triggers.showdisabled'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050091(void)
+{
+	if (ZBX_DB_OK > DBexecute("update profiles"
+			" set idx='web.httpconf.filter_status',value_int=case when value_int=0 then 0 else -1 end"
+			" where idx='web.httpconf.showdisabled'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(2050)
@@ -774,5 +905,20 @@ DBPATCH_ADD(2050073, 0, 1)
 DBPATCH_ADD(2050074, 0, 1)
 DBPATCH_ADD(2050075, 0, 1)
 DBPATCH_ADD(2050076, 0, 1)
+DBPATCH_ADD(2050077, 0, 1)
+DBPATCH_ADD(2050078, 0, 1)
+DBPATCH_ADD(2050079, 0, 1)
+DBPATCH_ADD(2050080, 0, 1)
+DBPATCH_ADD(2050081, 0, 1)
+DBPATCH_ADD(2050082, 0, 1)
+DBPATCH_ADD(2050083, 0, 1)
+DBPATCH_ADD(2050084, 0, 1)
+DBPATCH_ADD(2050085, 0, 1)
+DBPATCH_ADD(2050086, 0, 1)
+DBPATCH_ADD(2050087, 0, 1)
+DBPATCH_ADD(2050088, 0, 1)
+DBPATCH_ADD(2050089, 0, 1)
+DBPATCH_ADD(2050090, 0, 1)
+DBPATCH_ADD(2050091, 0, 1)
 
 DBPATCH_END()

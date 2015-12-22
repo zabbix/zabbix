@@ -151,7 +151,6 @@ $form_list->addRow(_('Minimum trigger severity'), new CSeverity([
 
 // create url table
 $urlTable = (new CTable())
-	->setNoDataMessage(_('No URLs defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('URL'), _('Element'), _('Action')]);
 if (empty($this->data['sysmap']['urls'])) {

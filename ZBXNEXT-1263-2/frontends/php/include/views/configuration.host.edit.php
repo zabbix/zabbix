@@ -563,7 +563,6 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$ignoredTemplates = [];
 
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
@@ -618,7 +617,6 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
