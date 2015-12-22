@@ -478,6 +478,7 @@ else {
 	createServiceConfigurationTree($services, $treeData);
 	$tree = new CServiceTree('service_conf_tree', $treeData, [
 		'caption' => _('Service'),
+		'action' => _('Action'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')
 	]);
