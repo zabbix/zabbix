@@ -1072,7 +1072,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		/* special print: psk_identity is not '\0'-terminated */
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%.*s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%.*s\"", __function_name,
 				(int)psk_identity_len, psk_identity);
 	}
 
@@ -1114,7 +1114,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find requested PSK identity: \"%.*s\"",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%.*s\"",
 						__function_name, (int)psk_identity_len, psk_identity);
 			}
 		}
@@ -1167,7 +1167,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%s\"", __function_name, psk_identity);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, psk_identity);
 
 	/* try PSK from configuration file first (it is already in binary form) */
 
@@ -1199,7 +1199,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find requested PSK identity: \"%s\"",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%s\"",
 						__function_name, psk_identity);
 			}
 		}
@@ -1258,7 +1258,7 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name,
 				psk_identity_for_cb);
 	}
 
@@ -1314,7 +1314,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%s\"", __function_name, identity);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() requested PSK identity \"%s\"", __function_name, identity);
 
 	/* try PSK from configuration file first (it is already in binary form) */
 
@@ -1346,7 +1346,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		{
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find requested PSK identity: \"%s\"",
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot find requested PSK identity \"%s\"",
 						__function_name, identity);
 			}
 
@@ -1492,7 +1492,7 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, const i
 		size_t		msg_alloc = 0, msg_offset = 0;
 		const int	*p;
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s() %s ciphersuites:", title1, title2);
 
 		for (p = cipher_ids; 0 != *p; p++)
 			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", ssl_get_ciphersuite_name(*p));
@@ -1525,7 +1525,7 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, gnutls_
 		unsigned int	idx = 0, sidx;
 		const char	*name;
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s() %s ciphersuites:", title1, title2);
 
 		while (1)
 		{
@@ -1569,7 +1569,7 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX
 		size_t	msg_alloc = 0, msg_offset = 0;
 		int	i, num;
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s() %s ciphersuites:", title1, title2);
 
 		num = sk_SSL_CIPHER_num(ciphers->cipher_list);
 
@@ -2070,7 +2070,7 @@ static int	zbx_log_peer_cert(const char *function_name, const x509_crt *cert, ch
 			SUCCEED == zbx_x509_dn_gets(&cert->subject, subject, sizeof(subject), error) &&
 			0 < x509_serial_gets(serial, sizeof(serial), &cert->serial))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): peer certificate: issuer:\"%s\" subject:\"%s\" serial:\"%s\"",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() peer certificate issuer:\"%s\" subject:\"%s\" serial:\"%s\"",
 				function_name, issuer, subject, serial);
 
 		return SUCCEED;
@@ -2549,7 +2549,7 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CA certificate(s) from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded CA certificate(s) from file \"%s\"", __function_name,
 				CONFIG_TLS_CA_FILE);
 	}
 
@@ -2570,7 +2570,7 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL(s) from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded CRL(s) from file \"%s\"", __function_name,
 				CONFIG_TLS_CRL_FILE);
 	}
 
@@ -2600,7 +2600,7 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded certificate from file \"%s\"", __function_name,
 				CONFIG_TLS_CERT_FILE);
 	}
 
@@ -2623,7 +2623,7 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded " ZBX_FS_SIZE_T "-bit %s private key from file \"%s\"",
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded " ZBX_FS_SIZE_T "-bit %s private key from file \"%s\"",
 				__function_name, (zbx_fs_size_t)pk_get_size(my_priv_key), pk_get_name(my_priv_key),
 				CONFIG_TLS_KEY_FILE);
 	}
@@ -2633,7 +2633,7 @@ void	zbx_tls_init_child(void)
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
 		zbx_read_psk_file();
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
 	}
 
 	/* 'TLSPSKIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf). */
@@ -2645,7 +2645,7 @@ void	zbx_tls_init_child(void)
 
 		zbx_check_psk_identity_len(my_psk_identity_len);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK identity \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __function_name,
 				CONFIG_TLS_PSK_IDENTITY);
 	}
 
@@ -2738,7 +2738,7 @@ void	zbx_tls_init_child(void)
 		if (0 < (res = gnutls_certificate_set_x509_trust_file(my_cert_creds, CONFIG_TLS_CA_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded %d CA certificate(s) from file \"%s\"",
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded %d CA certificate(s) from file \"%s\"",
 					__function_name, res, CONFIG_TLS_CA_FILE);
 		}
 		else if (0 == res)
@@ -2761,7 +2761,7 @@ void	zbx_tls_init_child(void)
 		if (0 < (res = gnutls_certificate_set_x509_crl_file(my_cert_creds, CONFIG_TLS_CRL_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded %d CRL(s) from file \"%s\"", __function_name, res,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded %d CRL(s) from file \"%s\"", __function_name, res,
 					CONFIG_TLS_CRL_FILE);
 		}
 		else if (0 == res)
@@ -2792,9 +2792,9 @@ void	zbx_tls_init_child(void)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate from file \"%s\"", __function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded certificate from file \"%s\"", __function_name,
 					CONFIG_TLS_CERT_FILE);
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded private key from file \"%s\"", __function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded private key from file \"%s\"", __function_name,
 					CONFIG_TLS_KEY_FILE);
 		}
 	}
@@ -2857,9 +2857,9 @@ void	zbx_tls_init_child(void)
 			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_cb);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK identity \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __function_name,
 				CONFIG_TLS_PSK_IDENTITY);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
 	}
 
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
@@ -2949,7 +2949,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 
 	if (NULL == (ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): EC_KEY_new_by_curve_name() failed. %s %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s() EC_KEY_new_by_curve_name() failed. %s %s",
 				__function_name, msg, zbx_ctx_name(ctx));
 		return FAIL;
 	}
@@ -2958,7 +2958,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 
 	if (1 != (res = SSL_CTX_set_tmp_ecdh(ctx, ecdh)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): SSL_CTX_set_tmp_ecdh() returned %ld. %s %s",
+		zabbix_log(LOG_LEVEL_WARNING, "%s() SSL_CTX_set_tmp_ecdh() returned %ld. %s %s",
 				__function_name, res, msg, zbx_ctx_name(ctx));
 		ret = FAIL;
 	}
@@ -3032,7 +3032,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CA certificate(s) from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded CA certificate(s) from file \"%s\"", __function_name,
 				CONFIG_TLS_CA_FILE);
 
 		SSL_CTX_set_verify(ctx_cert, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
@@ -3116,7 +3116,7 @@ void	zbx_tls_init_child(void)
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded %d CRL(s) from file \"%s\"", __function_name, count_cert,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded %d CRL(s) from file \"%s\"", __function_name, count_cert,
 				CONFIG_TLS_CRL_FILE);
 	}
 
@@ -3132,7 +3132,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate(s) from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded certificate(s) from file \"%s\"", __function_name,
 				CONFIG_TLS_CERT_FILE);
 	}
 
@@ -3149,7 +3149,7 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded private key from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded private key from file \"%s\"", __function_name,
 				CONFIG_TLS_KEY_FILE);
 
 		if (1 != SSL_CTX_check_private_key(ctx_cert))
@@ -3169,12 +3169,12 @@ void	zbx_tls_init_child(void)
 
 		zbx_check_psk_identity_len(my_psk_identity_len);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK identity \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK identity \"%s\"", __function_name,
 				CONFIG_TLS_PSK_IDENTITY);
 
 		zbx_read_psk_file();
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
 	}
 
 	/* set up PSK global variables for client callback if PSK comes only from configuration file or command line */
@@ -3681,7 +3681,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			/* special print: s->tls_ctx->psk_identity is not '\0'-terminated */
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK identity: \"%.*s\"", __function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%.*s\"", __function_name,
 					(int)s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
 		}
 	}
@@ -3878,7 +3878,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 			if (GNUTLS_E_WARNING_ALERT_RECEIVED == res)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() received a warning alert: %d"
+				zabbix_log(LOG_LEVEL_WARNING, "%s() gnutls_handshake() received a warning alert: %d"
 						" %s", __function_name, alert, msg);
 				continue;
 			}
@@ -3898,7 +3898,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 			if (SUCCEED == zabbix_check_log_level(level))
 			{
-				zabbix_log(level, "%s(): gnutls_handshake() returned: %d %s",
+				zabbix_log(level, "%s() gnutls_handshake() returned: %d %s",
 						__function_name, res, gnutls_strerror(res));
 			}
 
@@ -4401,7 +4401,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			/* special print: s->tls_ctx->psk_identity is not '\0'-terminated */
-			zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK identity: \"%.*s\"", __function_name,
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%.*s\"", __function_name,
 					(int)s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
 		}
 	}
@@ -4602,7 +4602,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 			if (GNUTLS_E_WARNING_ALERT_RECEIVED == res)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() received a warning alert: %d"
+				zabbix_log(LOG_LEVEL_WARNING, "%s() gnutls_handshake() received a warning alert: %d"
 						" %s", __function_name, alert, msg);
 				continue;
 			}
@@ -4622,7 +4622,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() returned: %d %s",
+			zabbix_log(LOG_LEVEL_WARNING, "%s() gnutls_handshake() returned: %d %s",
 					__function_name, res, gnutls_strerror(res));
 
 			if (0 != gnutls_error_is_fatal(res))
@@ -4680,7 +4680,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 			if (NULL != (psk_identity = gnutls_psk_server_get_username(s->tls_ctx)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK identity: \"%s\"", __function_name,
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() PSK identity: \"%s\"", __function_name,
 						psk_identity);
 			}
 		}
