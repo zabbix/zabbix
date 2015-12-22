@@ -232,7 +232,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 {
 	const char		*__function_name = "send_list_of_active_checks";
 
-	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
+	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
 	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
@@ -252,10 +252,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 		goto out;
 	}
 
-	strscpy(ip, get_ip_by_socket(sock));
-
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
 	zbx_vector_uint64_create(&itemids);
@@ -427,8 +425,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 {
 	const char		*__function_name = "send_list_of_active_checks_json";
 
-#define ZBX_KEY_OTHER		0
-
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
@@ -461,7 +457,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
-		strscpy(ip, get_ip_by_socket(sock));
+		strscpy(ip, sock->peer);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 		*tmp = '\0';
