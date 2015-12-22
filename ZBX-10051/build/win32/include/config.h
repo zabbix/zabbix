@@ -67,6 +67,9 @@
 /* Define to 1 if you have the <Iphlpapi.h> header file. */
 #define HAVE_IPHLPAPI_H 1
 
+/* Define to 1 if you have the <Netioapi.h> header file. */
+#define HAVE_NETIOAPI_H 1
+
 /* Define to 1 if 'sockaddr_storage.ss_family' exists. */
 #define HAVE_SOCKADDR_STORAGE_SS_FAMILY 1
 

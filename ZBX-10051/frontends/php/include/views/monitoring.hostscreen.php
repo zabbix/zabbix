@@ -30,7 +30,6 @@ $screenWidget->addItem($form);
 if (empty($this->data['screen']) || empty($this->data['host'])) {
 	$screenWidget
 		->setTitle(_('Screens'))
-		->addItem(BR())
 		->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
@@ -76,7 +75,10 @@ else {
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['screen']['screenid']
 	]);
-	$screenWidget->addItem($screenBuilder->show());
+
+	$screenWidget->addItem(
+		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+	);
 
 	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline,
