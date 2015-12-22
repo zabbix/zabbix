@@ -24,21 +24,21 @@ jQuery(function($) {
 		createSuggest('search');
 	}
 
-	if (IE || KQ) {
+	if (IE) {
 		setTimeout(function () { $('[autofocus]').focus(); }, 10);
 	}
 
 	/**
 	 * Change combobox color according selected option.
 	 */
-	$('.input.select').each(function() {
+	$('select').each(function() {
 		var comboBox = $(this),
 			changeClass = function(obj) {
-				if (obj.find('option.not-monitored:selected').length > 0) {
-					obj.addClass('not-monitored');
+				if (obj.find('option.red:selected').length > 0) {
+					obj.addClass('red');
 				}
 				else {
-					obj.removeClass('not-monitored');
+					obj.removeClass('red');
 				}
 			};
 
@@ -83,10 +83,6 @@ jQuery(function($) {
 
 			case 'refresh':
 				data = getMenuPopupRefresh(data);
-				break;
-
-			case 'serviceConfiguration':
-				data = getMenuPopupServiceConfiguration(data);
 				break;
 
 			case 'trigger':
