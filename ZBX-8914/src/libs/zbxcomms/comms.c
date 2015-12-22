@@ -1576,7 +1576,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			if (ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t) > buf_stat_bytes)
 				continue;
 
-			expected_len = zbx_letoh_uint64(*(zbx_uint64_t *)(s->buf_stat + ZBX_TCP_HEADER_LEN));
+			memcpy(&expected_len, s->buf_stat + ZBX_TCP_HEADER_LEN, sizeof(zbx_uint64_t));
+			expected_len = zbx_letoh_uint64(expected_len);
 
 			if (ZBX_MAX_RECV_DATA_SIZE < expected_len)
 			{
