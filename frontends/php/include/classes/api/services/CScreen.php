@@ -57,6 +57,7 @@ class CScreen extends CApiService {
 
 		$defOptions = [
 			'screenids'					=> null,
+			'userids'					=> null,
 			'screenitemids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -83,6 +84,13 @@ class CScreen extends CApiService {
 		if (!is_null($options['screenids'])) {
 			zbx_value2array($options['screenids']);
 			$sqlParts['where'][] = dbConditionInt('s.screenid', $options['screenids']);
+		}
+
+		// userids
+		if ($options['userids'] !== null) {
+			zbx_value2array($options['userids']);
+
+			$sql_parts['where'][] = dbConditionInt('s.userid', $options['userids']);
 		}
 
 		// screenitemids
