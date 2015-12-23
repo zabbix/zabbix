@@ -84,6 +84,39 @@ static void	__zbx_zbx_set_socket_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
+static char	*zbx_get_ip_by_socket(zbx_socket_t *s)
+{
+	ZBX_SOCKADDR			sa;
+	ZBX_SOCKLEN_T			sz = sizeof(sa);
+	ZBX_THREAD_LOCAL static char	host[64];
+	char				*error_message = NULL;
+
+	if (ZBX_PROTO_ERROR == getpeername(s->socket, (struct sockaddr *)&sa, &sz))
+	{
+		error_message = strerror_from_system(zbx_socket_last_error());
+		zbx_set_socket_strerror("connection rejected, getpeername() failed: %s", error_message);
+		goto out;
+	}
+
+#if defined(HAVE_IPV6)
+	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
+	{
+		error_message = strerror_from_system(zbx_socket_last_error());
+		zbx_set_socket_strerror("connection rejected, getnameinfo() failed: %s", error_message);
+	}
+#else
+	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
+#endif
+out:
+	if (NULL != error_message)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
+		strscpy(host, "unknown IP");
+	}
+
+	return host;
+}
+
 #if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
@@ -1224,7 +1257,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	s->socket = accepted_socket;	/* replace socket to accepted */
 	s->accepted = 1;
 
-	zbx_strlcpy(s->peer, get_ip_by_socket(s), sizeof(s->peer));	/* save peer IP address */
+	zbx_strlcpy(s->peer, zbx_get_ip_by_socket(s), sizeof(s->peer));	/* save peer IP address */
 
 	/* if the 1st byte is 0x16 then assume it's a TLS connection */
 	if (1 == recv(s->socket, &buf, 1, MSG_PEEK) && '\x16' == buf)
@@ -1768,39 +1801,6 @@ cleanup:
 	}
 
 	return total_bytes;
-}
-
-char	*get_ip_by_socket(zbx_socket_t *s)
-{
-	ZBX_SOCKADDR			sa;
-	ZBX_SOCKLEN_T			sz = sizeof(sa);
-	ZBX_THREAD_LOCAL static char	host[64];
-	char				*error_message = NULL;
-
-	if (ZBX_PROTO_ERROR == getpeername(s->socket, (struct sockaddr *)&sa, &sz))
-	{
-		error_message = strerror_from_system(zbx_socket_last_error());
-		zbx_set_socket_strerror("connection rejected, getpeername() failed: %s", error_message);
-		goto out;
-	}
-
-#if defined(HAVE_IPV6)
-	if (0 != zbx_getnameinfo((struct sockaddr *)&sa, host, sizeof(host), NULL, 0, NI_NUMERICHOST))
-	{
-		error_message = strerror_from_system(zbx_socket_last_error());
-		zbx_set_socket_strerror("connection rejected, getnameinfo() failed: %s", error_message);
-	}
-#else
-	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
-#endif
-out:
-	if (NULL != error_message)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot get socket IP address: %s", error_message);
-		strscpy(host, "unknown IP");
-	}
-
-	return host;
 }
 
 #if defined(HAVE_IPV6)
