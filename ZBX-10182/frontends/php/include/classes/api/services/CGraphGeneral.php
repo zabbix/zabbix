@@ -53,7 +53,8 @@ abstract class CGraphGeneral extends CApiService {
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'graphids' => $graphIds,
 			'editable' => true,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'inherited' => false
 		]);
 
 		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([

@@ -80,9 +80,11 @@
 	<td>
 		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
 	</td>
-	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
-	</td>
+	<?php if ($this->data['templates'] == []): ?>
+		<td class="<?= ZBX_STYLE_NOWRAP ?>">
+			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+		</td>
+	<?php endif; ?>
 </tr>
 </script>
 <script type="text/javascript">
@@ -363,7 +365,8 @@
 			$('#graphTab .input, #graphTab .button').each(function() {
 				$(this).attr('disabled', 'disabled');
 			});
-			$('#itemsTable').sortable({disabled: true});
+			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
+			$('select', '#itemsTable').prop('disabled', true);
 
 			var size = $('#itemsTable tr.sortable').length;
 
