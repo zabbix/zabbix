@@ -365,6 +365,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
+		$original_triggers = $triggers;
 		$triggers = $this->resolveTriggerExpressionUserMacro($triggers);
 
 		// Find macros.
@@ -419,6 +420,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					? array_merge($macro_values[$triggerid], $references)
 					: $references;
 			}
+
+			$triggers[$triggerid]['expression'] = $original_triggers[$triggerid]['expression'];
 		}
 
 		if (!$options['references_only']) {
