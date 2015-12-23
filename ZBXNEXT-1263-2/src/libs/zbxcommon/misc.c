@@ -28,8 +28,6 @@
 #define ZBX_SCHEDULER_FILTER_MINUTE	3
 #define ZBX_SCHEDULER_FILTER_SECOND	4
 
-extern volatile sig_atomic_t	zbx_timed_out;
-
 typedef struct zbx_scheduler_filter_t
 {
 	int				start;
@@ -53,6 +51,8 @@ typedef struct zbx_scheduler_interval_t
 	struct zbx_scheduler_interval_t	*next;
 }
 zbx_scheduler_interval_t;
+
+ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
 #ifdef _WINDOWS
 

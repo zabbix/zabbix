@@ -118,8 +118,6 @@ const char	*help_message[] = {
 	NULL	/* end of text */
 };
 
-volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
-
 /* TLS parameters */
 unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_get, just for linking */

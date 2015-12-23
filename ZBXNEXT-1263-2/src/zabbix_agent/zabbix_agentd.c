@@ -192,8 +192,6 @@ ZBX_THREAD_LOCAL int		server_num	= 0;
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 
-ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
-
 int	CONFIG_ALERTER_FORKS		= 0;
 int	CONFIG_DISCOVERER_FORKS		= 0;
 int	CONFIG_HOUSEKEEPER_FORKS	= 0;

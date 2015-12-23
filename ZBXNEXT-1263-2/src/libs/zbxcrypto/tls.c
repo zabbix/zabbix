@@ -54,9 +54,9 @@
 #	define ZBX_TLS_CIPHERSUITE_ALL	2			/* select ciphersuites with certificate and PSK */
 #endif
 
-extern volatile sig_atomic_t	zbx_timed_out;
-extern unsigned int		configured_tls_connect_mode;
-extern unsigned int		configured_tls_accept_modes;
+extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
+extern unsigned int				configured_tls_connect_mode;
+extern unsigned int				configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;
