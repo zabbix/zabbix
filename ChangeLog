@@ -3,6 +3,7 @@ Changes for 3.0.0alpha6
 New features:
 
 Bug fixes:
+..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha5
