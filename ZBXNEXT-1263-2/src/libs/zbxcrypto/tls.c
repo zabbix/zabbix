@@ -3564,7 +3564,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			/* when it connects to server) */
 
 			if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
-				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
+					(const unsigned char *)my_psk_identity, my_psk_identity_len)))
 			{
 				zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
 				ssl_free(s->tls_ctx);
@@ -3590,7 +3590,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			}
 
 			if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)psk_buf, (size_t)psk_len,
-				(const unsigned char *)tls_arg1, strlen(tls_arg1))))
+					(const unsigned char *)tls_arg1, strlen(tls_arg1))))
 			{
 				zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
 				ssl_free(s->tls_ctx);
@@ -3998,11 +3998,10 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+	char		psk_buf[HOST_TLS_PSK_LEN / 2];
 #if defined(_WINDOWS)
 	double		sec;
 #endif
-	char		psk_buf[HOST_TLS_PSK_LEN / 2];
-
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __function_name,
