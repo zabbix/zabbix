@@ -3998,10 +3998,11 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
-	char		psk_buf[HOST_TLS_PSK_LEN / 2];
 #if defined(_WINDOWS)
 	double		sec;
 #endif
+	char		psk_buf[HOST_TLS_PSK_LEN / 2];
+
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __function_name,
