@@ -62,8 +62,9 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	alarm_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	zbx_timed_out = 1;	/* set a global flag */
 	SIG_CHECK_PARAMS(sig, siginfo, context);
+
+	zbx_timed_out = 1;	/* set a global flag */
 }
 
 /******************************************************************************
