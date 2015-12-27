@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: 2015-10-31 20:52+0300\n"
+"POT-Creation-Date: 2015-12-27 14:53+0200\n"
+"PO-Revision-Date: 2015-12-26 22:28+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1446317571.0\n"
+"X-POOTLE-MTIME: 1451161719.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -3130,7 +3130,7 @@ msgstr "Подключаться через"
 
 #: app/views/administration.mediatype.edit.php:65
 msgid "Connection security"
-msgstr "Безопасность соединения"
+msgstr "Безопасность подключения"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
@@ -6449,7 +6449,7 @@ msgstr "Обзор инвентарных данных узла сети"
 #: include/classes/screens/CScreenHostTriggers.php:129
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr "События узлов сети"
+msgstr "События у узла сети"
 
 #: include/views/configuration.sysmap.edit.php:92
 #: include/views/monitoring.sysmap.edit.php:155
@@ -7138,12 +7138,12 @@ msgstr "Некорректное SNMP community."
 #: include/classes/api/services/CHttpTest.php:899
 #, c-format
 msgid "Incorrect SSL verify host value for web scenario \"%1$s\"."
-msgstr "Некорректное значение верификации SSL хоста для веб сценария \"%1$s\"."
+msgstr "Некорректное значение проверки SSL хоста для веб сценария \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:890
 #, c-format
 msgid "Incorrect SSL verify peer value for web scenario \"%1$s\"."
-msgstr "Некорректное значение верификации SSL пира для веб-сценария \"%1$s\"."
+msgstr "Некорректное значение проверки SSL узла для веб-сценария \"%1$s\"."
 
 #: include/classes/api/services/CService.php:959
 #, c-format
@@ -8290,7 +8290,7 @@ msgstr "Ошибочный ключ \"%1$s\": %2$s."
 #: include/classes/api/services/CUserMacro.php:650
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Ошибочный макрос \"%1$s\": %2$s."
 
 #: maintenance.php:324
 msgid "Invalid maintenance period"
@@ -12562,12 +12562,12 @@ msgstr "Пароль к SSL ключу"
 #: app/views/administration.mediatype.edit.php:73
 #: include/views/configuration.httpconf.edit.php:137
 msgid "SSL verify host"
-msgstr "Верификация SSL хоста"
+msgstr "Проверка SSL хоста"
 
 #: app/views/administration.mediatype.edit.php:72
 #: include/views/configuration.httpconf.edit.php:134
 msgid "SSL verify peer"
-msgstr "Верификация SSL пира"
+msgstr "Проверка SSL узла"
 
 #: app/views/administration.mediatype.edit.php:69
 msgid "SSL/TLS"
@@ -12614,7 +12614,7 @@ msgstr "Запланированная проверка"
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
-msgstr "Расписание"
+msgstr "По расписанию"
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
 #: include/views/configuration.screen.constructor.edit.php:541
@@ -15235,7 +15235,7 @@ msgstr "Пользователю не разрешается удалять са
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "У пользовательского макроса пропущены параметры: %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -16519,7 +16519,7 @@ msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
-msgstr ""
+msgstr "макрос пустой"
 
 #: include/views/js/administration.general.macros.edit.js.php:35
 msgid "macro(s)"
@@ -16751,7 +16751,7 @@ msgstr "неожиданный конец ключа"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "неожиданное завершение макроса"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
@@ -16783,7 +16783,7 @@ msgstr "через"
 #: include/func.inc.php:562 jsLoader.php:97
 msgctxt "year short"
 msgid "y"
-msgstr "Г"
+msgstr "г"
 
 #: include/html.inc.php:726
 msgid "yyyy"

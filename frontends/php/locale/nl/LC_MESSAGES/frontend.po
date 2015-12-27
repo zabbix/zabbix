@@ -4,9 +4,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: 2015-04-20 19:29+0300\n"
-"Last-Translator: acropia <acropia@gmail.com>\n"
+"POT-Creation-Date: 2015-12-27 14:53+0200\n"
+"PO-Revision-Date: 2015-12-27 12:32+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1429550947.0\n"
+"X-POOTLE-MTIME: 1451212365.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -525,7 +525,7 @@ msgstr "Toevoegen"
 
 #: include/services.inc.php:75 include/services.inc.php:115
 msgid "Add child"
-msgstr ""
+msgstr "Kind toevoegen"
 
 #: include/actions.inc.php:594 include/actions.inc.php:881
 msgid "Add host"
@@ -597,7 +597,7 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:339
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Agent beschikbaarheid. keert niets terug - niet beschikbaar; 1 - beschikbaar"
 
 #: include/views/configuration.host.list.php:69
 msgid "Agent encryption"
@@ -606,7 +606,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Agent hostnaam. Geeft string"
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -1132,12 +1132,12 @@ msgstr "CONFIGURATIE VAN TRIGGERS"
 #: include/classes/items/CHelpItems.php:205
 #: include/classes/items/CHelpItems.php:487
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "CPU informatie. Geeft string of integer"
 
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:463
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "CPU-belasting. keert terug float"
 
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
@@ -1191,7 +1191,6 @@ msgstr "Annuleer"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Kan event niet bevestigen"
@@ -1601,7 +1600,6 @@ msgid "Cannot delete maintenance"
 msgstr "Kan onderhoud niet verwijderen"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Kan het mediatype niet verwijderen"
@@ -1612,7 +1610,6 @@ msgid "Cannot delete network map"
 msgstr "Kan netwerk kaart niet verwijderen"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Kan proxy niet verwijderen"
@@ -1629,7 +1626,6 @@ msgid "Cannot delete screen"
 msgstr "Kan scherm niet verwijderen"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Kan script niet verwijderen"
@@ -1923,7 +1919,7 @@ msgstr "Kan host \"%1$s\" in scherm \"%2$s\" niet vinden."
 #: include/classes/import/CConfigurationImport.php:889
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "Kan gastheer groep \"%1$s\" niet vinden voor host prototype \"%2$s\" van de ontdekking regel \"%3$s\" op \"%4$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:972
 #: include/classes/api/services/CDiscoveryRule.php:1058
@@ -1946,37 +1942,37 @@ msgstr "Kan de icoon map \"%1$s\" gebruikt in map \"%2$s\" niet vinden."
 #: include/classes/import/CConfigurationImport.php:1219
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" op \"%2$s\" niet vinden dat wordt gebruikt als de Y-as MAX waarde voor graph \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1070
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Kan punt \"%1$s\" op \"%2$s\" niet vinden, dat wordt gebruikt als de Y-as MAX waarde voor grafiek prototype \"%3$s\" van de ontdekking regel \"%4$s\" op \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1203
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" niet vinden op \"%2$s\" wordt gebruikt als de Y-as MIN waarde voor graph \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1050
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" niet vinden op \"%2$s\" wordt gebruikt als de Y-as MIN waarde voor grafiek prototype \"%3$s\" van de ontdekking regel \"%4$s\" op \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1238
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" niet vinden op \"%2$s\" gebruikt in de grafiek \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1090
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
-msgstr ""
+msgstr "Kan item \"%1$s\" niet vinden op \"%2$s\" gebruikt in de grafiek prototype \"%3$s\" van de ontdekkings regel \"%4$s\" op \"%5$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1295
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
-msgstr ""
+msgstr "Kan punt \"%1$s\" niet vinden op \"%2$s\" gebruikt in trigger \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1016
 #, c-format
@@ -5165,7 +5161,6 @@ msgstr "Gebeurtenis-ID van vorig logboekvermelding bijpassende reguliere express
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "Event erkend"
@@ -9446,7 +9441,6 @@ msgid "Media type added"
 msgstr "Mediatype toegevoegd"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Mediatype uitgeschakeld"
