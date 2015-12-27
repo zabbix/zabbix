@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: 2015-10-29 18:03+0300\n"
+"POT-Creation-Date: 2015-12-27 14:53+0200\n"
+"PO-Revision-Date: 2015-12-27 10:45+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1446134587.0\n"
+"X-POOTLE-MTIME: 1451205927.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -2542,7 +2542,7 @@ msgstr "Recebe todas as traps SNMP que não foram aceitas pelos itens snmptrap[]
 
 #: include/views/configuration.screen.constructor.edit.php:706
 msgid "Center"
-msgstr "Centro"
+msgstr "Centralizado"
 
 #: app/views/administration.proxy.edit.php:101
 #: app/views/administration.proxy.edit.php:109
@@ -3133,7 +3133,7 @@ msgstr "Conexões"
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
-msgstr "Conexões do host"
+msgstr "Conexões do host (ativas)"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
@@ -3144,7 +3144,7 @@ msgstr "Conexões do proxy"
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
-msgstr "Conexões para o host"
+msgstr "Conexões com o host (passivas)"
 
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
@@ -3600,7 +3600,7 @@ msgstr "Host do banco de dados"
 
 #: include/items.inc.php:96
 msgid "Database monitor"
-msgstr "Monitoração do banco de dados"
+msgstr "Monitoração de banco de dados"
 
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:323 setup.php:44
@@ -4560,7 +4560,7 @@ msgstr "A regra de descoberta foi excluída"
 #: app/views/monitoring.widget.discovery.view.php:60
 #: include/actions.inc.php:55
 msgid "Discovery status"
-msgstr "Status autobusca"
+msgstr "Status da descoberta de rede"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:547
@@ -4589,7 +4589,7 @@ msgstr "Exibir gráfico"
 
 #: latest.php:821
 msgid "Display stacked graph"
-msgstr "Exibir pilha de gráficos"
+msgstr "Exibir gráfico empilhado"
 
 #: include/func.inc.php:1539 search.php:251 search.php:347 search.php:488
 #, c-format
@@ -4639,7 +4639,7 @@ msgstr "Receber a configuração"
 #: include/views/configuration.services.edit.php:150
 #: include/views/configuration.services.edit.php:192
 msgid "Downtime"
-msgstr "Tempo offline"
+msgstr "Downtime"
 
 #: include/views/configuration.graph.edit.php:254
 msgid "Draw style"
@@ -5671,7 +5671,7 @@ msgstr "Acesso à interface web atualizado"
 
 #: include/views/administration.users.edit.php:275
 msgid "Frontend messaging"
-msgstr "Mensagem da interface web"
+msgstr "Ativar mensagens globais"
 
 #: include/views/configuration.host.edit.php:807
 #: include/views/configuration.template.edit.php:470
@@ -6142,7 +6142,7 @@ msgstr "Esconder selecionados"
 
 #: include/views/monitoring.dashconf.php:71
 msgid "Hide selected groups"
-msgstr "Ocultar os grupos selecionados"
+msgstr "Ocultar grupos selecionados"
 
 #: adm.triggerseverities.php:38 adm.triggerseverities.php:39
 #: include/views/administration.general.triggerSeverity.edit.php:60
@@ -6393,7 +6393,7 @@ msgstr "Visão geral do inventário de host"
 #: include/classes/screens/CScreenHostTriggers.php:129
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr "Incidentes dos hosts"
+msgstr "Incidentes do host"
 
 #: include/views/configuration.sysmap.edit.php:92
 #: include/views/monitoring.sysmap.edit.php:155
@@ -6511,7 +6511,7 @@ msgstr "Telas do host"
 #: app/views/monitoring.dashboard.view.php:103
 #: app/views/monitoring.widget.hosts.view.php:368
 msgid "Host status"
-msgstr "Status do host"
+msgstr "Status dos hosts"
 
 #: include/hosts.inc.php:289
 msgid "Host subnet mask"
@@ -6593,7 +6593,7 @@ msgstr "Hosts em manutenção"
 
 #: include/classes/screens/CScreenHostsInfo.php:93 include/screens.inc.php:33
 msgid "Hosts info"
-msgstr "Info hosts"
+msgstr "Informações dos hosts"
 
 #: include/views/configuration.screen.constructor.edit.php:654
 #: include/views/monitoring.overview.items.php:50
@@ -8235,7 +8235,7 @@ msgstr "Chave inválida \"%1$s\": %2$s."
 #: include/classes/api/services/CUserMacro.php:650
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Macro inválida \"%1$s\": %2$s."
 
 #: maintenance.php:324
 msgid "Invalid maintenance period"
@@ -8722,7 +8722,7 @@ msgstr "Localização do texto"
 
 #: include/views/administration.users.edit.php:148
 msgid "Language"
-msgstr "Língua"
+msgstr "Idioma"
 
 #: include/forms.inc.php:1835 include/func.inc.php:1534
 #: include/maintenances.inc.php:115
@@ -9525,7 +9525,7 @@ msgstr "Limite da mensagem de texto"
 
 #: include/views/administration.users.edit.php:289
 msgid "Message timeout"
-msgstr "Expiração de mensagem"
+msgstr "Enquanto a mensagem estiver visível"
 
 #: include/views/administration.users.edit.php:278
 msgid "Message timeout (seconds)"
@@ -9545,7 +9545,7 @@ msgstr "Método não encontrado."
 
 #: include/views/configuration.screen.constructor.edit.php:718
 msgid "Middle"
-msgstr "Centro"
+msgstr "Meio"
 
 #: include/classes/setup/CFrontendSetup.php:125
 #, c-format
@@ -11003,7 +11003,7 @@ msgstr "Tipo da operação"
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.action.list.php:51
 msgid "Operations"
-msgstr "Ações"
+msgstr "Operações"
 
 #: include/hosts.inc.php:62
 msgid "Operator"
@@ -11527,7 +11527,7 @@ msgstr "Persa (fa_IR)"
 
 #: include/graphs.inc.php:26 popup.php:1484
 msgid "Pie"
-msgstr "Torta"
+msgstr "Pizza"
 
 #: include/views/js/monitoring.sysmaps.js.php:53
 msgid "Placing algorithm"
@@ -12376,7 +12376,7 @@ msgstr "SMTP"
 #: app/views/administration.mediatype.edit.php:64
 #: app/views/administration.mediatype.list.php:56
 msgid "SMTP email"
-msgstr "Email SMTP"
+msgstr "E-mail SMTP"
 
 #: app/views/administration.mediatype.edit.php:63
 #: app/views/administration.mediatype.list.php:55
@@ -12929,7 +12929,7 @@ msgstr "Servidor"
 
 #: include/screens.inc.php:37
 msgid "Server info"
-msgstr "Info servidor"
+msgstr "Informações do servidor Zabbix"
 
 #: include/views/configuration.screen.constructor.edit.php:611
 msgid "Server time"
@@ -13025,7 +13025,7 @@ msgstr "Defina o modo de inventário de host"
 #: include/views/reports.toptriggers.php:120 popup.php:1056 tr_logform.php:371
 #: tr_status.php:279
 msgid "Severity"
-msgstr "Risco"
+msgstr "Severidade"
 
 #: include/views/configuration.screen.constructor.edit.php:439
 msgid "Severity (descending)"
@@ -13159,7 +13159,7 @@ msgstr "Gráfico simples"
 
 #: include/screens.inc.php:46
 msgid "Simple graph prototype"
-msgstr "Protótipo simples de gráfico"
+msgstr "Protótipo gráfico simples"
 
 #: include/hosts.inc.php:364
 msgid "Site ZIP / postal"
@@ -13425,7 +13425,7 @@ msgstr "Status do Zabbix"
 #: app/controllers/CControllerDiscoveryView.php:160
 #: app/views/monitoring.discovery.view.php:22
 msgid "Status of discovery"
-msgstr "Status da autobusca"
+msgstr "Status das regras de autobusca"
 
 #: tr_status.php:25 tr_status.php:200
 msgid "Status of triggers"
@@ -13658,7 +13658,7 @@ msgstr "Destino"
 
 #: include/views/configuration.action.edit.php:761
 msgid "Target list"
-msgstr "Lista alvo"
+msgstr "Lista de destinos"
 
 #: include/views/configuration.copy.elements.php:46
 msgid "Target type"
@@ -14252,7 +14252,7 @@ msgstr "A trigger está no estado \"normal\""
 
 #: include/actions.inc.php:1351
 msgid "Trigger in \"unknown\" state"
-msgstr "A trigger está no estado \"não suportado\""
+msgstr "A trigger está no estado \"desconhecido\""
 
 #: include/classes/api/services/CHostBase.php:143
 #, c-format
@@ -14403,7 +14403,7 @@ msgstr "As triggers foram excluídas"
 #: include/classes/screens/CScreenTriggersInfo.php:31
 #: include/screens.inc.php:42
 msgid "Triggers info"
-msgstr "Info triggers"
+msgstr "Informações sobre triggers"
 
 #: include/classes/screens/CScreenTriggersOverview.php:84
 #: include/screens.inc.php:43
@@ -14555,7 +14555,7 @@ msgstr "URL"
 
 #: include/views/administration.users.edit.php:183
 msgid "URL (after login)"
-msgstr "URL (ao sair)"
+msgstr "URL (após se autenticar)"
 
 #: include/hosts.inc.php:269
 msgid "URL A"
@@ -15030,7 +15030,7 @@ msgstr "Usar multiplicador customizado"
 
 #: include/views/administration.users.edit.php:196 popup_media.php:136
 msgid "Use if severity"
-msgstr "Usar se risco"
+msgstr "Usar se severidade"
 
 #: app/views/administration.mediatype.list.php:46
 msgid "Used in actions"
@@ -15170,7 +15170,7 @@ msgstr "Um usuário não pode excluir a sí próprio."
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "Está faltando parâmetro na macro de usuário: %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -15778,7 +15778,7 @@ msgstr "Bem vindo a"
 
 #: include/views/administration.users.edit.php:196 popup_media.php:135
 msgid "When active"
-msgstr "Quando ativo"
+msgstr "Ativo quando"
 
 #: graphs.php:41 include/views/configuration.graph.edit.php:59
 #: include/views/configuration.graph.list.php:73
@@ -16454,7 +16454,7 @@ msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
-msgstr ""
+msgstr "macro vazia"
 
 #: include/views/js/administration.general.macros.edit.js.php:35
 msgid "macro(s)"
@@ -16686,7 +16686,7 @@ msgstr "final inesperado da chave"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "fim inesperado da macro"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
