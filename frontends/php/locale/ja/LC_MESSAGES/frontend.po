@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: 2015-10-30 01:40+0300\n"
+"POT-Creation-Date: 2015-12-27 14:53+0200\n"
+"PO-Revision-Date: 2015-12-02 05:38+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1446162023.0\n"
+"X-POOTLE-MTIME: 1449027515.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -5543,7 +5543,7 @@ msgstr "固定"
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
-msgstr "個別設定"
+msgstr "例外設定"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -8036,7 +8036,7 @@ msgstr "1つ目のパラメータが正しくありません。"
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr "更新間隔の個別設定が正しくありません: \"%1$s\"が\"%2$s\"の最大更新間隔を超えています。"
+msgstr "更新間隔の例外設定が正しくありません: \"%1$s\"が\"%2$s\"の最大更新間隔を超えています。"
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8168,7 +8168,7 @@ msgstr "キー\"%1$s\": %2$sが正しくありません。"
 #: include/classes/api/services/CUserMacro.php:650
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "マクロ\"%1$s\": %2$sが正しくありません。"
 
 #: maintenance.php:324
 msgid "Invalid maintenance period"
@@ -15062,7 +15062,7 @@ msgstr "自身のユーザーアカウントは削除できません。"
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "ユーザーマクロがパラメータに設定されていません: %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -16340,7 +16340,7 @@ msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
-msgstr ""
+msgstr "マクロが設定されていません"
 
 #: include/views/js/administration.general.macros.edit.js.php:35
 msgid "macro(s)"
@@ -16572,7 +16572,7 @@ msgstr "キーの末尾が間違っています"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "マクロの末尾が間違っています"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129

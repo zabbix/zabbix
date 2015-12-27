@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: 2015-10-29 15:46+0300\n"
+"POT-Creation-Date: 2015-12-27 14:53+0200\n"
+"PO-Revision-Date: 2015-11-13 11:26+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1446126380.0\n"
+"X-POOTLE-MTIME: 1447406795.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -8290,7 +8290,7 @@ msgstr "Neplatný klíč \"%1$s\": %2$s."
 #: include/classes/api/services/CUserMacro.php:650
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Neplatné makro \"%1$s\": %2$s."
 
 #: maintenance.php:324
 msgid "Invalid maintenance period"
@@ -15234,7 +15234,7 @@ msgstr "Uživatel nemá dovolené smazat sám sebe."
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "Chybějící parametry uživatelského makra: %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -16518,7 +16518,7 @@ msgstr ""
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
-msgstr ""
+msgstr "makro je prázdné"
 
 #: include/views/js/administration.general.macros.edit.js.php:35
 msgid "macro(s)"
@@ -16750,7 +16750,7 @@ msgstr "neočekávaný konec klíče"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "neočekávaný konec makra"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
