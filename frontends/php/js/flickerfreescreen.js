@@ -62,7 +62,7 @@ jQuery(function($) {
 			var requiredParameters = [
 				// mode			screenid		hostid	pageFile		profileIdx2		screenitemid	timeline
 				//		resourcetype	groupid					profileIdx		updateProfile	data
-				// 0	1		2		3		4		5		6		7		8		9		10
+				// 0	1		2		3		4		5		6		7		8		9		10		11
 				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_GRAPH
 				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SIMPLE_GRAPH
 				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_MAP
