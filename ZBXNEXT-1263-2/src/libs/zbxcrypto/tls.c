@@ -4935,25 +4935,60 @@ out1:
  ******************************************************************************/
 void	zbx_tls_close(zbx_socket_t *s)
 {
+	int	res;
+
 #if defined(HAVE_POLARSSL)
 	if (NULL != s->tls_ctx)
 	{
-		ssl_close_notify(s->tls_ctx);
+#if defined(_WINDOWS)
+		double	sec;
+
+		zbx_timed_out = 0;
+		sec = zbx_time();
+#endif
+		while (0 > (res = ssl_close_notify(s->tls_ctx)))
+		{
+#if defined(_WINDOWS)
+			if (s->timeout < zbx_time() - sec)
+				zbx_timed_out = 1;
+#endif
+			if (1 == zbx_timed_out)
+				break;
+
+			if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "ssl_close_notify() with %s returned error code: %d",
+						s->peer, res);
+				break;
+			}
+		}
+
 		ssl_free(s->tls_ctx);
 		zbx_free(s->tls_ctx);
 	}
 #elif defined(HAVE_GNUTLS)
-	int	res;
-
 	if (NULL != s->tls_ctx)
 	{
+#if defined(_WINDOWS)
+		double	sec;
+
+		zbx_timed_out = 0;
+		sec = zbx_time();
+#endif
 		/* shutdown TLS connection */
 		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx, GNUTLS_SHUT_RDWR)))
 		{
+#if defined(_WINDOWS)
+			if (s->timeout < zbx_time() - sec)
+				zbx_timed_out = 1;
+#endif
+			if (1 == zbx_timed_out)
+				break;
+
 			if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 				continue;
 
-			zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() with %s returned: %d %s",
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() with %s returned error code: %d %s",
 					s->peer, res, gnutls_strerror(res));
 
 			if (0 != gnutls_error_is_fatal(res))
@@ -4977,13 +5012,10 @@ void	zbx_tls_close(zbx_socket_t *s)
 		s->tls_psk_server_creds = NULL;
 	}
 #elif defined(HAVE_OPENSSL)
-	int	res;
-
 	if (NULL != s->tls_ctx)
 	{
-		/* In the best case SSL_shutdown() returns 1 (bidirectional shutdown successfully completed). */
-		/* 0 (shutdown is not yet finished) is also sufficient for us as unidirectional shutdown is allowed */
-		/* < 0 (fatal error) must be logged. */
+		/* After TLS shutdown the TCP conection will be closed. So, there is no need to do a bidirectional */
+		/* TLS shutdown - unidirectional shutdown is ok. */
 		if (0 > (res = SSL_shutdown(s->tls_ctx)))
 		{
 			int	error_code;
