@@ -21,4 +21,6 @@
 
 require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 
-$widget = (new CWidget())->setTitle(_('Status of Zabbix'))->addItem(make_status_of_zbx())->show();
+$widget = (new CWidget())
+	->setTitle(_('Status of Zabbix'))
+	->addItem(make_status_of_zbx())->show();

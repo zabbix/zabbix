@@ -39,7 +39,9 @@ $titles = [
 	'maps' => _('Maps')
 ];
 
-if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+$user_type = CWebUser::getType();
+
+if ($user_type == USER_TYPE_SUPER_ADMIN) {
 	$titles['images'] = _('Images');
 	$titles['valueMaps'] = _('Value mappings');
 }
@@ -52,6 +54,10 @@ foreach ($titles as $key => $title) {
 	if (array_key_exists('updateExisting', $data['rules'][$key])) {
 		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
 			->setChecked($data['rules'][$key]['updateExisting']);
+
+		if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+			$cbExist->setAttribute('disabled', 'disabled');
+		}
 
 		if ($key === 'images') {
 			$cbExist->onClick('updateWarning(this, '.CJs::encodeJson(_('Images for all maps will be updated!')).')');
@@ -69,10 +75,18 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['createMissing']);
 	}
 
+	if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		$cbMissed->setAttribute('disabled', 'disabled');
+	}
+
 	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
 		$cbDeleted = (new CCheckBox('rules['.$key.'][deleteMissing]'))
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('deleteMissing');
+
+		if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+			$cbDeleted->setAttribute('disabled', 'disabled');
+		}
 	}
 
 	$rulesTable->addRow([
