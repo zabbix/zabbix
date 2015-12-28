@@ -101,7 +101,7 @@ var PageRefresh = {
  * Main menu
  */
 var MMenu = {
-	menus:			{'empty': 0, 'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
+	menus:			{'view': 0, 'cm': 0, 'reports': 0, 'config': 0, 'admin': 0},
 	def_label:		null,
 	sub_active: 	false,
 	timeout_reset:	null,
@@ -125,22 +125,24 @@ var MMenu = {
 	},
 
 	showSubMenu: function(show_label) {
-		var menu_div = $('sub_' + show_label);
-		if (!is_null(menu_div)) {
+		var sub_menu = $('sub_' + show_label);
+		if (sub_menu !== null) {
 			$(show_label).className = 'selected';
-			$(show_label).firstChild.focus();
-			menu_div.show();
+			sub_menu.show();
+
 			for (var key in this.menus) {
 				if (key == show_label) {
 					continue;
 				}
 
 				var menu_cell = $(key);
-				if (!is_null(menu_cell)) {
+				if (menu_cell !== null) {
 					menu_cell.className = '';
+					jQuery('a', menu_cell).blur();
 				}
+
 				var sub_menu_cell = $('sub_' + key);
-				if (!is_null(sub_menu_cell)) {
+				if (sub_menu_cell !== null) {
 					sub_menu_cell.hide();
 				}
 			}

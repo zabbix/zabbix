@@ -104,7 +104,9 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 
 			CScreenBuilder::insertScreenCleanJs();
 
-			echo $screenBuilder->show()->toString();
+			echo (new CDiv($screenBuilder->show()))
+				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+				->toString();
 
 			CScreenBuilder::insertScreenStandardJs([
 				'timeline' => $screenBuilder->timeline,
