@@ -192,10 +192,10 @@ class CScreenHttpTestDetails extends CScreenBase {
 
 		$table->addRow([
 			bold(_('TOTAL')),
-			SPACE,
+			'',
 			bold(($total_time['value']) ? formatHistoryValue($total_time['value'], $total_time) : UNKNOWN_VALUE),
-			SPACE,
-			(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
+			'',
+			(new CSpan($status['msg']))->addClass($status['style'])
 		]);
 
 		return $this->getOutput($table);

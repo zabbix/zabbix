@@ -377,6 +377,39 @@ switch ($data['method']) {
 					}
 				}
 				break;
+
+			case 'users':
+				$users = API::User()->get([
+					'editable' => array_key_exists('editable', $data) ? $data['editable'] : null,
+					'output' => ['userid', 'alias', 'name', 'surname'],
+					'search' => array_key_exists('search', $data)
+						? [
+							'alias' => $data['search'],
+							'name' => $data['search'],
+							'surname' => $data['search']
+						]
+						: null,
+					'searchByAny' => true,
+					'limit' => $config['search_limit']
+				]);
+
+				if ($users) {
+					CArrayHelper::sort($users, [
+						['field' => 'alias', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$users = array_slice($users, 0, $data['limit']);
+					}
+
+					foreach ($users as $user) {
+						$result[] = [
+							'id' => $user['userid'],
+							'name' => getUserFullname($user)
+						];
+					}
+				}
+				break;
 		}
 		break;
 
