@@ -1065,7 +1065,7 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
  *                                                                            *
  * Function: DBdelete_trigger_hierarchy                                       *
  *                                                                            *
- * Purpose: delete parent triggers and auto-created childs from database      *
+ * Purpose: delete parent triggers and auto-created children from database    *
  *                                                                            *
  * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
@@ -1256,7 +1256,7 @@ out:
  *                                                                            *
  * Function: DBdelete_graph_hierarchy                                         *
  *                                                                            *
- * Purpose: delete parent graphs and auto-created childs from database        *
+ * Purpose: delete parent graphs and auto-created children from database      *
  *                                                                            *
  * Parameters: graphids - [IN] array of graph id's from database              *
  *                                                                            *
@@ -4451,6 +4451,47 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	zbx_vector_uint64_destroy(&selementids);
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_hosts_with_prototypes                                   *
+ *                                                                            *
+ * Purpose: delete hosts from database, check if there are any host           *
+ *          prototypes and delete them first                                  *
+ *                                                                            *
+ * Parameters: hostids - [IN] host identificators from database               *
+ *                                                                            *
+ ******************************************************************************/
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
+{
+	const char		*__function_name = "DBdelete_hosts_with_prototypes";
+
+	zbx_vector_uint64_t	host_prototypeids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&host_prototypeids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hd.hostid"
+			" from items i,host_discovery hd"
+			" where i.itemid=hd.parent_itemid"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &host_prototypeids);
+
+	DBdelete_host_prototypes(&host_prototypeids);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&host_prototypeids);
+
+	DBdelete_hosts(hostids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
