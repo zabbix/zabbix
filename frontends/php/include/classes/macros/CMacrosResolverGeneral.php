@@ -76,7 +76,7 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Checking existance of the macros.
+	 * Checking existence of the macros.
 	 *
 	 * @param array  $texts
 	 * @param array  $type
