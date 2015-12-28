@@ -121,24 +121,20 @@ class CScreenDiscovery extends CScreenBase {
 		]);
 		$dhosts = zbx_toHash($dhosts, 'dhostid');
 
-		// create table
-		$table = (new CTableInfo())->makeVerticalRotation();
-
-		$device_col = make_sorting_header(_('Discovered device'), 'ip', $sort, $sortorder,
-			'zabbix.php?action=discovery.view'
-		);
-		$device_col->addClass('left');
-
 		$header = [
-			$device_col,
-			(new CColHeader(_('Monitored host')))->addClass('left'),
-			(new CColHeader([_('Uptime').'/', _('Downtime')]))->addClass('left')
+			make_sorting_header(_('Discovered device'), 'ip', $sort, $sortorder),
+			_('Monitored host'),
+			_('Uptime').'/'._('Downtime')
 		];
 
 		foreach ($services as $name => $foo) {
 			$header[] = (new CColHeader($name))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header);
+
+		// create table
+		$table = (new CTableInfo())
+			->makeVerticalRotation()
+			->setHeader($header);
 
 		foreach ($drules as $drule) {
 			$discovery_info = [];

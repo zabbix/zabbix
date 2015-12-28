@@ -86,7 +86,7 @@ class CUserGroup extends CApiService {
 
 		// permissions
 		if ($userType != USER_TYPE_SUPER_ADMIN) {
-			if ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			if (!$options['editable']) {
 				$sqlParts['where'][] = 'g.usrgrpid IN ('.
 					'SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.

@@ -22,69 +22,46 @@
 $this->addJsFile('js/gtlc.js');
 $this->addJsFile('js/flickerfreescreen.js');
 
-$widget = (new CWidget())->setTitle(_('Maps'));
-
-$form = (new CForm('get'))->cleanItems();
-
-$controls = new CList();
-
-if ($data['maps']) {
-	$maps = [];
-	foreach ($data['maps'] as $sysmapid => $map) {
-		$maps[$sysmapid] = $map['name'];
-	}
-
-	$form->addVar('action', 'map.view')
-		->addVar('fullscreen', $data['fullscreen']);
-
-	$controls
-		->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)])
-		->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
-
-	// get map parent maps
-	$parent_maps = [];
-	foreach (getParentMaps($data['sysmapid']) as $parent) {
-		// check for permissions
-		if (array_key_exists([$parent['sysmapid']], $data['maps'])) {
-			$parent_maps[] = SPACE.SPACE;
-			$parent_maps[] = new CLink(
-				$parent['name'],
-				'zabbix.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].
-					'&severity_min='.$data['severity_min']
-			);
-		}
-	}
-	if ($parent_maps) {
-		array_unshift($parent_maps, _('Upper level maps').':');
-		$controls->addItem($parent_maps);
-	}
-
-	$table = CScreenBuilder::getScreen([
-		'resourcetype' => SCREEN_RESOURCE_MAP,
-		'mode' => SCREEN_MODE_PREVIEW,
-		'dataId' => 'mapimg',
-		'screenitem' => [
-			'screenitemid' => $data['sysmapid'],
-			'screenid' => null,
-			'resourceid' => $data['sysmapid'],
-			'width' => null,
-			'height' => null
-		]
-	])->get();
-
-	$controls->addItem(get_icon('favourite', [
-		'fav' => 'web.favorite.sysmapids',
-		'elname' => 'sysmapid',
-		'elid' => $data['sysmapid']
-	]));
-}
-else {
-	$table = (new CTable())->setNoDataMessage(_('No maps found.'));
-}
-
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
-
-$form->addItem($controls);
-$widget->setControls($form)
-	->addItem($table)
+(new CWidget())
+	->setTitle(_('Maps'))
+	->setControls(
+		(new CForm('get'))
+			->cleanItems()
+			->addVar('action', 'map.view')
+			->addVar('sysmapid', $data['map']['sysmapid'])
+			->addVar('fullscreen', $data['fullscreen'])
+			->addItem(
+				(new CList())
+					->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()])
+					->addItem(get_icon('favourite', [
+						'fav' => 'web.favorite.sysmapids',
+						'elname' => 'sysmapid',
+						'elid' => $data['map']['sysmapid']
+					]))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			)
+	)
+	->addItem(
+		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['fullscreen'],
+			$data['severity_min']
+		)
+	)
+	->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+			->addItem(
+				CScreenBuilder::getScreen([
+					'resourcetype' => SCREEN_RESOURCE_MAP,
+					'mode' => SCREEN_MODE_PREVIEW,
+					'dataId' => 'mapimg',
+					'screenitem' => [
+						'screenitemid' => $data['map']['sysmapid'],
+						'screenid' => null,
+						'resourceid' => $data['map']['sysmapid'],
+						'width' => null,
+						'height' => null
+					]
+				])->get()
+			)
+	)
 	->show();

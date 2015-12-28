@@ -87,7 +87,7 @@ class CUser extends CApiService {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			if (!$options['editable']) {
 				$sqlParts['from']['users_groups'] = 'users_groups ug';
 				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
@@ -510,18 +510,42 @@ class CUser extends CApiService {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @param array $userids
 	 *
-	 * @param array $userIds
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $userIds) {
-		if (!$userIds) {
+	protected function validateDelete(array $userids) {
+		if (!$userids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions($userIds);
-		$this->checkDeleteCurrentUser($userIds);
-		$this->checkDeleteInternal($userIds);
+		$this->checkPermissions($userids);
+		$this->checkDeleteCurrentUser($userids);
+		$this->checkDeleteInternal($userids);
+
+		// Check if deleted users have a map.
+		$user_maps = API::Map()->get([
+			'output' => ['name', 'userid'],
+			'userids' => $userids
+		]);
+
+		if ($user_maps) {
+			// Get first problem user and map.
+			$user_map = reset($user_maps);
+
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userids' => [$user_map['userid']],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is map "%2$s" owner.', $db_user['alias'], $user_map['name'])
+			);
+		}
 	}
 
 	/**
@@ -534,7 +558,13 @@ class CUser extends CApiService {
 	public function delete(array $userids) {
 		$this->validateDelete($userids);
 
-		// delete action operation msg
+		// Get users for audit log.
+		$db_users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => $userids
+		]);
+
+		// Delete action operation msg.
 		$db_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
@@ -543,7 +573,7 @@ class CUser extends CApiService {
 
 		DB::delete('opmessage_usr', ['userid' => $userids]);
 
-		// delete empty operations
+		// Delete empty operations.
 		$del_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
@@ -561,6 +591,13 @@ class CUser extends CApiService {
 		$actionids = zbx_objectValues($del_operations, 'actionid');
 		if ($actionids) {
 			$this->disableActionsWithoutOperations($actionids);
+		}
+
+		// Audit log.
+		foreach ($db_users as $db_user) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER,
+				'User alias ['.$db_user['alias'].'] name ['.$db_user['name'].'] surname ['.$db_user['surname'].']'
+			);
 		}
 
 		return ['userids' => $userids];

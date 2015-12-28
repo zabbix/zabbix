@@ -34,13 +34,14 @@ $main-subnav-bg-color: #013e62 !default;
 $main-subnav-bg-selected-color: #026dab !default;
 $main-color: #0275b8 !default;
 $font-color: #1f2c33 !default;
+$font-selected-color: #fff !default;
 $font-alt-color: #768d99 !default;
 $body-bg-color: #ebeef0 !default;
 
 
 // UI
 $ui-bg-color: #fff !default;
-$ui-bg-selected-color: #acbbc2 !default;
+$ui-bg-selected-color: #768d99 !default;
 $ui-hover-color: #eef7ff !default;
 $ui-border-color: #dfe4e7 !default;
 
@@ -57,7 +58,7 @@ $ui-tab-bg-selected-color: #0275b8 !default;
 $form-font-color: #1f2c33 !default;
 $form-bg-color: #fff !default;
 $form-border-color: #acbbc2 !default;
-$form-border-focus-color: #0275b8 !default;
+$form-border-focus-color: #02659f !default;//#0275b8 !default;
 
 $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
@@ -103,3 +104,9 @@ $link-main-subnav-color: rgba(#fff, 0.75) !default;
 $link-main-subnav-hover-color: rgba(#fff, 1) !default;
 $link-main-subnav-active-color: rgba(#fff, 1) !default;
 $link-main-subnav-visited-color: rgba(#fff, 0.75) !default;
+
+// ANALOG CLOCK
+$clock-face-color: #ebebeb!default;
+$clock-hand-color: #1f2c33 !default;
+$clock-hand-sec-color: #0275b8 !default;
+$clock-lines-color: #acbbc2 !default;

@@ -142,39 +142,6 @@ function BR() {
 	return new CTag('br');
 }
 
-function get_table_header($columnLeft, $columnRights = SPACE) {
-	$rights = [];
-
-	if ($columnRights) {
-		if (!is_array($columnRights)) {
-			$columnRights = [$columnRights];
-		}
-
-		foreach ($columnRights as $columnRight) {
-			$rights[] = (new CDiv($columnRight))->addClass('floatright');
-		}
-
-		$rights = array_reverse($rights);
-	}
-
-	$table = (new CTable())
-		->addRow([
-			(new CCol($columnLeft))
-				->addClass('header_l')
-				->addClass('left'),
-			(new CCol($rights))
-				->addClass('header_r')
-				->addClass('right')
-		]);
-
-	return $table;
-}
-
-function show_table_header($columnLeft, $columnRights = SPACE){
-	$table = get_table_header($columnLeft, $columnRights);
-	$table->show();
-}
-
 function get_icon($type, $params = []) {
 	switch ($type) {
 		case 'favourite':
@@ -326,10 +293,20 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	$list = (new CList())->addClass(ZBX_STYLE_OBJECT_GROUP);
 
 	if ($is_template) {
-		$list->addItem([
-			new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid')),
-			' / ',
+		$template = new CSpan(
 			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
+		);
+
+		if ($current_element === '') {
+			$template->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$list->addItem([
+			new CSpan(
+				new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
+			),
+			'/',
+			$template
 		]);
 
 		$db_host['hostid'] = $db_host['templateid'];
@@ -365,10 +342,16 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 				break;
 		}
 
+		$host = new CSpan(new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid']));
+
+		if ($current_element === '') {
+			$host->addClass(ZBX_STYLE_SELECTED);
+		}
+
 		$list->addItem([
-			new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid')),
-			' / ',
-			new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid'])
+			new CSpan(new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))),
+			'/',
+			$host
 		]);
 		$list->addItem($status);
 		$list->addItem(getHostAvailabilityTable($db_host));
@@ -455,13 +438,23 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem($http_tests);
 	}
 	else {
-		$list->addItem([
-			new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid')),
-			' / ',
+		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
 				CHtml::encode($db_discovery_rule['name']),
 				'host_discovery.php?form=update&itemid='.$db_discovery_rule['itemid']
 			)
+		);
+
+		if ($current_element == 'discoveries') {
+			$discovery_rule->addClass(ZBX_STYLE_SELECTED);
+		}
+
+		$list->addItem([
+			(new CSpan())->addItem(
+				new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid'))
+			),
+			'/',
+			$discovery_rule
 		]);
 
 		// item prototypes
@@ -507,6 +500,49 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			}
 			$list->addItem($host_prototypes);
 		}
+	}
+
+	return $list;
+}
+
+/**
+ * Create CDiv with sysmap information
+ *
+ * @param int    $sysmapid
+ * @param string $name
+ *
+ * @return object
+ */
+function get_header_sysmap_table($sysmapid, $name, $fullscreen, $severity_min) {
+	$list = (new CList())
+		->addClass(ZBX_STYLE_OBJECT_GROUP)
+		->addItem([
+			(new CSpan())->addItem(new CLink(_('All maps'), 'sysmaps.php')),
+			'/',
+			(new CSpan())
+				->addClass(ZBX_STYLE_SELECTED)
+				->addItem(
+					new CLink($name, 'zabbix.php?action=map.view&sysmapid='.$sysmapid.'&fullscreen='.$fullscreen.
+						'&severity_min='.$severity_min
+					)
+				)
+		]);
+
+	// get map parent maps
+	$parent_sysmaps = get_parent_sysmaps($sysmapid);
+	if ($parent_sysmaps) {
+		$hor_list = new CHorList();
+
+		foreach ($parent_sysmaps as $parent_sysmap) {
+			$hor_list->addItem(
+				new CLink($parent_sysmap['name'], 'zabbix.php?action=map.view'.
+					'&sysmapid='.$parent_sysmap['sysmapid'].'&fullscreen='.$fullscreen.'&severity_min='.$severity_min
+				)
+			);
+		}
+
+		$list->addItem(new CSpan(_('Upper level maps').':'));
+		$list->addItem($hor_list);
 	}
 
 	return $list;
