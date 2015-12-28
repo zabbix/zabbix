@@ -19,11 +19,10 @@
 **/
 
 
-$screenWidget = (new CWidget())->setTitle(_('Screens'))->addHeader($this->data['screen']['name']);
+$screenWidget = (new CWidget())->setTitle(_('Screens').': '.$this->data['screen']['name']);
 if (!empty($this->data['screen']['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
-$screenWidget->addItem(BR());
 
 $screenBuilder = new CScreenBuilder([
 	'isFlickerfree' => false,
@@ -31,7 +30,10 @@ $screenBuilder = new CScreenBuilder([
 	'mode' => SCREEN_MODE_EDIT,
 	'updateProfile' => false
 ]);
-$screenWidget->addItem($screenBuilder->show());
+
+$screenWidget->addItem(
+	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+);
 
 $screenBuilder->insertInitScreenJs($this->data['screenid']);
 $screenBuilder->insertProcessObjectsJs();
