@@ -1065,7 +1065,7 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
  *                                                                            *
  * Function: DBdelete_trigger_hierarchy                                       *
  *                                                                            *
- * Purpose: delete parent triggers and auto-created childs from database      *
+ * Purpose: delete parent triggers and auto-created children from database    *
  *                                                                            *
  * Parameters: triggerids - [IN] trigger identificators from database         *
  *                                                                            *
@@ -1256,7 +1256,7 @@ out:
  *                                                                            *
  * Function: DBdelete_graph_hierarchy                                         *
  *                                                                            *
- * Purpose: delete parent graphs and auto-created childs from database        *
+ * Purpose: delete parent graphs and auto-created children from database      *
  *                                                                            *
  * Parameters: graphids - [IN] array of graph id's from database              *
  *                                                                            *
