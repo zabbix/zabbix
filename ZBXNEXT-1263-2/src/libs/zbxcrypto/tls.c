@@ -2781,8 +2781,8 @@ void	zbx_tls_init_child(void)
 	/* Load certificate and private key. */
 	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
-		if (GNUTLS_E_SUCCESS != gnutls_certificate_set_x509_key_file(my_cert_creds, CONFIG_TLS_CERT_FILE,
-				CONFIG_TLS_KEY_FILE, GNUTLS_X509_FMT_PEM))
+		if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_set_x509_key_file(my_cert_creds, CONFIG_TLS_CERT_FILE,
+				CONFIG_TLS_KEY_FILE, GNUTLS_X509_FMT_PEM)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot load certificate or private key from file \"%s\" or \"%s\":"
 					" %d: %s", CONFIG_TLS_CERT_FILE, CONFIG_TLS_KEY_FILE, res,
