@@ -114,13 +114,6 @@ function removeObjectById(id) {
 }
 
 /**
- * Converts all HTML entities into the corresponding symbols.
- */
-jQuery.unescapeHtml = function(html) {
-	return jQuery('<div />').html(html).text();
-}
-
-/**
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
