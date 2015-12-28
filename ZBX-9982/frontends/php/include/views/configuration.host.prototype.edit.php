@@ -139,7 +139,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 
 	// IPMI interfaces
 	$row = (new CRow(
-			(new CCol(_('IPMI')))
+		(new CCol(_('IPMI')))
 			->addClass('interface_name')
 			->setRowSpan(1)
 	))
