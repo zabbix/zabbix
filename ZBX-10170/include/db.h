@@ -510,6 +510,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
