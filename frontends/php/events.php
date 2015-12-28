@@ -236,7 +236,7 @@ else {
 	$csvDisabled = true;
 
 	// header
-	$frmForm = (new CForm())
+	$frmForm = (new CForm('get'))
 		->addVar('stime', $stime, 'stime_csv')
 		->addVar('period', $period, 'period_csv')
 		->addVar('page', getPageNumber(), 'page_csv');

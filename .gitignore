@@ -106,6 +106,7 @@ sass/overlay-dialog.html
 sass/styleguide
 sass/stylesheets/*.css
 sass/stylesheets/*.map
+sass/stylesheets/sass/components.md
 sass/stylesheets/sass/index.md
 sass/stylesheets/sass/screen2.scss
 sass/stylesheets/themes

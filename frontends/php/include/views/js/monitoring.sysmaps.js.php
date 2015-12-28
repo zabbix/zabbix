@@ -94,7 +94,7 @@
 						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick('PopUp("popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid'.
+							->onClick('PopUp("popup.php?dstfrm=selementForm&dstfld1=elementid'.
 								'&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers'.
 								'&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1'.
 								'&real_hosts=1&noempty=1")')
@@ -108,7 +108,7 @@
 						(new CButton(null, _('Select')))
 							->addClass(ZBX_STYLE_BTN_GREY)
 							->onClick('PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
-								'&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1'.
+								'&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap'.
 								'&excludeids[]=#{sysmapid}")'
 							)
 					], 'mapSelectRow')
@@ -357,7 +357,7 @@
 							(new CButton(null, _('Add')))
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1'.
-									'&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1");'
+									'&reference=linktrigger&multiselect=1&with_triggers=1&noempty=1");'
 								)
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
