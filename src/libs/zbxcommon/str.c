@@ -3365,7 +3365,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                       0 if macro does not have context specified.          *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - the macro was parsed succesfully.                            *
+ *     SUCCEED - the macro was parsed successfully.                           *
  *     FAIL    - the macro parsing failed, the content of output variables    *
  *               is not defined.                                              *
  *                                                                            *
