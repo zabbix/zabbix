@@ -362,9 +362,6 @@
 		});
 
 		<?php if (!empty($this->data['templateid'])): ?>
-			$('#graphTab .input, #graphTab .button').each(function() {
-				$(this).attr('disabled', 'disabled');
-			});
 			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
 			$('select', '#itemsTable').prop('disabled', true);
 

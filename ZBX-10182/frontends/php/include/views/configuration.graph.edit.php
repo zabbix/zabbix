@@ -54,7 +54,7 @@ if ($has_templates === true) {
 $form_fields = ['graph_type' => new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()),
 	'show_legend' => new CCheckBox('show_legend'),
 	'show_working_period' => new CCheckBox('show_work_period'),
-	'show_triggers' => new ccheckbox('show_triggers'),
+	'show_triggers' => new CCheckbox('show_triggers'),
 	'percent_left_checkbox' => new CCheckBox('visible[percent_left]'),
 	'percent_right_checkbox' => new CCheckBox('visible[percent_right]'),
 	'yaxis_min_data' => new CComboBox('ymin_type', $this->data['ymin_type'], null, [
@@ -82,13 +82,12 @@ $graphFormList
 	)
 	->addRow(_('Width'),
 		(new CNumericBox('width', $this->data['width'], 5, $has_templates))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Height'),
 		(new CNumericBox('height', $this->data['height'], 5, $has_templates))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-	);
-$graphFormList
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
 	->addRow(_('Graph type'), $form_fields['graph_type'])
 	->addRow(_('Show legend'), $form_fields['show_legend']->setChecked($this->data['show_legend'] == 1));
 
@@ -106,11 +105,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->onClick('javascript: showHideVisible("percent_left");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
-			$form_fields['percent_left_checkbox']->setChecked(1);
+			$form_fields['percent_left_checkbox']->setChecked(true);
 		}
 		elseif ($this->data['percent_left'] == 0) {
 			$percentLeftTextBox->addStyle('visibility: hidden;');
-			$form_fields['percent_left_checkbox']->setChecked(0);
+			$form_fields['percent_left_checkbox']->setChecked(false);
 		}
 
 		$graphFormList->addRow(_('Percentile line (left)'), [$form_fields['percent_left_checkbox'], SPACE, $percentLeftTextBox]);
@@ -122,11 +121,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->onClick('javascript: showHideVisible("percent_right");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
-			$form_fields['percent_right_checkbox']->setChecked(1);
+			$form_fields['percent_right_checkbox']->setChecked(true);
 		}
 		elseif ($this->data['percent_right'] == 0) {
 			$percentRightTextBox->addStyle('visibility: hidden;');
-			$form_fields['percent_right_checkbox']->setChecked(0);
+			$form_fields['percent_right_checkbox']->setChecked(false);
 		}
 
 		$graphFormList->addRow(_('Percentile line (right)'), [$form_fields['percent_right_checkbox'], SPACE, $percentRightTextBox]);
@@ -246,7 +245,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 }
 else {
 	$graphFormList->addRow(_('3D view'),
-		(new CCheckBox('show_3d'))->setChecked($this->data['show_3d'] == 1)
+		!$has_templates
+			? (new CCheckBox('show_3d'))->setChecked($this->data['show_3d'] == 1)
+			: (new CCheckBox('show_3d'))->setChecked($this->data['show_3d'] == 1)->setEnabled(false)
 	);
 }
 
@@ -272,12 +273,12 @@ $itemsTable = (new CTable())
 				->setWidth(80)
 			: null,
 		(new CColHeader(_('Colour')))->setWidth(100),
-		(!$has_templates) ? (new CColHeader(_('Action')))->setWidth(50) : null
+		!$has_templates ? (new CColHeader(_('Action')))->setWidth(50) : null
 	]);
 
 $itemsTable->addRow(
 	(new CRow(
-		(!$has_templates)
+		!$has_templates
 			? (new CCol(
 				new CHorList([
 					(new CButton('add_item', _('Add')))
@@ -289,8 +290,7 @@ $itemsTable->addRow(
 						? (new CButton('add_protoitem', _('Add prototype')))
 							->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
 								url_param($this->data['graphtype'], false, 'graphtype').
-								url_param('parent_discoveryid').
-								($this->data['normal_only'] ? '&normal_only=1' : '').
+								url_param('parent_discoveryid').($this->data['normal_only'] ? '&normal_only=1' : '').
 								'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
