@@ -237,7 +237,7 @@ class CDRule extends CZBXAPI {
 	return !empty($objs);
 	}
 
-	public function checkInput(array &$dRules) {
+	public function checkInput(array &$dRules, $method) {
 		$dRules = zbx_toArray($dRules);
 
 		if (empty($dRules)) {
@@ -250,26 +250,31 @@ class CDRule extends CZBXAPI {
 
 		$proxies = array();
 		foreach ($dRules as $dRule) {
-			if (!isset($dRule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
-			}
-			elseif (!validate_ip_range($dRule['iprange'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+			if ($method === 'create') {
+				if (!isset($dRule['iprange'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
+				}
+				elseif (!validate_ip_range($dRule['iprange'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
+				}
+
+				if (empty($dRule['dchecks'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+				}
 			}
 
 			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
 			}
 
-			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
+			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED)
+					&& ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
 			}
 
-			if (empty($dRule['dchecks'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+			if ($dRule['dchecks']) {
+				$this->validateDChecks($dRule['dchecks']);
 			}
-
-			$this->validateDChecks($dRule['dchecks']);
 
 			if (isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']) {
 				$proxies[] = $dRule['proxy_hostid'];
@@ -292,6 +297,12 @@ class CDRule extends CZBXAPI {
 
 	protected function validateDChecks(array &$dChecks) {
 		$uniq = 0;
+
+		foreach ($dChecks as $dCheck) {
+			if (!is_array($dCheck)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s".', 'dchecks'));
+			}
+		}
 
 		foreach ($dChecks as $dcnum => $dCheck) {
 			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) $uniq++;
@@ -441,7 +452,7 @@ class CDRule extends CZBXAPI {
 	 */
 	public function create(array $dRules) {
 
-		$this->checkInput($dRules);
+		$this->checkInput($dRules, __FUNCTION__);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		// checking to the duplicate names
@@ -495,7 +506,7 @@ class CDRule extends CZBXAPI {
 	 * @return array
 	 */
 	public function update(array $dRules) {
-		$this->checkInput($dRules);
+		$this->checkInput($dRules, __FUNCTION__);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		$dRuleIds = zbx_objectValues($dRules, 'druleid');
@@ -514,7 +525,7 @@ class CDRule extends CZBXAPI {
 
 		foreach ($dRules as $dRule) {
 			// validate drule duplicate names
-			if (strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
+			if ($dRule['name'] !== NULL && strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
 				if ($this->exists($dRule)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 				}
@@ -526,31 +537,33 @@ class CDRule extends CZBXAPI {
 			);
 
 			// update dchecks
-			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
+			if ($dRule['dchecks'] !== NULL) {
+				$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 
-			$newChecks = array();
+				$newChecks = array();
 
-			foreach ($dRule['dchecks'] as $cnum => $check) {
-				if (!isset($check['druleid'])) {
-					$check['druleid'] = $dRule['druleid'];
-					unset($check['dcheckid']);
+				foreach ($dRule['dchecks'] as $cnum => $check) {
+					if (!isset($check['druleid'])) {
+						$check['druleid'] = $dRule['druleid'];
+						unset($check['dcheckid']);
 
-					$newChecks[] = array_merge($defaultValues, $check);
+						$newChecks[] = array_merge($defaultValues, $check);
 
-					unset($dRule['dchecks'][$cnum]);
+						unset($dRule['dchecks'][$cnum]);
+					}
 				}
+
+				$delDCheckIds = array_diff(
+					zbx_objectValues($dbChecks, 'dcheckid'),
+					zbx_objectValues($dRule['dchecks'], 'dcheckid')
+				);
+
+				if ($delDCheckIds) {
+					$this->deleteActionConditions($delDCheckIds);
+				}
+
+				DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
 			}
-
-			$delDCheckIds = array_diff(
-				zbx_objectValues($dbChecks, 'dcheckid'),
-				zbx_objectValues($dRule['dchecks'], 'dcheckid')
-			);
-
-			if ($delDCheckIds) {
-				$this->deleteActionConditions($delDCheckIds);
-			}
-
-			DB::replace('dchecks', $dbChecks, array_merge($dRule['dchecks'], $newChecks));
 		}
 
 		DB::update('drules', $dRulesUpdate);
