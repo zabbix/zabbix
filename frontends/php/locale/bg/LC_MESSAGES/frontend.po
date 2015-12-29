@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
+"POT-Creation-Date: 2015-12-29 14:05+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -5730,6 +5730,10 @@ msgid "Generated in %s sec"
 msgstr "Генерирано за %s сек"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "Немски (de_DE)"
 
@@ -5949,7 +5953,7 @@ msgstr "Графики копирани"
 msgid "Graphs deleted"
 msgstr "Графики изтрити"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "Гръцки (el_GR)"
 
@@ -6629,7 +6633,7 @@ msgstr "Часа"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "Унгарски (hu_HU)"
 
@@ -7920,7 +7924,7 @@ msgstr ""
 msgid "Incorrect web scenario ID."
 msgstr ""
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "Индонезийски (id_ID)"
 
@@ -8343,7 +8347,7 @@ msgstr "Не е възможно да се филтрира по парола н
 msgid "It is not possible to search by user password."
 msgstr "Не е възможно да се търси по парола на потребителя."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Италиански (it_IT)"
 
@@ -8628,7 +8632,7 @@ msgstr "Яну"
 msgid "January"
 msgstr "Януари"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Японски (ja_JP)"
 
@@ -8684,7 +8688,7 @@ msgstr "Ключ фраза за достъп"
 msgid "Keyword"
 msgstr "Ключова дума"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Корейски (ko_KR)"
 
@@ -8846,7 +8850,7 @@ msgstr "Последни събития"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Латвийски (lv_LV)"
 
@@ -8974,7 +8978,7 @@ msgstr ""
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -11535,7 +11539,7 @@ msgstr "Права за достъп"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Права за достъп може да бъдат назначен само за потребителски групи."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "Персийски (fa_IR)"
 
@@ -11578,7 +11582,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Моля, изберете два елемента"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "Полски (pl_PL)"
 
@@ -11615,11 +11619,11 @@ msgstr ""
 msgid "Port range"
 msgstr "Диапазон на порт"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "Португалски (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr "Португалски (pt_PT)"
 
@@ -12280,7 +12284,7 @@ msgstr ""
 msgid "Right"
 msgstr "Отдясно"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -12354,7 +12358,7 @@ msgstr "Изпълни отдалечени команди на хост"
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "Руски (ru_RU)"
 
@@ -13268,7 +13272,7 @@ msgstr "Слайдшоу"
 msgid "Slides"
 msgstr "Слайдове"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "Словашки (sk_SK)"
 
@@ -13334,7 +13338,7 @@ msgstr "Сортиране по поле \"%1$s\" не е разрешено."
 msgid "Source"
 msgstr "Източник"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "Испански (es_ES)"
 
@@ -13574,7 +13578,7 @@ msgstr ""
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "Шведски (sv_SE)"
 
@@ -14454,7 +14458,7 @@ msgstr "Вто"
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr "Турски (tr_TR)"
 
@@ -14612,7 +14616,7 @@ msgstr "URLs"
 msgid "USA (160 characters)"
 msgstr "USA (160 символа)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "Украински (uk_UA)"
 
@@ -15625,7 +15629,7 @@ msgstr "Вертикален"
 msgid "Vertical align"
 msgstr "Вертикално подравняване"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
