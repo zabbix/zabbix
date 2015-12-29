@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-29 14:05+0200\n"
-"PO-Revision-Date: 2015-09-01 10:06+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-28 18:02+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1441094804.0\n"
+"X-POOTLE-MTIME: 1451318569.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -72,8 +72,8 @@ msgstr[1] "%1$s giorni"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s evento"
+msgstr[1] "%1$s eventi"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -361,11 +361,11 @@ msgstr[1] "Azioni disabilitate"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Azione disattivata a causa cancellazione del gruppo di utenti"
 
 #: include/classes/api/services/CUser.php:1388
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Azione disattivata a causa eliminazione di utente"
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -599,7 +599,7 @@ msgstr "Agent controllo disponibilita'. Restituisce nullo - non disponibile: 1 -
 
 #: include/views/configuration.host.list.php:69
 msgid "Agent encryption"
-msgstr ""
+msgstr "Agent encryption"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -664,7 +664,7 @@ msgstr "Tutti i collegamenti devono avere \"Nome\" e \"URL\" definiti"
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "Tutte le mappe"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -865,7 +865,7 @@ msgstr "Creare almeno un intervallo di manutenzione."
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "Almeno una mappatura dovrebbe essere assegnata alla mappa valori \"%1$s\"."
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1121,7 +1121,7 @@ msgstr "Per template trigger"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: triggers.php:388
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1140,7 +1140,7 @@ msgstr "Carico CPU. Restituisce valore decimale (float)"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Percentuale di utilizzo della CPU. Restituisce valore decimale (float)"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1189,11 +1189,10 @@ msgstr "Annulla"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Impossibile aggiungere acknowledge all'evento"
-msgstr[1] "Impossibile aggiungere acknowledge all'evento"
+msgstr[1] "Impossibile aggiungere acknowledge agli eventi"
 
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
@@ -1721,7 +1720,6 @@ msgid "Cannot delete user media."
 msgstr "Impossibile rimuovere supporto utente."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Impossibile rimuovere mappa valori"
@@ -9044,7 +9042,7 @@ msgstr "Connesso come"
 #: include/views/administration.authentication.edit.php:98
 #: include/views/administration.users.list.php:53
 msgid "Login"
-msgstr "Accedi"
+msgstr "Accesso"
 
 #: include/classes/api/services/CUser.php:1102
 #, c-format
@@ -13125,7 +13123,7 @@ msgstr "Visibile"
 
 #: include/views/general.login.php:49 index.php:55 index.php:64
 msgid "Sign in"
-msgstr "Accedi"
+msgstr "Accesso"
 
 #: app/views/layout.htmlpage.menu.php:59
 msgid "Sign out"
@@ -14518,7 +14516,7 @@ msgstr "Tipi"
 #: include/translateDefines.inc.php:25
 #: include/views/js/adm.regexprs.edit.js.php:164
 msgid "UNKNOWN"
-msgstr "SCONOSCIUTI"
+msgstr "SCONOSCIUT0"
 
 #: include/triggers.inc.php:187
 msgid "UP"
@@ -14665,7 +14663,7 @@ msgstr "Unità"
 #: include/views/configuration.triggers.list.php:43
 #: include/views/js/configuration.discovery.edit.js.php:189
 msgid "Unknown"
-msgstr "Sconosciuti"
+msgstr "Sconosciuto"
 
 #: auditlogs.php:142
 msgid "Unknown action"
@@ -15521,7 +15519,6 @@ msgid "Value map added"
 msgstr "Mappa valori aggiunta"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Mappa valori rimossa"

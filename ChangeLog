@@ -1,7 +1,7 @@
 Changes for 3.0.0alpha6
 
 New features:
-A.F....... [ZBX-1357] updated Czech, Japanese, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
+A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
 ..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
