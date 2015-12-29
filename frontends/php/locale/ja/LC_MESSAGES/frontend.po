@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 14:53+0200\n"
+"POT-Creation-Date: 2015-12-29 14:05+0200\n"
 "PO-Revision-Date: 2015-12-02 05:38+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -5659,6 +5659,10 @@ msgid "Generated in %s sec"
 msgstr "Generated in %s sec"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "ドイツ語 (de_DE)"
 
@@ -5878,7 +5882,7 @@ msgstr "グラフをコピーしました"
 msgid "Graphs deleted"
 msgstr "グラフを削除しました"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "ギリシャ語 (el_GR)"
 
@@ -6551,7 +6555,7 @@ msgstr "時間"
 msgid "Housekeeping"
 msgstr "データの保存期間"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "ハンガリー語 (hu_HU)"
 
@@ -7835,7 +7839,7 @@ msgstr "プロキシのステータス\"%1$s\"に使用されている値が正�
 msgid "Incorrect web scenario ID."
 msgstr "WebシナリオIDが正しくありません。"
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "インドネシア語 (id_ID)"
 
@@ -8258,7 +8262,7 @@ msgstr "ユーザーのパスワードによるフィルターは行えません
 msgid "It is not possible to search by user password."
 msgstr "ユーザーのパスワードによる検索は行えません。"
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "イタリア語 (it_IT)"
 
@@ -8539,7 +8543,7 @@ msgstr "1月"
 msgid "January"
 msgstr "1月"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "日本語 (ja_JP)"
 
@@ -8595,7 +8599,7 @@ msgstr "キーのパスフレーズ"
 msgid "Keyword"
 msgstr "キーワード"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "韓国語 (ko_KR)"
 
@@ -8756,7 +8760,7 @@ msgstr "最新のイベント"
 msgid "Latest values"
 msgstr "最新の値"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "ラトビア語 (lv_LV)"
 
@@ -8884,7 +8888,7 @@ msgstr "インストールされたパッケージリスト。テキスト値を
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "サービスのリスト。空であれば「0」を返し、存在する場合はサービスのリストを改行で区切られたテキスト値を返す。"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr "リトアニア語 (lt_LT)"
 
@@ -11433,7 +11437,7 @@ msgstr "権限"
 msgid "Permissions can be assigned for user groups only."
 msgstr "権限はユーザーグループにのみ割り当てることができます。"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "ペルシャ語 (fa_IR)"
 
@@ -11476,7 +11480,7 @@ msgstr "Zabbixサーバーのホスト名かホストのIPアドレスとポー�
 msgid "Please select two elements"
 msgstr "2つの要素を選択してください"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "ポーランド語 (pl_PL)"
 
@@ -11513,11 +11517,11 @@ msgstr "ポート"
 msgid "Port range"
 msgstr "ポートの範囲"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "ポルトガル語 (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr "ポルトガル語 (pt_PT)"
 
@@ -12172,7 +12176,7 @@ msgstr "ICMP pingパケットのロスト率を返却。"
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr "ルーマニア語 (ro_RO)"
 
@@ -12246,7 +12250,7 @@ msgstr "ホストでリモートコマンドを実行"
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "ロシア語 (ru_RU)"
 
@@ -13157,7 +13161,7 @@ msgstr "スライドショー"
 msgid "Slides"
 msgstr "スライド"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "スロバキア語 (sk_SK)"
 
@@ -13223,7 +13227,7 @@ msgstr "フィールド\"%1$s\"による並べ替えは許可されていませ�
 msgid "Source"
 msgstr "ソース"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "スペイン語(es_ES)"
 
@@ -13463,7 +13467,7 @@ msgstr "スワップアウト（メモリからデバイスへ）の統計。 �
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "スワップ容量のサイズ。バイト単位であれば整数値を返し、パーセンテージであれば浮動小数点値を返す。"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "スウェーデン語 (sv_SE)"
 
@@ -14335,7 +14339,7 @@ msgstr "火"
 msgid "Tuesday"
 msgstr "火曜"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr "トルコ語 (tr_TR)"
 
@@ -14493,7 +14497,7 @@ msgstr "URL"
 msgid "USA (160 characters)"
 msgstr "USA (160文字)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "ウクライナ語 (uk_UA)"
 
@@ -15502,7 +15506,7 @@ msgstr "縦"
 msgid "Vertical align"
 msgstr "縦位置"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr "ベトナム語 (vi_VN)"
 
