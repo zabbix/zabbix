@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-29 14:05+0200\n"
-"PO-Revision-Date: 2015-05-08 10:29+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-27 13:43+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1431073768.0\n"
+"X-POOTLE-MTIME: 1451216603.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -1725,7 +1725,6 @@ msgid "Cannot delete user media."
 msgstr ""
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Değer haritası silinemedi"
@@ -15516,7 +15515,6 @@ msgid "Value map added"
 msgstr "Değer haritası eklendi"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Değer haritası silindi"
