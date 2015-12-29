@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-29 14:05+0200\n"
-"PO-Revision-Date: 2015-12-02 05:38+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-28 02:15+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1449027515.0\n"
+"X-POOTLE-MTIME: 1451261706.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -651,7 +651,7 @@ msgstr "すべてのリンクに\"名前\"と\"URL\"を設定する必要があ�
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "すべてのマップ"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1697,7 +1697,6 @@ msgid "Cannot delete user media."
 msgstr "ユーザーのメディアを削除できません"
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "値のマッピングを削除できません"
@@ -3097,7 +3096,7 @@ msgstr "ホストへの接続"
 
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr ""
+msgstr "マップ編集"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3948,7 +3947,7 @@ msgstr "選択したメンテナンス期間を削除しますか？"
 
 #: include/views/monitoring.sysmap.edit.php:367
 msgid "Delete selected map?"
-msgstr ""
+msgstr "選択したマップを削除しますか？"
 
 #: include/views/monitoring.sysmap.list.php:75
 msgid "Delete selected maps?"
@@ -4010,7 +4009,7 @@ msgstr[0] "選択した値のマッピングを削除しますか？この設定
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "選択した値のマッピングを削除しますか？"
 
 #: include/views/configuration.httpconf.list.php:160
 msgid "Delete selected web scenarios?"
@@ -4537,12 +4536,12 @@ msgstr "積算グラフ表示"
 #: include/func.inc.php:1539 search.php:251 search.php:347 search.php:488
 #, c-format
 msgid "Displaying %1$s of %2$s found"
-msgstr "%2$sのうち%1$s件を表示しています"
+msgstr "%2$s件のうち%1$s件を表示しています"
 
 #: include/func.inc.php:1561
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "%3$s件のうち%1$sから%2$s件までを表示しています"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4617,7 +4616,7 @@ msgstr "アイテムプロトタイプ\"%2$s\"内のアプリケーションプ�
 #: include/classes/api/services/CMap.php:812
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "マップのための\"name\"の値\"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4676,13 +4675,13 @@ msgstr "ユーザー名\"%s\"は重複しています"
 #: include/classes/api/services/CMap.php:926
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のためのユーザー内のuserid \"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CMap.php:580
 #: include/classes/api/services/CMap.php:999
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のためのユーザーグループ内のusrgrpid \"%1$s\"が重複しています。"
 
 #: events.php:417 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4856,7 +4855,7 @@ msgstr "入力値が空白です"
 
 #: include/classes/api/services/CMap.php:778
 msgid "Empty map ID."
-msgstr ""
+msgstr "マップIDが空白です。"
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
@@ -5380,7 +5379,7 @@ msgstr "フィールド\"%1$s\"は必須です。"
 #: include/classes/api/services/CMap.php:555
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のためのフィールド\"%1$s\"が設定されていません。"
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:474
@@ -6944,7 +6943,7 @@ msgstr "実行中"
 #: include/views/monitoring.sysmap.edit.php:87
 #: include/views/monitoring.sysmap.edit.php:92
 msgid "Inaccessible user"
-msgstr ""
+msgstr "アクセスできないユーザー"
 
 #: tr_logform.php:275 tr_logform.php:308
 msgid "Include"
@@ -6959,25 +6958,25 @@ msgstr "ネットワークインターフェースの受信統計。整数値を
 #: include/classes/api/services/CMap.php:868
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "マップ\"%1$s\"の\"height\"の値が正しくありません。"
 
 #: include/classes/api/services/CMap.php:565
 #: include/classes/api/services/CMap.php:985
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のユーザーグループ内の\"permission\"の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CMap.php:491
 #: include/classes/api/services/CMap.php:912
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のユーザー内の\"permission\"の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CMap.php:452
 #: include/classes/api/services/CMap.php:874
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"の\"private\"の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -6988,7 +6987,7 @@ msgstr "サービス\"%1$s\"依存関係のフィールド\"soft\"の値が正�
 #: include/classes/api/services/CMap.php:862
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "マップ\"%1$s\"の\"width\"の値が正しくありません。"
 
 #: include/classes/api/services/CMap.php:638
 #: include/classes/api/services/CMap.php:645
@@ -7472,7 +7471,7 @@ msgstr "スクリーンの要素のマップID\"%1$s\"が正しくありませ�
 
 #: include/classes/api/services/CMap.php:779
 msgid "Incorrect map ID."
-msgstr ""
+msgstr "マップIDが正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
@@ -7726,13 +7725,13 @@ msgstr "ディスカバリルール\"%1$s\"の計算のタイプが正しくあ�
 #: include/classes/api/services/CMap.php:947
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "マップ\"%1$s\"の指定されたユーザーIDが正しくありません。"
 
 #: include/classes/api/services/CMap.php:597
 #: include/classes/api/services/CMap.php:1016
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "マップ\"%1$s\"の指定されたユーザーグループIDが正しくありません。"
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -8862,11 +8861,11 @@ msgstr "リストがありません"
 
 #: include/views/monitoring.sysmap.edit.php:347
 msgid "List of user group shares"
-msgstr ""
+msgstr "共有ユーザーグループ"
 
 #: include/views/monitoring.sysmap.edit.php:352
 msgid "List of user shares"
-msgstr ""
+msgstr "共有ユーザー"
 
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
@@ -8899,7 +8898,7 @@ msgstr "Webページ全体の秒単位での読み込み時間。浮動小数点
 
 #: include/classes/screens/CScreenClock.php:92
 msgid "Local"
-msgstr ""
+msgstr "ローカル"
 
 #: include/classes/screens/CScreenHistory.php:147
 #: include/views/configuration.screen.constructor.edit.php:610
@@ -9016,7 +9015,7 @@ msgstr "ローレベルディスカバリが\"取得不可\"の状態"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1636
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:125
 msgctxt "Monday short"
@@ -9195,7 +9194,7 @@ msgstr "マップ"
 #: include/classes/api/services/CMap.php:828
 #, c-format
 msgid "Map \"%1$s\" already exists."
-msgstr ""
+msgstr "マップ\"%1$s\"はすでに存在しています。"
 
 #: include/classes/api/services/CMap.php:500
 #: include/classes/api/services/CMap.php:574
@@ -9203,7 +9202,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:993
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "マップ\"%1$s\"は公開および読込専用で共有することはできません。"
 
 #: include/views/js/monitoring.sysmaps.js.php:2
 msgid "Map element"
@@ -9220,12 +9219,12 @@ msgstr "マップラベルのタイプ"
 
 #: include/classes/api/services/CMap.php:798
 msgid "Map name cannot be empty."
-msgstr ""
+msgstr "マップの名前は必須項目です。"
 
 #: include/classes/api/services/CMap.php:440
 #: include/classes/api/services/CMap.php:846
 msgid "Map owner cannot be empty."
-msgstr ""
+msgstr "マップの所有者は必須項目です。"
 
 #: sysmap.php:86
 msgid "Map update failed."
@@ -9876,7 +9875,7 @@ msgstr "ホストのプロトタイプに\"%1$s\"が定義されていません�
 #: include/classes/api/services/CMap.php:777
 #, c-format
 msgid "No \"%1$s\" given for map."
-msgstr ""
+msgstr "マップに\"%1$s\"が定義されていません。"
 
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
@@ -10000,7 +9999,7 @@ msgstr "アクションの実行条件が設定されていません。"
 #: include/classes/screens/CScreenClock.php:74
 #: include/classes/screens/CScreenClock.php:78
 msgid "No data"
-msgstr ""
+msgstr "データがありません"
 
 #: include/views/configuration.maintenance.edit.php:44
 #: include/views/configuration.maintenance.list.php:65
@@ -10833,7 +10832,7 @@ msgstr "Zabbixエージェント、SNMPv1、SNMPv2、SNMPv3がユニークかど
 #: include/classes/api/services/CMap.php:444
 #: include/classes/api/services/CMap.php:850
 msgid "Only administrators can set map owner."
-msgstr ""
+msgstr "管理者だけがマップの所有者を設定できます。"
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11061,7 +11060,7 @@ msgstr "プロキシごとの概要"
 #: include/views/monitoring.sysmap.edit.php:86
 #: include/views/monitoring.sysmap.edit.php:91
 msgid "Owner"
-msgstr ""
+msgstr "所有者"
 
 #: include/classes/setup/CFrontendSetup.php:368
 msgid "PHP always_populate_raw_post_data"
@@ -11606,7 +11605,7 @@ msgstr "プライバシープロトコル"
 
 #: include/views/monitoring.sysmap.edit.php:343
 msgid "Private"
-msgstr ""
+msgstr "非公開"
 
 #: include/views/configuration.action.edit.php:837
 #: include/views/configuration.host.discovery.edit.php:173
@@ -11667,7 +11666,7 @@ msgstr "プロセスごとのCPU使用率。浮動小数点値を返す。"
 
 #: include/views/monitoring.sysmap.list.php:51
 msgid "Properties"
-msgstr ""
+msgstr "プロパティ"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:265
@@ -11732,7 +11731,7 @@ msgstr "プロキシを更新しました"
 
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr ""
+msgstr "公開"
 
 #: include/views/configuration.action.edit.php:822
 #: include/views/configuration.host.discovery.edit.php:162
@@ -11775,7 +11774,7 @@ msgstr "読込専用"
 #: include/views/js/monitoring.sysmap.edit.js.php:12
 #: include/views/js/monitoring.sysmap.edit.js.php:45
 msgid "Read-only"
-msgstr ""
+msgstr "読込専用"
 
 #: include/forms.inc.php:256 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:93
@@ -12248,7 +12247,7 @@ msgstr "ホストでリモートコマンドを実行"
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
+msgstr "ホスト上で指定したコマンドの実行。コマンドの実行結果のテキスト値を返す。モードでnowaitを指定した場合はコマンドの実行結果に関わらず1を返す。"
 
 #: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
@@ -12944,14 +12943,14 @@ msgstr "深刻度(降順)"
 
 #: include/views/monitoring.sysmap.edit.php:359
 msgid "Sharing"
-msgstr ""
+msgstr "共有"
 
 #: include/classes/api/services/CMap.php:481
 #: include/classes/api/services/CMap.php:902
 #: include/classes/api/services/CMap.php:975
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"の共有オプション\"%1$s\"の値がありません。"
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:697 tr_status.php:702
@@ -14471,7 +14470,7 @@ msgstr "URL C"
 #: include/classes/api/services/CMap.php:1150
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
-msgstr ""
+msgstr "マップ\"%1$s\"のURLの名前は重複できません。"
 
 #: include/html.inc.php:108
 msgid "URL parameter cannot be array."
@@ -14485,7 +14484,7 @@ msgstr "URLパラメータが設定されていません。"
 #: include/classes/api/services/CMap.php:1144
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
-msgstr ""
+msgstr "マップ\"%1$s\"のURLには\"name\"と\"url\"の両方のフィールドが必要です。"
 
 #: include/views/configuration.sysmap.edit.php:206
 #: include/views/js/monitoring.sysmaps.js.php:162
@@ -14936,7 +14935,7 @@ msgstr "アクションで使用"
 
 #: include/views/administration.general.valuemapping.list.php:44
 msgid "Used in items"
-msgstr ""
+msgstr "アイテムで使用"
 
 #: app/views/monitoring.acknowledge.edit.php:34 httpconf.php:57
 #: include/acknow.inc.php:49 include/actions.inc.php:1183
@@ -14952,7 +14951,7 @@ msgstr "ユーザー"
 #: include/classes/api/services/CUser.php:546
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
-msgstr ""
+msgstr "ユーザー\"%1$s\"はマップ\"%2$s\"の所有者です。"
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15047,7 +15046,7 @@ msgstr "データベース停止メッセージ\"%1$s\"の送信先グループ�
 #: include/classes/api/services/CMap.php:966
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のユーザーグループでの共有にはパラメータ:%1$s が必要です。"
 
 #: include/menu.inc.php:273
 #: include/views/administration.usergroups.edit.php:22
@@ -15117,7 +15116,7 @@ msgstr "ユーザーセッション"
 #: include/classes/api/services/CMap.php:893
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "マップ\"%2$s\"のユーザーでの共有にはパラメータ:%1$s が必要です。"
 
 #: include/views/administration.users.edit.php:386
 #: include/views/administration.users.edit.php:390
@@ -15433,7 +15432,6 @@ msgid "Value map added"
 msgstr "値のマッピングを追加しました"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "値のマッピングを削除しました"
@@ -15461,11 +15459,11 @@ msgstr "値のマッピング"
 
 #: include/views/conf.import.php:46
 msgid "Value mappings"
-msgstr ""
+msgstr "値のマッピング"
 
 #: include/views/conf.import.php:68
 msgid "Value mappings for value maps will be updated!"
-msgstr ""
+msgstr "値のマッピングを更新しました！"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
@@ -16336,11 +16334,11 @@ msgstr "m"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1639
 msgid "m-d"
-msgstr ""
+msgstr "m/d"
 
 #: include/translateDefines.inc.php:32
 msgid "m-d H:i"
-msgstr ""
+msgstr "m/d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
