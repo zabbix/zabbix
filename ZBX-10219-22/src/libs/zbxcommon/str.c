@@ -3402,7 +3402,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  ******************************************************************************/
 void	zbx_strarr_init(char ***arr)
 {
-	*arr = zbx_malloc(*arr, sizeof(char **));
+	*arr = zbx_malloc(*arr, sizeof(char *));
 	**arr = NULL;
 }
 
@@ -3431,7 +3431,7 @@ void	zbx_strarr_add(char ***arr, const char *entry)
 	for (i = 0; NULL != (*arr)[i]; i++)
 		;
 
-	*arr = zbx_realloc(*arr, sizeof(char **) * (i + 2));
+	*arr = zbx_realloc(*arr, sizeof(char *) * (i + 2));
 
 	(*arr)[i] = zbx_strdup((*arr)[i], entry);
 	(*arr)[++i] = NULL;
