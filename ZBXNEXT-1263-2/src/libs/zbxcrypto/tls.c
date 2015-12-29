@@ -4976,7 +4976,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 		sec = zbx_time();
 #endif
 		/* shutdown TLS connection */
-		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx, GNUTLS_SHUT_RDWR)))
+		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx, GNUTLS_SHUT_WR)))
 		{
 #if defined(_WINDOWS)
 			if (s->timeout < zbx_time() - sec)
