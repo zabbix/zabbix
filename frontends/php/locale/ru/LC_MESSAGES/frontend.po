@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-29 14:05+0200\n"
-"PO-Revision-Date: 2015-12-26 22:28+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-27 20:35+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451161719.0\n"
+"X-POOTLE-MTIME: 1451241311.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -677,7 +677,7 @@ msgstr "У всех ссылок должны быть указаны \"Имя\"
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "Все карты сети"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1743,7 +1743,6 @@ msgid "Cannot delete user media."
 msgstr "Не удалось удалить оповещение пользователя."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Не удалось удалить преобразование значений"
@@ -3197,7 +3196,7 @@ msgstr "Подключения к узлу сети"
 
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr ""
+msgstr "Конструктор"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -4050,7 +4049,7 @@ msgstr "Удалить выбранные периоды обслуживани�
 
 #: include/views/monitoring.sysmap.edit.php:367
 msgid "Delete selected map?"
-msgstr ""
+msgstr "Удалить выбранную карту сети?"
 
 #: include/views/monitoring.sysmap.list.php:75
 msgid "Delete selected maps?"
@@ -4114,7 +4113,7 @@ msgstr[2] "Удалить выбранное преобразование зна
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "Удалить выбранные преобразования значений?"
 
 #: include/views/configuration.httpconf.list.php:160
 msgid "Delete selected web scenarios?"
@@ -4650,7 +4649,7 @@ msgstr "Отображено %1$s из %2$s найденых"
 #: include/func.inc.php:1561
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "Отображено с %1$s до %2$s из %3$s найденных"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4725,7 +4724,7 @@ msgstr "Дубликат значения \"имя\" \"%1$s\" у прототи�
 #: include/classes/api/services/CMap.php:812
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "Дубликат значения \"имя\" \"%1$s\" у карты сети."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4784,13 +4783,13 @@ msgstr "Дубликат псевдонима пользователя \"%s\"."
 #: include/classes/api/services/CMap.php:926
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Дубликат userid \"%1$s\" в пользователях у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:580
 #: include/classes/api/services/CMap.php:999
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Дубликат usrgrpid \"%1$s\" в группах пользователей у карты сети \"%2$s\"."
 
 #: events.php:417 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4964,7 +4963,7 @@ msgstr "Ничего не введено."
 
 #: include/classes/api/services/CMap.php:778
 msgid "Empty map ID."
-msgstr ""
+msgstr "Пустой ID карты сети."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
@@ -5490,7 +5489,7 @@ msgstr "Поле \"%1$s\" обязательно."
 #: include/classes/api/services/CMap.php:555
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "В поле \"%1$s\" пропущено значение у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:474
@@ -7066,7 +7065,7 @@ msgstr "В работе"
 #: include/views/monitoring.sysmap.edit.php:87
 #: include/views/monitoring.sysmap.edit.php:92
 msgid "Inaccessible user"
-msgstr ""
+msgstr "Недоступный пользователь"
 
 #: tr_logform.php:275 tr_logform.php:308
 msgid "Include"
@@ -7081,25 +7080,25 @@ msgstr "Статистика входящего трафика сетевого 
 #: include/classes/api/services/CMap.php:868
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Некорректное значение \"высоты\" у карты сети \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:565
 #: include/classes/api/services/CMap.php:985
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Некорректное значение \"permission\" \"%1$s\" в группах пользователях у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:491
 #: include/classes/api/services/CMap.php:912
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Некорректное значение \"permission\" \"%1$s\" в пользователях у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:452
 #: include/classes/api/services/CMap.php:874
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Некорректное значение \"private\" \"%1$s\" у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -7110,7 +7109,7 @@ msgstr "Некорректное значение поля \"нежесткая\
 #: include/classes/api/services/CMap.php:862
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Некорректное значение \"width\" у карты сети \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:638
 #: include/classes/api/services/CMap.php:645
@@ -7594,7 +7593,7 @@ msgstr "Указан некорректный ID карты сети \"%1$s\" д
 
 #: include/classes/api/services/CMap.php:779
 msgid "Incorrect map ID."
-msgstr ""
+msgstr "Некорректный ID карты сети."
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
@@ -7848,13 +7847,13 @@ msgstr "Некорректный тип вычисления для правил
 #: include/classes/api/services/CMap.php:947
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Указано некорректное значение ID пользователя у карты сети \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:597
 #: include/classes/api/services/CMap.php:1016
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Указано некорректное значение ID группы пользователей у карты сети \"%1$s\"."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -8994,11 +8993,11 @@ msgstr "Список пустой"
 
 #: include/views/monitoring.sysmap.edit.php:347
 msgid "List of user group shares"
-msgstr ""
+msgstr "Список групп пользователей общего доступа"
 
 #: include/views/monitoring.sysmap.edit.php:352
 msgid "List of user shares"
-msgstr ""
+msgstr "Список пользователей общего доступа"
 
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
@@ -9031,7 +9030,7 @@ msgstr "Полное время загрузки веб страницы (в с�
 
 #: include/classes/screens/CScreenClock.php:92
 msgid "Local"
-msgstr ""
+msgstr "Локальное"
 
 #: include/classes/screens/CScreenHistory.php:147
 #: include/views/configuration.screen.constructor.edit.php:610
@@ -9148,7 +9147,7 @@ msgstr "Правило низкоуровневого обнаружения в 
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1636
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:125
 msgctxt "Monday short"
@@ -9327,7 +9326,7 @@ msgstr "Карта сети"
 #: include/classes/api/services/CMap.php:828
 #, c-format
 msgid "Map \"%1$s\" already exists."
-msgstr ""
+msgstr "Карта сети \"%1$s\" уже существует."
 
 #: include/classes/api/services/CMap.php:500
 #: include/classes/api/services/CMap.php:574
@@ -9335,7 +9334,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:993
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "Карта сети \"%1$s\" является публичной и общий доступ только на чтение отключен."
 
 #: include/views/js/monitoring.sysmaps.js.php:2
 msgid "Map element"
@@ -9352,12 +9351,12 @@ msgstr "Тип подписи к карте сети"
 
 #: include/classes/api/services/CMap.php:798
 msgid "Map name cannot be empty."
-msgstr ""
+msgstr "Имя карты сети не может быть пустым."
 
 #: include/classes/api/services/CMap.php:440
 #: include/classes/api/services/CMap.php:846
 msgid "Map owner cannot be empty."
-msgstr ""
+msgstr "Владелец карты сети не может быть пустым."
 
 #: sysmap.php:86
 msgid "Map update failed."
@@ -10018,7 +10017,7 @@ msgstr "Не задано \"%1$s\" для прототипа узлов сети
 #: include/classes/api/services/CMap.php:777
 #, c-format
 msgid "No \"%1$s\" given for map."
-msgstr ""
+msgstr "Не указан \"%1$s\" у карты сети."
 
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
@@ -10142,7 +10141,7 @@ msgstr "Условия не заданы."
 #: include/classes/screens/CScreenClock.php:74
 #: include/classes/screens/CScreenClock.php:78
 msgid "No data"
-msgstr ""
+msgstr "Нет данных"
 
 #: include/views/configuration.maintenance.edit.php:44
 #: include/views/configuration.maintenance.list.php:65
@@ -10975,7 +10974,7 @@ msgstr "Только Zabbix агент, SNMPv1, SNMPv2 и SNMPv3 проверк�
 #: include/classes/api/services/CMap.php:444
 #: include/classes/api/services/CMap.php:850
 msgid "Only administrators can set map owner."
-msgstr ""
+msgstr "Только администраторы могут указывать владельца карты сети."
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11205,7 +11204,7 @@ msgstr "Обзор по прокси"
 #: include/views/monitoring.sysmap.edit.php:86
 #: include/views/monitoring.sysmap.edit.php:91
 msgid "Owner"
-msgstr ""
+msgstr "Владелец"
 
 #: include/classes/setup/CFrontendSetup.php:368
 msgid "PHP always_populate_raw_post_data"
@@ -11750,7 +11749,7 @@ msgstr "Протокол безопасности"
 
 #: include/views/monitoring.sysmap.edit.php:343
 msgid "Private"
-msgstr ""
+msgstr "Приватная"
 
 #: include/views/configuration.action.edit.php:837
 #: include/views/configuration.host.discovery.edit.php:173
@@ -11811,7 +11810,7 @@ msgstr "Утилизация CPU процесса в процентах. Воз�
 
 #: include/views/monitoring.sysmap.list.php:51
 msgid "Properties"
-msgstr ""
+msgstr "Свойства"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:265
@@ -11878,7 +11877,7 @@ msgstr "Прокси обновлен"
 
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr ""
+msgstr "Публичная"
 
 #: include/views/configuration.action.edit.php:822
 #: include/views/configuration.host.discovery.edit.php:162
@@ -11921,7 +11920,7 @@ msgstr "Только чтение"
 #: include/views/js/monitoring.sysmap.edit.js.php:12
 #: include/views/js/monitoring.sysmap.edit.js.php:45
 msgid "Read-only"
-msgstr ""
+msgstr "Только чтение"
 
 #: include/forms.inc.php:256 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:93
@@ -12397,7 +12396,7 @@ msgstr "Выполнить удаленные команды на узлах с�
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
+msgstr "Выполнение заданной команды на узле сети. Возвращает текстовый результат команды; 1 - при наличии  режима nowait (вне зависимости от результата команды)"
 
 #: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
@@ -13095,14 +13094,14 @@ msgstr "Важность (в порядке убывания)"
 
 #: include/views/monitoring.sysmap.edit.php:359
 msgid "Sharing"
-msgstr ""
+msgstr "Общий доступ"
 
 #: include/classes/api/services/CMap.php:481
 #: include/classes/api/services/CMap.php:902
 #: include/classes/api/services/CMap.php:975
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "Отсутствует значение опции общего доступа \"%1$s\"  у карты сети \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:697 tr_status.php:702
@@ -14640,7 +14639,7 @@ msgstr "URL C"
 #: include/classes/api/services/CMap.php:1150
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
-msgstr ""
+msgstr "Имя URL должно быть уникальным у карты сети \"%1$s\"."
 
 #: include/html.inc.php:108
 msgid "URL parameter cannot be array."
@@ -14654,7 +14653,7 @@ msgstr "Параметр URL не может быть пустым."
 #: include/classes/api/services/CMap.php:1144
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
-msgstr ""
+msgstr "URL должно быть с обоими полями \"name\" и \"url\" у карты сети \"%1$s\"."
 
 #: include/views/configuration.sysmap.edit.php:206
 #: include/views/js/monitoring.sysmaps.js.php:162
@@ -15105,7 +15104,7 @@ msgstr "Используется в действиях"
 
 #: include/views/administration.general.valuemapping.list.php:44
 msgid "Used in items"
-msgstr ""
+msgstr "Используется в элементах данных"
 
 #: app/views/monitoring.acknowledge.edit.php:34 httpconf.php:57
 #: include/acknow.inc.php:49 include/actions.inc.php:1183
@@ -15121,7 +15120,7 @@ msgstr "Пользователь"
 #: include/classes/api/services/CUser.php:546
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
-msgstr ""
+msgstr "Пользователь \"%1$s\" является владельцем \"%2$s\" карты сети."
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15220,7 +15219,7 @@ msgstr "Группы пользователей для сообщения при
 #: include/classes/api/services/CMap.php:966
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Общий доступ группе пользователей имеет отсутствующие параметры: %1$s у карты сети \"%2$s\"."
 
 #: include/menu.inc.php:273
 #: include/views/administration.usergroups.edit.php:22
@@ -15290,7 +15289,7 @@ msgstr "Сессии пользователей"
 #: include/classes/api/services/CMap.php:893
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Общий доступ пользователям имеет отсутствующие параметры: %1$s у карты сети \"%2$s\"."
 
 #: include/views/administration.users.edit.php:386
 #: include/views/administration.users.edit.php:390
@@ -15606,7 +15605,6 @@ msgid "Value map added"
 msgstr "Преобразование значений добавлено"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Преобразование значение удалено"
@@ -15636,11 +15634,11 @@ msgstr "Преобразование значений"
 
 #: include/views/conf.import.php:46
 msgid "Value mappings"
-msgstr ""
+msgstr "Преобразования значений"
 
 #: include/views/conf.import.php:68
 msgid "Value mappings for value maps will be updated!"
-msgstr ""
+msgstr "Соответствия значений у преобразований значений будут обновлены!"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
@@ -16515,11 +16513,11 @@ msgstr "м"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1639
 msgid "m-d"
-msgstr ""
+msgstr "m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "m-d H:i"
-msgstr ""
+msgstr "m-d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
