@@ -225,7 +225,7 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 					&rawValues[*olderRawValue])))
 	{
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCalculateCounterFromRawValue(function, counterpath, &status,
-				handle, &rawValues, &olderRawValue, &counterValue)))
+				handle, rawValues, &olderRawValue, &counterValue)))
 		{
 			*value = counterValue.doubleValue;
 			break;
