@@ -334,45 +334,8 @@ void	collect_perfstat()
 			continue;
 		}
 
-		cptr->olderRawValue = (cptr->olderRawValue + 1) & 1;
-
-		pdh_status = PdhCalculateCounterFromRawValue(cptr->handle, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100,
-				&cptr->rawValues[(cptr->olderRawValue + 1) & 1],
-				(PERF_COUNTER_INITIALIZED < cptr->status ? &cptr->rawValues[cptr->olderRawValue] : NULL),
-				&value);
-
-		if (ERROR_SUCCESS == pdh_status && PDH_CSTATUS_VALID_DATA != value.CStatus &&
-				PDH_CSTATUS_NEW_DATA != value.CStatus)
-		{
-			pdh_status = value.CStatus;
-		}
-
-		if (PDH_CSTATUS_INVALID_DATA == pdh_status)
-		{
-			/* some (e.g., rate) counters require two raw values, MSDN lacks documentation */
-			/* about what happens but tests show that PDH_CSTATUS_INVALID_DATA is returned */
-
-			cptr->status = PERF_COUNTER_GET_SECOND_VALUE;
-			continue;
-		}
-
-		/* Negative values can occur when a counter rolls over. By default, this value entry does not appear  */
-		/* in the registry and Performance Monitor does not log data errors or notify the user that it has    */
-		/* received bad data; More info: https://support.microsoft.com/kb/177655/EN-US                        */
-
-		if (PDH_CALC_NEGATIVE_DENOMINATOR == pdh_status)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "PDH_CALC_NEGATIVE_DENOMINATOR error occurred in counterpath '%s'."
-					" Value ignored", cptr->counterpath);
-			continue;
-		}
-
-		if (PDH_CALC_NEGATIVE_VALUE == pdh_status)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "PDH_CALC_NEGATIVE_VALUE error occurred in counterpath '%s'."
-					" Value ignored", cptr->counterpath);
-			continue;
-		}
+		pdh_status = zbx_PdhCalculateCounterFromRawValue(__function_name, cptr->counterpath, &cptr->status,
+				cptr->handle, cptr->rawValues, &cptr->olderRawValue, &value);
 
 		if (ERROR_SUCCESS == pdh_status)
 		{
@@ -385,11 +348,9 @@ void	collect_perfstat()
 			if (cptr->value_count < cptr->interval)
 				cptr->value_count++;
 		}
-		else
+		else if (PDH_CSTATUS_INVALID_DATA != pdh_status && PDH_CALC_NEGATIVE_DENOMINATOR != pdh_status &&
+				PDH_CALC_NEGATIVE_TIMEBASE != pdh_status && PDH_CALC_NEGATIVE_VALUE != pdh_status)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate performance counter value \"%s\": %s",
-					cptr->counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
-
 			deactivate_perf_counter(cptr);
 		}
 	}
