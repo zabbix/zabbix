@@ -454,21 +454,20 @@ function getMenuPopupMap(options) {
 
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
+			var url = new Curl('events.php?filter_set=1&source=0');
+
 			var events = {
 				label: t('Events'),
 				url: url.getUrl()
 			};
 
-			if (options.gotos.showEvents) {
+			if (!options.gotos.showEvents) {
 				events.disabled = true;
 			}
 			else {
-				var url = new Curl('events.php?filter_set=1&source=0');
-
 				jQuery.each(options.gotos.events, function(name, value) {
 					url.setArgument(name, value);
 				});
-
 			}
 
 			gotos[gotos.length] = events;
