@@ -74,12 +74,12 @@ extern "C" void	zbx_co_uninitialize()
 extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*wmi_namespace, *wmi_query;
-	IWbemClassObject	*pclsObj = 0;
+	IWbemClassObject	*pclsObj = NULL;
 	ULONG			uReturn = 0;
 	VARIANT			vtProp;
-	IWbemLocator		*pLoc = 0;
-	IWbemServices		*pService = 0;
-	IEnumWbemClassObject	*pEnumerator = 0;
+	IWbemLocator		*pLoc = NULL;
+	IWbemServices		*pService = NULL;
+	IEnumWbemClassObject	*pEnumerator = NULL;
 	HRESULT			hres;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -98,18 +98,18 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	wmi_namespace = get_rparam(request, 0);
 	wmi_query = get_rparam(request, 1);
 
-	VariantInit(&vtProp);
-
 	/* obtain the initial locator to Windows Management on a particular host computer */
-	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
+	hres = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *)&pLoc);
 
-	if (FAILED(hres))
+	if (FAILED(hres) || NULL == pLoc)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain WMI locator service");
 		goto out;
 	}
 
-	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, 0, NULL, 0, 0, &pService);
+	/* connect to the WMI namespace */
+	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, NULL, WBEM_FLAG_CONNECT_USE_MAX_WAIT,
+			NULL, NULL, &pService);
 
 	if (FAILED(hres))
 	{
@@ -127,35 +127,54 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
+	/* perform a WQL query, get the results' enumerator */
 	hres = pService->ExecQuery(_bstr_t("WQL"), _bstr_t(wmi_query),
 			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
 
-	if (FAILED(hres))
+	if (FAILED(hres) || NULL == pEnumerator)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "failed to execute WMI query %s", wmi_query);
 		goto out;
 	}
 
+	/* TODO: add example (Win32_BootConfiguration fits the purpose) */
+
+	/* get the first object (row) from the query results */
 	hres = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
 
-	if (0 == uReturn)
+	if (FAILED(hres) || 1 != uReturn)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get the object from WMI query results");
 		goto out;
+	}
 
+	/* get the value of the first property (column) of the object */
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
 	if (FAILED(hres))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot start WMI query result enumeration");
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot enumerate properties of WMI object");
 		goto out;
 	}
 
+	VariantInit(&vtProp);
 	hres = pclsObj->Next(0, NULL, &vtProp, 0, 0);
 
-	pclsObj->EndEnumeration();
-
 	if (FAILED(hres) || hres == WBEM_S_NO_MORE_DATA)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get property from WMI object");
 		goto out;
+	}
 
+	hres = pclsObj->EndEnumeration();
+
+	if (FAILED(hres))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot terminate enumeration of WMI object's properties");
+		/* continue since calling EndEnumeration() is optional */
+	}
+
+	/* convert value from WMI type to string */
 	if (0 != (vtProp.vt & VT_ARRAY))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI array result");
@@ -220,16 +239,16 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 out:
 	VariantClear(&vtProp);
 
-	if (0 != pclsObj)
+	if (NULL != pclsObj)
 		pclsObj->Release();
 
-	if (0 != pEnumerator)
+	if (NULL != pEnumerator)
 		pEnumerator->Release();
 
-	if (0 != pService)
+	if (NULL != pService)
 		pService->Release();
 
-	if (0 != pLoc)
+	if (NULL != pLoc)
 		pLoc->Release();
 
 
