@@ -917,7 +917,7 @@ static int	zbx_is_ciphersuite_all(const int *p)
  *                                                                            *
  * Function: zbx_ciphersuites                                                 *
  *                                                                            *
- * Purpose: copy a list of ciphersuites (certificate- or PSK-related) from a  *
+ * Purpose: copy a list of ciphersuites (certificate or PSK-related) from a   *
  *          list of all supported ciphersuites                                *
  *                                                                            *
  ******************************************************************************/
@@ -2930,7 +2930,7 @@ static const char	*zbx_ctx_name(SSL_CTX *param)
 	if (ctx_psk == param)
 		return "PSK-based encryption";
 	if (ctx_all == param)
-		return "certificate- and PSK-based encryption";
+		return "certificate and PSK-based encryption";
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	return ZBX_NULL2STR(NULL);
@@ -4749,7 +4749,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD))
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate- and"
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate and"
 					" PSK-based incoming connection:");
 
 			if (NULL == ctx_cert)
