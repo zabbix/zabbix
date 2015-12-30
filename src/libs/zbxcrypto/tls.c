@@ -2933,15 +2933,14 @@ static const char	*zbx_ctx_name(SSL_CTX *param)
 		return "certificate- and PSK-based encryption";
 
 	THIS_SHOULD_NEVER_HAPPEN;
-
-	return "unknown 'ctx_...' parameter";
+	return ZBX_NULL2STR(NULL);
 }
 
 static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 {
-	const char	*__function_name = "zbx_set_ecdhe_parameters",
-			*msg = "Perfect Forward Secrecy ECDHE ciphersuites will not be available for";
-	EC_KEY		*ecdh = NULL;
+	const char	*__function_name = "zbx_set_ecdhe_parameters";
+	const char	*msg = "Perfect Forward Secrecy ECDHE ciphersuites will not be available for";
+	EC_KEY		*ecdh;
 	long		res;
 	int		ret = SUCCEED;
 
@@ -4750,7 +4749,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD))
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate and"
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate- and"
 					" PSK-based incoming connection:");
 
 			if (NULL == ctx_cert)
