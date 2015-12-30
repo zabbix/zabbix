@@ -221,7 +221,8 @@ PDH_STATUS	calculate_counter_value(const char *function, const char *counterpath
 	ts_timeout.sec += CONFIG_TIMEOUT;
 
 	while (ERROR_SUCCESS == (pdh_status = zbx_PdhCollectQueryData(function, counterpath, query)) &&
-			ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, handle, &rawData)))
+			ERROR_SUCCESS == (pdh_status = zbx_PdhGetRawCounterValue(function, counterpath, handle,
+					&rawValues[*olderRawValue])))
 	{
 		if (ERROR_SUCCESS == (pdh_status = zbx_PdhCalculateCounterFromRawValue(function, counterpath, &status,
 				handle, &rawValues, &olderRawValue, &counterValue)))
