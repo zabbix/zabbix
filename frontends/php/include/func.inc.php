@@ -468,12 +468,13 @@ function convertUnitsUptime($value) {
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
  * @param int $value	time period in seconds
- * @param bool $ignoreMillisec	without ms (1s 200 ms = 1.2s)
+ * @param bool $ignore_millisec	without ms (1s 200 ms = 1.2s)
  *
  * @return string
  */
-function convertUnitsS($value, $ignoreMillisec = false) {
-	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
+function convertUnitsS($value, $ignore_millisec = false) {
+	$secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000;
+	if ($secs < 0) {
 		$secs = -$secs;
 		$str = '-';
 	}
@@ -482,68 +483,79 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 	}
 
 	$values = ['y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null];
+
+	/*
+	 * $n_unit == 4,	(#y #m #d)
+	 * $n_unit == 3,	(#m #d #h)
+	 * $n_unit == 2,	(#d #h #mm)
+	 * $n_unit == 1,	(#h #mm #s)
+	 * $n_unit == 0,	(#mm #s) or (#mm #s #ms)
+	 */
 	$n_unit = 0;
 
-	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
+	$n = floor($secs / SEC_PER_YEAR);
+	if ($n != 0) {
 		$secs -= $n * SEC_PER_YEAR;
-		if ($n_unit == 0) {
-			$n_unit = 4;
-		}
+		$n_unit = 4;
+
 		$values['y'] = $n;
 	}
 
-	if (($n = floor($secs / SEC_PER_MONTH)) != 0) {
-		$secs -= $n * SEC_PER_MONTH;
-		// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
-		if ($n == 12) {
-			$values['y']++;
-			$values['m'] = null;
-			if ($n_unit == 0) {
-				$n_unit = 4;
-			}
-		}
-		else {
+	$n = floor($secs / SEC_PER_MONTH);
+	$secs -= $n * SEC_PER_MONTH;
+
+	if ($n == 12) {
+		$values['y']++;
+	}
+	else {
+		if ($n != 0) {
 			$values['m'] = $n;
 			if ($n_unit == 0) {
 				$n_unit = 3;
 			}
 		}
-	}
 
-	if (($n = floor($secs / SEC_PER_DAY)) != 0) {
-		$secs -= $n * SEC_PER_DAY;
-		$values['d'] = $n;
-		if ($n_unit == 0) {
-			$n_unit = 2;
+		$n = floor($secs / SEC_PER_DAY);
+		if ($n != 0) {
+			$secs -= $n * SEC_PER_DAY;
+			$values['d'] = $n;
+			if ($n_unit == 0) {
+				$n_unit = 2;
+			}
 		}
-	}
 
-	if ($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0) {
-		$secs -= $n * SEC_PER_HOUR;
-		$values['h'] = $n;
-		if ($n_unit == 0) {
-			$n_unit = 1;
+		$n = floor($secs / SEC_PER_HOUR);
+		if ($n_unit < 4 && $n != 0) {
+			$secs -= $n * SEC_PER_HOUR;
+			$values['h'] = $n;
+			if ($n_unit == 0) {
+				$n_unit = 1;
+			}
 		}
-	}
 
-	if ($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0) {
-		$secs -= $n * SEC_PER_MIN;
-		$values['mm'] = $n;
-	}
-
-	if ($n_unit < 2 && ($n = floor($secs)) != 0) {
-		$secs -= $n;
-		$values['s'] = $n;
-	}
-
-	if ($ignoreMillisec) {
-		if ($n_unit < 1 && ($n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-			$values['s'] += $n;
+		$n = floor($secs / SEC_PER_MIN);
+		if ($n_unit < 3 && $n != 0) {
+			$secs -= $n * SEC_PER_MIN;
+			$values['mm'] = $n;
 		}
-	}
-	else {
-		if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-			$values['ms'] = $n;
+
+		$n = floor($secs);
+		if ($n_unit < 2 && $n != 0) {
+			$secs -= $n;
+			$values['s'] = $n;
+		}
+
+		if ($ignore_millisec) {
+			$n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+			if ($n_unit < 1 && $n != 0) {
+				$values['s'] += $n;
+			}
+		}
+		else {
+			$n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+			if ($n_unit < 1 && $n != 0) {
+				$values['ms'] = $n;
+			}
 		}
 	}
 
@@ -555,7 +567,7 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
 	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
 
-	return $str ? rtrim($str) : 0;
+	return $str ? rtrim($str) : '0';
 }
 
 /**
@@ -1445,103 +1457,125 @@ function getPageNumber() {
  * @param array  $items				list of items
  * @param string $sortorder			the order in which items are sorted ASC or DESC
  *
- * @return CTable
+ * @return CDiv
  */
 function getPagingLine(&$items, $sortorder) {
 	global $page;
 
-	$config = select_config();
-
-	$searchLimit = '';
-	if ($config['search_limit'] < count($items)) {
-		if ($sortorder == ZBX_SORT_UP) {
-			array_pop($items);
-		}
-		else {
-			array_shift($items);
-		}
-
-		$searchLimit = '+';
-	}
-
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
 	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
-
-	if ($pagesCount == 1) {
-		return null;
-	}
-
 	$currentPage = getPageNumber();
+
 	if ($currentPage < 1) {
 		$currentPage = 1;
 	}
-
-	if ($currentPage > $pagesCount) {
+	elseif ($currentPage > $pagesCount) {
 		$currentPage = $pagesCount;
 	}
 
 	$start = ($currentPage - 1) * $rowsPerPage;
+	$tags = [];
 
-	// For MVC pages $page is not set
-	if (isset($page['file'])) {
-		CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
-		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+	if ($pagesCount > 1) {
+		// For MVC pages $page is not set
+		if (isset($page['file'])) {
+			CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
+			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+		}
+		elseif (isset($_REQUEST['action'])) {
+			CProfile::update('web.paging.lastpage', $_REQUEST['action'], PROFILE_TYPE_STR);
+			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+		}
+
+		// viewed pages (better to use not odd)
+		$pagingNavRange = 11;
+
+		$endPage = $currentPage + floor($pagingNavRange / 2);
+		if ($endPage < $pagingNavRange) {
+			$endPage = $pagingNavRange;
+		}
+		if ($endPage > $pagesCount) {
+			$endPage = $pagesCount;
+		}
+
+		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
+
+		$url = CUrlFactory::getContextUrl();
+		if ($startPage > 1) {
+			$url->setArgument('page', 1);
+			$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
+		}
+
+		if ($currentPage > 1) {
+			$url->setArgument('page', $currentPage - 1);
+			$tags[] = (new CLink(
+				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
+			))->removeSID();
+		}
+
+		for ($p = $startPage; $p <= $endPage; $p++) {
+			$url->setArgument('page', $p);
+			$link = (new CLink($p, $url->getUrl()))->removeSID();
+			if ($p == $currentPage) {
+				$link->addClass(ZBX_STYLE_PAGING_SELECTED);
+			}
+
+			$tags[] = $link;
+		}
+
+		if ($currentPage < $pagesCount) {
+			$url->setArgument('page', $currentPage + 1);
+			$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl()))->removeSID();
+		}
+
+		if ($p < $pagesCount) {
+			$url->setArgument('page', $pagesCount);
+			$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
+		}
 	}
-	elseif (isset($_REQUEST['action'])) {
-		CProfile::update('web.paging.lastpage', $_REQUEST['action'], PROFILE_TYPE_STR);
-		CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
+
+	if ($pagesCount == 1) {
+		$table_stats = _s('Displaying %1$s of %2$s found', $itemsCount, $itemsCount);
+	}
+	else {
+		$config = select_config();
+
+		$end = $start + $rowsPerPage;
+		if ($end > $itemsCount) {
+			$end = $itemsCount;
+		}
+		$total = $itemsCount;
+
+		if ($config['search_limit'] < $itemsCount) {
+			if ($sortorder == ZBX_SORT_UP) {
+				array_pop($items);
+			}
+			else {
+				array_shift($items);
+			}
+
+			$total .= '+';
+		}
+
+		$table_stats = _s('Displaying %1$s to %2$s of %3$s found', $start + 1, $end, $total);
 	}
 
 	// trim array with items to contain items for current page
 	$items = array_slice($items, $start, $rowsPerPage, true);
 
-	// viewed pages (better to use not odd)
-	$pagingNavRange = 11;
-
-	$endPage = $currentPage + floor($pagingNavRange / 2);
-	if ($endPage < $pagingNavRange) {
-		$endPage = $pagingNavRange;
-	}
-	if ($endPage > $pagesCount) {
-		$endPage = $pagesCount;
-	}
-
-	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
-
-	$tags = [];
-
-	$url = CUrlFactory::getContextUrl();
-	if ($startPage > 1) {
-		$url->setArgument('page', 1);
-		$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
-	}
-
-	if ($currentPage > 1) {
-		$url->setArgument('page', $currentPage - 1);
-		$tags[] = (new CLink(
-			(new CSpan())->addClass('arrow-left'), $url->getUrl()
-		))->removeSID();
-	}
-
-	for ($p = $startPage; $p <= $endPage; $p++) {
-		$url->setArgument('page', $p);
-		$tags[] = (new CLink($p, $url->getUrl()))
-			->addClass($p == $currentPage ? 'paging-selected' : null)
-			->removeSID();
-	}
-
-	if ($currentPage < $pagesCount) {
-		$url->setArgument('page', $currentPage + 1);
-		$tags[] = (new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl()))->removeSID();
-	}
-
-	if ($p < $pagesCount) {
-		$url->setArgument('page', $pagesCount);
-		$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
-	}
-
-	return (new CDiv($tags))->addClass('table-paging');
+	return (new CDiv())
+		->addClass(ZBX_STYLE_TABLE_PAGING)
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+				->addItem($tags)
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_TABLE_STATS)
+						->addItem($table_stats)
+				)
+		);
 }
 
 /************* MATH *************/
@@ -1694,30 +1728,22 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
-	$msg_box = (new CDiv($title))
-		->addClass($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD);
-
-	if ($show_close_box) {
-		$id = $good ? 'global-message-good' : 'global-message-bad';
-		$msg_box->setId($id);
-	}
+	$class = $good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD;
+	$msg_box = (new CDiv($title))->addClass($class);
 
 	if ($messages) {
 		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
 
 		if ($title !== null) {
-			$link = (new CLink(_('Details')))
+			$link = (new CSpan(_('Details')))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->removeSID()
-				->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
+				->onClick('javascript: showHide($(this).next(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));');
 			$msg_details->addItem($link);
 		}
 
 		$list = new CList();
 		if ($title !== null) {
-			$list
-				->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
-				->setId('msg-messages');
+			$list->addClass(ZBX_STYLE_MSG_DETAILS_BORDER);
 
 			if (!$show_details) {
 				$list->setAttribute('style', 'display: none;');
@@ -1725,7 +1751,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		}
 		foreach ($messages as $message) {
 			foreach (explode("\n", $message['message']) as $message_part) {
-				$list->addItem(/*$message['type'].'&nbsp;'.*/$message_part);
+				$list->addItem($message_part);
 			}
 		}
 		$msg_details->addItem($list);
@@ -1736,11 +1762,29 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	if ($show_close_box) {
 		$msg_box->addItem((new CSpan())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: showHide("'.$id.'", IE ? "block" : "");')
+			->onClick('javascript: $(this).closest(\'.'.$class.'\').remove();')
 			->setAttribute('title', _('Close')));
 	}
 
 	return $msg_box;
+}
+
+/**
+ * Returns the message box when messages are present; null otherwise
+ *
+ * @global array $ZBX_MESSAGES
+ *
+ * @return CDiv|null
+ */
+function getMessages()
+{
+	global $ZBX_MESSAGES;
+
+	$message_box = isset($ZBX_MESSAGES) && $ZBX_MESSAGES ? makeMessageBox(false, $ZBX_MESSAGES) : null;
+
+	$ZBX_MESSAGES = [];
+
+	return $message_box;
 }
 
 function show_messages($good = false, $okmsg = null, $errmsg = null) {
@@ -2070,13 +2114,13 @@ function set_image_header($format = null) {
 	}
 
 	if (IMAGE_FORMAT_JPEG == $format) {
-		header('Content-type:  image/jpeg');
+		header('Content-type: image/jpeg');
 	}
 	if (IMAGE_FORMAT_TEXT == $format) {
-		header('Content-type:  text/html');
+		header('Content-type: text/html');
 	}
 	else {
-		header('Content-type:  image/png');
+		header('Content-type: image/png');
 	}
 
 	header('Expires: Mon, 17 Aug 1998 12:51:50 GMT');
