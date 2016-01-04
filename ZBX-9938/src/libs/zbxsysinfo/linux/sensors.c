@@ -365,7 +365,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 				zbx_snprintf(regex, sizeof(regex), "%s[0-9]*_input", name);
 
 				if (NULL == (sensordir = opendir(devicepath)))
-					return;
+					goto out;
 
 				while (NULL != (sensorent = readdir(sensordir)))
 				{
@@ -384,6 +384,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			}
 		}
 	}
+out:
 	closedir(devicedir);
 #endif
 }

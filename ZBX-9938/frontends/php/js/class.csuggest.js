@@ -298,6 +298,7 @@ keyPressed: function(e){
 			this.hideSuggests(e);
 			break;
 		case(key==13):
+			this.needleChange(e);
 			Event.stop(e);
 			this.selectSuggest(e);
 			break;
