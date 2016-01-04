@@ -44,6 +44,7 @@
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
+extern int	CONFIG_TIMEOUT;
 extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
 
 /******************************************************************************
@@ -1274,8 +1275,15 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		if (0 != (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 		{
 			char	*error = NULL;
+			int	res;
 
-			if (SUCCEED != zbx_tls_accept(s, &error, tls_accept))
+			zbx_socket_timeout_set(s, CONFIG_TIMEOUT);
+
+			res = zbx_tls_accept(s, &error, tls_accept);
+#if !defined(_WINDOWS)
+			zbx_alarm_off();
+#endif
+			if (SUCCEED != res)
 			{
 				zbx_set_socket_strerror("from %s: %s", s->peer, error);
 				zbx_tcp_unaccept(s);

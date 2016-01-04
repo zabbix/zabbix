@@ -4248,7 +4248,9 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	int			ret = FAIL, res;
 	const x509_crt		*peer_cert;
 	const ssl_ciphersuite_t	*info;
-
+#if defined(_WINDOWS)
+	double			sec;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* set up TLS context */
@@ -4360,9 +4362,24 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
 
 	/* TLS handshake */
-
+#if defined(_WINDOWS)
+	zbx_timed_out = 0;
+	sec = zbx_time();
+#endif
 	while (0 != (res = ssl_handshake(s->tls_ctx)))
 	{
+#if defined(_WINDOWS)
+		if (s->timeout < zbx_time() - sec)
+			zbx_timed_out = 1;
+#endif
+		if (1 == zbx_timed_out)
+		{
+			*error = zbx_strdup(*error, "ssl_handshake() timed out");
+			ssl_free(s->tls_ctx);
+			zbx_free(s->tls_ctx);
+			goto out;
+		}
+
 		if (POLARSSL_ERR_NET_WANT_READ != res && POLARSSL_ERR_NET_WANT_WRITE != res)
 		{
 			if (POLARSSL_ERR_X509_CERT_VERIFY_FAILED == res)
@@ -4448,7 +4465,9 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	const char			*__function_name = "zbx_tls_accept";
 	int				ret = FAIL, res;
 	gnutls_credentials_type_t	creds;
-
+#if defined(_WINDOWS)
+	double				sec;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* set up TLS context */
@@ -4580,9 +4599,22 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	gnutls_transport_set_ptr(s->tls_ctx, (gnutls_transport_ptr_t)s->socket);
 
 	/* TLS handshake */
-
+#if defined(_WINDOWS)
+	zbx_timed_out = 0;
+	sec = zbx_time();
+#endif
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx)))
 	{
+#if defined(_WINDOWS)
+		if (s->timeout < zbx_time() - sec)
+			zbx_timed_out = 1;
+#endif
+		if (1 == zbx_timed_out)
+		{
+			*error = zbx_strdup(*error, "gnutls_handshake() timed out");
+			goto out;
+		}
+
 		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
 		{
 			continue;
@@ -4729,7 +4761,9 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	const char	*cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
-
+#if defined(_WINDOWS)
+	double		sec;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
@@ -4826,10 +4860,23 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	/* TLS handshake */
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-
+#if defined(_WINDOWS)
+	zbx_timed_out = 0;
+	sec = zbx_time();
+#endif
 	if (1 != (res = SSL_accept(s->tls_ctx)))
 	{
 		int	error_code;
+
+#if defined(_WINDOWS)
+		if (s->timeout < zbx_time() - sec)
+			zbx_timed_out = 1;
+#endif
+		if (1 == zbx_timed_out)
+		{
+			*error = zbx_strdup(*error, "SSL_accept() timed out");
+			goto out;
+		}
 
 		error_code = SSL_get_error(s->tls_ctx, res);
 
