@@ -106,7 +106,7 @@ class CMap extends CMapElement {
 			}
 			else {
 				$permission = PERM_READ;
-				$public_maps = ' OR s.private='.SYSMAP_PUBLIC;
+				$public_maps = ' OR s.private='.PUBLIC_SHARING;
 			}
 
 			$user_groups = getUserGroupsByUserId($user_data['userid']);
@@ -412,7 +412,7 @@ class CMap extends CMapElement {
 		}
 
 		$private_validator = new CLimitedSetValidator([
-			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
+			'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
 		]);
 
 		$permission_validator = new CLimitedSetValidator([
@@ -494,7 +494,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+					if (array_key_exists('private', $map) && $map['private'] == PUBLIC_SHARING
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
@@ -568,7 +568,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+					if (array_key_exists('private', $map) && $map['private'] == PUBLIC_SHARING
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
@@ -832,7 +832,7 @@ class CMap extends CMapElement {
 		}
 
 		$private_validator = new CLimitedSetValidator([
-			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
+			'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
 		]);
 
 		$permission_validator = new CLimitedSetValidator([
@@ -915,7 +915,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+					if ($map['private'] == PUBLIC_SHARING && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
 						);
@@ -988,7 +988,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+					if ($map['private'] == PUBLIC_SHARING && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
 						);
@@ -1820,13 +1820,13 @@ class CMap extends CMapElement {
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
 			// Get all allowed groups.
-			$related_groups = API::User()->get([
+			$related_users = API::User()->get([
 				'output' => ['userid'],
 				'userids' => $relation_map->getRelatedIds(),
 				'preservekeys' => true
 			]);
 
-			$related_userids = zbx_objectValues($related_groups, 'userid');
+			$related_userids = zbx_objectValues($related_users, 'userid');
 
 			$users = API::getApiService()->select('sysmap_user', [
 				'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid']),

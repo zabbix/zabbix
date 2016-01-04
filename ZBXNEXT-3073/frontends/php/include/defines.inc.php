@@ -341,8 +341,8 @@ define('SYSMAP_EXPAND_MACROS_ON',	1);
 define('SYSMAP_GRID_ALIGN_ON',	1);
 define('SYSMAP_GRID_ALIGN_OFF',	0);
 
-define('SYSMAP_PUBLIC',		0);
-define('SYSMAP_PRIVATE',	1);
+define('PUBLIC_SHARING',	0);
+define('PRIVATE_SHARING',	1);
 
 define('ZBX_ITEM_DELAY_DEFAULT', 30);
 
