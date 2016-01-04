@@ -1312,16 +1312,16 @@ footer {
 			line-height: 24px;
 		}
 
-		input {
+		//input {
 
-			&[type="checkbox"] {
-				top: -6px;
-			}
+		//	&[type="checkbox"] {
+		//		top: -6px;
+		//	}
 
-			&[type="radio"] {
-				top: -6px;
-			}
-		}
+		//	&[type="radio"] {
+		//		top: -6px;
+		//	}
+		//}
 	}
 
 	.table-forms-td-right {
@@ -1661,9 +1661,11 @@ select {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	vertical-align: bottom;
+	//vertical-align: bottom;
+	vertical-align: middle;
 	position: relative;
-	top: -2px;
+	//top: -2px;
+	top: -1px;
 	overflow: hidden;
 	width: 13px;
 	height: 13px;
