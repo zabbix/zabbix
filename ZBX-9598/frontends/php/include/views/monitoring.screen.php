@@ -36,7 +36,10 @@ $controls->addItem(new CComboBox('config', 'screens.php', 'redirect(this.options
 
 if (empty($this->data['screens'])) {
 	$headerForm->addItem($controls);
-	$screenWidget->setControls($headerForm)->addItem(BR())->addItem(new CTableInfo());
+
+	$screenWidget
+		->setControls($headerForm)
+		->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs([
@@ -111,14 +114,14 @@ else {
 		'period' => $this->data['period'],
 		'stime' => $this->data['stime']
 	]);
-	$screenWidget->addItem($screenBuilder->show());
+	$screenWidget->addItem(
+		(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+	);
 
 	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline,
 		'profileIdx' => $screenBuilder->profileIdx
 	]);
-
-	$screenWidget->addItem(BR());
 }
 
 return $screenWidget;

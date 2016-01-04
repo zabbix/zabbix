@@ -34,22 +34,20 @@ $discoveryWidget->setControls(
 		->addItem($controls)
 );
 
-// create table
-$discoveryTable = (new CTableInfo())->makeVerticalRotation();
-
-$discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
-$discoveredDeviceCol->addClass('left');
-
 $header = [
-	$discoveredDeviceCol,
-	(new CColHeader(_('Monitored host')))->addClass('left'),
-	(new CColHeader([_('Uptime').'/', _('Downtime')]))->addClass('left')
+	make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']),
+	_('Monitored host'),
+	_('Uptime').'/'._('Downtime')
 ];
 
 foreach ($data['services'] as $name => $foo) {
 	$header[] = (new CColHeader($name))->addClass('vertical_rotation');
 }
-$discoveryTable->setHeader($header);
+
+// create table
+$discoveryTable = (new CTableInfo())
+	->makeVerticalRotation()
+	->setHeader($header);
 
 foreach ($data['drules'] as $drule) {
 	$discovery_info = [];

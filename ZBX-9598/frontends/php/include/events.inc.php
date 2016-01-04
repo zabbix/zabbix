@@ -370,7 +370,7 @@ function getEventAckState($event, $backurl) {
 			->addClass(ZBX_STYLE_GREEN)
 			->removeSID();
 		if (is_array($event['acknowledges'])) {
-			$ack->setHint(makeAckTab($event), '', false);
+			$ack->setHint(makeAckTab(array_slice($event['acknowledges'], 0, ZBX_WIDGET_ROWS)), '', false);
 		}
 		$ack = [$ack, CViewHelper::showNum($acknowledges_num)];
 	}
