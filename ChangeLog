@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
+..F....... [ZBX-10145] fixed macro resolving for trigger description in dashboard (vitalijs)
 ..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
 
 --------------------------------------------------------------------------------
@@ -23,7 +24,6 @@ A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
-..F....... [ZBX-10145] fixed macro resolving for trigger description in dashboard (vitalijs)
 ...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
