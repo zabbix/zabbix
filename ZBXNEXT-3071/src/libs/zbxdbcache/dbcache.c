@@ -3035,7 +3035,7 @@ void	init_database_cache()
 	zbx_mem_create(&hc_mem, hc_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_CACHE_SIZE, "history cache",
 			"HistoryCacheSize", 1);
 
-	/* history index cache*/
+	/* history index cache */
 	zbx_mem_create(&hc_index_mem, hc_index_shm_key, ZBX_NO_MUTEX, CONFIG_HISTORY_INDEX_CACHE_SIZE,
 			"history index cache", "HistoryIndexCacheSize", 0);
 
