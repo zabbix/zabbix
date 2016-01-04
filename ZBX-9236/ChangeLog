@@ -1,10 +1,63 @@
+Changes for 3.0.0alpha6
+
+New features:
+A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
+
+Bug fixes:
+..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0alpha5
 
 New features:
+..F....... [ZBXNEXT-2662] implemented a new filter in triggers and web checks configuration lists (Sasha)
+..F....... [ZBXNEXT-2662] implemented a new screen clock (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] implemented displaying of the IT services bar graph using graph_themes (Sasha)
+..F....... [ZBXNEXT-2662] improved editing of the IT Services (Sasha)
+A.F.I..... [ZBXNEXT-3007] implemented support of public and private maps with ability to share them with other users and user groups (Oleg)
+...G...... [ZBX-10063] improved net.if.* on Windows to get values from 64-bit counters if available (Sandis)
+A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
+........S. [ZBXNEXT-3055] changed LLD lost resources deletion time calculation logic to avoid issues with invalid discovery item time stamps (gleb)
+A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ....I..... [ZBXNEXT-3037] removed unused fields "gridview" and "legendview" from "graph_theme" table (Sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+..F....... [ZBX-10145] fixed macro resolving for trigger description in dashboard (vitalijs)
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
+....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+..F....... [ZBXNEXT-2662] fixed trimming of leading and trailing spaces in the proxy encription-related fields (Sasha)
+..F....... [ZBX-10022] fixed a web scenario name into the graphs (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of the server name on the pages (Pavel, Sasha)
+..F.I..... [ZBXNEXT-2662] added ZBX_WIDGET_ROWS limitation for displaying of elements the popup windows (Sasha)
+..F....... [ZBXNEXT-2662] fixed closing of the multiple message boxes (Sasha)
+..F....... [ZBXNEXT-2662] added "Time" column in the actions popup window (Sasha)
+..F....... [ZBXNEXT-2662] fixed coloring of the configuration errors in "Status of Zabbix" widget (Sasha)
+..F....... [ZBX-4794] removed old-style flash clock (Sasha)
+..F....... [ZBX-4378] fixed several screen clock problems (Sasha)
+..F....... [ZBXNEXT-2662] fixed coloring for disabled hosts in drop-down controls (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] fixed background in Monitoring->Maps page (Sasha)
+..F....... [ZBXNEXT-2662] fixed escaping of multiselect drop-down list items (Sasha)
+..F....... [ZBXNEXT-2662] fixed the footer for "Last 20 issues" dashboard widget (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] fixed sort icons in the screen elements (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of screen elements (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] replaced <span> with <a> tag in action menu popups to allow open targets in a new browser's tab (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] fixed IT services status bar; fixed align of the root element (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] added information about number of records in tables (Pavel, Sasha)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
+..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
+........S. [ZBX-10067] fixed false event generation on log item meta information update (dimir)
+..F....... [ZBX-9998] changed output of history and trends in item list and item prototype list from #y #m #d format to #d format (vitalijs)
+..F....... [ZBX-9981] fixed validation for zabbix.conf.php saving in write protected directory (vitalijs)
+..F....... [ZBX-10139] fixed possible PHP and SQL errors on the dashdoard and screens (Sasha)
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
+...G...... [ZBX-10033] fixed Windows agent printing an incorrect error message in case of abandoned lock (Sandis)
+...G...... [ZBX-10034] fixed agent start-up failures within Windows session due to common locks abandoned by other agents (Sandis)
+..F....... [ZBX-10036] fixed showing all hosts in dashboard last 20 issues when trigger expression contains several hosts (Gunars)
 ..F....... [ZBX-9906] fixed automatic refreshing of WEB scenario details (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ...G...... [ZBX-10018] fixed inconsistent messages in debug log when UserParameter terminated by timeout (viktors)
@@ -262,8 +315,18 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.8rc1
 
 New features:
+A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
+....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
+..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
+........S. [ZBX-9950] fixed foreign key constraint violation when deleting host triggers and graphs (gleb)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -421,7 +484,7 @@ A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discov
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added Zabbix log file locking to avoid incomplete logging on log file rotation (igors)
-.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts (Ez Texting), VMware monitoring and simple checks (HTTPS services) (igors)
+...G...PS. [ZBX-591] fixed web monitoring, VMware monitoring, Ez Texting alerts and net.tcp.service{.perf}[https] items to use the SourceIP configuration parameter (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
@@ -977,8 +1040,17 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.12rc1
 
 New features:
+A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
+....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
+........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
+..F....... [ZBX-10110] fixed using Japanese in global search (Gunars)
+..F....... [ZBX-10099] fixed buffer flushing error when executing script on a host (Gunars)
+..F....... [ZBX-10077] fixed deleting of profile data for current user (Gunars)
 ...G...... [ZBX-10126] fixed compilation error in sensors.c on Linux 2.4 kernels (gleb)
 ........S. [ZBX-10084] fixed removing trigger-related network map elements (viktors)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -2315,6 +2387,8 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
+........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
 
 --------------------------------------------------------------------------------

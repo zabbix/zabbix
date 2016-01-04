@@ -629,8 +629,7 @@ class CImportReferencer {
 			$dbGroups = API::HostGroup()->get([
 				'filter' => ['name' => $this->groups],
 				'output' => ['groupid', 'name'],
-				'preservekeys' => true,
-				'editable' => true
+				'preservekeys' => true
 			]);
 			foreach ($dbGroups as $group) {
 				$this->groupsRefs[$group['name']] = $group['groupid'];
@@ -671,8 +670,7 @@ class CImportReferencer {
 				'filter' => ['host' => $this->hosts],
 				'output' => ['hostid', 'host'],
 				'preservekeys' => true,
-				'templated_hosts' => true,
-				'editable' => true
+				'templated_hosts' => true
 			]);
 			foreach ($dbHosts as $host) {
 				$this->hostsRefs[$host['host']] = $host['hostid'];
@@ -786,8 +784,7 @@ class CImportReferencer {
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
 						ZBX_FLAG_DISCOVERY_CREATED
 					]
-				],
-				'editable' => true
+				]
 			]);
 
 			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
