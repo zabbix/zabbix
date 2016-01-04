@@ -4362,6 +4362,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		ssl_set_ciphersuites(s->tls_ctx, ciphersuites_psk);
 
 	/* TLS handshake */
+
 #if defined(_WINDOWS)
 	zbx_timed_out = 0;
 	sec = zbx_time();
@@ -4599,6 +4600,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	gnutls_transport_set_ptr(s->tls_ctx, (gnutls_transport_ptr_t)s->socket);
 
 	/* TLS handshake */
+
 #if defined(_WINDOWS)
 	zbx_timed_out = 0;
 	sec = zbx_time();

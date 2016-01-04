@@ -45,6 +45,7 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
 extern int	CONFIG_TIMEOUT;
+
 extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
 
 /******************************************************************************
