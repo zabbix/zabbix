@@ -1276,7 +1276,7 @@ footer {
 		text-transform: $font-transform;
 		letter-spacing: 0.0688em;
 		text-rendering: optimizeLegibility;
-		padding: 0 10px 0 0;
+		padding: 0 5px 0 0;
 
 		&:last-child {
 			padding: 0;
@@ -1330,9 +1330,9 @@ footer {
 		vertical-align: middle;
 		width: 85%;
 
-		th {
-			padding: 0;
-		}
+		//th {
+		//	padding: 0;
+		//}
 
 		td {
 			padding: 5px 5px 5px 0;
