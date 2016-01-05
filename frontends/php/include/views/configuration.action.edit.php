@@ -386,9 +386,7 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 }
 
 // create operation table
-$operationsTable = (new CTable())
-	->setNoDataMessage(_('No operations defined.'))
-	->setAttribute('style', 'width: 100%;');
+$operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
@@ -630,12 +628,13 @@ if (!empty($this->data['new_operation'])) {
 
 			$users = API::User()->get([
 				'userids' => $userids,
-				'output' => ['alias', 'name', 'surname']
+				'output' => ['userid', 'alias', 'name', 'surname']
 			]);
 			order_result($users, 'alias');
 
 			foreach ($users as &$user) {
-				$user['fullname'] = getUserFullname($user);
+				$user['id'] = $user['userid'];
+				$user['name'] = getUserFullname($user);
 			}
 			unset($user);
 
@@ -937,7 +936,6 @@ if (!empty($this->data['new_operation'])) {
 		$grouped_opconditions = [];
 
 		$operationConditionsTable = (new CTable())
-			->setNoDataMessage(_('No conditions defined.'))
 			->setAttribute('style', 'width: 100%;')
 			->setId('operationConditionTable')
 			->setHeader([_('Label'), _('Name'), _('Action')]);

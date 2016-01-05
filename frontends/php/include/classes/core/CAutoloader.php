@@ -73,7 +73,6 @@ class CAutoloader {
 
 			if (is_file($filePath)) {
 				return $filePath;
-				break;
 			}
 		}
 

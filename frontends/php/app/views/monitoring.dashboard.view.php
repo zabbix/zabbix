@@ -146,9 +146,7 @@ foreach ($widgets as $widgetid => $widget) {
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
 		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
-		->setFooter(new CList([
-			(new CListItem(''))->setId($widgetid.'_footer')
-		]));
+		->setFooter((new CList())->setId($widgetid.'_footer'));
 
 	$widgetRefreshParams[$widgetid] = [
 		'frequency' => $rate,
