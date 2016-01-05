@@ -48,7 +48,10 @@ function local_generateHeader($data) {
 	echo $pageHeader->getOutput();
 
 	if ($data['fullscreen'] == 0) {
+		global $ZBX_SERVER_NAME;
+
 		$pageMenu = new CView('layout.htmlpage.menu', [
+			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 			'menu' => [
 				'main_menu' => $main_menu,
 				'sub_menus' => $sub_menus,
@@ -71,14 +74,14 @@ function local_generateHeader($data) {
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
-		$attempip = CProfile::get('web.login.attempt.ip', '');
-		$attempdate = CProfile::get('web.login.attempt.clock', 0);
+		$attempt_ip = CProfile::get('web.login.attempt.ip', '');
+		$attempt_date = CProfile::get('web.login.attempt.clock', 0);
 
 		$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
 			'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
-			$attempip,
-			zbx_date2str(DATE_FORMAT, $attempdate),
-			zbx_date2str(TIME_FORMAT, $attempdate),
+			$attempt_ip,
+			zbx_date2str(DATE_FORMAT, $attempt_date),
+			zbx_date2str(TIME_FORMAT, $attempt_date),
 			$failedAttempts
 		);
 		error($error_msg);

@@ -79,7 +79,6 @@
 			td.appendChild(inputRemove);
 			tr.appendChild(td);
 			document.getElementById('service_children').firstChild.appendChild(tr);
-			jQuery('#service_children .nothing-to-show').css('display', 'none');
 		}
 	}
 
