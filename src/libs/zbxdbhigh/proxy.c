@@ -1446,8 +1446,6 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "[WDN] JSON: %s", json->buffer);
-
 	return ret;
 }
 
