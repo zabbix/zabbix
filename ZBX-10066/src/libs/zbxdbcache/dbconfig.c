@@ -8024,8 +8024,9 @@ int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
  *                                                                            *
  * Function: DCget_hosts_availability                                         *
  *                                                                            *
- * Purpose: gets availability data for hosts with ability data changed int    *
- *          period from last availability update to the specified timestamp   *
+ * Purpose: gets availability data for hosts with availability data changed   *
+ *          in period from last availability update to the specified          *
+ *          timestamp                                                         *
  *                                                                            *
  * Parameters: hosts - [OUT] changed host availability data                   *
  *             ts    - [OUT] the availability diff timestamp                  *
