@@ -59,9 +59,10 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	$service = reset($service);
 
 	if ($service) {
-		$table = (new CTable())
-			->addClass('chart')
-			->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))
+		$table = (new CDiv())
+			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+			->addClass(ZBX_STYLE_CENTER)
+			->addItem(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))
 			->show();
 	}
 	else {
@@ -141,8 +142,9 @@ else {
 			'caption' => _('Service'),
 			'status' => _('Status'),
 			'reason' => _('Reason'),
-			'sla' => _('Problem time'),
-			'sla2' => nbsp(_('SLA').' / '._('Acceptable SLA'))
+			'sla' => (new CColHeader(_('Problem time')))->setColSpan(2),
+			'sla2' => null,
+			'sla3' => nbsp(_('SLA').' / '._('Acceptable SLA'))
 		]
 	);
 

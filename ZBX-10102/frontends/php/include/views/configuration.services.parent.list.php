@@ -62,7 +62,7 @@ foreach ($this->data['db_pservices'] as $db_service) {
 			self.close();
 			return false;'
 		);
-	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
+	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorithm($db_service['algorithm']), $db_service['trigger']]);
 }
 
 $servicesParentTable->setFooter(
