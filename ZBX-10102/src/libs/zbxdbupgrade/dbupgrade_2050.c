@@ -843,6 +843,17 @@ static int	DBpatch_2050092(void)
 	return DBrename_field("proxy_history", "meta", &field);
 }
 
+static int	DBpatch_2050093(void)
+{
+	/* previously, "meta" records never contained the value */
+	if (ZBX_DB_OK > DBexecute("update proxy_history set flags=3 where flags=1"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -928,5 +939,7 @@ DBPATCH_ADD(2050088, 0, 1)
 DBPATCH_ADD(2050089, 0, 1)
 DBPATCH_ADD(2050090, 0, 1)
 DBPATCH_ADD(2050091, 0, 1)
+DBPATCH_ADD(2050092, 0, 1)
+DBPATCH_ADD(2050093, 0, 1)
 
 DBPATCH_END()
