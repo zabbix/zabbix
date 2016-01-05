@@ -83,7 +83,9 @@ class CScreen extends CZBXAPI {
 
 		if ($options['countOutput'] !== null) {
 			$count_output = true;
+			$options['output'] = array('screenid');
 			$options['countOutput'] = null;
+			$options['limit'] = null;
 		}
 		else {
 			$count_output = false;
