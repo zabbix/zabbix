@@ -2352,20 +2352,34 @@ function getIconByMapping($iconMap, $inventory) {
 /**
  * Get parent maps for current map.
  *
- * @param int $mapId
+ * @param int $sysmapid
  *
  * @return array
  */
-function getParentMaps($mapId) {
-	$parentMaps = DBfetchArrayAssoc(DBselect(
-		'SELECT s.sysmapid,s.name'.
-			' FROM sysmaps s'.
-				' JOIN sysmaps_elements se ON se.sysmapid=s.sysmapid'.
-			' WHERE se.elementtype='.SYSMAP_ELEMENT_TYPE_MAP.
-				' AND se.elementid='.zbx_dbstr($mapId)
-	), 'sysmapid');
+function get_parent_sysmaps($sysmapid) {
+	$db_sysmaps_elements = DBselect(
+		'SELECT DISTINCT se.sysmapid'.
+		' FROM sysmaps_elements se'.
+		' WHERE '.dbConditionInt('se.elementtype', [SYSMAP_ELEMENT_TYPE_MAP]).
+			' AND '.dbConditionInt('se.elementid', [$sysmapid])
+	);
 
-	CArrayHelper::sort($parentMaps, ['name']);
+	$sysmapids = [];
 
-	return $parentMaps;
+	while ($db_sysmaps_element = DBfetch($db_sysmaps_elements)) {
+		$sysmapids[] = $db_sysmaps_element['sysmapid'];
+	}
+
+	if ($sysmapids) {
+		$sysmaps = API::Map()->get([
+			'output' => ['sysmapid', 'name'],
+			'sysmapids' => $sysmapids
+		]);
+
+		CArrayHelper::sort($sysmaps, ['name']);
+
+		return $sysmaps;
+	}
+
+	return [];
 }
