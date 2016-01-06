@@ -399,16 +399,14 @@ class CMap extends CMapElement {
 
 		// Check if map already exists.
 		$db_maps = $this->get([
-			'output' => ['sysmapid', 'name'],
+			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($maps, 'name')],
 			'nopermissions' => true,
 			'limit' => 1
 		]);
 
 		if ($db_maps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Map "%1$s" already exists.', $db_maps[0]['name'])
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map "%1$s" already exists.', $db_maps[0]['name']));
 		}
 
 		$private_validator = new CLimitedSetValidator([
@@ -1819,7 +1817,7 @@ class CMap extends CMapElement {
 		// Adding user shares.
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
-			// Get all allowed groups.
+			// Get all allowed users.
 			$related_users = API::User()->get([
 				'output' => ['userid'],
 				'userids' => $relation_map->getRelatedIds(),
