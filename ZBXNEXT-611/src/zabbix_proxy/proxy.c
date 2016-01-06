@@ -822,7 +822,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress ctrl+C to exit.\n\n",
+		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}

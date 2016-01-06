@@ -848,7 +848,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress ctrl+C to exit.\n\n",
+		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
