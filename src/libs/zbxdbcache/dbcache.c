@@ -56,7 +56,7 @@ extern int		CONFIG_HISTSYNCER_FREQUENCY;
 
 #define ZBX_IDS_SIZE	10
 
-#define ZBX_HC_ITEMS_INIT_SIZE		(1000)
+#define ZBX_HC_ITEMS_INIT_SIZE	1000
 
 #define ZBX_TRENDS_CLEANUP_TIME	((SEC_PER_HOUR * 55) / 60)
 
@@ -200,7 +200,7 @@ typedef struct
 }
 dc_item_value_t;
 
-char		*string_values = NULL;
+static char		*string_values = NULL;
 static size_t		string_values_alloc = 0, string_values_offset = 0;
 static dc_item_value_t	*item_values = NULL;
 static size_t		item_values_alloc = 0, item_values_num = 0;
@@ -1910,7 +1910,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
 	int			history_num, candidate_num, next_sync = 0;
-	time_t			sync_start = 0, now;
+	time_t			sync_start, now;
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_ptr_t	history_items;
 
