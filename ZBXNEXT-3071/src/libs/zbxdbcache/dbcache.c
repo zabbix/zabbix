@@ -1893,7 +1893,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  *                                                                            *
  * Return value: the timestamp of next history queue value to sync,           *
  *               0 if the queue is empty or most of items are locked by       *
- *               triggers.
+ *               triggers.                                                    *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -2014,7 +2014,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)*total_num / (cache->history_num + *total_num) * 100);
-			sync_start = time(NULL);
+			sync_start = now;
 		}
 
 		zbx_vector_ptr_clear(&history_items);
