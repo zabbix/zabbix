@@ -133,9 +133,7 @@ void	service_start(int flags)
 	if (0 == ret)
 	{
 		if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
-		{
 			zbx_error("Use --foreground command line option to run Zabbix Agent as console application\n");
-		}
 		else
 			zbx_error("StartServiceCtrlDispatcher() failed: %s", strerror_from_system(GetLastError()));
 	}

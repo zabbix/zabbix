@@ -287,8 +287,8 @@ int	zabbix_open_log(int type, int level, const char *filename)
 #ifdef _WINDOWS
 	wchar_t	*wevent_source;
 #endif
-	log_level = level;
 	log_type = type;
+	log_level = level;
 
 	if (LOG_TYPE_SYSLOG == type)
 	{
@@ -591,14 +591,13 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 int	zbx_get_log_type(const char *logtype)
 {
-	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_UNDEFINED, ZBX_OPTION_LOGTYPE_SYSLOG,
-					ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
+	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_SYSLOG, ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
 	size_t		i;
 
-	for (i = 1; i < ARRSIZE(logtypes); i++)
+	for (i = 0; i < ARRSIZE(logtypes); i++)
 	{
 		if (0 == strcmp(logtype, logtypes[i]))
-			return i;
+			return i + 1;
 	}
 
 	return LOG_TYPE_UNDEFINED;
@@ -606,19 +605,17 @@ int	zbx_get_log_type(const char *logtype)
 
 int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 {
-	int	ret = SUCCEED;
-
 	if (LOG_TYPE_UNDEFINED == CONFIG_LOG_TYPE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'", CONFIG_LOG_TYPE_STR);
-		ret = FAIL;
+		return FAIL;
 	}
 
 	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" 'console' parameter can be used only with --foreground"
 				" command line option");
-		ret = FAIL;
+		return FAIL;
 	}
 
 	if (NULL != CONFIG_LOG_FILE && '\0' != *CONFIG_LOG_FILE)
@@ -627,7 +624,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"LogFile\" parameter can be used only with \"LogType\" 'file'"
 					" parameter");
-			ret = FAIL;
+			return FAIL;
 		}
 	}
 	else
@@ -636,11 +633,11 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" 'file' parameter requires \"LogFile\" parameter"
 					" to be set");
-			ret = FAIL;
+			return FAIL;
 		}
 	}
 
-	return ret;
+	return SUCCEED;
 }
 
 /******************************************************************************

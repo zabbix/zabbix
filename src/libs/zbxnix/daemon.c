@@ -36,8 +36,6 @@ static int	daemon_flags = 0;
 extern pid_t	*threads;
 extern int	threads_num;
 
-extern char	*CONFIG_HOSTNAME;
-
 #ifdef HAVE_SIGQUEUE
 extern unsigned char	program_type;
 #endif
@@ -171,7 +169,6 @@ static void	zbx_signal_process_by_pid(int pid, int flags)
 		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: process pid:%d is not a Zabbix child"
 				" process", ZBX_RTC_GET_DATA(flags));
 	}
-
 }
 
 #endif
