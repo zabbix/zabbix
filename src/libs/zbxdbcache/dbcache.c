@@ -1939,8 +1939,11 @@ int	DCsync_history(int sync_type, int *total_num)
 	if (NULL == history)
 		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
-	zbx_vector_uint64_create(&triggerids);
-	zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_vector_uint64_create(&triggerids);
+		zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
+	}
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
@@ -2035,7 +2038,8 @@ int	DCsync_history(int sync_type, int *total_num)
 	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
 
 	zbx_vector_ptr_destroy(&history_items);
-	zbx_vector_uint64_destroy(&triggerids);
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		zbx_vector_uint64_destroy(&triggerids);
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
