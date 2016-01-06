@@ -239,19 +239,12 @@ zbx_action_condition_t;
 typedef struct
 {
 	zbx_uint64_t		actionid;
-	char			*name;
-	char			*def_shortdata;
-	char			*def_longdata;
-	char			*r_shortdata;
-	char			*r_longdata;
 	char			*formula;
 	unsigned char		eventsource;
 	unsigned char		evaltype;
-	unsigned char		recovery_msg;
-	int			esc_period;
 	zbx_vector_ptr_t	conditions;
 }
-zbx_action_t;
+zbx_action_eval_t;
 
 typedef struct
 {
@@ -490,4 +483,6 @@ void	zbx_config_clean(zbx_config_t *cfg);
 
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
+
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
 #endif
