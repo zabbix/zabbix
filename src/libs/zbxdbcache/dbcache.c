@@ -86,7 +86,6 @@ typedef struct
 	int		severity;
 	int		logeventid;
 	int		mtime;
-	int		num;		/* number of continuous values with the same itemid */
 	unsigned char	value_type;
 	unsigned char	value_undef;	/* unsupported or undefined (delta calculation failed) */
 	unsigned char	meta;		/* meta information update (log size and mtime) */
@@ -2723,17 +2722,16 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 {
 	history->itemid = itemid;
 	history->ts = data->ts;
+	history->state = data->state;
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		history->state = ITEM_STATE_NOTSUPPORTED;
 		history->value_orig.err = data->value.str;
 		history->value_undef = 1;
 
 		return;
 	}
 
-	history->state = ITEM_STATE_NORMAL;
 	history->value_undef = 0;
 	history->value_type = data->value_type;
 
@@ -2742,7 +2740,6 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 		case ITEM_VALUE_TYPE_FLOAT:
 			history->value_orig.dbl = data->value.dbl;
 			history->value.dbl = 0;
-
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			history->value_orig.ui64 = data->value.ui64;
@@ -2848,7 +2845,6 @@ static void	hc_push_unavailable_items(zbx_vector_ptr_t *history_items)
 		hc_queue_item(item);
 	}
 }
-
 
 /******************************************************************************
  *                                                                            *
