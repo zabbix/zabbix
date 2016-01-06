@@ -1402,7 +1402,7 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  * Function: get_host_availability_data                                       *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - no host availability has been changed                *
  *                                                                            *
  ******************************************************************************/
 int	get_host_availability_data(struct zbx_json *json, int *ts)

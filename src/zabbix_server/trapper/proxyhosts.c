@@ -84,7 +84,12 @@ void	send_host_availability(zbx_socket_t *sock)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	get_host_availability_data(&j, &ts);
+	/* if there are no host availability changes we still have to send empty data in response */
+	if (SUCCEED != get_host_availability_data(&j, &ts))
+	{
+		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+		zbx_json_close(&j);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
