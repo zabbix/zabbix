@@ -76,7 +76,7 @@ do						\
 {						\
 	if ((res)->type & AR_LOG)		\
 	{					\
-		zbx_logs_free((res)->logs);	\
+		zbx_log_free((res)->log);	\
 		(res)->type &= ~AR_LOG;		\
 	}					\
 }						\
@@ -113,7 +113,7 @@ while (0)
 #define GET_DBL_RESULT(res)	((double *)get_result_value_by_type(res, AR_DOUBLE))
 #define GET_STR_RESULT(res)	((char **)get_result_value_by_type(res, AR_STRING))
 #define GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
-#define GET_LOG_RESULT(res)	((zbx_log_t **)get_result_value_by_type(res, AR_LOG))
+#define GET_LOG_RESULT(res)	((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
 #define GET_MSG_RESULT(res)	((char **)get_result_value_by_type(res, AR_MESSAGE))
 
 void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
@@ -190,7 +190,7 @@ void	test_parameters();
 void	test_parameter(const char *key);
 
 void	init_result(AGENT_RESULT *result);
-void	zbx_logs_free(zbx_log_t **logs);
+void	zbx_log_free(zbx_log_t *log);
 void	free_result(AGENT_RESULT *result);
 
 void	init_request(AGENT_REQUEST *request);

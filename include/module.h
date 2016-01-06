@@ -60,14 +60,14 @@ typedef struct
 {
 	char		*value;
 	char		*source;
-	zbx_uint64_t	lastlogsize;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
-	int		mtime;
-	unsigned char	meta;	/* meta information update (log size and mtime) */
 }
 zbx_log_t;
+
+#define ZBX_AR_FLAG_META	0x01	/* contains meta information update */
+#define ZBX_AR_FLAG_NOVALUE	0x02	/* contains no value (just meta information update) */
 
 /* agent return structure */
 typedef struct
@@ -78,9 +78,11 @@ typedef struct
 	char		*str;
 	char		*text;
 	char		*msg;
+	zbx_log_t	*log;
 
-	/* null-terminated list of pointers */
-	zbx_log_t	**logs;
+	zbx_uint64_t	lastlogsize;
+	int		mtime;
+	unsigned char	flags;	/* see ZBX_AR_FLAG_* flags above */
 }
 AGENT_RESULT;
 

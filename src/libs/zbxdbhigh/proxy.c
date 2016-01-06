@@ -2242,8 +2242,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			continue;
 
 		/* empty values are only allowed for meta information update packets */
-		if (NULL == values[i].value &&
-				ITEM_VALUE_TYPE_LOG != items[i].value_type && 0 == (ZBX_AV_FLAG_LOG_OTHER & values[i].flags))
+		if (NULL == values[i].value && 0 == values[i].meta)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", items[i].key_orig);
 			continue;
@@ -2374,7 +2373,13 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 
 			init_result(&result);
 
-			if (NULL != values[i].value || ITEM_VALUE_TYPE_LOG == items[i].value_type)
+			if (NULL == values[i].value)
+				result.flags |= ZBX_AR_FLAG_NOVALUE;
+
+			if (0 != values[i].meta)
+				result.flags |= ZBX_AR_FLAG_META;
+
+			if (0 == result.flags & ZBX_AR_FLAG_NOVALUE)
 			{
 				res = set_result_type(&result, items[i].value_type,
 						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
@@ -2383,43 +2388,32 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 
 			if (SUCCEED == res)
 			{
-				zbx_log_meta_t	*log_meta = NULL;	/* for log items with value type non-log */
-
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 				{
-					zbx_log_t	*log;
-
-					log = result.logs[0];
-
-					log->timestamp = values[i].timestamp;
-					if (NULL != values[i].source)
+					if (0 == result.flags & ZBX_AR_FLAG_NOVALUE)
 					{
-						zbx_replace_invalid_utf8(values[i].source);
-						log->source = zbx_strdup(log->source, values[i].source);
+						result.log->timestamp = values[i].timestamp;
+						if (NULL != values[i].source)
+						{
+							zbx_replace_invalid_utf8(values[i].source);
+							result.log->source = zbx_strdup(result.log->source, values[i].source);
+						}
+						result.log->severity = values[i].severity;
+						result.log->logeventid = values[i].logeventid;
+
+						calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
 					}
-					log->severity = values[i].severity;
-					log->logeventid = values[i].logeventid;
-					log->lastlogsize = values[i].lastlogsize;
-					log->mtime = values[i].mtime;
-					log->meta = (0 == (values[i].flags & ZBX_AV_FLAG_META) ? 0 : 1);
-
-					if (NULL != log->value)
-						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
 				}
-				else if (values[i].flags & ZBX_AV_FLAG_LOG_OTHER)	/* log item with value type non-log */
-				{
-					log_meta = zbx_malloc(NULL, sizeof(zbx_log_meta_t));
 
-					log_meta->lastlogsize = values[i].lastlogsize;
-					log_meta->mtime = values[i].mtime;
-					log_meta->meta = (0 == (values[i].flags & ZBX_AV_FLAG_META) ? 0 : 1);
+				if (0 != values[i].meta)
+				{
+					result.lastlogsize = values[i].lastlogsize;
+					result.mtime = values[i].mtime;
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
 						&values[i].ts, items[i].state, NULL, log_meta);
-
-				zbx_free(log_meta);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -2581,14 +2575,21 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		else
 			zbx_timespec(&av->ts);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
 			continue;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
 			continue;
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
 			av->state = (unsigned char)atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
+		{
+			av->meta = 1;	/* contains meta information */
+
+			is_uint64(tmp, &av->lastlogsize);
+		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
 		{
@@ -2596,22 +2597,17 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		}
 		else
 		{
-			/* meta information update (lastlogsize and mtime) packet is missing value tag */
-
 			if (ITEM_STATE_NOTSUPPORTED == av->state)
 			{
 				/* unsupported items cannot have empty error message */
 				continue;
 			}
 
-			av->flags |= ZBX_AV_FLAG_META;
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
-		{
-			av->flags |= ZBX_AV_FLAG_LOG_OTHER;	/* log item */
-
-			is_uint64(tmp, &av->lastlogsize);
+			if (0 == av->meta)
+			{
+				/* only meta information update packets can have empty value*/
+				continue;
+			}
 		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))

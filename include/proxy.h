@@ -28,9 +28,6 @@
 
 #define ZBX_MAX_HRECORDS	1000
 
-#define ZBX_AV_FLAG_META		0x1	/* meta information update (log size and mtime) */
-#define ZBX_AV_FLAG_LOG_OTHER		0x2	/* log item with value type non-log */
-
 typedef struct
 {
 	zbx_timespec_t	ts;
@@ -44,7 +41,7 @@ typedef struct
 	int		severity;
 	int		logeventid;
 	unsigned char	state;
-	unsigned char	flags;	/* see ZBX_AV_FLAG_* above */
+	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
 }
 AGENT_VALUE;
 
