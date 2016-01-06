@@ -5193,8 +5193,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *           first unlocks triggers locked the previous time (if any), then   *
  *           starts where it left off to yield the next bunch of triggers.    *
  *                                                                            *
- *           Also see function DCconfig_lock_triggers_by_itemids(), which     *
- *           history syncer processes use to lock triggers.                   *
+ *           Also see function DCconfig_lock_triggers_by_history_items(),     *
+ *           which history syncer processes use to lock triggers.             *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,

@@ -1952,14 +1952,15 @@ int	DCsync_history(int sync_type, int *total_num)
 		hc_pop_items(&history_items);
 
 		if (0 != history_items.values_num && 0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		{
 			history_num = DCconfig_lock_triggers_by_history_items(&history_items, &triggerids);
+
+			/* there are unavailable items, push them back in history queue */
+			if (history_num != history_items.values_num)
+				hc_push_unavailable_items(&history_items);
+		}
 		else
 			history_num = history_items.values_num;
-
-		/* there are unavailable items, push them back in history queue */
-		if (history_num != history_items.values_num)
-			hc_push_unavailable_items(&history_items);
-
 
 		UNLOCK_CACHE;
 
