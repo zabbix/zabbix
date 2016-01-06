@@ -1600,6 +1600,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 		}
 	}
 
+	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
 
 	if (0 != rec_actionids.values_num)

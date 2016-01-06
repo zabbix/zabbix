@@ -476,4 +476,5 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
 
 void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
+void	zbx_action_eval_free(zbx_action_eval_t *action);
 #endif
