@@ -448,16 +448,9 @@ zbx_dc_action_condition_t;
 typedef struct
 {
 	zbx_uint64_t		actionid;
-	const char		*name;
-	const char		*def_shortdata;
-	const char		*def_longdata;
-	const char		*r_shortdata;
-	const char		*r_longdata;
 	const char		*formula;
 	unsigned char		eventsource;
 	unsigned char		evaltype;
-	unsigned char		recovery_msg;
-	int			esc_period;
 	zbx_vector_ptr_t	conditions;
 }
 zbx_dc_action_t;
@@ -3397,14 +3390,7 @@ static void	DCsync_actions(DB_RESULT result)
 
 		action->eventsource = atoi(row[2]);
 		action->evaltype = atoi(row[3]);
-		action->esc_period = atoi(row[4]);
-		action->recovery_msg = atoi(row[7]);
 
-		DCstrpool_replace(found, &action->name, row[1]);
-		DCstrpool_replace(found, &action->def_shortdata, row[5]);
-		DCstrpool_replace(found, &action->def_longdata, row[6]);
-		DCstrpool_replace(found, &action->r_shortdata, row[8]);
-		DCstrpool_replace(found, &action->r_longdata, row[9]);
 		DCstrpool_replace(found, &action->formula, row[10]);
 
 		/* reset conditions vector */
@@ -3422,11 +3408,6 @@ static void	DCsync_actions(DB_RESULT result)
 		if (FAIL != zbx_vector_uint64_bsearch(&ids, action->actionid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 			continue;
 
-		zbx_strpool_release(action->name);
-		zbx_strpool_release(action->def_shortdata);
-		zbx_strpool_release(action->def_longdata);
-		zbx_strpool_release(action->r_shortdata);
-		zbx_strpool_release(action->r_longdata);
 		zbx_strpool_release(action->formula);
 
 		zbx_hashset_iter_remove(&iter);
@@ -8015,20 +7996,15 @@ static void	zbx_action_condition_free(zbx_action_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_action_free                                                  *
+ * Function: zbx_action_eval_free                                             *
  *                                                                            *
- * Purpose: frees action data structure                                       *
+ * Purpose: frees action evaluation data structure                            *
  *                                                                            *
- * Parameters: action - [IN] the action to free                               *
+ * Parameters: action - [IN] the action evaluation to free                    *
  *                                                                            *
  ******************************************************************************/
-void	zbx_action_free(zbx_action_t *action)
+void	zbx_action_eval_free(zbx_action_eval_t *action)
 {
-	zbx_free(action->name);
-	zbx_free(action->def_shortdata);
-	zbx_free(action->def_longdata);
-	zbx_free(action->r_shortdata);
-	zbx_free(action->r_longdata);
 	zbx_free(action->formula);
 
 	zbx_vector_ptr_clear_ext(&action->conditions, (zbx_mem_free_func_t)zbx_action_condition_free);
@@ -8038,42 +8014,22 @@ void	zbx_action_free(zbx_action_t *action)
 
 /******************************************************************************
  *                                                                            *
- * Function: dc_action_clone                                                  *
+ * Function: dc_action_copy_conditions                                        *
  *                                                                            *
- * Purpose: clones action data stored in configuration cache to heap          *
+ * Purpose: copies configuration cache action conditions to the specified     *
+ *          vector                                                            *
  *                                                                            *
- * Parameters: dc_action - [IN] the action to clone                           *
- *                                                                            *
- * Return value: the cloned action                                            *
- *                                                                            *
- * Comments: The returned value must be freed with zbx_action_free() function *
- *           later.                                                           *
+ * Parameters: dc_action  - [IN] the source action                            *
+ *             conditions - [OUT] the conditions vector                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_action_t	*dc_action_clone(zbx_dc_action_t *dc_action)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
 {
-	zbx_action_t			*action;
+	int				i;
 	zbx_action_condition_t		*condition;
 	zbx_dc_action_condition_t	*dc_condition;
-	int				i;
 
-	action = (zbx_action_t *)zbx_malloc(NULL, sizeof(zbx_action_t));
-
-	action->actionid = dc_action->actionid;
-	action->esc_period = dc_action->esc_period;
-	action->eventsource = dc_action->eventsource;
-	action->evaltype = dc_action->evaltype;
-	action->recovery_msg = dc_action->recovery_msg;
-
-	action->name = zbx_strdup(NULL, dc_action->name);
-	action->def_shortdata = zbx_strdup(NULL, dc_action->def_shortdata);
-	action->def_longdata = zbx_strdup(NULL, dc_action->def_longdata);
-	action->r_shortdata = zbx_strdup(NULL, dc_action->r_shortdata);
-	action->r_longdata = zbx_strdup(NULL, dc_action->r_longdata);
-	action->formula = zbx_strdup(NULL, dc_action->formula);
-
-	zbx_vector_ptr_create(&action->conditions);
-	zbx_vector_ptr_reserve(&action->conditions, dc_action->conditions.values_num);
+	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
 
 	for (i = 0; i < dc_action->conditions.values_num; i++)
 	{
@@ -8086,32 +8042,60 @@ static zbx_action_t	*dc_action_clone(zbx_dc_action_t *dc_action)
 		condition->operator = dc_condition->operator;
 		condition->value = zbx_strdup(NULL, dc_condition->value);
 
-		zbx_vector_ptr_append(&action->conditions, condition);
+		zbx_vector_ptr_append(conditions, condition);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_action_eval_create                                            *
+ *                                                                            *
+ * Purpose: creates action evaluation data from configuration cache action    *
+ *                                                                            *
+ * Parameters: dc_action - [IN] the source action                             *
+ *                                                                            *
+ * Return value: the action evaluation data                                   *
+ *                                                                            *
+ * Comments: The returned value must be freed with zbx_action_eval_free()     *
+ *           function later.                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action)
+{
+	zbx_action_eval_t		*action;
+
+	action = (zbx_action_eval_t *)zbx_malloc(NULL, sizeof(zbx_action_eval_t));
+
+	action->actionid = dc_action->actionid;
+	action->eventsource = dc_action->eventsource;
+	action->evaltype = dc_action->evaltype;
+	action->formula = zbx_strdup(NULL, dc_action->formula);
+	zbx_vector_ptr_create(&action->conditions);
+
+	dc_action_copy_conditions(dc_action, &action->conditions);
 
 	return action;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_get_actions_by_eventsource                                *
+ * Function: zbx_dc_get_actions_eval                                          *
  *                                                                            *
- * Purpose: gets actions of the specified event source                        *
+ * Purpose: gets action evaluation data                                       *
  *                                                                            *
- * Parameters: actions     - [OUT] the actions                                *
- *             eventsource - [IN] the event source                            *
+ * Parameters: actions     - [OUT] the action evaluation data                 *
  *                                                                            *
- * Comments: The returned actions must be freed with zbx_action_free()        *
+ * Comments: The returned actions must be freed with zbx_action_eval_free()   *
  *           function later.                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_actions_by_eventsource(zbx_vector_ptr_t *actions, unsigned char eventsource)
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions)
 {
-	const char			*__function_name = "DCreset_hosts_availability";
+	const char			*__function_name = "zbx_dc_get_actions_eval";
 	zbx_dc_action_t			*dc_action;
 	zbx_hashset_iter_t		iter;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventsource:%d", __function_name, (int)eventsource);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	LOCK_CACHE;
 
@@ -8119,10 +8103,7 @@ void	zbx_dc_get_actions_by_eventsource(zbx_vector_ptr_t *actions, unsigned char 
 
 	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (dc_action->eventsource != eventsource)
-			continue;
-
-		zbx_vector_ptr_append(actions, dc_action_clone(dc_action));
+		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
 	}
 
 	UNLOCK_CACHE;
