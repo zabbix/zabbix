@@ -7981,14 +7981,14 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_action_condition_free                                        *
+ * Function: zbx_db_condition_free                                            *
  *                                                                            *
- * Purpose: frees action condition data structure                             *
+ * Purpose: frees condition data structure                                    *
  *                                                                            *
- * Parameters: condition - [IN] the action condition to free                  *
+ * Parameters: condition - [IN] the condition data to free                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_action_condition_free(zbx_action_condition_t *condition)
+static void	zbx_db_condition_free(DB_CONDITION *condition)
 {
 	zbx_free(condition->value);
 	zbx_free(condition);
@@ -8007,7 +8007,8 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
 {
 	zbx_free(action->formula);
 
-	zbx_vector_ptr_clear_ext(&action->conditions, (zbx_mem_free_func_t)zbx_action_condition_free);
+	zbx_vector_ptr_clear_ext(&action->conditions, (zbx_clean_func_t)zbx_db_condition_free);
+	zbx_vector_ptr_destroy(&action->conditions);
 
 	zbx_free(action);
 }
@@ -8026,7 +8027,7 @@ void	zbx_action_eval_free(zbx_action_eval_t *action)
 static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
 {
 	int				i;
-	zbx_action_condition_t		*condition;
+	DB_CONDITION			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
 	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
@@ -8035,9 +8036,10 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 	{
 		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
 
-		condition = (zbx_action_condition_t *)zbx_malloc(NULL, sizeof(zbx_action_condition_t));
+		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
 
 		condition->conditionid = dc_condition->conditionid;
+		condition->actionid = dc_action->actionid;
 		condition->conditiontype = dc_condition->conditiontype;
 		condition->operator = dc_condition->operator;
 		condition->value = zbx_strdup(NULL, dc_condition->value);

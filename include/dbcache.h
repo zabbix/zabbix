@@ -229,15 +229,6 @@ DC_PROXY;
 
 typedef struct
 {
-	zbx_uint64_t	conditionid;
-	unsigned char	conditiontype;
-	unsigned char	operator;
-	char		*value;
-}
-zbx_action_condition_t;
-
-typedef struct
-{
 	zbx_uint64_t		actionid;
 	char			*formula;
 	unsigned char		eventsource;
