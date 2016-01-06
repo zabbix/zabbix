@@ -16,7 +16,8 @@ body {
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
-	margin-bottom: 90px;
+	//margin-bottom: 90px;
+	margin-bottom: 60px; 
 	min-width: 950px;
 }
 
@@ -556,7 +557,9 @@ footer {
 	position: absolute;
     bottom: 0;
     width: 100%;
-    height: 60px;
+    //height: 60px;
+    height: 30px;
+    //background-color: #eee;
 	text-align: center;
 	color: $font-alt-color;
 
@@ -2116,17 +2119,23 @@ $form-icon-btn: (
 .setup-container  {
 	background-color: $ui-bg-color;
 	width: 766px;
-	height: 440px;
+	height: 420px;
 	margin: 0 auto;
-	padding: 20px 28px;
+	margin-top: 5%;
+	//padding: 20px 28px;
+	padding: 42px;
 	vertical-align: top;
 	position: relative;
 	border: 1px solid $ui-border-color;
 
 	h1 {
 		border: none;
-		margin: 0 0 10px 0;
+		margin: 3px 0 11px 0;
 		padding: 0;
+	}
+
+	.signin-logo {
+		margin: 0 0 37px 0;
 	}
 }
 
@@ -2136,15 +2145,18 @@ $form-icon-btn: (
 	padding-right: 10px;
 
 	ul {
-		margin: -4px 0 0 -28px;
+		//margin: -4px 0 0 -28px;
+		margin: -4px 0 0 -42px;
 
 		li {
-			padding: 4px 0 4px 28px;
+			//padding: 4px 0 4px 28px;
+			padding: 4px 0 4px 42px;
 
 			&.setup-left-current {
 				border-left: 3px solid $ui-tab-bg-selected-color;
 				color: $font-alt-color;
-				padding-left: 25px;
+				//padding-left: 25px;
+				padding-left: 39px;
 			}
 		}
 	}
@@ -2152,12 +2164,12 @@ $form-icon-btn: (
 
 .setup-right {
 	width: auto;
-	margin-left: 198px; 
+	margin-left: 198px;
 }
 
 .setup-right-body {
 	padding-right: 5px;
-	max-height: 355px;
+	max-height: 345px;
 	overflow-y: auto;
 
 	.list-table {
@@ -2173,7 +2185,7 @@ $form-icon-btn: (
 		width: 100%;
 	}
 
-	h4 {
+	h1 {
 		margin: 25% 0 0.4em 0;
 	}
 
@@ -2182,7 +2194,7 @@ $form-icon-btn: (
 
 .setup-title {
 	color: $font-alt-color;
-	height: 350px;
+	height: 345px;
 	display: table-cell;
 	vertical-align: middle;
 	font-size: $font-setup-title;
@@ -2196,7 +2208,8 @@ $form-icon-btn: (
 
 .setup-footer {
 	position: absolute;
-	bottom: 21px;
+	//bottom: 21px;
+	bottom: 32px;
 	width: 766px;
 	text-align: right;
 
@@ -2216,9 +2229,12 @@ $form-icon-btn: (
 
 .signin-container {
 	background-color: $ui-bg-color;
-	width: 322px;
+	//width: 322px;
+	width: 280px;
 	margin: 0 auto;
-	padding: 20px 28px 0 28px;
+	margin-top: 5%;
+	//padding: 20px 28px 0 28px;
+	padding: 42px 42px 39px 42px;
 	border: 1px solid $ui-border-color;
 
 	h1 {
@@ -2228,7 +2244,8 @@ $form-icon-btn: (
 	}
 
 	ul li {
-		padding: 0 0 22px 0;
+		//padding: 0 0 22px 0;
+		padding: 16px 0 0 0; 
 		font-size: $font-top-nav-size;
 
 		&.sign-in-txt {
@@ -2237,7 +2254,7 @@ $form-icon-btn: (
 	}
 
 	label {                                                                                                                                                                                                                                                                                                              
-		display: block;
+		display: inline-block;
 		margin: 0 0 2px 0;
 	}
 
@@ -2254,16 +2271,20 @@ $form-icon-btn: (
 
 	button {
 		font-size: $font-form-size;
-		min-height: 38px;
-		line-height: 38px;
+		margin: 7px 0;
+		//min-height: 38px;
+		//line-height: 38px;
+		min-height: 35px;
+		line-height: 35px;
 		width: 100%;
 	}
 }
 
 .signin-logo {
 	margin: 0 auto;
-	margin-top: 5%;
-	margin-bottom: 25px;
+	//margin-top: 5%;
+	//margin-bottom: 25px;
+	margin-bottom: 21px;
 	width: 114px;
 	height: 30px;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
@@ -2273,11 +2294,12 @@ $form-icon-btn: (
 	width: 100%;
 	text-align: center;
 	color: $font-alt-color;
-	margin: 22px 0 0 0;
+	margin: 11px 0 0 0;
 }
 
 %signin-input {
-	padding: 10px 5px;
+	//padding: 10px 5px;
+	padding: 9px 5px;
 	width: 100%;
 }
 
