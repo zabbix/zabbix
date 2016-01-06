@@ -453,7 +453,7 @@ class CScreen extends CApiService {
 		]);
 
 		if ($db_screens) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $db_screen[0]['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $db_screens[0]['name']));
 		}
 
 		$private_validator = new CLimitedSetValidator([
