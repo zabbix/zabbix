@@ -340,20 +340,20 @@ class CScreen extends CApiService {
 			$maps = [];
 
 			foreach ($screens as $screenid => $resources) {
-				foreach ($resources['maps'] as $screenid => $foo) {
-					$maps[$screenid][$screenid] = true;
+				foreach ($resources['maps'] as $sysmapid => $foo) {
+					$maps[$sysmapid][$screenid] = true;
 				}
 			}
 
 			if ($maps) {
 				$db_maps = API::Map()->get([
 					'output' => [],
-					'screenids' => array_keys($maps),
+					'sysmapids' => array_keys($maps),
 					'preservekeys' => true
 				]);
 
-				foreach ($maps as $screenid => $resources) {
-					if (!array_key_exists($screenid, $db_maps)) {
+				foreach ($maps as $sysmapid => $resources) {
+					if (!array_key_exists($sysmapid, $db_maps)) {
 						foreach ($resources as $screenid => $foo) {
 							unset($screens[$screenid], $result[$screenid]);
 						}
@@ -406,9 +406,9 @@ class CScreen extends CApiService {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $screens
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $screens) {
 		if (!$screens) {
@@ -452,8 +452,8 @@ class CScreen extends CApiService {
 			'limit' => 1
 		]);
 
-		foreach ($db_screens as $db_screen) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $db_screen['name']));
+		if ($db_screens) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $db_screen[0]['name']));
 		}
 
 		$private_validator = new CLimitedSetValidator([
@@ -705,10 +705,10 @@ class CScreen extends CApiService {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $screens
-	 * @param array $db_screens	array of existing screens with screen IDs as keys
+	 * @param array $db_screens		array of existing screens with screen IDs as keys.
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $screens, array $db_screens) {
 		if (!$screens) {
@@ -1077,26 +1077,26 @@ class CScreen extends CApiService {
 				);
 			}
 
-			// User shares.
-			DB::insert('screen_user', $shared_users_to_add);
-			DB::update('screen_user', $shared_users_to_update);
-
-			if ($shared_userids_to_delete) {
-				DB::delete('screen_user', ['screenuserid' => $shared_userids_to_delete]);
-			}
-
-			// User group shares.
-			DB::insert('screen_usrgrp', $shared_user_groups_to_add);
-			DB::update('screen_usrgrp', $shared_user_groups_to_update);
-
-			if ($shared_user_groupids_to_delete) {
-				DB::delete('screen_usrgrp', ['screenusrgrpid' => $shared_user_groupids_to_delete]);
-			}
-
 			// Replace screen items.
 			if (array_key_exists('screenitems', $screen)) {
 				$this->replaceItems($screen['screenid'], $screen['screenitems']);
 			}
+		}
+
+		// User shares.
+		DB::insert('screen_user', $shared_users_to_add);
+		DB::update('screen_user', $shared_users_to_update);
+
+		if ($shared_userids_to_delete) {
+			DB::delete('screen_user', ['screenuserid' => $shared_userids_to_delete]);
+		}
+
+		// User group shares.
+		DB::insert('screen_usrgrp', $shared_user_groups_to_add);
+		DB::update('screen_usrgrp', $shared_user_groups_to_update);
+
+		if ($shared_user_groupids_to_delete) {
+			DB::delete('screen_usrgrp', ['screenusrgrpid' => $shared_user_groupids_to_delete]);
 		}
 	}
 
@@ -1288,7 +1288,7 @@ class CScreen extends CApiService {
 		// Adding user shares.
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'screenid', 'userid', 'screen_user');
-			// Get all allowed groups.
+			// Get all allowed users.
 			$related_users = API::User()->get([
 				'output' => ['userid'],
 				'userids' => $relation_map->getRelatedIds(),
