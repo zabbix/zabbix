@@ -992,6 +992,8 @@ class CUser extends CApiService {
 		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionId));
 
+		CSession::destroy();
+
 		return true;
 	}
 
