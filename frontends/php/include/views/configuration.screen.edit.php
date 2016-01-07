@@ -19,41 +19,194 @@
 **/
 
 
-$screenWidget = (new CWidget())->setTitle(_('Screens'));
-if (!empty($this->data['templateid'])) {
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
+require_once dirname(__FILE__).'/js/monitoring.screen.edit.js.php';
+
+$widget = (new CWidget())->setTitle(_('Screens'));
+
+$tabs = new CTabView();
+
+if (!$data['form_refresh']) {
+	$tabs->setSelected(0);
+}
+
+if ($this->data['screen']['templateid']) {
+	$widget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
 
 // create form
-$screenForm = (new CForm())
+$form = (new CForm())
 	->setName('screenForm')
-	->addVar('form', $this->data['form'])
-	->addVar('templateid', $this->data['templateid']);
-if (!empty($this->data['screenid'])) {
-	$screenForm->addVar('screenid', $this->data['screenid']);
+	->addVar('form', $this->data['form']);
+
+if ($this->data['screen']['templateid']) {
+	$form->addVar('templateid', $this->data['screen']['templateid']);
 }
 
-// create screen form list
-$screenFormList = (new CFormList())
-	->addRow(_('Name'),
-		(new CTextBox('name', $this->data['name']))
+if ($this->data['screen']['screenid']) {
+	$form->addVar('screenid', $this->data['screen']['screenid']);
+}
+
+$user_type = CWebUser::getType();
+
+// Create screen form list.
+$screen_tab = (new CFormList());
+
+if (!$this->data['screen']['templateid']) {
+	// Screen owner multiselect.
+	$multiselect_data = [
+		'name' => 'userid',
+		'selectedLimit' => 1,
+		'objectName' => 'users',
+		'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+		'popup' => [
+			'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+		]
+	];
+
+	$screen_ownerid = $data['screen']['userid'];
+
+	// If screen owner does not exist or is not allowed to display.
+	if (!$screen_ownerid || $screen_ownerid && array_key_exists($screen_ownerid, $data['users'])) {
+		// Screen owner data.
+		if ($screen_ownerid) {
+			$owner_data = [[
+				'id' => $screen_ownerid,
+				'name' => getUserFullname($data['users'][$screen_ownerid])
+			]];
+		}
+		else {
+			$owner_data = [];
+		}
+
+		$multiselect_data['data'] = $owner_data;
+
+		// Append multiselect to screen tab.
+		$screen_tab->addRow(_('Owner'),
+			(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
+	else {
+		$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+		// Administrators can change screen owner, but cannot see users from other groups.
+		if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
+			$screen_tab->addRow(_('Owner'), $multiselect_userid)
+				->addRow('', _('Inaccessible user'), 'inaccessible_user');
+		}
+		else {
+			// For regular users and guests, only information message is displayed without multiselect.
+			$screen_tab->addRow(_('Owner'), [
+				(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
+				(new CSpan($multiselect_userid))
+					->addStyle('display: none;')
+					->setId('multiselect_userid_wrapper')
+			]);
+		}
+	}
+}
+
+$screen_tab->addRow(_('Name'),
+		(new CTextBox('name', $this->data['screen']['name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Columns'),
-		(new CNumericBox('hsize', $this->data['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('hsize', $this->data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Rows'),
-		(new CNumericBox('vsize', $this->data['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('vsize', $this->data['screen']['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
-// append tabs to form
-$screenTab = (new CTabView())->addTab('screenTab', _('Screen'), $screenFormList);
+// append tab to form
+$tabs->addTab('screen_tab', _('Screen'), $screen_tab);
+if (!$this->data['screen']['templateid']) {
+	// User group sharing table.
+	$user_group_shares_table = (new CTable())
+		->setHeader([_('User groups'), _('Permissions'), _('Action')])
+		->setAttribute('style', 'width: 100%;');
+
+	$add_user_group_btn = ([(new CButton(null, _('Add')))
+		->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
+			'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
+		)
+		->addClass(ZBX_STYLE_BTN_LINK)]);
+
+	$user_group_shares_table->addRow(
+		(new CRow(
+			(new CCol($add_user_group_btn))->setColSpan(3)
+		))->setId('user_group_list_footer')
+	);
+
+	$user_groups = [];
+
+	foreach ($data['screen']['userGroups'] as $user_group) {
+		$user_groupid = $user_group['usrgrpid'];
+		$user_groups[$user_groupid] = [
+			'usrgrpid' => $user_groupid,
+			'name' => $data['user_groups'][$user_groupid]['name'],
+			'permission' => $user_group['permission']
+		];
+	}
+
+	$js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $user_groups]).');';
+
+	// User sharing table.
+	$user_shares_table = (new CTable())
+		->setHeader([_('Users'), _('Permissions'), _('Action')])
+		->setAttribute('style', 'width: 100%;');
+
+	$add_user_btn = ([(new CButton(null, _('Add')))
+		->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
+			'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
+		)
+		->addClass(ZBX_STYLE_BTN_LINK)]);
+
+	$user_shares_table->addRow(
+		(new CRow(
+			(new CCol($add_user_btn))->setColSpan(3)
+		))->setId('user_list_footer')
+	);
+
+	$users = [];
+
+	foreach ($data['screen']['users'] as $user) {
+		$userid = $user['userid'];
+		$users[$userid] = [
+			'id' => $userid,
+			'name' => getUserFullname($data['users'][$userid]),
+			'permission' => $user['permission']
+		];
+	}
+
+	$js_insert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+
+	zbx_add_post_js($js_insert);
+
+	$sharing_tab = (new CFormList('sharing_form'))
+		->addRow(_('Type'),
+		(new CRadioButtonList('private', (int) $data['screen']['private']))
+			->addValue(_('Private'), PRIVATE_SHARING)
+			->addValue(_('Public'), PUBLIC_SHARING)
+			->setModern(true)
+		)
+		->addRow(_('List of user group shares'),
+			(new CDiv($user_group_shares_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		)
+		->addRow(_('List of user shares'),
+			(new CDiv($user_shares_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		);
+
+	// Append data to form.
+	$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
+}
 
 // append buttons to form
-if (isset($this->data['screenid']))
-{
-	$screenTab->setFooter(makeFormFooter(
+if ($this->data['screen']['screenid']) {
+	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
@@ -63,13 +216,13 @@ if (isset($this->data['screenid']))
 	));
 }
 else {
-	$screenTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel(url_param('templateid'))]
 	));
 }
 
-$screenForm->addItem($screenTab);
+$form->addItem($tabs);
 
-$screenWidget->addItem($screenForm);
-return $screenWidget;
+$widget->addItem($form);
+return $widget;
