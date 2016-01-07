@@ -2903,6 +2903,8 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 
 		next_sync = item->tail->ts.sec;
 	}
+	else
+		next_sync = 0;
 
 	return next_sync;
 }
