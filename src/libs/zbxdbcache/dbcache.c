@@ -2727,6 +2727,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	history->itemid = itemid;
 	history->ts = data->ts;
 	history->state = data->state;
+	history->meta = data->meta;
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
@@ -2763,7 +2764,6 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 
 			history->lastlogsize = data->lastlogsize;
 			history->mtime = data->mtime;
-			history->meta = data->meta;
 			break;
 	}
 }
