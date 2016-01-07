@@ -5032,8 +5032,6 @@ int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx
 	ZBX_DC_TRIGGER		*dc_trigger;
 	zbx_hc_item_t		*history_item;
 
-	zbx_vector_uint64_clear(triggerids);
-
 	LOCK_CACHE;
 
 	for (i = 0; i < history_items->values_num; i++)
