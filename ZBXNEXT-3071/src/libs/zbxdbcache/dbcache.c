@@ -2698,7 +2698,6 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
 
 		if (0 != update_queue)
 			hc_queue_item(item);
-
 	}
 }
 
