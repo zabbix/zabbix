@@ -1949,6 +1949,9 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	do
 	{
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			zbx_vector_uint64_clear(&triggerids);
+
 		LOCK_CACHE;
 
 		hc_pop_items(&history_items);
