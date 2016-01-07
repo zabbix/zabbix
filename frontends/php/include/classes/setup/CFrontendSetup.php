@@ -363,13 +363,12 @@ class CFrontendSetup {
 	 */
 	public function checkPhpAlwaysPopulateRawPostData() {
 		$current = ini_get('always_populate_raw_post_data');
-		$current_is_valid = ($current == -1 || $current === false);
 
 		return [
 			'name' => _('PHP always_populate_raw_post_data'),
-			'current' => $current_is_valid ? _('off') : _('on'),
+			'current' => ($current != -1) ? _('on') : _('off'),
 			'required' => _('off'),
-			'result' => $current_is_valid ? self::CHECK_OK : self::CHECK_FATAL,
+			'result' => ($current != -1) ? self::CHECK_FATAL : self::CHECK_OK,
 			'error' => _('PHP always_populate_raw_post_data must be set to -1.')
 		];
 	}
