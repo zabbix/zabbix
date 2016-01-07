@@ -20,7 +20,8 @@ $main-subnav-bg-color: #454545;
 $main-subnav-bg-selected-color: #2e2e2e;
 $main-color: #2d3135;
 $font-color: #f2f2f2;
-$font-alt-color: #737373;;
+$font-selected-color: #f2f2f2;
+$font-alt-color: #737373;
 $body-bg-color: #0e1012;
 
 
@@ -88,6 +89,11 @@ $link-main-subnav-hover-color: rgba(#fff, 1);
 $link-main-subnav-active-color: rgba(#fff, 1);
 $link-main-subnav-visited-color: rgba(#fff, 0.75);
 
+// ANALOG CLOCK
+$clock-face-color: #383838;
+$clock-hand-color: #f2f2f2;
+$clock-hand-sec-color: #69808d;
+$clock-lines-color: #4f4f4f;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
