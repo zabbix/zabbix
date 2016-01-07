@@ -41,7 +41,7 @@ class CControllerSystemWarning extends CController {
 
 		if (CSession::keyExists('messages')) {
 			$data['messages'] = CSession::getValue('messages');
-			CSession::unsetValue('messages');
+			CSession::unsetValue(['messages']);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
