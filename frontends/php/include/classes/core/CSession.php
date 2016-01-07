@@ -121,6 +121,15 @@ class CSession {
 	}
 
 	/**
+	 * Destroy session
+	 */
+	public static function destroy() {
+		self::open();
+		session_destroy();
+		self::close();
+	}
+
+	/**
 	 * Open session for writing
 	 */
 	private static function open() {
