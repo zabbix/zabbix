@@ -372,7 +372,7 @@
 #	include <sys/mount.h>
 #endif
 
-#if defined(HAVE_SYS_TIMEB_H) && defined(_WINDOWS)
+#if defined(HAVE_SYS_TIMEB_H)
 #	include <sys/timeb.h>
 #endif
 
