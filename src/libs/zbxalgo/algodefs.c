@@ -224,6 +224,11 @@ zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed)
 
 /* default hash functions */
 
+zbx_hash_t	zbx_default_ptr_hash_func(const void *data)
+{
+	return ZBX_DEFAULT_PTR_HASH_ALGO(data, ZBX_PTR_SIZE, ZBX_DEFAULT_HASH_SEED);
+}
+
 zbx_hash_t	zbx_default_uint64_hash_func(const void *data)
 {
 	return ZBX_DEFAULT_UINT64_HASH_ALGO(data, sizeof(zbx_uint64_t), ZBX_DEFAULT_HASH_SEED);
