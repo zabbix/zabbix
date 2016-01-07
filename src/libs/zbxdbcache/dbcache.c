@@ -2728,6 +2728,8 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	history->ts = data->ts;
 	history->state = data->state;
 	history->meta = data->meta;
+	history->keep_history = 0;
+	history->keep_trends = 0;
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
