@@ -576,17 +576,17 @@ class CTemplateScreen extends CScreen {
 			_('Incorrect template screen ID.')
 		);
 
-		$dbScreens = $this->get([
-			'output' => ['screenid', 'hsize', 'vsize', 'templateid'],
+		$db_screens = $this->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
 			'selectScreenItems' => ['screenitemid', 'x', 'y', 'colspan', 'rowspan'],
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$this->validateUpdate($screens, $dbScreens);
-		$this->updateReal($screens);
-		$this->truncateScreenItems($screens, $dbScreens);
+		$this->validateUpdate($screens, $db_screens);
+		$this->updateReal($screens, $db_screens);
+		$this->truncateScreenItems($screens, $db_screens);
 
 		return ['screenids' => zbx_objectValues($screens, 'screenid')];
 	}

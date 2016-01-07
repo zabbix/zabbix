@@ -48,15 +48,33 @@ $screenTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		_('Dimension (cols x rows)'),
-		_('Screen')
+		_('Actions')
 	]);
 
 foreach ($this->data['screens'] as $screen) {
+	$user_type = CWebUser::getType();
+	if ($this->data['templateid'] || $user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
+			|| array_key_exists('editable', $screen)) {
+		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
+		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'));
+		$constructor = new CLink(_('Constructor'),
+			'screenedit.php?screenid='.$screen['screenid'].url_param('templateid')
+		);
+	}
+	else {
+		$checkbox = (new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']))
+			->setAttribute('disabled', 'disabled');
+		$action = '';
+		$constructor = '';
+	}
+
 	$screenTable->addRow([
-		new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']),
-		new CLink($screen['name'], '?form=update&screenid='.$screen['screenid'].url_param('templateid')),
+		$checkbox,
+		$this->data['templateid']
+			? $screen['name']
+			: new CLink($screen['name'], 'screens.php?elementid='.$screen['screenid']),
 		$screen['hsize'].' x '.$screen['vsize'],
-		new CLink(_('Edit'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
+		new CHorList([$action, $constructor])
 	]);
 }
 
