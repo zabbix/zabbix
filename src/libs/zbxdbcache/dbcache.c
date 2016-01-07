@@ -2333,7 +2333,8 @@ void	dc_flush_history()
 
 	UNLOCK_CACHE;
 
-	item_values_num = string_values_offset = 0;
+	item_values_num = 0;
+	string_values_offset = 0;
 }
 
 /******************************************************************************
@@ -2576,31 +2577,27 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			return FAIL;
 
 		memset(*data, 0, sizeof(zbx_hc_data_t));
-	}
 
-	(*data)->ts = item_value->ts;
-	DCcheck_ns(&(*data)->ts);
+		(*data)->state = item_value->state;
+		(*data)->ts = item_value->ts;
+		DCcheck_ns(&(*data)->ts);
+	}
 
 	if (ITEM_STATE_NOTSUPPORTED == item_value->state)
 	{
 		if (NULL == ((*data)->value.str = hc_mem_value_str_dup(&item_value->value.value_str)))
 			return FAIL;
 
-		(*data)->state = ITEM_STATE_NOTSUPPORTED;
-
 		cache->stats.notsupported_counter++;
 
 		return SUCCEED;
 	}
-
-	(*data)->state = ITEM_STATE_NORMAL;
 
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_value->flags))
 	{
 		if (NULL == ((*data)->value.str = hc_mem_value_str_dup(&item_value->value.value_str)))
 			return FAIL;
 
-		(*data)->state = ITEM_STATE_NORMAL;
 		(*data)->value_type = ITEM_VALUE_TYPE_TEXT;
 
 		cache->stats.history_text_counter++;
@@ -2644,7 +2641,6 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 	}
 
 	(*data)->value_type = item_value->value_type;
-	(*data)->state = ITEM_STATE_NORMAL;
 
 	cache->stats.history_counter++;
 
