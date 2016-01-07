@@ -54,7 +54,7 @@ void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error);
 void	process_proxyconfig(struct zbx_json_parse *jp_data);
 
-int	get_host_availability_data(struct zbx_json *j);
+int	get_host_availability_data(struct zbx_json *j, int *ts);
 void	process_host_availability(struct zbx_json_parse *jp_data);
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid);
