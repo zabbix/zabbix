@@ -5,6 +5,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
+...G...PS. [ZBX-8755] removed unutilised header file to eliminate bulid warinings (Sandis, viktors)
 .......PS. [ZBX-10066] fixed bug where host availability changes could be lost if proxy failed to send the update, fixed possibility of duplicate availability updates for passive proxies (wiper)
 ..F....... [ZBX-10145] fixed macro resolving for trigger description in dashboard (vitalijs)
 ..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
