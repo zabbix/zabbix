@@ -50,7 +50,11 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	process_areg_data(jp, proxy_hostid);
+	if (SUCCEED != (ret = process_areg_data(jp, proxy_hostid)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid autoregistration data from proxy \"%s\" at \"%s\"", host,
+				get_ip_by_socket(sock));
+	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
