@@ -264,8 +264,13 @@ static int	process_proxy(void)
 					goto network_error;
 				}
 
-				if (SUCCEED == zbx_json_open(answer, &jp))
-					process_host_availability(&jp);
+				if (SUCCEED != zbx_json_open(answer, &jp) || SUCCEED != process_host_availability(&jp))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" availability data", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
 
 				zbx_free(answer);
 			}
@@ -284,17 +289,21 @@ retry_history:
 					goto network_error;
 				}
 
-				if (SUCCEED == zbx_json_open(answer, &jp))
+				if (SUCCEED != zbx_json_open(answer, &jp) ||
+						SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, NULL, 0))
 				{
-					process_hist_data(NULL, &jp, proxy.hostid, NULL, 0);
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" history data", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
 
-					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+				{
+					if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
 					{
-						if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
-						{
-							zbx_free(answer);
-							goto retry_history;
-						}
+						zbx_free(answer);
+						goto retry_history;
 					}
 				}
 
@@ -315,17 +324,20 @@ retry_dhistory:
 					goto network_error;
 				}
 
-				if (SUCCEED == zbx_json_open(answer, &jp))
+				if (SUCCEED != zbx_json_open(answer, &jp) || SUCCEED != process_dhis_data(&jp))
 				{
-					process_dhis_data(&jp);
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" discovery data", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
 
-					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+				{
+					if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
 					{
-						if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
-						{
-							zbx_free(answer);
-							goto retry_dhistory;
-						}
+						zbx_free(answer);
+						goto retry_dhistory;
 					}
 				}
 
@@ -346,17 +358,21 @@ retry_autoreg_host:
 					goto network_error;
 				}
 
-				if (SUCCEED == zbx_json_open(answer, &jp))
+				if (SUCCEED != zbx_json_open(answer, &jp) ||
+						SUCCEED != process_areg_data(&jp, proxy.hostid))
 				{
-					process_areg_data(&jp, proxy.hostid);
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" auto registration data", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
 
-					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+				if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+				{
+					if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
 					{
-						if (ZBX_MAX_HRECORDS <= zbx_json_count(&jp_data))
-						{
-							zbx_free(answer);
-							goto retry_autoreg_host;
-						}
+						zbx_free(answer);
+						goto retry_autoreg_host;
 					}
 				}
 

@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
+#include "dbcache.h"
 
 #include "proxyhosts.h"
 
@@ -50,7 +51,11 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	process_host_availability(jp);
+	if (SUCCEED != (ret = process_host_availability(jp)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid host availability data from proxy \"%s\" at \"%s\"",
+				host, get_ip_by_socket(sock));
+	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 

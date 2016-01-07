@@ -48,7 +48,11 @@ void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	process_dhis_data(jp);
+	if (SUCCEED != (ret = process_dhis_data(jp)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid discovery data from proxy \"%s\" at \"%s\"", host,
+				get_ip_by_socket(sock));
+	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
