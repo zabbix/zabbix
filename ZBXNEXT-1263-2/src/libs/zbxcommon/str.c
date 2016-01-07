@@ -2160,7 +2160,6 @@ const char	*get_program_type_string(unsigned char program_type)
 		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
 			return "proxy";
 		case ZBX_PROGRAM_TYPE_AGENTD:
-		case ZBX_PROGRAM_TYPE_AGENT:
 			return "agent";
 		case ZBX_PROGRAM_TYPE_SENDER:
 			return "sender";
@@ -3365,7 +3364,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                       0 if macro does not have context specified.          *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - the macro was parsed succesfully.                            *
+ *     SUCCEED - the macro was parsed successfully.                           *
  *     FAIL    - the macro parsing failed, the content of output variables    *
  *               is not defined.                                              *
  *                                                                            *
