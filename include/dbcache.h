@@ -464,7 +464,7 @@ void	zbx_config_clean(zbx_config_t *cfg);
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
 
-#define ZBX_HC_ITEM_STATUS_AVAILABLE	0
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
 #define ZBX_HC_ITEM_STATUS_QUEUED	2
 
