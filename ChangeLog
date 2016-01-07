@@ -1,8 +1,13 @@
 Changes for 3.0.0alpha6
 
 New features:
+...GI..... [ZBXNEXT-3045] dropped zabbix_agent - the inetd version of Zabbix agent (asaveljevs)
+A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
+.......PS. [ZBX-10066] fixed bug where host availability changes could be lost if proxy failed to send the update, fixed possibility of duplicate availability updates for passive proxies (wiper)
+..F....... [ZBX-10145] fixed macro resolving for trigger description in dashboard (vitalijs)
+..F....... [ZBX-10140] fixed starting session in page header when output buffering is disabled (Gunars)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha5
@@ -21,6 +26,7 @@ A......... [ZBXNEXT-1193] implemented trend.get method for API (Ivo, sasha)
 ..F....... [ZBXNEXT-2357] implemented a new MVC style for Monitoring->Web and IT Services report (Alexei)
 
 Bug fixes:
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
@@ -315,6 +321,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
@@ -480,7 +487,7 @@ A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discov
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added Zabbix log file locking to avoid incomplete logging on log file rotation (igors)
-.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts (Ez Texting), VMware monitoring and simple checks (HTTPS services) (igors)
+...G...PS. [ZBX-591] fixed web monitoring, VMware monitoring, Ez Texting alerts and net.tcp.service{.perf}[https] items to use the SourceIP configuration parameter (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
@@ -1039,6 +1046,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
