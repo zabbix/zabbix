@@ -1216,12 +1216,17 @@ static void	DCsync_hosts(DB_RESULT result)
 	unsigned char		ipmi_privilege;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	ZBX_DC_PSK		*psk_i, psk_i_local;
+	zbx_ptr_pair_t		*psk_owner, psk_owner_local;
+	zbx_hashset_t		psk_owners;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, config->hosts.num_data + 32);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+#endif
 	now = time(NULL);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1366,6 +1371,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
 		/* validation in frontend or API. Do not update cache in case of error. */
 
+		psk_owner = NULL;
+
 		if ('\0' != *row[33] && '\0' == *row[34])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
@@ -1423,9 +1430,18 @@ static void	DCsync_hosts(DB_RESULT result)
 				if (0 != strcmp(host->tls_dc_psk->tls_psk, row[34]))	/* new PSK value */
 											/* differs from old */
 				{
-					/* change underlying PSK value and 'config->psks' is updated, too */
-					DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[34]);
-					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[33]);
+					if (NULL == (psk_owner = zbx_hashset_search(&psk_owners,
+							&host->tls_dc_psk->tls_psk_identity)))
+					{
+						/* change underlying PSK value and 'config->psks' is updated, too */
+						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[34]);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
+								" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
+								psk_owner->first, psk_owner->second, host->host);
+					}
 				}
 
 				goto done;
@@ -1456,8 +1472,16 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (0 != strcmp(psk_i->tls_psk, row[34]))	/* PSKid stored but PSK value is different */
 			{
-				DCstrpool_replace(1, &psk_i->tls_psk, row[34]);
-				zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[33]);
+				if (NULL == (psk_owner = zbx_hashset_search(&psk_owners, &psk_i->tls_psk_identity)))
+				{
+					DCstrpool_replace(1, &psk_i->tls_psk, row[34]);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
+							" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
+							psk_owner->first, psk_owner->second, host->host);
+				}
 			}
 
 			host->tls_dc_psk = psk_i;
@@ -1472,6 +1496,18 @@ static void	DCsync_hosts(DB_RESULT result)
 		psk_i_local.refcount = 1;
 		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
 done:
+		if (NULL != host->tls_dc_psk && NULL == psk_owner)
+		{
+			if (NULL == (psk_owner = zbx_hashset_search(&psk_owners, &host->tls_dc_psk->tls_psk_identity)))
+			{
+				/* register this host as the PSK identity owner, against which to report conflicts */
+
+				psk_owner_local.first = (char *)host->tls_dc_psk->tls_psk_identity;
+				psk_owner_local.second = (char *)host->host;
+
+				zbx_hashset_insert(&psk_owners, &psk_owner_local, sizeof(psk_owner_local));
+			}
+		}
 #endif
 		ZBX_STR2UCHAR(host->tls_connect, row[29]);
 		ZBX_STR2UCHAR(host->tls_accept, row[30]);
@@ -1687,6 +1723,9 @@ done:
 
 	zbx_vector_uint64_destroy(&ids);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_hashset_destroy(&psk_owners);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
