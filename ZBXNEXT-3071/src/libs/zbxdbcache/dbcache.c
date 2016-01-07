@@ -52,13 +52,20 @@ static size_t		sql_alloc = 64 * ZBX_KIBIBYTE;
 
 extern unsigned char	program_type;
 
-extern int		CONFIG_HISTSYNCER_FREQUENCY;
-
 #define ZBX_IDS_SIZE	10
 
 #define ZBX_HC_ITEMS_INIT_SIZE	1000
 
 #define ZBX_TRENDS_CLEANUP_TIME	((SEC_PER_HOUR * 55) / 60)
+
+/* the maximum time spent synchronizing history */
+#define ZBX_HC_SYNC_TIME_MAX	SEC_PER_MIN
+
+/* the maximum number of items in one synchronization batch */
+#define ZBX_HC_SYNC_MAX		1000
+
+/* the minimum processed item percentage of item candidates to continue synchronizing */
+#define ZBX_HC_SYNC_MIN_PCNT	10
 
 typedef struct
 {
@@ -380,7 +387,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			assert(0);
 	}
 
-	ids_alloc = MIN(ZBX_SYNC_MAX, *trends_num);
+	ids_alloc = MIN(ZBX_HC_SYNC_MAX, *trends_num);
 	ids = zbx_malloc(ids, ids_alloc * sizeof(zbx_uint64_t));
 
 	for (i = 0; i < *trends_num; i++)
@@ -397,7 +404,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, trend->itemid, 64);
 
-		if (ZBX_SYNC_MAX == ids_num)
+		if (ZBX_HC_SYNC_MAX == ids_num)
 		{
 			trends_to = i + 1;
 			break;
@@ -1900,12 +1907,6 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
  ******************************************************************************/
 int	DCsync_history(int sync_type, int *total_num)
 {
-/* the maximum time spent syncing history */
-#define ZBX_HC_SYNC_TIME_MAX		SEC_PER_MIN
-
-/* the minimum processed item percentage of sync candidates to continue syncing */
-#define ZBX_HC_SYNC_PROCESSED_PCNT	10
-
 	const char		*__function_name = "DCsync_history";
 	static ZBX_DC_HISTORY	*history = NULL;
 	int			history_num, candidate_num, next_sync = 0;
@@ -1936,16 +1937,16 @@ int	DCsync_history(int sync_type, int *total_num)
 	sync_start = time(NULL);
 
 	if (NULL == history)
-		history = zbx_malloc(history, ZBX_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
+		history = zbx_malloc(history, ZBX_HC_SYNC_MAX * sizeof(ZBX_DC_HISTORY));
 
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_vector_uint64_create(&triggerids);
-		zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
+		zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
 	}
 
 	zbx_vector_ptr_create(&history_items);
-	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_SYNC_MAX) + 32);
+	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
 
 	do
 	{
@@ -2022,7 +2023,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 		zbx_vector_ptr_clear(&history_items);
 
-		if (ZBX_HC_SYNC_PROCESSED_PCNT > history_num * 100 / candidate_num)
+		if (ZBX_HC_SYNC_MIN_PCNT > history_num * 100 / candidate_num)
 		{
 			/* Stop sync if only small percentage of sync candidates were processed     */
 			/* (meaning most of sync candidates are locked by triggers).                */
@@ -2779,7 +2780,7 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items)
 	zbx_binary_heap_elem_t	*elem;
 	zbx_hc_item_t		*item;
 
-	while (ZBX_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
+	while (ZBX_HC_SYNC_MAX > history_items->values_num && FAIL == zbx_binary_heap_empty(&cache->history_queue))
 	{
 		elem = zbx_binary_heap_find_min(&cache->history_queue);
 		item = (zbx_hc_item_t *)elem->data;
