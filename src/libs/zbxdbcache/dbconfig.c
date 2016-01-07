@@ -245,27 +245,11 @@ ZBX_DC_CALCITEM;
 typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#define MAX_CONF_H	10u
-#define MAX_CONF_P	5u
-
-static zbx_vector_ptr_t	conflicts;	/* temporary storage for detected PSK conflicts before they are logged */
-
 typedef struct
 {
-	char		*psk_id;				/* problematic PSK identity			*/
-	char		*names[MAX_CONF_H + MAX_CONF_P];	/* names of conflicting hosts and proxies	*/
-	unsigned int	num_h, num_p;				/* number of conflicting hosts and proxies	*/
-}
-ZBX_PSK_CONF;
-
-typedef struct
-{
-	const char	*tls_psk_identity;	/* pre-shared key identity		*/
-	const char	*tls_psk;		/* pre-shared key value (hex-string) 	*/
-	unsigned int	refcount;		/* reference count			*/
-	unsigned int	changes;		/* changes per one config update	*/
-	ZBX_PSK_CONF	*conf;			/* hosts and proxies with the same	*/
-						/* identity but different keys		*/
+	const char	*tls_psk_identity;	/* pre-shared key identity           */
+	const char	*tls_psk;		/* pre-shared key value (hex-string) */
+	unsigned int	refcount;		/* reference count                   */
 }
 ZBX_DC_PSK;
 #endif
@@ -1210,75 +1194,6 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	return SUCCEED;
 }
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-static void	add_host_to_conflict(ZBX_DC_HOST *host)
-{
-	if (NULL == host->tls_dc_psk->conf)
-	{
-		host->tls_dc_psk->conf = zbx_malloc(NULL, sizeof(ZBX_PSK_CONF));
-		host->tls_dc_psk->conf->psk_id = zbx_strdup(NULL, host->tls_dc_psk->tls_psk_identity);
-		host->tls_dc_psk->conf->num_h = host->tls_dc_psk->conf->num_p = 0;
-	}
-
-	if (HOST_STATUS_MONITORED == host->status || HOST_STATUS_NOT_MONITORED == host->status)
-	{
-		if (MAX_CONF_H > host->tls_dc_psk->conf->num_h++)
-			host->tls_dc_psk->conf->names[host->tls_dc_psk->conf->num_h - 1] = zbx_strdup(NULL, host->name);
-	}
-	else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
-	{
-		if (MAX_CONF_P > host->tls_dc_psk->conf->num_p++)
-			host->tls_dc_psk->conf->names[MAX_CONF_H + host->tls_dc_psk->conf->num_p - 1] =
-					zbx_strdup(NULL, host->name);
-	}
-}
-
-static void	report_and_free(ZBX_PSK_CONF *conf)
-{
-	char	*message = NULL;
-	size_t	alloc = 0, offset = 0;
-	int	i;
-
-	zbx_snprintf_alloc(&message, &alloc, &offset, "PSK conflict for identity \"%s\" between ", conf->psk_id);
-	zbx_free(conf->psk_id);
-
-	if (1 == conf->num_h)
-		zbx_snprintf_alloc(&message, &alloc, &offset, "host \"%s\"", conf->names[0]);
-	else if (1 < conf->num_h)
-		zbx_snprintf_alloc(&message, &alloc, &offset, "hosts: \"%s\"", conf->names[0]);
-
-	for (i = 1; MAX_CONF_H > i && conf->num_h > i; i++)
-		zbx_snprintf_alloc(&message, &alloc, &offset, ", \"%s\"", conf->names[i]);
-
-	if (MAX_CONF_H < conf->num_h)
-		zbx_snprintf_alloc(&message, &alloc, &offset, "... (and %u more)", conf->num_h - MAX_CONF_H);
-
-	if (0 < conf->num_h && 0 < conf->num_p)
-		zbx_snprintf_alloc(&message, &alloc, &offset, " and ");
-
-	if (1 == conf->num_p)
-		zbx_snprintf_alloc(&message, &alloc, &offset, "proxy \"%s\"", conf->names[MAX_CONF_H]);
-	else if (1 < conf->num_p)
-		zbx_snprintf_alloc(&message, &alloc, &offset, "proxies: \"%s\"", conf->names[MAX_CONF_H]);
-
-	for (i = 1; MAX_CONF_P > i && conf->num_p > i; i++)
-		zbx_snprintf_alloc(&message, &alloc, &offset, ", \"%s\"", conf->names[MAX_CONF_H + i]);
-
-	if (MAX_CONF_P < conf->num_p)
-		zbx_snprintf_alloc(&message, &alloc, &offset, "... (and %u more)", conf->num_p - MAX_CONF_P);
-
-	for (i = 0; MAX_CONF_H > i && conf->num_h > i; i++)
-		zbx_free(conf->names[i]);
-
-	for (i = 0; MAX_CONF_P > i && conf->num_p > i; i++)
-		zbx_free(conf->names[MAX_CONF_H + i]);
-
-	zbx_free(conf);
-	zabbix_log(LOG_LEVEL_WARNING, "%s", message);
-	zbx_free(message);
-}
-#endif
-
 static void	DCsync_hosts(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_hosts";
@@ -1508,13 +1423,9 @@ static void	DCsync_hosts(DB_RESULT result)
 				if (0 != strcmp(host->tls_dc_psk->tls_psk, row[34]))	/* new PSK value */
 											/* differs from old */
 				{
-					if (0 == host->tls_dc_psk->changes++)
-					{
-						/* change underlying PSK value and 'config->psks' is updated, too */
-						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[34]);
-						zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"",
-								row[33]);
-					}
+					/* change underlying PSK value and 'config->psks' is updated, too */
+					DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[34]);
+					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[33]);
 				}
 
 				goto done;
@@ -1545,11 +1456,8 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (0 != strcmp(psk_i->tls_psk, row[34]))	/* PSKid stored but PSK value is different */
 			{
-				if (0 == psk_i->changes++)
-				{
-					DCstrpool_replace(1, &psk_i->tls_psk, row[34]);
-					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[33]);
-				}
+				DCstrpool_replace(1, &psk_i->tls_psk, row[34]);
+				zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[33]);
 			}
 
 			host->tls_dc_psk = psk_i;
@@ -1562,8 +1470,6 @@ static void	DCsync_hosts(DB_RESULT result)
 		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[33]);
 		DCstrpool_replace(0, &psk_i_local.tls_psk, row[34]);
 		psk_i_local.refcount = 1;
-		psk_i_local.changes = 1;
-		psk_i_local.conf = NULL;
 		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
 done:
 #endif
@@ -1702,13 +1608,7 @@ done:
 		hostid = host->hostid;
 
 		if (FAIL != zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-		{
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			if (NULL != host->tls_dc_psk && 1 < host->tls_dc_psk->changes)
-				add_host_to_conflict(host);
-#endif
 			continue;
-		}
 
 		/* IPMI hosts */
 
@@ -1786,22 +1686,7 @@ done:
 	}
 
 	zbx_vector_uint64_destroy(&ids);
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	/* relink conflicts within PSK identities */
-	zbx_vector_ptr_create(&conflicts);
-	zbx_hashset_iter_reset(&config->psks, &iter);
 
-	while (NULL != (psk_i = zbx_hashset_iter_next(&iter)))
-	{
-		if (NULL != psk_i->conf)
-		{
-			zbx_vector_ptr_append(&conflicts, psk_i->conf);
-			psk_i->conf = NULL;
-		}
-
-		psk_i->changes = 0;
-	}
-#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -3851,12 +3736,6 @@ void	DCsync_configuration(void)
 	zbx_mem_dump_stats(strpool->mem_info);
 
 	FINISH_SYNC;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	for (i = 0; i < conflicts.values_num; i++)
-		report_and_free((ZBX_PSK_CONF *)conflicts.values[i]);
-
-	zbx_vector_ptr_destroy(&conflicts);
-#endif
 out:
 	DBfree_result(conf_result);
 	DBfree_result(host_result);
