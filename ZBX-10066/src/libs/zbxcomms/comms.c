@@ -210,22 +210,6 @@ static void	zbx_socket_free(zbx_socket_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_init                                                     *
- *                                                                            *
- * Purpose: initialize structure of zabbix socket with specified socket       *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_tcp_init(zbx_socket_t *s, ZBX_SOCKET o)
-{
-	zbx_socket_clean(s);
-
-	s->socket = o;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_socket_timeout_set                                           *
  *                                                                            *
  * Purpose: set timeout for socket operations                                 *
