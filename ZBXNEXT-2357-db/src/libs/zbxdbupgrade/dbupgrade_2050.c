@@ -856,7 +856,8 @@ static int	DBpatch_2050092(void)
 				"report1.php", "report.status"
 			};
 
-	result = DBselect("select userid,url from users where url<>''");
+	if (NULL == (result = DBselect("select userid,url from users where url<>''")))
+		return FAIL;
 
 	while (NULL != (row = (DBfetch(result))))
 	{
