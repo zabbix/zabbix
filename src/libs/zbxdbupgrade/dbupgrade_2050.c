@@ -848,7 +848,7 @@ static int	DBpatch_2050093(void)
 	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
 	if (ZBX_DB_OK > DBexecute("update screens"
 			" set userid=(select min(userid) from users where type=3)"
-			" where templateid is not null"))
+			" where templateid is null"))
 	{
 		return FAIL;
 	}
