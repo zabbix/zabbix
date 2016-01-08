@@ -291,7 +291,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	log_type = type;
 	log_level = level;
 
-	if (LOG_TYPE_SYSLOG == type)
+	if (LOG_TYPE_SYSTEM == type)
 	{
 #ifdef _WINDOWS
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
@@ -338,7 +338,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 
 void	zabbix_close_log(void)
 {
-	if (LOG_TYPE_SYSLOG == log_type)
+	if (LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		if (NULL != system_log_handle)
@@ -498,7 +498,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
 	va_end(args);
 
-	if (LOG_TYPE_SYSLOG == log_type)
+	if (LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		switch (level)
@@ -592,7 +592,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 int	zbx_get_log_type(const char *logtype)
 {
-	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_SYSLOG, ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
+	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_SYSTEM, ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
 	size_t		i;
 
 	for (i = 0; i < ARRSIZE(logtypes); i++)
