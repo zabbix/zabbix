@@ -328,7 +328,7 @@ if (hasRequest('form')) {
 			$data['screen']['templateid'] = getRequest('templateid');
 		}
 		else {
-			$data['screen']['userid'] = $current_userid;
+			$data['screen']['userid'] = getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid);
 			$data['screen']['private'] = getRequest('private', 1);
 			$data['screen']['users'] = getRequest('users', []);
 			$data['screen']['userGroups'] = getRequest('userGroups', []);
