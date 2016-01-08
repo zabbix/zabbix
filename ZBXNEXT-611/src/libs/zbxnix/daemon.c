@@ -31,7 +31,6 @@
 
 char		*CONFIG_PID_FILE = NULL;
 static int	parent_pid = -1;
-static int	daemon_flags = 0;
 
 extern pid_t	*threads;
 extern int	threads_num;
@@ -299,11 +298,9 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 	pid_t		pid;
 	struct passwd	*pwd;
 
-	daemon_flags = flags;
-
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
-		if (0 != (daemon_flags & ZBX_TASK_FLAG_FOREGROUND))
+		if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 		{
 			zbx_error("cannot run as root!");
 			exit(EXIT_FAILURE);
@@ -359,7 +356,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 
 	umask(0002);
 
-	if (0 == (daemon_flags & ZBX_TASK_FLAG_FOREGROUND))
+	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		if (0 != (pid = zbx_fork()))
 			exit(EXIT_SUCCESS);
@@ -375,10 +372,10 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 			assert(0);
 
 		zbx_handle_log();
-
-		if (FAIL == create_pid_file(CONFIG_PID_FILE))
-			exit(EXIT_FAILURE);
 	}
+
+	if (FAIL == create_pid_file(CONFIG_PID_FILE))
+		exit(EXIT_FAILURE);
 
 	atexit(daemon_stop);
 
@@ -392,7 +389,7 @@ int	daemon_start(int allow_root, const char *user, unsigned int flags)
 	/* other cases, SIGCHLD is set to SIG_DFL in zbx_child_fork(). */
 	zbx_set_child_signal_handler();
 
-	return MAIN_ZABBIX_ENTRY(daemon_flags);
+	return MAIN_ZABBIX_ENTRY(flags);
 }
 
 void	daemon_stop(void)
@@ -403,8 +400,7 @@ void	daemon_stop(void)
 	if (parent_pid != (int)getpid())
 		return;
 
-	if (0 == (daemon_flags & ZBX_TASK_FLAG_FOREGROUND))
-		drop_pid_file(CONFIG_PID_FILE);
+	drop_pid_file(CONFIG_PID_FILE);
 }
 
 int	zbx_sigusr_send(int flags)

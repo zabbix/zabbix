@@ -767,6 +767,7 @@ typedef struct
 {
 	zbx_task_t	task;
 	int		flags;
+	int		data;
 }
 ZBX_TASK_EX;
 
