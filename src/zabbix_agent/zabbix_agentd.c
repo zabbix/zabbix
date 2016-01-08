@@ -173,7 +173,7 @@ static struct zbx_option	longopts[] =
 };
 
 static char	shortopts[] =
-	"c:hVpt:"
+	"c:hVpt:f"
 #ifndef _WINDOWS
 	"R:"
 #else
