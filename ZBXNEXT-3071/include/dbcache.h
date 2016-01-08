@@ -113,6 +113,10 @@ typedef struct
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
+	char		error[HOST_ERROR_LEN_MAX];
+	char		snmp_error[HOST_ERROR_LEN_MAX];
+	char		ipmi_error[HOST_ERROR_LEN_MAX];
+	char		jmx_error[HOST_ERROR_LEN_MAX];
 }
 DC_HOST;
 
@@ -298,16 +302,6 @@ typedef struct
 }
 zbx_queue_item_t;
 
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	int		errors_from;
-	int		disable_until;
-	unsigned char	type;
-	unsigned char	available;
-}
-zbx_host_availability_t;
-
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
@@ -406,11 +400,11 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
-int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out);
+int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out);
 
-int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
-
-void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num);
+int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error);
 
 void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
 void	DCset_delta_items(zbx_hashset_t *items);
@@ -455,14 +449,24 @@ void	zbx_config_clean(zbx_config_t *cfg);
 
 /* flags to specify which host interfaces have enabled items */
 #define ZBX_FLAG_INTERFACE_NONE		0x00
-#define ZBX_FLAG_INTERFACE_AGENT	0x01
-#define ZBX_FLAG_INTERFACE_SNMP		0x02
-#define ZBX_FLAG_INTERFACE_IPMI		0x04
-#define ZBX_FLAG_INTERFACE_JMX		0x08
+#define ZBX_FLAG_INTERFACE_ZABBIX	(0x01 << (INTERFACE_TYPE_AGENT - 1))
+#define ZBX_FLAG_INTERFACE_SNMP		(0x01 << (INTERFACE_TYPE_SNMP - 1))
+#define ZBX_FLAG_INTERFACE_IPMI		(0x01 << (INTERFACE_TYPE_IPMI - 1))
+#define ZBX_FLAG_INTERFACE_JMX		(0x01 << (INTERFACE_TYPE_JMX - 1))
 #define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
 
-int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
+int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
+
+int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability();
+int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
+
+void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
+void	zbx_host_availability_clean(zbx_host_availability_t *availability);
+void	zbx_host_availability_free(zbx_host_availability_t *availability);
+int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
+
+void	zbx_set_availability_diff_ts(int ts);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1

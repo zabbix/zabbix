@@ -461,9 +461,8 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_PROXY_PASSIVE	0x04
 #define ZBX_PROGRAM_TYPE_PROXY		0x06	/* ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
 #define ZBX_PROGRAM_TYPE_AGENTD		0x08
-#define ZBX_PROGRAM_TYPE_AGENT		0x10
-#define ZBX_PROGRAM_TYPE_SENDER		0x20
-#define ZBX_PROGRAM_TYPE_GET		0x40
+#define ZBX_PROGRAM_TYPE_SENDER		0x10
+#define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
@@ -1122,5 +1121,17 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
 #define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
+
+typedef struct
+{
+	char	*name;
+	char	**params;
+	int	nparam;
+}
+zbx_function_t;
+
+void	zbx_function_clean(zbx_function_t *func);
+int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
+int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
 
 #endif
