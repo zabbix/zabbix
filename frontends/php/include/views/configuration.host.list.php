@@ -66,8 +66,8 @@ $table = (new CTableInfo())
 		_('Templates'),
 		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
 		_('Availability'),
-		_('Info'),
-		_('Agent encryption')
+		_('Agent encryption'),
+		_('Info')
 	]);
 
 $current_time = time();
@@ -245,8 +245,8 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates,
 		$status,
 		getHostAvailabilityTable($host),
-		$lifetime_indicator,
-		$encryption
+		$encryption,
+		$lifetime_indicator
 	]);
 }
 
