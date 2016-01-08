@@ -856,7 +856,7 @@ static int	DBpatch_2050092(void)
 				"report1.php", "report.status"
 			};
 
-	result = DBselect("select userid,url from users");
+	result = DBselect("select userid,url from users where url<>''");
 
 	while (NULL != (row = (DBfetch(result))))
 	{
@@ -887,9 +887,19 @@ static int	DBpatch_2050092(void)
 			zbx_strcpy_alloc(&url, &url_alloc, &url_offset, end + 1);
 		}
 
-		url_esc = DBdyn_escape_string(url);
-		rc = DBexecute("update users set url='%s' where userid=%s", url_esc, row[0]);
-		zbx_free(url_esc);
+		/* 255 - user url field size */
+		if (url_offset > 255)
+		{
+			rc = DBexecute("update users set url='' where userid=%s", row[0]);
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert URL for user id \"%s\":"
+					" value is too long. The URL field was reset.", row[0]);
+		}
+		else
+		{
+			url_esc = DBdyn_escape_string(url);
+			rc = DBexecute("update users set url='%s' where userid=%s", url_esc, row[0]);
+			zbx_free(url_esc);
+		}
 
 		if (ZBX_DB_OK > rc)
 			goto out;
