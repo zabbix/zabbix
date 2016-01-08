@@ -75,7 +75,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Absolute path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
-	"  --foreground                   Run application in foreground",
+	"  -f --foreground                Run application in foreground",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
@@ -765,15 +765,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (0 != foreground)
-	{
-		if (ZBX_TASK_START != t.task)
-		{
-			zbx_error("foreground option can be used only when running Zabbix proxy");
-			exit(EXIT_FAILURE);
-		}
-
 		t.flags = ZBX_TASK_FLAG_FOREGROUND;
-	}
 
 	/* every option may be specified only once */
 	if (1 < opt_c || 1 < opt_r)

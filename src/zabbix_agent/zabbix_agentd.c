@@ -107,7 +107,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Absolute path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
-	"  --foreground                   Run application in foreground",
+	"  -f --foreground                Run application in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
 #ifdef _WINDOWS
@@ -272,7 +272,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -331,17 +331,33 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		}
 	}
 
-	if (0 != foreground)
+#ifdef _WINDOWS
+	switch (t->task)
 	{
-		if (ZBX_TASK_START != t->task)
-		{
-			zbx_error("foreground option can be used only when running Zabbix agent");
-			ret = FAIL;
-			goto out;
-		}
+		case ZBX_TASK_INSTALL_SERVICE:
+		case ZBX_TASK_UNINSTALL_SERVICE:
+		case ZBX_TASK_START_SERVICE:
+		case ZBX_TASK_STOP_SERVICE:
+			if (0 != foreground)
+			{
+				zbx_error("foreground option can not be used with Zabbix agent services");
+				ret = FAIL;
+				goto out;
+			}
+			break;
 
-		t->flags = ZBX_TASK_FLAG_FOREGROUND;
+		default:
+			if (ZBX_TASK_FLAG_MULTIPLE_AGENTS == t->flags)
+			{
+				zbx_error("multiple agents option can be used only with Zabbix agent services");
+				ret = FAIL;
+				goto out;
+			}
 	}
+#endif
+
+	if (0 != foreground)
+		t->flags = ZBX_TASK_FLAG_FOREGROUND;
 
 	/* every option may be specified only once */
 
@@ -352,7 +368,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		if ('h' == ch || 'V' == ch)
 			continue;
 
-		if (1 < opt_count[ch])
+		if (1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
