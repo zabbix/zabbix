@@ -843,7 +843,7 @@ static int	DBpatch_2050092(void)
 	const char	*end, *start;
 	int		len, ret = FAIL, rc;
 	char		*url = NULL, *url_esc;
-	size_t		i, url_alloc = 0, url_offset = 0;
+	size_t		i, url_alloc = 0, url_offset;
 	char		*url_map[] = {
 				"dashboard.php", "dashboard.view",
 				"discovery.php", "discovery.view",
@@ -877,6 +877,7 @@ static int	DBpatch_2050092(void)
 		if (ARRSIZE(url_map) == i)
 			continue;
 
+		url_offset = 0;
 		zbx_strncpy_alloc(&url, &url_alloc, &url_offset, row[1], start - row[1]);
 		zbx_strcpy_alloc(&url, &url_alloc, &url_offset, "zabbix.php?action=");
 		zbx_strcpy_alloc(&url, &url_alloc, &url_offset, url_map[i + 1]);
@@ -901,8 +902,6 @@ static int	DBpatch_2050092(void)
 
 		if (ZBX_DB_OK > rc)
 			goto out;
-
-		url_offset = 0;
 	}
 
 	ret = SUCCEED;
