@@ -36,7 +36,9 @@ if ($this->data['screen']['templateid']) {
 // create form
 $form = (new CForm())
 	->setName('screenForm')
-	->addVar('form', $this->data['form']);
+	->addVar('form', $this->data['form'])
+	->addVar('current_user_userid', $data['current_user_userid'])
+	->addVar('current_user_fullname', getUserFullname($data['users'][$data['current_user_userid']]));
 
 if ($this->data['screen']['templateid']) {
 	$form->addVar('templateid', $this->data['screen']['templateid']);
