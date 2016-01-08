@@ -845,16 +845,16 @@ static int	DBpatch_2050092(void)
 	char		*url = NULL, *url_esc;
 	size_t		i, url_alloc = 0, url_offset = 0;
 	char		*url_map[] = {
-					"dashboard.php", "dashboard.view",
-					"discovery.php", "discovery.view",
-					"maps.php", "map.view",
-					"httpmon.php", "web.view",
-					"media_types.php", "mediatype.list",
-					"proxies.php", "proxy.list",
-					"scripts.php", "script.list",
-					"report3.php", "report.services",
-					"report1.php", "report.status"
-				};
+				"dashboard.php", "dashboard.view",
+				"discovery.php", "discovery.view",
+				"maps.php", "map.view",
+				"httpmon.php", "web.view",
+				"media_types.php", "mediatype.list",
+				"proxies.php", "proxy.list",
+				"scripts.php", "script.list",
+				"report3.php", "report.services",
+				"report1.php", "report.status"
+			};
 
 	result = DBselect("select userid,url from users");
 
