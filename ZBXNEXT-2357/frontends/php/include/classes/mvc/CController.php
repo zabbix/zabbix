@@ -149,7 +149,7 @@ abstract class CController {
 	 */
 	public function validateInput($validationRules) {
 		if (CSession::keyExists('formData')) {
-			$input = array_merge($_REQUEST, CSession::getValue('messages'));
+			$input = array_merge($_REQUEST, CSession::getValue('formData'));
 			CSession::unsetValue(['formData']);
 		}
 		else {
