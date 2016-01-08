@@ -752,10 +752,10 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT && history[i].value_type != ITEM_VALUE_TYPE_UINT64)
+		if (0 != history[i].value_undef || 0 == history[i].keep_trends)
 			continue;
 
-		if (0 != history[i].value_undef || 0 == history[i].keep_trends)
+		if (history[i].value_type != ITEM_VALUE_TYPE_FLOAT && history[i].value_type != ITEM_VALUE_TYPE_UINT64)
 			continue;
 
 		DCadd_trend(&history[i], &trends, &trends_alloc, &trends_num);
@@ -1465,10 +1465,10 @@ static void	dc_add_history_dbl(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
-		if (0 != history[i].value_undef || 0 == history[i].keep_history)
+		if (ITEM_VALUE_TYPE_FLOAT != history[i].value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1495,10 +1495,10 @@ static void	dc_add_history_uint(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
-		if (0 != history[i].value_undef || 0 == history[i].keep_history)
+		if (ITEM_VALUE_TYPE_UINT64 != history[i].value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1525,10 +1525,10 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_STR != history[i].value_type)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
-		if (0 != history[i].value_undef || 0 == history[i].keep_history)
+		if (ITEM_VALUE_TYPE_STR != history[i].value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1558,10 +1558,10 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int ht
 
 	for (i = 0; i < history_num; i++)
 	{
-		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
+		if (0 != history[i].value_undef || 0 == history[i].keep_history)
 			continue;
 
-		if (0 != history[i].value_undef || 0 == history[i].keep_history)
+		if (ITEM_VALUE_TYPE_TEXT != history[i].value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, id++, history[i].itemid, history[i].ts.sec, history[i].ts.ns,
@@ -1595,10 +1595,10 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 	{
 		h = &history[i];
 
-		if (ITEM_VALUE_TYPE_LOG != h->value_type)
+		if (0 != h->value_undef || 0 != h->meta || 0 == h->keep_history)
 			continue;
 
-		if (0 != h->value_undef || 0 != h->meta || 0 == h->keep_history)
+		if (ITEM_VALUE_TYPE_LOG != h->value_type)
 			continue;
 
 		zbx_db_insert_add_values(&db_insert, id++, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
