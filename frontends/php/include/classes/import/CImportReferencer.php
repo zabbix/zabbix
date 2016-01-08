@@ -818,8 +818,7 @@ class CImportReferencer {
 				'filter' => [
 					'name' => $graphNames,
 					'flags' => null
-				],
-				'editable' => true
+				]
 			]);
 
 			foreach ($dbGraphs as $dbGraph) {
