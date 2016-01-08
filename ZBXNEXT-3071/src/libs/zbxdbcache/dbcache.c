@@ -1924,7 +1924,6 @@ int	DCsync_history(int sync_type, int *total_num)
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			DCconfig_unlock_all_triggers();
 
-
 		LOCK_CACHE;
 
 		/* A history syncer exited before pushing taken items back to history cache. */
