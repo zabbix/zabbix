@@ -30,11 +30,11 @@
 #define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
 
 #define LOG_TYPE_UNDEFINED	0
-#define LOG_TYPE_SYSLOG		1
+#define LOG_TYPE_SYSTEM		1
 #define LOG_TYPE_FILE		2
 #define LOG_TYPE_CONSOLE	3
 
-#define ZBX_OPTION_LOGTYPE_SYSLOG	"syslog"
+#define ZBX_OPTION_LOGTYPE_SYSTEM	"system"
 #define ZBX_OPTION_LOGTYPE_FILE		"file"
 #define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
