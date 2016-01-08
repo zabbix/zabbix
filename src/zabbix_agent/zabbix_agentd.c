@@ -282,7 +282,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -1115,7 +1115,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
+			exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:

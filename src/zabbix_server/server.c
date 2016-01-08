@@ -694,7 +694,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.data))
 					exit(EXIT_FAILURE);
 
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
@@ -752,7 +752,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
+		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
