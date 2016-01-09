@@ -197,11 +197,11 @@ if (CSession::keyExists('messageOk') || CSession::keyExists('messageError')) {
 
 	if (CSession::keyExists('messageOk')) {
 		$message_good = true;
-		$message_ok = CSession::keyExists('messageOk');
+		$message_ok = CSession::getValue('messageOk');
 	}
 	else {
 		$message_good = false;
-		$message_error = CSession::keyExists('messageError');
+		$message_error = CSession::getValue('messageError');
 	}
 
 	CSession::unsetValue(['messageOk', 'messageError']);
