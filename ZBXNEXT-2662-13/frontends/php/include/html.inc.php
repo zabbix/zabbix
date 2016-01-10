@@ -777,19 +777,11 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
  *
  * @return CDiv
  */
-function makePageFooter($with_logo = true, $with_version = true)
+function makePageFooter($with_version = true)
 {
-	$logo = $with_logo
-		? (new CLink('', 'http://www.zabbix.com/'))
-			->addClass('logo')
-			->removeSID()
-			->setAttribute('target', '_blank')
-		: null;
-	$version = $with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : '';
-
 	return (new CDiv([
-		$logo,
-		$version.'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
+		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
+		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
 		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT)
