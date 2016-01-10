@@ -39,7 +39,7 @@ body {
   line-height: 1.4em;
   color: #f2f2f2;
   background-color: #0e1012;
-  margin-bottom: 90px;
+  margin-bottom: 60px;
   min-width: 950px; }
 
 a:link {
@@ -381,7 +381,7 @@ footer, .footer {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 60px;
+  height: 30px;
   text-align: center;
   color: #737373; }
   footer a.logo, .footer a.logo {
@@ -885,7 +885,7 @@ footer, .footer {
     text-transform: uppercase;
     letter-spacing: 0.0688em;
     text-rendering: optimizeLegibility;
-    padding: 0 10px 0 0; }
+    padding: 0 5px 0 0; }
     .table-forms th:last-child {
       padding: 0; }
   .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {
@@ -903,17 +903,11 @@ footer, .footer {
       display: block;
       height: 24px;
       line-height: 24px; }
-    .table-forms .table-forms-td-left input[type="checkbox"] {
-      top: -6px; }
-    .table-forms .table-forms-td-left input[type="radio"] {
-      top: -6px; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
     vertical-align: middle;
     width: 85%; }
-    .table-forms .table-forms-td-right th {
-      padding: 0; }
     .table-forms .table-forms-td-right td {
       padding: 5px 5px 5px 0;
       position: relative; }
@@ -1076,9 +1070,9 @@ input[type="checkbox"], input[type="radio"] {
   margin: 0;
   padding: 0;
   border: 0;
-  vertical-align: bottom;
+  vertical-align: middle;
   position: relative;
-  top: -2px;
+  top: -1px;
   overflow: hidden;
   width: 13px;
   height: 13px;
@@ -1429,29 +1423,32 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 .setup-container {
   background-color: #2b2b2b;
   width: 766px;
-  height: 440px;
+  height: 420px;
   margin: 0 auto;
-  padding: 20px 28px;
+  margin-top: 5%;
+  padding: 42px;
   vertical-align: top;
   position: relative;
   border: 1px solid #303030; }
   .setup-container h1 {
     border: none;
-    margin: 0 0 10px 0;
+    margin: 3px 0 11px 0;
     padding: 0; }
+  .setup-container .signin-logo {
+    margin: 0 0 37px 0; }
 
 .setup-left {
   float: left;
   width: 198px;
   padding-right: 10px; }
   .setup-left ul {
-    margin: -4px 0 0 -28px; }
+    margin: -4px 0 0 -42px; }
     .setup-left ul li {
-      padding: 4px 0 4px 28px; }
+      padding: 4px 0 4px 42px; }
       .setup-left ul li.setup-left-current {
         border-left: 3px solid #69808d;
         color: #737373;
-        padding-left: 25px; }
+        padding-left: 39px; }
 
 .setup-right {
   width: auto;
@@ -1459,7 +1456,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .setup-right-body {
   padding-right: 5px;
-  max-height: 355px;
+  max-height: 345px;
   overflow-y: auto; }
   .setup-right-body .list-table {
     border: none; }
@@ -1468,12 +1465,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     width: auto; }
   .setup-right-body .table-forms-td-right {
     width: 100%; }
-  .setup-right-body h4 {
+  .setup-right-body h1 {
     margin: 25% 0 0.4em 0; }
 
 .setup-title {
   color: #737373;
-  height: 350px;
+  height: 345px;
   display: table-cell;
   vertical-align: middle;
   font-size: 7em;
@@ -1484,7 +1481,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .setup-footer {
   position: absolute;
-  bottom: 21px;
+  bottom: 32px;
   width: 766px;
   text-align: right; }
   .setup-footer div {
@@ -1497,32 +1494,33 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .signin-container {
   background-color: #2b2b2b;
-  width: 322px;
+  width: 280px;
   margin: 0 auto;
-  padding: 20px 28px 0 28px;
+  margin-top: 5%;
+  padding: 42px 42px 39px 42px;
   border: 1px solid #303030; }
   .signin-container h1 {
     border: none;
     margin: 0 0 17px 0;
     padding: 0; }
   .signin-container ul li {
-    padding: 0 0 22px 0;
+    padding: 16px 0 0 0;
     font-size: 1.167em; }
     .signin-container ul li.sign-in-txt {
       text-align: center; }
   .signin-container label {
-    display: block;
+    display: inline-block;
     margin: 0 0 2px 0; }
   .signin-container button {
     font-size: 1em;
-    min-height: 38px;
-    line-height: 38px;
+    margin: 7px 0;
+    min-height: 35px;
+    line-height: 35px;
     width: 100%; }
 
 .signin-logo {
   margin: 0 auto;
-  margin-top: 5%;
-  margin-bottom: 25px;
+  margin-bottom: 21px;
   width: 114px;
   height: 30px;
   background: url(../img/icon-sprite.svg) no-repeat 0 -864px; }
@@ -1531,10 +1529,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   width: 100%;
   text-align: center;
   color: #737373;
-  margin: 22px 0 0 0; }
+  margin: 11px 0 0 0; }
 
 .signin-container input[type="text"], .signin-container input[type="password"] {
-  padding: 10px 5px;
+  padding: 9px 5px;
   width: 100%; }
 
 .widget-placeholder .cell {
