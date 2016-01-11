@@ -123,11 +123,7 @@ if ($isExportData) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['screenid'])) {
-	unset($_REQUEST['screenid']);
-	$_REQUEST['form'] = 'clone';
-}
-elseif (hasRequest('add') || hasRequest('update')) {
+if (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {
