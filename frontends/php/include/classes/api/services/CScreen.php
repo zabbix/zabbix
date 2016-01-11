@@ -734,7 +734,7 @@ class CScreen extends CApiService {
 			}
 		}
 
-		$screens = $this->extendObjects($this->tableName(), $screens, ['name']);
+		$screens = $this->extendFromObjects(zbx_toHash($screens, 'screenid'), $db_screens, ['name']);
 
 		foreach ($screens as $screen) {
 			// "templateid" is not allowed
