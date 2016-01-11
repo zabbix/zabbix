@@ -177,13 +177,13 @@ next:
 			case SUCCEED:
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 				{
-					calc_timestamp(results[i].logs[0]->value, &results[i].logs[0]->timestamp,
+					calc_timestamp(results[i].log->value, &results[i].log->timestamp,
 							items[i].logtimefmt);
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-						ts, items[i].state, NULL, NULL);
+						ts, items[i].state, NULL);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;
@@ -192,7 +192,7 @@ next:
 			case NOTSUPPORTED:
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						ts, items[i].state, results[i].msg, NULL);
+						ts, items[i].state, results[i].msg);
 
 				itemids[i] = items[i].itemid;
 				states[i] = items[i].state;

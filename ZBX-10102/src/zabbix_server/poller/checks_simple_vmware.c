@@ -654,7 +654,8 @@ out:
 	return ret;
 }
 
-static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result)
+static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result,
+		zbx_vector_ptr_t *vmware_events)
 {
 	const char		*__function_name = "vmware_get_events";
 
@@ -697,56 +698,60 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 
 		for (i = 0; i < ids.values_num; i++)
 		{
+			vmware_event_t	*vmware_event;
+
 			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
 					ZBX_XPATH_LN("fullFormattedMessage"), ids.values[i]);
 
 			if (NULL == (value = zbx_xml_read_value(events, xpath)))
 				continue;
 
-			zbx_replace_invalid_utf8(value);
-			log = add_log_result(result, value);
-			log->logeventid = ids.values[i];
-			log->lastlogsize = ids.values[i];
+			vmware_event = zbx_malloc(NULL, sizeof(vmware_event_t));
 
-			zbx_free(value);
+			zbx_replace_invalid_utf8(value);
+
+			vmware_event->value = value;
+			vmware_event->logeventid = ids.values[i];
+			vmware_event->timestamp = 0;
+			vmware_event->lastlogsize = ids.values[i];
 
 			/* timestamp */
 
 			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
 					ZBX_XPATH_LN("createdTime"), ids.values[i]);
 
-			if (NULL == (value = zbx_xml_read_value(events, xpath)))
-				continue;
-
-			/* 2013-06-04T14:19:23.406298Z */
-			if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-					&tm.tm_hour, &tm.tm_min, &tm.tm_sec))
-
+			if (NULL != (value = zbx_xml_read_value(events, xpath)))
 			{
-				int		tz_offset;
+				/* 2013-06-04T14:19:23.406298Z */
+				if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
+								&tm.tm_hour, &tm.tm_min, &tm.tm_sec))
+
+				{
+					int		tz_offset;
 #if defined(HAVE_TM_TM_GMTOFF)
-				struct tm	*ptm;
-				time_t		now;
+					struct tm	*ptm;
+					time_t		now;
 
-				now = time(NULL);
-				ptm = localtime(&now);
-				tz_offset = ptm->tm_gmtoff;
+					now = time(NULL);
+					ptm = localtime(&now);
+					tz_offset = ptm->tm_gmtoff;
 #else
-				tz_offset = -timezone;
+					tz_offset = -timezone;
 #endif
-				tm.tm_year -= 1900;
-				tm.tm_mon--;
-				tm.tm_isdst = -1;
+					tm.tm_year -= 1900;
+					tm.tm_mon--;
+					tm.tm_isdst = -1;
 
-				if (0 < (t = mktime(&tm)))
-					log->timestamp = (int)t + tz_offset;
+					if (0 < (t = mktime(&tm)))
+						vmware_event->timestamp = (int)t + tz_offset;
+				}
+
+				zbx_free(value);
 			}
 
-			zbx_free(value);
+			zbx_vector_ptr_append(vmware_events, vmware_event);
 		}
 	}
-	else
-		set_log_result_empty(result);
 
 	zbx_vector_uint64_destroy(&ids);
 
@@ -761,7 +766,7 @@ out:
 }
 
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+		AGENT_RESULT *result, zbx_vector_ptr_t *vmware_events)
 {
 	const char		*__function_name = "check_vcenter_eventlog";
 
@@ -782,12 +787,9 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const c
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-	{
-		set_log_result_empty(result);
 		goto unlock;
-	}
 
-	ret = vmware_get_events(service->data->events, request->lastlogsize, result);
+	ret = vmware_get_events(service->data->events, request->lastlogsize, result, vmware_events);
 unlock:
 	zbx_vmware_unlock();
 out:

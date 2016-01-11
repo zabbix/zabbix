@@ -417,7 +417,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
+static void    vmware_event_free(vmware_event_t *vmware_event)
+{
+	zbx_free(vmware_event->value);
+	zbx_free(vmware_event);
+}
+
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *vmware_events)
 {
 	const char	*__function_name = "get_value";
 	int		res = FAIL;
@@ -441,7 +447,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
-			res = get_value_simple(item, result);
+			res = get_value_simple(item, result, vmware_events);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result);
@@ -518,15 +524,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
-	const char	*__function_name = "get_values";
-	DC_ITEM		items[MAX_POLLER_ITEMS];
-	AGENT_RESULT	results[MAX_POLLER_ITEMS];
-	zbx_uint64_t	lastlogsizes[MAX_POLLER_ITEMS];
-	int		errcodes[MAX_POLLER_ITEMS];
-	zbx_timespec_t	timespec;
-	int		i, num;
-	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
-	int		last_available = HOST_AVAILABLE_UNKNOWN;
+	const char		*__function_name = "get_values";
+	DC_ITEM			items[MAX_POLLER_ITEMS];
+	AGENT_RESULT		results[MAX_POLLER_ITEMS];
+	int			errcodes[MAX_POLLER_ITEMS];
+	zbx_timespec_t		timespec;
+	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
+	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
+	zbx_vector_ptr_t	vmware_events;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -543,7 +548,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	{
 		init_result(&results[i]);
 		errcodes[i] = SUCCEED;
-		lastlogsizes[i] = 0;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
@@ -636,6 +640,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_free(port);
 
+	zbx_vector_ptr_create(&vmware_events);
+
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
@@ -662,7 +668,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	else if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0]);
+			errcodes[0] = get_value(&items[0], &results[0], &vmware_events);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -672,6 +678,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
+		zbx_uint64_t	lastlogsize;
+		char		lastlogsize_undef = 1;
+
 		switch (errcodes[i])
 		{
 			case SUCCEED:
@@ -699,40 +708,69 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			/* remove formatting symbols from the end of the result */
 			/* so it could be checked by "is_uint64" and "is_double" functions */
 			/* when we try to get "int" or "float" values from "string" result */
-			if (ISSET_STR(&results[i]))
+			if (0 != ISSET_STR(&results[i]))
 				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
-			if (ISSET_TEXT(&results[i]))
+			if (0 != ISSET_TEXT(&results[i]))
 				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
 
 			items[i].state = ITEM_STATE_NORMAL;
-			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].state, NULL, NULL);
 
-			if (0 != ISSET_LOG(&results[i]))
+			if (0 == vmware_events.values_num)
 			{
-				if (NULL != results[i].logs[0])
+				if (ITEM_VALUE_TYPE_LOG != items[i].value_type)
 				{
-					size_t	j;
-
-					for (j = 1; NULL != results[i].logs[j]; j++)
-						;
-
-					lastlogsizes[i] = results[i].logs[j - 1]->lastlogsize;
+					dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
+							&timespec, items[i].state, NULL);
 				}
-				else
-					lastlogsizes[i] = items[i].lastlogsize;
 			}
+			else
+			{
+				/* vmware.eventlog item returns list of events with a value */
 
+				size_t	i;
+
+				for (i = 0; i < vmware_events.values_num; i++)
+				{
+					AGENT_RESULT	ar;
+					int		ret;
+					vmware_event_t	*vmware_event = vmware_events.values[i];
+
+					init_result(&ar);
+
+					/* vmware event always contains value and lastlogsize */
+					if (SUCCEED == (ret = set_result_type(&ar, items[i].value_type, items[i].flags,
+							vmware_event->value)))
+					{
+						set_result_meta(&ar, vmware_event->lastlogsize, 0);
+
+						ar.log->logeventid = vmware_event->logeventid;
+						ar.log->timestamp = vmware_event->timestamp;
+
+						if (0 != lastlogsize_undef)
+						{
+							lastlogsize_undef = 0;
+							lastlogsize = ar.lastlogsize;
+						}
+					}
+
+					dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &ar,
+							&timespec, items[i].state, NULL);
+
+					if (SUCCEED != ret)
+						break;
+				}
+			}
 		}
 		else if (HOST_AVAILABLE_FALSE != last_available)
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
-					items[i].state, results[i].msg, NULL);
+					items[i].state, results[i].msg);
 		}
 
-		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
-				&errcodes[i], 1, poller_type, nextcheck);
+		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec,
+				(0 == lastlogsize_undef ? &lastlogsize : NULL), NULL, &errcodes[i], 1, poller_type,
+				nextcheck);
 
 		zbx_free(items[i].key);
 
@@ -764,6 +802,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		free_result(&results[i]);
 	}
+
+	zbx_vector_ptr_clear_ext(&vmware_events, (zbx_mem_free_func_t)vmware_event_free);
+	zbx_vector_ptr_destroy(&vmware_events);
 
 	DCconfig_clean_items(items, NULL, num);
 

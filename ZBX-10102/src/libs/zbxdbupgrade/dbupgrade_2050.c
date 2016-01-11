@@ -845,7 +845,7 @@ static int	DBpatch_2050092(void)
 
 static int	DBpatch_2050093(void)
 {
-	/* previously, "meta" records never contained the value */
+	/* previously, "meta" records never contained a value */
 	if (ZBX_DB_OK > DBexecute("update proxy_history set flags=3 where flags=1"))
 	{
 		return FAIL;

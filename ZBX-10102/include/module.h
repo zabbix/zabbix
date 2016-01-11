@@ -86,6 +86,16 @@ typedef struct
 }
 AGENT_RESULT;
 
+/* result of simple check vmware.eventlog */
+typedef struct
+{
+	char		*value;
+	int		logeventid;
+	int		timestamp;
+	zbx_uint64_t	lastlogsize;
+}
+vmware_event_t;
+
 /* agent result types */
 #define AR_UINT64	0x01
 #define AR_DOUBLE	0x02

@@ -23,6 +23,7 @@
 #include "log.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
+typedef int	(*vmlogfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *, zbx_vector_ptr_t *);
 
 #define ZBX_VMWARE_PREFIX	"vmware."
 
@@ -33,17 +34,25 @@ typedef struct
 }
 zbx_vmcheck_t;
 
+typedef struct
+{
+	const char	*key;
+	vmlogfunc_t	logfunc;
+}
+zbx_vmlogcheck_t;
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #	define VMCHECK_FUNC(func)	func
+#	define VMLOGCHECK_FUNC(func)	func
 #else
 #	define VMCHECK_FUNC(func)	NULL
+#	define VMLOGCHECK_FUNC(func)	NULL
 #endif
 
 static zbx_vmcheck_t	vmchecks[] =
 {
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
-	{"eventlog", VMCHECK_FUNC(check_vcenter_eventlog)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 
@@ -104,6 +113,13 @@ static zbx_vmcheck_t	vmchecks[] =
 	{NULL, NULL}
 };
 
+static zbx_vmlogcheck_t	vmlogchecks[] =
+{
+	{"eventlog", VMLOGCHECK_FUNC(check_vcenter_eventlog)},
+
+	{NULL, NULL}
+};
+
 /******************************************************************************
  *                                                                            *
  * Function: get_vmware_function                                              *
@@ -136,12 +152,32 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
+static int	get_vmware_eventlog_function(const char *key, vmlogfunc_t *vmlogfunc)
+{
+	zbx_vmlogcheck_t	*check;
+
+	if (0 != strncmp(key, ZBX_VMWARE_PREFIX, ZBX_CONST_STRLEN(ZBX_VMWARE_PREFIX)))
+		return FAIL;
+
+	for (check = vmlogchecks; NULL != check->key; check++)
+	{
+		if (0 == strcmp(key + ZBX_CONST_STRLEN(ZBX_VMWARE_PREFIX), check->key))
+		{
+			*vmlogfunc = check->logfunc;
+			return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *vmware_events)
 {
 	const char	*__function_name = "get_value_simple";
 
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;
+	vmlogfunc_t	vmlogfunc;
 	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'",
@@ -168,6 +204,16 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		if (NULL != vmfunc)
 		{
 			if (SYSINFO_RET_OK == vmfunc(&request, item->username, item->password, result))
+				ret = SUCCEED;
+		}
+		else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
+	}
+	else if (SUCCEED == get_vmware_eventlog_function(request.key, &vmlogfunc))
+	{
+		if (NULL != vmlogfunc)
+		{
+			if (SYSINFO_RET_OK == vmlogfunc(&request, item->username, item->password, result, vmware_events))
 				ret = SUCCEED;
 		}
 		else
