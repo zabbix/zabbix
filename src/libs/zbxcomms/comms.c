@@ -1509,12 +1509,12 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
  ******************************************************************************/
 ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 {
-#define ZBX_TCP_EXPECT_NOTHING	0
 #define ZBX_TCP_EXPECT_HEADER	1
 #define ZBX_TCP_EXPECT_LENGTH	2
 #define ZBX_TCP_EXPECT_TEXT_XML	3
 #define ZBX_TCP_EXPECT_SIZE	4
 #define ZBX_TCP_EXPECT_CLOSE	5
+#define ZBX_TCP_EXPECT_XML_END	6
 
 	ssize_t		nbytes;
 	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0;
@@ -1534,23 +1534,16 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 		if (ZBX_PROTO_ERROR == nbytes)
 			goto out;
 
-		if (buf_stat_bytes + buf_dyn_bytes + nbytes > expected_len)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Message from %s exceeds expected size of " ZBX_FS_UI64 " bytes. "
-					"Message ignored.", get_ip_by_socket(s), expected_len);
-			nbytes = ZBX_PROTO_ERROR;
-			goto out;
-		}
-
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
 			buf_stat_bytes += nbytes;
 		else
 			zbx_strncpy_alloc(&s->buffer, &allocated, &buf_dyn_bytes, s->buf_stat, nbytes);
 
-		if (ZBX_TCP_EXPECT_SIZE == expect && buf_stat_bytes + buf_dyn_bytes == expected_len)
+		if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 			break;
 
-		if (ZBX_TCP_EXPECT_SIZE == expect || ZBX_TCP_EXPECT_CLOSE == expect)
+		/* performance short-circuit, can be omitted */
+		if (ZBX_TCP_EXPECT_SIZE == expect || (ZBX_TCP_EXPECT_CLOSE == expect && ZBX_BUF_TYPE_DYN == s->buf_type))
 			continue;
 
 		if (ZBX_TCP_EXPECT_HEADER == expect)
@@ -1606,7 +1599,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 
 			expect = ZBX_TCP_EXPECT_SIZE;
 
-			if (buf_stat_bytes + buf_dyn_bytes == expected_len)
+			if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 				break;
 
 			continue;
@@ -1645,23 +1638,45 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 				if (0 != strncmp(s->buffer, "<req>", ZBX_CONST_STRLEN("<req>")))
 					break;
 
-				expect = ZBX_TCP_EXPECT_NOTHING;
+				expect = ZBX_TCP_EXPECT_XML_END;
 			}
 		}
 
-		/* closing tag received in the last 10 bytes? */
-		s->buffer[buf_stat_bytes + buf_dyn_bytes] = '\0';
-		if (NULL != strstr(s->buffer + buf_stat_bytes + buf_dyn_bytes - (10 > buf_stat_bytes + buf_dyn_bytes ?
-				buf_stat_bytes + buf_dyn_bytes : 10), "</req>"))
+		if (ZBX_TCP_EXPECT_XML_END == expect)
 		{
-			break;
+			/* closing tag received in the last 10 bytes? */
+			s->buffer[buf_stat_bytes + buf_dyn_bytes] = '\0';
+			if (NULL != strstr(s->buffer + buf_stat_bytes + buf_dyn_bytes - (10 > buf_stat_bytes +
+					buf_dyn_bytes ? buf_stat_bytes + buf_dyn_bytes : 10), "</req>"))
+			{
+				break;
+			}
 		}
 	}
 
-	if (ZBX_TCP_EXPECT_SIZE == expect && buf_stat_bytes + buf_dyn_bytes != expected_len)
+	if (ZBX_TCP_EXPECT_SIZE == expect)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is shorter than expected " ZBX_FS_UI64 " bytes. "
-				"Message ignored.", get_ip_by_socket(s), expected_len);
+		if (buf_stat_bytes + buf_dyn_bytes != expected_len)
+		{
+			if (buf_stat_bytes + buf_dyn_bytes < expected_len)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is shorter than expected " ZBX_FS_UI64
+						" bytes. Message ignored.", get_ip_by_socket(s), expected_len);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than expected " ZBX_FS_UI64
+						" bytes. Message ignored.", get_ip_by_socket(s), expected_len);
+			}
+
+			nbytes = ZBX_PROTO_ERROR;
+			goto out;
+		}
+	}
+	else if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than " ZBX_FS_UI64 " bytes allowed for"
+				" plain text. Message ignored.", get_ip_by_socket(s), expected_len);
 		nbytes = ZBX_PROTO_ERROR;
 		goto out;
 	}
@@ -1674,12 +1689,12 @@ out:
 
 	return (ZBX_PROTO_ERROR == nbytes ? FAIL : s->read_bytes);
 
-#undef ZBX_TCP_EXPECT_NOTHING
 #undef ZBX_TCP_EXPECT_HEADER
 #undef ZBX_TCP_EXPECT_LENGTH
 #undef ZBX_TCP_EXPECT_TEXT_XML
 #undef ZBX_TCP_EXPECT_SIZE
 #undef ZBX_TCP_EXPECT_CLOSE
+#undef ZBX_TCP_EXPECT_XML_END
 }
 
 char	*get_ip_by_socket(zbx_socket_t *s)
