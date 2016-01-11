@@ -260,7 +260,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	int		i, ret = SUCCEED;
 	char		ch;
+#ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
+#endif
 	unsigned short	opt_count[256] = {0};
 
 	t->task = ZBX_TASK_START;
