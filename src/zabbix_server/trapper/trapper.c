@@ -53,14 +53,16 @@ extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_agenthistory";
-	char		info[128];
+	char		*info = NULL;
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = process_hist_data(sock, jp, 0, info, sizeof(info));
+	ret = process_hist_data(sock, jp, 0, &info);
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
+
+	zbx_free(info);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -90,7 +92,7 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	update_proxy_lastaccess(proxy_hostid);
 
-	ret = process_hist_data(sock, jp, proxy_hostid, error, sizeof(error));
+	ret = process_hist_data(sock, jp, proxy_hostid, &error);
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
