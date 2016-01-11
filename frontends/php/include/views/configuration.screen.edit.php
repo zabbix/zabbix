@@ -68,7 +68,7 @@ if (!$this->data['screen']['templateid']) {
 	$screen_ownerid = $data['screen']['userid'];
 
 	// If screen owner does not exist or is not allowed to display.
-	if (!$screen_ownerid || $screen_ownerid && array_key_exists($screen_ownerid, $data['users'])) {
+	if ($screen_ownerid === '' || $screen_ownerid && array_key_exists($screen_ownerid, $data['users'])) {
 		// Screen owner data.
 		if ($screen_ownerid) {
 			$owner_data = [[
@@ -227,4 +227,5 @@ else {
 $form->addItem($tabs);
 
 $widget->addItem($form);
+
 return $widget;
