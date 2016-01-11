@@ -648,7 +648,9 @@ class CScreen extends CApiService {
 		$this->validateCreate($screens);
 
 		foreach ($screens as &$screen) {
-			$screen['userid'] = array_key_exists('userid', $screen) ? $screen['userid'] : self::$userData['userid'];
+			if (!array_key_exists('templateid', $screen)) {
+				$screen['userid'] = array_key_exists('userid', $screen) ? $screen['userid'] : self::$userData['userid'];
+			}
 		}
 		unset($screen);
 
