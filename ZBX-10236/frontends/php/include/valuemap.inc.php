@@ -34,25 +34,24 @@ function getMappedValue($value, $valuemapid) {
 		return false;
 	}
 
-	$valuemaps[$valuemapid] = [];
+	if (!array_key_exists($valuemapid, $valuemaps)) {
+		$valuemaps[$valuemapid] = [];
 
-	$db_valuemaps = API::ValueMap()->get([
-		'output' => [],
-		'selectMappings' => ['value', 'newvalue'],
-		'valuemapids' => [$valuemapid]
-	]);
+		$db_valuemaps = API::ValueMap()->get([
+			'output' => [],
+			'selectMappings' => ['value', 'newvalue'],
+			'valuemapids' => [$valuemapid]
+		]);
 
-	if ($db_valuemaps) {
-		$mapping = array_filter($db_valuemaps[0]['mappings'], function($val) use ($value) {
-			return $val['value'] == (integer)$value;
-		});
-		$mapping = reset($mapping);
-		$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
-
-		return $mapping['newvalue'];
+		if ($db_valuemaps === []) {
+			return false;
+		}
+		foreach ($db_valuemaps[0]['mappings'] as $mapping) {
+			$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
+		}
 	}
 
-	return false;
+	return array_key_exists((string)$value, $valuemaps[$valuemapid]) ? $valuemaps[$valuemapid][$value] : false;
 }
 
 /**
