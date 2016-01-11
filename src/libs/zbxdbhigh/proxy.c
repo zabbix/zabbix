@@ -2044,31 +2044,28 @@ try_again:
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
 
-		/* meta information update record does not need those */
-		if (0 == (ZBX_AV_FLAG_META & hd->flags))
+		if (0 != hd->timestamp)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
+
+		if ('\0' != string_buffer[hd->psource])
 		{
-			if (0 != hd->timestamp)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
-
-			if ('\0' != string_buffer[hd->psource])
-			{
-				zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[hd->psource],
-						ZBX_JSON_TYPE_STRING);
-			}
-
-			if (0 != hd->severity)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, hd->severity);
-
-			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[hd->pvalue], ZBX_JSON_TYPE_STRING);
-
-			if (0 != hd->logeventid)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[hd->psource],
+					ZBX_JSON_TYPE_STRING);
 		}
+
+		if (0 != hd->severity)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, hd->severity);
+
+		if (0 != hd->logeventid)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 
 		if (0 != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
-		if (ITEM_VALUE_TYPE_LOG == dc_items[i].value_type || 0 != (ZBX_AV_FLAG_LOG_OTHER & hd->flags))
+		if (0 == (PROXY_HISTORY_FLAG_NOVALUE & hd->flags))
+			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[hd->pvalue], ZBX_JSON_TYPE_STRING);
+
+		if (0 != (PROXY_HISTORY_FLAG_META & hd->flags))
 		{
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
@@ -2362,7 +2359,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &values[i].ts,
-					items[i].state, values[i].value, NULL);
+					items[i].state, values[i].value);
 
 			if (NULL != processed)
 				(*processed)++;
@@ -2373,47 +2370,45 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 
 			init_result(&result);
 
-			if (NULL == values[i].value)
-				result.flags |= ZBX_AR_FLAG_NOVALUE;
+			zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s() key:%s value:%s lastlogsize:" ZBX_FS_UI64 " mtime:%d meta:%d flags:%d", __function_name, items[i].key_orig, (values[i].value ? values[i].value : "(null)"),
+					values[i].lastlogsize, values[i].mtime, values[i].meta, result.flags);
 
-			if (0 != values[i].meta)
-				result.flags |= ZBX_AR_FLAG_META;
-
-			if (0 == result.flags & ZBX_AR_FLAG_NOVALUE)
+			if (NULL != values[i].value)
 			{
 				res = set_result_type(&result, items[i].value_type,
 						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
 						values[i].value);
 			}
 
+			zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s() key:%s value:%s lastlogsize:" ZBX_FS_UI64 " mtime:%d meta:%d", __function_name, items[i].key_orig, (values[i].value ? values[i].value : "(null)"),
+					values[i].lastlogsize, values[i].mtime, values[i].meta);
+
 			if (SUCCEED == res)
 			{
-				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
+				if (ITEM_VALUE_TYPE_LOG == items[i].value_type && NULL != values[i].value)
 				{
-					if (0 == result.flags & ZBX_AR_FLAG_NOVALUE)
+					result.log->timestamp = values[i].timestamp;
+					if (NULL != values[i].source)
 					{
-						result.log->timestamp = values[i].timestamp;
-						if (NULL != values[i].source)
-						{
-							zbx_replace_invalid_utf8(values[i].source);
-							result.log->source = zbx_strdup(result.log->source, values[i].source);
-						}
-						result.log->severity = values[i].severity;
-						result.log->logeventid = values[i].logeventid;
-
-						calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
+						zbx_replace_invalid_utf8(values[i].source);
+						result.log->source = zbx_strdup(result.log->source, values[i].source);
 					}
+					result.log->severity = values[i].severity;
+					result.log->logeventid = values[i].logeventid;
+
+					calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
 				}
 
 				if (0 != values[i].meta)
 				{
-					result.lastlogsize = values[i].lastlogsize;
-					result.mtime = values[i].mtime;
+					set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
+
+					zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s() key:%s META IS SET!", __function_name, items[i].key_orig);
 				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
-						&values[i].ts, items[i].state, NULL, log_meta);
+						&values[i].ts, items[i].state, NULL);
 
 				if (NULL != processed)
 					(*processed)++;
@@ -2425,7 +2420,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, result.msg, NULL);
+						&values[i].ts, items[i].state, result.msg);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */

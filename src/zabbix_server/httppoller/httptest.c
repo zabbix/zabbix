@@ -190,7 +190,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		}
 
 		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL, NULL);
+		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL);
 
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
@@ -278,7 +278,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		}
 
 		items[i].state = ITEM_STATE_NORMAL;
-		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL, NULL);
+		dc_add_history(items[i].itemid, items[i].value_type, 0, &value, ts, items[i].state, NULL);
 
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
