@@ -2257,6 +2257,13 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                                                                            *
  * Purpose: process values sent by proxies, active agents and senders         *
  *                                                                            *
+ * Parameters: sock         - [IN] descriptor of agent-server socket          *
+ *                                 connection. NULL for proxy connection      *
+ *             jp           - [IN] JSON with historical data                  *
+ *             proxy_hostid - [IN] proxy identificator from database          *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
