@@ -68,6 +68,8 @@ All processes of specified type (e.g., listener)
 Process type and number (e.g., listener,3)
 .RE
 .RE
+.IP "\fB\-f\fR, \fB\-\-foreground\fR"
+Run Zabbix agent in foreground.
 .IP "\fB\-p\fR, \fB\-\-print\fR"
 Print known items and exit.
 For each item either generic defaults are used, or specific defaults for testing are supplied.
