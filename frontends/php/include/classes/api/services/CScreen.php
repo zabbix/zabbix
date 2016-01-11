@@ -1297,22 +1297,32 @@ class CScreen extends CApiService {
 
 			$related_userids = zbx_objectValues($related_users, 'userid');
 
-			$users = API::getApiService()->select('screen_user', [
-				'output' => $this->outputExtend($options['selectUsers'], ['screenid', 'userid']),
-				'filter' => ['screenid' => $screenIds, 'userid' => $related_userids],
-				'preservekeys' => true
-			]);
+			if ($related_userids) {
+				$users = API::getApiService()->select('screen_user', [
+					'output' => $this->outputExtend($options['selectUsers'], ['screenid', 'userid']),
+					'filter' => ['screenid' => $screenIds, 'userid' => $related_userids],
+					'preservekeys' => true
+				]);
 
-			$relation_map = $this->createRelationMap($users, 'screenid', 'screenuserid');
+				$relation_map = $this->createRelationMap($users, 'screenid', 'screenuserid');
 
-			$users = $this->unsetExtraFields($users, ['screenuserid', 'userid', 'permission'], $options['selectUsers']);
+				$users = $this->unsetExtraFields($users, ['screenuserid', 'userid', 'permission'],
+					$options['selectUsers']
+				);
 
-			foreach ($users as &$user) {
-				unset($user['screenid']);
+				foreach ($users as &$user) {
+					unset($user['screenid']);
+				}
+				unset($user);
+
+				$result = $relation_map->mapMany($result, $users, 'users');
 			}
-			unset($user);
-
-			$result = $relation_map->mapMany($result, $users, 'users');
+			else {
+				foreach ($result as &$row) {
+					$row['users'] = [];
+				}
+				unset($row);
+			}
 		}
 
 		// Adding user group shares.
@@ -1327,24 +1337,32 @@ class CScreen extends CApiService {
 
 			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
 
-			$user_groups = API::getApiService()->select('screen_usrgrp', [
-				'output' => $this->outputExtend($options['selectUserGroups'], ['screenid', 'usrgrpid']),
-				'filter' => ['screenid' => $screenIds, 'usrgrpid' => $related_groupids],
-				'preservekeys' => true
-			]);
+			if ($related_groupids) {
+				$user_groups = API::getApiService()->select('screen_usrgrp', [
+					'output' => $this->outputExtend($options['selectUserGroups'], ['screenid', 'usrgrpid']),
+					'filter' => ['screenid' => $screenIds, 'usrgrpid' => $related_groupids],
+					'preservekeys' => true
+				]);
 
-			$relation_map = $this->createRelationMap($user_groups, 'screenid', 'screenusrgrpid');
+				$relation_map = $this->createRelationMap($user_groups, 'screenid', 'screenusrgrpid');
 
-			$user_groups = $this->unsetExtraFields($user_groups, ['screenusrgrpid', 'usrgrpid', 'permission'],
-				$options['selectUserGroups']
-			);
+				$user_groups = $this->unsetExtraFields($user_groups, ['screenusrgrpid', 'usrgrpid', 'permission'],
+					$options['selectUserGroups']
+				);
 
-			foreach ($user_groups as &$user_group) {
-				unset($user_group['screenid']);
+				foreach ($user_groups as &$user_group) {
+					unset($user_group['screenid']);
+				}
+				unset($user_group);
+
+				$result = $relation_map->mapMany($result, $user_groups, 'userGroups');
 			}
-			unset($user_group);
-
-			$result = $relation_map->mapMany($result, $user_groups, 'userGroups');
+			else {
+				foreach ($result as &$row) {
+					$row['userGroups'] = [];
+				}
+				unset($row);
+			}
 		}
 
 		return $result;
