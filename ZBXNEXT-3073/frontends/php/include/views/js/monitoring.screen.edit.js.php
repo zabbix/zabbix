@@ -75,6 +75,8 @@
 				.attr({id: 'add', name: 'add'});
 			$('#name').focus();
 
+			$('#form').val('Create screen');
+
 			// Set screen to private.
 			$('input[name=private][value=' + <?= PRIVATE_SHARING ?> + ']').prop('checked', true);
 
