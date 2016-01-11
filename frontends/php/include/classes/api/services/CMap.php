@@ -1835,7 +1835,9 @@ class CMap extends CMapElement {
 
 				$relation_map = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
 
-				$users = $this->unsetExtraFields($users, ['sysmapuserid', 'userid', 'permission'], $options['selectUsers']);
+				$users = $this->unsetExtraFields($users, ['sysmapuserid', 'userid', 'permission'],
+					$options['selectUsers']
+				);
 
 				foreach ($users as &$user) {
 					unset($user['sysmapid']);
