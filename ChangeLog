@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
 ...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
 ...G...PS. [ZBX-8755] removed unutilised header file to eliminate build warnings (Sandis, viktors)
 .......PS. [ZBX-10066] fixed bug where host availability changes could be lost if proxy failed to send the update, fixed possibility of duplicate availability updates for passive proxies (wiper)
@@ -323,6 +324,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
 ...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
 ...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
@@ -1049,6 +1051,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
 ...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
 ...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
