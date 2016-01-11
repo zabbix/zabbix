@@ -264,7 +264,7 @@ retry_history:
 			{
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
-					process_hist_data(NULL, &jp, proxy.hostid, NULL, 0);
+					process_hist_data(NULL, &jp, proxy.hostid, NULL);
 
 					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 					{
