@@ -132,10 +132,6 @@ if (hasRequest('add') || hasRequest('update')) {
 			'name' => getRequest('name'),
 			'hsize' => getRequest('hsize'),
 			'vsize' => getRequest('vsize'),
-			'userid' => getRequest('userid', ''),
-			'private' => getRequest('private', 1),
-			'users' => getRequest('users', []),
-			'userGroups' => getRequest('userGroups', [])
 		];
 
 		$messageSuccess = _('Screen updated');
@@ -152,6 +148,11 @@ if (hasRequest('add') || hasRequest('update')) {
 			$result = API::TemplateScreen()->update($screen);
 		}
 		else {
+			$screen['userid'] = getRequest('userid', '');
+			$screen['private'] = getRequest('private', 1);
+			$screen['users'] = getRequest('users', []);
+			$screen['userGroups'] = getRequest('userGroups', []);
+
 			// Screen update with inaccessible user.
 			if ($screen['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 				$user_exist = API::User()->get([
@@ -183,10 +184,6 @@ if (hasRequest('add') || hasRequest('update')) {
 			'name' => getRequest('name'),
 			'hsize' => getRequest('hsize'),
 			'vsize' => getRequest('vsize'),
-			'userid' => getRequest('userid', ''),
-			'private' => getRequest('private', 1),
-			'users' => getRequest('users', []),
-			'userGroups' => getRequest('userGroups', [])
 		];
 
 		$messageSuccess = _('Screen added');
@@ -197,6 +194,10 @@ if (hasRequest('add') || hasRequest('update')) {
 			$screenids = API::TemplateScreen()->create($screen);
 		}
 		else {
+			$screen['userid'] = getRequest('userid', '');
+			$screen['private'] = getRequest('private', 1);
+			$screen['users'] = getRequest('users', []);
+			$screen['userGroups'] = getRequest('userGroups', []);
 			$screenids = API::Screen()->create($screen);
 		}
 
