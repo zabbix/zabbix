@@ -273,45 +273,45 @@ elseif ((hasRequest('delete') && hasRequest('screenid')) || (hasRequest('action'
  */
 if (hasRequest('form')) {
 	$current_userid = CWebUser::$data['userid'];
-	$userids[$current_userid] = $current_userid;
+	$userids[$current_userid] = true;
 	$user_groupids = [];
 
 	if (!hasRequest('templateid') && (!array_key_exists('templateid', $screen) || !$screen['templateid'])) {
 		if (!hasRequest('screenid') || hasRequest('form_refresh')) {
 			// Screen owner.
 			$screen_owner = getRequest('userid', $current_userid);
-			$userids[$screen_owner] = $screen_owner;
+			$userids[$screen_owner] = true;
 
 			foreach (getRequest('users', []) as $user) {
-				$userids[$user['userid']] = $user['userid'];
+				$userids[$user['userid']] = true;
 			}
 
 			foreach (getRequest('userGroups', []) as $user_group) {
-				$user_groupids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+				$user_groupids[$user_group['usrgrpid']] = true;
 			}
 		}
 		else {
 			// Screen owner.
-			$userids[$screen['userid']] = $screen['userid'];
+			$userids[$screen['userid']] = true;
 
 			foreach ($screen['users'] as $user) {
-				$userids[$user['userid']] = $user['userid'];
+				$userids[$user['userid']] = true;
 			}
 
 			foreach ($screen['userGroups'] as $user_group) {
-				$user_groupids[$user_group['usrgrpid']] = $user_group['usrgrpid'];
+				$user_groupids[$user_group['usrgrpid']] = true;
 			}
 		}
 
 		$data['users'] = API::User()->get([
 			'output' => ['userid', 'alias', 'name', 'surname'],
-			'userids' => $userids,
+			'userids' => array_keys($userids),
 			'preservekeys' => true
 		]);
 
 		$data['user_groups'] = API::UserGroup()->get([
 			'output' => ['usrgrpid', 'name'],
-			'usrgrpids' => $user_groupids,
+			'usrgrpids' => array_keys($user_groupids),
 			'preservekeys' => true
 		]);
 	}
