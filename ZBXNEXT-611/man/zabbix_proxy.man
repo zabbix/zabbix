@@ -71,6 +71,8 @@ All processes of specified type (e.g., poller)
 Process type and number (e.g., poller,3)
 .RE
 .RE
+.IP "\fB\-f\fR, \fB\-\-foreground\fR"
+Run Zabbix proxy in foreground.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
 Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
