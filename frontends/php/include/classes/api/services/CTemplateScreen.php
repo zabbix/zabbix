@@ -521,6 +521,17 @@ class CTemplateScreen extends CScreen {
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
+
+			// Sharing is not allowed for template screen.
+			$sharing_fields = ['userid', 'private', 'users', 'userGroups'];
+			foreach ($sharing_fields as $sharing_field) {
+				if (array_key_exists($sharing_field, $screen)) {
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot set "%1$s" for template screen "%2$s".', $sharing_field, $screen['name'])
+					);
+				}
+			}
 		}
 
 		$templateIds = zbx_objectValues($screens, 'templateid');
@@ -607,6 +618,17 @@ class CTemplateScreen extends CScreen {
 					ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot update "templateid" for template screen "%1$s".', $screen['name'])
 				);
+			}
+
+			// Sharing is not allowed for template screen.
+			$sharing_fields = ['userid', 'private', 'users', 'userGroups'];
+			foreach ($sharing_fields as $sharing_field) {
+				if (array_key_exists($sharing_field, $screen)) {
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot set "%1$s" for template screen "%2$s".', $sharing_field, $screen['name'])
+					);
+				}
 			}
 
 			if (isset($screen['name'])) {
