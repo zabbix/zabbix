@@ -127,20 +127,58 @@ void	zbx_redirect_stdio(const char *filename)
 }
 #endif
 
-static void	get_time(struct tm **tm, long *milliseconds)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_time                                                         *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     get current time and store it in memory localtions provided by caller  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     tm           - [OUT] broken-down representation of the current time    *
+ *     milliseconds - [OUT] milliseconds since the previous second            *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     On Windows localtime() returns pointer to static, thread-local storage *
+ *     location. On Unix localtime() is not thread-safe and re-entrant as it  *
+ *     returns pointer to static storage location which can be overwritten    *
+ *     by localtime() itself or other time functions in other threads or      *
+ *     signal handlers. To avoid this we use localtime_r().                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_time(struct tm *tm, long *milliseconds)
 {
 #ifdef _WINDOWS
 	struct _timeb	current_time;
+	struct tm	*tm_thread_static;
 
 	_ftime(&current_time);
-	*tm = localtime(&current_time.time);
+	if (NULL != (tm_thread_static = localtime(&current_time.time)))
+	{
+		*tm = *tm_thread_static;
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		memset(tm, 0, sizeof(struct tm));
+	}
+
 	*milliseconds = current_time.millitm;
 #else
 	struct timeval	current_time;
 	struct tm	tm_local;
 
 	gettimeofday(&current_time, NULL);
-	*tm = localtime_r(&current_time.tv_sec, &tm_local);
+	if (NULL != localtime_r(&current_time.tv_sec, &tm_local))
+	{
+		*tm = tm_local;
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		memset(tm, 0, sizeof(struct tm));
+	}
+
 	*milliseconds = current_time.tv_usec / 1000;
 #endif
 }
@@ -148,8 +186,6 @@ static void	get_time(struct tm **tm, long *milliseconds)
 static void	rotate_log(const char *log_filename)
 {
 	zbx_stat_t		buf;
-	long			milliseconds;
-	struct tm		*tm;
 	zbx_uint64_t		new_size;
 #ifndef _WINDOWS
 	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
@@ -186,17 +222,20 @@ static void	rotate_log(const char *log_filename)
 
 			if (NULL != (log_file = fopen(log_filename, "w")))
 			{
+				long		milliseconds;
+				struct tm	tm;
+
 				get_time(&tm, &milliseconds);
 
 				fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
 						" cannot rename log file \"%s\" to \"%s\": %s\n",
 						zbx_get_thread_id(),
-						tm->tm_year + 1900,
-						tm->tm_mon + 1,
-						tm->tm_mday,
-						tm->tm_hour,
-						tm->tm_min,
-						tm->tm_sec,
+						tm.tm_year + 1900,
+						tm.tm_mon + 1,
+						tm.tm_mday,
+						tm.tm_hour,
+						tm.tm_min,
+						tm.tm_sec,
 						milliseconds,
 						log_filename,
 						filename_old,
@@ -207,12 +246,12 @@ static void	rotate_log(const char *log_filename)
 						" LogFileSize but moving it to \"%s\" failed. The logfile"
 						" was truncated.\n",
 						zbx_get_thread_id(),
-						tm->tm_year + 1900,
-						tm->tm_mon + 1,
-						tm->tm_mday,
-						tm->tm_hour,
-						tm->tm_min,
-						tm->tm_sec,
+						tm.tm_year + 1900,
+						tm.tm_mon + 1,
+						tm.tm_mday,
+						tm.tm_hour,
+						tm.tm_min,
+						tm.tm_sec,
 						milliseconds,
 						log_filename,
 						filename_old);
@@ -413,9 +452,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
 	FILE		*log_file = NULL;
 	char		message[MAX_BUFFER_LEN];
-	long		milliseconds;
 	va_list		args;
-	struct tm	*tm;
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
@@ -431,17 +468,20 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		if (NULL != (log_file = fopen(log_filename, "a+")))
 		{
+			long		milliseconds;
+			struct tm	tm;
+
 			get_time(&tm, &milliseconds);
 
 			fprintf(log_file,
 					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
 					zbx_get_thread_id(),
-					tm->tm_year + 1900,
-					tm->tm_mon + 1,
-					tm->tm_mday,
-					tm->tm_hour,
-					tm->tm_min,
-					tm->tm_sec,
+					tm.tm_year + 1900,
+					tm.tm_mon + 1,
+					tm.tm_mday,
+					tm.tm_hour,
+					tm.tm_min,
+					tm.tm_sec,
 					milliseconds
 					);
 
