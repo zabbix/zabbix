@@ -340,7 +340,7 @@ if (hasRequest('form')) {
 	$data['form_refresh'] = getRequest('form_refresh');
 
 	// render view
-	$screenView = new CView('configuration.screen.edit', $data);
+	$screenView = new CView('monitoring.screen.edit', $data);
 	$screenView->render();
 	$screenView->show();
 }
@@ -397,7 +397,7 @@ else {
 	$data['paging'] = getPagingLine($data['screens'], $sortOrder);
 
 	// render view
-	$screenView = new CView('configuration.screen.list', $data);
+	$screenView = new CView('monitoring.screen.list', $data);
 	$screenView->render();
 	$screenView->show();
 }
