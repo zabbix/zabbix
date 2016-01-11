@@ -1013,7 +1013,7 @@ class CScreen extends CApiService {
 
 		foreach ($screens as $screen) {
 			$screenid = $screen['screenid'];
-			unset($screen['screenid'], $screen['screenitems']);
+			unset($screen['screenid'], $screen['screenitems'], $screen['users'], $screen['userGroups']);
 
 			if ($screen) {
 				$update_screens[] = [
