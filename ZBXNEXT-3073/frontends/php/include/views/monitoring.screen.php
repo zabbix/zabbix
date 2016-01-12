@@ -19,24 +19,21 @@
 **/
 
 
-$screenWidget = (new CWidget())
+$widget = (new CWidget())
 	->setTitle(_('Screens'))
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
-// header form
-$headerForm = new CForm();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);',
-	[
+$controls = (new CList())->addItem(
+	new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
 		'screens.php' => _('Screens'),
 		'slides.php' => _('Slide shows')
-	]
-));
+	])
+);
 
 // Append screens combobox to page header.
-$headerForm->setName('headerForm');
-$headerForm->addVar('fullscreen', $data['fullscreen']);
+$form = (new CForm())
+	->setName('headerForm')
+	->addVar('fullscreen', $data['fullscreen']);
 
 if (check_dynamic_items($data['screen']['screenid'], 0)) {
 	$pageFilter = new CPageFilter([
@@ -71,11 +68,11 @@ $controls
 	))
 	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$headerForm->addItem($controls);
+$form->addItem($controls);
 
-$screenWidget->setControls($headerForm);
+$widget->setControls($form);
 
-$screenWidget->addItem((new CList())
+$widget->addItem((new CList())
 	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
 		(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
@@ -100,7 +97,7 @@ $screenBuilder = new CScreenBuilder([
 	'period' => $data['period'],
 	'stime' => $data['stime']
 ]);
-$screenWidget->addItem(
+$widget->addItem(
 	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 );
 
@@ -109,4 +106,4 @@ CScreenBuilder::insertScreenStandardJs([
 	'profileIdx' => $screenBuilder->profileIdx
 ]);
 
-return $screenWidget;
+return $widget;
