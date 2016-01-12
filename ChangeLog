@@ -1,14 +1,14 @@
 Changes for 3.0.0alpha6
 
 New features:
-...G...PS. [ZBXNEXT-1263] fixed timeout detection for encrypted connections (Andris)
-........S. [ZBXNEXT-1263] fixed encryption problems with running remote commands (Andris)
-A.FGI..PS. [ZBXNEXT-1263] polished encryption support for communications between Zabbix components (Andris, asaveljevs, gleb, Oleg, Sandis)
 .......PS. [ZBXNEXT-3071] optimized history cache to better handle few items flooding cache with values (wiper)
 ...GI..... [ZBXNEXT-3045] dropped zabbix_agent - the inetd version of Zabbix agent (asaveljevs)
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
+...G...PS. [ZBXNEXT-1263] fixed timeout detection for encrypted connections (Andris)
+........S. [ZBXNEXT-1263] fixed encryption problems with running remote commands (Andris)
+A.FGI..PS. [ZBXNEXT-1263] polished encryption support for communications between Zabbix components (Andris, asaveljevs, gleb, Oleg, Sandis)
 .D........ [ZBXNEXT-2637] fixed incorrect double quote character in the default agent configuration files (Richlv)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
 ...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
