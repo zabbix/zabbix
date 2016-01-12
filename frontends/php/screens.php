@@ -54,6 +54,27 @@ $fields = [
 check_fields($fields);
 
 /*
+ * Permissions
+ */
+// Validate group IDs.
+$validate_groupids = array_filter([
+	getRequest('groupid'),
+	getRequest('tr_groupid')
+]);
+if ($validate_groupids && !API::HostGroup()->isReadable($validate_groupids)) {
+	access_deny();
+}
+
+// Validate host IDs.
+$validate_hostids = array_filter([
+	getRequest('hostid'),
+	getRequest('tr_hostid')
+]);
+if ($validate_hostids && !API::Host()->isReadable($validate_hostids)) {
+	access_deny();
+}
+
+/*
  * Filter
  */
 if (isset($_REQUEST['favobj'])) {
