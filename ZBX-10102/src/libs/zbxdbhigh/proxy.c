@@ -2370,18 +2370,12 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 
 			init_result(&result);
 
-			zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s() key:%s value:%s lastlogsize:" ZBX_FS_UI64 " mtime:%d meta:%d flags:%d", __function_name, items[i].key_orig, (values[i].value ? values[i].value : "(null)"),
-					values[i].lastlogsize, values[i].mtime, values[i].meta, result.flags);
-
 			if (NULL != values[i].value)
 			{
 				res = set_result_type(&result, items[i].value_type,
 						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
 						values[i].value);
 			}
-
-			zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s() key:%s value:%s lastlogsize:" ZBX_FS_UI64 " mtime:%d meta:%d", __function_name, items[i].key_orig, (values[i].value ? values[i].value : "(null)"),
-					values[i].lastlogsize, values[i].mtime, values[i].meta);
 
 			if (SUCCEED == res)
 			{
@@ -2400,11 +2394,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 				if (0 != values[i].meta)
-				{
 					set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
-
-					zabbix_log(LOG_LEVEL_WARNING, "DIMIR: %s() key:%s META IS SET!", __function_name, items[i].key_orig);
-				}
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
