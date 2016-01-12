@@ -608,14 +608,14 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 {
 	if (LOG_TYPE_UNDEFINED == CONFIG_LOG_TYPE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'", CONFIG_LOG_TYPE_STR);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" parameter: \"%s\"", CONFIG_LOG_TYPE_STR);
 		return FAIL;
 	}
 
 	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" 'console' parameter can be used only with --foreground"
-				" command line option");
+		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"console\" parameter can only be used with the"
+				" -f (--foreground) command line option");
 		return FAIL;
 	}
 
@@ -623,7 +623,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 	{
 		if (LOG_TYPE_FILE != CONFIG_LOG_TYPE)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"LogFile\" parameter can be used only with \"LogType\" 'file'"
+			zabbix_log(LOG_LEVEL_CRIT, "\"LogFile\" parameter can be only used with \"LogType\" \"file\""
 					" parameter");
 			return FAIL;
 		}
@@ -632,7 +632,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 	{
 		if (LOG_TYPE_FILE == CONFIG_LOG_TYPE)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" 'file' parameter requires \"LogFile\" parameter"
+			zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter"
 					" to be set");
 			return FAIL;
 		}
