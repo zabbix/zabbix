@@ -2146,11 +2146,8 @@ function imageOut(&$image, $format = null) {
 	ob_end_clean();
 
 	if ($page['type'] != PAGE_TYPE_IMAGE) {
-		session_start();
 		$imageId = md5(strlen($imageSource));
-		$_SESSION['image_id'] = [];
-		$_SESSION['image_id'][$imageId] = $imageSource;
-		session_write_close();
+		CSession::setValue('image_id', [$imageId => $imageSource]);
 	}
 
 	switch ($page['type']) {
