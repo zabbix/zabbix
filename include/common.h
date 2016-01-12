@@ -1134,4 +1134,9 @@ void	zbx_function_clean(zbx_function_t *func);
 int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
 int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
 
+#ifndef _WINDOWS
+unsigned int	zbx_alarm_on(unsigned int seconds);
+unsigned int	zbx_alarm_off(void);
+#endif
+
 #endif

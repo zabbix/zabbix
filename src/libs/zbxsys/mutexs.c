@@ -90,7 +90,7 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 		}
 	}
 lbl_create:
-	if (-1 != ZBX_SEM_LIST_ID || -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0600 /* 0022 */)) )
+	if (-1 != ZBX_SEM_LIST_ID || -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0600 /* 0022 */)))
 	{
 		/* set default semaphore value */
 
