@@ -20,25 +20,25 @@
 
 $widget = (new CWidget())->setTitle(_('Screens'));
 
-$createForm = (new CForm('get'))
-	->cleanItems();
+$createForm = (new CForm('get'))->cleanItems();
 
-$controls = (new CList())
-	->addItem(new CSubmit('form', _('Create screen')));
-if (!empty($this->data['templateid'])) {
-	$createForm->addVar('templateid', $this->data['templateid']);
-	$widget->addItem(get_header_host_table('screens', $this->data['templateid']));
+$controls = (new CList())->addItem(new CSubmit('form', _('Create screen')));
+
+if ($data['templateid']) {
+	$createForm->addVar('templateid', $data['templateid']);
+	$widget->addItem(get_header_host_table('screens', $data['templateid']));
 }
 else {
 	$controls->addItem((new CButton('form', _('Import')))->onClick('redirect("screen.import.php?rules_preset=screen")'));
 }
+
 $createForm->addItem($controls);
 $widget->setControls($createForm);
 
 // create form
 $screenForm = (new CForm())
 	->setName('screenForm')
-	->addVar('templateid', $this->data['templateid']);
+	->addVar('templateid', $data['templateid']);
 
 // create table
 $screenTable = (new CTableInfo())
@@ -46,14 +46,15 @@ $screenTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 		_('Dimension (cols x rows)'),
 		_('Actions')
 	]);
 
-foreach ($this->data['screens'] as $screen) {
+foreach ($data['screens'] as $screen) {
 	$user_type = CWebUser::getType();
-	if ($this->data['templateid'] || $user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
+
+	if ($data['templateid'] || $user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
 			|| array_key_exists('editable', $screen)) {
 		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
 		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'));
@@ -70,7 +71,7 @@ foreach ($this->data['screens'] as $screen) {
 
 	$screenTable->addRow([
 		$checkbox,
-		$this->data['templateid']
+		$data['templateid']
 			? $screen['name']
 			: new CLink($screen['name'], 'screens.php?elementid='.$screen['screenid']),
 		$screen['hsize'].' x '.$screen['vsize'],
@@ -79,18 +80,16 @@ foreach ($this->data['screens'] as $screen) {
 }
 
 // buttons
-$buttonsArray = [];
-if (!$this->data['templateid']) {
-	$buttonsArray['screen.export'] = ['name' => _('Export')];
+$buttons = [];
+
+if (!$data['templateid']) {
+	$buttons['screen.export'] = ['name' => _('Export')];
 }
-$buttonsArray['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?')];
+
+$buttons['screen.massdelete'] = ['name' => _('Delete'), 'confirm' => _('Delete selected screens?')];
 
 // append table to form
-$screenForm->addItem([
-	$screenTable,
-	$this->data['paging'],
-	new CActionButtonList('action', 'screens', $buttonsArray)
-]);
+$screenForm->addItem([$screenTable, $data['paging'], new CActionButtonList('action', 'screens', $buttons)]);
 
 // append form to widget
 $widget->addItem($screenForm);
