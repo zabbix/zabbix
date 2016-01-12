@@ -890,8 +890,7 @@ class CImportReferencer {
 
 			$db_screens = API::Screen()->get([
 				'filter' => ['name' => $this->screens],
-				'output' => ['screenid', 'name'],
-				'preservekeys' => true
+				'output' => ['screenid', 'name']
 			]);
 			foreach ($db_screens as $db_screen) {
 				$this->screensRefs[$db_screen['name']] = $db_screen['screenid'];
