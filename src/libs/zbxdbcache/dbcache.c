@@ -1744,8 +1744,6 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 				continue;
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_add_proxy_history() itemid:" ZBX_FS_UI64 " value:[%s] flags:%d", h->itemid, pvalue, h->flags);
-
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue);
 	}
 
@@ -1814,8 +1812,6 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 			pvalue = "";
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_add_proxy_history_meta() itemid:" ZBX_FS_UI64 " value:[%s] flags:%d", h->itemid, pvalue, flags);
-
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, h->lastlogsize, h->mtime,
 				flags);
 	}
@@ -1868,8 +1864,6 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		}
 		else
 			pvalue = h->value_orig.str;
-
-		zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_add_proxy_history_log() itemid:" ZBX_FS_UI64 " value:[%s] flags:%d", h->itemid, pvalue, flags);
 
 		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
 				NULL != h->value.str ? h->value.str : "", h->severity, pvalue, h->logeventid,
@@ -2801,11 +2795,7 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, const zbx_timespec_t 
 		item_value->flags |= ZBX_DC_FLAG_META;
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
-
-		zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_local_add_history_uint() itemid:" ZBX_FS_UI64 " META SET! flags:%d", itemid, flags);
 	}
-	else
-		zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_local_add_history_uint() itemid:" ZBX_FS_UI64 " META NOT SET! flags:%d", itemid, flags);
 
 	if (0 != (flags & ZBX_AR_FLAG_NOVALUE))
 		item_value->flags |= ZBX_DC_FLAG_NOVALUE;
@@ -3003,8 +2993,6 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_add_history() itemid:" ZBX_FS_UI64 " flags:%d", itemid, result->flags);
-
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		dc_local_add_history_notsupported(itemid, ts, error);
@@ -3030,8 +3018,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
-
-	zabbix_log(LOG_LEVEL_WARNING, "DIMIR: dc_add_history() itemid:" ZBX_FS_UI64 " flags:%d", itemid, result->flags);
 
 	switch (value_type)
 	{
