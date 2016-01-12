@@ -27,8 +27,6 @@
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
-#define ZBX_SYNC_MAX	1000
-
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
@@ -51,8 +49,8 @@ extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE;
 
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
@@ -310,7 +308,7 @@ int	in_maintenance_without_data_collection(unsigned char maintenance_status, uns
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
-int	DCsync_history(int sync_type);
+int	DCsync_history(int sync_type, int *sync_num);
 void	init_database_cache();
 void	free_database_cache();
 
@@ -332,10 +330,10 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TREND_USED		12
 #define ZBX_STATS_TREND_FREE		13
 #define ZBX_STATS_TREND_PFREE		14
-#define ZBX_STATS_TEXT_TOTAL		15
-#define ZBX_STATS_TEXT_USED		16
-#define ZBX_STATS_TEXT_FREE		17
-#define ZBX_STATS_TEXT_PFREE		18
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	15
+#define ZBX_STATS_HISTORY_INDEX_USED	16
+#define ZBX_STATS_HISTORY_INDEX_FREE	17
+#define ZBX_STATS_HISTORY_INDEX_PFREE	18
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -356,7 +354,7 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
-void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids);
+int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers();
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -469,5 +467,21 @@ void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
 void	zbx_set_availability_diff_ts(int ts);
+
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
+#define ZBX_HC_ITEM_STATUS_BUSY		1
+#define ZBX_HC_ITEM_STATUS_QUEUED	2
+
+struct zbx_hc_data_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		status;
+
+	struct zbx_hc_data_t	*tail;
+	struct zbx_hc_data_t	*head;
+}
+zbx_hc_item_t;
 
 #endif
