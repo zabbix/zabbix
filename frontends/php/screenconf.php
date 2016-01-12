@@ -74,22 +74,24 @@ CProfile::update('web.screenconf.config', getRequest('config', 0), PROFILE_TYPE_
  * Permissions
  */
 if (hasRequest('screenid')) {
-	$options = [
-		'screenids' => $_REQUEST['screenid'],
-		'editable' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectScreenItems' => API_OUTPUT_EXTEND,
-		'selectUsers' => ['userid', 'permission'],
-		'selectUserGroups' => ['usrgrpid', 'permission']
-	];
-	if (isset($_REQUEST['templateid'])) {
-		$screens = API::TemplateScreen()->get($options);
+	if (hasRequest('templateid')) {
+		$screens = API::TemplateScreen()->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
+			'screenids' => getRequest('screenid'),
+			'editable' => true
+		]);
 	}
 	else {
-		$screens = API::Screen()->get($options);
+		$screens = API::Screen()->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid', 'userid', 'private'],
+			'selectUsers' => ['userid', 'permission'],
+			'selectUserGroups' => ['usrgrpid', 'permission'],
+			'screenids' => getRequest('screenid'),
+			'editable' => true
+		]);
 	}
 
-	if (empty($screens)) {
+	if (!$screens) {
 		access_deny();
 	}
 
@@ -104,10 +106,12 @@ else {
  */
 if ($isExportData) {
 	$screens = getRequest('screens', []);
+
 	$export = new CConfigurationExport(['screens' => $screens]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 	$exportData = $export->export();
+
 	if (hasErrorMesssages()) {
 		show_messages();
 	}
@@ -117,7 +121,6 @@ if ($isExportData) {
 
 	exit;
 }
-
 
 /*
  * Actions
@@ -130,7 +133,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			'screenid' => getRequest('screenid'),
 			'name' => getRequest('name'),
 			'hsize' => getRequest('hsize'),
-			'vsize' => getRequest('vsize'),
+			'vsize' => getRequest('vsize')
 		];
 
 		$messageSuccess = _('Screen updated');
@@ -175,14 +178,16 @@ if (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if ($result) {
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens', $screenOld, $screen);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'], 'screens',
+				$screenOld, $screen
+			);
 		}
 	}
 	else {
 		$screen = [
 			'name' => getRequest('name'),
 			'hsize' => getRequest('hsize'),
-			'vsize' => getRequest('vsize'),
+			'vsize' => getRequest('vsize')
 		];
 
 		$messageSuccess = _('Screen added');
@@ -190,6 +195,7 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('templateid')) {
 			$screen['templateid'] = getRequest('templateid');
+
 			$screenids = API::TemplateScreen()->create($screen);
 		}
 		else {
@@ -197,13 +203,16 @@ if (hasRequest('add') || hasRequest('update')) {
 			$screen['private'] = getRequest('private', 1);
 			$screen['users'] = getRequest('users', []);
 			$screen['userGroups'] = getRequest('userGroups', []);
+
 			$screenids = API::Screen()->create($screen);
 		}
 
 		$result = (bool) $screenids;
+
 		if ($result) {
 			$screenid = reset($screenids);
 			$screenid = reset($screenid);
+
 			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_SCREEN, $screenid, $screen['name']);
 		}
 	}
@@ -216,7 +225,8 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif ((hasRequest('delete') && hasRequest('screenid')) || (hasRequest('action') && getRequest('action') == 'screen.massdelete' && hasRequest('screens'))) {
+elseif ((hasRequest('delete') && hasRequest('screenid'))
+		|| (hasRequest('action') && getRequest('action') === 'screen.massdelete' && hasRequest('screens'))) {
 	$screenids = getRequest('screens', []);
 	if (hasRequest('screenid')) {
 		$screenids[] = getRequest('screenid');
@@ -360,21 +370,26 @@ else {
 		'sortorder' => $sortOrder
 	];
 
-	$options = [
-		'output' => ['screenid', 'name', 'hsize', 'vsize'],
-		'templateids' => $data['templateid'],
-		'editable' => true,
-		'sortfield' => $sortField,
-		'limit' => $config['search_limit'],
-		'preservekeys' => true
-	];
 	if ($data['templateid']) {
-		$data['screens'] = API::TemplateScreen()->get($options);
+		$data['screens'] = API::TemplateScreen()->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize'],
+			'templateids' => $data['templateid'],
+			'sortfield' => $sortField,
+			'limit' => $config['search_limit'],
+			'editable' => true,
+			'preservekeys' => true
+		]);
 	}
 	else {
-		$data['screens'] = API::Screen()->get($options);
+		$data['screens'] = API::Screen()->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize'],
+			'sortfield' => $sortField,
+			'limit' => $config['search_limit'],
+			'preservekeys' => true
+		]);
 
 		$user_type = CWebUser::getType();
+
 		if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$editable_screens = API::Screen()->get([
 				'output' => ['screenid', 'name', 'hsize', 'vsize'],

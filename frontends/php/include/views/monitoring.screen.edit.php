@@ -29,25 +29,25 @@ if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }
 
-if ($this->data['screen']['templateid']) {
-	$widget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
+if ($data['screen']['templateid']) {
+	$widget->addItem(get_header_host_table('screens', $data['screen']['templateid']));
 }
 
 // create form
 $form = (new CForm())
 	->setName('screenForm')
-	->addVar('form', $this->data['form']);
+	->addVar('form', $data['form']);
 
-if ($this->data['screen']['templateid']) {
-	$form->addVar('templateid', $this->data['screen']['templateid']);
+if ($data['screen']['templateid']) {
+	$form->addVar('templateid', $data['screen']['templateid']);
 }
 else {
 	$form->addVar('current_user_userid', $data['current_user_userid'])
 		->addVar('current_user_fullname', getUserFullname($data['users'][$data['current_user_userid']]));
 }
 
-if ($this->data['screen']['screenid']) {
-	$form->addVar('screenid', $this->data['screen']['screenid']);
+if ($data['screen']['screenid']) {
+	$form->addVar('screenid', $data['screen']['screenid']);
 }
 
 $user_type = CWebUser::getType();
@@ -55,7 +55,7 @@ $user_type = CWebUser::getType();
 // Create screen form list.
 $screen_tab = (new CFormList());
 
-if (!$this->data['screen']['templateid']) {
+if (!$data['screen']['templateid']) {
 	// Screen owner multiselect.
 	$multiselect_data = [
 		'name' => 'userid',
@@ -110,20 +110,20 @@ if (!$this->data['screen']['templateid']) {
 }
 
 $screen_tab->addRow(_('Name'),
-		(new CTextBox('name', $this->data['screen']['name']))
+		(new CTextBox('name', $data['screen']['name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Columns'),
-		(new CNumericBox('hsize', $this->data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('hsize', $data['screen']['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Rows'),
-		(new CNumericBox('vsize', $this->data['screen']['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('vsize', $data['screen']['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
 // append tab to form
 $tabs->addTab('screen_tab', _('Screen'), $screen_tab);
-if (!$this->data['screen']['templateid']) {
+if (!$data['screen']['templateid']) {
 	// User group sharing table.
 	$user_group_shares_table = (new CTable())
 		->setHeader([_('User groups'), _('Permissions'), _('Action')])
@@ -209,7 +209,7 @@ if (!$this->data['screen']['templateid']) {
 }
 
 // append buttons to form
-if ($this->data['screen']['screenid']) {
+if ($data['screen']['screenid']) {
 	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
