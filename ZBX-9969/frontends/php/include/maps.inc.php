@@ -67,7 +67,7 @@ function sysmapElementLabel($label = null) {
  *
  * @param array $sysmap
  * @param array $options
- * @param int   $options['severity_min']
+ * @param int	$options['severoty_min']
  *
  * @return CAreaMap
  */
@@ -112,7 +112,8 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		'nopermissions' => true,
 		'preservekeys' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT
+		'selectScreens' => API_OUTPUT_COUNT,
+		'selectTriggers' => ['status']
 	]);
 
 	$triggers = API::Trigger()->get([
@@ -173,7 +174,15 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 					'hostid' => $elem['elementid'],
 					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
-				$gotos['showTriggers'] = ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED);
+				$gotos['showTriggers'] = false;
+				if ($host['status'] == HOST_STATUS_MONITORED && $host['triggers'] != []) {
+					foreach ($host['triggers'] as $trigger) {
+						if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
+							$gotos['showTriggers'] = true;
+							break;
+						}
+					}
+				}
 
 				$gotos['graphs'] = ['hostid' => $host['hostid']];
 				$gotos['showGraphs'] = (bool) $host['graphs'];
