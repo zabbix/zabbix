@@ -1687,7 +1687,7 @@ out:
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
-	return (ZBX_PROTO_ERROR == nbytes ? FAIL : s->read_bytes);
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)s->read_bytes);
 
 #undef ZBX_TCP_EXPECT_HEADER
 #undef ZBX_TCP_EXPECT_LENGTH
@@ -1943,7 +1943,7 @@ int	zbx_udp_recv(zbx_socket_t *s, int timeout)
 	if (ZBX_PROTO_ERROR == read_bytes)
 		return FAIL;
 
-	if (sizeof(s->buf_stat) > read_bytes)
+	if (sizeof(s->buf_stat) > (size_t)read_bytes)
 	{
 		s->buf_type = ZBX_BUF_TYPE_STAT;
 		s->buffer = s->buf_stat;
