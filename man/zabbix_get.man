@@ -68,7 +68,7 @@ How to connect to agent. Values:\fR
 .RS 12
 .TP 12
 .B unencrypted
-connect without encryption
+connect without encryption (default)
 .RE
 .RS 12
 .TP 12
