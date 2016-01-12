@@ -345,6 +345,7 @@ if (hasRequest('form')) {
 	$screenView->show();
 }
 else {
+	CProfile::delete('web.screens.elementid');
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
 	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
