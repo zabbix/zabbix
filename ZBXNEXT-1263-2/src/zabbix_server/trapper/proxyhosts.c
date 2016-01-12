@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
+#include "dbcache.h"
 
 #include "proxyhosts.h"
 

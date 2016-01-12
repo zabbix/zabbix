@@ -835,6 +835,83 @@ static int	DBpatch_2050091(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_2050092(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	const char	*end, *start;
+	int		len, ret = FAIL, rc;
+	char		*url = NULL, *url_esc;
+	size_t		i, url_alloc = 0, url_offset;
+	char		*url_map[] = {
+				"dashboard.php", "dashboard.view",
+				"discovery.php", "discovery.view",
+				"maps.php", "map.view",
+				"httpmon.php", "web.view",
+				"media_types.php", "mediatype.list",
+				"proxies.php", "proxy.list",
+				"scripts.php", "script.list",
+				"report3.php", "report.services",
+				"report1.php", "report.status"
+			};
+
+	if (NULL == (result = DBselect("select userid,url from users where url<>''")))
+		return FAIL;
+
+	while (NULL != (row = (DBfetch(result))))
+	{
+		if (NULL == (end = strchr(row[1], '?')))
+			end = row[1] + strlen(row[1]);
+
+		for (start = end - 1; start > row[1] && '/' != start[-1]; start--)
+			;
+
+		len = end - start;
+
+		for (i = 0; ARRSIZE(url_map) > i; i += 2)
+		{
+			if (0 == strncmp(start, url_map[i], len))
+				break;
+		}
+
+		if (ARRSIZE(url_map) == i)
+			continue;
+
+		url_offset = 0;
+		zbx_strncpy_alloc(&url, &url_alloc, &url_offset, row[1], start - row[1]);
+		zbx_strcpy_alloc(&url, &url_alloc, &url_offset, "zabbix.php?action=");
+		zbx_strcpy_alloc(&url, &url_alloc, &url_offset, url_map[i + 1]);
+
+		if ('\0' != *end)
+		{
+			zbx_chrcpy_alloc(&url, &url_alloc, &url_offset, '&');
+			zbx_strcpy_alloc(&url, &url_alloc, &url_offset, end + 1);
+		}
+
+		/* 255 - user url field size */
+		if (url_offset > 255)
+		{
+			*url = '\0';
+			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert URL for user id \"%s\":"
+					" value is too long. The URL field was reset.", row[0]);
+		}
+
+		url_esc = DBdyn_escape_string(url);
+		rc = DBexecute("update users set url='%s' where userid=%s", url_esc, row[0]);
+		zbx_free(url_esc);
+
+		if (ZBX_DB_OK > rc)
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(url);
+	DBfree_result(result);
+
+	return ret;
+}
 #endif
 
 DBPATCH_START(2050)
@@ -920,5 +997,6 @@ DBPATCH_ADD(2050088, 0, 1)
 DBPATCH_ADD(2050089, 0, 1)
 DBPATCH_ADD(2050090, 0, 1)
 DBPATCH_ADD(2050091, 0, 1)
+DBPATCH_ADD(2050092, 0, 1)
 
 DBPATCH_END()
