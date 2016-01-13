@@ -664,7 +664,6 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 	zbx_uint64_t		key;
 	char			*value, xpath[MAX_STRING_LEN];
 	int			i, ret = SYSINFO_RET_FAIL;
-	zbx_log_t		*log;
 	struct tm		tm;
 	time_t			t;
 
@@ -841,7 +840,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 {
 	const char		*__function_name = "check_vcenter_fullname";
 
-	char			*url, *fullname;
+	char			*url, *fullname = NULL;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -869,7 +868,8 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s fullname:[%s]", __function_name, sysinfo_ret_string(ret),
+			ZBX_NULL2STR(fullname));
 
 	return ret;
 }
@@ -1688,7 +1688,7 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 	for (i = 0; i < service->data->hvs.values_num; i++)
 	{
 		zbx_vmware_hv_t	*hv = service->data->hvs.values[i];
-		zbx_vmware_vm_t		*vm;
+		zbx_vmware_vm_t	*vm;
 
 		if (NULL != (vm = vm_get(&hv->vms, uuid)))
 		{
@@ -1713,7 +1713,7 @@ out:
 int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_cpu_ready";
+	const char		*__function_name = "check_vcenter_vm_cpu_ready";
 
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;

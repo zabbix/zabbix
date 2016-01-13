@@ -2490,7 +2490,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		return;
 	}
 
-	if (0 != (ZBX_DC_FLAG_LLD & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & flags))
 	{
 		if (NULL == GET_TEXT_RESULT(result))
 			return;
@@ -2505,10 +2505,7 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	}
 
 	if (0 != (result->flags & ZBX_AR_FLAG_NOVALUE) && 0 == (result->flags & ZBX_AR_FLAG_META))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
+		return;
 
 	switch (value_type)
 	{

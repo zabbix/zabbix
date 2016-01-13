@@ -723,43 +723,42 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 			if (0 == vmware_events.values_num)
 			{
-				if (ITEM_VALUE_TYPE_LOG != items[i].value_type)
-				{
-					dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-							&timespec, items[i].state, NULL);
-				}
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
+						&timespec, items[i].state, NULL);
 			}
 			else
 			{
 				/* vmware.eventlog item returns list of events with a value */
 
-				size_t	i;
+				size_t	j;
 
-				for (i = 0; i < vmware_events.values_num; i++)
+				for (j = 0; j < vmware_events.values_num; j++)
 				{
-					AGENT_RESULT	ar;
 					int		ret;
-					vmware_event_t	*vmware_event = vmware_events.values[i];
+					vmware_event_t	*vmware_event = vmware_events.values[j];
 
-					init_result(&ar);
+					init_result(&results[i]);
 
 					/* vmware event always contains value and lastlogsize */
-					if (SUCCEED == (ret = set_result_type(&ar, items[i].value_type, items[i].flags,
+					if (SUCCEED == (ret = set_result_type(&results[i], items[i].value_type, items[i].flags,
 							vmware_event->value)))
 					{
-						set_result_meta(&ar, vmware_event->lastlogsize, 0);
+						set_result_meta(&results[i], vmware_event->lastlogsize, 0);
 
-						ar.log->logeventid = vmware_event->logeventid;
-						ar.log->timestamp = vmware_event->timestamp;
+						if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
+						{
+							results[i].log->logeventid = vmware_event->logeventid;
+							results[i].log->timestamp = vmware_event->timestamp;
+						}
 
 						if (0 != lastlogsize_undef)
 						{
 							lastlogsize_undef = 0;
-							lastlogsize = ar.lastlogsize;
+							lastlogsize = results[i].lastlogsize;
 						}
 					}
 
-					dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &ar,
+					dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
 							&timespec, items[i].state, NULL);
 
 					if (SUCCEED != ret)
