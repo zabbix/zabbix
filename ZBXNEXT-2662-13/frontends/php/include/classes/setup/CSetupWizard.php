@@ -21,13 +21,11 @@
 
 class CSetupWizard extends CForm {
 
-	function __construct($ZBX_CONFIG) {
+	function __construct() {
 		$this->DISABLE_CANCEL_BUTTON = false;
 		$this->DISABLE_BACK_BUTTON = false;
 		$this->SHOW_RETRY_BUTTON = false;
 		$this->STEP_FAILED = false;
-		$this->ZBX_CONFIG = $ZBX_CONFIG;
-
 		$this->frontendSetup = new CFrontendSetup();
 
 		$this->stage = [
@@ -63,11 +61,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function getConfig($name, $default = null) {
-		return isset($this->ZBX_CONFIG[$name]) ? $this->ZBX_CONFIG[$name] : $default;
+		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
 	}
 
 	function setConfig($name, $value) {
-		$this->ZBX_CONFIG[$name] = $value;
+		CSession::setValue($name, $value);
 	}
 
 	function getStep() {
@@ -76,7 +74,7 @@ class CSetupWizard extends CForm {
 
 	function doNext() {
 		if (isset($this->stage[$this->getStep() + 1])) {
-			$this->ZBX_CONFIG['step'] = $this->ZBX_CONFIG['step'] + 1;
+			$this->setConfig('step', $this->getStep('step') + 1);
 
 			return true;
 		}
@@ -86,7 +84,7 @@ class CSetupWizard extends CForm {
 
 	function doBack() {
 		if (isset($this->stage[$this->getStep() - 1])) {
-			$this->ZBX_CONFIG['step'] = $this->ZBX_CONFIG['step'] - 1;
+			$this->setConfig('step', $this->getStep('step') - 1);
 
 			return true;
 		}
