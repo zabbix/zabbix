@@ -107,7 +107,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Absolute path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
-	"  -f --foreground                Run application in foreground",
+	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
 #ifdef _WINDOWS
