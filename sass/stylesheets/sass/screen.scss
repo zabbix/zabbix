@@ -16,7 +16,6 @@ body {
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
-	//margin-bottom: 90px;
 	margin-bottom: 60px; 
 	min-width: 950px;
 }
@@ -233,15 +232,17 @@ nav {
 }
 
 .top-nav-container {
-	height: 36px;
-	line-height: 35px;
+	height: 49px;
+	line-height: 49px;
 	position: relative;
+	overflow: hidden;
 	background-color: $main-nav-bg-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
 	background-color: $main-nav-bg-color;
+	display: inline-block;
 
 	li {
 		display: block;
@@ -261,9 +262,9 @@ nav {
 				height: 0;
 				font-size: 0;
 				line-height: 0;
-				border-left: 7px solid transparent;
-				border-right: 7px solid transparent;
-				border-bottom: 7px solid $main-subnav-bg-color;
+				border-left: 9px solid transparent;
+				border-right: 9px solid transparent;
+			    border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
@@ -273,7 +274,7 @@ nav {
 	}
 
 	a {
-		padding: 10px 13px;
+		padding: 17px 13px;
 		color: $link-main-nav-color;
 		text-decoration: none;
 		cursor: pointer;
@@ -327,12 +328,11 @@ ul.top-nav-icons {
 	a {
 		display: block;
 		width: 38px;
-		height: 36px;
-		line-height: 36px;
-		color: $white;
+		height: 49px;
+		line-height: 49px;
 		font-size: $font-h3-size;
 		text-decoration: none;
-		@include opacity(0.75);
+		@include opacity(0.85);
 		@include transition(opacity .2s ease-out);
 
 		&:hover {
@@ -345,20 +345,20 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -30px;
 	}
 
 	.top-nav-profile {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -102px;
 	}
 
 	.top-nav-signout {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -138px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -66px;
 	    width: auto;
 		padding: 0 12px 0 27px;
 		-webkit-transform-style: preserve-3d;
@@ -369,17 +369,16 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background-color: darken($main-nav-bg-color, 5%);
-		border: 1px solid darken($main-nav-bg-color, 6%);
+		background-color: darken($main-nav-bg-color, 7%);
+		border: 1px solid darken($main-nav-bg-color, 9%);
 		width: 198px;
 		margin: 6px 7px 0 0;
-		color: $white;
+		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
-		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			border-color: darken($main-nav-bg-color, 10%);
+			border: 1px solid darken($main-nav-bg-color, 9%);
 			@include opacity(1);
 		}
 
@@ -390,8 +389,8 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
-	height: 36px;
-	line-height: 36px;
+	height: 32px;
+	line-height: 32px;
 	background-color: $main-subnav-bg-color;
 	position: relative;
 	padding: 0 13px;
@@ -414,7 +413,7 @@ ul.top-nav-icons {
 }
 
 .top-subnav a {
-	padding: 5px 8px;
+	padding: 9px 8px;
 
 	&:link {
 		color: $link-main-subnav-color;
@@ -437,9 +436,7 @@ ul.top-nav-icons {
 	}
 
 	&.selected {
-		background-color: $main-subnav-bg-selected-color;
 		color: $link-main-subnav-active-color;
-		@include border-radius(2px);
 	}
 }
 
@@ -557,9 +554,7 @@ footer {
 	position: absolute;
     bottom: 0;
     width: 100%;
-    //height: 60px;
     height: 30px;
-    //background-color: #eee;
 	text-align: center;
 	color: $font-alt-color;
 
@@ -576,13 +571,13 @@ footer {
 }
 
 .logo {
+	float: left;
 	display: block;
-	width: 94px;
+	width: 95px;
 	height: 25px;
-	margin: 0 auto;
-	margin-bottom: 10px;
-	background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
-	background-size: 94px;
+	margin: 12px 9px 0 13px;
+	background: $white url(../img/icon-sprite.svg) no-repeat 0 -720px;
+	background-size: 95px;
 }
 
 // Tables
@@ -758,28 +753,25 @@ footer {
 
 	&.paging-selected {
 		color: $font-selected-color;
-		border-color: $ui-bg-selected-color;//$form-border-color;
+		border-color: $ui-bg-selected-color;
 		background-color: $ui-bg-selected-color;	
 		position: relative;
 		z-index: 1;
 
 		&:hover {
 			background-color: darken($ui-bg-selected-color, 4%);
-			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:focus {
 			background-color: darken($ui-bg-selected-color, 4%);
 			border-color: $form-border-focus-color;
 			position: relative;
-			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 
 		&:active {
 			background-color: darken($ui-bg-selected-color, 4%);
 			border-color: $form-border-focus-color;
 			position: relative;
-			//@include btn-hover-active($btn-font-color, $btn-bg-color);
 		}
 	}
 }
@@ -932,7 +924,6 @@ footer {
 	@include border-radius(2px);
 
 	a {
-		//color: $font-color;
 		color: $font-selected-color;
 		text-decoration: none;
 		cursor: default;
@@ -1314,17 +1305,6 @@ footer {
 			height: 24px;
 			line-height: 24px;
 		}
-
-		//input {
-
-		//	&[type="checkbox"] {
-		//		top: -6px;
-		//	}
-
-		//	&[type="radio"] {
-		//		top: -6px;
-		//	}
-		//}
 	}
 
 	.table-forms-td-right {
@@ -1332,10 +1312,6 @@ footer {
 		padding: 5px 0 5px 10px;
 		vertical-align: middle;
 		width: 85%;
-
-		//th {
-		//	padding: 0;
-		//}
 
 		td {
 			padding: 5px 5px 5px 0;
@@ -1480,9 +1456,7 @@ footer {
 			}
 
 			&:active {
-				//color: $white;
 				border-color: $form-border-color;
-				//background-color: $ui-bg-selected-color;
 				background-color: $btn-form-hover-color;
 			}
 		}
@@ -1496,8 +1470,8 @@ footer {
 
 		&:checked + label {
 			color: $white;
-			border-color: $ui-bg-selected-color;//$btn-border-color;//$form-border-color;
-			background-color: $ui-bg-selected-color;//$btn-bg-color;	
+			border-color: $ui-bg-selected-color;
+			background-color: $ui-bg-selected-color;;	
 			position: relative;
 			z-index: 1;
 		}
@@ -1625,16 +1599,6 @@ select {
 		}
 	}
 
-	//&.select-multiple {
-	//	padding: 4px 5px;
-	//	width: 300px;
-	//	height: auto;
-
-	//	option {
-	//		padding: 0;
-	//	}
-	//}
-
 	&[multiple] {
 		padding: 4px 5px;
 		width: 300px;
@@ -1664,10 +1628,8 @@ select {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	//vertical-align: bottom;
 	vertical-align: middle;
 	position: relative;
-	//top: -2px;
 	top: -1px;
 	overflow: hidden;
 	width: 13px;
@@ -1681,10 +1643,6 @@ select {
 }
 
 %form-input-style {
-	//font: {
-	//	family: $font-stack;
-		//size: $font-form-size;
-	//}
 	border: 1px solid $form-border-color;
 	color: $font-color;
 	background-color: $form-bg-color;
@@ -1797,7 +1755,7 @@ button {
 	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
-	top: 7px;
+	top: 13px;
 	right: 8px;
 	width: 24px;
 	min-height: 22px;
@@ -1870,7 +1828,6 @@ $icon-widget-btn: (
 	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
-	//wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
@@ -1881,10 +1838,6 @@ $icon-widget-btn: (
     .btn-#{$icon-widget-btn} {
         background: $bgimage;
         @extend %btn-widget;
-
-        //@if $icon-widget-btn == 'wizard-action' {
-        //	height: 12px!important;
-        //}
     }
 }
 
@@ -1958,7 +1911,7 @@ $icon-widget-btn: (
 }
 
 %btn-search-hover-focus {
-	background-color: darken($main-nav-bg-color, 5%);
+	background-color: $transparent;
 	@include opacity(1);
 }
 
@@ -2122,7 +2075,6 @@ $form-icon-btn: (
 	height: 420px;
 	margin: 0 auto;
 	margin-top: 5%;
-	//padding: 20px 28px;
 	padding: 42px;
 	vertical-align: top;
 	position: relative;
@@ -2145,17 +2097,14 @@ $form-icon-btn: (
 	padding-right: 10px;
 
 	ul {
-		//margin: -4px 0 0 -28px;
 		margin: -4px 0 0 -42px;
 
 		li {
-			//padding: 4px 0 4px 28px;
 			padding: 4px 0 4px 42px;
 
 			&.setup-left-current {
 				border-left: 3px solid $ui-tab-bg-selected-color;
 				color: $font-alt-color;
-				//padding-left: 25px;
 				padding-left: 39px;
 			}
 		}
@@ -2208,7 +2157,6 @@ $form-icon-btn: (
 
 .setup-footer {
 	position: absolute;
-	//bottom: 21px;
 	bottom: 32px;
 	width: 766px;
 	text-align: right;
@@ -2229,11 +2177,9 @@ $form-icon-btn: (
 
 .signin-container {
 	background-color: $ui-bg-color;
-	//width: 322px;
 	width: 280px;
 	margin: 0 auto;
 	margin-top: 5%;
-	//padding: 20px 28px 0 28px;
 	padding: 42px 42px 39px 42px;
 	border: 1px solid $ui-border-color;
 
@@ -2244,7 +2190,6 @@ $form-icon-btn: (
 	}
 
 	ul li {
-		//padding: 0 0 22px 0;
 		padding: 16px 0 0 0; 
 		font-size: $font-top-nav-size;
 
@@ -2272,8 +2217,6 @@ $form-icon-btn: (
 	button {
 		font-size: $font-form-size;
 		margin: 7px 0;
-		//min-height: 38px;
-		//line-height: 38px;
 		min-height: 35px;
 		line-height: 35px;
 		width: 100%;
@@ -2282,8 +2225,6 @@ $form-icon-btn: (
 
 .signin-logo {
 	margin: 0 auto;
-	//margin-top: 5%;
-	//margin-bottom: 25px;
 	margin-bottom: 21px;
 	width: 114px;
 	height: 30px;
@@ -2298,7 +2239,6 @@ $form-icon-btn: (
 }
 
 %signin-input {
-	//padding: 10px 5px;
 	padding: 9px 5px;
 	width: 100%;
 }
@@ -3453,7 +3393,6 @@ a.overlay-close-btn {
 	position: absolute;
 	top: 0;
 	right: -12px;
-	//color: darken($ui-bg-selected-color, 40%);
 	color: $font-selected-color;
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
@@ -3461,17 +3400,14 @@ a.overlay-close-btn {
 	@include opacity(1);
 
 	&:hover {
-		//color: darken($ui-bg-selected-color, 65%);
 		color: darken($font-selected-color, 5%);
 	}
 
 	&:focus {
-		//color: darken($ui-bg-selected-color, 55%);
 		color: darken($font-selected-color, 10%);
 	}
 
 	&:active {
-		//color: darken($ui-bg-selected-color, 55%);
 		color: darken($font-selected-color, 10%);
 	}
 }
