@@ -21,7 +21,6 @@ frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
 frontends/php/favicon.ico -text svneol=unset#image/x-icon
 frontends/php/fonts/DejaVuSans.ttf -text
-frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
 frontends/php/images/general/arrow_up.png -text
 frontends/php/images/general/no_icon.png -text
@@ -68,6 +67,7 @@ frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
 frontends/php/locale/id/LC_MESSAGES/frontend.po -text
 frontends/php/locale/it/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
+frontends/php/locale/ka/LC_MESSAGES/frontend.po -text
 frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
 frontends/php/locale/lt/LC_MESSAGES/frontend.po -text
 frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
@@ -102,7 +102,6 @@ man/zabbix_get.man -text
 man/zabbix_proxy.man -text
 man/zabbix_sender.man -text
 man/zabbix_server.man -text
-misc/clock/clock.fla -text
 misc/images/README -text
 misc/images/README.dev -text
 misc/images/images_oracle_end.txt svneol=native#text/plain
@@ -374,6 +373,7 @@ sass/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
 sass/browserwarning.html -text
+sass/clock.html -text
 sass/dashboard.html -text
 sass/errors.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
