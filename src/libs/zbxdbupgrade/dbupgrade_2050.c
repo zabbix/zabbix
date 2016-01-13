@@ -912,6 +912,113 @@ out:
 
 	return ret;
 }
+
+static int	DBpatch_2050093(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("screens", &field);
+}
+
+static int	DBpatch_2050094(void)
+{
+	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
+	if (ZBX_DB_OK > DBexecute("update screens"
+			" set userid=(select min(userid) from users where type=3)"
+			" where templateid is null"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050095(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("screens", 3, &field);
+}
+
+static int	DBpatch_2050096(void)
+{
+	const ZBX_FIELD field = {"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("screens", &field);
+}
+
+static int	DBpatch_2050097(void)
+{
+	const ZBX_TABLE table =
+		{"screen_user",	"screenuserid",	0,
+			{
+				{"screenuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"screenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050098(void)
+{
+	return DBcreate_index("screen_user", "screen_user_1", "screenid,userid", 1);
+}
+
+static int	DBpatch_2050099(void)
+{
+	const ZBX_FIELD	field = {"screenid", NULL, "screens", "screenid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("screen_user", 1, &field);
+}
+
+static int	DBpatch_2050100(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("screen_user", 2, &field);
+}
+
+static int	DBpatch_2050101(void)
+{
+	const ZBX_TABLE table =
+		{"screen_usrgrp", "screenusrgrpid", 0,
+			{
+				{"screenusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"screenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050102(void)
+{
+	return DBcreate_index("screen_usrgrp", "screen_usrgrp_1", "screenid,usrgrpid", 1);
+}
+
+static int	DBpatch_2050103(void)
+{
+	const ZBX_FIELD	field = {"screenid", NULL, "screens", "screenid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("screen_usrgrp", 1, &field);
+}
+
+static int	DBpatch_2050104(void)
+{
+	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("screen_usrgrp", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -998,5 +1105,17 @@ DBPATCH_ADD(2050089, 0, 1)
 DBPATCH_ADD(2050090, 0, 1)
 DBPATCH_ADD(2050091, 0, 1)
 DBPATCH_ADD(2050092, 0, 1)
+DBPATCH_ADD(2050093, 0, 1)
+DBPATCH_ADD(2050094, 0, 1)
+DBPATCH_ADD(2050095, 0, 1)
+DBPATCH_ADD(2050096, 0, 1)
+DBPATCH_ADD(2050097, 0, 1)
+DBPATCH_ADD(2050098, 0, 1)
+DBPATCH_ADD(2050099, 0, 1)
+DBPATCH_ADD(2050100, 0, 1)
+DBPATCH_ADD(2050101, 0, 1)
+DBPATCH_ADD(2050102, 0, 1)
+DBPATCH_ADD(2050103, 0, 1)
+DBPATCH_ADD(2050104, 0, 1)
 
 DBPATCH_END()
