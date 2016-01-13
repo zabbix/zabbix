@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.0.0alpha6');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050092);
+define('ZABBIX_DB_VERSION',		2050104);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -341,8 +341,8 @@ define('SYSMAP_EXPAND_MACROS_ON',	1);
 define('SYSMAP_GRID_ALIGN_ON',	1);
 define('SYSMAP_GRID_ALIGN_OFF',	0);
 
-define('SYSMAP_PUBLIC',		0);
-define('SYSMAP_PRIVATE',	1);
+define('PUBLIC_SHARING',	0);
+define('PRIVATE_SHARING',	1);
 
 define('ZBX_ITEM_DELAY_DEFAULT', 30);
 
