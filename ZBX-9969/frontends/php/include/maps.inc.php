@@ -83,6 +83,7 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 
 	$hostIds = [];
 	$triggerIds = [];
+	$host_groupids = [];
 
 	foreach ($sysmap['selements'] as $id => &$selement) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
@@ -96,6 +97,9 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		}
 		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 			$triggerIds[$selement['elementid']] = $selement['elementid'];
+		}
+		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+			$host_groupids[$selement['elementid']] = $selement['elementid'];
 		}
 
 		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
@@ -112,8 +116,15 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		'nopermissions' => true,
 		'preservekeys' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'selectTriggers' => ['status']
+		'selectScreens' => API_OUTPUT_COUNT
+	]);
+
+	$monitored_triggers_hosts = API::Host()->get([
+		'hostids' => $hostIds,
+		'output' => ['hostid'],
+		'nopermissions' => true,
+		'preservekeys' => true,
+		'with_monitored_triggers' => true
 	]);
 
 	$triggers = API::Trigger()->get([
@@ -122,6 +133,14 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		'triggerids' => $triggerIds,
 		'preservekeys' => true,
 		'nopermissions' => true
+	]);
+
+	$host_groups = API::HostGroup()->get([
+		'groupids' => $host_groupids,
+		'output' => ['status'],
+		'nopermissions' => true,
+		'preservekeys' => true,
+		'with_monitored_triggers' => true
 	]);
 
 	// Find monitored hosts and get groups that those hosts belong to.
@@ -174,15 +193,8 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 					'hostid' => $elem['elementid'],
 					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
-				$gotos['showTriggers'] = false;
-				if ($host['status'] == HOST_STATUS_MONITORED && $host['triggers'] != []) {
-					foreach ($host['triggers'] as $trigger) {
-						if ($trigger['status'] == TRIGGER_STATUS_ENABLED) {
-							$gotos['showTriggers'] = true;
-							break;
-						}
-					}
-				}
+				$gotos['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED
+						&& array_key_exists($elem['elementid'], $monitored_triggers_hosts));
 
 				$gotos['graphs'] = ['hostid' => $host['hostid']];
 				$gotos['showGraphs'] = (bool) $host['graphs'];
@@ -236,7 +248,7 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 				];
 
 				// always show active trigger link for host group map elements
-				$gotos['showTriggers'] = true;
+				$gotos['showTriggers'] = array_key_exists($elem['elementid'], $host_groups);
 				break;
 		}
 
