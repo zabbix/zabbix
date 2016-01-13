@@ -52,6 +52,8 @@ typedef struct zbx_scheduler_interval_t
 }
 zbx_scheduler_interval_t;
 
+ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
+
 #ifdef _WINDOWS
 
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -2920,3 +2922,21 @@ fail:
 
 	return res;
 }
+
+#if !defined(_WINDOWS)
+unsigned int	zbx_alarm_on(unsigned int seconds)
+{
+	zbx_timed_out = 0;
+
+	return alarm(seconds);
+}
+
+unsigned int	zbx_alarm_off(void)
+{
+	unsigned int	ret;
+
+	ret = alarm(0);
+	zbx_timed_out = 0;
+	return ret;
+}
+#endif

@@ -72,6 +72,7 @@ zbx_buf_type_t;
 
 #define ZBX_SOCKET_COUNT	256
 #define ZBX_STAT_BUF_LEN	2048
+#define ZBX_SOCKET_PEER_BUF_LEN	129
 
 typedef struct
 {
@@ -98,6 +99,9 @@ typedef struct
 	int				num_socks;
 	ZBX_SOCKET			sockets[ZBX_SOCKET_COUNT];
 	char				buf_stat[ZBX_STAT_BUF_LEN];
+	/* Peer hostname or IP address for diagnostics (after TCP connection is established). */
+	/* TLS connection may be shut down at any time and it will not be possible to get peer IP address anymore. */
+	char				peer[ZBX_SOCKET_PEER_BUF_LEN];
 }
 zbx_socket_t;
 
@@ -145,7 +149,6 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
-char	*get_ip_by_socket(zbx_socket_t *s);
 int	zbx_tcp_check_security(zbx_socket_t *s, const char *ip_list, int allow_if_empty);
 
 int	zbx_udp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);

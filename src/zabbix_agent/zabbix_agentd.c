@@ -270,7 +270,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -335,7 +335,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		if ('h' == ch || 'V' == ch)
 			continue;
 
-		if (1 < opt_count[ch])
+		if (1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
@@ -823,6 +823,11 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
+#ifdef HAVE_IPV6
+#	define IPV6_FEATURE_STATUS	"YES"
+#else
+#	define IPV6_FEATURE_STATUS	" NO"
+#endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define TLS_FEATURE_STATUS	"YES"
 #else
@@ -833,6 +838,7 @@ int	MAIN_ZABBIX_ENTRY()
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 

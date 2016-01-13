@@ -60,7 +60,7 @@ static void	host_availability_sender(struct zbx_json *j)
 		if (SUCCEED != put_data_to_server(&sock, j, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
-					get_ip_by_socket(&sock), error);
+					sock.peer, error);
 		}
 		else
 			zbx_set_availability_diff_ts(ts);
@@ -113,7 +113,7 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 		{
 			*records = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send history data to server at \"%s\": %s",
-					get_ip_by_socket(&sock), error);
+					sock.peer, error);
 		}
 
 		zbx_free(error);
