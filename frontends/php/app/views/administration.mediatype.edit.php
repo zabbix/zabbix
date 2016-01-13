@@ -47,7 +47,6 @@ $cmbType = new CComboBox('type', $data['type'], null, [
 $cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
 $cmbTypeRow = [$cmbType];
 $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
-	->removeSID()
 	->setId('eztext_link')
 	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;

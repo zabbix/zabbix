@@ -1,16 +1,23 @@
 <script type="text/x-jquery-tmpl" id="macroRow">
-	<tr class="form_row">
-		<td>
-			<input class="macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{$MACRO}">
-		</td>
-		<td>&rArr;</td>
-		<td>
-			<input type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px" maxlength="255" placeholder="<?= _('value') ?>">
-		</td>
-		<td class="<?= ZBX_STYLE_NOWRAP ?>">
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+<?=
+	(new CRow([
+		(new CTextBox('macros[#{rowNum}][macro]', '', false, 255))
+			->addClass('macro')
+			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+			->setAttribute('placeholder', '{$MACRO}'),
+		'&rArr;',
+		(new CTextBox('macros[#{rowNum}][value]', '', false, 255))
+			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		(new CCol(
+			(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('form_row')
+		->toString()
+?>
 </script>
 <script type="text/javascript">
 	jQuery(function($) {

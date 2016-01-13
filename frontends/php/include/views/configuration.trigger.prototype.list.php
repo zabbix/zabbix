@@ -125,9 +125,11 @@ foreach ($this->data['triggers'] as $trigger) {
 				: 'triggerprototype.massdisable'
 			).
 			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(triggerIndicatorStyle($trigger['status']));
+			'&parent_discoveryid='.$this->data['parent_discoveryid']
+	))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(triggerIndicatorStyle($trigger['status']))
+		->addSID();
 
 	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);

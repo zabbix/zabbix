@@ -43,11 +43,15 @@ $discoveryTable = (new CTableInfo())
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
-	$status = new CCol((new CLink(
-		discovery_status2str($drule['status']),
-		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable')))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(discovery_status2style($drule['status']))
+	$status = new CCol(
+		(new CLink(
+			discovery_status2str($drule['status']),
+			'?g_druleid[]='.$drule['druleid'].
+			'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable')
+		))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(discovery_status2style($drule['status']))
+			->addSID()
 	);
 
 	$discoveryTable->addRow([
