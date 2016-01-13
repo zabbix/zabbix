@@ -440,6 +440,7 @@
 
 #ifdef HAVE_ZONE_H
 #	include <zone.h>
+#	include <utmpx.h>
 #endif
 
 #endif
