@@ -80,14 +80,16 @@ if ($this->data['actions']) {
 				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
 			)
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED);
+				->addClass(ZBX_STYLE_RED)
+				->addSID();
 		}
 		else {
 			$status = (new CLink(_('Enabled'),
 				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'))
 			)
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN);
+				->addClass(ZBX_STYLE_GREEN)
+				->addSID();
 		}
 
 		$actionTable->addRow([

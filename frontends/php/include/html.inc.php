@@ -785,7 +785,6 @@ function makePageFooter($with_version = true)
 		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->removeSID()
 			->setAttribute('target', '_blank')
 	]))->addClass(ZBX_STYLE_FOOTER);
 }
@@ -868,7 +867,6 @@ function makeDebugButton()
 {
 	return (new CDiv(
 		(new CLink(_('Debug'), '#debug'))
-			->removeSid()
 			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
 				"this.state = (this.state == 'none' ? 'block' : 'none');".
 				"jQuery(this)".

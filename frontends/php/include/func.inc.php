@@ -1371,7 +1371,7 @@ function zbx_str2links($text) {
 		$start = 0;
 		foreach ($matches[0] as $match) {
 			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = (new CLink($match[0], $match[0]))->removeSID();
+			$result[] = new CLink($match[0], $match[0]);
 			$start = $match[1] + mb_strlen($match[0]);
 		}
 		$result[] = mb_substr($line, $start);
@@ -1417,7 +1417,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 		}
 	}
 
-	return new CColHeader((new CLink([$obj, $arrow], $link->getUrl()))->removeSID());
+	return new CColHeader(new CLink([$obj, $arrow], $link->getUrl()));
 }
 
 /**
@@ -1502,19 +1502,19 @@ function getPagingLine(&$items, $sortorder) {
 		$url = CUrlFactory::getContextUrl();
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
+			$tags[] = new CLink(_('First'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
 			$url->setArgument('page', $currentPage - 1);
-			$tags[] = (new CLink(
+			$tags[] = new CLink(
 				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
-			))->removeSID();
+			);
 		}
 
 		for ($p = $startPage; $p <= $endPage; $p++) {
 			$url->setArgument('page', $p);
-			$link = (new CLink($p, $url->getUrl()))->removeSID();
+			$link = new CLink($p, $url->getUrl());
 			if ($p == $currentPage) {
 				$link->addClass(ZBX_STYLE_PAGING_SELECTED);
 			}
@@ -1524,12 +1524,12 @@ function getPagingLine(&$items, $sortorder) {
 
 		if ($currentPage < $pagesCount) {
 			$url->setArgument('page', $currentPage + 1);
-			$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl()))->removeSID();
+			$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
 		}
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
+			$tags[] = new CLink(_('Last'), $url->getUrl());
 		}
 	}
 
