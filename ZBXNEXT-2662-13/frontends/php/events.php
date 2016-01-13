@@ -283,7 +283,8 @@ else {
 	$frmForm->addItem($controls);
 	$eventsWidget->setControls($frmForm);
 
-	$filterForm = new CFilter('web.events.filter.state');
+	$filterForm = (new CFilter('web.events.filter.state'))
+		->addVar('fullscreen', getRequest('fullscreen'));
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		$filterForm->addVar('triggerid', $triggerId)
