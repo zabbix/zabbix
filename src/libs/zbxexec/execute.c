@@ -390,7 +390,7 @@ close:
 
 #else	/* not _WINDOWS */
 
-	alarm(timeout);
+	zbx_alarm_on(timeout);
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
@@ -432,7 +432,7 @@ close:
 	else
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
-	alarm(0);
+	zbx_alarm_off();
 
 #endif	/* _WINDOWS */
 

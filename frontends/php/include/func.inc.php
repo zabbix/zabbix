@@ -39,7 +39,7 @@ function zbx_is_callable(array $names) {
 /************ REQUEST ************/
 function redirect($url) {
 	$curl = new CUrl($url);
-	$curl->setArgument('sid', null);
+	$curl->removeArgument('sid');
 	header('Location: '.$curl->getUrl());
 	exit;
 }
@@ -1371,7 +1371,7 @@ function zbx_str2links($text) {
 		$start = 0;
 		foreach ($matches[0] as $match) {
 			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = (new CLink($match[0], $match[0]))->removeSID();
+			$result[] = new CLink($match[0], $match[0]);
 			$start = $match[1] + mb_strlen($match[0]);
 		}
 		$result[] = mb_substr($line, $start);
@@ -1417,9 +1417,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 		}
 	}
 
-	$col = new CColHeader([new CLink([$obj, $arrow], $link->getUrl())]);
-
-	return $col;
+	return new CColHeader(new CLink([$obj, $arrow], $link->getUrl()));
 }
 
 /**
@@ -1504,19 +1502,19 @@ function getPagingLine(&$items, $sortorder) {
 		$url = CUrlFactory::getContextUrl();
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
+			$tags[] = new CLink(_('First'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
 			$url->setArgument('page', $currentPage - 1);
-			$tags[] = (new CLink(
+			$tags[] = new CLink(
 				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
-			))->removeSID();
+			);
 		}
 
 		for ($p = $startPage; $p <= $endPage; $p++) {
 			$url->setArgument('page', $p);
-			$link = (new CLink($p, $url->getUrl()))->removeSID();
+			$link = new CLink($p, $url->getUrl());
 			if ($p == $currentPage) {
 				$link->addClass(ZBX_STYLE_PAGING_SELECTED);
 			}
@@ -1526,12 +1524,12 @@ function getPagingLine(&$items, $sortorder) {
 
 		if ($currentPage < $pagesCount) {
 			$url->setArgument('page', $currentPage + 1);
-			$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl()))->removeSID();
+			$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
 		}
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
+			$tags[] = new CLink(_('Last'), $url->getUrl());
 		}
 	}
 
@@ -1660,7 +1658,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	else {
 		// url to redirect the user to after he loggs in
 		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-		$url->setArgument('sid', null);
+		$url->removeArgument('sid');
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message

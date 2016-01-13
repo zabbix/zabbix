@@ -109,18 +109,16 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 
 		$serviceNode = [
 			'id' => $service['serviceid'],
-			'caption' => (new CLink($service['name'], 'services.php?form=1&serviceid='.$service['serviceid']))
-				->removeSID(),
+			'caption' => new CLink($service['name'], 'services.php?form=1&serviceid='.$service['serviceid']),
 			'action' => new CHorList([
 				(new CLink(_('Add child'),
 					'services.php?form=1&parentid='.$service['serviceid'].'&parentname='.$service['name']
-				))
-					->addClass(ZBX_STYLE_LINK_ACTION)
-					->removeSID(),
+				))->addClass(ZBX_STYLE_LINK_ACTION),
 				$deletable
 					? (new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))
 						->onClick('return Confirm('.CJs::encodeJson(_s('Delete service "%1$s"?', $service['name'])).')')
 						->addClass(ZBX_STYLE_LINK_ACTION)
+						->addSID()
 					: null
 			]),
 			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
@@ -207,18 +205,18 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			24 * DAY_IN_YEAR => 'yearly'
 		];
 
-		$caption = (new CLink($service['name'],
+		$caption = new CLink($service['name'],
 			'zabbix.php?action=report.services'.'&serviceid='.$service['serviceid'].'&period='.$periods[$period]
-		))->removeSID();
+		);
 
 		$trigger = $service['trigger'];
 		if ($trigger) {
 			$caption = [
 				$caption,
 				' - ',
-				(new CLink($trigger['description'],
+				new CLink($trigger['description'],
 					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
-				))->removeSID()
+				)
 			];
 		}
 
