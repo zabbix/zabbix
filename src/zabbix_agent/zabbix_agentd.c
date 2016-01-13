@@ -340,7 +340,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case ZBX_TASK_STOP_SERVICE:
 			if (0 != foreground)
 			{
-				zbx_error("foreground option can not be used with Zabbix agent services");
+				zbx_error("foreground option cannot be used with Zabbix agent services");
 				ret = FAIL;
 				goto out;
 			}
