@@ -50,7 +50,7 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 	char	**valRes = NULL;
 	int	ldapErr = 0;
 
-	alarm(timeout);
+	zbx_alarm_on(timeout);
 
 	*value_int = 0;
 
@@ -82,7 +82,7 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 
 	*value_int = 1;
 lbl_ret:
-	alarm(0);
+	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);

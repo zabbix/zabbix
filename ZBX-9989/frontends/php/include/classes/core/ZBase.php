@@ -41,13 +41,6 @@ class ZBase {
 	protected $rootDir;
 
 	/**
-	 * Session object.
-	 *
-	 * @var CSession
-	 */
-	protected $session;
-
-	/**
 	 * @var array of config data from zabbix config file
 	 */
 	protected $config = [];
@@ -268,19 +261,6 @@ class ZBase {
 	}
 
 	/**
-	 * Return session object.
-	 *
-	 * @return CSession
-	 */
-	public function getSession() {
-		if ($this->session === null) {
-			$this->session = new CSession();
-		}
-
-		return $this->session;
-	}
-
-	/**
 	 * Set custom error handler for PHP errors.
 	 */
 	protected function setErrorHandler() {
@@ -438,17 +418,17 @@ class ZBase {
 		else if ($response instanceof CControllerResponseRedirect) {
 			header('Content-Type: text/html; charset=UTF-8');
 			if ($response->getMessageOk() !== null) {
-				$_SESSION['messageOk'] = $response->getMessageOk();
+				CSession::setValue('messageOk', $response->getMessageOk());
 			}
 			if ($response->getMessageError() !== null) {
-				$_SESSION['messageError'] = $response->getMessageError();
+				CSession::setValue('messageError', $response->getMessageError());
 			}
 			global $ZBX_MESSAGES;
 			if (isset($ZBX_MESSAGES)) {
-				$_SESSION['messages'] = $ZBX_MESSAGES;
+				CSession::setValue('messages', $ZBX_MESSAGES);
 			}
 			if ($response->getFormData() !== null) {
-				$_SESSION['formData'] = $response->getFormData();
+				CSession::setValue('formData', $response->getFormData());
 			}
 
 			redirect($response->getLocation());
@@ -464,7 +444,8 @@ class ZBase {
 					$response->addMessage($key.': '.$value);
 				}
 			}
-			$_SESSION['messages'] = $response->getMessages();
+			CSession::setValue('messages', $response->getMessages());
+
 			redirect('zabbix.php?action=system.warning');
 		}
 	}
