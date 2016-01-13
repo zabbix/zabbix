@@ -47,7 +47,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host availability data from active proxy at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 		goto out;
 	}
 
@@ -110,7 +110,7 @@ out:
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 	}
 
 	zbx_json_free(&j);
