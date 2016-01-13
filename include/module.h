@@ -109,12 +109,14 @@ vmware_event_t;
 #define SET_UI64_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_UINT64,		\
+	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->ui64 = (zbx_uint64_t)(val)	\
 )
 
 #define SET_DBL_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_DOUBLE,		\
+	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->dbl = (double)(val)		\
 )
 
@@ -122,6 +124,7 @@ vmware_event_t;
 #define SET_STR_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_STRING,		\
+	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->str = (char *)(val)		\
 )
 
@@ -129,6 +132,7 @@ vmware_event_t;
 #define SET_TEXT_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_TEXT,			\
+	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->text = (char *)(val)		\
 )
 
@@ -136,6 +140,7 @@ vmware_event_t;
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
+	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->logs = (zbx_log_t **)(val)	\
 )
 
@@ -143,6 +148,7 @@ vmware_event_t;
 #define SET_MSG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_MESSAGE,		\
+	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->msg = (char *)(val)		\
 )
 
