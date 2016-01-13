@@ -608,7 +608,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 {
 	if (LOG_TYPE_UNDEFINED == CONFIG_LOG_TYPE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" parameter: \"%s\"", CONFIG_LOG_TYPE_STR);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'", CONFIG_LOG_TYPE_STR);
 		return FAIL;
 	}
 
