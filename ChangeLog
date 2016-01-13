@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
+...G...PS. [ZBX-8914] improved receiving TCP messages: more tolerant to fragmented messages, stricter message length validation, better performance (gleb)
 ...G...PS. [ZBXNEXT-1263] fixed timeout detection for encrypted connections (Andris)
 ........S. [ZBXNEXT-1263] fixed encryption problems with running remote commands (Andris)
 A.FGI..PS. [ZBXNEXT-1263] polished encryption support for communications between Zabbix components (Andris, asaveljevs, gleb, Oleg, Sandis)
