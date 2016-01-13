@@ -33,16 +33,16 @@ $icons = (new CList())
 	->addItem(
 		(new CLink('Share', 'https://share.zabbix.com/'))
 			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
-			->removeSID()
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Zabbix Share'))
+			->removeSID()
 	)
 	->addItem(
 		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.0/'))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
-			->removeSID()
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Help'))
+			->removeSID()
 	);
 
 if (!$data['user']['is_guest']) {
@@ -50,6 +50,7 @@ if (!$data['user']['is_guest']) {
 		(new CLink(SPACE, 'profile.php'))
 			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 			->setAttribute('title', getUserFullname($data['user']))
+			->removeSID()
 	);
 }
 
