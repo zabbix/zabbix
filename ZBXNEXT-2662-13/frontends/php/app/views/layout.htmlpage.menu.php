@@ -60,6 +60,7 @@ $icons->addItem(
 
 // 1st level menu
 $top_menu = (new CDiv())
+	->addItem((new CDiv())->addClass('logo'))
 	->addItem(
 		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
 	)
