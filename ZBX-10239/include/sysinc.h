@@ -438,4 +438,8 @@
 #	include <dlfcn.h>
 #endif
 
+#ifdef HAVE_ZONE_H
+#	include <zone.h>
+#endif
+
 #endif
