@@ -35,7 +35,12 @@ $guest = (CWebUser::$data['userid'] > 0)
 		->addClass(ZBX_STYLE_SIGN_IN_TXT)
 	: null;
 
+global $ZBX_SERVER_NAME;
+
 (new CDiv([
+	(isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '')
+		? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
+		: null,
 	(new CDiv([
 		(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),
 		(new CForm())
