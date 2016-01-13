@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha6
 
 New features:
+A.F.I..... [ZBXNEXT-3073] implemented support of public and private screens with ability to share them with other users and user groups (Oleg)
 .......PS. [ZBXNEXT-3071] optimized history cache to better handle few items flooding cache with values (wiper)
 ...GI..... [ZBXNEXT-3045] dropped zabbix_agent - the inetd version of Zabbix agent (asaveljevs)
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
