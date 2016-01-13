@@ -78,7 +78,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Absolute path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
-	"  -f --foreground                Run application in foreground",
+	"  -f --foreground                Run Zabbix server in foreground",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
