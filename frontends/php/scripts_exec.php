@@ -66,9 +66,7 @@ else {
 }
 
 if ($isErrorExist) {
-	show_error_message(
-		_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
-	);
+	show_error_message(_('Cannot execute script'));
 }
 
 // render view

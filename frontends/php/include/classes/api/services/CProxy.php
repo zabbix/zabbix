@@ -700,7 +700,7 @@ class CProxy extends CApiService {
 		}
 
 		$proxy_exists = $this->get([
-			'output' => ['proxyid'],
+			'output' => ['proxyid', 'host'],
 			'filter' => ['host' => array_keys($names)],
 			'limit' => 1
 		]);

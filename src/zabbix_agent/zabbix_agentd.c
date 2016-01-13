@@ -262,10 +262,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	int		i, ret = SUCCEED, foreground = 0;
 	char		ch;
-	unsigned short	opt_count[256] = {0};
 #ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
 #endif
+	unsigned short	opt_count[256] = {0};
 
 	t->task = ZBX_TASK_START;
 
@@ -870,6 +870,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
+#ifdef HAVE_IPV6
+#	define IPV6_FEATURE_STATUS	"YES"
+#else
+#	define IPV6_FEATURE_STATUS	" NO"
+#endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define TLS_FEATURE_STATUS	"YES"
 #else
@@ -880,6 +885,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
