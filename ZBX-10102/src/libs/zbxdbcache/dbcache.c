@@ -198,15 +198,14 @@ typedef struct
 	dc_value_t	value;
 	zbx_timespec_t	ts;
 	dc_value_str_t	source;		/* for log items only */
-	zbx_uint64_t	lastlogsize;	/* for log items only */
+	zbx_uint64_t	lastlogsize;
 	int		timestamp;	/* for log items only */
 	int		severity;	/* for log items only */
 	int		logeventid;	/* for log items only */
-	int		mtime;		/* for log items only */
-	unsigned char	meta;		/* for log items only: meta information update (log size and mtime) */
+	int		mtime;
 	unsigned char	value_type;
 	unsigned char	state;
-	unsigned char	flags;
+	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
 }
 dc_item_value_t;
 
