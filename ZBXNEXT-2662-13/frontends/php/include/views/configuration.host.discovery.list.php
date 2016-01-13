@@ -76,7 +76,8 @@ foreach ($data['discoveries'] as $discovery) {
 			))
 		)
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']))
+			->addSID();
 
 	// info
 	if ($data['showInfoColumn']) {

@@ -108,7 +108,6 @@ if (!CWebUser::$data) {
  * Displaying
  */
 $link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
-	->removeSID()
 	->setTarget('_blank')
 	->addClass(ZBX_STYLE_GREY)
 	->addClass(ZBX_STYLE_LINK_ALT);
