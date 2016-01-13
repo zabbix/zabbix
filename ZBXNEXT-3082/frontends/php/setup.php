@@ -98,7 +98,7 @@ if (!CWebUser::$data) {
 }
 
 // page title
-$pageHeader = (new CPageHeader(_('Installation')))
+(new CPageHeader(_('Installation')))
 	->addCssFile('styles/'.CHtml::encode($theme).'.css')
 	->addJsFile('js/browsers.js')
 	->addJsFile('jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'])
@@ -107,20 +107,13 @@ $pageHeader = (new CPageHeader(_('Installation')))
 /*
  * Displaying
  */
-$header = (new CTag('header', true, new CDiv((new CDiv())->addClass('signin-logo'))))
-	->setAttribute('role', 'banner');
-
 $link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
-	->removeSID()
-	->setAttribute('target', '_blank');
-$sub_footer = (new CDiv(['Licensed under ', $link]))->addClass('signin-links');
+	->setTarget('_blank')
+	->addClass(ZBX_STYLE_GREY)
+	->addClass(ZBX_STYLE_LINK_ALT);
+$sub_footer = (new CDiv(['Licensed under ', $link]))->addClass(ZBX_STYLE_SIGNIN_LINKS);
 
-$body = new CTag('body', true, [
-	$header,
-	(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE),
-	makePageFooter(false)
-]);
-
-$body->show();
+(new CTag('body', true, [(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE), makePageFooter()]))
+	->show();
 ?>
 </html>

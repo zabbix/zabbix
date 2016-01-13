@@ -99,15 +99,18 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	}
 
 	// status
-	$status = (new CLink(item_status2str($hostPrototype['status']),
+	$status = (new CLink(
+		item_status2str($hostPrototype['status']),
 		'?group_hostid='.$hostPrototype['hostid'].
 			'&parent_discoveryid='.$this->data['discovery_rule']['itemid'].
 			'&action='.($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
-			)))
+			)
+	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(itemIndicatorStyle($hostPrototype['status']));
+		->addClass(itemIndicatorStyle($hostPrototype['status']))
+		->addSID();
 
 	$hostTable->addRow([
 		new CCheckBox('group_hostid['.$hostPrototype['hostid'].']', $hostPrototype['hostid']),
