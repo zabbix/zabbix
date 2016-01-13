@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1704,7 +1704,6 @@ msgid "Cannot delete user media."
 msgstr "無法刪除用戶示警媒介."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "無法刪除值對應"
@@ -5669,6 +5668,10 @@ msgid "Generated in %s sec"
 msgstr "產生於%s秒"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "德語 (de_DE)"
 
@@ -5888,7 +5891,7 @@ msgstr "圖形已複製"
 msgid "Graphs deleted"
 msgstr "圖形已删除"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "希臘(el_GR)"
 
@@ -6563,7 +6566,7 @@ msgstr "時"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "匈牙利(hu_HU)"
 
@@ -7847,7 +7850,7 @@ msgstr ""
 msgid "Incorrect web scenario ID."
 msgstr ""
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "印尼語 (id_ID)"
 
@@ -8270,7 +8273,7 @@ msgstr "以用戶密碼過濾是不可能的."
 msgid "It is not possible to search by user password."
 msgstr "以用戶密碼尋找是不可能的."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "意大利語 (it_IT)"
 
@@ -8551,7 +8554,7 @@ msgstr "一月"
 msgid "January"
 msgstr "一月"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "日語 (ja_JP)"
 
@@ -8607,7 +8610,7 @@ msgstr "鍵值通行短語"
 msgid "Keyword"
 msgstr "關鍵字"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "韓語 (ko_KR)"
 
@@ -8768,7 +8771,7 @@ msgstr "最新報警"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "拉脱維亞語(lv_LV)"
 
@@ -8896,7 +8899,7 @@ msgstr ""
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -11447,7 +11450,7 @@ msgstr "許可權"
 msgid "Permissions can be assigned for user groups only."
 msgstr "許可權只能被指派予用戶群組"
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "波斯語 (fa_IR)"
 
@@ -11490,7 +11493,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "請選擇兩組件"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "波蘭(pl_PL)"
 
@@ -11527,11 +11530,11 @@ msgstr ""
 msgid "Port range"
 msgstr "埠範圍"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "波蘭語 (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -12186,7 +12189,7 @@ msgstr ""
 msgid "Right"
 msgstr "右"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -12260,7 +12263,7 @@ msgstr "於主機上執行遠程命令"
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "俄語 (ru_RU)"
 
@@ -13171,7 +13174,7 @@ msgstr "簡報片展示"
 msgid "Slides"
 msgstr "簡報片"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "斯洛伐克(sk_SK)"
 
@@ -13237,7 +13240,7 @@ msgstr "依欄位\"%1$s\"排序是不允許的."
 msgid "Source"
 msgstr "來源 "
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "西班牙語 (es_ES)"
 
@@ -13477,7 +13480,7 @@ msgstr ""
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
@@ -14349,7 +14352,7 @@ msgstr "二"
 msgid "Tuesday"
 msgstr "週二"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -14507,7 +14510,7 @@ msgstr "URLs"
 msgid "USA (160 characters)"
 msgstr "USA (160字元)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "烏克蘭語 (uk_UA)"
 
@@ -15443,7 +15446,6 @@ msgid "Value map added"
 msgstr "值對應已新增"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "值對應已刪除"
@@ -15516,7 +15518,7 @@ msgstr "垂直的"
 msgid "Vertical align"
 msgstr "縱向對齊"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 

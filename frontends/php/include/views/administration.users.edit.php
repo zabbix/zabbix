@@ -200,15 +200,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$status = (new CLink(_('Enabled'), '#'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);')
-				->removeSID();
+				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);');
 		}
 		else {
 			$status = (new CLink(_('Disabled'), '#'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);')
-				->removeSID();
+				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
 		$mediaUrl = 'popup_media.php'.

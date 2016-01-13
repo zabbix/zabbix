@@ -73,9 +73,11 @@ foreach ($this->data['items'] as $item) {
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
-			)))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status']));
+			)
+	))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($item['status']))
+		->addSID();
 
 	if (!empty($item['applications'])) {
 		order_result($item['applications'], 'name');

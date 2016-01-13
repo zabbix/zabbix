@@ -818,8 +818,7 @@ class CImportReferencer {
 				'filter' => [
 					'name' => $graphNames,
 					'flags' => null
-				],
-				'editable' => true
+				]
 			]);
 
 			foreach ($dbGraphs as $dbGraph) {
@@ -889,11 +888,12 @@ class CImportReferencer {
 		if (!empty($this->screens)) {
 			$this->screensRefs = [];
 
-			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
-					' s.templateid IS NULL '.
-					' AND '.dbConditionString('s.name', $this->screens));
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$this->screensRefs[$dbScreen['name']] = $dbScreen['screenid'];
+			$db_screens = API::Screen()->get([
+				'filter' => ['name' => $this->screens],
+				'output' => ['screenid', 'name']
+			]);
+			foreach ($db_screens as $db_screen) {
+				$this->screensRefs[$db_screen['name']] = $db_screen['screenid'];
 			}
 
 			$this->screens = [];
@@ -907,15 +907,12 @@ class CImportReferencer {
 		if ($this->templateScreens) {
 			$this->templateScreensRefs = [];
 
-			$dbScreens = DBselect(
-				'SELECT s.screenid, s.name, s.templateid'.
-				' FROM screens s'.
-				' WHERE s.templateid IS NOT NULL '.
-					' AND '.dbConditionString('s.name', $this->templateScreens)
-			);
-
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$this->templateScreensRefs[$dbScreen['templateid']][$dbScreen['name']] = $dbScreen['screenid'];
+			$db_template_screens = API::TemplateScreen()->get([
+				'filter' => ['name' => $this->templateScreens],
+				'output' => ['screenid', 'name', 'templateid']
+			]);
+			foreach ($db_template_screens as $screen) {
+				$this->templateScreensRefs[$screen['templateid']][$screen['name']] = $screen['screenid'];
 			}
 
 			$this->templateScreens = [];

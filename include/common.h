@@ -461,9 +461,8 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_PROXY_PASSIVE	0x04
 #define ZBX_PROGRAM_TYPE_PROXY		0x06	/* ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
 #define ZBX_PROGRAM_TYPE_AGENTD		0x08
-#define ZBX_PROGRAM_TYPE_AGENT		0x10
-#define ZBX_PROGRAM_TYPE_SENDER		0x20
-#define ZBX_PROGRAM_TYPE_GET		0x40
+#define ZBX_PROGRAM_TYPE_SENDER		0x10
+#define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
@@ -1134,5 +1133,10 @@ zbx_function_t;
 void	zbx_function_clean(zbx_function_t *func);
 int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
 int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
+
+#ifndef _WINDOWS
+unsigned int	zbx_alarm_on(unsigned int seconds);
+unsigned int	zbx_alarm_off(void);
+#endif
 
 #endif

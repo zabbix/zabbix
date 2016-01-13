@@ -35,6 +35,7 @@ $frmHost = (new CForm())
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
+	->addVar('tls_connect', $data['tls_connect'])
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
 
