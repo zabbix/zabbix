@@ -190,7 +190,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		->setId('current_step_'.$stepid);
 
 	$name = (new CLink($step['name'], 'javascript:void(0);'))
-		->removeSID()
 		->setId('name_'.$stepid)
 		->setAttribute('name_step', $stepid);
 
