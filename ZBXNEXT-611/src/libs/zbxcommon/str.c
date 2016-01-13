@@ -3178,7 +3178,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  ******************************************************************************/
 void	zbx_strarr_init(char ***arr)
 {
-	*arr = zbx_malloc(*arr, sizeof(char **));
+	*arr = zbx_malloc(*arr, sizeof(char *));
 	**arr = NULL;
 }
 
@@ -3207,7 +3207,7 @@ void	zbx_strarr_add(char ***arr, const char *entry)
 	for (i = 0; NULL != (*arr)[i]; i++)
 		;
 
-	*arr = zbx_realloc(*arr, sizeof(char **) * (i + 2));
+	*arr = zbx_realloc(*arr, sizeof(char *) * (i + 2));
 
 	(*arr)[i] = zbx_strdup((*arr)[i], entry);
 	(*arr)[++i] = NULL;
@@ -3785,7 +3785,7 @@ static int	function_parse_unquoted_param(const char *expr, size_t *length, size_
 	}
 out:
 	/* trim the trailing whitespace */
-	while (ptr > expr && ' ' == *(ptr - 1) )
+	while (ptr > expr && ' ' == *(ptr - 1))
 		ptr--;
 
 	*length = ptr - expr;
@@ -3904,7 +3904,7 @@ static int	function_quoted_param_len(const char *param, int *quoted)
 	if (' ' == *param || '"' == *param)
 		*quoted = 1;
 
-	for(;'\0' != *param; param++)
+	for (; '\0' != *param; param++)
 	{
 		switch (*param)
 		{
@@ -4098,9 +4098,9 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
  ******************************************************************************/
 int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out)
 {
-	int		ret = FAIL, index = 0, quoted;
-	size_t		right, len, offset, next_pos, param_pos, next_offset;
-	char		*param;
+	int	ret = FAIL, index = 0, quoted;
+	size_t	right, len, offset, next_pos, param_pos, next_offset;
+	char	*param;
 
 	*out = zbx_malloc(NULL, expr_len + 1);
 	memcpy(*out, expr, expr_len);
