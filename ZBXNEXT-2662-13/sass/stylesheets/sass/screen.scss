@@ -330,9 +330,10 @@ ul.top-nav-icons {
 		width: 38px;
 		height: 49px;
 		line-height: 49px;
+		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
-		@include opacity(0.85);
+		@include opacity(0.75);
 		@include transition(opacity .2s ease-out);
 
 		&:hover {
