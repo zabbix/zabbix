@@ -105,6 +105,8 @@ switch ($page['type']) {
 	default:
 		header('Content-Type: text/html; charset=UTF-8');
 
+		global $ZBX_SERVER_NAME;
+
 		// page title
 		$pageTitle = '';
 		if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {

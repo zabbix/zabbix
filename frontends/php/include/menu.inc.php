@@ -386,7 +386,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		$mmenu_entry = (new CListItem(
 			(new CLink($menu['label']))
 				->setAttribute('tabindex', 0)
-				->removeSID()
 		))
 			->addClass($menu_class)
 			->setId($label);

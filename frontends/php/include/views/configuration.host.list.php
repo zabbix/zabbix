@@ -122,7 +122,8 @@ foreach ($data['hosts'] as $host) {
 	$status = (new CLink($statusCaption, $statusUrl))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($statusClass)
-		->onClick($statusScript);
+		->onClick($statusScript)
+		->addSID();
 
 	order_result($host['parentTemplates'], 'name');
 
