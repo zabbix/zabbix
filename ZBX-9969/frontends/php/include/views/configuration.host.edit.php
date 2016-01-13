@@ -35,6 +35,7 @@ $frmHost = (new CForm())
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
+	->addVar('tls_connect', $data['tls_connect'])
 	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
 
@@ -562,7 +563,6 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$ignoredTemplates = [];
 
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
@@ -617,7 +617,6 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 

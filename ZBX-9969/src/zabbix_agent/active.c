@@ -36,8 +36,9 @@
 #include "zbxjson.h"
 #include "alias.h"
 
-extern unsigned char	process_type, program_type;
-extern int		server_num, process_num;
+extern unsigned char			program_type;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -811,7 +812,7 @@ static int	send_buffer(const char *host, unsigned short port)
 					host, port, err_send_step, zbx_socket_strerror());
 			buffer.first_error = now;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s %s", err_send_step, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[3.0.0alpha5])
+AC_INIT([Zabbix],[3.0.0alpha6])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -60,7 +60,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
+  Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
   dlfcn.h sys/utsname.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [

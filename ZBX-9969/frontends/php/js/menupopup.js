@@ -556,14 +556,14 @@ function getMenuPopupRefresh(options) {
 					});
 				}
 
-				jQuery('span').each(function() {
-					var span = jQuery(this);
+				jQuery('a').each(function() {
+					var link = jQuery(this);
 
-					if (span.data('value') == currentRate) {
-						span.addClass('selected');
+					if (link.data('value') == currentRate) {
+						link.addClass('selected');
 					}
 					else {
-						span.removeClass('selected');
+						link.removeClass('selected');
 					}
 				});
 
@@ -580,63 +580,6 @@ function getMenuPopupRefresh(options) {
 
 	return [{
 		label: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
-		items: items
-	}];
-}
-
-/**
- * Get menu popup service configuration section data.
- *
- * @param string options['serviceid']		service id
- * @param string options['name']			service name
- * @param bool   options['deletable']		service has dependencies and cannot be deleted
- *
- * @return array
- */
-function getMenuPopupServiceConfiguration(options) {
-	var items = [];
-
-	if (options.serviceid === null) {
-		// add
-		items[items.length] = {
-			label: t('Add child'),
-			url: new Curl('services.php?form=1&parentname=' + options.name).getUrl()
-		};
-	}
-	else {
-		// add
-		items[items.length] = {
-			label: t('Add child'),
-			url: new Curl('services.php?form=1&parentid=' + options.serviceid + '&parentname=' + options.name).getUrl()
-		};
-
-		// edit
-		items[items.length] = {
-			label: t('Edit'),
-			url: new Curl('services.php?form=1&serviceid=' + options.serviceid).getUrl()
-		};
-
-		var del = {
-				label: t('Delete')
-			};
-
-		// delete
-		if (options.deletable) {
-			del.clickCallback = function() {
-				jQuery(this).closest('.action-menu').fadeOut(100);
-
-				if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
-					window.location = new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl();
-				}
-			};
-		}
-		else {
-			del.disabled = true;
-		}
-		items[items.length] = del;
-	}
-
-	return [{
 		items: items
 	}];
 }
@@ -1063,47 +1006,46 @@ jQuery(function($) {
 	 */
 	function createMenuItem(options) {
 		var item = $('<li>'),
-			span = $('<span>');
+			link = $('<a>');
 
 		if (typeof options.label !== 'undefined') {
+			link.text(options.label);
+
 			if (typeof options.items !== 'undefined' && options.items.length > 0) {
 				// if submenu exists
-				span.html(jQuery.escapeHtml(options.label) + '<span class="arrow-right"></span>');
-			}
-			else {
-				span.html(jQuery.escapeHtml(options.label));
+				link.append($('<span>', {'class': 'arrow-right'}));
 			}
 		}
 
 		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
 			$.each(options.data, function(key, value) {
-				span.data(key, value);
+				link.data(key, value);
 			});
 		}
 
 		if (typeof options.disabled !== 'undefined' && options.disabled) {
-			span.addClass('action-menu-item-disabled');
+			link.addClass('action-menu-item-disabled');
 		}
 		else {
-			span.addClass('action-menu-item');
+			link.addClass('action-menu-item');
 
 			if (typeof options.url !== 'undefined') {
-				span.attr('onclick', 'location.href=\'' + options.url + '\'');
+				link.attr('href', options.url);
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {
-				span.click(options.clickCallback);
+				link.click(options.clickCallback);
 			}
 		}
 
 		if (typeof options.selected !== 'undefined' && options.selected) {
-			span.addClass('selected');
+			link.addClass('selected');
 		}
 
-		item.append(span);
+		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>', {'class' : 'action-menu'} );
+			var menu = $('<ul>', {'class' : 'action-menu'});
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));

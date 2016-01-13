@@ -26,6 +26,8 @@ $page['file'] = 'scripts_exec.php';
 
 define('ZBX_PAGE_NO_MENU', 1);
 
+ob_start();
+
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -35,8 +37,7 @@ $fields = [
 ];
 check_fields($fields);
 
-ob_flush();
-flush();
+ob_end_flush();
 
 $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
@@ -65,9 +66,7 @@ else {
 }
 
 if ($isErrorExist) {
-	show_error_message(
-		_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
-	);
+	show_error_message(_('Cannot execute script'));
 }
 
 // render view
