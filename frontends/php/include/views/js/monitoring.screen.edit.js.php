@@ -65,48 +65,23 @@
 </script>
 
 <script type="text/javascript">
-	inputs = ['label_type_hostgroup', 'label_type_host', 'label_type_trigger', 'label_type_map', 'label_type_image'];
-
-	function toggleAdvancedLabels(toggle) {
-		jQuery.each(inputs, function() {
-			jQuery('#' + this).parentsUntil('ul').toggle(toggle);
-		});
-
-		jQuery('#label_type').parentsUntil('ul').toggle(!toggle);
-	}
-
-	function toggleCustomLabel(e) {
-		jQuery(e.target)
-			.parent()
-			.find('textarea')
-			.toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?= MAP_LABEL_TYPE_CUSTOM ?>');
-	}
-
 	jQuery(function($) {
-		$('#label_format').click(function() {
-			toggleAdvancedLabels($('#label_format:checked').length != 0);
-		});
-
-		$.each(inputs, function() {
-			$('#' + this).change(toggleCustomLabel);
-		});
-
-		toggleAdvancedLabels($('#label_format:checked').length != 0);
-
 		// clone button
 		$('#clone').click(function() {
 			// Remove buttons, sharing options and inaccessible user message.
-			$('#sysmapid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_], #inaccessible_user').remove();
+			$('#screenid, #delete, #clone, [id^=user_group_shares_], [id^=user_shares_], #inaccessible_user').remove();
 			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			$('#name').focus();
 
-			// Set map to private.
+			$('#form').val('clone');
+
+			// Set screen to private.
 			$('input[name=private][value=' + <?= PRIVATE_SHARING ?> + ']').prop('checked', true);
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
-			$('#tab_sysmap_tab').trigger('click');
+			$('#tab_screen_tab').trigger('click');
 
 			$('#multiselect_userid_wrapper').show();
 
