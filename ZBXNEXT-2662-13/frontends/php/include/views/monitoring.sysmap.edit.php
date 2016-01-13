@@ -340,8 +340,8 @@ zbx_add_post_js($js_insert);
 $sharing_tab = (new CFormList('sharing_form'))
 	->addRow(_('Type'),
 	(new CRadioButtonList('private', (int) $data['sysmap']['private']))
-		->addValue(_('Private'), SYSMAP_PRIVATE)
-		->addValue(_('Public'), SYSMAP_PUBLIC)
+		->addValue(_('Private'), PRIVATE_SHARING)
+		->addValue(_('Public'), PUBLIC_SHARING)
 		->setModern(true)
 	)
 	->addRow(_('List of user group shares'),
