@@ -348,7 +348,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 	const char		*__function_name = "deactivate_host";
 	zbx_host_availability_t	in, out;
 	unsigned char		agent_type;
-	int			has_error_changed;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
 			__function_name, item->host.hostid, item->itemid, (int)item->type);
@@ -362,15 +361,9 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 	if (FAIL == host_get_availability(&item->host, agent_type, &in))
 		goto out;
 
-	has_error_changed = strcmp(in.agents[agent_type].error, error);
-
 	/* if the item is still flagged as unreachable while the host is reachable, */
 	/* it means that this is item rather than network failure                   */
-	if (0 == in.agents[agent_type].errors_from && 0 != item->unreachable && 0 == has_error_changed)
-		goto out;
-
-	/* skip update if host is already disabled and error message has not been changed */
-	if (HOST_AVAILABLE_FALSE == in.agents[agent_type].available && 0 == has_error_changed)
+	if (0 == in.agents[agent_type].errors_from && 0 != item->unreachable)
 		goto out;
 
 	if (FAIL == DChost_deactivate(item->host.hostid, agent_type, ts, &in.agents[agent_type],
