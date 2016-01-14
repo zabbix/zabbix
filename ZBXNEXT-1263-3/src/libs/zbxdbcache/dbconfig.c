@@ -1231,6 +1231,28 @@ static void	DCsync_hosts(DB_RESULT result)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		/* Detect PSK identity (PSKid) without PSK value or vice versa. This should have been prevented by */
+		/* validation in frontend or API. */
+
+		if ('\0' != *row[33])			/* PSKid */
+		{
+			if ('\0' == *row[34])		/* PSK value */
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host"
+						" \"%s\" (hostid %s)", row[33], row[2], row[0]);
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+		}
+		else if ('\0' != *row[34])		/* PSK value */
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty PSK configured for"
+					" host \"%s\" (hostid %s)", row[2], row[0]);
+			THIS_SHOULD_NEVER_HAPPEN;
+			continue;
+		}
+#endif
 		ZBX_STR2UINT64(hostid, row[0]);
 		ZBX_DBROW2UINT64(proxy_hostid, row[1]);
 		ZBX_STR2UCHAR(status, row[22]);
@@ -1368,29 +1390,10 @@ static void	DCsync_hosts(DB_RESULT result)
 		/*                                                                           */
 		/*****************************************************************************/
 
-		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
-		/* validation in frontend or API. Do not update cache in case of error. */
-
 		psk_owner = NULL;
-
-		if ('\0' != *row[33] && '\0' == *row[34])
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
-					" (hostid %s)", row[33], row[2], row[0]);
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto done;
-		}
 
 		if ('\0' == *row[33])				/* new PSKid empty */
 		{
-			if ('\0' != *row[34])
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty PSK configured for"
-						" host \"%s\" (hostid %s)", row[2], row[0]);
-				THIS_SHOULD_NEVER_HAPPEN;
-				goto done;
-			}
-
 			/* new PSKid and value empty */
 
 			if (0 == found)				/* new host with empty PSK */
