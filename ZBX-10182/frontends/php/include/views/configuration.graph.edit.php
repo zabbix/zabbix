@@ -257,7 +257,7 @@ else {
 $itemsTable = (new CTable())
 	->setId('itemsTable')
 	->setHeader([
-		$is_templated ? null : (new CColHeader())->setWidth(15),
+		(new CColHeader())->setWidth(15),
 		(new CColHeader())->setWidth(15),
 		(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
 		($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)

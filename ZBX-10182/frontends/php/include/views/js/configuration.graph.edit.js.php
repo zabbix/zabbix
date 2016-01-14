@@ -1,20 +1,22 @@
 <script type="text/x-jquery-tmpl" id="itemTpl">
 <tr id="items_#{number}" class="sortable">
 	<!-- icon + hidden -->
-	<?php if (!$this->data['templates']): ?>
+	<?php if ($this->data['templates']): ?>
+		<td>
+	<?php else: ?>
 		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 			<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-			<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
-			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-			<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
-				<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-			<?php endif ?>
-		</td>
 	<?php endif ?>
+		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
+		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
+		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
+		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
+			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
+		<?php endif ?>
+	</td>
 
 	<!-- row number -->
 	<td>
