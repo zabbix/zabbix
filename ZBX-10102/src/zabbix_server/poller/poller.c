@@ -423,10 +423,10 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void    vmware_event_free(vmware_event_t *vmware_event)
+static void    free_result_ptr(AGENT_RESULT *result)
 {
-	zbx_free(vmware_event->value);
-	zbx_free(vmware_event);
+	free_result(result);
+	zbx_free(result);
 }
 
 static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *vmware_events)
@@ -537,7 +537,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	zbx_timespec_t		timespec;
 	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
 	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
-	zbx_vector_ptr_t	vmware_events;
+	zbx_vector_ptr_t	add_results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -646,7 +646,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_free(port);
 
-	zbx_vector_ptr_create(&vmware_events);
+	zbx_vector_ptr_create(&add_results);
 
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
@@ -674,7 +674,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	else if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0], &vmware_events);
+			errcodes[0] = get_value(&items[0], &results[0], &add_results);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -719,50 +719,37 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			if (0 != ISSET_TEXT(&results[i]))
 				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
 
-			items[i].state = ITEM_STATE_NORMAL;
-
-			if (0 == vmware_events.values_num)
+			if (0 == add_results.values_num)
 			{
+				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
 						&timespec, items[i].state, NULL);
 			}
 			else
 			{
-				/* vmware.eventlog item returns list of events with a value */
+				/* vmware.eventlog item returns vector of AGENT_RESULT representing events */
 
-				size_t	j;
+				int	j;
 
-				for (j = 0; j < vmware_events.values_num; j++)
+				for (j = 0; j < add_results.values_num; j++)
 				{
-					int		ret;
-					vmware_event_t	*vmware_event = vmware_events.values[j];
+					AGENT_RESULT	*add_result = add_results.values[j];
 
-					init_result(&results[i]);
-
-					/* vmware event always contains value and lastlogsize */
-					if (SUCCEED == (ret = set_result_type(&results[i], items[i].value_type, items[i].flags,
-							vmware_event->value)))
+					if (ISSET_MSG(add_result))
 					{
-						set_result_meta(&results[i], vmware_event->lastlogsize, 0);
-
-						if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
-						{
-							results[i].log->logeventid = vmware_event->logeventid;
-							results[i].log->timestamp = vmware_event->timestamp;
-						}
-
-						if (0 != lastlogsize_undef)
-						{
-							lastlogsize_undef = 0;
-							lastlogsize = results[i].lastlogsize;
-						}
+						items[i].state = ITEM_STATE_NOTSUPPORTED;
+						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
+								NULL, &timespec, items[i].state, add_result->msg);
 					}
+					else
+					{
+						items[i].state = ITEM_STATE_NORMAL;
+						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
+								add_result, &timespec, items[i].state, NULL);
 
-					dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
-							&timespec, items[i].state, NULL);
-
-					if (SUCCEED != ret)
-						break;
+						lastlogsize_undef = 0;
+						lastlogsize = add_result->lastlogsize;
+					}
 				}
 			}
 		}
@@ -808,8 +795,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		free_result(&results[i]);
 	}
 
-	zbx_vector_ptr_clear_ext(&vmware_events, (zbx_mem_free_func_t)vmware_event_free);
-	zbx_vector_ptr_destroy(&vmware_events);
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
+	zbx_vector_ptr_destroy(&add_results);
 
 	DCconfig_clean_items(items, NULL, num);
 
