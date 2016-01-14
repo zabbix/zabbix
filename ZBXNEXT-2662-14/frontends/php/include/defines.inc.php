@@ -1144,6 +1144,7 @@ define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
 define('ZBX_STYLE_LOG_WARNING_BG', 'log-warning-bg');
 define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
 define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
+define('ZBX_STYLE_LOGO', 'logo');
 define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
