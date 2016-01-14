@@ -187,7 +187,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			'&hostid='.$this->data['hostid'].
 			'&g_triggerid='.$triggerid))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
+		->addSID();
 
 	// hosts
 	$hosts = null;

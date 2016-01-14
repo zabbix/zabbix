@@ -89,7 +89,6 @@ class CTabView extends CDiv {
 
 			foreach ($this->headers as $id => $header) {
 				$tabLink = (new CLink($header, '#'.$id))
-					->removeSID()
 					->setId('tab_'.$id);
 				$headersList->addItem($tabLink);
 			}

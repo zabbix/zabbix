@@ -120,9 +120,7 @@ class CProfiler {
 		global $DB;
 
 		$debug = [];
-		$debug[] = (new CLink())
-			->setAttribute('name', 'debug')
-			->removeSid();
+		$debug[] = (new CLink())->setAttribute('name', 'debug');
 		$debug[] = '******************** '._('Script profiler').' ********************';
 		$debug[] = BR();
 		$debug[] = _s('Total time: %1$s', round($this->stopTime - $this->startTime, 6));

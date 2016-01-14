@@ -75,8 +75,7 @@ if ($this->data['slideshows']) {
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 
-		$formFilter = (new CFilter('web.slides.filter.state'))
-			->addNavigator();
+		$formFilter = (new CFilter('web.slides.filter.state'))->addNavigator();
 		$slideshowWidget->addItem($formFilter);
 
 		$slideshowWidget->addItem(

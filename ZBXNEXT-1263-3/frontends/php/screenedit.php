@@ -391,7 +391,7 @@ if (empty($data['screen'])) {
 $data['screen'] = reset($data['screen']);
 
 // render view
-$screenView = new CView('configuration.screen.constructor.list', $data);
+$screenView = new CView('monitoring.screen.constructor.list', $data);
 $screenView->render();
 $screenView->show();
 
