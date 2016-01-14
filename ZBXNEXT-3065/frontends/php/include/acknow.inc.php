@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,27 +36,25 @@ function get_last_event_by_triggerid($triggerId) {
 /**
  * Get acknowledgement table.
  *
- * @param array $event
- * @param array $event['acknowledges']
- * @param array $event['acknowledges']['clock']
- * @param array $event['acknowledges']['alias']
- * @param array $event['acknowledges']['message']
+ * @param array $acknowledges
+ * @param array $acknowledges['clock']
+ * @param array $acknowledges['alias']
+ * @param array $acknowledges['name']
+ * @param array $acknowledges['surname']
+ * @param array $acknowledges['message']
  *
  * @return CTableInfo
  */
-function makeAckTab($event) {
-	$acknowledgeTable = (new CTableInfo())
-		->setHeader([_('Time'), _('User'), _('Message')]);
+function makeAckTab($acknowledges) {
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message')]);
 
-	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
-		foreach ($event['acknowledges'] as $acknowledge) {
-			$acknowledgeTable->addRow([
-				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
-				getUserFullname($acknowledge),
-				zbx_nl2br($acknowledge['message'])
-			]);
-		}
+	foreach ($acknowledges as $acknowledge) {
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
+			getUserFullname($acknowledge),
+			zbx_nl2br($acknowledge['message'])
+		]);
 	}
 
-	return $acknowledgeTable;
+	return $table;
 }

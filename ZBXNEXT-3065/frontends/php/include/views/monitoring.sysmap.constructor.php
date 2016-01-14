@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,7 @@
 **/
 
 
-include('include/views/js/configuration.sysmaps.js.php');
-
-$sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
+include('include/views/js/monitoring.sysmaps.js.php');
 
 // create menu
 $menu = (new CList())
@@ -67,13 +65,6 @@ $backgroundImageTable->addRow($backgroundImage);
 
 $container = (new CDiv())->setId('sysmap_cnt');
 
-$sysmapWidget->addItem($menu)->addItem(
-	(new CDiv())
-		->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
-		->addItem($backgroundImageTable)
-		->addItem($container)
-);
-
 // create elements
 zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson([
 	'sysmap' => $this->data['sysmap'],
@@ -85,4 +76,12 @@ zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson([
 
 insert_show_color_picker_javascript();
 
-return $sysmapWidget;
+return (new CWidget())
+	->setTitle(_('Network maps'))
+	->addItem($menu)
+	->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+			->addItem($backgroundImageTable)
+			->addItem($container)
+	);

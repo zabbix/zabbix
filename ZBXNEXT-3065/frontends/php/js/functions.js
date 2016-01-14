@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -111,13 +111,6 @@ function removeObjectById(id) {
 	if (obj != null && typeof(obj) == 'object') {
 		obj.parentNode.removeChild(obj);
 	}
-}
-
-/**
- * Converts all HTML entities into the corresponding symbols.
- */
-jQuery.unescapeHtml = function(html) {
-	return jQuery('<div />').html(html).text();
 }
 
 /**

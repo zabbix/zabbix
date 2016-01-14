@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -244,13 +244,15 @@ ZBX_DC_CALCITEM;
 
 typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 typedef struct
 {
-	const char	*tls_psk_identity;	/* pre-shared key identity		*/
-	const char	*tls_psk;		/* pre-shared key value (hex-string) 	*/
-	unsigned int	refcount;		/* reference count			*/
+	const char	*tls_psk_identity;	/* pre-shared key identity           */
+	const char	*tls_psk;		/* pre-shared key value (hex-string) */
+	unsigned int	refcount;		/* reference count                   */
 }
 ZBX_DC_PSK;
+#endif
 
 typedef struct
 {
@@ -268,6 +270,10 @@ typedef struct
 	int		ipmi_disable_until;
 	int		jmx_errors_from;
 	int		jmx_disable_until;
+
+	/* timestamp of last availability status (available/error) field change on any interface */
+	int		availability_ts;
+
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
 	unsigned char	available;
@@ -288,9 +294,12 @@ typedef struct
 	const char	*tls_subject;
 	ZBX_DC_PSK	*tls_dc_psk;
 #endif
+	const char	*error;
+	const char	*snmp_error;
+	const char	*ipmi_error;
+	const char	*jmx_error;
 }
 ZBX_DC_HOST;
-
 
 typedef struct
 {
@@ -437,6 +446,9 @@ ZBX_DC_CONFIG_TABLE;
 
 typedef struct
 {
+	/* timestamp of the last host availability diff sent to sever, used only by proxies */
+	int			availability_diff_ts;
+
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		numitems;
@@ -1204,12 +1216,17 @@ static void	DCsync_hosts(DB_RESULT result)
 	unsigned char		ipmi_privilege;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	ZBX_DC_PSK		*psk_i, psk_i_local;
+	zbx_ptr_pair_t		*psk_owner, psk_owner_local;
+	zbx_hashset_t		psk_owners;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_reserve(&ids, config->hosts.num_data + 32);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+#endif
 	now = time(NULL);
 
 	while (NULL != (row = DBfetch(result)))
@@ -1283,8 +1300,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		DCstrpool_replace(found, &host->tls_issuer, row[27]);
-		DCstrpool_replace(found, &host->tls_subject, row[28]);
+		DCstrpool_replace(found, &host->tls_issuer, row[31]);
+		DCstrpool_replace(found, &host->tls_subject, row[32]);
 
 		/* maintain 'config->psks' in configuration cache */
 
@@ -1354,17 +1371,19 @@ static void	DCsync_hosts(DB_RESULT result)
 		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
 		/* validation in frontend or API. Do not update cache in case of error. */
 
-		if ('\0' != *row[29] && '\0' == *row[30])
+		psk_owner = NULL;
+
+		if ('\0' != *row[33] && '\0' == *row[34])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
-					" (hostid %s)", row[28], row[2], row[0]);
+					" (hostid %s)", row[33], row[2], row[0]);
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto done;
 		}
 
-		if ('\0' == *row[29])				/* new PSKid empty */
+		if ('\0' == *row[33])				/* new PSKid empty */
 		{
-			if ('\0' != *row[30])
+			if ('\0' != *row[34])
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty PSK configured for"
 						" host \"%s\" (hostid %s)", row[2], row[0]);
@@ -1401,17 +1420,28 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* non-empty new PSKid and value */
 
+		zbx_strlower(row[34]);
+
 		if (1 == found && NULL != host->tls_dc_psk)	/* 'host' record has non-empty PSK */
 		{
-			if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[29]))	/* new PSKid same as */
+			if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[33]))	/* new PSKid same as */
 											/* old PSKid */
 			{
-				if (0 != strcmp(host->tls_dc_psk->tls_psk, row[30]))	/* new PSK value */
+				if (0 != strcmp(host->tls_dc_psk->tls_psk, row[34]))	/* new PSK value */
 											/* differs from old */
 				{
-					/* change underlying PSK value and 'config->psks' is updated, too */
-					DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[30]);
-					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[29]);
+					if (NULL == (psk_owner = zbx_hashset_search(&psk_owners,
+							&host->tls_dc_psk->tls_psk_identity)))
+					{
+						/* change underlying PSK value and 'config->psks' is updated, too */
+						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[34]);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
+								" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
+								psk_owner->first, psk_owner->second, host->host);
+					}
 				}
 
 				goto done;
@@ -1434,16 +1464,24 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* new PSK identity already stored? */
 
-		psk_i_local.tls_psk_identity = row[29];
+		psk_i_local.tls_psk_identity = row[33];
 
 		if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)))
 		{
 			/* new PSKid already in psks hashset */
 
-			if (0 != strcmp(psk_i->tls_psk, row[30]))	/* PSKid stored but PSK value is different */
+			if (0 != strcmp(psk_i->tls_psk, row[34]))	/* PSKid stored but PSK value is different */
 			{
-				DCstrpool_replace(1, &psk_i->tls_psk, row[30]);
-				zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[29]);
+				if (NULL == (psk_owner = zbx_hashset_search(&psk_owners, &psk_i->tls_psk_identity)))
+				{
+					DCstrpool_replace(1, &psk_i->tls_psk, row[34]);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "conflicting PSK values for PSK identity"
+							" \"%s\" on hosts \"%s\" and \"%s\" (and maybe others)",
+							psk_owner->first, psk_owner->second, host->host);
+				}
 			}
 
 			host->tls_dc_psk = psk_i;
@@ -1453,14 +1491,26 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* insert new PSKid and value into psks hashset */
 
-		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[29]);
-		DCstrpool_replace(0, &psk_i_local.tls_psk, row[30]);
+		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[33]);
+		DCstrpool_replace(0, &psk_i_local.tls_psk, row[34]);
 		psk_i_local.refcount = 1;
 		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
 done:
+		if (NULL != host->tls_dc_psk && NULL == psk_owner)
+		{
+			if (NULL == (psk_owner = zbx_hashset_search(&psk_owners, &host->tls_dc_psk->tls_psk_identity)))
+			{
+				/* register this host as the PSK identity owner, against which to report conflicts */
+
+				psk_owner_local.first = (char *)host->tls_dc_psk->tls_psk_identity;
+				psk_owner_local.second = (char *)host->host;
+
+				zbx_hashset_insert(&psk_owners, &psk_owner_local, sizeof(psk_owner_local));
+			}
+		}
 #endif
-		ZBX_STR2UCHAR(host->tls_connect, row[25]);
-		ZBX_STR2UCHAR(host->tls_accept, row[26]);
+		ZBX_STR2UCHAR(host->tls_connect, row[29]);
+		ZBX_STR2UCHAR(host->tls_accept, row[30]);
 
 		if (0 == found)
 		{
@@ -1481,6 +1531,12 @@ done:
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
+			host->availability_ts = now;
+
+			DCstrpool_replace(0, &host->error, row[25]);
+			DCstrpool_replace(0, &host->snmp_error, row[26]);
+			DCstrpool_replace(0, &host->ipmi_error, row[27]);
+			DCstrpool_replace(0, &host->jmx_error, row[28]);
 		}
 		else
 		{
@@ -1640,6 +1696,10 @@ done:
 
 		zbx_strpool_release(host->host);
 		zbx_strpool_release(host->name);
+		zbx_strpool_release(host->error);
+		zbx_strpool_release(host->snmp_error);
+		zbx_strpool_release(host->ipmi_error);
+		zbx_strpool_release(host->jmx_error);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_strpool_release(host->tls_issuer);
 		zbx_strpool_release(host->tls_subject);
@@ -1663,6 +1723,9 @@ done:
 
 	zbx_vector_uint64_destroy(&ids);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_hashset_destroy(&psk_owners);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -2418,7 +2481,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				switch (type)
 				{
 					case ITEM_TYPE_ZABBIX:
-						host->used_interfaces |= ZBX_FLAG_INTERFACE_AGENT;
+						host->used_interfaces |= ZBX_FLAG_INTERFACE_ZABBIX;
 						break;
 					case ITEM_TYPE_SNMPv1:
 					case ITEM_TYPE_SNMPv2c:
@@ -3137,7 +3200,7 @@ static void	DCsync_functions(DB_RESULT result)
 		DCstrpool_replace(found, &function->function, row[2]);
 		DCstrpool_replace(found, &function->parameter, row[3]);
 
-		/* spread triggers with time based-fuctions between timer processes (load balancing) */
+		/* spread triggers with time-based functions between timer processes (load balancing) */
 
 		if (SUCCEED == is_time_function(function->function))
 		{
@@ -3382,7 +3445,7 @@ void	DCsync_configuration(void)
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name,lastaccess,tls_connect,tls_accept"
+				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
 				",tls_issuer,tls_subject,tls_psk_identity,tls_psk"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
@@ -3397,7 +3460,7 @@ void	DCsync_configuration(void)
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name,lastaccess,tls_connect,tls_accept"
+				"status,name,lastaccess,error,snmp_error,ipmi_error,jmx_error,tls_connect,tls_accept"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -3729,6 +3792,17 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Helper functions for configuration cache data structure element comparison *
+ * and hash value calculation.                                                *
+ *                                                                            *
+ * The __config_mem_XXX_func(), __config_XXX_hash and __config_XXX_compare    *
+ * functions are used only inside init_configuration_cache() function to      *
+ * initialize internal data structures.                                       *
+ *                                                                            *
+ ******************************************************************************/
+
 static zbx_hash_t	__config_item_hk_hash(const void *data)
 {
 	const ZBX_DC_ITEM_HK	*item_hk = (const ZBX_DC_ITEM_HK *)data;
@@ -3970,7 +4044,8 @@ static int	__config_proxy_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-/* hash and compare functitions for expressions hashset */
+/* hash and compare functions for expressions hashset */
+
 static zbx_hash_t	__config_regexp_hash(const void *data)
 {
 	const ZBX_DC_REGEXP	*regexp = (const ZBX_DC_REGEXP *)data;
@@ -4012,10 +4087,6 @@ static int	__config_psk_compare(const void *d1, const void *d2)
  * Purpose: Allocate shared memory for configuration cache                    *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments: helper functions __config_mem_XXX_func(), __config_XXX_hash,     *
- *           and __config_XXX_compare are only used inside this function      *
- *           for initializing hashset, vector, and heap data structures       *
  *                                                                            *
  ******************************************************************************/
 void	init_configuration_cache(void)
@@ -4147,6 +4218,8 @@ void	init_configuration_cache(void)
 
 	config->config = NULL;
 
+	config->availability_diff_ts = 0;
+
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
 
@@ -4272,6 +4345,10 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
 	dst_host->jmx_available = src_host->jmx_available;
 	dst_host->jmx_disable_until = src_host->jmx_disable_until;
 	dst_host->status = src_host->status;
+	strscpy(dst_host->error, src_host->error);
+	strscpy(dst_host->snmp_error, src_host->snmp_error);
+	strscpy(dst_host->ipmi_error, src_host->ipmi_error);
+	strscpy(dst_host->jmx_error, src_host->jmx_error);
 	dst_host->tls_connect = src_host->tls_connect;
 	dst_host->tls_accept = src_host->tls_accept;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -4351,7 +4428,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
  *                                                                            *
  * Parameters:                                                                *
  *     host   - [IN] proxy name                                               *
- *     attr   - [IN] connection attributes                                    *
+ *     sock   - [IN] connection socket context                                *
  *     hostid - [OUT] proxy ID found in configuration cache                   *
  *     error  - [OUT] error message why access was denied                     *
  *                                                                            *
@@ -4363,8 +4440,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
  *     locking.                                                               *
  *                                                                            *
  ******************************************************************************/
-int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr, zbx_uint64_t *hostid,
-		char **error)
+int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
 
@@ -4384,19 +4460,29 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 		return FAIL;
 	}
 
-	if (0 == ((unsigned int)dc_host->tls_accept & attr->connection_type))
+	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
-				zbx_tls_connection_type_name(attr->connection_type), host);
+				zbx_tls_connection_type_name(sock->connection_type), host);
 		return FAIL;
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
+		zbx_tls_conn_attr_t	attr;
+
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+
 		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr->issuer))
+		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr.issuer))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", host);
@@ -4404,20 +4490,30 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 		}
 
 		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr->subject))
+		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr.subject))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", host);
 			return FAIL;
 		}
 	}
-	else if (ZBX_TCP_SEC_TLS_PSK == attr->connection_type)
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
+		zbx_tls_conn_attr_t	attr;
+
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+
 		if (NULL != dc_host->tls_dc_psk)
 		{
-			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->psk_identity_len ||
-					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->psk_identity,
-					attr->psk_identity_len))
+			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr.psk_identity_len ||
+					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr.psk_identity,
+					attr.psk_identity_len))
 			{
 				UNLOCK_CACHE;
 				*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
@@ -4988,7 +5084,7 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_lock_triggers_by_itemids                                *
+ * Function: DCconfig_lock_triggers_by_history_items                          *
  *                                                                            *
  * Purpose: Lock triggers for specified items so that multiple processes do   *
  *          not process one trigger simultaneously. Otherwise, this leads to  *
@@ -4996,11 +5092,11 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *          started and not cancelled, because they are not seen in parallel  *
  *          transactions.                                                     *
  *                                                                            *
- * Parameters: itemids     - [IN/OUT] list of item IDs a history syncer       *
+ * Parameters: history_items - [IN/OUT] list of history items history syncer  *
  *                                    wishes to take for processing; on       *
- *                                    output, the elements are set to 0 if    *
- *                                    the corresponding item cannot be taken  *
- *             itemids_num - [IN] number of such item IDs                     *
+ *                                    output, the item locked field is set    *
+ *                                    to 0 if the corresponding item cannot   *
+ *                                    be taken                                *
  *             triggerids  - [OUT] list of trigger IDs that this function has *
  *                                 locked for processing; unlock those using  *
  *                                 DCconfig_unlock_triggers() function        *
@@ -5022,20 +5118,26 @@ void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num)
  *           Also see function DCconfig_get_time_based_triggers(), which      *
  *           timer processes use to lock and unlock triggers.                 *
  *                                                                            *
+ * Return value: the number of items available for processing (unlocked).     *
+ *                                                                            *
  ******************************************************************************/
-void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids)
+int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids)
 {
-	int			i, j;
+	int			i, j, locked_num = 0;
 	const ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_TRIGGER		*dc_trigger;
-
-	zbx_vector_uint64_clear(triggerids);
+	zbx_hc_item_t		*history_item;
 
 	LOCK_CACHE;
 
-	for (i = 0; i < itemids_num; i++)
+	for (i = 0; i < history_items->values_num; i++)
 	{
-		if (NULL == (dc_item = zbx_hashset_search(&config->items, &itemids[i])) || NULL == dc_item->triggers)
+		history_item = (zbx_hc_item_t *)history_items->values[i];
+
+		if (NULL == (dc_item = zbx_hashset_search(&config->items, &history_item->itemid)))
+			continue;
+
+		if (NULL == dc_item->triggers)
 			continue;
 
 		for (j = 0; NULL != (dc_trigger = dc_item->triggers[j]); j++)
@@ -5045,7 +5147,8 @@ void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, z
 
 			if (1 == dc_trigger->locked)
 			{
-				itemids[i] = 0;
+				locked_num++;
+				history_item->status = ZBX_HC_ITEM_STATUS_BUSY;
 				goto next;
 			}
 		}
@@ -5062,6 +5165,8 @@ next:;
 	}
 
 	UNLOCK_CACHE;
+
+	return history_items->values_num - locked_num;
 }
 
 /******************************************************************************
@@ -5085,6 +5190,29 @@ void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids)
 
 		dc_trigger->locked = 0;
 	}
+
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_unlock_all_triggers                                     *
+ *                                                                            *
+ * Purpose: Unlocks all locked triggers before doing full history sync at     *
+ *          program exit                                                      *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_unlock_all_triggers()
+{
+	ZBX_DC_TRIGGER		*dc_trigger;
+	zbx_hashset_iter_t	iter;
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->triggers, &iter);
+
+	while (NULL != (dc_trigger = zbx_hashset_iter_next(&iter)))
+		dc_trigger->locked = 0;
 
 	UNLOCK_CACHE;
 }
@@ -5159,8 +5287,8 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
  *           first unlocks triggers locked the previous time (if any), then   *
  *           starts where it left off to yield the next bunch of triggers.    *
  *                                                                            *
- *           Also see function DCconfig_lock_triggers_by_itemids(), which     *
- *           history syncer processes use to lock triggers.                   *
+ *           Also see function DCconfig_lock_triggers_by_history_items(),     *
+ *           which history syncer processes use to lock triggers.             *
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
@@ -5879,53 +6007,129 @@ void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *l
 
 /******************************************************************************
  *                                                                            *
- * Function: DChost_get_availability                                          *
+ * Function: DChost_get_agent_availability                                    *
  *                                                                            *
- * Purpose: get host availability data based on the specified item type       *
+ * Purpose: get host availability data for the specified agent                *
  *                                                                            *
  * Parameters: dc_host      - [IN] the host                                   *
- *             type         - [IN] the item type                              *
+ *             agent        - [IN] the agent (see ZBX_FLAGS_AGENT_STATUS_*    *
+ *                                 defines                                    *
  *             availability - [OUT] the host availability data                *
  *                                                                            *
- * Return value: SUCCEED - the host availability data was retrieved           *
- *                         successfully                                       *
- *               FAIL    - failed to retrieve host availability data,         *
- *                         unrecognized item type was specified               *
+ * Comments: The configuration cache must be locked already.                  *
  *                                                                            *
  ******************************************************************************/
-static int	DChost_get_availability(const ZBX_DC_HOST *dc_host, unsigned char type,
-		zbx_host_availability_t *availability)
+static void	DChost_get_agent_availability(const ZBX_DC_HOST *dc_host, unsigned char agent_type,
+		zbx_agent_availability_t *agent)
 {
-	switch (type)
+
+	agent->flags = ZBX_FLAGS_AGENT_STATUS;
+
+	switch (agent_type)
 	{
-		case ITEM_TYPE_ZABBIX:
-			availability->errors_from = dc_host->errors_from;
-			availability->available = dc_host->available;
-			availability->disable_until = dc_host->disable_until;
+		case ZBX_AGENT_ZABBIX:
+			agent->available = dc_host->available;
+			agent->error = zbx_strdup(agent->error, dc_host->error);
+			agent->errors_from = dc_host->errors_from;
+			agent->disable_until = dc_host->disable_until;
 			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			availability->errors_from = dc_host->snmp_errors_from;
-			availability->available = dc_host->snmp_available;
-			availability->disable_until = dc_host->snmp_disable_until;
+		case ZBX_AGENT_SNMP:
+			agent->available = dc_host->snmp_available;
+			agent->error = zbx_strdup(agent->error, dc_host->snmp_error);
+			agent->errors_from = dc_host->snmp_errors_from;
+			agent->disable_until = dc_host->snmp_disable_until;
 			break;
-		case ITEM_TYPE_IPMI:
-			availability->errors_from = dc_host->ipmi_errors_from;
-			availability->available = dc_host->ipmi_available;
-			availability->disable_until = dc_host->ipmi_disable_until;
+		case ZBX_AGENT_IPMI:
+			agent->available = dc_host->ipmi_available;
+			agent->error = zbx_strdup(agent->error, dc_host->ipmi_error);
+			agent->errors_from = dc_host->ipmi_errors_from;
+			agent->disable_until = dc_host->ipmi_disable_until;
 			break;
-		case ITEM_TYPE_JMX:
-			availability->errors_from = dc_host->jmx_errors_from;
-			availability->available = dc_host->jmx_available;
-			availability->disable_until = dc_host->jmx_disable_until;
+		case ZBX_AGENT_JMX:
+			agent->available = dc_host->jmx_available;
+			agent->error = zbx_strdup(agent->error, dc_host->jmx_error);
+			agent->errors_from = dc_host->jmx_errors_from;
+			agent->disable_until = dc_host->jmx_disable_until;
 			break;
-		default:
-			return FAIL;
+	}
+}
+
+static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned char *available, const char **error,
+		int *errors_from, int *disable_until)
+{
+#define AGENT_AVAILABILITY_ASSIGN(flags, mask, dst, src)	\
+	if (0 != (flags & mask))				\
+	{							\
+		if (dst != src)					\
+			dst = src;				\
+		else						\
+			flags &= (~(mask));			\
 	}
 
-	availability->type = type;
-	availability->hostid = dc_host->hostid;
+#define AGENT_AVAILABILITY_ASSIGN_STR(flags, mask, dst, src)	\
+	if (0 != (flags & mask))				\
+	{							\
+		if (0 != strcmp(dst, src))			\
+			DCstrpool_replace(1, &dst, src);	\
+		else						\
+			flags &= (~(mask));			\
+	}
+
+	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_AVAILABLE, *available, av->available);
+	AGENT_AVAILABILITY_ASSIGN_STR(av->flags, ZBX_FLAGS_AGENT_STATUS_ERROR, *error, av->error);
+	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM, *errors_from, av->errors_from);
+	AGENT_AVAILABILITY_ASSIGN(av->flags, ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL, *disable_until, av->disable_until);
+
+#undef AGENT_AVAILABILITY_ASSIGN_STR
+#undef AGENT_AVAILABILITY_ASSIGN
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DChost_set_availability                                          *
+ *                                                                            *
+ * Purpose: set host availability data in configuration cache                 *
+ *                                                                            *
+ * Parameters: dc_host      - [OUT] the host                                  *
+ *             availability - [IN/OUT] the host availability data             *
+ *                                                                            *
+ * Return value: SUCCEED - at least one availability field was updated        *
+ *               FAIL    - no availability fields were updated                *
+ *                                                                            *
+ * Comments: The configuration cache must be locked already.                  *
+ *                                                                            *
+ *           This function clears availability flags of non updated fields    *
+ *           updated leaving only flags identifying changed fields.           *
+ *                                                                            *
+ ******************************************************************************/
+static int	DChost_set_agent_availability(ZBX_DC_HOST *dc_host, int now, unsigned char agent_type,
+		zbx_agent_availability_t *agent)
+{
+	switch (agent_type)
+	{
+		case ZBX_AGENT_ZABBIX:
+			DCagent_set_availability(agent, &dc_host->available,
+					&dc_host->error, &dc_host->errors_from, &dc_host->disable_until);
+			break;
+		case ZBX_AGENT_SNMP:
+			DCagent_set_availability(agent, &dc_host->snmp_available,
+					&dc_host->snmp_error, &dc_host->snmp_errors_from, &dc_host->snmp_disable_until);
+			break;
+		case ZBX_AGENT_IPMI:
+			DCagent_set_availability(agent, &dc_host->ipmi_available,
+					&dc_host->ipmi_error, &dc_host->ipmi_errors_from, &dc_host->ipmi_disable_until);
+			break;
+		case ZBX_AGENT_JMX:
+			DCagent_set_availability(agent, &dc_host->jmx_available,
+					&dc_host->jmx_error, &dc_host->jmx_errors_from, &dc_host->jmx_disable_until);
+			break;
+	}
+
+	if (ZBX_FLAGS_AGENT_STATUS_NONE == agent->flags)
+		return FAIL;
+
+	if (0 != (agent->flags & (ZBX_FLAGS_AGENT_STATUS_AVAILABLE | ZBX_FLAGS_AGENT_STATUS_ERROR)))
+		dc_host->availability_ts = now;
 
 	return SUCCEED;
 }
@@ -5934,65 +6138,207 @@ static int	DChost_get_availability(const ZBX_DC_HOST *dc_host, unsigned char typ
  *                                                                            *
  * Function: DChost_set_availability                                          *
  *                                                                            *
- * Purpose: set host availability data based on the specified item type       *
+ * Purpose: set host availability data in configuration cache                 *
  *                                                                            *
  * Parameters: dc_host      - [OUT] the host                                  *
- *             availability - [IN] the host availability data                 *
+ *             availability - [IN/OUT] the host availability data             *
  *                                                                            *
- * Return value: SUCCEED - the host availability data was set successfully    *
- *               FAIL    - failed to set host availability data,              *
- *                         unrecognized item type was specified               *
+ * Return value: SUCCEED - at least one availability field was updated        *
+ *               FAIL    - no availability fields were updated                *
+ *                                                                            *
+ * Comments: The configuration cache must be locked already.                  *
+ *                                                                            *
+ *           This function clears availability flags of non updated fields    *
+ *           updated leaving only flags identifying changed fields.           *
  *                                                                            *
  ******************************************************************************/
-static int	DChost_set_availability(ZBX_DC_HOST *dc_host, const zbx_host_availability_t *availability)
+static int	DChost_set_availability(ZBX_DC_HOST *dc_host, int now, zbx_host_availability_t *ha)
 {
-	switch (availability->type)
-	{
-		case ITEM_TYPE_ZABBIX:
-			dc_host->errors_from = availability->errors_from;
-			dc_host->available = availability->available;
-			dc_host->disable_until = availability->disable_until;
-			break;
-		case ITEM_TYPE_SNMPv1:
-		case ITEM_TYPE_SNMPv2c:
-		case ITEM_TYPE_SNMPv3:
-			dc_host->snmp_errors_from = availability->errors_from;
-			dc_host->snmp_available = availability->available;
-			dc_host->snmp_disable_until = availability->disable_until;
-			break;
-		case ITEM_TYPE_IPMI:
-			dc_host->ipmi_errors_from = availability->errors_from;
-			dc_host->ipmi_available = availability->available;
-			dc_host->ipmi_disable_until = availability->disable_until;
-			break;
-		case ITEM_TYPE_JMX:
-			dc_host->jmx_errors_from = availability->errors_from;
-			dc_host->jmx_available = availability->available;
-			dc_host->jmx_disable_until = availability->disable_until;
-			break;
-		default:
-			return FAIL;
-	}
+	int		i;
+	unsigned char	flags = ZBX_FLAGS_AGENT_STATUS_NONE;
+
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_ZABBIX], &dc_host->available, &dc_host->error,
+			&dc_host->errors_from, &dc_host->disable_until);
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_SNMP], &dc_host->snmp_available, &dc_host->snmp_error,
+			&dc_host->snmp_errors_from, &dc_host->snmp_disable_until);
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_IPMI], &dc_host->ipmi_available, &dc_host->ipmi_error,
+			&dc_host->ipmi_errors_from, &dc_host->ipmi_disable_until);
+	DCagent_set_availability(&ha->agents[ZBX_AGENT_JMX], &dc_host->jmx_available, &dc_host->jmx_error,
+			&dc_host->jmx_errors_from, &dc_host->jmx_disable_until);
+
+	for (i = 0; i < ZBX_AGENT_MAX; i++)
+		flags |= ha->agents[i].flags;
+
+	if (ZBX_FLAGS_AGENT_STATUS_NONE == flags)
+		return FAIL;
+
+	if (0 != (flags & (ZBX_FLAGS_AGENT_STATUS_AVAILABLE | ZBX_FLAGS_AGENT_STATUS_ERROR)))
+		dc_host->availability_ts = now;
 
 	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DChost_activate                                                  *
+ * Function: zbx_host_availability_init                                       *
  *                                                                            *
- * Purpose: set host as available for the checks of the specified item type   *
+ * Purpose: initializes host availability data                                *
  *                                                                            *
- * Parameters: in  - [IN/OUT] IN: the caller's host availability data         *
- *                            OUT: the host availability data in cache        *
- *                            before changes                                  *
- *             out - [OUT] the host availability data after changes           *
- *                                                                            *
- * Return value: SUCCEED - the host was activated successfully                *
- *               FAIL    - failed to activate host, host not found            *
+ * Parameters: availability - [IN/OUT] host availability data                 *
  *                                                                            *
  ******************************************************************************/
-int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
+void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid)
+{
+	memset(availability, 0, sizeof(zbx_host_availability_t));
+	availability->hostid = hostid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_availability_clean                                      *
+ *                                                                            *
+ * Purpose: releases resources allocated to store host availability data      *
+ *                                                                            *
+ * Parameters: availability - [IN] host availability data                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_host_availability_clean(zbx_host_availability_t *ha)
+{
+	int	i;
+
+	for (i = 0; i < ZBX_AGENT_MAX; i++)
+		zbx_free(ha->agents[i].error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_availability_free                                       *
+ *                                                                            *
+ * Purpose: frees host availability data                                      *
+ *                                                                            *
+ * Parameters: availability - [IN] host availability data                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_host_availability_free(zbx_host_availability_t *availability)
+{
+	zbx_host_availability_clean(availability);
+	zbx_free(availability);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_agent_availability_init                                      *
+ *                                                                            *
+ * Purpose: initializes agent availability with the specified data            *
+ *                                                                            *
+ * Parameters: availability  - [IN/OUT] agent availability data               *
+ *             hostid        - [IN] the host identifier                       *
+ *             flags         - [IN] the availability flags indicating which   *
+ *                                  availability fields to set                *
+ *             available     - [IN] the availability data                     *
+ *             error         - [IN]                                           *
+ *             errors_from   - [IN]                                           *
+ *             disable_until - [IN]                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigned char available, const char *error,
+		int errors_from, int disable_until)
+{
+	agent->flags = ZBX_FLAGS_AGENT_STATUS;
+	agent->available = available;
+	agent->error = zbx_strdup(agent->error, error);
+	agent->errors_from = errors_from;
+	agent->disable_until = disable_until;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_host_availability_init                                       *
+ *                                                                            *
+ * Purpose: checks host availability if any agent availability field is set   *
+ *                                                                            *
+ * Parameters: availability - [IN] host availability data                     *
+ *                                                                            *
+ * Return value: SUCCEED - an agent availability field is set                 *
+ *               FAIL - no agent availability fields are set                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_host_availability_is_set(const zbx_host_availability_t *ha)
+{
+	int	i;
+
+	for (i = 0; i < ZBX_AGENT_MAX; i++)
+	{
+		if (ZBX_FLAGS_AGENT_STATUS_NONE != ha->agents[i].flags)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/**************************************************************************************
+ *                                                                                    *
+ * Host availability update example                                                   *
+ *                                                                                    *
+ *                                                                                    *
+ *               |            UnreachablePeriod                                       *
+ *               |               (conf file)                                          *
+ *               |              ______________                                        *
+ *               |             /              \                                       *
+ *               |             p     p     p     p       p       p                    *
+ *               |             o     o     o     o       o       o                    *
+ *               |             l     l     l     l       l       l                    *
+ *               |             l     l     l     l       l       l                    *
+ *               | n                                                                  *
+ *               | e           e     e     e     e       e       e                    *
+ *     agent     | w   p   p   r     r     r     r       r       r       p   p   p    *
+ *       polls   |     o   o   r     r     r     r       r       r       o   o   o    *
+ *               | h   l   l   o     o     o     o       o       o       l   l   l    *
+ *               | o   l   l   r     r     r     r       r       r       l   l   l    *
+ *               | s                                                                  *
+ *               | t   ok  ok  E1    E1    E2    E1      E1      E2      ok  ok  ok   *
+ *  --------------------------------------------------------------------------------  *
+ *  available    | 0   1   1   1     1     1     2       2       2       0   0   0    *
+ *               |                                                                    *
+ *  error        | ""  ""  ""  ""    ""    ""    E1      E1      E2      ""  ""  ""   *
+ *               |                                                                    *
+ *  errors_from  | 0   0   0   T4    T4    T4    T4      T4      T4      0   0   0    *
+ *               |                                                                    *
+ *  disable_until| 0   0   0   T5    T6    T7    T8      T9      T10     0   0   0    *
+ *  --------------------------------------------------------------------------------  *
+ *   timestamps  | T1  T2  T3  T4    T5    T6    T7      T8      T9     T10 T11 T12   *
+ *               |  \_/ \_/ \_/ \___/ \___/ \___/ \_____/ \_____/ \_____/ \_/ \_/     *
+ *               |   |   |   |    |     |     |      |       |       |     |   |      *
+ *  polling      |  item delay   UnreachableDelay    UnavailableDelay     item |      *
+ *      periods  |                 (conf file)         (conf file)         delay      *
+ *                                                                                    *
+ *                                                                                    *
+ **************************************************************************************/
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DChost_activate                                                  *
+ *                                                                            *
+ * Purpose: set host as available based on the agent availability data        *
+ *                                                                            *
+ * Parameters: hostid     - [IN] the host identifier                          *
+ *             agent_type - [IN] the agent type (see ZBX_AGENT_* defines)     *
+ *             ts         - [IN] the last timestamp                           *
+ *             in         - [IN/OUT] IN: the caller's agent availability data *
+ *                                  OUT: the agent availability data in cache *
+ *                                       before changes                       *
+ *             out        - [OUT] the agent availability data after changes   *
+ *                                                                            *
+ * Return value: SUCCEED - the host was activated successfully                *
+ *               FAIL    - the host was already activated or activation       *
+ *                         failed                                             *
+ *                                                                            *
+ * Comments: The host availability fields are updated according to the above  *
+ *           schema.                                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out)
 {
 	int		ret = FAIL;
 	ZBX_DC_HOST	*dc_host;
@@ -6003,29 +6349,24 @@ int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
 
 	/* Don't try activating host if:                  */
 	/* - (server, proxy) it's not monitored any more; */
-	/* - (server) it's monitored by proxy.             */
+	/* - (server) it's monitored by proxy.            */
 	if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
 			HOST_STATUS_MONITORED != dc_host->status)
 	{
 		goto unlock;
 	}
 
-	DChost_get_availability(dc_host, in->type, in);
+	DChost_get_agent_availability(dc_host, agent_type, in);
+	zbx_agent_availability_init(out, HOST_AVAILABLE_TRUE, "", 0, 0);
+	DChost_set_agent_availability(dc_host, ts->sec, agent_type, out);
 
-	out->hostid = in->hostid;
-	out->type = in->type;
-	out->errors_from = 0;
-	out->available = HOST_AVAILABLE_TRUE;
-	out->disable_until = 0;
-
-	DChost_set_availability(dc_host, out);
-
-	ret = SUCCEED;
+	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
+		ret = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
 out:
@@ -6036,23 +6377,33 @@ out:
  *                                                                            *
  * Function: DChost_deactivate                                                *
  *                                                                            *
- * Purpose: attempt to set host as unavailable for the checks of the          *
- *          specified item type based on the time the checks are failing      *
+ * Purpose: attempt to set host as unavailable based on agent availability    *
  *                                                                            *
- * Parameters: ts  - [IN] the failure timestamp                               *
- *             in  - [IN/OUT] IN: the caller's host availability data         *
- *                            OUT: the host availability data in cache        *
- *                            before changes                                  *
- *             out - [OUT] the host availability data after changes           *
+ * Parameters: hostid     - [IN] the host identifier                          *
+ *             agent_type - [IN] the agent type (see ZBX_AGENT_* defines)     *
+ *             ts         - [IN] the last timestamp                           *
+ *             in         - [IN/OUT] IN: the caller's host availability data  *
+ *                                  OUT: the host availability data in cache  *
+ *                                       before changes                       *
+ *             out        - [OUT] the host availability data after changes    *
+ *             error      - [IN] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the host was deactivated successfully              *
- *               FAIL    - failed to activate host, host not found            *
+ *               FAIL    - the host was already deactivated or deactivation   *
+ *                         failed                                             *
+ *                                                                            *
+ * Comments: The host availability fields are updated according to the above  *
+ *           schema.                                                          *
  *                                                                            *
  ******************************************************************************/
-int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out)
+int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg)
 {
-	int		ret = FAIL;
+	int		ret = FAIL, errors_from,disable_until;
+	const char	*error;
+	unsigned char	available;
 	ZBX_DC_HOST	*dc_host;
+
 
 	/* don't try deactivating host if the unreachable delay has not passed since the first error */
 	if (CONFIG_UNREACHABLE_DELAY > ts->sec - in->errors_from)
@@ -6060,52 +6411,60 @@ int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx
 
 	LOCK_CACHE;
 
-	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
+	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 		goto unlock;
 
 	/* Don't try deactivating host if:                */
 	/* - (server, proxy) it's not monitored any more; */
-	/* - (server) it's monitored by proxy.             */
+	/* - (server) it's monitored by proxy.            */
 	if ((0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
 			HOST_STATUS_MONITORED != dc_host->status)
 	{
 		goto unlock;
 	}
 
-	DChost_get_availability(dc_host, in->type, in);
-	*out = *in;
+	DChost_get_agent_availability(dc_host, agent_type, in);
 
-	if (0 == out->errors_from)
+	available = in->available;
+	error = in->error;
+
+	if (0 == in->errors_from)
 	{
 		/* first error, schedule next unreachable check */
-		out->errors_from = ts->sec;
-		out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+		errors_from = ts->sec;
+		disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 	}
 	else
 	{
+		errors_from = in->errors_from;
+		disable_until = in->disable_until;
+
 		/* Check if other pollers haven't already attempted deactivating host. */
 		/* In that case should wait the initial unreachable delay before       */
 		/* trying to make it unavailable.                                      */
-		if (CONFIG_UNREACHABLE_DELAY <= ts->sec - out->errors_from)
+		if (CONFIG_UNREACHABLE_DELAY <= ts->sec - errors_from)
 		{
 			/* repeating error */
-			if (CONFIG_UNREACHABLE_PERIOD > ts->sec - out->errors_from)
+			if (CONFIG_UNREACHABLE_PERIOD > ts->sec - errors_from)
 			{
 				/* leave host available, schedule next unreachable check */
-				out->disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
+				disable_until = ts->sec + CONFIG_UNREACHABLE_DELAY;
 			}
 			else
 			{
 				/* make host unavailable, schedule next unavailable check */
-				out->disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
-				out->available = HOST_AVAILABLE_FALSE;
+				disable_until = ts->sec + CONFIG_UNAVAILABLE_DELAY;
+				available = HOST_AVAILABLE_FALSE;
+				error = error_msg;
 			}
 		}
 	}
 
-	DChost_set_availability(dc_host, out);
+	zbx_agent_availability_init(out, available, error, errors_from, disable_until);
+	DChost_set_agent_availability(dc_host, ts->sec, agent_type, out);
 
-	ret = SUCCEED;
+	if (ZBX_FLAGS_AGENT_STATUS_NONE != out->flags)
+		ret = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
 out:
@@ -6114,35 +6473,51 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: DChost_update_availability                                       *
+ * Function: DCset_hosts_availability                                         *
  *                                                                            *
- * Purpose: update hosts availability in configuration cache                  *
+ * Purpose: update availability of hosts in configuration cache and return    *
+ *          the updated field flags                                           *
  *                                                                            *
- * Parameters: availability     - [IN] an array containing host availability  *
- *                                data                                        *
- *             availability_num - [IN] the number of items in availability    *
- *                                array                                       *
+ * Parameters: availabilities - [IN/OUT] the hosts availability data          *
+ *                                                                            *
+ * Return value: SUCCEED - at least one host availability data was updated    *
+ *               FAIL    - no hosts were updated                              *
  *                                                                            *
  ******************************************************************************/
-void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num)
+int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities)
 {
-	int		i;
-	ZBX_DC_HOST	*dc_host;
+	int			i;
+	ZBX_DC_HOST		*dc_host;
+	zbx_host_availability_t	*ha;
+	int			ret = FAIL, now;
+
+	now = time(NULL);
 
 	LOCK_CACHE;
 
-	for (i = 0; i < availability_num; i++)
+	for (i = 0; i < availabilities->values_num; i++)
 	{
-		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &availability[i].hostid)))
-			continue;
+		ha = (zbx_host_availability_t *)availabilities->values[i];
 
-		if (HOST_STATUS_MONITORED != dc_host->status)
-			continue;
+		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &ha->hostid)) ||
+				HOST_STATUS_MONITORED != dc_host->status)
+		{
+			int	j;
 
-		DChost_set_availability(dc_host, &availability[i]);
+			/* reset availability flags so this host is ignored when saving availability diff to DB */
+			for (j = 0; j < ZBX_AGENT_MAX; j++)
+				ha->agents[j].flags = ZBX_FLAGS_AGENT_STATUS_NONE;
+
+			continue;
+		}
+
+		if (SUCCEED == DChost_set_availability(dc_host, now, ha))
+			ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
@@ -7637,8 +8012,7 @@ void	zbx_config_clean(zbx_config_t *cfg)
  * Purpose: resets host availability for disabled hosts and hosts without     *
  *          enabled items for the corresponding interface                     *
  *                                                                            *
- * Parameters: hosts - [OUT] a vector of hostid,reset_flags pairs containing  *
- *                           host availability reset data (sorted by hostid)  *
+ * Parameters: hosts - [OUT] changed host availability data                   *
  *                                                                            *
  * Return value: SUCCEED - host availability was reset for at least one host  *
  *               FAIL    - no hosts required availability reset               *
@@ -7649,12 +8023,12 @@ void	zbx_config_clean(zbx_config_t *cfg)
  *           skips hosts handled by proxies.                                  *
  *                                                                            *
  ******************************************************************************/
-int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
+int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts)
 {
 	const char		*__function_name = "DCreset_hosts_availability";
-	zbx_uint64_pair_t	pair;
 	ZBX_DC_HOST		*host;
 	zbx_hashset_iter_t	iter;
+	zbx_host_availability_t	*ha = NULL;
 	int			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -7688,61 +8062,130 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 			}
 		}
 
-		pair.second = ZBX_FLAG_INTERFACE_NONE;
+		if (NULL == ha)
+			ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
 
-		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_AGENT) &&
+		zbx_host_availability_init(ha, host->hostid);
+
+		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_ZABBIX) &&
 				HOST_AVAILABLE_UNKNOWN != host->available)
 		{
-			pair.second |= ZBX_FLAG_INTERFACE_AGENT;
-
-			host->available = HOST_AVAILABLE_UNKNOWN;
-			host->errors_from = 0;
-			host->disable_until = 0;
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_ZABBIX], HOST_AVAILABLE_UNKNOWN, "", 0, 0);
 		}
 
 		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_SNMP) &&
 				HOST_AVAILABLE_UNKNOWN != host->snmp_available)
 		{
-			pair.second |= ZBX_FLAG_INTERFACE_SNMP;
-
-			host->snmp_available = HOST_AVAILABLE_UNKNOWN;
-			host->snmp_errors_from = 0;
-			host->snmp_disable_until = 0;
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_SNMP], HOST_AVAILABLE_UNKNOWN, "", 0, 0);
 		}
 
 		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_IPMI) &&
 				HOST_AVAILABLE_UNKNOWN != host->ipmi_available)
 		{
-			pair.second |= ZBX_FLAG_INTERFACE_IPMI;
-
-			host->ipmi_available = HOST_AVAILABLE_UNKNOWN;
-			host->ipmi_errors_from = 0;
-			host->ipmi_disable_until = 0;
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_IPMI], HOST_AVAILABLE_UNKNOWN, "", 0, 0);
 		}
 
 		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_JMX) &&
 				HOST_AVAILABLE_UNKNOWN != host->jmx_available)
 		{
-			pair.second |= ZBX_FLAG_INTERFACE_JMX;
-
-
-			host->jmx_available = HOST_AVAILABLE_UNKNOWN;
-			host->jmx_errors_from = 0;
-			host->jmx_disable_until = 0;
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_JMX], HOST_AVAILABLE_UNKNOWN, "", 0, 0);
 		}
 
-		if (ZBX_FLAG_INTERFACE_NONE != pair.second)
+		if (SUCCEED == zbx_host_availability_is_set(ha))
 		{
-			pair.first = host->hostid;
-			zbx_vector_uint64_pair_append_ptr(hosts, &pair);
+			if (SUCCEED == DChost_set_availability(host, now, ha))
+			{
+				zbx_vector_ptr_append(hosts, ha);
+				ha = NULL;
+			}
+			else
+				zbx_host_availability_clean(ha);
+		}
+	}
+	UNLOCK_CACHE;
+
+	zbx_free(ha);
+
+	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
+
+	return 0 == hosts->values_num ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_hosts_availability                                         *
+ *                                                                            *
+ * Purpose: gets availability data for hosts with availability data changed   *
+ *          in period from last availability update to the specified          *
+ *          timestamp                                                         *
+ *                                                                            *
+ * Parameters: hosts - [OUT] changed host availability data                   *
+ *             ts    - [OUT] the availability diff timestamp                  *
+ *                                                                            *
+ * Return value: SUCCEED - availability was changed for at least one host     *
+ *               FAIL    - no host availability was changed                   *
+ *                                                                            *
+ ******************************************************************************/
+int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
+{
+	const char		*__function_name = "DCget_hosts_availability";
+	ZBX_DC_HOST		*host;
+	zbx_hashset_iter_t	iter;
+	zbx_host_availability_t	*ha = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	*ts = time(NULL);
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+
+	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		if (config->availability_diff_ts <= host->availability_ts && host->availability_ts < *ts)
+		{
+			ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
+			zbx_host_availability_init(ha, host->hostid);
+
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_ZABBIX], host->available, host->error,
+					host->errors_from, host->disable_until);
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_SNMP], host->snmp_available, host->snmp_error,
+					host->snmp_errors_from, host->snmp_disable_until);
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_IPMI], host->ipmi_available, host->ipmi_error,
+					host->ipmi_errors_from, host->ipmi_disable_until);
+			zbx_agent_availability_init(&ha->agents[ZBX_AGENT_JMX], host->jmx_available, host->jmx_error,
+					host->jmx_errors_from, host->jmx_disable_until);
+
+			zbx_vector_ptr_append(hosts, ha);
 		}
 	}
 
 	UNLOCK_CACHE;
 
-	zbx_vector_uint64_pair_sort(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_ptr_sort(hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
 
 	return 0 == hosts->values_num ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_set_availability_update_ts                                   *
+ *                                                                            *
+ * Purpose: sets timestamp of the last availability update                    *
+ *                                                                            *
+ * Parameter: ts - [IN] the last availability update timestamp                *
+ *                                                                            *
+ * Comments: This function is used only by proxies when preparing host        *
+ *           availability data to be sent to server.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_set_availability_diff_ts(int ts)
+{
+	/* this data can't be accessed simultaneously from multiple processes - locking is not necessary */
+	config->availability_diff_ts = ts;
 }

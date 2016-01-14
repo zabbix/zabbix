@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -283,7 +283,6 @@ $conditionFormList->addRow(_('Type of calculation'),
 
 // macros
 $conditionTable = (new CTable())
-	->setNoDataMessage('')
 	->setId('conditions')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);

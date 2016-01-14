@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -526,6 +526,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 	size_t			sql_alloc = 128, sql_offset = 0;
 	const char		*sql_start = "update items set ", *sql_continue = ",";
 	lld_filter_t		filter;
+	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __function_name, lld_ruleid);
 
@@ -579,10 +580,12 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 
 	error = zbx_strdup(error, "");
 
-	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
+	now = time(NULL);
+
+	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, now);
 	lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
 	lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
-	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, ts->sec);
+	lld_update_hosts(lld_ruleid, &lld_rows, &error, lifetime, now);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{

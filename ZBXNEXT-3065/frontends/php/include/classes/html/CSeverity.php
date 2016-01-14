@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,8 @@ class CSeverity extends CList {
 
 	/**
 	 * @param string $options['name']
-	 * @param int    $options['value']
+	 * @param int    $options['value']		(optional) Default: TRIGGER_SEVERITY_NOT_CLASSIFIED
+	 * @param bool   $options['all']		(optional)
 	 */
 	public function __construct(array $options = []) {
 		parent::__construct();
@@ -37,9 +38,16 @@ class CSeverity extends CList {
 			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
+		$severity_from = (array_key_exists('all', $options) && $options['all'])
+			? -1
+			: TRIGGER_SEVERITY_NOT_CLASSIFIED;
+
 		$config = select_config();
 
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		for ($severity = $severity_from; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+			$name = ($severity == -1) ? _('all') : getSeverityName($severity, $config);
+			$class = ($severity == -1) ? null : getSeverityStyle($severity);
+
 			$radio = (new CInput('radio', $options['name'], $severity))
 				->setId(zbx_formatDomId($options['name'].'_'.$severity));
 			if ($severity === $options['value']) {
@@ -48,8 +56,8 @@ class CSeverity extends CList {
 
 			parent::addItem(
 				(new CListItem([
-					$radio, new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity)
-				]))->addClass(getSeverityStyle($severity))
+					$radio, new CLabel($name, $options['name'].'_'.$severity)
+				]))->addClass($class)
 			);
 		}
 	}

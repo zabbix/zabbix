@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,7 +104,9 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 
 			CScreenBuilder::insertScreenCleanJs();
 
-			echo $screenBuilder->show()->toString();
+			echo (new CDiv($screenBuilder->show()))
+				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+				->toString();
 
 			CScreenBuilder::insertScreenStandardJs([
 				'timeline' => $screenBuilder->timeline,

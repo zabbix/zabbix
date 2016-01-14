@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -521,6 +521,17 @@ class CTemplateScreen extends CScreen {
 			if (!check_db_fields($screenDbFields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
+
+			// Sharing is not allowed for template screen.
+			$sharing_fields = ['userid', 'private', 'users', 'userGroups'];
+			foreach ($sharing_fields as $sharing_field) {
+				if (array_key_exists($sharing_field, $screen)) {
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot set "%1$s" for template screen "%2$s".', $sharing_field, $screen['name'])
+					);
+				}
+			}
 		}
 
 		$templateIds = zbx_objectValues($screens, 'templateid');
@@ -576,17 +587,17 @@ class CTemplateScreen extends CScreen {
 			_('Incorrect template screen ID.')
 		);
 
-		$dbScreens = $this->get([
-			'output' => ['screenid', 'hsize', 'vsize', 'templateid'],
+		$db_screens = $this->get([
+			'output' => ['screenid', 'name', 'hsize', 'vsize', 'templateid'],
 			'selectScreenItems' => ['screenitemid', 'x', 'y', 'colspan', 'rowspan'],
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$this->validateUpdate($screens, $dbScreens);
-		$this->updateReal($screens);
-		$this->truncateScreenItems($screens, $dbScreens);
+		$this->validateUpdate($screens, $db_screens);
+		$this->updateReal($screens, $db_screens);
+		$this->truncateScreenItems($screens, $db_screens);
 
 		return ['screenids' => zbx_objectValues($screens, 'screenid')];
 	}
@@ -607,6 +618,17 @@ class CTemplateScreen extends CScreen {
 					ZBX_API_ERROR_PARAMETERS,
 					_s('Cannot update "templateid" for template screen "%1$s".', $screen['name'])
 				);
+			}
+
+			// Sharing is not allowed for template screen.
+			$sharing_fields = ['userid', 'private', 'users', 'userGroups'];
+			foreach ($sharing_fields as $sharing_field) {
+				if (array_key_exists($sharing_field, $screen)) {
+					self::exception(
+						ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot set "%1$s" for template screen "%2$s".', $sharing_field, $screen['name'])
+					);
+				}
 			}
 
 			if (isset($screen['name'])) {

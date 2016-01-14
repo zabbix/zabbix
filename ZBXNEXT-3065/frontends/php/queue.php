@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -275,17 +275,22 @@ elseif ($config == QUEUE_DETAILS) {
 	}
 }
 
-$widget->addItem($table)->show();
-
 // display the table footer
 if ($config == QUEUE_OVERVIEW_BY_PROXY) {
-	show_table_header(_('Total').': '.$table->getNumRows());
-}
-elseif ($config == QUEUE_DETAILS) {
-	show_table_header(
-		_('Total').': '.$table->getNumRows().
-		((count($queueData) > QUEUE_DETAIL_ITEM_COUNT) ? ' ('._('Truncated').')' : '')
+	$table->setFooter(
+		new CCol(_('Total').': '.$table->getNumRows())
 	);
 }
+elseif ($config == QUEUE_DETAILS) {
+	$table->setFooter(
+		new CCol(_('Total').': '.$table->getNumRows().
+		(count($queueData) > QUEUE_DETAIL_ITEM_COUNT ? ' ('._('Truncated').')' : ''))
+	);
+}
+
+$widget
+	->addItem($table)
+	->show();
+
 
 require_once dirname(__FILE__).'/include/page_footer.php';

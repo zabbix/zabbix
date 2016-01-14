@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,55 +29,46 @@ class CScreenActions extends CScreenBase {
 	public function get() {
 		$sortfield = 'clock';
 		$sortorder = ZBX_SORT_DOWN;
-		$sorttitle = _('Time');
 
 		switch ($this->screenitem['sort_triggers']) {
 			case SCREEN_SORT_TRIGGERS_TIME_ASC:
 				$sortfield = 'clock';
 				$sortorder = ZBX_SORT_UP;
-				$sorttitle = _('Time');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TIME_DESC:
 				$sortfield = 'clock';
 				$sortorder = ZBX_SORT_DOWN;
-				$sorttitle = _('Time');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TYPE_ASC:
 				$sortfield = 'description';
 				$sortorder = ZBX_SORT_UP;
-				$sorttitle = _('Type');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_TYPE_DESC:
 				$sortfield = 'description';
 				$sortorder = ZBX_SORT_DOWN;
-				$sorttitle = _('Type');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_STATUS_ASC:
 				$sortfield = 'status';
 				$sortorder = ZBX_SORT_UP;
-				$sorttitle = _('Status');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_STATUS_DESC:
 				$sortfield = 'status';
 				$sortorder = ZBX_SORT_DOWN;
-				$sorttitle = _('Status');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_ASC:
 				$sortfield = 'sendto';
 				$sortorder = ZBX_SORT_UP;
-				$sorttitle = _('Recipient(s)');
 				break;
 
 			case SCREEN_SORT_TRIGGERS_RECIPIENT_DESC:
 				$sortfield = 'sendto';
 				$sortorder = ZBX_SORT_DOWN;
-				$sorttitle = _('Recipient(s)');
 				break;
 		}
 
@@ -110,28 +101,34 @@ class CScreenActions extends CScreenBase {
 
 		order_result($alerts, $sortfield, $sortorder);
 
-		if ($alerts) {
+		$userids = [];
+
+		foreach ($alerts as $alert) {
+			if ($alert['userid'] != 0) {
+				$userids[$alert['userid']] = true;
+			}
+		}
+
+		if ($userids) {
 			$dbUsers = API::User()->get([
 				'output' => ['userid', 'alias', 'name', 'surname'],
-				'userids' => zbx_objectValues($alerts, 'userid'),
+				'userids' => array_keys($userids),
 				'preservekeys' => true
 			]);
 		}
 
 		// indicator of sort field
-		$sortfieldSpan = new CSpan([$sorttitle, SPACE]);
-		$sortorderSpan = (new CSpan(SPACE))
-			->addClass(($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+		$sort_div = (new CSpan())->addClass(($sortorder === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 
 		// create alert table
-		$actionTable = (new CTableInfo())
+		$table = (new CTableInfo())
 			->setHeader([
-				($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
+				($sortfield === 'clock') ? [('Time'), $sort_div] : _('Time'),
 				_('Action'),
-				($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
-				($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
+				($sortfield === 'description') ? [_('Type'), $sort_div] : _('Type'),
+				($sortfield === 'sendto') ? [_('Recipient(s)'), $sort_div] : _('Recipient(s)'),
 				_('Message'),
-				($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
+				($sortfield === 'status') ? [_('Status'), $sort_div] : _('Status'),
 				_('Info')
 			]);
 
@@ -157,11 +154,11 @@ class CScreenActions extends CScreenBase {
 				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			}
 
-			$recipient = $alert['userid']
+			$recipient = $alert['userid'] != 0
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
-			$actionTable->addRow([
+			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
 				$actions[$alert['actionid']]['name'],
 				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
@@ -172,6 +169,10 @@ class CScreenActions extends CScreenBase {
 			]);
 		}
 
-		return $this->getOutput($actionTable);
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput((new CUiWidget(uniqid(), [$table, $footer]))->setHeader(_('Action log')));
 	}
 }
