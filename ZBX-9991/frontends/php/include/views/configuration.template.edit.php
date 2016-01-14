@@ -74,11 +74,14 @@ if ($templateid > 0 && !hasRequest('form_refresh')) {
 	$templateIds = $this->data['original_templates'];
 }
 else {
-	$groups = get_request('groups', array());
-	if (!hasRequest('form_refresh') && (getRequest('groupid') > 0) && !uint_in_array(getRequest('groupid'), $groups)) {
-		$groups[] = getRequest('groupid');
+	$groups = getRequest('groups', array());
+	$groupid = getRequest('groupid');
+
+	if (!hasRequest('form_refresh') && $groupid != 0 && !uint_in_array($groupid, $groups)) {
+		$groups[] = $groupid;
 	}
-	$hosts_linked_to = get_request('hosts', array());
+
+	$hosts_linked_to = getRequest('hosts', array());
 }
 
 $clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
