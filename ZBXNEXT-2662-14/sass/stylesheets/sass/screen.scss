@@ -2005,7 +2005,6 @@ $var-icons: (
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -622px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -2021,12 +2020,17 @@ $var-icons: (
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -617px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
     .icon-#{$form-icon-btn} {
         background: $transparent $bgimage;
         @extend %form-icon-btn;
+
+        @if $form-icon-btn == 'wzrd-action' {
+        	margin-top: -16px;
+        }
     }
 }
 
