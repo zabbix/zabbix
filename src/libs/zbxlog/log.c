@@ -30,15 +30,15 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 
 static char		log_filename[MAX_STRING_LEN];
 static int		log_type = LOG_TYPE_UNDEFINED;
-static ZBX_MUTEX	log_file_access = ZBX_MUTEX_NULL;
+static ZBX_MUTEX	log_access = ZBX_MUTEX_NULL;
 #ifdef DEBUG
 static int		log_level = LOG_LEVEL_DEBUG;
 #else
 static int		log_level = LOG_LEVEL_WARNING;
 #endif
 
-#define LOCK_LOG	zbx_mutex_lock(&log_file_access)
-#define UNLOCK_LOG	zbx_mutex_unlock(&log_file_access)
+#define LOCK_LOG	zbx_mutex_lock(&log_access)
+#define UNLOCK_LOG	zbx_mutex_unlock(&log_access)
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
@@ -309,7 +309,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			exit(EXIT_FAILURE);
 		}
 
-		if (FAIL == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
+		if (FAIL == zbx_mutex_create_force(&log_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("unable to create mutex for log file");
 			exit(EXIT_FAILURE);
@@ -326,6 +326,11 @@ int	zabbix_open_log(int type, int level, const char *filename)
 	}
 	else if (LOG_TYPE_CONSOLE == type)
 	{
+		if (FAIL == zbx_mutex_create_force(&log_access, ZBX_MUTEX_LOG))
+		{
+			zbx_error("unable to create mutex for standard output");
+			exit(EXIT_FAILURE);
+		}
 #ifndef _WINDOWS
 		fflush(stderr);
 		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
@@ -349,7 +354,7 @@ void	zabbix_close_log(void)
 	}
 	else if (LOG_TYPE_FILE == log_type)
 	{
-		zbx_mutex_destroy(&log_file_access);
+		zbx_mutex_destroy(&log_access);
 	}
 }
 
@@ -488,6 +493,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		va_end(args);
 
 		fprintf(stdout, "\n");
+
+		fflush(stdout);
 
 		unlock_log();
 
