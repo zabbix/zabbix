@@ -14,8 +14,8 @@ A.F.I..... [ZBXNEXT-3073] implemented support of public and private screens with
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
 
 Bug fixes:
-..F....... [ZBXNEXT-2662] moved logo in an upper left corner (Sasha)
-..F....... [ZBXNEXT-2662] added server name in login page (Sasha)
+..F....... [ZBXNEXT-2662] moved logo in an upper left corner (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] added server name in login page (Pavel, Sasha)
 ..F....... [ZBXNEXT-2662] removed "sid" parameter from almost all links (Sasha)
 ...G...PS. [ZBX-8914] improved receiving TCP messages: more tolerant to fragmented messages, stricter message length validation, better performance (gleb)
 ...G...PS. [ZBXNEXT-1263] fixed timeout detection for encrypted connections (Andris)
