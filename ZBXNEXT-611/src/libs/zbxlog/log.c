@@ -46,9 +46,9 @@ static int		log_level = LOG_LEVEL_WARNING;
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
 #ifdef _WINDOWS
-#	define STDIN_FILENO	0
-#	define STDOUT_FILENO	1
-#	define STDERR_FILENO	2
+#	define STDIN_FILENO	_fileno(stdin)
+#	define STDOUT_FILENO	_fileno(stdout)
+#	define STDERR_FILENO	_fileno(stderr)
 
 #	define ZBX_DEV_NULL	"NUL"
 
@@ -243,6 +243,7 @@ static void	rotate_log(const char *log_filename)
 
 #ifndef _WINDOWS
 static sigset_t	orig_mask;
+
 static void	lock_log(void)
 {
 	sigset_t	mask;
