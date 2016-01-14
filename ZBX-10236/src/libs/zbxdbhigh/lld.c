@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -581,6 +581,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 	error = zbx_strdup(error, "");
 
 	now = time(NULL);
+
 	lld_update_items(hostid, lld_ruleid, &lld_rows, &error, lifetime, now);
 	lld_update_triggers(hostid, lld_ruleid, &lld_rows, &error);
 	lld_update_graphs(hostid, lld_ruleid, &lld_rows, &error);
