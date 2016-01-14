@@ -260,7 +260,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	int		i, ret = SUCCEED, foreground = 0;
+	int		i, ret = SUCCEED;
 	char		ch;
 #ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
@@ -306,7 +306,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				}
 				break;
 			case 'f':
-				foreground = 1;
+				t->flags |= ZBX_TASK_FLAG_FOREGROUND;
+				break;
 				break;
 #ifdef _WINDOWS
 			case 'i':
@@ -322,7 +323,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				t->task = ZBX_TASK_STOP_SERVICE;
 				break;
 			case 'm':
-				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
+				t->flags |= ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
 #endif
 			default:
@@ -338,7 +339,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
 		case ZBX_TASK_STOP_SERVICE:
-			if (0 != foreground)
+			if (0 != (t->flags & ZBX_TASK_FLAG_FOREGROUND))
 			{
 				zbx_error("foreground option cannot be used with Zabbix agent services");
 				ret = FAIL;
@@ -347,7 +348,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 
 		default:
-			if (ZBX_TASK_FLAG_MULTIPLE_AGENTS == t->flags)
+			if (0 != (t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS))
 			{
 				zbx_error("multiple agents option can be used only with Zabbix agent services");
 				ret = FAIL;
@@ -355,9 +356,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			}
 	}
 #endif
-
-	if (0 != foreground)
-		t->flags = ZBX_TASK_FLAG_FOREGROUND;
 
 	/* every option may be specified only once */
 
