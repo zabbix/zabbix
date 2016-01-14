@@ -120,7 +120,7 @@ class CFrontendSetup {
 		$check = ($current == '-1' || str2mem($current) >= self::MIN_PHP_MEMORY_LIMIT);
 
 		return [
-			'name' => _('PHP option memory_limit'),
+			'name' => _s('PHP option "%1$s"', 'memory_limit'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_MEMORY_LIMIT),
 			'result' => $check ? self::CHECK_OK : self::CHECK_FATAL,
@@ -137,7 +137,7 @@ class CFrontendSetup {
 		$current = ini_get('post_max_size');
 
 		return [
-			'name' => _('PHP option post_max_size'),
+			'name' => _s('PHP option "%1$s"', 'post_max_size'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_POST_MAX_SIZE),
 			'result' => (str2mem($current) >= self::MIN_PHP_POST_MAX_SIZE) ? self::CHECK_OK : self::CHECK_FATAL,
@@ -154,7 +154,7 @@ class CFrontendSetup {
 		$current = ini_get('upload_max_filesize');
 
 		return [
-			'name' => _('PHP option upload_max_filesize'),
+			'name' => _s('PHP option "%1$s"', 'upload_max_filesize'),
 			'current' => $current,
 			'required' => mem2str(self::MIN_PHP_UPLOAD_MAX_FILESIZE),
 			'result' => (str2mem($current) >= self::MIN_PHP_UPLOAD_MAX_FILESIZE) ? self::CHECK_OK : self::CHECK_FATAL,
@@ -183,7 +183,7 @@ class CFrontendSetup {
 		$currentIsValid = ($current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_EXECUTION_TIME);
 
 		return [
-			'name' => _('PHP option max_execution_time'),
+			'name' => _s('PHP option "%1$s"', 'max_execution_time'),
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_EXECUTION_TIME,
 			'result' => $currentIsValid ? self::CHECK_OK : self::CHECK_FATAL,
@@ -204,7 +204,7 @@ class CFrontendSetup {
 		$currentIsValid = ($current === '0' || $current === '-1' || $current >= self::MIN_PHP_MAX_INPUT_TIME);
 
 		return [
-			'name' => _('PHP option max_input_time'),
+			'name' => _s('PHP option "%1$s"', 'max_input_time'),
 			'current' => $current,
 			'required' => self::MIN_PHP_MAX_INPUT_TIME,
 			'result' => $currentIsValid ? self::CHECK_OK : self::CHECK_FATAL,
@@ -221,7 +221,7 @@ class CFrontendSetup {
 		$current = ini_get('date.timezone');
 
 		return [
-			'name' => _('PHP time zone'),
+			'name' => _s('PHP option "%1$s"', 'date.timezone'),
 			'current' => $current ? $current : _('unknown'),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
@@ -346,7 +346,7 @@ class CFrontendSetup {
 		$current = ini_get('mbstring.func_overload');
 
 		return [
-			'name' => _('PHP mbstring.func_overload'),
+			'name' => _s('PHP option "%1$s"', 'mbstring.func_overload'),
 			'current' => ($current & 2) ? _('on') : _('off'),
 			'required' => _('off'),
 			'result' => ($current & 2) ? self::CHECK_FATAL : self::CHECK_OK,
@@ -367,11 +367,11 @@ class CFrontendSetup {
 		$current = ini_get('always_populate_raw_post_data');
 
 		return [
-			'name' => _('PHP always_populate_raw_post_data'),
+			'name' => _s('PHP option "%1$s"', 'always_populate_raw_post_data'),
 			'current' => ($current != -1) ? _('on') : _('off'),
 			'required' => _('off'),
 			'result' => ($current != -1) ? self::CHECK_FATAL : self::CHECK_OK,
-			'error' => _('PHP always_populate_raw_post_data must be set to -1.')
+			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'always_populate_raw_post_data', -1)
 		];
 	}
 
@@ -598,7 +598,7 @@ class CFrontendSetup {
 		$current = !ini_get('session.auto_start');
 
 		return [
-			'name' => _('PHP session auto start'),
+			'name' => _s('PHP option "%1$s"', 'session.auto_start'),
 			'current' => $current ? _('off') : _('on'),
 			'required' => _('off'),
 			'result' => $current ? self::CHECK_OK : self::CHECK_FATAL,
@@ -632,11 +632,13 @@ class CFrontendSetup {
 		$current = ini_get('arg_separator.output');
 
 		return [
-			'name' => _('PHP arg_separator.output'),
+			'name' => _s('PHP option "%1$s"', 'arg_separator.output'),
 			'current' => htmlspecialchars($current),
 			'required' => htmlspecialchars(self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT),
 			'result' => ($current === self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT) ? self::CHECK_OK : self::CHECK_FATAL,
-			'error' => _s('PHP arg_separator.output must be equal to "%1$s"', self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT)
+			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'arg_separator.output',
+				self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT
+			)
 		];
 	}
 }
