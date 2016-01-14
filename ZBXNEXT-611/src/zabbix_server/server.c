@@ -675,7 +675,7 @@ int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
 	char		ch;
-	int		opt_c = 0, opt_r = 0, foreground = 0;
+	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	argv = setproctitle_save_env(argc, argv);
@@ -708,7 +708,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'f':
-				foreground = 1;
+				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
 				usage();
@@ -716,9 +716,6 @@ int	main(int argc, char **argv)
 				break;
 		}
 	}
-
-	if (0 != foreground)
-		t.flags = ZBX_TASK_FLAG_FOREGROUND;
 
 	/* every option may be specified only once */
 	if (1 < opt_c || 1 < opt_r)
