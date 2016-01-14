@@ -22,10 +22,10 @@
 /**
  * Get mapping for value.
  *
- * @param string $value			Value that mapping should be applied to.
- * @param string $valuemapid	Value map ID which should be used.
+ * @param int|float|string $value		Value that mapping should be applied to.
+ * @param string           $valuemapid	Value map ID which should be used.
  *
- * @return string|bool			 If there is no mapping return false, return mapped value otherwise.
+ * @return string|bool     If there is no mapping return false, return mapped value otherwise.
  */
 function getMappedValue($value, $valuemapid) {
 	static $valuemaps = [];
@@ -43,15 +43,14 @@ function getMappedValue($value, $valuemapid) {
 			'valuemapids' => [$valuemapid]
 		]);
 
-		if ($db_valuemaps === []) {
-			return false;
-		}
-		foreach ($db_valuemaps[0]['mappings'] as $mapping) {
-			$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
+		if ($db_valuemaps) {
+			foreach ($db_valuemaps[0]['mappings'] as $mapping) {
+				$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
+			}
 		}
 	}
 
-	return array_key_exists((string)$value, $valuemaps[$valuemapid]) ? $valuemaps[$valuemapid][$value] : false;
+	return array_key_exists((string)$value, $valuemaps[$valuemapid]) ? $valuemaps[$valuemapid][(string)$value] : false;
 }
 
 /**
