@@ -1111,7 +1111,7 @@ static int	DBpatch_2050114(void)
 
 static int	DBpatch_2050115(void)
 {
-	return DBcreate_index("slideshow_usrgrp", "slideshow_usrgrp_1", "slideshowid,usrgrpid", 1);
+	return DBcreate_index("slideshow_usrgrp", "slideshow_usrgrp_1", "slideshowid,usrgrpid",	1);
 }
 
 static int	DBpatch_2050116(void)
