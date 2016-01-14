@@ -112,7 +112,7 @@ rollback:
  *                                                                            *
  * Function: housekeeping_history                                             *
  *                                                                            *
- * Purpose: remove outdated information from history and trends               *
+ * Purpose: remove outdated information from history                          *
  *                                                                            *
  * Parameters: now - current timestamp                                        *
  *                                                                            *
