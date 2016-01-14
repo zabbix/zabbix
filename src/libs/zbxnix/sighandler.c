@@ -125,6 +125,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	int	si_code;
+
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	if (!SIG_PARENT_PROCESS)
@@ -134,6 +136,12 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #endif
 		exit(EXIT_FAILURE);
 	}
+
+	si_code = SIG_CHECKED_FIELD(siginfo, si_code);
+
+	/* ignore SIGSTOP/SIGCONT signals to children */
+	if (CLD_STOPPED == si_code || CLD_CONTINUED == si_code)
+		return;
 
 	if (0 == sig_exiting)
 	{
