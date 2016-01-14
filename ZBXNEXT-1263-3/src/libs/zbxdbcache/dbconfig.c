@@ -1232,15 +1232,38 @@ static void	DCsync_hosts(DB_RESULT result)
 	while (NULL != (row = DBfetch(result)))
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		/* Detect PSK identity (PSKid) without PSK value or vice versa. This should have been prevented by */
-		/* validation in frontend or API. */
+		/* defend against PSK errors (should have been prevented by validation in frontend or API) */
 
-		if ('\0' != *row[33])			/* PSKid */
+		if ('\0' != *row[33])			/* PSKid not empty */
 		{
-			if ('\0' == *row[34])		/* PSK value */
+			char	*p = row[34];		/* PSK value */
+
+			/* Catch empty and too short PSK values. */
+			/* strlen() not used here as only the first HOST_TLS_PSK_LEN_MIN chars should be checked. */
+			/* Emulate strnlen() which might not be available on older systems. */
+
+			while (row[34] + HOST_TLS_PSK_LEN_MIN > p)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host"
-						" \"%s\" (hostid %s)", row[33], row[2], row[0]);
+				if ('\0' == *p)
+					break;
+
+				p++;
+			}
+
+			if (row[34] + HOST_TLS_PSK_LEN_MIN > p)
+			{
+				if ('\0' == *row[34])
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for"
+							" host \"%s\" (hostid %s)", row[33], row[2], row[0]);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "PSK for host \"%s\" (hostid %s) is too short."
+							" Minimum is %d hex-digits", row[2], row[0],
+							HOST_TLS_PSK_LEN_MIN);
+				}
+
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
