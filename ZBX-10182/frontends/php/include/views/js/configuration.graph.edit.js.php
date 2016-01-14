@@ -84,7 +84,7 @@
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
 		</td>
-	<?php endif; ?>
+	<?php endif ?>
 </tr>
 </script>
 <script type="text/javascript">
