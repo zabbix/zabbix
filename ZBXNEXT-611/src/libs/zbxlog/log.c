@@ -45,6 +45,18 @@ static int		log_level = LOG_LEVEL_WARNING;
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
 
+#ifdef _WINDOWS
+#	define STDIN_FILENO	0
+#	define STDOUT_FILENO	1
+#	define STDERR_FILENO	2
+
+#	define ZBX_DEV_NULL	"NUL"
+
+#	define dup2(fd1, fd2)	_dup2(fd1, fd2)
+#else
+#	define ZBX_DEV_NULL	"/dev/null"
+#endif
+
 const char	*zabbix_get_log_level_string(void)
 {
 	switch (log_level)
@@ -87,11 +99,10 @@ int	zabbix_decrease_log_level(void)
 	return SUCCEED;
 }
 
-#ifndef _WINDOWS
 void	zbx_redirect_stdio(const char *filename)
 {
 	int		fd;
-	const char	default_file[] = "/dev/null";
+	const char	default_file[] = ZBX_DEV_NULL;
 	int		open_flags = O_WRONLY;
 
 	if (NULL != filename && '\0' != *filename)
@@ -126,7 +137,6 @@ void	zbx_redirect_stdio(const char *filename)
 
 	close(fd);
 }
-#endif
 
 static void	get_time(struct tm **tm, long *milliseconds)
 {
@@ -152,19 +162,17 @@ static void	rotate_log(const char *log_filename)
 	long			milliseconds;
 	struct tm		*tm;
 	zbx_uint64_t		new_size;
-#ifndef _WINDOWS
 	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
-#endif
+
 	if (0 == CONFIG_LOG_FILE_SIZE || NULL == log_filename || '\0' == *log_filename)
 	{
-#ifndef _WINDOWS
 		/* redirect only once if log file wasn't specified or there is no log file size limit */
 		if (ZBX_MAX_UINT64 == old_size)
 		{
 			old_size = 0;
 			zbx_redirect_stdio(log_filename);
 		}
-#endif
+
 		return;
 	}
 
@@ -226,12 +234,11 @@ static void	rotate_log(const char *log_filename)
 		else
 			new_size = 0;
 	}
-#ifndef _WINDOWS
+
 	if (old_size > new_size)
 		zbx_redirect_stdio(log_filename);
 
 	old_size = new_size;
-#endif
 }
 
 #ifndef _WINDOWS
@@ -331,11 +338,10 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			zbx_error("unable to create mutex for standard output");
 			exit(EXIT_FAILURE);
 		}
-#ifndef _WINDOWS
+
 		fflush(stderr);
 		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
 			zbx_error("cannot redirect stderr to stdout: %s", zbx_strerror(errno));
-#endif
 	}
 
 	return SUCCEED;
