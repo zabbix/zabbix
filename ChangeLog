@@ -3,6 +3,7 @@ Changes for 3.0.0alpha7
 New features:
 
 Bug fixes:
+A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha6
