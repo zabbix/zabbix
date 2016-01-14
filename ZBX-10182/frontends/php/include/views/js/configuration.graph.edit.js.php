@@ -1,20 +1,20 @@
 <script type="text/x-jquery-tmpl" id="itemTpl">
 <tr id="items_#{number}" class="sortable">
 	<!-- icon + hidden -->
-	<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-		<?php if (!$this->data['templates']): ?>
+	<?php if (!$this->data['templates']): ?>
+		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 			<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
-		<?php endif ?>
-		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
-		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
-		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
-		<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
-		<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
-		<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
-			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
-		<?php endif ?>
-	</td>
+			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
+			<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
+			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
+			<input type="hidden" id="items_#{number}_sortorder" name="items[#{number}][sortorder]" value="#{sortorder}">
+			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
+			<?php if ($this->data['graphtype'] != GRAPH_TYPE_PIE && $this->data['graphtype'] != GRAPH_TYPE_EXPLODED): ?>
+				<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="<?= GRAPH_ITEM_SIMPLE ?>">
+			<?php endif ?>
+		</td>
+	<?php endif ?>
 
 	<!-- row number -->
 	<td>
@@ -152,7 +152,9 @@
 			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
 		}
 
-		activateSortable();
+		<?php if (!$this->data['templates']): ?>
+			activateSortable();
+		<?php endif ?>
 		rewriteNameLinks();
 	}
 
@@ -187,7 +189,9 @@
 		jQuery('#items_' + number).remove();
 
 		recalculateSortOrder();
-		activateSortable();
+		<?php if (!$this->data['templates']): ?>
+			activateSortable();
+		<?php endif ?>
 	}
 
 	function recalculateSortOrder() {
@@ -260,6 +264,7 @@
 		rewriteNameLinks();
 	}
 
+<?php if (!$this->data['templates']): ?>
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
 			itemsTableWidth = itemsTable.width(),
@@ -311,6 +316,7 @@
 	function activateSortable() {
 		jQuery('#itemsTable').sortable({disabled: (jQuery('#itemsTable tr.sortable').length < 2)});
 	}
+<?php endif ?>
 
 	jQuery(function($) {
 		$('#tab_previewTab').click(function() {
@@ -419,6 +425,8 @@
 			$('form[name="graphForm"]').submit();
 		});
 
-		initSortable();
+		<?php if (!$this->data['templates']): ?>
+			initSortable();
+		<?php endif ?>
 	});
 </script>

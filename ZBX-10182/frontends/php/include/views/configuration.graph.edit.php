@@ -255,7 +255,7 @@ else {
 $itemsTable = (new CTable())
 	->setId('itemsTable')
 	->setHeader([
-		(new CColHeader())->setWidth(15),
+		$has_templates ? null : (new CColHeader())->setWidth(15),
 		(new CColHeader())->setWidth(15),
 		(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
 		($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
@@ -273,7 +273,7 @@ $itemsTable = (new CTable())
 				->setWidth(80)
 			: null,
 		(new CColHeader(_('Colour')))->setWidth(100),
-		!$has_templates ? (new CColHeader(_('Action')))->setWidth(50) : null
+		$has_templates ? null : (new CColHeader(_('Action')))->setWidth(50)
 	]);
 
 $itemsTable->addRow(
