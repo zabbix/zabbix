@@ -80,6 +80,16 @@ class CScreen extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		if ($options['countOutput'] !== null) {
+			$count_output = true;
+			$options['output'] = ['screenid'];
+			$options['countOutput'] = null;
+			$options['limit'] = null;
+		}
+		else {
+			$count_output = false;
+		}
+
 		// Editable + permission check.
 		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
 				&& !$options['nopermissions']) {
@@ -156,19 +166,8 @@ class CScreen extends CApiService {
 		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
 		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 		while ($screen = DBfetch($res)) {
-			if ($options['countOutput'] !== null) {
-				if ($options['groupCount'] !== null) {
-					$result[] = $screen;
-				}
-				else {
-					$result = $screen['rowscount'];
-				}
-			}
-			else {
-				$screenids[$screen['screenid']] = true;
-
-				$result[$screen['screenid']] = $screen;
-			}
+			$screenids[$screen['screenid']] = true;
+			$result[$screen['screenid']] = $screen;
 		}
 
 		// editable + PERMISSION CHECK
@@ -385,8 +384,13 @@ class CScreen extends CApiService {
 			}
 		}
 
-		if ($options['countOutput'] !== null) {
-			return $result;
+		if ($count_output) {
+			if ($options['groupCount'] !== null) {
+				return [['rowscount' => count($result)]];
+			}
+			else {
+				return count($result);
+			}
 		}
 
 		if ($result) {
