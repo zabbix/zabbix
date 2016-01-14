@@ -308,7 +308,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			case 'f':
 				t->flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
-				break;
 #ifdef _WINDOWS
 			case 'i':
 				t->task = ZBX_TASK_INSTALL_SERVICE;
