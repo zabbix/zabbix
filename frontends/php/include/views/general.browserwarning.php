@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@
 			</div>
 		</div>
 		<div class="<?= ZBX_STYLE_FOOTER ?>">
-			&copy; 2001&ndash;2015, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
+			&copy; <?= ZABBIX_COPYRIGHT_FROM ?>&ndash;<?= ZABBIX_COPYRIGHT_TO ?>, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
 		</div>
 	</body>
 </html>
