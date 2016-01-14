@@ -612,7 +612,8 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 		return FAIL;
 	}
 
-	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND))
+	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
+			ZBX_TASK_START == task->task)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"console\" parameter can only be used with the"
 				" -f (--foreground) command line option");
