@@ -72,29 +72,18 @@ zbx_log_t;
 /* agent return structure */
 typedef struct
 {
-	int	 	type;
+	zbx_uint64_t	lastlogsize;	/* meta information */
 	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
 	char		*text;
-	char		*msg;
+	char		*msg;		/* possible error message */
+	unsigned char	flags;		/* see ZBX_AR_FLAG_* flags above */
 	zbx_log_t	*log;
-
-	zbx_uint64_t	lastlogsize;
-	int		mtime;
-	unsigned char	flags;	/* see ZBX_AR_FLAG_* flags above */
+	int	 	type;		/* value type */
+	int		mtime;		/* meta information */
 }
 AGENT_RESULT;
-
-/* result of simple check vmware.eventlog */
-typedef struct
-{
-	char		*value;
-	int		logeventid;
-	int		timestamp;
-	zbx_uint64_t	lastlogsize;
-}
-vmware_event_t;
 
 /* agent result types */
 #define AR_UINT64	0x01

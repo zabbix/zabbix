@@ -669,14 +669,15 @@ static void	add_log_result(AGENT_RESULT *result, const char *value)
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
-	int		ret = FAIL;
-	zbx_uint64_t	value_uint64;
-	double		value_double;
+	int	ret = FAIL;
 
 	assert(result);
 
 	switch (value_type)
 	{
+		zbx_uint64_t	value_uint64;
+		double		value_double;
+
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_rtrim(c, " \"");
 			zbx_ltrim(c, " \"+");
