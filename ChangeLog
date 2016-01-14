@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
+..F....... [ZBXNEXT-3065] added arg_separator.output check in setup pre-requisites (Vitalijs)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha6
