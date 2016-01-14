@@ -620,23 +620,10 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
 		return FAIL;
 	}
 
-	if (NULL != CONFIG_LOG_FILE && '\0' != *CONFIG_LOG_FILE)
+	if (LOG_TYPE_FILE == CONFIG_LOG_TYPE && (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE))
 	{
-		if (LOG_TYPE_FILE != CONFIG_LOG_TYPE)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"LogFile\" parameter can be only used with \"LogType\" \"file\""
-					" parameter");
-			return FAIL;
-		}
-	}
-	else
-	{
-		if (LOG_TYPE_FILE == CONFIG_LOG_TYPE)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter"
-					" to be set");
-			return FAIL;
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter to be set");
+		return FAIL;
 	}
 
 	return SUCCEED;
