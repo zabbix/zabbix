@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,10 +38,9 @@ class CFilter extends CTag {
 		$this->columns = [];
 
 		$this->form = (new CForm('get'))
+			->cleanItems()
 			->setAttribute('name', $this->name)
-			->setId('id', $this->name)
-			->addVar('ddreset', 1)
-			->addVar('uncheck', 1);
+			->setId('id', $this->name);
 
 		// filter is opened by default
 		$this->opened = (CProfile::get($this->filterid, 1) == 1);
@@ -137,8 +136,8 @@ class CFilter extends CTag {
 		}
 
 		$url = new CUrl();
-		$url->removeArgument('sid');
 		$url->removeArgument('filter_set');
+		$url->removeArgument('ddreset');
 		$url->setArgument('filter_rst', 1);
 
 		return (new CDiv())

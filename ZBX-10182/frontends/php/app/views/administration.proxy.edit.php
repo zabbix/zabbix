@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ $proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxy_form_list);
 
 // Encryption form list.
 $encryption_form_list = (new CFormList('encryption'))
-	->addRow(_('Connections to host'),
+	->addRow(_('Connections to proxy'),
 		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
 			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
