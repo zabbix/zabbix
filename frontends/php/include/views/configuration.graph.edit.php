@@ -347,14 +347,14 @@ if (!empty($this->data['graphid'])) {
 		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('parent_discoveryid'))
+			new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))
 		]
 	));
 }
 else {
 	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid'))]
+		[new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))]
 	));
 }
 
