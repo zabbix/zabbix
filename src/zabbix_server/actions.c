@@ -47,7 +47,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
 	char		*tmp_str = NULL;
-	int		condition_value_i, ret = FAIL;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -269,7 +269,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	}
 	else if (CONDITION_TYPE_TRIGGER_VALUE == condition->conditiontype)
 	{
-		condition_value_i = atoi(condition->value);
+		int	condition_value_i = atoi(condition->value);
 
 		switch (condition->operator)
 		{
@@ -446,7 +446,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	condition_value;
-	int		condition_value_i, tmp_int, now, ret = FAIL;
+	int		tmp_int, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -523,7 +523,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	}
 	else if (CONDITION_TYPE_DOBJECT == condition->conditiontype)
 	{
-		condition_value_i = atoi(condition->value);
+		int	condition_value_i = atoi(condition->value);
 
 		switch (condition->operator)
 		{
@@ -664,7 +664,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	{
 		if (EVENT_OBJECT_DSERVICE == event->object)
 		{
-			condition_value_i = atoi(condition->value);
+			int	condition_value_i = atoi(condition->value);
 
 			result = DBselect(
 					"select type"
@@ -695,7 +695,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	}
 	else if (CONDITION_TYPE_DSTATUS == condition->conditiontype)
 	{
-		condition_value_i = atoi(condition->value);
+		int	condition_value_i = atoi(condition->value);
 
 		switch (condition->operator)
 		{
@@ -713,7 +713,7 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 	}
 	else if (CONDITION_TYPE_DUPTIME == condition->conditiontype)
 	{
-		condition_value_i = atoi(condition->value);
+		int	condition_value_i = atoi(condition->value);
 
 		if (EVENT_OBJECT_DHOST == event->object)
 		{
@@ -734,8 +734,9 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 
 		if (NULL != (row = DBfetch(result)))
 		{
+			int	now = time(NULL);
+
 			tmp_int = DOBJECT_STATUS_UP == atoi(row[0]) ? atoi(row[1]) : atoi(row[2]);
-			now = time(NULL);
 
 			switch (condition->operator)
 			{
@@ -1392,11 +1393,9 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 
 	DB_RESULT		result;
 	DB_ROW			row;
-	unsigned char		operationtype;
 	zbx_uint64_t		groupid, templateid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids,
 				new_groupids, del_groupids;
-	int			inventory_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
 
@@ -1416,6 +1415,9 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int		inventory_mode;
+		unsigned char	operationtype;
+
 		operationtype = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(groupid, row[1]);
 		ZBX_DBROW2UINT64(templateid, row[2]);
