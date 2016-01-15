@@ -3345,16 +3345,9 @@ static void	DCsync_expressions(DB_RESULT result)
  *                                                                            *
  * Comments: The result contains the following fields:                        *
  *           0 - actionid                                                     *
- *           1 - name                                                         *
- *           2 - eventsource                                                  *
- *           3 - evaltype                                                     *
- *           4 - esc_period                                                   *
- *           5 - def_shortdata                                                *
- *           6 - def_longdata                                                 *
- *           7 - recovery_msg                                                 *
- *           8 - r_shortdata                                                  *
- *           9 - r_longdata                                                   *
- *          10 - formula                                                      *
+ *           1 - eventsource                                                  *
+ *           2 - evaltype                                                     *
+ *           3 - formula                                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_actions(DB_RESULT result)
@@ -3388,10 +3381,10 @@ static void	DCsync_actions(DB_RESULT result)
 			zbx_vector_ptr_reserve(&action->conditions, 1);
 		}
 
-		action->eventsource = atoi(row[2]);
-		action->evaltype = atoi(row[3]);
+		action->eventsource = atoi(row[1]);
+		action->evaltype = atoi(row[2]);
 
-		DCstrpool_replace(found, &action->formula, row[10]);
+		DCstrpool_replace(found, &action->formula, row[3]);
 
 		/* reset conditions vector */
 		zbx_vector_ptr_clear(&action->conditions);
@@ -3714,8 +3707,7 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (action_result = DBselect(
-			"select actionid,name,eventsource,evaltype,esc_period,def_shortdata,def_longdata,"
-				"recovery_msg,r_shortdata,r_longdata,formula"
+			"select actionid,eventsource,evaltype,formula"
 			" from actions"
 			" where status=%d",
 			ACTION_STATUS_ACTIVE)))
