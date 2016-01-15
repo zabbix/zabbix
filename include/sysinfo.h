@@ -31,8 +31,9 @@
 #define ISSET_TEXT(res)	((res)->type & AR_TEXT)
 #define ISSET_LOG(res)	((res)->type & AR_LOG)
 #define ISSET_MSG(res)	((res)->type & AR_MESSAGE)
+#define ISSET_META(res)	((res)->type & AR_META)
 
-#define ISSET_ANY(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
+#define ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
 
 /* UNSET RESULT */
 
@@ -42,7 +43,6 @@ do									\
 {									\
 	(res)->type &= ~AR_UINT64;					\
 	(res)->ui64 = (zbx_uint64_t)0;					\
-	if (!ISSET_ANY(res))	(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }									\
 while (0)
 
@@ -52,7 +52,6 @@ do									\
 {									\
 	(res)->type &= ~AR_DOUBLE;					\
 	(res)->dbl = (double)0;						\
-	if (!ISSET_ANY(res))	(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }									\
 while (0)
 
@@ -65,7 +64,6 @@ do									\
 		zbx_free((res)->str);					\
 		(res)->type &= ~AR_STRING;				\
 	}								\
-	if (!ISSET_ANY(res))	(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }									\
 while (0)
 
@@ -78,7 +76,6 @@ do									\
 		zbx_free((res)->text);					\
 		(res)->type &= ~AR_TEXT;				\
 	}								\
-	if (!ISSET_ANY(res))	(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }									\
 while (0)
 
@@ -91,7 +88,6 @@ do									\
 		zbx_log_free((res)->log);				\
 		(res)->type &= ~AR_LOG;					\
 	}								\
-	if (!ISSET_ANY(res))	(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }									\
 while (0)
 
@@ -104,7 +100,6 @@ do									\
 		zbx_free((res)->msg);					\
 		(res)->type &= ~AR_MESSAGE;				\
 	}								\
-	if (!ISSET_ANY(res))	(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }									\
 while (0)
 
@@ -118,7 +113,6 @@ do										\
 	if (!(exc_type & AR_TEXT))	UNSET_TEXT_RESULT(res);			\
 	if (!(exc_type & AR_LOG))	UNSET_LOG_RESULT(res);			\
 	if (!(exc_type & AR_MESSAGE))	UNSET_MSG_RESULT(res);			\
-	if (!ISSET_ANY(res))		(res)->flags |= ZBX_AR_FLAG_NOVALUE;	\
 }										\
 while (0)
 
