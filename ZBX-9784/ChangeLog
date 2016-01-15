@@ -4,6 +4,11 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
+..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
+........S. [ZBX-7006] implemented trend cache cleanup procedure which forces hourly flush of deleted, disabled or rarely updated item trends (dimir, gleb)
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
+...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
 ...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
@@ -170,7 +175,7 @@ A.F....PS. [ZBXNEXT-2160] added support for extended IP ranges in network discov
 
 Bug fixes:
 ...G...PS. [ZBX-9284] added Zabbix log file locking to avoid incomplete logging on log file rotation (igors)
-.......PS. [ZBX-591] added interface (SourceIP) for outgoing connection in web monitoring, alerts (Ez Texting), VMware monitoring and simple checks (HTTPS services) (igors)
+...G...PS. [ZBX-591] fixed web monitoring, VMware monitoring, Ez Texting alerts and net.tcp.service{.perf}[https] items to use the SourceIP configuration parameter (igors)
 ...G...... [ZBX-9143] improved proc.num under Windows to handle more processes (dimir)
 ...G...... [ZBX-9232] fixed processing of eventlog messages to avoid incomplete messaging for events which description could not be found (igors)
 ..F....... [ZBX-9257] fixed displaying missing history links in trigger context menu (Ivo)
@@ -729,6 +734,10 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
+..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
+...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
 ...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
