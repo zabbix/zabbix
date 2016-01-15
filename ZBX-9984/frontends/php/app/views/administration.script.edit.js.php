@@ -29,7 +29,7 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#scriptid, #delete, #clone').remove();
-			jQuery('#update span').text(<?php echo CJs::encodeJson(_('Add')); ?>);
+			jQuery('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
 			jQuery('#update').val('script.create').attr({id: 'add'});
 			jQuery('#name').focus();
 		});
