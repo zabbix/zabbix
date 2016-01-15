@@ -405,7 +405,7 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		padding: 0 5px;
+		padding: 0 12px;
 
 		&:last-child {
 			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
@@ -414,7 +414,7 @@ ul.top-nav-icons {
 }
 
 .top-subnav a {
-	padding: 9px 8px;
+	padding: 9px 1px;
 
 	&:link {
 		color: $link-main-subnav-color;
@@ -438,6 +438,8 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
+		padding: 9px 1px 6px 1px;
+		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
 	}
 }
 
