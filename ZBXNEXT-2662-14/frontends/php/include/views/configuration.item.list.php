@@ -220,9 +220,11 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = (new CButton(null))
-			->addClass(ZBX_STYLE_BTN_WIZARD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
+		$menuIcon = (new CSpan(
+			(new CButton(null))
+				->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers))
+		))->addClass(ZBX_STYLE_REL_CONTAINER);
 	}
 	else {
 		$menuIcon = '';
