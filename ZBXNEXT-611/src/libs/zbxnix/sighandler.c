@@ -125,8 +125,6 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
  ******************************************************************************/
 static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
-	int	exit_code;
-
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
 	if (!SIG_PARENT_PROCESS)
@@ -136,12 +134,6 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 #endif
 		exit(EXIT_FAILURE);
 	}
-
-	exit_code = SIG_CHECKED_FIELD(siginfo, si_code);
-
-	/* ignore SIGSTOP/SIGCONT signals to children */
-	if (CLD_STOPPED == exit_code || CLD_CONTINUED == exit_code)
-		return;
 
 	if (0 == sig_exiting)
 	{
@@ -201,7 +193,7 @@ void 	zbx_set_child_signal_handler()
 	sig_parent_pid = (int)getpid();
 
 	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = SA_SIGINFO;
+	phan.sa_flags = SA_SIGINFO | SA_NOCLDSTOP;
 
 	phan.sa_sigaction = child_signal_handler;
 	sigaction(SIGCHLD, &phan, NULL);
