@@ -119,6 +119,13 @@ AGENT_RESULT;
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_LOG_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_LOG,			\
+	(res)->log = (zbx_log_t *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_MESSAGE,		\
