@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 14:53+0200\n"
-"PO-Revision-Date: 2015-12-19 14:41+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-28 22:36+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1450528863.0\n"
+"X-POOTLE-MTIME: 1451335009.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -677,7 +677,7 @@ msgstr "Všetky linky by mali mať zadefinované \"Meno\" a \"URL\""
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "Všetky mapy"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1744,7 +1744,6 @@ msgid "Cannot delete user media."
 msgstr "Nie je možné zmazať médium používateľa."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Nie je možné zmazať mapu hodnôt"
@@ -3198,7 +3197,7 @@ msgstr "Pripojenia k hostovi"
 
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr ""
+msgstr "Konštruktor"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -4051,7 +4050,7 @@ msgstr "Zmazať označené plánované odstávky?"
 
 #: include/views/monitoring.sysmap.edit.php:367
 msgid "Delete selected map?"
-msgstr ""
+msgstr "Zmazať označenú mapu?"
 
 #: include/views/monitoring.sysmap.list.php:75
 msgid "Delete selected maps?"
@@ -4115,7 +4114,7 @@ msgstr[2] "Zmazať označené mapovanie hodnôt? Je použité pre %d položiek!"
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "Zmazať označenú hodnotu máp?"
 
 #: include/views/configuration.httpconf.list.php:160
 msgid "Delete selected web scenarios?"
@@ -4651,7 +4650,7 @@ msgstr "Zobrazujem %1$s z %2$s nájdených"
 #: include/func.inc.php:1561
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "Zobrazujem %1$s do %2$s z %3$s nájdených"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4726,7 +4725,7 @@ msgstr "Duplicitné \"meno\" hodnoty \"%1$s\" pre prototyp aplikácie v prototyp
 #: include/classes/api/services/CMap.php:812
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "Duplicitné \"meno\" hodnoty \"%1$s\" pre mapu."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4785,13 +4784,13 @@ msgstr "Kopírovanie používateľského aliasu \"%s\"."
 #: include/classes/api/services/CMap.php:926
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Duplicitné userid \"%1$s\" v používateľoch pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:580
 #: include/classes/api/services/CMap.php:999
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Duplicitné usrgrpid \"%1$s\" v používatelských skupinách pre mapu \"%2$s\"."
 
 #: events.php:417 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4965,7 +4964,7 @@ msgstr "Prázdny vstup."
 
 #: include/classes/api/services/CMap.php:778
 msgid "Empty map ID."
-msgstr ""
+msgstr "Prázdne ID mapy."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
@@ -5491,7 +5490,7 @@ msgstr "Pole \"%1$s\" je povinné."
 #: include/classes/api/services/CMap.php:555
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "Chýbajúca hodnota pola \"%1$s\" pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:474
@@ -5770,6 +5769,10 @@ msgid "Generated in %s sec"
 msgstr "Vygenerované za %s sekúnd"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "Nemecky (de_DE)"
 
@@ -5989,7 +5992,7 @@ msgstr "Grafy skopírované"
 msgid "Graphs deleted"
 msgstr "Grafy zmazané"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "Grécky (el_GR)"
 
@@ -6674,7 +6677,7 @@ msgstr "hodín"
 msgid "Housekeeping"
 msgstr "Údržba"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "Maďarsky (hu_HU)"
 
@@ -7063,7 +7066,7 @@ msgstr "V priebehu"
 #: include/views/monitoring.sysmap.edit.php:87
 #: include/views/monitoring.sysmap.edit.php:92
 msgid "Inaccessible user"
-msgstr ""
+msgstr "Nedostupný používateľ"
 
 #: tr_logform.php:275 tr_logform.php:308
 msgid "Include"
@@ -7078,25 +7081,25 @@ msgstr "Štatistika príchodzej prevádzky na sieťovom rozhraní. Vráti celé 
 #: include/classes/api/services/CMap.php:868
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota \"výška\" pre mapu \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:565
 #: include/classes/api/services/CMap.php:985
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľských skupinách pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:491
 #: include/classes/api/services/CMap.php:912
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateloch pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:452
 #: include/classes/api/services/CMap.php:874
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota \"súkromné\" \"%1$s\" pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -7107,7 +7110,7 @@ msgstr "Neplatná hodnota pola \"soft\" pre závislosť na službe \"%1$s\"."
 #: include/classes/api/services/CMap.php:862
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota \"šírka\" pre mapu \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:638
 #: include/classes/api/services/CMap.php:645
@@ -7591,7 +7594,7 @@ msgstr "Neplatné ID mapy \"%1$s\" v prvku obrazovky."
 
 #: include/classes/api/services/CMap.php:779
 msgid "Incorrect map ID."
-msgstr ""
+msgstr "Neplatné ID mapy."
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
@@ -7845,13 +7848,13 @@ msgstr "Nesprávny typ výpočtu pre zisťovacie pravidlo \"%1$s\"."
 #: include/classes/api/services/CMap.php:947
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Nesprávne user ID špecifikované pre mapu \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:597
 #: include/classes/api/services/CMap.php:1016
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Nesprávne user group ID špecifikované pre mapu \"%1$s\"."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -7958,7 +7961,7 @@ msgstr "Neplatná hodnota použitá pre proxy stav \"%1$s\"."
 msgid "Incorrect web scenario ID."
 msgstr "Neplatné ID web scenára."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "Indonézsky (id_ID)"
 
@@ -8382,7 +8385,7 @@ msgstr "Nie je možné filtrovať cez heslo používateľa."
 msgid "It is not possible to search by user password."
 msgstr "Nie je možné nájsť používateľské heslo."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Taliansky (it_IT)"
 
@@ -8671,7 +8674,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Január"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Japonsky (ja_JP)"
 
@@ -8727,7 +8730,7 @@ msgstr "Fráza kľúča"
 msgid "Keyword"
 msgstr "Kľúčové slovo"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Kórejsky (ko_KR)"
 
@@ -8890,7 +8893,7 @@ msgstr "Posledné udalosti"
 msgid "Latest values"
 msgstr "Posledné hodnoty"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Litovsky (lv_LV)"
 
@@ -9018,7 +9021,7 @@ msgstr "Zoznam nainštalovaných balíčkov. Vráti text"
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Zoznam služieb. Vráti 0 - ak nie sú žiadne služby alebo text - zoznam služieb oddelených novým riadkom"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr "Litovsky (lt_LT)"
 
@@ -11579,7 +11582,7 @@ msgstr "Oprávnenia"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Oprávnenia môžu byť priradené len používateľskej skupine, nie k používateľovi."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "Persky (fa_IR)"
 
@@ -11622,7 +11625,7 @@ msgstr "Prosím zadajte meno Zabbix hosta alebo jeho IP adresu a číslo portu Z
 msgid "Please select two elements"
 msgstr "Označte prosím dva elementy"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "Polsky (pl_PL)"
 
@@ -11659,11 +11662,11 @@ msgstr "Port like"
 msgid "Port range"
 msgstr "Rozsah portov"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "Portugalsky (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr "Portugalsky (pt_PT)"
 
@@ -12322,7 +12325,7 @@ msgstr "Vrátí percento stratených ICMP ping paketov."
 msgid "Right"
 msgstr "Vpravo"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr "Rumunsky (ro_RO)"
 
@@ -12396,7 +12399,7 @@ msgstr "Spusti vzdialené príkazy na hostoch"
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "Rusky (ru_RU)"
 
@@ -13313,7 +13316,7 @@ msgstr "Prezentácie"
 msgid "Slides"
 msgstr "Slajdy"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "Slovensky (sk_SK)"
 
@@ -13379,7 +13382,7 @@ msgstr "Zoradenie podľa pola \"%1$s\" nie je dovolené."
 msgid "Source"
 msgstr "Zdroj"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "Španielsky (es_ES)"
 
@@ -13619,7 +13622,7 @@ msgstr "Swap out štatistika (z pamäte do zariadenia). Vráti celé číslo"
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Veľkosť voľného swap miesta v bytoch alebo v percentách. Vráti celé číslo pre byty alebo desatinné číslo pre percentá"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
@@ -14505,7 +14508,7 @@ msgstr "Ut"
 msgid "Tuesday"
 msgstr "Utorok"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr "Turecky (tr_TR)"
 
@@ -14663,7 +14666,7 @@ msgstr "URLky"
 msgid "USA (160 characters)"
 msgstr "USA (160 znakov)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrajinsky (uk_UA)"
 
@@ -15603,7 +15606,6 @@ msgid "Value map added"
 msgstr "Mapa hodnôt pridaná"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Mapa hodnôt zmazaná"
@@ -15678,7 +15680,7 @@ msgstr "Vertikálny"
 msgid "Vertical align"
 msgstr "Vertikálne zarovnanie"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnamsky (vi_VN)"
 

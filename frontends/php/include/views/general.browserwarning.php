@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,40 +39,39 @@
 	</head>
 	<body>
 		<div class="<?= ZBX_STYLE_ARTICLE ?>">
-			<div class="browser-warning-container">
+			<div class="<?= ZBX_STYLE_BROWSER_WARNING_CONTAINER ?>">
 				<h2 class="<?= ZBX_STYLE_RED ?>">You are using an outdated browser.</h2>
 				<p>Zabbix frontend is built on advanced, modern technologies and does not support old browsers. It is highly recommended that you choose and install a modern browser. It is free of charge and only takes a couple of minutes.</p>
 				<p>New browsers usually come with support for new technologies, increasing web page speed, better privacy settings and so on. They also resolve security and functional issues.</p>
 				<ul>
 					<li>
-						<a target="_blank" href="http://www.google.com/chrome"><div class="browser-logo-chrome"></div></a>
+						<a target="_blank" href="http://www.google.com/chrome"><div class="<?= ZBX_STYLE_BROWSER_LOGO_CHROME ?>"></div></a>
 						<a target="_blank" href="http://www.google.com/chrome">Google Chrome</a>
 					</li>
 					<li>
-						<a target="_blank" href="http://www.mozilla.org/firefox"><div class="browser-logo-ff"></div></a>
+						<a target="_blank" href="http://www.mozilla.org/firefox"><div class="<?= ZBX_STYLE_BROWSER_LOGO_FF ?>"></div></a>
 						<a target="_blank" href="http://www.mozilla.org/firefox">Mozilla Firefox</a>
 					</li>
 					<li>
-						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie"><div class="browser-logo-ie"></div></a>
+						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie"><div class="<?= ZBX_STYLE_BROWSER_LOGO_IE ?>"></div></a>
 						<a target="_blank" href="http://windows.microsoft.com/en-US/internet-explorer/downloads/ie">Internet Explorer</a>
 					</li>
 					<li>
-						<a target="_blank" href="http://www.opera.com/download"><div class="browser-logo-opera"></div></a>
+						<a target="_blank" href="http://www.opera.com/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_OPERA ?>"></div></a>
 						<a target="_blank" href="http://www.opera.com/download">Opera browser</a>
 					</li>
 					<li>
-						<a target="_blank" href="http://www.apple.com/safari/download"><div class="browser-logo-safari"></div></a>
+						<a target="_blank" href="http://www.apple.com/safari/download"><div class="<?= ZBX_STYLE_BROWSER_LOGO_SAFARI ?>"></div></a>
 						<a target="_blank" href="http://www.apple.com/safari/download">Apple Safari</a>
 					</li>
 				</ul>
-				<div class="browser-warning-footer">
+				<div class="<?= ZBX_STYLE_BROWSER_WARNING_FOOTER ?>">
 					<a href="index.php" onClick="javascript: document.cookie='browserwarning_ignore=yes';">Continue despite this warning</a>
 				</div>
 			</div>
 		</div>
 		<div class="<?= ZBX_STYLE_FOOTER ?>">
-			<a class="logo" target="_blank" href="http://www.zabbix.com"></a>
-			&copy; 2001&ndash;2015, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
+			&copy; <?= ZABBIX_COPYRIGHT_FROM ?>&ndash;<?= ZABBIX_COPYRIGHT_TO ?>, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
 		</div>
 	</body>
 </html>
