@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ const char	*help_message[] = {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"  --tls-connect value        How to connect to server or proxy. Values:",
 	"                               unencrypted - connect without encryption",
+	"                                             (default)",
 	"                               psk         - connect using TLS and a pre-shared",
 	"                                             key",
 	"                               cert        - connect using TLS and a",
@@ -452,8 +453,11 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	/* take TLS data passed from 'main' thread */
-	zbx_tls_take_vars(&sendval_args->tls_vars);
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		/* take TLS data passed from 'main' thread */
+		zbx_tls_take_vars(&sendval_args->tls_vars);
+	}
 #endif
 
 #if !defined(_WINDOWS)
@@ -605,7 +609,7 @@ static void	parse_commandline(int argc, char **argv)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -716,7 +720,7 @@ static void	parse_commandline(int argc, char **argv)
 	{
 		ch = longopts[i].val;
 
-		if ('v' == ch && 2 < opt_count[ch])	/* '-v' or '-vv' can be specified */
+		if ('v' == ch && 2 < opt_count[(unsigned char)ch])	/* '-v' or '-vv' can be specified */
 		{
 			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
 
@@ -724,7 +728,7 @@ static void	parse_commandline(int argc, char **argv)
 			continue;
 		}
 
-		if ('v' != ch && 1 < opt_count[ch])
+		if ('v' != ch && 1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
@@ -981,27 +985,30 @@ int	main(int argc, char **argv)
 	sendval_args.server = ZABBIX_SERVER;
 	sendval_args.port = ZABBIX_SERVER_PORT;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
-#if defined(_WINDOWS)
-	zbx_tls_init_parent();
-#endif
-	zbx_tls_init_child();
-#else
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_tls_validate_config();
+#if defined(_WINDOWS)
+		zbx_tls_init_parent();
+#endif
+		zbx_tls_init_child();
+#else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 				" support");
 		goto exit;
-	}
 #endif
+	}
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
-	zbx_tls_pass_vars(&sendval_args.tls_vars);
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
+		zbx_tls_pass_vars(&sendval_args.tls_vars);
+	}
 #endif
 	zbx_json_init(&sendval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
@@ -1018,7 +1025,7 @@ int	main(int argc, char **argv)
 				setvbuf(stdin, (char *)NULL, _IOLBF, 1024);
 			}
 		}
-		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
+		else if (NULL == (in = fopen(INPUT_FILE, "r")))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			goto free;
@@ -1218,10 +1225,13 @@ exit:
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		zbx_tls_free();
 #if defined(_WINDOWS)
-	zbx_tls_library_deinit();
+		zbx_tls_library_deinit();
 #endif
+	}
 #endif
 	zabbix_close_log();
 

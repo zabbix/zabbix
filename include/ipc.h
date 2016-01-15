@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 #define ZBX_IPC_CONFIG_ID		'g'
 #define ZBX_IPC_HISTORY_ID		'h'
-#define ZBX_IPC_HISTORY_TEXT_ID		'x'
+#define ZBX_IPC_HISTORY_INDEX_ID	'H'
 #define ZBX_IPC_TREND_ID		't'
 #define ZBX_IPC_STRPOOL_ID		's'
 #define ZBX_IPC_COLLECTOR_ID		'l'

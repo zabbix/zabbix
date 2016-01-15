@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ abstract class CController {
 	private $validateSID = true;
 
 	public function __construct() {
-		session_start();
+		CSession::start();
 		$this->init();
 	}
 
@@ -148,10 +148,9 @@ abstract class CController {
 	 * @return var
 	 */
 	public function validateInput($validationRules) {
-		if (isset($_SESSION['formData']))
-		{
-			$input = array_merge($_REQUEST, $_SESSION['formData']);
-			unset($_SESSION['formData']);
+		if (CSession::keyExists('formData')) {
+			$input = array_merge($_REQUEST, CSession::getValue('formData'));
+			CSession::unsetValue(['formData']);
 		}
 		else {
 			$input = $_REQUEST;

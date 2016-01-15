@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@ class CMap extends CMapElement {
 			}
 			else {
 				$permission = PERM_READ;
-				$public_maps = ' OR s.private='.SYSMAP_PUBLIC;
+				$public_maps = ' OR s.private='.PUBLIC_SHARING;
 			}
 
 			$user_groups = getUserGroupsByUserId($user_data['userid']);
@@ -399,20 +399,18 @@ class CMap extends CMapElement {
 
 		// Check if map already exists.
 		$db_maps = $this->get([
-			'output' => ['sysmapid', 'name'],
+			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($maps, 'name')],
 			'nopermissions' => true,
 			'limit' => 1
 		]);
 
 		if ($db_maps) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Map "%1$s" already exists.', $db_maps[0]['name'])
-			);
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map "%1$s" already exists.', $db_maps[0]['name']));
 		}
 
 		$private_validator = new CLimitedSetValidator([
-			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
+			'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
 		]);
 
 		$permission_validator = new CLimitedSetValidator([
@@ -494,7 +492,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+					if (array_key_exists('private', $map) && $map['private'] == PUBLIC_SHARING
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
@@ -568,7 +566,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if (array_key_exists('private', $map) && $map['private'] == SYSMAP_PUBLIC
+					if (array_key_exists('private', $map) && $map['private'] == PUBLIC_SHARING
 							&& $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
@@ -832,7 +830,7 @@ class CMap extends CMapElement {
 		}
 
 		$private_validator = new CLimitedSetValidator([
-			'values' => [SYSMAP_PUBLIC, SYSMAP_PRIVATE]
+			'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
 		]);
 
 		$permission_validator = new CLimitedSetValidator([
@@ -915,7 +913,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+					if ($map['private'] == PUBLIC_SHARING && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
 						);
@@ -988,7 +986,7 @@ class CMap extends CMapElement {
 						));
 					}
 
-					if ($map['private'] == SYSMAP_PUBLIC && $share['permission'] == PERM_READ) {
+					if ($map['private'] == PUBLIC_SHARING && $share['permission'] == PERM_READ) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Map "%1$s" is public and read-only sharing is disallowed.', $map['name'])
 						);
@@ -1819,31 +1817,41 @@ class CMap extends CMapElement {
 		// Adding user shares.
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relation_map = $this->createRelationMap($result, 'sysmapid', 'userid', 'sysmap_user');
-			// Get all allowed groups.
-			$related_groups = API::User()->get([
+			// Get all allowed users.
+			$related_users = API::User()->get([
 				'output' => ['userid'],
 				'userids' => $relation_map->getRelatedIds(),
 				'preservekeys' => true
 			]);
 
-			$related_userids = zbx_objectValues($related_groups, 'userid');
+			$related_userids = zbx_objectValues($related_users, 'userid');
 
-			$users = API::getApiService()->select('sysmap_user', [
-				'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid']),
-				'filter' => ['sysmapid' => $sysmapIds, 'userid' => $related_userids],
-				'preservekeys' => true
-			]);
+			if ($related_userids) {
+				$users = API::getApiService()->select('sysmap_user', [
+					'output' => $this->outputExtend($options['selectUsers'], ['sysmapid', 'userid']),
+					'filter' => ['sysmapid' => $sysmapIds, 'userid' => $related_userids],
+					'preservekeys' => true
+				]);
 
-			$relation_map = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
+				$relation_map = $this->createRelationMap($users, 'sysmapid', 'sysmapuserid');
 
-			$users = $this->unsetExtraFields($users, ['sysmapuserid', 'userid', 'permission'], $options['selectUsers']);
+				$users = $this->unsetExtraFields($users, ['sysmapuserid', 'userid', 'permission'],
+					$options['selectUsers']
+				);
 
-			foreach ($users as &$user) {
-				unset($user['sysmapid']);
+				foreach ($users as &$user) {
+					unset($user['sysmapid']);
+				}
+				unset($user);
+
+				$result = $relation_map->mapMany($result, $users, 'users');
 			}
-			unset($user);
-
-			$result = $relation_map->mapMany($result, $users, 'users');
+			else {
+				foreach ($result as &$row) {
+					$row['users'] = [];
+				}
+				unset($row);
+			}
 		}
 
 		// Adding user group shares.
@@ -1858,24 +1866,32 @@ class CMap extends CMapElement {
 
 			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
 
-			$user_groups = API::getApiService()->select('sysmap_usrgrp', [
-				'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid']),
-				'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $related_groupids],
-				'preservekeys' => true
-			]);
+			if ($related_groupids) {
+				$user_groups = API::getApiService()->select('sysmap_usrgrp', [
+					'output' => $this->outputExtend($options['selectUserGroups'], ['sysmapid', 'usrgrpid']),
+					'filter' => ['sysmapid' => $sysmapIds, 'usrgrpid' => $related_groupids],
+					'preservekeys' => true
+				]);
 
-			$relation_map = $this->createRelationMap($user_groups, 'sysmapid', 'sysmapusrgrpid');
+				$relation_map = $this->createRelationMap($user_groups, 'sysmapid', 'sysmapusrgrpid');
 
-			$user_groups = $this->unsetExtraFields($user_groups, ['sysmapusrgrpid', 'usrgrpid', 'permission'],
-				$options['selectUserGroups']
-			);
+				$user_groups = $this->unsetExtraFields($user_groups, ['sysmapusrgrpid', 'usrgrpid', 'permission'],
+					$options['selectUserGroups']
+				);
 
-			foreach ($user_groups as &$user_group) {
-				unset($user_group['sysmapid']);
+				foreach ($user_groups as &$user_group) {
+					unset($user_group['sysmapid']);
+				}
+				unset($user_group);
+
+				$result = $relation_map->mapMany($result, $user_groups, 'userGroups');
 			}
-			unset($user_group);
-
-			$result = $relation_map->mapMany($result, $user_groups, 'userGroups');
+			else {
+				foreach ($result as &$row) {
+					$row['userGroups'] = [];
+				}
+				unset($row);
+			}
 		}
 
 		return $result;

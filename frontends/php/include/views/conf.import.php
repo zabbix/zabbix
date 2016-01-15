@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,8 @@ foreach ($titles as $key => $title) {
 		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
 			->setChecked($data['rules'][$key]['updateExisting']);
 
-		if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
+				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbExist->setAttribute('disabled', 'disabled');
 		}
 
@@ -75,7 +76,8 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['createMissing']);
 	}
 
-	if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+	if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
+			&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 		$cbMissed->setAttribute('disabled', 'disabled');
 	}
 
@@ -84,7 +86,8 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['deleteMissing'])
 			->addClass('deleteMissing');
 
-		if ($key !== 'maps' && $user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
+		if ($key !== 'maps' && $key !== 'screens' && $user_type != USER_TYPE_SUPER_ADMIN
+				&& $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$cbDeleted->setAttribute('disabled', 'disabled');
 		}
 	}
