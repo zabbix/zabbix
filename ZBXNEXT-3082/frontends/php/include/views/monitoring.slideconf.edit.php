@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
+require_once dirname(__FILE__).'/js/monitoring.slideconf.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Slide shows'));
 

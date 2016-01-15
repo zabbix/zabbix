@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 $page['title'] = _('Configuration of slide shows');
 $page['file'] = 'slideconf.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -57,14 +58,14 @@ if (!empty($_REQUEST['slides'])) {
 /*
  * Permissions
  */
-if (isset($_REQUEST['slideshowid'])) {
+if (hasRequest('slideshowid')) {
 	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE)) {
 		access_deny();
 	}
 
-	$dbSlideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'));
+	$db_slideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'));
 
-	if (!$dbSlideshow) {
+	if (!$db_slideshow) {
 		access_deny();
 	}
 }
@@ -126,7 +127,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	$result = delete_slideshow($_REQUEST['slideshowid']);
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$dbSlideshow['name'].'" ');
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$db_slideshow['name'].'" ');
 	}
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
@@ -173,8 +174,8 @@ if (isset($_REQUEST['form'])) {
 	];
 
 	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['name'] = $dbSlideshow['name'];
-		$data['delay'] = $dbSlideshow['delay'];
+		$data['name'] = $db_slideshow['name'];
+		$data['delay'] = $db_slideshow['delay'];
 
 		// get slides
 		$data['slides'] = DBfetchArray(DBselect(
@@ -193,7 +194,7 @@ if (isset($_REQUEST['form'])) {
 	unset($slide);
 
 	// render view
-	$slideshowView = new CView('configuration.slideconf.edit', $data);
+	$slideshowView = new CView('monitoring.slideconf.edit', $data);
 	$slideshowView->render();
 	$slideshowView->show();
 }
@@ -240,7 +241,7 @@ else {
 	$data['paging'] = getPagingLine($data['slides'], $sortOrder);
 
 	// render view
-	$slideshowView = new CView('configuration.slideconf.list', $data);
+	$slideshowView = new CView('monitoring.slideconf.list', $data);
 	$slideshowView->render();
 	$slideshowView->show();
 }
