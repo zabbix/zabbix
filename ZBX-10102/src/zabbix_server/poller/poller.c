@@ -429,7 +429,7 @@ static void    free_result_ptr(AGENT_RESULT *result)
 	zbx_free(result);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *vmware_events)
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	const char	*__function_name = "get_value";
 	int		res = FAIL;
@@ -453,7 +453,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *vmwa
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
-			res = get_value_simple(item, result, vmware_events);
+			res = get_value_simple(item, result, add_results);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result);
@@ -684,8 +684,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		zbx_uint64_t	lastlogsize;
-		char		lastlogsize_undef = 1;
+		zbx_uint64_t	lastlogsize, *plastlogsize = NULL;
 
 		switch (errcodes[i])
 		{
@@ -729,7 +728,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			{
 				/* vmware.eventlog item returns vector of AGENT_RESULT representing events */
 
-				int	j;
+				int		j;
+				zbx_timespec_t	ts_tmp = timespec;
 
 				for (j = 0; j < add_results.values_num; j++)
 				{
@@ -739,16 +739,26 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
-								NULL, &timespec, items[i].state, add_result->msg);
+								NULL, &ts_tmp, items[i].state, add_result->msg);
 					}
 					else
 					{
 						items[i].state = ITEM_STATE_NORMAL;
 						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
-								add_result, &timespec, items[i].state, NULL);
+								add_result, &ts_tmp, items[i].state, NULL);
 
-						lastlogsize_undef = 0;
-						lastlogsize = add_result->lastlogsize;
+						if (0 != ISSET_META(add_result))
+						{
+							plastlogsize = &lastlogsize;
+							lastlogsize = add_result->lastlogsize;
+						}
+					}
+
+					/* ensure that every log item value timestamp is unique */
+					if (++ts_tmp.ns == 1000000000)
+					{
+						ts_tmp.sec++;
+						ts_tmp.ns = 0;
 					}
 				}
 			}
@@ -760,9 +770,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					items[i].state, results[i].msg);
 		}
 
-		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec,
-				(0 == lastlogsize_undef ? &lastlogsize : NULL), NULL, &errcodes[i], 1, poller_type,
-				nextcheck);
+		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, plastlogsize, NULL,
+				&errcodes[i], 1, poller_type, nextcheck);
 
 		zbx_free(items[i].key);
 

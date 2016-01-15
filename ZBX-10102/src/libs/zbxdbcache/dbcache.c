@@ -1242,9 +1242,6 @@ static void	DCinventory_value_add(zbx_vector_ptr_t *inventory_values, DC_ITEM *i
 		return;
 	}
 
-	if (0 != (ZBX_DC_FLAG_META & h->flags))
-		return;
-
 	switch (h->value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -1670,10 +1667,10 @@ static void	DCmass_add_history(ZBX_DC_HISTORY *history, int history_num)
 	{
 		const ZBX_DC_HISTORY	*h = &history[i];
 
-		if (0 == h->keep_history)
+		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
 			continue;
 
-		if (0 != (ZBX_DC_FLAG_UNDEF & h->flags) || 0 != (ZBX_DC_FLAG_NOVALUE & h->flags))
+		if (0 == h->keep_history)
 			continue;
 
 		switch (h->value_type)
@@ -1845,16 +1842,16 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		unsigned char		flags = PROXY_HISTORY_FLAG_META;
+		unsigned int		flags = PROXY_HISTORY_FLAG_META;
 		const ZBX_DC_HISTORY	*h = &history[i];
+
+		if (ITEM_STATE_NOTSUPPORTED == h->state)
+			continue;
 
 		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
 			continue;
 
 		if (0 == (h->flags & ZBX_DC_FLAG_META))
-			continue;
-
-		if (ITEM_STATE_NOTSUPPORTED == h->state)
 			continue;
 
 		if (ITEM_VALUE_TYPE_LOG == h->value_type)
@@ -1913,7 +1910,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
-		unsigned char		flags = PROXY_HISTORY_FLAG_META;
+		unsigned int		flags = PROXY_HISTORY_FLAG_META;
 		const char		*pvalue;
 		const ZBX_DC_HISTORY	*h = &history[i];
 
@@ -2447,20 +2444,19 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
  *                                                                            *
  * Parameters:  itemid     - [IN] the itemid                                  *
  *              value_type - [IN] the value type (see ITEM_VALUE_TYPE_* defs) *
- *              flags      - [IN] the item flags (e. g. lld rule)             *
+ *              item_flags - [IN] the item flags (e. g. lld rule)             *
  *              result     - [IN] agent result containing the value to add    *
  *              ts         - [IN] the value timestamp                         *
  *              state      - [IN] the item state                              *
  *              error      - [IN] the error message in case item state is     *
  *                                ITEM_STATE_NOTSUPPORTED                     *
- *              log_meta   - [IN] meta information update in case of log item *
- *                                with value type non-log                     *
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	unsigned char	value_flags;
+	zbx_log_t	log_empty = {0}, *plog;
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -2496,32 +2492,44 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
-			dc_local_add_history_dbl(itemid, ts, result->dbl, result->lastlogsize, result->mtime,
-					value_flags);
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			{
+				dc_local_add_history_dbl(itemid, ts, result->dbl, result->lastlogsize, result->mtime,
+						value_flags);
+			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			dc_local_add_history_uint(itemid, ts, result->ui64, result->lastlogsize, result->mtime,
-					value_flags);
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			{
+				dc_local_add_history_uint(itemid, ts, result->ui64, result->lastlogsize, result->mtime,
+						value_flags);
+			}
 			break;
 		case ITEM_VALUE_TYPE_STR:
-			dc_local_add_history_str(itemid, ts, result->str, result->lastlogsize, result->mtime,
-					value_flags);
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			{
+				dc_local_add_history_str(itemid, ts, result->str, result->lastlogsize, result->mtime,
+						value_flags);
+			}
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			dc_local_add_history_text(itemid, ts, result->text, result->lastlogsize, result->mtime,
-					value_flags);
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			{
+				dc_local_add_history_text(itemid, ts, result->text, result->lastlogsize, result->mtime,
+						value_flags);
+			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (ISSET_VALUE(result))
-			{
-				dc_local_add_history_log(itemid, ts, result->log->value, result->log->timestamp,
-						result->log->source, result->log->severity, result->log->logeventid,
-						result->lastlogsize, result->mtime, value_flags);
-			}
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE))
+				plog = &log_empty;
 			else
+				plog = GET_LOG_RESULT(result);
+
+			if (NULL != plog)
 			{
-				dc_local_add_history_log(itemid, ts, NULL, 0, NULL, 0, 0, result->lastlogsize,
-						result->mtime, value_flags);
+				dc_local_add_history_log(itemid, ts, plog->value, plog->timestamp, plog->source,
+						plog->severity, plog->logeventid, result->lastlogsize, result->mtime,
+						value_flags);
 			}
 
 			break;
@@ -2938,7 +2946,6 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
 		history->value_orig.err = data->value.str;
-
 		return;
 	}
 

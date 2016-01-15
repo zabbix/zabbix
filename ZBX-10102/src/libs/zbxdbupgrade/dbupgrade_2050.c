@@ -922,7 +922,7 @@ static int	DBpatch_2050093(void)
 
 static int	DBpatch_2050094(void)
 {
-	/* previously, "meta" records never contained a value */
+	/* convert meta value (1) to PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE (0x03) flags */
 	if (ZBX_DB_OK > DBexecute("update proxy_history set flags=3 where flags=1"))
 	{
 		return FAIL;
