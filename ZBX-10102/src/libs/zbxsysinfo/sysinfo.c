@@ -257,8 +257,6 @@ void	init_result(AGENT_RESULT *result)
 	result->text = NULL;
 	result->log = NULL;
 	result->msg = NULL;
-
-	result->flags = ZBX_AR_FLAG_NOVALUE;
 }
 
 static void	zbx_log_clean(zbx_log_t *log)
@@ -669,15 +667,14 @@ static void	add_log_result(AGENT_RESULT *result, const char *value)
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
-	int	ret = FAIL;
+	zbx_uint64_t	value_uint64;
+	double		value_double;
+	int		ret = FAIL;
 
 	assert(result);
 
 	switch (value_type)
 	{
-		zbx_uint64_t	value_uint64;
-		double		value_double;
-
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_rtrim(c, " \"");
 			zbx_ltrim(c, " \"+");
@@ -775,8 +772,6 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 		SET_MSG_RESULT(result, error);
 	}
-	else
-		result->flags &= ~ZBX_AR_FLAG_NOVALUE;
 
 	return ret;
 }
@@ -785,7 +780,7 @@ void	set_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime)
 {
 	result->lastlogsize = lastlogsize;
 	result->mtime = mtime;
-	result->flags |= ZBX_AR_FLAG_META;
+	result->type |= AR_META;
 }
 
 static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)

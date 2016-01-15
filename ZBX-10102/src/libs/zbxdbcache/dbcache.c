@@ -2250,19 +2250,15 @@ static void	dc_local_add_history_dbl(zbx_uint64_t itemid, const zbx_timespec_t *
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_FLOAT;
 	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
 
-	item_value->flags = 0;
-
-	if (0 != (flags & ZBX_AR_FLAG_META))
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
-		item_value->flags |= ZBX_DC_FLAG_META;
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
 
-	if (0 != (flags & ZBX_AR_FLAG_NOVALUE))
-		item_value->flags |= ZBX_DC_FLAG_NOVALUE;
-	else
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 		item_value->value.value_dbl = value_orig;
 }
 
@@ -2277,21 +2273,16 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, const zbx_timespec_t 
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_UINT64;
 	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
 
-	item_value->flags = 0;
-
-	if (0 != (flags & ZBX_AR_FLAG_META))
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
-		item_value->flags |= ZBX_DC_FLAG_META;
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
 
-	if (0 != (flags & ZBX_AR_FLAG_NOVALUE))
-		item_value->flags |= ZBX_DC_FLAG_NOVALUE;
-	else
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 		item_value->value.value_uint = value_orig;
-
 }
 
 static void	dc_local_add_history_str(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
@@ -2305,22 +2296,15 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, const zbx_timespec_t *
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_STR;
 	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
 
-	item_value->flags = 0;
-
-	if (0 != (flags & ZBX_AR_FLAG_META))
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
-		item_value->flags |= ZBX_DC_FLAG_META;
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
 
-	if (0 != (flags & ZBX_AR_FLAG_NOVALUE))
-	{
-		item_value->flags |= ZBX_DC_FLAG_NOVALUE;
-		item_value->value.value_str.len = 0;
-	}
-	else
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
 		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_STR_VALUE_LEN) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -2329,6 +2313,8 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, const zbx_timespec_t *
 		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
 		string_values_offset += item_value->value.value_str.len;
 	}
+	else
+		item_value->value.value_str.len = 0;
 }
 
 static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
@@ -2342,22 +2328,15 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t 
 	item_value->ts = *ts;
 	item_value->value_type = ITEM_VALUE_TYPE_TEXT;
 	item_value->state = ITEM_STATE_NORMAL;
+	item_value->flags = flags;
 
-	item_value->flags = 0;
-
-	if (0 != (flags & ZBX_AR_FLAG_META))
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
-		item_value->flags |= ZBX_DC_FLAG_META;
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
 
-	if (0 != (flags & ZBX_AR_FLAG_NOVALUE))
-	{
-		item_value->flags |= ZBX_DC_FLAG_NOVALUE;
-		item_value->value.value_str.len = 0;
-	}
-	else
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
 		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_TEXT_VALUE_LEN) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -2366,6 +2345,8 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t 
 		memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
 		string_values_offset += item_value->value.value_str.len;
 	}
+	else
+		item_value->value.value_str.len = 0;
 }
 
 static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
@@ -2390,22 +2371,18 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *
 	item_value->logeventid = logeventid;
 	item_value->timestamp = timestamp;
 
-	item_value->flags = 0;
+	item_value->flags = flags;
 
-	if (0 != (flags & ZBX_AR_FLAG_META))
+	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
 	{
-		item_value->flags |= ZBX_DC_FLAG_META;
 		item_value->lastlogsize = lastlogsize;
 		item_value->mtime = mtime;
 	}
 
-	if (0 != (flags & ZBX_AR_FLAG_NOVALUE))
-	{
-		item_value->flags |= ZBX_DC_FLAG_NOVALUE;
-		item_value->value.value_str.len = 0;
-	}
-	else
+	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	else
+		item_value->value.value_str.len = 0;
 
 	if (0 != item_value->value.value_str.len + item_value->source.len)
 	{
@@ -2480,16 +2457,18 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *
  *                                with value type non-log                     *
  *                                                                            *
  ******************************************************************************/
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *result,
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error)
 {
+	unsigned char	value_flags;
+
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		dc_local_add_history_notsupported(itemid, ts, error);
 		return;
 	}
 
-	if (0 != (ZBX_FLAG_DISCOVERY_RULE & flags))
+	if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
 	{
 		if (NULL == GET_TEXT_RESULT(result))
 			return;
@@ -2503,38 +2482,46 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		return;
 	}
 
-	if (0 != (result->flags & ZBX_AR_FLAG_NOVALUE) && 0 == (result->flags & ZBX_AR_FLAG_META))
+	if (!ISSET_VALUE(result) && !ISSET_META(result))
 		return;
+
+	value_flags = 0;
+
+	if (!ISSET_VALUE(result))
+		value_flags |= ZBX_DC_FLAG_NOVALUE;
+
+	if (ISSET_META(result))
+		value_flags |= ZBX_DC_FLAG_META;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 			dc_local_add_history_dbl(itemid, ts, result->dbl, result->lastlogsize, result->mtime,
-					result->flags);
+					value_flags);
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 			dc_local_add_history_uint(itemid, ts, result->ui64, result->lastlogsize, result->mtime,
-					result->flags);
+					value_flags);
 			break;
 		case ITEM_VALUE_TYPE_STR:
 			dc_local_add_history_str(itemid, ts, result->str, result->lastlogsize, result->mtime,
-					result->flags);
+					value_flags);
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
 			dc_local_add_history_text(itemid, ts, result->text, result->lastlogsize, result->mtime,
-					result->flags);
+					value_flags);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (0 == (result->flags & ZBX_AR_FLAG_NOVALUE))
+			if (ISSET_VALUE(result))
 			{
 				dc_local_add_history_log(itemid, ts, result->log->value, result->log->timestamp,
 						result->log->source, result->log->severity, result->log->logeventid,
-						result->lastlogsize, result->mtime, result->flags);
+						result->lastlogsize, result->mtime, value_flags);
 			}
 			else
 			{
 				dc_local_add_history_log(itemid, ts, NULL, 0, NULL, 0, 0, result->lastlogsize,
-						result->mtime, result->flags);
+						result->mtime, value_flags);
 			}
 
 			break;

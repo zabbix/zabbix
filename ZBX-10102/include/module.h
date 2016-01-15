@@ -66,8 +66,14 @@ typedef struct
 }
 zbx_log_t;
 
-#define ZBX_AR_FLAG_META	0x01	/* contains meta information update */
-#define ZBX_AR_FLAG_NOVALUE	0x02	/* contains no value (just meta information update) */
+/* agent result types */
+#define AR_UINT64	0x01
+#define AR_DOUBLE	0x02
+#define AR_STRING	0x04
+#define AR_TEXT		0x08
+#define AR_LOG		0x10
+#define AR_MESSAGE	0x20
+#define AR_META		0x40
 
 /* agent return structure */
 typedef struct
@@ -78,34 +84,23 @@ typedef struct
 	char		*str;
 	char		*text;
 	char		*msg;		/* possible error message */
-	unsigned char	flags;		/* see ZBX_AR_FLAG_* flags above */
 	zbx_log_t	*log;
-	int	 	type;		/* value type */
+	int	 	type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
 }
 AGENT_RESULT;
-
-/* agent result types */
-#define AR_UINT64	0x01
-#define AR_DOUBLE	0x02
-#define AR_STRING	0x04
-#define AR_TEXT		0x08
-#define AR_LOG		0x10
-#define AR_MESSAGE	0x20
 
 /* SET RESULT */
 
 #define SET_UI64_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_UINT64,		\
-	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->ui64 = (zbx_uint64_t)(val)	\
 )
 
 #define SET_DBL_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_DOUBLE,		\
-	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->dbl = (double)(val)		\
 )
 
@@ -113,7 +108,6 @@ AGENT_RESULT;
 #define SET_STR_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_STRING,		\
-	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->str = (char *)(val)		\
 )
 
@@ -121,7 +115,6 @@ AGENT_RESULT;
 #define SET_TEXT_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_TEXT,			\
-	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->text = (char *)(val)		\
 )
 
@@ -129,7 +122,6 @@ AGENT_RESULT;
 #define SET_MSG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_MESSAGE,		\
-	(res)->flags &= ~ZBX_AR_FLAG_NOVALUE,	\
 	(res)->msg = (char *)(val)		\
 )
 
