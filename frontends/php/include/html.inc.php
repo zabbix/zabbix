@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -777,23 +777,14 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
  *
  * @return CDiv
  */
-function makePageFooter($with_logo = true, $with_version = true)
+function makePageFooter($with_version = true)
 {
-	$logo = $with_logo
-		? (new CLink('', 'http://www.zabbix.com/'))
-			->addClass('logo')
-			->removeSID()
-			->setAttribute('target', '_blank')
-		: null;
-	$version = $with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : '';
-
 	return (new CDiv([
-		$logo,
-		$version.'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
+		$with_version ? 'Zabbix '.ZABBIX_VERSION.'. ' : null,
+		'&copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
 		(new CLink('Zabbix SIA', 'http://www.zabbix.com/'))
 			->addClass(ZBX_STYLE_GREY)
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->removeSID()
 			->setAttribute('target', '_blank')
 	]))->addClass(ZBX_STYLE_FOOTER);
 }
@@ -876,7 +867,6 @@ function makeDebugButton()
 {
 	return (new CDiv(
 		(new CLink(_('Debug'), '#debug'))
-			->removeSid()
 			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
 				"this.state = (this.state == 'none' ? 'block' : 'none');".
 				"jQuery(this)".
