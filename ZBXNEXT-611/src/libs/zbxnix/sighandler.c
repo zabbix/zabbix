@@ -80,7 +80,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 	if (!SIG_PARENT_PROCESS)
 	{
-		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) ?
+		zabbix_log(sig_parent_pid == SIG_CHECKED_FIELD(siginfo, si_pid) || SIGINT == sig ?
 				LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING,
 				"Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,"
 				"reason:%d]. %s ...",
