@@ -57,7 +57,7 @@ class CMacrosResolverGeneral {
 
 		// Replace user macros with string 'macro' to make values search easier.
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$text = substr_replace($expression, 'macro', $pos, strlen($macro));
+			$expression = substr_replace($expression, 'macro', $pos, strlen($macro));
 		}
 
 		// Replace functionids with string 'function' to make values search easier.
