@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -365,6 +365,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'usermacros' => true
 		];
 
+		$original_triggers = $triggers;
+		$triggers = $this->resolveTriggerExpressionUserMacro($triggers);
+
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
 			$matched_macros = $this->extractMacros([$trigger['description']], $types);
@@ -417,6 +420,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					? array_merge($macro_values[$triggerid], $references)
 					: $references;
 			}
+
+			$triggers[$triggerid]['expression'] = $original_triggers[$triggerid]['expression'];
 		}
 
 		if (!$options['references_only']) {
