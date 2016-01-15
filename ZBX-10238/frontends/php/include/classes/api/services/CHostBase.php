@@ -79,20 +79,19 @@ abstract class CHostBase extends CApiService {
 				$dbItemHost = API::Item()->get(array(
 					'output' => array('hostid'),
 					'filter' => array('key_' => $dbItem['key_']),
-					'templateids' => $templateIdsAll
+					'templateids' => zbx_objectValues($linkedTpls, 'templateid')
 				));
 				$dbItemHost = reset($dbItemHost);
 
-				$template = API::Template()->get(array(
+				$templates = API::Template()->get(array(
 					'output' => array('name'),
-					'templateids' => $dbItemHost['hostid']
+					'templateids' => array($dbItemHost['hostid'], $targetid),
+					'preservekeys' => true
 				));
 
-				$template = reset($template);
-
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" with item key "%2$s" already linked to host.',
-						$template['name'], $dbItem['key_']));
+					_s('Item "%1$s" already exists on "%2$s", inherited from template "%3$s".',
+						$dbItem['key_'], $templates[$targetid]['name'], $templates[$dbItemHost['hostid']]['name']));
 			}
 		}
 
