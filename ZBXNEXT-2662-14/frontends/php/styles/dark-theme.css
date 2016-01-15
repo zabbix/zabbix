@@ -166,7 +166,6 @@ nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hove
 .top-nav-container {
   height: 49px;
   line-height: 49px;
-  position: relative;
   overflow: hidden;
   background-color: #2b2b2b; }
 
@@ -261,7 +260,7 @@ ul.top-nav-icons {
     position: relative; }
   ul.top-nav-icons input {
     background-color: #191919;
-    border: 1px solid #141414;
+    border: 1px solid #121212;
     width: 198px;
     margin: 6px 7px 0 0;
     color: #f2f2f2;
@@ -269,7 +268,8 @@ ul.top-nav-icons {
     opacity: 1;
     filter: alpha(opacity=100); }
     ul.top-nav-icons input:focus {
-      border: 1px solid #141414;
+      background-color: #383838;
+      border: 1px solid #4f4f4f;
       opacity: 1;
       filter: alpha(opacity=100); }
     ul.top-nav-icons input:focus + .btn-search {
