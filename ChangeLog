@@ -4,9 +4,9 @@ New features:
 
 Bug fixes:
 A.F....... [ZBX-10051] fixed expanding of trigger expression user macro in trigger name positional macro (Gunars)
-A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
-..F....... [ZBX-10236] fixed history PHP errors for items that are stored as float (Vitalijs)
+..F....... [ZBX-10236] fixed history page PHP errors that occurred with items that are value mapped with floating point values (Vitalijs)
 ..F....... [ZBXNEXT-3065] added arg_separator.output check in setup pre-requisites (Vitalijs)
+A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha6
