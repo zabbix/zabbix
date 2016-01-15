@@ -95,12 +95,13 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->onClick('javascript: showHideVisible("percent_left");')
 			->setEnabled(!$is_templated);
 
-		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
-			$percentLeftCheckbox->setChecked(true);
-		}
-		elseif ($this->data['percent_left'] == 0) {
+		if ((!array_key_exists('visible', $this->data) || !array_key_exists('percent_left', $this->data['visible']))
+				&& $this->data['percent_left'] == 0) {
 			$percentLeftTextBox->addStyle('visibility: hidden;');
 			$percentLeftCheckbox->setChecked(false);
+		}
+		else {
+			$percentLeftCheckbox->setChecked(true);
 		}
 
 		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, SPACE, $percentLeftTextBox]);
@@ -112,12 +113,13 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			->onClick('javascript: showHideVisible("percent_right");')
 			->setEnabled(!$is_templated);
 
-		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
-			$percentRightCheckbox->setChecked(true);
-		}
-		elseif ($this->data['percent_right'] == 0) {
+		if ((!array_key_exists('visible', $this->data) || !array_key_exists('percent_right', $this->data['visible']))
+				&& $this->data['percent_right'] == 0) {
 			$percentRightTextBox->addStyle('visibility: hidden;');
 			$percentRightCheckbox->setChecked(false);
+		}
+		else {
+			$percentRightCheckbox->setChecked(true);
 		}
 
 		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, SPACE, $percentRightTextBox]);
