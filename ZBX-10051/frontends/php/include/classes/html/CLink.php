@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 
 class CLink extends CTag {
 
-	private	$use_sid = true;
+	private	$use_sid = false;
 	private $url = null;
 
 	public function __construct($item = null, $url = null) {
@@ -33,8 +33,8 @@ class CLink extends CTag {
 		$this->url = $url;
 	}
 
-	public function removeSID() {
-		$this->use_sid = false;
+	public function addSID() {
+		$this->use_sid = true;
 		return $this;
 	}
 
@@ -47,6 +47,7 @@ class CLink extends CTag {
 				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
 			}
 		}
+
 		return $url;
 	}
 

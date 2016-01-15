@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,6 +110,7 @@ foreach ($this->data['items'] as $item) {
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status'], $item['state']))
+		->addSID()
 	);
 
 	// info
