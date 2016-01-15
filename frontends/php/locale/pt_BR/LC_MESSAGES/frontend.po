@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 14:53+0200\n"
-"PO-Revision-Date: 2015-12-27 10:45+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-28 11:48+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451205927.0\n"
+"X-POOTLE-MTIME: 1451296104.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -269,7 +269,7 @@ msgstr "Eventos OK vistados"
 #: adm.triggerdisplayoptions.php:34
 #: include/views/administration.general.trigger.options.edit.php:40
 msgid "Acknowledged PROBLEM events"
-msgstr "Eventos PROBLEM vistados"
+msgstr "Eventos de INCIDENTE reconhecidos"
 
 #: tr_events.php:112
 msgid "Acknowledges"
@@ -665,7 +665,7 @@ msgstr "Todos os links devem ter \"Nome\" e \"URL\" definidos"
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "Todos os mapas"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -777,7 +777,7 @@ msgstr "Aplicar"
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr "Abordagem"
+msgstr "Aproximando"
 
 #: include/func.inc.php:240
 msgid "Apr"
@@ -1122,7 +1122,7 @@ msgstr "Por trigger template"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr "CERT"
+msgstr "CERTIFICADO"
 
 #: triggers.php:388
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1368,7 +1368,7 @@ msgstr "Mapeamento de valor não foi incluído"
 
 #: httpconf.php:202
 msgid "Cannot add web scenario"
-msgstr "Não foi possível adicionar a apresentação de slides"
+msgstr "Não foi possível adicionar a apresentação de telas"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -1542,7 +1542,7 @@ msgstr "Protótipo de gráfico não excluído"
 
 #: graphs.php:319
 msgid "Cannot delete graphs"
-msgstr "Não foi possível remover gráficos"
+msgstr "Não foi possível exluir gráficos"
 
 #: include/classes/api/services/CGraphPrototype.php:586
 msgid "Cannot delete graphs created by low level discovery."
@@ -1568,7 +1568,7 @@ msgstr "Não é possível excluir protótipos de hosts"
 
 #: adm.iconmapping.php:96
 msgid "Cannot delete icon map"
-msgstr "Não foi possível remover icone do mapa"
+msgstr "Não foi possível excluir icone do mapa"
 
 #: adm.images.php:124
 msgid "Cannot delete image"
@@ -1576,7 +1576,7 @@ msgstr "A imagem não foi excluída"
 
 #: include/classes/api/services/CHost.php:1008
 msgid "Cannot delete inventory."
-msgstr "Não foi possível remover inventário."
+msgstr "Não foi possível excluir inventário."
 
 #: items.php:373
 msgid "Cannot delete item"
@@ -1596,29 +1596,29 @@ msgstr "Itens não foram removidos"
 
 #: maintenance.php:251
 msgid "Cannot delete maintenance"
-msgstr "Não foi possível remover período de manutenção"
+msgstr "Não foi possível excluir período de manutenção"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] "Não foi possível remover tipo de mídia"
-msgstr[1] "Não foi possível remover tipo de mídia"
+msgstr[0] "Não foi possível excluir tipo de mídia"
+msgstr[1] "Não foi possível excluir tipo de mídia"
 
 #: sysmaps.php:244
 msgid "Cannot delete network map"
-msgstr "Não foi possível remover mapa de rede"
+msgstr "Não foi possível excluir mapa de rede"
 
 #: app/controllers/CControllerProxyDelete.php:65
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] "Não foi possível remover proxy"
-msgstr[1] "Não foi possível remover proxy"
+msgstr[0] "Não foi possível excluir proxy"
+msgstr[1] "Não foi possível excluir proxy"
 
 #: adm.regexps.php:198
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] "Não foi possível remover expressão regular"
-msgstr[1] "Não foi possível remover expressões regulares"
+msgstr[0] "Não foi possível excluir expressão regular"
+msgstr[1] "Não foi possível excluir expressões regulares"
 
 #: screenconf.php:236
 msgid "Cannot delete screen"
@@ -1627,8 +1627,8 @@ msgstr "Não foi possível excluir a tela"
 #: app/controllers/CControllerScriptDelete.php:75
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
-msgstr[0] "Não foi possível remover script"
-msgstr[1] "Não foi possível remover script"
+msgstr[0] "Não foi possível excluir script"
+msgstr[1] "Não foi possível excluir script"
 
 #: include/classes/api/services/CScript.php:460
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
@@ -1654,11 +1654,11 @@ msgstr "Serviço não foi removido"
 
 #: slideconf.php:138 slideconf.php:159
 msgid "Cannot delete slide show"
-msgstr "Não foi possível excluir a apresentação de slides"
+msgstr "Não foi possível excluir a apresentação de telas"
 
 #: templates.php:372 templates.php:386 templates.php:411
 msgid "Cannot delete template"
-msgstr "Não foi possível remover template"
+msgstr "Não foi possível excluir template"
 
 #: include/classes/api/services/CApplication.php:411
 msgid "Cannot delete templated application."
@@ -1721,7 +1721,6 @@ msgid "Cannot delete user media."
 msgstr "Não foi possível excluir a mídia do usuário."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Mapeamento não foi removido"
@@ -2140,7 +2139,7 @@ msgstr "Não é possível receber a resposta, verifique a comunicação com o se
 
 #: include/views/js/monitoring.history.js.php:36
 msgid "Cannot remove all items, at least one item should remain."
-msgstr "Não é possível remover todos os itens, no mínimo um deverá ser mantido."
+msgstr "Não é possível excluir todos os itens, no mínimo um deverá ser mantido."
 
 #: include/classes/api/services/CUser.php:273
 msgid "Cannot rename guest user."
@@ -2476,7 +2475,7 @@ msgstr "Serviços não foram atualizados"
 
 #: slideconf.php:100
 msgid "Cannot update slide show"
-msgstr "Não é possível atualizar a apresentação de slides"
+msgstr "Não é possível atualizar a apresentação de telas"
 
 #: templates.php:234
 msgid "Cannot update template"
@@ -2729,7 +2728,7 @@ msgstr "Limpar histórico"
 #: include/views/configuration.httpconf.edit.php:274
 #: include/views/configuration.item.edit.php:461
 msgid "Clear history and trends"
-msgstr "Limpar histórico e médias"
+msgstr "Limpar histórico e estatísticas (médias)"
 
 #: include/views/configuration.host.massupdate.php:217
 msgid "Clear when unlinking"
@@ -3006,7 +3005,7 @@ msgstr "Configuração dos scripts"
 
 #: slideconf.php:25
 msgid "Configuration of slide shows"
-msgstr "Configuração das apresentações de slides"
+msgstr "Configuração das apresentações de telas"
 
 #: templates.php:38
 msgid "Configuration of templates"
@@ -3148,7 +3147,7 @@ msgstr "Conexões com o host (passivas)"
 
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr ""
+msgstr "Construtor"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3477,7 +3476,7 @@ msgstr "Tamanho personalizado"
 
 #: slides.php:27
 msgid "Custom slides"
-msgstr "Slides personalizados"
+msgstr "Telas personalizadas"
 
 #: include/locales.inc.php:57
 msgid "Czech (cs_CZ)"
@@ -3821,7 +3820,7 @@ msgstr "Atrasado por"
 #: include/views/configuration.triggers.list.php:230
 #: include/views/monitoring.sysmap.list.php:75 templates.php:756
 msgid "Delete"
-msgstr "Remover"
+msgstr "Excluir"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
@@ -3829,15 +3828,15 @@ msgstr "Excluir todos os elementos que não estão presentes no arquivo XML?"
 
 #: include/views/configuration.template.edit.php:474 templates.php:757
 msgid "Delete and clear"
-msgstr "Remover e limpar"
+msgstr "Excluir e limpar"
 
 #: templates.php:758
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Remover e limpar templates selecionados? (Aviso: todos os hosts associados terão limpados seus elementos herdados dos templates removidos!)"
+msgstr "Excluir e limpar templates selecionados? (Aviso: todos os hosts associados terão as entidades herdadas dos templates excluídas, bem como os dados coletados!)"
 
 #: include/views/configuration.template.edit.php:475
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "Remover e limpar template? (Aviso: todos os hosts associados terão limpados seus elementos herdados do template removido!)"
+msgstr "Excluir e limpar template? (Aviso: todos os hosts associados terão as entidades herdadas dos templates excluídas, bem como os dados coletados!)"
 
 #: include/views/configuration.application.edit.php:51
 msgid "Delete application?"
@@ -3855,7 +3854,7 @@ msgstr "Excluir a regra de descoberta?"
 #: include/views/configuration.trigger.prototype.edit.php:193
 #: include/views/configuration.triggers.edit.php:198
 msgid "Delete expression?"
-msgstr "Remover expressão?"
+msgstr "Excluir expressão?"
 
 #: include/views/configuration.graph.edit.php:336
 msgid "Delete graph prototype?"
@@ -3863,11 +3862,11 @@ msgstr "Excluir o protótipo de gráfico?"
 
 #: include/views/configuration.graph.edit.php:336
 msgid "Delete graph?"
-msgstr "Remover gráfico?"
+msgstr "Excluir gráfico?"
 
 #: include/views/configuration.item.list.php:261
 msgid "Delete history of selected items?"
-msgstr "Remover o histórico dos itens selecionados?"
+msgstr "Excluir o histórico dos itens selecionados?"
 
 #: include/views/configuration.httpconf.list.php:158
 msgid "Delete history of selected web scenarios?"
@@ -3891,7 +3890,7 @@ msgstr "Excluir vínculos entre os elementos selecionados?"
 
 #: include/views/configuration.maintenance.edit.php:204
 msgid "Delete maintenance period?"
-msgstr "Remover período de manutenção?"
+msgstr "Excluir período de manutenção?"
 
 #: app/views/administration.mediatype.edit.php:167
 msgid "Delete media type?"
@@ -3911,22 +3910,22 @@ msgstr "Excluir o proxy?"
 
 #: include/views/administration.general.regularexpressions.edit.php:137
 msgid "Delete regular expression?"
-msgstr "Remover expressão regular?"
+msgstr "Excluir expressão regular?"
 
 #: include/views/configuration.screen.edit.php:60
 msgid "Delete screen?"
-msgstr "Remover tela?"
+msgstr "Excluir tela?"
 
 #: app/views/administration.script.edit.php:122
 msgid "Delete script?"
-msgstr "Remover script?"
+msgstr "Excluir script?"
 
 #: include/views/administration.usergroups.edit.php:123
 #: include/views/administration.usergroups.edit.php:131
 #: include/views/administration.usergroups.edit.php:139
 #: include/views/administration.users.edit.php:77
 msgid "Delete selected"
-msgstr "Remover selecionados"
+msgstr "Excluir selecionados"
 
 #: include/views/configuration.action.list.php:110
 msgid "Delete selected actions?"
@@ -3934,16 +3933,16 @@ msgstr "Excluir ações selecionadas?"
 
 #: include/views/configuration.application.list.php:150
 msgid "Delete selected applications?"
-msgstr "Remover aplicações selecionadas?"
+msgstr "Excluir aplicações selecionadas?"
 
 #: include/views/configuration.discovery.list.php:70
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete selected discovery rules?"
-msgstr "Remover regras de descoberta selecionadas?"
+msgstr "Excluir regras de descoberta selecionadas?"
 
 #: jsLoader.php:150
 msgid "Delete selected elements?"
-msgstr "Remover elementos selecionados?"
+msgstr "Excluir elementos selecionados?"
 
 #: include/views/configuration.graph.list.php:163
 msgid "Delete selected graph prototypes?"
@@ -3951,16 +3950,16 @@ msgstr "Excluir o protótipos de gráfico selecionados?"
 
 #: include/views/configuration.graph.list.php:164
 msgid "Delete selected graphs?"
-msgstr "Remover gráficos selecionados?"
+msgstr "Excluir gráficos selecionados?"
 
 #: include/views/administration.usergroups.edit.php:160
 #: include/views/configuration.hostgroups.edit.php:82
 msgid "Delete selected group?"
-msgstr "Remover grupo selecionado?"
+msgstr "Excluir grupo selecionado?"
 
 #: include/views/administration.usergroups.list.php:143
 msgid "Delete selected groups?"
-msgstr "Remover grupos selecionados?"
+msgstr "Excluir grupos selecionados?"
 
 #: include/views/configuration.hostgroups.list.php:148
 msgid "Delete selected host groups?"
@@ -3977,15 +3976,15 @@ msgstr "Excluir os protótipos de host selecionados?"
 
 #: include/views/configuration.host.edit.php:808
 msgid "Delete selected host?"
-msgstr "Remover host selecionado?"
+msgstr "Excluir host selecionado?"
 
 #: include/views/configuration.host.list.php:262
 msgid "Delete selected hosts?"
-msgstr "Remover hosts selecionados?"
+msgstr "Excluir hosts selecionados?"
 
 #: include/views/administration.general.image.edit.php:62
 msgid "Delete selected image?"
-msgstr "Remover imagem selecionada?"
+msgstr "Excluir imagem selecionada?"
 
 #: include/views/configuration.item.prototype.list.php:121
 msgid "Delete selected item prototypes?"
@@ -3993,47 +3992,47 @@ msgstr "Excluir o protótipos de item selecionados?"
 
 #: include/views/configuration.item.list.php:265
 msgid "Delete selected items?"
-msgstr "Remover itens selecionados?"
+msgstr "Excluir itens selecionados?"
 
 #: include/views/configuration.maintenance.list.php:78
 msgid "Delete selected maintenance periods?"
-msgstr "Remover períodos de manutenção selecionados?"
+msgstr "Excluir períodos de manutenção selecionados?"
 
 #: include/views/monitoring.sysmap.edit.php:367
 msgid "Delete selected map?"
-msgstr ""
+msgstr "Excluir o mapa selecionado?"
 
 #: include/views/monitoring.sysmap.list.php:75
 msgid "Delete selected maps?"
-msgstr "Remover mapas selecionados?"
+msgstr "Excluir mapas selecionados?"
 
 #: app/views/administration.mediatype.list.php:130
 msgid "Delete selected media types?"
-msgstr "Remover tipos de mídia selecionados?"
+msgstr "Excluir tipos de mídia selecionados?"
 
 #: app/views/administration.proxy.list.php:142
 msgid "Delete selected proxies?"
-msgstr "Remover proxies selecionados?"
+msgstr "Excluir proxies selecionados?"
 
 #: include/views/administration.general.regularexpressions.list.php:75
 msgid "Delete selected regular expressions?"
-msgstr "Remover expressões regulares selecionadas?"
+msgstr "Excluir expressões regulares selecionadas?"
 
 #: include/views/configuration.screen.list.php:68
 msgid "Delete selected screens?"
-msgstr "Remover telas selecionadas?"
+msgstr "Excluir telas selecionadas?"
 
 #: app/views/administration.script.list.php:94
 msgid "Delete selected scripts?"
-msgstr "Remover scripts selecionados?"
+msgstr "Excluir scripts selecionados?"
 
 #: include/views/configuration.slideconf.list.php:58
 msgid "Delete selected slide shows?"
-msgstr "Excluir as apresentações de slides selecionadas?"
+msgstr "Excluir as apresentações de telas selecionadas?"
 
 #: templates.php:756
 msgid "Delete selected templates?"
-msgstr "Remover templates selecionados?"
+msgstr "Excluir templates selecionados?"
 
 #: include/views/configuration.trigger.prototype.list.php:160
 msgid "Delete selected trigger prototypes?"
@@ -4041,19 +4040,19 @@ msgstr "Excluir o protótipos de trigger selecionados?"
 
 #: include/views/configuration.triggers.list.php:230
 msgid "Delete selected triggers?"
-msgstr "Remover triggers selecionadas?"
+msgstr "Excluir triggers selecionadas?"
 
 #: include/views/administration.users.edit.php:409
 msgid "Delete selected user?"
-msgstr "Remover usuários selecionados?"
+msgstr "Excluir usuários selecionados?"
 
 #: include/views/administration.users.list.php:146
 msgid "Delete selected users?"
-msgstr "Remover usuários selecionados?"
+msgstr "Excluir usuários selecionados?"
 
 #: include/views/administration.general.valuemapping.edit.php:83
 msgid "Delete selected value mapping?"
-msgstr "Remover mapeamento de valor selecionado?"
+msgstr "Excluir mapeamento de valor selecionado?"
 
 #: include/views/administration.general.valuemapping.edit.php:87
 #, c-format
@@ -4064,7 +4063,7 @@ msgstr[1] "Excluir o mapeamento de valores selecionado? Ele é utilizado por %d 
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "Excluir o mapeamento de valor selecionado?"
 
 #: include/views/configuration.httpconf.list.php:160
 msgid "Delete selected web scenarios?"
@@ -4077,11 +4076,11 @@ msgstr "Excluir o serviço \"%1$s\"?"
 
 #: include/views/configuration.slideconf.edit.php:121
 msgid "Delete slide show?"
-msgstr "Apagar apresentação de slides?"
+msgstr "Apagar apresentação de tela?"
 
 #: include/views/configuration.template.edit.php:471
 msgid "Delete template?"
-msgstr "Remover template?"
+msgstr "Excluir template?"
 
 #: include/views/configuration.trigger.prototype.edit.php:327
 msgid "Delete trigger prototype?"
@@ -4089,7 +4088,7 @@ msgstr "Excluir o protótipo de trigger?"
 
 #: include/views/configuration.triggers.edit.php:321
 msgid "Delete trigger?"
-msgstr "Remover trigger?"
+msgstr "Excluir trigger?"
 
 #: include/views/configuration.httpconf.edit.php:264
 msgid "Delete web scenario?"
@@ -4336,7 +4335,7 @@ msgstr "Desabilitar o modo de depuração"
 
 #: include/views/administration.usergroups.list.php:141
 msgid "Disable debug mode in selected groups?"
-msgstr "Desativar modo debug nos grupos selecionados?"
+msgstr "Desativar modo depuração nos grupos selecionados?"
 
 #: include/actions.inc.php:606 include/actions.inc.php:884
 msgid "Disable host"
@@ -4599,7 +4598,7 @@ msgstr "Exibindo %1$s de %2$s encontrados"
 #: include/func.inc.php:1561
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "Apresentando %1$s até %2$s de %3$s encontrados"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4647,7 +4646,7 @@ msgstr "Estilo"
 
 #: adm.gui.php:36 include/views/administration.general.gui.edit.php:33
 msgid "Dropdown first entry"
-msgstr "Primeiro ítem dropdown"
+msgstr "Primeira entrada da caixa suspensa"
 
 #: include/profiles.inc.php:171
 #, c-format
@@ -4674,7 +4673,7 @@ msgstr "O protótipo de aplicação \"%1$s\" aplicado ao protótipo de item \"%2
 #: include/classes/api/services/CMap.php:812
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "O valor informado para o \"nome\" do mapa \"%1$s\" está duplicado."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4733,13 +4732,13 @@ msgstr "Apelido de usuário duplicado: \"%s\"."
 #: include/classes/api/services/CMap.php:926
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "O userid \"%1$s\" está duplicado nos usuários do mapa \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:580
 #: include/classes/api/services/CMap.php:999
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "O usrgrpid \"%1$s\" está duplicado nos grupos de usuários do mapa \"%2$s\"."
 
 #: events.php:417 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4913,7 +4912,7 @@ msgstr "Entrada nula."
 
 #: include/classes/api/services/CMap.php:778
 msgid "Empty map ID."
-msgstr ""
+msgstr "ID de mapa vazio."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
@@ -4994,11 +4993,11 @@ msgstr "Ativar confirmação"
 
 #: include/views/administration.usergroups.list.php:137
 msgid "Enable debug mode"
-msgstr "Ativar modo de debug"
+msgstr "Ativar modo de depuração"
 
 #: include/views/administration.usergroups.list.php:138
 msgid "Enable debug mode in selected groups?"
-msgstr "Ativar modo debug nos grupos selecionados?"
+msgstr "Ativar modo depuração nos grupos selecionados?"
 
 #: adm.gui.php:45 include/views/administration.general.gui.edit.php:50
 msgid "Enable event acknowledges"
@@ -5438,7 +5437,7 @@ msgstr "O campo \"%1$s\" é obrigatório."
 #: include/classes/api/services/CMap.php:555
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "No mapa \"%2$s\" o campo \"%1$s\" está com valor ausente."
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:474
@@ -5717,6 +5716,10 @@ msgid "Generated in %s sec"
 msgstr "Gerado em %s segundos"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "Alemão (de_DE)"
 
@@ -5936,7 +5939,7 @@ msgstr "Gráficos copiados"
 msgid "Graphs deleted"
 msgstr "Gráficos removidos"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "Grego (el_GR)"
 
@@ -6615,7 +6618,7 @@ msgstr "Horas"
 msgid "Housekeeping"
 msgstr "Limpeza de dados"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "Húngaro (hu_HU)"
 
@@ -6972,7 +6975,7 @@ msgstr "Impossível filtrar pelo campo de inventário \"%s\", ele não existe."
 
 #: screenedit.php:332 screenedit.php:372
 msgid "Impossible to remove last row and column."
-msgstr "Não é possível remover a última linha e coluna."
+msgstr "Não é possível excluir a última linha e coluna."
 
 #: include/classes/html/CTweenBox.php:72
 #: include/classes/html/CTweenBox.php:102
@@ -7004,7 +7007,7 @@ msgstr "Em andamento"
 #: include/views/monitoring.sysmap.edit.php:87
 #: include/views/monitoring.sysmap.edit.php:92
 msgid "Inaccessible user"
-msgstr ""
+msgstr "Usuário inacessível"
 
 #: tr_logform.php:275 tr_logform.php:308
 msgid "Include"
@@ -7019,25 +7022,25 @@ msgstr "Retorna estatísticas de tráfego de uma interface. Retorna: número int
 #: include/classes/api/services/CMap.php:868
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Valor incorreto para a \"altura\" do mapa \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:565
 #: include/classes/api/services/CMap.php:985
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Valor incorreto para a \"permissão\" \"%1$s\" nos grupos de usuários do mapa \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:491
 #: include/classes/api/services/CMap.php:912
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Valor incorreto para a \"permissão\" \"%1$s\" nos usuários do mapa \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:452
 #: include/classes/api/services/CMap.php:874
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Valor incorreto para o campo \"private\" \"%1$s\" no mapa \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -7048,7 +7051,7 @@ msgstr "Valor incorreto para no campo de dependência \"leve\" para o serviço \
 #: include/classes/api/services/CMap.php:862
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Valor inválido para a \"largura\" do mapa \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:638
 #: include/classes/api/services/CMap.php:645
@@ -7532,7 +7535,7 @@ msgstr "Foi informado o ID de mapa \"%1$s\" e ele é inválido para o elemento n
 
 #: include/classes/api/services/CMap.php:779
 msgid "Incorrect map ID."
-msgstr ""
+msgstr "ID de mapa inválido."
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
@@ -7651,7 +7654,7 @@ msgstr "ID de tela inválido."
 
 #: include/screens.inc.php:172 include/screens.inc.php:232
 msgid "Incorrect screen provided for slide show."
-msgstr "Foi informada uma tela inválida para a apresentação de slides."
+msgstr "Foi informada uma tela inválida para a apresentação de telas."
 
 #: include/services.inc.php:493 include/services.inc.php:502
 msgid "Incorrect service end time."
@@ -7787,13 +7790,13 @@ msgstr "Tipo de cálculo incorreto para a regra de descoberta \"%1$s\"."
 #: include/classes/api/services/CMap.php:947
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Foi informado um ID de usuário inválido para o mapa \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:597
 #: include/classes/api/services/CMap.php:1016
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "O ID de grupo de usuários informado para o mapa \"%1$s\" é inválido."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -7900,7 +7903,7 @@ msgstr "Foi utilizado um valor inválido para o status do proxy \"%1$s\"."
 msgid "Incorrect web scenario ID."
 msgstr "ID de cenário web inválido."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "Indonésio (id_ID)"
 
@@ -8325,7 +8328,7 @@ msgstr "Não é possível filtrar pela senha de usuário."
 msgid "It is not possible to search by user password."
 msgstr "Não é possível pesquisar pela senha de usuário."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Italiano (it_IT)"
 
@@ -8612,7 +8615,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Janeiro"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Japonês (ja_JP)"
 
@@ -8671,7 +8674,7 @@ msgstr "Chave de acesso"
 msgid "Keyword"
 msgstr "Palavra-chave"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Coreano (ko_KR)"
 
@@ -8801,7 +8804,7 @@ msgstr "Última de"
 
 #: app/views/administration.proxy.list.php:46
 msgid "Last seen (age)"
-msgstr "Última vez visto (idade)"
+msgstr "Visto pela última vez (tempo)"
 
 #: latest.php:439 latest.php:455
 msgid "Last value"
@@ -8833,7 +8836,7 @@ msgstr "Últimos eventos"
 msgid "Latest values"
 msgstr "Últimos valores"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Lituâno (lv_LV)"
 
@@ -8935,11 +8938,11 @@ msgstr "A lista está vazia"
 
 #: include/views/monitoring.sysmap.edit.php:347
 msgid "List of user group shares"
-msgstr ""
+msgstr "Lista de compartilhamento com grupos de usuários"
 
 #: include/views/monitoring.sysmap.edit.php:352
 msgid "List of user shares"
-msgstr ""
+msgstr "Lista de compartilhamento com usuários"
 
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
@@ -8961,7 +8964,7 @@ msgstr "Lista de pacotes instalados. Retorna: texto"
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Lista de serviços. Retorna: 0 - se vazia; texto - lista de serviços separados por quebra de linha"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituano (lt_LT)"
 
@@ -8972,7 +8975,7 @@ msgstr "Tempo para carga completa de uma página web (em segundos). Retorna: pon
 
 #: include/classes/screens/CScreenClock.php:92
 msgid "Local"
-msgstr ""
+msgstr "Local"
 
 #: include/classes/screens/CScreenHistory.php:147
 #: include/views/configuration.screen.constructor.edit.php:610
@@ -9089,7 +9092,7 @@ msgstr "A regra de autobusca (LLD) está em estado \"não suportado\""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1636
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:125
 msgctxt "Monday short"
@@ -9269,7 +9272,7 @@ msgstr "Mapa"
 #: include/classes/api/services/CMap.php:828
 #, c-format
 msgid "Map \"%1$s\" already exists."
-msgstr ""
+msgstr "O mapa \"%1$s\" já existe."
 
 #: include/classes/api/services/CMap.php:500
 #: include/classes/api/services/CMap.php:574
@@ -9277,7 +9280,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:993
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "O mapa \"%1$s\" é público e o compartilhamento de somente-leitura não é permitido."
 
 #: include/views/js/monitoring.sysmaps.js.php:2
 msgid "Map element"
@@ -9294,12 +9297,12 @@ msgstr "Tipo de rótulo no mapa"
 
 #: include/classes/api/services/CMap.php:798
 msgid "Map name cannot be empty."
-msgstr ""
+msgstr "O nome do mapa não pode estar vazio."
 
 #: include/classes/api/services/CMap.php:440
 #: include/classes/api/services/CMap.php:846
 msgid "Map owner cannot be empty."
-msgstr ""
+msgstr "O proprietário do mapa não pode estar vazio."
 
 #: sysmap.php:86
 msgid "Map update failed."
@@ -9374,7 +9377,7 @@ msgstr "Máximo de colunas"
 
 #: adm.gui.php:43 include/views/administration.general.gui.edit.php:47
 msgid "Max count of elements to show inside table cell"
-msgstr "Número máximo de elementos mostrados dentro de uma célula de tabela"
+msgstr "Máximo de elementos mostrados dentro de uma célula de tabela"
 
 #: include/profiles.inc.php:177
 #, c-format
@@ -9955,7 +9958,7 @@ msgstr "Não foi encontrado \"%1$s\" para o protótipo de host."
 #: include/classes/api/services/CMap.php:777
 #, c-format
 msgid "No \"%1$s\" given for map."
-msgstr ""
+msgstr "Não foi encontrado \"%1$s\" para o mapa."
 
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
@@ -10079,7 +10082,7 @@ msgstr "Nenhuma condição definida."
 #: include/classes/screens/CScreenClock.php:74
 #: include/classes/screens/CScreenClock.php:78
 msgid "No data"
-msgstr ""
+msgstr "Sem dados"
 
 #: include/views/configuration.maintenance.edit.php:44
 #: include/views/configuration.maintenance.list.php:65
@@ -10642,7 +10645,7 @@ msgstr "Número de segundos desde a época é NÃO É N"
 
 #: include/views/configuration.slideconf.list.php:41
 msgid "Number of slides"
-msgstr "Quantidade de slides"
+msgstr "Quantidade de telas"
 
 #: include/views/reports.toptriggers.php:121
 msgid "Number of status changes"
@@ -10907,7 +10910,7 @@ msgstr "Apenas os administradores podem mudar mídia de usuário."
 
 #: include/classes/api/services/CUser.php:902
 msgid "Only Zabbix Admins can remove user media."
-msgstr "Apenas os administradores podem remover mídia de usuário."
+msgstr "Apenas os administradores podem excluir mídia de usuário."
 
 #: include/classes/api/services/CDRule.php:232
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -10916,7 +10919,7 @@ msgstr "Apenas através de verificações com o agente Zabbix, SNMPv1, SNMPv2 e 
 #: include/classes/api/services/CMap.php:444
 #: include/classes/api/services/CMap.php:850
 msgid "Only administrators can set map owner."
-msgstr ""
+msgstr "Apenas administradores podem definir o proprietário de um mapa."
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11127,7 +11130,7 @@ msgstr "Substituir o período de histórico do item"
 
 #: include/views/administration.general.housekeeper.edit.php:120
 msgid "Override item trend period"
-msgstr "Substituir o período de histórico da média"
+msgstr "Substituir o período de retenção das estatísticas (médias)"
 
 #: include/menu.inc.php:51 include/menu.inc.php:127
 #: include/views/inventory.host.view.php:195
@@ -11145,7 +11148,7 @@ msgstr "Visão geral por proxy"
 #: include/views/monitoring.sysmap.edit.php:86
 #: include/views/monitoring.sysmap.edit.php:91
 msgid "Owner"
-msgstr ""
+msgstr "Proprietário"
 
 #: include/classes/setup/CFrontendSetup.php:368
 msgid "PHP always_populate_raw_post_data"
@@ -11521,7 +11524,7 @@ msgstr "Permissões"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Permissões devem ser definidas para grupos de usuários apenas."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "Persa (fa_IR)"
 
@@ -11564,7 +11567,7 @@ msgstr "Por favor informe o nome ou IP e a porta do servidor Zabbix, assim como 
 msgid "Please select two elements"
 msgstr "Favor selecionar dois elementos"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "Polonês (pl_PL)"
 
@@ -11601,11 +11604,11 @@ msgstr "Porta como"
 msgid "Port range"
 msgstr "Range de portas"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "Português Brasileiro (PT_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr "Português de Portugal (pt_BR)"
 
@@ -11690,7 +11693,7 @@ msgstr "Protocolo de privacidade"
 
 #: include/views/monitoring.sysmap.edit.php:343
 msgid "Private"
-msgstr ""
+msgstr "Privado"
 
 #: include/views/configuration.action.edit.php:837
 #: include/views/configuration.host.discovery.edit.php:173
@@ -11751,7 +11754,7 @@ msgstr "Utilização percentual, pelo processo, de CPU. Retorna número com pont
 
 #: include/views/monitoring.sysmap.list.php:51
 msgid "Properties"
-msgstr ""
+msgstr "Propriedades"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:265
@@ -11817,7 +11820,7 @@ msgstr "Proxy atualizado"
 
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr ""
+msgstr "Público"
 
 #: include/views/configuration.action.edit.php:822
 #: include/views/configuration.host.discovery.edit.php:162
@@ -11860,7 +11863,7 @@ msgstr "Somente leitura"
 #: include/views/js/monitoring.sysmap.edit.js.php:12
 #: include/views/js/monitoring.sysmap.edit.js.php:45
 msgid "Read-only"
-msgstr ""
+msgstr "Leitura"
 
 #: include/forms.inc.php:256 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:93
@@ -12172,7 +12175,7 @@ msgstr "Confirmação de restauração"
 #: include/views/js/administration.general.trigger.options.js.php:19
 #: include/views/js/administration.general.triggerSeverity.js.php:19
 msgid "Reset defaults"
-msgstr "Restaurar defaults"
+msgstr "Restaurar padrões"
 
 #: jsrpc.php:111
 msgid "Resolved"
@@ -12262,7 +12265,7 @@ msgstr "Retorna o percentual de perda de pacotes ICMP."
 msgid "Right"
 msgstr "Direita"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr "Romênio (ro_RO)"
 
@@ -12334,9 +12337,9 @@ msgstr "Executar comandos remotos nos hosts"
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
+msgstr "Executa o comando em no host. Retorna o texto retornado pelo comando; 1 - para modo sem espera (não espera o resultado do comando)"
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "Russo (ru_RU)"
 
@@ -12734,7 +12737,7 @@ msgstr "Padrão de busca está vazio"
 
 #: adm.gui.php:40 include/views/administration.general.gui.edit.php:44
 msgid "Search/Filter elements limit"
-msgstr "Limite de Busca/Filtragem de elementos"
+msgstr "Limite de Busca/Filtro de elementos"
 
 #: include/forms.inc.php:1832 include/maintenances.inc.php:112
 msgid "Second"
@@ -13033,14 +13036,14 @@ msgstr "Severidade (descedente)"
 
 #: include/views/monitoring.sysmap.edit.php:359
 msgid "Sharing"
-msgstr ""
+msgstr "Compartilhamento"
 
 #: include/classes/api/services/CMap.php:481
 #: include/classes/api/services/CMap.php:902
 #: include/classes/api/services/CMap.php:975
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "A opção de compartilhamento \"%1$s\" tem valor ausente no mapa \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:697 tr_status.php:702
@@ -13126,7 +13129,7 @@ msgstr "Mostrar valor"
 
 #: adm.gui.php:53 include/views/administration.general.gui.edit.php:59
 msgid "Show warning if Zabbix server is down"
-msgstr "Exibir alertas se o servidor Zabbix estiver fora do ar"
+msgstr "Exibir um alerta se o servidor Zabbix estiver fora do ar"
 
 #: include/views/configuration.graph.edit.php:70
 msgid "Show working time"
@@ -13218,28 +13221,28 @@ msgstr "Slideshow"
 #: include/screens.inc.php:245
 #, c-format
 msgid "Slide show \"%1$s\" already exists."
-msgstr "A apresentação de slides \"%1$s\" já existe."
+msgstr "A apresentação de telas \"%1$s\" já existe."
 
 #: include/screens.inc.php:183
 #, c-format
 msgid "Slide show \"%s\" already exists."
-msgstr "A apresentação de slides \"%s\" já existe."
+msgstr "A apresentação de telas \"%s\" já existe."
 
 #: slideconf.php:106
 msgid "Slide show added"
-msgstr "Apresentação de slides adicionada"
+msgstr "Apresentação de telas adicionada"
 
 #: slideconf.php:138 slideconf.php:159
 msgid "Slide show deleted"
-msgstr "Apresentação de slides excluída"
+msgstr "Apresentação de telas excluída"
 
 #: include/screens.inc.php:159 include/screens.inc.php:219
 msgid "Slide show must contain slides."
-msgstr "Uma apresentação de slides precisa conter slides."
+msgstr "Uma apresentação de telas precisa conter telas."
 
 #: slideconf.php:99
 msgid "Slide show updated"
-msgstr "Apresentação de slides atualizada"
+msgstr "Apresentação de telas atualizada"
 
 #: app/views/monitoring.dashboard.view.php:58 include/menu.inc.php:228
 #: include/views/configuration.slideconf.edit.php:24
@@ -13252,9 +13255,9 @@ msgstr "Slideshows"
 
 #: include/views/configuration.slideconf.edit.php:105
 msgid "Slides"
-msgstr "Slides"
+msgstr "Telas"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "Eslovaco (sk_SK)"
 
@@ -13320,7 +13323,7 @@ msgstr "Ordenação pelo campo \"%1$s\" não é suportada."
 msgid "Source"
 msgstr "Origem"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "Espanhol (es_ES)"
 
@@ -13560,7 +13563,7 @@ msgstr "Estatísticas de envio de dados da memória para o swap. Retorna: númer
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Tamanho do espaço do swap em bytes ou percentual relativo ao total. Retorna: inteiro para bytes; ponto flutuante para percentual"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
@@ -13806,7 +13809,7 @@ msgstr "Teste de autenticação"
 
 #: app/views/administration.script.edit.php:101
 msgid "Test confirmation"
-msgstr "Confirmação do teste"
+msgstr "Testar mensagem de confirmação"
 
 #: tr_testexpr.php:138
 msgid "Test data"
@@ -14124,7 +14127,7 @@ msgstr "Erro de transporte."
 
 #: adm.housekeeper.php:62
 msgid "Trend data storage period"
-msgstr "Período de retenção das estatísticas"
+msgstr "Período de retenção das estatísticas (médias)"
 
 #: include/profiles.inc.php:153
 #, c-format
@@ -14151,7 +14154,7 @@ msgstr "Estatísticas"
 
 #: include/forms.inc.php:563
 msgid "Trends (in days)"
-msgstr "Médias (em dias)"
+msgstr "Estatísticas/Médias (em dias)"
 
 #: events.php:275 events.php:318 include/actions.inc.php:43
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:488
@@ -14440,7 +14443,7 @@ msgstr "Ter"
 msgid "Tuesday"
 msgstr "Terça-feira"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr "Turco (tr_TR)"
 
@@ -14573,7 +14576,7 @@ msgstr "URL C"
 #: include/classes/api/services/CMap.php:1150
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
-msgstr ""
+msgstr "O nome da URL deverá ser único para o mapa \"%1$s\"."
 
 #: include/html.inc.php:108
 msgid "URL parameter cannot be array."
@@ -14587,7 +14590,7 @@ msgstr "O parâmetro URL está vazio."
 #: include/classes/api/services/CMap.php:1144
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
-msgstr ""
+msgstr "A URL deverá possuir os campos \"name\" e \"url\" no mapa \"%1$s\"."
 
 #: include/views/configuration.sysmap.edit.php:206
 #: include/views/js/monitoring.sysmaps.js.php:162
@@ -14599,7 +14602,7 @@ msgstr "URLs"
 msgid "USA (160 characters)"
 msgstr "EUA (160 caracteres)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraniano (uk_UA)"
 
@@ -15038,7 +15041,7 @@ msgstr "Usado nas ações"
 
 #: include/views/administration.general.valuemapping.list.php:44
 msgid "Used in items"
-msgstr ""
+msgstr "Utilizado em itens"
 
 #: app/views/monitoring.acknowledge.edit.php:34 httpconf.php:57
 #: include/acknow.inc.php:49 include/actions.inc.php:1183
@@ -15054,7 +15057,7 @@ msgstr "Usuário"
 #: include/classes/api/services/CUser.php:546
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
-msgstr ""
+msgstr "O usuário \"%1$s\" é o proprietário do mapa \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15151,7 +15154,7 @@ msgstr "Grupo para mensagens sobre incidentes com o banco de dados \"%1$s\"."
 #: include/classes/api/services/CMap.php:966
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "O grupo de usuários compartilhado possui parâmetros ausentes: %1$s no mapa \"%2$s\"."
 
 #: include/menu.inc.php:273
 #: include/views/administration.usergroups.edit.php:22
@@ -15221,7 +15224,7 @@ msgstr "Sessões de usuários"
 #: include/classes/api/services/CMap.php:893
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s no mapa \"%2$s\"."
 
 #: include/views/administration.users.edit.php:386
 #: include/views/administration.users.edit.php:390
@@ -15537,7 +15540,6 @@ msgid "Value map added"
 msgstr "Mapeamento de valor incluído"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Mapeamento de valor removido"
@@ -15566,11 +15568,11 @@ msgstr "Mapeamento de valor"
 
 #: include/views/conf.import.php:46
 msgid "Value mappings"
-msgstr ""
+msgstr "Mapeamentos de valor"
 
 #: include/views/conf.import.php:68
 msgid "Value mappings for value maps will be updated!"
-msgstr ""
+msgstr "Os mapeamentos de valor dos mapas serão atualizados!"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
@@ -15611,7 +15613,7 @@ msgstr "Vertical"
 msgid "Vertical align"
 msgstr "Alinhamento vertical"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnamita (vi_VN)"
 
@@ -16446,11 +16448,11 @@ msgstr "m"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1639
 msgid "m-d"
-msgstr ""
+msgstr "d-m"
 
 #: include/translateDefines.inc.php:32
 msgid "m-d H:i"
-msgstr ""
+msgstr "d-m H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
