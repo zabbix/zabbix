@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@
 #include "../operations.h"
 #include "../actions.h"
 #include "../scripts.h"
+#include "../../libs/zbxcrypto/tls.h"
+#include "comms.h"
 
 extern int	CONFIG_ESCALATOR_FORKS;
 
@@ -358,23 +360,34 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, const 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+#ifdef HAVE_OPENIPMI
+#	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in functions */
+						/* get_dynamic_hostid() and execute_commands() */
+#else
+#	define ZBX_IPMI_FIELDS_NUM	0
+#endif
+
 static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "get_dynamic_hostid";
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		sql[512];
+	char		sql[512];	/* do not forget to adjust size if SQLs change */
 	size_t		offset;
 	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.host");
+	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.host,h.tls_connect");
 #ifdef HAVE_OPENIPMI
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
-
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk");
+#endif
 	switch (event->source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
@@ -446,12 +459,18 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 		ZBX_STR2UINT64(host->hostid, row[0]);
 		strscpy(host->host, row[1]);
 #ifdef HAVE_OPENIPMI
-		host->ipmi_authtype = (signed char)atoi(row[2]);
-		host->ipmi_privilege = (unsigned char)atoi(row[3]);
-		strscpy(host->ipmi_username, row[4]);
-		strscpy(host->ipmi_password, row[5]);
+		host->ipmi_authtype = (signed char)atoi(row[3]);
+		host->ipmi_privilege = (unsigned char)atoi(row[4]);
+		strscpy(host->ipmi_username, row[5]);
+		strscpy(host->ipmi_password, row[6]);
 #endif
-		host->tls_connect = (unsigned char)1;	/* temporary fix */
+		host->tls_connect = (unsigned char)atoi(row[2]);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		strscpy(host->tls_issuer, row[3 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_subject, row[4 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_psk_identity, row[5 + ZBX_IPMI_FIELDS_NUM]);
+		strscpy(host->tls_psk, row[6 + ZBX_IPMI_FIELDS_NUM]);
+#endif
 	}
 	DBfree_result(result);
 
@@ -481,7 +500,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	zbx_db_insert_t		db_insert;
 	int			alerts_num = 0;
 	char			*buffer = NULL;
-	size_t			buffer_alloc = ZBX_KIBIBYTE, buffer_offset = 0;
+	size_t			buffer_alloc = 2 * ZBX_KIBIBYTE, buffer_offset = 0;
 	zbx_vector_uint64_t	executed_on_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -489,12 +508,17 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	buffer = zbx_malloc(buffer, buffer_alloc);
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+			/* the 1st 'select' works if remote command target is "Host group" */
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command");
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
 #ifdef HAVE_OPENIPMI
-	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
+			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
+#endif
+			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_grp og,hosts_groups hg,hosts h"
 			" where o.operationid=og.operationid"
@@ -502,14 +526,19 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and hg.hostid=h.hostid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
-			" union "
-			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
+			" union ",
 			operationid, HOST_STATUS_MONITORED);
-#ifdef HAVE_OPENIPMI
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
+			/* the 2nd 'select' works if remote command target is "Host" */
+			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
+#ifdef HAVE_OPENIPMI
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk"
+#endif
+			);
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh,hosts h"
 			" where o.operationid=oh.operationid"
@@ -517,11 +546,17 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
+			/* the 3rd 'select' works if remote command target is "Current host" */
 			"select distinct 0,null,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
-			operationid, HOST_STATUS_MONITORED);
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,%d",
+			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
 #ifdef HAVE_OPENIPMI
-	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, ",0,2,null,null");
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				",0,2,null,null");
+#endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+				",null,null,null,null");
 #endif
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh"
@@ -573,12 +608,18 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[1]);
-				host.tls_connect = (unsigned char)1;	/* temporary fix */
+				host.tls_connect = (unsigned char)atoi(row[12]);
 #ifdef HAVE_OPENIPMI
-				host.ipmi_authtype = (signed char)atoi(row[12]);
-				host.ipmi_privilege = (unsigned char)atoi(row[13]);
-				strscpy(host.ipmi_username, row[14]);
-				strscpy(host.ipmi_password, row[15]);
+				host.ipmi_authtype = (signed char)atoi(row[13]);
+				host.ipmi_privilege = (unsigned char)atoi(row[14]);
+				strscpy(host.ipmi_username, row[15]);
+				strscpy(host.ipmi_password, row[16]);
+#endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				strscpy(host.tls_issuer, row[13 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[14 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[15 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
@@ -634,6 +675,8 @@ skip:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+#undef ZBX_IPMI_FIELDS_NUM
 
 static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event, DB_ACTION *action,
 		zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *subject, const char *message)
@@ -1700,6 +1743,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
