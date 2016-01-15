@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: 2015-09-01 10:06+0300\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-28 18:02+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1441094804.0\n"
+"X-POOTLE-MTIME: 1451318569.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -72,8 +72,8 @@ msgstr[1] "%1$s giorni"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s evento"
+msgstr[1] "%1$s eventi"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -361,11 +361,11 @@ msgstr[1] "Azioni disabilitate"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Azione disattivata a causa cancellazione del gruppo di utenti"
 
 #: include/classes/api/services/CUser.php:1388
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Azione disattivata a causa eliminazione di utente"
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -599,7 +599,7 @@ msgstr "Agent controllo disponibilita'. Restituisce nullo - non disponibile: 1 -
 
 #: include/views/configuration.host.list.php:69
 msgid "Agent encryption"
-msgstr ""
+msgstr "Agent encryption"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -664,7 +664,7 @@ msgstr "Tutti i collegamenti devono avere \"Nome\" e \"URL\" definiti"
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "Tutte le mappe"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -865,7 +865,7 @@ msgstr "Creare almeno un intervallo di manutenzione."
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "Almeno una mappatura dovrebbe essere assegnata alla mappa valori \"%1$s\"."
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1121,7 +1121,7 @@ msgstr "Per template trigger"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: triggers.php:388
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1140,7 +1140,7 @@ msgstr "Carico CPU. Restituisce valore decimale (float)"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Percentuale di utilizzo della CPU. Restituisce valore decimale (float)"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1189,11 +1189,10 @@ msgstr "Annulla"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Impossibile aggiungere acknowledge all'evento"
-msgstr[1] "Impossibile aggiungere acknowledge all'evento"
+msgstr[1] "Impossibile aggiungere acknowledge agli eventi"
 
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
@@ -1721,7 +1720,6 @@ msgid "Cannot delete user media."
 msgstr "Impossibile rimuovere supporto utente."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Impossibile rimuovere mappa valori"
@@ -5716,6 +5714,10 @@ msgid "Generated in %s sec"
 msgstr "Generato in %s sec"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "Tedesco (de_DE)"
 
@@ -5935,7 +5937,7 @@ msgstr "Grafici copiati"
 msgid "Graphs deleted"
 msgstr "Grafici rimossi"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "Greco (el_GR)"
 
@@ -6614,7 +6616,7 @@ msgstr "Ore"
 msgid "Housekeeping"
 msgstr "Housekeeping"
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "Ungherese (hu_HU)"
 
@@ -7898,7 +7900,7 @@ msgstr "Valore errato utilizzato per lo stato proxy \"%1$s\"."
 msgid "Incorrect web scenario ID."
 msgstr "Errato scenario web ID."
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "Indonesiano (id_ID)"
 
@@ -8321,7 +8323,7 @@ msgstr "Impossibile filtrare per password utente."
 msgid "It is not possible to search by user password."
 msgstr "Impossibile cercare per password utente."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Italiano (it_IT)"
 
@@ -8606,7 +8608,7 @@ msgstr "Gen"
 msgid "January"
 msgstr "Gennaio"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Giapponese (ja_JP)"
 
@@ -8662,7 +8664,7 @@ msgstr "Passphrase della chiave"
 msgid "Keyword"
 msgstr "Parola chiave"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Coreano (ko_KR)"
 
@@ -8824,7 +8826,7 @@ msgstr "Ultimi eventi"
 msgid "Latest values"
 msgstr "Ultimi valori"
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Lettone (lv_LV)"
 
@@ -8952,7 +8954,7 @@ msgstr "Elenco pacchetti installati. Restituisce testo"
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr "Elenco dei servizi. Restituisce 0 - se vuoto; testo - elenco dei servizi separati da un ritorno a capo"
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituano (lt_LT)"
 
@@ -9040,7 +9042,7 @@ msgstr "Connesso come"
 #: include/views/administration.authentication.edit.php:98
 #: include/views/administration.users.list.php:53
 msgid "Login"
-msgstr "Accedi"
+msgstr "Accesso"
 
 #: include/classes/api/services/CUser.php:1102
 #, c-format
@@ -11507,7 +11509,7 @@ msgstr "Permessi"
 msgid "Permissions can be assigned for user groups only."
 msgstr "I permessi possono esser assegnati solo per i gruppi utente."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "Persiano (fa_IR)"
 
@@ -11550,7 +11552,7 @@ msgstr "Si prega di inserire il nome host o indirizzo IP dell'host e porta del s
 msgid "Please select two elements"
 msgstr "Per favore seleziona due elementi"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "Polacco (pl_PL)"
 
@@ -11587,11 +11589,11 @@ msgstr "Porta come"
 msgid "Port range"
 msgstr "Range porte"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "Portoghese (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr "Portoghese (pt_PT)"
 
@@ -12248,7 +12250,7 @@ msgstr "Restituisce la percentuale di pacchetti ICMP ping persi."
 msgid "Right"
 msgstr "Destra"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr "Rumeno (ro_RO)"
 
@@ -12322,7 +12324,7 @@ msgstr "Esegui comandi remoti sugli host"
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "Russo (ru_RU)"
 
@@ -13121,7 +13123,7 @@ msgstr "Visibile"
 
 #: include/views/general.login.php:49 index.php:55 index.php:64
 msgid "Sign in"
-msgstr "Accedi"
+msgstr "Accesso"
 
 #: app/views/layout.htmlpage.menu.php:59
 msgid "Sign out"
@@ -13236,7 +13238,7 @@ msgstr "Presentazioni"
 msgid "Slides"
 msgstr "Diapositive"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "Slovacco (sk_SK)"
 
@@ -13302,7 +13304,7 @@ msgstr "L'ordinamento per campo \"%1$s\" non è permesso."
 msgid "Source"
 msgstr "Sorgente"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "Spagnolo (es_ES)"
 
@@ -13542,7 +13544,7 @@ msgstr "Statistiche Swap Out (da memoria a dispositivo). Restituisce intero"
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Dimensioni spazio Swap in byte o in percentuale dal totale. Restituisce intero per byte; decimale (float) per percentuale"
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "Svedese (sv_SE)"
 
@@ -14421,7 +14423,7 @@ msgstr "Mar"
 msgid "Tuesday"
 msgstr "Martedì"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr "Turco (tr_TR)"
 
@@ -14514,7 +14516,7 @@ msgstr "Tipi"
 #: include/translateDefines.inc.php:25
 #: include/views/js/adm.regexprs.edit.js.php:164
 msgid "UNKNOWN"
-msgstr "SCONOSCIUTI"
+msgstr "SCONOSCIUT0"
 
 #: include/triggers.inc.php:187
 msgid "UP"
@@ -14579,7 +14581,7 @@ msgstr "URLs"
 msgid "USA (160 characters)"
 msgstr "USA (160 caratteri)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "Ucraino (uk_UA)"
 
@@ -14661,7 +14663,7 @@ msgstr "Unità"
 #: include/views/configuration.triggers.list.php:43
 #: include/views/js/configuration.discovery.edit.js.php:189
 msgid "Unknown"
-msgstr "Sconosciuti"
+msgstr "Sconosciuto"
 
 #: auditlogs.php:142
 msgid "Unknown action"
@@ -15517,7 +15519,6 @@ msgid "Value map added"
 msgstr "Mappa valori aggiunta"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Mappa valori rimossa"
@@ -15591,7 +15592,7 @@ msgstr "Verticale"
 msgid "Vertical align"
 msgstr "Allineamento verticale"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr "Vietnamita (vi_VN)"
 

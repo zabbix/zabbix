@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -544,6 +544,30 @@ class CUser extends CApiService {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('User "%1$s" is map "%2$s" owner.', $db_user['alias'], $user_map['name'])
+			);
+		}
+
+		// Check if deleted users have a screen.
+		$user_screens = API::Screen()->get([
+			'output' => ['name', 'userid'],
+			'userids' => $userids
+		]);
+
+		if ($user_screens) {
+			// Get first problem user and screen.
+			$user_screen = reset($user_screens);
+
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userids' => [$user_screen['userid']],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is screen "%2$s" owner.', $db_user['alias'], $user_screen['name'])
 			);
 		}
 	}

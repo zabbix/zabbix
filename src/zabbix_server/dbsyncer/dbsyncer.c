@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ extern int		server_num, process_num;
  ******************************************************************************/
 ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 {
-	int	sleeptime = -1, num = 0, old_num = 0, retry_up = 0, retry_dn = 0;
+	int	sleeptime = -1, num = 0, old_num = 0, sync_num, next_sync;
 	double	sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t	last_stat_time;
 
@@ -74,45 +74,11 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 		}
 
 		sec = zbx_time();
-		num += DCsync_history(ZBX_SYNC_PARTIAL);
+		next_sync = DCsync_history(ZBX_SYNC_PARTIAL, &sync_num);
+		num += sync_num;
 		total_sec += zbx_time() - sec;
 
-		if (-1 == sleeptime)
-		{
-			sleeptime = num ? ZBX_SYNC_MAX / num : CONFIG_HISTSYNCER_FREQUENCY;
-		}
-		else
-		{
-			if (ZBX_SYNC_MAX < num)
-			{
-				retry_up = 0;
-				retry_dn++;
-			}
-			else if (ZBX_SYNC_MAX / 2 > num)
-			{
-				retry_up++;
-				retry_dn = 0;
-			}
-			else
-				retry_up = retry_dn = 0;
-
-			if (2 < retry_dn)
-			{
-				sleeptime--;
-				retry_dn = 0;
-			}
-
-			if (2 < retry_up)
-			{
-				sleeptime++;
-				retry_up = 0;
-			}
-		}
-
-		if (0 > sleeptime)
-			sleeptime = 0;
-		else if (CONFIG_HISTSYNCER_FREQUENCY < sleeptime)
-			sleeptime = CONFIG_HISTSYNCER_FREQUENCY;
+		sleeptime = 0 < next_sync ? 0 : CONFIG_HISTSYNCER_FREQUENCY;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
