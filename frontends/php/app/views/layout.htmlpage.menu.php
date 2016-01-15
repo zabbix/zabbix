@@ -24,7 +24,6 @@ $icons = (new CList())
 		(new CForm('get', 'search.php'))
 			->addItem([
 				(new CTextBox('search', '', false, 255))
-					->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH),
 				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
