@@ -234,7 +234,6 @@ nav {
 .top-nav-container {
 	height: 49px;
 	line-height: 49px;
-	position: relative;
 	overflow: hidden;
 	background-color: $main-nav-bg-color;
 }
@@ -371,7 +370,7 @@ ul.top-nav-icons {
 
 	input {
 		background-color: darken($main-nav-bg-color, 7%);
-		border: 1px solid darken($main-nav-bg-color, 9%);
+		border: 1px solid darken($main-nav-bg-color, 10%);
 		width: 198px;
 		margin: 6px 7px 0 0;
 		color: $font-color;
@@ -379,7 +378,8 @@ ul.top-nav-icons {
 		@include opacity(1);
 
 		&:focus {
-			border: 1px solid darken($main-nav-bg-color, 9%);
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
 			@include opacity(1);
 		}
 
