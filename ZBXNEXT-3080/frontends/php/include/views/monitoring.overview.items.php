@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,9 +58,7 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter('web.overview.filter.state'))
-	->addVar('fullscreen', $this->data['fullscreen'])
-	->addVar('groupid', $this->data['groupid'])
-	->addVar('hostid', $this->data['hostid']);
+	->addVar('fullscreen', $this->data['fullscreen']);
 
 $column = new CFormList();
 

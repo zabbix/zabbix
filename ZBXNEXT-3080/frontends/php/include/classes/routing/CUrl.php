@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,10 +56,6 @@ class CUrl {
 
 			$this->formatArguments();
 		}
-
-		if (isset($_COOKIE['zbx_sessionid'])) {
-			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
-		}
 	}
 
 	/**
@@ -72,9 +68,6 @@ class CUrl {
 	public function formatGetArguments() {
 		$this->arguments = $_GET;
 
-		if (isset($_COOKIE['zbx_sessionid'])) {
-			$this->setArgument('sid', substr($_COOKIE['zbx_sessionid'], 16, 16));
-		}
 		$this->formatQuery();
 	}
 

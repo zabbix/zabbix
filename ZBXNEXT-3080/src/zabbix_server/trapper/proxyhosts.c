@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "db.h"
 #include "log.h"
 #include "proxy.h"
+#include "dbcache.h"
 
 #include "proxyhosts.h"
 
@@ -46,7 +47,7 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse host availability data from active proxy at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 		goto out;
 	}
 
@@ -71,7 +72,7 @@ void	send_host_availability(zbx_socket_t *sock)
 	const char	*__function_name = "send_host_availability";
 
 	struct zbx_json	j;
-	int		ret = FAIL;
+	int		ret = FAIL, ts;
 	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -84,7 +85,12 @@ void	send_host_availability(zbx_socket_t *sock)
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	get_host_availability_data(&j);
+	/* if there are no host availability changes we still have to send empty data in response */
+	if (SUCCEED != get_host_availability_data(&j, &ts))
+	{
+		zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+		zbx_json_close(&j);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() [%s]", __function_name, j.buffer);
 
@@ -97,12 +103,14 @@ void	send_host_availability(zbx_socket_t *sock)
 	if (SUCCEED != zbx_recv_response(sock, CONFIG_TIMEOUT, &error))
 		goto out;
 
+	zbx_set_availability_diff_ts(ts);
+
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 	}
 
 	zbx_json_free(&j);

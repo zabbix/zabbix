@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,9 +105,9 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm = new CFilter('web.history.filter.state');
-		$filterColumn1 = new CFormList();
-		$filterForm->addVar('action', $this->data['action']);
+		$filterForm = (new CFilter('web.history.filter.state'))
+			->addVar('fullscreen', $this->data['fullscreen'])
+			->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
 			$filterForm->addVar('itemids['.$itemId.']', $itemId);
 		}
@@ -142,10 +142,11 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 			];
 		}
 
-		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
-		$filterColumn1->addRow(_('Select rows with value like'),
-			(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-		);
+		$filterColumn1 = (new CFormList())
+			->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton])
+			->addRow(_('Select rows with value like'),
+				(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			);
 
 		$filterTask = getRequest('filter_task', 0);
 
@@ -237,7 +238,7 @@ else {
 				)
 			);
 			$filterForm->removeButtons();
-
+			$filterForm->addVar('fullscreen', $this->data['fullscreen']);
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
 		}
