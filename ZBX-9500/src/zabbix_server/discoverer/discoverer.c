@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 	if (SUCCEED == ret)
 	{
-		alarm(CONFIG_TIMEOUT);
+		zbx_alarm_on(CONFIG_TIMEOUT);
 
 		switch (dcheck->type)
 		{
@@ -307,7 +307,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 				break;
 		}
 
-		alarm(0);
+		zbx_alarm_off();
 	}
 	free_result(&result);
 
@@ -525,9 +525,9 @@ static void	process_rule(DB_DRULE *drule)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __function_name, ip);
 
-			alarm(CONFIG_TIMEOUT);
+			zbx_alarm_on(CONFIG_TIMEOUT);
 			zbx_gethost_by_ip(ip, dns, sizeof(dns));
-			alarm(0);
+			zbx_alarm_off();
 
 			if (0 != drule->unique_dcheckid)
 				process_checks(drule, &dhost, &host_status, ip, dns, 1, now);

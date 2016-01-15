@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
 "PO-Revision-Date: 2015-06-27 21:59+0300\n"
 "Last-Translator: antonin <antonin.sommier@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1724,7 +1724,6 @@ msgid "Cannot delete user media."
 msgstr "Impossible de supprimer le média utilisateur."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Impossible de supprimer la table de correspondance"
@@ -5724,6 +5723,10 @@ msgid "Generated in %s sec"
 msgstr "Généré en %s secondes"
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "Allemand (de_DE)"
 
@@ -5943,7 +5946,7 @@ msgstr "Graphique copié"
 msgid "Graphs deleted"
 msgstr "Graphiques supprimés"
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr "Grec (el_GR)"
 
@@ -6624,7 +6627,7 @@ msgstr "Heures"
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "Hongrois (hu_HU)"
 
@@ -7908,7 +7911,7 @@ msgstr "Valeur incorrecte utilisée pour l'état de proxy \"%1$s\"."
 msgid "Incorrect web scenario ID."
 msgstr ""
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr "Indonésien (id_ID)"
 
@@ -8331,7 +8334,7 @@ msgstr "Impossible de filtrer sur le mot de passe utilisateur."
 msgid "It is not possible to search by user password."
 msgstr "Impossible de chercher par mot de passe utilisateur."
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "Italien (it_IT)"
 
@@ -8616,7 +8619,7 @@ msgstr "Jan"
 msgid "January"
 msgstr "Janvier"
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "Japonais (ja_JP)"
 
@@ -8672,7 +8675,7 @@ msgstr "Phrase de passe de la clé"
 msgid "Keyword"
 msgstr "Mot-clé"
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr "Coréen (ko_KR)"
 
@@ -8834,7 +8837,7 @@ msgstr "Derniers événements"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "Letton (lv_LV)"
 
@@ -8962,7 +8965,7 @@ msgstr ""
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr "Lituanien (lt_LT)"
 
@@ -11520,7 +11523,7 @@ msgstr "Permissions"
 msgid "Permissions can be assigned for user groups only."
 msgstr "Les permissions ne peuvent être assignées qu'aux groupes d'utilisateurs."
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr "Persan (fa_IR)"
 
@@ -11563,7 +11566,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr "Veuillez sélectionner deux éléments"
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr "Polonais (pl_PL)"
 
@@ -11600,11 +11603,11 @@ msgstr ""
 msgid "Port range"
 msgstr "Intervalle du port"
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "Portugais (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr "Portugais (pt_PT)"
 
@@ -12262,7 +12265,7 @@ msgstr ""
 msgid "Right"
 msgstr "Droit"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -12336,7 +12339,7 @@ msgstr "Exécuter des commandes distantes sur l'hôte"
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "Russe (ru_RU)"
 
@@ -13250,7 +13253,7 @@ msgstr "Diaporamas"
 msgid "Slides"
 msgstr "Diapositives"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr "Slovaque (sk_SK)"
 
@@ -13316,7 +13319,7 @@ msgstr "Tri par le champ \"%1$s\" non autorisé."
 msgid "Source"
 msgstr "Source"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "Espagnol (es_ES)"
 
@@ -13556,7 +13559,7 @@ msgstr ""
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "Suédois (sv_SE)"
 
@@ -14435,7 +14438,7 @@ msgstr "Mar"
 msgid "Tuesday"
 msgstr "Mardi"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr "Turc (tr_TR)"
 
@@ -14593,7 +14596,7 @@ msgstr "URLs"
 msgid "USA (160 characters)"
 msgstr "USA (160 caractères)"
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr "Ukrainien (uk_UA)"
 
@@ -15532,7 +15535,6 @@ msgid "Value map added"
 msgstr "Table de correspondance ajoutée"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Table de correspondance supprimée"
@@ -15606,7 +15608,7 @@ msgstr "Vertical"
 msgid "Vertical align"
 msgstr "Alignement vertical"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 
