@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -812,7 +812,7 @@ static int	send_buffer(const char *host, unsigned short port)
 					host, port, err_send_step, zbx_socket_strerror());
 			buffer.first_error = now;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s %s", err_send_step, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s%s", err_send_step, zbx_socket_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));

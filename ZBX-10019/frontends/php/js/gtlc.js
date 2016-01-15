@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,6 +138,7 @@ var timeControl = {
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
 					var graphUrl = new Curl(obj.src);
+					graphUrl.unsetArgument('sid');
 					graphUrl.setArgument('width', obj.objDims.width);
 
 					obj.src = graphUrl.getUrl();

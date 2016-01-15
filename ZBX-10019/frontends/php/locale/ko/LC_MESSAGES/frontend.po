@@ -2,16 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-27 12:27+0200\n"
-"PO-Revision-Date: \n"
-"Last-Translator: Konstantin <konstantin.buravcov@zabbix.com>\n"
+"POT-Creation-Date: 2015-12-29 14:49+0200\n"
+"PO-Revision-Date: 2015-12-29 12:47+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1451386056.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -28,37 +30,37 @@ msgstr ""
 #: maintenance.php:162 services.php:193 services.php:207
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr ""
+msgstr "\"%s\" 는 반드시 1970.01.01에서 2038.01.18 사이 여야 한다."
 
 #: include/func.inc.php:453
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d 일%1$d 일"
 
 #: include/blocks.inc.php:772
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
+msgstr[0] "%2$d 중 %1$d개 이슈 출력%2$d 중 %1$d개 이슈 출력"
 
 #: chart4.php:91 chart5.php:105
 #, c-format
 msgid "%1$s (year %2$s)"
-msgstr ""
+msgstr "%1$s (%2$s 년)"
 
 #: latest.php:636 latest.php:807
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
+msgstr[0] "항목 %1$s개항목 %1$s개"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
+msgstr[0] "%1$s일%1$s일"
 
 #: app/views/monitoring.acknowledge.edit.php:60
 #: app/views/monitoring.acknowledge.edit.php:65
@@ -78,55 +80,55 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
+msgstr[0] "%1$s분%1$s분"
 
 #: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:66
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
+msgstr[0] "%1$s 의 재시도 가능%1$s 의 재시도 가능"
 
 #: jsLoader.php:218 jsLoader.php:219
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
+msgstr[0] "%1$s초%1$s초"
 
 #: app/views/layout.htmlpage.php:80 include/page_header.php:244
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
+msgstr[0] "%4$s 의 로그인 시도 실패가 있었습니다. 마지막 시도 실패는 %3$s %2$s %1$s 에 있었습니다.%4$s 의 로그인 시도 실패가 있었습니다. 마지막 시도 실패는 %3$s %2$s %1$s 에 있었습니다."
 
 #: app/views/monitoring.discovery.view.php:134
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
-msgstr[0] ""
+msgstr[0] "%d개의 장치"
 
 #: include/users.inc.php:225
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.host.edit.php:95
 #: include/views/configuration.hostgroups.list.php:26
 #: include/views/configuration.template.edit.php:123
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(오직 super admin 만이 group 생성 가능)"
 
 #: include/views/configuration.action.edit.php:537
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr ""
+msgstr "(최소 60초, 0 - 디폴트 값 사용)"
 
 #: include/views/configuration.host.edit.php:290
 #: include/views/configuration.host.edit.php:294
 #: include/views/configuration.host.massupdate.php:166
 #: include/views/configuration.host.prototype.edit.php:164
 msgid "(no proxy)"
-msgstr ""
+msgstr "(프록시 없음)"
 
 #: include/classes/setup/CSetupWizard.php:236
 msgid "0 - use default port"
@@ -138,7 +140,7 @@ msgstr ""
 #: include/triggers.inc.php:1845 include/triggers.inc.php:1846
 #: include/triggers.inc.php:1859
 msgid "0 or 1"
-msgstr ""
+msgstr "0 또는 1"
 
 #: queue.php:107 queue.php:168
 msgid "1 minute"
@@ -158,7 +160,7 @@ msgstr "30초"
 
 #: include/views/configuration.graph.edit.php:237
 msgid "3D view"
-msgstr ""
+msgstr "3D 뷰"
 
 #: queue.php:108 queue.php:169
 msgid "5 minutes"
@@ -174,12 +176,12 @@ msgstr "최근 500개의 값"
 
 #: app/views/administration.script.edit.php:39
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>Script"
 
 #: include/views/configuration.sysmap.edit.php:61
 #: include/views/monitoring.sysmap.edit.php:124
 msgid "<manual>"
-msgstr ""
+msgstr "<manual>"
 
 #: include/views/configuration.host.discovery.edit.php:141
 #: include/views/configuration.item.edit.php:150
@@ -187,7 +189,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:149
 #: include/views/js/configuration.discovery.edit.js.php:98
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: tr_logform.php:266
 msgid "AND"
@@ -195,25 +197,25 @@ msgstr "AND"
 
 #: popup_trexpr.php:186
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "최근 값과 그 이전의 값의 차가 N 보다 작다"
 
 #: popup_trexpr.php:194
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "최근 값과 그 이전의 값의 차가 N 과 같다"
 
 #: popup_trexpr.php:190
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "최근 값과 그 이전의 값의 차가 N 보다 크다"
 
 #: popup_trexpr.php:198
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "최근 값과 그 이전의 값의 차가 N 이 아니다"
 
 #: app/views/report.services.php:54 app/views/report.services.php:55
 #: app/views/report.services.php:56 app/views/report.services.php:57
 #: srv_status.php:147
 msgid "Acceptable SLA"
-msgstr ""
+msgstr "허용 가능한 SLA"
 
 #: include/func.inc.php:1669
 msgid "Access denied"
@@ -221,12 +223,12 @@ msgstr ""
 
 #: sysmap.php:74
 msgid "Access denied!"
-msgstr ""
+msgstr "접근 거부됨!"
 
 #: include/classes/api/services/CUser.php:1023
 #, c-format
 msgid "Account is blocked for %s seconds"
-msgstr ""
+msgstr "계정이 %s 초 동안 정지 되었습니다."
 
 #: events.php:418 include/actions.inc.php:150 include/actions.inc.php:338
 #: include/blocks.inc.php:631 include/blocks.inc.php:796
@@ -242,7 +244,7 @@ msgstr "인지"
 
 #: include/views/common.filter.trigger.php:43
 msgid "Acknowledge status"
-msgstr ""
+msgstr "Acknowledge 상태"
 
 #: include/events.inc.php:183
 msgid "Acknowledged"
@@ -251,12 +253,12 @@ msgstr "인지 완료"
 #: adm.triggerdisplayoptions.php:37
 #: include/views/administration.general.trigger.options.edit.php:56
 msgid "Acknowledged OK events"
-msgstr ""
+msgstr "Acknowledge OK 이벤트"
 
 #: adm.triggerdisplayoptions.php:34
 #: include/views/administration.general.trigger.options.edit.php:40
 msgid "Acknowledged PROBLEM events"
-msgstr ""
+msgstr "Acknowledge PROBLEM 이벤트"
 
 #: tr_events.php:112
 msgid "Acknowledges"
@@ -319,18 +321,18 @@ msgstr "액션"
 #: include/classes/api/services/CAction.php:2115
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Action \"%s\"이(가) 이미 존재합니다."
 
 #: include/classes/api/services/CAction.php:1963
 #: include/classes/api/services/CAction.php:2062
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr ""
+msgstr "Action \"%1$s\"가 \"esc_기간\"동안 잘못된 값을 가지고 있습니다.(최소 %2$s 초)"
 
 #: include/classes/api/services/CAction.php:2137
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "Action \"%1$s\"는 어떤 기능도 정의 되지 않았습니다."
 
 #: actionconf.php:187
 msgid "Action added"
@@ -343,7 +345,7 @@ msgstr "액션을 삭제하였습니다"
 #: actionconf.php:416
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
+msgstr[0] "Action을 중지하였습니다.Action을 중지하였습니다."
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
@@ -356,17 +358,17 @@ msgstr ""
 #: actionconf.php:415
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
+msgstr[0] "Action이 실행되었습니다.Action이 실행되었습니다."
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:176
 #: include/menu.inc.php:162 include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:21
 msgid "Action log"
-msgstr ""
+msgstr "Action 로그"
 
 #: include/views/configuration.action.edit.php:500
 msgid "Action operations"
-msgstr ""
+msgstr "Action 기능"
 
 #: actionconf.php:176
 msgid "Action updated"
@@ -388,7 +390,7 @@ msgstr "활성"
 #: include/views/configuration.maintenance.list.php:58
 msgctxt "maintenance status"
 msgid "Active"
-msgstr ""
+msgstr "활성"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:493
@@ -396,7 +398,7 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:41 maintenance.php:144
 #: maintenance.php:150
 msgid "Active since"
-msgstr ""
+msgstr "활성 시작 시간:"
 
 #: include/classes/api/services/CMaintenance.php:357
 #: include/classes/api/services/CMaintenance.php:498
@@ -404,7 +406,7 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:42 maintenance.php:158
 #: maintenance.php:162
 msgid "Active till"
-msgstr ""
+msgstr "활성 종료 시간:"
 
 #: app/views/administration.mediatype.edit.js.php:65
 #: app/views/administration.mediatype.edit.php:102
@@ -508,7 +510,7 @@ msgstr "추가"
 
 #: include/services.inc.php:75 include/services.inc.php:115
 msgid "Add child"
-msgstr ""
+msgstr "하위 추가"
 
 #: include/actions.inc.php:594 include/actions.inc.php:881
 msgid "Add host"
@@ -516,29 +518,29 @@ msgstr "호스트 추가"
 
 #: include/views/configuration.item.massupdate.php:555
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "새로운 또는 기존 application 추가"
 
 #: include/views/configuration.host.massupdate.php:110
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "새로운 혹은 기존 host group 추가"
 
 #: include/views/configuration.graph.edit.php:277
 #: include/views/configuration.trigger.prototype.edit.php:314
 #: include/views/configuration.trigger.prototype.massupdate.php:95
 msgid "Add prototype"
-msgstr ""
+msgstr "prototype 추가"
 
 #: app/controllers/CControllerFavouriteDelete.php:62 include/html.inc.php:157
 msgid "Add to favourites"
-msgstr ""
+msgstr "즐겨찾기에 추가"
 
 #: include/actions.inc.php:885
 msgid "Add to host group"
-msgstr ""
+msgstr "host group에 추가"
 
 #: include/actions.inc.php:622
 msgid "Add to host groups"
-msgstr ""
+msgstr "host group에 추가"
 
 #: auditlogs.php:121
 msgid "Added"
@@ -546,7 +548,7 @@ msgstr "추가"
 
 #: include/hosts.inc.php:63
 msgid "Admin"
-msgstr ""
+msgstr "Admin"
 
 #: include/menu.inc.php:241
 msgid "Administration"
@@ -555,22 +557,22 @@ msgstr "관리"
 #: include/views/configuration.sysmap.edit.php:79
 #: include/views/monitoring.sysmap.edit.php:142
 msgid "Advanced labels"
-msgstr ""
+msgstr "자세한 라벨"
 
 #: include/blocks.inc.php:629 include/blocks.inc.php:794
 #: include/events.inc.php:197 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:283
 msgid "Age"
-msgstr ""
+msgstr "수명"
 
 #: include/views/common.filter.trigger.php:83
 msgid "Age less than"
-msgstr ""
+msgstr "수명이 더 작음"
 
 #: include/views/monitoring.overview.triggers.php:63
 #, c-format
 msgid "Age less than %s"
-msgstr ""
+msgstr "수명이 %s 보다 작음"
 
 #: app/views/administration.script.list.php:64 include/items.inc.php:286
 #: include/views/configuration.httpconf.edit.php:93 popup.php:1868
@@ -596,15 +598,15 @@ msgstr ""
 #: include/views/configuration.host.prototype.edit.php:103
 #: include/views/inventory.host.view.php:73
 msgid "Agent interfaces"
-msgstr ""
+msgstr "Agent 인터페이스"
 
 #: hosts.php:59
 msgid "Agent or SNMP or JMX or IPMI interface"
-msgstr ""
+msgstr "Agent 또는 SNMP 또는 JMX 또는 IPMI 인터페이스"
 
 #: include/classes/items/CHelpItems.php:617
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr ""
+msgstr "Aggregate checks 는 모니터링 되는 호스트에서 실행되는 agent를 필요로 하지 않는다. Zabbix server는 데이터베이스 쿼리를 직접적으로 날려 aggregate 정보를 모아온다. Zabbix 메뉴얼 참고"
 
 #: app/controllers/CControllerAcknowledgeEdit.php:146
 #: app/views/monitoring.acknowledge.edit.php:83
@@ -619,7 +621,7 @@ msgstr "로그인 이름"
 #: include/views/configuration.sysmap.constructor.php:56
 #: include/views/monitoring.sysmap.constructor.php:56
 msgid "Align icons"
-msgstr ""
+msgstr "icon 할당"
 
 #: app/views/administration.script.edit.php:67
 #: app/views/administration.script.edit.php:75
@@ -637,7 +639,7 @@ msgstr ""
 #: include/views/monitoring.dashconf.php:116
 #: include/views/monitoring.sysmap.edit.php:206 jsLoader.php:92
 msgid "All"
-msgstr ""
+msgstr "모든"
 
 #: include/html.inc.php:352
 msgid "All hosts"
@@ -645,7 +647,7 @@ msgstr ""
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
-msgstr ""
+msgstr "모든 link는 반드시 \"Name\"과 \"URL\"속성이 명시되어야 한다."
 
 #: include/html.inc.php:520
 msgid "All maps"
@@ -673,22 +675,22 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.triggers.edit.php:104
 msgid "And"
-msgstr ""
+msgstr "이고"
 
 #: include/views/configuration.action.edit.php:134
 #: include/views/configuration.action.edit.php:992
 #: include/views/configuration.host.discovery.edit.php:268
 msgid "And/Or"
-msgstr ""
+msgstr "교집합/합집합"
 
 #: include/views/common.filter.trigger.php:35
 #: include/views/common.filter.trigger.php:45
 msgid "Any"
-msgstr ""
+msgstr "모든"
 
 #: include/regexp.inc.php:223 include/views/js/adm.regexprs.edit.js.php:132
 msgid "Any character string included"
-msgstr ""
+msgstr "문자열이 포함하는 모든 문자"
 
 #: applications.php:126 httpconf.php:41 include/actions.inc.php:59
 #: include/audit.inc.php:32 include/forms.inc.php:519
@@ -706,21 +708,20 @@ msgstr "애플리케이션"
 #: httpconf.php:262 include/classes/api/services/CApplication.php:338
 #, c-format
 msgid "Application \"%1$s\" already exists."
-msgstr ""
+msgstr "Application \"%1$s\" 은 이미 존재합니다."
 
 #: applications.php:117
 msgid "Application added"
 msgstr "애플리케이션을 추가하였습니다"
 
 #: applications.php:167 applications.php:207
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
-msgstr[0] "애플리케이션을 삭제하였습니다"
+msgstr[0] "Application이 삭제 되었습니다."
 
 #: include/classes/core/CJsonRpc.php:194
 msgid "Application error."
-msgstr ""
+msgstr "Application 에러발생"
 
 #: include/views/configuration.item.prototype.edit.php:397
 msgid "Application prototypes"
@@ -733,7 +734,7 @@ msgstr "애플리케이션을 갱신하였습니다"
 #: include/classes/api/services/CItemGeneral.php:479
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
-msgstr ""
+msgstr "ID \"%1$s\"의 Application은 \"%2$s\"가 가능하지 않습니다."
 
 #: include/forms.inc.php:858 include/html.inc.php:370
 #: include/views/configuration.application.edit.php:23
@@ -756,37 +757,37 @@ msgstr "애플리케이션"
 #: include/views/js/monitoring.sysmaps.js.php:277
 #: include/views/js/monitoring.sysmaps.js.php:369
 msgid "Apply"
-msgstr ""
+msgstr "적용"
 
 #: include/views/configuration.maintenance.list.php:55
 msgctxt "maintenance status"
 msgid "Approaching"
-msgstr ""
+msgstr "접근하기"
 
 #: include/func.inc.php:240
 msgid "Apr"
-msgstr ""
+msgstr "4월"
 
 #: include/forms.inc.php:1790 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:116
 msgid "April"
-msgstr ""
+msgstr "4월"
 
 #: include/classes/html/CButtonQMessage.php:46
 msgid "Are you sure you want perform this action?"
-msgstr ""
+msgstr "정말로 이 액션을 수행하시겠습니까?"
 
 #: include/views/js/administration.general.macros.edit.js.php:35
 msgid "Are you sure you want to delete"
-msgstr ""
+msgstr "정말로 삭제하시겠습니까?"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 msgid "Area size"
-msgstr ""
+msgstr "영역 크기"
 
 #: include/views/js/monitoring.sysmaps.js.php:33
 msgid "Area type"
-msgstr ""
+msgstr "영역 종류"
 
 #: include/views/configuration.item.edit.php:370
 #: include/views/configuration.item.edit.php:387
@@ -805,45 +806,45 @@ msgstr "일반 텍스트로 보기"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
-msgstr ""
+msgstr "자산 태그"
 
 #: include/maintenances.inc.php:118
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "매 %5$s %3$s %4$s, %1$s:%2$s에"
 
 #: include/maintenances.inc.php:127
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "매 %4$s %3$s일, %1$s:%2$s"
 
 #: include/maintenances.inc.php:76
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
+msgstr[0] "매주 매 %3$s, %1$s:%2$s에매 %4$s주 매 %3$s, %1$s:%2$s에"
 
 #: include/maintenances.inc.php:56
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
+msgstr[0] "매일 %1$s:%2$s에%3$s일에 한번 %1$s:%2$s에"
 
 #: include/forms.inc.php:1921
 msgid "At (hour:minute)"
-msgstr ""
+msgstr "(시:분) 에"
 
 #: include/classes/api/services/CMaintenance.php:278
 #: include/classes/api/services/CMaintenance.php:523
 msgid "At least one host or group should be selected."
-msgstr ""
+msgstr "최소 하나의 host 또는 group이 선택 되어야합니다."
 
 #: include/classes/api/services/CMaintenance.php:367
 #: include/classes/api/services/CMaintenance.php:374
 #: include/classes/api/services/CMaintenance.php:508
 #: include/classes/api/services/CMaintenance.php:513
 msgid "At least one maintenance period must be created."
-msgstr ""
+msgstr "최소한 하나의 maintenance 기간이 생성되어 있어야 합니다."
 
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
@@ -852,7 +853,7 @@ msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "최소한 하나의 MySQL, PostgreSQL, Oracle, SQLite3 또는 IBM DB2가 지원되어야합니다."
 
 #: httpconf.php:46 include/views/configuration.httpconf.edit.php:80
 #: include/views/configuration.httpconf.list.php:75
@@ -866,37 +867,37 @@ msgstr "감사"
 
 #: adm.housekeeper.php:49
 msgid "Audit data storage period"
-msgstr ""
+msgstr "Audit 데이터 스토리지 기간"
 
 #: include/profiles.inc.php:144
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Audit 데이터 스토리지 기간(일 단위) \"%1$s\"."
 
 #: auditlogs.php:27 include/views/administration.auditlogs.list.php:21
 msgid "Audit log"
-msgstr ""
+msgstr "Audit 로그"
 
 #: include/func.inc.php:244
 msgid "Aug"
-msgstr ""
+msgstr "8월"
 
 #: include/forms.inc.php:1774 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:120
 msgid "August"
-msgstr ""
+msgstr "8월"
 
 #: app/views/administration.mediatype.edit.php:74 include/menu.inc.php:269
 #: include/views/administration.authentication.edit.php:22
 #: include/views/configuration.httpconf.edit.php:253
 #: include/views/configuration.httpconf.list.php:76
 msgid "Authentication"
-msgstr ""
+msgstr "인증"
 
 #: include/views/configuration.host.edit.php:661
 #: include/views/configuration.host.prototype.edit.php:301
 msgid "Authentication algorithm"
-msgstr ""
+msgstr "인증 알고리즘"
 
 #: include/views/configuration.action.edit.php:826
 #: include/views/configuration.host.discovery.edit.php:164
@@ -904,19 +905,19 @@ msgstr ""
 #: include/views/configuration.item.massupdate.php:248
 #: include/views/configuration.item.prototype.edit.php:172
 msgid "Authentication method"
-msgstr ""
+msgstr "인증 방법"
 
 #: authentication.php:194
 msgid "Authentication method changed to HTTP"
-msgstr ""
+msgstr "인증 방식이 HTTP로 변경됨"
 
 #: authentication.php:144
 msgid "Authentication method changed to LDAP"
-msgstr ""
+msgstr "인증 방식이 LDAP로 변경됨"
 
 #: authentication.php:90
 msgid "Authentication method changed to Zabbix internal"
-msgstr ""
+msgstr "인증 방식이 Zabbix internal로 변경됨"
 
 #: include/views/configuration.host.discovery.edit.php:133
 #: include/views/configuration.item.edit.php:142
@@ -924,7 +925,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:141
 #: include/views/js/configuration.discovery.edit.js.php:91
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "인증 패스프레이즈"
 
 #: include/views/configuration.host.discovery.edit.php:126
 #: include/views/configuration.item.edit.php:135
@@ -932,32 +933,32 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:134
 #: include/views/js/configuration.discovery.edit.js.php:81
 msgid "Authentication protocol"
-msgstr ""
+msgstr "인증 프로토콜"
 
 #: include/views/configuration.action.list.php:31
 msgid "Auto registration"
-msgstr ""
+msgstr "자동 등록"
 
 #: include/views/administration.users.edit.php:171
 msgid "Auto-login"
-msgstr ""
+msgstr "자동 로그인"
 
 #: include/views/administration.users.edit.php:172 profile.php:49 users.php:60
 msgid "Auto-logout (min 90 seconds)"
-msgstr ""
+msgstr "자동 로그아웃(최소 90초)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "데이터 스토리지 자동 등록 기간(일 단위)"
 
 #: adm.housekeeper.php:41
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "event와 alert 데이터 스토리지 자동 등록 기간"
 
 #: include/profiles.inc.php:136
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "event와 alert데이터 스토리지 자동 등록 기간(일 단위) \"%1$s\"."
 
 #: include/hosts.inc.php:1075
 #: include/views/administration.general.other.edit.php:52
@@ -966,17 +967,17 @@ msgstr ""
 #: include/views/configuration.host.massupdate.php:293
 #: include/views/configuration.host.prototype.edit.php:341
 msgid "Automatic"
-msgstr ""
+msgstr "자동"
 
 #: include/views/configuration.sysmap.edit.php:67
 #: include/views/monitoring.sysmap.edit.php:130
 msgid "Automatic icon mapping"
-msgstr ""
+msgstr "자동 아이콘 맵핑"
 
 #: include/views/js/monitoring.sysmaps.js.php:124
 #: include/views/js/monitoring.sysmaps.js.php:242
 msgid "Automatic icon selection"
-msgstr ""
+msgstr "자동 아이콘 선택"
 
 #: include/views/configuration.host.list.php:68
 msgid "Availability"
@@ -997,19 +998,19 @@ msgstr "가벼운 장애"
 
 #: popup_trexpr.php:202
 msgid "Average value of a period T is < N"
-msgstr ""
+msgstr "T 기간의 평균 값이 N 보다 작다"
 
 #: popup_trexpr.php:212
 msgid "Average value of a period T is = N"
-msgstr ""
+msgstr "T 기간의 평균 값이 N 과 같다."
 
 #: popup_trexpr.php:207
 msgid "Average value of a period T is > N"
-msgstr ""
+msgstr "T 기간의 평균 값이 N 보다 크다"
 
 #: popup_trexpr.php:217
 msgid "Average value of a period T is NOT N"
-msgstr ""
+msgstr "T 기간의 평균 값이 N 이 아니다"
 
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:341
@@ -1029,38 +1030,38 @@ msgstr "배경 이미지"
 #: authentication.php:42
 #: include/views/administration.authentication.edit.php:63
 msgid "Base DN"
-msgstr ""
+msgstr "기본 DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "기본"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Bind DN"
-msgstr ""
+msgstr "DN 결합하기"
 
 #: authentication.php:45
 #: include/views/administration.authentication.edit.php:86
 #: include/views/administration.authentication.edit.php:92
 msgid "Bind password"
-msgstr ""
+msgstr "패스워드 설정하기"
 
 #: popup_trexpr.php:588
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr ""
+msgstr "마지막(가장 최근의)T 값과 마스크 값의 bit AND 연산이 N과 같다"
 
 #: popup_trexpr.php:593
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "마지막(가장 최근의)T 값과 마스크의 bit AND 연산이 N 이 아니다"
 
 #: adm.triggerdisplayoptions.php:38 adm.triggerdisplayoptions.php:39
 #: adm.triggerdisplayoptions.php:40 adm.triggerdisplayoptions.php:41
 msgid "Blinking"
-msgstr ""
+msgstr "깜빡이기"
 
 #: include/views/administration.users.list.php:77
 msgid "Blocked"
-msgstr ""
+msgstr "차단됨"
 
 #: include/classes/core/ZBase.php:265
 msgid "Blue"
@@ -1073,7 +1074,7 @@ msgstr "굵은 선"
 
 #: include/items.inc.php:140
 msgid "Boolean"
-msgstr ""
+msgstr "Boolean"
 
 #: include/views/configuration.screen.constructor.edit.php:719
 #: include/views/configuration.sysmap.edit.php:130
@@ -1085,19 +1086,19 @@ msgstr "아래쪽"
 
 #: include/locales.inc.php:54
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "불가리아어 (bg_BG)"
 
 #: tr_status.php:771
 msgid "Bulk acknowledge"
-msgstr ""
+msgstr "대량 acknowledge"
 
 #: report2.php:172
 msgid "By host"
-msgstr ""
+msgstr "host에 의해"
 
 #: report2.php:173
 msgid "By trigger template"
-msgstr ""
+msgstr "trigger template에 의해"
 
 #: app/views/administration.proxy.list.php:97
 #: app/views/administration.proxy.list.php:110
@@ -1144,7 +1145,7 @@ msgstr ""
 
 #: app/views/administration.mediatype.edit.php:142
 msgid "Canada (136 characters)"
-msgstr ""
+msgstr "캐나다(글자 수 136자)"
 
 #: app/views/administration.mediatype.edit.php:152
 #: app/views/administration.proxy.edit.php:128
@@ -1174,7 +1175,7 @@ msgstr "취소"
 #: app/controllers/CControllerAcknowledgeCreate.php:129
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
-msgstr[0] ""
+msgstr[0] "event를 acknowledge 할 수 없습니다."
 
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
@@ -1186,13 +1187,13 @@ msgstr ""
 #: include/classes/api/services/CGraph.php:753
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "숫자가 아닌 \"%1$s\"을 graph \"%2$s\"에 추가할 수 없습니다."
 
 #: include/classes/api/services/CGraphPrototype.php:693
 #: include/classes/api/services/CGraphPrototype.php:757
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "숫자가 아닌 \"%1$s\"를 graph prototype \"%2$s\"에 추가할 수 없습니다."
 
 #: actionconf.php:188
 msgid "Cannot add action"
@@ -1200,7 +1201,7 @@ msgstr "액션을 추가할 수 없습니다"
 
 #: actionconf.php:273
 msgid "Cannot add action condition"
-msgstr ""
+msgstr "action 조건을 추가할 수 없습니다."
 
 #: applications.php:118
 msgid "Cannot add application"
@@ -1209,12 +1210,12 @@ msgstr "애플리케이션을 추가할 수 없습니다"
 #: include/classes/api/services/CTrigger.php:1303
 #: include/classes/api/services/CTriggerPrototype.php:1057
 msgid "Cannot add dependency from a host to a template."
-msgstr ""
+msgstr "host에서 template으로 dependency(의존성)을 추가할 수 없습니다."
 
 #: include/triggers.inc.php:517
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
-msgstr ""
+msgstr "trigger \"%1$s:%2$s\"에서 존재하지 않는 trigger \"%3$s:%4$s\"로 dependency(의존성)을 추가할 수 없습니다."
 
 #: host_discovery.php:324
 msgid "Cannot add discovery rule"
@@ -1226,7 +1227,7 @@ msgstr "그래프를 추가할 수 없습니다"
 
 #: graphs.php:234
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "graph prototype(그래프 원형)을 추가 할 수 없습니다."
 
 #: hostgroups.php:182 usergrps.php:195
 msgid "Cannot add group"
@@ -1234,7 +1235,7 @@ msgstr "그룹을 추가할 수 없습니다"
 
 #: include/classes/api/services/CTemplate.php:338
 msgid "Cannot add group."
-msgstr ""
+msgstr "group을 추가할 수 없습니다."
 
 #: hosts.php:431
 msgid "Cannot add host"
@@ -1242,7 +1243,7 @@ msgstr "호스트를 추가할 수 없습니다"
 
 #: host_prototypes.php:207
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "host 원형(host prototype)을 추가할 수 없습니다."
 
 #: adm.images.php:63
 msgid "Cannot add image"
@@ -1255,52 +1256,52 @@ msgstr "아이템을 추가할 수 없습니다"
 #: include/classes/api/services/CApplication.php:521
 #, c-format
 msgid "Cannot add item \"%1$s\" from \"%2$s\" to application \"%3$s\" from \"%4$s\"."
-msgstr ""
+msgstr "\"%2$s\"의 item \"%1$s\"을 \"%4$s\"의 application \"%3$s\"로 추가 시킬 수 없습니다."
 
 #: disc_prototypes.php:393
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "item 원형(item prototype)을 추가할 수 없습니다."
 
 #: include/classes/api/services/CApplication.php:574
 msgid "Cannot add items."
-msgstr ""
+msgstr "item을 추가할 수 없습니다."
 
 #: maintenance.php:131
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "maintenance를 추가할 수 없습니다."
 
 #: app/controllers/CControllerMediatypeCreate.php:54
 #: app/controllers/CControllerMediatypeCreate.php:139
 msgid "Cannot add media type"
-msgstr ""
+msgstr "media 타입(type)을 추가할 수 없습니다."
 
 #: include/classes/api/services/CGraph.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "여러개의 \"Graph sum(그래프 합산)\" 타입의 item을 graph \"%1$s\"에 추가할 수 없습니다."
 
 #: include/classes/api/services/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "여러개의 \"Graph sum(그래프 합산)\" 타입의 item을 graph prototype(그래프 원형) \"%1$s\"에 추가할 수 없습니다."
 
 #: sysmaps.php:199
 msgid "Cannot add network map"
-msgstr ""
+msgstr "network map(네트워크 맵)을 추가 할 수 없습니다."
 
 #: httpconf.php:277
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "새 application \"%1$s\"를 추가할 수 없습니다."
 
 #: app/controllers/CControllerProxyCreate.php:56
 #: app/controllers/CControllerProxyCreate.php:112
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "proxy를 추가할 수 없습니다."
 
 #: adm.regexps.php:148
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "regular expression(정규 표현식)을 추가할 수 없습니다."
 
 #: screenconf.php:165
 msgid "Cannot add screen"
@@ -1309,7 +1310,7 @@ msgstr "스크린을 추가할 수 없습니다"
 #: app/controllers/CControllerScriptCreate.php:47
 #: app/controllers/CControllerScriptCreate.php:100
 msgid "Cannot add script"
-msgstr ""
+msgstr "script를 추가할 수 없습니다."
 
 #: services.php:162
 msgid "Cannot add service"
@@ -1317,11 +1318,11 @@ msgstr "서비스를 추가할 수 없습니다"
 
 #: slideconf.php:107
 msgid "Cannot add slide show"
-msgstr ""
+msgstr "slide show 추가할 수 없습니다."
 
 #: templates.php:244
 msgid "Cannot add template"
-msgstr ""
+msgstr "template을 추가할 수 없습니다."
 
 #: triggers.php:226 triggers.php:357 tr_logform.php:152
 msgid "Cannot add trigger"
@@ -1329,7 +1330,7 @@ msgstr "트리거를 추가할 수 없습니다"
 
 #: trigger_prototypes.php:219
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "trigger 프로토타입을 추가할 수 없습니다."
 
 #: users.php:247
 msgid "Cannot add user"
@@ -1341,7 +1342,7 @@ msgstr "사용자를 추가할 수 없습니다. 암호가 일치하지 않습�
 
 #: include/classes/api/services/CUserGroup.php:216
 msgid "Cannot add users."
-msgstr ""
+msgstr "user를 추가할 수 없습니다."
 
 #: adm.valuemapping.php:110
 msgid "Cannot add value map"
@@ -1349,15 +1350,15 @@ msgstr "값 매핑을 추가할 수 없습니다"
 
 #: httpconf.php:202
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "web 시나리오를 추가할 수 없습니다."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "authentication을 변경할 수 없습니다."
 
 #: authentication.php:195
 msgid "Cannot change authentication method to HTTP"
-msgstr ""
+msgstr "authentication 메소드를 HTTP로 변경할 수 없습니다."
 
 #: authentication.php:140 authentication.php:147
 msgid "Cannot change authentication method to LDAP"
@@ -1373,19 +1374,19 @@ msgstr "이력을 삭제할 수 없습니다"
 
 #: include/classes/api/services/CDiscoveryRule.php:1192
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "그래프 원형(graph prototype)을 복제할 수 없습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:1240
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "호스트 원형(host prototype)을 복제할 수 없습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:1076
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "item prototype(아이템 원형)을 복제할 수 없습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:595
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "trigger prototype(트리거 원형)을 복제할 수 없습니다."
 
 #: include/classes/setup/CSetupWizard.php:262
 msgid "Cannot connect to the database."
@@ -1393,38 +1394,38 @@ msgstr ""
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
-msgstr ""
+msgstr "zabbix 서버 데몬의 trapper포트에 연결할 수 없습니다. script 실행을 하기 위해선 연결은 필수적입니다."
 
 #: graphs.php:371
 msgid "Cannot copy graphs"
-msgstr ""
+msgstr "graph를 복사할 수 없습니다."
 
 #: items.php:819
 msgid "Cannot copy items"
-msgstr ""
+msgstr "item을 복사할 수 없습니다."
 
 #: include/triggers.inc.php:406
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "expression에 다수의 host를 포함하는 trigger \"%1$s:%2$s\"를 복사할 수 없습니다."
 
 #: include/classes/api/services/CHostPrototype.php:151
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "discovered host인 \"%1$s\"에 host 프로토타입(prototype)을 생성할 수 없습니다."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "다수의 database 커넥션은 생성할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:1337
 #: include/classes/api/services/CTriggerPrototype.php:1088
 msgid "Cannot create circular dependencies."
-msgstr ""
+msgstr "순환적 의존관계(circular dependency)는 허용되지 않습니다."
 
 #: include/classes/api/services/CTrigger.php:1309
 msgid "Cannot create dependency on trigger itself."
-msgstr ""
+msgstr "재귀적 의존관계(dependency on itself)는 허용되지 않습니다."
 
 #: include/classes/api/services/CTriggerPrototype.php:1027
 msgid "Cannot create dependency on trigger prototype itself."
@@ -1432,29 +1433,29 @@ msgstr ""
 
 #: discoveryconf.php:155
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "discovery 규칙을 생성할 수 없습니다."
 
 #: adm.iconmapping.php:80
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "icon map을 생성할 수 없습니다."
 
 #: include/classes/api/services/CIconMap.php:166
 #: include/classes/api/services/CIconMap.php:226
 #, c-format
 msgid "Cannot create icon maps with identical name \"%s\"."
-msgstr ""
+msgstr "\"%s\"라는 이름의 icon map을 생성할 수 없습니다."
 
 #: httpconf.php:211
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr ""
+msgstr "새로운 application을 생성할 수 없습니다. web secenario가 이미 application에 할당이 되어 있습니다."
 
 #: include/js.inc.php:204
 msgid "Cannot create new element"
-msgstr ""
+msgstr "새로운 요소를 추가할 수 없습니다."
 
 #: include/classes/api/services/CTemplate.php:352
 msgid "Cannot create template."
-msgstr ""
+msgstr "새로운 템플릿(template)을 생성할 수 없습니다."
 
 #: include/classes/setup/CSetupWizard.php:382
 msgid "Cannot create the configuration file."
@@ -1463,7 +1464,7 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1352
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Zabbix 내부 user인 \"%1$s\"를 삭제할 수 없습니다. user 중지(disable)을 시도해보십시오"
 
 #: actionconf.php:211
 msgid "Cannot delete action"
@@ -1478,7 +1479,7 @@ msgstr[0] "애플리케이션을 삭제할 수 없습니다"
 #: include/classes/api/services/CTrigger.php:961
 #: include/classes/api/services/CTriggerPrototype.php:854
 msgid "Cannot delete dependency"
-msgstr ""
+msgstr "의존성을 삭제할 수 없습니다."
 
 #: include/classes/api/services/CApplication.php:415
 #, c-format
@@ -1488,17 +1489,17 @@ msgstr ""
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
+msgstr "발견된 그래프(discovered graph) \"%1$s\"를 삭제할 수 없습니다."
 
 #: include/classes/api/services/CItem.php:581
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
-msgstr ""
+msgstr "발견된 아이템(discovered item) \"%1$s\"를 삭제할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:762
 #, c-format
 msgid "Cannot delete discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "발견된 트리거(discovered trigger) \"%1$s\"를 삭제할 수 없습니다."
 
 #: discoveryconf.php:179 host_discovery.php:167
 #: include/classes/api/services/CDiscoveryRule.php:400
@@ -1507,7 +1508,7 @@ msgstr "디스커버리 규칙을 삭제할 수 없습니다"
 
 #: discoveryconf.php:221 host_discovery.php:364
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "discovery 규칙을 삭제할 수 없습니다."
 
 #: graphs.php:295
 msgid "Cannot delete graph"
@@ -1515,19 +1516,19 @@ msgstr "그래프를 삭제할 수 없습니다"
 
 #: graphs.php:287
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "graph 원형(graph prototype)을 삭제할 수 없습니다."
 
 #: graphs.php:311
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "graph 원형(graph prototype)을 삭제할 수 없습니다."
 
 #: graphs.php:319
 msgid "Cannot delete graphs"
-msgstr ""
+msgstr "graph를 삭제할 수 없습니다."
 
 #: include/classes/api/services/CGraphPrototype.php:586
 msgid "Cannot delete graphs created by low level discovery."
-msgstr ""
+msgstr "저급 디스커버리(low level discovery)에 의해 생성된 그래프를 삭제할 수 없습니다."
 
 #: hostgroups.php:227 hostgroups.php:249 usergrps.php:228 usergrps.php:259
 #, fuzzy
@@ -1541,15 +1542,15 @@ msgstr "호스트를 삭제할 수 없습니다"
 
 #: include/classes/api/services/CDiscoveryRule.php:412
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "호스트 원형(host prototype)을 삭제할 수 없습니다."
 
 #: host_prototypes.php:127 host_prototypes.php:256
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "호스트 원형(host prototype)을 삭제할 수 없습니다."
 
 #: adm.iconmapping.php:96
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "아이콘 맵(icon map)을 삭제할 수 없습니다."
 
 #: adm.images.php:124
 msgid "Cannot delete image"
@@ -1557,7 +1558,7 @@ msgstr "이미지를 삭제할 수 없습니다"
 
 #: include/classes/api/services/CHost.php:1008
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "인벤토리(inventory)를 삭제할 수 없습니다."
 
 #: items.php:373
 msgid "Cannot delete item"
@@ -1565,11 +1566,11 @@ msgstr "아이템을 삭제할 수 없습니다"
 
 #: disc_prototypes.php:223
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "아이템 원형(item prototype)을 삭제할 수 없습니다."
 
 #: disc_prototypes.php:435
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "아이템 원형(item prototype)을 삭제할 수 없습니다."
 
 #: items.php:892
 msgid "Cannot delete items"
@@ -1577,39 +1578,39 @@ msgstr "아이템을 삭제할 수 없습니다"
 
 #: maintenance.php:251
 msgid "Cannot delete maintenance"
-msgstr ""
+msgstr "maintenance를 삭제할 수 없습니다."
 
 #: app/controllers/CControllerMediatypeDelete.php:65
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] ""
+msgstr[0] "미디어 타입(media type)을 삭제할 수 없습니다."
 
 #: sysmaps.php:244
 msgid "Cannot delete network map"
-msgstr ""
+msgstr "네트워크 맵(network map)을 삭제할 수 없습니다."
 
 #: app/controllers/CControllerProxyDelete.php:65
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] ""
+msgstr[0] "프록시(proxy)를 삭제할 수 없습니다."
 
 #: adm.regexps.php:198
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] ""
+msgstr[0] "정규 표현식(regular expression)을 삭제할 수 없습니다."
 
 #: screenconf.php:236
 msgid "Cannot delete screen"
-msgstr ""
+msgstr "스크린(screen)을 삭제할 수 없습니다."
 
 #: app/controllers/CControllerScriptDelete.php:75
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
-msgstr[0] ""
+msgstr[0] "스크립트(script)를 삭제할 수 없습니다."
 
 #: include/classes/api/services/CScript.php:460
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr ""
+msgstr "스크립트(script)를 삭제할 수 없습니다. 파라미터 scriptid가 명시되지 않았습니다."
 
 #: include/classes/api/services/CScript.php:492
 #, c-format
@@ -1619,7 +1620,7 @@ msgstr ""
 #: include/classes/api/services/CScript.php:475
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr ""
+msgstr "스크립트(script)를 삭제할 수 없습니다. scriptid가 \"%1$s\"인 스크립트는 존재하지 않습니다."
 
 #: actionconf.php:434
 msgid "Cannot delete selected actions"
@@ -1639,39 +1640,39 @@ msgstr ""
 
 #: include/classes/api/services/CApplication.php:411
 msgid "Cannot delete templated application."
-msgstr ""
+msgstr "템플릿에 속한 어플리케이션(templated application)은 삭제할 수 없습니다."
 
 #: include/classes/api/services/CGraph.php:549
 #: include/classes/api/services/CGraphPrototype.php:561
 msgid "Cannot delete templated graphs."
-msgstr ""
+msgstr "템플릿에 속한 그래프(templated graph)는 삭제할 수 없습니다."
 
 #: include/classes/api/services/CHostPrototype.php:1075
 msgid "Cannot delete templated host prototype."
-msgstr ""
+msgstr "템플릿에 속한 호스트 원형(templated host prototype)은 삭제할 수 없습니다."
 
 #: include/classes/api/services/CItem.php:576
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "템플릿에 속한 아이템(templated item)은 삭제할 수 없습니다."
 
 #: include/classes/api/services/CItemPrototype.php:726
 msgid "Cannot delete templated items"
-msgstr ""
+msgstr "템플릿에 속한 아이템(templated item)은 삭제할 수 없습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:360
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "템플릿에 속한 아이템(templated item)은 삭제할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:1794
 #: include/classes/api/services/CTriggerPrototype.php:606
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "템플릿에 속한 트리거(templated trigger) \"%1$s:%2$s\"은 삭제할 수 없습니다."
 
 #: include/classes/api/services/CHttpTest.php:354
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "템플릿화 된 웹 시나리오(templated web scenario) \"%1$s\"를 삭제할 수 없습니다."
 
 #: triggers.php:244
 msgid "Cannot delete trigger"
@@ -1679,11 +1680,11 @@ msgstr "트리거를 삭제할 수 없습니다"
 
 #: trigger_prototypes.php:234
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "트리거 원형(trigger prototype)을 삭제할 수 없습니다."
 
 #: trigger_prototypes.php:323
 msgid "Cannot delete trigger prototypes"
-msgstr ""
+msgstr "트리거 원형(trigger prototype)을 삭제할 수 없습니다."
 
 #: triggers.php:369
 msgid "Cannot delete triggers"
@@ -1695,48 +1696,47 @@ msgstr "사용자를 삭제할 수 없습니다"
 
 #: include/classes/api/services/CUser.php:923
 msgid "Cannot delete user media."
-msgstr ""
+msgstr "사용자 미디어(user media)를 삭제할 수 없습니다."
 
 #: adm.valuemapping.php:131
-#, fuzzy
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "값 매핑을 삭제할 수 없습니다"
 
 #: httpconf.php:151 httpconf.php:461
 msgid "Cannot delete web scenario"
-msgstr ""
+msgstr "웹 시나리오(web senario)를 삭제할 수 없습니다."
 
 #: actionconf.php:419
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] ""
+msgstr[0] "액션(action)을 중지시킬 수 없습니다."
 
 #: discoveryconf.php:206
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
+msgstr[0] "디스커버리 룰(discovery rule)를 중지시킬 수 없습니다."
 
 #: host_discovery.php:354
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
+msgstr[0] "디스커버리 룰(discovery rule)를 중지시킬 수 없습니다."
 
 #: app/controllers/CControllerProxyHostDisable.php:76 hostgroups.php:299
 #: hosts.php:705
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
+msgstr[0] "호스트(host)를 중지시킬 수 없습니다."
 
 #: host_prototypes.php:241
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
+msgstr[0] "호스트 원형(host prototype)을 중지(disable)시킬 수 없습니다."
 
 #: applications.php:248 items.php:784
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
+msgstr[0] "아이템(item)을 중지(disable)시킬 수 없습니다."
 
 #: disc_prototypes.php:419
 msgid "Cannot disable item prototype"
@@ -1770,92 +1770,92 @@ msgstr[0] ""
 
 #: queue.php:60
 msgid "Cannot display item queue."
-msgstr ""
+msgstr "아이템 목록(item queue)를 출력할 수 없습니다."
 
 #: chart7.php:79
 msgid "Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "\"그래프 합계(Graph sum)\" 형식의 아이템은 여러 개를 출력할 수 없습니다."
 
 #: actionconf.php:418
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] ""
+msgstr[0] "액션(action)을 가동 시킬 수 없습니다."
 
 #: discoveryconf.php:205
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
+msgstr[0] "디스커버리 룰(discovery rule)을 가동 시킬 수 없습니다."
 
 #: host_discovery.php:353
 msgid "Cannot enable discovery rules"
 msgid_plural "Cannot enable discovery rules"
-msgstr[0] ""
+msgstr[0] "디스커버리 룰(discovery rule)을 가동 시킬 수 없습니다."
 
 #: app/controllers/CControllerProxyHostEnable.php:76 hostgroups.php:298
 #: hosts.php:704
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] ""
+msgstr[0] "호스트(host)를 가동 시킬 수 없습니다."
 
 #: host_prototypes.php:240
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] ""
+msgstr[0] "호스트 원형(host prototype)을 가동시킬 수 없습니다."
 
 #: applications.php:247 items.php:783
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
-msgstr[0] ""
+msgstr[0] "아이템(item)을 가동시킬 수 없습니다."
 
 #: disc_prototypes.php:418
 msgid "Cannot enable item prototype"
 msgid_plural "Cannot enable item prototypes"
-msgstr[0] ""
+msgstr[0] "아이템 원형(item prototype)을 가동시킬 수 없습니다."
 
 #: app/controllers/CControllerMediatypeEnable.php:71
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
-msgstr[0] ""
+msgstr[0] "미디어 타입(media type)을 가동시킬 수 없습니다."
 
 #: triggers.php:317
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
+msgstr[0] "트리거(trigger)를 가동(enable) 시킬 수 없습니다."
 
 #: trigger_prototypes.php:312
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
-msgstr[0] ""
+msgstr[0] "트리거 원형(trigger prototype)을 가동 시킬 수 없습니다."
 
 #: usergrps.php:368
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
-msgstr[0] ""
+msgstr[0] "사용자 그룹(user group)을 가동시킬 수 없습니다."
 
 #: httpconf.php:404
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
+msgstr[0] "웹 시나리오(web senario)를 가동 시킬 수 없습니다."
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
 msgid "Cannot find background image \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "맵(map) \"%2$s\"에서 사용되는 배경 이미지 \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:80
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "스크린(screen)\" %2$s\"에서 사용되는 그래프(graph) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CMapImporter.php:213
 #, c-format
 msgid "Cannot find group \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "맵 \"%2$s\"에서 사용되는 그룹(group) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "스크린(screen) \"%2$s\"에서 사용되는 그룹(group) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CMapImporter.php:221
 #, c-format
@@ -1865,12 +1865,12 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "스크린 \"%2$s\"에서 호스트(host) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/CConfigurationImport.php:889
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr ""
+msgstr "\"%4$s\"에서 디스커버리 룰(discovery rule) \"%3$s\"의 호스트 원형(host prototype) \"%2$s\"을 가진 호스트 그룹 \"%1$s\"을 찾을 수 없습니다."
 
 #: include/classes/api/services/CDiscoveryRule.php:972
 #: include/classes/api/services/CDiscoveryRule.php:1058
@@ -1878,7 +1878,7 @@ msgstr ""
 #: include/items.inc.php:437
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr ""
+msgstr "아이템 키(item key) \"%2$s\"를 가진 \"%1$s\"에서 호스트 인터페이스를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CMapImporter.php:254
 #, c-format
@@ -1933,26 +1933,26 @@ msgstr ""
 #: include/classes/import/importers/CAbstractScreenImporter.php:99
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "스크린(screen) \"%2$s\"에서 사용되는 아이템(item) \"%1$s\"을 찾을 수 없습니다."
 
 #: include/classes/import/importers/CMapImporter.php:205
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
-msgstr ""
+msgstr "맵(map) \"%2$s\"에서 사용된 맵(map) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:107
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "스크린(screen) \"%2$s\"에서 사용된 맵(map) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/js.inc.php:187
 msgid "Cannot find objects with name"
-msgstr ""
+msgstr "이름을 가진 객체를 찾을 수 없습니다."
 
 #: include/classes/import/importers/CAbstractScreenImporter.php:115
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr ""
+msgstr "스크린(screen) \"%2$s\"에서 사용된 스크린(screen) \"%1$s\"를 찾을 수 없습니다."
 
 #: include/classes/import/CConfigurationImport.php:912
 #, c-format
@@ -2015,40 +2015,40 @@ msgstr ""
 #: include/classes/mvc/CView.php:141
 #, c-format
 msgid "Cannot include view file \"%s\"."
-msgstr ""
+msgstr "뷰 파일 \"%s\"를 포함 시킬 수 없습니다."
 
 #: popup_trexpr.php:891
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "trigger expression을 추가할 수 없습니다."
 
 #: include/classes/api/services/CUser.php:712
 msgid "Cannot insert user media."
-msgstr ""
+msgstr "user media를 추가할 수 없습니다."
 
 #: include/classes/api/services/CHost.php:986
 msgid "Cannot link template"
-msgstr ""
+msgstr "template을 연결(link)할 수 없습니다."
 
 #: include/classes/api/services/CTemplate.php:847
 #: include/classes/api/services/CTemplate.php:861
 msgid "Cannot link template."
-msgstr ""
+msgstr "template을 연결(link)할 수 없습니다."
 
 #: include/classes/api/services/CUser.php:1064
 msgid "Cannot login."
-msgstr ""
+msgstr "로그인 할 수 없습니다."
 
 #: include/classes/api/services/CUser.php:989
 msgid "Cannot logout."
-msgstr ""
+msgstr "로그아웃할 수 없습니다."
 
 #: include/classes/api/services/CHost.php:844
 msgid "Cannot mass update host name."
-msgstr ""
+msgstr "host 이름을 다량 업데이트 할 수 없습니다."
 
 #: include/classes/api/services/CTemplate.php:982
 msgid "Cannot mass update template name."
-msgstr ""
+msgstr "템플릿 이름을 다량 업데이트 할 수 없습니다."
 
 #: include/classes/api/services/CHost.php:834
 msgid "Cannot mass update visible host name."
@@ -2085,19 +2085,19 @@ msgstr ""
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
 msgid "Cannot read the response, check connection with the Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Zabbix 서버 \"%1$s\"와의 연결을 체크하고 응답을 얻는데 실패하였습니다."
 
 #: include/views/js/monitoring.history.js.php:36
 msgid "Cannot remove all items, at least one item should remain."
-msgstr ""
+msgstr "아이템(item) 모두를 삭제할 수 없습니다. 최소 한 개의 아이템은 설정되어야합니다."
 
 #: include/classes/api/services/CUser.php:273
 msgid "Cannot rename guest user."
-msgstr ""
+msgstr "게스트 유저(guest user)의 이름을 바꿀 수 없습니다."
 
 #: include/classes/api/services/CDRule.php:200
 msgid "Cannot save discovery rule without checks."
-msgstr ""
+msgstr "디스커버리 규칙(discovery rule)을 저장할 수 없습니다."
 
 #: include/classes/server/CZabbixServer.php:191
 #, c-format
@@ -5649,6 +5649,10 @@ msgid "Generated in %s sec"
 msgstr ""
 
 #: include/locales.inc.php:61
+msgid "Georgian (ka_GE)"
+msgstr ""
+
+#: include/locales.inc.php:62
 msgid "German (de_DE)"
 msgstr "독일어 (de_DE)"
 
@@ -5868,7 +5872,7 @@ msgstr ""
 msgid "Graphs deleted"
 msgstr ""
 
-#: include/locales.inc.php:62
+#: include/locales.inc.php:63
 msgid "Greek (el_GR)"
 msgstr ""
 
@@ -6543,7 +6547,7 @@ msgstr ""
 msgid "Housekeeping"
 msgstr ""
 
-#: include/locales.inc.php:63
+#: include/locales.inc.php:64
 msgid "Hungarian (hu_HU)"
 msgstr "헝가리어 (hu_HU)"
 
@@ -7827,7 +7831,7 @@ msgstr ""
 msgid "Incorrect web scenario ID."
 msgstr ""
 
-#: include/locales.inc.php:64
+#: include/locales.inc.php:65
 msgid "Indonesian (id_ID)"
 msgstr ""
 
@@ -8250,7 +8254,7 @@ msgstr ""
 msgid "It is not possible to search by user password."
 msgstr ""
 
-#: include/locales.inc.php:65
+#: include/locales.inc.php:66
 msgid "Italian (it_IT)"
 msgstr "이탈리아어 (it_IT)"
 
@@ -8531,7 +8535,7 @@ msgstr ""
 msgid "January"
 msgstr ""
 
-#: include/locales.inc.php:67
+#: include/locales.inc.php:68
 msgid "Japanese (ja_JP)"
 msgstr "일본어 (ja_JP)"
 
@@ -8587,7 +8591,7 @@ msgstr ""
 msgid "Keyword"
 msgstr ""
 
-#: include/locales.inc.php:66
+#: include/locales.inc.php:67
 msgid "Korean (ko_KR)"
 msgstr ""
 
@@ -8748,7 +8752,7 @@ msgstr "최근 이벤트"
 msgid "Latest values"
 msgstr ""
 
-#: include/locales.inc.php:68
+#: include/locales.inc.php:69
 msgid "Latvian (lv_LV)"
 msgstr "라트비아어 (lv_LV)"
 
@@ -8876,7 +8880,7 @@ msgstr ""
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
 msgstr ""
 
-#: include/locales.inc.php:69
+#: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
 msgstr ""
 
@@ -9363,7 +9367,6 @@ msgid "Media type added"
 msgstr ""
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "연락 방법을 삭제하였습니다"
@@ -11426,7 +11429,7 @@ msgstr ""
 msgid "Permissions can be assigned for user groups only."
 msgstr ""
 
-#: include/locales.inc.php:70
+#: include/locales.inc.php:71
 msgid "Persian (fa_IR)"
 msgstr ""
 
@@ -11469,7 +11472,7 @@ msgstr ""
 msgid "Please select two elements"
 msgstr ""
 
-#: include/locales.inc.php:71
+#: include/locales.inc.php:72
 msgid "Polish (pl_PL)"
 msgstr ""
 
@@ -11506,11 +11509,11 @@ msgstr ""
 msgid "Port range"
 msgstr ""
 
-#: include/locales.inc.php:72
+#: include/locales.inc.php:73
 msgid "Portuguese (pt_BR)"
 msgstr "포르투갈어 (pt_BR)"
 
-#: include/locales.inc.php:73
+#: include/locales.inc.php:74
 msgid "Portuguese (pt_PT)"
 msgstr ""
 
@@ -12165,7 +12168,7 @@ msgstr ""
 msgid "Right"
 msgstr "오른쪽"
 
-#: include/locales.inc.php:74
+#: include/locales.inc.php:75
 msgid "Romanian (ro_RO)"
 msgstr ""
 
@@ -12239,7 +12242,7 @@ msgstr ""
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
 
-#: include/locales.inc.php:75
+#: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
 msgstr "러시아어 (ru_RU)"
 
@@ -13150,7 +13153,7 @@ msgstr "슬라이드쇼"
 msgid "Slides"
 msgstr "슬라이드"
 
-#: include/locales.inc.php:76
+#: include/locales.inc.php:77
 msgid "Slovak (sk_SK)"
 msgstr ""
 
@@ -13216,7 +13219,7 @@ msgstr ""
 msgid "Source"
 msgstr "소스"
 
-#: include/locales.inc.php:77
+#: include/locales.inc.php:78
 msgid "Spanish (es_ES)"
 msgstr "스페인어 (es_ES)"
 
@@ -13456,7 +13459,7 @@ msgstr ""
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
 
-#: include/locales.inc.php:78
+#: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
 msgstr "스웨덴어 (sv_SE)"
 
@@ -14328,7 +14331,7 @@ msgstr ""
 msgid "Tuesday"
 msgstr "화"
 
-#: include/locales.inc.php:79
+#: include/locales.inc.php:80
 msgid "Turkish (tr_TR)"
 msgstr ""
 
@@ -14486,7 +14489,7 @@ msgstr ""
 msgid "USA (160 characters)"
 msgstr ""
 
-#: include/locales.inc.php:80
+#: include/locales.inc.php:81
 msgid "Ukrainian (uk_UA)"
 msgstr ""
 
@@ -15422,7 +15425,6 @@ msgid "Value map added"
 msgstr "값 매핑을 추가하였습니다"
 
 #: adm.valuemapping.php:130
-#, fuzzy
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "값 매핑을 삭제하였습니다"
@@ -15495,7 +15497,7 @@ msgstr "세로"
 msgid "Vertical align"
 msgstr "세로 위치"
 
-#: include/locales.inc.php:81
+#: include/locales.inc.php:82
 msgid "Vietnamese (vi_VN)"
 msgstr ""
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@ typedef struct zbx_scheduler_interval_t
 	struct zbx_scheduler_interval_t	*next;
 }
 zbx_scheduler_interval_t;
+
+ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
 #ifdef _WINDOWS
 
@@ -2920,3 +2922,21 @@ fail:
 
 	return res;
 }
+
+#if !defined(_WINDOWS)
+unsigned int	zbx_alarm_on(unsigned int seconds)
+{
+	zbx_timed_out = 0;
+
+	return alarm(seconds);
+}
+
+unsigned int	zbx_alarm_off(void)
+{
+	unsigned int	ret;
+
+	ret = alarm(0);
+	zbx_timed_out = 0;
+	return ret;
+}
+#endif
