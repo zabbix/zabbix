@@ -182,7 +182,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if (0 >= waitpid(thread, &status, 0))
 	{
-		zbx_error("Error on thread waiting.");
+		zbx_error("Error on thread waiting: %s", zbx_strerror(errno));
 		return ZBX_THREAD_ERROR;
 	}
 
