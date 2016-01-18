@@ -19,7 +19,21 @@
 **/
 
 
-$widget = (new CWidget())->setTitle(_('Slide shows'));
+$widget = (new CWidget())
+	->setTitle(_('Slide shows'))
+	->addItem((new CList())
+	->addClass(ZBX_STYLE_OBJECT_GROUP)
+	->addItem([
+		(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
+		'/',
+		(new CSpan())
+			->addClass(ZBX_STYLE_SELECTED)
+			->addItem(
+				new CLink($data['screen']['name'], 'slides.php?elementid='.$data['screen']['slideshowid'].
+					'&fullscreen='.$data['fullscreen']
+				)
+			)
+	]));
 
 // Create header form.
 $header = (new CForm('get'))
