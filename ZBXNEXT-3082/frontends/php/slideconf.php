@@ -111,7 +111,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$result = add_slideshow(getRequest('name'), getRequest('delay'), getRequest('slides', []));
+		$data = [
+			'name' => getRequest('name'),
+			'delay' => getRequest('delay'),
+			'slides' => getRequest('slides', []),
+			'userid' => getRequest('userid'),
+			'private' => getRequest('private'),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
+		];
+		$result = add_slideshow($data);
 
 		$messageSuccess = _('Slide show added');
 		$messageFailed = _('Cannot add slide show');
