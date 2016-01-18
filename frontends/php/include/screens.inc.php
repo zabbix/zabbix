@@ -270,13 +270,15 @@ function add_slideshow($data) {
 }
 
 function update_slideshow($data) {
-	// validate slides
+	$user_data = CWebUser::$data;
+
+	// Validate slides.
 	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
 		return false;
 	}
 
-	// validate screens
+	// validate screens.
 	$screenids = zbx_objectValues($data['slides'], 'screenid');
 	$screens = API::Screen()->get([
 		'screenids' => $screenids,
@@ -290,7 +292,7 @@ function update_slideshow($data) {
 		}
 	}
 
-	// validate slide name
+	// Validate slide name.
 	$db_slideshow = DBfetch(DBselect(
 		'SELECT s.slideshowid'.
 		' FROM slideshows s'.
@@ -299,6 +301,20 @@ function update_slideshow($data) {
 	));
 	if ($db_slideshow) {
 		error(_s('Slide show "%1$s" already exists.', $data['name']));
+
+		return false;
+	}
+
+	// Validate slide show owner.
+	if ($data['userid'] === null) {
+		error(_('Slide show owner cannot be empty.'));
+
+		return false;
+	}
+	elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+			&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+		error(_('Only administrators can set screen owner.'));
+
 		return false;
 	}
 
