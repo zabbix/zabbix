@@ -1,1 +1,0 @@
-ALTER TABLE groups MODIFY groupid DEFAULT NULL;
