@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha7
 
 New features:
+...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
 A.F....... [ZBX-10051] fixed expanding of trigger expression user macro in trigger name positional macro (Gunars)
