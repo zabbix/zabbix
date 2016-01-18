@@ -87,15 +87,15 @@ class CMapPainter {
 		for ($xy = $size; $xy < $maxSize; $xy += $size) {
 			if ($xy < $width) {
 				$this->canvas->drawLine($xy, 0, $xy, $height, $this->options['graphtheme']['gridcolor'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-				$this->canvas->drawText(8, 0, $xy + 3, $dims['height'] + 3, $this->options['graphtheme']['gridcolor'], $xy);
+				$this->canvas->drawText(8, 0, $xy + 3, $dims['height'] + 3, $this->options['graphtheme']['maingridcolor'], $xy);
 			}
 			if ($xy < $height) {
 				$this->canvas->drawLine(0, $xy, $width, $xy, $this->options['graphtheme']['gridcolor'], MAP_LINK_DRAWTYPE_DASHED_LINE);
-				$this->canvas->drawText(8, 0, 3, $xy + $dims['height'] + 3, $this->options['graphtheme']['gridcolor'], $xy);
+				$this->canvas->drawText(8, 0, 3, $xy + $dims['height'] + 3, $this->options['graphtheme']['maingridcolor'], $xy);
 			}
 		}
 
-		$this->canvas->drawText(8, 0, 2, $dims['height'] + 3, $this->options['graphtheme']['gridcolor'], 'Y X:');
+		$this->canvas->drawText(8, 0, 2, $dims['height'] + 3, $this->options['graphtheme']['maingridcolor'], 'Y X:');
 	}
 
 	protected function paintAreas() {
