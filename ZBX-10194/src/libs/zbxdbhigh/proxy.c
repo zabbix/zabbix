@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -118,8 +118,7 @@ static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
 		char **error)
 {
-	char			*ch_error;
-	zbx_tls_conn_attr_t	attr;
+	char	*ch_error;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
@@ -134,14 +133,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-	{
-		*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-
-	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, hostid, error))
+	if (SUCCEED != DCcheck_proxy_permissions(host, sock, hostid, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -2038,6 +2030,17 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (0 == proxy_hostid &&
+			((ZBX_TCP_SEC_TLS_CERT == sock->connection_type &&
+				SUCCEED != zbx_tls_get_attr_cert(sock, &attr)) ||
+			(ZBX_TCP_SEC_TLS_PSK == sock->connection_type &&
+				SUCCEED != zbx_tls_get_attr_psk(sock, &attr))))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+#endif
 	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * values_num);
 	items = zbx_malloc(items, sizeof(DC_ITEM) * values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * values_num);
@@ -2110,7 +2113,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		/* It is enough to check connection type, and optionally, certificate issuer and subject, and PSK */
 		/* identity only for a host. No need to check it for every item if the host is the same. */
 
-		if (0 == proxy_hostid && NULL != sock)
+		if (0 == proxy_hostid)
 		{
 			if (hostid_prev == items[i].host.hostid)	/* host and connection already checked */
 			{
@@ -2133,17 +2136,6 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
-						ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-				{
-					if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-					{
-						THIS_SHOULD_NEVER_HAPPEN;
-						flag_host_allow = 0;
-						continue;
-					}
-				}
-
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 				{
 					/* simplified match, not compliant with RFC 4517, 4518 */
@@ -2294,12 +2286,18 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                                                                            *
  * Purpose: process values sent by proxies, active agents and senders         *
  *                                                                            *
+ * Parameters: sock         - [IN] descriptor of agent-server socket          *
+ *                                 connection. NULL for proxy connection      *
+ *             jp           - [IN] JSON with historical data                  *
+ *             proxy_hostid - [IN] proxy identificator from database          *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
-		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid, char **info)
 {
 #define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
@@ -2455,7 +2453,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 
 	if (NULL != info)
 	{
-		zbx_snprintf(info, max_info_size, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
+		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
 

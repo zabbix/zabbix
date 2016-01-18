@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,13 +21,11 @@
 
 class CSetupWizard extends CForm {
 
-	function __construct($ZBX_CONFIG) {
+	function __construct() {
 		$this->DISABLE_CANCEL_BUTTON = false;
 		$this->DISABLE_BACK_BUTTON = false;
 		$this->SHOW_RETRY_BUTTON = false;
 		$this->STEP_FAILED = false;
-		$this->ZBX_CONFIG = $ZBX_CONFIG;
-
 		$this->frontendSetup = new CFrontendSetup();
 
 		$this->stage = [
@@ -63,11 +61,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function getConfig($name, $default = null) {
-		return isset($this->ZBX_CONFIG[$name]) ? $this->ZBX_CONFIG[$name] : $default;
+		return CSession::keyExists($name) ? CSession::getValue($name) : $default;
 	}
 
 	function setConfig($name, $value) {
-		$this->ZBX_CONFIG[$name] = $value;
+		CSession::setValue($name, $value);
 	}
 
 	function getStep() {
@@ -76,7 +74,7 @@ class CSetupWizard extends CForm {
 
 	function doNext() {
 		if (isset($this->stage[$this->getStep() + 1])) {
-			$this->ZBX_CONFIG['step'] = $this->ZBX_CONFIG['step'] + 1;
+			$this->setConfig('step', $this->getStep('step') + 1);
 
 			return true;
 		}
@@ -86,7 +84,7 @@ class CSetupWizard extends CForm {
 
 	function doBack() {
 		if (isset($this->stage[$this->getStep() - 1])) {
-			$this->ZBX_CONFIG['step'] = $this->ZBX_CONFIG['step'] - 1;
+			$this->setConfig('step', $this->getStep('step') - 1);
 
 			return true;
 		}
@@ -95,9 +93,11 @@ class CSetupWizard extends CForm {
 	}
 
 	function bodyToString($destroy = true) {
-		$setup_left = (new CDiv($this->getList()))->addClass('setup-left');
+		$setup_left = (new CDiv([
+			(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO), $this->getList()
+		]))->addClass(ZBX_STYLE_SETUP_LEFT);
 
-		$setup_right = (new CDiv($this->getStage()))->addClass('setup-right');
+		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
 
 		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			$cancel_button = (new CSubmit('cancel', _('Cancel')))
@@ -126,9 +126,10 @@ class CSetupWizard extends CForm {
 			$back_button->setEnabled(false);
 		}
 
-		$setup_footer = (new CDiv([new CDiv([$next_button, $back_button]), $cancel_button]))->addClass('setup-footer');
+		$setup_footer = (new CDiv([new CDiv([$next_button, $back_button]), $cancel_button]))
+			->addClass(ZBX_STYLE_SETUP_FOOTER);
 
-		$setup_container = (new CDiv([$setup_left, $setup_right, $setup_footer]))->addClass('setup-container');
+		$setup_container = (new CDiv([$setup_left, $setup_right, $setup_footer]))->addClass(ZBX_STYLE_SETUP_CONTAINER);
 
 		return parent::bodyToString($destroy).$setup_container->ToString();
 	}
@@ -137,7 +138,7 @@ class CSetupWizard extends CForm {
 		$list = new CList();
 
 		foreach ($this->stage as $id => $data) {
-			$list->addItem($data['title'], ($id <= $this->getStep()) ? 'setup-left-current' : null);
+			$list->addItem($data['title'], ($id <= $this->getStep()) ? ZBX_STYLE_SETUP_LEFT_CURRENT : null);
 		}
 
 		return $list;
@@ -149,9 +150,9 @@ class CSetupWizard extends CForm {
 	}
 
 	function stage0() {
-		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix 3.0']))->addClass('setup-title');
+		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix 3.0']))->addClass(ZBX_STYLE_SETUP_TITLE);
 
-		return (new CDiv($setup_title))->addClass('setup-right-body');
+		return (new CDiv($setup_title))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY);
 	}
 
 	function stage1() {
@@ -200,7 +201,7 @@ class CSetupWizard extends CForm {
 
 		return [
 			new CTag('h1', true, _('Check of pre-requisites')),
-			(new CDiv([$message_box, $table]))->addClass('setup-right-body')
+			(new CDiv([$message_box, $table]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
 
@@ -270,8 +271,8 @@ class CSetupWizard extends CForm {
 			(new CDiv([
 				new CTag('p', true, _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
 				$message_box,
-				$table]))
-				->addClass('setup-right-body')
+				$table
+			]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
 
@@ -298,8 +299,8 @@ class CSetupWizard extends CForm {
 			new CTag('h1', true, _('Zabbix server details')),
 			(new CDiv([
 				new CTag('p', true, _('Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional).')),
-				$table]))
-				->addClass('setup-right-body')
+				$table
+			]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
 
@@ -339,8 +340,8 @@ class CSetupWizard extends CForm {
 			new CTag('h1', true, _('Pre-installation summary')),
 			(new CDiv([
 				new CTag('p', true, _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
-				$table]))
-				->addClass('setup-right-body')
+				$table
+			]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
 
@@ -394,16 +395,15 @@ class CSetupWizard extends CForm {
 
 			$message_box = null;
 			$message = [
-				new CTag('h4', true, _('Congratulations! You have successfully installed Zabbix frontend.'),
-					ZBX_STYLE_GREEN
-				),
+				(new CTag('h1', true, _('Congratulations! You have successfully installed Zabbix frontend.')))
+					->addClass(ZBX_STYLE_GREEN),
 				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
 			];
 		}
 
 		return [
 			new CTag('h1', true, _('Install')),
-			(new CDiv([$message_box, $message]))->addClass('setup-right-body')
+			(new CDiv([$message_box, $message]))->addClass(ZBX_STYLE_SETUP_RIGHT_BODY)
 		];
 	}
 

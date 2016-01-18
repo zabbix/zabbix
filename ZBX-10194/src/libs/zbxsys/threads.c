@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,9 +58,10 @@ int	zbx_child_fork()
 	pid_t		pid;
 	sigset_t	mask, orig_mask;
 
-	/* block SIGTERM and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
+	/* block SIGTERM, SIGINT and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
 	sigaddset(&mask, SIGCHLD);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
@@ -181,7 +182,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if (0 >= waitpid(thread, &status, 0))
 	{
-		zbx_error("Error on thread waiting.");
+		zbx_error("Error waiting for process with PID %d: %s", (int)thread, zbx_strerror(errno));
 		return ZBX_THREAD_ERROR;
 	}
 
