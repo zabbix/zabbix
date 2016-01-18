@@ -73,6 +73,9 @@ if (hasRequest('slideshowid')) {
 		access_deny();
 	}
 }
+else {
+	$db_slideshow = [];
+}
 if (hasRequest('action')) {
 	if (!hasRequest('shows') || !is_array(getRequest('shows'))) {
 		access_deny();
@@ -227,7 +230,7 @@ if (isset($_REQUEST['form'])) {
 		'preservekeys' => true
 	]);
 
-	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
+	if (array_key_exists('slideshowid', $db_slideshow) && !isset($_REQUEST['form_refresh'])) {
 		$data['slideshow'] = [
 			'slideshowid' => $db_slideshow['slideshowid'],
 			'name' => $db_slideshow['name'],
@@ -239,10 +242,10 @@ if (isset($_REQUEST['form'])) {
 		];
 
 		// Get slides.
-		$data['slides'] = DBfetchArray(DBselect(
+		$data['slideshow']['slides'] = DBfetchArray(DBselect(
 				'SELECT s.slideid, s.screenid, s.delay'.
 				' FROM slides s'.
-				' WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).
+				' WHERE s.slideshowid='.zbx_dbstr($db_slideshow['slideshowid']).
 				' ORDER BY s.step'
 		));
 	}
