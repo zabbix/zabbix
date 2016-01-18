@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -347,14 +347,14 @@ if (!empty($this->data['graphid'])) {
 		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('parent_discoveryid'))
+			new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))
 		]
 	));
 }
 else {
 	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid'))]
+		[new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))]
 	));
 }
 

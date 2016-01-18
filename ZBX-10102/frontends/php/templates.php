@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -715,35 +715,31 @@ else {
 			new CCheckBox('templates['.$template['templateid'].']', $template['templateid']),
 			(new CCol($templatesOutput))->addClass(ZBX_STYLE_NOWRAP),
 			[
-				(new CLink(_('Applications'), 'applications.php?hostid='.$template['templateid'].url_param('groupid')))
-					->removeSID(),
+				new CLink(_('Applications'), 'applications.php?hostid='.$template['templateid'].url_param('groupid')),
 				CViewHelper::showNum($template['applications'])
 			],
 			[
-				(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$template['templateid'].url_param('groupid')))
-					->removeSID(),
+				new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$template['templateid'].url_param('groupid')),
 				CViewHelper::showNum($template['items'])
 			],
 			[
-				(new CLink(_('Triggers'), 'triggers.php?hostid='.$template['templateid'].url_param('groupid')))
-					->removeSID(),
+				new CLink(_('Triggers'), 'triggers.php?hostid='.$template['templateid'].url_param('groupid')),
 				CViewHelper::showNum($template['triggers'])
 			],
 			[
-				(new CLink(_('Graphs'), 'graphs.php?hostid='.$template['templateid'].url_param('groupid')))
-					->removeSID(),
+				new CLink(_('Graphs'), 'graphs.php?hostid='.$template['templateid'].url_param('groupid')),
 				CViewHelper::showNum($template['graphs'])
 			],
 			[
-				(new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']))->removeSID(),
+				new CLink(_('Screens'), 'screenconf.php?templateid='.$template['templateid']),
 				CViewHelper::showNum($template['screens'])
 			],
 			[
-				(new CLink(_('Discovery'), 'host_discovery.php?hostid='.$template['templateid']))->removeSID(),
+				new CLink(_('Discovery'), 'host_discovery.php?hostid='.$template['templateid']),
 				CViewHelper::showNum($template['discoveries'])
 			],
 			[
-				(new CLink(_('Web'), 'httpconf.php?hostid='.$template['templateid'].url_param('groupid')))->removeSID(),
+				new CLink(_('Web'), 'httpconf.php?hostid='.$template['templateid'].url_param('groupid')),
 				CViewHelper::showNum($template['httpTests'])
 			],
 			$linkedTemplatesOutput,

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,22 +218,6 @@ Curl.prototype = {
 
 	getPort: function() {
 		return this.port;
-	},
-
-	setQuery: function(query) {
-		this.query = query;
-
-		if (this.query.indexOf('?') >= 0) {
-			this.query = this.query.substring(this.query.indexOf('?') + 1);
-		}
-
-		this.formatArguments();
-		this.addSID();
-	},
-
-	getQuery: function() {
-		this.formatQuery();
-		return this.query;
 	},
 
 	// returns the protocol of this url, i.e. 'http' in the url 'http://server/'
