@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@
 /**
  * Get mapping for value.
  *
- * @param string $value			Value that mapping should be applied to.
- * @param string $valuemapid	Value map ID which should be used.
+ * @param int|float|string $value		Value that mapping should be applied to.
+ * @param string           $valuemapid	Value map ID which should be used.
  *
- * @return string|bool			 If there is no mapping return false, return mapped value otherwise.
+ * @return string|bool     If there is no mapping return false, return mapped value otherwise.
  */
 function getMappedValue($value, $valuemapid) {
 	static $valuemaps = [];
@@ -34,29 +34,23 @@ function getMappedValue($value, $valuemapid) {
 		return false;
 	}
 
-	if (array_key_exists($valuemapid, $valuemaps)) {
-		return array_key_exists($value, $valuemaps[$valuemapid]) ? $valuemaps[$valuemapid][$value] : false;
-	}
+	if (!array_key_exists($valuemapid, $valuemaps)) {
+		$valuemaps[$valuemapid] = [];
 
-	$result = false;
-	$valuemaps[$valuemapid] = [];
+		$db_valuemaps = API::ValueMap()->get([
+			'output' => [],
+			'selectMappings' => ['value', 'newvalue'],
+			'valuemapids' => [$valuemapid]
+		]);
 
-	$db_valuemaps = API::ValueMap()->get([
-		'output' => [],
-		'selectMappings' => ['value', 'newvalue'],
-		'valuemapids' => [$valuemapid]
-	]);
-
-	if ($db_valuemaps) {
-		foreach ($db_valuemaps[0]['mappings'] as $mapping) {
-			$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
-			if ($mapping['value'] === $value) {
-				$result = $mapping['newvalue'];
+		if ($db_valuemaps) {
+			foreach ($db_valuemaps[0]['mappings'] as $mapping) {
+				$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
 			}
 		}
 	}
 
-	return $result;
+	return array_key_exists((string)$value, $valuemaps[$valuemapid]) ? $valuemaps[$valuemapid][(string)$value] : false;
 }
 
 /**

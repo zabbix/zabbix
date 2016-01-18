@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ class CControllerSystemWarning extends CController {
 			'messages' => []
 		];
 
-		if (isset($_SESSION['messages'])) {
-			$data['messages'] = $_SESSION['messages'];
-			unset($_SESSION['messages']);
+		if (CSession::keyExists('messages')) {
+			$data['messages'] = CSession::getValue('messages');
+			CSession::unsetValue(['messages']);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
