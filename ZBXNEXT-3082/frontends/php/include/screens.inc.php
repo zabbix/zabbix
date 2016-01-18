@@ -195,7 +195,7 @@ function add_slideshow($data) {
 	}
 	elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
 			&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-		error(_('Only administrators can set screen owner.'));
+		error(_('Only administrators can set slide show owner.'));
 
 		return false;
 	}
@@ -279,24 +279,24 @@ function update_slideshow($data) {
 	}
 
 	// validate slide name
-	$dbSlideshow = DBfetch(DBselect(
+	$db_slideshow = DBfetch(DBselect(
 		'SELECT s.slideshowid'.
 		' FROM slideshows s'.
 		' WHERE s.name='.zbx_dbstr($data['name']).
 			' AND s.slideshowid<>'.zbx_dbstr($data['slideshowid'])
 	));
-	if ($dbSlideshow) {
+	if ($db_slideshow) {
 		error(_s('Slide show "%1$s" already exists.', $data['name']));
 		return false;
 	}
 
-	$dbSlideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($data['slideshowid'])));
-	$dbSlideshow = $dbSlideshow[0];
+	$db_slideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($data['slideshowid'])));
+	$db_slideshow = $db_slideshow[0];
 	$changed = false;
 	$slideshow = ['name' => $data['name'], 'delay' => $data['delay']];
 
 	foreach ($slideshow as $key => $val) {
-		if ((string) $val !== (string) $dbSlideshow[$key]) {
+		if ((string) $val !== (string) $db_slideshow[$key]) {
 			$changed = true;
 			break;
 		}
@@ -312,6 +312,74 @@ function update_slideshow($data) {
 		if (!$result) {
 			return false;
 		}
+	}
+
+	$db_slideshow['users'] = DBfetchArray(DBselect(
+		'SELECT s.userid,s.permission,s.slideshowuserid'.
+		' FROM slideshow_user s'.
+		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+	));
+
+	$db_slideshow['userGroups'] = DBfetchArray(DBselect(
+		'SELECT s.usrgrpid,s.permission,s.slideshowusrgrpid'.
+		' FROM slideshow_usrgrp s'.
+		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+	));
+
+	$shared_userids_to_delete = [];
+	$shared_users_to_update = [];
+	$shared_users_to_add = [];
+	$shared_user_groupids_to_delete = [];
+	$shared_user_groups_to_update = [];
+	$shared_user_groups_to_add = [];
+
+	$user_shares_diff = zbx_array_diff($data['users'], $db_slideshow['users'], 'userid');
+
+	foreach ($user_shares_diff['both'] as $update_user_share) {
+		$shared_users_to_update[] = [
+			'values' => $update_user_share,
+			'where' => ['userid' => $update_user_share['userid'], 'slideshowid' => $data['slideshowid']]
+		];
+	}
+
+	foreach ($user_shares_diff['first'] as $new_shared_user) {
+		$new_shared_user['slideshowid'] = $data['slideshowid'];
+		$shared_users_to_add[] = $new_shared_user;
+	}
+
+	$shared_userids_to_delete = zbx_objectValues($user_shares_diff['second'], 'slideshowuserid');
+
+	// Slide show user group shares.
+	$user_group_shares_diff = zbx_array_diff($data['userGroups'], $db_slideshow['userGroups'], 'usrgrpid');
+
+	foreach ($user_group_shares_diff['both'] as $update_user_share) {
+		$shared_user_groups_to_update[] = [
+			'values' => $update_user_share,
+			'where' => ['usrgrpid' => $update_user_share['usrgrpid'], 'slideshowid' => $data['slideshowid']]
+		];
+	}
+
+	foreach ($user_group_shares_diff['first'] as $new_shared_user_group) {
+		$new_shared_user_group['slideshowid'] = $data['slideshowid'];
+		$shared_user_groups_to_add[] = $new_shared_user_group;
+	}
+
+	$shared_user_groupids_to_delete = zbx_objectValues($user_group_shares_diff['second'], 'slideshowusrgrpid');
+
+	// User shares.
+	DB::insert('slideshow_user', $shared_users_to_add);
+	DB::update('slideshow_user', $shared_users_to_update);
+
+	if ($shared_userids_to_delete) {
+		DB::delete('slideshow_user', ['slideshowuserid' => $shared_userids_to_delete]);
+	}
+
+	// User group shares.
+	DB::insert('slideshow_usrgrp', $shared_user_groups_to_add);
+	DB::update('slideshow_usrgrp', $shared_user_groups_to_update);
+
+	if ($shared_user_groupids_to_delete) {
+		DB::delete('slideshow_usrgrp', ['slideshowusrgrpid' => $shared_user_groupids_to_delete]);
 	}
 
 	// get slides
