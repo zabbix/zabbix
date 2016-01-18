@@ -2945,6 +2945,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
 		history->value_orig.err = data->value.str;
+		history->flags |= ZBX_DC_FLAG_UNDEF;
 		return;
 	}
 
