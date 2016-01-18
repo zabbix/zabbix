@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha7
 
 New features:
+..F....... [ZBXNEXT-2662] implemented displaying of maps using graph_themes (Sasha)
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 ..F....... [ZBXNEXT-2662] moved sid parameter into POST method for links with actions (Sasha)
 
