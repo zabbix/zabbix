@@ -21,11 +21,6 @@
 #include "sysinfo.h"
 #include "log.h"
 
-#ifdef HAVE_ZONE_H
-#	include "zone.h"
-#	include "utmpx.h"
-#endif
-
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int	ret = SYSINFO_RET_FAIL;
