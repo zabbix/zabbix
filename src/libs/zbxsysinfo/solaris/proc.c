@@ -19,10 +19,6 @@
 
 #include <procfs.h>
 
-#ifdef HAVE_ZONE_H
-#	include <zone.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
