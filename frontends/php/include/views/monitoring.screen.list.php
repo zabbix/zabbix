@@ -20,9 +20,15 @@
 
 $widget = (new CWidget())->setTitle(_('Screens'));
 
-$createForm = (new CForm('get'))->cleanItems();
+$controls = (new CList())->addItem(
+	new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	])
+)
+	->addItem(new CSubmit('form', _('Create screen')));
 
-$controls = (new CList())->addItem(new CSubmit('form', _('Create screen')));
+$createForm = (new CForm('get'))->cleanItems();
 
 if ($data['templateid']) {
 	$createForm->addVar('templateid', $data['templateid']);
