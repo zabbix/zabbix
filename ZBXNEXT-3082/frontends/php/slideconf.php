@@ -63,7 +63,7 @@ if (!empty($_REQUEST['slides'])) {
  * Permissions
  */
 if (hasRequest('slideshowid')) {
-	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE)) {
+	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ)) {
 		access_deny();
 	}
 
@@ -324,7 +324,7 @@ else {
 	));
 
 	foreach ($data['slides'] as $key => $slide) {
-		if (!slideshow_accessible($slide['slideshowid'], PERM_READ_WRITE)) {
+		if (!slideshow_accessible($slide['slideshowid'], PERM_READ)) {
 			unset($data['slides'][$key]);
 		}
 	}
