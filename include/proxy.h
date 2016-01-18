@@ -41,7 +41,7 @@ typedef struct
 	int		severity;
 	int		logeventid;
 	unsigned char	state;
-	unsigned char	meta;	/* meta information update (log size and mtime) */
+	unsigned char	meta;	/* non-zero of contains meta information (lastlogsize and mtime) */
 }
 AGENT_VALUE;
 

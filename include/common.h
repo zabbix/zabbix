@@ -611,6 +611,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
+/* proxy_history flags */
+#define PROXY_HISTORY_FLAG_META		0x01
+#define PROXY_HISTORY_FLAG_NOVALUE	0x02
+
 /* user permissions */
 typedef enum
 {

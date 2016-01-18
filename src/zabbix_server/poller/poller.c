@@ -416,7 +416,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
+static void    free_result_ptr(AGENT_RESULT *result)
+{
+	free_result(result);
+	zbx_free(result);
+}
+
+static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	const char	*__function_name = "get_value";
 	int		res = FAIL;
@@ -440,7 +446,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
-			res = get_value_simple(item, result);
+			res = get_value_simple(item, result, add_results);
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result);
@@ -517,15 +523,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
  ******************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck)
 {
-	const char	*__function_name = "get_values";
-	DC_ITEM		items[MAX_POLLER_ITEMS];
-	AGENT_RESULT	results[MAX_POLLER_ITEMS];
-	zbx_uint64_t	lastlogsizes[MAX_POLLER_ITEMS];
-	int		errcodes[MAX_POLLER_ITEMS];
-	zbx_timespec_t	timespec;
-	int		i, num;
-	char		*port = NULL, error[ITEM_ERROR_LEN_MAX];
-	int		last_available = HOST_AVAILABLE_UNKNOWN;
+	const char		*__function_name = "get_values";
+	DC_ITEM			items[MAX_POLLER_ITEMS];
+	AGENT_RESULT		results[MAX_POLLER_ITEMS];
+	int			errcodes[MAX_POLLER_ITEMS];
+	zbx_timespec_t		timespec;
+	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
+	int			i, num, last_available = HOST_AVAILABLE_UNKNOWN;
+	zbx_vector_ptr_t	add_results;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -542,7 +547,6 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	{
 		init_result(&results[i]);
 		errcodes[i] = SUCCEED;
-		lastlogsizes[i] = 0;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
@@ -635,6 +639,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 	zbx_free(port);
 
+	zbx_vector_ptr_create(&add_results);
+
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
@@ -661,7 +667,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	else if (1 == num)
 	{
 		if (SUCCEED == errcodes[0])
-			errcodes[0] = get_value(&items[0], &results[0]);
+			errcodes[0] = get_value(&items[0], &results[0], &add_results);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -671,6 +677,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
+		zbx_uint64_t	lastlogsize, *plastlogsize = NULL;
+
 		switch (errcodes[i])
 		{
 			case SUCCEED:
@@ -698,30 +706,55 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			/* remove formatting symbols from the end of the result */
 			/* so it could be checked by "is_uint64" and "is_double" functions */
 			/* when we try to get "int" or "float" values from "string" result */
-			if (ISSET_STR(&results[i]))
+			if (0 != ISSET_STR(&results[i]))
 				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
-			if (ISSET_TEXT(&results[i]))
+			if (0 != ISSET_TEXT(&results[i]))
 				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
 
-			items[i].state = ITEM_STATE_NORMAL;
-			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
-					items[i].state, NULL);
-
-			if (0 != ISSET_LOG(&results[i]))
+			if (0 == add_results.values_num)
 			{
-				if (NULL != results[i].logs[0])
-				{
-					size_t	j;
-
-					for (j = 1; NULL != results[i].logs[j]; j++)
-						;
-
-					lastlogsizes[i] = results[i].logs[j - 1]->lastlogsize;
-				}
-				else
-					lastlogsizes[i] = items[i].lastlogsize;
+				items[i].state = ITEM_STATE_NORMAL;
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i],
+						&timespec, items[i].state, NULL);
 			}
+			else
+			{
+				/* vmware.eventlog item returns vector of AGENT_RESULT representing events */
 
+				int		j;
+				zbx_timespec_t	ts_tmp = timespec;
+
+				for (j = 0; j < add_results.values_num; j++)
+				{
+					AGENT_RESULT	*add_result = add_results.values[j];
+
+					if (ISSET_MSG(add_result))
+					{
+						items[i].state = ITEM_STATE_NOTSUPPORTED;
+						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
+								NULL, &ts_tmp, items[i].state, add_result->msg);
+					}
+					else
+					{
+						items[i].state = ITEM_STATE_NORMAL;
+						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
+								add_result, &ts_tmp, items[i].state, NULL);
+
+						if (0 != ISSET_META(add_result))
+						{
+							plastlogsize = &lastlogsize;
+							lastlogsize = add_result->lastlogsize;
+						}
+					}
+
+					/* ensure that every log item value timestamp is unique */
+					if (++ts_tmp.ns == 1000000000)
+					{
+						ts_tmp.sec++;
+						ts_tmp.ns = 0;
+					}
+				}
+			}
 		}
 		else if (HOST_AVAILABLE_FALSE != last_available)
 		{
@@ -730,7 +763,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					items[i].state, results[i].msg);
 		}
 
-		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
+		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, plastlogsize, NULL,
 				&errcodes[i], 1, poller_type, nextcheck);
 
 		zbx_free(items[i].key);
@@ -763,6 +796,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 
 		free_result(&results[i]);
 	}
+
+	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);
+	zbx_vector_ptr_destroy(&add_results);
 
 	DCconfig_clean_items(items, NULL, num);
 
