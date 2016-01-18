@@ -1903,6 +1903,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-color: rgba(66, 54, 1, 0.5);
   border: 1px solid rgba(66, 54, 1, 0.5); }
 
+.ui-selectable-helper {
+  position: absolute;
+  z-index: 100;
+  background-color: rgba(66, 54, 1, 0.5);
+  border: 1px solid rgba(66, 54, 1, 0.5); }
+
 .map-selected {
   border: 3px dashed #e99003;
   margin: -3px; }
