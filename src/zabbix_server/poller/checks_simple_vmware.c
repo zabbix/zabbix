@@ -662,7 +662,7 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 	zbx_vector_str_t	keys;
 	zbx_vector_uint64_t	ids;
 	zbx_uint64_t		key;
-	char			*value, *timestamp, xpath[MAX_STRING_LEN];
+	char			*value, xpath[MAX_STRING_LEN];
 	int			i, ret = SYSINFO_RET_FAIL;
 	struct tm		tm;
 	time_t			t;
@@ -717,7 +717,10 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 				if (ITEM_VALUE_TYPE_LOG == item->value_type)
 				{
+					char	*timestamp;
+
 					add_result->log->logeventid = ids.values[i];
+					add_result->log->timestamp = 0;
 
 					zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key")
 							"[.='" ZBX_FS_UI64 "']/.." ZBX_XPATH_LN("createdTime"),
@@ -751,8 +754,6 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 						zbx_free(timestamp);
 					}
-					else
-						add_result->log->timestamp = 0;
 				}
 			}
 

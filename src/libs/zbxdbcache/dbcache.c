@@ -1998,6 +1998,7 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
+				/* if log item has no meta information it has no other information but value */
 				if (0 != (h->flags & ZBX_DC_FLAG_META))
 					hlog_num++;
 				else
