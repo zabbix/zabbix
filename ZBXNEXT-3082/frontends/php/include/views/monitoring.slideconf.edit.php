@@ -157,7 +157,7 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 $addButtonColumn = (new CCol(
 		(new CButton('add', _('Add')))
 			->onClick('return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$form->getName().
-					'&multiselect=1&writeonly=1")')
+					'&multiselect=1")')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(5);
 
