@@ -162,7 +162,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1'.
-					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");');
+					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");')
+			->setEnabled(!$is_templated);
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
@@ -223,7 +224,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1'.
-					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");');
+					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");')
+			->setEnabled(!$is_templated);
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
