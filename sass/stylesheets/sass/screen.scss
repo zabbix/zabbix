@@ -234,7 +234,6 @@ nav {
 .top-nav-container {
 	height: 49px;
 	line-height: 49px;
-	position: relative;
 	overflow: hidden;
 	background-color: $main-nav-bg-color;
 }
@@ -371,7 +370,7 @@ ul.top-nav-icons {
 
 	input {
 		background-color: darken($main-nav-bg-color, 7%);
-		border: 1px solid darken($main-nav-bg-color, 9%);
+		border: 1px solid darken($main-nav-bg-color, 10%);
 		width: 198px;
 		margin: 6px 7px 0 0;
 		color: $font-color;
@@ -379,7 +378,8 @@ ul.top-nav-icons {
 		@include opacity(1);
 
 		&:focus {
-			border: 1px solid darken($main-nav-bg-color, 9%);
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
 			@include opacity(1);
 		}
 
@@ -405,7 +405,7 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		padding: 0 5px;
+		padding: 0 12px;
 
 		&:last-child {
 			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
@@ -414,7 +414,7 @@ ul.top-nav-icons {
 }
 
 .top-subnav a {
-	padding: 9px 8px;
+	padding: 9px 1px;
 
 	&:link {
 		color: $link-main-subnav-color;
@@ -438,6 +438,8 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
+		padding: 9px 1px 6px 1px;
+		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
 	}
 }
 
@@ -2005,7 +2007,6 @@ $var-icons: (
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
-	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -622px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -2021,12 +2022,17 @@ $var-icons: (
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -617px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
     .icon-#{$form-icon-btn} {
         background: $transparent $bgimage;
         @extend %form-icon-btn;
+
+        @if $form-icon-btn == 'wzrd-action' {
+        	margin-top: -16px;
+        }
     }
 }
 
@@ -2793,6 +2799,13 @@ $form-icon-btn: (
 	position: absolute;
 	z-index: 98;
 	overflow: hidden;
+	background-color: rgba($yellow,0.5);
+	border: 1px solid rgba($yellow,0.5);
+}
+
+.ui-selectable-helper {
+	position: absolute;
+	z-index: 100;
 	background-color: rgba($yellow,0.5);
 	border: 1px solid rgba($yellow,0.5);
 }

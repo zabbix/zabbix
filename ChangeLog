@@ -2,8 +2,12 @@ Changes for 3.0.0alpha7
 
 New features:
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
+..F....... [ZBXNEXT-2662] moved sid parameter into POST method for links with actions (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10275] fixed displaying of the search dropdown (Pavel)
+..F....... [ZBXNEXT-2662] fixed displaying of a mass selection box in the map configurator (Pavel)
+..F....... [ZBXNEXT-2662] fixed displaying of action buttons in the list of items (Pavel, Sasha)
 A.F....... [ZBX-10051] fixed expanding of trigger expression user macro in trigger name positional macro (Gunars)
 ..F....... [ZBX-10236] fixed history page PHP errors that occurred with items that are value mapped with floating point values (Vitalijs)
 ..F....... [ZBXNEXT-3065] added arg_separator.output check in setup pre-requisites (Vitalijs)
@@ -17,11 +21,11 @@ A.F.I..... [ZBXNEXT-3073] implemented support of public and private screens with
 .......PS. [ZBXNEXT-3071] optimized history cache to better handle few items flooding cache with values (wiper)
 ...GI..... [ZBXNEXT-3045] dropped zabbix_agent - the inetd version of Zabbix agent (asaveljevs)
 A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
+..F....... [ZBXNEXT-2662] removed "sid" parameter from almost all links (Sasha)
 
 Bug fixes:
 ..F....... [ZBXNEXT-2662] moved logo in an upper left corner (Pavel, Sasha)
 ..F....... [ZBXNEXT-2662] added server name in login page (Pavel, Sasha)
-..F....... [ZBXNEXT-2662] removed "sid" parameter from almost all links (Sasha)
 ...G...PS. [ZBX-8914] improved receiving TCP messages: more tolerant to fragmented messages, stricter message length validation, better performance (gleb)
 ...G...PS. [ZBXNEXT-1263] fixed timeout detection for encrypted connections (Andris)
 ........S. [ZBXNEXT-1263] fixed encryption problems with running remote commands (Andris)
