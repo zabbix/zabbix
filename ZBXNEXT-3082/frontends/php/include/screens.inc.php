@@ -200,14 +200,6 @@ function add_slideshow($data) {
 		return false;
 	}
 
-	$private_validator = new CLimitedSetValidator([
-		'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
-	]);
-
-	if (!$private_validator->validate($data['private'])) {
-		error(_s('Incorrect "private" value "%1$s" for screen "%2$s".', $data['private'], $data['name']));
-	}
-
 	$slideshowid = get_dbid('slideshows', 'slideshowid');
 	$result = DBexecute(
 		'INSERT INTO slideshows (slideshowid,name,delay,userid,private)'.
@@ -217,6 +209,8 @@ function add_slideshow($data) {
 
 
 	// User shares.
+	$shared_users = [];
+
 	foreach ($data['users'] as $user) {
 		$shared_users[] = [
 			'slideshowid' => $slideshowid,
@@ -228,6 +222,8 @@ function add_slideshow($data) {
 	DB::insert('slideshow_user', $shared_users);
 
 	// User group shares.
+	$shared_user_groups = [];
+
 	foreach ($data['userGroups'] as $user_group) {
 		$shared_user_groups[] = [
 			'slideshowid' => $slideshowid,
@@ -261,15 +257,15 @@ function add_slideshow($data) {
 	return $slideshowid;
 }
 
-function update_slideshow($slideshowid, $name, $delay, $slides) {
+function update_slideshow($data) {
 	// validate slides
-	if (empty($slides)) {
+	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
 		return false;
 	}
 
 	// validate screens
-	$screenids = zbx_objectValues($slides, 'screenid');
+	$screenids = zbx_objectValues($data['slides'], 'screenid');
 	$screens = API::Screen()->get([
 		'screenids' => $screenids,
 		'output' => ['screenid']
@@ -286,18 +282,18 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	$dbSlideshow = DBfetch(DBselect(
 		'SELECT s.slideshowid'.
 		' FROM slideshows s'.
-		' WHERE s.name='.zbx_dbstr($name).
-			' AND s.slideshowid<>'.zbx_dbstr($slideshowid)
+		' WHERE s.name='.zbx_dbstr($data['name']).
+			' AND s.slideshowid<>'.zbx_dbstr($data['slideshowid'])
 	));
 	if ($dbSlideshow) {
-		error(_s('Slide show "%1$s" already exists.', $name));
+		error(_s('Slide show "%1$s" already exists.', $data['name']));
 		return false;
 	}
 
-	$dbSlideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($slideshowid)));
+	$dbSlideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($data['slideshowid'])));
 	$dbSlideshow = $dbSlideshow[0];
 	$changed = false;
-	$slideshow = ['name' => $name, 'delay' => $delay];
+	$slideshow = ['name' => $data['name'], 'delay' => $data['delay']];
 
 	foreach ($slideshow as $key => $val) {
 		if ((string) $val !== (string) $dbSlideshow[$key]) {
@@ -309,8 +305,8 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	if ($changed) {
 		$result = DBexecute(
 			'UPDATE slideshows'.
-			' SET name='.zbx_dbstr($name).',delay='.zbx_dbstr($delay).
-			' WHERE slideshowid='.zbx_dbstr($slideshowid)
+			' SET name='.zbx_dbstr($data['name']).',delay='.zbx_dbstr($data['delay']).
+			' WHERE slideshowid='.zbx_dbstr($data['slideshowid'])
 		);
 
 		if (!$result) {
@@ -319,12 +315,12 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	}
 
 	// get slides
-	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($slideshowid)), 'slideid');
+	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($data['slideshowid'])), 'slideid');
 
 	$slidesToDel = zbx_objectValues($db_slides, 'slideid');
 	$slidesToDel = zbx_toHash($slidesToDel);
 	$step = 0;
-	foreach ($slides as $slide) {
+	foreach ($data['slides'] as $slide) {
 		$slide['delay'] = $slide['delay'] ? $slide['delay'] : 0;
 		if (isset($db_slides[$slide['slideid']])) {
 			// update slide
@@ -342,7 +338,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 			$slideid = get_dbid('slides', 'slideid');
 			$result = DBexecute(
 				'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
-				' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.zbx_dbstr($step).','.zbx_dbstr($slide['delay']).')'
+				' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($data['slideshowid']).','.zbx_dbstr($slide['screenid']).','.zbx_dbstr($step).','.zbx_dbstr($slide['delay']).')'
 			);
 		}
 		$step ++;

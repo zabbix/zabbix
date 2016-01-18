@@ -104,7 +104,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {
-		$result = update_slideshow(getRequest('slideshowid'), getRequest('name'), getRequest('delay'), getRequest('slides', []));
+		$data = [
+			'slideshowid' => getRequest('slideshowid'),
+			'name' => getRequest('name'),
+			'delay' => getRequest('delay'),
+			'slides' => getRequest('slides', []),
+			'userid' => getRequest('userid'),
+			'private' => getRequest('private'),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
+		];
+
+		$result = update_slideshow($data);
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
