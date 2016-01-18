@@ -95,8 +95,10 @@ if (hasRequest('action')) {
  * Actions
  */
 if (isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])) {
-	unset($_REQUEST['slideshowid']);
+	unset($_REQUEST['slideshowid'], $_REQUEST['users'], $_REQUEST['userGroups']);
 	$_REQUEST['form'] = 'clone';
+	$_REQUEST['private'] = 1;
+	$_REQUEST['userid'] = CWebUser::$data['userid'];
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
