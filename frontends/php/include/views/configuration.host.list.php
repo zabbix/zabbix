@@ -97,8 +97,6 @@ foreach ($data['hosts'] as $host) {
 	$hostInterface = ($interface['useip'] == INTERFACE_USE_IP) ? $interface['ip'] : $interface['dns'];
 	$hostInterface .= empty($interface['port']) ? '' : NAME_DELIMITER.$interface['port'];
 
-	$statusScript = null;
-
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			$statusCaption = _('In maintenance');
@@ -109,20 +107,20 @@ foreach ($data['hosts'] as $host) {
 			$statusClass = ZBX_STYLE_GREEN;
 		}
 
-		$statusScript = 'return Confirm('.CJs::encodeJson(_('Disable host?')).');';
+		$confirm_message = _('Disable host?');
 		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massdisable'.url_param('groupid');
 	}
 	else {
 		$statusCaption = _('Disabled');
 		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
-		$statusScript = 'return Confirm('.CJs::encodeJson(_('Enable host?')).');';
+		$confirm_message = _('Enable host?');
 		$statusClass = ZBX_STYLE_RED;
 	}
 
 	$status = (new CLink($statusCaption, $statusUrl))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass($statusClass)
-		->onClick($statusScript)
+		->addConfirmation($confirm_message)
 		->addSID();
 
 	order_result($host['parentTemplates'], 'name');
