@@ -24,12 +24,12 @@ require_once dirname(__FILE__).'/js/monitoring.slideconf.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create form
-$slideForm = (new CForm())
+$form = (new CForm())
 	->setName('slideForm')
 	->addVar('form', $this->data['form'])
 	->addVar('slides', $this->data['slides_without_delay']);
 if (!empty($this->data['slideshowid'])) {
-	$slideForm->addVar('slideshowid', $this->data['slideshowid']);
+	$form->addVar('slideshowid', $this->data['slideshowid']);
 }
 
 // create slide form list
@@ -93,7 +93,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 $addButtonColumn = (new CCol(
 	empty($this->data['work_slide'])
 		? (new CButton('add', _('Add')))
-			->onClick('return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
+			->onClick('return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$form->getName().
 					'&multiselect=1&writeonly=1")')
 			->addClass(ZBX_STYLE_BTN_LINK)
 		: null
@@ -130,7 +130,7 @@ else {
 	));
 }
 
-$slideForm->addItem($slideTab);
-$widget->addItem($slideForm);
+$form->addItem($slideTab);
+$widget->addItem($form);
 
 return $widget;
