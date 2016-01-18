@@ -2804,6 +2804,8 @@ $form-icon-btn: (
 }
 
 .ui-selectable-helper {
+	position: absolute;
+	z-index: 100;
 	background-color: rgba($yellow,0.5);
 	border: 1px solid rgba($yellow,0.5);
 }
