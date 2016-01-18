@@ -119,17 +119,6 @@ class CUrl {
 		return isset($this->arguments[$key]) ? $this->arguments[$key] : null;
 	}
 
-	public function setQuery($query) {
-		$this->query = $query;
-		$this->formatArguments();
-		$this->formatQuery();
-	}
-
-	public function getQuery() {
-		$this->formatQuery();
-		return $this->query;
-	}
-
 	public function setReference($reference) {
 		$this->reference = $reference;
 	}

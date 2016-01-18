@@ -116,8 +116,8 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 				))->addClass(ZBX_STYLE_LINK_ACTION),
 				$deletable
 					? (new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))
-						->onClick('return Confirm('.CJs::encodeJson(_s('Delete service "%1$s"?', $service['name'])).')')
 						->addClass(ZBX_STYLE_LINK_ACTION)
+						->addConfirmation(_s('Delete service "%1$s"?', $service['name']))
 						->addSID()
 					: null
 			]),
