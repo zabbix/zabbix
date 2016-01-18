@@ -751,7 +751,7 @@ define('GRAPH_STACKED_ALFA', 15); // 0..100 transparency
 define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
 
-define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000');
+define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000000');
 
 define('ZBX_MAX_TREND_DIFF', 3600);
 
@@ -1144,6 +1144,7 @@ define('ZBX_STYLE_LOG_WARNING_BG', 'log-warning-bg');
 define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
 define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_LOGO', 'logo');
+define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
