@@ -36,6 +36,10 @@ $fields = [
 	'name' => [T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'delay' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')],
 	'slides' =>			[null,		 O_OPT, null,		null,	null],
+	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
+	'users' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
+	'userGroups' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null],
 	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -164,20 +168,77 @@ elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' &
  * Display
  */
 if (isset($_REQUEST['form'])) {
+	$current_userid = CWebUser::$data['userid'];
+	$userids[$current_userid] = true;
+	$user_groupids = [];
+
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh', 0),
-		'slideshowid' => getRequest('slideshowid'),
-		'name' => getRequest('name', ''),
-		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'slides' => getRequest('slides', [])
+		'form_refresh' => getRequest('form_refresh', 0)
 	];
 
-	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['name'] = $db_slideshow['name'];
-		$data['delay'] = $db_slideshow['delay'];
+	if (!hasRequest('slideshowid') || hasRequest('form_refresh')) {
+		// Slide show owner.
+		$slideshow_owner = getRequest('userid', $current_userid);
+		$userids[$slideshow_owner] = true;
 
-		// get slides
+		foreach (getRequest('users', []) as $user) {
+			$userids[$user['userid']] = true;
+		}
+
+		foreach (getRequest('userGroups', []) as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = true;
+		}
+	}
+	else {
+		// Slide show owner.
+		$userids[$db_slideshow['userid']] = true;
+
+		$db_slideshow['users'] = DBfetchArray(DBselect(
+			'SELECT s.userid,s.permission'.
+			' FROM slideshow_user s'.
+			' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+		));
+
+		foreach ($db_slideshow['users'] as $user) {
+			$userids[$user['userid']] = true;
+		}
+
+		$db_slideshow['userGroups'] = DBfetchArray(DBselect(
+			'SELECT s.usrgrpid,s.permission'.
+			' FROM slideshow_usrgrp s'.
+			' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+		));
+
+		foreach ($db_slideshow['userGroups'] as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = true;
+		}
+	}
+
+	$data['users'] = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'userids' => array_keys($userids),
+		'preservekeys' => true
+	]);
+
+	$data['user_groups'] = API::UserGroup()->get([
+		'output' => ['usrgrpid', 'name'],
+		'usrgrpids' => array_keys($user_groupids),
+		'preservekeys' => true
+	]);
+
+	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
+		$data['slideshow'] = [
+			'slideshowid' => $db_slideshow['slideshowid'],
+			'name' => $db_slideshow['name'],
+			'delay' => $db_slideshow['delay'],
+			'userid' => $db_slideshow['userid'],
+			'private' => $db_slideshow['private'],
+			'users' => $db_slideshow['users'],
+			'userGroups' => $db_slideshow['userGroups']
+		];
+
+		// Get slides.
 		$data['slides'] = DBfetchArray(DBselect(
 				'SELECT s.slideid, s.screenid, s.delay'.
 				' FROM slides s'.
@@ -185,9 +246,23 @@ if (isset($_REQUEST['form'])) {
 				' ORDER BY s.step'
 		));
 	}
+	else {
+		$data['slideshow'] = [
+			'slideshowid' => getRequest('slideshowid'),
+			'name' => getRequest('name', ''),
+			'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+			'slides' => getRequest('slides', []),
+			'userid' => getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid),
+			'private' => getRequest('private', 1),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
+		];
+	}
 
-	// get slides without delay
-	$data['slides_without_delay'] = $data['slides'];
+	$data['current_user_userid'] = $current_userid;
+
+	// Get slides without delay.
+	$data['slides_without_delay'] = $data['slideshow']['slides'];
 	foreach ($data['slides_without_delay'] as &$slide) {
 		unset($slide['delay']);
 	}
