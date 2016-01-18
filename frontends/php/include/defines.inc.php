@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,13 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0alpha6');
+define('ZABBIX_VERSION',		'3.0.0alpha7');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050092);
+define('ZABBIX_DB_VERSION',		2050104);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2015');
+define('ZABBIX_COPYRIGHT_TO',	'2016');
 
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
@@ -341,8 +341,8 @@ define('SYSMAP_EXPAND_MACROS_ON',	1);
 define('SYSMAP_GRID_ALIGN_ON',	1);
 define('SYSMAP_GRID_ALIGN_OFF',	0);
 
-define('SYSMAP_PUBLIC',		0);
-define('SYSMAP_PRIVATE',	1);
+define('PUBLIC_SHARING',	0);
+define('PRIVATE_SHARING',	1);
 
 define('ZBX_ITEM_DELAY_DEFAULT', 30);
 
@@ -1080,6 +1080,13 @@ define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_BTN_WIZARD_ACTION', 'btn-wizard-action');
 define('ZBX_STYLE_BOTTOM', 'bottom');
+define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
+define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');
+define('ZBX_STYLE_BROWSER_LOGO_IE', 'browser-logo-ie');
+define('ZBX_STYLE_BROWSER_LOGO_OPERA', 'browser-logo-opera');
+define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
+define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');
+define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
@@ -1173,6 +1180,17 @@ define('ZBX_STYLE_SEARCH', 'search');
 define('ZBX_STYLE_SELECTED', 'selected');
 define('ZBX_STYLE_SELECTED_ITEM_COUNT', 'selected-item-count');
 define('ZBX_STYLE_SERVER_NAME', 'server-name');
+define('ZBX_STYLE_SETUP_CONTAINER', 'setup-container');
+define('ZBX_STYLE_SETUP_FOOTER', 'setup-footer');
+define('ZBX_STYLE_SETUP_LEFT', 'setup-left');
+define('ZBX_STYLE_SETUP_LEFT_CURRENT', 'setup-left-current');
+define('ZBX_STYLE_SETUP_RIGHT', 'setup-right');
+define('ZBX_STYLE_SETUP_RIGHT_BODY', 'setup-right-body');
+define('ZBX_STYLE_SETUP_TITLE', 'setup-title');
+define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
+define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
+define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
+define('ZBX_STYLE_SIGN_IN_TXT', 'sign-in-txt');
 define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
