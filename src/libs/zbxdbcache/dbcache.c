@@ -1808,6 +1808,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_LOG:
 				pvalue = h->value_orig.str;
 				break;
 			default:
@@ -1920,13 +1921,6 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
 			continue;
 
-		if (0 == (h->flags & ZBX_DC_FLAG_META))
-		{
-			/* log value must always come with meta information */
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
 		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
 			flags |= PROXY_HISTORY_FLAG_NOVALUE;
@@ -2004,7 +1998,10 @@ static void	DCmass_proxy_add_history(ZBX_DC_HISTORY *history, int history_num)
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
-				hlog_num++;
+				if (0 != (h->flags & ZBX_DC_FLAG_META))
+					hlog_num++;
+				else
+					h_num++;
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
