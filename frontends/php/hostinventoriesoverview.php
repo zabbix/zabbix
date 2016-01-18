@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,11 +139,11 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 	foreach ($report as $rep) {
 		$table->addRow([
 			zbx_str2links($rep['inventory_field']),
-			(new CLink($rep['host_count'],
+			new CLink($rep['host_count'],
 				'hostinventories.php?filter_field='.$_REQUEST['groupby'].
 				'&filter_field_value='.urlencode($rep['inventory_field']).
 				'&filter_set=1&filter_exact=1'.url_param('groupid')
-			))->removeSID()
+			)
 		]);
 	}
 }
