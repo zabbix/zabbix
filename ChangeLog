@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha7
 
 New features:
+.......PS. [ZBX-10266] fixed uninitialized variable in VMware code reported by Coverity (CIDs 118958, 118960, 118962, 118965) (dimir)
 ...GI..PS. [ZBX-10102] added support for log file meta information update for items with value type other than log (dimir)
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 ..F....... [ZBXNEXT-2662] moved sid parameter into POST method for links with actions (Sasha)
