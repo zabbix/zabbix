@@ -153,15 +153,17 @@ function get_slideshow_by_slideshowid($slideshowid) {
 	return DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.zbx_dbstr($slideshowid)));
 }
 
-function add_slideshow($name, $delay, $slides) {
-	// validate slides
-	if (empty($slides)) {
+function add_slideshow($data) {
+	$user_data = CWebUser::$data;
+
+	// Validate slides.
+	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
 		return false;
 	}
 
-	// validate screens
-	$screenids = zbx_objectValues($slides, 'screenid');
+	// Validate screens.
+	$screenids = zbx_objectValues($data['slides'], 'screenid');
 	$screens = API::Screen()->get([
 		'screenids' => $screenids,
 		'output' => ['screenid']
@@ -174,26 +176,71 @@ function add_slideshow($name, $delay, $slides) {
 		}
 	}
 
-	// validate slide name
+	// Validate slide name.
 	$db_slideshow = DBfetch(DBselect(
-		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name)
+		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($data['name'])
 	));
 
 	if ($db_slideshow) {
-		error(_s('Slide show "%s" already exists.', $name));
+		error(_s('Slide show "%s" already exists.', $data['name']));
 
 		return false;
 	}
 
+	// Validate slide show owner.
+	if ($data['userid'] === null) {
+		error(_('Slide show owner cannot be empty.'));
+
+		return false;
+	}
+	elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+			&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+		error(_('Only administrators can set screen owner.'));
+
+		return false;
+	}
+
+	$private_validator = new CLimitedSetValidator([
+		'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
+	]);
+
+	if (!$private_validator->validate($data['private'])) {
+		error(_s('Incorrect "private" value "%1$s" for screen "%2$s".', $data['private'], $data['name']));
+	}
+
 	$slideshowid = get_dbid('slideshows', 'slideshowid');
 	$result = DBexecute(
-		'INSERT INTO slideshows (slideshowid,name,delay)'.
-		' VALUES ('.zbx_dbstr($slideshowid).','.zbx_dbstr($name).','.zbx_dbstr($delay).')'
+		'INSERT INTO slideshows (slideshowid,name,delay,userid,private)'.
+		' VALUES ('.zbx_dbstr($slideshowid).','.zbx_dbstr($data['name']).','.zbx_dbstr($data['delay']).','.
+			zbx_dbstr($data['userid']).','.zbx_dbstr($data['private']).')'
 	);
+
+
+	// User shares.
+	foreach ($data['users'] as $user) {
+		$shared_users[] = [
+			'slideshowid' => $slideshowid,
+			'userid' => $user['userid'],
+			'permission' => $user['permission']
+		];
+	}
+
+	DB::insert('slideshow_user', $shared_users);
+
+	// User group shares.
+	foreach ($data['userGroups'] as $user_group) {
+		$shared_user_groups[] = [
+			'slideshowid' => $slideshowid,
+			'usrgrpid' => $user_group['usrgrpid'],
+			'permission' => $user_group['permission']
+		];
+	}
+
+	DB::insert('slideshow_usrgrp', $shared_user_groups);
 
 	// create slides
 	$i = 0;
-	foreach ($slides as $slide) {
+	foreach ($data['slides'] as $slide) {
 		$slideid = get_dbid('slides', 'slideid');
 
 		// set default delay
@@ -205,6 +252,7 @@ function add_slideshow($name, $delay, $slides) {
 			'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
 			' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.($i++).','.zbx_dbstr($slide['delay']).')'
 		);
+
 		if (!$result) {
 			return false;
 		}

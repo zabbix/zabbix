@@ -196,7 +196,7 @@ foreach ($data['slideshow']['userGroups'] as $user_group) {
 	$user_groupid = $user_group['usrgrpid'];
 	$user_groups[$user_groupid] = [
 		'usrgrpid' => $user_groupid,
-		'name' => $data['slideshow']['user_groups'][$user_groupid]['name'],
+		'name' => $data['user_groups'][$user_groupid]['name'],
 		'permission' => $user_group['permission']
 	];
 }
@@ -226,7 +226,7 @@ foreach ($data['slideshow']['users'] as $user) {
 	$userid = $user['userid'];
 	$users[$userid] = [
 		'id' => $userid,
-		'name' => getUserFullname($data['slideshow']['users'][$userid]),
+		'name' => getUserFullname($data['users'][$userid]),
 		'permission' => $user['permission']
 	];
 }
