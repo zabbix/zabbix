@@ -6,6 +6,7 @@ New features:
 ..F....... [ZBXNEXT-2662] moved sid parameter into POST method for links with actions (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 ...G...PS. [ZBX-10239] fixed agent collector crashes on Linux while gathering data for proc.cpu.util[], fixed unsafe use of stack in logging functions (Sandis)
 A.F....... [ZBX-10182] fixed API to disallow update of templated host graphs and disabled form fields for templated host graph update (Vitalijs)
 ........S. [ZBX-10194] fixed server attempts to insert duplicate entries during LLD on ARM 32 bit processors (gleb)
@@ -24,7 +25,7 @@ New features:
 A.F.I..... [ZBXNEXT-3073] implemented support of public and private screens with ability to share them with other users and user groups (Oleg)
 .......PS. [ZBXNEXT-3071] optimized history cache to better handle few items flooding cache with values (wiper)
 ...GI..... [ZBXNEXT-3045] dropped zabbix_agent - the inetd version of Zabbix agent (asaveljevs)
-A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (Zalex)
+A.F....... [ZBX-1357] updated Czech, Japanese, Korean, Dutch, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBXNEXT-2662] removed "sid" parameter from almost all links (Sasha)
 
 Bug fixes:
@@ -353,6 +354,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 ........S. [ZBX-7006] implemented trend cache cleanup procedure which forces hourly flush of deleted, disabled or rarely updated item trends (dimir, gleb)
@@ -1083,6 +1085,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
@@ -2431,6 +2434,7 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
