@@ -2810,6 +2810,10 @@ $form-icon-btn: (
 	border: 1px solid rgba($yellow,0.5);
 }
 
+.maps-element-bg {
+	background-color: rgba($ui-hover-color,0.75);
+}
+
 .map-selected {
 	border: 3px dashed $dark-yellow;
 	margin: -3px;
