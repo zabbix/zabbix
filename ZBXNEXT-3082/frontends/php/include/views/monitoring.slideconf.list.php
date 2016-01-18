@@ -28,30 +28,32 @@ $widget = (new CWidget())
 	);
 
 // create form
-$slideForm = (new CForm())->setName('slideForm');
+$form = (new CForm())->setName('slideForm');
 
 // create table
 $slidesTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_shows'))->onClick("checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
+			(new CCheckBox('all_shows'))->onClick("checkAll('".$form->getName()."', 'all_shows', 'shows');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder']),
+		_('Actions')
 	]);
 
 foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow([
 		new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']),
-		(new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid']))->addClass('action'),
+		(new CLink($slide['name'], 'slides.php?elementid='.$slide['slideshowid']))->addClass('action'),
 		convertUnitsS($slide['delay']),
-		$slide['cnt']
+		$slide['cnt'],
+		(new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))->addClass('action')
 	]);
 }
 
 // append table to form
-$slideForm->addItem([
+$form->addItem([
 	$slidesTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'shows', [
@@ -60,6 +62,6 @@ $slideForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($slideForm);
+$widget->addItem($form);
 
 return $widget;
