@@ -97,7 +97,7 @@ if (hasRequest('action')) {
 if (isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])) {
 	unset($_REQUEST['slideshowid'], $_REQUEST['users'], $_REQUEST['userGroups']);
 	$_REQUEST['form'] = 'clone';
-	$_REQUEST['private'] = 1;
+	$_REQUEST['private'] = PRIVATE_SHARING;
 	$_REQUEST['userid'] = CWebUser::$data['userid'];
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -258,7 +258,7 @@ if (isset($_REQUEST['form'])) {
 			'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 			'slides' => getRequest('slides', []),
 			'userid' => getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid),
-			'private' => getRequest('private', 1),
+			'private' => getRequest('private', PRIVATE_SHARING),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
 		];

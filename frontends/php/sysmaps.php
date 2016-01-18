@@ -157,7 +157,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 		'urls' => getRequest('urls', []),
 		'userid' => getRequest('userid', ''),
-		'private' => getRequest('private', 1),
+		'private' => getRequest('private', PRIVATE_SHARING),
 		'users' => getRequest('users', []),
 		'userGroups' => getRequest('userGroups', [])
 	];
@@ -318,7 +318,7 @@ if (hasRequest('form')) {
 			'severity_min' => getRequest('severity_min', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 			'urls' => getRequest('urls', []),
 			'userid' => getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid),
-			'private' => getRequest('private', 1),
+			'private' => getRequest('private', PRIVATE_SHARING),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
 		];
