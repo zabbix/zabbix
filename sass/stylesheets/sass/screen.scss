@@ -2803,6 +2803,11 @@ $form-icon-btn: (
 	border: 1px solid rgba($yellow,0.5);
 }
 
+.ui-selectable-helper {
+	background-color: rgba($yellow,0.5);
+	border: 1px solid rgba($yellow,0.5);
+}
+
 .map-selected {
 	border: 3px dashed $dark-yellow;
 	margin: -3px;
