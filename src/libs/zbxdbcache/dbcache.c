@@ -2346,9 +2346,8 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t 
 		item_value->value.value_str.len = 0;
 }
 
-static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
-		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime,
-		unsigned char flags)
+static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *ts, const zbx_log_t *log,
+		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
 	dc_item_value_t	*item_value;
 
@@ -2359,15 +2358,6 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *
 	item_value->value_type = ITEM_VALUE_TYPE_LOG;
 	item_value->state = ITEM_STATE_NORMAL;
 
-	if (NULL != source && '\0' != *source)
-		item_value->source.len = zbx_db_strlen_n(source, HISTORY_LOG_SOURCE_LEN) + 1;
-	else
-		item_value->source.len = 0;
-
-	item_value->severity = severity;
-	item_value->logeventid = logeventid;
-	item_value->timestamp = timestamp;
-
 	item_value->flags = flags;
 
 	if (0 != (item_value->flags & ZBX_DC_FLAG_META))
@@ -2377,9 +2367,23 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *
 	}
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
-		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, HISTORY_LOG_VALUE_LEN) + 1;
+	{
+		item_value->severity = log->severity;
+		item_value->logeventid = log->logeventid;
+		item_value->timestamp = log->timestamp;
+
+		item_value->value.value_str.len = zbx_db_strlen_n(log->value, HISTORY_LOG_VALUE_LEN) + 1;
+
+		if (NULL != log->source && '\0' != *log->source)
+			item_value->source.len = zbx_db_strlen_n(log->source, HISTORY_LOG_SOURCE_LEN) + 1;
+		else
+			item_value->source.len = 0;
+	}
 	else
+	{
 		item_value->value.value_str.len = 0;
+		item_value->source.len = 0;
+	}
 
 	if (0 != item_value->value.value_str.len + item_value->source.len)
 	{
@@ -2388,14 +2392,14 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *
 		if (0 != item_value->value.value_str.len)
 		{
 			item_value->value.value_str.pvalue = string_values_offset;
-			memcpy(&string_values[string_values_offset], value_orig, item_value->value.value_str.len);
+			memcpy(&string_values[string_values_offset], log->value, item_value->value.value_str.len);
 			string_values_offset += item_value->value.value_str.len;
 		}
 
 		if (0 != item_value->source.len)
 		{
 			item_value->source.pvalue = string_values_offset;
-			memcpy(&string_values[string_values_offset], source, item_value->source.len);
+			memcpy(&string_values[string_values_offset], log->source, item_value->source.len);
 			string_values_offset += item_value->source.len;
 		}
 	}
@@ -2456,7 +2460,6 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 		const zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	unsigned char	value_flags;
-	zbx_log_t	log_empty = {0}, *plog;
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -2489,6 +2492,9 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 	if (ISSET_META(result))
 		value_flags |= ZBX_DC_FLAG_META;
 
+	/* Add data to the local history cache if:                            */
+	/*   1) the NOVALUE flag is set (data contains only meta information) */
+	/*   2) the NOVALUE flag is not set and value conversion succeeded    */
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -2499,39 +2505,32 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 			}
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
-			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_UI64_RESULT(result))
 			{
 				dc_local_add_history_uint(itemid, ts, result->ui64, result->lastlogsize, result->mtime,
 						value_flags);
 			}
 			break;
 		case ITEM_VALUE_TYPE_STR:
-			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_STR_RESULT(result))
 			{
 				dc_local_add_history_str(itemid, ts, result->str, result->lastlogsize, result->mtime,
 						value_flags);
 			}
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_DBL_RESULT(result))
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_TEXT_RESULT(result))
 			{
 				dc_local_add_history_text(itemid, ts, result->text, result->lastlogsize, result->mtime,
 						value_flags);
 			}
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE))
-				plog = &log_empty;
-			else
-				plog = GET_LOG_RESULT(result);
-
-			if (NULL != plog)
+			if (0 != (value_flags & ZBX_DC_FLAG_NOVALUE) || GET_LOG_RESULT(result))
 			{
-				dc_local_add_history_log(itemid, ts, plog->value, plog->timestamp, plog->source,
-						plog->severity, plog->logeventid, result->lastlogsize, result->mtime,
+				dc_local_add_history_log(itemid, ts, result->log, result->lastlogsize, result->mtime,
 						value_flags);
 			}
-
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
