@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -309,9 +309,9 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		int	res;
 
-		alarm(CONFIG_TIMEOUT);
+		zbx_alarm_on(CONFIG_TIMEOUT);
 		res = get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result);
-		alarm(0);
+		zbx_alarm_off();
 
 		if (SUCCEED != res)
 			goto out;

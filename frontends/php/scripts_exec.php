@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,9 +66,7 @@ else {
 }
 
 if ($isErrorExist) {
-	show_error_message(
-		_('Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script.')
-	);
+	show_error_message(_('Cannot execute script'));
 }
 
 // render view
