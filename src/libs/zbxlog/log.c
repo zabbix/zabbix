@@ -21,6 +21,7 @@
 #include "log.h"
 #include "mutexs.h"
 #include "threads.h"
+#include "cfg.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "service.h"
@@ -29,20 +30,28 @@ static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 
 static char		log_filename[MAX_STRING_LEN];
 static int		log_type = LOG_TYPE_UNDEFINED;
-static ZBX_MUTEX	log_file_access = ZBX_MUTEX_NULL;
-#ifdef DEBUG
-static int		log_level = LOG_LEVEL_DEBUG;
-#else
+static ZBX_MUTEX	log_access = ZBX_MUTEX_NULL;
 static int		log_level = LOG_LEVEL_WARNING;
-#endif
 
-#define LOCK_LOG	zbx_mutex_lock(&log_file_access)
-#define UNLOCK_LOG	zbx_mutex_unlock(&log_file_access)
+#define LOCK_LOG	zbx_mutex_lock(&log_access)
+#define UNLOCK_LOG	zbx_mutex_unlock(&log_access)
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 #define ZBX_CHECK_LOG_LEVEL(level)	\
 		((LOG_LEVEL_INFORMATION != level && (level > log_level || LOG_LEVEL_EMPTY == level)) ? FAIL : SUCCEED)
+
+#ifdef _WINDOWS
+#	define STDIN_FILENO	_fileno(stdin)
+#	define STDOUT_FILENO	_fileno(stdout)
+#	define STDERR_FILENO	_fileno(stderr)
+
+#	define ZBX_DEV_NULL	"NUL"
+
+#	define dup2(fd1, fd2)	_dup2(fd1, fd2)
+#else
+#	define ZBX_DEV_NULL	"/dev/null"
+#endif
 
 const char	*zabbix_get_log_level_string(void)
 {
@@ -86,11 +95,10 @@ int	zabbix_decrease_log_level(void)
 	return SUCCEED;
 }
 
-#ifndef _WINDOWS
 void	zbx_redirect_stdio(const char *filename)
 {
 	int		fd;
-	const char	default_file[] = "/dev/null";
+	const char	default_file[] = ZBX_DEV_NULL;
 	int		open_flags = O_WRONLY;
 
 	if (NULL != filename && '\0' != *filename)
@@ -125,7 +133,6 @@ void	zbx_redirect_stdio(const char *filename)
 
 	close(fd);
 }
-#endif
 
 static void	get_time(struct tm **tm, long *milliseconds)
 {
@@ -151,19 +158,17 @@ static void	rotate_log(const char *log_filename)
 	long			milliseconds;
 	struct tm		*tm;
 	zbx_uint64_t		new_size;
-#ifndef _WINDOWS
 	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
-#endif
+
 	if (0 == CONFIG_LOG_FILE_SIZE || NULL == log_filename || '\0' == *log_filename)
 	{
-#ifndef _WINDOWS
 		/* redirect only once if log file wasn't specified or there is no log file size limit */
 		if (ZBX_MAX_UINT64 == old_size)
 		{
 			old_size = 0;
 			zbx_redirect_stdio(log_filename);
 		}
-#endif
+
 		return;
 	}
 
@@ -225,23 +230,24 @@ static void	rotate_log(const char *log_filename)
 		else
 			new_size = 0;
 	}
-#ifndef _WINDOWS
+
 	if (old_size > new_size)
 		zbx_redirect_stdio(log_filename);
 
 	old_size = new_size;
-#endif
 }
 
 #ifndef _WINDOWS
 static sigset_t	orig_mask;
+
 static void	lock_log(void)
 {
 	sigset_t	mask;
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGTERM);	/* block SIGTERM to prevent deadlock on log file mutex */
+	sigaddset(&mask, SIGTERM);	/* block SIGTERM, SIGINT to prevent deadlock on log file mutex */
+	sigaddset(&mask, SIGINT);
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
@@ -286,14 +292,11 @@ int	zabbix_open_log(int type, int level, const char *filename)
 #ifdef _WINDOWS
 	wchar_t	*wevent_source;
 #endif
+	log_type = type;
 	log_level = level;
 
-	if (LOG_TYPE_FILE == type && NULL == filename)
-		type = LOG_TYPE_SYSLOG;
-
-	if (LOG_TYPE_SYSLOG == type)
+	if (LOG_TYPE_SYSTEM == type)
 	{
-		log_type = LOG_TYPE_SYSLOG;
 #ifdef _WINDOWS
 		wevent_source = zbx_utf8_to_unicode(ZABBIX_EVENT_SOURCE);
 		system_log_handle = RegisterEventSource(NULL, wevent_source);
@@ -310,7 +313,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			exit(EXIT_FAILURE);
 		}
 
-		if (FAIL == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
+		if (FAIL == zbx_mutex_create_force(&log_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("unable to create mutex for log file");
 			exit(EXIT_FAILURE);
@@ -322,9 +325,20 @@ int	zabbix_open_log(int type, int level, const char *filename)
 			exit(EXIT_FAILURE);
 		}
 
-		log_type = LOG_TYPE_FILE;
 		strscpy(log_filename, filename);
 		zbx_fclose(log_file);
+	}
+	else if (LOG_TYPE_CONSOLE == type)
+	{
+		if (FAIL == zbx_mutex_create_force(&log_access, ZBX_MUTEX_LOG))
+		{
+			zbx_error("unable to create mutex for standard output");
+			exit(EXIT_FAILURE);
+		}
+
+		fflush(stderr);
+		if (-1 == dup2(STDOUT_FILENO, STDERR_FILENO))
+			zbx_error("cannot redirect stderr to stdout: %s", zbx_strerror(errno));
 	}
 
 	return SUCCEED;
@@ -332,7 +346,7 @@ int	zabbix_open_log(int type, int level, const char *filename)
 
 void	zabbix_close_log(void)
 {
-	if (LOG_TYPE_SYSLOG == log_type)
+	if (LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		if (NULL != system_log_handle)
@@ -341,9 +355,9 @@ void	zabbix_close_log(void)
 		closelog();
 #endif
 	}
-	else if (LOG_TYPE_FILE == log_type)
+	else if (LOG_TYPE_FILE == log_type || LOG_TYPE_CONSOLE == log_type)
 	{
-		zbx_mutex_destroy(&log_file_access);
+		zbx_mutex_destroy(&log_access);
 	}
 }
 
@@ -459,11 +473,42 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 
+	if (LOG_TYPE_CONSOLE == log_type)
+	{
+		lock_log();
+
+		get_time(&tm, &milliseconds);
+
+		fprintf(stdout,
+				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
+				zbx_get_thread_id(),
+				tm->tm_year + 1900,
+				tm->tm_mon + 1,
+				tm->tm_mday,
+				tm->tm_hour,
+				tm->tm_min,
+				tm->tm_sec,
+				milliseconds
+				);
+
+		va_start(args, fmt);
+		vfprintf(stdout, fmt, args);
+		va_end(args);
+
+		fprintf(stdout, "\n");
+
+		fflush(stdout);
+
+		unlock_log();
+
+		return;
+	}
+
 	va_start(args, fmt);
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
 	va_end(args);
 
-	if (LOG_TYPE_SYSLOG == log_type)
+	if (LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		switch (level)
@@ -553,6 +598,45 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		unlock_log();
 	}
+}
+
+int	zbx_get_log_type(const char *logtype)
+{
+	const char	*logtypes[] = {ZBX_OPTION_LOGTYPE_SYSTEM, ZBX_OPTION_LOGTYPE_FILE, ZBX_OPTION_LOGTYPE_CONSOLE};
+	size_t		i;
+
+	for (i = 0; i < ARRSIZE(logtypes); i++)
+	{
+		if (0 == strcmp(logtype, logtypes[i]))
+			return i + 1;
+	}
+
+	return LOG_TYPE_UNDEFINED;
+}
+
+int	zbx_validate_log_parameters(ZBX_TASK_EX *task)
+{
+	if (LOG_TYPE_UNDEFINED == CONFIG_LOG_TYPE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'", CONFIG_LOG_TYPE_STR);
+		return FAIL;
+	}
+
+	if (LOG_TYPE_CONSOLE == CONFIG_LOG_TYPE && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
+			ZBX_TASK_START == task->task)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"console\" parameter can only be used with the"
+				" -f (--foreground) command line option");
+		return FAIL;
+	}
+
+	if (LOG_TYPE_FILE == CONFIG_LOG_TYPE && (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter to be set");
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
