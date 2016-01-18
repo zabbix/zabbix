@@ -212,6 +212,12 @@ function add_slideshow($data) {
 	$shared_users = [];
 
 	foreach ($data['users'] as $user) {
+		if ($data['private'] == PUBLIC_SHARING && $user['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+
 		$shared_users[] = [
 			'slideshowid' => $slideshowid,
 			'userid' => $user['userid'],
@@ -225,6 +231,12 @@ function add_slideshow($data) {
 	$shared_user_groups = [];
 
 	foreach ($data['userGroups'] as $user_group) {
+		if ($data['private'] == PUBLIC_SHARING && $user_group['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+
 		$shared_user_groups[] = [
 			'slideshowid' => $slideshowid,
 			'usrgrpid' => $user_group['usrgrpid'],
@@ -325,6 +337,23 @@ function update_slideshow($data) {
 		' FROM slideshow_usrgrp s'.
 		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
 	));
+
+	// Shares validation
+	foreach ($data['users'] as $user) {
+		if ($data['private'] == PUBLIC_SHARING && $user['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+	}
+
+	foreach ($data['userGroups'] as $user_group) {
+		if ($data['private'] == PUBLIC_SHARING && $user_group['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+	}
 
 	$shared_userids_to_delete = [];
 	$shared_users_to_update = [];
