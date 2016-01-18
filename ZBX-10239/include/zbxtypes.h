@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,10 @@
 
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
+#	endif
+
+#	ifndef __INT64_C
+#		define __INT64_C(x)	x
 #	endif
 
 #	define zbx_uint64_t	unsigned __int64

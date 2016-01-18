@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,7 +187,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			'&hostid='.$this->data['hostid'].
 			'&g_triggerid='.$triggerid))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
+		->addSID();
 
 	// hosts
 	$hosts = null;

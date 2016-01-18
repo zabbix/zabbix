@@ -29,8 +29,8 @@ $transparent: transparent;
 
 
 // MAIN
-$main-nav-bg-color: #0275b8 !default;
-$main-subnav-bg-color: #013e62 !default;
+$main-nav-bg-color: #fff !default;
+$main-subnav-bg-color: #0a466a !default;
 $main-subnav-bg-selected-color: #026dab !default;
 $main-color: #0275b8 !default;
 $font-color: #1f2c33 !default;
@@ -58,7 +58,7 @@ $ui-tab-bg-selected-color: #0275b8 !default;
 $form-font-color: #1f2c33 !default;
 $form-bg-color: #fff !default;
 $form-border-color: #acbbc2 !default;
-$form-border-focus-color: #02659f !default;//#0275b8 !default;
+$form-border-focus-color: #02659f !default;
 
 $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
@@ -95,10 +95,10 @@ $link-visited-color: #0275b8 !default;
 
 $link-alt-underline-color: #768d99 !default;
 
-$link-main-nav-color: rgba(#fff, 0.75) !default;
-$link-main-nav-hover-color: rgba(#fff, 1) !default;
-$link-main-nav-active-color: rgba(#fff, 1) !default;
-$link-main-nav-visited-color: rgba(#fff, 0.75) !default;
+$link-main-nav-color: rgba(#3c5563, 0.85) !default;
+$link-main-nav-hover-color: rgba(#3c5563, 1) !default;
+$link-main-nav-active-color: rgba(#3c5563, 1) !default;
+$link-main-nav-visited-color: rgba(#3c5563, 0.85) !default;
 
 $link-main-subnav-color: rgba(#fff, 0.75) !default;
 $link-main-subnav-hover-color: rgba(#fff, 1) !default;

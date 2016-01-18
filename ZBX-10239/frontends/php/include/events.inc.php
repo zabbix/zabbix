@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -287,7 +287,7 @@ function make_popup_eventlist($trigger, $backurl) {
 	if ($trigger['url'] !== '') {
 		$div->addItem(
 			(new CDiv())
-				->addItem((new CLink($trigger['url'], $trigger['url']))->removeSID())
+				->addItem(new CLink($trigger['url'], $trigger['url']))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 		);
 	}
@@ -367,8 +367,7 @@ function getEventAckState($event, $backurl) {
 	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
 		$ack = (new CLink(_('Yes'), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREEN)
-			->removeSID();
+			->addClass(ZBX_STYLE_GREEN);
 		if (is_array($event['acknowledges'])) {
 			$ack->setHint(makeAckTab(array_slice($event['acknowledges'], 0, ZBX_WIDGET_ROWS)), '', false);
 		}
@@ -377,8 +376,7 @@ function getEventAckState($event, $backurl) {
 	else {
 		$ack = (new CLink(_('No'), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_RED)
-			->removeSID();
+			->addClass(ZBX_STYLE_RED);
 	}
 
 	return $ack;
