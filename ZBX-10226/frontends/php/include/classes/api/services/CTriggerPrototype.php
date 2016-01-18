@@ -746,7 +746,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$expressionFull = $triggerPrototype['expression'];
 			}
 
-			if ($descriptionChanged || $expressionChanged) {
+			if ($expressionChanged) {
 				$expressionData = new CTriggerExpression();
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
@@ -757,9 +757,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 						'Trigger expression must contain at least one host:key reference.'
 					));
 				}
-			}
 
-			if ($expressionChanged) {
 				DB::delete('functions', ['triggerid' => $triggerPrototype['triggerid']]);
 
 				try {
