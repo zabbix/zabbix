@@ -570,6 +570,28 @@ class CUser extends CApiService {
 				_s('User "%1$s" is screen "%2$s" owner.', $db_user['alias'], $user_screen['name'])
 			);
 		}
+
+		// Check if deleted users have a slide show.
+		$user_slideshow = DBfetch(DBselect(
+			'SELECT s.name,s.userid'.
+			' FROM slideshows s'.
+			' WHERE '.dbConditionInt('s.userid', $userids)
+		));
+
+		if ($user_slideshow) {
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userids' => [$user_slideshow['userid']],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is slide show "%2$s" owner.', $db_user['alias'], $user_slideshow['name'])
+			);
+		}
 	}
 
 	/**
