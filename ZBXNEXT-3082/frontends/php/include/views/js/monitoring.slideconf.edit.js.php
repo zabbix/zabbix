@@ -17,6 +17,73 @@
 	</td>
 </tr>
 </script>
+
+<script type="text/x-jquery-tmpl" id="user_group_row_tpl">
+	<?= (new CRow([
+			new CCol([
+				(new CTextBox('userGroups[#{usrgrpid}][usrgrpid]', '#{usrgrpid}'))->setAttribute('type', 'hidden'),
+				(new CSpan('#{name}')),
+			]),
+			new CCol(
+				(new CTag('ul', false, [
+					new CTag('li', false, [
+						(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ))
+							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ),
+						(new CTag('label', false, _('Read-only')))
+							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ)
+					]),
+					new CTag('li', false, [
+						(new CInput('radio', 'userGroups[#{usrgrpid}][permission]', PERM_READ_WRITE))
+							->setId('user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE),
+						(new CTag('label', false, _('Read-write')))
+							->setAttribute('for', 'user_group_#{usrgrpid}_permission_'.PERM_READ_WRITE)
+					])
+				]))->addClass('radio-segmented')
+			),
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('removeUserGroupShares("#{usrgrpid}");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('user_group_shares_#{usrgrpid}')
+			->toString()
+	?>
+</script>
+
+<script type="text/x-jquery-tmpl" id="user_row_tpl">
+	<?= (new CRow([
+			new CCol([
+				(new CTextBox('users[#{id}][userid]', '#{id}'))->setAttribute('type', 'hidden'),
+				(new CSpan('#{name}')),
+			]),
+			new CCol(
+				(new CTag('ul', false, [
+					new CTag('li', false, [
+						(new CInput('radio', 'users[#{id}][permission]', PERM_READ))
+							->setId('user_#{id}_permission_'.PERM_READ),
+						(new CTag('label', false, _('Read-only')))
+							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ)
+					]),
+					new CTag('li', false, [
+						(new CInput('radio', 'users[#{id}][permission]', PERM_READ_WRITE))
+							->setId('user_#{id}_permission_'.PERM_READ_WRITE),
+						(new CTag('label', false, _('Read-write')))
+							->setAttribute('for', 'user_#{id}_permission_'.PERM_READ_WRITE)
+					])
+				]))->addClass('radio-segmented')
+			),
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('removeUserShares("#{id}");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('user_shares_#{id}')
+			->toString()
+	?>
+</script>
+
 <script type="text/javascript">
 	function removeSlide(obj) {
 		var step = obj.getAttribute('remove_slide');
@@ -151,6 +218,14 @@
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 			}
 		});
+	}
+
+	function removeUserGroupShares(usrgrpid) {
+		jQuery('#user_group_shares_' + usrgrpid).remove();
+	}
+
+	function removeUserShares(userid) {
+		jQuery('#user_shares_' + userid).remove();
 	}
 
 	jQuery(function() {

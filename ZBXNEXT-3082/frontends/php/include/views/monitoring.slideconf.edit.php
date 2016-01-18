@@ -23,24 +23,88 @@ require_once dirname(__FILE__).'/js/monitoring.slideconf.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Slide shows'));
 
+$tabs = new CTabView();
+
+if (!$data['form_refresh']) {
+	$tabs->setSelected(0);
+}
+
 // create form
 $form = (new CForm())
 	->setName('slideForm')
-	->addVar('form', $this->data['form'])
-	->addVar('slides', $this->data['slides_without_delay']);
-if (!empty($this->data['slideshowid'])) {
-	$form->addVar('slideshowid', $this->data['slideshowid']);
+	->addVar('form', $data['form'])
+	->addVar('slides', $data['slides_without_delay'])
+	->addVar('current_user_userid', $data['current_user_userid'])
+	->addVar('current_user_fullname', getUserFullname($data['users'][$data['current_user_userid']]));
+
+if (!empty($data['slideshow']['slideshowid'])) {
+	$form->addVar('slideshowid', $data['slideshow']['slideshowid']);
 }
 
-// create slide form list
-$slideFormList = (new CFormList())
-	->addRow(_('Name'),
-		(new CTextBox('name', $this->data['name']))
+$user_type = CWebUser::getType();
+
+// Create slide form list.
+$slideshow_tab = (new CFormList());
+
+// Slide show owner multiselect.
+$multiselect_data = [
+	'name' => 'userid',
+	'selectedLimit' => 1,
+	'objectName' => 'users',
+	'disabled' => ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN),
+	'popup' => [
+		'parameters' => 'srctbl=users&dstfrm='.$form->getName().'&dstfld1=userid&srcfld1=userid&srcfld2=fullname'
+	]
+];
+
+$slideshow_ownerid = $data['slideshow']['userid'];
+
+// If slide show owner does not exist or is not allowed to display.
+if ($slideshow_ownerid === '' || $slideshow_ownerid && array_key_exists($slideshow_ownerid, $data['users'])) {
+	// Slide show owner data.
+	if ($slideshow_ownerid) {
+		$owner_data = [[
+			'id' => $slideshow_ownerid,
+			'name' => getUserFullname($data['users'][$slideshow_ownerid])
+		]];
+	}
+	else {
+		$owner_data = [];
+	}
+
+	$multiselect_data['data'] = $owner_data;
+
+	// Append multiselect to slide show tab.
+	$slideshow_tab->addRow(_('Owner'),
+		(new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+}
+else {
+	$multiselect_userid = (new CMultiSelect($multiselect_data))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+	// Administrators can change slide show owner, but cannot see users from other groups.
+	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
+		$slideshow_tab->addRow(_('Owner'), $multiselect_userid)
+			->addRow('', _('Inaccessible user'), 'inaccessible_user');
+	}
+	else {
+		// For regular users and guests, only information message is displayed without multiselect.
+		$slideshow_tab->addRow(_('Owner'), [
+			(new CSpan(_('Inaccessible user')))->setId('inaccessible_user'),
+			(new CSpan($multiselect_userid))
+				->addStyle('display: none;')
+				->setId('multiselect_userid_wrapper')
+		]);
+	}
+}
+
+$slideshow_tab->addRow(_('Name'),
+		(new CTextBox('name', $data['slideshow']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Default delay (in seconds)'),
-		(new CNumericBox('delay', $this->data['delay'], 5, false, false, false))
+		(new CNumericBox('delay', $data['slideshow']['delay'], 5, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
@@ -57,7 +121,7 @@ $slideTable = (new CTable())
 	]);
 
 $i = 1;
-foreach ($this->data['slides'] as $key => $slides) {
+foreach ($data['slideshow']['slides'] as $key => $slides) {
 	$name = '';
 	if (!empty($slides['screenid'])) {
 		$screen = get_screen_by_screenid($slides['screenid']);
@@ -91,30 +155,110 @@ foreach ($this->data['slides'] as $key => $slides) {
 }
 
 $addButtonColumn = (new CCol(
-	empty($this->data['work_slide'])
-		? (new CButton('add', _('Add')))
+		(new CButton('add', _('Add')))
 			->onClick('return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$form->getName().
 					'&multiselect=1&writeonly=1")')
 			->addClass(ZBX_STYLE_BTN_LINK)
-		: null
 	))->setColSpan(5);
 
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideFormList->addRow(_('Slides'),
+$slideshow_tab->addRow(_('Slides'),
 	(new CDiv($slideTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-// append tabs to form
-$slideTab = new CTabView();
-$slideTab->addTab('slideTab', _('Slide'), $slideFormList);
+// Append tabs to form.
+$tabs->addTab('slideTab', _('Slide'), $slideshow_tab);
+
+// User group sharing table.
+$user_group_shares_table = (new CTable())
+	->setHeader([_('User groups'), _('Permissions'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
+
+$add_user_group_btn = ([(new CButton(null, _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
+		'&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")'
+	)
+	->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$user_group_shares_table->addRow(
+	(new CRow(
+		(new CCol($add_user_group_btn))->setColSpan(3)
+	))->setId('user_group_list_footer')
+);
+
+$user_groups = [];
+
+foreach ($data['slideshow']['userGroups'] as $user_group) {
+	$user_groupid = $user_group['usrgrpid'];
+	$user_groups[$user_groupid] = [
+		'usrgrpid' => $user_groupid,
+		'name' => $data['slideshow']['user_groups'][$user_groupid]['name'],
+		'permission' => $user_group['permission']
+	];
+}
+
+$js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $user_groups]).');';
+
+// User sharing table.
+$user_shares_table = (new CTable())
+	->setHeader([_('Users'), _('Permissions'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
+
+$add_user_btn = ([(new CButton(null, _('Add')))
+	->onClick('return PopUp("popup.php?dstfrm='.$form->getName().
+		'&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")'
+	)
+	->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$user_shares_table->addRow(
+	(new CRow(
+		(new CCol($add_user_btn))->setColSpan(3)
+	))->setId('user_list_footer')
+);
+
+$users = [];
+
+foreach ($data['slideshow']['users'] as $user) {
+	$userid = $user['userid'];
+	$users[$userid] = [
+		'id' => $userid,
+		'name' => getUserFullname($data['slideshow']['users'][$userid]),
+		'permission' => $user['permission']
+	];
+}
+
+$js_insert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+
+zbx_add_post_js($js_insert);
+
+$sharing_tab = (new CFormList('sharing_form'))
+	->addRow(_('Type'),
+	(new CRadioButtonList('private', (int) $data['slideshow']['private']))
+		->addValue(_('Private'), PRIVATE_SHARING)
+		->addValue(_('Public'), PUBLIC_SHARING)
+		->setModern(true)
+	)
+	->addRow(_('List of user group shares'),
+		(new CDiv($user_group_shares_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
+	->addRow(_('List of user shares'),
+		(new CDiv($user_shares_table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	);
+
+// Append data to form.
+$tabs->addTab('sharing_tab', _('Sharing'), $sharing_tab);
 
 // append buttons to form
-if (isset($this->data['slideshowid'])) {
-	$slideTab->setFooter(makeFormFooter(
+if (isset($data['slideshow']['slideshowid'])) {
+	$tabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
@@ -124,13 +268,13 @@ if (isset($this->data['slideshowid'])) {
 	));
 }
 else {
-	$slideTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$form->addItem($slideTab);
+$form->addItem($tabs);
 $widget->addItem($form);
 
 return $widget;
