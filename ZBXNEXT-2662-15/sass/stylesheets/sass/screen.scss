@@ -2812,12 +2812,12 @@ $form-icon-btn: (
 
 #map-area {
 
-	.map-area-element-bg {
-		background-color: rgba($ui-hover-color,0.5);
+	.map-element-area-bg {
+		background-color: rgba($action-hover-color,0.35);
 	}
 }
 
-.map-selected {
+.map-element-selected {
 	border: 3px dashed $dark-yellow;
 	margin: -3px;
 }
