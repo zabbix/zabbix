@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,7 @@
 
 $screenWidget = new CWidget();
 
-$form = (new CFilter('web.hostscreen.filter.state'))
-	->addVar('fullscreen', $this->data['fullscreen'])
-	->addNavigator();
+$form = (new CFilter('web.hostscreen.filter.state'))->addNavigator();
 
 $screenWidget->addItem($form);
 
