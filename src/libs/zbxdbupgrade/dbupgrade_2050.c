@@ -912,7 +912,6 @@ out:
 
 	return ret;
 }
-
 static int	DBpatch_2050093(void)
 {
 	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
@@ -1019,6 +1018,24 @@ static int	DBpatch_2050104(void)
 	return DBadd_foreign_key("screen_usrgrp", 2, &field);
 }
 
+static int	DBpatch_2050105(void)
+{
+	const ZBX_FIELD	field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBrename_field("proxy_history", "meta", &field);
+}
+
+static int	DBpatch_2050106(void)
+{
+	/* convert meta value (1) to PROXY_HISTORY_FLAG_META | PROXY_HISTORY_FLAG_NOVALUE (0x03) flags */
+	if (ZBX_DB_OK > DBexecute("update proxy_history set flags=3 where flags=1"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -1117,5 +1134,7 @@ DBPATCH_ADD(2050101, 0, 1)
 DBPATCH_ADD(2050102, 0, 1)
 DBPATCH_ADD(2050103, 0, 1)
 DBPATCH_ADD(2050104, 0, 1)
+DBPATCH_ADD(2050105, 0, 1)
+DBPATCH_ADD(2050106, 0, 1)
 
 DBPATCH_END()
