@@ -1353,6 +1353,7 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-10232] fixed report3.php SQL errors with invalid "year" parameter (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
