@@ -679,7 +679,6 @@ function changeWidgetState(obj, widgetId, url) {
 function sendAjaxData(url, options) {
 	var url = new Curl(url);
 	url.setArgument('output', 'ajax');
-	url.addSID();
 
 	options.type = 'post';
 	options.url = url.getUrl();
