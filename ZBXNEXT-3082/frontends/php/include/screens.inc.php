@@ -356,6 +356,23 @@ function update_slideshow($data) {
 		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
 	));
 
+	$userids = [];
+	foreach ($db_slideshow['users'] as $user) {
+		$userids[] = $user['userid'];
+	}
+
+	$allowed_users = API::User()->get([
+		'output' => ['userid'],
+		'userids' => $userids,
+		'preservekeys' => true
+	]);
+
+	foreach ($db_slideshow['users'] as $key => $user) {
+		if (!array_key_exists($user['userid'], $allowed_users)) {
+			unset($db_slideshow['users'][$key]);
+		}
+	}
+
 	$user_shares_diff = zbx_array_diff($data['users'], $db_slideshow['users'], 'userid');
 
 	foreach ($user_shares_diff['both'] as $update_user_share) {
@@ -378,6 +395,23 @@ function update_slideshow($data) {
 		' FROM slideshow_usrgrp s'.
 		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
 	));
+
+	$usrgrpids = [];
+	foreach ($db_slideshow['userGroups'] as $user_group) {
+		$usrgrpids[] = $user_group['usrgrpid'];
+	}
+
+	$allowed_users = API::UserGroup()->get([
+		'output' => ['usrgrpid'],
+		'usrgrpids' => $usrgrpids,
+		'preservekeys' => true
+	]);
+
+	foreach ($db_slideshow['userGroups'] as $key => $user_group) {
+		if (!array_key_exists($user_group['usrgrpid'], $allowed_users)) {
+			unset($db_slideshow['userGroups'][$key]);
+		}
+	}
 
 	$user_group_shares_diff = zbx_array_diff($data['userGroups'], $db_slideshow['userGroups'], 'usrgrpid');
 
