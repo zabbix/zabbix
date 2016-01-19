@@ -9,6 +9,7 @@ New features:
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
+A......... [ZBX-10226] fixed trigger prototype updateReal API method (Gunars)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
