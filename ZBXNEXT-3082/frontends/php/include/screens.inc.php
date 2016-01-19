@@ -106,11 +106,7 @@ function getSlideshowScreens($slideshowId, $step) {
 function slideshow_accessible($slideshowid, $perm) {
 	$result = false;
 
-	$sql = 'SELECT s.slideshowid'.
-			' FROM slideshows s'.
-			' WHERE s.slideshowid='.zbx_dbstr($slideshowid);
-
-	if (DBselect($sql)) {
+	if (get_slideshow_by_slideshowid($slideshowid, PERM_READ)) {
 		$result = true;
 
 		$screenids = [];
@@ -143,8 +139,41 @@ function slideshow_accessible($slideshowid, $perm) {
 	return $result;
 }
 
-function get_slideshow_by_slideshowid($slideshowid) {
-	return DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.zbx_dbstr($slideshowid)));
+function get_slideshow_by_slideshowid($slideshowid, $permission) {
+	$user_data = CWebUser::$data;
+
+	$condition = '';
+	if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+		$public_slideshows = '';
+
+		if ($permission == PERM_READ) {
+			$public_slideshows = ' OR s.private='.PUBLIC_SHARING;
+		}
+
+		$user_groups = getUserGroupsByUserId($user_data['userid']);
+
+		$condition = ' AND (EXISTS ('.
+				'SELECT NULL'.
+				' FROM slideshow_user su'.
+				' WHERE s.slideshowid=su.slideshowid'.
+					' AND su.userid='.$user_data['userid'].
+					' AND su.permission>='.$permission.
+			')'.
+			' OR EXISTS ('.
+				'SELECT NULL'.
+				' FROM slideshow_usrgrp sg'.
+				' WHERE s.slideshowid=sg.slideshowid'.
+					' AND '.dbConditionInt('sg.usrgrpid', $user_groups).
+					' AND sg.permission>='.$permission.
+			')'.
+			' OR s.userid='.$user_data['userid'].
+			$public_slideshows.
+		')';
+	}
+
+	return DBfetch(DBselect(
+		'SELECT s.* FROM slideshows s WHERE s.slideshowid='.zbx_dbstr($slideshowid).$condition
+	));
 }
 
 function add_slideshow($data) {
@@ -493,9 +522,13 @@ function update_slideshow($data) {
 }
 
 function delete_slideshow($slideshowid) {
-	$result = DBexecute('DELETE FROM slideshows where slideshowid='.zbx_dbstr($slideshowid));
-	$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
-	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
+	$result = false;
+
+	if (get_slideshow_by_slideshowid($slideshowid, PERM_READ_WRITE)) {
+		$result = DBexecute('DELETE FROM slideshows where slideshowid='.zbx_dbstr($slideshowid));
+		$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
+		$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
+	}
 
 	return (bool) $result;
 }

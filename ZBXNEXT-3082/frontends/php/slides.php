@@ -63,7 +63,7 @@ if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid'
 	access_deny();
 }
 if (hasRequest('elementid')) {
-	$data['screen'] = get_slideshow_by_slideshowid(getRequest('elementid'));
+	$data['screen'] = get_slideshow_by_slideshowid(getRequest('elementid'), PERM_READ);
 
 	if (!$data['screen']) {
 		access_deny();
@@ -159,7 +159,7 @@ if ($data['screen']) {
 }
 else {
 	$data['elementId'] = CProfile::get('web.slides.elementid');
-	$data['screen'] = get_slideshow_by_slideshowid($data['elementId']);
+	$data['screen'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
 
 	if (!$data['screen']) {
 		// Redirect to slide show list.
@@ -194,7 +194,7 @@ if ($data['screen']) {
 	}
 
 	// get element
-	$data['element'] = get_slideshow_by_slideshowid($data['elementId']);
+	$data['element'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
 
 	if ($data['screen']['delay'] > 0) {
 		$data['element']['delay'] = $data['screen']['delay'];
