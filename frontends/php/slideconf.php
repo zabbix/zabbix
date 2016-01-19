@@ -94,7 +94,7 @@ if (hasRequest('action')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])) {
+if (hasRequest('clone') && hasRequest('slideshowid')) {
 	unset($_REQUEST['slideshowid'], $_REQUEST['users'], $_REQUEST['userGroups']);
 	$_REQUEST['form'] = 'clone';
 	$_REQUEST['private'] = PRIVATE_SHARING;
@@ -104,7 +104,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {
-		$data = [
+		$result = update_slideshow([
 			'slideshowid' => getRequest('slideshowid'),
 			'name' => getRequest('name'),
 			'delay' => getRequest('delay'),
@@ -113,16 +113,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'private' => getRequest('private'),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
-		];
-
-		$result = update_slideshow($data);
+		]);
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$data = [
+		$result = add_slideshow([
 			'name' => getRequest('name'),
 			'delay' => getRequest('delay'),
 			'slides' => getRequest('slides', []),
@@ -130,8 +128,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'private' => getRequest('private'),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
-		];
-		$result = add_slideshow($data);
+		]);
 
 		$messageSuccess = _('Slide show added');
 		$messageFailed = _('Cannot add slide show');
