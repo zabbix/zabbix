@@ -150,7 +150,23 @@ TABLE|slideshows|slideshowid|ZBX_DATA
 FIELD		|slideshowid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|3|users	|		|RESTRICT
+FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
 UNIQUE		|1		|name
+
+TABLE|slideshow_user|slideshowuserid|ZBX_DATA
+FIELD		|slideshowuserid|t_id		|	|NOT NULL	|0
+FIELD		|slideshowid	|t_id		|	|NOT NULL	|0			|1|slideshows
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+UNIQUE		|1		|slideshowid,userid
+
+TABLE|slideshow_usrgrp|slideshowusrgrpid|ZBX_DATA
+FIELD		|slideshowusrgrpid|t_id		|	|NOT NULL	|0
+FIELD		|slideshowid	|t_id		|	|NOT NULL	|0			|1|slideshows
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+UNIQUE		|1		|slideshowid,usrgrpid
 
 TABLE|slides|slideid|ZBX_DATA
 FIELD		|slideid	|t_id		|	|NOT NULL	|0
@@ -1337,4 +1353,4 @@ FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050106	|2050106
+ROW		|2050119	|2050119

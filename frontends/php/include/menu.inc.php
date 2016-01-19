@@ -81,7 +81,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'screens.php',
 					'label' => _('Screens'),
-					'sub_pages' => ['slides.php', 'screenconf.php', 'screenedit.php', 'screen.import.php']
+					'sub_pages' => [
+						'screenconf.php',
+						'screenedit.php',
+						'screen.import.php',
+						'slides.php',
+						'slideconf.php'
+					]
 				],
 				[
 					'url' => 'zabbix.php',
@@ -217,10 +223,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'actionconf.php',
 					'label' => _('Actions')
-				],
-				[
-					'url' => 'slideconf.php',
-					'label' => _('Slide shows'),
 				],
 				[
 					'url' => 'discoveryconf.php',
