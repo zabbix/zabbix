@@ -1221,6 +1221,7 @@ define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
 define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
+define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_YELLOW', 'yellow');
 
