@@ -1985,8 +1985,8 @@ class CLineGraphDraw extends CGraphDraw {
 			return;
 		}
 
-		$opposite = hex2rgb(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
-		$oppColor = imagecolorallocate($this->im, $opposite[0], $opposite[1], $opposite[2]);
+		$oppColor = $this->getColor(GRAPH_TRIGGER_LINE_OPPOSITE_COLOR);
+
 		foreach ($this->triggers as $tnum => $trigger) {
 			if ($trigger['skipdraw']) {
 				continue;

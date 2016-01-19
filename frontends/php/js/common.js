@@ -389,7 +389,7 @@ function PopUp(url, width, height, form_name) {
 	return false;
 }
 
-function redirect(uri, method, needle) {
+function redirect(uri, method, needle, invert_needle) {
 	method = method || 'get';
 	var url = new Curl(uri);
 
@@ -404,12 +404,17 @@ function redirect(uri, method, needle) {
 		domBody.appendChild(postForm);
 		postForm.setAttribute('method', 'post');
 
+		invert_needle = (typeof(invert_needle) != 'undefined' && invert_needle);
+
 		var args = url.getArguments();
 		for (var key in args) {
 			if (empty(args[key])) {
 				continue;
 			}
-			if (typeof(needle) != 'undefined' && key.indexOf(needle) > -1) {
+
+			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
+
+			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				action += '&' + key + '=' + args[key];
 				continue;
 			}
