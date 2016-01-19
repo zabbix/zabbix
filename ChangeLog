@@ -9,6 +9,7 @@ New features:
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
+A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 ...G...PS. [ZBX-10239] fixed agent collector crashes on Linux while gathering data for proc.cpu.util[], fixed unsafe use of stack in logging functions (Sandis)
 A.F....... [ZBX-10182] fixed API to disallow update of templated host graphs and disabled form fields for templated host graph update (Vitalijs)
