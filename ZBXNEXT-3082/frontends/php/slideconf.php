@@ -116,7 +116,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		];
 
 		// Slide show update with inaccessible user.
-		if ($data['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		if ($data['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN
+				&& CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN) {
 			$user_exist = API::User()->get([
 				'output' => ['userid'],
 				'userids' => [$data['userid']]
@@ -292,12 +293,20 @@ if (hasRequest('form')) {
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
 		];
-
-		if (hasRequest('userid')) {
-			$data['slideshow']['userid'] = getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid);
-		}
-		else {
-			$data['slideshow']['userid'] = $db_slideshow['userid'];
+		if (hasRequest('form_refresh')) {
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN || CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
+				$data['slideshow']['userid'] = getRequest('userid', '');
+			}
+			else {
+				$data['slideshow']['userid'] = getRequest('userid');
+			}
+		} else {
+			if ($db_slideshow) {
+				$data['slideshow']['userid'] = $db_slideshow['userid'];
+			}
+			else {
+				$data['slideshow']['userid'] = $current_userid;
+			}
 		}
 	}
 
