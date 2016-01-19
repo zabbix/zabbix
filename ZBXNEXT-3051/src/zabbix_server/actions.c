@@ -734,8 +734,9 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 
 		if (NULL != (row = DBfetch(result)))
 		{
-			int	now = time(NULL);
+			int	now;
 
+			now = time(NULL);
 			tmp_int = DOBJECT_STATUS_UP == atoi(row[0]) ? atoi(row[1]) : atoi(row[2]);
 
 			switch (condition->operator)
