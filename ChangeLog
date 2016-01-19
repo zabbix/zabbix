@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha7
 
 New features:
+..F.I..... [ZBXNEXT-3082] implemented support of public and private slide shows with ability to share them with other users and user groups (Oleg)
 ..F....... [ZBXNEXT-3080] implemented action menu closing only when clicking outside of it (Gunars)
 ........S. [ZBXNEXT-3051] implemented action and action condition caching (wiper)
 ..F....... [ZBXNEXT-2662] implemented displaying of maps using graph_themes (Pavel, Sasha)
