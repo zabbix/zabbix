@@ -628,7 +628,7 @@ return [
 				'default' => '0',
 			],
 			'userid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'users',
