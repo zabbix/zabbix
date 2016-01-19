@@ -104,16 +104,30 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {
-		$result = update_slideshow([
+		$data = [
 			'slideshowid' => getRequest('slideshowid'),
 			'name' => getRequest('name'),
 			'delay' => getRequest('delay'),
 			'slides' => getRequest('slides', []),
-			'userid' => getRequest('userid'),
+			'userid' => getRequest('userid', ''),
 			'private' => getRequest('private'),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
-		]);
+		];
+
+		// Slide show update with inaccessible user.
+		if ($data['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			$user_exist = API::User()->get([
+				'output' => ['userid'],
+				'userids' => [$data['userid']]
+			]);
+
+			if (!$user_exist) {
+				unset($data['userid']);
+			}
+		}
+
+		$result = update_slideshow($data);
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
@@ -274,11 +288,17 @@ if (hasRequest('form')) {
 			'name' => getRequest('name', ''),
 			'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 			'slides' => getRequest('slides', []),
-			'userid' => getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid),
 			'private' => getRequest('private', PRIVATE_SHARING),
 			'users' => getRequest('users', []),
 			'userGroups' => getRequest('userGroups', [])
 		];
+
+		if (hasRequest('userid')) {
+			$data['slideshow']['userid'] = getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid);
+		}
+		else {
+			$data['slideshow']['userid'] = $db_slideshow['userid'];
+		}
 	}
 
 	$screenids = [];
