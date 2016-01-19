@@ -1447,9 +1447,17 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
+	if (HOST_TLS_PSK_LEN_MIN > len)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too short. Minimum is %d hex-digits",
+				CONFIG_TLS_PSK_FILE, HOST_TLS_PSK_LEN_MIN);
+		goto out;
+	}
+
 	if (HOST_TLS_PSK_LEN < len)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too large", CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too long. Maximum is %d hex-digits",
+				CONFIG_TLS_PSK_FILE, HOST_TLS_PSK_LEN);
 		goto out;
 	}
 
