@@ -1036,6 +1036,115 @@ static int	DBpatch_2050106(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_2050107(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("slideshows", &field);
+}
+
+static int	DBpatch_2050108(void)
+{
+	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
+	if (ZBX_DB_OK > DBexecute("update slideshows set userid=(select min(userid) from users where type=3)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050109(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBset_not_null("slideshows", &field);
+}
+
+static int	DBpatch_2050110(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("slideshows", 3, &field);
+}
+
+static int	DBpatch_2050111(void)
+{
+	const ZBX_FIELD field = {"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("slideshows", &field);
+}
+
+static int	DBpatch_2050112(void)
+{
+	const ZBX_TABLE table =
+		{"slideshow_user",	"slideshowuserid",	0,
+			{
+				{"slideshowuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"slideshowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050113(void)
+{
+	return DBcreate_index("slideshow_user", "slideshow_user_1", "slideshowid,userid", 1);
+}
+
+static int	DBpatch_2050114(void)
+{
+	const ZBX_FIELD	field = {"slideshowid", NULL, "slideshows", "slideshowid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("slideshow_user", 1, &field);
+}
+
+static int	DBpatch_2050115(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("slideshow_user", 2, &field);
+}
+
+static int	DBpatch_2050116(void)
+{
+	const ZBX_TABLE table =
+		{"slideshow_usrgrp", "slideshowusrgrpid", 0,
+			{
+				{"slideshowusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"slideshowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050117(void)
+{
+	return DBcreate_index("slideshow_usrgrp", "slideshow_usrgrp_1", "slideshowid,usrgrpid", 1);
+}
+
+static int	DBpatch_2050118(void)
+{
+	const ZBX_FIELD	field = {"slideshowid", NULL, "slideshows", "slideshowid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("slideshow_usrgrp", 1, &field);
+}
+
+static int	DBpatch_2050119(void)
+{
+	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("slideshow_usrgrp", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -1136,5 +1245,18 @@ DBPATCH_ADD(2050103, 0, 1)
 DBPATCH_ADD(2050104, 0, 1)
 DBPATCH_ADD(2050105, 0, 1)
 DBPATCH_ADD(2050106, 0, 1)
+DBPATCH_ADD(2050107, 0, 1)
+DBPATCH_ADD(2050108, 0, 1)
+DBPATCH_ADD(2050109, 0, 1)
+DBPATCH_ADD(2050110, 0, 1)
+DBPATCH_ADD(2050111, 0, 1)
+DBPATCH_ADD(2050112, 0, 1)
+DBPATCH_ADD(2050113, 0, 1)
+DBPATCH_ADD(2050114, 0, 1)
+DBPATCH_ADD(2050115, 0, 1)
+DBPATCH_ADD(2050116, 0, 1)
+DBPATCH_ADD(2050117, 0, 1)
+DBPATCH_ADD(2050118, 0, 1)
+DBPATCH_ADD(2050119, 0, 1)
 
 DBPATCH_END()
