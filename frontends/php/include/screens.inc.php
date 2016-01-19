@@ -317,29 +317,13 @@ function update_slideshow($data) {
 		return false;
 	}
 
-	$db_slideshow = DBfetch(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($data['slideshowid'])));
+	$to_update = $data;
+	unset($to_update['slideshowid'], $to_update['slides'], $to_update['users'], $to_update['userGroups']);
 
-	$changed = false;
-	$slideshow = ['name' => $data['name'], 'delay' => $data['delay']];
-
-	foreach ($slideshow as $key => $val) {
-		if ((string) $val !== (string) $db_slideshow[$key]) {
-			$changed = true;
-			break;
-		}
-	}
-
-	if ($changed) {
-		$result = DBexecute(
-			'UPDATE slideshows'.
-			' SET name='.zbx_dbstr($data['name']).',delay='.zbx_dbstr($data['delay']).
-			' WHERE slideshowid='.zbx_dbstr($data['slideshowid'])
-		);
-
-		if (!$result) {
-			return false;
-		}
-	}
+	DB::update('slideshows', [
+		'values' => $to_update,
+		'where' => ['slideshowid' => $data['slideshowid']]
+	]);
 
 	// Read-only sharing validation.
 	foreach ($data['users'] as $user) {
