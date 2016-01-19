@@ -34,7 +34,7 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
-			'eztext_limit' =>			'in 0,1',
+			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array media_type.exec_params',
 			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
