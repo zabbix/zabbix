@@ -281,6 +281,18 @@ if (isset($_REQUEST['form'])) {
 		];
 	}
 
+	$screenids = [];
+	foreach ($data['slideshow']['slides'] as $slides) {
+		$screenids[] = $slides['screenid'];
+	}
+
+	$data['slideshow']['screens'] = API::Screen()->get([
+		'output' => ['name'],
+		'screenids' => $screenids,
+		'preservekeys' => true
+	]);
+
+
 	$data['current_user_userid'] = $current_userid;
 
 	// Get slides without delay.
@@ -325,6 +337,14 @@ else {
 			unset($data['slides'][$key]);
 		}
 	}
+
+	foreach ($data['slides'] as &$slide) {
+		if (slideshow_accessible($slide['slideshowid'], PERM_READ_WRITE)) {
+			$slide['editable'] = true;
+		}
+	}
+	unset($slide);
+
 
 	order_result($data['slides'], $sortField, $sortOrder);
 

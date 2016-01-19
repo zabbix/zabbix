@@ -121,15 +121,8 @@ $slideTable = (new CTable())
 	]);
 
 $i = 1;
-foreach ($data['slideshow']['slides'] as $key => $slides) {
-	$name = '';
-	if (!empty($slides['screenid'])) {
-		$screen = get_screen_by_screenid($slides['screenid']);
-		if ($screen) {
-			$name = $screen['name'];
-		}
-	}
 
+foreach ($data['slideshow']['slides'] as $key => $slides) {
 	$delay = (new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false))
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		->setAttribute('placeholder', _('default'));
@@ -140,7 +133,7 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
-			$name,
+			$data['slideshow']['screens'][$slides['screenid']]['name'],
 			$delay,
 			(new CCol(
 				(new CButton('remove_'.$key, _('Remove')))
