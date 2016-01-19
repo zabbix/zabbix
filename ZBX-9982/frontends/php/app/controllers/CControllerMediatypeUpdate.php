@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
+			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array media_type.exec_params',
 			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
@@ -80,17 +81,22 @@ class CControllerMediatypeUpdate extends CController {
 	protected function doAction() {
 		$mediatype = [];
 
-		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description', 'status']);
+		$this->getInputs($mediatype, ['mediatypeid', 'type', 'description']);
+		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_DISABLED);
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd'
+					'smtp_authentication', 'passwd'
 				]);
 
 				if ($this->hasInput('smtp_username')) {
 					$mediatype['username'] = $this->getInput('smtp_username');
 				}
+
+				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
+				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
+
 				break;
 
 			case MEDIA_TYPE_EXEC:
@@ -120,10 +126,14 @@ class CControllerMediatypeUpdate extends CController {
 				break;
 
 			case MEDIA_TYPE_EZ_TEXTING:
-				$this->getInputs($mediatype, ['passwd', 'exec_path']);
+				$this->getInputs($mediatype, ['passwd']);
 
 				if ($this->hasInput('eztext_username')) {
 					$mediatype['username'] = $this->getInput('eztext_username');
+				}
+
+				if ($this->hasInput('eztext_limit')) {
+					$mediatype['exec_path'] = $this->getInput('eztext_limit');
 				}
 				break;
 		}

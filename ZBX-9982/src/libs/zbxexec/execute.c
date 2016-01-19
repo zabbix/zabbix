@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -390,7 +390,7 @@ close:
 
 #else	/* not _WINDOWS */
 
-	alarm(timeout);
+	zbx_alarm_on(timeout);
 
 	if (-1 != (fd = zbx_popen(&pid, command)))
 	{
@@ -432,7 +432,7 @@ close:
 	else
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
 
-	alarm(0);
+	zbx_alarm_off();
 
 #endif	/* _WINDOWS */
 

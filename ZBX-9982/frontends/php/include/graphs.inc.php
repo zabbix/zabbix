@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -941,24 +941,4 @@ function calcMaxLengthAfterDot($calcValues) {
 	}
 
 	return $maxLength;
-}
-
-/**
- * Allocate color for an image.
- *
- * @param resource 	$image
- * @param string	$color		a hexadecimal color identifier like "1F2C33"
- * @param int 		$alpha
- */
-function get_color($image, $color, $alpha = 0) {
-	$red = hexdec('0x'.substr($color, 0, 2));
-	$green = hexdec('0x'.substr($color, 2, 2));
-	$blue = hexdec('0x'.substr($color, 4, 2));
-
-	if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-			&& @imagecreatetruecolor(1, 1)) {
-		return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
-	}
-
-	return imagecolorallocate($image, $red, $green, $blue);
 }

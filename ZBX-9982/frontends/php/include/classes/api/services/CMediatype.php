@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -391,7 +391,8 @@ class CMediatype extends CApiService {
 
 		// Check value map names.
 		$db_mediatypes = API::getApiService()->select('media_type', [
-			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'smtp_authentication', 'status'],
+			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
+				'smtp_verify_host', 'smtp_authentication'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);

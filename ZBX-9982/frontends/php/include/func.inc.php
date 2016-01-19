@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ function zbx_is_callable(array $names) {
 /************ REQUEST ************/
 function redirect($url) {
 	$curl = new CUrl($url);
-	$curl->setArgument('sid', null);
+	$curl->removeArgument('sid');
 	header('Location: '.$curl->getUrl());
 	exit;
 }
@@ -1371,7 +1371,7 @@ function zbx_str2links($text) {
 		$start = 0;
 		foreach ($matches[0] as $match) {
 			$result[] = mb_substr($line, $start, $match[1] - $start);
-			$result[] = (new CLink($match[0], $match[0]))->removeSID();
+			$result[] = new CLink($match[0], $match[0]);
 			$start = $match[1] + mb_strlen($match[0]);
 		}
 		$result[] = mb_substr($line, $start);
@@ -1417,9 +1417,7 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 		}
 	}
 
-	$col = new CColHeader([new CLink([$obj, $arrow], $link->getUrl())]);
-
-	return $col;
+	return new CColHeader(new CLink([$obj, $arrow], $link->getUrl()));
 }
 
 /**
@@ -1504,19 +1502,19 @@ function getPagingLine(&$items, $sortorder) {
 		$url = CUrlFactory::getContextUrl();
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
-			$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
+			$tags[] = new CLink(_('First'), $url->getUrl());
 		}
 
 		if ($currentPage > 1) {
 			$url->setArgument('page', $currentPage - 1);
-			$tags[] = (new CLink(
+			$tags[] = new CLink(
 				(new CSpan())->addClass(ZBX_STYLE_ARROW_LEFT), $url->getUrl()
-			))->removeSID();
+			);
 		}
 
 		for ($p = $startPage; $p <= $endPage; $p++) {
 			$url->setArgument('page', $p);
-			$link = (new CLink($p, $url->getUrl()))->removeSID();
+			$link = new CLink($p, $url->getUrl());
 			if ($p == $currentPage) {
 				$link->addClass(ZBX_STYLE_PAGING_SELECTED);
 			}
@@ -1526,12 +1524,12 @@ function getPagingLine(&$items, $sortorder) {
 
 		if ($currentPage < $pagesCount) {
 			$url->setArgument('page', $currentPage + 1);
-			$tags[] = (new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl()))->removeSID();
+			$tags[] = new CLink((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT), $url->getUrl());
 		}
 
 		if ($p < $pagesCount) {
 			$url->setArgument('page', $pagesCount);
-			$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
+			$tags[] = new CLink(_('Last'), $url->getUrl());
 		}
 	}
 
@@ -1660,7 +1658,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	else {
 		// url to redirect the user to after he loggs in
 		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-		$url->setArgument('sid', null);
+		$url->removeArgument('sid');
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message
@@ -2146,11 +2144,8 @@ function imageOut(&$image, $format = null) {
 	ob_end_clean();
 
 	if ($page['type'] != PAGE_TYPE_IMAGE) {
-		session_start();
 		$imageId = md5(strlen($imageSource));
-		$_SESSION['image_id'] = [];
-		$_SESSION['image_id'][$imageId] = $imageSource;
-		session_write_close();
+		CSession::setValue('image_id', [$imageId => $imageSource]);
 	}
 
 	switch ($page['type']) {
@@ -2276,4 +2271,24 @@ function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 	}
 
 	return $pathItemsArray;
+}
+
+/**
+ * Allocate color for an image.
+ *
+ * @param resource 	$image
+ * @param string	$color		a hexadecimal color identifier like "1F2C33"
+ * @param int 		$alpha
+ */
+function get_color($image, $color, $alpha = 0) {
+	$red = hexdec('0x'.substr($color, 0, 2));
+	$green = hexdec('0x'.substr($color, 2, 2));
+	$blue = hexdec('0x'.substr($color, 4, 2));
+
+	if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
+			&& @imagecreatetruecolor(1, 1)) {
+		return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
+	}
+
+	return imagecolorallocate($image, $red, $green, $blue);
 }

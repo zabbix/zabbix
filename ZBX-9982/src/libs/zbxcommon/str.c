@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "threads.h"
 
 static const char	copyright_message[] =
-	"Copyright (C) 2015 Zabbix SIA\n"
+	"Copyright (C) 2016 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -2160,7 +2160,6 @@ const char	*get_program_type_string(unsigned char program_type)
 		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
 			return "proxy";
 		case ZBX_PROGRAM_TYPE_AGENTD:
-		case ZBX_PROGRAM_TYPE_AGENT:
 			return "agent";
 		case ZBX_PROGRAM_TYPE_SENDER:
 			return "sender";
@@ -3179,7 +3178,7 @@ char	*str_linefeed(const char *src, size_t maxline, const char *delim)
  ******************************************************************************/
 void	zbx_strarr_init(char ***arr)
 {
-	*arr = zbx_malloc(*arr, sizeof(char **));
+	*arr = zbx_malloc(*arr, sizeof(char *));
 	**arr = NULL;
 }
 
@@ -3208,7 +3207,7 @@ void	zbx_strarr_add(char ***arr, const char *entry)
 	for (i = 0; NULL != (*arr)[i]; i++)
 		;
 
-	*arr = zbx_realloc(*arr, sizeof(char **) * (i + 2));
+	*arr = zbx_realloc(*arr, sizeof(char *) * (i + 2));
 
 	(*arr)[i] = zbx_strdup((*arr)[i], entry);
 	(*arr)[++i] = NULL;
@@ -3365,7 +3364,7 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
  *                       0 if macro does not have context specified.          *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - the macro was parsed succesfully.                            *
+ *     SUCCEED - the macro was parsed successfully.                           *
  *     FAIL    - the macro parsing failed, the content of output variables    *
  *               is not defined.                                              *
  *                                                                            *
@@ -3786,7 +3785,7 @@ static int	function_parse_unquoted_param(const char *expr, size_t *length, size_
 	}
 out:
 	/* trim the trailing whitespace */
-	while (ptr > expr && ' ' == *(ptr - 1) )
+	while (ptr > expr && ' ' == *(ptr - 1))
 		ptr--;
 
 	*length = ptr - expr;
@@ -3905,7 +3904,7 @@ static int	function_quoted_param_len(const char *param, int *quoted)
 	if (' ' == *param || '"' == *param)
 		*quoted = 1;
 
-	for(;'\0' != *param; param++)
+	for (; '\0' != *param; param++)
 	{
 		switch (*param)
 		{
@@ -4099,9 +4098,9 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
  ******************************************************************************/
 int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out)
 {
-	int		ret = FAIL, index = 0, quoted;
-	size_t		right, len, offset, next_pos, param_pos, next_offset;
-	char		*param;
+	int	ret = FAIL, index = 0, quoted;
+	size_t	right, len, offset, next_pos, param_pos, next_offset;
+	char	*param;
 
 	*out = zbx_malloc(NULL, expr_len + 1);
 	memcpy(*out, expr, expr_len);
