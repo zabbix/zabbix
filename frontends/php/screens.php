@@ -121,16 +121,21 @@ else {
 	ob_end_clean();
 	redirect('screenconf.php');
 }
-ob_end_flush();
 
 $screens = API::Screen()->get($options);
 
-if (!$screens) {
+if (!$screens && (getRequest('elementid') || hasRequest('screenname'))) {
 	access_deny();
+}
+elseif (!$screens) {
+	// Redirect to screen list.
+	ob_end_clean();
+	redirect('screenconf.php');
 }
 else {
 	$data['screen'] = reset($screens);
 }
+ob_end_flush();
 
 // render view
 $screenView = new CView('monitoring.screen', $data);
