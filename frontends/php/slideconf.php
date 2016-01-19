@@ -300,7 +300,8 @@ if (hasRequest('form')) {
 			else {
 				$data['slideshow']['userid'] = getRequest('userid');
 			}
-		} else {
+		}
+		else {
 			if ($db_slideshow) {
 				$data['slideshow']['userid'] = $db_slideshow['userid'];
 			}
