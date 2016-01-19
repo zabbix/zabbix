@@ -39,6 +39,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				var conditions = [];
 				$('#conditions .macro').each(function(index, macroInput) {
 					macroInput = $(macroInput);
+					macroInput.val(macroInput.val().toUpperCase());
 					conditions.push({
 						id: macroInput.data('formulaid'),
 						type: macroInput.val()
