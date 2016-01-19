@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,6 @@ $permission = getRequest('permission', PERM_DENY);
 /*
  * Display
  */
-show_table_header(permission2str($permission));
 
 // host groups
 $hostGroupForm = (new CForm())->setId('groups');
@@ -77,7 +76,11 @@ $hostGroupTable->setFooter(
 );
 
 $hostGroupForm->addItem($hostGroupTable);
-$hostGroupForm->show();
+
+(new CWidget())
+	->setTitle(permission2str($permission))
+	->addItem($hostGroupForm)
+	->show();
 
 ?>
 <script type="text/javascript">

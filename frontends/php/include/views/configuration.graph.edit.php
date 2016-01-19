@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,81 +46,93 @@ if (!empty($this->data['graphid'])) {
 
 // create form list
 $graphFormList = new CFormList('graphFormList');
-if (!empty($this->data['templates'])) {
+$is_templated = (bool) $this->data['templates'];
+if ($is_templated) {
 	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
 
 $graphFormList
 	->addRow(_('Name'),
-		(new CTextBox('name', $this->data['name']))
+		(new CTextBox('name', $this->data['name'], $is_templated))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
 	->addRow(_('Width'),
-		(new CNumericBox('width', $this->data['width'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('width', $this->data['width'], 5, $is_templated))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Height'),
-		(new CNumericBox('height', $this->data['height'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		(new CNumericBox('height', $this->data['height'], 5, $is_templated))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
-	->addRow(_('Show legend'), (new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1));
+	->addRow(_('Graph type'),
+		(new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))->setEnabled(!$is_templated)
+	)
+	->addRow(_('Show legend'),
+		(new CCheckBox('show_legend'))
+			->setChecked($this->data['show_legend'] == 1)
+			->setEnabled(!$is_templated)
+	);
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {
 	$graphFormList->addRow(_('Show working time'),
-		(new CCheckBox('show_work_period'))->setChecked($this->data['show_work_period'] == 1)
+		(new CCheckBox('show_work_period'))
+			->setChecked($this->data['show_work_period'] == 1)
+			->setEnabled(!$is_templated)
 	);
 	$graphFormList->addRow(_('Show triggers'),
-		(new CCheckBox('show_triggers'))->setChecked($this->data['show_triggers'] == 1)
+		(new CCheckbox('show_triggers'))
+			->setchecked($this->data['show_triggers'] == 1)
+			->setEnabled(!$is_templated)
 	);
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		// percent left
-		$percentLeftTextBox = (new CTextBox('percent_left', $this->data['percent_left'], false, 7))
+		$percentLeftTextBox = (new CTextBox('percent_left', $this->data['percent_left'], $is_templated, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
-			->setChecked(true)
-			->onClick('javascript: showHideVisible("percent_left");');
+			->onClick('javascript: showHideVisible("percent_left");')
+			->setEnabled(!$is_templated);
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
-			$percentLeftCheckbox->setChecked(1);
+			$percentLeftCheckbox->setChecked(true);
 		}
 		elseif ($this->data['percent_left'] == 0) {
 			$percentLeftTextBox->addStyle('visibility: hidden;');
-			$percentLeftCheckbox->setChecked(0);
+			$percentLeftCheckbox->setChecked(false);
 		}
 
 		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, SPACE, $percentLeftTextBox]);
 
 		// percent right
-		$percentRightTextBox = (new CTextBox('percent_right', $this->data['percent_right'], false, 7))
+		$percentRightTextBox = (new CTextBox('percent_right', $this->data['percent_right'], $is_templated, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
-			->setChecked(true)
-			->onClick('javascript: showHideVisible("percent_right");');
+			->onClick('javascript: showHideVisible("percent_right");')
+			->setEnabled(!$is_templated);
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
-			$percentRightCheckbox->setChecked(1);
+			$percentRightCheckbox->setChecked(true);
 		}
 		elseif ($this->data['percent_right'] == 0) {
 			$percentRightTextBox->addStyle('visibility: hidden;');
-			$percentRightCheckbox->setChecked(0);
+			$percentRightCheckbox->setChecked(false);
 		}
-
 
 		$graphFormList->addRow(_('Percentile line (right)'), [$percentRightCheckbox, SPACE, $percentRightTextBox]);
 	}
 
-	$yaxisMinData = [];
-	$yaxisMinData[] = new CComboBox('ymin_type', $this->data['ymin_type'], null, [
+	$yaxisMinData = [(new CComboBox('ymin_type', $this->data['ymin_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
 		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	]);
+	]))->setEnabled(!$is_templated)];
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin'], $is_templated))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
@@ -136,7 +148,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, $is_templated))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -172,16 +184,16 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	$graphFormList->addRow(_('Y axis MIN value'), $yaxisMinData);
 
-	$yaxisMaxData = [];
-	$yaxisMaxData[] = new CComboBox('ymax_type', $this->data['ymax_type'], null, [
+	$yaxisMaxData = [(new CComboBox('ymax_type', $this->data['ymax_type'], null, [
 		GRAPH_YAXIS_TYPE_CALCULATED => _('Calculated'),
 		GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 		GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
-	]);
+	]))->setEnabled(!$is_templated)];
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax'], $is_templated))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
@@ -197,7 +209,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, $is_templated))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -235,7 +247,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 }
 else {
 	$graphFormList->addRow(_('3D view'),
-		(new CCheckBox('show_3d'))->setChecked($this->data['show_3d'] == 1)
+		(new CCheckBox('show_3d'))
+			->setChecked($this->data['show_3d'] == 1)
+			->setEnabled(!$is_templated)
 	);
 }
 
@@ -261,29 +275,30 @@ $itemsTable = (new CTable())
 				->setWidth(80)
 			: null,
 		(new CColHeader(_('Colour')))->setWidth(100),
-		(new CColHeader(_('Action')))->setWidth(50)
+		$is_templated ? null : (new CColHeader(_('Action')))->setWidth(50)
 	]);
 
 $itemsTable->addRow(
 	(new CRow(
-		(new CCol(
-			new CHorList([
-				(new CButton('add_item', _('Add')))
-					->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-						($this->data['normal_only'] ? '&normal_only=1' : '').
-						'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());')
-					->addClass(ZBX_STYLE_BTN_LINK),
-				$this->data['parent_discoveryid']
-					? (new CButton('add_protoitem', _('Add prototype')))
+		$is_templated
+			? null
+			: (new CCol(
+				new CHorList([
+					(new CButton('add_item', _('Add')))
 						->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-							url_param($this->data['graphtype'], false, 'graphtype').
-							url_param('parent_discoveryid').
 							($this->data['normal_only'] ? '&normal_only=1' : '').
-							'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
-						->addClass(ZBX_STYLE_BTN_LINK)
-					: null
-			])
-		))->setColSpan(8)
+							'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());')
+						->addClass(ZBX_STYLE_BTN_LINK),
+					$this->data['parent_discoveryid']
+						? (new CButton('add_protoitem', _('Add prototype')))
+							->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+								url_param($this->data['graphtype'], false, 'graphtype').
+								url_param('parent_discoveryid').($this->data['normal_only'] ? '&normal_only=1' : '').
+								'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
+							->addClass(ZBX_STYLE_BTN_LINK)
+						: null
+				])
+			))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
 
@@ -347,14 +362,14 @@ if (!empty($this->data['graphid'])) {
 		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('parent_discoveryid'))
+			new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))
 		]
 	));
 }
 else {
 	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid'))]
+		[new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))]
 	));
 }
 

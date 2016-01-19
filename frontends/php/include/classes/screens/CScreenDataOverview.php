@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,23 @@ class CScreenDataOverview extends CScreenBase {
 			$applicationIds = zbx_objectValues($applications, 'applicationid');
 		}
 
-		return $this->getOutput(getItemsDataOverview($hostids, $applicationIds, $this->screenitem['style']));
+		$groups = API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => [$this->screenitem['resourceid']]
+		]);
+
+		$header = (new CDiv([
+			new CTag('h4', true, _('Data overview')),
+			(new CList())
+				->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
+		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
+
+		$table = getItemsDataOverview($hostids, $applicationIds, $this->screenitem['style']);
+
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput(new CUiWidget(uniqid(), [$header, $table, $footer]));
 	}
 }

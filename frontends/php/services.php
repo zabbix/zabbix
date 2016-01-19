@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -478,6 +478,7 @@ else {
 	createServiceConfigurationTree($services, $treeData);
 	$tree = new CServiceTree('service_conf_tree', $treeData, [
 		'caption' => _('Service'),
+		'action' => _('Action'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')
 	]);
