@@ -1486,7 +1486,7 @@ footer {
 		}
 
 		&:checked[disabled] + label {
-			background-color: lighten($ui-bg-selected-color, 15%);
+			background-color: lighten($ui-bg-selected-color, 33%) !important;
 		}
 
 		&[disabled] + label {
