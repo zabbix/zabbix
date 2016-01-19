@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -355,18 +355,6 @@ function get_scroll_pos() {
 	return [scrOfX, scrOfY];
 }
 
-function insertInElement(element_name, text, tagName) {
-	var elems = (IE)
-		? $$(tagName + '[name=' + element_name + ']')
-		: document.getElementsByName(element_name);
-
-	for (var key = 0; key < elems.length; key++) {
-		if (typeof(elems[key]) != 'undefined' && !is_null(elems[key])) {
-			$(elems[key]).update(text);
-		}
-	}
-}
-
 function openWinCentered(url, name, width, height, params) {
 	var top = Math.ceil((screen.height - height) / 2),
 		left = Math.ceil((screen.width - width) / 2);
@@ -401,7 +389,7 @@ function PopUp(url, width, height, form_name) {
 	return false;
 }
 
-function redirect(uri, method, needle) {
+function redirect(uri, method, needle, invert_needle) {
 	method = method || 'get';
 	var url = new Curl(uri);
 
@@ -416,12 +404,17 @@ function redirect(uri, method, needle) {
 		domBody.appendChild(postForm);
 		postForm.setAttribute('method', 'post');
 
+		invert_needle = (typeof(invert_needle) != 'undefined' && invert_needle);
+
 		var args = url.getArguments();
 		for (var key in args) {
 			if (empty(args[key])) {
 				continue;
 			}
-			if (typeof(needle) != 'undefined' && key.indexOf(needle) > -1) {
+
+			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
+
+			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				action += '&' + key + '=' + args[key];
 				continue;
 			}
@@ -440,24 +433,12 @@ function redirect(uri, method, needle) {
 	return false;
 }
 
-function showHide(obj, style) {
-	if (typeof(style) == 'undefined') {
-		style = 'inline';
-	}
-	if (is_string(obj)) {
-		obj = document.getElementById(obj);
-	}
-	if (!obj) {
-		throw 'showHide(): Object not found.';
-	}
-
-	if (obj.style.display != 'none') {
-		obj.style.display = 'none';
-		return 0;
+function showHide(obj) {
+	if (jQuery(obj).is(':hidden')) {
+		jQuery(obj).css('display', 'block');
 	}
 	else {
-		obj.style.display = style;
-		return 1;
+		jQuery(obj).css('display', 'none');
 	}
 }
 

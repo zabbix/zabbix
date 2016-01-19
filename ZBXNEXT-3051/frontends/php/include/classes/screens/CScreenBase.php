@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,19 +266,18 @@ class CScreenBase {
 			$this->insertFlickerfreeJs($flickerfreeData);
 		}
 
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			$div = (new CDiv([$item, BR(), new CLink(_('Change'), $this->action)]))
-				->addClass('flickerfreescreen')
-				->setId($this->getScreenId());
-		}
-		else {
-			$div = (new CDiv($item))
-				->addClass('flickerfreescreen')
-				->setId($this->getScreenId());
-		}
+		$div = (new CDiv($item))
+			->addClass('flickerfreescreen')
+			->setAttribute('data-timestamp', $this->timestamp)
+			->setId($this->getScreenId());
 
-		$div->setAttribute('data-timestamp', $this->timestamp);
-		$div->addStyle('position: relative;');
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$div->addItem(
+				(new CDiv([
+					new CLink(_('Change'), $this->action)
+				]))->addClass(ZBX_STYLE_CENTER)
+			);
+		}
 
 		return $div;
 	}

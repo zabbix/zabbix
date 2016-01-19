@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,23 +270,8 @@ function swapNodesNames(n1, n2) {
 }
 
 function closeForm(page) {
-//	try {
-//		// set header confirmation message to opener
-//		var msg = IE ? document.getElementById('global-message').innerText : document.getElementById('global-message').textContent;
-//		window.opener.location.replace(page + '?msg=' + encodeURI(msg));
-		window.opener.location.reload(true);
-//	}
-//	catch (e) {
-//		throw(e);
-//	}
-
-//	if (IE) {
-//		// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
-//		window.setTimeout(function() { window.self.close(); }, 1000);
-//	}
-//	else {
-		window.self.close();
-//	}
+	window.opener.location.reload(true);
+	window.self.close();
 }
 
 function add_keyword(bt_type) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,34 +28,55 @@ $message = CHtml::encode(getRequest('message', '')) ;
 $message = trim(preg_replace('/\[.*\]/', '', $message));
 
 require_once dirname(__FILE__).'/../page_header.php';
+
+$error = ($message !== '') ? (new CDiv($message))->addClass(ZBX_STYLE_RED) : null;
+$guest = (CWebUser::$data['userid'] > 0)
+	? (new CListItem(['or ', new CLink('sign in as guest', ZBX_DEFAULT_URL)]))
+		->addClass(ZBX_STYLE_SIGN_IN_TXT)
+	: null;
+
+global $ZBX_SERVER_NAME;
+
+(new CDiv([
+	(isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '')
+		? (new CDiv($ZBX_SERVER_NAME))->addClass(ZBX_STYLE_SERVER_NAME)
+		: null,
+	(new CDiv([
+		(new CDiv())->addClass(ZBX_STYLE_SIGNIN_LOGO),
+		(new CForm())
+			->addItem(
+				(new CList())
+					->addItem([
+						new CLabel(_('Username'), 'name'),
+						(new CTextBox('name'))->setAttribute('autofocus', 'autofocus'),
+						$error
+					])
+					->addItem([new CLabel(_('Password'), 'password'), (new CTextBox('password'))->setType('password')])
+					->addItem(
+						new CLabel([
+							(new CCheckBox('autologin'))->setChecked(getRequest('autologin', 1) == 1),
+							_('Remember me for 30 days')
+						], 'autologin')
+					)
+					->addItem(new CSubmit('enter', _('Sign in')))
+					->addItem($guest)
+			)
+	]))->addClass(ZBX_STYLE_SIGNIN_CONTAINER),
+	(new CDiv([
+		(new CLink(_('Help'), 'http://www.zabbix.com/documentation/3.0/'))
+			->setTarget('_blank')
+			->addClass(ZBX_STYLE_GREY)
+			->addClass(ZBX_STYLE_LINK_ALT),
+		'&nbsp;&nbsp;•&nbsp;&nbsp;',
+		(new CLink(_('Support'), 'http://www.zabbix.com/support.php'))
+			->setTarget('_blank')
+			->addClass(ZBX_STYLE_GREY)
+			->addClass(ZBX_STYLE_LINK_ALT)
+	]))->addClass(ZBX_STYLE_SIGNIN_LINKS)
+]))
+	->addClass(ZBX_STYLE_ARTICLE)
+	->show();
+
+makePageFooter(false)->show();
 ?>
-<header role="banner">
-		<div><div class="signin-logo"></div></div>
-</header>
-<div class="<?= ZBX_STYLE_ARTICLE ?>">
-<div class="signin-container">
-	<h1>Sign in</h1>
-	<form action="index.php" method="post">
-	<input type="hidden" name="request" value="<?= $request; ?>" />
-		<ul>
-			<li>
-				<label for="name"><?= _('Username'); ?></label><input id="name" name="name" autofocus="" type="text">
-<?php if (!empty($message)): ?>
-				<div class="red"><?= $message ?></div>
-<?php endif ?>
-			</li>
-			<li><label for="password"><?= _('Password'); ?></label><input id="password" name="password" type="password"></li>
-			<li><label for="autologin"><input name="autologin" value="1" id="autologin" <?= (getRequest('autologin', 1) == 1) ? 'checked="checked"' : ''; ?> type="checkbox"><?= _('Remember me for 30 days'); ?></label></li>
-			<li><button name="enter" type="submit" value="<?= _('Sign in'); ?>"><?= _('Sign in'); ?></button></li>
-<?php if (CWebUser::$data['userid'] > 0): ?>
-			<li class="sign-in-txt">or <a href="<?= ZBX_DEFAULT_URL; ?>">sign in as guest</a></li>
-<?php endif ?>
-		</ul>
-	</form>
-</div>
-<div class="signin-links"><a target="_blank" href="http://www.zabbix.com/documentation/"><?= _('Help'); ?></a>&nbsp;&nbsp;•&nbsp;&nbsp;<a target="_lbank" href="http://www.zabbix.com/support.php"><?= _('Support'); ?></a></div>
-</div>
-
-<?= makePageFooter(false, false)->toString() ?>
-
 </body>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,7 +215,6 @@ $map_tab->addRow(_('Minimum trigger severity'),
 
 // Create url table.
 $url_table = (new CTable())
-	->setNoDataMessage(_('No URLs defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('URL'), _('Element'), _('Action')]);
 if (empty($data['sysmap']['urls'])) {
@@ -341,8 +340,8 @@ zbx_add_post_js($js_insert);
 $sharing_tab = (new CFormList('sharing_form'))
 	->addRow(_('Type'),
 	(new CRadioButtonList('private', (int) $data['sysmap']['private']))
-		->addValue(_('Private'), SYSMAP_PRIVATE)
-		->addValue(_('Public'), SYSMAP_PUBLIC)
+		->addValue(_('Private'), PRIVATE_SHARING)
+		->addValue(_('Public'), PUBLIC_SHARING)
 		->setModern(true)
 	)
 	->addRow(_('List of user group shares'),

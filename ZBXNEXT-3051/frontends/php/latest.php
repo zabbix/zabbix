@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -190,7 +190,7 @@ if ($hosts) {
 	$items = API::Item()->get([
 		'hostids' => array_keys($hosts),
 		'output' => ['itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
-			'error', 'trends', 'history', 'delay', 'key_', 'flags'],
+			'error', 'trends', 'history', 'delay', 'key_', 'flags', 'lastlogsize', 'mtime'],
 		'selectApplications' => ['applicationid'],
 		'selectItemDiscovery' => ['ts_delete'],
 		'applicationids' => ($applications !== null) ? zbx_objectValues($applications, 'applicationid') : null,
@@ -339,7 +339,8 @@ $widget = (new CWidget())
 	);
 
 // Filter
-$filterForm = new CFilter('web.latest.filter.state');
+$filterForm = (new CFilter('web.latest.filter.state'))
+	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(
@@ -431,9 +432,11 @@ if ($filter['showDetails']) {
 			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 13%'),
 		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)
 			->addStyle('width: '.($singleHostSelected ? 34 : 21).'%'),
-		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
-		(new CColHeader(_('History')))->addStyle('width: 5%'),
-		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
+//		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
+		(new CColHeader(_('Lastlogsize')))->addStyle('width: 14%'),
+		(new CColHeader(_('Mtime')))->addStyle('width: 14%'),
+//		(new CColHeader(_('History')))->addStyle('width: 5%'),
+//		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
 		(new CColHeader(_('Type')))->addStyle('width: 8%'),
 		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
@@ -560,13 +563,15 @@ foreach ($items as $key => $item){
 			$checkbox,
 			$hostColumn,
 			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
-			(new CCol(
-				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
-					? UNKNOWN_VALUE
-					: $item['delay']
-			))->addClass($state_css),
-			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
-			(new CCol($trendValue))->addClass($state_css),
+//			(new CCol(
+//				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
+//					? UNKNOWN_VALUE
+//					: $item['delay']
+//			))->addClass($state_css),
+			(new CCol($item['lastlogsize']))->addClass($state_css),
+			(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item['mtime'])))->addClass($state_css),
+//			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+//			(new CCol($trendValue))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
@@ -741,13 +746,15 @@ foreach ($items as $item) {
 			$checkbox,
 			$hostColumn,
 			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
-			(new CCol(
-				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
-					? UNKNOWN_VALUE
-					: $item['delay']
-			))->addClass($state_css),
-			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
-			(new CCol($trendValue))->addClass($state_css),
+//			(new CCol(
+//				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
+//					? UNKNOWN_VALUE
+//					: $item['delay']
+//			))->addClass($state_css),
+			(new CCol($item['lastlogsize']))->addClass($state_css),
+			(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $item['mtime'])))->addClass($state_css),
+//			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+//			(new CCol($trendValue))->addClass($state_css),
 			(new CCol(item_type2str($item['type'])))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),

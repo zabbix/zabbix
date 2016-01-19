@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -653,8 +653,7 @@ foreach ($triggers as $trigger) {
 							'&backurl='.$page['file']
 					))
 						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_RED)
-						->removeSID(),
+						->addClass(ZBX_STYLE_RED),
 					CViewHelper::showNum($trigger['event_count'])
 				];
 			}
@@ -666,8 +665,7 @@ foreach ($triggers as $trigger) {
 						'&backurl='.$page['file']
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREEN)
-					->removeSID();
+					->addClass(ZBX_STYLE_GREEN);
 			}
 		}
 		else {

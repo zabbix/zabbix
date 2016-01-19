@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,13 +180,10 @@ $tranStrings = [
 	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
 		'Add' => _('Add'),
-		'Add child' => _('Add child'),
 		'Configuration' => _('Configuration'),
 		'Create trigger' => _('Create trigger'),
-		'Delete' => _('Delete'),
 		'Delete service "%1$s"?' => _('Delete service "%1$s"?'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
-		'Edit' => _('Edit'),
 		'Edit trigger' => _('Edit trigger'),
 		'Events' => _('Events'),
 		'Favourite graphs' => _('Favourite graphs'),

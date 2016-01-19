@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@
 
 class CTableInfo extends CTable {
 
+	protected $message;
+
 	public function __construct() {
 		parent::__construct();
+
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
 		$this->setNoDataMessage(_('No data found.'));
 		$this->addMakeVerticalRotationJs = false;
@@ -55,6 +58,11 @@ class CTableInfo extends CTable {
 		return $string;
 	}
 
+	public function setNoDataMessage($message) {
+		$this->message = $message;
+		return $this;
+	}
+
 	/**
 	 * Rotate table header text vertical.
 	 * Cells must be marked with "vertical_rotation" class.
@@ -62,5 +70,14 @@ class CTableInfo extends CTable {
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;
 		return $this;
+	}
+
+	public function endToString() {
+		$ret = '';
+		if ($this->rownum == 0 && $this->message !== null) {
+			$ret .= $this->prepareRow(new CCol($this->message), ZBX_STYLE_NOTHING_TO_SHOW)->toString();
+		}
+		$ret .= parent::endToString();
+		return $ret;
 	}
 }

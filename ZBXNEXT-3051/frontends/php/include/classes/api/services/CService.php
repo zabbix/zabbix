@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -918,7 +918,7 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function checkAlgorithm(array $service) {
-		if (!isset($service['algorithm']) || !serviceAlgorythm($service['algorithm'])) {
+		if (!isset($service['algorithm']) || !serviceAlgorithm($service['algorithm'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect algorithm for service "%1$s".', $service['name']));
 		}
 	}

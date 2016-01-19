@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 extern ZBX_THREAD_HANDLE	*threads;
 
-void	service_start();
+void	service_start(int flags);
 
 int	ZabbixCreateService(const char *path, int multiple_agents);
 int	ZabbixRemoveService();
@@ -45,6 +45,6 @@ int	application_status;	/* required for closing application from service */
 #define ZBX_IS_RUNNING()	(ZBX_APP_RUNNING == application_status)
 #define ZBX_DO_EXIT()		application_status = ZBX_APP_STOPPED
 
-#define START_MAIN_ZABBIX_ENTRY(a, u)	service_start()
+#define START_MAIN_ZABBIX_ENTRY(allow_root, user, flags)	service_start(flags)
 
 #endif /* ZABBIX_SERVICE_H */
