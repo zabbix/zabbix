@@ -1,3 +1,0 @@
-triggers order by triggerid>templateid
-items order by itemid>templateid
-graphs order by graphid>templateid
