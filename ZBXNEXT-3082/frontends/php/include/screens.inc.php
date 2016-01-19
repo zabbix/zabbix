@@ -153,19 +153,23 @@ function add_slideshow($data) {
 	// Validate slides.
 	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
+
 		return false;
 	}
 
 	// Validate screens.
 	$screenids = zbx_objectValues($data['slides'], 'screenid');
+
 	$screens = API::Screen()->get([
+		'output' => ['screenid'],
 		'screenids' => $screenids,
-		'output' => ['screenid']
+		'preservekeys' => true
 	]);
-	$screens = ZBX_toHash($screens, 'screenid');
+
 	foreach ($screenids as $screenid) {
-		if (!isset($screens[$screenid])) {
+		if (!array_key_exists($screenid, $screens)) {
 			error(_('Incorrect screen provided for slide show.'));
+
 			return false;
 		}
 	}
@@ -401,14 +405,14 @@ function update_slideshow($data) {
 		$usrgrpids[] = $user_group['usrgrpid'];
 	}
 
-	$allowed_users = API::UserGroup()->get([
+	$allowed_user_groups = API::UserGroup()->get([
 		'output' => ['usrgrpid'],
 		'usrgrpids' => $usrgrpids,
 		'preservekeys' => true
 	]);
 
 	foreach ($db_slideshow['userGroups'] as $key => $user_group) {
-		if (!array_key_exists($user_group['usrgrpid'], $allowed_users)) {
+		if (!array_key_exists($user_group['usrgrpid'], $allowed_user_groups)) {
 			unset($db_slideshow['userGroups'][$key]);
 		}
 	}
