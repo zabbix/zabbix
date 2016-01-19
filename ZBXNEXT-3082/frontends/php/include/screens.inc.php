@@ -58,12 +58,6 @@ function screen_resources($resource = null) {
 	}
 }
 
-function get_screen_by_screenid($screenid) {
-	$dbScreen = DBfetch(DBselect('SELECT s.* FROM screens s WHERE s.screenid='.zbx_dbstr($screenid)));
-
-	return empty($dbScreen) ? false : $dbScreen;
-}
-
 function check_screen_recursion($mother_screenid, $child_screenid) {
 	if (bccomp($mother_screenid , $child_screenid) == 0) {
 		return true;
