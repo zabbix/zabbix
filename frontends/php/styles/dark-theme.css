@@ -1035,7 +1035,7 @@ footer, .footer {
       position: relative;
       z-index: 2; }
     .radio-segmented input[type="radio"]:checked[disabled] + label {
-      background-color: #757575; }
+      background-color: #a3a3a3 !important; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
