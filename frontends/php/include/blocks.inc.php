@@ -211,7 +211,7 @@ function getFavouriteScreensData() {
 
 			if ($favourite['source'] === 'slideshowid') {
 				if (slideshow_accessible($sourceId, PERM_READ)) {
-					$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
+					$dbSlideshow = get_slideshow_by_slideshowid($sourceId, PERM_READ);
 
 					if ($dbSlideshow) {
 						$slideshows[] = [

@@ -67,7 +67,7 @@ if (hasRequest('slideshowid')) {
 		access_deny();
 	}
 
-	$db_slideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'));
+	$db_slideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'), PERM_READ_WRITE);
 
 	if (!$db_slideshow) {
 		access_deny();
@@ -351,14 +351,12 @@ else {
 			' ORDER BY '.(($sortField === 'cnt') ? 'cnt' : 's.'.$sortField)
 	));
 
-	foreach ($data['slides'] as $key => $slide) {
+	foreach ($data['slides'] as $key => &$slide) {
 		if (!slideshow_accessible($slide['slideshowid'], PERM_READ)) {
 			unset($data['slides'][$key]);
 		}
-	}
 
-	foreach ($data['slides'] as &$slide) {
-		if (slideshow_accessible($slide['slideshowid'], PERM_READ_WRITE)) {
+		if (get_slideshow_by_slideshowid($slide['slideshowid'], PERM_READ_WRITE)) {
 			$slide['editable'] = true;
 		}
 	}
