@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha7
 
 New features:
+..F....... [ZBXNEXT-3080] implemented action menu closing only when clicking outside of it (Gunars)
 ........S. [ZBXNEXT-3051] implemented action and action condition caching (wiper)
 ..F....... [ZBXNEXT-2662] implemented displaying of maps using graph_themes (Pavel, Sasha)
 .......PS. [ZBX-10266] fixed uninitialized variable in VMware code reported by Coverity (CIDs 118958, 118960, 118962, 118965) (dimir)
