@@ -15,7 +15,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			<input type="hidden" name="conditions[#{rowNum}][formulaid]" value="#{formulaId}">
 		</td>
 		<td>
-			<input class="macro" type="text" id="conditions_#{rowNum}_macro" name="conditions[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{#MACRO}" data-formulaid="#{formulaId}">
+			<input class="<?= ZBX_STYLE_UPPERCASE ?> macro" type="text" id="conditions_#{rowNum}_macro" name="conditions[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{#MACRO}" data-formulaid="#{formulaId}">
 		</td>
 		<td>
 			<span><?= _('matches') ?></span>
@@ -35,6 +35,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				var conditions = [];
 				$('#conditions .macro').each(function(index, macroInput) {
 					macroInput = $(macroInput);
+					macroInput.val(macroInput.val().toUpperCase());
 					conditions.push({
 						id: macroInput.data('formulaid'),
 						type: macroInput.val()
