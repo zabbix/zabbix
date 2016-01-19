@@ -309,16 +309,18 @@ function update_slideshow($data) {
 	}
 
 	// Validate slide show owner.
-	if ($data['userid'] === null) {
-		error(_('Slide show owner cannot be empty.'));
+	if (array_key_exists('userid', $data)) {
+		if ($data['userid'] === null || $data['userid'] === '') {
+			error(_('Slide show owner cannot be empty.'));
 
-		return false;
-	}
-	elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
-			&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
-		error(_('Only administrators can set slide show owner.'));
+			return false;
+		}
+		elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+				&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+			error(_('Only administrators can set slide show owner.'));
 
-		return false;
+			return false;
+		}
 	}
 
 	$to_update = $data;
