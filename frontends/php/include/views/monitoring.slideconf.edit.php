@@ -84,7 +84,8 @@ else {
 
 	// Administrators can change slide show owner, but cannot see users from other groups.
 	if ($user_type == USER_TYPE_ZABBIX_ADMIN) {
-		$slideshow_tab->addRow(_('Owner'), $multiselect_userid)
+		$slideshow_tab
+			->addRow(_('Owner'), $multiselect_userid)
 			->addRow('', _('Inaccessible user'), 'inaccessible_user');
 	}
 	else {
@@ -98,7 +99,8 @@ else {
 	}
 }
 
-$slideshow_tab->addRow(_('Name'),
+$slideshow_tab
+	->addRow(_('Name'),
 		(new CTextBox('name', $data['slideshow']['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
