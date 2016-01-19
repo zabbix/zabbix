@@ -231,6 +231,16 @@ DC_PROXY;
 
 typedef struct
 {
+	zbx_uint64_t		actionid;
+	char			*formula;
+	unsigned char		eventsource;
+	unsigned char		evaltype;
+	zbx_vector_ptr_t	conditions;
+}
+zbx_action_eval_t;
+
+typedef struct
+{
 	const char	*host;
 	const char	*key;
 }
@@ -305,7 +315,7 @@ zbx_queue_item_t;
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
 int	DCsync_history(int sync_type, int *sync_num);
@@ -459,6 +469,10 @@ int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
 
 int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
 void	DCupdate_hosts_availability();
+
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
+void	zbx_action_eval_free(zbx_action_eval_t *action);
+
 int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
 
 void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
