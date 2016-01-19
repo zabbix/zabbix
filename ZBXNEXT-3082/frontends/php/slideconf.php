@@ -189,7 +189,7 @@ elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' &
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = true;
 	$user_groupids = [];
@@ -287,11 +287,10 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$data['slideshow']['screens'] = API::Screen()->get([
-		'output' => ['name'],
+		'output' => ['screenid', 'name'],
 		'screenids' => $screenids,
 		'preservekeys' => true
 	]);
-
 
 	$data['current_user_userid'] = $current_userid;
 
@@ -344,7 +343,6 @@ else {
 		}
 	}
 	unset($slide);
-
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
