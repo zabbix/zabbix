@@ -4,6 +4,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
