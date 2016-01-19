@@ -854,7 +854,7 @@ function getMenuPopupScriptData(scripts, hostId) {
 					item.clickCallback = function(e) {
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
 						cancelEvent(e);
-						jQuery(this).closest('.action-menu').fadeOut(100);
+						jQuery(this).closest('.action-menu-top').fadeOut(100);
 					};
 				}
 
@@ -977,11 +977,6 @@ jQuery(function($) {
 
 					clearTimeout(window.menuPopupTimeoutHandler);
 				})
-				.mouseleave(function() {
-					menuPopup.data('is-active', false);
-
-					closeInactiveMenuPopup(menuPopup, 500);
-				})
 				.position({
 					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
 					my: 'left top',
@@ -989,7 +984,12 @@ jQuery(function($) {
 				});
 		}
 
-		closeInactiveMenuPopup(menuPopup, 2000);
+		$(document).click(function(e) {
+			if (!menuPopup.is(e.target) && menuPopup.has(e.target).length === 0) {
+				menuPopup.data('is-active', false);
+				menuPopup.fadeOut(0);
+			}
+		});
 	};
 
 	/**
@@ -1088,27 +1088,5 @@ jQuery(function($) {
 		}
 
 		return item;
-	}
-
-	/**
-	 * Closing menu after delay.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param int    delay			delay to close menu popup
-	 */
-	function closeInactiveMenuPopup(menuPopup, delay) {
-		clearTimeout(window.menuPopupTimeoutHandler);
-
-		window.menuPopupTimeoutHandler = setTimeout(function() {
-			if (!menuPopup.data('is-active')) {
-				menuPopup.data('is-active', false);
-
-				$('.action-menu-top', menuPopup).each(function() {
-					$(this).menu('collapseAll', null, true);
-				});
-
-				menuPopup.fadeOut(0);
-			}
-		}, delay);
 	}
 });

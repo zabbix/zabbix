@@ -4514,7 +4514,7 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
-			'meta' => [
+			'flags' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

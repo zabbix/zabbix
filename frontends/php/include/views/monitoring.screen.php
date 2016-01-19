@@ -21,6 +21,19 @@
 
 $widget = (new CWidget())
 	->setTitle(_('Screens'))
+	->addItem((new CList())
+	->addClass(ZBX_STYLE_OBJECT_GROUP)
+	->addItem([
+		(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
+		'/',
+		(new CSpan())
+			->addClass(ZBX_STYLE_SELECTED)
+			->addItem(
+				new CLink($data['screen']['name'], 'screens.php?elementid='.$data['screen']['screenid'].
+					'&fullscreen='.$data['fullscreen']
+				)
+			)
+	]))
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
 $controls = (new CList())->addItem(
@@ -71,20 +84,6 @@ $controls
 $form->addItem($controls);
 
 $widget->setControls($form);
-
-$widget->addItem((new CList())
-	->addClass(ZBX_STYLE_OBJECT_GROUP)
-	->addItem([
-		(new CSpan())->addItem(new CLink(_('All screens'), 'screenconf.php')),
-		'/',
-		(new CSpan())
-			->addClass(ZBX_STYLE_SELECTED)
-			->addItem(
-				new CLink($data['screen']['name'], 'screens.php?elementid='.$data['screen']['screenid'].
-					'&fullscreen='.$data['fullscreen']
-				)
-			)
-	]));
 
 // Append screens to widget.
 $screenBuilder = new CScreenBuilder([

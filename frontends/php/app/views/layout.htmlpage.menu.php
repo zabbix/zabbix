@@ -24,7 +24,6 @@ $icons = (new CList())
 		(new CForm('get', 'search.php'))
 			->addItem([
 				(new CTextBox('search', '', false, 255))
-					->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH),
 				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
@@ -60,7 +59,7 @@ $icons->addItem(
 
 // 1st level menu
 $top_menu = (new CDiv())
-	->addItem((new CDiv())->addClass('logo'))
+	->addItem(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
 	->addItem(
 		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
 	)
