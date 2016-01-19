@@ -49,7 +49,7 @@ class CConfigurationExportBuilder {
 	 * @param array $groups
 	 */
 	public function buildGroups(array $groups) {
-		$this->data['groups'] = $this->formatGroups($groups);	// ok
+		$this->data['groups'] = $this->formatGroups($groups);
 	}
 
 	/**
@@ -65,13 +65,13 @@ class CConfigurationExportBuilder {
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
-				'groups' => $this->formatGroups($template['groups']),	// ok
-				'applications' => $this->formatApplications($template['applications']),	// ok
-				'items' => $this->formatItems($template['items']),	// ok
-				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),	// ok
-				'macros' => $this->formatMacros($template['macros']),	// ok
-				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),	// ok
-				'screens' => $this->formatScreens($template['screens'])	// ok
+				'groups' => $this->formatGroups($template['groups']),
+				'applications' => $this->formatApplications($template['applications']),
+				'items' => $this->formatItems($template['items']),
+				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
+				'macros' => $this->formatMacros($template['macros']),
+				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
+				'screens' => $this->formatScreens($template['screens'])
 			];
 		}
 
@@ -105,14 +105,14 @@ class CConfigurationExportBuilder {
 				'tls_subject' => $host['tls_subject'],
 				'tls_psk_identity' => $host['tls_psk_identity'],
 				'tls_psk' => $host['tls_psk'],
-				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),	// ok
-				'groups' => $this->formatGroups($host['groups']),	// ok
-				'interfaces' => $this->formatHostInterfaces($host['interfaces']),	// ok
-				'applications' => $this->formatApplications($host['applications']),	// ok
-				'items' => $this->formatItems($host['items']),	// ok
-				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),	// ok
-				'macros' => $this->formatMacros($host['macros']),	// ok
-				'inventory' => $this->formatHostInventory($host['inventory'])	// ok
+				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
+				'groups' => $this->formatGroups($host['groups']),
+				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
+				'applications' => $this->formatApplications($host['applications']),
+				'items' => $this->formatItems($host['items']),
+				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
+				'macros' => $this->formatMacros($host['macros']),
+				'inventory' => $this->formatHostInventory($host['inventory'])
 			];
 		}
 
@@ -125,7 +125,7 @@ class CConfigurationExportBuilder {
 	 * @param array $graphs
 	 */
 	public function buildGraphs(array $graphs) {
-		$this->data['graphs'] = $this->formatGraphs($graphs);	// ok
+		$this->data['graphs'] = $this->formatGraphs($graphs);
 	}
 
 	/**
@@ -134,7 +134,7 @@ class CConfigurationExportBuilder {
 	 * @param array $triggers
 	 */
 	public function buildTriggers(array $triggers) {
-		$this->data['triggers'] = $this->formatTriggers($triggers);	// ok
+		$this->data['triggers'] = $this->formatTriggers($triggers);
 	}
 
 	/**
@@ -143,7 +143,7 @@ class CConfigurationExportBuilder {
 	 * @param array $screens
 	 */
 	public function buildScreens(array $screens) {
-		$this->data['screens'] = $this->formatScreens($screens);	// ok
+		$this->data['screens'] = $this->formatScreens($screens);
 	}
 
 	/**
@@ -172,7 +172,7 @@ class CConfigurationExportBuilder {
 		$this->data['maps'] = [];
 
 		foreach ($maps as $map) {
-			$tmpSelements = $this->formatMapElements($map['selements']);	// ok
+			$tmpSelements = $this->formatMapElements($map['selements']);
 			$this->data['maps'][] = [
 				'name' => $map['name'],
 				'width' => $map['width'],
@@ -201,9 +201,9 @@ class CConfigurationExportBuilder {
 				'expand_macros' => $map['expand_macros'],
 				'background' => $map['backgroundid'],
 				'iconmap' => $map['iconmap'],
-				'urls' => $this->formatMapUrls($map['urls']),	// ok
+				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $tmpSelements,
-				'links' => $this->formatMapLinks($map['links'], $tmpSelements)	// ok
+				'links' => $this->formatMapLinks($map['links'], $tmpSelements)
 			];
 		}
 
@@ -243,7 +243,7 @@ class CConfigurationExportBuilder {
 		foreach ($valuemaps as $valuemap) {
 			$this->data['value_maps'][] = [
 				'name' => $valuemap['name'],
-				'mappings' => $this->formatMappings($valuemap['mappings'])	// ok
+				'mappings' => $this->formatMappings($valuemap['mappings'])
 			];
 		}
 
@@ -336,10 +336,10 @@ class CConfigurationExportBuilder {
 				'filter' => $discoveryRule['filter'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
-				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),	// ok
-				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),	// ok
-				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),	// ok
-				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes'])	// ok
+				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes']),
+				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
+				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
+				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes'])
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
@@ -395,7 +395,7 @@ class CConfigurationExportBuilder {
 				'ymax_type_1' => $graph['ymax_type'],
 				'ymin_item_1' => $graph['ymin_itemid'],
 				'ymax_item_1' => $graph['ymax_itemid'],
-				'graph_items' => $this->formatGraphItems($graph['gitems'])	// ok
+				'graph_items' => $this->formatGraphItems($graph['gitems'])
 			];
 		}
 
@@ -419,9 +419,9 @@ class CConfigurationExportBuilder {
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
-				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),	// ok
-				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),	// ok
-				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])	// ok
+				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
+				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
+				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
 			];
 		}
 
@@ -512,7 +512,7 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies'])	// ok
+				'dependencies' => $this->formatDependencies($trigger['dependencies'])
 			];
 		}
 
@@ -616,13 +616,13 @@ class CConfigurationExportBuilder {
 				'port' => $item['port'],
 				'description' => $item['description'],
 				'inventory_link' => $item['inventory_link'],
-				'applications' => $this->formatApplications($item['applications']),	// ok
+				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt']
 			];
 
 			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);	// ok
+				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
 			}
 
 			if (isset($item['interface_ref'])) {
@@ -695,7 +695,7 @@ class CConfigurationExportBuilder {
 				'name' => $screen['name'],
 				'hsize' => $screen['hsize'],
 				'vsize' => $screen['vsize'],
-				'screen_items' => $this->formatScreenItems($screen['screenitems'])	// ok
+				'screen_items' => $this->formatScreenItems($screen['screenitems'])
 			];
 		}
 
@@ -867,7 +867,7 @@ class CConfigurationExportBuilder {
 				'label' => $link['label'],
 				'selementid1' => $link['selementid1'],
 				'selementid2' => $link['selementid2'],
-				'linktriggers' => $this->formatMapLinkTriggers($link['linktriggers'])	// ok
+				'linktriggers' => $this->formatMapLinkTriggers($link['linktriggers'])
 			];
 		}
 
@@ -933,7 +933,7 @@ class CConfigurationExportBuilder {
 				'icon_disabled' => $element['iconid_disabled'],
 				'icon_maintenance' => $element['iconid_maintenance'],
 				'application' => $element['application'],
-				'urls' => $this->formatMapElementUrls($element['urls'])	// ok
+				'urls' => $this->formatMapElementUrls($element['urls'])
 			];
 		}
 
