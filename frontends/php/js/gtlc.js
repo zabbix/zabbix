@@ -1766,11 +1766,11 @@ var sbox = Class.create({
 
 	optimizeEvent: function(e) {
 		if (!empty(e.pageX) && !empty(e.pageY)) {
-			this.mouse_event.left = e.pageX - jQuery(this.containerId).position().left;
+			this.mouse_event.left = e.pageX;
 			this.mouse_event.top = e.pageY;
 		}
 		else if (!empty(e.clientX) && !empty(e.clientY)) {
-			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - jQuery(this.containerId).position().left;
+			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 			this.mouse_event.top = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 		}
 		else {
