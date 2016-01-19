@@ -11,6 +11,7 @@ New features:
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
+..F....... [ZBX-9500] fixed elements sorting in configuration export (Gunars, Sasha)
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 ..F....... [ZBX-10019] fixed graphs time interval selection (Gunars)
