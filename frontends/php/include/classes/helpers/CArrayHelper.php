@@ -24,6 +24,7 @@ class CArrayHelper {
 	/**
 	 * @var array
 	 */
+	protected static $fields;
 
 	private function __construct() {}
 
@@ -105,34 +106,43 @@ class CArrayHelper {
 				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
 			}
 		}
+		self::$fields = $fields;
+		uasort($array, ['self', 'compare']);
+	}
 
-		uasort($array, function($a, $b) use ($fields) {
-			foreach ($fields as $field) {
-				// if field is not set or is null, treat it as smallest string
-				// strnatcasecmp() has unexpected behaviour with null values
-
-				$valueA = self::getValueByPath($a, $field['field']);
-				$valueB = self::getValueByPath($b, $field['field']);
-
-				if ((false === $valueA) && (false === $valueB)) {
-					$cmp = 0;
-				}
-				elseif ((false === $valueA)) {
-					$cmp = -1;
-				}
-				elseif ((false === $valueB)) {
-					$cmp = 1;
-				}
-				else {
-					$cmp = strnatcasecmp($valueA, $valueB);
-				}
-
-				if ($cmp != 0) {
-					return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
-				}
+	/**
+	 * Method to be used as callback for uasort function in sort method.
+	 *
+	 * @TODO: with PHP 5.3+ this should be changed to closure
+	 * @static
+	 *
+	 * @param $a
+	 * @param $b
+	 *
+	 * @return int
+	 */
+	protected static function compare($a, $b) {
+		foreach (self::$fields as $field) {
+			// if field is not set or is null, treat it as smallest string
+			// strnatcasecmp() has unexpected behaviour with null values
+			if (!isset($a[$field['field']]) && !isset($b[$field['field']])) {
+				$cmp = 0;
 			}
-			return 0;
-		});
+			elseif (!isset($a[$field['field']])) {
+				$cmp = -1;
+			}
+			elseif (!isset($b[$field['field']])) {
+				$cmp = 1;
+			}
+			else {
+				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
+			}
+
+			if ($cmp != 0) {
+				return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
+			}
+		}
+		return 0;
 	}
 
 	/**
@@ -208,51 +218,5 @@ class CArrayHelper {
 				$uniqueValues[$value] = $value;
 			}
 		}
-	}
-
-	/**
-	 * Get value of multidimensional array field by provided path
-	 *
-	 * Example 1
-	 * CArrayHelper::getValueByPath($myArray, 'item/key');
-	 *
-	 * @param array $array		array
-	 * @param string $path		path to field
-	 * @param string $delimiter	path delimeter
-	 *
-	 * @return boolean|string|array		nested array field value
-	 */
-	public static function getValueByPath(array $array, $path, $delimiter = '/') {
-		if (strpos($path, $delimiter) === 0) {
-			$path = substr($path, 1);
-		}
-		$pathArray = explode($delimiter, $path);
-		$value = $array;
-
-		foreach ($pathArray as $key) {
-			if (!is_array($value) || !array_key_exists($key, $value)) {
-				return false;
-			}
-			$value = $value[$key];
-		}
-		return $value;
-	}
-
-	/**
-	 * Flip multidimensional array by specified field
-	 *
-	 * @param array $array
-	 * @param string $field
-	 * @return array
-	 */
-	public static function flipByField(array $array, $field) {
-		$result = [];
-
-		foreach ($array as $key => $item) {
-			if(array_key_exists($field, $item)) {
-				$result[$item[$field]] = $key;
-			}
-		}
-		return $result;
 	}
 }
