@@ -3427,6 +3427,7 @@ static void	DCsync_actions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->actions.num_data + 32);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -3505,6 +3506,7 @@ static void	DCsync_action_conditions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->action_conditions.num_data + 32);
 
 	while (NULL != (row = DBfetch(result)))
 	{
