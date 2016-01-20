@@ -446,6 +446,26 @@ ZBX_DC_CONFIG_TABLE;
 
 typedef struct
 {
+	zbx_uint64_t	conditionid;
+
+	unsigned char	conditiontype;
+	unsigned char	operator;
+	const char	*value;
+}
+zbx_dc_action_condition_t;
+
+typedef struct
+{
+	zbx_uint64_t		actionid;
+	const char		*formula;
+	unsigned char		eventsource;
+	unsigned char		evaltype;
+	zbx_vector_ptr_t	conditions;
+}
+zbx_dc_action_t;
+
+typedef struct
+{
 	/* timestamp of the last host availability diff sent to sever, used only by proxies */
 	int			availability_diff_ts;
 
@@ -485,6 +505,8 @@ typedef struct
 	zbx_hashset_t		interface_snmpitems;	/* interfaceid, itemids for SNMP trap items */
 	zbx_hashset_t		regexps;
 	zbx_hashset_t		expressions;
+	zbx_hashset_t		actions;
+	zbx_hashset_t		action_conditions;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -3378,6 +3400,157 @@ static void	DCsync_expressions(DB_RESULT result)
 
 /******************************************************************************
  *                                                                            *
+ * Function: DCsync_actions                                                   *
+ *                                                                            *
+ * Purpose: Updates actions configuration cache                               *
+ *                                                                            *
+ * Parameters: result - [IN] the result of actions database select            *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - actionid                                                     *
+ *           1 - eventsource                                                  *
+ *           2 - evaltype                                                     *
+ *           3 - formula                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_actions(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_actions";
+
+	DB_ROW			row;
+	zbx_vector_uint64_t	ids;
+	zbx_uint64_t		actionid;
+	zbx_dc_action_t		*action;
+	int			found;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[0]);
+
+		zbx_vector_uint64_append(&ids, actionid);
+
+		action = DCfind_id(&config->actions, actionid, sizeof(zbx_dc_action_t), &found);
+
+		if (0 == found)
+		{
+			zbx_vector_ptr_create_ext(&action->conditions, __config_mem_malloc_func,
+					__config_mem_realloc_func, __config_mem_free_func);
+
+			zbx_vector_ptr_reserve(&action->conditions, 1);
+		}
+
+		action->eventsource = atoi(row[1]);
+		action->evaltype = atoi(row[2]);
+
+		DCstrpool_replace(found, &action->formula, row[3]);
+
+		/* reset conditions vector */
+		zbx_vector_ptr_clear(&action->conditions);
+	}
+
+	/* remove deleted actions */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->actions, &iter);
+
+	while (NULL != (action = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, action->actionid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_strpool_release(action->formula);
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_action_conditions                                         *
+ *                                                                            *
+ * Purpose: Updates action conditions configuration cache                     *
+ *                                                                            *
+ * Parameters: result - [IN] the result of action conditions database select  *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - conditionid                                                  *
+ *           1 - actionid                                                     *
+ *           2 - conditiontype                                                *
+ *           3 - operator                                                     *
+ *           4 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_action_conditions(DB_RESULT result)
+{
+	const char			*__function_name = "DCsync_action_conditions";
+
+	DB_ROW				row;
+	zbx_vector_uint64_t		ids;
+	zbx_uint64_t			actionid, conditionid;
+	zbx_dc_action_t			*action;
+	zbx_dc_action_condition_t	*condition;
+	int				found;
+	zbx_hashset_iter_t		iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[1]);
+
+		if (NULL == (action = zbx_hashset_search(&config->actions, &actionid)))
+			continue;
+
+		ZBX_STR2UINT64(conditionid, row[0]);
+
+		zbx_vector_uint64_append(&ids, conditionid);
+
+		condition = DCfind_id(&config->action_conditions, conditionid, sizeof(zbx_dc_action_condition_t),
+				&found);
+
+		condition->conditiontype = atoi(row[2]);
+		condition->operator = atoi(row[3]);
+
+		DCstrpool_replace(found, &condition->value, row[4]);
+
+		zbx_vector_ptr_append(&action->conditions, condition);
+	}
+
+	/* remove deleted conditions */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->action_conditions, &iter);
+
+	while (NULL != (condition = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, condition->conditionid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_strpool_release(condition->value);
+
+		zbx_hashset_iter_remove(&iter);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_config_select                                             *
  *                                                                            *
  * Purpose: Executes SQL select statement used to synchronize configuration   *
@@ -3423,11 +3596,14 @@ void	DCsync_configuration(void)
 	DB_RESULT		tdep_result = NULL;
 	DB_RESULT		func_result = NULL;
 	DB_RESULT		expr_result = NULL;
+	DB_RESULT		action_result = NULL;
+	DB_RESULT		action_condition_result = NULL;
 
 	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
 				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
-				expr_sec2, total, total2;
+				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
+				total, total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -3592,6 +3768,29 @@ void	DCsync_configuration(void)
 	}
 	expr_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (NULL == (action_result = DBselect(
+			"select actionid,eventsource,evaltype,formula"
+			" from actions"
+			" where status=%d",
+			ACTION_STATUS_ACTIVE)))
+	{
+		goto out;
+	}
+	action_sec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (action_condition_result = DBselect(
+			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value"
+			" from conditions c,actions a"
+			" where c.actionid=a.actionid"
+				" and a.status=%d",
+			ACTION_STATUS_ACTIVE)))
+	{
+		goto out;
+	}
+	action_condition_sec = zbx_time() - sec;
+
 	START_SYNC;
 
 	sec = zbx_time();
@@ -3644,10 +3843,21 @@ void	DCsync_configuration(void)
 	DCsync_expressions(expr_result);
 	expr_sec2 = zbx_time() - sec;
 
+	sec = zbx_time();
+	DCsync_actions(action_result);
+	action_sec2 = zbx_time() - sec;
+
+	sec = zbx_time();
+	DCsync_action_conditions(action_condition_result);
+	action_condition_sec2 = zbx_time() - sec;
+
 	strpool = zbx_strpool_info();
 
-	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec;
-	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 + expr_sec2;
+	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
+			action_sec + action_condition_sec;
+	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
+			expr_sec2 + action_sec2 + action_condition_sec2;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
@@ -3672,6 +3882,11 @@ void	DCsync_configuration(void)
 			fsec, fsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			expr_sec, expr_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			action_sec, action_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.",
+			__function_name, action_condition_sec, action_condition_sec2);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
 
@@ -3753,6 +3968,11 @@ void	DCsync_configuration(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: %d (%d slots)", __function_name,
 			config->expressions.num_data, config->expressions.num_slots);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : %d (%d slots)", __function_name,
+			config->actions.num_data, config->actions.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : %d (%d slots)", __function_name,
+			config->action_conditions.num_data, config->action_conditions.num_slots);
+
 	for (i = 0; ZBX_POLLER_TYPE_COUNT > i; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() queue[%d]   : %d (%d allocated)", __function_name,
@@ -3788,6 +4008,8 @@ out:
 	DBfree_result(tdep_result);
 	DBfree_result(func_result);
 	DBfree_result(expr_result);
+	DBfree_result(action_result);
+	DBfree_result(action_condition_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4157,6 +4379,8 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->interfaces, 10);
 	CREATE_HASHSET(config->interface_snmpitems, 0);
 	CREATE_HASHSET(config->expressions, 0);
+	CREATE_HASHSET(config->actions, 0);
+	CREATE_HASHSET(config->action_conditions, 0);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -8170,6 +8394,140 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
 
 	return 0 == hosts->values_num ? FAIL : SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_condition_free                                            *
+ *                                                                            *
+ * Purpose: frees condition data structure                                    *
+ *                                                                            *
+ * Parameters: condition - [IN] the condition data to free                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_db_condition_free(DB_CONDITION *condition)
+{
+	zbx_free(condition->value);
+	zbx_free(condition);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_action_eval_free                                             *
+ *                                                                            *
+ * Purpose: frees action evaluation data structure                            *
+ *                                                                            *
+ * Parameters: action - [IN] the action evaluation to free                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_action_eval_free(zbx_action_eval_t *action)
+{
+	zbx_free(action->formula);
+
+	zbx_vector_ptr_clear_ext(&action->conditions, (zbx_clean_func_t)zbx_db_condition_free);
+	zbx_vector_ptr_destroy(&action->conditions);
+
+	zbx_free(action);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_action_copy_conditions                                        *
+ *                                                                            *
+ * Purpose: copies configuration cache action conditions to the specified     *
+ *          vector                                                            *
+ *                                                                            *
+ * Parameters: dc_action  - [IN] the source action                            *
+ *             conditions - [OUT] the conditions vector                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
+{
+	int				i;
+	DB_CONDITION			*condition;
+	zbx_dc_action_condition_t	*dc_condition;
+
+	zbx_vector_ptr_reserve(conditions, dc_action->conditions.values_num);
+
+	for (i = 0; i < dc_action->conditions.values_num; i++)
+	{
+		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
+
+		condition = (DB_CONDITION *)zbx_malloc(NULL, sizeof(DB_CONDITION));
+
+		condition->conditionid = dc_condition->conditionid;
+		condition->actionid = dc_action->actionid;
+		condition->conditiontype = dc_condition->conditiontype;
+		condition->operator = dc_condition->operator;
+		condition->value = zbx_strdup(NULL, dc_condition->value);
+
+		zbx_vector_ptr_append(conditions, condition);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_action_eval_create                                            *
+ *                                                                            *
+ * Purpose: creates action evaluation data from configuration cache action    *
+ *                                                                            *
+ * Parameters: dc_action - [IN] the source action                             *
+ *                                                                            *
+ * Return value: the action evaluation data                                   *
+ *                                                                            *
+ * Comments: The returned value must be freed with zbx_action_eval_free()     *
+ *           function later.                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action)
+{
+	zbx_action_eval_t		*action;
+
+	action = (zbx_action_eval_t *)zbx_malloc(NULL, sizeof(zbx_action_eval_t));
+
+	action->actionid = dc_action->actionid;
+	action->eventsource = dc_action->eventsource;
+	action->evaltype = dc_action->evaltype;
+	action->formula = zbx_strdup(NULL, dc_action->formula);
+	zbx_vector_ptr_create(&action->conditions);
+
+	dc_action_copy_conditions(dc_action, &action->conditions);
+
+	return action;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_get_actions_eval                                          *
+ *                                                                            *
+ * Purpose: gets action evaluation data                                       *
+ *                                                                            *
+ * Parameters: actions     - [OUT] the action evaluation data                 *
+ *                                                                            *
+ * Comments: The returned actions must be freed with zbx_action_eval_free()   *
+ *           function later.                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions)
+{
+	const char			*__function_name = "zbx_dc_get_actions_eval";
+	zbx_dc_action_t			*dc_action;
+	zbx_hashset_iter_t		iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->actions, &iter);
+
+	while (NULL != (dc_action = (zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
+	}
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() actions:%d", __function_name, actions->values_num);
 }
 
 /******************************************************************************
