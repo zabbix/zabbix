@@ -35,8 +35,6 @@
 #	include <lber.h>
 #endif
 
-
-
 ZBX_METRIC	parameters_simple[] =
 /*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {

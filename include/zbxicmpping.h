@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "db.h"
 
 typedef struct
 {
