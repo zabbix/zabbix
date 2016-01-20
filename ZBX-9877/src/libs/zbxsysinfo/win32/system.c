@@ -22,8 +22,6 @@
 #include "perfmon.h"
 #pragma comment(lib, "user32.lib")
 
-void	zbx_wmi_get(char *wmi_namespace, char *wmi_query, char **utf8_value);
-
 /******************************************************************************
  *                                                                            *
  * Function: read_registry_value                                              *
