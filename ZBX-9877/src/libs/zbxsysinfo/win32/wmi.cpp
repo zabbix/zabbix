@@ -71,34 +71,19 @@ extern "C" void	zbx_co_uninitialize()
 		CoUninitialize();
 }
 
-extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+/*
+ * vtProp must be initialized with VariantInit().
+ * wmi_* are not NULL.
+ */
+extern "C" int	zbx_wmi_get_variant(char *wmi_namespace, char *wmi_query, VARIANT *vtProp)
 {
-	char			*wmi_namespace, *wmi_query;
-	IWbemClassObject	*pclsObj = 0;
-	ULONG			uReturn = 0;
-	VARIANT			vtProp;
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
 	IEnumWbemClassObject	*pEnumerator = 0;
-	HRESULT			hres;
+	IWbemClassObject	*pclsObj = 0;
+	ULONG			uReturn = 0;
 	int			ret = SYSINFO_RET_FAIL;
-
-	if (2 != request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (SUCCEED != zbx_co_initialize())
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize COM library."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	wmi_namespace = get_rparam(request, 0);
-	wmi_query = get_rparam(request, 1);
-
-	VariantInit(&vtProp);
+	HRESULT			hres;
 
 	/* obtain the initial locator to Windows Management on a particular host computer */
 	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
@@ -110,7 +95,6 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, 0, NULL, 0, 0, &pService);
-
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain %s WMI service", wmi_namespace);
@@ -149,12 +133,91 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	hres = pclsObj->Next(0, NULL, &vtProp, 0, 0);
+	hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
 
 	pclsObj->EndEnumeration();
 
 	if (FAILED(hres) || hres == WBEM_S_NO_MORE_DATA)
 		goto out;
+
+	ret = SYSINFO_RET_OK;
+out:
+	if (0 != pclsObj)
+		pclsObj->Release();
+
+	if (0 != pEnumerator)
+		pEnumerator->Release();
+
+	if (0 != pService)
+		pService->Release();
+
+	if (0 != pLoc)
+		pLoc->Release();
+
+	return ret;
+}	
+
+extern "C" void	zbx_wmi_get(char *wmi_namespace, char *wmi_query, char **utf8_value)
+{
+	VARIANT		vtProp;
+	HRESULT		hres;
+
+	VariantInit(&vtProp);
+
+	if (SUCCEED != zbx_co_initialize())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot initialize COM library for querying WMI");
+		goto out;
+	}
+
+	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, &vtProp))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get WMI result");
+		goto out;
+	}
+
+	hres = VariantChangeType(&vtProp, &vtProp, VARIANT_ALPHABOOL, VT_BSTR);
+
+	if (FAILED(hres))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot convert WMI result of type %d to VT_BSTR", vtProp.vt);
+		goto out;
+	}
+
+	*utf8_value = zbx_unicode_to_utf8((wchar_t *)_bstr_t(vtProp.bstrVal));
+out:
+	VariantClear(&vtProp);
+}
+
+extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	char		*wmi_namespace, *wmi_query;
+	VARIANT		vtProp;
+	HRESULT		hres;
+	int		ret = SYSINFO_RET_FAIL;
+
+	if (2 != request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	wmi_namespace = get_rparam(request, 0);
+	wmi_query = get_rparam(request, 1);
+
+	VariantInit(&vtProp);
+
+	if (SUCCEED != zbx_co_initialize())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize COM library."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, &vtProp))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot get WMI result");
+		goto out;
+	}
 
 	if (0 != (vtProp.vt & VT_ARRAY))
 	{
@@ -204,6 +267,8 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			break;
 		default:
+			char *utf8;
+
 			hres = VariantChangeType(&vtProp, &vtProp, VARIANT_ALPHABOOL, VT_BSTR);
 
 			if (FAILED(hres))
@@ -212,26 +277,14 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto out;
 			}
 
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, (char *)_bstr_t(vtProp.bstrVal)));
+			utf8 = zbx_unicode_to_utf8((wchar_t *)_bstr_t(vtProp.bstrVal));
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, utf8));
 			ret = SYSINFO_RET_OK;
 
 			break;
 	}
 out:
 	VariantClear(&vtProp);
-
-	if (0 != pclsObj)
-		pclsObj->Release();
-
-	if (0 != pEnumerator)
-		pEnumerator->Release();
-
-	if (0 != pService)
-		pService->Release();
-
-	if (0 != pLoc)
-		pLoc->Release();
-
 
 	if (SYSINFO_RET_FAIL == ret)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain WMI information."));
