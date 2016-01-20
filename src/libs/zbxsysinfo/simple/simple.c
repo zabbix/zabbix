@@ -27,6 +27,16 @@
 #include "ntp.h"
 #include "simple.h"
 
+#ifdef HAVE_LDAP
+#	include <ldap.h>
+#endif
+
+#ifdef HAVE_LBER_H
+#	include <lber.h>
+#endif
+
+
+
 ZBX_METRIC	parameters_simple[] =
 /*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {
