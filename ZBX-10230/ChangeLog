@@ -1,3 +1,11 @@
+Changes for 3.0.0beta2
+
+New features:
+
+Bug fixes:
+A.F....... [ZBX-10230] fixes and improvements for translatable strings (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0beta1
 
 New features:
@@ -10,7 +18,6 @@ New features:
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
-A.F....... [ZBX-10230] fixes and improvements for translatable strings (zalex_ua)
 ..F....... [ZBX-9500] fixed elements sorting in configuration export (Gunars, Sasha)
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
