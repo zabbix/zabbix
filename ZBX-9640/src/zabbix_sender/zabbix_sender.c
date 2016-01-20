@@ -313,6 +313,9 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
+		if (1 == WITH_TIMESTAMPS)
+			zbx_json_adduint64(&sentdval_args->json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
@@ -655,10 +658,6 @@ int	main(int argc, char **argv)
 		if (FAIL != ret && 0 != buffer_count)
 		{
 			zbx_json_close(&sentdval_args.json);
-
-			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
 
