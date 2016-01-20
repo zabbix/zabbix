@@ -1474,10 +1474,10 @@ int	process_host_availability(struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-		goto exit;
+		goto out;
 
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
-		goto exit;
+		goto out;
 
 	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
 
@@ -1559,7 +1559,7 @@ int	process_host_availability(struct zbx_json_parse *jp)
 	zbx_vector_ptr_destroy(&hosts);
 
 	zbx_free(tmp);
-exit:
+out:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
 
@@ -2494,10 +2494,10 @@ int	process_dhis_data(struct zbx_json_parse *jp)
 	now = time(NULL);
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
-		goto exit;
+		goto out;
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-		goto exit;
+		goto out;
 
 	hosttime = atoi(tmp);
 
@@ -2589,7 +2589,7 @@ int	process_dhis_data(struct zbx_json_parse *jp)
 
 				zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64 " does not exist", drule.druleid);
 
-				goto next;
+				continue;
 			}
 
 			discovery_update_host(&dhost, ip, status, itemtime);
@@ -2603,21 +2603,19 @@ int	process_dhis_data(struct zbx_json_parse *jp)
 				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
 						" belong to druleid:" ZBX_FS_UI64, dcheck.dcheckid, drule.druleid);
 
-				goto next;
+				continue;
 			}
 
 			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
 		}
 
 		DBcommit();
-next:
-		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
 
 	zbx_free(value);
-exit:
+out:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 
@@ -2654,10 +2652,10 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	now = time(NULL);
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
-		goto exit;
+		goto out;
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-		goto exit;
+		goto out;
 
 	hosttime = atoi(tmp);
 
@@ -2701,7 +2699,7 @@ int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 	}
-exit:
+out:
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
