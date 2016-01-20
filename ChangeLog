@@ -3,6 +3,7 @@ Changes for 3.0.0beta2
 New features:
 
 Bug fixes:
+A.F....... [ZBX-10230] fixes and improvements for translatable strings (zalex_ua)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0beta1
