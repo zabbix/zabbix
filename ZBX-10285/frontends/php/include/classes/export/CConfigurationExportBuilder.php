@@ -846,7 +846,14 @@ class CConfigurationExportBuilder {
 		$result = [];
 
 		// Get array where key is selementid and value is sort position.
-		$flippedSelements = CArrayHelper::flipByField($selements, 'selementid');
+		$flippedSelements = [];
+		$selements = array_values($selements);
+		foreach ($selements as $key => $item) {
+			if(array_key_exists('selementid', $item)) {
+				$flippedSelements[$item['selementid']] = $key;
+			}
+		}
+
 		foreach ($links as &$link) {
 			$link['selementpos1'] = $flippedSelements[$link['selementid1']];
 			$link['selementpos2'] = $flippedSelements[$link['selementid2']];
