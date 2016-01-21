@@ -135,7 +135,7 @@ if ($csvExport) {
 	if (hasRequest('stime')) {
 		$stime = getRequest('stime');
 
-		if ($stime + $period > time()) {
+		if ($stime + $period > date(TIMESTAMP_FORMAT, time())) {
 			$stime = date(TIMESTAMP_FORMAT, time() - $period);
 		}
 	}
@@ -647,10 +647,10 @@ else {
 
 				$eventOptions['objectids'] = array($triggerId);;
 			}
-			elseif ($pageFilter->hostid > 0) {
+			elseif (getRequest('hostid') > 0) {
 				$hostTriggers = API::Trigger()->get(array(
 					'output' => array('triggerid'),
-					'hostids' => $pageFilter->hostid,
+					'hostids' => getRequest('hostid'),
 					'monitored' => true,
 					'preservekeys' => true
 				));
@@ -658,13 +658,13 @@ else {
 				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
 				$validTriggerIds = $knownTriggerIds;
 
-				$eventOptions['hostids'] = $pageFilter->hostid;
+				$eventOptions['hostids'] = getRequest('hostid');
 				$eventOptions['objectids'] = $validTriggerIds;
 			}
-			elseif ($pageFilter->groupid > 0) {
-				$eventOptions['groupids'] = $pageFilter->groupid;
+			elseif (getRequest('groupid') > 0) {
+				$eventOptions['groupids'] = getRequest('groupid');
 
-				$triggerOptions['groupids'] = $pageFilter->groupid;
+				$triggerOptions['groupids'] = getRequest('groupid');
 			}
 
 			$events = array();
@@ -748,8 +748,8 @@ else {
 				$hosts[] = reset($trigger['hosts']);
 
 				// Add already filtered read and read-write 'groupid' and 'hostid' to pass to menu pop-up "Events" link.
-				$trigger['groupid'] = $pageFilter->groupid;
-				$trigger['hostid'] = $pageFilter->hostid;
+				$trigger['groupid'] = getRequest('groupid');
+				$trigger['hostid'] = getRequest('hostid');
 			}
 			unset($trigger);
 
