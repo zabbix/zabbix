@@ -314,7 +314,14 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
 		if (1 == WITH_TIMESTAMPS)
-			zbx_json_adduint64(&sentdval_args->json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+		{
+			zbx_timespec_t	ts;
+
+			zbx_timespec(&ts);
+
+			zbx_json_adduint64(&sentdval_args->json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+			zbx_json_adduint64(&sentdval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
+		}
 
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
 		{
