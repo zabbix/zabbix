@@ -71,10 +71,24 @@ extern "C" void	zbx_co_uninitialize()
 		CoUninitialize();
 }
 
-/*
- * vtProp must be initialized with VariantInit().
- * wmi_* are not NULL.
- */
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_wmi_get_variant                                              *
+ *                                                                            *
+ * Purpose: retrieves WMI value and stores it in the provided memory location *
+ *                                                                            *
+ * Parameters: wmi_namespace [IN]  - the object path of the WMI namespace     *
+ *             wmi_query     [IN]  - WQL query                                *
+ *             vtProp        [OUT] - pointer to memory for the queried value  *
+ *                                                                            *
+ * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value  *
+ *               SYSINFO_RET_FAIL - retreiving WMI value failed               *
+ *                                                                            *
+ * Comments: *vtProp must be initialized with VariantInit(),                  *
+ *           wmi_* must not be NULL. The callers must convert value to the    *
+ *           intended format using VariantChangeType()                        *
+ *                                                                            *
+ ******************************************************************************/
 extern "C" int	zbx_wmi_get_variant(char *wmi_namespace, char *wmi_query, VARIANT *vtProp)
 {
 	IWbemLocator		*pLoc = 0;
@@ -157,6 +171,23 @@ out:
 	return ret;
 }	
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_wmi_get                                                      *
+ *                                                                            *
+ * Purpose: wrapper function for zbx_wmi_get_variant(), stores the retrieved  *
+ *          WMI value as UTF-8 encoded string                                 *
+ *                                                                            *
+ * Parameters: wmi_namespace [IN]  - the object path of the WMI namespace     *
+ *             wmi_query     [IN]  - WQL query                                *
+ *             utf8_value    [OUT] - address of the pointer to the retrieved  *
+ *                                   value (dynamically allocated)            *
+ *                                                                            *
+ * Comments: if either retrieval or type conversion failed then *utf8_value   *
+ *           remains unchanged (set it to NULL before calling this function   *
+ *           to check for this condition). Callers must free *utf8_value.     *
+ *                                                                            *
+ ******************************************************************************/
 extern "C" void	zbx_wmi_get(char *wmi_namespace, char *wmi_query, char **utf8_value)
 {
 	VARIANT		vtProp;
