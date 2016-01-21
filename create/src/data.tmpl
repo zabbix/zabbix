@@ -256,7 +256,7 @@ ROW   |4         |APC Battery Replacement Status       |
 ROW   |5         |APC Battery Status                   |
 ROW   |7         |Dell Open Manage System Status       |
 ROW   |6         |HP Insight System Status             |
-ROW   |2         |Host status                          |
+ROW   |2         |Host availability                    |
 ROW   |17        |HTTP response status code            |
 ROW   |14        |Maintenance status                   |
 ROW   |9         |SNMP device status (hrDeviceStatus)  |
@@ -2995,8 +2995,9 @@ TABLE |mappings
 FIELDS|mappingid|valuemapid|value|newvalue                              |
 ROW   |1        |1         |0    |Down                                  |
 ROW   |2        |1         |1    |Up                                    |
-ROW   |3        |2         |0    |Up                                    |
-ROW   |4        |2         |2    |Unreachable                           |
+ROW   |3        |2         |0    |not available                         |
+ROW   |4        |2         |1    |available                             |
+ROW   |5        |2         |2    |unknown                               |
 ROW   |13       |6         |1    |Other                                 |
 ROW   |14       |6         |2    |OK                                    |
 ROW   |15       |6         |3    |Degraded                              |
