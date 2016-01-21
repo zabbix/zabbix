@@ -3,17 +3,18 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-20 17:30+0200\n"
-"PO-Revision-Date: 2015-12-27 20:35+0300\n"
+"PO-Revision-Date: 2016-01-20 21:18+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451241311.0\n"
+"X-POOTLE-MTIME: 1453317520.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -683,11 +684,11 @@ msgstr "Все карты сети"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr ""
+msgstr "Все комплексные экраны"
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr ""
+msgstr "Все слайд-шоу"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -804,7 +805,7 @@ msgstr "Близится"
 
 #: include/func.inc.php:240
 msgid "Apr"
-msgstr "Апр"
+msgstr "Апр."
 
 #: include/forms.inc.php:1790 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:116
@@ -1923,7 +1924,7 @@ msgstr[2] "Не удалось активировать веб-сценарии"
 
 #: scripts_exec.php:69
 msgid "Cannot execute script"
-msgstr ""
+msgstr "Не удалось выполнить скрипт"
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
@@ -2215,7 +2216,7 @@ msgstr "Не удалось установить \"%1$s\" для элемент�
 #: include/classes/api/services/CTemplateScreen.php:629
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr ""
+msgstr "Не удалось установить \"%1$s\" шаблонному комплексному экрану \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:532
 #, c-format
@@ -2342,7 +2343,7 @@ msgstr "Не удалось обновить \"%1$s\" у обнаруженно�
 #: include/classes/api/services/CTrigger.php:499
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr "Не удалось обновить \"%1$s\" у обнаруженного триггера \"%2$s\"."
+msgstr "Не удалось обновить \"%2$s\" у обнаруженного триггера \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:516
 #, c-format
@@ -2582,10 +2583,14 @@ msgstr "Регистрозависимое"
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr ""
+"Отлов всех SNMP трапов, которые совпадают с регулярным выражением. Если "
+"регулярное выражение не задано, под условие попадают все трапы."
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
+"Отлов всех SNMP трапов, которые не были пойманы ни одним элементом данных "
+"snmptrap[]."
 
 #: include/views/monitoring.screen.constructor.edit.php:706
 msgid "Center"
@@ -2692,6 +2697,8 @@ msgstr "Проверяет есть ли возможность создать T
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
+"Проверка, доступен ли сервер по ICMP ping. 0 - ICMP ping не успешен. 1 - "
+"ICMP ping успешен."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:403
@@ -2891,7 +2898,7 @@ msgstr "Коммерческие"
 
 #: include/classes/api/services/CAction.php:1843
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr "Сравнение нескольких триггеров с \"и\" запрещено."
+msgstr "Сравнение нескольких триггеров с условием \"и\" запрещено."
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -3193,7 +3200,7 @@ msgstr "Подключения к узлу сети"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr ""
+msgstr "Подключения к прокси"
 
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
@@ -3770,7 +3777,7 @@ msgstr "Режим отладки обновлен"
 
 #: include/func.inc.php:248
 msgid "Dec"
-msgstr "Дек"
+msgstr "Дек."
 
 #: include/forms.inc.php:1814 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:124
@@ -4728,7 +4735,7 @@ msgstr "Дубликат значения \"имя\" \"%1$s\" у карты се
 #: include/classes/api/services/CScreen.php:774
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
-msgstr ""
+msgstr "Дубликат значения \"имя\" \"%1$s\" у комплексного экрана."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4793,7 +4800,7 @@ msgstr "Дубликат userid \"%1$s\" в пользователях у кар
 #: include/classes/api/services/CScreen.php:875
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "Дубликат userid \"%1$s\" в пользователях у комплексного экрана \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:578
 #: include/classes/api/services/CMap.php:997
@@ -4806,6 +4813,8 @@ msgstr "Дубликат usrgrpid \"%1$s\" в группах пользоват�
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
+"Дубликат usrgrpid \"%1$s\" в группах пользователей у комплексного экрана \"%"
+"2$s\"."
 
 #: events.php:418 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -5028,7 +5037,7 @@ msgstr "Пустой screen ID для шаблонного комплексно�
 
 #: include/classes/api/services/CScreen.php:727
 msgid "Empty screen ID."
-msgstr ""
+msgstr "Пустой ID комплексного экрана."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5483,7 +5492,7 @@ msgstr "Избранные"
 
 #: include/func.inc.php:238
 msgid "Feb"
-msgstr "Февр"
+msgstr "Фев."
 
 #: include/forms.inc.php:1770 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:114
@@ -5520,7 +5529,7 @@ msgstr "В поле \"%1$s\" пропущено значение типа опо
 #: include/classes/api/services/CScreen.php:588
 #, c-format
 msgid "Field \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "В поле \"%1$s\" пропущено значение у комплексного экрана \"%2$s\"."
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5793,7 +5802,7 @@ msgstr "Сгенерировано за %s сек"
 
 #: include/locales.inc.php:61
 msgid "Georgian (ka_GE)"
-msgstr ""
+msgstr "Грузинский (ka_GE)"
 
 #: include/locales.inc.php:62
 msgid "German (de_DE)"
@@ -7111,6 +7120,8 @@ msgstr "Некорректное значение \"permission\" \"%1$s\" в г�
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
+"Некорректное значение \"permission\" \"%1$s\" в группах пользователях у "
+"комплексного экрана \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:489
 #: include/classes/api/services/CMap.php:910
@@ -7123,6 +7134,8 @@ msgstr "Некорректное значение \"permission\" \"%1$s\" в п�
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
 msgstr ""
+"Некорректное значение \"permission\" \"%1$s\" в пользователях у комплексного "
+"экрана \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:450
 #: include/classes/api/services/CMap.php:872
@@ -7134,7 +7147,7 @@ msgstr "Некорректное значение \"private\" \"%1$s\" у кар
 #: include/classes/api/services/CScreen.php:823
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
-msgstr ""
+msgstr "Некорректное значение \"private\" \"%1$s\" у комплексного экрана \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1131
 #, c-format
@@ -7896,6 +7909,7 @@ msgstr "Указано некорректное значение ID пользо
 #, c-format
 msgid "Incorrect user ID specified for screen \"%1$s\"."
 msgstr ""
+"Указано некорректное значение ID пользователя у комплексного экрана \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:595
 #: include/classes/api/services/CMap.php:1014
@@ -7908,6 +7922,8 @@ msgstr "Указано некорректное значение ID группы
 #, c-format
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
 msgstr ""
+"Указано некорректное значение ID группы пользователей у комплексного экрана "
+"\"%1$s\"."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -8732,7 +8748,7 @@ msgstr "Японский (ja_JP)"
 
 #: include/func.inc.php:243
 msgid "Jul"
-msgstr "Июль"
+msgstr "Июл"
 
 #: include/forms.inc.php:1764 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:119
@@ -8741,7 +8757,7 @@ msgstr "Июль"
 
 #: include/func.inc.php:242
 msgid "Jun"
-msgstr "Июнь"
+msgstr "Июн"
 
 #: include/forms.inc.php:1810 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:118
@@ -9439,7 +9455,7 @@ msgstr "Карты сетей"
 
 #: include/func.inc.php:239
 msgid "Mar"
-msgstr "Март"
+msgstr "Мрт."
 
 #: include/forms.inc.php:1780 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:115
@@ -10582,7 +10598,7 @@ msgstr "Триггеры не заданы."
 #: include/views/configuration.item.prototype.edit.php:378
 #: include/views/configuration.item.prototype.edit.php:393
 msgid "None"
-msgstr "Пусто"
+msgstr "Нет"
 
 #: include/graphs.inc.php:24 include/items.inc.php:184
 #: include/triggers.inc.php:1224
@@ -10669,7 +10685,7 @@ msgstr "Оповещения"
 
 #: include/func.inc.php:247
 msgid "Nov"
-msgstr "Нояб"
+msgstr "Нбр."
 
 #: include/forms.inc.php:1804 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:123
@@ -11023,11 +11039,11 @@ msgstr "Только администраторы могут указывать 
 #: include/classes/api/services/CScreen.php:477
 #: include/classes/api/services/CScreen.php:812
 msgid "Only administrators can set screen owner."
-msgstr ""
+msgstr "Только администраторы могут указывать владельца комплексного экрана."
 
 #: include/screens.inc.php:225 include/screens.inc.php:349
 msgid "Only administrators can set slide show owner."
-msgstr ""
+msgstr "Только администраторы могут указывать владельца слайд-шоу."
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11353,13 +11369,13 @@ msgstr "Расширение PHP mbstring отсутствует (парамет
 #: include/classes/setup/CFrontendSetup.php:635
 #, c-format
 msgid "PHP option \"%1$s\""
-msgstr ""
+msgstr "PHP опция \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:374
 #: include/classes/setup/CFrontendSetup.php:639
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
-msgstr ""
+msgstr "PHP опция \"%1$s\" должна быть задана равной \"%2$s\""
 
 #: include/classes/setup/CFrontendSetup.php:584
 msgid "PHP session"
@@ -11795,7 +11811,7 @@ msgstr "Протокол безопасности"
 #: include/views/monitoring.slideconf.edit.php:240
 #: include/views/monitoring.sysmap.edit.php:343
 msgid "Private"
-msgstr "Приватная"
+msgstr "Приватный"
 
 #: include/views/configuration.action.edit.php:837
 #: include/views/configuration.host.discovery.edit.php:173
@@ -11926,7 +11942,7 @@ msgstr "Прокси обновлен"
 #: include/views/monitoring.slideconf.edit.php:241
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr "Публичная"
+msgstr "Публичный"
 
 #: include/views/configuration.action.edit.php:822
 #: include/views/configuration.host.discovery.edit.php:162
@@ -12713,6 +12729,8 @@ msgstr "Объединение колонок в ячейке X - %2$s Y - %3$s 
 #, c-format
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"Комплексный экран \"%1$s\" является публичным и общий доступ на только чтение "
+"запрещен."
 
 #: include/classes/api/services/CScreenItem.php:822
 #, c-format
@@ -12738,12 +12756,12 @@ msgstr "Комплексный экран удален"
 
 #: include/classes/api/services/CScreen.php:759
 msgid "Screen name cannot be empty."
-msgstr ""
+msgstr "Имя комплексного экрана не может быть пустым."
 
 #: include/classes/api/services/CScreen.php:473
 #: include/classes/api/services/CScreen.php:808
 msgid "Screen owner cannot be empty."
-msgstr ""
+msgstr "Владелец комплексного экрана не может быть пустым."
 
 #: screenedit.php:331 screenedit.php:371
 msgid "Screen should contain at least one row and column."
@@ -13032,7 +13050,7 @@ msgstr "Отправлено"
 
 #: include/func.inc.php:245
 msgid "Sep"
-msgstr "Сент"
+msgstr "Сен."
 
 #: include/views/monitoring.dashconf.php:117
 #: include/views/monitoring.sysmap.edit.php:207
@@ -13172,7 +13190,7 @@ msgstr "Общий доступ"
 #: include/classes/api/services/CMap.php:973
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr "Отсутствует значение опции общего доступа \"%1$s\"  у карты сети \"%2$s\"."
+msgstr "Отсутствует значение опции общего доступа \"%1$s\" у карты сети \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:514
 #: include/classes/api/services/CScreen.php:851
@@ -13180,6 +13198,8 @@ msgstr "Отсутствует значение опции общего дост
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
 msgstr ""
+"Отсутствует значение опции общего доступа \"%1$s\" у комплексного экрана \"%"
+"2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:695 tr_status.php:700
@@ -13362,6 +13382,8 @@ msgstr "Слайд-шоу \"%1$s\" уже существует."
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"Слайд-шоу \"%1$s\" является публичным и общий доступ только на чтение "
+"запрещен."
 
 #: include/screens.inc.php:212
 #, c-format
@@ -13382,7 +13404,7 @@ msgstr "Слайд-шоу должно содержать слайды."
 
 #: include/screens.inc.php:219 include/screens.inc.php:343
 msgid "Slide show owner cannot be empty."
-msgstr ""
+msgstr "Владелец слайд-шоу не может быть пустым."
 
 #: slideconf.php:133
 msgid "Slide show updated"
@@ -15082,7 +15104,7 @@ msgstr "Обновлено"
 #: include/hosts.inc.php:554
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "Состояние узла сети \"%1$s\" обновлено."
 
 #: app/views/monitoring.widget.discovery.view.php:62
 #: app/views/monitoring.widget.hosts.view.php:370
@@ -15209,12 +15231,12 @@ msgstr "Пользователь \"%1$s\" является владельцем 
 #: include/classes/api/services/CUser.php:570
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
-msgstr ""
+msgstr "Пользователь \"%1$s\" является владельцем \"%2$s\" комплексного экрана."
 
 #: include/classes/api/services/CUser.php:592
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
-msgstr ""
+msgstr "Пользователь \"%1$s\" является владельцем \"%2$s\" слайд-шоу."
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15320,6 +15342,8 @@ msgstr "Общий доступ группе пользователей имее
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
+"Общий доступ группе пользователей имеет отсутствующие параметры: %1$s у "
+"комплексного экрана \"%2$s\"."
 
 #: include/menu.inc.php:270
 #: include/views/administration.usergroups.edit.php:22
@@ -15398,6 +15422,8 @@ msgstr "Общий доступ пользователям имеет отсут
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
+"Общий доступ пользователям имеет отсутствующие параметры: %1$s у "
+"комплексного экрана \"%2$s\"."
 
 #: include/views/administration.users.edit.php:384
 #: include/views/administration.users.edit.php:388
@@ -16849,7 +16875,7 @@ msgstr "триггер"
 
 #: include/classes/html/CMultiSelect.php:52 jsLoader.php:176
 msgid "type here to search"
-msgstr "печатайте здесь для поиска"
+msgstr "начните печатать для поиска"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"

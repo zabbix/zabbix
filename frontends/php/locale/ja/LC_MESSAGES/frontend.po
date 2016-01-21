@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-20 17:30+0200\n"
-"PO-Revision-Date: 2015-12-28 02:15+0300\n"
+"PO-Revision-Date: 2016-01-21 04:22+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451261706.0\n"
+"X-POOTLE-MTIME: 1453342928.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -329,7 +329,7 @@ msgstr "アクション\"%1$s\"はすでに存在しています。"
 #: include/classes/api/services/CAction.php:2062
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "アクション\"%1$s\"の\"エスカレーションの間隔\"の設定が正しくありません (最小%2$s秒)."
+msgstr "アクション\"%1$s\"の\"esc_period\"の値が正しくありません (最小%2$s秒)。"
 
 #: include/classes/api/services/CAction.php:2137
 #, c-format
@@ -657,11 +657,11 @@ msgstr "すべてのマップ"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr ""
+msgstr "すべてのスクリーン"
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr ""
+msgstr "すべてのスライドショー"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1338,7 +1338,7 @@ msgstr "トリガーを追加できません"
 
 #: trigger_prototypes.php:219
 msgid "Cannot add trigger prototype"
-msgstr "トリガーのプロトタイプが追加できません"
+msgstr "トリガーのプロトタイプを追加できません"
 
 #: users.php:247
 msgid "Cannot add user"
@@ -1382,19 +1382,19 @@ msgstr "ヒストリを削除できません"
 
 #: include/classes/api/services/CDiscoveryRule.php:1192
 msgid "Cannot clone graph prototypes."
-msgstr "グラフのプロトタイプを複製できません"
+msgstr "グラフのプロトタイプを複製できません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1240
 msgid "Cannot clone host prototypes."
-msgstr "ホストのプロトタイプを複製できません"
+msgstr "ホストのプロトタイプを複製できません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:1076
 msgid "Cannot clone item prototypes."
-msgstr "アイテムのプロトタイプを複製できません"
+msgstr "アイテムのプロトタイプを複製できません。"
 
 #: include/classes/api/services/CDiscoveryRule.php:595
 msgid "Cannot clone trigger prototypes."
-msgstr "トリガーのプロトタイプを複製できません"
+msgstr "トリガーのプロトタイプを複製できません。"
 
 #: include/classes/setup/CSetupWizard.php:263
 msgid "Cannot connect to the database."
@@ -1507,7 +1507,7 @@ msgstr "ディスカバリされたトリガー\"%1$s\"は削除できません�
 #: discoveryconf.php:179 host_discovery.php:167
 #: include/classes/api/services/CDiscoveryRule.php:400
 msgid "Cannot delete discovery rule"
-msgstr "ディスカバリのルールを削除できません"
+msgstr "ディスカバリルールを削除できません"
 
 #: discoveryconf.php:221 host_discovery.php:364
 msgid "Cannot delete discovery rules"
@@ -1560,7 +1560,7 @@ msgstr "イメージを削除できません"
 
 #: include/classes/api/services/CHost.php:1009
 msgid "Cannot delete inventory."
-msgstr "インベントリを削除できません"
+msgstr "インベントリを削除できません。"
 
 #: items.php:373
 msgid "Cannot delete item"
@@ -1651,11 +1651,11 @@ msgstr "テンプレートのグラフを削除できません。"
 
 #: include/classes/api/services/CHostPrototype.php:1075
 msgid "Cannot delete templated host prototype."
-msgstr "テンプレートのホストのプロトタイプを削除できません"
+msgstr "テンプレートのホストのプロトタイプを削除できません。"
 
 #: include/classes/api/services/CItem.php:576
 msgid "Cannot delete templated item."
-msgstr "テンプレートのアイテムを削除できません"
+msgstr "テンプレートのアイテムを削除できません。"
 
 #: include/classes/api/services/CItemPrototype.php:726
 msgid "Cannot delete templated items"
@@ -1663,13 +1663,13 @@ msgstr "テンプレートのアイテムを削除できません"
 
 #: include/classes/api/services/CDiscoveryRule.php:360
 msgid "Cannot delete templated items."
-msgstr "テンプレートのアイテムを削除できません"
+msgstr "テンプレートのアイテムを削除できません。"
 
 #: include/classes/api/services/CTrigger.php:1795
 #: include/classes/api/services/CTriggerPrototype.php:606
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません"
+msgstr "テンプレートのトリガー\"%1$s:%2$s\"を削除できません。"
 
 #: include/classes/api/services/CHttpTest.php:354
 #, c-format
@@ -1831,7 +1831,7 @@ msgstr[0] "Webシナリオを有効にできません"
 
 #: scripts_exec.php:69
 msgid "Cannot execute script"
-msgstr ""
+msgstr "スクリプトを実行できません"
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
@@ -1874,7 +1874,7 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 #: include/items.inc.php:437
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に存在しません"
+msgstr "アイテムのキー\"%2$s\"のインターフェースは\"%1$s\"に存在しません。"
 
 #: include/classes/import/importers/CMapImporter.php:254
 #, c-format
@@ -1989,7 +1989,7 @@ msgstr "テンプレート表示名に空白は設定できません。"
 #: include/classes/api/services/CTriggerPrototype.php:770
 #, c-format
 msgid "Cannot implode expression \"%s\"."
-msgstr "条件式\"%s\"を展開できません"
+msgstr "条件式\"%s\"を展開できません。"
 
 #: include/classes/import/importers/CScreenImporter.php:78
 #, c-format
@@ -2019,7 +2019,7 @@ msgstr "トリガー条件式を追加できません"
 
 #: include/classes/api/services/CUser.php:758
 msgid "Cannot insert user media."
-msgstr "ユーザーメディアを追加できません"
+msgstr "ユーザーメディアを追加できません。"
 
 #: include/classes/api/services/CHost.php:987
 msgid "Cannot link template"
@@ -2048,7 +2048,7 @@ msgstr "テンプレート名を一括更新できません。"
 
 #: include/classes/api/services/CHost.php:835
 msgid "Cannot mass update visible host name."
-msgstr "ホストの表示名は一括更新できません。"
+msgstr "ホストの表示名を一括更新できません。"
 
 #: include/classes/api/services/CTemplate.php:947
 msgid "Cannot mass update visible template name."
@@ -2089,11 +2089,11 @@ msgstr "すべてのアイテムを削除できません。少なくとの1つ�
 
 #: include/classes/api/services/CUser.php:273
 msgid "Cannot rename guest user."
-msgstr "ゲストユーザーの名前は変更できません"
+msgstr "ゲストユーザーの名前は変更できません。"
 
 #: include/classes/api/services/CDRule.php:200
 msgid "Cannot save discovery rule without checks."
-msgstr "ディスカバリルールにはチェックの設定が必須です"
+msgstr "ディスカバリルールにはチェックの設定が必須です。"
 
 #: include/classes/server/CZabbixServer.php:191
 #, c-format
@@ -2119,7 +2119,7 @@ msgstr "アイテム\"%2$s\"に\"%1$s\"を設定できません。"
 #: include/classes/api/services/CTemplateScreen.php:629
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr ""
+msgstr "テンプレートスクリーン\"%2$s\"に\"%1$s\"を設定できません。"
 
 #: include/classes/api/services/CTrigger.php:532
 #, c-format
@@ -2179,7 +2179,7 @@ msgstr "グラフのプロトタイプのリンク削除と削除が行えませ
 
 #: include/classes/api/services/CHostGeneral.php:518
 msgid "Cannot unlink and clear graphs."
-msgstr "グラフのリンク削除と削除が行えません"
+msgstr "グラフのリンク削除と削除が行えません。"
 
 #: include/classes/api/services/CHostGeneral.php:393
 msgid "Cannot unlink and clear item prototypes"
@@ -2330,7 +2330,7 @@ msgstr "グループを更新できません"
 
 #: include/classes/api/services/CUserGroup.php:249
 msgid "Cannot update group."
-msgstr "グループを更新できません"
+msgstr "グループを更新できません。"
 
 #: include/classes/api/services/CHostGroup.php:878
 #: include/classes/api/services/CHostGroup.php:983
@@ -2461,7 +2461,7 @@ msgstr "ユーザーを更新できません"
 
 #: include/classes/api/services/CUser.php:838
 msgid "Cannot update user media."
-msgstr "ユーザーのメディアを更新できません"
+msgstr "ユーザーのメディアを更新できません。"
 
 #: profile.php:113 users.php:187
 msgid "Cannot update user. Both passwords must be equal."
@@ -2485,11 +2485,11 @@ msgstr "大文字小文字を区別"
 
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
-msgstr ""
+msgstr "正規表現に一致するすべてのSNMPトラップをキャッチする。正規表現が指定されない場合は、すべてのトラップをキャッチする。"
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
-msgstr ""
+msgstr "snmptrap[]アイテムでキャッチされていないすべてのSNMPトラップをキャッチする。"
 
 #: include/views/monitoring.screen.constructor.edit.php:706
 msgid "Center"
@@ -2556,7 +2556,7 @@ msgstr "すでに存在します。"
 #: include/classes/parsers/CTriggerExpression.php:467
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr "条件式の%1$s\"から始まる部分を確認してください。"
+msgstr "条件式の\"%1$s\"から始まる部分を確認してください。"
 
 #: include/classes/setup/CSetupWizard.php:37
 #: include/classes/setup/CSetupWizard.php:203
@@ -2596,6 +2596,7 @@ msgstr "指定されたポートでのTCP接続性チェック。接続できな
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
+"サーバーがICMP pingでアクセス可能かチェック。ICMP pingに失敗した場合は「0」を返し、ICMP pingに成功した場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:403
@@ -3097,12 +3098,12 @@ msgstr "ホストへの接続"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr ""
+msgstr "プロキシへの接続"
 
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr "マップ編集"
+msgstr "編集"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -4395,7 +4396,7 @@ msgstr "Discovered by"
 
 #: app/views/monitoring.discovery.view.php:38
 msgid "Discovered device"
-msgstr "ディスカバリされたホスト"
+msgstr "発見されたデバイス"
 
 #: events.php:276 include/menu.inc.php:103 include/menu.inc.php:229
 #: include/views/configuration.action.list.php:30
@@ -4624,7 +4625,7 @@ msgstr "マップのための\"name\"の値\"%1$s\"が重複しています。"
 #: include/classes/api/services/CScreen.php:774
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
-msgstr ""
+msgstr "スクリーンのための\"name\"の値\"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4689,7 +4690,7 @@ msgstr "マップ\"%2$s\"のためのユーザー内のuserid \"%1$s\"が重複�
 #: include/classes/api/services/CScreen.php:875
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のためのユーザー内のuserid \"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CMap.php:578
 #: include/classes/api/services/CMap.php:997
@@ -4701,7 +4702,7 @@ msgstr "マップ\"%2$s\"のためのユーザーグループ内のusrgrpid \"%1
 #: include/classes/api/services/CScreen.php:948
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のためのユーザーグループ内のusrgrpid \"%1$s\"が重複しています。"
 
 #: events.php:418 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4924,7 +4925,7 @@ msgstr "プンプレートスクリーンのスクリーンIDが空白です。"
 
 #: include/classes/api/services/CScreen.php:727
 msgid "Empty screen ID."
-msgstr ""
+msgstr "スクリーンIDが空白です。"
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5414,7 +5415,7 @@ msgstr "メディアタイプ\"%2$s\"のためのフィールド\"%1$s\"が設�
 #: include/classes/api/services/CScreen.php:588
 #, c-format
 msgid "Field \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のためのフィールド\"%1$s\"が設定されていません。"
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5687,7 +5688,7 @@ msgstr "Generated in %s sec"
 
 #: include/locales.inc.php:61
 msgid "Georgian (ka_GE)"
-msgstr ""
+msgstr "グルジア語 (ka_GE)"
 
 #: include/locales.inc.php:62
 msgid "German (de_DE)"
@@ -6992,7 +6993,7 @@ msgstr "マップ\"%2$s\"のユーザーグループ内の\"permission\"の値\"
 #: include/classes/api/services/CScreen.php:934
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のユーザーグループ内の\"permission\"の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CMap.php:489
 #: include/classes/api/services/CMap.php:910
@@ -7004,7 +7005,7 @@ msgstr "マップ\"%2$s\"のユーザー内の\"permission\"の値\"%1$s\"が正
 #: include/classes/api/services/CScreen.php:861
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のユーザー内の\"permission\"の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CMap.php:450
 #: include/classes/api/services/CMap.php:872
@@ -7016,7 +7017,7 @@ msgstr "マップ\"%2$s\"の\"private\"の値\"%1$s\"が正しくありません
 #: include/classes/api/services/CScreen.php:823
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"の\"private\"の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CService.php:1131
 #, c-format
@@ -7777,7 +7778,7 @@ msgstr "マップ\"%1$s\"の指定されたユーザーIDが正しくありま�
 #: include/classes/api/services/CScreen.php:896
 #, c-format
 msgid "Incorrect user ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "スクリーン\"%1$s\"の指定されたユーザーIDが正しくありません。"
 
 #: include/classes/api/services/CMap.php:595
 #: include/classes/api/services/CMap.php:1014
@@ -7789,7 +7790,7 @@ msgstr "マップ\"%1$s\"の指定されたユーザーグループIDが正し�
 #: include/classes/api/services/CScreen.php:965
 #, c-format
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "スクリーン\"%1$s\"の指定されたユーザーグループIDが正しくありません。"
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -10885,11 +10886,11 @@ msgstr "管理者だけがマップの所有者を設定できます。"
 #: include/classes/api/services/CScreen.php:477
 #: include/classes/api/services/CScreen.php:812
 msgid "Only administrators can set screen owner."
-msgstr ""
+msgstr "管理者だけがスクリーンの所有者を設定できます。"
 
 #: include/screens.inc.php:225 include/screens.inc.php:349
 msgid "Only administrators can set slide show owner."
-msgstr ""
+msgstr "管理者だけがスライドショーの所有者を設定できます。"
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11213,13 +11214,13 @@ msgstr "PHP mbstringモジュールが存在しません (PHPのconfigure時の�
 #: include/classes/setup/CFrontendSetup.php:635
 #, c-format
 msgid "PHP option \"%1$s\""
-msgstr ""
+msgstr "PHPの\"%1$s\"オプション"
 
 #: include/classes/setup/CFrontendSetup.php:374
 #: include/classes/setup/CFrontendSetup.php:639
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
-msgstr ""
+msgstr "PHPの\"%1$s\"オプションは\"%2$s\"に設定する必要があります"
 
 #: include/classes/setup/CFrontendSetup.php:584
 msgid "PHP session"
@@ -12567,7 +12568,7 @@ msgstr "スクリーン\"%1$s\"のセル X - %2$s Y - %3$s の列の幅が大き
 #: include/classes/api/services/CScreen.php:942
 #, c-format
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "スクリーン\"%1$s\"は公開および読込専用で共有することはできません。"
 
 #: include/classes/api/services/CScreenItem.php:822
 #, c-format
@@ -12593,12 +12594,12 @@ msgstr "スクリーンを削除しました"
 
 #: include/classes/api/services/CScreen.php:759
 msgid "Screen name cannot be empty."
-msgstr ""
+msgstr "スクリーンの名前は必須項目です。"
 
 #: include/classes/api/services/CScreen.php:473
 #: include/classes/api/services/CScreen.php:808
 msgid "Screen owner cannot be empty."
-msgstr ""
+msgstr "スクリーンの所有者は必須項目です。"
 
 #: screenedit.php:331 screenedit.php:371
 msgid "Screen should contain at least one row and column."
@@ -13032,7 +13033,7 @@ msgstr "マップ\"%2$s\"の共有オプション\"%1$s\"の値がありませ�
 #: include/classes/api/services/CScreen.php:924
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"の共有オプション\"%1$s\"の値がありません。"
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:695 tr_status.php:700
@@ -13210,7 +13211,7 @@ msgstr "スライドショー\"%1$s\"はすでに存在します。"
 #: include/screens.inc.php:366 include/screens.inc.php:374
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "スライドショー\"%1$s\"は公開および読込専用で共有することはできません。"
 
 #: include/screens.inc.php:212
 #, c-format
@@ -13231,7 +13232,7 @@ msgstr "スライドショーには必ずスライドを設定してください
 
 #: include/screens.inc.php:219 include/screens.inc.php:343
 msgid "Slide show owner cannot be empty."
-msgstr ""
+msgstr "スライドショーの所有者は必須項目です。"
 
 #: slideconf.php:133
 msgid "Slide show updated"
@@ -14917,7 +14918,7 @@ msgstr "更新"
 #: include/hosts.inc.php:554
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "ホスト\"%1$s\"のステータスを更新しました。"
 
 #: app/views/monitoring.widget.discovery.view.php:62
 #: app/views/monitoring.widget.hosts.view.php:370
@@ -15044,12 +15045,12 @@ msgstr "ユーザー\"%1$s\"はマップ\"%2$s\"の所有者です。"
 #: include/classes/api/services/CUser.php:570
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
-msgstr ""
+msgstr "ユーザー\"%1$s\"はスクリーン\"%2$s\"の所有者です。"
 
 #: include/classes/api/services/CUser.php:592
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
-msgstr ""
+msgstr "ユーザー\"%1$s\"はスライドショー\"%2$s\"の所有者です。"
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15150,7 +15151,7 @@ msgstr "マップ\"%2$s\"のユーザーグループでの共有にはパラメ�
 #: include/classes/api/services/CScreen.php:915
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のユーザーグループでの共有にはパラメータ:%1$s が必要です。"
 
 #: include/menu.inc.php:270
 #: include/views/administration.usergroups.edit.php:22
@@ -15228,7 +15229,7 @@ msgstr "マップ\"%2$s\"のユーザーでの共有にはパラメータ:%1$s �
 #: include/classes/api/services/CScreen.php:842
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%2$s\"のユーザーでの共有にはパラメータ:%1$s が必要です。"
 
 #: include/views/administration.users.edit.php:384
 #: include/views/administration.users.edit.php:388
