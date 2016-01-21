@@ -156,33 +156,48 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*os = NULL;
 	size_t	os_alloc = 0, os_offset = 0;
 	char	*sysname = "Windows";
-	char	*nodename_csname = NULL;
-	char	*release_version = NULL;
-	char	*version_caption = NULL;
-	char	*version_csdversion = NULL;
-	char	*machine_osarchitecture = NULL;
+	char	*os_csname = NULL;
+	char	*os_version = NULL;
+	char	*os_caption = NULL;
+	char	*os_csdversion = NULL;
+	char	*proc_architecture = NULL;
 	char	*wmi_namespace = "root\\cimv2";
+	char	*arch = "<unknown machine>";
 
-	zbx_wmi_get(wmi_namespace, "select CSName from Win32_OperatingSystem", &nodename_csname);
-	zbx_wmi_get(wmi_namespace, "select Version from Win32_OperatingSystem", &release_version);
-	zbx_wmi_get(wmi_namespace, "select Caption from Win32_OperatingSystem", &version_caption);
-	zbx_wmi_get(wmi_namespace, "select CSDVersion from Win32_OperatingSystem", &version_csdversion);
-	zbx_wmi_get(wmi_namespace, "select OSArchitecture from Win32_OperatingSystem", &machine_osarchitecture);
+	/* Emulates uname(2) (POSIX) since it is not provided natively by Windows by taking */
+	/* the relevant values from Win32_OperatingSystem and Win32_Processor WMI classes.  */
 
+	zbx_wmi_get(wmi_namespace, "select CSName from Win32_OperatingSystem", &os_csname);
+	zbx_wmi_get(wmi_namespace, "select Version from Win32_OperatingSystem", &os_version);
+	zbx_wmi_get(wmi_namespace, "select Caption from Win32_OperatingSystem", &os_caption);
+	zbx_wmi_get(wmi_namespace, "select CSDVersion from Win32_OperatingSystem", &os_csdversion);
+	zbx_wmi_get(wmi_namespace, "select Architecture from Win32_Processor", &proc_architecture);
+
+	if (NULL != proc_architecture)
+	{
+		switch (atoi(proc_architecture))
+		{
+			case 0: arch = "x86"; break;
+			case 6: arch = "ia64"; break;
+			case 9: arch = "x64"; break;
+		}
+	}
+
+	/* The comments indicate the relevant field in struct utsname (POSIX) that is used in uname(2). */
 	zbx_snprintf_alloc(&os, &os_alloc, &os_offset, "%s %s %s %s%s%s %s",
-		sysname,
-		nodename_csname ? nodename_csname : "<unknown nodename>",
-		release_version ? release_version : "<unknown release>",
-		version_caption ? version_caption : "<unknown version>",
-		version_csdversion ? " " : "",
-		version_csdversion ? version_csdversion : "",
-		machine_osarchitecture ? machine_osarchitecture : "32-bit");
+		sysname,						/* sysname */
+		os_csname ? os_csname : "<unknown nodename>",		/* nodename */
+		os_version ? os_version : "<unknown release>",		/* release */
+		os_caption ? os_caption : "<unknown version>",		/* version */
+		os_caption && os_csdversion ? " " : "",
+		os_caption && os_csdversion ? os_csdversion : "",	/* version (cont.) */
+		arch);							/* machine */
 
-	zbx_free(nodename_csname);
-	zbx_free(release_version);
-	zbx_free(version_caption);
-	zbx_free(version_csdversion);
-	zbx_free(machine_osarchitecture);
+	zbx_free(os_csname);
+	zbx_free(os_version);
+	zbx_free(os_caption);
+	zbx_free(os_csdversion);
+	zbx_free(proc_architecture);
 
 	SET_STR_RESULT(result, os);
 
