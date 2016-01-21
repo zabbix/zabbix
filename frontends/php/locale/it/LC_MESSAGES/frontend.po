@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-20 17:30+0200\n"
-"PO-Revision-Date: 2015-12-28 18:02+0300\n"
+"PO-Revision-Date: 2015-12-29 16:19+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451318569.0\n"
+"X-POOTLE-MTIME: 1451398758.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -2394,6 +2394,8 @@ msgstr "Impossibile aggiornare l'host"
 #: include/classes/api/services/CHost.php:803
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr ""
+"Impossibile aggiornare le impostazioni di crittografia dell'host. Occorre "
+"speificare le impostazioni di connesione per entrambe le direzioni (In/Out)."
 
 #: host_prototypes.php:193
 msgid "Cannot update host prototype"
@@ -2552,7 +2554,7 @@ msgstr "Centro"
 #: include/views/configuration.host.prototype.edit.php:354
 #: include/views/configuration.host.prototype.edit.php:363
 msgid "Certificate"
-msgstr ""
+msgstr "Certificato"
 
 #: include/classes/screens/CScreenBase.php:277
 #: include/classes/screens/CScreenBuilder.php:493
@@ -2778,7 +2780,7 @@ msgstr "Chiudi costruttore di espressioni"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
 msgid "Collapse"
-msgstr ""
+msgstr "Espandi"
 
 #: include/views/configuration.graph.edit.php:277
 #: include/views/js/monitoring.sysmaps.js.php:354
@@ -2843,7 +2845,7 @@ msgstr "Commerciale"
 
 #: include/classes/api/services/CAction.php:1843
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "Confronto con più trigger tramite operatore \"and\" non è consentito."
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -3125,23 +3127,23 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr ""
+msgstr "Connessioni"
 
 #: include/views/configuration.host.edit.php:773
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
-msgstr ""
+msgstr "Connessioni dall'host"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr ""
+msgstr "Connessioni dal proxy"
 
 #: include/views/configuration.host.edit.php:765
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
-msgstr ""
+msgstr "Connessioni verso l'host"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
@@ -3150,7 +3152,7 @@ msgstr ""
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr ""
+msgstr "Costruttore"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3444,7 +3446,7 @@ msgstr "Grafici personalizzati"
 #: include/views/configuration.item.massupdate.php:372
 #: include/views/configuration.item.prototype.edit.php:311
 msgid "Custom intervals"
-msgstr ""
+msgstr "Intervalli personalizzati"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -3754,7 +3756,7 @@ msgstr "Intervallo predefinito (in secondi)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Modalita' inventario host predefinito"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:670
@@ -3998,7 +4000,7 @@ msgstr "Rimuovere periodi di manutenzione selezionati?"
 
 #: include/views/monitoring.sysmap.edit.php:367
 msgid "Delete selected map?"
-msgstr ""
+msgstr "Cancellare la mappa selezionata?"
 
 #: include/views/monitoring.sysmap.list.php:75
 msgid "Delete selected maps?"
@@ -4061,7 +4063,7 @@ msgstr[1] "Rimuovere mappatura di valori selezionata? È utilizzata per %d item!
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "Cancellare la mappa valori selezionata?"
 
 #: include/views/configuration.httpconf.list.php:160
 msgid "Delete selected web scenarios?"
@@ -4595,7 +4597,7 @@ msgstr "Visualizzati %1$s di %2$s trovate"
 #: include/func.inc.php:1559
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "Visualizzati %1$s a %2$s di %3$s trovati"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4659,7 +4661,7 @@ msgstr "Ricorda selezionato \"%1$s\" nel menù a discesa."
 #: include/classes/api/services/CMediatype.php:451
 #, c-format
 msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr ""
+msgstr "Valore \"descrizione\" duplicato \"%1$s\" per il tipo di supporto."
 
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
@@ -4670,7 +4672,7 @@ msgstr "Duplica valore \"nome\" \"%1$s\" per l'applicazione prototipo in item pr
 #: include/classes/api/services/CMap.php:810
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "Valore \"nome\" duplicato \"%1$s\" per la mappa."
 
 #: include/classes/api/services/CScreen.php:445
 #: include/classes/api/services/CScreen.php:774
@@ -4682,7 +4684,7 @@ msgstr ""
 #: include/classes/api/services/CValueMap.php:437
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for value map."
-msgstr ""
+msgstr "Valore \"nome\" duplicato \"%1$s\" per la mappa valori."
 
 #: include/classes/api/services/CTrigger.php:1480
 #, c-format
@@ -4719,7 +4721,7 @@ msgstr "Host duplicato. Un host con lo stesso nome visibile \"%s\" esiste già n
 #: include/classes/api/services/CValueMap.php:524
 #, c-format
 msgid "Duplicate mapping value \"%1$s\" for value map \"%2$s\"."
-msgstr ""
+msgstr "Valore mappa duplicato \"%1$s\" per la mappa valori \"%2$s\"."
 
 #: include/profiles.inc.php:91
 #, c-format
@@ -4735,7 +4737,7 @@ msgstr "Alias utente duplicato \"%s\"."
 #: include/classes/api/services/CMap.php:924
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Userid duplicato \"%1$s\" sugli utenti per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:539
 #: include/classes/api/services/CScreen.php:875
@@ -4747,7 +4749,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:997
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Usrgrpid \"%1$s\" nel gurppo utenti per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:613
 #: include/classes/api/services/CScreen.php:948
@@ -4928,11 +4930,11 @@ msgstr "Input vuoto."
 
 #: include/classes/api/services/CMap.php:776
 msgid "Empty map ID."
-msgstr ""
+msgstr "ID mappa assente."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
-msgstr ""
+msgstr "ID tipo media assente."
 
 #: include/classes/api/services/CHostPrototype.php:222
 msgid "Empty name for group prototype."
@@ -4955,7 +4957,7 @@ msgstr "Nome vuoto."
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
 msgid "Empty new value in value map \"%1$s\"."
-msgstr ""
+msgstr "Nuovo valore nella mappa valori \"%1$s\" assente."
 
 #: include/classes/api/services/CImage.php:369
 msgid "Empty parameters"
@@ -4984,7 +4986,7 @@ msgstr "Periodo di tempo vuoto."
 
 #: include/classes/api/services/CValueMap.php:396
 msgid "Empty value map ID."
-msgstr ""
+msgstr "ID valore mappa assente."
 
 #: include/classes/api/services/CHttpTest.php:298
 msgid "Empty web scenario ID."
@@ -5138,7 +5140,7 @@ msgstr "Abilitato"
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:386
 msgid "Encryption"
-msgstr ""
+msgstr "Encryption"
 
 #: include/locales.inc.php:52
 msgid "English (en_GB)"
@@ -5181,11 +5183,10 @@ msgstr "L'ID evento dell'ultima voce nei log corrisponde all'espressione regolar
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
-msgstr[0] "Aggiunta acknowledge ad evento"
-msgstr[1] "Aggiunta acknowledge ad evento"
+msgstr[0] "Evento preso in carico"
+msgstr[1] "Eventi presi in carico"
 
 #: include/profiles.inc.php:162
 #, c-format
@@ -5281,7 +5282,7 @@ msgstr "Conferma esecuzione"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:170
 msgid "Expand"
-msgstr ""
+msgstr "Espandi"
 
 #: include/views/monitoring.sysmap.constructor.php:40
 msgid "Expand macros"
@@ -5456,14 +5457,14 @@ msgstr "Il campo \"%1$s\" è obbligatorio."
 #: include/classes/api/services/CMap.php:553
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "Campo \"%1$s\" non ha un valore per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:475
 #: include/classes/api/services/CMediatype.php:808
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
-msgstr ""
+msgstr "Campo \"%1$s\" non ha un valore per il tipo media \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:588
 #, c-format
@@ -5488,7 +5489,7 @@ msgstr "Il campo \"%1$s\" non è una stringa."
 #: include/classes/api/services/CMediatype.php:802
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
-msgstr ""
+msgstr "Campo \"%1$s\" è richiesto per il tipo media \"%2$s\"."
 
 #: include/validate.inc.php:289
 #, c-format
@@ -5606,7 +5607,7 @@ msgstr "Primo"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
-msgstr ""
+msgstr "Adatta"
 
 #: include/views/js/monitoring.sysmaps.js.php:35
 msgid "Fit to map"
@@ -5624,7 +5625,7 @@ msgstr "Fisso"
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
-msgstr ""
+msgstr "Flessibile"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -5636,19 +5637,19 @@ msgstr "Per l'account guest, la password deve essere vuota"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "Previsioni per i prossimi t secondi basati nel periodo T è < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "Previsioni per i prossimi t secondi basati nel periodo T è = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "Previsioni per i prossimi t secondi basati nel periodo T è > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "Previsioni per i prossimi t secondi basati nel periodo T NON è N"
 
 #: include/items.inc.php:1310 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -5741,7 +5742,7 @@ msgstr "Generato in %s sec"
 
 #: include/locales.inc.php:61
 msgid "Georgian (ka_GE)"
-msgstr ""
+msgstr "Georgian (ka_GE)"
 
 #: include/locales.inc.php:62
 msgid "German (de_DE)"
@@ -7025,7 +7026,7 @@ msgstr "In corso"
 #: include/views/monitoring.sysmap.edit.php:87
 #: include/views/monitoring.sysmap.edit.php:92
 msgid "Inaccessible user"
-msgstr ""
+msgstr "Utente inaccessibile"
 
 #: tr_logform.php:275 tr_logform.php:308
 msgid "Include"
@@ -7040,13 +7041,13 @@ msgstr "Statistiche di traffico in ingresso sull'interfaccia di rete. Restituice
 #: include/classes/api/services/CMap.php:866
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Valore \"altezza\" non corretto per la mappa \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:563
 #: include/classes/api/services/CMap.php:983
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Valore \"permesso\" errato \"%1$s\" nei gruppi utenti per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:598
 #: include/classes/api/services/CScreen.php:934
@@ -7058,7 +7059,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:910
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Valore \"permesso\" errato \"%1$s\" negli utenti per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:524
 #: include/classes/api/services/CScreen.php:861
@@ -7070,7 +7071,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:872
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Valore \"private\" errato \"%1$s\" per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:485
 #: include/classes/api/services/CScreen.php:823
@@ -7087,7 +7088,7 @@ msgstr "Valore errato nel campo \"soft\" per la dipendenza del servizio \"%1$s\"
 #: include/classes/api/services/CMap.php:860
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Valore \"larghezza\" errato per la mappa \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:636
 #: include/classes/api/services/CMap.php:643
@@ -7503,7 +7504,7 @@ msgstr "Campo inventario \"%s\" errato."
 
 #: include/classes/api/services/CAction.php:1462
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "Modalita' di inventario non corretta nell'operazione dell'azione."
 
 #: include/classes/api/services/CScreenItem.php:727
 #, c-format
@@ -7576,7 +7577,7 @@ msgstr "ID mappa \"%1$s\" non corretto per elemento schermata."
 
 #: include/classes/api/services/CMap.php:777
 msgid "Incorrect map ID."
-msgstr ""
+msgstr "ID mappa errato."
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
@@ -7584,7 +7585,7 @@ msgstr "Valore max colonne errato per l'elemento dello schermata."
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
-msgstr ""
+msgstr "ID tipo media errato."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7831,7 +7832,7 @@ msgstr "Tipo non corretto di calcolo per la regola di discovery \"%1$s\"."
 #: include/classes/api/services/CMap.php:945
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "ID utente specificato errato per la mappa \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:560
 #: include/classes/api/services/CScreen.php:896
@@ -7843,7 +7844,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:1014
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "ID gruppo utente specificato errato per la mappa \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:630
 #: include/classes/api/services/CScreen.php:965
@@ -7906,7 +7907,7 @@ msgstr "Valore \"%1$s\" errato per il campo int senza segno \"%2$s\"."
 #: include/classes/api/services/CMediatype.php:783
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "Valore errato \"%1$s\" nel campo \"%2$s\" per il tipo media \"%3$s\"."
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:418
@@ -7914,7 +7915,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "Valore errato per il campo \"%1$s\": %2$s."
 
 #: include/validate.inc.php:319
 #, c-format
@@ -7923,28 +7924,30 @@ msgstr "Valore errato per il campo \"%1$s\": non può esser vuoto."
 
 #: include/classes/api/services/CValueMap.php:397
 msgid "Incorrect value map ID."
-msgstr ""
+msgstr "Valore errato per ID mappa"
 
 #: include/classes/api/services/CHost.php:1558
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr ""
+"Valore utilizzato non corretto per il campo PSK. Deve essere composto da un "
+"numero pari di caratteri esadecimali."
 
 #: include/classes/api/services/CHost.php:1541
 msgid "Incorrect value used for connections from host field."
-msgstr ""
+msgstr "Valore utilizzato non corretto per le connessioni nel campo host."
 
 #: include/classes/api/services/CProxy.php:651
 msgid "Incorrect value used for connections from proxy field."
-msgstr ""
+msgstr "Valore utilizzato non corretto per le connessioni nel campo proxy."
 
 #: include/classes/api/services/CHost.php:1537
 msgid "Incorrect value used for connections to host field."
-msgstr ""
+msgstr "Valore utilizzato non corretto per le connessioni verso il campo host."
 
 #: include/classes/api/services/CProxy.php:646
 msgid "Incorrect value used for connections to proxy field."
-msgstr ""
+msgstr "Valore utilizzato non corretto per le connessioni verso il campo proxy."
 
 #: include/classes/api/services/CProxy.php:720
 #: include/classes/api/services/CProxy.php:818
@@ -7995,7 +7998,7 @@ msgstr "Eredita host macro"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and template macros"
-msgstr ""
+msgstr "Ereditato e macro template"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -8158,6 +8161,8 @@ msgstr "Primo parametro errato."
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
 msgstr ""
+"Ritardo intervallo flessibile invalido: \"%1$s\" è superiore al massimo "
+"ritardo di \"%2$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8250,11 +8255,15 @@ msgstr ""
 #, c-format
 msgid "Invalid interval \"%1$s\": starting minute must be less or equal to ending minute."
 msgstr ""
+"Intervallo non valido \"%1$s\": il minuto di partenza deve essere inferiore o "
+"uguale al minuto di fine."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:151
 #, c-format
 msgid "Invalid interval \"%1$s\": starting month day must be less or equal to ending month day."
 msgstr ""
+"Intervallo non valido \"%1$s\": il giorno del mese di partenza deve essere "
+"inferiore o uguale al giorno del mese finale."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:432
 #, c-format
