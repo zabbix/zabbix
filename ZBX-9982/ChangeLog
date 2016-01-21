@@ -1,16 +1,34 @@
-Changes for 3.0.0alpha7
+Changes for 3.0.0beta2
 
 New features:
+
+Bug fixes:
+..F....... [ZBX-9969] fixed triggers, graphs and screens access from maps (Vitalijs)
+.........T [ZBX-9730] removed unused value map template "Host status" and added new - "Host availability" (viktors)
+A.F....... [ZBX-10230] fixed and improved translatable strings (zalex_ua)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0beta1
+
+New features:
+..F.I..... [ZBXNEXT-3082] implemented support of public and private slide shows with ability to share them with other users and user groups (Oleg)
+..F....... [ZBXNEXT-3080] implemented action menu closing only when clicking outside of it (Gunars)
 ........S. [ZBXNEXT-3051] implemented action and action condition caching (wiper)
 ..F....... [ZBXNEXT-2662] implemented displaying of maps using graph_themes (Pavel, Sasha)
-.......PS. [ZBX-10266] fixed uninitialized variable in VMware code reported by Coverity (CIDs 118958, 118960, 118962, 118965) (dimir)
 ...GI..PS. [ZBX-10102] added support for log file meta information update for items with value type other than log (dimir)
 ..F....... [ZBXNEXT-2662] moved "sid" parameter into POST method for links with actions (Sasha)
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
+..F....... [ZBX-9500] fixed elements sorting in configuration export (Gunars, Sasha)
+..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
+.......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
+..F....... [ZBX-10019] fixed graphs time interval selection (Gunars)
+A......... [ZBX-10226] fixed trigger prototype updateReal API method (Gunars)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+.......PS. [ZBX-10266] fixed uninitialized variable in VMware code reported by Coverity (CIDs 118958, 118960, 118962, 118965) (dimir)
 ...G...PS. [ZBX-10239] fixed agent collector crashes on Linux while gathering data for proc.cpu.util[], fixed unsafe use of stack in logging functions (Sandis)
 A.F....... [ZBX-10182] fixed API to disallow update of templated host graphs and disabled form fields for templated host graph update (Vitalijs)
 ........S. [ZBX-10194] fixed server attempts to insert duplicate entries during LLD on ARM 32 bit processors (gleb)
@@ -358,6 +376,9 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
+.......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
@@ -1089,6 +1110,8 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
@@ -2438,6 +2461,7 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
