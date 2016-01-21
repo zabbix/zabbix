@@ -252,8 +252,6 @@ static int	process_proxy(void)
 
 		if (proxy.proxy_data_nextcheck <= now)
 		{
-			zbx_free(answer);
-
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer))
 			{
@@ -275,8 +273,6 @@ static int	process_proxy(void)
 			else
 				goto network_error;
 retry_history:
-			zbx_free(answer);
-
 			if (SUCCEED == get_data_from_proxy(&proxy, ZBX_PROTO_VALUE_HISTORY_DATA, &answer))
 			{
 				if ('\0' == *answer)
@@ -304,8 +300,6 @@ retry_history:
 			else
 				goto network_error;
 retry_dhistory:
-			zbx_free(answer);
-
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer))
 			{
@@ -333,8 +327,6 @@ retry_dhistory:
 			else
 				goto network_error;
 retry_autoreg_host:
-			zbx_free(answer);
-
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer))
 			{
