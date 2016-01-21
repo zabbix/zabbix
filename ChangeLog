@@ -3,6 +3,7 @@ Changes for 3.0.0beta2
 New features:
 
 Bug fixes:
+..F....... [ZBX-9969] fixed triggers, graphs and screens access from maps (Vitalijs)
 .........T [ZBX-9730] removed unused value map template "Host status" and added new - "Host availability" (viktors)
 A.F....... [ZBX-10230] fixed and improved translatable strings (zalex_ua)
 
