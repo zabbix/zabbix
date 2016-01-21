@@ -130,7 +130,7 @@ if ($csvExport) {
 	if (hasRequest('stime')) {
 		$stime = getRequest('stime');
 
-		if ($stime + $period > time()) {
+		if ($stime + $period > date(TIMESTAMP_FORMAT, time())) {
 			$stime = date(TIMESTAMP_FORMAT, time() - $period);
 		}
 	}
