@@ -2610,6 +2610,8 @@ int	process_dhis_data(struct zbx_json_parse *jp)
 		}
 
 		DBcommit();
+
+		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
 	}
