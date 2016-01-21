@@ -137,11 +137,13 @@
 		function addDraggable(domElement) {
 			var dragInterfaceType,
 				interfaceid = domElement.data('interfaceid');
+			jQuery('div.<?= ZBX_STYLE_DRAG_ICON ?>', domElement).on('mousedown', function() {
+				jQuery('input', domElement).blur();
+			});
 			domElement.draggable({
 				helper: function() {
 					var row = jQuery(this).clone();
-					jQuery('#interfaces_' + interfaceid + '_useip_0, #interfaces_' + interfaceid + '_useip_1', row)
-						.attr('name', '');
+					jQuery('input', row).removeAttr('name');
 
 					return row;
 				},
