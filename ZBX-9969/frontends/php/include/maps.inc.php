@@ -67,7 +67,7 @@ function sysmapElementLabel($label = null) {
  *
  * @param array $sysmap
  * @param array $options
- * @param int	$options['severoty_min']
+ * @param int	$options['severity_min']
  *
  * @return CAreaMap
  */
@@ -120,11 +120,11 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 	]);
 
 	$monitored_triggers_hosts = API::Host()->get([
-		'hostids' => $hostIds,
 		'output' => ['hostid'],
-		'nopermissions' => true,
+		'hostids' => $hostIds,
+		'with_monitored_triggers' => true,
 		'preservekeys' => true,
-		'with_monitored_triggers' => true
+		'nopermissions' => true
 	]);
 
 	$triggers = API::Trigger()->get([
@@ -136,11 +136,11 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 	]);
 
 	$host_groups = API::HostGroup()->get([
+		'output' => ['groupid'],
 		'groupids' => $host_groupids,
-		'output' => ['status'],
-		'nopermissions' => true,
+		'with_monitored_triggers' => true,
 		'preservekeys' => true,
-		'with_monitored_triggers' => true
+		'nopermissions' => true
 	]);
 
 	// Find monitored hosts and get groups that those hosts belong to.
