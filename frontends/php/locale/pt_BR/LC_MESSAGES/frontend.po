@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-20 17:30+0200\n"
-"PO-Revision-Date: 2015-12-28 11:48+0300\n"
+"PO-Revision-Date: 2016-01-21 02:25+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451296104.0\n"
+"X-POOTLE-MTIME: 1453335911.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -671,11 +671,11 @@ msgstr "Todos os mapas"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr ""
+msgstr "Todas as telas"
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr ""
+msgstr "Todas as apresentações de telas"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1878,7 +1878,7 @@ msgstr[1] "Não foi possível ativar os cenários web"
 
 #: scripts_exec.php:69
 msgid "Cannot execute script"
-msgstr ""
+msgstr "Não foi possível executar o script"
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
@@ -2168,7 +2168,7 @@ msgstr "Não é possível configurar \"%1$s\" para o item \"%2$s\"."
 #: include/classes/api/services/CTemplateScreen.php:629
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr ""
+msgstr "Não foi possível definir \"%1$s\" para o template de tela \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:532
 #, c-format
@@ -2535,10 +2535,14 @@ msgstr "Distinguir maiúscula/minúscula"
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr ""
+"Captura todas as traps SNMP que combinem com a expressão regular. Se a "
+"expressão não for definida irá capturar todas as traps."
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
+"Captura todas as traps SNMP que não tiverem sido recebidas por nenhum item "
+"de snmptrap[]."
 
 #: include/views/monitoring.screen.constructor.edit.php:706
 msgid "Center"
@@ -2645,6 +2649,8 @@ msgstr "Verifica se é possível estabelecer uma conexão TCP com a porta especi
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
+"Verifica se o servidor está acessível através de ICMP ping. 0 - o ping ICMP "
+"falhou. 1 - o ping ICMP funcionou."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:403
@@ -3145,7 +3151,7 @@ msgstr "Conexões com o host (passivas)"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr ""
+msgstr "Conexões com o proxy"
 
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
@@ -4678,7 +4684,7 @@ msgstr "O valor informado para o \"nome\" do mapa \"%1$s\" está duplicado."
 #: include/classes/api/services/CScreen.php:774
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
-msgstr ""
+msgstr "O valor do nome \"%1$s\" está duplicado na tela."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4743,7 +4749,7 @@ msgstr "O userid \"%1$s\" está duplicado nos usuários do mapa \"%2$s\"."
 #: include/classes/api/services/CScreen.php:875
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "O userid \"%1$s\" está duplicado nos usuários da tela \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:578
 #: include/classes/api/services/CMap.php:997
@@ -4755,7 +4761,7 @@ msgstr "O usrgrpid \"%1$s\" está duplicado nos grupos de usuários do mapa \"%2
 #: include/classes/api/services/CScreen.php:948
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "O usrgrpid \"%1$s\" está duplicado nos grupos de usuários da tela \"%2$s\"."
 
 #: events.php:418 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4978,7 +4984,7 @@ msgstr "Não foi informado o ID do template de tela."
 
 #: include/classes/api/services/CScreen.php:727
 msgid "Empty screen ID."
-msgstr ""
+msgstr "ID de tela ausente."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5469,7 +5475,7 @@ msgstr "O campo \"%1$s\" está ausente para um valor do tipo de mídia \"%2$s\".
 #: include/classes/api/services/CScreen.php:588
 #, c-format
 msgid "Field \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "O campo \"%1$s\" está com valor ausente na tela \"%2$s\"."
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5742,7 +5748,7 @@ msgstr "Gerado em %s segundos"
 
 #: include/locales.inc.php:61
 msgid "Georgian (ka_GE)"
-msgstr ""
+msgstr "Gregoriano (ka_GE)"
 
 #: include/locales.inc.php:62
 msgid "German (de_DE)"
@@ -7054,6 +7060,8 @@ msgstr "Valor incorreto para a \"permissão\" \"%1$s\" nos grupos de usuários d
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
+"O valor da permissão \"%1$s\" nos grupos de usuários da tela \"%2$s\" está "
+"incorreto."
 
 #: include/classes/api/services/CMap.php:489
 #: include/classes/api/services/CMap.php:910
@@ -7065,7 +7073,7 @@ msgstr "Valor incorreto para a \"permissão\" \"%1$s\" nos usuários do mapa \"%
 #: include/classes/api/services/CScreen.php:861
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "O valor da permissão \"%1$s\" nos usuários da tela \"%2$s\" está incorreto."
 
 #: include/classes/api/services/CMap.php:450
 #: include/classes/api/services/CMap.php:872
@@ -7077,7 +7085,7 @@ msgstr "Valor incorreto para o campo \"private\" \"%1$s\" no mapa \"%2$s\"."
 #: include/classes/api/services/CScreen.php:823
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
-msgstr ""
+msgstr "Valor \"privado\" inválido \"%1$s\" na tela \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1131
 #, c-format
@@ -7839,7 +7847,7 @@ msgstr "Foi informado um ID de usuário inválido para o mapa \"%1$s\"."
 #: include/classes/api/services/CScreen.php:896
 #, c-format
 msgid "Incorrect user ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "ID de usuário inválido especificado para a tela \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:595
 #: include/classes/api/services/CMap.php:1014
@@ -7851,7 +7859,7 @@ msgstr "O ID de grupo de usuários informado para o mapa \"%1$s\" é inválido."
 #: include/classes/api/services/CScreen.php:965
 #, c-format
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "Foi informado um ID de grupo de usuário inválido para a tela \"%1$s\"."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -10969,11 +10977,13 @@ msgstr "Apenas administradores podem definir o proprietário de um mapa."
 #: include/classes/api/services/CScreen.php:477
 #: include/classes/api/services/CScreen.php:812
 msgid "Only administrators can set screen owner."
-msgstr ""
+msgstr "Apenas administradores podem definir o proprietário da tela."
 
 #: include/screens.inc.php:225 include/screens.inc.php:349
 msgid "Only administrators can set slide show owner."
 msgstr ""
+"Apenas administradores podem definir o proprietário da apresentação de "
+"telas."
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11298,13 +11308,13 @@ msgstr "A extensão PHP mbstring está ausente (parâmetro de configuração do 
 #: include/classes/setup/CFrontendSetup.php:635
 #, c-format
 msgid "PHP option \"%1$s\""
-msgstr ""
+msgstr "Opção do PHP \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:374
 #: include/classes/setup/CFrontendSetup.php:639
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
-msgstr ""
+msgstr "A opção do PHP \"%1$s\" precisa ser definida para \"%2$s\""
 
 #: include/classes/setup/CFrontendSetup.php:584
 msgid "PHP session"
@@ -12657,6 +12667,8 @@ msgstr "Na tela \"%1$s\" extensão de coluna X - %2$s Y - %3$s é muito grande."
 #, c-format
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"A tela \"%1$s\" é pública e o compartilhamento de apenas leitura não é "
+"permitido."
 
 #: include/classes/api/services/CScreenItem.php:822
 #, c-format
@@ -12682,12 +12694,12 @@ msgstr "A tela foi excluída"
 
 #: include/classes/api/services/CScreen.php:759
 msgid "Screen name cannot be empty."
-msgstr ""
+msgstr "O nome da tela não pode estar vazio."
 
 #: include/classes/api/services/CScreen.php:473
 #: include/classes/api/services/CScreen.php:808
 msgid "Screen owner cannot be empty."
-msgstr ""
+msgstr "O proprietário da tela não pode estar vazio."
 
 #: screenedit.php:331 screenedit.php:371
 msgid "Screen should contain at least one row and column."
@@ -13122,7 +13134,7 @@ msgstr "A opção de compartilhamento \"%1$s\" tem valor ausente no mapa \"%2$s\
 #: include/classes/api/services/CScreen.php:924
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "A opção de compartilhamento \"%1$s\" tem um valor ausente na tela \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:695 tr_status.php:700
@@ -13305,6 +13317,8 @@ msgstr "A apresentação de telas \"%1$s\" já existe."
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"A apresentação de telas \"%1$s\" é pública e o compartilhamento de apenas "
+"leitura não é permitido."
 
 #: include/screens.inc.php:212
 #, c-format
@@ -13325,7 +13339,7 @@ msgstr "Uma apresentação de telas precisa conter telas."
 
 #: include/screens.inc.php:219 include/screens.inc.php:343
 msgid "Slide show owner cannot be empty."
-msgstr ""
+msgstr "A apresentação de telas não pode estar vazia."
 
 #: slideconf.php:133
 msgid "Slide show updated"
@@ -15020,7 +15034,7 @@ msgstr "Atualizado"
 #: include/hosts.inc.php:554
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "O status do host \"%1$s\" foi atualizado."
 
 #: app/views/monitoring.widget.discovery.view.php:62
 #: app/views/monitoring.widget.hosts.view.php:370
@@ -15147,12 +15161,12 @@ msgstr "O usuário \"%1$s\" é o proprietário do mapa \"%2$s\"."
 #: include/classes/api/services/CUser.php:570
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
-msgstr ""
+msgstr "O usuário \"%1$s\" é o proprietário da tela \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:592
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
-msgstr ""
+msgstr "O usuário \"%1$s\" é o proprietário da apresentação de telas \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15251,11 +15265,17 @@ msgstr "Grupo para mensagens sobre incidentes com o banco de dados \"%1$s\"."
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "O grupo de usuários compartilhado possui parâmetros ausentes: %1$s no mapa \"%2$s\"."
 
+# Oleksiy:
+# The original message is not beter like (double quotes on first parameter):
+# User group sharing is missing parameters: "%1$s" for screen "%2$s". 
+# ?
 #: include/classes/api/services/CScreen.php:579
 #: include/classes/api/services/CScreen.php:915
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
+"O compartilhamento de grupos de usuários tem parâmetros ausentes: \"%1$s\" "
+"para a tela \"%2$s\"."
 
 #: include/menu.inc.php:270
 #: include/views/administration.usergroups.edit.php:22
@@ -15333,7 +15353,7 @@ msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s no mapa \"%2$s
 #: include/classes/api/services/CScreen.php:842
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "Compartilhamento de usuário com parâmetro ausente: %1$s na tela \"%2$s\"."
 
 #: include/views/administration.users.edit.php:384
 #: include/views/administration.users.edit.php:388

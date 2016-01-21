@@ -3,17 +3,18 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-01-20 17:30+0200\n"
-"PO-Revision-Date: 2015-09-24 09:46+0300\n"
-"Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
+"PO-Revision-Date: 2016-01-13 16:34+0300\n"
+"Last-Translator: refaston <refaston@o2.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1443080767.0\n"
+"X-POOTLE-MTIME: 1452695653.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -375,11 +376,11 @@ msgstr[2] "Wyłączono akcje"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Wyłączono akcję ze względu na usunięcie grupy użytkownika."
 
 #: include/classes/api/services/CUser.php:1434
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Wyłączono akcję ze względu na usunięcie użytkownika."
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -616,7 +617,7 @@ msgstr "Sprawdzenie dostępności agenta. Nic nie zwróciło - niedostępny, 1 -
 
 #: include/views/configuration.host.list.php:69
 msgid "Agent encryption"
-msgstr ""
+msgstr "Szyfrowanie agenta"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -679,7 +680,7 @@ msgstr "Wszystkie połączenia powinny mieć określone pola \"Name\" i \"URL\""
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "Wszystkie mapy"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -892,6 +893,7 @@ msgstr "Przynajmniej jeden okres utrzymania musi być utworzony."
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
 msgstr ""
+"Przynajmniej jedno mapowanie powinno być podane dla mapy wartości \"%1$s\"."
 
 #: include/classes/setup/CFrontendSetup.php:251
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1145,7 +1147,7 @@ msgstr "Wg szablonu wyzwalacza"
 #: include/views/configuration.host.list.php:217
 #: include/views/configuration.host.list.php:220
 msgid "CERT"
-msgstr ""
+msgstr "CERTYFIKAT"
 
 #: triggers.php:388
 msgid "CONFIGURATION OF TRIGGERS"
@@ -2442,6 +2444,8 @@ msgstr "Nie można zaktualizować hosta"
 #: include/classes/api/services/CHost.php:803
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr ""
+"Nie można zaktualizować ustawień szyfrowania hosta. Należy określić "
+"ustawienia połączeń w obu kierunkach."
 
 #: host_prototypes.php:193
 msgid "Cannot update host prototype"
@@ -2600,7 +2604,7 @@ msgstr "W środku"
 #: include/views/configuration.host.prototype.edit.php:354
 #: include/views/configuration.host.prototype.edit.php:363
 msgid "Certificate"
-msgstr ""
+msgstr "Certyfikat"
 
 #: include/classes/screens/CScreenBase.php:277
 #: include/classes/screens/CScreenBuilder.php:493
@@ -2891,7 +2895,7 @@ msgstr "Komercyjne"
 
 #: include/classes/api/services/CAction.php:1843
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "Porównywanie kilku wyzwalaczy przy pomocy \"i\" jest niedozwolone."
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -3173,23 +3177,23 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr ""
+msgstr "Połączenia"
 
 #: include/views/configuration.host.edit.php:773
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
-msgstr ""
+msgstr "Połączenia z hosta"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr ""
+msgstr "Połączenia z proxy"
 
 #: include/views/configuration.host.edit.php:765
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
-msgstr ""
+msgstr "Połączenia do hosta"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
@@ -3198,7 +3202,7 @@ msgstr ""
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr ""
+msgstr "Konstruktor"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3493,7 +3497,7 @@ msgstr "Wykresy własne"
 #: include/views/configuration.item.massupdate.php:372
 #: include/views/configuration.item.prototype.edit.php:311
 msgid "Custom intervals"
-msgstr ""
+msgstr "Okresy użytkownika"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -4047,7 +4051,7 @@ msgstr "Usunąć wybrane okresy utrzymania?"
 
 #: include/views/monitoring.sysmap.edit.php:367
 msgid "Delete selected map?"
-msgstr ""
+msgstr "Usunąć wybraną mapę?"
 
 #: include/views/monitoring.sysmap.list.php:75
 msgid "Delete selected maps?"
@@ -4111,7 +4115,7 @@ msgstr[2] "Usunąć wybrane mapowanie wartości? Jest wykorzystywane przez %d po
 
 #: include/views/administration.general.valuemapping.list.php:69
 msgid "Delete selected value maps?"
-msgstr ""
+msgstr "Usunąć wybraną mapę wartości?"
 
 #: include/views/configuration.httpconf.list.php:160
 msgid "Delete selected web scenarios?"
@@ -4620,6 +4624,8 @@ msgstr "Statystyki odczytu dysku. Zwraca liczbę całkowitą dla typów sectors,
 #: include/classes/items/CHelpItems.php:591
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
+"Przestrzeń dyskowa w bajtach lub procentach ogólnej przestrzeni. Zwraca "
+"liczbę całkowitą dla bajtów; liczbę zmiennoprzecinkową dla procentów"
 
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:551
@@ -4647,7 +4653,7 @@ msgstr "Wyświetlanie %1$s z %2$s znalezionych"
 #: include/func.inc.php:1559
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "Wyświetlone od %1$s do %2$s z %3$s znalezionych"
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4678,7 +4684,7 @@ msgstr "Nie działa"
 
 #: include/classes/setup/CSetupWizard.php:387
 msgid "Download the configuration file"
-msgstr ""
+msgstr "Pobranie pliku konfiguracyjnego"
 
 #: app/views/monitoring.discovery.view.php:40
 #: app/views/monitoring.discovery.view.php:171
@@ -4897,7 +4903,7 @@ msgstr "Pusty warunek akcji."
 #: include/classes/api/services/CItemPrototype.php:300
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
-msgstr ""
+msgstr "Pusta nazwa prototypu aplikacji w prototypie pozycji \"%1$s\"."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
@@ -4980,7 +4986,7 @@ msgstr "Puste wejście."
 
 #: include/classes/api/services/CMap.php:776
 msgid "Empty map ID."
-msgstr ""
+msgstr "Puste ID mapy."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
@@ -5190,7 +5196,7 @@ msgstr "Włączony"
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:386
 msgid "Encryption"
-msgstr ""
+msgstr "Szyfrowanie"
 
 #: include/locales.inc.php:52
 msgid "English (en_GB)"
@@ -5333,7 +5339,7 @@ msgstr "Potwierdzenie wykonania"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:170
 msgid "Expand"
-msgstr ""
+msgstr "Rozwiń"
 
 #: include/views/monitoring.sysmap.constructor.php:40
 msgid "Expand macros"
