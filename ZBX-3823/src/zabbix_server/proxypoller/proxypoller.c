@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,15 +229,14 @@ static int	process_proxy(void)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\","
 						" datalen " ZBX_FS_SIZE_T,
-						proxy.host, get_ip_by_socket(&s), (zbx_fs_size_t)j.buffer_size);
+						proxy.host, s.peer, (zbx_fs_size_t)j.buffer_size);
 
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
 				{
 					if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
-								" \"%s\" at \"%s\": %s",
-								proxy.host, get_ip_by_socket(&s), error);
+								" \"%s\" at \"%s\": %s", proxy.host, s.peer, error);
 					}
 
 					zbx_free(error);
@@ -284,7 +283,7 @@ retry_history:
 				}
 
 				if (SUCCEED != zbx_json_open(answer, &jp) ||
-						SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, NULL, 0))
+						SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, NULL))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 							" history data", proxy.host, proxy.addr);

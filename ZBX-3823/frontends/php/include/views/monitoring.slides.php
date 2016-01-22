@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,24 @@
 **/
 
 
-$slideshowWidget = (new CWidget())->setTitle(_('Slide shows'));
+$widget = (new CWidget())
+	->setTitle(_('Slide shows'))
+	->addItem((new CList())
+	->addClass(ZBX_STYLE_OBJECT_GROUP)
+	->addItem([
+		(new CSpan())->addItem(new CLink(_('All slide shows'), 'slideconf.php')),
+		'/',
+		(new CSpan())
+			->addClass(ZBX_STYLE_SELECTED)
+			->addItem(
+				new CLink($data['screen']['name'], 'slides.php?elementid='.$data['screen']['slideshowid'].
+					'&fullscreen='.$data['fullscreen']
+				)
+			)
+	]));
 
-// create header form
-$slideHeaderForm = (new CForm('get'))
+// Create header form.
+$header = (new CForm('get'))
 	->setName('slideHeaderForm');
 
 $controls = new CList();
@@ -33,81 +47,48 @@ $controls->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[
 	]
 ));
 
-if ($this->data['slideshows']) {
-	$favouriteIcon = $this->data['screen']
-		? get_icon('favourite', [
-			'fav' => 'web.favorite.screenids',
-			'elname' => 'slideshowid',
-			'elid' => $this->data['elementId']
-		])
-		: (new CIcon(_('Favourites')))->addClass('iconplus');
+$favourite_icon = $this->data['screen']
+	? get_icon('favourite', [
+		'fav' => 'web.favorite.screenids',
+		'elname' => 'slideshowid',
+		'elid' => $this->data['elementId']
+	])
+	: (new CIcon(_('Favourites')))->addClass('iconplus');
 
-	$refreshIcon = get_icon('screenconf');
+$refresh_icon = get_icon('screenconf');
 
-	if ($this->data['screen']) {
-		$refreshIcon->setMenuPopup(CMenuPopupHelper::getRefresh(
-			WIDGET_SLIDESHOW,
-			'x'.$this->data['refreshMultiplier'],
-			true,
-			[
-				'elementid' => $this->data['elementId']
-			]
-		));
-	}
-
-	$slideHeaderForm->addVar('fullscreen', $this->data['fullscreen']);
-
-	$slideshowsComboBox = new CComboBox('elementid', $this->data['elementId'], 'submit()');
-	foreach ($this->data['slideshows'] as $slideshow) {
-		$slideshowsComboBox->addItem($slideshow['slideshowid'], $slideshow['name']);
-	}
-	$controls->addItem([_('Slide show').SPACE, $slideshowsComboBox]);
-
-	if ($this->data['screen']) {
-		if (isset($this->data['isDynamicItems'])) {
-			$controls->addItem([SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()]);
-			$controls->addItem([SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
-		}
-		$controls
-			->addItem($favouriteIcon)
-			->addItem($refreshIcon)
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-		$slideHeaderForm->addItem($controls);
-		$slideshowWidget->setControls($slideHeaderForm);
-
-		$formFilter = (new CFilter('web.slides.filter.state'))
-			->addNavigator();
-		$slideshowWidget->addItem($formFilter);
-
-		$slideshowWidget->addItem(
-			(new CDiv((new CDiv())->addClass('preloader')))
-				->setId(WIDGET_SLIDESHOW)
-		);
-	}
-	else {
-		$controls
-			->addItem($favouriteIcon)
-			->addItem($refreshIcon)
-			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-		$slideHeaderForm->addItem($controls);
-		$slideshowWidget->setControls($slideHeaderForm)
-			->addItem(new CTableInfo());
-	}
-}
-else {
-	$slideshowWidget->setControls(
+if ($this->data['screen']) {
+	$refresh_icon->setMenuPopup(CMenuPopupHelper::getRefresh(
+		WIDGET_SLIDESHOW,
+		'x'.$this->data['refreshMultiplier'],
+		true,
 		[
-			$slideHeaderForm,
-			SPACE,
-			get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])
+			'elementid' => $this->data['elementId']
 		]
-	);
-	$slideshowWidget->addItem(BR());
-	$slideshowWidget->addItem(new CTableInfo());
+	));
 }
 
-if ($this->data['elementId'] && isset($this->data['element'])) {
-	require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
-}
+$header->addVar('fullscreen', $this->data['fullscreen']);
 
-return $slideshowWidget;
+if (isset($this->data['isDynamicItems'])) {
+	$controls->addItem([SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()]);
+	$controls->addItem([SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
+}
+$controls
+	->addItem($favourite_icon)
+	->addItem($refresh_icon)
+	->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+$header->addItem($controls);
+$widget->setControls($header);
+
+$filter = (new CFilter('web.slides.filter.state'))->addNavigator();
+$widget->addItem($filter);
+
+$widget->addItem(
+	(new CDiv((new CDiv())->addClass('preloader')))
+		->setId(WIDGET_SLIDESHOW)
+);
+
+require_once dirname(__FILE__).'/js/monitoring.slides.js.php';
+
+return $widget;

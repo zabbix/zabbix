@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Absolute path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
 #ifdef _WINDOWS
@@ -152,6 +153,7 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
+	{"foreground",		0,	NULL,	'f'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
 	{"print",		0,	NULL,	'p'},
@@ -171,7 +173,7 @@ static struct zbx_option	longopts[] =
 };
 
 static char	shortopts[] =
-	"c:hVpt:"
+	"c:hVpt:f"
 #ifndef _WINDOWS
 	"R:"
 #else
@@ -260,7 +262,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
 	int		i, ret = SUCCEED;
 	char		ch;
+#ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
+#endif
 	unsigned short	opt_count[256] = {0};
 
 	t->task = ZBX_TASK_START;
@@ -268,7 +272,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -278,7 +282,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->data))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -301,6 +305,9 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 					TEST_METRIC = strdup(zbx_optarg);
 				}
 				break;
+			case 'f':
+				t->flags |= ZBX_TASK_FLAG_FOREGROUND;
+				break;
 #ifdef _WINDOWS
 			case 'i':
 				t->task = ZBX_TASK_INSTALL_SERVICE;
@@ -315,7 +322,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				t->task = ZBX_TASK_STOP_SERVICE;
 				break;
 			case 'm':
-				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
+				t->flags |= ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
 #endif
 			default:
@@ -323,6 +330,31 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				goto out;
 		}
 	}
+
+#ifdef _WINDOWS
+	switch (t->task)
+	{
+		case ZBX_TASK_INSTALL_SERVICE:
+		case ZBX_TASK_UNINSTALL_SERVICE:
+		case ZBX_TASK_START_SERVICE:
+		case ZBX_TASK_STOP_SERVICE:
+			if (0 != (t->flags & ZBX_TASK_FLAG_FOREGROUND))
+			{
+				zbx_error("foreground option cannot be used with Zabbix agent services");
+				ret = FAIL;
+				goto out;
+			}
+			break;
+
+		default:
+			if (0 != (t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS))
+			{
+				zbx_error("multiple agents option can be used only with Zabbix agent services");
+				ret = FAIL;
+				goto out;
+			}
+	}
+#endif
 
 	/* every option may be specified only once */
 
@@ -333,7 +365,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		if ('h' == ch || 'V' == ch)
 			continue;
 
-		if (1 < opt_count[ch])
+		if (1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
@@ -490,6 +522,8 @@ static void	set_defaults(void)
 	if (NULL == CONFIG_PID_FILE)
 		CONFIG_PID_FILE = "/tmp/zabbix_agentd.pid";
 #endif
+	if (NULL == CONFIG_LOG_TYPE_STR)
+		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
 }
 
 /******************************************************************************
@@ -501,10 +535,16 @@ static void	set_defaults(void)
  * Author: Vladimir Levijev                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config(void)
+static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
 	char	*ch_error;
 	int	err = 0;
+
+	if (NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "StartAgents is not 0, parameter Server must be defined");
+		err = 1;
+	}
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
@@ -538,6 +578,10 @@ static void	zbx_validate_config(void)
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		err = 1;
 	}
+
+	if (SUCCEED != zbx_validate_log_parameters(task))
+		err = 1;
+
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
@@ -632,7 +676,7 @@ fail:
  * Parameters: requirement - produce error if config file missing or not      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(int requirement)
+static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 {
 	char	*active_hosts = NULL;
 
@@ -660,6 +704,8 @@ static void	zbx_load_config(int requirement)
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
+		{"LogType",			&CONFIG_LOG_TYPE_STR,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
@@ -740,11 +786,7 @@ static void	zbx_load_config(int requirement)
 
 	set_defaults();
 
-	if (ZBX_CFG_FILE_REQUIRED == requirement && NULL == CONFIG_HOSTS_ALLOWED && 0 != CONFIG_PASSIVE_FORKS)
-	{
-		zbx_error("StartAgents is not 0, parameter Server must be defined");
-		exit(EXIT_FAILURE);
-	}
+	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
 		get_serveractive_hosts(active_hosts);
@@ -753,7 +795,7 @@ static void	zbx_load_config(int requirement)
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement)
 	{
-		zbx_validate_config();
+		zbx_validate_config(task);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();
 #endif
@@ -809,18 +851,27 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 }
 #endif	/* _WINDOWS */
 
-int	MAIN_ZABBIX_ENTRY()
+int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	int		i, j = 0;
 #ifdef _WINDOWS
 	DWORD		res;
 #endif
-	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
-	else
-		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
+	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
+				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+
+	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+
+#ifdef HAVE_IPV6
+#	define IPV6_FEATURE_STATUS	"YES"
+#else
+#	define IPV6_FEATURE_STATUS	" NO"
+#endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define TLS_FEATURE_STATUS	"YES"
 #else
@@ -831,6 +882,7 @@ int	MAIN_ZABBIX_ENTRY()
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
@@ -1065,8 +1117,8 @@ int	main(int argc, char **argv)
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
-			exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
+			exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -1075,7 +1127,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_STOP_SERVICE:
 			if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS)
 			{
-				zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, CONFIG_HOSTNAME);
@@ -1083,7 +1135,7 @@ int	main(int argc, char **argv)
 						APPLICATION_NAME, CONFIG_HOSTNAME);
 			}
 			else
-				zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+				zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 
 			zbx_free_config();
 
@@ -1094,7 +1146,7 @@ int	main(int argc, char **argv)
 #endif
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
-			zbx_load_config(ZBX_CFG_FILE_OPTIONAL);
+			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
 			init_perf_collector(0);
 			load_perf_counters(CONFIG_PERF_COUNTERS);
@@ -1138,13 +1190,13 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		default:
-			zbx_load_config(ZBX_CFG_FILE_REQUIRED);
+			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 			load_user_parameters(CONFIG_USER_PARAMETERS);
 			load_aliases(CONFIG_ALIASES);
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER);
+	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 
 	exit(EXIT_SUCCESS);
 }

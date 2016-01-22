@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,14 +331,15 @@ static zbx_hash_t	lld_item_application_hash_func(const void *data)
 
 static int	lld_item_application_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_application_t	*item_application1 = d1, *item_application2 = d2;
-	int					rc;
+	const zbx_lld_item_application_t	*ia1 = (zbx_lld_item_application_t *)d1;
+	const zbx_lld_item_application_t	*ia2 = (zbx_lld_item_application_t *)d2;
 
-	if (0 != (rc = memcmp(&item_application1->item_ref, &item_application2->item_ref, sizeof(zbx_lld_item_ref_t))))
-		return rc;
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->item_ref.itemid, ia2->item_ref.itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->item_ref.item, ia2->item_ref.item);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->application_ref.applicationid, ia2->application_ref.applicationid);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->application_ref.application, ia2->application_ref.application);
 
-	return memcmp(&item_application1->application_ref, &item_application2->application_ref,
-			sizeof(zbx_lld_application_ref_t));
+	return 0;
 }
 
 static void	lld_application_prototype_free(zbx_lld_application_prototype_t *application_prototype)

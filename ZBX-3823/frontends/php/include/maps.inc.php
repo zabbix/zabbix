@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ function sysmapElementLabel($label = null) {
  *
  * @param array $sysmap
  * @param array $options
- * @param int   $options['severity_min']
+ * @param int	$options['severity_min']
  *
  * @return CAreaMap
  */
@@ -83,6 +83,7 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 
 	$hostIds = [];
 	$triggerIds = [];
+	$host_groupids = [];
 
 	foreach ($sysmap['selements'] as $id => &$selement) {
 		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
@@ -96,6 +97,9 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		}
 		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 			$triggerIds[$selement['elementid']] = $selement['elementid'];
+		}
+		elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+			$host_groupids[$selement['elementid']] = $selement['elementid'];
 		}
 
 		if ($selement['elementsubtype'] == SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS) {
@@ -115,10 +119,26 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		'selectScreens' => API_OUTPUT_COUNT
 	]);
 
+	$monitored_triggers_hosts = API::Host()->get([
+		'output' => ['hostid'],
+		'hostids' => $hostIds,
+		'with_monitored_triggers' => true,
+		'preservekeys' => true,
+		'nopermissions' => true
+	]);
+
 	$triggers = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid', 'status'],
 		'triggerids' => $triggerIds,
+		'preservekeys' => true,
+		'nopermissions' => true
+	]);
+
+	$host_groups = API::HostGroup()->get([
+		'output' => ['groupid'],
+		'groupids' => $host_groupids,
+		'with_monitored_triggers' => true,
 		'preservekeys' => true,
 		'nopermissions' => true
 	]);
@@ -173,7 +193,8 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 					'hostid' => $elem['elementid'],
 					'show_severity' => isset($options['severity_min']) ? $options['severity_min'] : null
 				];
-				$gotos['showTriggers'] = ($hosts[$elem['elementid']]['status'] == HOST_STATUS_MONITORED);
+				$gotos['showTriggers'] = ($host['status'] == HOST_STATUS_MONITORED
+						&& array_key_exists($elem['elementid'], $monitored_triggers_hosts));
 
 				$gotos['graphs'] = ['hostid' => $host['hostid']];
 				$gotos['showGraphs'] = (bool) $host['graphs'];
@@ -227,7 +248,7 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 				];
 
 				// always show active trigger link for host group map elements
-				$gotos['showTriggers'] = true;
+				$gotos['showTriggers'] = array_key_exists($elem['elementid'], $host_groups);
 				break;
 		}
 
@@ -299,15 +320,6 @@ function get_png_by_selement($info) {
 	$image = get_image_by_imageid($info['iconid']);
 
 	return $image['image'] ? imagecreatefromstring($image['image']) : get_default_image();
-}
-
-function convertColor($im, $color) {
-	$RGB = [
-		hexdec('0x'.substr($color, 0, 2)),
-		hexdec('0x'.substr($color, 2, 2)),
-		hexdec('0x'.substr($color, 4, 2))
-	];
-	return imagecolorallocate($im, $RGB[0], $RGB[1], $RGB[2]);
 }
 
 function get_map_elements($db_element, &$elements) {
@@ -467,8 +479,6 @@ function add_triggerExpressions(&$selements, $triggers = []) {
  * @return array
  */
 function getTriggersInfo($selement, $i, $showUnack) {
-	global $colors;
-
 	$info = [
 		'latelyChanged' => $i['latelyChanged'],
 		'ack' => $i['ack'],
@@ -483,7 +493,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_ON;
 		$info['info']['unack'] = [
 			'msg' => _('PROBLEM'),
-			'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+			'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
 		];
 	}
 	elseif ($i['trigger_disabled']) {
@@ -491,7 +501,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 		$info['info']['status'] = [
 			'msg' => _('DISABLED'),
-			'color' => $colors['Dark Red']
+			'color' => '960000'
 		];
 	}
 	else {
@@ -499,7 +509,7 @@ function getTriggersInfo($selement, $i, $showUnack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
+			'color' => '009600'
 		];
 	}
 
@@ -516,8 +526,6 @@ function getTriggersInfo($selement, $i, $showUnack) {
  * @return array
  */
 function getHostsInfo($selement, $i, $show_unack) {
-	global $colors;
-
 	$info = [
 		'latelyChanged' => $i['latelyChanged'],
 		'ack' => $i['ack'],
@@ -541,14 +549,14 @@ function getHostsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+				'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => $colors['Dark Red']
+				'color' => '960000'
 			];
 		}
 
@@ -565,7 +573,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_MAINTENANCE;
 		$info['info']['maintenance'] = [
 			'msg' => _('MAINTENANCE').' ('.$i['maintenance_title'].')',
-			'color' => $colors['Orange']
+			'color' => 'EE9600'
 		];
 	}
 	elseif ($i['disabled']) {
@@ -573,7 +581,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_DISABLED;
 		$info['info']['status'] = [
 			'msg' => _('DISABLED'),
-			'color' => $colors['Dark Red']
+			'color' => '960000'
 		];
 	}
 	elseif (!$hasProblem) {
@@ -581,7 +589,7 @@ function getHostsInfo($selement, $i, $show_unack) {
 		$info['icon_type'] = SYSMAP_ELEMENT_ICON_OFF;
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
+			'color' => '009600'
 		];
 	}
 
@@ -598,8 +606,6 @@ function getHostsInfo($selement, $i, $show_unack) {
  * @return array
  */
 function getHostGroupsInfo($selement, $i, $show_unack) {
-	global $colors;
-
 	$info = [
 		'latelyChanged' => $i['latelyChanged'],
 		'ack' => $i['ack'],
@@ -624,14 +630,14 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+				'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => $colors['Dark Red']
+				'color' => '960000'
 			];
 		}
 
@@ -650,7 +656,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		}
 		$info['info']['maintenance'] = [
 			'msg' => $i['maintenance'].' '._('Maintenance'),
-			'color' => $colors['Orange']
+			'color' => 'EE9600'
 		];
 		$hasStatus = true;
 	}
@@ -661,7 +667,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		}
 		$info['info']['disabled'] = [
 			'msg' => _('DISABLED'),
-			'color' => $colors['Dark Red']
+			'color' => '960000'
 		];
 		$hasStatus = true;
 	}
@@ -671,7 +677,7 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
+			'color' => '009600'
 		];
 	}
 
@@ -688,8 +694,6 @@ function getHostGroupsInfo($selement, $i, $show_unack) {
  * @return array
  */
 function getMapsInfo($selement, $i, $show_unack) {
-	global $colors;
-
 	$info = [
 		'latelyChanged' => $i['latelyChanged'],
 		'ack' => $i['ack'],
@@ -715,14 +719,14 @@ function getMapsInfo($selement, $i, $show_unack) {
 
 			$info['info']['problem'] = [
 				'msg' => $msg,
-				'color' => ($i['priority'] > 3) ? $colors['Red'] : $colors['Dark Red']
+				'color' => ($i['priority'] > 3) ? 'FF0000' : '960000'
 			];
 		}
 
 		if (in_array($show_unack, [EXTACK_OPTION_UNACK, EXTACK_OPTION_BOTH]) && $i['problem_unack']) {
 			$info['info']['unack'] = [
 				'msg' => $i['problem_unack'].' '._('Unacknowledged'),
-				'color' => $colors['Dark Red']
+				'color' => '960000'
 			];
 		}
 
@@ -740,7 +744,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 		}
 		$info['info']['maintenance'] = [
 			'msg' => $i['maintenance'].' '._('Maintenance'),
-			'color' => $colors['Orange']
+			'color' => 'EE9600'
 		];
 		$hasStatus = true;
 	}
@@ -751,7 +755,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 		}
 		$info['info']['disabled'] = [
 			'msg' => _('DISABLED'),
-			'color' => $colors['Dark Red']
+			'color' => '960000'
 		];
 		$hasStatus = true;
 	}
@@ -761,7 +765,7 @@ function getMapsInfo($selement, $i, $show_unack) {
 		$info['iconid'] = $selement['iconid_off'];
 		$info['info']['ok'] = [
 			'msg' => _('OK'),
-			'color' => $colors['Dark Green']
+			'color' => '009600'
 		];
 	}
 
@@ -1479,7 +1483,7 @@ function drawMapConnectors(&$im, $map, $mapInfo, $drawAll = false) {
 		}
 
 		$drawtype = $link['drawtype'];
-		$color = convertColor($im, $link['color']);
+		$color = get_color($im, $link['color']);
 
 		$linktriggers = $link['linktriggers'];
 		order_result($linktriggers, 'triggerid');
@@ -1499,7 +1503,7 @@ function drawMapConnectors(&$im, $map, $mapInfo, $drawAll = false) {
 				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE) {
 					if ($triggers[$id]['priority'] >= $max_severity) {
 						$drawtype = $triggers[$id]['drawtype'];
-						$color = convertColor($im, $triggers[$id]['color']);
+						$color = get_color($im, $triggers[$id]['color']);
 						$max_severity = $triggers[$id]['priority'];
 					}
 				}
@@ -1549,14 +1553,14 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 			$st_color = null;
 
 			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_ON) {
-				$hl_color = hex2rgb(getSeverityColor($elementInfo['priority']));
+				$hl_color = getSeverityColor($elementInfo['priority']);
 			}
 
 			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_MAINTENANCE) {
-				$st_color = hex2rgb('FF9933');
+				$st_color = 'FF9933';
 			}
 			if ($elementInfo['icon_type'] == SYSMAP_ELEMENT_ICON_DISABLED) {
-				$st_color = hex2rgb('EEEEEE');
+				$st_color = '999999';
 			}
 
 			$mainProblems = [
@@ -1565,7 +1569,7 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 			];
 
 			if (isset($mainProblems[$selement['elementtype']])) {
-				if (!is_null($hl_color)) {
+				if ($hl_color !== null) {
 					$st_color = null;
 				}
 			}
@@ -1573,56 +1577,23 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 				$hl_color = null;
 			}
 
-			if (!is_null($st_color)) {
-				$r = $st_color[0];
-				$g = $st_color[1];
-				$b = $st_color[2];
-
+			if ($st_color !== null) {
 				imagefilledrectangle($im,
 					$selement['x'] - 2,
 					$selement['y'] - 2,
 					$selement['x'] + $iconX + 2,
 					$selement['y'] + $iconY + 2,
-					imagecolorallocatealpha($im, $r, $g, $b, 0)
-				);
-
-				// shadow
-				imagerectangle($im,
-					$selement['x'] - 2 - 1,
-					$selement['y'] - 2 - 1,
-					$selement['x'] + $iconX + 2 + 1,
-					$selement['y'] + $iconY + 2 + 1,
-					imagecolorallocate($im, 120, 120, 120)
-				);
-
-				imagerectangle($im,
-					$selement['x'] - 2 - 2,
-					$selement['y'] - 2 - 2,
-					$selement['x'] + $iconX + 2 + 2,
-					$selement['y'] + $iconY + 2 + 2,
-					imagecolorallocate($im, 220, 220, 220)
+					get_color($im, $st_color, 50)
 				);
 			}
 
-			if (!is_null($hl_color)) {
-				$r = $hl_color[0];
-				$g = $hl_color[1];
-				$b = $hl_color[2];
-
+			if ($hl_color !== null) {
 				imagefilledellipse($im,
 					$selement['x'] + ($iconX / 2),
 					$selement['y'] + ($iconY / 2),
 					$iconX + 20,
 					$iconX + 20,
-					imagecolorallocatealpha($im, $r, $g, $b, 0)
-				);
-
-				imageellipse($im,
-					$selement['x'] + ($iconX / 2),
-					$selement['y'] + ($iconY / 2),
-					$iconX + 20 + 1,
-					$iconX + 20 + 1,
-					imagecolorallocate($im, 120, 120, 120)
+					get_color($im, $hl_color)
 				);
 
 				if (isset($elementInfo['ack']) && $elementInfo['ack'] && $config['event_ack_enable']) {
@@ -1630,8 +1601,8 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 					imagearc($im,
 						$selement['x'] + ($iconX / 2),
 						$selement['y'] + ($iconY / 2),
-						$iconX + 20 - 3,
-						$iconX + 20 - 3,
+						$iconX + 20 - 2,
+						$iconX + 20 - 2,
 						0,
 						359,
 						imagecolorallocate($im, 50, 150, 50)
@@ -1644,8 +1615,6 @@ function drawMapHighligts(&$im, $map, $mapInfo) {
 }
 
 function drawMapSelementsMarks(&$im, $map, $mapInfo) {
-	global $colors;
-
 	$selements = $map['selements'];
 
 	foreach ($selements as $selementId => $selement) {
@@ -1730,13 +1699,11 @@ function drawMapSelementsMarks(&$im, $map, $mapInfo) {
 			$marks = 'trbl';
 		}
 
-		imageVerticalMarks($im, $selement['x'] + ($iconX / 2), $selement['y'] + ($iconY / 2), $markSize, $colors['Red'], $marks);
+		imageVerticalMarks($im, $selement['x'] + ($iconX / 2), $selement['y'] + ($iconY / 2), $markSize, 'FF0000', $marks);
 	}
 }
 
-function drawMapLinkLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
-	global $colors;
-
+function drawMapLinkLabels(&$im, $map, $mapInfo, $resolveMacros, $graphtheme) {
 	$links = $map['links'];
 	$selements = $map['selements'];
 
@@ -1776,7 +1743,7 @@ function drawMapLinkLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 		}
 
 		$drawtype = $link['drawtype'];
-		$color = convertColor($im, $link['color']);
+		$color = get_color($im, $link['color']);
 
 		$linktriggers = $link['linktriggers'];
 		order_result($linktriggers, 'triggerid');
@@ -1795,7 +1762,7 @@ function drawMapLinkLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 				if ($triggers[$id]['status'] == TRIGGER_STATUS_ENABLED && $triggers[$id]['value'] == TRIGGER_VALUE_TRUE) {
 					if ($triggers[$id]['priority'] >= $max_severity) {
 						$drawtype = $triggers[$id]['drawtype'];
-						$color = convertColor($im, $triggers[$id]['color']);
+						$color = get_color($im, $triggers[$id]['color']);
 						$max_severity = $triggers[$id]['priority'];
 					}
 				}
@@ -1840,7 +1807,11 @@ function drawMapLinkLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 				imagerectangle($im, $boxX_left, $boxY_top, $boxX_right, $boxY_bottom, $color);
 		}
 
-		imagefilledrectangle($im, $boxX_left + 1, $boxY_top + 1, $boxX_right - 1, $boxY_bottom - 1, $colors['White']);
+		imagefilledrectangle($im, $boxX_left + 1, $boxY_top + 1, $boxX_right - 1, $boxY_bottom - 1,
+			get_color($im, $graphtheme['backgroundcolor'])
+		);
+
+		$color = get_color($im, $graphtheme['textcolor']);
 
 		$increasey = 4;
 		foreach ($strings as $str) {
@@ -1849,16 +1820,14 @@ function drawMapLinkLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 			$labelx = ($x1 + $x2) / 2 - ($dims['width'] / 2);
 			$labely = $boxY_top + $increasey;
 
-			imagetext($im, 8, 0, $labelx, $labely + $dims['height'], $colors['Black'], $str);
+			imagetext($im, 8, 0, $labelx, $labely + $dims['height'], $color, $str);
 
 			$increasey += $dims['height'] + 2;
 		}
 	}
 }
 
-function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
-	global $colors;
-
+function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros, $graphtheme) {
 	if ($map['label_type'] == MAP_LABEL_TYPE_NOTHING && $map['label_format'] == SYSMAP_LABEL_ADVANCED_OFF) {
 		return;
 	}
@@ -2086,7 +2055,7 @@ function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 			}
 
 			$str = str_replace("\r", '', $line['msg']);
-			$color = isset($line['color']) ? $line['color'] : $colors['Black'];
+			$color = isset($line['color']) ? $line['color'] : $graphtheme['textcolor'];
 
 			$dims = imageTextSize(8, 0, $str);
 
@@ -2104,9 +2073,9 @@ function drawMapLabels(&$im, $map, $mapInfo, $resolveMacros = true) {
 				$im,
 				$x_label - 1, $y_rec + $increasey - $labelFontHeight + $labelFontBaseline,
 				$x_label + $dims['width'] + 1, $y_rec + $increasey + $labelFontBaseline,
-				$colors['White']
+				get_color($im, $graphtheme['backgroundcolor'])
 			);
-			imagetext($im, 8, 0, $x_label, $y_rec + $increasey, $color, $str);
+			imagetext($im, 8, 0, $x_label, $y_rec + $increasey, get_color($im, $color), $str);
 
 			$increasey += $labelFontHeight + 1;
 		}

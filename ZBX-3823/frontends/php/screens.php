@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
+ob_start();
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -55,34 +56,23 @@ check_fields($fields);
 /*
  * Permissions
  */
-// validate group IDs
-$validateGroupIds = array_filter([
+// Validate group IDs.
+$validate_groupids = array_filter([
 	getRequest('groupid'),
 	getRequest('tr_groupid')
 ]);
-if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
+if ($validate_groupids && !API::HostGroup()->isReadable($validate_groupids)) {
 	access_deny();
 }
 
-// validate host IDs
-$validateHostIds = array_filter([
+// Validate host IDs.
+$validate_hostids = array_filter([
 	getRequest('hostid'),
 	getRequest('tr_hostid')
 ]);
-if ($validateHostIds && !API::Host()->isReadable($validateHostIds)) {
+if ($validate_hostids && !API::Host()->isReadable($validate_hostids)) {
 	access_deny();
 }
-
-if (getRequest('elementid')) {
-	$screens = API::Screen()->get([
-		'screenids' => [$_REQUEST['elementid']],
-		'output' => ['screenid']
-	]);
-	if (!$screens) {
-		access_deny();
-	}
-}
-
 
 /*
  * Filter
@@ -109,33 +99,43 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 $data = [
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'period' => getRequest('period'),
-	'stime' => getRequest('stime'),
-	'elementid' => getRequest('elementid', false),
-
-	// whether we should use screen name to fetch a screen (if this is false, elementid is used)
-	'use_screen_name' => isset($_REQUEST['screenname'])
+	'stime' => getRequest('stime')
 ];
 
-// if none is provided
-if (empty($data['elementid']) && !$data['use_screen_name']) {
-	// get element id saved in profile from the last visit
-	$data['elementid'] = CProfile::get('web.screens.elementid', null);
-}
-
-$data['screens'] = API::Screen()->get([
+$options = [
 	'output' => ['screenid', 'name']
-]);
+];
 
-// if screen name is provided it takes priority over elementid
-if ($data['use_screen_name']) {
-	$data['screens'] = zbx_toHash($data['screens'], 'name');
-	$data['elementIdentifier'] = getRequest('screenname');
+if (getRequest('elementid')) {
+	$options['screenids'] = getRequest('elementid');
+	CProfile::update('web.screens.elementid', getRequest('elementid') , PROFILE_TYPE_ID);
+}
+elseif (hasRequest('screenname')) {
+	$options['filter']['name'] = getRequest('screenname');
+}
+elseif (CProfile::get('web.screens.elementid')) {
+	$options['screenids'] = CProfile::get('web.screens.elementid');
 }
 else {
-	$data['screens'] = zbx_toHash($data['screens'], 'screenid');
-	$data['elementIdentifier'] = $data['elementid'];
+	// Redirect to screen list.
+	ob_end_clean();
+	redirect('screenconf.php');
 }
-order_result($data['screens'], 'name');
+
+$screens = API::Screen()->get($options);
+
+if (!$screens && (getRequest('elementid') || hasRequest('screenname'))) {
+	access_deny();
+}
+elseif (!$screens) {
+	// Redirect to screen list.
+	ob_end_clean();
+	redirect('screenconf.php');
+}
+else {
+	$data['screen'] = reset($screens);
+}
+ob_end_flush();
 
 // render view
 $screenView = new CView('monitoring.screen', $data);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'screens.php',
 					'label' => _('Screens'),
-					'sub_pages' => ['slides.php']
+					'sub_pages' => [
+						'screenconf.php',
+						'screenedit.php',
+						'screen.import.php',
+						'slides.php',
+						'slideconf.php'
+					]
 				],
 				[
 					'url' => 'zabbix.php',
@@ -217,15 +223,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'actionconf.php',
 					'label' => _('Actions')
-				],
-				[
-					'url' => 'screenconf.php',
-					'label' => _('Screens'),
-					'sub_pages' => ['screenedit.php']
-				],
-				[
-					'url' => 'slideconf.php',
-					'label' => _('Slide shows'),
 				],
 				[
 					'url' => 'discoveryconf.php',
@@ -391,7 +388,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		$mmenu_entry = (new CListItem(
 			(new CLink($menu['label']))
 				->setAttribute('tabindex', 0)
-				->removeSID()
 		))
 			->addClass($menu_class)
 			->setId($label);

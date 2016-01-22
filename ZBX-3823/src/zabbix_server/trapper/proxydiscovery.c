@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,14 +44,14 @@ void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse discovery data from active proxy at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 		goto out;
 	}
 
 	if (SUCCEED != (ret = process_dhis_data(jp)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid discovery data from proxy \"%s\" at \"%s\"", host,
-				get_ip_by_socket(sock));
+				sock->peer);
 	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
@@ -110,10 +110,7 @@ void	send_discovery_data(zbx_socket_t *sock)
 	ret = SUCCEED;
 out:
 	if (SUCCEED != ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send discovery data to server at \"%s\": %s",
-				get_ip_by_socket(sock), error);
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send discovery data to server at \"%s\": %s", sock->peer, error);
 
 	zbx_json_free(&j);
 	zbx_free(error);
