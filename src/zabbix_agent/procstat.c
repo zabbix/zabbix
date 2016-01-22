@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@
  * 6) saves the last cpu utilization snapshot
  *
  * Initialisation.
- * * procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
+ * * zbx_procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
  *   (zbx_dshm_create() called with size 0).
  * * the first call of procstat_add() allocates the shared memory for the header and the first query
  *   via call to zbx_dshm_realloc().
@@ -65,7 +65,7 @@
  * * Ensure that memory segment has enough free space with procstat_dshm_has_enough_space() before
  *   allocating space within segment with procstat_alloc() or functions that use it.
  * * Check how much of the allocated dshm is actually used by procstat by procstat_dshm_used_size().
- * * Change the dshm size with with zbx_dshm_realloc().
+ * * Change the dshm size with zbx_dshm_realloc().
  *
  * Synchronisation.
  * * agentd processes share a single instance of ZBX_COLLECTOR_DATA (*collector) containing reference
@@ -203,7 +203,7 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes);
  * Function: procstat_dshm_has_enough_space                                   *
  *                                                                            *
  * Purpose: check if the procstat shared memory segment has at least          *
- *          the specified amount of free bytes in the middle of the segment   *
+ *          the specified amount of free bytes in the segment                 *
  *                                                                            *
  * Parameters: base - [IN] the procstat shared memory segment                 *
  *             size - [IN] number of free bytes needed                        *

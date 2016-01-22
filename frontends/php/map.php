@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,30 +56,38 @@ if (empty($map)) {
 	access_deny();
 }
 
+$graphtheme = [
+	'theme' => 'blue-theme',
+	'textcolor' => '1F2C33',
+	'highlightcolor' => 'E33734',
+	'backgroundcolor' => 'FFFFFF',
+	'graphcolor' => 'FFFFFF',
+	'gridcolor' => 'CCD5D9',
+	'maingridcolor' => 'ACBBC2',
+	'gridbordercolor' => 'ACBBC2',
+	'nonworktimecolor' => 'EBEBEB',
+	'leftpercentilecolor' => '429E47',
+	'righttpercentilecolor' => 'E33734'
+];
+
+$themes = DB::find('graph_theme', [
+	'theme' => getUserTheme(CWebUser::$data)
+]);
+if ($themes) {
+	$graphtheme = $themes[0];
+}
+
 $mapPainter = new CMapPainter($map, [
 	'map' => [
 		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements']))
 	],
 	'grid' => [
 		'size' => getRequest('grid', 0)
-	]
+	],
+	'graphtheme' => $graphtheme
 ]);
 
 $im = $mapPainter->paint();
-
-$colors['Red'] = imagecolorallocate($im, 255, 0, 0);
-$colors['Dark Red'] = imagecolorallocate($im, 150, 0, 0);
-$colors['Green'] = imagecolorallocate($im, 0, 255, 0);
-$colors['Dark Green'] = imagecolorallocate($im, 0, 150, 0);
-$colors['Blue'] = imagecolorallocate($im, 0, 0, 255);
-$colors['Dark Blue'] = imagecolorallocate($im, 0, 0, 150);
-$colors['Yellow'] = imagecolorallocate($im, 255, 255, 0);
-$colors['Dark Yellow'] = imagecolorallocate($im, 150, 150, 0);
-$colors['Cyan'] = imagecolorallocate($im, 0, 255, 255);
-$colors['Black'] = imagecolorallocate($im, 0, 0, 0);
-$colors['Gray'] = imagecolorallocate($im, 150, 150, 150);
-$colors['White'] = imagecolorallocate($im, 255, 255, 255);
-$colors['Orange'] = imagecolorallocate($im, 238, 96, 0);
 
 $x = imagesx($im);
 $y = imagesy($im);
@@ -170,8 +178,8 @@ if (!isset($_REQUEST['noselements'])) {
 }
 
 $expandMacros = getRequest('expand_macros', true);
-drawMapLabels($im, $map, $mapInfo, $expandMacros);
-drawMapLinkLabels($im, $map, $mapInfo, $expandMacros);
+drawMapLabels($im, $map, $mapInfo, $expandMacros, $graphtheme);
+drawMapLinkLabels($im, $map, $mapInfo, $expandMacros, $graphtheme);
 
 if (!isset($_REQUEST['noselements']) && $map['markelements'] == 1) {
 	drawMapSelementsMarks($im, $map, $mapInfo);

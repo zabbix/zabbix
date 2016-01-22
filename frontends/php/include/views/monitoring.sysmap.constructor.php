@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,10 +63,10 @@ $backgroundImage = (new CImg('images/general/tree/zero.gif', 'Sysmap'))
 $backgroundImageTable = new CTable();
 $backgroundImageTable->addRow($backgroundImage);
 
-$container = (new CDiv())->setId('sysmap_cnt');
+$container = (new CDiv())->setId(ZBX_STYLE_MAP_AREA);
 
 // create elements
-zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson([
+zbx_add_post_js('ZABBIX.apps.map.run("'.ZBX_STYLE_MAP_AREA.'", '.CJs::encodeJson([
 	'sysmap' => $this->data['sysmap'],
 	'iconList' => $this->data['iconList'],
 	'defaultAutoIconId' => $this->data['defaultAutoIconId'],

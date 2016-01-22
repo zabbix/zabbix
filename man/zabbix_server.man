@@ -1,4 +1,4 @@
-.TH ZABBIX_SERVER 8 "2014\-07\-10" Zabbix
+.TH ZABBIX_SERVER 8 "2016\-01\-13" Zabbix
 .SH NAME
 zabbix_server \- Zabbix server daemon
 .SH SYNOPSIS
@@ -22,6 +22,8 @@ is the core daemon of Zabbix software.
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
+.IP "\fB\-f\fR, \fB\-\-foreground\fR"
+Run Zabbix server in foreground.
 .IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"
 Perform administrative functions according to \fIruntime\-option\fR.
 .SS

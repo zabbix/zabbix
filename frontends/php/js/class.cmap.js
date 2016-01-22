@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -970,10 +970,10 @@ ZABBIX.apps.map = (function($) {
 				this.selected = state;
 
 				if (this.selected) {
-					this.domNode.addClass('map-selected');
+					this.domNode.addClass('map-element-selected');
 				}
 				else {
-					this.domNode.removeClass('map-selected');
+					this.domNode.removeClass('map-element-selected');
 				}
 
 				return this.selected;
@@ -1087,7 +1087,7 @@ ZABBIX.apps.map = (function($) {
 								width: this.data.width + 'px',
 								height: this.data.height + 'px'
 							})
-							.addClass('selementArea');
+							.addClass('map-element-area-bg');
 					}
 					else {
 						this.domNode
@@ -1095,7 +1095,7 @@ ZABBIX.apps.map = (function($) {
 								width: this.sysmap.data.width + 'px',
 								height: this.sysmap.data.height + 'px'
 							})
-							.addClass('selementArea');
+							.addClass('map-element-area-bg');
 					}
 				}
 				else {
@@ -1104,7 +1104,7 @@ ZABBIX.apps.map = (function($) {
 							width: '',
 							height: ''
 						})
-						.removeClass('selementArea');
+						.removeClass('map-element-area-bg');
 				}
 			}
 		};
