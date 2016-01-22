@@ -664,9 +664,14 @@ int	process_httptests(int httppoller_num, int now)
 					&httptest.httptest.http_password, MACRO_TYPE_COMMON, NULL, 0);
 		}
 
-		httptest.httptest.http_proxy = zbx_strdup(NULL, row[10]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
-				&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+		if ('\0' != *row[10])
+		{
+			httptest.httptest.http_proxy = zbx_strdup(NULL, row[10]);
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host.hostid, NULL, NULL,
+					&httptest.httptest.http_proxy, MACRO_TYPE_COMMON, NULL, 0);
+		}
+		else
+			httptest.httptest.http_proxy = NULL;
 
 		httptest.httptest.retries = atoi(row[11]);
 
@@ -676,6 +681,7 @@ int	process_httptests(int httppoller_num, int now)
 		process_httptest(&host, &httptest);
 
 		zbx_free(httptest.httptest.http_proxy);
+
 		if (HTTPTEST_AUTH_NONE != httptest.httptest.authentication)
 		{
 			zbx_free(httptest.httptest.http_password);
