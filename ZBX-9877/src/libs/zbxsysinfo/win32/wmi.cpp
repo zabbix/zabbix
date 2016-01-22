@@ -31,7 +31,7 @@ extern "C"
 
 #pragma comment(lib, "wbemuuid.lib")
 
-static int	com_initialized = 0;
+ZBX_THREAD_LOCAL static int	com_initialized = 0;
 
 extern "C" int	zbx_co_initialize()
 {
@@ -298,8 +298,6 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 			break;
 		default:
-			char *utf8;
-
 			hres = VariantChangeType(&vtProp, &vtProp, VARIANT_ALPHABOOL, VT_BSTR);
 
 			if (FAILED(hres))
@@ -308,8 +306,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto out;
 			}
 
-			utf8 = zbx_unicode_to_utf8((wchar_t *)_bstr_t(vtProp.bstrVal));
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, utf8));
+			SET_TEXT_RESULT(result, zbx_unicode_to_utf8((wchar_t *)_bstr_t(vtProp.bstrVal)));
 			ret = SYSINFO_RET_OK;
 
 			break;
