@@ -25,7 +25,7 @@ Bug fixes:
 ..F....... [ZBX-9500] fixed elements sorting in configuration export (Gunars, Sasha)
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
-..F....... [ZBX-10019] fixed graphs time interval selection (Gunars)
+..F....... [ZBX-10019] fixed graph time interval selection (Gunars)
 A......... [ZBX-10226] fixed trigger prototype updateReal API method (Gunars)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
