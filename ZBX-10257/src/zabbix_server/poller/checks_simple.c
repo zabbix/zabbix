@@ -22,6 +22,8 @@
 #include "simple.h"
 #include "log.h"
 
+#include "../vmware/vmware.h"
+
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
 #define ZBX_VMWARE_PREFIX	"vmware."
@@ -167,6 +169,14 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (NULL != vmfunc)
 		{
+			zbx_vmware_stats_t	stats;
+
+			if (FAIL == zbx_vmware_get_statistics(&stats))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "VMWare collector not started"));
+				goto out;
+			}
+
 			if (SYSINFO_RET_OK == vmfunc(&request, item->username, item->password, result))
 				ret = SUCCEED;
 		}
@@ -183,6 +193,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported"));
 
+out:
 	free_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
