@@ -157,7 +157,7 @@ A.F....PS. [ZBXNEXT-2683] added user macro context (Ivo, Oleg, Sasha, wiper)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
-..F....... [ZBX-2517] changed minimum period for time navigator to 5 minutes; thanks to Zabbix community (Alexei)
+..F....... [ZBX-2517] changed minimum period for time navigator to 1 minute; thanks to Zabbix community (Alexei)
 A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
