@@ -4112,6 +4112,19 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			goto out;
 		}
 
+		if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
+		{
+			long	verify_result;
+
+			/* In case of certificate error SSL_get_verify_result() provides more helpful diagnostics */
+			/* than other methods. Include it as first but continue with other diagnostics. */
+			if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s: ",
+						X509_verify_cert_error_string(verify_result));
+			}
+		}
+
 		error_code = SSL_get_error(s->tls_ctx, res);
 
 		switch (error_code)
@@ -4119,14 +4132,16 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			case SSL_ERROR_NONE:		/* handshake successful */
 				break;
 			case SSL_ERROR_ZERO_RETURN:
-				*error = zbx_strdup(*error, "TLS connection has been closed during handshake");
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset,
+						"TLS connection has been closed during handshake");
 				goto out;
 			case SSL_ERROR_SYSCALL:
 				if (0 == ERR_peek_error())
 				{
 					if (0 == res)
 					{
-						*error = zbx_strdup(*error, "connection closed by peer");
+						zbx_snprintf_alloc(error, &error_alloc, &error_offset,
+								"connection closed by peer");
 					}
 					else if (-1 == res)
 					{
@@ -4169,10 +4184,18 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	{
 		X509	*peer_cert = NULL;
 		char	*issuer = NULL, *subject = NULL;
+		long	verify_result;
 		int	err = 0;
 
-		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
-				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
+					X509_verify_cert_error_string(verify_result));
+			err = 1;
+		}
+
+		if (0 == err && ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
+				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG)))
 		{
 			if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) ||
 					SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
@@ -4771,6 +4794,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	const char	*cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+	long		verify_result;
 #if defined(_WINDOWS)
 	double		sec;
 #endif
@@ -4888,6 +4912,16 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 			goto out;
 		}
 
+		/* In case of certificate error SSL_get_verify_result() provides more helpful diagnostics */
+		/* than other methods. Include it as first but continue with other diagnostics. Should be */
+		/* harmless in case of PSK. */
+
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s: ",
+					X509_verify_cert_error_string(verify_result));
+		}
+
 		error_code = SSL_get_error(s->tls_ctx, res);
 
 		if (0 == res)
@@ -4917,6 +4951,14 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	else if (0 != strncmp("NONE", cipher_name, 4))		/* is there a better method to find cipher type? */
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
+
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
+					X509_verify_cert_error_string(verify_result));
+			zbx_tls_close(s);
+			goto out1;
+		}
 
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
