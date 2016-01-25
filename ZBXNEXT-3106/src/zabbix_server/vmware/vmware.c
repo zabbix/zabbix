@@ -114,6 +114,32 @@ typedef struct
 }
 zbx_vmware_counter_t;
 
+/* the vm/hv object property mapping */
+typedef struct
+{
+	int		propid;
+	const char	*xpath;
+}
+zbx_vmware_propmap_t;
+
+static char	*hv_propmap[] = {
+	ZBX_XPATH_HV_QUICKSTATS("overallCpuUsage"),			/* ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE */
+	ZBX_XPATH_HV_CONFIG_PRODUCT("fullName"),			/* ZBX_VMWARE_HVPROP_FULL_NAME */
+	ZBX_XPATH_HV_HARDWARE("numCpuCores"),				/* ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES */
+	ZBX_XPATH_HV_HARDWARE("cpuMhz"),				/* ZBX_VMWARE_HVPROP_HW_CPU_MHZ */
+	ZBX_XPATH_HV_HARDWARE("cpuModel"),				/* ZBX_VMWARE_HVPROP_HW_CPU_MODEL */
+	ZBX_XPATH_HV_HARDWARE("numCpuThreads"), 			/* ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS */
+	ZBX_XPATH_HV_HARDWARE("memorySize"), 				/* ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE */
+	ZBX_XPATH_HV_HARDWARE("model"), 				/* ZBX_VMWARE_HVPROP_HW_MODEL */
+	ZBX_XPATH_HV_HARDWARE("uuid"), 					/* ZBX_VMWARE_HVPROP_HW_UUID */
+	ZBX_XPATH_HV_HARDWARE("vendor"), 				/* ZBX_VMWARE_HVPROP_HW_VENDOR */
+	ZBX_XPATH_HV_QUICKSTATS("overallMemoryUsage"),			/* ZBX_VMWARE_HVPROP_MEMORY_USED */
+	ZBX_XPATH_HV_SENSOR_STATUS("VMware Rollup Health State"),	/* ZBX_VMWARE_HVPROP_STATUS */
+	ZBX_XPATH_HV_QUICKSTATS("uptime"),				/* ZBX_VMWARE_HVPROP_UPTIME */
+	ZBX_XPATH_HV_CONFIG_PRODUCT("version"),				/* ZBX_VMWARE_HVPROP_VERSION */
+	ZBX_XPATH_HV_CONFIG("name")					/* ZBX_VMWARE_HVPROP_NAME */
+};
+
 /* hypervisor hashset support */
 zbx_hash_t	vmware_hv_hash(const void *data)
 {
@@ -252,6 +278,65 @@ static int	vmware_perf_entity_compare_func(const void *d1, const void *d2)
 		ret = strcmp(e1->id, e2->id);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: xml_read_props                                                   *
+ *                                                                            *
+ * Purpose: reads the vmware object properties by their xpaths from xml data  *
+ *                                                                            *
+ * Parameters: xml       - [IN] the xml data                                  *
+ *             propmap   - [IN] the xpaths of the properties to read          *
+ *             props_num - [IN] the number of properties to read              *
+ *                                                                            *
+ * Return value: an array of property values                                  *
+ *                                                                            *
+ * Comments: The array with property values must be freed by the caller.      *
+ *                                                                            *
+ ******************************************************************************/
+static char	**xml_read_props(const char *xml, char **propmap, int props_num)
+{
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*val;
+	char		**props;
+	int		i;
+
+	if (NULL == (doc = xmlReadMemory(xml, strlen(xml), ZBX_VM_NONAME_XML, NULL, 0)))
+		return NULL;
+
+	props = (char **)zbx_malloc(NULL, sizeof(char *) * props_num);
+	memset(props, 0, sizeof(char *) * props_num);
+
+	for (i = 0; i < props_num; i++)
+	{
+		xpathCtx = xmlXPathNewContext(doc);
+
+		if (NULL != (xpathObj = xmlXPathEvalExpression((const xmlChar *)propmap[i], xpathCtx)))
+		{
+			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+			{
+				nodeset = xpathObj->nodesetval;
+
+				if (NULL != (val = xmlNodeListGetString(doc, nodeset->nodeTab[0]->xmlChildrenNode, 1)))
+				{
+					props[i] = zbx_strdup(NULL, (char *)val);
+					xmlFree(val);
+				}
+			}
+
+			xmlXPathFreeObject(xpathObj);
+		}
+
+		xmlXPathFreeContext(xpathCtx);
+	}
+
+	xmlFreeDoc(doc);
+
+	return props;
 }
 
 /******************************************************************************
@@ -401,6 +486,32 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_props_shared_free                                         *
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store properties list         *
+ *                                                                            *
+ * Parameters: props     - [IN] the properties list                           *
+ *             props_num - [IN] the number of properties in the list          *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_props_shared_free(char **props, int props_num)
+{
+	int	i;
+
+	if (NULL == props)
+		return;
+
+	for (i = 0; i < props_num; i++)
+	{
+		if (NULL != props[i])
+			__vm_mem_free_func(props[i]);
+	}
+
+	__vm_mem_free_func(props);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_dev_shared_free                                           *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vm device data          *
@@ -468,11 +579,10 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 	if (NULL != hv->id)
 		__vm_mem_free_func(hv->id);
 
-	if (NULL != hv->details)
-		__vm_mem_free_func(hv->details);
-
 	if (NULL != hv->clusterid)
 		__vm_mem_free_func(hv->clusterid);
+
+	vmware_props_shared_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
 /******************************************************************************
@@ -683,6 +793,31 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_props_shared_dup                                          *
+ *                                                                            *
+ * Purpose: copies object properties list into shared memory                  *
+ *                                                                            *
+ * Parameters: src       - [IN] the properties list                           *
+ *             props_num - [IN] the number of properties in the list          *
+ *                                                                            *
+ * Return value: a duplicated object properties list                          *
+ *                                                                            *
+ ******************************************************************************/
+static char	**vmware_props_shared_dup(char ** const src, int props_num)
+{
+	char	**props;
+	int	i;
+
+	props = __vm_mem_malloc_func(NULL, sizeof(char *) * props_num);
+
+	for (i = 0; i < props_num; i++)
+		props[i] = vmware_shared_strdup(src[i]);
+
+	return props;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_vm_shared_dup                                             *
  *                                                                            *
  * Purpose: copies vmware virtual machine object into shared memory           *
@@ -731,8 +866,9 @@ static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 
 	dst->uuid = vmware_shared_strdup(src->uuid);
 	dst->id = vmware_shared_strdup(src->id);
-	dst->details = vmware_shared_strdup(src->details);
 	dst->clusterid = vmware_shared_strdup(src->clusterid);
+
+	dst->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_HVPROPS_NUM);
 
 	for (i = 0; i < src->datastores.values_num; i++)
 		zbx_vector_ptr_append(&dst->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
@@ -810,6 +946,29 @@ static void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_props_free                                                *
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store properties list         *
+ *                                                                            *
+ * Parameters: props     - [IN] the properties list                           *
+ *             props_num - [IN] the number of properties in the list          *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_props_free(char **props, int props_num)
+{
+	int	i;
+
+	if (NULL == props)
+		return;
+
+	for (i = 0; i < props_num; i++)
+		zbx_free(props[i]);
+
+	zbx_free(props);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_dev_free                                                  *
  *                                                                            *
  * Purpose: frees resources allocated to store vm device data                 *
@@ -863,8 +1022,9 @@ static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 
 	zbx_free(hv->uuid);
 	zbx_free(hv->id);
-	zbx_free(hv->details);
 	zbx_free(hv->clusterid);
+
+	vmware_props_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
 /******************************************************************************
@@ -1834,7 +1994,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		zbx_vmware_hv_t *hv, char **error)
 {
 	const char		*__function_name = "vmware_service_init_hv";
-	char			*value;
+	char			*value, *details;
 	zbx_vector_str_t	datastores, vms;
 	int			i, ret = FAIL;
 
@@ -1848,21 +2008,21 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 	zbx_vector_str_create(&datastores);
 	zbx_vector_str_create(&vms);
 
-	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &hv->details, error))
+	if (SUCCEED != vmware_service_get_hv_data(service, easyhandle, id, &details, error))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_HARDWARE("uuid"))))
+	hv->props = xml_read_props(details, hv_propmap, ZBX_VMWARE_HVPROPS_NUM);
+
+	if (NULL == hv->props[ZBX_VMWARE_HVPROP_HW_UUID])
 		goto out;
 
-	hv->uuid = value;
+	hv->uuid = zbx_strdup(NULL, hv->props[ZBX_VMWARE_HVPROP_HW_UUID]);
 	hv->id = zbx_strdup(NULL, id);
 
-	if (NULL != (value = zbx_xml_read_value(hv->details, "//*[@type='ClusterComputeResource']")))
-	{
+	if (NULL != (value = zbx_xml_read_value(details, "//*[@type='ClusterComputeResource']")))
 		hv->clusterid = value;
-	}
 
-	zbx_xml_read_values(hv->details, ZBX_XPATH_HV_DATASTORES(), &datastores);
+	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 
 	for (i = 0; i < datastores.values_num; i++)
 	{
@@ -1872,7 +2032,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 			zbx_vector_ptr_append(&hv->datastores, datastore);
 	}
 
-	zbx_xml_read_values(hv->details, ZBX_XPATH_HV_VMS(), &vms);
+	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
 
 	for (i = 0; i < vms.values_num; i++)
 	{
@@ -1884,6 +2044,8 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 
 	ret = SUCCEED;
 out:
+	zbx_free(details);
+
 	zbx_vector_str_clean(&vms);
 	zbx_vector_str_destroy(&vms);
 

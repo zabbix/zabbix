@@ -95,6 +95,7 @@ typedef struct
 	char			*uuid;
 	char			*id;
 	char			*details;
+	char			**props;
 	zbx_vector_ptr_t	devs;
 }
 zbx_vmware_vm_t;
@@ -104,8 +105,8 @@ typedef struct
 {
 	char			*uuid;
 	char			*id;
-	char			*details;
 	char			*clusterid;
+	char			**props;
 	zbx_vector_ptr_t	datastores;
 	zbx_vector_ptr_t	vms;
 }
@@ -274,6 +275,25 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 char	*zbx_xml_read_value(const char *data, const char *xpath);
 char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
+
+/* hypervisor properties */
+#define ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE		0
+#define ZBX_VMWARE_HVPROP_FULL_NAME			1
+#define ZBX_VMWARE_HVPROP_HW_NUM_CPU_CORES		2
+#define ZBX_VMWARE_HVPROP_HW_CPU_MHZ			3
+#define ZBX_VMWARE_HVPROP_HW_CPU_MODEL			4
+#define ZBX_VMWARE_HVPROP_HW_NUM_CPU_THREADS		5
+#define ZBX_VMWARE_HVPROP_HW_MEMORY_SIZE		6
+#define ZBX_VMWARE_HVPROP_HW_MODEL			7
+#define ZBX_VMWARE_HVPROP_HW_UUID			8
+#define ZBX_VMWARE_HVPROP_HW_VENDOR			9
+#define ZBX_VMWARE_HVPROP_MEMORY_USED			10
+#define ZBX_VMWARE_HVPROP_STATUS			11
+#define ZBX_VMWARE_HVPROP_UPTIME			12
+#define ZBX_VMWARE_HVPROP_VERSION			13
+#define ZBX_VMWARE_HVPROP_NAME				14
+
+#define ZBX_VMWARE_HVPROPS_NUM				15
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
