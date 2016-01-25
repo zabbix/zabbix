@@ -140,6 +140,26 @@ static char	*hv_propmap[] = {
 	ZBX_XPATH_HV_CONFIG("name")					/* ZBX_VMWARE_HVPROP_NAME */
 };
 
+
+static char	*vm_propmap[] = {
+	ZBX_XPATH_VM_CONFIG("numCpu"),					/* ZBX_VMWARE_VMPROP_CPU_NUM */
+	ZBX_XPATH_VM_QUICKSTATS("overallCpuUsage"),			/* ZBX_VMWARE_VMPROP_CPU_USAGE */
+	ZBX_XPATH_VM_CONFIG("name"),					/* ZBX_VMWARE_VMPROP_NAME */
+	ZBX_XPATH_VM_CONFIG("memorySizeMB"),				/* ZBX_VMWARE_VMPROP_MEMORY_SIZE */
+	ZBX_XPATH_VM_QUICKSTATS("balloonedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_BALLOONED */
+	ZBX_XPATH_VM_QUICKSTATS("compressedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_COMPRESSED */
+	ZBX_XPATH_VM_QUICKSTATS("swappedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SWAPPED */
+	ZBX_XPATH_VM_QUICKSTATS("guestMemoryUsage"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_GUEST */
+	ZBX_XPATH_VM_QUICKSTATS("hostMemoryUsage"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_USAGE_HOST */
+	ZBX_XPATH_VM_QUICKSTATS("privateMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_PRIVATE */
+	ZBX_XPATH_VM_QUICKSTATS("sharedMemory"),			/* ZBX_VMWARE_VMPROP_MEMORY_SIZE_SHARED */
+	ZBX_XPATH_VM_RUNTIME("powerState"),				/* ZBX_VMWARE_VMPROP_POWER_STATE */
+	ZBX_XPATH_VM_STORAGE("committed"),				/* ZBX_VMWARE_VMPROP_STORAGE_COMMITED */
+	ZBX_XPATH_VM_STORAGE("unshared"),				/* ZBX_VMWARE_VMPROP_STORAGE_UNSHARED */
+	ZBX_XPATH_VM_STORAGE("uncommitted"),				/* ZBX_VMWARE_VMPROP_STORAGE_UNCOMMITTED */
+	ZBX_XPATH_VM_QUICKSTATS("uptimeSeconds")			/* ZBX_VMWARE_VMPROP_UPTIME */
+};
+
 /* hypervisor hashset support */
 zbx_hash_t	vmware_hv_hash(const void *data)
 {
@@ -553,6 +573,8 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 	if (NULL != vm->details)
 		__vm_mem_free_func(vm->details);
 
+	vmware_props_shared_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
+
 	__vm_mem_free_func(vm);
 }
 
@@ -839,6 +861,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
 	vm->details = vmware_shared_strdup(src->details);
+	vm->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_VMPROPS_NUM);
 
 	for (i = 0; i < src->devs.values_num; i++)
 		zbx_vector_ptr_append(&vm->devs, vmware_dev_shared_dup(src->devs.values[i]));
@@ -1000,6 +1023,7 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 	zbx_free(vm->uuid);
 	zbx_free(vm->id);
 	zbx_free(vm->details);
+	vmware_props_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
 	zbx_free(vm);
 }
 
@@ -1796,6 +1820,8 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 
 	vm->uuid = value;
 	vm->id = zbx_strdup(NULL, id);
+
+	vm->props = xml_read_props(vm->details, vm_propmap, ZBX_VMWARE_VMPROPS_NUM);
 
 	wmware_vm_get_nic_devices(vm);
 	wmware_vm_get_disk_devices(vm);
