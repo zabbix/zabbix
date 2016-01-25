@@ -122,66 +122,72 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		: 'hostInterfacesManager.addNew('.INTERFACE_TYPE_AGENT.');');
 	zbx_add_post_js('hostInterfacesManager.addDroppable(jQuery(".interface_add"))');
 
-	$ifTab = (new CTable())
-		->setHeader([
-			(new CColHeader())->setColSpan(2),
-			new CColHeader(_('IP address')),
-			new CColHeader(_('DNS name')),
-			new CColHeader(_('Connect to')),
-			new CColHeader(_('Port')),
-			new CColHeader(_('Default')),
-			new CColHeader()
-		])
-		->addRow((new CRow([
-				(new CCol(_('Agent')))
-					->setRowSpan(1)
-					->addClass('interface_name'),
-				(new CCol((new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
-			]))
-				->setId('agentInterfacesFooter')
-				->addClass('interface_type_'.INTERFACE_TYPE_AGENT)
-				->addClass('interface_add')
-				->setAttribute('data-type', INTERFACE_TYPE_AGENT)
-		)
-		->addRow(new CRow((new CCol())->setColSpan(8)))
-		->addRow((new CRow([
-				(new CCol(_('SNMP')))
-					->setRowSpan(1)
-					->addClass('interface_name'),
-				(new CCol((new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
-			]))
-				->setId('SNMPInterfacesFooter')
-				->addClass('interface_type_'.INTERFACE_TYPE_SNMP)
-				->addClass('interface_add')
-				->setAttribute('data-type', INTERFACE_TYPE_SNMP)
-		)
-		->addRow(new CRow((new CCol())->setColSpan(8)))
-		->addRow((new CRow([
-				(new CCol(_('JMX')))
-					->setRowSpan(1)
-					->addClass('interface_name'),
-				(new CCol((new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
-			]))
-				->setId('JMXInterfacesFooter')
-				->addClass('interface_type_'.INTERFACE_TYPE_JMX)
-				->addClass('interface_add')
-				->setAttribute('data-type', INTERFACE_TYPE_JMX)
-		)
-		->addRow(new CRow((new CCol())->setColSpan(8)))
-		->addRow((new CRow([
-				(new CCol(_('IPMI')))
-					->setRowSpan(1)
-					->addClass('interface_name'),
-				(new CCol((new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
-			]))
-				->setId('IPMIInterfacesFooter')
-				->addClass('interface_type_'.INTERFACE_TYPE_IPMI)
-				->addClass('interface_add')
-				->setAttribute('data-type', INTERFACE_TYPE_IPMI)
-		);
-
 	$hostList->addRow([_('Interfaces')],
-		(new CDiv($ifTab))
+		(new CDiv(
+			(new CTable())
+				->setHeader([
+					(new CColHeader())->setColSpan(2),
+					new CColHeader(_('IP address')),
+					new CColHeader(_('DNS name')),
+					new CColHeader(_('Connect to')),
+					new CColHeader(_('Port')),
+					new CColHeader(_('Default')),
+					new CColHeader()
+				])
+				->addRow((new CRow([
+						(new CCol(_('Agent')))
+							->setRowSpan(1)
+							->addClass('interface_name'),
+						(new CCol(
+							(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+						))->setColSpan(8)
+					]))
+						->setId('agentInterfacesFooter')
+						->addClass('interface_type_'.INTERFACE_TYPE_AGENT)
+						->addClass('interface_add')
+						->setAttribute('data-type', INTERFACE_TYPE_AGENT)
+				)
+				->addRow(new CRow((new CCol())->setColSpan(8)))
+				->addRow((new CRow([
+						(new CCol(_('SNMP')))
+							->setRowSpan(1)
+							->addClass('interface_name'),
+						(new CCol(
+							(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+						))->setColSpan(8)
+					]))
+						->setId('SNMPInterfacesFooter')
+						->addClass('interface_type_'.INTERFACE_TYPE_SNMP)
+						->addClass('interface_add')
+						->setAttribute('data-type', INTERFACE_TYPE_SNMP)
+				)
+				->addRow(new CRow((new CCol())->setColSpan(8)))
+				->addRow(
+					(new CRow([
+						(new CCol(_('JMX')))
+							->setRowSpan(1)
+							->addClass('interface_name'),
+						(new CCol((new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
+					]))
+						->setId('JMXInterfacesFooter')
+						->addClass('interface_type_'.INTERFACE_TYPE_JMX)
+						->addClass('interface_add')
+						->setAttribute('data-type', INTERFACE_TYPE_JMX)
+				)
+				->addRow(new CRow((new CCol())->setColSpan(8)))
+				->addRow(
+					(new CRow([
+						(new CCol(_('IPMI')))
+							->setRowSpan(1)
+							->addClass('interface_name'),
+						(new CCol((new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(8)
+					]))
+						->setId('IPMIInterfacesFooter')
+						->addClass('interface_type_'.INTERFACE_TYPE_IPMI)
+						->addClass('interface_add')
+						->setAttribute('data-type', INTERFACE_TYPE_IPMI)
+				);
+		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_HOST_INTERFACE_WIDTH.'px;')
 	);
@@ -198,7 +204,7 @@ else {
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 
-	$ifTab = (new CTable())
+	$interface_table = (new CTable())
 		->setHeader([
 			(new CColHeader())->setColSpan(2),
 			new CColHeader(_('IP address')),
@@ -221,7 +227,7 @@ else {
 			->addItem(new CCol())
 			->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
 	}
-	$ifTab
+	$interface_table
 		->addRow($row)
 		->addRow((new CCol())->setColSpan(8));
 
@@ -238,7 +244,7 @@ else {
 			->addItem(new CCol())
 			->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
 	}
-	$ifTab
+	$interface_table
 		->addRow($row)
 		->addRow((new CCol())->setColSpan(8));
 
@@ -256,7 +262,7 @@ else {
 			->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
 	}
 
-	$ifTab
+	$interface_table
 		->addRow($row)
 		->addRow((new CCol())->setColSpan(8));
 
@@ -272,10 +278,10 @@ else {
 		$row->addItem(new CCol())
 			->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
 	}
-	$ifTab->addRow($row);
+	$interface_table->addRow($row);
 
 	$hostList->addRow(_('Interfaces'),
-		(new CDiv($ifTab))
+		(new CDiv($interface_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-widht:'.ZBX_HOST_INTERFACE_WIDTH.';')
 	);

@@ -81,7 +81,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
-	$ifTab = (new CTable())
+	$interface_table = (new CTable())
 		->setHeader([
 			(new CColHeader())->setColSpan(2),
 			new CColHeader(_('IP address')),
@@ -104,7 +104,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 			->addItem(new CCol())
 			->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
 	}
-	$ifTab
+	$interface_table
 		->addRow($row)
 		->addRow((new CCol())->setColSpan(8));
 
@@ -121,7 +121,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 			->addItem(new CCol())
 			->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
 	}
-	$ifTab
+	$interface_table
 		->addRow($row)
 		->addRow((new CCol())->setColSpan(8));
 
@@ -138,7 +138,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 			->addItem(new CCol())
 			->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
 	}
-	$ifTab
+	$interface_table
 		->addRow($row)
 		->addRow((new CCol())->setColSpan(8));
 
@@ -155,10 +155,10 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 			->addItem(new CCol())
 			->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
 	}
-	$ifTab->addRow($row);
+	$interface_table->addRow($row);
 
 	$hostList->addRow(_('Interfaces'),
-		(new CDiv($ifTab))
+		(new CDiv($interface_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width:'.ZBX_HOST_INTERFACE_WIDTH.';')
 	);
