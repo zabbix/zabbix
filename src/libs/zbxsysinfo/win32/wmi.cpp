@@ -39,6 +39,7 @@ extern "C" int	zbx_co_initialize()
 	{
 		HRESULT	hres;
 
+		/* must be called once per each thread */
 		hres = CoInitializeEx(0, COINIT_MULTITHREADED);
 
 		if (FAILED(hres))
@@ -47,15 +48,14 @@ extern "C" int	zbx_co_initialize()
 			return FAIL;
 		}
 
-		/* initialize security */
+		/* must be called once per process, subsequent calls return RPC_E_TOO_LATE */
 		hres = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT,
 				RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
 
-		if (FAILED(hres))
+		if (FAILED(hres) && RPC_E_TOO_LATE != hres)
 		{
-			CoUninitialize();
-
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot set default security levels for COM library");
+			CoUninitialize();
 			return FAIL;
 		}
 
