@@ -603,7 +603,7 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
 	}
 
 	$color = get_color($im, $color);
-	$plygon_color = '960000';
+	$plygon_color = get_color($im, '960000');
 
 	if (strpos($marks, 't') !== false) {
 		imagefilledpolygon($im, $gims['t'], $polygons, $color);
