@@ -161,17 +161,21 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*os_caption = NULL;
 	char	*os_csdversion = NULL;
 	char	*proc_architecture = NULL;
+	char	*proc_addresswidth = NULL;
 	char	*wmi_namespace = "root\\cimv2";
-	char	*arch = "<unknown machine>";
+	char	*arch = "<unknown architecture>";
 
 	/* Emulates uname(2) (POSIX) since it is not provided natively by Windows by taking */
 	/* the relevant values from Win32_OperatingSystem and Win32_Processor WMI classes.  */
+	/* It was decided that in context of Windows OS ISA is more useful information than */
+	/* CPU architecture. This is contrary to POSIX and uname(2) in Unix.                */
 
 	zbx_wmi_get(wmi_namespace, "select CSName from Win32_OperatingSystem", &os_csname);
 	zbx_wmi_get(wmi_namespace, "select Version from Win32_OperatingSystem", &os_version);
 	zbx_wmi_get(wmi_namespace, "select Caption from Win32_OperatingSystem", &os_caption);
 	zbx_wmi_get(wmi_namespace, "select CSDVersion from Win32_OperatingSystem", &os_csdversion);
 	zbx_wmi_get(wmi_namespace, "select Architecture from Win32_Processor", &proc_architecture);
+	zbx_wmi_get(wmi_namespace, "select AddressWidth from Win32_Processor", &proc_addresswidth);
 
 	if (NULL != proc_architecture)
 	{
@@ -179,7 +183,16 @@ int	SYSTEM_UNAME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			case 0: arch = "x86"; break;
 			case 6: arch = "ia64"; break;
-			case 9: arch = "x64"; break;
+			case 9:
+				if (NULL != proc_addresswidth)
+				{
+					if (32 == atoi(proc_addresswidth))
+						arch = "x86";
+					else
+						arch = "x64";
+				}
+
+				break;
 		}
 	}
 
