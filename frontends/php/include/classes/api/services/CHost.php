@@ -1558,6 +1558,12 @@ class CHost extends CHostGeneral {
 						'Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters.'
 					));
 				}
+
+				if (strlen($host['tls_psk']) < PSK_MIN_LEN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('PSK is too short. Minimum is "%1$s" hex-digits.', PSK_MIN_LEN)
+					);
+				}
 			}
 		}
 	}
