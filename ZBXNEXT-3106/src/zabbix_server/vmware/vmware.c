@@ -552,6 +552,23 @@ static void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_fs_shared_free                                            *
+ *                                                                            *
+ * Purpose: frees shared resources allocated to store file system object      *
+ *                                                                            *
+ * Parameters: dev   - [IN] the vm device                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
+{
+	if (NULL != fs->path)
+		__vm_mem_free_func(fs->path);
+
+	__vm_mem_free_func(fs);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_vm_shared_free                                            *
  *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
@@ -564,14 +581,14 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_shared_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
+	zbx_vector_ptr_clean(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_shared_free);
+	zbx_vector_ptr_destroy(&vm->file_systems);
+
 	if (NULL != vm->uuid)
 		__vm_mem_free_func(vm->uuid);
 
 	if (NULL != vm->id)
 		__vm_mem_free_func(vm->id);
-
-	if (NULL != vm->details)
-		__vm_mem_free_func(vm->details);
 
 	vmware_props_shared_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
 
@@ -815,6 +832,30 @@ static zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_fs_shared_dup                                             *
+ *                                                                            *
+ * Purpose: copies vmware virtual machine file system object into shared      *
+ *          memory                                                            *
+ *                                                                            *
+ * Parameters: src   - [IN] the vmware device object                          *
+ *                                                                            *
+ * Return value: a duplicated vmware device object                            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
+{
+	zbx_vmware_fs_t	*fs;
+
+	fs = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_fs_t));
+	fs->path = vmware_shared_strdup(src->path);
+	fs->capacity = src->capacity;
+	fs->free_space = src->free_space;
+
+	return fs;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_props_shared_dup                                          *
  *                                                                            *
  * Purpose: copies object properties list into shared memory                  *
@@ -857,14 +898,17 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	vm = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_vm_t));
 
 	VMWARE_VECTOR_CREATE(&vm->devs, ptr);
+	VMWARE_VECTOR_CREATE(&vm->file_systems, ptr);
 
 	vm->uuid = vmware_shared_strdup(src->uuid);
 	vm->id = vmware_shared_strdup(src->id);
-	vm->details = vmware_shared_strdup(src->details);
 	vm->props = vmware_props_shared_dup(src->props, ZBX_VMWARE_VMPROPS_NUM);
 
 	for (i = 0; i < src->devs.values_num; i++)
 		zbx_vector_ptr_append(&vm->devs, vmware_dev_shared_dup(src->devs.values[i]));
+
+	for (i = 0; i < src->file_systems.values_num; i++)
+		zbx_vector_ptr_append(&vm->file_systems, vmware_fs_shared_dup(src->file_systems.values[i]));
 
 	return vm;
 }
@@ -994,7 +1038,7 @@ static void	vmware_props_free(char **props, int props_num)
  *                                                                            *
  * Function: vmware_dev_free                                                  *
  *                                                                            *
- * Purpose: frees resources allocated to store vm device data                 *
+ * Purpose: frees resources allocated to store vm device object               *
  *                                                                            *
  * Parameters: dev   - [IN] the vm device                                     *
  *                                                                            *
@@ -1004,6 +1048,21 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
 	zbx_free(dev->instance);
 	zbx_free(dev->label);
 	zbx_free(dev);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_fs_free                                                   *
+ *                                                                            *
+ * Purpose: frees resources allocated to store vm file system object          *
+ *                                                                            *
+ * Parameters: dev   - [IN] the vm device                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_fs_free(zbx_vmware_fs_t *fs)
+{
+	zbx_free(fs->path);
+	zbx_free(fs);
 }
 
 /******************************************************************************
@@ -1020,9 +1079,11 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 	zbx_vector_ptr_clean(&vm->devs, (zbx_mem_free_func_t)vmware_dev_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
+	zbx_vector_ptr_clean(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_free);
+	zbx_vector_ptr_destroy(&vm->file_systems);
+
 	zbx_free(vm->uuid);
 	zbx_free(vm->id);
-	zbx_free(vm->details);
 	vmware_props_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
 	zbx_free(vm);
 }
@@ -1518,17 +1579,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: wmware_vm_get_nic_devices                                        *
+ * Function: vmware_vm_get_nic_devices                                        *
  *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
- * Parameters: vm     - [IN] the virtual machine                              *
+ * Parameters: vm      - [IN] the virtual machine                             *
+ *             details - [IN] a xml string containing virtual machine data    *
  *                                                                            *
  * Comments: The network interface devices are taken from vm device list      *
  *           filtered by macAddress key.                                      *
  *                                                                            *
  ******************************************************************************/
-static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
+static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, const char *details)
 {
 	const char	*__function_name = "wmware_vm_get_nic_devices";
 	xmlDoc		*doc;
@@ -1539,7 +1601,7 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(details, strlen(details), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -1565,14 +1627,12 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 		dev = zbx_malloc(NULL, sizeof(zbx_vmware_dev_t));
 		dev->type =  ZBX_VMWARE_DEV_TYPE_NIC;
-		dev->instance = zbx_strdup(NULL, key);
+		dev->instance = key;
 		dev->label = zbx_xml_read_node_value(doc, nodeset->nodeTab[i],
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
 
 		zbx_vector_ptr_append(&vm->devs, dev);
 		nics++;
-
-		zbx_free(key);
 	}
 clean:
 	if (NULL != xpathObj)
@@ -1586,14 +1646,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: wmware_vm_get_disk_devices                                       *
+ * Function: vmware_vm_get_disk_devices                                       *
  *                                                                            *
  * Purpose: gets virtual machine virtual disk devices                         *
  *                                                                            *
- * Parameters: vm     - [IN] the virtual machine                              *
+ * Parameters: vm      - [IN] the virtual machine                             *
+ *             details - [IN] a xml string containing virtual machine data    *
  *                                                                            *
  ******************************************************************************/
-static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
+static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, const char *details)
 {
 	const char	*__function_name = "wmware_vm_get_disk_devices";
 	xmlDoc		*doc;
@@ -1605,7 +1666,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, 0)))
+	if (NULL == (doc = xmlReadMemory(details, strlen(details), ZBX_VM_NONAME_XML, NULL, 0)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -1706,6 +1767,80 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_vm_get_file_systems                                       *
+ *                                                                            *
+ * Purpose: gets virtual machine network interface devices                    *
+ *                                                                            *
+ * Parameters: vm     - [IN] the virtual machine                              *
+ *             details - [IN] a xml string containing virtual machine data    *
+ *                                                                            *
+ * Comments: The network interface devices are taken from vm device list      *
+ *           filtered by macAddress key.                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, const char *details)
+{
+	const char	*__function_name = "vmware_vm_get_file_systems";
+	xmlDoc		*doc;
+	xmlXPathContext	*xpathCtx;
+	xmlXPathObject	*xpathObj;
+	xmlNodeSetPtr	nodeset;
+	int		i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (NULL == (doc = xmlReadMemory(details, strlen(details), ZBX_VM_NONAME_XML, NULL, 0)))
+		goto out;
+
+	xpathCtx = xmlXPathNewContext(doc);
+
+	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)ZBX_XPATH_VM_GUESTDISKS(), xpathCtx)))
+		goto clean;
+
+	if (0 != xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+		goto clean;
+
+	nodeset = xpathObj->nodesetval;
+
+	for (i = 0; i < nodeset->nodeNr; i++)
+	{
+		zbx_vmware_fs_t	*fs;
+		char		*value;
+
+		if (NULL == (value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='diskPath']")))
+			continue;
+
+		fs = zbx_malloc(NULL, sizeof(zbx_vmware_fs_t));
+		memset(fs, 0, sizeof(zbx_vmware_fs_t));
+
+		fs->path = value;
+
+		if (NULL != (value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='capacity']")))
+		{
+			ZBX_STR2UINT64(fs->capacity, value);
+			zbx_free(value);
+		}
+
+		if (NULL != (value = zbx_xml_read_node_value(doc, nodeset->nodeTab[i], "*[local-name()='freeSpace']")))
+		{
+			ZBX_STR2UINT64(fs->free_space, value);
+			zbx_free(value);
+		}
+
+		zbx_vector_ptr_append(&vm->file_systems, fs);
+	}
+clean:
+	if (NULL != xpathObj)
+		xmlXPathFreeObject(xpathObj);
+
+	xmlXPathFreeContext(xpathCtx);
+	xmlFreeDoc(doc);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __function_name, vm->file_systems.values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_get_vm_data                                       *
  *                                                                            *
  * Purpose: gets the virtual machine data                                     *
@@ -1734,7 +1869,7 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>config.uuid</ns0:pathSet>"	\
 					"<ns0:pathSet>config.instanceUuid</ns0:pathSet>"\
 					"<ns0:pathSet>summary</ns0:pathSet>"		\
-					"<ns0:pathSet>guest</ns0:pathSet>"		\
+					"<ns0:pathSet>guest.disk</ns0:pathSet>"		\
 				"</ns0:propSet>"					\
 				"<ns0:objectSet>"					\
 					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"	\
@@ -1801,7 +1936,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	const char	*__function_name = "vmware_service_create_vm";
 
 	zbx_vmware_vm_t	*vm;
-	char		*value;
+	char		*value, *details;
 	const char	*uuid_xpath[3] = {NULL, ZBX_XPATH_VM_UUID(), ZBX_XPATH_VM_INSTANCE_UUID()};
 	int		ret = FAIL;
 
@@ -1811,23 +1946,27 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	memset(vm, 0, sizeof(zbx_vmware_vm_t));
 
 	zbx_vector_ptr_create(&vm->devs);
+	zbx_vector_ptr_create(&vm->file_systems);
 
-	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, &vm->details, error))
+	if (SUCCEED != vmware_service_get_vm_data(service, easyhandle, id, &details, error))
 		goto out;
 
-	if (NULL == (value = zbx_xml_read_value(vm->details, uuid_xpath[service->type])))
+	if (NULL == (value = zbx_xml_read_value(details, uuid_xpath[service->type])))
 		goto out;
 
 	vm->uuid = value;
 	vm->id = zbx_strdup(NULL, id);
 
-	vm->props = xml_read_props(vm->details, vm_propmap, ZBX_VMWARE_VMPROPS_NUM);
+	vm->props = xml_read_props(details, vm_propmap, ZBX_VMWARE_VMPROPS_NUM);
 
-	wmware_vm_get_nic_devices(vm);
-	wmware_vm_get_disk_devices(vm);
+	vmware_vm_get_nic_devices(vm, details);
+	vmware_vm_get_disk_devices(vm, details);
+	vmware_vm_get_file_systems(vm, details);
 
 	ret = SUCCEED;
 out:
+	zbx_free(details);
+
 	if (SUCCEED != ret)
 	{
 		vmware_vm_free(vm);

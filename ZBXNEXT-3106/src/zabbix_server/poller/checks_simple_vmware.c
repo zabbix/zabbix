@@ -2505,7 +2505,6 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
 	char			*url, *uuid;
-	zbx_vector_str_t	disks;
 	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2536,24 +2535,19 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 		goto unlock;
 	}
 
-	zbx_vector_str_create(&disks);
-
-	zbx_xml_read_values(vm->details, ZBX_XPATH_LN2("disk", "diskPath"), &disks);
-
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
-	for (i = 0; i < disks.values_num; i++)
+	for (i = 0; i < vm->file_systems.values_num; i++)
 	{
+		zbx_vmware_fs_t	*fs = (zbx_vmware_fs_t *)vm->file_systems.values[i];
+
 		zbx_json_addobject(&json_data, NULL);
-		zbx_json_addstring(&json_data, "{#FSNAME}", disks.values[i], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "{#FSNAME}", fs->path, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json_data);
 	}
 
 	zbx_json_close(&json_data);
-
-	zbx_vector_str_clean(&disks);
-	zbx_vector_str_destroy(&disks);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, json_data.buffer));
 
@@ -2575,9 +2569,9 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
-	char			*url, *uuid, *fsname, *mode, *value = NULL, xpath[MAX_STRING_LEN];
-	zbx_uint64_t		value_total, value_free;
-	int			ret = SYSINFO_RET_FAIL;
+	char			*url, *uuid, *fsname, *mode;
+	int			i, ret = SYSINFO_RET_FAIL;
+	zbx_vmware_fs_t		*fs = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2609,48 +2603,38 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	zbx_snprintf(xpath, sizeof(xpath),
-			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/.." ZBX_XPATH_LN("capacity"), fsname);
+	for (i = 0; i < vm->file_systems.values_num; i++)
+	{
+		fs = (zbx_vmware_fs_t *)vm->file_systems.values[i];
 
-	if (NULL == (value = zbx_xml_read_value(vm->details, xpath)))
+		if (0 == strcmp(fs->path, fsname))
+			break;
+	}
+
+	if (NULL == fs)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown file system path."));
 		goto unlock;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() value:'%s'", __function_name, value);
-
-	if (SUCCEED != is_uint64(value, &value_total))
-		goto unlock;
-
-	zbx_free(value);
-
-	zbx_snprintf(xpath, sizeof(xpath),
-			ZBX_XPATH_LN2("disk", "diskPath") "[.='%s']/.." ZBX_XPATH_LN("freeSpace"), fsname);
-
-	if (NULL == (value = zbx_xml_read_value(vm->details, xpath)))
-		goto unlock;
-
-	if (SUCCEED != is_uint64(value, &value_free))
-		goto unlock;
+	}
 
 	ret = SYSINFO_RET_OK;
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
-		SET_UI64_RESULT(result, value_total);
+		SET_UI64_RESULT(result, fs->capacity);
 	else if (0 == strcmp(mode, "free"))
-		SET_UI64_RESULT(result, value_free);
+		SET_UI64_RESULT(result, fs->free_space);
 	else if (0 == strcmp(mode, "used"))
-		SET_UI64_RESULT(result, value_total - value_free);
+		SET_UI64_RESULT(result, fs->capacity - fs->free_space);
 	else if (0 == strcmp(mode, "pfree"))
-		SET_DBL_RESULT(result, 0 != value_total ? (double)(100.0 * value_free) / value_total : 0);
+		SET_DBL_RESULT(result, 0 != fs->capacity ? (double)(100.0 * fs->free_space) / fs->capacity : 0);
 	else if (0 == strcmp(mode, "pused"))
-		SET_DBL_RESULT(result, 100.0 - (0 != value_total ? (double)(100.0 * value_free) / value_total : 0));
+		SET_DBL_RESULT(result, 100.0 - (0 != fs->capacity ? 100.0 * fs->free_space / fs->capacity : 0));
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fourth parameter."));
 		ret = SYSINFO_RET_FAIL;
 	}
 unlock:
-	zbx_free(value);
-
 	zbx_vmware_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));

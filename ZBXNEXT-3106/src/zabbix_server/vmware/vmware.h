@@ -89,14 +89,23 @@ typedef struct
 }
 zbx_vmware_dev_t;
 
+/* file system data */
+typedef struct
+{
+	char		*path;
+	zbx_uint64_t	capacity;
+	zbx_uint64_t	free_space;
+}
+zbx_vmware_fs_t;
+
 /* the vmware virtual machine data */
 typedef struct
 {
 	char			*uuid;
 	char			*id;
-	char			*details;
 	char			**props;
 	zbx_vector_ptr_t	devs;
+	zbx_vector_ptr_t	file_systems;
 }
 zbx_vmware_vm_t;
 
@@ -231,6 +240,10 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
+#define ZBX_XPATH_VM_GUESTDISKS()									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
+	"/*/*[local-name()='GuestDiskInfo']"
+
 #define ZBX_XPATH_VM_UUID()										\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
 		"/*[local-name()='val']"
@@ -262,7 +275,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 		"/*[local-name()='val']/*[local-name()='numericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
-
 
 #define ZBX_XPATH_VMWARE_ABOUT(property)								\
 	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
