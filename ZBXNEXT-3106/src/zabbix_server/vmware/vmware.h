@@ -111,6 +111,14 @@ typedef struct
 }
 zbx_vmware_hv_t;
 
+/* index virtual machines by uuids */
+typedef struct
+{
+	zbx_vmware_vm_t	*vm;
+	zbx_vmware_hv_t	*hv;
+}
+zbx_vmware_vm_index_t;
+
 /* the vmware cluster data */
 typedef struct
 {
@@ -126,7 +134,8 @@ typedef struct
 	char	*error;
 	char	*events;
 
-	zbx_vector_ptr_t	hvs;
+	zbx_hashset_t		hvs;
+	zbx_hashset_t		vms_index;
 	zbx_vector_ptr_t	clusters;
 }
 zbx_vmware_data_t;

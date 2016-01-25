@@ -61,73 +61,56 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 	return ret;
 }
 
-static zbx_vmware_hv_t	*hv_get(zbx_vector_ptr_t *hvs, const char *uuid)
+static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 {
 	const char	*__function_name = "hv_get";
 
-	int		i;
-	zbx_vmware_hv_t	*hv;
+	zbx_vmware_hv_t	*hv, hv_local = {(char *)uuid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
-	for (i = 0; i < hvs->values_num; i++)
-	{
-		hv = (zbx_vmware_hv_t *)hvs->values[i];
+	hv = zbx_hashset_search(hvs, &hv_local);
 
-		if (0 == strcmp(hv->uuid, uuid))
-			goto out;
-	}
-
-	hv = NULL;
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, hv);
 
 	return hv;
 }
 
-static zbx_vmware_vm_t	*vm_get(zbx_vector_ptr_t *vms, const char *uuid)
+static zbx_vmware_hv_t	*service_hv_get_by_vm_uuid(zbx_vmware_service_t *service, const char *uuid)
 {
-	const char	*__function_name = "vm_get";
+	const char	*__function_name = "service_hv_get_by_vm_uuid";
 
-	int		i;
-	zbx_vmware_vm_t	*vm;
+	zbx_vmware_vm_t		vm_local = {(char *)uuid};
+	zbx_vmware_vm_index_t	vmi_local = {&vm_local}, *vmi;
+	zbx_vmware_hv_t		*hv = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
-	for (i = 0; i < vms->values_num; i++)
-	{
-		vm = (zbx_vmware_vm_t *)vms->values[i];
+	if (NULL != (vmi = zbx_hashset_search(&service->data->vms_index, &vmi_local)))
+		hv = vmi->hv;
+	else
+		hv = NULL;
 
-		if (0 == strcmp(vm->uuid, uuid))
-			goto out;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, hv);
 
-	vm = NULL;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, vm);
+	return hv;
 
-	return vm;
 }
 
 static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char *uuid)
 {
 	const char	*__function_name = "service_vm_get";
 
-	int		i;
-	zbx_vmware_vm_t	*vm;
+	zbx_vmware_vm_t		vm_local = {(char *)uuid}, *vm;
+	zbx_vmware_vm_index_t	vmi_local = {&vm_local}, *vmi;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __function_name, uuid);
 
-	for (i = 0; i < service->data->hvs.values_num; i++)
-	{
-		zbx_vmware_hv_t	*hv = (zbx_vmware_hv_t *)service->data->hvs.values[i];
+	if (NULL != (vmi = zbx_hashset_search(&service->data->vms_index, &vmi_local)))
+		vm = vmi->vm;
+	else
+		vm = NULL;
 
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
-			goto out;
-	}
-
-	vm = NULL;
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, vm);
 
 	return vm;
@@ -953,7 +936,10 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	struct zbx_json		json_data;
 	char			*url, *name;
 	zbx_vmware_service_t	*service;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vmware_hv_t		*hv;
+	zbx_hashset_iter_t	iter;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -973,10 +959,10 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
-	for (i = 0; i < service->data->hvs.values_num; i++)
+	zbx_hashset_iter_reset(&service->data->hvs, &iter);
+	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vmware_cluster_t	*cluster = NULL;
-		zbx_vmware_hv_t	*hv = (zbx_vmware_hv_t *)service->data->hvs.values[i];
 
 		if (NULL == (name = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_CONFIG("name"))))
 			continue;
@@ -1659,7 +1645,8 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 	char			*url, *uuid;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_cluster_t	*cluster = NULL;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
+	zbx_vmware_hv_t		*hv;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1683,19 +1670,13 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (i = 0; i < service->data->hvs.values_num; i++)
+	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
 	{
-		zbx_vmware_hv_t	*hv = service->data->hvs.values[i];
-		zbx_vmware_vm_t		*vm;
-
-		if (NULL != (vm = vm_get(&hv->vms, uuid)))
-		{
-			if (NULL != hv->clusterid)
-				cluster = cluster_get(&service->data->clusters, hv->clusterid);
-
-			break;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
 	}
+	if (NULL != hv->clusterid)
+		cluster = cluster_get(&service->data->clusters, hv->clusterid);
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, NULL != cluster ? cluster->name : ""));
 
@@ -1737,7 +1718,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_t		*vm;
-	int			i, k, ret = SYSINFO_RET_FAIL;
+	zbx_hashset_iter_t	iter;
+	int			i, ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1757,18 +1739,17 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_json_init(&json_data, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addarray(&json_data, ZBX_PROTO_TAG_DATA);
 
-	for (i = 0; i < service->data->hvs.values_num; i++)
+	zbx_hashset_iter_reset(&service->data->hvs, &iter);
+	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
 	{
 		zbx_vmware_cluster_t	*cluster = NULL;
-
-		hv = (zbx_vmware_hv_t *)service->data->hvs.values[i];
 
 		if (NULL != hv->clusterid)
 			cluster = cluster_get(&service->data->clusters, hv->clusterid);
 
-		for (k = 0; k < hv->vms.values_num; k++)
+		for (i = 0; i < hv->vms.values_num; i++)
 		{
-			vm = (zbx_vmware_vm_t *)hv->vms.values[k];
+			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
 
 			if (NULL == (vm_name = zbx_xml_read_value(vm->details, ZBX_XPATH_VM_CONFIG("name"))))
 				continue;
@@ -1816,7 +1797,7 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	char			*url, *uuid, *name;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1840,23 +1821,19 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (i = 0; i < service->data->hvs.values_num; i++)
+
+	if (NULL == (hv = service_hv_get_by_vm_uuid(service, uuid)))
 	{
-		hv = (zbx_vmware_hv_t *)service->data->hvs.values[i];
-
-		if (NULL != vm_get(&hv->vms, uuid))
-			break;
-	}
-
-	if (i != service->data->hvs.values_num)
-	{
-		name = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_CONFIG("name"));
-
-		SET_STR_RESULT(result, name);
-		ret = SYSINFO_RET_OK;
-	}
-	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
+		goto unlock;
+	}
+
+	name = zbx_xml_read_value(hv->details, ZBX_XPATH_HV_CONFIG("name"));
+	SET_STR_RESULT(result, name);
+
+	ret = SYSINFO_RET_OK;
+
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
 unlock:
 	zbx_vmware_unlock();
 out:

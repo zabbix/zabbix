@@ -114,6 +114,38 @@ typedef struct
 }
 zbx_vmware_counter_t;
 
+/* hypervisor hashset support */
+zbx_hash_t	vmware_hv_hash(const void *data)
+{
+	zbx_vmware_hv_t	*hv = (zbx_vmware_hv_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->uuid, strlen(hv->uuid), ZBX_DEFAULT_HASH_SEED);
+}
+
+int	vmware_hv_compare(const void *d1, const void *d2)
+{
+	zbx_vmware_hv_t	*hv1 = (zbx_vmware_hv_t *)d1;
+	zbx_vmware_hv_t	*hv2 = (zbx_vmware_hv_t *)d2;
+
+	return strcmp(hv1->uuid, hv2->uuid);
+}
+
+/* virtual machine index support */
+zbx_hash_t	vmware_vm_hash(const void *data)
+{
+	zbx_vmware_vm_index_t	*vmi = (zbx_vmware_vm_index_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(vmi->vm->uuid, strlen(vmi->vm->uuid), ZBX_DEFAULT_HASH_SEED);
+}
+
+int	vmware_vm_compare(const void *d1, const void *d2)
+{
+	zbx_vmware_vm_index_t	*vmi1 = (zbx_vmware_vm_index_t *)d1;
+	zbx_vmware_vm_index_t	*vmi2 = (zbx_vmware_vm_index_t *)d2;
+
+	return strcmp(vmi1->vm->uuid, vmi2->vm->uuid);
+}
+
 /*
  * SOAP support
  */
@@ -415,14 +447,14 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hv_shared_free                                            *
+ * Function: vmware_hv_shared_clean                                           *
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
+static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 {
 	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_shared_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
@@ -441,8 +473,6 @@ static void	vmware_hv_shared_free(zbx_vmware_hv_t *hv)
 
 	if (NULL != hv->clusterid)
 		__vm_mem_free_func(hv->clusterid);
-
-	__vm_mem_free_func(hv);
 }
 
 /******************************************************************************
@@ -481,8 +511,16 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 {
 	if (NULL != data)
 	{
-		zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_shared_free);
-		zbx_vector_ptr_destroy(&data->hvs);
+		zbx_hashset_iter_t	iter;
+		zbx_vmware_hv_t		*hv;
+
+		zbx_hashset_iter_reset(&data->hvs, &iter);
+		while (NULL != (hv = zbx_hashset_iter_next(&iter)))
+			vmware_hv_shared_clean(hv);
+
+		zbx_hashset_destroy(&data->hvs);
+
+		zbx_hashset_destroy(&data->vms_index);
 
 		zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_shared_free);
 		zbx_vector_ptr_destroy(&data->clusters);
@@ -675,7 +713,7 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hv_shared_dup                                             *
+ * Function: vmware_hv_shared_copy                                            *
  *                                                                            *
  * Purpose: copies vmware hypervisor object into shared memory                *
  *                                                                            *
@@ -684,28 +722,23 @@ static zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
  * Return value: a duplicated vmware hypervisor object                        *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
+static	void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *src)
 {
-	zbx_vmware_hv_t	*hv;
-	int		i;
+	int	i;
 
-	hv = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_hv_t));
+	VMWARE_VECTOR_CREATE(&dst->datastores, ptr);
+	VMWARE_VECTOR_CREATE(&dst->vms, ptr);
 
-	VMWARE_VECTOR_CREATE(&hv->datastores, ptr);
-	VMWARE_VECTOR_CREATE(&hv->vms, ptr);
-
-	hv->uuid = vmware_shared_strdup(src->uuid);
-	hv->id = vmware_shared_strdup(src->id);
-	hv->details = vmware_shared_strdup(src->details);
-	hv->clusterid = vmware_shared_strdup(src->clusterid);
+	dst->uuid = vmware_shared_strdup(src->uuid);
+	dst->id = vmware_shared_strdup(src->id);
+	dst->details = vmware_shared_strdup(src->details);
+	dst->clusterid = vmware_shared_strdup(src->clusterid);
 
 	for (i = 0; i < src->datastores.values_num; i++)
-		zbx_vector_ptr_append(&hv->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
+		zbx_vector_ptr_append(&dst->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
 
 	for (i = 0; i < src->vms.values_num; i++)
-		zbx_vector_ptr_append(&hv->vms, vmware_vm_shared_dup(src->vms.values[i]));
-
-	return hv;
+		zbx_vector_ptr_append(&dst->vms, vmware_vm_shared_dup(src->vms.values[i]));
 }
 
 /******************************************************************************
@@ -719,15 +752,21 @@ static zbx_vmware_hv_t	*vmware_hv_shared_dup(const zbx_vmware_hv_t *src)
  * Return value: a duplicated vmware data object                              *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_data_t	*vmware_data_shared_dup(const zbx_vmware_data_t *src)
+static zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 {
 	zbx_vmware_data_t	*data;
 	int			i;
+	zbx_hashset_iter_t	iter;
+	zbx_vmware_hv_t		*hv, hv_local;
 
 	data = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_data_t));
 
-	VMWARE_VECTOR_CREATE(&data->hvs, ptr);
+	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_mem_malloc_func,
+			__vm_mem_realloc_func, __vm_mem_free_func);
 	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
+
+	zbx_hashset_create_ext(&data->vms_index, 100, vmware_vm_hash, vmware_vm_compare, NULL, __vm_mem_malloc_func,
+			__vm_mem_realloc_func, __vm_mem_free_func);
 
 	data->events = vmware_shared_strdup(src->events);
 	data->error =  vmware_shared_strdup(src->error);
@@ -735,8 +774,20 @@ static zbx_vmware_data_t	*vmware_data_shared_dup(const zbx_vmware_data_t *src)
 	for (i = 0; i < src->clusters.values_num; i++)
 		zbx_vector_ptr_append(&data->clusters, vmware_cluster_shared_dup(src->clusters.values[i]));
 
-	for (i = 0; i < src->hvs.values_num; i++)
-		zbx_vector_ptr_append(&data->hvs, vmware_hv_shared_dup(src->hvs.values[i]));
+	zbx_hashset_iter_reset(&src->hvs, &iter);
+	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
+	{
+
+		vmware_hv_shared_copy(&hv_local, hv);
+		hv = zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
+
+		for (i = 0; i < hv->vms.values_num; i++)
+		{
+			zbx_vmware_vm_index_t	vmi_local = {(zbx_vmware_vm_t *)hv->vms.values[i], hv};
+
+			zbx_hashset_insert(&data->vms_index, &vmi_local, sizeof(vmi_local));
+		}
+	}
 
 	return data;
 }
@@ -795,14 +846,14 @@ static void	vmware_vm_free(zbx_vmware_vm_t *vm)
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_hv_free                                                   *
+ * Function: vmware_hv_clean                                                  *
  *                                                                            *
  * Purpose: frees resources allocated to store vmware hypervisor              *
  *                                                                            *
  * Parameters: hv   - [IN] the vmware hypervisor                              *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_hv_free(zbx_vmware_hv_t *hv)
+static void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 {
 	zbx_vector_ptr_clean(&hv->datastores, (zbx_mem_free_func_t)vmware_datastore_free);
 	zbx_vector_ptr_destroy(&hv->datastores);
@@ -814,7 +865,6 @@ static void	vmware_hv_free(zbx_vmware_hv_t *hv)
 	zbx_free(hv->id);
 	zbx_free(hv->details);
 	zbx_free(hv->clusterid);
-	zbx_free(hv);
 }
 
 /******************************************************************************
@@ -845,8 +895,14 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  ******************************************************************************/
 static void	vmware_data_free(zbx_vmware_data_t *data)
 {
-	zbx_vector_ptr_clean(&data->hvs, (zbx_mem_free_func_t)vmware_hv_free);
-	zbx_vector_ptr_destroy(&data->hvs);
+	zbx_hashset_iter_t	iter;
+	zbx_vmware_hv_t		*hv;
+
+	zbx_hashset_iter_reset(&data->hvs, &iter);
+	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
+		vmware_hv_clean(hv);
+
+	zbx_hashset_destroy(&data->hvs);
 
 	zbx_vector_ptr_clean(&data->clusters, (zbx_mem_free_func_t)vmware_cluster_free);
 	zbx_vector_ptr_destroy(&data->clusters);
@@ -1760,31 +1816,30 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: vmware_service_create_hv                                         *
+ * Function: vmware_service_init_hv                                           *
  *                                                                            *
- * Purpose: create vmware hypervisor object                                   *
+ * Purpose: initialize vmware hypervisor object                               *
  *                                                                            *
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the vmware hypervisor id                   *
+ *             hv           - [OUT] the hypervisor object                     *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
- * Return value: The created vmware hypervisor object or NULL if an error was *
- *               detected.                                                    *
+ * Return value: SUCCEED - the hypervisor object was initialized successfully *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_hv_t	*vmware_service_create_hv(zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *id, char **error)
+static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
+		zbx_vmware_hv_t *hv, char **error)
 {
-	const char		*__function_name = "vmware_service_create_hv";
-	zbx_vmware_hv_t		*hv;
+	const char		*__function_name = "vmware_service_init_hv";
 	char			*value;
 	zbx_vector_str_t	datastores, vms;
 	int			i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __function_name, id);
 
-	hv = zbx_malloc(NULL, sizeof(zbx_vmware_hv_t));
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
 
 	zbx_vector_ptr_create(&hv->datastores);
@@ -1836,14 +1891,11 @@ out:
 	zbx_vector_str_destroy(&datastores);
 
 	if (SUCCEED != ret)
-	{
-		vmware_hv_free(hv);
-		hv = NULL;
-	}
+		vmware_hv_clean(hv);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
-	return hv;
+	return ret;
 }
 
 /******************************************************************************
@@ -2732,7 +2784,7 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 {
 	const char			*__function_name = "vmware_service_update_perf_entities";
 
-	int				now, i, j;
+	int				now, i;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_hv_t			*hv;
 	zbx_vmware_vm_t			*vm;
@@ -2757,14 +2809,14 @@ static void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 	now = time(NULL);
 
 	/* update current performance entities */
-	for (i = 0; i < service->data->hvs.values_num; i++)
+	zbx_hashset_iter_reset(&service->data->hvs, &iter);
+	while (NULL != (hv = zbx_hashset_iter_next(&iter)))
 	{
-		hv = service->data->hvs.values[i];
 		vmware_service_add_perf_entity(service, "HostSystem", hv->id, hv_perfcounters, now);
 
-		for (j = 0; j < hv->vms.values_num; j++)
+		for (i = 0; i < hv->vms.values_num; i++)
 		{
-			vm = hv->vms.values[j];
+			vm = hv->vms.values[i];
 			vmware_service_add_perf_entity(service, "VirtualMachine", vm->id, vm_perfcounters, now);
 		}
 	}
@@ -2807,7 +2859,7 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 	data = zbx_malloc(NULL, sizeof(zbx_vmware_data_t));
 	memset(data, 0, sizeof(zbx_vmware_data_t));
 
-	zbx_vector_ptr_create(&data->hvs);
+	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_ptr_create(&data->clusters);
 
 	zbx_vector_str_create(&hvs);
@@ -2841,10 +2893,10 @@ static void	vmware_service_update(zbx_vmware_service_t *service)
 
 	for (i = 0; i < hvs.values_num; i++)
 	{
-		zbx_vmware_hv_t	*hv;
+		zbx_vmware_hv_t	hv_local;
 
-		if (NULL != (hv = vmware_service_create_hv(service, easyhandle, hvs.values[i], &data->error)))
-			zbx_vector_ptr_append(&data->hvs, hv);
+		if (SUCCEED == vmware_service_init_hv(service, easyhandle, hvs.values[i], &hv_local, &data->error))
+			zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
 	}
 
 	if (SUCCEED != vmware_service_get_event_data(service, easyhandle, &data->events, &data->error))
