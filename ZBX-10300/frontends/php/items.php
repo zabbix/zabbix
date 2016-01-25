@@ -164,7 +164,7 @@ $fields = [
 	'filter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
 	'filter_ipmi_sensor' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
-	'subfilter_set' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'subfilter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'subfilter_apps' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_value_types' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
