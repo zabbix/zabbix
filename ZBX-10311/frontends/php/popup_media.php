@@ -31,10 +31,6 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
-	access_deny();
-}
-
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'dstfrm'=>		[T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null],
