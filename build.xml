@@ -116,14 +116,14 @@
 	</target>
 
 	<target name="test-phpunit" depends="init-common">
-		<exec executable="phpunit" dir="${basedir}/frontends/php/tests/unit" failonerror="on">
+		<exec executable="phpunit" dir="${basedir}/frontends/php/tests/unit" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
 			<arg line="include/"/>
 		</exec>
 	</target>
 
 	<target name="test-frontend">
-		<exec executable="phpunit" dir="${builddir}/frontends/php/tests" failonerror="on">
+		<exec executable="phpunit" dir="${builddir}/frontends/php/tests" failonerror="off">
 			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php frontend.php"/>
 		</exec>
 	</target>
