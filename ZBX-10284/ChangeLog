@@ -1,3 +1,16 @@
+Changes for 3.0.0beta2
+
+New features:
+A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
+A......... [ZBX-10285] fixed map export fatal error (Gunars)
+..F....... [ZBX-9969] fixed triggers, graphs and screens access from maps (Vitalijs)
+.........T [ZBX-9730] removed unused value map template "Host status" and added new - "Host availability" (viktors)
+A.F....... [ZBX-10230] fixed and improved translatable strings (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0beta1
 
 New features:
@@ -10,10 +23,11 @@ New features:
 ...G...PS. [ZBXNEXT-611] added an option to start Zabbix daemons in foreground mode and a configuration parameter to log to the standard ouput (wiper)
 
 Bug fixes:
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (vitalijs)
 ..F....... [ZBX-9500] fixed elements sorting in configuration export (Gunars, Sasha)
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
-..F....... [ZBX-10019] fixed graphs time interval selection (Gunars)
+..F....... [ZBX-10019] fixed graph time interval selection (Gunars)
 A......... [ZBX-10226] fixed trigger prototype updateReal API method (Gunars)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
@@ -143,7 +157,7 @@ A.F....PS. [ZBXNEXT-2683] added user macro context (Ivo, Oleg, Sasha, wiper)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
-..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
+..F....... [ZBX-2517] changed minimum period for time navigator to 1 minute; thanks to Zabbix community (Alexei)
 A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
@@ -366,6 +380,8 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (vitalijs)
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
@@ -1100,6 +1116,8 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (vitalijs)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
