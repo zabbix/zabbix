@@ -96,7 +96,7 @@ class CMap extends CMapElement {
 
 		if ($options['countOutput'] !== null) {
 			$count_output = true;
-			$options['output'] = array('screenid');
+			$options['output'] = array('sysmapid');
 			$options['countOutput'] = null;
 			$options['limit'] = null;
 		}
