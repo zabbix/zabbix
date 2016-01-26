@@ -60,7 +60,7 @@ extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_SOCKET_STRERROR_LEN	256
+#define ZBX_SOCKET_STRERROR_LEN	512
 
 static char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN];
 
