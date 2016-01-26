@@ -134,7 +134,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 					new CColHeader(_('Default')),
 					new CColHeader()
 				])
-				->addRow((new CRow([
+				->addRow(
+					(new CRow([
 						(new CCol(_('Agent')))
 							->setRowSpan(1)
 							->addClass('interface_name'),
@@ -148,7 +149,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						->setAttribute('data-type', INTERFACE_TYPE_AGENT)
 				)
 				->addRow(new CRow((new CCol())->setColSpan(8)))
-				->addRow((new CRow([
+				->addRow(
+					(new CRow([
 						(new CCol(_('SNMP')))
 							->setRowSpan(1)
 							->addClass('interface_name'),
@@ -186,7 +188,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 						->addClass('interface_type_'.INTERFACE_TYPE_IPMI)
 						->addClass('interface_add')
 						->setAttribute('data-type', INTERFACE_TYPE_IPMI)
-				);
+				)
 		))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_HOST_INTERFACE_WIDTH.'px;')
