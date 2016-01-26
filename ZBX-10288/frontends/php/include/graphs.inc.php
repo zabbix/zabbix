@@ -603,23 +603,23 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
 	}
 
 	$color = get_color($im, $color);
-	$plygon_color = get_color($im, '960000');
+	$polygon_color = get_color($im, '960000');
 
 	if (strpos($marks, 't') !== false) {
 		imagefilledpolygon($im, $gims['t'], $polygons, $color);
-		imagepolygon($im, $gims['t'], $polygons, $plygon_color);
+		imagepolygon($im, $gims['t'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'r') !== false) {
 		imagefilledpolygon($im, $gims['r'], $polygons, $color);
-		imagepolygon($im, $gims['r'], $polygons, $plygon_color);
+		imagepolygon($im, $gims['r'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'b') !== false) {
 		imagefilledpolygon($im, $gims['b'], $polygons, $color);
-		imagepolygon($im, $gims['b'], $polygons, $plygon_color);
+		imagepolygon($im, $gims['b'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'l') !== false) {
 		imagefilledpolygon($im, $gims['l'], $polygons, $color);
-		imagepolygon($im, $gims['l'], $polygons, $plygon_color);
+		imagepolygon($im, $gims['l'], $polygons, $polygon_color);
 	}
 }
 
