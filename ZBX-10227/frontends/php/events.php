@@ -165,6 +165,23 @@ $till = $from + $period;
  * Display
  */
 if ($csvExport) {
+	$page['menu'] = 'view';
+}
+
+$pageFilter = new CPageFilter(array(
+	'groups' => array(
+		'monitored_hosts' => true,
+		'with_monitored_triggers' => true
+	),
+	'hosts' => array(
+		'monitored_hosts' => true,
+		'with_monitored_triggers' => true
+	),
+	'hostid' => getRequest('hostid'),
+	'groupid' => getRequest('groupid')
+));
+
+if ($csvExport) {
 	if (!hasRequest('hostid')) {
 		$_REQUEST['hostid'] = 0;
 	}
@@ -174,18 +191,6 @@ if ($csvExport) {
 }
 else {
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$pageFilter = new CPageFilter(array(
-			'groups' => array(
-				'monitored_hosts' => true,
-				'with_monitored_triggers' => true
-			),
-			'hosts' => array(
-				'monitored_hosts' => true,
-				'with_monitored_triggers' => true
-			),
-			'hostid' => getRequest('hostid'),
-			'groupid' => getRequest('groupid')
-		));
 
 		// try to find matching trigger when host is changed
 		// use the host ID from the page filter since it may not be present in the request
@@ -647,10 +652,10 @@ else {
 
 				$eventOptions['objectids'] = array($triggerId);;
 			}
-			elseif (getRequest('hostid') > 0) {
+			elseif ($pageFilter->hostid > 0) {
 				$hostTriggers = API::Trigger()->get(array(
 					'output' => array('triggerid'),
-					'hostids' => getRequest('hostid'),
+					'hostids' => $pageFilter->hostid,
 					'monitored' => true,
 					'preservekeys' => true
 				));
@@ -658,13 +663,13 @@ else {
 				$knownTriggerIds = array_combine($filterTriggerIds, $filterTriggerIds);
 				$validTriggerIds = $knownTriggerIds;
 
-				$eventOptions['hostids'] = getRequest('hostid');
+				$eventOptions['hostids'] = $pageFilter->hostid;
 				$eventOptions['objectids'] = $validTriggerIds;
 			}
-			elseif (getRequest('groupid') > 0) {
-				$eventOptions['groupids'] = getRequest('groupid');
+			elseif ($pageFilter->groupid > 0) {
+				$eventOptions['groupids'] = $pageFilter->groupid;
 
-				$triggerOptions['groupids'] = getRequest('groupid');
+				$triggerOptions['groupids'] = $pageFilter->groupid;
 			}
 
 			$events = array();
@@ -748,8 +753,8 @@ else {
 				$hosts[] = reset($trigger['hosts']);
 
 				// Add already filtered read and read-write 'groupid' and 'hostid' to pass to menu pop-up "Events" link.
-				$trigger['groupid'] = getRequest('groupid');
-				$trigger['hostid'] = getRequest('hostid');
+				$trigger['groupid'] = $pageFilter->groupid;
+				$trigger['hostid'] = $pageFilter->hostid;
 			}
 			unset($trigger);
 
