@@ -4,6 +4,15 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (vitalijs)
+.......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
+A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
+..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
+.......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
+...G...PS. [ZBX-10219] fixed pointer type in sizeof() (gleb)
 ...G...... [ZBX-10177] fixed resource leak in sensor[] on Linux kernel versions 2.6 and higher (gleb)
 ....I..... [ZBX-10154] improved sender.pl script to take advantage of buffering (increases performance and makes communication with daemons more robust) (gleb)
 ........S. [ZBX-10138] fixed action based host removal when hosts to be deleted have host prototypes (gleb)
@@ -1348,6 +1357,8 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
+A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
