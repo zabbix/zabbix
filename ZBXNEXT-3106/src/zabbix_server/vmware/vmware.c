@@ -1936,7 +1936,7 @@ static zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, 
 	const char	*__function_name = "vmware_service_create_vm";
 
 	zbx_vmware_vm_t	*vm;
-	char		*value, *details;
+	char		*value, *details = NULL;
 	const char	*uuid_xpath[3] = {NULL, ZBX_XPATH_VM_UUID(), ZBX_XPATH_VM_INSTANCE_UUID()};
 	int		ret = FAIL;
 
@@ -2159,7 +2159,7 @@ static int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandl
 		zbx_vmware_hv_t *hv, char **error)
 {
 	const char		*__function_name = "vmware_service_init_hv";
-	char			*value, *details;
+	char			*value, *details = NULL;
 	zbx_vector_str_t	datastores, vms;
 	int			i, ret = FAIL;
 
