@@ -164,22 +164,20 @@ $till = $from + $period;
 /*
  * Display
  */
-if ($csvExport) {
-	$page['menu'] = 'view';
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	$pageFilter = new CPageFilter(array(
+		'groups' => array(
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true
+		),
+		'hosts' => array(
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true
+		),
+		'hostid' => getRequest('hostid'),
+		'groupid' => getRequest('groupid')
+	));
 }
-
-$pageFilter = new CPageFilter(array(
-	'groups' => array(
-		'monitored_hosts' => true,
-		'with_monitored_triggers' => true
-	),
-	'hosts' => array(
-		'monitored_hosts' => true,
-		'with_monitored_triggers' => true
-	),
-	'hostid' => getRequest('hostid'),
-	'groupid' => getRequest('groupid')
-));
 
 if ($csvExport) {
 	if (!hasRequest('hostid')) {
@@ -191,7 +189,6 @@ if ($csvExport) {
 }
 else {
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-
 		// try to find matching trigger when host is changed
 		// use the host ID from the page filter since it may not be present in the request
 		// if all hosts are selected, preserve the selected trigger
@@ -296,8 +293,8 @@ else {
 			$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
 		}
 		else {
-			$frmForm->addVar('groupid', getRequest('groupid'), 'groupid_csv');
-			$frmForm->addVar('hostid', getRequest('hostid'), 'hostid_csv');
+			$frmForm->addVar('groupid', $pageFilter->groupid, 'groupid_csv');
+			$frmForm->addVar('hostid', $pageFilter->hostid, 'hostid_csv');
 		}
 	}
 	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
@@ -352,6 +349,8 @@ else {
 		$filterForm->addVar('triggerid', $triggerId);
 		$filterForm->addVar('stime', $stime);
 		$filterForm->addVar('period', $period);
+		$filterForm->addVar('groupid', $pageFilter->groupid);
+		$filterForm->addVar('hostid', $pageFilter->hostid);
 
 		if ($triggerId > 0) {
 			$dbTrigger = API::Trigger()->get(array(
