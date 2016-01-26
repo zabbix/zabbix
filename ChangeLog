@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-10284] fixed possible crash when removing all cached actions during configuration sync (wiper)
 ...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
 A......... [ZBX-10285] fixed map export fatal error (Gunars)
 ..F....... [ZBX-9969] fixed triggers, graphs and screens access from maps (Vitalijs)
