@@ -520,7 +520,7 @@ if (hasRequest('form')) {
 		$hostIdsLinkedTo = array_keys($hostIdsLinkedTo);
 	}
 	else {
-		if ($data['groupId'] != 0 && !$data['groupIds']) {
+		if (!hasRequest('form_refresh') && $data['groupId'] != 0 && !$data['groupIds']) {
 			$data['groupIds'][] = $data['groupId'];
 		}
 		$hostIdsLinkedTo = getRequest('hosts', []);
