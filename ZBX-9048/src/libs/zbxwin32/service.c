@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -108,13 +108,19 @@ static VOID WINAPI	ServiceEntry(DWORD argc, wchar_t **argv)
 	serviceStatus.dwWaitHint	= 0;
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	MAIN_ZABBIX_ENTRY();
+	MAIN_ZABBIX_ENTRY(0);
 }
 
-void	service_start()
+void	service_start(int flags)
 {
 	int				ret;
 	static SERVICE_TABLE_ENTRY	serviceTable[2];
+
+	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		MAIN_ZABBIX_ENTRY(flags);
+		return;
+	}
 
 	serviceTable[0].lpServiceName = zbx_utf8_to_unicode(ZABBIX_SERVICE_NAME);
 	serviceTable[0].lpServiceProc = (LPSERVICE_MAIN_FUNCTION)ServiceEntry;
@@ -127,10 +133,7 @@ void	service_start()
 	if (0 == ret)
 	{
 		if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
-		{
-			zbx_error("\n\n\t!!!ATTENTION!!! Zabbix Agent started as a console application. !!!ATTENTION!!!\n");
-			MAIN_ZABBIX_ENTRY();
-		}
+			zbx_error("use foreground option to run Zabbix agent as console application");
 		else
 			zbx_error("StartServiceCtrlDispatcher() failed: %s", strerror_from_system(GetLastError()));
 	}

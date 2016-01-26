@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,6 +84,14 @@ static zbx_history_table_t areg = {
 		}
 };
 
+static const char	*availability_tag_available[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_AVAILABLE,
+					ZBX_PROTO_TAG_SNMP_AVAILABLE, ZBX_PROTO_TAG_IPMI_AVAILABLE,
+					ZBX_PROTO_TAG_JMX_AVAILABLE};
+static const char	*availability_tag_error[ZBX_AGENT_MAX] = {ZBX_PROTO_TAG_ERROR,
+					ZBX_PROTO_TAG_SNMP_ERROR, ZBX_PROTO_TAG_IPMI_ERROR,
+					ZBX_PROTO_TAG_JMX_ERROR};
+
+
 /******************************************************************************
  *                                                                            *
  * Function: get_active_proxy_id                                              *
@@ -110,8 +118,7 @@ static zbx_history_table_t areg = {
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
 		char **error)
 {
-	char			*ch_error;
-	zbx_tls_conn_attr_t	attr;
+	char	*ch_error;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
@@ -126,14 +133,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-	{
-		*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-
-	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, hostid, error))
+	if (SUCCEED != DCcheck_proxy_permissions(host, sock, hostid, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -1379,7 +1379,10 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
 				(NULL == error ? "database error" : error));
 	}
 	else
+	{
 		DCsync_configuration();
+		DCupdate_hosts_availability();
+	}
 
 	zbx_free(error);
 
@@ -1391,155 +1394,47 @@ void	process_proxyconfig(struct zbx_json_parse *jp_data)
  * Function: get_host_availability_data                                       *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - no host availability has been changed                *
  *                                                                            *
  ******************************************************************************/
-#define CHECK_ARRAY_SIZE(array, alloc, num)				\
-	if (num == alloc)						\
-	{								\
-		alloc = (0 == alloc ? 8 : alloc * 3 / 2);		\
-		array = zbx_realloc(array, alloc * sizeof(*array));	\
-	}
-
-int	get_host_availability_data(struct zbx_json *j)
+int	get_host_availability_data(struct zbx_json *json, int *ts)
 {
-	typedef struct
-	{
-		zbx_uint64_t	hostid;
-		char		*error, *snmp_error, *ipmi_error, *jmx_error;
-		unsigned char	available, snmp_available, ipmi_available, jmx_available;
-	}
-	zbx_host_availability_t;
-
 	const char			*__function_name = "get_host_availability_data";
-	zbx_uint64_t			hostid;
-	size_t				sz;
-	DB_RESULT			result;
-	DB_ROW				row;
-	static zbx_host_availability_t	*ha = NULL;
-	static int			ha_alloc = 0, ha_num = 0;
-	int				index, new, ret = FAIL;
-	unsigned char			available, snmp_available, ipmi_available, jmx_available;
-	char				*error, *snmp_error, *ipmi_error, *jmx_error;
+	int				i, j, ret = FAIL;
+	zbx_vector_ptr_t		hosts;
+	zbx_host_availability_t		*ha;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
+	zbx_vector_ptr_create(&hosts);
 
-	result = DBselect(
-			"select hostid,available,error,snmp_available,snmp_error,"
-				"ipmi_available,ipmi_error,jmx_available,jmx_error"
-			" from hosts"
-			" where status in (%d,%d) order by hostid asc",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
+	if (SUCCEED != DCget_hosts_availability(&hosts, ts))
+		goto out;
 
-	while (NULL != (row = DBfetch(result)))
+	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
+
+	for (i = 0; i < hosts.values_num; i++)
 	{
-		ZBX_STR2UINT64(hostid, row[0]);
+		ha = (zbx_host_availability_t *)hosts.values[i];
 
-		new = 0;
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_HOSTID, ha->hostid);
 
-		index = get_nearestindex(ha, sizeof(zbx_host_availability_t), ha_num, hostid);
-
-		if (index == ha_num || ha[index].hostid != hostid)
+		for (j = 0; j < ZBX_AGENT_MAX; j++)
 		{
-			CHECK_ARRAY_SIZE(ha, ha_alloc, ha_num);
-
-			if (0 != (sz = sizeof(zbx_host_availability_t) * (ha_num - index)))
-				memmove(&ha[index + 1], &ha[index], sz);
-			ha_num++;
-
-			ha[index].hostid = hostid;
-			ha[index].available = HOST_AVAILABLE_UNKNOWN;
-			ha[index].snmp_available = HOST_AVAILABLE_UNKNOWN;
-			ha[index].ipmi_available = HOST_AVAILABLE_UNKNOWN;
-			ha[index].jmx_available = HOST_AVAILABLE_UNKNOWN;
-			ha[index].error = NULL;
-			ha[index].snmp_error = NULL;
-			ha[index].ipmi_error = NULL;
-			ha[index].jmx_error = NULL;
-
-			new = 1;
+			zbx_json_adduint64(json, availability_tag_available[j], ha->agents[j].available);
+			zbx_json_addstring(json, availability_tag_error[j], ha->agents[j].error, ZBX_JSON_TYPE_STRING);
 		}
 
-		available = (unsigned char)atoi(row[1]);
-		error = row[2];
-		snmp_available = (unsigned char)atoi(row[3]);
-		snmp_error = row[4];
-		ipmi_available = (unsigned char)atoi(row[5]);
-		ipmi_error = row[6];
-		jmx_available = (unsigned char)atoi(row[7]);
-		jmx_error = row[8];
-
-		if (0 == new && ha[index].available == available &&
-				ha[index].snmp_available == snmp_available &&
-				ha[index].ipmi_available == ipmi_available &&
-				ha[index].jmx_available == jmx_available &&
-				0 == strcmp(ha[index].error, error) &&
-				0 == strcmp(ha[index].snmp_error, snmp_error) &&
-				0 == strcmp(ha[index].ipmi_error, ipmi_error) &&
-				0 == strcmp(ha[index].jmx_error, jmx_error))
-			continue;
-
-		zbx_json_addobject(j, NULL);
-
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_HOSTID, hostid);
-
-		if (1 == new || ha[index].available != available)
-		{
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_AVAILABLE, available);
-			ha[index].available = available;
-		}
-
-		if (1 == new || ha[index].snmp_available != snmp_available)
-		{
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_SNMP_AVAILABLE, snmp_available);
-			ha[index].snmp_available = snmp_available;
-		}
-
-		if (1 == new || ha[index].ipmi_available != ipmi_available)
-		{
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_IPMI_AVAILABLE, ipmi_available);
-			ha[index].ipmi_available = ipmi_available;
-		}
-
-		if (1 == new || ha[index].jmx_available != jmx_available)
-		{
-			zbx_json_adduint64(j, ZBX_PROTO_TAG_JMX_AVAILABLE, jmx_available);
-			ha[index].jmx_available = jmx_available;
-		}
-
-		if (1 == new || 0 != strcmp(ha[index].error, error))
-		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
-			ZBX_STRDUP(ha[index].error, error);
-		}
-
-		if (1 == new || 0 != strcmp(ha[index].snmp_error, snmp_error))
-		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_SNMP_ERROR, snmp_error, ZBX_JSON_TYPE_STRING);
-			ZBX_STRDUP(ha[index].snmp_error, snmp_error);
-		}
-
-		if (1 == new || 0 != strcmp(ha[index].ipmi_error, ipmi_error))
-		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_IPMI_ERROR, ipmi_error, ZBX_JSON_TYPE_STRING);
-			ZBX_STRDUP(ha[index].ipmi_error, ipmi_error);
-		}
-
-		if (1 == new || 0 != strcmp(ha[index].jmx_error, jmx_error))
-		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_JMX_ERROR, jmx_error, ZBX_JSON_TYPE_STRING);
-			ZBX_STRDUP(ha[index].jmx_error, jmx_error);
-		}
-
-		zbx_json_close(j);
-
-		ret = SUCCEED;
+		zbx_json_close(json);
 	}
-	DBfree_result(result);
 
-	zbx_json_close(j);
+	zbx_json_close(json);
+
+	ret = SUCCEED;
+out:
+	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
+	zbx_vector_ptr_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1559,11 +1454,11 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	zbx_uint64_t		hostid;
 	struct zbx_json_parse	jp_data, jp_row;
 	const char		*p = NULL;
-	char			*sql = NULL, *tmp = NULL, *error_esc;
-	size_t			sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0, sql_offset_tmp,
-				tmp_alloc = 129;
-	int			availability_alloc = 0, availability_num = 0;
-	zbx_host_availability_t	*availability = NULL;
+	char			*tmp = NULL;
+	size_t			tmp_alloc = 129;
+	zbx_host_availability_t	*ha = NULL;
+	zbx_vector_ptr_t	hosts;
+	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1577,12 +1472,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	if (SUCCEED == zbx_json_object_is_empty(&jp_data))
 		goto out;
 
-	sql = zbx_malloc(sql, sql_alloc);
-	tmp = zbx_malloc(tmp, tmp_alloc);
+	tmp = (char *)zbx_malloc(NULL, tmp_alloc);
 
-	DBbegin();
-
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_vector_ptr_create(&hosts);
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
 	{
@@ -1599,130 +1491,68 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			continue;
 		}
 
-		sql_offset_tmp = sql_offset;
+		ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
+		zbx_host_availability_init(ha, hostid);
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set ");
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_AVAILABLE, &tmp, &tmp_alloc))
+		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_available[i], &tmp, &tmp_alloc))
+				continue;
 
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_ZABBIX;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			ha->agents[i].available = atoi(tmp);
+			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_AVAILABLE;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_SNMP_AVAILABLE, &tmp, &tmp_alloc))
+		for (i = 0; i < ZBX_AGENT_MAX; i++)
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, availability_tag_error[i], &tmp, &tmp_alloc))
+				continue;
 
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_SNMPv1;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
+			ha->agents[i].error = zbx_strdup(NULL, tmp);
+			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
 		}
 
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_IPMI_AVAILABLE, &tmp, &tmp_alloc))
+		if (SUCCEED != zbx_host_availability_is_set(ha))
 		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_IPMI;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_JMX_AVAILABLE, &tmp, &tmp_alloc))
-		{
-			CHECK_ARRAY_SIZE(availability, availability_alloc, availability_num);
-
-			availability[availability_num].hostid = hostid;
-			availability[availability_num].type = ITEM_TYPE_JMX;
-			availability[availability_num].available = atoi(tmp);
-			availability[availability_num].errors_from = 0;
-			availability[availability_num].disable_until = 0;
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_available=%d,",
-					availability[availability_num].available);
-
-			availability_num++;
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_SNMP_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "snmp_error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_IPMI_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "ipmi_error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_JMX_ERROR, &tmp, &tmp_alloc))
-		{
-			error_esc = DBdyn_escape_string_len(tmp, HOST_ERROR_LEN);
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "jmx_error='%s',", error_esc);
-			zbx_free(error_esc);
-		}
-
-		sql_offset--;
-
-		if (',' != sql[sql_offset])
-		{
+			zbx_free(ha);
 			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
-			sql_offset = sql_offset_tmp;
-			sql[sql_offset] = '\0';
-			continue;
 		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n", hostid);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		else
+			zbx_vector_ptr_append(&hosts, ha);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
+	{
+		int	i;
+		char	*sql = NULL;
+		size_t	sql_alloc = 4 * ZBX_KIBIBYTE, sql_offset = 0;
 
-	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-		DBexecute("%s", sql);
+		sql = zbx_malloc(sql, sql_alloc);
 
-	DBcommit();
+		DBbegin();
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	DChost_update_availability(availability, availability_num);
-out:
-	zbx_free(availability);
+		for (i = 0; i < hosts.values_num; i++)
+		{
+			zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (16 < sql_offset)
+			DBexecute("%s", sql);
+
+		DBcommit();
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
+	zbx_vector_ptr_destroy(&hosts);
+
 	zbx_free(tmp);
-	zbx_free(sql);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -1905,7 +1735,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 		int		logeventid;
 		int		mtime;
 		unsigned char	state;
-		unsigned char	meta;
+		unsigned char	flags;
 	}
 	zbx_history_data_t;
 
@@ -1936,7 +1766,7 @@ static int	proxy_get_history_data(struct zbx_json *j, zbx_uint64_t *lastid)
 try_again:
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select id,itemid,clock,ns,timestamp,source,severity,"
-				"value,logeventid,state,lastlogsize,mtime,meta"
+				"value,logeventid,state,lastlogsize,mtime,flags"
 			" from proxy_history"
 			" where id>" ZBX_FS_UI64
 			" order by id",
@@ -1990,7 +1820,7 @@ try_again:
 		ZBX_STR2UCHAR(hd->state, row[9]);
 		ZBX_STR2UINT64(hd->lastlogsize, row[10]);
 		hd->mtime = atoi(row[11]);
-		ZBX_STR2UCHAR(hd->meta, row[12]);
+		ZBX_STR2UCHAR(hd->flags, row[12]);
 
 		len1 = strlen(row[5]) + 1;
 		len2 = strlen(row[7]) + 1;
@@ -2040,31 +1870,28 @@ try_again:
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, hd->clock);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, hd->ns);
 
-		/* meta information update record does not need those */
-		if (0 == hd->meta)
+		if (0 != hd->timestamp)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
+
+		if ('\0' != string_buffer[hd->psource])
 		{
-			if (0 != hd->timestamp)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, hd->timestamp);
-
-			if ('\0' != string_buffer[hd->psource])
-			{
-				zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[hd->psource],
-						ZBX_JSON_TYPE_STRING);
-			}
-
-			if (0 != hd->severity)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, hd->severity);
-
-			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[hd->pvalue], ZBX_JSON_TYPE_STRING);
-
-			if (0 != hd->logeventid)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_LOGSOURCE, &string_buffer[hd->psource],
+					ZBX_JSON_TYPE_STRING);
 		}
+
+		if (0 != hd->severity)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, hd->severity);
+
+		if (0 != hd->logeventid)
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, hd->logeventid);
 
 		if (0 != hd->state)
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, hd->state);
 
-		if (ITEM_VALUE_TYPE_LOG == dc_items[i].value_type)
+		if (0 == (PROXY_HISTORY_FLAG_NOVALUE & hd->flags))
+			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, &string_buffer[hd->pvalue], ZBX_JSON_TYPE_STRING);
+
+		if (0 != (PROXY_HISTORY_FLAG_META & hd->flags))
 		{
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, hd->lastlogsize);
 			zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, hd->mtime);
@@ -2186,7 +2013,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		int *processed)
 {
 	const char		*__function_name = "process_mass_data";
-	AGENT_RESULT		agent;
+	AGENT_RESULT		result;
 	DC_ITEM			*items = NULL;
 	zbx_host_key_t		*keys = NULL;
 	size_t			i;
@@ -2200,6 +2027,17 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (0 == proxy_hostid &&
+			((ZBX_TCP_SEC_TLS_CERT == sock->connection_type &&
+				SUCCEED != zbx_tls_get_attr_cert(sock, &attr)) ||
+			(ZBX_TCP_SEC_TLS_PSK == sock->connection_type &&
+				SUCCEED != zbx_tls_get_attr_psk(sock, &attr))))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+#endif
 	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * values_num);
 	items = zbx_malloc(items, sizeof(DC_ITEM) * values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * values_num);
@@ -2238,8 +2076,11 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			continue;
 
 		/* empty values are only allowed for meta information update packets */
-		if (ITEM_VALUE_TYPE_LOG != items[i].value_type && NULL == values[i].value)
+		if (NULL == values[i].value && 0 == values[i].meta)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "item %s value is empty", items[i].key_orig);
 			continue;
+		}
 
 		if (ITEM_TYPE_AGGREGATE == items[i].type || ITEM_TYPE_CALCULATED == items[i].type)
 			continue;
@@ -2272,7 +2113,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		/* It is enough to check connection type, and optionally, certificate issuer and subject, and PSK */
 		/* identity only for a host. No need to check it for every item if the host is the same. */
 
-		if (0 == proxy_hostid && NULL != sock)
+		if (0 == proxy_hostid)
 		{
 			if (hostid_prev == items[i].host.hostid)	/* host and connection already checked */
 			{
@@ -2295,17 +2136,6 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
-						ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
-				{
-					if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-					{
-						THIS_SHOULD_NEVER_HAPPEN;
-						flag_host_allow = 0;
-						continue;
-					}
-				}
-
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 				{
 					/* simplified match, not compliant with RFC 4517, 4518 */
@@ -2362,53 +2192,56 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		}
 		else
 		{
-			init_result(&agent);
+			int	res = SUCCEED;
 
-			if (SUCCEED == set_result_type(&agent, items[i].value_type,
-					proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type, values[i].value))
+			init_result(&result);
+
+			if (NULL != values[i].value)
 			{
-				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
+				res = set_result_type(&result, items[i].value_type,
+						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
+						values[i].value);
+			}
+
+			if (SUCCEED == res)
+			{
+				if (ITEM_VALUE_TYPE_LOG == items[i].value_type && NULL != values[i].value)
 				{
-					zbx_log_t	*log;
-
-					log = agent.logs[0];
-
-					log->timestamp = values[i].timestamp;
+					result.log->timestamp = values[i].timestamp;
 					if (NULL != values[i].source)
 					{
 						zbx_replace_invalid_utf8(values[i].source);
-						log->source = zbx_strdup(log->source, values[i].source);
+						result.log->source = zbx_strdup(result.log->source, values[i].source);
 					}
-					log->severity = values[i].severity;
-					log->logeventid = values[i].logeventid;
-					log->lastlogsize = values[i].lastlogsize;
-					log->mtime = values[i].mtime;
-					log->meta = values[i].meta;
+					result.log->severity = values[i].severity;
+					result.log->logeventid = values[i].logeventid;
 
-					if (NULL != log->value)
-						calc_timestamp(log->value, &log->timestamp, items[i].logtimefmt);
+					calc_timestamp(result.log->value, &result.log->timestamp, items[i].logtimefmt);
 				}
 
+				if (0 != values[i].meta)
+					set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
+
 				items[i].state = ITEM_STATE_NORMAL;
-				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &agent,
+				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
 						&values[i].ts, items[i].state, NULL);
 
 				if (NULL != processed)
 					(*processed)++;
 			}
-			else if (ISSET_MSG(&agent))
+			else if (ISSET_MSG(&result))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
-						items[i].host.host, items[i].key_orig, agent.msg);
+						items[i].host.host, items[i].key_orig, result.msg);
 
 				items[i].state = ITEM_STATE_NOTSUPPORTED;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL,
-						&values[i].ts, items[i].state, agent.msg);
+						&values[i].ts, items[i].state, result.msg);
 			}
 			else
-				THIS_SHOULD_NEVER_HAPPEN; /* set_result_type() always sets MSG result if not SUCCEED */
+				THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
 
-			free_result(&agent);
+			free_result(&result);
 		}
 
 		itemids[num] = items[i].itemid;
@@ -2456,12 +2289,18 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                                                                            *
  * Purpose: process values sent by proxies, active agents and senders         *
  *                                                                            *
+ * Parameters: sock         - [IN] descriptor of agent-server socket          *
+ *                                 connection. NULL for proxy connection      *
+ *             jp           - [IN] JSON with historical data                  *
+ *             proxy_hostid - [IN] proxy identificator from database          *
+ *             info         - [OUT] address of a pointer to the info string   *
+ *                                  (should be freed by the caller)           *
+ *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
-		const zbx_uint64_t proxy_hostid, char *info, int max_info_size)
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid, char **info)
 {
 #define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
@@ -2553,14 +2392,21 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		else
 			zbx_timespec(&av->ts);
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, av->host_name, sizeof(av->host_name)))
 			continue;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, av->key, sizeof(av->key)))
 			continue;
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_STATE, &tmp, &tmp_alloc))
 			av->state = (unsigned char)atoi(tmp);
+
+		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
+		{
+			av->meta = 1;	/* contains meta information */
+
+			is_uint64(tmp, &av->lastlogsize);
+		}
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &tmp, &tmp_alloc))
 		{
@@ -2568,19 +2414,18 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		}
 		else
 		{
-			/* meta information update (lastlogsize and mtime) packet is missing value tag */
-
 			if (ITEM_STATE_NOTSUPPORTED == av->state)
 			{
-				/* unsupported items cannot have NULL-string error message */
+				/* unsupported items cannot have empty error message */
 				continue;
 			}
 
-			av->meta = 1;
+			if (0 == av->meta)
+			{
+				/* only meta information update packets can have empty value*/
+				continue;
+			}
 		}
-
-		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_LASTLOGSIZE, &tmp, &tmp_alloc))
-			is_uint64(tmp, &av->lastlogsize);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_MTIME, &tmp, &tmp_alloc))
 			av->mtime = atoi(tmp);
@@ -2617,7 +2462,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 
 	if (NULL != info)
 	{
-		zbx_snprintf(info, max_info_size, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
+		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
 

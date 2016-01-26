@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,40 +133,35 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		(new CLink(_('Web'), 'httpmon.php?hostid='.$data['host']['hostid'].url_param('groupid')))
-			->removeSID(),
-		(new CLink(_('Latest data'),
+		new CLink(_('Web'), 'zabbix.php?action=web.view&hostid='.$data['host']['hostid'].url_param('groupid')),
+		new CLink(_('Latest data'),
 			'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$data['host']['hostid']
-		))->removeSID(),
-		(new CLink(_('Triggers'),
+		),
+		new CLink(_('Triggers'),
 			'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
 			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].url_param('groupid')
-		))->removeSID(),
-		(new CLink(_('Events'),
+		),
+		new CLink(_('Events'),
 			'events.php?hostid='.$data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS
-		))->removeSID(),
-		(new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')))->removeSID(),
-		(new CLink(_('Screens'), 'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')))->removeSID()
+		),
+		new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')),
+		new CLink(_('Screens'), 'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid'))
 	])
 );
 
 // configuration
 if ($data['rwHost']) {
-	$hostLink = (new CLink(_('Host'), 'hosts.php?form=update&hostid='.$data['host']['hostid'].url_param('groupid')))
-		->removeSID();
-	$applicationsLink = (new CLink(_('Applications'),
+	$hostLink = new CLink(_('Host'), 'hosts.php?form=update&hostid='.$data['host']['hostid'].url_param('groupid'));
+	$applicationsLink = new CLink(_('Applications'),
 		'applications.php?hostid='.$data['host']['hostid'].url_param('groupid')
-	))->removeSID();
-	$itemsLink = (new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$data['host']['hostid'].url_param('groupid')))
-		->removeSID();
-	$triggersLink = (new CLink(_('Triggers'), 'triggers.php?hostid='.$data['host']['hostid'].url_param('groupid')))
-		->removeSID();
-	$graphsLink = (new CLink(_('Graphs'), 'graphs.php?hostid='.$data['host']['hostid'].url_param('groupid')))
-		->removeSID();
-	$discoveryLink = (new CLink(_('Discovery'),
+	);
+	$itemsLink = new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$data['host']['hostid'].url_param('groupid'));
+	$triggersLink = new CLink(_('Triggers'), 'triggers.php?hostid='.$data['host']['hostid'].url_param('groupid'));
+	$graphsLink = new CLink(_('Graphs'), 'graphs.php?hostid='.$data['host']['hostid'].url_param('groupid'));
+	$discoveryLink = new CLink(_('Discovery'),
 		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')
-	))->removeSID();
-	$webLink = (new CLink(_('Web'), 'httpconf.php?hostid='.$data['host']['hostid'].url_param('groupid')))->removeSID();
+	);
+	$webLink = new CLink(_('Web'), 'httpconf.php?hostid='.$data['host']['hostid'].url_param('groupid'));
 }
 else {
 	$hostLink = _('Host');

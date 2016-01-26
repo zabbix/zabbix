@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ check_fields($fields);
 if (isset($_REQUEST['favobj'])) {
 	$json = new CJson();
 
-//	if ($_REQUEST['favobj'] == 'sysmap' && getRequest('action') == 'update') {
 	if (getRequest('favobj') == 'sysmap' && hasRequest('action') && getRequest('action') == 'update') {
 		$sysmapid = getRequest('sysmapid', 0);
 
@@ -118,11 +117,13 @@ if (PAGE_TYPE_HTML != $page['type']) {
  */
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
-		'sysmapids' => $_REQUEST['sysmapid'],
-		'editable' => true,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['sysmapid', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
+			'iconmapid'
+		],
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
+		'sysmapids' => getRequest('sysmapid'),
+		'editable' => true,
 		'preservekeys' => true
 	]);
 	if (empty($sysmap)) {
@@ -202,7 +203,7 @@ if ($data['iconList']) {
 }
 
 // render view
-$sysmapView = new CView('configuration.sysmap.constructor', $data);
+$sysmapView = new CView('monitoring.sysmap.constructor', $data);
 $sysmapView->render();
 $sysmapView->show();
 

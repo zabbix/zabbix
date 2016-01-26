@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,11 +55,11 @@ foreach ($this->data['db_cservices'] as $service) {
 	$servicesChildTable->addRow([
 		$cb,
 		[$prefix, $description],
-		serviceAlgorythm($service['algorithm']),
+		serviceAlgorithm($service['algorithm']),
 		$service['trigger']]
 	);
 }
-$servicesChildTable->setFooter((new CCol(new CButton('select', _('Select'))))->addClass('right'));
+$servicesChildTable->setFooter(new CCol(new CButton('select', _('Select'))));
 
 // append table to form
 $servicesChildForm->addItem($servicesChildTable);

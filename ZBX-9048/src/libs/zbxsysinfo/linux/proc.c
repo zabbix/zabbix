@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
+
+extern int	CONFIG_TIMEOUT;
 
 typedef struct
 {
@@ -875,12 +877,13 @@ static int	proc_get_process_name(pid_t pid, char **procname)
  *           by the caller.                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	proc_get_process_cmdline(pid_t pid, char **cmdline)
+static int	proc_get_process_cmdline(pid_t pid, char **cmdline, size_t *cmdline_nbytes)
 {
 	char	tmp[MAX_STRING_LEN];
 	int	fd, n;
-	size_t	cmdline_alloc = ZBX_KIBIBYTE, cmdline_offset = 0;
+	size_t	cmdline_alloc = ZBX_KIBIBYTE;
 
+	*cmdline_nbytes = 0;
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/cmdline", (int)pid);
 
 	if (-1 == (fd = open(tmp, O_RDONLY)))
@@ -888,11 +891,11 @@ static int	proc_get_process_cmdline(pid_t pid, char **cmdline)
 
 	*cmdline = zbx_malloc(NULL, cmdline_alloc);
 
-	while (0 < (n = read(fd, *cmdline + cmdline_offset, cmdline_alloc - cmdline_offset)))
+	while (0 < (n = read(fd, *cmdline + *cmdline_nbytes, cmdline_alloc - *cmdline_nbytes)))
 	{
-		cmdline_offset += n;
+		*cmdline_nbytes += n;
 
-		if (cmdline_offset == cmdline_alloc)
+		if (*cmdline_nbytes == cmdline_alloc)
 		{
 			cmdline_alloc *= 2;
 			*cmdline = zbx_realloc(*cmdline, cmdline_alloc);
@@ -901,8 +904,25 @@ static int	proc_get_process_cmdline(pid_t pid, char **cmdline)
 
 	close(fd);
 
-	if (0 == cmdline_offset)
+	if (0 < *cmdline_nbytes)
+	{
+		/* add terminating NUL if it is missing due to processes setting their titles or other reasons */
+		if ('\0' != (*cmdline)[*cmdline_nbytes - 1])
+		{
+			if (*cmdline_nbytes == cmdline_alloc)
+			{
+				cmdline_alloc += 1;
+				*cmdline = zbx_realloc(*cmdline, cmdline_alloc);
+			}
+
+			(*cmdline)[*cmdline_nbytes] = '\0';
+			*cmdline_nbytes += 1;
+		}
+	}
+	else
+	{
 		zbx_free(*cmdline);
+	}
 
 	return SUCCEED;
 }
@@ -1146,12 +1166,13 @@ static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 	uid_t			uid = -1;
 	zbx_sysinfo_proc_t	*proc = NULL;
 	int			ret = FAIL;
+	size_t			cmdline_nbytes;
 
 	if (0 != (flags & ZBX_SYSINFO_PROC_USER) && SUCCEED != proc_get_process_uid(pid, &uid))
 		goto out;
 
 	if (0 != (flags & (ZBX_SYSINFO_PROC_CMDLINE | ZBX_SYSINFO_PROC_NAME)) &&
-			SUCCEED != proc_get_process_cmdline(pid, &cmdline))
+			SUCCEED != proc_get_process_cmdline(pid, &cmdline, &cmdline_nbytes))
 	{
 		goto out;
 	}
@@ -1162,6 +1183,7 @@ static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 	if (NULL != cmdline)
 	{
 		char	*ptr;
+		int	i;
 
 		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
 		{
@@ -1171,15 +1193,10 @@ static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 				name_arg0 = zbx_strdup(NULL, ptr + 1);
 		}
 
-		for (ptr = cmdline;; ptr++)
-		{
-			if ('\0' == *ptr)
-			{
-				if ('\0' == ptr[1])
-					break;
-				*ptr = ' ';
-			}
-		}
+		/* according to proc(5) the arguments are separated by '\0' */
+		for (i = 0; i < cmdline_nbytes - 1; i++)
+			if ('\0' == cmdline[i])
+				cmdline[i] = ' ';
 	}
 
 	ret = SUCCEED;
@@ -1328,8 +1345,9 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp;
 	char		*errmsg = NULL;
-	int		period, type, ret;
+	int		period, type;
 	double		value;
+	zbx_timespec_t	ts_timeout, ts;
 
 	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15)] */
 	/*                   0          1           2            3             4          */
@@ -1394,7 +1412,10 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED != (ret = zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg)))
+	zbx_timespec(&ts_timeout);
+	ts_timeout.sec += CONFIG_TIMEOUT;
+
+	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg))
 	{
 		/* zbx_procstat_get_* functions will return FAIL when either a collection   */
 		/* error was registered or if less than 2 data samples were collected.      */
@@ -1404,9 +1425,19 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, errmsg);
 			return SYSINFO_RET_FAIL;
 		}
+
+		zbx_timespec(&ts);
+
+		if (0 > zbx_timespec_compare(&ts_timeout, &ts))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for collector data."));
+			return SYSINFO_RET_FAIL;
+		}
+
+		sleep(1);
 	}
-	else
-		SET_DBL_RESULT(result, value);
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }

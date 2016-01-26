@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,19 +27,6 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))))
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
-
-/*
-$widget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink(
-		$this->data['showdisabled'] ? _('Hide disabled trigger prototypes') : _('Show disabled trigger prototypes'),
-		'trigger_prototypes.php?'.
-			'showdisabled='.($this->data['showdisabled'] ? 0 : 1).
-			'&parent_discoveryid='.$this->data['parent_discoveryid']
-	),
-	' ]'
-));
-*/
 
 // create form
 $triggersForm = (new CForm())
@@ -138,9 +125,11 @@ foreach ($this->data['triggers'] as $trigger) {
 				: 'triggerprototype.massdisable'
 			).
 			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(triggerIndicatorStyle($trigger['status']));
+			'&parent_discoveryid='.$this->data['parent_discoveryid']
+	))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(triggerIndicatorStyle($trigger['status']))
+		->addSID();
 
 	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);

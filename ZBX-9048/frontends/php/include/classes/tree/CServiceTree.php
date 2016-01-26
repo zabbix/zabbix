@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,25 +35,27 @@ class CServiceTree extends CTree {
 	 * @return CCol
 	 */
 	protected function makeCol($rowId, $colName) {
-		$class = null;
 		$config = select_config();
 
-		if ($colName == 'status' && zbx_is_int($this->tree[$rowId][$colName]) && $this->tree[$rowId]['id'] > 0) {
-			$status = $this->tree[$rowId][$colName];
+		switch ($colName) {
+			case 'status':
+				if (zbx_is_int($this->tree[$rowId][$colName]) && $this->tree[$rowId]['id'] > 0) {
+					$status = $this->tree[$rowId][$colName];
 
-			// do not show the severity for information and unclassified triggers
-			if (in_array($status, [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
-				$this->tree[$rowId][$colName] = (new CSpan(_('OK')))->addClass(ZBX_STYLE_GREEN);
-			}
-			else {
-				$this->tree[$rowId][$colName] = getSeverityName($status, $config);
-				$class = getSeverityStyle($status);
-			}
+					// do not show the severity for information and unclassified triggers
+					if (in_array($status, [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
+						return (new CCol(_('OK')))->addClass(ZBX_STYLE_GREEN);
+					}
+					else {
+						return (new CCol(getSeverityName($status, $config)))->addClass(getSeverityStyle($status));
+					}
+				}
+				break;
+
+			case 'sla':
+				return parent::makeCol($rowId, $colName)->addClass(ZBX_STYLE_CELL_WIDTH);
 		}
 
-		$col = parent::makeCol($rowId, $colName);
-		$col->addClass($class);
-
-		return $col;
+		return parent::makeCol($rowId, $colName);
 	}
 }

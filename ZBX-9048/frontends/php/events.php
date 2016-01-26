@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ else {
 	$csvDisabled = true;
 
 	// header
-	$frmForm = (new CForm())
+	$frmForm = (new CForm('get'))
 		->addVar('stime', $stime, 'stime_csv')
 		->addVar('period', $period, 'period_csv')
 		->addVar('page', getPageNumber(), 'page_csv');
@@ -283,7 +283,8 @@ else {
 	$frmForm->addItem($controls);
 	$eventsWidget->setControls($frmForm);
 
-	$filterForm = new CFilter('web.events.filter.state');
+	$filterForm = (new CFilter('web.events.filter.state'))
+		->addVar('fullscreen', getRequest('fullscreen'));
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		$filterForm->addVar('triggerid', $triggerId)

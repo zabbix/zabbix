@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,6 +67,7 @@ const char	*help_message[] = {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"  --tls-connect value        How to connect to agent. Values:",
 	"                               unencrypted - connect without encryption",
+	"                                             (default)",
 	"                               psk         - connect using TLS and a pre-shared",
 	"                                             key",
 	"                               cert        - connect using TLS and a",
@@ -184,7 +185,8 @@ static void	get_signal_handler(int sig)
 		zbx_error("Timeout while executing operation");
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free_on_signal();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+		zbx_tls_free_on_signal();
 #endif
 	exit(EXIT_FAILURE);
 }
@@ -207,8 +209,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	zbx_socket_t	s;
 	int		ret;
 	ssize_t		bytes_received = -1;
-	char		*tls_arg1, *tls_arg2;
-	char		request[1024];
+	char		*tls_arg1, *tls_arg2, *request;
 
 	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
 	{
@@ -229,7 +230,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
-		zbx_snprintf(request, sizeof(request), "%s\n", key);
+		request = zbx_dsprintf(NULL, "%s\n", key);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
@@ -253,6 +254,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 				ret = FAIL;
 			}
 		}
+
+		zbx_free(request);
 
 		zbx_tcp_close(&s);
 
@@ -299,7 +302,7 @@ int	main(int argc, char **argv)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -388,7 +391,7 @@ int	main(int argc, char **argv)
 	{
 		ch = longopts[i].val;
 
-		if (1 < opt_count[ch])
+		if (1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
@@ -418,13 +421,19 @@ int	main(int argc, char **argv)
 		goto out;
 	}
 
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
+			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
+			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
+			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
+		zbx_tls_validate_config();
 #if defined(_WINDOWS)
-	zbx_tls_init_parent();
+		zbx_tls_init_parent();
 #endif
-	zbx_tls_init_child();
+		zbx_tls_init_child();
 #endif
+	}
 #if !defined(_WINDOWS)
 	signal(SIGINT,  get_signal_handler);
 	signal(SIGTERM, get_signal_handler);
@@ -438,10 +447,13 @@ out:
 	zbx_free(key);
 	zbx_free(source_ip);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		zbx_tls_free();
 #if defined(_WINDOWS)
-	zbx_tls_library_deinit();
+		zbx_tls_library_deinit();
 #endif
+	}
 #endif
 	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

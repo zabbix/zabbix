@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,285 +19,6 @@
 **/
 
 
-global $ZBX_MENU;
-
-$ZBX_MENU = [
-	'view' => [
-		'label'				=> _('Monitoring'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'default_page_id'	=> 0,
-		'pages' => [
-			[
-				'url' => 'zabbix.php',
-				'action' => 'dashboard.view',
-				'active_if' => ['dashboard.view'],
-				'label' => _('Dashboard'),
-				'sub_pages' => ['dashconf.php']
-			],
-			[
-				'url' => 'overview.php',
-				'label' => _('Overview')
-			],
-			[
-				'url' => 'httpmon.php',
-				'label' => _('Web'),
-				'sub_pages' => ['httpdetails.php']
-			],
-			[
-				'url' => 'latest.php',
-				'label' => _('Latest data'),
-				'sub_pages' => ['history.php', 'chart.php']
-			],
-			[
-				'url' => 'tr_status.php',
-				'active_if' => ['acknowledge.edit'],
-				'label' => _('Triggers'),
-				'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
-			],
-			[
-				'url' => 'events.php',
-				'label' => _('Events'),
-				'sub_pages' => ['tr_events.php']
-			],
-			[
-				'url' => 'charts.php',
-				'label' => _('Graphs'),
-				'sub_pages' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
-			],
-			[
-				'url' => 'screens.php',
-				'label' => _('Screens'),
-				'sub_pages' => ['slides.php']
-			],
-			[
-				'url' => 'zabbix.php',
-				'action' => 'map.view',
-				'active_if' => ['map.view'],
-				'label' => _('Maps'),
-				'sub_pages' => ['map.php']
-			],
-			[
-				'url' => 'zabbix.php',
-				'action' => 'discovery.view',
-				'active_if' => ['discovery.view'],
-				'label' => _('Discovery'),
-				'user_type' => USER_TYPE_ZABBIX_ADMIN
-			],
-			[
-				'url' => 'srv_status.php',
-				'label' => _('IT services'),
-				'sub_pages' => ['report3.php', 'chart5.php']
-			],
-			[
-				'url' => 'chart3.php'
-			],
-			[
-				'url' => 'imgstore.php'
-			],
-			[
-				'url' => 'search.php'
-			],
-			[
-				'url' => 'jsrpc.php'
-			]
-		]
-	],
-	'cm' => [
-		'label'				=> _('Inventory'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'default_page_id'	=> 0,
-		'pages' => [
-			[
-				'url' => 'hostinventoriesoverview.php',
-				'label' => _('Overview')
-			],
-			[
-				'url' => 'hostinventories.php',
-				'label' => _('Hosts')
-			]
-		]
-	],
-	'reports' => [
-		'label'				=> _('Reports'),
-		'user_type'			=> USER_TYPE_ZABBIX_USER,
-		'default_page_id'	=> 0,
-		'pages' => [
-			[
-				'url' => 'zabbix.php',
-				'action' => 'report.status',
-				'active_if' => ['report.status'],
-				'label' => _('Status of Zabbix'),
-				'user_type' => USER_TYPE_SUPER_ADMIN
-			],
-			[
-				'url' => 'report2.php',
-				'label' => _('Availability report')
-			],
-			[
-				'url' => 'toptriggers.php',
-				'label' => _('Triggers top 100')
-			],
-			[
-				'url' => 'auditlogs.php',
-				'label' => _('Audit'),
-				'user_type' => USER_TYPE_ZABBIX_ADMIN
-			],
-			[
-				'url' => 'auditacts.php',
-				'label' => _('Action log'),
-				'user_type' => USER_TYPE_ZABBIX_ADMIN
-			],
-			[
-				'url' => 'report4.php',
-				'label' => _('Notifications'),
-				'user_type' => USER_TYPE_ZABBIX_ADMIN
-			],
-			[
-				'url' => 'popup.php'
-			],
-			[
-				'url' => 'popup_right.php'
-			]
-		]
-	],
-	'config' => [
-		'label'				=> _('Configuration'),
-		'user_type'			=> USER_TYPE_ZABBIX_ADMIN,
-		'default_page_id'	=> 0,
-		'pages' => [
-			[
-				'url' => 'conf.import.php'
-			],
-			[
-				'url' => 'hostgroups.php',
-				'label' => _('Host groups')
-			],
-			[
-				'url' => 'templates.php',
-				'label' => _('Templates')
-			],
-			[
-				'url' => 'hosts.php',
-				'label' => _('Hosts'),
-				'sub_pages' => [
-					'items.php',
-					'triggers.php',
-					'graphs.php',
-					'applications.php',
-					'tr_logform.php',
-					'tr_testexpr.php',
-					'popup_trexpr.php',
-					'host_discovery.php',
-					'disc_prototypes.php',
-					'trigger_prototypes.php',
-					'host_prototypes.php',
-					'httpconf.php',
-					'popup_httpstep.php'
-				]
-			],
-			[
-				'url' => 'maintenance.php',
-				'label' => _('Maintenance')
-			],
-			[
-				'url' => 'actionconf.php',
-				'label' => _('Actions')
-			],
-			[
-				'url' => 'screenconf.php',
-				'label' => _('Screens'),
-				'sub_pages' => ['screenedit.php']
-			],
-			[
-				'url' => 'slideconf.php',
-				'label' => _('Slide shows'),
-			],
-			[
-				'url' => 'sysmaps.php',
-				'label' => _('Maps'),
-				'sub_pages' => ['image.php', 'sysmap.php']
-			],
-			[
-				'url' => 'discoveryconf.php',
-				'label' => _('Discovery')
-			],
-			[
-				'url' => 'services.php',
-				'label' => _('IT services')
-			]
-		]
-	],
-	'admin' => [
-		'label'				=> _('Administration'),
-		'user_type'			=> USER_TYPE_SUPER_ADMIN,
-		'default_page_id'	=> 0,
-		'pages' => [
-			[
-				'url' => 'adm.gui.php',
-				'label' => _('General'),
-				'sub_pages' => [
-					'adm.housekeeper.php',
-					'adm.images.php',
-					'adm.iconmapping.php',
-					'adm.regexps.php',
-					'adm.macros.php',
-					'adm.valuemapping.php',
-					'adm.workingtime.php',
-					'adm.triggerseverities.php',
-					'adm.triggerdisplayoptions.php',
-					'adm.other.php'
-				]
-			],
-			[
-				'url' => 'zabbix.php',
-				'action' => 'proxy.list',
-				'active_if' => ['proxy.edit', 'proxy.list'],
-				'label' => _('Proxies')
-			],
-			[
-				'url' => 'authentication.php',
-				'label' => _('Authentication')
-			],
-			[
-				'url' => 'usergrps.php',
-				'label' => _('User groups')
-			],
-			[
-				'url' => 'users.php',
-				'label' => _('Users'),
-				'sub_pages' => ['popup_usrgrp.php']
-			],
-			[
-				'url' => 'zabbix.php',
-				'action' => 'mediatype.list',
-				'active_if' => ['mediatype.edit', 'mediatype.list'],
-				'label' => _('Media types')
-			],
-			[
-				'url' => 'zabbix.php',
-				'action' => 'script.list',
-				'active_if' => ['script.edit', 'script.list'],
-				'label' => _('Scripts')
-			],
-			[
-				'url' => 'queue.php',
-				'label' => _('Queue')
-			]
-		]
-	],
-	'login' => [
-		'label'					=> _('Login'),
-		'user_type'				=> 0,
-		'default_page_id'		=> 0,
-		'pages' => [
-			[
-				'url' => 'index.php',
-				'sub_pages' => ['profile.php', 'popup_media.php']
-			]
-		]
-	]
-];
-
 /**
  * NOTE - menu array format:
  * first level:
@@ -312,13 +33,283 @@ $ZBX_MENU = [
  *	'sub_pages' = collection of pages for displaying but not remembered as last visited.
  */
 function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
-	global $ZBX_MENU;
+	$zbx_menu = [
+		'view' => [
+			'label' => _('Monitoring'),
+			'user_type' => USER_TYPE_ZABBIX_USER,
+			'default_page_id' => 0,
+			'pages' => [
+				[
+					'url' => 'zabbix.php',
+					'action' => 'dashboard.view',
+					'active_if' => ['dashboard.view'],
+					'label' => _('Dashboard'),
+					'sub_pages' => ['dashconf.php']
+				],
+				[
+					'url' => 'overview.php',
+					'label' => _('Overview')
+				],
+				[
+					'url' => 'zabbix.php',
+					'action' => 'web.view',
+					'active_if' => ['web.view'],
+					'label' => _('Web'),
+					'sub_pages' => ['httpdetails.php']
+				],
+				[
+					'url' => 'latest.php',
+					'label' => _('Latest data'),
+					'sub_pages' => ['history.php', 'chart.php']
+				],
+				[
+					'url' => 'tr_status.php',
+					'active_if' => ['acknowledge.edit'],
+					'label' => _('Triggers'),
+					'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
+				],
+				[
+					'url' => 'events.php',
+					'label' => _('Events'),
+					'sub_pages' => ['tr_events.php']
+				],
+				[
+					'url' => 'charts.php',
+					'label' => _('Graphs'),
+					'sub_pages' => ['chart2.php', 'chart3.php', 'chart6.php', 'chart7.php']
+				],
+				[
+					'url' => 'screens.php',
+					'label' => _('Screens'),
+					'sub_pages' => [
+						'screenconf.php',
+						'screenedit.php',
+						'screen.import.php',
+						'slides.php',
+						'slideconf.php'
+					]
+				],
+				[
+					'url' => 'zabbix.php',
+					'action' => 'map.view',
+					'active_if' => ['map.view'],
+					'label' => _('Maps'),
+					'sub_pages' => ['image.php', 'sysmaps.php', 'sysmap.php', 'map.php', 'map.import.php']
+				],
+				[
+					'url' => 'zabbix.php',
+					'action' => 'discovery.view',
+					'active_if' => ['discovery.view'],
+					'label' => _('Discovery'),
+					'user_type' => USER_TYPE_ZABBIX_ADMIN
+				],
+				[
+					'url' => 'srv_status.php',
+					'active_if' => ['report.services'],
+					'label' => _('IT services'),
+					'sub_pages' => ['chart5.php']
+				],
+				[
+					'url' => 'chart3.php'
+				],
+				[
+					'url' => 'imgstore.php'
+				],
+				[
+					'url' => 'search.php'
+				],
+				[
+					'url' => 'jsrpc.php'
+				]
+			]
+		],
+		'cm' => [
+			'label' => _('Inventory'),
+			'user_type' => USER_TYPE_ZABBIX_USER,
+			'default_page_id' => 0,
+			'pages' => [
+				[
+					'url' => 'hostinventoriesoverview.php',
+					'label' => _('Overview')
+				],
+				[
+					'url' => 'hostinventories.php',
+					'label' => _('Hosts')
+				]
+			]
+		],
+		'reports' => [
+			'label' => _('Reports'),
+			'user_type' => USER_TYPE_ZABBIX_USER,
+			'default_page_id' => 0,
+			'pages' => [
+				[
+					'url' => 'zabbix.php',
+					'action' => 'report.status',
+					'active_if' => ['report.status'],
+					'label' => _('Status of Zabbix'),
+					'user_type' => USER_TYPE_SUPER_ADMIN
+				],
+				[
+					'url' => 'report2.php',
+					'label' => _('Availability report')
+				],
+				[
+					'url' => 'toptriggers.php',
+					'label' => _('Triggers top 100')
+				],
+				[
+					'url' => 'auditlogs.php',
+					'label' => _('Audit'),
+					'user_type' => USER_TYPE_ZABBIX_ADMIN
+				],
+				[
+					'url' => 'auditacts.php',
+					'label' => _('Action log'),
+					'user_type' => USER_TYPE_ZABBIX_ADMIN
+				],
+				[
+					'url' => 'report4.php',
+					'label' => _('Notifications'),
+					'user_type' => USER_TYPE_ZABBIX_ADMIN
+				],
+				[
+					'url' => 'popup.php'
+				],
+				[
+					'url' => 'popup_right.php'
+				]
+			]
+		],
+		'config' => [
+			'label' => _('Configuration'),
+			'user_type' => USER_TYPE_ZABBIX_ADMIN,
+			'default_page_id' => 0,
+			'pages' => [
+				[
+					'url' => 'conf.import.php'
+				],
+				[
+					'url' => 'hostgroups.php',
+					'label' => _('Host groups')
+				],
+				[
+					'url' => 'templates.php',
+					'label' => _('Templates')
+				],
+				[
+					'url' => 'hosts.php',
+					'label' => _('Hosts'),
+					'sub_pages' => [
+						'items.php',
+						'triggers.php',
+						'graphs.php',
+						'applications.php',
+						'tr_logform.php',
+						'tr_testexpr.php',
+						'popup_trexpr.php',
+						'host_discovery.php',
+						'disc_prototypes.php',
+						'trigger_prototypes.php',
+						'host_prototypes.php',
+						'httpconf.php',
+						'popup_httpstep.php'
+					]
+				],
+				[
+					'url' => 'maintenance.php',
+					'label' => _('Maintenance')
+				],
+				[
+					'url' => 'actionconf.php',
+					'label' => _('Actions')
+				],
+				[
+					'url' => 'discoveryconf.php',
+					'label' => _('Discovery')
+				],
+				[
+					'url' => 'services.php',
+					'label' => _('IT services')
+				]
+			]
+		],
+		'admin' => [
+			'label' => _('Administration'),
+			'user_type' => USER_TYPE_SUPER_ADMIN,
+			'default_page_id' => 0,
+			'pages' => [
+				[
+					'url' => 'adm.gui.php',
+					'label' => _('General'),
+					'sub_pages' => [
+						'adm.housekeeper.php',
+						'adm.images.php',
+						'adm.iconmapping.php',
+						'adm.regexps.php',
+						'adm.macros.php',
+						'adm.valuemapping.php',
+						'adm.workingtime.php',
+						'adm.triggerseverities.php',
+						'adm.triggerdisplayoptions.php',
+						'adm.other.php'
+					]
+				],
+				[
+					'url' => 'zabbix.php',
+					'action' => 'proxy.list',
+					'active_if' => ['proxy.edit', 'proxy.list'],
+					'label' => _('Proxies')
+				],
+				[
+					'url' => 'authentication.php',
+					'label' => _('Authentication')
+				],
+				[
+					'url' => 'usergrps.php',
+					'label' => _('User groups')
+				],
+				[
+					'url' => 'users.php',
+					'label' => _('Users'),
+					'sub_pages' => ['popup_usrgrp.php']
+				],
+				[
+					'url' => 'zabbix.php',
+					'action' => 'mediatype.list',
+					'active_if' => ['mediatype.edit', 'mediatype.list'],
+					'label' => _('Media types')
+				],
+				[
+					'url' => 'zabbix.php',
+					'action' => 'script.list',
+					'active_if' => ['script.edit', 'script.list'],
+					'label' => _('Scripts')
+				],
+				[
+					'url' => 'queue.php',
+					'label' => _('Queue')
+				]
+			]
+		],
+		'login' => [
+			'label' => _('Login'),
+			'user_type' => 0,
+			'default_page_id' => 0,
+			'pages' => [
+				[
+					'url' => 'index.php',
+					'sub_pages' => ['profile.php', 'popup_media.php']
+				]
+			]
+		]
+	];
 
 	$denied_page_requested = false;
 	$page_exists = false;
 	$deny = true;
 
-	foreach ($ZBX_MENU as $label => $menu) {
+	foreach ($zbx_menu as $label => $menu) {
 		$show_menu = true;
 
 		if (isset($menu['user_type'])) {
@@ -346,7 +337,7 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			}
 
 			$row = [
-				'menu_text' => isset($sub_page['label']) ? $sub_page['label'] : '',
+				'menu_text' => array_key_exists('label', $sub_page) ? $sub_page['label'] : '',
 				'menu_url' => $sub_page['url'],
 				'menu_action' => array_key_exists('action', $sub_page) ? $sub_page['action'] : null,
 				'selected' => false
@@ -395,7 +386,8 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
 		}
 		$mmenu_entry = (new CListItem(
-			(new CLink($menu['label'], 'javascript:void(0);'))->removeSID()
+			(new CLink($menu['label']))
+				->setAttribute('tabindex', 0)
 		))
 			->addClass($menu_class)
 			->setId($label);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ extern int	CONFIG_LISTEN_PORT;
 #define ZBX_METRIC_FLAG_LOG_LOG		0x04	/* log[ */
 #define ZBX_METRIC_FLAG_LOG_LOGRT	0x08	/* logrt[ */
 #define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x10	/* eventlog[ */
-#define ZBX_METRIC_FLAG_LOG			/* item value type is log, one of the above */	\
+#define ZBX_METRIC_FLAG_LOG			/* item for log file monitoring, one of the above */	\
 		(ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_EVENTLOG)
 
 typedef struct

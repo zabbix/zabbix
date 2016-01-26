@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -223,24 +223,6 @@ function insert_javascript_for_visibilitybox() {
 
 function insert_js_function($fnct_name) {
 	switch ($fnct_name) {
-		case 'add_item_variable':
-			insert_js('
-				function add_item_variable(s_formname, x_value) {
-					if (add_variable(null, "itemid[" + x_value + "]", x_value, s_formname, window.opener.document)) {
-						var o_form;
-						if (!(o_form = window.opener.document.forms[s_formname])) {
-							throw "Missing form with name [" + s_formname + "].";
-						}
-						var element = o_form.elements["itemid"];
-						if (element) {
-							element.name = "itemid[" + element.value + "]";
-						}
-						o_form.submit();
-					}
-					close_window();
-					return true;
-				}');
-			break;
 		case 'add_media':
 			insert_js('
 				function add_media(formname, media, mediatypeid, sendto, period, active, severity) {
@@ -261,80 +243,7 @@ function insert_js_function($fnct_name) {
 					return true;
 				}');
 			break;
-		case 'add_bitem':
-			insert_js('
-				function add_bitem(formname, caption, itemid, color, calc_fnc, axisside) {
-					var form = window.opener.document.forms[formname];
-					if (!form) {
-						close_window();
-						return false;
-					}
-					window.opener.create_var(form, "new_graph_item[caption]", caption);
-					window.opener.create_var(form, "new_graph_item[itemid]", itemid);
-					window.opener.create_var(form, "new_graph_item[color]", color);
-					window.opener.create_var(form, "new_graph_item[calc_fnc]", calc_fnc);
-					window.opener.create_var(form, "new_graph_item[axisside]", axisside);
 
-					form.submit();
-					close_window();
-					return true;
-				}');
-			break;
-		case 'update_bitem':
-			insert_js('
-				function update_bitem(formname, list_name, gid, caption, itemid, color, calc_fnc, axisside) {
-					var form = window.opener.document.forms[formname];
-					if (!form) {
-						close_window();
-						return false;
-					}
-					window.opener.create_var(form, list_name + "[" + gid + "][caption]", caption);
-					window.opener.create_var(form, list_name + "[" + gid + "][itemid]", itemid);
-					window.opener.create_var(form, list_name + "[" + gid + "][color]", color);
-					window.opener.create_var(form, list_name + "[" + gid + "][calc_fnc]", calc_fnc);
-					window.opener.create_var(form, list_name + "[" + gid + "][axisside]", axisside);
-
-					form.submit();
-					close_window();
-					return true;
-				}');
-			break;
-		case 'add_period':
-			insert_js('
-				function add_period(formname, caption, since, till, color) {
-					var form = window.opener.document.forms[formname];
-					if (!form) {
-						close_window();
-						return false;
-					}
-					window.opener.create_var(form, "new_period[caption]", caption);
-					window.opener.create_var(form, "new_period[report_timesince]", since);
-					window.opener.create_var(form, "new_period[report_timetill]", till);
-					window.opener.create_var(form, "new_period[color]", color);
-
-					form.submit();
-					close_window();
-					return true;
-				}');
-			break;
-		case 'update_period':
-			insert_js('
-				function update_period(pid, formname, caption, since, till, color) {
-					var form = window.opener.document.forms[formname];
-					if (!form) {
-						close_window();
-						return false;
-					}
-					window.opener.create_var(form, "periods[" + pid + "][caption]", caption);
-					window.opener.create_var(form, "periods[" + pid + "][report_timesince]", since);
-					window.opener.create_var(form, "periods[" + pid + "][report_timetill]", till);
-					window.opener.create_var(form, "periods[" + pid + "][color]", color);
-
-					form.submit();
-					close_window();
-					return true;
-				}');
-			break;
 		case 'addSelectedValues':
 			insert_js('
 				function addSelectedValues(form, object, parentId) {
@@ -370,6 +279,7 @@ function insert_js_function($fnct_name) {
 					parent.jQuery(parent.document).trigger("add.popup", data);
 				}');
 			break;
+
 		case 'addValue':
 			insert_js('
 				function addValue(object, singleValue, parentId) {
@@ -395,6 +305,7 @@ function insert_js_function($fnct_name) {
 					parent.jQuery(parent.document).trigger("add.popup", data);
 				}');
 			break;
+
 		case 'addValues':
 			insert_js('
 				function addValues(frame, values, submitParent) {
@@ -430,17 +341,6 @@ function insert_js_function($fnct_name) {
 					}
 					close_window();
 				}');
-			break;
-		case 'check_all':
-			insert_js('
-				function check_all(objname, value) {
-					$(objname).getInputs("checkbox").each(function(e) {
-						e.checked = value;
-					});
-				}');
-			break;
-		default:
-			insert_js('throw("JS function not found ['.$fnct_name.']");');
 			break;
 	}
 };

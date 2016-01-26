@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -461,9 +461,8 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_PROXY_PASSIVE	0x04
 #define ZBX_PROGRAM_TYPE_PROXY		0x06	/* ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
 #define ZBX_PROGRAM_TYPE_AGENTD		0x08
-#define ZBX_PROGRAM_TYPE_AGENT		0x10
-#define ZBX_PROGRAM_TYPE_SENDER		0x20
-#define ZBX_PROGRAM_TYPE_GET		0x40
+#define ZBX_PROGRAM_TYPE_SENDER		0x10
+#define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
@@ -611,6 +610,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_HTTPITEM_TYPE_SPEED		2
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
+
+/* proxy_history flags */
+#define PROXY_HISTORY_FLAG_META		0x01
+#define PROXY_HISTORY_FLAG_NOVALUE	0x02
 
 /* user permissions */
 typedef enum
@@ -762,11 +765,13 @@ typedef enum
 zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
+#define ZBX_TASK_FLAG_FOREGROUND      0x02
 
 typedef struct
 {
 	zbx_task_t	task;
 	int		flags;
+	int		data;
 }
 ZBX_TASK_EX;
 
@@ -869,8 +874,6 @@ time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);
 u_char	zbx_hex2num(char c);
-size_t	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
-size_t	zbx_hex2binary(char *io);
 void	zbx_hex2octal(const char *input, char **output, int *olen);
 int	str_in_list(const char *list, const char *value, char delimiter);
 char	*str_linefeed(const char *src, size_t maxline, const char *delim);
@@ -966,7 +969,6 @@ int	is_ip(const char *ip);
 void	zbx_on_exit(void); /* calls exit() at the end! */
 
 int	int_in_list(char *list, int value);
-int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(const char *list, const char *ip);
 
 /* IP range support */
@@ -997,7 +999,6 @@ int	iprange_validate(const zbx_iprange_t *range, const int *address);
 zbx_uint64_t	iprange_volume(const zbx_iprange_t *range);
 
 /* time related functions */
-double	time_diff(struct timeval *from, struct timeval *to);
 char	*zbx_age2str(int age);
 char	*zbx_date2str(time_t date);
 char	*zbx_time2str(time_t time);
@@ -1012,10 +1013,8 @@ int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
 int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t value, int alloc_step);
-void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step);
 int	uint64_array_exists(const zbx_uint64_t *values, int num, zbx_uint64_t value);
 void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_values, int rm_num);
-void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num);
 
 const char	*zbx_event_value_string(unsigned char source, unsigned char object, unsigned char value);
 
@@ -1067,7 +1066,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 
-int	MAIN_ZABBIX_ENTRY();
+int	MAIN_ZABBIX_ENTRY(int flags);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -1128,5 +1127,22 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
 #define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
+
+typedef struct
+{
+	char	*name;
+	char	**params;
+	int	nparam;
+}
+zbx_function_t;
+
+void	zbx_function_clean(zbx_function_t *func);
+int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
+int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
+
+#ifndef _WINDOWS
+unsigned int	zbx_alarm_on(unsigned int seconds);
+unsigned int	zbx_alarm_off(void);
+#endif
 
 #endif

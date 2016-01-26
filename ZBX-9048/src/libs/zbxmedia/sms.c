@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, 
 	static char	buffer[0xff], *ebuf = buffer, *sbuf = buffer;
 	fd_set		fdset;
 	struct timeval  tv;
-	int		i, nbytes, rc, ret = SUCCEED;
+	int		i, nbytes, nbytes_total, rc, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s] [%s] [%s] [%s]", __function_name, expect,
 			ebuf != buffer ? buffer : "NULL", ebuf != buffer ? ebuf : "NULL", ebuf != buffer ? sbuf : "NULL");
@@ -164,19 +164,24 @@ static int	read_gsm(int fd, const char *expect, char *error, int max_error_len, 
 
 		/* read characters into our string buffer */
 
+		nbytes_total = 0;
+
 		while (0 < (nbytes = read(fd, ebuf, buffer + sizeof(buffer) - 1 - ebuf)))
 		{
 			ebuf += nbytes;
 			*ebuf = '\0';
 
-			zabbix_log(LOG_LEVEL_DEBUG, "Read attempt #%d from GSM modem [%s]", i, ebuf - nbytes);
+			nbytes_total += nbytes;
 
-			do
-			{
-				if (0 == isspace(ebuf[-nbytes]))
-					goto check_result;
-			}
-			while (0 < --nbytes);
+			zabbix_log(LOG_LEVEL_DEBUG, "Read attempt #%d from GSM modem [%s]", i, ebuf - nbytes);
+		}
+
+		while (0 < nbytes_total)
+		{
+			if (0 == isspace(ebuf[-nbytes_total]))
+				goto check_result;
+
+			nbytes_total--;
 		}
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,6 +86,7 @@ struct	_DC_TRIGGER;
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
 #define HOST_NAME_LEN			128
 #define HOST_ERROR_LEN			2048
+#define HOST_ERROR_LEN_MAX		(HOST_ERROR_LEN + 1)
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
 #define HOST_IPMI_PASSWORD_LEN		20
@@ -482,8 +483,6 @@ char	*DBdyn_escape_string(const char *src);
 char	*DBdyn_escape_string_len(const char *src, size_t max_src_len);
 char	*DBdyn_escape_like_pattern(const char *src);
 
-void    DBget_item_from_db(DB_ITEM *item, DB_ROW row);
-
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
@@ -503,6 +502,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 void	DBdelete_items(zbx_vector_uint64_t *itemids);
 void	DBdelete_graphs(zbx_vector_uint64_t *graphids);
 void	DBdelete_hosts(zbx_vector_uint64_t *hostids);
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids);
 
 int	DBupdate_itservices(const DB_EVENT *events, size_t events_num);
 int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_num);
@@ -597,5 +597,49 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
 int	zbx_db_get_database_type(void);
+
+/* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
+typedef struct
+{
+	/* flags specifying which fields are set, see ZBX_FLAGS_AGENT_STATUS_* defines */
+	unsigned char	flags;
+
+	/* agent availability fields */
+	unsigned char	available;
+	char		*error;
+	int		errors_from;
+	int		disable_until;
+}
+zbx_agent_availability_t;
+
+#define ZBX_FLAGS_AGENT_STATUS_NONE		0x00000000
+#define ZBX_FLAGS_AGENT_STATUS_AVAILABLE	0x00000001
+#define ZBX_FLAGS_AGENT_STATUS_ERROR		0x00000002
+#define ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM	0x00000004
+#define ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL	0x00000008
+
+#define ZBX_FLAGS_AGENT_STATUS		(ZBX_FLAGS_AGENT_STATUS_AVAILABLE |	\
+					ZBX_FLAGS_AGENT_STATUS_ERROR |		\
+					ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM |	\
+					ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL)
+
+#define ZBX_AGENT_ZABBIX	(INTERFACE_TYPE_AGENT - 1)
+#define ZBX_AGENT_SNMP		(INTERFACE_TYPE_SNMP - 1)
+#define ZBX_AGENT_IPMI		(INTERFACE_TYPE_IPMI - 1)
+#define ZBX_AGENT_JMX		(INTERFACE_TYPE_JMX - 1)
+#define ZBX_AGENT_UNKNOWN 	255
+#define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
+
+typedef struct
+{
+	zbx_uint64_t			hostid;
+
+	zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
+}
+zbx_host_availability_t;
+
+
+int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_host_availability_t *ha);
 
 #endif

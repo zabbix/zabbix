@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -736,28 +736,6 @@ char	*DBdyn_escape_string_len(const char *src, size_t max_src_len)
 char	*DBdyn_escape_like_pattern(const char *src)
 {
 	return zbx_db_dyn_escape_like_pattern(src);
-}
-
-void	DBget_item_from_db(DB_ITEM *item, DB_ROW row)
-{
-	ZBX_STR2UINT64(item->itemid, row[0]);
-	item->key = row[1];
-	item->host_name = row[2];
-	item->type = atoi(row[3]);
-	item->history = atoi(row[4]);
-	item->trends = atoi(row[13]);
-	item->value_type = atoi(row[6]);
-
-	ZBX_STR2UINT64(item->hostid, row[5]);
-	item->delta = atoi(row[7]);
-
-	item->units = row[8];
-	item->multiplier = atoi(row[9]);
-	item->formula = row[10];
-	item->state = (unsigned char)atoi(row[11]);
-	ZBX_DBROW2UINT64(item->valuemapid, row[12]);
-
-	item->data_type = atoi(row[14]);
 }
 
 const ZBX_TABLE	*DBget_table(const char *tablename)
@@ -2614,3 +2592,70 @@ int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_sql_add_host_availability                                    *
+ *                                                                            *
+ * Purpose: adds host availability update to sql statement                    *
+ *                                                                            *
+ * Parameters: sql        - [IN/OUT] the sql statement                        *
+ *             sql_alloc  - [IN/OUT] the number of bytes allocated for sql    *
+ *                                   statement                                *
+ *             sql_offset - [IN/OUT] the number of bytes used in sql          *
+ *                                   statement                                *
+ *             ha           [IN] the host availability data                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const zbx_host_availability_t *ha)
+{
+	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
+	char	delim = ' ';
+	int	i;
+
+	if (FAIL == zbx_host_availability_is_set(ha))
+		return FAIL;
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "update hosts set");
+
+	for (i = 0; i < ZBX_AGENT_MAX; i++)
+	{
+		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_AVAILABLE))
+		{
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%savailable=%d", delim, field_prefix[i],
+					(int)ha->agents[i].available);
+			delim = ',';
+		}
+
+		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_ERROR))
+		{
+			char	*error_esc;
+
+			error_esc = DBdyn_escape_string_len(ha->agents[i].error, HOST_ERROR_LEN);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%serror='%s'", delim, field_prefix[i],
+					error_esc);
+			zbx_free(error_esc);
+			delim = ',';
+		}
+
+		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_ERRORS_FROM))
+		{
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%serrors_from=%d", delim, field_prefix[i],
+					ha->agents[i].errors_from);
+			delim = ',';
+		}
+
+		if (0 != (ha->agents[i].flags & ZBX_FLAGS_AGENT_STATUS_DISABLE_UNTIL))
+		{
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%c%sdisable_until=%d", delim, field_prefix[i],
+					ha->agents[i].disable_until);
+			delim = ',';
+		}
+	}
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64 "\n;", ha->hostid);
+
+	return SUCCEED;
+}
+

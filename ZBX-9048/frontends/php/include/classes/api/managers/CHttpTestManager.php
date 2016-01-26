@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1089,5 +1089,21 @@ class CHttpTestManager {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get httptest step items by "httptestid".
+	 *
+	 * @param string $httptestid		ID of a web scenario
+	 *
+	 * @return array
+	 */
+	public function getHttpStepItems($httptestid) {
+		return DBfetchArray(DBselect(
+			'SELECT hi.itemid'.
+			' FROM httpstepitem hi,httpstep hs'.
+			' WHERE hi.httpstepid=hs.httpstepid'.
+				' AND hs.httptestid='.zbx_dbstr($httptestid)
+		));
 	}
 }

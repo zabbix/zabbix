@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -636,23 +636,24 @@ class CHost extends CHostGeneral {
 				$host['name'] = $host['host'];
 			}
 
-			$tls_connect = array_key_exists('tls_connect', $host)
+			$host['tls_connect'] = array_key_exists('tls_connect', $host)
 				? $host['tls_connect']
 				: $db_hosts[$host['hostid']]['tls_connect'];
 
-			$tls_accept = array_key_exists('tls_accept', $host)
+			$host['tls_accept'] = array_key_exists('tls_accept', $host)
 				? $host['tls_accept']
 				: $db_hosts[$host['hostid']]['tls_accept'];
 
 			// Clean PSK fields.
-			if ($tls_connect != HOST_ENCRYPTION_PSK && ($tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK) {
+			if ($host['tls_connect'] != HOST_ENCRYPTION_PSK
+					&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK) {
 				$host['tls_psk_identity'] = '';
 				$host['tls_psk'] = '';
 			}
 
 			// Clean certificate fields.
-			if ($tls_connect != HOST_ENCRYPTION_CERTIFICATE
-					&& ($tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+			if ($host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE
+					&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 				$host['tls_issuer'] = '';
 				$host['tls_subject'] = '';
 			}
@@ -1323,7 +1324,7 @@ class CHost extends CHostGeneral {
 		}
 
 		// remove Monitoring > Latest data toggle profile values related to given hosts
-		CProfile::delete('web.latest.toggle_other', $hostIds);
+		DB::delete('profiles', ['idx' => 'web.latest.toggle_other', 'idx2' => $hostIds]);
 
 		return ['hostids' => $hostIds];
 	}

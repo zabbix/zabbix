@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -721,8 +721,9 @@ int	DBupdate_itservices(const DB_EVENT *events, size_t events_num)
 {
 	const char		*__function_name = "DBupdate_itservices";
 
-	int			i, ret = SUCCEED;
+	int			ret = SUCCEED;
 	zbx_vector_ptr_t	updates;
+	size_t			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 

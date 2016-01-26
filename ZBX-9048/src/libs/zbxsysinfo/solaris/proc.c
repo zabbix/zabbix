@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,15 +19,13 @@
 
 #include <procfs.h>
 
-#ifdef HAVE_ZONE_H
-#	include <zone.h>
-#endif
-
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
+
+extern int	CONFIG_TIMEOUT;
 
 typedef struct
 {
@@ -669,9 +667,10 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp, *flags;
 	char		*errmsg = NULL;
-	int		period, type, ret;
+	int		period, type;
 	double		value;
 	zbx_uint64_t	zoneflag;
+	zbx_timespec_t	ts_timeout, ts;
 
 	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15)] */
 	if (6 < request->nparam)
@@ -757,8 +756,10 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED != (ret = zbx_procstat_get_util(procname, username, cmdline, zoneflag, period, type, &value,
-			&errmsg)))
+	zbx_timespec(&ts_timeout);
+	ts_timeout.sec += CONFIG_TIMEOUT;
+
+	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, zoneflag, period, type, &value, &errmsg))
 	{
 		/* zbx_procstat_get_* functions will return FAIL when either a collection   */
 		/* error was registered or if less than 2 data samples were collected.      */
@@ -768,9 +769,19 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, errmsg);
 			return SYSINFO_RET_FAIL;
 		}
+
+		zbx_timespec(&ts);
+
+		if (0 > zbx_timespec_compare(&ts_timeout, &ts))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for collector data."));
+			return SYSINFO_RET_FAIL;
+		}
+
+		sleep(1);
 	}
-	else
-		SET_DBL_RESULT(result, value);
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }

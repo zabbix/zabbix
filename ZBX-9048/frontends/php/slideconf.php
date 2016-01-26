@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 $page['title'] = _('Configuration of slide shows');
 $page['file'] = 'slideconf.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
+$page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -35,6 +36,10 @@ $fields = [
 	'name' => [T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'delay' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')],
 	'slides' =>			[null,		 O_OPT, null,		null,	null],
+	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
+	'users' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
+	'userGroups' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
 	// actions
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null],
 	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -57,16 +62,19 @@ if (!empty($_REQUEST['slides'])) {
 /*
  * Permissions
  */
-if (isset($_REQUEST['slideshowid'])) {
-	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ_WRITE)) {
+if (hasRequest('slideshowid')) {
+	if (!slideshow_accessible($_REQUEST['slideshowid'], PERM_READ)) {
 		access_deny();
 	}
 
-	$dbSlideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'));
+	$db_slideshow = get_slideshow_by_slideshowid(getRequest('slideshowid'), PERM_READ_WRITE);
 
-	if (!$dbSlideshow) {
+	if (!$db_slideshow) {
 		access_deny();
 	}
+}
+else {
+	$db_slideshow = [];
 }
 if (hasRequest('action')) {
 	if (!hasRequest('shows') || !is_array(getRequest('shows'))) {
@@ -86,22 +94,56 @@ if (hasRequest('action')) {
 /*
  * Actions
  */
-if (isset($_REQUEST['clone']) && isset($_REQUEST['slideshowid'])) {
-	unset($_REQUEST['slideshowid']);
+if (hasRequest('clone') && hasRequest('slideshowid')) {
+	unset($_REQUEST['slideshowid'], $_REQUEST['users'], $_REQUEST['userGroups']);
 	$_REQUEST['form'] = 'clone';
+	$_REQUEST['private'] = PRIVATE_SHARING;
+	$_REQUEST['userid'] = CWebUser::$data['userid'];
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {
-		$result = update_slideshow(getRequest('slideshowid'), getRequest('name'), getRequest('delay'), getRequest('slides', []));
+		$data = [
+			'slideshowid' => getRequest('slideshowid'),
+			'name' => getRequest('name'),
+			'delay' => getRequest('delay'),
+			'slides' => getRequest('slides', []),
+			'userid' => getRequest('userid', ''),
+			'private' => getRequest('private'),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
+		];
+
+		// Slide show update with inaccessible user.
+		if ($data['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN
+				&& CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN) {
+			$user_exist = API::User()->get([
+				'output' => ['userid'],
+				'userids' => [$data['userid']]
+			]);
+
+			if (!$user_exist) {
+				unset($data['userid']);
+			}
+		}
+
+		$result = update_slideshow($data);
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$result = add_slideshow(getRequest('name'), getRequest('delay'), getRequest('slides', []));
+		$result = add_slideshow([
+			'name' => getRequest('name'),
+			'delay' => getRequest('delay'),
+			'slides' => getRequest('slides', []),
+			'userid' => getRequest('userid'),
+			'private' => getRequest('private'),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
+		]);
 
 		$messageSuccess = _('Slide show added');
 		$messageFailed = _('Cannot add slide show');
@@ -126,7 +168,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['slideshowid'])) {
 	$result = delete_slideshow($_REQUEST['slideshowid']);
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$dbSlideshow['name'].'" ');
+		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_SLIDESHOW, ' Name "'.$db_slideshow['name'].'" ');
 	}
 	unset($_REQUEST['slideshowid'], $_REQUEST['form']);
 
@@ -162,42 +204,141 @@ elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' &
 /*
  * Display
  */
-if (isset($_REQUEST['form'])) {
+if (hasRequest('form')) {
+	$current_userid = CWebUser::$data['userid'];
+	$userids[$current_userid] = true;
+	$user_groupids = [];
+
 	$data = [
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh', 0),
-		'slideshowid' => getRequest('slideshowid'),
-		'name' => getRequest('name', ''),
-		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'slides' => getRequest('slides', [])
+		'form_refresh' => getRequest('form_refresh', 0)
 	];
 
-	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
-		$data['name'] = $dbSlideshow['name'];
-		$data['delay'] = $dbSlideshow['delay'];
+	if (!hasRequest('slideshowid') || hasRequest('form_refresh')) {
+		// Slide show owner.
+		$slideshow_owner = getRequest('userid', $current_userid);
+		$userids[$slideshow_owner] = true;
 
-		// get slides
-		$data['slides'] = DBfetchArray(DBselect(
+		foreach (getRequest('users', []) as $user) {
+			$userids[$user['userid']] = true;
+		}
+
+		foreach (getRequest('userGroups', []) as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = true;
+		}
+	}
+	else {
+		// Slide show owner.
+		$userids[$db_slideshow['userid']] = true;
+
+		$db_slideshow['users'] = DBfetchArray(DBselect(
+			'SELECT s.userid,s.permission'.
+			' FROM slideshow_user s'.
+			' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+		));
+
+		foreach ($db_slideshow['users'] as $user) {
+			$userids[$user['userid']] = true;
+		}
+
+		$db_slideshow['userGroups'] = DBfetchArray(DBselect(
+			'SELECT s.usrgrpid,s.permission'.
+			' FROM slideshow_usrgrp s'.
+			' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+		));
+
+		foreach ($db_slideshow['userGroups'] as $user_group) {
+			$user_groupids[$user_group['usrgrpid']] = true;
+		}
+	}
+
+	$data['users'] = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'userids' => array_keys($userids),
+		'preservekeys' => true
+	]);
+
+	$data['user_groups'] = API::UserGroup()->get([
+		'output' => ['usrgrpid', 'name'],
+		'usrgrpids' => array_keys($user_groupids),
+		'preservekeys' => true
+	]);
+
+	if (array_key_exists('slideshowid', $db_slideshow) && !isset($_REQUEST['form_refresh'])) {
+		$data['slideshow'] = [
+			'slideshowid' => $db_slideshow['slideshowid'],
+			'name' => $db_slideshow['name'],
+			'delay' => $db_slideshow['delay'],
+			'userid' => $db_slideshow['userid'],
+			'private' => $db_slideshow['private'],
+			'users' => $db_slideshow['users'],
+			'userGroups' => $db_slideshow['userGroups']
+		];
+
+		// Get slides.
+		$data['slideshow']['slides'] = DBfetchArray(DBselect(
 				'SELECT s.slideid, s.screenid, s.delay'.
 				' FROM slides s'.
-				' WHERE s.slideshowid='.zbx_dbstr($data['slideshowid']).
+				' WHERE s.slideshowid='.zbx_dbstr($db_slideshow['slideshowid']).
 				' ORDER BY s.step'
 		));
 	}
+	else {
+		$data['slideshow'] = [
+			'slideshowid' => getRequest('slideshowid'),
+			'name' => getRequest('name', ''),
+			'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
+			'slides' => getRequest('slides', []),
+			'private' => getRequest('private', PRIVATE_SHARING),
+			'users' => getRequest('users', []),
+			'userGroups' => getRequest('userGroups', [])
+		];
+		if (hasRequest('form_refresh')) {
+			if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN || CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
+				$data['slideshow']['userid'] = getRequest('userid', '');
+			}
+			else {
+				$data['slideshow']['userid'] = getRequest('userid');
+			}
+		}
+		else {
+			if ($db_slideshow) {
+				$data['slideshow']['userid'] = $db_slideshow['userid'];
+			}
+			else {
+				$data['slideshow']['userid'] = $current_userid;
+			}
+		}
+	}
 
-	// get slides without delay
-	$data['slides_without_delay'] = $data['slides'];
+	$screenids = [];
+	foreach ($data['slideshow']['slides'] as $slides) {
+		$screenids[] = $slides['screenid'];
+	}
+
+	$data['slideshow']['screens'] = API::Screen()->get([
+		'output' => ['screenid', 'name'],
+		'screenids' => $screenids,
+		'preservekeys' => true
+	]);
+
+	$data['current_user_userid'] = $current_userid;
+
+	// Get slides without delay.
+	$data['slides_without_delay'] = $data['slideshow']['slides'];
 	foreach ($data['slides_without_delay'] as &$slide) {
 		unset($slide['delay']);
 	}
 	unset($slide);
 
 	// render view
-	$slideshowView = new CView('configuration.slideconf.edit', $data);
+	$slideshowView = new CView('monitoring.slideconf.edit', $data);
 	$slideshowView->render();
 	$slideshowView->show();
 }
 else {
+	CProfile::delete('web.slides.elementid');
+
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
 	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
@@ -220,11 +361,16 @@ else {
 			' ORDER BY '.(($sortField === 'cnt') ? 'cnt' : 's.'.$sortField)
 	));
 
-	foreach ($data['slides'] as $key => $slide) {
-		if (!slideshow_accessible($slide['slideshowid'], PERM_READ_WRITE)) {
+	foreach ($data['slides'] as $key => &$slide) {
+		if (!slideshow_accessible($slide['slideshowid'], PERM_READ)) {
 			unset($data['slides'][$key]);
 		}
+
+		if (get_slideshow_by_slideshowid($slide['slideshowid'], PERM_READ_WRITE)) {
+			$slide['editable'] = true;
+		}
 	}
+	unset($slide);
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
@@ -240,7 +386,7 @@ else {
 	$data['paging'] = getPagingLine($data['slides'], $sortOrder);
 
 	// render view
-	$slideshowView = new CView('configuration.slideconf.list', $data);
+	$slideshowView = new CView('monitoring.slideconf.list', $data);
 	$slideshowView->render();
 	$slideshowView->show();
 }
