@@ -563,7 +563,20 @@ function make_hoststat_summary($filter) {
 
 				if (!isset($hosts_data[$group['groupid']]['hostids_all'][$host['hostid']])) {
 					$hosts_data[$group['groupid']]['hostids_all'][$host['hostid']] = $host['hostid'];
-					$hosts_data[$group['groupid']]['problematic']++;
+
+					/*
+					 * Display acknowledged problem triggers in "Without problems" column when filter dashboard is
+					 * enabled and is set to display "Unacknowledged only". Host and trigger must not be in
+					 * unacknowledged lists. Count as problematic host otherwise.
+					 */
+					if ($filter['extAck'] == EXTACK_OPTION_UNACK
+							&& !array_key_exists($host['hostid'], $hosts_with_unack_triggers)
+							&& !array_key_exists($trigger['triggerid'], $triggers_unack)) {
+						$hosts_data[$group['groupid']]['ok']++;
+					}
+					else {
+						$hosts_data[$group['groupid']]['problematic']++;
+					}
 				}
 			}
 		}
