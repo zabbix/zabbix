@@ -1485,9 +1485,11 @@ footer {
 
 		&:checked[disabled] + label {
 			background-color: lighten($ui-bg-selected-color, 33%) !important;
+			@include transition(none);
 		}
 
 		&[disabled] + label {
+			@include transition(none);
 			@extend %form-disabled;
 		}
 	}
