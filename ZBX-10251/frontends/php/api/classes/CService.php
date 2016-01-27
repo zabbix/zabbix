@@ -588,19 +588,21 @@ class CService extends CZBXAPI {
 
 			if ($usedSeviceIds) {
 				// add service alarms
-				$intervalConditions = array();
-				foreach ($intervals as $interval) {
-					$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
-				}
-				$query = DBselect(
-					'SELECT *'.
-					' FROM service_alarms sa'.
-					' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
-						' AND ('.implode(' OR ', $intervalConditions).')'.
-					' ORDER BY sa.clock,sa.servicealarmid'
-				);
-				while ($data = DBfetch($query)) {
-					$services[$data['serviceid']]['alarms'][] = $data;
+				if ($intervals) {
+					$intervalConditions = array();
+					foreach ($intervals as $interval) {
+						$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
+					}
+					$query = DBselect(
+						'SELECT *'.
+						' FROM service_alarms sa'.
+						' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
+							' AND ('.implode(' OR ', $intervalConditions).')'.
+						' ORDER BY sa.clock,sa.servicealarmid'
+					);
+					while ($data = DBfetch($query)) {
+						$services[$data['serviceid']]['alarms'][] = $data;
+					}
 				}
 
 				// add problem triggers
