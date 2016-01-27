@@ -1846,8 +1846,6 @@ int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, name));
 	ret = SYSINFO_RET_OK;
-
-	SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown virtual machine uuid."));
 unlock:
 	zbx_vmware_unlock();
 out:

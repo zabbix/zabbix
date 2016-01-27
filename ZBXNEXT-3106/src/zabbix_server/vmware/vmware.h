@@ -178,7 +178,7 @@ typedef struct
 	/* list of entities to monitor with performance counters */
 	zbx_hashset_t		entities;
 
-	/* The service data object that is swapped with a new one during service update */
+	/* the service data object that is swapped with a new one during service update */
 	zbx_vmware_data_t	*data;
 }
 zbx_vmware_service_t;
