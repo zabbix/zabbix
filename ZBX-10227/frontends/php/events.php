@@ -289,12 +289,11 @@ else {
 	$frmForm->addVar('page', getPageNumber(), 'page_csv');
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
+		$frmForm->addVar('groupid', $pageFilter->groupid, 'groupid_csv');
+		$frmForm->addVar('hostid', $pageFilter->hostid, 'hostid_csv');
+
 		if ($triggerId) {
 			$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
-		}
-		else {
-			$frmForm->addVar('groupid', $pageFilter->groupid, 'groupid_csv');
-			$frmForm->addVar('hostid', $pageFilter->hostid, 'hostid_csv');
 		}
 	}
 	$frmForm->addItem(new CSubmit('csv_export', _('Export to CSV')));
@@ -472,7 +471,7 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 else {
 	$header = array(
 		_('Time'),
-		(getRequest('hostid', 0) == 0) ? _('Host') : null,
+		($pageFilter->hostid == 0) ? _('Host') : null,
 		_('Description'),
 		_('Status'),
 		_('Severity'),
@@ -768,7 +767,7 @@ else {
 			));
 
 			// fetch scripts for the host JS menu
-			if (!$csvExport && getRequest('hostid', 0) == 0) {
+			if (!$csvExport && $pageFilter->hostid == 0) {
 				$scripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
@@ -798,7 +797,7 @@ else {
 				if ($csvExport) {
 					$csvRows[] = array(
 						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-						(getRequest('hostid', 0) == 0) ? $host['name'] : null,
+						($pageFilter->hostid == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
 						getSeverityCaption($trigger['priority']),
@@ -829,7 +828,7 @@ else {
 					// host JS menu link
 					$hostName = null;
 
-					if (getRequest('hostid', 0) == 0) {
+					if ($pageFilter->hostid == 0) {
 						$hostName = new CSpan($host['name'], 'link_menu');
 						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
