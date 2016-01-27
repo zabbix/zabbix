@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -729,9 +729,10 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		$dbTriggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggerPrototypes);
 
-		$descriptionChanged = false;
-		$expressionChanged = false;
 		foreach ($triggerPrototypes as &$triggerPrototype) {
+			$descriptionChanged = false;
+			$expressionChanged = false;
+
 			$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototype['triggerid']];
 			$hosts = zbx_objectValues($dbTriggerPrototype['hosts'], 'name');
 
@@ -746,7 +747,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$expressionFull = $triggerPrototype['expression'];
 			}
 
-			if ($descriptionChanged || $expressionChanged) {
+			if ($expressionChanged) {
 				$expressionData = new CTriggerExpression();
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
@@ -757,9 +758,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 						'Trigger expression must contain at least one host:key reference.'
 					));
 				}
-			}
 
-			if ($expressionChanged) {
 				DB::delete('functions', ['triggerid' => $triggerPrototype['triggerid']]);
 
 				try {

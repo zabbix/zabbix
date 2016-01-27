@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
 
+ob_start();
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -55,24 +56,27 @@ check_fields($fields);
 /*
  * Permissions
  */
-$dbSlideshow = null;
+$data = [];
 
 if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid')])
 		|| getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
 	access_deny();
 }
 if (hasRequest('elementid')) {
-	$dbSlideshow = get_slideshow_by_slideshowid(getRequest('elementid'));
+	$data['screen'] = get_slideshow_by_slideshowid(getRequest('elementid'), PERM_READ);
 
-	if (!$dbSlideshow) {
+	if (!$data['screen']) {
 		access_deny();
 	}
+}
+else {
+	$data['screen'] = [];
 }
 
 /*
  * Actions
  */
-if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlideshow) {
+if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $data['screen']) {
 	$elementId = getRequest('elementid');
 
 	$screen = getSlideshowScreens($elementId, getRequest('upd_counter'));
@@ -104,7 +108,9 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 
 			CScreenBuilder::insertScreenCleanJs();
 
-			echo $screenBuilder->show()->toString();
+			echo (new CDiv($screenBuilder->show()))
+				->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+				->toString();
 
 			CScreenBuilder::insertScreenStandardJs([
 				'timeline' => $screenBuilder->timeline,
@@ -120,7 +126,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 
 			CProfile::update('web.slides.rf_rate.'.WIDGET_SLIDESHOW, $widgetRefreshRate, PROFILE_TYPE_STR, $elementId);
 
-			$delay = ($screen['delay'] > 0) ? $screen['delay'] : $dbSlideshow['delay'];
+			$delay = ($screen['delay'] > 0) ? $screen['delay'] : $data['screen']['delay'];
 
 			echo 'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.CJs::encodeJson($delay * $widgetRefreshRate).');'."\n"
 				.'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();';
@@ -147,32 +153,22 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$data = [
-	'fullscreen' => getRequest('fullscreen'),
-	'elementId' => getRequest('elementid', CProfile::get('web.slides.elementid')),
-	'slideshows' => []
-];
+if ($data['screen']) {
+	$data['elementId'] = getRequest('elementid');
+	CProfile::update('web.slides.elementid', getRequest('elementid'), PROFILE_TYPE_ID);
+}
+else {
+	$data['elementId'] = CProfile::get('web.slides.elementid');
+	$data['screen'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
 
-// get slideshows
-$dbSlideshows = DBselect('SELECT s.slideshowid,s.name FROM slideshows s');
-
-while ($dbSlideshow = DBfetch($dbSlideshows)) {
-	if (slideshow_accessible($dbSlideshow['slideshowid'], PERM_READ)) {
-		$data['slideshows'][$dbSlideshow['slideshowid']] = $dbSlideshow;
+	if (!$data['screen']) {
+		// Redirect to slide show list.
+		ob_end_clean();
+		redirect('slideconf.php');
 	}
-};
-order_result($data['slideshows'], 'name');
-
-if (!isset($data['slideshows'][$data['elementId']])) {
-	$slideshow = reset($data['slideshows']);
-
-	$data['elementId'] = $slideshow['slideshowid'];
 }
 
-CProfile::update('web.slides.elementid', $data['elementId'], PROFILE_TYPE_ID);
-
-// get screen
-$data['screen'] = $data['elementId'] ? getSlideshowScreens($data['elementId'], 0) : [];
+$data['fullscreen'] = getRequest('fullscreen');
 
 if ($data['screen']) {
 	// get groups and hosts
@@ -198,7 +194,7 @@ if ($data['screen']) {
 	}
 
 	// get element
-	$data['element'] = get_slideshow_by_slideshowid($data['elementId']);
+	$data['element'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
 
 	if ($data['screen']['delay'] > 0) {
 		$data['element']['delay'] = $data['screen']['delay'];

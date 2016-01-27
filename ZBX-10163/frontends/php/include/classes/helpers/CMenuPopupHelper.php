@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,7 +168,7 @@ class CMenuPopupHelper {
 
 				if ($favourite['source'] === 'slideshowid') {
 					if (slideshow_accessible($sourceId, PERM_READ)) {
-						$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
+						$dbSlideshow = get_slideshow_by_slideshowid($sourceId, PERM_READ);
 
 						if ($dbSlideshow) {
 							$slideshows[] = [
@@ -337,24 +337,6 @@ class CMenuPopupHelper {
 			'currentRate' => $currentRate,
 			'multiplier' => $multiplier,
 			'params' => $params
-		];
-	}
-
-	/**
-	 * Prepare data for service configuration menu popup.
-	 *
-	 * @param string $serviceId		service id
-	 * @param string $name			service name
-	 * @param bool   $deletable		services without dependencies can be deleted
-	 *
-	 * @return array
-	 */
-	public static function getServiceConfiguration($serviceId, $name, $deletable) {
-		return [
-			'type' => 'serviceConfiguration',
-			'serviceid' => $serviceId,
-			'name' => $name,
-			'deletable' => $deletable
 		];
 	}
 

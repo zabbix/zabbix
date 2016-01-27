@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1180,7 +1180,9 @@ function getActionCommands(array $alerts) {
 }
 
 function makeActionHints($alerts, $mediatypes, $users, $status) {
-	$table = (new CTableInfo())->setHeader([_('User'), _('Details'), _('Status'), _('Info')]);
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Details'), _('Status'), _('Info')]);
+
+	$popup_rows = 0;
 
 	foreach ($alerts as $alert) {
 		switch ($status) {
@@ -1213,7 +1215,17 @@ function makeActionHints($alerts, $mediatypes, $users, $status) {
 				$message = '';
 		}
 
-		$table->addRow([$user, $message, $status_str, $alert['error'] === '' ? '' : makeErrorIcon($alert['error'])]);
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+			$user,
+			$message,
+			$status_str,
+			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+		]);
+
+		if (++$popup_rows == ZBX_WIDGET_ROWS) {
+			break;
+		}
 	}
 
 	return $table;
@@ -1225,11 +1237,11 @@ function makeEventsActions($eventids) {
 	}
 
 	$result = DBselect(
-		'SELECT a.eventid,a.mediatypeid,a.userid,a.message,a.status,a.alerttype,a.error'.
+		'SELECT a.eventid,a.mediatypeid,a.userid,a.clock,a.message,a.status,a.alerttype,a.error'.
 		' FROM alerts a'.
 		' WHERE '.dbConditionInt('a.eventid', $eventids).
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-		' ORDER BY a.alertid'
+		' ORDER BY a.alertid DESC'
 	);
 
 	$events = [];
@@ -1248,6 +1260,7 @@ function makeEventsActions($eventids) {
 		}
 
 		$event = [
+			'clock' => $row['clock'],
 			'alerttype' => $row['alerttype'],
 			'error' => $row['error']
 		];
@@ -1292,13 +1305,13 @@ function makeEventsActions($eventids) {
 
 	foreach ($events as $eventid => &$event) {
 		$event = (new CList([
-			count($event[ALERT_STATUS_SENT]) != 0
+			$event[ALERT_STATUS_SENT]
 				? (new CSpan(count($event[ALERT_STATUS_SENT])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 					->addClass(ZBX_STYLE_GREEN)
 					->setHint(makeActionHints($event[ALERT_STATUS_SENT], $mediatypes, $users, ALERT_STATUS_SENT))
 				: '',
-			count($event[ALERT_STATUS_NOT_SENT]) != 0
+			$event[ALERT_STATUS_NOT_SENT]
 				? (new CSpan(count($event[ALERT_STATUS_NOT_SENT])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 					->addClass(ZBX_STYLE_YELLOW)
@@ -1306,7 +1319,7 @@ function makeEventsActions($eventids) {
 						makeActionHints($event[ALERT_STATUS_NOT_SENT], $mediatypes, $users, ALERT_STATUS_NOT_SENT)
 					)
 				: '',
-			count($event[ALERT_STATUS_FAILED]) != 0
+			$event[ALERT_STATUS_FAILED]
 				? (new CSpan(count($event[ALERT_STATUS_FAILED])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 					->addClass(ZBX_STYLE_RED)

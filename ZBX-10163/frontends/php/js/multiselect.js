@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -504,7 +504,9 @@ jQuery(function($) {
 					});
 				}
 
-				obj.parent().append($('<div class="multiselect-button"></div>').append(popupButton));
+				obj.parent().append($('<div>', {
+					'class': 'multiselect-button'
+				}).append(popupButton));
 			}
 		});
 	};
@@ -750,9 +752,9 @@ jQuery(function($) {
 			end = text.indexOf(search, end);
 
 			if (end > start) {
-				li.append(
-					item.name.substring(start, end)
-				);
+				li.append($('<span>', {
+					text: item.name.substring(start, end)
+				}));
 			}
 
 			li.append($('<span>', {
@@ -765,9 +767,9 @@ jQuery(function($) {
 		}
 
 		if (end < item.name.length) {
-			li.append(
-				item.name.substring(end, item.name.length)
-			);
+			li.append($('<span>', {
+				text: item.name.substring(end, item.name.length)
+			}));
 		}
 
 		$('.available ul', obj).append(li);

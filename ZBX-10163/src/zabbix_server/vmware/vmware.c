@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -3359,14 +3359,17 @@ int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() path:%s", __function_name, path);
 
-	if (NULL != (counter = zbx_hashset_search(&service->counters, &path)))
-	{
-		*counterid = counter->id;
-		ret = SUCCEED;
-	}
+	if (NULL == (counter = zbx_hashset_search(&service->counters, &path)))
+		goto out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s counterid:" ZBX_FS_UI64, __function_name, zbx_result_string(ret),
-			*counterid);
+	*counterid = counter->id;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() counterid:" ZBX_FS_UI64, __function_name, *counterid);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 #else
 	return FAIL;

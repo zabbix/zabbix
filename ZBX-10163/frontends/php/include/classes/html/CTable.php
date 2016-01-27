@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,6 @@ class CTable extends CTag {
 	protected $footer;
 	protected $colnum;
 	protected $rownum;
-	protected $message;
 
 	public function __construct() {
 		parent::__construct('table', true);
@@ -45,11 +44,6 @@ class CTable extends CTag {
 		return $this;
 	}
 
-	public function setNoDataMessage($message) {
-		$this->message = $message;
-		return $this;
-	}
-
 	public function prepareRow($item, $class = null, $id = null) {
 		if ($item === null) {
 			return null;
@@ -59,28 +53,17 @@ class CTable extends CTag {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
 			}
+		}
+
+		if (!is_object($item) || strtolower(get_class($item)) !== 'crow') {
 			$item = new CRow($item);
-			if ($class !== null) {
-				$item->addClass($class);
-			}
 			if ($id !== null) {
 				$item->setId($id);
 			}
 		}
 
-		if (is_object($item) && strtolower(get_class($item)) === 'crow') {
-			if ($class !== null) {
-				$item->addClass($class);
-			}
-		}
-		else {
-			$item = new CRow($item);
-			if ($class !== null) {
-				$item->addClass($class);
-			}
-			if ($id !== null) {
-				$item->setId($id);
-			}
+		if ($class !== null) {
+			$item->addClass($class);
 		}
 
 		return $item;
@@ -109,11 +92,6 @@ class CTable extends CTag {
 		return $this;
 	}
 
-	public function showRow($item, $class = null, $id = null) {
-		echo $this->prepareRow($item, $class, $id)->toString();
-		++$this->rownum;
-	}
-
 	public function getNumRows() {
 		return $this->rownum;
 	}
@@ -126,12 +104,7 @@ class CTable extends CTag {
 	}
 
 	public function endToString() {
-		$ret = '';
-		if ($this->rownum == 0 && $this->message !== null) {
-			$ret = $this->prepareRow(new CCol($this->message), 'nothing-to-show');
-			$ret = $ret->toString();
-		}
-		$ret .= $this->footer;
+		$ret = $this->footer;
 		$ret .= '</tbody>';
 		$ret .= parent::endToString();
 		return $ret;

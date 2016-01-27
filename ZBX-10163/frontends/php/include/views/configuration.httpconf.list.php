@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,19 @@ else {
 	$create_button = new CSubmit('form', _('Create web scenario'));
 }
 
+$filter = (new CFilter('web.httpconf.filter.state'))
+	->addColumn(
+		(new CFormList())
+			->addRow(_('Status'),
+				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
+					->addValue(_('all'), -1)
+					->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
+					->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
+					->setModern(true)
+			)
+	)
+	->addNavigator();
+
 $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setControls((new CForm('get'))
@@ -40,6 +53,8 @@ $widget = (new CWidget())
 if (!empty($this->data['hostid'])) {
 	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
+
+$widget->addItem($filter);
 
 // create form
 $httpForm = (new CForm())

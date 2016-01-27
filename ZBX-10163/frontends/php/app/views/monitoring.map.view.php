@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,60 +19,41 @@
 **/
 
 
-$mapWidget = (new CWidget())->setTitle(_('Maps'));
+$actionMap = getActionMapBySysmap($data['map'], ['severity_min' => $data['severity_min']]);
+$imgMap = (new CImg('map.php?sysmapid='.$data['map']['sysmapid'].'&severity_min='.$data['severity_min']))
+	->setMap($actionMap->getName());
 
-$headerMapForm = (new CForm('get'))->cleanItems();
-
-$controls = new CList();
-
-if ($data['maps']) {
-	$maps = [];
-	foreach ($data['maps'] as $sysmapid => $map) {
-		$maps[$sysmapid] = $map['name'];
-	}
-
-	$headerMapForm->addVar('action', 'map.view')
-		->addVar('fullscreen', $data['fullscreen']);
-
-	$controls
-		->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)])
-		->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
-
-	// get map parent maps
-	$parentMaps = [];
-	foreach (getParentMaps($data['sysmapid']) as $parent) {
-		// check for permissions
-		if (isset($data['maps'][$parent['sysmapid']])) {
-			$parentMaps[] = SPACE.SPACE;
-			$parentMaps[] = new CLink($parent['name'], 'zabbix.php?action=map.view&sysmapid='.$parent['sysmapid'].'&fullscreen='.$data['fullscreen'].'&severity_min='.$data['severity_min']);
-		}
-	}
-	if (!empty($parentMaps)) {
-		array_unshift($parentMaps, _('Upper level maps').':');
-		$controls->addItem($parentMaps);
-	}
-
-	$actionMap = getActionMapBySysmap($data['map'], ['severity_min' => $data['severity_min']]);
-	$imgMap = (new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']))
-		->setMap($actionMap->getName());
-
-	$mapTable = (new CTable())
-		->addRow($actionMap)
-		->addRow($imgMap);
-
-	$controls->addItem(get_icon('favourite', [
-		'fav' => 'web.favorite.sysmapids',
-		'elname' => 'sysmapid',
-		'elid' => $data['sysmapid']
-	]));
-}
-else {
-	$mapTable = (new CTable())->setNoDataMessage(_('No maps found.'));
-}
-
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
-
-$headerMapForm->addItem($controls);
-$mapWidget->setControls($headerMapForm)
-	->addItem($mapTable)
+(new CWidget())
+	->setTitle(_('Maps'))
+	->setControls(
+		(new CForm('get'))
+			->cleanItems()
+			->addVar('action', 'map.view')
+			->addVar('sysmapid', $data['map']['sysmapid'])
+			->addVar('fullscreen', $data['fullscreen'])
+			->addItem(
+				(new CList())
+					->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()])
+					->addItem(get_icon('favourite', [
+						'fav' => 'web.favorite.sysmapids',
+						'elname' => 'sysmapid',
+						'elid' => $data['map']['sysmapid']
+					]))
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			)
+	)
+	->addItem(
+		get_header_sysmap_table($data['map']['sysmapid'], $data['map']['name'], $data['fullscreen'],
+			$data['severity_min']
+		)
+	)
+	->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+			->addItem(
+				(new CTable())
+					->addRow($actionMap)
+					->addRow($imgMap)
+			)
+	)
 	->show();

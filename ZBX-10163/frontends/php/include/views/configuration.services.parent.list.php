@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ foreach ($this->data['db_pservices'] as $db_service) {
 			self.close();
 			return false;'
 		);
-	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
+	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorithm($db_service['algorithm']), $db_service['trigger']]);
 }
 
 $servicesParentTable->setFooter(

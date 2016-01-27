@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-class CController {
+abstract class CController {
 
 	const VALIDATION_OK = 0;
 	const VALIDATION_ERROR = 1;
@@ -61,12 +61,12 @@ class CController {
 	private $validateSID = true;
 
 	public function __construct() {
-		session_start();
+		CSession::start();
 		$this->init();
 	}
 
 	/**
-	 * Initialization function that can be overwritten later.
+	 * Initialization function that can be overridden later.
 	 *
 	 * @return var
 	 */
@@ -148,10 +148,9 @@ class CController {
 	 * @return var
 	 */
 	public function validateInput($validationRules) {
-		if (isset($_SESSION['formData']))
-		{
-			$input = array_merge($_REQUEST, $_SESSION['formData']);
-			unset($_SESSION['formData']);
+		if (CSession::keyExists('formData')) {
+			$input = array_merge($_REQUEST, CSession::getValue('formData'));
+			CSession::unsetValue(['formData']);
 		}
 		else {
 			$input = $_REQUEST;
@@ -216,7 +215,7 @@ class CController {
 	 * @return var
 	 */
 	public function getInputs(&$var, $names) {
-		foreach($names as $name) {
+		foreach ($names as $name) {
 			if ($this->hasInput($name)) {
 				$var[$name] = $this->getInput($name);
 			}
@@ -233,22 +232,22 @@ class CController {
 	}
 
 	/**
-	 * Check user permissions. The function must present in inherited controller.
+	 * Check user permissions.
+	 *
+	 * @abstract
 	 *
 	 * @return var
 	 */
-	protected function checkPermissions() {
-		return false;
-	}
+	abstract protected function checkPermissions();
 
 	/**
-	 * Validate input parameters. The function must present in inherited controller.
+	 * Validate input parameters.
+	 *
+	 * @abstract
 	 *
 	 * @return var
 	 */
-	protected function checkInput() {
-		access_deny(ACCESS_DENY_PAGE);
-	}
+	abstract protected function checkInput();
 
 	/**
 	 * Validate session ID (SID).
@@ -275,13 +274,13 @@ class CController {
 	}
 
 	/**
-	 * Execute action and generate response object. The function must present in inherited controller.
+	 * Execute action and generate response object.
+	 *
+	 * @abstract
 	 *
 	 * @return var
 	 */
-	protected function doAction() {
-		return null;
-	}
+	abstract protected function doAction();
 
 	/**
 	 * Main controller processing routine. Returns response object: data, redirect or fatal redirect.
