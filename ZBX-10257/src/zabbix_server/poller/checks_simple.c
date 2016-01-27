@@ -22,7 +22,7 @@
 #include "simple.h"
 #include "log.h"
 
-#include "../vmware/vmware.h"
+#include "zbxself.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
 
@@ -169,11 +169,9 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (NULL != vmfunc)
 		{
-			zbx_vmware_stats_t	stats;
-
-			if (FAIL == zbx_vmware_get_statistics(&stats))
+			if (0 == get_process_type_forks(ZBX_PROCESS_TYPE_VMWARE))
 			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "VMWare collector not started"));
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "No \"vmware collector\" is running."));
 				goto out;
 			}
 
@@ -181,7 +179,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 				ret = SUCCEED;
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in"));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
 	}
 	else
 	{
@@ -191,7 +189,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	}
 
 	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
 out:
 	free_request(&request);
