@@ -366,11 +366,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
 		goto out;
 
-	/* if the item is still flagged as unreachable while the host is reachable, */
-	/* it means that this is item rather than network failure                   */
-	if (0 == in.errors_from && 0 != item->unreachable)
-		goto out;
-
 	if (FAIL == DChost_deactivate(ts, &in, &out))
 		goto out;
 
@@ -671,12 +666,12 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
 					activate_host(&items[i], &timespec, &last_available);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
 					deactivate_host(&items[i], &timespec, &last_available, results[i].msg);
 				break;
