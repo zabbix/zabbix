@@ -25,7 +25,11 @@
 
 	<!-- name -->
 	<td>
-		<span id="items_#{number}_name" class="link" onclick="">#{name}</span>
+		<?php if ($this->data['templates']): ?>
+			<span id="items_#{number}_name">#{name}</span>
+		<?php else: ?>
+			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+		<?php endif ?>
 	</td>
 
 	<!-- type -->
@@ -123,7 +127,9 @@
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
 		incrementNextColor();
-		rewriteNameLinks();
+		<?php if (!$this->data['templates']): ?>
+			rewriteNameLinks();
+		<?php endif ?>
 	}
 
 	function addPopupValues(list) {
@@ -159,8 +165,8 @@
 
 		<?php if (!$this->data['templates']): ?>
 			activateSortable();
+			rewriteNameLinks();
 		<?php endif ?>
-		rewriteNameLinks();
 	}
 
 	function getOnlyHostParam() {
@@ -171,6 +177,7 @@
 		<?php endif ?>
 	}
 
+<?php if (!$this->data['templates']): ?>
 	function rewriteNameLinks() {
 		var size = jQuery('#itemsTable tr.sortable').length;
 
@@ -186,6 +193,7 @@
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}
+<?php endif ?>
 
 	function removeItem(obj) {
 		var number = jQuery(obj).data('remove');
@@ -266,7 +274,9 @@
 			i++;
 		});
 
-		rewriteNameLinks();
+		<?php if (!$this->data['templates']): ?>
+			rewriteNameLinks();
+		<?php endif ?>
 	}
 
 <?php if (!$this->data['templates']): ?>
@@ -377,8 +387,6 @@
 			var size = $('#itemsTable tr.sortable').length;
 
 			for (var i = 0; i < size; i++) {
-				$('#items_' + i + '_name').removeAttr('onclick');
-				$('#items_' + i + '_name').removeAttr('class');
 				$('#items_' + i + '_color').removeAttr('onchange');
 				$('#lbl_items_' + i + '_color').removeAttr('onclick');
 			}
