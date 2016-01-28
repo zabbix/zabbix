@@ -86,7 +86,6 @@
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
 		</td>
-	<?php else: ?>
 	<?php endif ?>
 	<td>
 		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
