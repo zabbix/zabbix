@@ -390,8 +390,7 @@ footer, .footer {
   width: 95px;
   height: 25px;
   margin: 12px 9px 0 13px;
-  background: #fff url(../img/icon-sprite.svg) no-repeat 0 -720px;
-  background-size: 95px; }
+  background: url(../img/icon-sprite.svg) no-repeat 0 -903px; }
 
 .list-table {
   width: 100%;
@@ -1020,7 +1019,14 @@ footer, .footer {
       position: relative;
       z-index: 2; }
     .radio-segmented input[type="radio"]:checked[disabled] + label {
-      background-color: #d6dde1 !important; }
+      background-color: #d6dde1 !important;
+      -webkit-transition: none;
+      -moz-transition: none;
+      transition: none; }
+    .radio-segmented input[type="radio"][disabled] + label {
+      -webkit-transition: none;
+      -moz-transition: none;
+      transition: none; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
