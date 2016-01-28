@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 ..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
 ..F....... [ZBX-10280] fixed events export to CSV (Gunars)
 ..F....... [ZBX-10163] fixed expression area changes in LLD rule filters when selecting different type of calculation (Cemeris)
