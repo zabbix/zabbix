@@ -286,8 +286,8 @@
 			itemsTableColumns = jQuery('#itemsTable th'),
 			itemsTableColumnWidths = [];
 
-		itemsTableColumns.each(function() {
-			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
+		itemsTableColumns.each(function(i) {
+			itemsTableColumnWidths[i] = jQuery(this).width();
 		});
 		itemsTable.sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
