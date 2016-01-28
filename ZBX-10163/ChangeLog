@@ -4,6 +4,8 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
+..F....... [ZBX-10182] fixed percentile line checkbox checking (Cemeris)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
 ...G...... [ZBX-9877] changed system.uname on Windows to get data from WMI, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
 ..F....... [ZBX-10282] fixed undefined index "eztext_limit" in media types (Gunars)
@@ -386,6 +388,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
 ...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
