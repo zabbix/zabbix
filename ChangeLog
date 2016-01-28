@@ -4,6 +4,10 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBXNEXT-2662] added escaping of the HTML entities and tags in the GUI notifications (Sasha)
+..F....... [ZBXNEXT-2662] added space between Auto-logout elemants in the user profile form (Sasha)
+..F....... [ZBXNEXT-2662] fixed flickering of disabled radios (Pavel)
+..F....... [ZBXNEXT-2662] fixed logo white background (Pavel)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 ..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
 ..F....... [ZBX-10280] fixed events export to CSV (Gunars)

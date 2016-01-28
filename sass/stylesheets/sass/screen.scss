@@ -170,7 +170,6 @@ pre {
 		family: $font-stack-mono;
 		size: $font-mono-size;
 	}
-	//display: block;
 	@extend %space-pre-wrap;
 
 	a {
@@ -579,8 +578,7 @@ footer {
 	width: 95px;
 	height: 25px;
 	margin: 12px 9px 0 13px;
-	background: $white url(../img/icon-sprite.svg) no-repeat 0 -720px;
-	background-size: 95px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
 }
 
 // Tables
@@ -1487,9 +1485,11 @@ footer {
 
 		&:checked[disabled] + label {
 			background-color: lighten($ui-bg-selected-color, 33%) !important;
+			@include transition(none);
 		}
 
 		&[disabled] + label {
+			@include transition(none);
 			@extend %form-disabled;
 		}
 	}
