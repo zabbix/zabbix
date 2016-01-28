@@ -177,7 +177,7 @@ next:
 			case SUCCEED:
 				if (ITEM_VALUE_TYPE_LOG == items[i].value_type)
 				{
-					calc_timestamp(results[i].logs[0]->value, &results[i].logs[0]->timestamp,
+					calc_timestamp(results[i].log->value, &results[i].log->timestamp,
 							items[i].logtimefmt);
 				}
 
