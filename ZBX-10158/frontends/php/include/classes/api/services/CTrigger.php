@@ -1053,11 +1053,12 @@ class CTrigger extends CTriggerGeneral {
 
 		$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
 
-		$descriptionChanged = false;
-		$expressionChanged = false;
 		$changedPriorityTriggerIds = [];
 
 		foreach ($triggers as &$trigger) {
+			$descriptionChanged = false;
+			$expressionChanged = false;
+
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 

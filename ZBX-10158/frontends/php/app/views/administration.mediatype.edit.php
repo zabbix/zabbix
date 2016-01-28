@@ -136,7 +136,7 @@ $mediaTypeFormList
 		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Password'), $passwdField)
-	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, [
+	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['eztext_limit'], null, [
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 	]))
