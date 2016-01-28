@@ -4,7 +4,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
-..F....... [ZBX-10227] fixed exporting events to csv for selected host (Gunars)
+..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
 ..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
