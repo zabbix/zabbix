@@ -3330,6 +3330,7 @@ static void	DCsync_expressions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->expressions.num_data + 32);
 
 	zbx_hashset_iter_reset(&config->regexps, &iter);
 
@@ -3340,9 +3341,11 @@ static void	DCsync_expressions(DB_RESULT result)
 	/* update expressions from db */
 	while (NULL != (row = DBfetch(result)))
 	{
-		ZBX_DC_REGEXP	new_regexp = {row[0]};
+		ZBX_DC_REGEXP	new_regexp;
 		zbx_uint64_t	expressionid;
 		int 		found;
+
+		new_regexp.name = row[0];
 
 		if (NULL == (regexp = zbx_hashset_search(&config->regexps, &new_regexp)))
 		{
@@ -3427,6 +3430,7 @@ static void	DCsync_actions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->actions.num_data + 32);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -3444,8 +3448,8 @@ static void	DCsync_actions(DB_RESULT result)
 			zbx_vector_ptr_reserve(&action->conditions, 1);
 		}
 
-		action->eventsource = atoi(row[1]);
-		action->evaltype = atoi(row[2]);
+		ZBX_STR2UCHAR(action->eventsource, row[1]);
+		ZBX_STR2UCHAR(action->evaltype, row[2]);
 
 		DCstrpool_replace(found, &action->formula, row[3]);
 
@@ -3505,6 +3509,7 @@ static void	DCsync_action_conditions(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
+	zbx_vector_uint64_reserve(&ids, config->action_conditions.num_data + 32);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -3520,8 +3525,8 @@ static void	DCsync_action_conditions(DB_RESULT result)
 		condition = DCfind_id(&config->action_conditions, conditionid, sizeof(zbx_dc_action_condition_t),
 				&found);
 
-		condition->conditiontype = atoi(row[2]);
-		condition->operator = atoi(row[3]);
+		ZBX_STR2UCHAR(condition->conditiontype, row[2]);
+		ZBX_STR2UCHAR(condition->operator, row[3]);
 
 		DCstrpool_replace(found, &condition->value, row[4]);
 
