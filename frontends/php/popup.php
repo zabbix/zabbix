@@ -268,6 +268,7 @@ $group = getRequest('group', '');
 $host = getRequest('host', '');
 $onlyHostid = getRequest('only_hostid');
 $parentDiscoveryId = getRequest('parent_discoveryid');
+$templateid = getRequest('templateid');
 
 if (isset($onlyHostid)) {
 	$_REQUEST['hostid'] = $onlyHostid;
@@ -447,6 +448,9 @@ if (isset($onlyHostid)) {
 }
 if (getRequest('screenid')) {
 	$frmTitle->addVar('screenid', getRequest('screenid'));
+}
+if (hasRequest('templateid')) {
+	$frmTitle->addVar('templateid', $templateid);
 }
 
 // adding param to a form, so that it would remain when page is refreshed
@@ -725,11 +729,10 @@ elseif ($srctbl == 'templates') {
 
 	$data = [];
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
-	$templateid = getRequest('templateid');
 
 	foreach ($templates as &$template) {
 		// dont show itself
-		if ($template['templateid'] == $templateid) {
+		if (bccomp($template['templateid'], $templateid) == 0) {
 			continue;
 		}
 
