@@ -83,7 +83,7 @@ class CScreenSimpleGraph extends CScreenBase {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.CJs::encodeJson($this->timeline).', '.CJs::encodeJson($timeControlData).');');
 			}
 
-			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) {
+			if ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW || !$resourceid) {
 				$item = new CDiv();
 			}
 			elseif ($this->mode == SCREEN_MODE_PREVIEW) {
