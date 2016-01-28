@@ -22,6 +22,7 @@
 class CLink extends CTag {
 
 	private	$use_sid = false;
+	private	$confirm_message = '';
 	private $url = null;
 
 	public function __construct($item = null, $url = null) {
@@ -33,22 +34,21 @@ class CLink extends CTag {
 		$this->url = $url;
 	}
 
+	/*
+	 * Add a "sid" argument into the URL.
+	 * POST method will be used for the "sid" argument.
+	 */
 	public function addSID() {
 		$this->use_sid = true;
 		return $this;
 	}
 
-	private function getUrl() {
-		$url = $this->url;
-
-		if ($this->use_sid) {
-			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
-				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
-				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
-			}
-		}
-
-		return $url;
+	/*
+	 * Add a confirmation message
+	 */
+	public function addConfirmation($value) {
+		$this->confirm_message = $value;
+		return $this;
 	}
 
 	public function setTarget($value = null) {
@@ -57,7 +57,26 @@ class CLink extends CTag {
 	}
 
 	public function toString($destroy = true) {
-		$this->setAttribute('href', $this->getUrl());
+		$url = $this->url;
+
+		if ($this->use_sid) {
+			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
+				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
+				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
+			}
+			$confirm_script = ($this->confirm_message !== '')
+				? 'Confirm('.CJs::encodeJson($this->confirm_message).') && '
+				: '';
+			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', 'sid', true)");
+			$this->setAttribute('href', 'javascript:void(0)');
+		}
+		else {
+			$this->setAttribute('href', $url);
+
+			if ($this->confirm_message !== '') {
+				$this->onClick('javascript: return Confirm('.CJs::encodeJson($this->confirm_message).');');
+			}
+		}
 
 		return parent::toString($destroy);
 	}

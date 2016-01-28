@@ -75,6 +75,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Absolute path to the configuration file",
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+	"  -f --foreground                Run Zabbix proxy in foreground",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
@@ -101,6 +102,7 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
+	{"foreground",		0,	NULL,	'f'},
 	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
@@ -108,7 +110,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:hVR:";
+static char	shortopts[] = "c:hVR:f";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -418,6 +420,9 @@ static void	zbx_set_defaults(void)
 		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
 		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
+
+	if (NULL == CONFIG_LOG_TYPE_STR)
+		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
 }
 
 /******************************************************************************
@@ -429,7 +434,7 @@ static void	zbx_set_defaults(void)
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config(void)
+static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
 	char	*ch_error;
 	int	err = 0;
@@ -487,6 +492,10 @@ static void	zbx_validate_config(void)
 	/* parameters VMwareFrequency, VMwarePerfFrequency, VMwareCacheSize, VMwareTimeout are not checked here */
 	/* because they have non-zero default values */
 #endif
+
+	if (SUCCEED != zbx_validate_log_parameters(task))
+		err = 1;
+
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
 	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
@@ -514,7 +523,7 @@ static void	zbx_validate_config(void)
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(void)
+static void	zbx_load_config(ZBX_TASK_EX *task)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -600,6 +609,8 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			5},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"LogType",			&CONFIG_LOG_TYPE_STR,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogFileSize",			&CONFIG_LOG_FILE_SIZE,			TYPE_INT,
@@ -678,7 +689,9 @@ static void	zbx_load_config(void)
 
 	zbx_set_defaults();
 
-	zbx_validate_config();
+	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
+
+	zbx_validate_config(task);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_validate_config();
 #endif
@@ -728,7 +741,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.data))
 					exit(EXIT_FAILURE);
 
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
@@ -740,6 +753,9 @@ int	main(int argc, char **argv)
 			case 'V':
 				version();
 				exit(EXIT_SUCCESS);
+				break;
+			case 'f':
+				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
 				usage();
@@ -777,26 +793,30 @@ int	main(int argc, char **argv)
 	/* required for simple checks */
 	init_metrics();
 
-	zbx_load_config();
+	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
+		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
+	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
-int	MAIN_ZABBIX_ENTRY()
+int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	int		i, db_type;
 
-	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
-	else
-		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
+				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
+				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+
+	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
