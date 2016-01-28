@@ -55,6 +55,12 @@
 				<option value="<?= CALC_FNC_MAX ?>"><?= _('max') ?></option>
 		<?php endif ?>
 		</select>
+		<?php if ($this->data['graphtype'] != GRAPH_TYPE_NORMAL): ?>
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
+			<?php if ($this->data['graphtype'] != GRAPH_TYPE_STACKED): ?>
+				<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
+			<?php endif ?>
+		<?php endif ?>
 	</td>
 
 	<!-- drawtype -->
@@ -66,8 +72,6 @@
 			<?php endforeach ?>
 			</select>
 		</td>
-	<?php else: ?>
-		<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="#{drawtype}">
 	<?php endif ?>
 
 	<!-- yaxisside -->
@@ -79,7 +83,6 @@
 			</select>
 		</td>
 	<?php else: ?>
-		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
 		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
@@ -270,13 +273,12 @@
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
 			itemsTableWidth = itemsTable.width(),
-			itemsTableColumns = jQuery('#itemsTable .header td'),
+			itemsTableColumns = jQuery('#itemsTable th'),
 			itemsTableColumnWidths = [];
 
 		itemsTableColumns.each(function() {
 			itemsTableColumnWidths[itemsTableColumnWidths.length] = jQuery(this).width();
 		});
-
 		itemsTable.sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
 			items: 'tbody tr.sortable',
@@ -291,10 +293,8 @@
 				itemsTable.width(itemsTableWidth);
 			},
 			helper: function(e, ui) {
-				ui.children().each(function(i) {
-					var td = jQuery(this);
-
-					td.width(itemsTableColumnWidths[i]);
+				ui.children().each(function(i, td) {
+					jQuery(td).width(itemsTableColumnWidths[i]);
 				});
 
 				// when dragging element on safari, it jumps out of the table
@@ -303,14 +303,13 @@
 					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
-				itemsTableColumns.each(function(i) {
-					jQuery(this).width(itemsTableColumnWidths[i]);
-				});
-
 				return ui;
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+			},
+			stop: function(e, ui) {
+				jQuery(ui.item).children().width('');
 			}
 		});
 	}
