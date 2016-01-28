@@ -151,7 +151,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		}
 		else {
 			$screen['userid'] = getRequest('userid', '');
-			$screen['private'] = getRequest('private', 1);
+			$screen['private'] = getRequest('private', PRIVATE_SHARING);
 			$screen['users'] = getRequest('users', []);
 			$screen['userGroups'] = getRequest('userGroups', []);
 
@@ -200,7 +200,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		}
 		else {
 			$screen['userid'] = getRequest('userid', '');
-			$screen['private'] = getRequest('private', 1);
+			$screen['private'] = getRequest('private', PRIVATE_SHARING);
 			$screen['users'] = getRequest('users', []);
 			$screen['userGroups'] = getRequest('userGroups', []);
 
@@ -335,7 +335,7 @@ if (hasRequest('form')) {
 		}
 		else {
 			$data['screen']['userid'] = getRequest('userid', hasRequest('form_refresh') ? '' : $current_userid);
-			$data['screen']['private'] = getRequest('private', 1);
+			$data['screen']['private'] = getRequest('private', PRIVATE_SHARING);
 			$data['screen']['users'] = getRequest('users', []);
 			$data['screen']['userGroups'] = getRequest('userGroups', []);
 			$data['screen']['templateid'] = null;

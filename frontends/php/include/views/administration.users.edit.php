@@ -169,7 +169,11 @@ else {
 
 if ($this->data['alias'] != ZBX_GUEST_USER) {
 	$userFormList->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($this->data['autologin']));
-	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [$autologoutCheckBox, $autologoutTextBox]);
+	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [
+		$autologoutCheckBox,
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$autologoutTextBox
+	]);
 }
 
 $userFormList

@@ -1,4 +1,4 @@
-.TH ZABBIX_AGENTD 8 "2014\-07\-10" Zabbix
+.TH ZABBIX_AGENTD 8 "2016\-01\-13" Zabbix
 .SH NAME
 zabbix_agentd \- Zabbix agent daemon
 .SH SYNOPSIS
@@ -33,6 +33,8 @@ is a daemon for monitoring of various server parameters.
 .IP "\fB\-c\fR, \fB\-\-config\fR \fIconfig\-file\fR"
 Use the alternate \fIconfig\-file\fR instead of the default one.
 Absolute path should be specified.
+.IP "\fB\-f\fR, \fB\-\-foreground\fR"
+Run Zabbix agent in foreground.
 .IP "\fB\-R\fR, \fB\-\-runtime\-control\fR \fIruntime\-option\fR"
 Perform administrative functions according to \fIruntime\-option\fR.
 .SS
