@@ -139,7 +139,7 @@ void	zbx_redirect_stdio(const char *filename)
  * Function: get_time                                                         *
  *                                                                            *
  * Purpose:                                                                   *
- *     get current time and store it in memory localtions provided by caller  *
+ *     get current time and store it in memory locations provided by caller   *
  *                                                                            *
  * Parameters:                                                                *
  *     tm           - [OUT] broken-down representation of the current time    *

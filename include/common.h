@@ -1020,6 +1020,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 
 #ifdef _WINDOWS
 const OSVERSIONINFOEX	*zbx_win_getversion();
+void	zbx_wmi_get(char *wmi_namespace, char *wmi_query, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
