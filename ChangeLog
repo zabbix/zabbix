@@ -4,8 +4,9 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-10280] fixed events export to csv (Gunars)
-..F....... [ZBX-10163] fixed expression area changes in lld rule filters when selecting different type of calculation (Cemeris)
+..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
+..F....... [ZBX-10280] fixed events export to CSV (Gunars)
+..F....... [ZBX-10163] fixed expression area changes in LLD rule filters when selecting different type of calculation (Cemeris)
 ..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-10182] fixed percentile line checkbox checking (Cemeris)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
@@ -390,7 +391,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
-..F....... [ZBX-10227] fixed exporting events to csv for selected host (Gunars)
+..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
 ..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
