@@ -250,30 +250,29 @@ class CDRule extends CZBXAPI {
 
 		$proxies = array();
 		foreach ($dRules as $dRule) {
-			if ($method === 'create') {
-				if (!isset($dRule['iprange'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
-				}
-				elseif (!validate_ip_range($dRule['iprange'])) {
+			if (array_key_exists('iprange', $dRule)) {
+				if (!validate_ip_range($dRule['iprange'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
 				}
-
-				if (empty($dRule['dchecks'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
-				}
+			}
+			else if ($method === 'create') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
 			}
 
-			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
+			if (array_key_exists('delay', $dRule) && $dRule['delay'] < 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
 			}
 
-			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED)
+			if (array_key_exists('status', $dRule) && (($dRule['status'] != DRULE_STATUS_DISABLED)
 					&& ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
 			}
 
-			if ($dRule['dchecks']) {
+			if (array_key_exists('dchecks', $dRule) && $dRule['dchecks']) {
 				$this->validateDChecks($dRule['dchecks']);
+			}
+			else if (array_key_exists('dchecks', $dRule) || $method === 'create') {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
 
 			if (isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']) {
@@ -506,18 +505,24 @@ class CDRule extends CZBXAPI {
 	 * @return array
 	 */
 	public function update(array $dRules) {
-		$this->checkInput($dRules, __FUNCTION__);
-		$this->validateRequiredFields($dRules, __FUNCTION__);
-
 		$dRuleIds = zbx_objectValues($dRules, 'druleid');
 
 		$dRulesDb = API::DRule()->get(array(
 			'druleids' => $dRuleIds,
-			'output' => API_OUTPUT_EXTEND,
-			'selectDChecks' => API_OUTPUT_EXTEND,
+			'output' => array('druleid', 'name'),
+			'selectDChecks' => array('dcheckid'),
 			'editable' => true,
 			'preservekeys' => true
 		));
+
+		foreach ($dRuleIds as $druleid) {
+			if (!array_key_exists($druleid, $dRulesDb)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		$this->checkInput($dRules, __FUNCTION__);
+		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		$defaultValues = DB::getDefaults('dchecks');
 
