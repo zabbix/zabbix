@@ -997,7 +997,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!$triggerExpression->parse($triggerPrototype['expression'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 		}
-		if ($triggerExpression->expressions) {
+		if (!$triggerExpression->expressions) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_('Trigger expression must contain at least one host:key reference.')
 			);
