@@ -39,14 +39,6 @@ class CButtonTest extends CTagTest {
 				['button', 'caption'],
 				'<button type="button" id="button" name="button">caption</button>'
 			],
-			[
-				['button', 'caption', 'callback()'],
-				'<button type="button" id="button" name="button" onclick="callback()">caption</button>'
-			],
-			[
-				['button', 'caption', null, 'my-class'],
-				'<button class="my-class" type="button" id="button" name="button">caption</button>'
-			],
 			// value encoding
 			[
 				['button', '</button>'],
