@@ -1110,7 +1110,7 @@ static void	vmware_dev_free(zbx_vmware_dev_t *dev)
  *                                                                            *
  * Purpose: frees resources allocated to store vm file system object          *
  *                                                                            *
- * Parameters: dev   - [IN] the vm device                                     *
+ * Parameters: fs    - [IN] the file system                                   *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_fs_free(zbx_vmware_fs_t *fs)
@@ -1637,7 +1637,7 @@ out:
  *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
- * Parameters: vm      - [IN] the virtual machine                             *
+ * Parameters: vm      - [OUT] the virtual machine                            *
  *             details - [IN] a xml string containing virtual machine data    *
  *                                                                            *
  * Comments: The network interface devices are taken from vm device list      *
@@ -1646,7 +1646,7 @@ out:
  ******************************************************************************/
 static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, const char *details)
 {
-	const char	*__function_name = "wmware_vm_get_nic_devices";
+	const char	*__function_name = "vmware_vm_get_nic_devices";
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -1704,13 +1704,13 @@ out:
  *                                                                            *
  * Purpose: gets virtual machine virtual disk devices                         *
  *                                                                            *
- * Parameters: vm      - [IN] the virtual machine                             *
+ * Parameters: vm      - [OUT] the virtual machine                            *
  *             details - [IN] a xml string containing virtual machine data    *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_vm_get_disk_devices(zbx_vmware_vm_t *vm, const char *details)
 {
-	const char	*__function_name = "wmware_vm_get_disk_devices";
+	const char	*__function_name = "vmware_vm_get_disk_devices";
 	xmlDoc		*doc;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -1825,7 +1825,7 @@ out:
  *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
- * Parameters: vm     - [IN] the virtual machine                              *
+ * Parameters: vm      - [OUT] the virtual machine                            *
  *             details - [IN] a xml string containing virtual machine data    *
  *                                                                            *
  * Comments: The network interface devices are taken from vm device list      *
@@ -2202,7 +2202,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *             easyhandle   - [IN] the CURL handle                            *
  *             id           - [IN] the vmware hypervisor id                   *
- *             hv           - [OUT] the hypervisor object                     *
+ *             hv           - [OUT] the hypervisor object (must be allocated) *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the hypervisor object was initialized successfully *
