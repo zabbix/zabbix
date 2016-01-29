@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-10158] fixed template "JMX Generic" (Gunars)
 ..F....... [ZBXNEXT-2662] added escaping of the HTML entities and tags in the GUI notifications (Sasha)
 ..F....... [ZBXNEXT-2662] added space between Auto-logout elemants in the user profile form (Sasha)
 ..F....... [ZBXNEXT-2662] fixed flickering of disabled radios (Pavel)

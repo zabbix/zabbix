@@ -1247,7 +1247,7 @@ ROW   |13533    |({TRIGGER.VALUE}=0 and {13151}>75) or ({TRIGGER.VALUE}=1 and {1
 ROW   |13534    |({TRIGGER.VALUE}=0 and {13138}>75) or ({TRIGGER.VALUE}=1 and {13138}>65)|Zabbix data sender processes more than 75% busy                     |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13535    |({TRIGGER.VALUE}=0 and {13140}>75) or ({TRIGGER.VALUE}=1 and {13140}>65)|Zabbix heartbeat sender processes more than 75% busy                |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13536    |{12965}<25                                                              |Less than 25% free in the vmware cache                              |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
-ROW   |13538    |{12968}>0.7                                                             |70% os Process CPU Load on {HOST.NAME}                              |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
+ROW   |13538    |{12968}>70                                                              |70% os Process CPU Load on {HOST.NAME}                              |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13539    |{12969}>({12970}*0.7)                                                   |70% mem Heap Memory used on {HOST.NAME}                             |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13540    |{12971}>({12972}*0.7)                                                   |70% mem Non-Heap Memory used on {HOST.NAME}                         |   |0     |3       |                                                                                                                                      |NULL      |0   |0    |
 ROW   |13541    |{12973}={12974}                                                         |mem Heap Memory fully committed on {HOST.NAME}                      |   |0     |2       |                                                                                                                                      |NULL      |0   |0    |
@@ -1555,7 +1555,7 @@ ROW   |12870     |23206 |13463    |last    |0        |
 ROW   |12871     |23207 |13463    |last    |0        |
 ROW   |12872     |23209 |13464    |last    |0        |
 ROW   |12873     |23210 |13464    |last    |0        |
-ROW   |12874     |23188 |13465    |nodata  |1m       |
+ROW   |12874     |23188 |13465    |nodata  |5m       |
 ROW   |12895     |23271 |13486    |min     |10m      |
 ROW   |12896     |23273 |13487    |min     |10m      |
 ROW   |12897     |23274 |13488    |min     |10m      |
