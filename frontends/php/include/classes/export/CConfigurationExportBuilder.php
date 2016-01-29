@@ -838,7 +838,8 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format map links.
 	 *
-	 * @param array $links
+	 * @param array $links			Map links
+	 * @param array $selements		Map elements
 	 *
 	 * @return array
 	 */
@@ -846,10 +847,18 @@ class CConfigurationExportBuilder {
 		$result = [];
 
 		// Get array where key is selementid and value is sort position.
-		$flippedSelements = CArrayHelper::flipByField($selements, 'selementid');
+		$flipped_selements = [];
+		$selements = array_values($selements);
+
+		foreach ($selements as $key => $item) {
+			if (array_key_exists('selementid', $item)) {
+				$flipped_selements[$item['selementid']] = $key;
+			}
+		}
+
 		foreach ($links as &$link) {
-			$link['selementpos1'] = $flippedSelements[$link['selementid1']];
-			$link['selementpos2'] = $flippedSelements[$link['selementid2']];
+			$link['selementpos1'] = $flipped_selements[$link['selementid1']];
+			$link['selementpos2'] = $flipped_selements[$link['selementid2']];
 
 			// Sort selements positons asc.
 			if ($link['selementpos2'] < $link['selementpos1']) {
