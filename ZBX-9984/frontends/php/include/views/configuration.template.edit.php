@@ -139,6 +139,9 @@ foreach ($data['hostsAllowedToAdd'] as $host) {
 	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
 		continue;
 	}
+	if (bccomp($host['hostid'], $data['templateId']) == 0) {
+		continue;
+	}
 	$hostsTB->addItem($host['hostid'], $host['name']);
 }
 
@@ -386,7 +389,7 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-$ignoredTemplates = [];
+$ignoredTemplates = [$data['templateId'] => $this->data['dbTemplate']['host']];
 
 $linkedTemplateTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
