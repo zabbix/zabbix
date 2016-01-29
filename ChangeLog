@@ -22,7 +22,7 @@ A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gu
 ........S. [ZBX-10284] fixed possible crash when removing all cached actions during configuration sync (wiper)
 ...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
 A......... [ZBX-10285] fixed map export fatal error (Gunars)
-..F....... [ZBX-9969] fixed triggers, graphs and screens access from maps (Cemeris)
+..F....... [ZBX-9969] fixed availability of action menu popups for map elements (Cemeris)
 .........T [ZBX-9730] removed unused value map template "Host status" and added new - "Host availability" (viktors)
 A.F....... [ZBX-10230] fixed and improved translatable strings (zalex_ua)
 
