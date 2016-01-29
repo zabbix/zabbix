@@ -10,7 +10,7 @@
 	<td class="interface-ip">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" size="24" maxlength="64" value="#{iface.ip}" />
 		<div class="interface-bulk">
-			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk} />
+			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk} />
 			<label for="interfaces[#{iface.interfaceid}][bulk]"><?php echo _('Use bulk requests'); ?></label>
 		</div>
 	</td>
