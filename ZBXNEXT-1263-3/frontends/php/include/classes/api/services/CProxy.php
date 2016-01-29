@@ -665,7 +665,7 @@ class CProxy extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
 				}
 
-				if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $proxy['tls_psk'])) {
+				if (!preg_match('/^([0-9a-f]{2})+$/i', $proxy['tls_psk'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _(
 						'Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters.'
 					));
@@ -673,7 +673,7 @@ class CProxy extends CApiService {
 
 				if (strlen($proxy['tls_psk']) < PSK_MIN_LEN) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('PSK is too short. Minimum is "%1$s" hex-digits.', PSK_MIN_LEN)
+						_s('PSK is too short. Minimum is %1$s hex-digits.', PSK_MIN_LEN)
 					);
 				}
 			}
