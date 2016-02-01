@@ -136,10 +136,13 @@ foreach ($data['groupsAllowed'] as $group) {
 $hostsTB = new CTweenBox($frmHost, 'hosts', $data['hostIdsLinkedTo'], 20);
 
 foreach ($data['hostsAllowedToAdd'] as $host) {
+	if (bccomp($host['hostid'], $data['templateId']) == 0) {
+		continue;
+	}
 	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
 		continue;
 	}
-	if (bccomp($host['hostid'], $data['templateId']) == 0) {
+	if (array_key_exists($host['hostid'], $data['linkedTemplates'])) {
 		continue;
 	}
 	$hostsTB->addItem($host['hostid'], $host['name']);
