@@ -334,6 +334,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifdef _WINDOWS
 	switch (t->task)
 	{
+		case ZBX_TASK_START:
+			break;
 		case ZBX_TASK_INSTALL_SERVICE:
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
@@ -345,7 +347,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				goto out;
 			}
 			break;
-
 		default:
 			if (0 != (t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS))
 			{
