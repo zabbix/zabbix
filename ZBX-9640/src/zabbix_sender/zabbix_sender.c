@@ -116,6 +116,7 @@ typedef struct
 	char		*server;
 	unsigned short	port;
 	struct zbx_json	json;
+	int		timestamps;
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -313,7 +314,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
-		if (1 == WITH_TIMESTAMPS)
+		if (1 == sentdval_args->timestamps)
 		{
 			zbx_timespec_t	ts;
 
@@ -539,6 +540,7 @@ int	main(int argc, char **argv)
 			goto free;
 		}
 
+		sentdval_args.timestamps = WITH_TIMESTAMPS;
 		ret = SUCCEED;
 
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
@@ -673,6 +675,7 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
+		sentdval_args.timestamps = 0;
 		total_count++;
 
 		do /* try block simulation */
