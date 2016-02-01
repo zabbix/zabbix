@@ -151,7 +151,7 @@ nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hove
 .top-nav-container {
   height: 49px;
   line-height: 49px;
-  overflow: hidden;
+  position: relative;
   background-color: #fff; }
 
 .top-nav {

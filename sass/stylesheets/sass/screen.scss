@@ -233,7 +233,7 @@ nav {
 .top-nav-container {
 	height: 49px;
 	line-height: 49px;
-	overflow: hidden;
+	position: relative;
 	background-color: $main-nav-bg-color;
 }
 
