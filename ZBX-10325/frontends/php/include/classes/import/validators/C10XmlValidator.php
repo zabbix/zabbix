@@ -378,11 +378,11 @@ class C10XmlValidator {
 	public function validateYMinItem($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['ymin_type']) && $parent_data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			if (strpos($data, ':') === false) {
-				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"host:key" pair is expected')));
+				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 			}
 		}
 		elseif ($data !== '') {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('an empty string is expected')));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an empty string is expected')));
 		}
 
 		return $data;
@@ -400,11 +400,11 @@ class C10XmlValidator {
 	public function validateYMaxItem($data, array $parent_data = null, $path) {
 		if (zbx_is_int($parent_data['ymax_type']) && $parent_data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 			if (strpos($data, ':') === false) {
-				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"host:key" pair is expected')));
+				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 			}
 		}
 		elseif ($data !== '') {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('an empty string is expected')));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an empty string is expected')));
 		}
 
 		return $data;
