@@ -2799,15 +2799,15 @@ $form-icon-btn: (
 	position: absolute;
 	z-index: 98;
 	overflow: hidden;
-	background-color: rgba($yellow,0.5);
-	border: 1px solid rgba($yellow,0.5);
+	background-color: rgba($yellow,0.6);
+	border: 1px solid rgba($yellow,0.6);
 }
 
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;
-	background-color: rgba($yellow,0.5);
-	border: 1px solid rgba($yellow,0.5);
+	background-color: rgba($yellow,0.6);
+	border: 1px solid rgba($yellow,0.6);
 }
 
 #map-area {
@@ -3210,7 +3210,8 @@ td.inactive-bg {
 }
 
 %found-bg {
-	background-color: $lighter-yellow;
+	color: $alt-dark-orange;
+	background-color: $light-yellow;
 }
 
 .active-indic {
