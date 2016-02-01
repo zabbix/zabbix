@@ -743,6 +743,10 @@ footer, .footer {
   -moz-box-shadow: 0 6px 10px 0 rgba(118, 141, 153, 0.5);
   box-shadow: 0 6px 10px 0 rgba(118, 141, 153, 0.5); }
 
+.suggest-found {
+  font-weight: bold;
+  color: #e99003; }
+
 .scrollbar {
   position: relative;
   margin: 0 auto;
@@ -1891,14 +1895,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 98;
   overflow: hidden;
-  background-color: rgba(250, 214, 52, 0.5);
-  border: 1px solid rgba(250, 214, 52, 0.5); }
+  background-color: rgba(250, 214, 52, 0.35);
+  border: 1px solid rgba(233, 144, 3, 0.6);
+  border-top: none;
+  border-bottom: none; }
 
 .ui-selectable-helper {
   position: absolute;
   z-index: 100;
-  background-color: rgba(250, 214, 52, 0.5);
-  border: 1px solid rgba(250, 214, 52, 0.5); }
+  background-color: rgba(250, 214, 52, 0.35);
+  border: 1px solid rgba(233, 144, 3, 0.6); }
 
 #map-area .map-element-area-bg {
   background-color: rgba(235, 235, 235, 0.35); }
@@ -2107,7 +2113,7 @@ td.active-bg {
   color: #4b0c0c;
   background-color: #e45959; }
 
-.list-table tbody tr.row-selected, .suggest-found, .drag-drop-area {
+.list-table tbody tr.row-selected, .drag-drop-area {
   background-color: #fcf7c2; }
 
 .active-indic {
