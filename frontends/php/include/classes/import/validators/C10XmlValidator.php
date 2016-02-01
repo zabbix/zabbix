@@ -115,10 +115,12 @@ class C10XmlValidator {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'width' =>					['type' => XML_STRING | XML_REQUIRED],
 							'height' =>					['type' => XML_STRING | XML_REQUIRED],
+							// The tag 'ymin_type' should be validated before the 'ymin_item_key' because it is used in 'ex_validate' method.
 							'ymin_type' =>				['type' => XML_STRING | XML_REQUIRED],
+							'ymin_item_key' =>			['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateYMinItem']],
+							// The tag 'ymax_type' should be validated before the 'ymax_item_key' because it is used in 'ex_validate' method.
 							'ymax_type' =>				['type' => XML_STRING | XML_REQUIRED],
-							'ymin_item_key' =>			['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateYAxisItemKey']],
-							'ymax_item_key' =>			['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateYAxisItemKey']],
+							'ymax_item_key' =>			['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateYMaxItem']],
 							'show_work_period' =>		['type' => XML_STRING | XML_REQUIRED],
 							'show_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
 							'graphtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -373,9 +375,36 @@ class C10XmlValidator {
 	 *
 	 * @throws Exception			if tag is invalid
 	 */
-	public function validateYAxisItemKey($data, array $parent_data = null, $path) {
-		if ($data !== '' && strpos($data, ':') === false) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"host:key" pair is expected')));
+	public function validateYMinItem($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['ymin_type']) && $parent_data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			if (strpos($data, ':') === false) {
+				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"host:key" pair is expected')));
+			}
+		}
+		elseif ($data !== '') {
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('an empty string is expected')));
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate Y Axis value.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if tag is invalid
+	 */
+	public function validateYMaxItem($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['ymax_type']) && $parent_data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			if (strpos($data, ':') === false) {
+				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"host:key" pair is expected')));
+			}
+		}
+		elseif ($data !== '') {
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('an empty string is expected')));
 		}
 
 		return $data;
