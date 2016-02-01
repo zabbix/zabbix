@@ -238,8 +238,6 @@ class CDRule extends CZBXAPI {
 	}
 
 	public function checkInput(array &$dRules, $method) {
-		$dRules = zbx_toArray($dRules);
-
 		if (empty($dRules)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
 		}
@@ -250,12 +248,18 @@ class CDRule extends CZBXAPI {
 
 		$proxies = array();
 		foreach ($dRules as $dRule) {
+			if (array_key_exists('name', $dRule) && $dRule['name'] === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s: cannot be empty.', 'name')
+				);
+			}
+
 			if (array_key_exists('iprange', $dRule)) {
 				if (!validate_ip_range($dRule['iprange'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
 				}
 			}
-			else if ($method === 'create') {
+			elseif ($method === 'create') {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
 			}
 
@@ -263,15 +267,14 @@ class CDRule extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
 			}
 
-			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED)
-					&& ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
+			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
 			}
 
 			if (array_key_exists('dchecks', $dRule) && $dRule['dchecks']) {
 				$this->validateDChecks($dRule['dchecks']);
 			}
-			else if (array_key_exists('dchecks', $dRule) || $method === 'create') {
+			elseif (array_key_exists('dchecks', $dRule) || $method === 'create') {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
 
@@ -308,6 +311,16 @@ class CDRule extends CZBXAPI {
 
 			if (isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
+			}
+
+			$dcheck_types = array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
+				SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET);
+
+			if (!array_key_exists('type', $dCheck)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'type'));
+			}
+			elseif (!in_array($dCheck['type'], $dcheck_types)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s".', 'type'));
 			}
 
 			switch ($dCheck['type']) {
@@ -450,9 +463,9 @@ class CDRule extends CZBXAPI {
 	 * @return array
 	 */
 	public function create(array $dRules) {
-
-		$this->checkInput($dRules, __FUNCTION__);
+		$dRules = zbx_toArray($dRules);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
+		$this->checkInput($dRules, __FUNCTION__);
 
 		// checking to the duplicate names
 		foreach ($dRules as $dRule) {
@@ -505,6 +518,7 @@ class CDRule extends CZBXAPI {
 	 * @return array
 	 */
 	public function update(array $dRules) {
+		$dRules = zbx_toArray($dRules);
 		$dRuleIds = zbx_objectValues($dRules, 'druleid');
 
 		$dRulesDb = API::DRule()->get(array(
@@ -521,8 +535,8 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		$this->checkInput($dRules, __FUNCTION__);
 		$this->validateRequiredFields($dRules, __FUNCTION__);
+		$this->checkInput($dRules, __FUNCTION__);
 
 		$defaultValues = DB::getDefaults('dchecks');
 
@@ -530,10 +544,9 @@ class CDRule extends CZBXAPI {
 
 		foreach ($dRules as $dRule) {
 			// validate drule duplicate names
-			if ($dRule['name'] !== NULL && strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0) {
-				if ($this->exists($dRule)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
-				}
+			if (array_key_exists('name', $dRule) && strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0
+					&& $this->exists($dRule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
 			}
 
 			$dRulesUpdate[] = array(
@@ -542,7 +555,7 @@ class CDRule extends CZBXAPI {
 			);
 
 			// update dchecks
-			if ($dRule['dchecks'] !== NULL) {
+			if (array_key_exists('dchecks', $dRule)) {
 				$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 
 				$newChecks = array();
