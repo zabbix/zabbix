@@ -345,7 +345,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				goto out;
 			}
 			break;
-
+		case ZBX_TASK_START:
+			break;
 		default:
 			if (0 != (t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS))
 			{
