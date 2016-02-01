@@ -63,15 +63,14 @@ check_fields($fields);
 /*
  * Ajax
  */
-if (isset($_REQUEST['favobj'])) {
-	if ($_REQUEST['favobj'] == 'timeline') {
-		navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);
-	}
-
-	// saving fixed/dynamic setting to profile
-	if ($_REQUEST['favobj'] == 'timelinefixedperiod' && isset($_REQUEST['favid'])) {
-		CProfile::update('web.history.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
-	}
+$favobj = getRequest('favobj');
+$favid = getRequest('favid');
+if ($favobj == 'timeline') {
+	navigation_bar_calc('web.item.graph', $favid, true);
+}
+// saving fixed/dynamic setting to profile
+elseif ($favobj == 'timelinefixedperiod' && $favid === null) {
+	CProfile::update('web.history.timelinefixed', $favid, PROFILE_TYPE_INT);
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -82,24 +81,22 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Actions
  */
-$_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
-
-$item_ids = getRequest('itemids');
-$item_ids = is_array($item_ids) ? $item_ids : [$item_ids];
+$action = getRequest('action', HISTORY_GRAPH);
+$itemids = zbx_toArray(getRequest('itemids'));
 
 /*
  * Display
  */
 $items = API::Item()->get([
-	'itemids' => $item_ids,
+	'itemids' => $itemids,
 	'webitems' => true,
 	'selectHosts' => ['name'],
 	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'],
 	'preservekeys' => true
 ]);
 
-foreach ($item_ids as $item_id) {
-	if (!isset($items[$item_id])) {
+foreach ($itemids as $itemid) {
+	if (!isset($items[$itemid])) {
 		access_deny();
 	}
 }
@@ -109,10 +106,10 @@ $items = CMacrosResolverHelper::resolveItemNames($items);
 $item = reset($items);
 
 $data = [
-	'itemids' => $item_ids,
+	'itemids' => $itemids,
 	'items' => $items,
 	'value_type' => $item['value_type'],
-	'action' => getRequest('action'),
+	'action' => $action,
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
