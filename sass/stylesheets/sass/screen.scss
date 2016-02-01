@@ -1074,7 +1074,8 @@ footer {
 }
 
 .suggest-found {
-	@extend %found-bg;
+	font-weight: bold;
+	color: $dark-yellow;
 }
 
 // Timeline
@@ -3210,8 +3211,7 @@ td.inactive-bg {
 }
 
 %found-bg {
-	color: $alt-dark-orange;
-	background-color: $light-yellow;
+	background-color: $lighter-yellow;
 }
 
 .active-indic {
