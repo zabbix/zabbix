@@ -2802,13 +2802,15 @@ $form-icon-btn: (
 	overflow: hidden;
 	background-color: rgba($yellow,0.35);
 	border: 1px solid rgba($dark-yellow,0.6);
+	border-top: none;
+	border-bottom: none;
 }
 
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;
-	background-color: rgba($yellow,0.6);
-	border: 1px solid rgba($yellow,0.6);
+	background-color: rgba($yellow,0.35);
+	border: 1px solid rgba($dark-yellow,0.6);
 }
 
 #map-area {
