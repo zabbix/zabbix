@@ -63,14 +63,14 @@ check_fields($fields);
 /*
  * Ajax
  */
-$favobj = getRequest('favobj');
-$favid = getRequest('favid');
-if ($favobj == 'timeline') {
-	navigation_bar_calc('web.item.graph', $favid, true);
-}
-// saving fixed/dynamic setting to profile
-elseif ($favobj == 'timelinefixedperiod' && $favid === null) {
-	CProfile::update('web.history.timelinefixed', $favid, PROFILE_TYPE_INT);
+if (isset($_REQUEST['favobj'])) {
+	if ($_REQUEST['favobj'] == 'timeline') {
+		navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);
+	}
+	// saving fixed/dynamic setting to profile
+	if ($_REQUEST['favobj'] == 'timelinefixedperiod' && isset($_REQUEST['favid'])) {
+		CProfile::update('web.history.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
+	}
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -81,7 +81,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Actions
  */
-$action = getRequest('action', HISTORY_GRAPH);
+$_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
 $itemids = zbx_toArray(getRequest('itemids'));
 
 /*
@@ -109,7 +109,7 @@ $data = [
 	'itemids' => $itemids,
 	'items' => $items,
 	'value_type' => $item['value_type'],
-	'action' => $action,
+	'action' => getRequest('action'),
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
