@@ -3,6 +3,7 @@ Changes for 3.0.0rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10289] fixed top menu element overlapping (Pavel)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0beta2
