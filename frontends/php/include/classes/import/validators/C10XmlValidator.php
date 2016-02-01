@@ -421,7 +421,7 @@ class C10XmlValidator {
 	 */
 	public function validateGraphItem($data, array $parent_data = null, $path) {
 		if (strpos($data, ':') === false) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"host:key" pair is expected')));
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 		}
 
 		return $data;
