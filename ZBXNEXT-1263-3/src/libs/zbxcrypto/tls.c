@@ -60,6 +60,10 @@ extern unsigned int				configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;
+
+extern int				CONFIG_PASSIVE_FORKS;
+extern int				CONFIG_ACTIVE_FORKS;
+
 extern char				*CONFIG_TLS_CONNECT;
 extern char				*CONFIG_TLS_ACCEPT;
 extern char				*CONFIG_TLS_CA_FILE;
@@ -613,11 +617,11 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2)
  *           CONFIG_TLS_PSK_FILE - are defined and not empty or none of them, *
  *           (if CONFIG_TLS_PSK_IDENTITY is defined it must be a valid UTF-8  *
  *           string),                                                         *
- *         - in agentd, active proxy, zabbix_get, and zabbix_sender the       *
+ *         - in active agent, active proxy, zabbix_get, and zabbix_sender the *
  *           certificate and PSK parameters must match the value of           *
  *           CONFIG_TLS_CONNECT parameter,                                    *
- *         - in agentd and passive proxy the certificate and PSK parameters   *
- *           must match the value of CONFIG_TLS_ACCEPT parameter.             *
+ *         - in passive agent and passive proxy the certificate and PSK       *
+ *           parameters must match the value of CONFIG_TLS_ACCEPT parameter.  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tls_validate_config(void)
@@ -741,14 +745,13 @@ void	zbx_tls_validate_config(void)
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_UTF8, &CONFIG_TLS_PSK_IDENTITY, NULL);
 
-	/* agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
+	/* active agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
-				ZBX_PROGRAM_TYPE_SENDER)))
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != CONFIG_ACTIVE_FORKS) ||
+			(0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
+					ZBX_PROGRAM_TYPE_SENDER))))
 	{
 		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
-		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
-		/* (i.e. 'ServerActive' is not specified). */
 
 		if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_CONNECT)
 		{
@@ -775,9 +778,10 @@ void	zbx_tls_validate_config(void)
 		}
 	}
 
-	/* agentd and passive proxy specific validation */
+	/* passive agentd and passive proxy specific validation */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_PASSIVE)))
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != CONFIG_PASSIVE_FORKS) ||
+			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
