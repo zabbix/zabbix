@@ -2809,8 +2809,7 @@ $form-icon-btn: (
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;
-	background-color: rgba($yellow,0.35);
-	border: 1px solid rgba($dark-yellow,0.6);
+	border: 3px solid $dark-yellow; 
 }
 
 #map-area {
