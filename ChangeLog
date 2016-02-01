@@ -3,6 +3,7 @@ Changes for 3.0.0rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10331] fixed starting agent as Windows service with multiple agents option (wiper)
 ..F....... [ZBX-10289] fixed top menu element overlapping (Pavel)
 
 --------------------------------------------------------------------------------
