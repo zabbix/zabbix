@@ -18,40 +18,62 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$widget = (new CWidget())
-	->setTitle(_('Slide shows'))
-	->setControls((new CForm('get'))
-		->cleanItems()
-		->addItem((new CList())
-			->addItem(new CSubmit('form', _('Create slide show')))
-		)
-	);
+$widget = (new CWidget())->setTitle(_('Slide shows'));
 
-// create form
-$slideForm = (new CForm())->setName('slideForm');
+$controls = (new CList())->addItem(
+	new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	])
+)
+	->addItem(new CSubmit('form', _('Create slide show')));
+
+$createForm = (new CForm('get'))->cleanItems()
+	->addItem($controls);
+
+$widget->setControls($createForm);
+
+// Create form.
+$form = (new CForm())->setName('slideForm');
 
 // create table
 $slidesTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_shows'))->onClick("checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
+			(new CCheckBox('all_shows'))->onClick("checkAll('".$form->getName()."', 'all_shows', 'shows');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
+		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder']),
+		_('Actions')
 	]);
 
 foreach ($this->data['slides'] as $slide) {
+	$user_type = CWebUser::getType();
+
+	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
+			|| array_key_exists('editable', $slide)) {
+		$checkbox = new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']);
+		$properties = (new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))
+			->addClass('action');
+	}
+	else {
+		$checkbox = (new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']))
+			->setAttribute('disabled', 'disabled');
+		$properties = '';
+	}
+
 	$slidesTable->addRow([
-		new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']),
-		(new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid']))->addClass('action'),
+		$checkbox,
+		(new CLink($slide['name'], 'slides.php?elementid='.$slide['slideshowid']))->addClass('action'),
 		convertUnitsS($slide['delay']),
-		$slide['cnt']
+		$slide['cnt'],
+		$properties
 	]);
 }
 
 // append table to form
-$slideForm->addItem([
+$form->addItem([
 	$slidesTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'shows', [
@@ -60,6 +82,6 @@ $slideForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($slideForm);
+$widget->addItem($form);
 
 return $widget;

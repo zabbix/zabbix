@@ -39,14 +39,6 @@ class CSubmitTest extends CTagTest {
 				['button', 'caption'],
 				'<button type="submit" id="button" name="button" value="caption">caption</button>'
 			],
-			[
-				['button', 'caption', 'callback()'],
-				'<button type="submit" id="button" name="button" onclick="callback()" value="caption">caption</button>'
-			],
-			[
-				['button', 'caption', null, 'my-class'],
-				'<button class="my-class" type="submit" id="button" name="button" value="caption">caption</button>'
-			],
 			// value encoding
 			[
 				['button', '</button>'],

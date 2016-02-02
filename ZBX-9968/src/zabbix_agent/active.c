@@ -959,7 +959,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:%s", __function_name, metric->key);
 
 	if (0 != (ZBX_METRIC_FLAG_LOG & metric->flags))
 	{

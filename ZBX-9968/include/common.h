@@ -611,6 +611,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
+/* proxy_history flags */
+#define PROXY_HISTORY_FLAG_META		0x01
+#define PROXY_HISTORY_FLAG_NOVALUE	0x02
+
 /* user permissions */
 typedef enum
 {
@@ -761,11 +765,13 @@ typedef enum
 zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
+#define ZBX_TASK_FLAG_FOREGROUND      0x02
 
 typedef struct
 {
 	zbx_task_t	task;
 	int		flags;
+	int		data;
 }
 ZBX_TASK_EX;
 
@@ -1014,6 +1020,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 
 #ifdef _WINDOWS
 const OSVERSIONINFOEX	*zbx_win_getversion();
+void	zbx_wmi_get(char *wmi_namespace, char *wmi_query, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
@@ -1060,7 +1067,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 
-int	MAIN_ZABBIX_ENTRY();
+int	MAIN_ZABBIX_ENTRY(int flags);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);

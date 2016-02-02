@@ -159,7 +159,7 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm)
  * Parameters: shm     - [IN] the dynamic shared memory data                  *
  *             shm_ref - [IN/OUT] a local reference to dynamic shared memory  *
  *                                segment                                     *
- *             errmsg - [OUT] the error message                               *
+ *             errmsg  - [OUT] the error message                              *
  *                                                                            *
  * Return value: SUCCEED - the local reference to dynamic shared memory       *
  *                         segment was validated successfully and contains    *
