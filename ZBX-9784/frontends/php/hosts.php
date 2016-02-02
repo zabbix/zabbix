@@ -416,27 +416,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			// interfaces
 			$interfaces = getRequest('interfaces', array());
 
-			foreach ($interfaces as $key => &$interface) {
+			foreach ($interfaces as $key => $interface) {
 				if (zbx_empty($interface['ip']) && zbx_empty($interface['dns'])) {
-					unset($interfaces[$key]);
+					unset($interface[$key]);
 					continue;
 				}
 
 				if ($interface['type'] == INTERFACE_TYPE_SNMP && !isset($interface['bulk'])) {
-					$interface['bulk'] = SNMP_BULK_DISABLED;
+					$interfaces[$key]['bulk'] = SNMP_BULK_DISABLED;
 				}
 				else {
-					$interface['bulk'] = SNMP_BULK_ENABLED;
+					$interfaces[$key]['bulk'] = SNMP_BULK_ENABLED;
 				}
 
 				if ($interface['isNew']) {
-					unset($interface['interfaceid']);
+					unset($interfaces[$key]['interfaceid']);
 				}
 
-				unset($interface['isNew']);
-				$interface['main'] = 0;
+				unset($interfaces[$key]['isNew']);
+				$interfaces[$key]['main'] = 0;
 			}
-			unset($interface);
 
 			$interfaceTypes = array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI);
 
