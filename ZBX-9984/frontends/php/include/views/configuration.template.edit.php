@@ -419,6 +419,10 @@ foreach ($data['linkedTemplates'] as $template) {
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
+foreach ($data['hostIdsLinkedTo'] as $templateid) {
+	$ignoredTemplates[$templateid] = '';
+}
+
 $tmplList->addRow(_('Linked templates'),
 	(new CDiv($linkedTemplateTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
