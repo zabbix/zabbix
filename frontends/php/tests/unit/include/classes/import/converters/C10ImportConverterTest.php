@@ -1442,8 +1442,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'graph1',
 					'type' => GRAPH_TYPE_BAR,
-					'ymin_item_1' => '',
-					'ymax_item_1' => '',
+					'ymin_item_1' => [],
+					'ymax_item_1' => [],
 					'graph_items' => [
 						[
 							'item' => [
@@ -1534,8 +1534,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'graph2',
 					'type' => GRAPH_TYPE_NORMAL,
-					'ymin_item_1' => '',
-					'ymax_item_1' => '',
+					'ymin_item_1' => [],
+					'ymax_item_1' => [],
 					'graph_items' => [
 						[
 							'item' => [
