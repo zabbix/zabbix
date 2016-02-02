@@ -841,7 +841,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => '{#VMID}',
 							'status' => '0',
 							'group_links' => [
-								'group_link' => [
+								[
 									'group' => [
 										'name' => 'Zabbix servers'
 									]
@@ -1076,7 +1076,7 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 							'name' => '{#VMID}',
 							'status' => '0',
 							'group_links' => [
-								'group_link' => [
+								[
 									'group' => [
 										'name' => 'Zabbix servers'
 									]

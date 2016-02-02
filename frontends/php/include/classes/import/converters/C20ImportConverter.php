@@ -276,7 +276,7 @@ class C20ImportConverter extends CConverter {
 				$discovery_rule['status'] = ITEM_STATUS_ACTIVE;
 			}
 
-			if (!array_key_exists('st_prototypes', $discovery_rule)) {
+			if (!array_key_exists('host_prototypes', $discovery_rule)) {
 				$discovery_rule['host_prototypes'] = [];
 			}
 
