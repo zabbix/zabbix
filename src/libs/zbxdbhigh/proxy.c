@@ -2300,7 +2300,8 @@ static void	clean_agent_values(AGENT_VALUE *values, size_t values_num)
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid, char **info)
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid,
+		zbx_timespec_t *ts, char **info)
 {
 #define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
@@ -2310,14 +2311,13 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 	size_t			tmp_alloc = 0, values_num = 0;
 	int			ret = FAIL, processed = 0, total_num = 0;
 	double			sec;
-	zbx_timespec_t		ts, proxy_timediff;
+	zbx_timespec_t		proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	sec = zbx_time();
 
-	zbx_timespec(&ts);
 	proxy_timediff.sec = 0;
 	proxy_timediff.ns = 0;
 
@@ -2326,11 +2326,11 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_CLOCK, &tmp, &tmp_alloc))
 	{
-		proxy_timediff.sec = ts.sec - atoi(tmp);
+		proxy_timediff.sec = ts->sec - atoi(tmp);
 
 		if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_NS, &tmp, &tmp_alloc))
 		{
-			proxy_timediff.ns = ts.ns - atoi(tmp);
+			proxy_timediff.ns = ts->ns - atoi(tmp);
 
 			if (proxy_timediff.ns < 0)
 			{
