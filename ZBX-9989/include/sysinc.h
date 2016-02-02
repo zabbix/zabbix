@@ -165,10 +165,6 @@
 #	include <kstat.h>
 #endif
 
-#ifdef HAVE_LDAP
-#	include <ldap.h>
-#endif
-
 #ifdef HAVE_WINLDAP_H
 #	undef SEC_I_INCOMPLETE_CREDENTIALS
 #	undef SEC_E_INCOMPLETE_CREDENTIALS
@@ -332,10 +328,6 @@
 #	include <unistd.h>
 #endif
 
-#ifdef HAVE_LBER_H
-#	include <lber.h>
-#endif
-
 #ifdef HAVE_SYS_IPC_H
 #	include <sys/ipc.h>
 #endif
@@ -436,6 +428,11 @@
 
 #ifdef HAVE_DLFCN_H
 #	include <dlfcn.h>
+#endif
+
+#ifdef HAVE_ZONE_H
+#	include <zone.h>
+#	include <utmpx.h>
 #endif
 
 #endif

@@ -31,10 +31,6 @@ class CSimpleButtonTest extends CTagTest {
 				['caption'],
 				'<button type="button">caption</button>'
 			],
-			[
-				['caption', 'my-class'],
-				'<button class="my-class" type="button">caption</button>'
-			],
 			// value encoding
 			[
 				['</button>'],

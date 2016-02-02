@@ -129,9 +129,9 @@ switch ($data['method']) {
 						'priority' => $priority,
 						'sound' => $sound,
 						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
-						'title' => $title.' [url='.$url_tr_status.']'.$host['name'].'[/url]',
+						'title' => $title.' [url='.$url_tr_status.']'.CHtml::encode($host['name']).'[/url]',
 						'body' => [
-							'[url='.$url_events.']'.$trigger['description'].'[/url]',
+							'[url='.$url_events.']'.CHtml::encode($trigger['description']).'[/url]',
 							'[url='.$url_tr_events.']'.
 								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']).'[/url]',
 						],

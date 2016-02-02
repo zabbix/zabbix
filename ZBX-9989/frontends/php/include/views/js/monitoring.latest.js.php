@@ -88,7 +88,6 @@
 
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
-			url.addSID();
 			$.post(url.getUrl(), {
 				favobj: 'toggle',
 				toggle_ids: applicationids,
@@ -145,7 +144,6 @@
 
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
-			url.addSID();
 			$.post(url.getUrl(), {
 				favobj: 'toggle',
 				toggle_ids: [applicationid],
