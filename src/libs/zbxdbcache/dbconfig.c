@@ -1390,57 +1390,38 @@ static void	DCsync_hosts(DB_RESULT result)
 		/*                                                                           */
 		/*****************************************************************************/
 
-		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
-		/* validation in frontend or API. Do not update cache in case of error. */
-
 		psk_owner = NULL;
 
-		if ('\0' != *row[33] && '\0' == *row[34])
+		if ('\0' == *row[33] || '\0' == *row[34])	/* new PSKid or value empty */
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
-					" (hostid %s)", row[33], row[2], row[0]);
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto done;
-		}
+			/* In case of "impossible" errors ("PSK value without identity" or "PSK identity without */
+			/* value") assume empty PSK identity and value. These errors should have been prevented */
+			/* by validation in frontend/API. Be prepared when making a connection requiring PSK - */
+			/* the PSK might not be available. */
 
-		if ('\0' == *row[33])				/* new PSKid empty */
-		{
-			if ('\0' != *row[34])
+			if (1 == found)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty PSK configured for"
-						" host \"%s\" (hostid %s)", row[2], row[0]);
-				THIS_SHOULD_NEVER_HAPPEN;
-				goto done;
-			}
+				if (NULL == host->tls_dc_psk)	/* 'host' record has empty PSK */
+					goto done;
 
-			/* new PSKid and value empty */
+				/* 'host' record has non-empty PSK. Unlink and delete PSK. */
 
-			if (0 == found)				/* new host with empty PSK */
-			{
-				host->tls_dc_psk = NULL;
-				goto done;
-			}
+				psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
 
-			if (NULL == host->tls_dc_psk)		/* existing host with empty PSK */
-				goto done;
-
-			/* Existing host with non-empty PSK. Unlink and delete PSK. */
-
-			psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
-
-			if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
-					0 == --(psk_i->refcount))
-			{
-				zbx_strpool_release(psk_i->tls_psk_identity);
-				zbx_strpool_release(psk_i->tls_psk);
-				zbx_hashset_remove_direct(&config->psks, psk_i);
+				if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
+						0 == --(psk_i->refcount))
+				{
+					zbx_strpool_release(psk_i->tls_psk_identity);
+					zbx_strpool_release(psk_i->tls_psk);
+					zbx_hashset_remove_direct(&config->psks, psk_i);
+				}
 			}
 
 			host->tls_dc_psk = NULL;
 			goto done;
 		}
 
-		/* non-empty new PSKid and value */
+		/* new PSKid and value non-empty */
 
 		zbx_strlower(row[34]);
 
