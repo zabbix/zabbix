@@ -31,8 +31,8 @@ require_once dirname(__FILE__).'/include/page_header.php';
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
 	'serviceid' =>	array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,										null),
-	'period' =>		array(T_ZBX_STR, O_OPT,		null,	IN('"daily","weekly","monthly","yearly"'),	null),
-	'year' =>		array(T_ZBX_INT, O_OPT,		null,	null,										null)
+	'period' =>		array(T_ZBX_STR, O_OPT,		P_SYS,	IN('"daily","weekly","monthly","yearly"'),	null),
+	'year' =>		array(T_ZBX_INT, O_OPT,		P_SYS,	null,										null)
 );
 check_fields($fields);
 
