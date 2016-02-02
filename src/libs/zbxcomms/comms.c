@@ -60,7 +60,7 @@ extern ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;
  *                                                                            *
  ******************************************************************************/
 
-#define ZBX_SOCKET_STRERROR_LEN	256
+#define ZBX_SOCKET_STRERROR_LEN	512
 
 static char	zbx_socket_strerror_message[ZBX_SOCKET_STRERROR_LEN];
 
@@ -425,7 +425,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		THIS_SHOULD_NEVER_HAPPEN;
 		return FAIL;
 	}
-#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
+	{
+		zbx_set_socket_strerror("cannot connect with PSK: PSK not available");
+		return FAIL;
+	}
+#else
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zbx_set_socket_strerror("support for TLS was not compiled in");
@@ -526,7 +532,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		THIS_SHOULD_NEVER_HAPPEN;
 		return FAIL;
 	}
-#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
+	{
+		zbx_set_socket_strerror("cannot connect with PSK: PSK not available");
+		return FAIL;
+	}
+#else
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zbx_set_socket_strerror("support for TLS was not compiled in");
