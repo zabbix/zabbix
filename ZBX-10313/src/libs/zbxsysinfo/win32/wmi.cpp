@@ -89,7 +89,7 @@ extern "C" void	zbx_co_uninitialize()
  *           intended format using VariantChangeType()                        *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	zbx_wmi_get_variant(const char * wmi_namespace, const char *wmi_query, VARIANT *vtProp)
+extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query, VARIANT *vtProp)
 {
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
@@ -98,6 +98,7 @@ extern "C" int	zbx_wmi_get_variant(const char * wmi_namespace, const char *wmi_q
 	ULONG			uReturn = 0;
 	int			ret = SYSINFO_RET_FAIL;
 	HRESULT			hres;
+	wchar_t			*wmi_namespace_wide;
 	wchar_t			*wmi_query_wide;
 
 	/* obtain the initial locator to Windows Management on a particular host computer */
@@ -109,7 +110,10 @@ extern "C" int	zbx_wmi_get_variant(const char * wmi_namespace, const char *wmi_q
 		goto out;
 	}
 
-	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, 0, NULL, 0, 0, &pService);
+	wmi_namespace_wide = zbx_utf8_to_unicode(wmi_namespace);
+	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace_wide), NULL, NULL, 0, NULL, 0, 0, &pService);
+	zbx_free(wmi_namespace_wide);
+
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain %s WMI service", wmi_namespace);
