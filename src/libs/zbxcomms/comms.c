@@ -1689,7 +1689,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 #define ZBX_TCP_EXPECT_XML_END	6
 
 	ssize_t		nbytes;
-	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0;
+	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0;
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
 
@@ -1770,6 +1770,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 			}
 
 			expect = ZBX_TCP_EXPECT_SIZE;
+			header_bytes = ZBX_TCP_HEADER_LEN + sizeof(zbx_uint64_t);
 
 			if (buf_stat_bytes + buf_dyn_bytes >= expected_len)
 				break;
@@ -1859,7 +1860,7 @@ out:
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
-	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)s->read_bytes);
+	return (ZBX_PROTO_ERROR == nbytes ? FAIL : (ssize_t)(s->read_bytes + header_bytes));
 
 #undef ZBX_TCP_EXPECT_HEADER
 #undef ZBX_TCP_EXPECT_LENGTH
