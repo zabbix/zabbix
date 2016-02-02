@@ -116,7 +116,7 @@ typedef struct
 	char		*server;
 	unsigned short	port;
 	struct zbx_json	json;
-	int		timestamps;
+	int		sync_timestamp;
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -314,7 +314,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
 	{
-		if (1 == sentdval_args->timestamps)
+		if (1 == sentdval_args->sync_timestamp)
 		{
 			zbx_timespec_t	ts;
 
@@ -540,7 +540,7 @@ int	main(int argc, char **argv)
 			goto free;
 		}
 
-		sentdval_args.timestamps = WITH_TIMESTAMPS;
+		sentdval_args.sync_timestamp = WITH_TIMESTAMPS;
 		ret = SUCCEED;
 
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
@@ -649,9 +649,6 @@ int	main(int argc, char **argv)
 			{
 				zbx_json_close(&sentdval_args.json);
 
-				if (1 == WITH_TIMESTAMPS)
-					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 				last_send = zbx_time();
 
 				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
@@ -675,7 +672,7 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
-		sentdval_args.timestamps = 0;
+		sentdval_args.sync_timestamp = 0;
 		total_count++;
 
 		do /* try block simulation */
