@@ -392,7 +392,11 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-$ignoredTemplates = [$data['templateId'] => $this->data['dbTemplate']['host']];
+$ignoredTemplates = [];
+
+if ($data['templateId'] != 0) {
+	$ignoredTemplates[$data['templateId']] = $this->data['dbTemplate']['host'];
+}
 
 $linkedTemplateTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
