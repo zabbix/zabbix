@@ -1,6 +1,7 @@
 Changes for 3.0.0rc1
 
 New features:
+....I..... [ZBXNEXT-3122] added Windows ReFS to the list of file system types discovered by default (asaveljevs)
 ..F....... [ZBXNEXT-3124] added edit buttons in map, screen and slide show views (Ivo)
 
 Bug fixes:
