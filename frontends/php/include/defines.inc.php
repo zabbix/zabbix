@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0alpha7');
+define('ZABBIX_VERSION',		'3.0.0rc1');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050104);
+define('ZABBIX_DB_VERSION',		2050119);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -751,7 +751,7 @@ define('GRAPH_STACKED_ALFA', 15); // 0..100 transparency
 define('GRAPH_ZERO_LINE_COLOR_LEFT',	'AAAAAA');
 define('GRAPH_ZERO_LINE_COLOR_RIGHT',	'888888');
 
-define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000');
+define('GRAPH_TRIGGER_LINE_OPPOSITE_COLOR', '000000');
 
 define('ZBX_MAX_TREND_DIFF', 3600);
 
@@ -958,7 +958,6 @@ define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
 define('ZBX_TEXTAREA_FILTER_BIG_WIDTH',			524);
 define('ZBX_TEXTAREA_TINY_WIDTH',				75);
 define('ZBX_TEXTAREA_SMALL_WIDTH',				150);
-define('ZBX_TEXTAREA_SEARCH_WIDTH',				200);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',			300);
 define('ZBX_TEXTAREA_BIG_WIDTH',				524);
 define('ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH',	75);
@@ -1078,7 +1077,6 @@ define('ZBX_STYLE_BTN_SEARCH', 'btn-search');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
-define('ZBX_STYLE_BTN_WIZARD_ACTION', 'btn-wizard-action');
 define('ZBX_STYLE_BOTTOM', 'bottom');
 define('ZBX_STYLE_BROWSER_LOGO_CHROME', 'browser-logo-chrome');
 define('ZBX_STYLE_BROWSER_LOGO_FF', 'browser-logo-ff');
@@ -1128,6 +1126,7 @@ define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_ICON_WZRD_ACTION', 'icon-wzrd-action');
 define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
@@ -1144,6 +1143,8 @@ define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
 define('ZBX_STYLE_LOG_WARNING_BG', 'log-warning-bg');
 define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
 define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
+define('ZBX_STYLE_LOGO', 'logo');
+define('ZBX_STYLE_MAP_AREA', 'map-area');
 define('ZBX_STYLE_MIDDLE', 'middle');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
@@ -1220,6 +1221,7 @@ define('ZBX_STYLE_TOP_SUBNAV', 'top-subnav');
 define('ZBX_STYLE_TOP_SUBNAV_CONTAINER', 'top-subnav-container');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
+define('ZBX_STYLE_UPPERCASE', 'uppercase');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_YELLOW', 'yellow');
 

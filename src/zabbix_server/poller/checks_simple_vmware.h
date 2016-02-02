@@ -23,12 +23,12 @@
 #include "common.h"
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 #include "sysinfo.h"
+#include "zbxalgo.h"
+#include "dbcache.h"
 
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
@@ -140,6 +140,9 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 		AGENT_RESULT *result);
 int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+
+int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
+		zbx_vector_ptr_t *add_results);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 #endif
