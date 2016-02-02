@@ -60,6 +60,10 @@ extern unsigned int				configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 extern unsigned char			program_type;
+
+extern int				CONFIG_PASSIVE_FORKS;
+extern int				CONFIG_ACTIVE_FORKS;
+
 extern char				*CONFIG_TLS_CONNECT;
 extern char				*CONFIG_TLS_ACCEPT;
 extern char				*CONFIG_TLS_CA_FILE;
@@ -613,11 +617,11 @@ static void	zbx_tls_validation_error(int type, char **param1, char **param2)
  *           CONFIG_TLS_PSK_FILE - are defined and not empty or none of them, *
  *           (if CONFIG_TLS_PSK_IDENTITY is defined it must be a valid UTF-8  *
  *           string),                                                         *
- *         - in agentd, active proxy, zabbix_get, and zabbix_sender the       *
+ *         - in active agent, active proxy, zabbix_get, and zabbix_sender the *
  *           certificate and PSK parameters must match the value of           *
  *           CONFIG_TLS_CONNECT parameter,                                    *
- *         - in agentd and passive proxy the certificate and PSK parameters   *
- *           must match the value of CONFIG_TLS_ACCEPT parameter.             *
+ *         - in passive agent and passive proxy the certificate and PSK       *
+ *           parameters must match the value of CONFIG_TLS_ACCEPT parameter.  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tls_validate_config(void)
@@ -741,14 +745,13 @@ void	zbx_tls_validate_config(void)
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_UTF8, &CONFIG_TLS_PSK_IDENTITY, NULL);
 
-	/* agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
+	/* active agentd, active proxy, zabbix_get, and zabbix_sender specific validation */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
-				ZBX_PROGRAM_TYPE_SENDER)))
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != CONFIG_ACTIVE_FORKS) ||
+			(0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_GET |
+					ZBX_PROGRAM_TYPE_SENDER))))
 	{
 		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
-		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
-		/* (i.e. 'ServerActive' is not specified). */
 
 		if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_CONNECT)
 		{
@@ -775,9 +778,10 @@ void	zbx_tls_validate_config(void)
 		}
 	}
 
-	/* agentd and passive proxy specific validation */
+	/* passive agentd and passive proxy specific validation */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_PASSIVE)))
+	if ((0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) && 0 != CONFIG_PASSIVE_FORKS) ||
+			0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
@@ -1447,9 +1451,17 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
+	if (HOST_TLS_PSK_LEN_MIN > len)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too short. Minimum is %d hex-digits",
+				CONFIG_TLS_PSK_FILE, HOST_TLS_PSK_LEN_MIN);
+		goto out;
+	}
+
 	if (HOST_TLS_PSK_LEN < len)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too large", CONFIG_TLS_PSK_FILE);
+		zabbix_log(LOG_LEVEL_CRIT, "PSK in file \"%s\" is too long. Maximum is %d hex-digits",
+				CONFIG_TLS_PSK_FILE, HOST_TLS_PSK_LEN);
 		goto out;
 	}
 
@@ -4104,6 +4116,19 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			goto out;
 		}
 
+		if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
+		{
+			long	verify_result;
+
+			/* In case of certificate error SSL_get_verify_result() provides more helpful diagnostics */
+			/* than other methods. Include it as first but continue with other diagnostics. */
+			if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s: ",
+						X509_verify_cert_error_string(verify_result));
+			}
+		}
+
 		error_code = SSL_get_error(s->tls_ctx, res);
 
 		switch (error_code)
@@ -4111,14 +4136,16 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			case SSL_ERROR_NONE:		/* handshake successful */
 				break;
 			case SSL_ERROR_ZERO_RETURN:
-				*error = zbx_strdup(*error, "TLS connection has been closed during handshake");
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset,
+						"TLS connection has been closed during handshake");
 				goto out;
 			case SSL_ERROR_SYSCALL:
 				if (0 == ERR_peek_error())
 				{
 					if (0 == res)
 					{
-						*error = zbx_strdup(*error, "connection closed by peer");
+						zbx_snprintf_alloc(error, &error_alloc, &error_offset,
+								"connection closed by peer");
 					}
 					else if (-1 == res)
 					{
@@ -4161,10 +4188,18 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	{
 		X509	*peer_cert = NULL;
 		char	*issuer = NULL, *subject = NULL;
+		long	verify_result;
 		int	err = 0;
 
-		if ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
-				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
+					X509_verify_cert_error_string(verify_result));
+			err = 1;
+		}
+
+		if (0 == err && ((NULL != tls_arg2 && '\0' != *tls_arg2) || (NULL != tls_arg1 && '\0' != *tls_arg1) ||
+				SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG)))
 		{
 			if (NULL == (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) ||
 					SUCCEED != zbx_get_issuer_subject(peer_cert, &issuer, &subject))
@@ -4763,6 +4798,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	const char	*cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+	long		verify_result;
 #if defined(_WINDOWS)
 	double		sec;
 #endif
@@ -4880,6 +4916,16 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 			goto out;
 		}
 
+		/* In case of certificate error SSL_get_verify_result() provides more helpful diagnostics */
+		/* than other methods. Include it as first but continue with other diagnostics. Should be */
+		/* harmless in case of PSK. */
+
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s: ",
+					X509_verify_cert_error_string(verify_result));
+		}
+
 		error_code = SSL_get_error(s->tls_ctx, res);
 
 		if (0 == res)
@@ -4909,6 +4955,14 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	else if (0 != strncmp("NONE", cipher_name, 4))		/* is there a better method to find cipher type? */
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
+
+		if (X509_V_OK != (verify_result = SSL_get_verify_result(s->tls_ctx)))
+		{
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "%s",
+					X509_verify_cert_error_string(verify_result));
+			zbx_tls_close(s);
+			goto out1;
+		}
 
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{

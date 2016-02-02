@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0beta2');
+define('ZABBIX_VERSION',		'3.0.0rc1');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
 define('ZABBIX_DB_VERSION',		2050119);
@@ -246,6 +246,8 @@ define('HOST_STATUS_PROXY_PASSIVE',	6);
 define('HOST_ENCRYPTION_NONE',			1);
 define('HOST_ENCRYPTION_PSK',			2);
 define('HOST_ENCRYPTION_CERTIFICATE',	4);
+
+define('PSK_MIN_LEN',	32);
 
 define('HOST_MAINTENANCE_STATUS_OFF',	0);
 define('HOST_MAINTENANCE_STATUS_ON',	1);
