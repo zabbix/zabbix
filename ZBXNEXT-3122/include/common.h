@@ -1128,6 +1128,7 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
 #define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
+#define HOST_TLS_PSK_LEN_MIN		32				/* for 16 hex-encoded bytes (128-bit PSK) */
 
 typedef struct
 {

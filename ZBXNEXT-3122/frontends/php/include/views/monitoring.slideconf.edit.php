@@ -262,7 +262,7 @@ if (isset($data['slideshow']['slideshowid'])) {
 		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete slide show?'), url_params(['form', 'slideshowid'])),
-			new CButtonCancel()
+			new CRedirectButton(_('Cancel'), 'slides.php')
 		]
 	));
 }

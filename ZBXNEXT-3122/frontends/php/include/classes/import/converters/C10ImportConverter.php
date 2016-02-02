@@ -710,27 +710,27 @@ class C10ImportConverter extends CConverter {
 	 *
 	 * @param array 		$array		source array
 	 * @param string		$key		property under which the reference is stored
-	 * @param string|null 	$hostName	if set to some host name, host macros will be resolved into this host
+	 * @param string|null 	$host_name	if set to some host name, host macros will be resolved into this host
 	 *
 	 * @return array
 	 */
-	protected function convertGraphItemReference(array $array, $key, $hostName = null) {
-		if (!isset($array[$key]) || !$array[$key]) {
-			return $array;
+	protected function convertGraphItemReference(array $array, $key, $host_name = null) {
+		if ($array[$key] === '') {
+			$array[$key] = [];
 		}
+		else {
+			$colon_pos = strpos($array[$key], ':');
 
-		list ($host, $itemKey) = explode(':', $array[$key], 2);
+			list ($host, $item_key) = explode(':', $array[$key], 2);
 
-		// replace host macros with the host name
-		// not sure why this is required, but this has been preserved from when refactoring CXmlImport18
-		if ($hostName !== null && ($host === '{HOSTNAME}' || $host === '{HOST.HOST}')) {
-			$host = $hostName;
+			// replace host macros with the host name
+			// not sure why this is required, but this has been preserved from when refactoring CXmlImport18
+			if ($host_name !== null && ($host === '{HOSTNAME}' || $host === '{HOST.HOST}')) {
+				$host = $host_name;
+			}
+
+			$array[$key] = ['host' => $host, 'key' => $this->itemKeyConverter->convert($item_key)];
 		}
-
-		$array[$key] = [
-			'host' => $host,
-			'key' => $this->itemKeyConverter->convert($itemKey)
-		];
 
 		return $array;
 	}
