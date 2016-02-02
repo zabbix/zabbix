@@ -1031,18 +1031,17 @@ class C30XmlValidator {
 	 * @throws Exception			if the element is invalid
 	 */
 	public function validateYMinItem($data, array $parent_data = null, $path) {
-		if (zbx_is_int($parent_data['ymin_type_1'])) {
-			if ($parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$rules = ['type' => XML_ARRAY, 'rules' => [
-					'host' =>	['type' => XML_STRING | XML_REQUIRED],
-					'key' =>	['type' => XML_STRING | XML_REQUIRED]
-				]];
-
-				$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
-			}
+		if (zbx_is_int($parent_data['ymin_type_1']) && $parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$rules = ['type' => XML_ARRAY, 'rules' => [
+				'host' =>	['type' => XML_STRING | XML_REQUIRED],
+				'key' =>	['type' => XML_STRING | XML_REQUIRED]
+			]];
+		}
+		else {
+			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return $data;
+		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
 	}
 
 	/**
@@ -1055,18 +1054,17 @@ class C30XmlValidator {
 	 * @throws Exception			if the element is invalid
 	 */
 	public function validateYMaxItem($data, array $parent_data = null, $path) {
-		if (zbx_is_int($parent_data['ymax_type_1'])) {
-			if ($parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$rules = ['type' => XML_ARRAY, 'rules' => [
-					'host' =>	['type' => XML_STRING | XML_REQUIRED],
-					'key' =>	['type' => XML_STRING | XML_REQUIRED]
-				]];
-
-				$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
-			}
+		if (zbx_is_int($parent_data['ymax_type_1']) && $parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$rules = ['type' => XML_ARRAY, 'rules' => [
+				'host' =>	['type' => XML_STRING | XML_REQUIRED],
+				'key' =>	['type' => XML_STRING | XML_REQUIRED]
+			]];
+		}
+		else {
+			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return $data;
+		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
 	}
 
 	/**

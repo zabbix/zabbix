@@ -195,6 +195,7 @@ if ($data['screen']) {
 
 	// get element
 	$data['element'] = get_slideshow_by_slideshowid($data['elementId'], PERM_READ);
+	$data['screen']['editable'] = (bool) get_slideshow_by_slideshowid($data['elementId'], PERM_READ_WRITE);
 
 	if ($data['screen']['delay'] > 0) {
 		$data['element']['delay'] = $data['screen']['delay'];

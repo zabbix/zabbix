@@ -185,7 +185,7 @@ unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
 									/* linking with tls.c */
 char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in zabbix_sender, just for linking with tls.c */
+char	*CONFIG_TLS_ACCEPT		= NULL;	/* not used in zabbix_sender, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
@@ -194,6 +194,9 @@ char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
+
+int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
+int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 
 /* COMMAND LINE OPTIONS */
 
@@ -263,6 +266,7 @@ typedef struct
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
 #endif
+	int		sync_timestamp;
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -485,6 +489,16 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
 			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
+		if (1 == sendval_args->sync_timestamp)
+		{
+			zbx_timespec_t	ts;
+
+			zbx_timespec(&ts);
+
+			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
+		}
+
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
@@ -1031,6 +1045,7 @@ int	main(int argc, char **argv)
 			goto free;
 		}
 
+		sendval_args.sync_timestamp = WITH_TIMESTAMPS;
 		ret = SUCCEED;
 
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
@@ -1147,9 +1162,6 @@ int	main(int argc, char **argv)
 			{
 				zbx_json_close(&sendval_args.json);
 
-				if (1 == WITH_TIMESTAMPS)
-					zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 				last_send = zbx_time();
 
 				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
@@ -1165,10 +1177,6 @@ int	main(int argc, char **argv)
 		if (FAIL != ret && 0 != buffer_count)
 		{
 			zbx_json_close(&sendval_args.json);
-
-			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
 
@@ -1177,6 +1185,7 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
+		sendval_args.sync_timestamp = 0;
 		total_count++;
 
 		do /* try block simulation */
