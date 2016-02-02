@@ -637,16 +637,27 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 			fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
-
+			on = 1;
+#ifdef _WINDOWS
+			/* prevent other processes from binding to the same port */
+			/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
+			/* on Windows SO_REUSEADDR has different semantics than on Unix */
+			/* https://msdn.microsoft.com/en-us/library/windows/desktop/ms740621(v=vs.85).aspx */
+			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&on, sizeof(on)))
+			{
+				zbx_set_tcp_strerror("setsockopt() with SO_EXCLUSIVEADDRUSE for [[%s]:%s] failed: %s",
+						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
+			}
+#else
 			/* enable address reuse */
 			/* this is to immediately use the address even if it is in TIME_WAIT state */
 			/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
-			on = 1;
 			if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
 			{
 				zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%s] failed: %s",
 						ip ? ip : "-", port, strerror_from_system(zbx_sock_last_error()));
 			}
+#endif
 
 #if defined(IPPROTO_IPV6) && defined(IPV6_V6ONLY)
 			if (PF_INET6 == current_ai->ai_family &&
@@ -760,17 +771,27 @@ int	zbx_tcp_listen(zbx_sock_t *s, const char *listen_ip, unsigned short listen_p
 #if !defined(_WINDOWS) && !SOCK_CLOEXEC
 		fcntl(s->sockets[s->num_socks], F_SETFD, FD_CLOEXEC);
 #endif
-
-		/* Enable address reuse */
-		/* This is to immediately use the address even if it is in TIME_WAIT state */
-		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 		on = 1;
-		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
+#ifdef _WINDOWS
+		/* prevent other processes from binding to the same port */
+		/* SO_EXCLUSIVEADDRUSE is mutually exclusive with SO_REUSEADDR */
+		/* on Windows SO_REUSEADDR has different semantics than on Unix */
+		/* https://msdn.microsoft.com/en-us/library/windows/desktop/ms740621(v=vs.85).aspx */
+		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_EXCLUSIVEADDRUSE, (void *)&on, sizeof(on)))
 		{
-			zbx_set_tcp_strerror("setsockopt() for [[%s]:%hu] failed: %s",
+			zbx_set_tcp_strerror("setsockopt() with SO_EXCLUSIVEADDRUSE for [[%s]:%hu] failed: %s",
 					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
 		}
-
+#else
+		/* enable address reuse */
+		/* this is to immediately use the address even if it is in TIME_WAIT state */
+		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
+		if (ZBX_TCP_ERROR == setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)))
+		{
+			zbx_set_tcp_strerror("setsockopt() with SO_REUSEADDR for [[%s]:%hu] failed: %s",
+					ip ? ip : "-", listen_port, strerror_from_system(zbx_sock_last_error()));
+		}
+#endif
 		memset(&serv_addr, 0, sizeof(serv_addr));
 
 		serv_addr.sin_family		= AF_INET;
