@@ -1,6 +1,7 @@
 Changes for 3.0.0rc1
 
 New features:
+..F....... [ZBXNEXT-3124] added edit buttons in map, screen and slide show views (Ivo)
 
 Bug fixes:
 A......... [ZBX-10325] fixed importing of host prototypes from Zabbix 2.4 (Sasha)
