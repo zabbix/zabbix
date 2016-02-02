@@ -3220,7 +3220,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-static void vmware_service_remove(zbx_vmware_service_t *service)
+static void	vmware_service_remove(zbx_vmware_service_t *service)
 {
 	const char	*__function_name = "vmware_service_remove";
 	int		index;
@@ -3601,7 +3601,7 @@ void	main_vmware_loop(void)
 
 			zbx_vmware_unlock();
 
-			switch(task)
+			switch (task)
 			{
 				case ZBX_VMWARE_TASK_UPDATE:
 					vmware_service_update(service);
