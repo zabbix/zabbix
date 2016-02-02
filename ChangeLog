@@ -3,6 +3,7 @@ Changes for 3.0.0rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-9640] improved server/proxy/agent item value timestamp synchronization (wiper)
 A.FGI..PS. [ZBXNEXT-1263] fixed number of bugs in encryption support, increased minimum PSK length to 128 bits (Andris, asaveljevs, Oleg)
 ...G...PS. [ZBX-10333] fixed treatment of empty results from agent as network errors (gleb)
 ..F....... [ZBX-10327] fixed brightness of the selections (Pavel, Sasha)
@@ -411,6 +412,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-9640] improved server/proxy/agent item value timestamp synchronization (wiper)
 ..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
 ..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
