@@ -395,7 +395,7 @@ $tmplList = new CFormList();
 $ignoredTemplates = [];
 
 if ($data['templateId'] != 0) {
-	$ignoredTemplates[$data['templateId']] = $this->data['dbTemplate']['host'];
+	$ignoredTemplates[$data['templateId']] = $data['dbTemplate']['host'];
 }
 
 $linkedTemplateTable = (new CTable())
