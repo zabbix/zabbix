@@ -237,66 +237,6 @@ class CDRule extends CZBXAPI {
 	return !empty($objs);
 	}
 
-	public function checkInput(array &$dRules, $method) {
-		if (empty($dRules)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
-		}
-
-		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$proxies = array();
-		foreach ($dRules as $dRule) {
-			if (array_key_exists('name', $dRule) && $dRule['name'] === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s: cannot be empty.', 'name')
-				);
-			}
-
-			if (array_key_exists('iprange', $dRule)) {
-				if (!validate_ip_range($dRule['iprange'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $dRule['iprange']));
-				}
-			}
-			elseif ($method === 'create') {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
-			}
-
-			if (isset($dRule['delay']) && $dRule['delay'] < 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
-			}
-
-			if (isset($dRule['status']) && (($dRule['status'] != DRULE_STATUS_DISABLED) && ($dRule['status'] != DRULE_STATUS_ACTIVE))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
-			}
-
-			if (array_key_exists('dchecks', $dRule) && $dRule['dchecks']) {
-				$this->validateDChecks($dRule['dchecks']);
-			}
-			elseif (array_key_exists('dchecks', $dRule) || $method === 'create') {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
-			}
-
-			if (isset($dRule['proxy_hostid']) && $dRule['proxy_hostid']) {
-				$proxies[] = $dRule['proxy_hostid'];
-			}
-		}
-
-		if (!empty($proxies)) {
-			$proxiesDB = API::proxy()->get(array(
-				'proxyids' => $proxies,
-				'output' => array('proxyid'),
-				'preservekeys' => true,
-			));
-			foreach ($proxies as $proxy) {
-				if (!isset($proxiesDB[$proxy])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
-				}
-			}
-		}
-	}
-
 	protected function validateDChecks(array &$dChecks) {
 		$uniq = 0;
 
@@ -395,23 +335,6 @@ class CDRule extends CZBXAPI {
 		}
 	}
 
-	protected function validateRequiredFields($dRules, $on) {
-		if ($on == 'update') {
-			foreach ($dRules as $dRule) {
-				if (!isset($dRule['druleid']) || zbx_empty($dRule['druleid'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
-				}
-			}
-		}
-		else {
-			foreach ($dRules as $dRule) {
-				if (!isset($dRule['name']) || zbx_empty($dRule['name'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
-				}
-			}
-		}
-	}
-
 	protected function validateDuplicateChecks(array $dChecks) {
 		$defaultValues = DB::getDefaults('dchecks');
 		foreach ($dChecks as &$dCheck) {
@@ -464,15 +387,7 @@ class CDRule extends CZBXAPI {
 	 */
 	public function create(array $dRules) {
 		$dRules = zbx_toArray($dRules);
-		$this->validateRequiredFields($dRules, __FUNCTION__);
-		$this->checkInput($dRules, __FUNCTION__);
-
-		// checking to the duplicate names
-		foreach ($dRules as $dRule) {
-			if ($this->exists($dRule)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
-			}
-		}
+		$this->validateCreate($dRules);
 
 		$druleids = DB::insert('drules', $dRules);
 
@@ -535,20 +450,13 @@ class CDRule extends CZBXAPI {
 			}
 		}
 
-		$this->validateRequiredFields($dRules, __FUNCTION__);
-		$this->checkInput($dRules, __FUNCTION__);
+		$this->validateUpdate($dRules, $dRulesDb);
 
 		$defaultValues = DB::getDefaults('dchecks');
 
-		$dRulesUpdate = $dCheckIdsDelete = $dChecksCreate = array();
+		$dRulesUpdate = array();
 
 		foreach ($dRules as $dRule) {
-			// validate drule duplicate names
-			if (array_key_exists('name', $dRule) && strcmp($dRulesDb[$dRule['druleid']]['name'], $dRule['name']) != 0
-					&& $this->exists($dRule)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $dRule['name']));
-			}
-
 			$dRulesUpdate[] = array(
 				'values' => $dRule,
 				'where' => array('druleid' => $dRule['druleid'])
@@ -818,6 +726,164 @@ class CDRule extends CZBXAPI {
 	protected function checkDrulePermissions(array $druleIds) {
 		if (!$this->isWritable($druleIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Validate the input parameters for create() method
+	 *
+	 * @param array $drules		discovery rules data
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateCreate(array &$drules) {
+		if (!$drules) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
+		}
+
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		$proxies = array();
+
+		foreach ($drules as $drule) {
+			if (!array_key_exists('name', $drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
+			}
+			elseif ($drule['name'] === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s: cannot be empty.', 'name')
+				);
+			}
+
+			if (!array_key_exists('iprange', $drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
+			}
+			elseif (!validate_ip_range($drule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $drule['iprange']));
+			}
+
+			if (array_key_exists('delay', $drule) && $drule['delay'] < 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
+			}
+
+			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
+					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
+			}
+
+			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
+				$this->validateDChecks($drule['dchecks']);
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+			}
+
+			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
+				$proxies[] = $drule['proxy_hostid'];
+			}
+
+			// validate drule duplicate names
+			if ($this->exists($drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $drule['name']));
+			}
+		}
+
+		if ($proxies) {
+			$db_proxies = API::proxy()->get(array(
+				'output' => array('proxyid'),
+				'proxyids' => $proxies,
+				'preservekeys' => true,
+			));
+			foreach ($proxies as $proxy) {
+				if (!array_key_exists($proxy, $db_proxies)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
+				}
+			}
+		}
+	}
+
+	/**
+	 * Validate the input parameters for update() method
+	 *
+	 * @param array $drules			discovery rules data
+	 * @param array $db_drules		db discovery rules data
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateUpdate(array &$drules, array &$db_drules) {
+		if (!$drules) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
+		}
+
+		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		foreach ($drules as $drule) {
+			if (array_key_exists('druleid', $drule) && !array_key_exists($drule['druleid'], $db_drules)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
+			}
+		}
+
+		$proxies = array();
+
+		foreach ($drules as $drule) {
+			if (!array_key_exists('druleid', $drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
+			}
+
+			if (array_key_exists('name', $drule) && $drule['name'] === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s: cannot be empty.', 'name')
+				);
+			}
+
+			if (array_key_exists('iprange', $drule) && !validate_ip_range($drule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect IP range "%s".', $drule['iprange']));
+			}
+
+			if (array_key_exists('delay', $drule) && $drule['delay'] < 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
+			}
+
+			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
+					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
+			}
+
+			if (array_key_exists('dchecks', $drule)) {
+				if ($drule['dchecks']) {
+					$this->validateDChecks($drule['dchecks']);
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+				}
+			}
+
+			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
+				$proxies[] = $drule['proxy_hostid'];
+			}
+
+			// validate drule duplicate names
+			if (array_key_exists('name', $drule) && $db_drules[$drule['druleid']]['name'] !== $drule['name']
+					&& $this->exists($drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%s" already exists.', $drule['name']));
+			}
+		}
+
+		if ($proxies) {
+			$db_proxies = API::proxy()->get(array(
+				'output' => array('proxyid'),
+				'proxyids' => $proxies,
+				'preservekeys' => true,
+			));
+			foreach ($proxies as $proxy) {
+				if (!array_key_exists($proxy, $db_proxies)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
+				}
+			}
 		}
 	}
 }
