@@ -91,10 +91,10 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
-	'add_row' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
-	'add_col' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
-	'rmv_row' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
-	'rmv_col' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'add_row' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
+	'add_col' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
+	'rmv_row' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
+	'rmv_col' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
 	'sw_pos' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
 	'ajaxAction' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,			null]
 ];
