@@ -40,6 +40,9 @@
 #	include <openssl/ssl.h>
 #	include <openssl/err.h>
 #	include <openssl/rand.h>
+#ifdef _WINDOWS
+#	include "mutexs.h"
+#endif
 #endif
 
 /* Currently use only TLS 1.2, which has number 3.3. In 2015 a new standard for TLS 1.3 is expected. */
@@ -115,6 +118,10 @@ ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
 ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
+#ifdef _WINDOWS
+/* array of mutexes for OpenSSL on multi-threaded systems (see "man 3ssl threads") */
+ZBX_MUTEX					*crypto_mutexes		= NULL;
+#endif
 static int					init_done 		= 0;
 /* buffer for messages produced by zbx_openssl_info_cb() */
 ZBX_THREAD_LOCAL char				info_buf[256];
@@ -2421,6 +2428,64 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 }
 #endif
 
+#if defined(HAVE_OPENSSL) && defined(_WINDOWS)
+/* see "man 3ssl threads" and example in OpenSSL crypto/threads/mttest.c */
+
+static void zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
+{
+	const char	*__function_name = "zbx_openssl_locking_cb";
+
+	if (mode & CRYPTO_LOCK)
+		__zbx_mutex_lock(file, line, crypto_mutexes + n);
+	else
+		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
+}
+
+static void zbx_openssl_thread_setup(void)
+{
+	const char	*__function_name = "zbx_openssl_thread_setup";
+
+	int	i, num_locks;
+
+	if (NULL == (crypto_mutexes = OPENSSL_malloc(CRYPTO_num_locks() * sizeof(ZBX_MUTEX))))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
+		exit(EXIT_FAILURE);
+	}
+
+	num_locks = CRYPTO_num_locks();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() creating %d mutexes", __function_name, num_locks);
+
+	for (i = 0; i < num_locks; i++)
+	{
+		if (SUCCEED != zbx_mutex_create(crypto_mutexes + i, NULL))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex #%d for OpenSSL library", i);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	CRYPTO_set_locking_callback((void (*)(int, int, const char *, int))zbx_openssl_locking_cb);
+
+	/* do not register our own threadid_func() callback, use OpenSSL default one */
+}
+
+static void zbx_openssl_thread_cleanup(void)
+{
+	int	i, num_locks;
+
+	CRYPTO_set_locking_callback(NULL);
+
+	num_locks = CRYPTO_num_locks();
+
+	for (i = 0; i < num_locks; i++)
+		CloseHandle(crypto_mutexes[i]);
+
+	OPENSSL_free(crypto_mutexes);
+	crypto_mutexes = NULL;
+}
+#endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
@@ -2456,7 +2521,9 @@ static void	zbx_tls_library_init(void)
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();             /* always returns "1" */
-
+#if defined(_WINDOWS)
+	zbx_openssl_thread_setup();
+#endif
 	init_done = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", SSLeay_version(SSLEAY_VERSION));
@@ -2486,6 +2553,9 @@ void	zbx_tls_library_deinit(void)
 		init_done = 0;
 		RAND_cleanup();         /* erase PRNG state */
 		ERR_free_strings();
+#if defined(_WINDOWS)
+		zbx_openssl_thread_cleanup();
+#endif
 	}
 #endif
 }
