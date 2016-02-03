@@ -2461,7 +2461,7 @@ static void zbx_openssl_thread_setup(void)
 
 	num_locks = CRYPTO_num_locks();
 
-	zabbix_log(LOG_LEVEL_TRACE, "%s() creating %d mutexes", __function_name, num_locks);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() creating %d mutexes", __function_name, num_locks);
 
 	for (i = 0; i < num_locks; i++)
 	{
