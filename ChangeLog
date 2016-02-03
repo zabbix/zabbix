@@ -1,7 +1,6 @@
 Changes for 3.0.0rc1
 
 New features:
-
 A.F....... [ZBX-1357] enabled English (United States), Korean, Ukrainian translations to be displayed by default (zalex_ua)
 A.F....... [ZBX-1357] updated Chinese (China), Japanese, Korean, Polish, Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 ....I..... [ZBXNEXT-3122] added Windows ReFS to the list of file system types discovered by default (asaveljevs)
@@ -72,7 +71,7 @@ Bug fixes:
 A......... [ZBX-10226] fixed trigger prototype updateReal API method (Gunars)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 .......PS. [ZBX-10266] fixed uninitialized variable in VMware code reported by Coverity (CIDs 118958, 118960, 118962, 118965) (dimir)
 ...G...PS. [ZBX-10239] fixed agent collector crashes on Linux while gathering data for proc.cpu.util[], fixed unsafe use of stack in logging functions (Sandis)
 A.F....... [ZBX-10182] fixed API to disallow update of templated host graphs and disabled form fields for templated host graph update (Cemeris)
@@ -432,7 +431,7 @@ A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gu
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 ........S. [ZBX-7006] implemented trend cache cleanup procedure which forces hourly flush of deleted, disabled or rarely updated item trends (dimir, gleb)
@@ -1171,7 +1170,7 @@ A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gu
 ..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (Cemeris)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
@@ -2521,7 +2520,7 @@ New features:
 
 Bug fixes:
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
