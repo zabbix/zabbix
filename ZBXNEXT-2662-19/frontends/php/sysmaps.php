@@ -373,11 +373,11 @@ else {
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	if (hasRequest('filter_set')) {
-		CProfile::update('web.maps.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.sysmapconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	}
 	elseif (hasRequest('filter_rst')) {
 		DBStart();
-		CProfile::delete('web.maps.filter_name');
+		CProfile::delete('web.sysmapconf.filter_name');
 		DBend();
 	}
 
@@ -385,7 +385,7 @@ else {
 
 	$data = [
 		'filter' => [
-			'name' => CProfile::get('web.maps.filter_name', '')
+			'name' => CProfile::get('web.sysmapconf.filter_name', '')
 		],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
