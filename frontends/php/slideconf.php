@@ -116,8 +116,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		];
 
 		// Slide show update with inaccessible user.
-		if ($data['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN
-				&& CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN) {
+		if ($data['userid'] === '' && CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
 			$user_exist = API::User()->get([
 				'output' => ['userid'],
 				'userids' => [$data['userid']]
@@ -126,6 +125,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (!$user_exist) {
 				unset($data['userid']);
 			}
+		}
+
+		// Only administrators can set slide show owner.
+		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN) {
+			unset($data['userid']);
 		}
 
 		$result = update_slideshow($data);
