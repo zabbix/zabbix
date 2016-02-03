@@ -38,7 +38,7 @@ $form = (new CForm())
 	->setName('screenForm')
 	->addVar('form', $data['form']);
 
-if ($data['screen']['templateid']) {
+if ($data['screen']['templateid'] != 0) {
 	$form->addVar('templateid', $data['screen']['templateid']);
 }
 else {
@@ -214,7 +214,7 @@ if ($data['screen']['screenid']) {
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete screen?'), url_param('form').url_param('screenid').url_param('templateid')),
+			new CButtonDelete(_('Delete screen?'), url_params(['form', 'screenid', 'templateid'])),
 			new CButtonCancel(url_param('templateid'))
 		]
 	));
