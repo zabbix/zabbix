@@ -46,6 +46,16 @@ else {
 $createForm->addItem($controls);
 $widget->setControls($createForm);
 
+// filter
+if (!$data['templateid']) {
+	$widget->addItem(
+		(new CFilter('web.screenconf.filter.state'))
+			->addColumn((new CFormList())->addRow(_('Name like'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			))
+	);
+}
+
 // create form
 $screenForm = (new CForm())
 	->setName('screenForm')
@@ -66,7 +76,7 @@ foreach ($data['screens'] as $screen) {
 	$user_type = CWebUser::getType();
 
 	if ($data['templateid'] || $user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
-			|| array_key_exists('editable', $screen)) {
+			|| $screen['editable']) {
 		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
 		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'));
 		$constructor = new CLink(_('Constructor'),

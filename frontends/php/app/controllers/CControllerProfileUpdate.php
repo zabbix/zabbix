@@ -54,7 +54,10 @@ class CControllerProfileUpdate extends CController {
 				case 'web.triggers.filter.state':
 				case 'web.tr_status.filter.state':
 				case 'web.screens.filter.state':
+				case 'web.screenconf.filter.state':
 				case 'web.slides.filter.state':
+				case 'web.slideconf.filter.state':
+				case 'web.sysmapconf.filter.state':
 					$ret = ($mask == self::VALUE_INT && in_array($this->getInput('value_int'), [0, 1]));
 					break;
 				default:

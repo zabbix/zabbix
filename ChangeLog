@@ -1,6 +1,10 @@
 Changes for 3.0.0rc1
 
 New features:
+..F....... [ZBXNEXT-2662] added a new filter in Monitoring -> Screens (Sasha)
+..F....... [ZBXNEXT-2662] added a new filter in Monitoring -> Screens -> Slide shows (Sasha)
+..F....... [ZBXNEXT-2662] added a new filter in Monitoring -> Maps (Sasha)
+..F....... [ZBXNEXT-2662] updated default colors for graph elements (Cemeris, Pavel, Sasha)
 A.F....... [ZBX-1357] enabled English (United States), Korean, Ukrainian translations to be displayed by default (zalex_ua)
 A.F....... [ZBX-1357] updated Chinese (China), Japanese, Korean, Polish, Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 ....I..... [ZBXNEXT-3122] added Windows ReFS to the list of file system types discovered by default (asaveljevs)
