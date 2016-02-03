@@ -68,7 +68,7 @@ extern char		*CONFIG_SOURCE_IP;
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_mem_malloc_func, \
 		__vm_mem_realloc_func, __vm_mem_free_func)
 
-#define ZBX_VMWARE_CAHCE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
+#define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL	SEC_PER_DAY
 
@@ -3249,6 +3249,35 @@ out:
 			(zbx_fs_size_t)page.offset);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: vmware_service_remove                                            *
+ *                                                                            *
+ * Purpose: removes vmware service                                            *
+ *                                                                            *
+ * Parameters: service      - [IN] the vmware service                         *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_service_remove(zbx_vmware_service_t *service)
+{
+	const char	*__function_name = "vmware_service_remove";
+	int		index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s@%s", __function_name, service->username, service->url);
+
+	zbx_vmware_lock();
+
+	if (FAIL != (index = zbx_vector_ptr_search(&vmware->services, &service, ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+	{
+		zbx_vector_ptr_remove(&vmware->services, index);
+		vmware_service_shared_free(service);
+	}
+
+	zbx_vmware_unlock();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()");
+}
+
 /*
  * Public API
  */
@@ -3533,7 +3562,7 @@ void	zbx_vmware_destroy(void)
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			i, now, state, next_update, updated_services = 0, removed_services = 0,
+	int			i, now, task, next_update, updated_services = 0, removed_services = 0,
 				old_updated_services = 0, old_removed_services = 0, sleeptime = -1;
 	zbx_vmware_service_t	*service = NULL;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
@@ -3566,53 +3595,57 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 		do
 		{
-			state = ZBX_VMWARE_TASK_IDLE;
+			task = ZBX_VMWARE_TASK_IDLE;
 
 			now = time(NULL);
 			next_update = now + POLLER_DELAY;
 
 			zbx_vmware_lock();
 
+			/* find a task to be performed on a vmware service */
 			for (i = 0; i < vmware->services.values_num; i++)
 			{
 				service = vmware->services.values[i];
 
-				if (0 == (service->state & ZBX_VMWARE_STATE_UPDATING_PERF) &&
-						0 != (service->state & ZBX_VMWARE_STATE_READY) &&
+				/* check if the service isn't used and should be removed */
+				if (0 == (service->state & ZBX_VMWARE_STATE_BUSY) &&
+						now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
+				{
+					service->state |= ZBX_VMWARE_STATE_REMOVING;
+					task = ZBX_VMWARE_TASK_REMOVE;
+					break;
+				}
+
+				/* check if the performance statistics should be updated */
+				if (0 != (service->state & ZBX_VMWARE_STATE_READY) &&
+						0 == (service->state & ZBX_VMWARE_STATE_UPDATING_PERF) &&
 						now - service->lastperfcheck >= ZBX_VMWARE_PERF_UPDATE_PERIOD)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING_PERF;
-					state = ZBX_VMWARE_TASK_UPDATE_PERF;
-					updated_services++;
+					task = ZBX_VMWARE_TASK_UPDATE_PERF;
 					break;
 				}
 
-				if (0 != (service->state & ZBX_VMWARE_STATE_UPDATING))
-					continue;
-
-				if (now - service->lastcheck >= ZBX_VMWARE_CAHCE_UPDATE_PERIOD)
+				/* check if the service data should be updated */
+				if (0 == (service->state & ZBX_VMWARE_STATE_UPDATING) &&
+						now - service->lastcheck >= ZBX_VMWARE_CACHE_UPDATE_PERIOD)
 				{
 					service->state |= ZBX_VMWARE_STATE_UPDATING;
-					state = ZBX_VMWARE_TASK_UPDATE;
-					updated_services++;
+					task = ZBX_VMWARE_TASK_UPDATE;
 					break;
 				}
 
-				if (now - service->lastaccess > ZBX_VMWARE_SERVICE_TTL)
-				{
-					zbx_vector_ptr_remove(&vmware->services, i);
-					vmware_service_shared_free(service);
-					state = ZBX_VMWARE_TASK_REMOVE;
-					removed_services++;
-					break;
-				}
+				/* don't calculate nextcheck for services that are already updating something */
+				if (0 != (service->state & ZBX_VMWARE_STATE_BUSY))
+						continue;
 
-				/* don't change next update timestamp for failed services */
+				/* calculate next service update time */
+
+				if (service->lastcheck + ZBX_VMWARE_CACHE_UPDATE_PERIOD < next_update)
+					next_update = service->lastcheck + ZBX_VMWARE_CACHE_UPDATE_PERIOD;
+
 				if (0 != (service->state & ZBX_VMWARE_STATE_READY))
 				{
-					if (service->lastcheck + ZBX_VMWARE_CAHCE_UPDATE_PERIOD < next_update)
-						next_update = service->lastcheck + ZBX_VMWARE_CAHCE_UPDATE_PERIOD;
-
 					if (service->lastperfcheck + ZBX_VMWARE_PERF_UPDATE_PERIOD < next_update)
 						next_update = service->lastperfcheck + ZBX_VMWARE_PERF_UPDATE_PERIOD;
 				}
@@ -3620,12 +3653,23 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 			zbx_vmware_unlock();
 
-			if (ZBX_VMWARE_TASK_UPDATE == state)
-				vmware_service_update(service);
-			else if (ZBX_VMWARE_TASK_UPDATE_PERF == state)
-				vmware_service_update_perf(service);
+			switch (task)
+			{
+				case ZBX_VMWARE_TASK_UPDATE:
+					vmware_service_update(service);
+					updated_services++;
+					break;
+				case ZBX_VMWARE_TASK_UPDATE_PERF:
+					vmware_service_update_perf(service);
+					updated_services++;
+					break;
+				case ZBX_VMWARE_TASK_REMOVE:
+					vmware_service_remove(service);
+					removed_services++;
+					break;
+			}
 		}
-		while (ZBX_VMWARE_TASK_IDLE != state);
+		while (ZBX_VMWARE_TASK_IDLE != task);
 
 		total_sec += zbx_time() - sec;
 		now = time(NULL);
