@@ -174,8 +174,12 @@ if (hasRequest('add') || hasRequest('update')) {
 		// TODO check permission by new value.
 		$map['sysmapid'] = getRequest('sysmapid');
 
+		// Only administrators can set map owner.
+		if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+			unset($map['userid']);
+		}
 		// Map update with inaccessible user.
-		if ($map['userid'] === '' && CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
+		elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $map['userid'] === '') {
 			$user_exist = API::User()->get([
 				'output' => ['userid'],
 				'userids' => [$sysmap['userid']]
@@ -184,11 +188,6 @@ if (hasRequest('add') || hasRequest('update')) {
 			if (!$user_exist) {
 				unset($map['userid']);
 			}
-		}
-
-		// Only administrators can set map owner.
-		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN) {
-			unset($map['userid']);
 		}
 
 		$result = API::Map()->update($map);
