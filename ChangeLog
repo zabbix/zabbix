@@ -27,7 +27,7 @@ Bug fixes:
 ..F....... [ZBX-10297] fixed changing web scenario status from list view (Cemeris)
 ..F....... [ZBX-10158] fixed threshold parameters for triggers "70% os Process CPU Load on {HOST.NAME}" and "{HOST.NAME} is not reachable" in template "JMX Generic" (Gunars)
 ..F....... [ZBXNEXT-2662] added escaping of the HTML entities and tags in the GUI notifications (Sasha)
-..F....... [ZBXNEXT-2662] added space between Auto-logout elemants in the user profile form (Sasha)
+..F....... [ZBXNEXT-2662] added space between Auto-logout elements in the user profile form (Sasha)
 ..F....... [ZBXNEXT-2662] fixed flickering of disabled radios (Pavel)
 ..F....... [ZBXNEXT-2662] fixed logo white background (Pavel)
 ..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
