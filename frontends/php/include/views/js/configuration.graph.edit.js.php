@@ -123,7 +123,7 @@
 		jQuery('#lbl_items_' + number + '_color').attr('title', '#' + color);
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
-		incrementNextColor();
+		colorPalette.incrementNextColor();
 		<?php if (!$this->data['templates']): ?>
 			rewriteNameLinks();
 		<?php endif ?>
@@ -148,7 +148,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: getNextColor(1),
+					color: colorPalette.getNextColor(),
 					name: list.values[i].name
 				},
 				itemTpl = new Template(jQuery('#itemTpl').html());
