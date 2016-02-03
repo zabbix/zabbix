@@ -4,6 +4,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-8635] fixed undefined index in trigger expression constructor popup (Cemeris)
 ..F....... [ZBX-10155] disallowed creating host prototype triggers without any host:key reference (Cemeris)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
@@ -11,7 +12,7 @@ A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gu
 ..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (Cemeris)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
@@ -1361,7 +1362,7 @@ New features:
 
 Bug fixes:
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
