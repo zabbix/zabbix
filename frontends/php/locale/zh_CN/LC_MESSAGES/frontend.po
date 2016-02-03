@@ -6,8 +6,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-03 10:48+0200\n"
-"PO-Revision-Date: 2013-08-25 15:11+0300\n"
-"Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
+"PO-Revision-Date: 2016-01-26 11:02+0300\n"
+"Last-Translator: tom3000 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1377436299.0\n"
+"X-POOTLE-MTIME: 1453798938.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -45,13 +45,13 @@ msgstr ""
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d 天%1$d 每天"
 
 #: include/blocks.inc.php:772
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
+msgstr[0] "%1$d of %2$d 问题显示%1$d of %2$d 有问题显示"
 
 #: chart4.php:91 chart5.php:105
 #, c-format
@@ -77,19 +77,19 @@ msgstr[0] "%1$s 天"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
+msgstr[0] "%1$s 事件%1$s events"
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
+msgstr[0] "%1$s 项目%1$s 条款"
 
 #: jsLoader.php:220 jsLoader.php:221 jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
+msgstr[0] "%1$s 分%1$s 分钟"
 
 #: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:66
@@ -102,7 +102,7 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
+msgstr[0] "%1$s 秒%1$s 每秒"
 
 #: app/views/layout.htmlpage.php:80 include/page_header.php:246
 #, c-format
@@ -120,7 +120,7 @@ msgstr[0] "%d个装置"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -141,7 +141,7 @@ msgstr "(无系统代理程式)"
 
 #: include/classes/setup/CSetupWizard.php:237
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - 使用默认端口"
 
 #: include/triggers.inc.php:1831 include/triggers.inc.php:1833
 #: include/triggers.inc.php:1834 include/triggers.inc.php:1836
@@ -161,7 +161,7 @@ msgstr "10秒"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "触发器TOP100"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -185,7 +185,7 @@ msgstr "最近500个值"
 
 #: app/views/administration.script.edit.php:39
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>脚本"
 
 #: include/views/monitoring.sysmap.edit.php:124
 msgid "<manual>"
@@ -227,7 +227,7 @@ msgstr "可接受的SLA"
 
 #: include/func.inc.php:1667
 msgid "Access denied"
-msgstr ""
+msgstr "访问拒绝"
 
 #: sysmap.php:74
 msgid "Access denied!"
@@ -356,7 +356,7 @@ msgstr "动作已删除"
 #: actionconf.php:416
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
+msgstr[0] "激活 禁用激活 禁用"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
@@ -369,7 +369,7 @@ msgstr ""
 #: actionconf.php:415
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
+msgstr[0] "激活 启用激活 启用"
 
 #: auditacts.php:27 include/classes/screens/CScreenActions.php:176
 #: include/menu.inc.php:168 include/screens.inc.php:31
@@ -654,7 +654,7 @@ msgstr "所有"
 
 #: include/html.inc.php:352
 msgid "All hosts"
-msgstr ""
+msgstr "所有主机"
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -662,19 +662,19 @@ msgstr "所有的连结应含 特定的名称和URL"
 
 #: include/html.inc.php:520
 msgid "All maps"
-msgstr ""
+msgstr "所有地图"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr ""
+msgstr "所有 屏幕"
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr ""
+msgstr "所有 IDE 展示"
 
 #: include/html.inc.php:306
 msgid "All templates"
-msgstr ""
+msgstr "所有模板"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:401
@@ -685,7 +685,7 @@ msgstr "容许的主机"
 
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "另外，您也可以手动安装:"
 
 #: include/triggers.inc.php:1283
 #: include/views/configuration.action.edit.php:135
@@ -694,13 +694,13 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.triggers.edit.php:104
 msgid "And"
-msgstr ""
+msgstr "和"
 
 #: include/views/configuration.action.edit.php:134
 #: include/views/configuration.action.edit.php:992
 #: include/views/configuration.host.discovery.edit.php:268
 msgid "And/Or"
-msgstr ""
+msgstr "和/或者"
 
 #: include/views/common.filter.trigger.php:35
 #: include/views/common.filter.trigger.php:45
@@ -892,11 +892,11 @@ msgstr ""
 #: include/profiles.inc.php:144
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "审计数据存储期限（天数）\"%1$s\"."
 
 #: auditlogs.php:27 include/views/administration.auditlogs.list.php:21
 msgid "Audit log"
-msgstr ""
+msgstr "审计日志"
 
 #: include/func.inc.php:244
 msgid "Aug"
@@ -969,16 +969,16 @@ msgstr "自动退出(90秒)"
 
 #: include/views/administration.general.housekeeper.edit.php:56
 msgid "Auto-registration data storage period (in days)"
-msgstr ""
+msgstr "自动注册数据存储时间（天）"
 
 #: adm.housekeeper.php:41
 msgid "Auto-registration event and alert data storage period"
-msgstr ""
+msgstr "自动注册&发现事件和报警数据保存期"
 
 #: include/profiles.inc.php:136
 #, c-format
 msgid "Auto-registration event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "自动注册事件和警报数据存储期限（天）\"%1$s\"."
 
 #: include/hosts.inc.php:1075
 #: include/views/administration.general.other.edit.php:52
