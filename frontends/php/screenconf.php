@@ -155,8 +155,12 @@ if (hasRequest('add') || hasRequest('update')) {
 			$screen['users'] = getRequest('users', []);
 			$screen['userGroups'] = getRequest('userGroups', []);
 
+			// Only administrators can set screen owner.
+			if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+				unset($screen['userid']);
+			}
 			// Screen update with inaccessible user.
-			if ($screen['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $screen['userid'] === '') {
 				$user_exist = API::User()->get([
 					'output' => ['userid'],
 					'userids' => [$screen['userid']]

@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Japanese, Korean, Polish, Russian
 ..F....... [ZBXNEXT-3124] added edit buttons in map, screen and slide show views (Ivo)
 
 Bug fixes:
+..F....... [ZBX-10345] fixed screen, map and slide show update by a simple user (Oleg)
 ...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query (Sandis)
 A.F....... [ZBX-10339] fixed undefined index "conditiontype" when adding LLD rule (Gunars)
 ..F....... [ZBX-10305] fixed incorrect menu highlighting and removed dropdown control for templated screens (Ivo)
