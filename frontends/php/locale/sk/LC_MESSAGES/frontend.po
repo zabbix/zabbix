@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-03 10:48+0200\n"
-"PO-Revision-Date: 2016-01-21 16:06+0300\n"
+"PO-Revision-Date: 2016-01-28 13:53+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,8 +13,9 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1453385211.0\n"
+"X-POOTLE-MTIME: 1453982017.0\n"
 
+# "%1$s" je očakávanáX
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C20XmlValidator.php:821
@@ -123,9 +124,9 @@ msgstr[2] "%1$s sekúnd"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "Zaznamenané %4$s neúspešné prihlásenie. Posledný pokus bol z %1$s na %2$s o %3$s."
-msgstr[1] "Zaznamenané %4$s neúspešné prihlásenia. Posledný pokus bol z %1$s na %2$s o %3$s."
-msgstr[2] "Zaznamenané %4$s neúspešných prihlásení. Posledný pokus bol z %1$s na %2$s o %3$s."
+msgstr[0] "Zaznamenané %4$s neúspešné prihlásenie. Posledný pokus bol z IP %1$s dátum %2$s o %3$s."
+msgstr[1] "Zaznamenané %4$s neúspešné prihlásenia. Posledný pokus bol z IP %1$s dátum %2$s o %3$s."
+msgstr[2] "Zaznamenané %4$s neúspešných prihlásení. Posledný pokus bol z IP %1$s dátum %2$s o %3$s."
 
 #: app/views/monitoring.discovery.view.php:134
 #, c-format
@@ -1461,7 +1462,7 @@ msgstr "Nie je možné vytvoriť prototyp grafu pre zisteného hosta \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
-msgstr "Nie je možné otvoriť ďalšie pripojenie k databáze."
+msgstr "Nie je možné otvoriť ďalšie spojenie k databáze."
 
 #: include/classes/api/services/CTrigger.php:1338
 #: include/classes/api/services/CTriggerPrototype.php:1087
@@ -2581,7 +2582,7 @@ msgstr "Nie je možné aktualizovať web scenár"
 
 #: include/views/js/configuration.discovery.edit.js.php:602
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové pripojenie k Zabbix serveru."
+msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové spojenie so Zabbix serverom."
 
 #: include/views/administration.general.regularexpressions.edit.php:46
 msgid "Case sensitive"
@@ -3114,7 +3115,7 @@ msgstr "Konfigurovať"
 #: include/classes/setup/CSetupWizard.php:41
 #: include/classes/setup/CSetupWizard.php:270
 msgid "Configure DB connection"
-msgstr "Konfigurovať pripojenie DB"
+msgstr "Konfigurovať DB spojenie"
 
 #: app/views/administration.script.edit.php:97
 msgid "Confirmation text"
@@ -3135,12 +3136,12 @@ msgstr "Pripojiť k"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Connection security"
-msgstr "Bezpečnosť pripojenia"
+msgstr "Bezpečnosť spojenia"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr "Časový limit pripojenie %1$s sekúnd vypršal pri pripájaní k Zabbix serveru \"%2$s\"."
+msgstr "Časový limit spojenie %1$s sekúnd vypršal pri spájaní so Zabbix serverom \"%2$s\"."
 
 #: include/classes/server/CZabbixServer.php:282
 #, c-format
@@ -3149,7 +3150,7 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
-"Pripojenie k Zabbix serveru \"%s\" zlyhalo. Možné dôvody:\n"
+"Spojenie so Zabbix serverom \"%s\" zlyhalo. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
 "2. Nesprávne nastavenie DNS servera.\n"
 
@@ -3162,9 +3163,9 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
-"Pripojenie k Zabbix serveru \"%s\" bolo odmietnuté. Možné dôvody:\n"
+"Spojenie so Zabbix serverom \"%s\" bolo odmietnuté. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
-"2. Bezpečnostné nastavenia (napríklad SELinux) blokujú pripojenie;\n"
+"2. Bezpečnostné nastavenia (napríklad SELinux) blokujú spojenie;\n"
 "3. Zabbix server démon nie je spustený;\n"
 "4. Firewall blokuje TCP spojenie.\n"
 
@@ -3175,33 +3176,33 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
-"Časový limit pripojenia k Zabbix serveru \"%s\" vypršal. Možné dôvody:\n"
+"Časový limit spojenia so Zabbix serverom \"%s\" vypršal. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
 "2. Firewall blokuje TCP spojenie.\n"
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr "Pripojenia"
+msgstr "Spojenia"
 
 #: include/views/configuration.host.edit.php:773
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
-msgstr "Pripojenia z hosta"
+msgstr "Spojenia z hosta"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr "Pripojenia z proxy"
+msgstr "Spojenia z proxy"
 
 #: include/views/configuration.host.edit.php:765
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
-msgstr "Pripojenia k hostovi"
+msgstr "Spojenia k hostovi"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr "Pripojenia k proxy"
+msgstr "Spojenia k proxy"
 
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
@@ -4807,7 +4808,7 @@ msgstr "Duplicitné userid \"%1$s\" v používateľoch pre obrazovky \"%2$s\"."
 #: include/classes/api/services/CMap.php:1002
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr "Duplicitné usrgrpid \"%1$s\" v používatelských skupinách pre mapu \"%2$s\"."
+msgstr "Duplicitné usrgrpid \"%1$s\" v používateľských skupinách pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:613
 #: include/classes/api/services/CScreen.php:948
@@ -6981,7 +6982,7 @@ msgstr "Ikony"
 
 #: include/func.inc.php:1670 include/func.inc.php:1689
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr "Pokiaľ si myslíte, že táto správa je zlá, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
+msgstr "Pokiaľ si myslíte, že táto správa je nesprávna, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
 #: include/maps.inc.php:779
@@ -7136,7 +7137,7 @@ msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľských skupin
 #: include/classes/api/services/CMap.php:915
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateloch pre mapu \"%2$s\"."
+msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľoch pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:524
 #: include/classes/api/services/CScreen.php:861

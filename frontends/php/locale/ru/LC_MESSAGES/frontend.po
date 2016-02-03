@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-03 10:48+0200\n"
-"PO-Revision-Date: 2016-01-20 21:18+0300\n"
-"Last-Translator: Alexey <dotneft@gmail.com>\n"
+"PO-Revision-Date: 2016-01-26 20:45+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1453317520.0\n"
+"X-POOTLE-MTIME: 1453833920.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -4916,7 +4916,7 @@ msgstr "Условие действия пустое."
 #: include/classes/api/services/CItemPrototype.php:300
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
-msgstr "Пустое имя группы элементов данных в прототипе элементов данных \"%1$s\"."
+msgstr "Пустое имя прототипа группы элементов данных в прототипе элементов данных \"%1$s\"."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
@@ -5003,7 +5003,7 @@ msgstr "Пустой ID карты сети."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
-msgstr "Путой ID типа оповещений."
+msgstr "Пустой ID типа оповещений."
 
 #: include/classes/api/services/CHostPrototype.php:222
 msgid "Empty name for group prototype."
@@ -5677,7 +5677,7 @@ msgstr "Первый"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
-msgstr "Вписать"
+msgstr "Аппроксимация"
 
 #: include/views/js/monitoring.sysmaps.js.php:35
 msgid "Fit to map"
@@ -9082,7 +9082,7 @@ msgstr "Список пользователей общего доступа"
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
 msgid "Listing of MAC addresses. Returns string"
-msgstr "Список MAC адерсов. Возвращает строка"
+msgstr "Список MAC адресов. Возвращает строку"
 
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:491
@@ -9138,7 +9138,7 @@ msgstr "Журнал (лог)"
 
 #: include/classes/items/CHelpItems.php:363
 msgid "Log file monitoring with log rotation support. Returns log"
-msgstr "Мониторинг файлов журналов с поддержкой сжатия. Возвращает лог"
+msgstr "Мониторинг файлов журналов с поддержкой ротации. Возвращает лог"
 
 #: include/classes/items/CHelpItems.php:359
 msgid "Log file monitoring. Returns log"
@@ -9521,7 +9521,7 @@ msgstr "Макс. количество отображаемых событий �
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:351
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr "Максимальное количество открытых фалов поддерживаемое ОС. Возвращает целое число"
+msgstr "Максимальное количество открытых файлов поддерживаемое ОС. Возвращает целое число"
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:355
@@ -10286,7 +10286,7 @@ msgstr "Нет элемента графика с graphid \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:534
 msgid "No graph prototype ID provided for screen element."
-msgstr "Не найдет прототип графика с таким ID для элемента комплексного экрана."
+msgstr "Не найден прототип графика с таким ID для элемента комплексного экрана."
 
 #: include/blocks.inc.php:114
 msgid "No graphs added."
@@ -14015,17 +14015,17 @@ msgstr "Метод \"%1$s.%2$s\" должен вызываться без \"auth
 #: include/classes/api/services/CScreenItem.php:984
 #, c-format
 msgid "The X coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr "X координата элемента комплексного экрана размещенного в X - %1$s b Y - %2$s на комплексном экране \"%3$s\" слишком большая."
+msgstr "X координата элемента комплексного экрана размещенного в X - %1$s и Y - %2$s на комплексном экране \"%3$s\" слишком большая."
 
 #: include/classes/api/services/CScreenItem.php:996
 #, c-format
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr "Y координата элемента комплексного экрана размещенного в X - %1$s b Y - %2$s на комплексном экране \"%3$s\" слишком большая."
+msgstr "Y координата элемента комплексного экрана размещенного в X - %1$s и Y - %2$s на комплексном экране \"%3$s\" слишком большая."
 
 #: include/views/configuration.application.list.php:97
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Группа элементов данных более не обнаруживается и будет удалена в %1$s (через %2$s %3$s)."
+msgstr "Группа элементов данных более не обнаруживается и будет удалена через %1$s (%2$s в %3$s)."
 
 #: include/views/configuration.application.list.php:92
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -14047,7 +14047,7 @@ msgstr "Веб-интерфейс не соответствует базе да�
 #: include/html.inc.php:628
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Группа узлов сети более не обнаруживается и будет удалена в %1$s (через %2$s %3$s)."
+msgstr "Группа узлов сети более не обнаруживается и будет удалена через %1$s (%2$s в %3$s)."
 
 #: include/html.inc.php:623
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -14056,7 +14056,7 @@ msgstr "Группа узлов сети более не обнаруживае�
 #: include/html.inc.php:655
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Узел сети более не обнаруживается и будет удален в %1$s (через %2$s %3$s)."
+msgstr "Узел сети более не обнаруживается и будет удален через %1$s (%2$s в %3$s)."
 
 #: include/html.inc.php:650
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
@@ -14081,7 +14081,7 @@ msgstr[2] "Изображение используется на картах с�
 #: include/html.inc.php:682
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Элемент данных более не обнаруживается и будет удален в %1$s (из %2$s в %3$s)."
+msgstr "Элемент данных более не обнаруживается и будет удален через %1$s (%2$s в %3$s)."
 
 #: include/html.inc.php:677
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."

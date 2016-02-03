@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-03 10:48+0200\n"
-"PO-Revision-Date: 2016-01-21 04:22+0300\n"
+"PO-Revision-Date: 2016-02-03 02:46+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1453342928.0\n"
+"X-POOTLE-MTIME: 1454460410.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -3109,7 +3109,7 @@ msgstr "プロキシへの接続"
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
 msgid "Constructor"
-msgstr "編集"
+msgstr "変更"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
