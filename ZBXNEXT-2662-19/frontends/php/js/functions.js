@@ -214,39 +214,35 @@ function getUniqueId() {
 }
 
 /**
- * Color palette object used for geting different colors from color pallete
+ * Color palette object used for geting different colors from color palette.
  */
 var colorPalette = (function() {
 	'use strict';
 
-	var prevColor = 0;
-
-	function incrementNextColor() {
-		prevColor++;
-		if (prevColor == 21) {
-			prevColor = 0;
-		}
-	}
+	var current_color = 0,
+		palette = [
+			'1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
+			'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
+		];
 
 	return {
 		incrementNextColor: function() {
-			incrementNextColor();
+			if (++current_color == palette.length) {
+				current_color = 0;
+			}
 		},
 
 		/**
-		 * Gets next color from pallete.
+		 * Gets next color from palette.
 		 *
 		 * @return string	hexadecimal color code
 		 */
-		getNextColor: function(paletteType) {
-			var palette = ['1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14',
-					'611F27', 'F230E0', '5CCD18', 'BB2A02', '5A2B57', '89ABF8', '7EC25C',
-					'274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
-				],
-				hexColor = palette[prevColor];
-			incrementNextColor();
+		getNextColor: function() {
+			var color = palette[current_color];
 
-			return hexColor.toUpperCase();
+			this.incrementNextColor();
+
+			return color;
 		}
 	}
 }());
