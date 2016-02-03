@@ -5,6 +5,7 @@ New features:
 ..F....... [ZBXNEXT-3124] added edit buttons in map, screen and slide show views (Ivo)
 
 Bug fixes:
+..F....... [ZBX-9784] fixed host clone form to work with prototype v1.7.1 (Gunars)
 A......... [ZBX-10325] fixed importing of host prototypes from Zabbix 2.4 (Sasha)
 A......... [ZBX-10325] fixed validation of graph items when importing XML files (Sasha)
 ...G...PS. [ZBX-9640] improved server/proxy/agent item value timestamp synchronization (wiper)
