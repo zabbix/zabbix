@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-03 10:48+0200\n"
-"PO-Revision-Date: 2016-01-13 16:34+0300\n"
-"Last-Translator: refaston <refaston@o2.pl>\n"
+"PO-Revision-Date: 2016-01-28 12:48+0300\n"
+"Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1452695653.0\n"
+"X-POOTLE-MTIME: 1453978102.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -689,11 +689,11 @@ msgstr "Wszystkie mapy"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr ""
+msgstr "Wszystkie ekrany"
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr ""
+msgstr "Wszystkie pokazy slajdów"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1930,7 +1930,7 @@ msgstr[2] "Nie można włączyć scenariuszy sieci www"
 
 #: scripts_exec.php:69
 msgid "Cannot execute script"
-msgstr ""
+msgstr "Nie można uruchomić skryptu."
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
@@ -2222,7 +2222,7 @@ msgstr "Nie można ustawić \"%1$s\" dla pozycji \"%2$s\"."
 #: include/classes/api/services/CTemplateScreen.php:629
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr ""
+msgstr "Nie można ustawić \"%1$s\" dla ekranu szablonu \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:532
 #, c-format
@@ -2232,7 +2232,7 @@ msgstr "Nie można ustawić \"%1$s\" dla wyzwalacza \"%2$s\"."
 #: include/classes/api/services/CItemPrototype.php:306
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr "nie można ustawić pola \"templateid\" dla prototypu aplikacji w prototypie pozycji \"%1$s\"."
+msgstr "Nie można ustawić pola \"templateid\" dla prototypu aplikacji w prototypie pozycji \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:433
 #, c-format
@@ -2580,7 +2580,7 @@ msgstr "Nie można zaktualizować scenariusza sieci www"
 
 #: include/views/js/configuration.discovery.edit.js.php:602
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Nie można skontrolować testów wykrywania: błędne zapytanie lub błąd połączenia z serwerem Zabbix."
+msgstr "Nie można skontrolować testów wykrywania: nieprawidłowe zapytanie lub błąd połączenia z serwerem Zabbix."
 
 #: include/views/administration.general.regularexpressions.edit.php:46
 msgid "Case sensitive"
@@ -2588,11 +2588,11 @@ msgstr "Rozróżnianie wielkości liter"
 
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
-msgstr ""
+msgstr "Wyłapuje wszystkie pułapki SNMP zgodne z wyrażeniem regularnym. Jeżeli nie określono wyrażenia wyłapuje wszystkie pułapki."
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
-msgstr ""
+msgstr "Wyłapuje wszystkie pułapki SNMP, które nie zostały wyłapane przez jakąś pozycję snmptrap[]."
 
 #: include/views/monitoring.screen.constructor.edit.php:706
 msgid "Center"
@@ -2698,7 +2698,7 @@ msgstr "Sprawdza, czy możliwe jest nawiązanie połączenia do określonego por
 
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
+msgstr "Sprawdza, czy serwer jest dostępny przy pomocy ping-a ICMP. 0 - ping ICMP nie powiódł się. 1 - ping ICMP powiódł się."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:403
@@ -3200,7 +3200,7 @@ msgstr "Połączenia do hosta"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr ""
+msgstr "Połączenia do proxy"
 
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
@@ -4631,7 +4631,7 @@ msgstr "Przestrzeń dyskowa w bajtach lub procentach ogólnej przestrzeni. Zwrac
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:551
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Statystyki zapisu na dysk. Zwraca liczbę całkowitą dla typów sectors, operations, bytes (sektory, operacje i bajty); liczbę rzeczywistą dla typów sps, ops i bps"
 
 #: adm.triggerdisplayoptions.php:43
 #: include/views/administration.general.trigger.options.edit.php:65
@@ -4718,30 +4718,30 @@ msgstr "Menu rozwijalne zapamiętuje wybrane \"%1$s\"."
 #: include/classes/api/services/CMediatype.php:451
 #, c-format
 msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr ""
+msgstr "Powtórzona wartość \"description\" (opis) \"%1$s\" dla typu mediów."
 
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
-msgstr ""
+msgstr "Powtórzona wartość \"name\" (nazwa) \"%1$s\" dla prototypu aplikacji w prototypie pozycji \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:401
 #: include/classes/api/services/CMap.php:815
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "Powtórzona wartość \"name\" (nazwa) \"%1$s\" dla mapy."
 
 #: include/classes/api/services/CScreen.php:445
 #: include/classes/api/services/CScreen.php:774
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
-msgstr ""
+msgstr "Powtórzona wartość \"name\" (nazwa) \"%1$s\" dla ekranu."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for value map."
-msgstr ""
+msgstr "Powtórzona wartość \"name\" (nazwa) \"%1$s\" dla mapy wartości."
 
 #: include/classes/api/services/CTrigger.php:1480
 #, c-format
@@ -4778,7 +4778,7 @@ msgstr "Powielony host. Już istnieje host o tej samej widocznej nazwie \"%s\"."
 #: include/classes/api/services/CValueMap.php:524
 #, c-format
 msgid "Duplicate mapping value \"%1$s\" for value map \"%2$s\"."
-msgstr ""
+msgstr "Powtórzona wartość mapowania \"%1$s\" dla mapy wartości \"%2$s\"."
 
 #: include/profiles.inc.php:91
 #, c-format
@@ -4794,25 +4794,25 @@ msgstr "Powielony alias użytkownika \"%s\"."
 #: include/classes/api/services/CMap.php:929
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Powtórzone userid (id użytkownika) \"%1$s\" w użytkownikach dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:539
 #: include/classes/api/services/CScreen.php:875
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "Powtórzone userid (id użytkownika) \"%1$s\" w użytkownikach dla ekranu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:583
 #: include/classes/api/services/CMap.php:1002
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Powtórzone usrgrpid (id grupy użytkowników) \"%1$s\" w grupie użytkowników dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:613
 #: include/classes/api/services/CScreen.php:948
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "Powtórzone usrgrpid (id grupy użytkowników) \"%1$s\" w grupie użytkowników dla ekranu \"%2$s\"."
 
 #: events.php:421 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -5003,7 +5003,7 @@ msgstr "Puste ID mapy."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
-msgstr ""
+msgstr "Puste ID typu mediów."
 
 #: include/classes/api/services/CHostPrototype.php:222
 msgid "Empty name for group prototype."
@@ -5026,7 +5026,7 @@ msgstr "Pusta nazwa."
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
 msgid "Empty new value in value map \"%1$s\"."
-msgstr ""
+msgstr "Pusta nowa wartość w mapie wartości \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:369
 msgid "Empty parameters"
@@ -5047,15 +5047,15 @@ msgstr "Puste ID ekranu dla szablonu ekranu."
 
 #: include/classes/api/services/CScreen.php:727
 msgid "Empty screen ID."
-msgstr ""
+msgstr "Puste ID ekranu."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
-msgstr "Pusty okres czasu."
+msgstr "Pusty okres."
 
 #: include/classes/api/services/CValueMap.php:396
 msgid "Empty value map ID."
-msgstr ""
+msgstr "Puste ID mapy wartości."
 
 #: include/classes/api/services/CHttpTest.php:298
 msgid "Empty web scenario ID."
@@ -5277,7 +5277,7 @@ msgstr "Lista zdarzeń [poprzednie 20]"
 
 #: include/classes/items/CHelpItems.php:347
 msgid "Event log monitoring. Returns log"
-msgstr ""
+msgstr "Monitorowanie logu zdarzeń. Zwraca log"
 
 #: include/views/configuration.action.list.php:27
 msgid "Event source"
@@ -5326,7 +5326,7 @@ msgstr "Błąd wykonania SQL [%1$s] w [%2$s]."
 #: include/classes/items/CHelpItems.php:329
 #: include/classes/items/CHelpItems.php:611
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Wykonuje zapytanie WMI i zwraca pierwszy wybrany obiekt. Zwraca liczbę całkowitą, zmiennoprzecinkową, ciąg znaków lub tekst (zależnie od zapytania)"
 
 #: app/views/administration.script.edit.php:50
 #: app/views/administration.script.list.php:44
@@ -5474,7 +5474,7 @@ msgstr "Audyt niepowodzeń"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
-msgstr ""
+msgstr "Błąd fatalny, proszę zgłosić do zespołu Zabbix"
 
 #: app/views/monitoring.dashboard.view.php:45 jsLoader.php:189
 msgid "Favourite graphs"
@@ -5527,19 +5527,19 @@ msgstr "Pole \"%1$s\" jest wymagane."
 #: include/classes/api/services/CMap.php:558
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "Brak wartości w polu \"%1$s\" dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:475
 #: include/classes/api/services/CMediatype.php:808
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
-msgstr ""
+msgstr "Brak wartości w polu \"%1$s\" dla typu mediów \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:588
 #, c-format
 msgid "Field \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "Brak wartości w polu \"%1$s\" dla ekranu \"%2$s\"."
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5559,7 +5559,7 @@ msgstr "Pole \"%1$s\" nie zawiera ciągu znaków."
 #: include/classes/api/services/CMediatype.php:802
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
-msgstr ""
+msgstr "Pole \"%1$s\" jest wymagane dla typu mediów \"%2$s\"."
 
 #: include/validate.inc.php:289
 #, c-format
@@ -5581,7 +5581,7 @@ msgstr "Pole \"name\" jest wymagane."
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:555
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
-msgstr ""
+msgstr "Suma kontrolna pliku, obliczana przez algorytm UNIX cksum. Zwraca liczbę całkowitą"
 
 #: include/classes/api/services/CImage.php:562
 msgid "File format is unsupported."
@@ -5600,12 +5600,12 @@ msgstr "Plik udostępniony do oglądania nie istnieje. Próbowano wyszukać \"%s
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:579
 msgid "File size (in bytes). Returns integer"
-msgstr ""
+msgstr "Rozmiar pliku (w bajtach). Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:583
 msgid "File time information. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Informacja o czasie pliku. Zwraca liczbę całkowitą (znacznik czasu Unix)"
 
 #: include/graphs.inc.php:57
 msgid "Filled region"
@@ -5650,17 +5650,17 @@ msgstr "Wyszukaj ciąg V w ostatniej (aktualnej) wartości. N NOT 1 - jeśli zna
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:575
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
-msgstr ""
+msgstr "Szuka ciągu w pliku. Zwraca 0 - nie znaleziono; 1 - znaleziono"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:571
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Szuka ciągu w pliku. Zwraca linię zawierającą zgodny ciąg, lub określoną w opcjonalnym parametrze output (wyjście)"
 
 #: include/classes/items/CHelpItems.php:325
 #: include/classes/items/CHelpItems.php:607
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Szuka ciągu na stronie www. Zwraca zgodny ciąg, lub określony w opcjonalnym parametrze output (wyjście)"
 
 #: include/classes/setup/CSetupWizard.php:118
 msgid "Finish"
@@ -5677,7 +5677,7 @@ msgstr "Pierwszy"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
-msgstr ""
+msgstr "Dopasowanie"
 
 #: include/views/js/monitoring.sysmaps.js.php:35
 msgid "Fit to map"
@@ -5695,7 +5695,7 @@ msgstr "Stały"
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
-msgstr ""
+msgstr "Elastyczny"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -5707,19 +5707,19 @@ msgstr "Hasło użytkownika guest musi być puste"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "Prognoza na najbliższe t sekund w oparciu o okres T jest < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "Prognoza na najbliższe t sekund w oparciu o okres T jest = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "Prognoza na najbliższe t sekund w oparciu o okres T jest > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "Prognoza na najbliższe t sekund w oparciu o okres T NIE jest N"
 
 #: include/items.inc.php:1310 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -5812,7 +5812,7 @@ msgstr "Wygenerowano w %s sek"
 
 #: include/locales.inc.php:61
 msgid "Georgian (ka_GE)"
-msgstr ""
+msgstr "Gruziński (ka_GE)"
 
 #: include/locales.inc.php:62
 msgid "German (de_DE)"
@@ -5821,7 +5821,7 @@ msgstr "Niemiecki (de_DE)"
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:599
 msgid "Get content of web page. Returns web page source as text"
-msgstr ""
+msgstr "Pobiera zawartość strony www. Zwraca źródło strony www jako tekst"
 
 #: include/triggers.inc.php:1359 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -5841,7 +5841,7 @@ msgstr "Skrypty globalne"
 
 #: include/views/hostmacros.php:46
 msgid "Global value"
-msgstr ""
+msgstr "Wartość globalna"
 
 #: jsLoader.php:198
 msgid "Go to"
@@ -6195,7 +6195,7 @@ msgstr "Sprzęt (wszystkie informacje)"
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:443
 msgid "Hardware sensor reading. Returns float"
-msgstr ""
+msgstr "Odczyt czujnika sprzętowego. Zwraca liczbę zmiennoprzecinkową"
 
 #: include/views/configuration.httpconf.edit.php:110
 #: include/views/configuration.httpconf.popup.php:97
@@ -6230,7 +6230,7 @@ msgstr "Ukryj wszystko"
 
 #: include/html.inc.php:873
 msgid "Hide debug"
-msgstr ""
+msgstr "Ukryj śledzenie"
 
 #: include/views/monitoring.history.php:155
 msgid "Hide selected"
@@ -6256,7 +6256,7 @@ msgstr "Historia"
 
 #: include/forms.inc.php:543
 msgid "History (in days)"
-msgstr ""
+msgstr "Historia (w dniach)"
 
 #: httpconf.php:184 httpconf.php:191 httpconf.php:440 httpconf.php:452
 #: items.php:555 items.php:562 items.php:850 items.php:862
@@ -6499,7 +6499,7 @@ msgstr "Typ etykiety hosta"
 
 #: include/views/hostmacros.php:173
 msgid "Host macros"
-msgstr ""
+msgstr "Makra hosta"
 
 #: include/actions.inc.php:62
 msgid "Host metadata"
@@ -6762,7 +6762,7 @@ msgstr "Pola IP oraz DNS interfejsu hosta nie mogą być puste."
 
 #: include/views/configuration.host.list.php:41
 msgid "IP like"
-msgstr ""
+msgstr "IP podobne do"
 
 #: include/views/configuration.discovery.edit.php:51
 #: include/views/configuration.discovery.list.php:38
@@ -7102,7 +7102,7 @@ msgstr "W trakcie"
 #: include/views/monitoring.sysmap.edit.php:87
 #: include/views/monitoring.sysmap.edit.php:92
 msgid "Inaccessible user"
-msgstr ""
+msgstr "Niedostępny użytkownik"
 
 #: tr_logform.php:275 tr_logform.php:308
 msgid "Include"
@@ -7111,49 +7111,49 @@ msgstr "Zawrzyj"
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:379
 msgid "Incoming traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Statystyka ruchu przychodzącego interfejsu sieciowego. Zwraca liczbę całkowitą"
 
 #: include/classes/api/services/CMap.php:436
 #: include/classes/api/services/CMap.php:871
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Błędna wartość \"height\" (wysokość) dla mapy \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:568
 #: include/classes/api/services/CMap.php:988
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość \"permission\" (uprawnienie) \"%1$s\" w grupach użytkowników dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:598
 #: include/classes/api/services/CScreen.php:934
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość \"permission\" (uprawnienie) \"%1$s\" w grupach użytkowników dla ekranu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:494
 #: include/classes/api/services/CMap.php:915
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość \"permission\" (uprawnienie) \"%1$s\" w użytkownikach dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:524
 #: include/classes/api/services/CScreen.php:861
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość \"permission\" (uprawnienie) \"%1$s\" w użytkownikach dla ekranu \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:455
 #: include/classes/api/services/CMap.php:877
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość \"private\" (prywatne) \"%1$s\" dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:485
 #: include/classes/api/services/CScreen.php:823
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość \"private\" (prywatne) \"%1$s\" dla ekranu \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1131
 #, c-format
@@ -7164,7 +7164,7 @@ msgstr "Błędna wartość pola \"soft\" dla zależności usługi \"%1$s\"."
 #: include/classes/api/services/CMap.php:865
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "Błędna wartość \"width\" (szerokość) dla mapy \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:641
 #: include/classes/api/services/CMap.php:648
@@ -7580,7 +7580,7 @@ msgstr "Podano błędne pole inwentarza \"%s\"."
 
 #: include/classes/api/services/CAction.php:1462
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "Błędny tryb inwentarza w operacji akcji."
 
 #: include/classes/api/services/CScreenItem.php:727
 #, c-format
@@ -7653,7 +7653,7 @@ msgstr "Błędne ID mapy \"%1$s\" dla elementu ekranu."
 
 #: include/classes/api/services/CMap.php:782
 msgid "Incorrect map ID."
-msgstr ""
+msgstr "Błędne ID mapy."
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
@@ -7661,7 +7661,7 @@ msgstr "Błędna ilość maksymalna kolumn dla elementu ekranu."
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
-msgstr ""
+msgstr "Błędne ID typu mediów."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7832,18 +7832,18 @@ msgstr "Błędny motyw dla użytkownika \"%1$s\"."
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr "Błędny okres czasu \"%1$s\" dzień początkowy musi być mniejszy lub równy z dniem końcowym."
+msgstr "Błędny okres \"%1$s\" dzień początkowy musi być mniejszy lub równy z dniem końcowym."
 
 #: include/classes/validators/CTimePeriodValidator.php:105
 #, c-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr "Błędny okres czasu \"%1$s\" czas początkowy musi być mniejszy od czasu końcowego."
+msgstr "Błędny okres \"%1$s\" czas początkowy musi być mniejszy od czasu końcowego."
 
 #: include/classes/validators/CTimePeriodValidator.php:89
 #: include/classes/validators/CTimePeriodValidator.php:94
 #, c-format
 msgid "Incorrect time period \"%1$s\"."
-msgstr "Błędny okres czasu \"%1$s\"."
+msgstr "Błędny okres \"%1$s\"."
 
 #: include/classes/api/services/CService.php:993
 #, c-format
@@ -7908,25 +7908,25 @@ msgstr "Błędny typ obliczenia dla reguły wykrywania \"%1$s\"."
 #: include/classes/api/services/CMap.php:950
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Błędne ID użytkownika określone dla mapy \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:560
 #: include/classes/api/services/CScreen.php:896
 #, c-format
 msgid "Incorrect user ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "Błędne ID użytkownika określone dla ekranu \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:600
 #: include/classes/api/services/CMap.php:1019
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "Błędne ID grupy użytkowników określone dla mapy \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:630
 #: include/classes/api/services/CScreen.php:965
 #, c-format
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "Błędne ID grupy użytkowników określone dla ekranu \"%1$s\"."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -7983,7 +7983,7 @@ msgstr "Błędna wartość \"%1$s\" dla pola całkowitego bez znaku \"%2$s\"."
 #: include/classes/api/services/CMediatype.php:783
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "Błędna wartość \"%1$s\" w polu \"%2$s\" dla typu mediów \"%3$s\"."
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:418
@@ -7991,7 +7991,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "Błędna wartość dla pola \"%1$s\": %2$s."
 
 #: include/validate.inc.php:319
 #, c-format
@@ -8000,28 +8000,28 @@ msgstr "Błędna wartość dla pola \"%1$s\": nie może być puste."
 
 #: include/classes/api/services/CValueMap.php:397
 msgid "Incorrect value map ID."
-msgstr ""
+msgstr "Błędna wartość ID mapy."
 
 #: include/classes/api/services/CHost.php:1558
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr ""
+msgstr "Użyto błędnej wartości w polu PSK. Powinna zawierać parzystą liczbę znaków heksadecymalnych."
 
 #: include/classes/api/services/CHost.php:1541
 msgid "Incorrect value used for connections from host field."
-msgstr ""
+msgstr "Użyto błędnej wartości dla połączeń z pola host."
 
 #: include/classes/api/services/CProxy.php:651
 msgid "Incorrect value used for connections from proxy field."
-msgstr ""
+msgstr "Użyto błędnej wartości dla połączeń z pola proxy."
 
 #: include/classes/api/services/CHost.php:1537
 msgid "Incorrect value used for connections to host field."
-msgstr ""
+msgstr "Użyto błędnej wartości dla połączeń z pola host."
 
 #: include/classes/api/services/CProxy.php:646
 msgid "Incorrect value used for connections to proxy field."
-msgstr ""
+msgstr "Użyto błędnej wartości dla połączeń z pola proxy."
 
 #: include/classes/api/services/CProxy.php:726
 #: include/classes/api/services/CProxy.php:824
@@ -8064,15 +8064,15 @@ msgstr "Informacja"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:447
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr ""
+msgstr "Informacje o usłudze. Zwraca liczbę całkowitą dla parametrów state, startup; ciąg znaków - dla parametrów displayname, path, user; tekst - dla parametru description; Specyficzne dla state: 0 - działa, 1 - wstrzymany, 2 - w trakcie uruchamiania, 3 - w trakcie wstrzymywania, 4 - w trakcie wznawiania, 5 - w trakcie zatrzymywania, 6 - zatrzymany, 7 - nieznany, 255 - nie ma takiej usługi; Specyficzne dla startup: 0 - automatyczny, 1 - automatyczny opóźniony, 2 - ręczny, 3 - wyłączony, 4 - nieznany"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and host macros"
-msgstr ""
+msgstr "Makra dziedziczone i hosta"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and template macros"
-msgstr ""
+msgstr "Makra dziedziczone i szablonu"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -8086,7 +8086,7 @@ msgstr "Wprowadź wyrażenie"
 #: include/classes/setup/CSetupWizard.php:53
 #: include/classes/setup/CSetupWizard.php:405
 msgid "Install"
-msgstr ""
+msgstr "Instalacja"
 
 #: setup.php:101
 msgid "Installation"
@@ -8182,22 +8182,22 @@ msgstr "Interwał"
 #: include/classes/validators/CIPValidator.php:49
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
-msgstr "Błędny adres IP \"%1$s\"."
+msgstr "Nieprawidłowy adres IP \"%1$s\"."
 
 #: include/classes/validators/CIPValidator.php:37
 #, c-format
 msgid "Invalid IP address \"%1$s\": must be a string."
-msgstr "Błędny adres IP \"%1$s\": musi być ciągiem znaków."
+msgstr "Nieprawidłowy adres IP \"%1$s\": musi być ciągiem znaków."
 
 #: include/classes/validators/CIPRangeValidator.php:74
 #, c-format
 msgid "Invalid IP address range \"%1$s\"."
-msgstr "Błędny zakres adresów IP \"%1$s\"."
+msgstr "Nieprawidłowy zakres adresów IP \"%1$s\"."
 
 #: include/classes/validators/CIPRangeValidator.php:56
 #, c-format
 msgid "Invalid IP address range \"%1$s\": must be a string."
-msgstr "Błędny zakres adresów IP \"%1$s\": musi być ciągiem znaków."
+msgstr "Nieprawidłowy zakres adresów IP \"%1$s\": musi być ciągiem znaków."
 
 #: include/classes/core/CJsonRpc.php:170
 msgid "Invalid JSON. An error occurred on the server while parsing the JSON text."
@@ -8225,7 +8225,7 @@ msgstr "Nieprawidłowe żądanie."
 #: include/classes/import/validators/CXmlValidator.php:62
 #, c-format
 msgid "Invalid XML tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nieprawidłowy tag XML \"%1$s\": %2$s."
 
 #: maintenance.php:144 maintenance.php:158 services.php:187 services.php:201
 #, c-format
@@ -8239,7 +8239,7 @@ msgstr "Nieprawidłowy pierwszy parametr."
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowe opóźnienie elastycznego okresu: \"%1$s\" przekracza maksymalne opóźnienie \"%2$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8256,97 +8256,97 @@ msgstr "Nieprawidłowy hostid dla makra \"%1$s\"."
 #: items.php:601
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:395
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": %2$s."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:306
 #: include/classes/validators/CItemDelayFlexValidator.php:321
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hour step \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy krok godzin \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:269
 #: include/classes/validators/CItemDelayFlexValidator.php:282
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hours \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowe godziny \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:375
 #: include/classes/validators/CItemDelayFlexValidator.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minute step \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy krok minut \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:338
 #: include/classes/validators/CItemDelayFlexValidator.php:351
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minutes \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowe minuty \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:127
 #: include/classes/validators/CItemDelayFlexValidator.php:140
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy dzień miesiąca \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:165
 #: include/classes/validators/CItemDelayFlexValidator.php:180
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day step \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy krok dnia miesiąca \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:446
 #: include/classes/validators/CItemDelayFlexValidator.php:461
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid second step \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy krok sekund \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:408
 #: include/classes/validators/CItemDelayFlexValidator.php:421
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid seconds \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowe sekundy \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:198
 #: include/classes/validators/CItemDelayFlexValidator.php:211
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy dzień tygodnia \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:236
 #: include/classes/validators/CItemDelayFlexValidator.php:251
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day step \"%2$s\"."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": nieprawidłowy krok dnia tygodnia \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": godzina początkowa musi być mniejsza lub równa godzinie końcowej."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
 msgid "Invalid interval \"%1$s\": starting minute must be less or equal to ending minute."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": minuta początkowa musi być mniejsza lub równa minucie końcowej."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:151
 #, c-format
 msgid "Invalid interval \"%1$s\": starting month day must be less or equal to ending month day."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": miesiąc początkowy musi być mniejszy lub równy miesiącowi końcowemu."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:432
 #, c-format
 msgid "Invalid interval \"%1$s\": starting second must be less or equal to ending second."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": sekunda początkowa musi być mniejsza lub równa sekundzie końcowej."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:222
 #, c-format
 msgid "Invalid interval \"%1$s\": starting week day must be less or equal to ending week day."
-msgstr ""
+msgstr "Nieprawidłowy okres \"%1$s\": dzień tygodnia początkowy musi być mniejszy lub równy z dniem tygodnia końcowym."
 
 #: include/classes/api/services/CDiscoveryRule.php:42
 #, c-format
@@ -8366,12 +8366,12 @@ msgstr "Nieprawidłowy klucz \"%1$s\" dla prototypu pozycji \"%2$s\" w \"%3$s\":
 #: discoveryconf.php:103 include/classes/api/services/CDRule.php:251
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr "nieprawidłowy klucz \"%1$s\": %2$s."
+msgstr "Nieprawidłowy klucz \"%1$s\": %2$s."
 
 #: include/classes/api/services/CUserMacro.php:650
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nieprawidłowe makro \"%1$s\": \"%2$s\"."
 
 #: maintenance.php:324
 msgid "Invalid maintenance period"
@@ -8417,7 +8417,7 @@ msgstr "Nieprawidłowy trzeci parametr."
 #: include/classes/mvc/CView.php:80
 #, c-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
-msgstr "Podano błędną nazwę widoku \"%s\". Dozwolone znaki: \"a-z\" and \".\"."
+msgstr "Podano nieprawidłową nazwę widoku \"%s\". Dozwolone znaki: \"a-z\" and \".\"."
 
 #: include/menu.inc.php:127
 #: include/views/configuration.host.massupdate.php:388
@@ -8451,7 +8451,7 @@ msgstr "Problem"
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
-msgstr ""
+msgstr "Wydawca"
 
 #: include/classes/api/services/CUser.php:141
 msgid "It is not possible to filter by user password."
@@ -8795,7 +8795,7 @@ msgstr "Klucz \"%1$s\" nie pasuje do wyrażenia <grpmax|grpmin|grpsum|grpavg>[\"
 
 #: include/forms.inc.php:576
 msgid "Key like"
-msgstr ""
+msgstr "Klucz podobny do"
 
 #: include/views/configuration.action.edit.php:850
 #: include/views/js/common.item.edit.js.php:237
@@ -9061,7 +9061,7 @@ msgstr "Połączono z"
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:313
 msgid "Links"
-msgstr ""
+msgstr "Łącza"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -9071,33 +9071,33 @@ msgstr "Lista jest pusta"
 #: include/views/monitoring.slideconf.edit.php:244
 #: include/views/monitoring.sysmap.edit.php:347
 msgid "List of user group shares"
-msgstr ""
+msgstr "Lista współdzielonych grup użytkowników"
 
 #: include/views/monitoring.screen.edit.php:201
 #: include/views/monitoring.slideconf.edit.php:249
 #: include/views/monitoring.sysmap.edit.php:352
 msgid "List of user shares"
-msgstr ""
+msgstr "Lista współdzielonych użytkowników"
 
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
 msgid "Listing of MAC addresses. Returns string"
-msgstr ""
+msgstr "Lista adresów MAC. Zwraca ciąg znaków"
 
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:491
 msgid "Listing of PCI or USB devices. Returns text"
-msgstr ""
+msgstr "Lista urządzeń PCI lub USB. Zwraca tekst"
 
 #: include/classes/items/CHelpItems.php:237
 #: include/classes/items/CHelpItems.php:519
 msgid "Listing of installed packages. Returns text"
-msgstr ""
+msgstr "Lista zainstalowanych pakietów. Zwraca tekst"
 
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:451
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
-msgstr ""
+msgstr "Lista usług. Zwraca 0 - jeżeli pusta; tekst - lista usług roddzielonych znakami nowej linii"
 
 #: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
@@ -9106,11 +9106,11 @@ msgstr "Litewski (lt_LT)"
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:603
 msgid "Loading time of full web page (in seconds). Returns float"
-msgstr ""
+msgstr "Czas ładowania całej strony www (w sekundach). Zwraca liczbę zmiennoprzecinkową"
 
 #: include/classes/screens/CScreenClock.php:92
 msgid "Local"
-msgstr ""
+msgstr "Lokalny"
 
 #: include/classes/screens/CScreenHistory.php:147
 #: include/views/monitoring.screen.constructor.edit.php:610
@@ -9138,11 +9138,11 @@ msgstr "Log"
 
 #: include/classes/items/CHelpItems.php:363
 msgid "Log file monitoring with log rotation support. Returns log"
-msgstr ""
+msgstr "Monitorowanie pliku logu z obsługą rotacji. Zwraca log"
 
 #: include/classes/items/CHelpItems.php:359
 msgid "Log file monitoring. Returns log"
-msgstr ""
+msgstr "Monitorowanie pliku logu. Zwraca log"
 
 #: popup_trexpr.php:520
 msgid "Log severity of the last log entry is < N"
@@ -9227,7 +9227,7 @@ msgstr "Niskopoziomowa reguła wykrywania w stanie \"niewspierany\""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1636
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:125
 msgctxt "Monday short"
@@ -9262,7 +9262,7 @@ msgstr "MD5"
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:567
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
-msgstr ""
+msgstr "Suma kontrolna MD5. Zwraca ciąg znaków (hash MD5 pliku)"
 
 #: include/audit.inc.php:49
 #: include/views/administration.general.macros.edit.php:33
@@ -9405,7 +9405,7 @@ msgstr "Mapa"
 #: include/classes/api/services/CMap.php:831
 #, c-format
 msgid "Map \"%1$s\" already exists."
-msgstr ""
+msgstr "Mapa \"%1$s\" już istnieje."
 
 #: include/classes/api/services/CMap.php:503
 #: include/classes/api/services/CMap.php:577
@@ -9413,11 +9413,11 @@ msgstr ""
 #: include/classes/api/services/CMap.php:996
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "Mapa \"%1$s\" jest publiczna i współdzielenie w trybie tylko do odczytu jest zabronione."
 
 #: include/views/js/monitoring.sysmaps.js.php:2
 msgid "Map element"
-msgstr ""
+msgstr "Element mapy"
 
 #: sysmap.php:83
 msgid "Map is updated! Return?"
@@ -9429,12 +9429,12 @@ msgstr "Typ etykiety mapy"
 
 #: include/classes/api/services/CMap.php:801
 msgid "Map name cannot be empty."
-msgstr ""
+msgstr "Nazwa mapy nie może być pusta."
 
 #: include/classes/api/services/CMap.php:443
 #: include/classes/api/services/CMap.php:849
 msgid "Map owner cannot be empty."
-msgstr ""
+msgstr "Właściciel mapy nie może być pusty."
 
 #: sysmap.php:86
 msgid "Map update failed."
@@ -9447,7 +9447,7 @@ msgstr "Mapowanie na"
 #: include/classes/api/services/CValueMap.php:501
 #, c-format
 msgid "Mapping is missing parameters: %1$s for value map \"%2$s\"."
-msgstr ""
+msgstr "Brakuje parametru mapowania: %1$s dla mapy wartości \"%2$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/administration.general.valuemapping.edit.php:71
@@ -9521,20 +9521,20 @@ msgstr "Maksymalna pokazywana liczba zdarzeń na wyzwalacz"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:351
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr ""
+msgstr "Maksymalna liczba otwartych plików obsługiwana przez OS. Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:355
 msgid "Maximum number of processes supported by OS. Returns integer"
-msgstr ""
+msgstr "Maksymalna liczba procesów obsługiwana przez OS. Zwraca liczbę całkowitą"
 
 #: include/classes/screens/CScreenBase.php:361 include/graphs.inc.php:415
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] "Maksymalny okres czasu do wyświetlenia to %1$s dzień."
-msgstr[1] "Maksymalny okres czasu do wyświetlenia to %1$s dni."
-msgstr[2] "Maksymalny okres czasu do wyświetlenia to %1$s dni."
+msgstr[0] "Maksymalny okres do wyświetlenia to %1$s dzień."
+msgstr[1] "Maksymalny okres do wyświetlenia to %1$s dni."
+msgstr[2] "Maksymalny okres do wyświetlenia to %1$s dni."
 
 #: popup_trexpr.php:306
 msgid "Maximum value for period T is < N"
@@ -9577,7 +9577,7 @@ msgstr "Typ mediów"
 #: include/classes/api/services/CMediatype.php:439
 #, c-format
 msgid "Media type \"%1$s\" already exists."
-msgstr ""
+msgstr "Typ mediów \"%1$s\" już istnieje."
 
 #: app/controllers/CControllerMediatypeCreate.php:139
 msgid "Media type added"
@@ -9607,7 +9607,7 @@ msgstr[2] "Włączono typy mediów"
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
 msgid "Media type is missing parameters: %1$s"
-msgstr ""
+msgstr "Brakuje parametrów typu mediów: %1$s"
 
 #: app/controllers/CControllerMediatypeUpdate.php:153
 msgid "Media type updated"
@@ -9631,17 +9631,17 @@ msgstr "Członkowie"
 #: include/classes/debug/CProfiler.php:139
 #, c-format
 msgid "Memory limit: %1$s"
-msgstr ""
+msgstr "Ograniczenie pamięci: %1$s"
 
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:595
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Rozmiar pamięci w bajtach lub procentach z ogółem. Zwraca liczbę całkowitą dla bajtów; liczbę zmiennoprzecinkową dla procentów"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:431
 msgid "Memory used by process in bytes. Returns integer"
-msgstr ""
+msgstr "Pamięć użyta przez proces w bajtach. Zwraca liczbę całkowitą"
 
 #: app/views/monitoring.acknowledge.edit.php:25
 #: app/views/monitoring.acknowledge.edit.php:34 include/acknow.inc.php:49
@@ -9722,9 +9722,9 @@ msgstr "Minimalny poziom"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Minimalny okres do wyświetlenia to %1$s minuta."
+msgstr[1] "Minimalny okres do wyświetlenia to %1$s minut."
+msgstr[2] "Minimalny okres do wyświetlenia to %1$s minuty."
 
 #: include/views/common.filter.trigger.php:71
 #: include/views/monitoring.sysmap.edit.php:212
@@ -9763,7 +9763,7 @@ msgstr "Brakujące pole \"itemid\" dla pozycji."
 #: include/classes/api/services/CItemPrototype.php:294
 #, c-format
 msgid "Missing \"name\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "Brakujące pole \"name\" dla prototypu aplikacji w prototypie pozycji \"%1$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
@@ -9964,7 +9964,7 @@ msgstr "Nazwa dla prototypu grupy \"%1$s\" musi zawierać makra."
 
 #: include/forms.inc.php:556 include/views/configuration.host.list.php:35
 msgid "Name like"
-msgstr ""
+msgstr "Nazwa podobna do"
 
 #: include/views/administration.general.housekeeper.edit.php:50
 msgid "Network discovery data storage period (in days)"
@@ -9982,7 +9982,7 @@ msgstr "Okres przechowywania danych zdarzeń i alarmów dla wykrywania sieci (w 
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:383
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
-msgstr ""
+msgstr "Lista interfejsów sieciowych (zawiera typ interfejsu, stan, adres IPv4, opis). Zwraca tekst"
 
 #: sysmaps.php:198
 msgid "Network map added"
@@ -10029,7 +10029,7 @@ msgstr "Nowa aplikacja"
 
 #: include/views/configuration.item.prototype.edit.php:385
 msgid "New application prototype"
-msgstr ""
+msgstr "Nowy prototyp aplikacji"
 
 #: include/views/configuration.action.edit.php:356
 msgid "New condition"
@@ -10060,7 +10060,7 @@ msgstr "Nowy czas obsługi"
 #: include/classes/setup/CSetupWizard.php:272
 #: include/classes/setup/CSetupWizard.php:342
 msgid "Next step"
-msgstr ""
+msgstr "Następny krok"
 
 #: events.php:750 include/events.inc.php:377 include/func.inc.php:1989
 #: include/triggers.inc.php:1227
@@ -10088,12 +10088,12 @@ msgstr "Nie podano \"%1$s\" dla prototypu hosta."
 #: include/classes/api/services/CMap.php:780
 #, c-format
 msgid "No \"%1$s\" given for map."
-msgstr ""
+msgstr "Nie podano \"%1$s\" dla mapy."
 
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
 msgid "No \"%1$s\" given for media type."
-msgstr ""
+msgstr "Nie podano \"%1$s\" dla typu mediów."
 
 #: include/classes/api/services/CScreen.php:726
 #: include/classes/api/services/CScreen.php:987
@@ -10109,7 +10109,7 @@ msgstr "Nie podano \"%1$s\" dla ekranu szablonu."
 #: include/classes/api/services/CValueMap.php:395
 #, c-format
 msgid "No \"%1$s\" given for value map."
-msgstr ""
+msgstr "Nie podano \"%1$s\" dla mapy wartości."
 
 #: include/classes/api/services/CHttpTest.php:297
 #, c-format
@@ -10213,7 +10213,7 @@ msgstr "Nie zdefiniowano żadnych warunków."
 #: include/classes/screens/CScreenClock.php:74
 #: include/classes/screens/CScreenClock.php:78
 msgid "No data"
-msgstr ""
+msgstr "Brak danych"
 
 #: include/views/configuration.maintenance.edit.php:44
 #: include/views/configuration.maintenance.list.php:65
@@ -10222,15 +10222,15 @@ msgstr "Bez zbierania danych"
 
 #: include/classes/html/CTableInfo.php:30
 msgid "No data found."
-msgstr ""
+msgstr "Nie znaleziono danych."
 
 #: popup_trexpr.php:578
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr "Nie otrzymano danych w okresie czasu T, wtedy N = 1, 0 - w przeciwnym przypadku"
+msgstr "Nie otrzymano danych w okresie T, wtedy N = 1, 0 - w przeciwnym przypadku"
 
 #: popup_trexpr.php:583
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr "Nie otrzymano danych w okresie czasu T, wtedy N NOT 1, 0 - w przeciwnym przypadku"
+msgstr "Nie otrzymano danych w okresie T, wtedy N NOT 1, 0 - w przeciwnym przypadku"
 
 #: include/classes/api/services/CHostInterface.php:811
 #, c-format
@@ -10260,7 +10260,7 @@ msgstr "Nie podano żadnego identifykatora reguł wykrywania."
 #: include/views/configuration.host.prototype.edit.php:352
 #: include/views/configuration.host.prototype.edit.php:359
 msgid "No encryption"
-msgstr ""
+msgstr "Brak szyfrowania"
 
 #: include/blocks.inc.php:731 include/blocks.inc.php:815 tr_status.php:673
 msgid "No events"
@@ -10376,7 +10376,7 @@ msgstr "Brak interfejsów dla hosta \"%s\"."
 
 #: include/classes/api/services/CAction.php:1457
 msgid "No inventory mode specified for action operation."
-msgstr ""
+msgstr "Nie określono trybu inwentarza w operacji akcji."
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
@@ -10617,7 +10617,7 @@ msgstr "Normalny"
 
 #: app/views/administration.mediatype.edit.php:76
 msgid "Normal password"
-msgstr ""
+msgstr "Normalne hasło"
 
 #: include/html.inc.php:178
 msgid "Normal view"
@@ -10707,11 +10707,11 @@ msgstr "Teraz"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:467
 msgid "Number of CPUs. Returns integer"
-msgstr ""
+msgstr "Liczba CPU. Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "Number of enabled items on the host."
-msgstr ""
+msgstr "Liczba włączonych pozycji na hoście."
 
 #: include/blocks.inc.php:478 include/blocks.inc.php:479
 msgid "Number of hosts (enabled/disabled/templates)"
@@ -10740,7 +10740,7 @@ msgstr "Liczba monitorowanych hostów"
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:375
 msgid "Number of out-of-window collisions. Returns integer"
-msgstr ""
+msgstr "Liczba kolizji poza-oknem. Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:691
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -10772,7 +10772,7 @@ msgstr "Liczba sekund od rozpoczęcia epoki NIE jest = N"
 
 #: include/views/monitoring.slideconf.list.php:47
 msgid "Number of slides"
-msgstr ""
+msgstr "Liczba slajdów"
 
 #: include/views/reports.toptriggers.php:121
 msgid "Number of status changes"
@@ -10813,7 +10813,7 @@ msgstr "Liczba niewspieranych pozycji w bazie danych Zabbix."
 
 #: include/classes/items/CHelpItems.php:891
 msgid "Number of unsupported items on the host."
-msgstr ""
+msgstr "Liczba niewspieranych pozycji na hoście."
 
 #: include/blocks.inc.php:505
 msgid "Number of users (online)"
@@ -10822,7 +10822,7 @@ msgstr "Liczba użytkowników (zalogowanych)"
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:543
 msgid "Number of users logged in. Returns integer"
-msgstr ""
+msgstr "Liczba zalogowanych użytkowników. Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:867
 msgid "Number of values stored in table HISTORY."
@@ -10859,7 +10859,7 @@ msgstr "Liczba maszyn wirtualnych hipernadzorcy VMware, <url> - URL usługi VMwa
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:587
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr ""
+msgstr "Liczba lub procent węzłów inod. Zwraca liczbę całkowitą dla liczby; liczbę zmiennoprzecinkową dla procentu"
 
 #: include/forms.inc.php:452 include/items.inc.php:127
 #: include/triggers.inc.php:1807 include/views/configuration.item.edit.php:216
@@ -11042,16 +11042,16 @@ msgstr "Tylko kontrole agenta Zabbix, SNMPv1, SNMPv2 i SNMPv3 mogą być unikaln
 #: include/classes/api/services/CMap.php:447
 #: include/classes/api/services/CMap.php:853
 msgid "Only administrators can set map owner."
-msgstr ""
+msgstr "Tylko administrator może ustawić właściciela mapy."
 
 #: include/classes/api/services/CScreen.php:477
 #: include/classes/api/services/CScreen.php:812
 msgid "Only administrators can set screen owner."
-msgstr ""
+msgstr "Tylko administrator może ustawić właściciela ekranu."
 
 #: include/screens.inc.php:225 include/screens.inc.php:349
 msgid "Only administrators can set slide show owner."
-msgstr ""
+msgstr "Tylko administrator może ustawić właściciela pokazu slajdów."
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11068,21 +11068,21 @@ msgstr "Można zmienić tylko jedną nazwę grupy na raz."
 #: app/views/monitoring.acknowledge.edit.php:58
 msgid "Only selected event"
 msgid_plural "Only selected events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Tylko wybrane zdarzenie"
+msgstr[1] "Tylko wybrane zdarzenia"
+msgstr[2] "Tylko wybranych zdarzeń"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
-msgstr ""
+msgstr "Tylko super administratorzy mogą utworzyć mapy wartości."
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
-msgstr ""
+msgstr "Tylko super administratorzy mogą usunąć mapy wartości."
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "Tylko super administratorzy mogą zaktualizować mapy wartości."
 
 #: include/services.inc.php:264
 #, c-format
@@ -11104,7 +11104,7 @@ msgstr "Opera"
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:515
 msgid "Operating system information. Returns string"
-msgstr ""
+msgstr "Informacje o systemie operacyjnym. Zwraca ciąg znaków"
 
 #: actionconf.php:350
 #, c-format
@@ -11248,7 +11248,7 @@ msgstr "Inni"
 #: include/classes/items/CHelpItems.php:105
 #: include/classes/items/CHelpItems.php:387
 msgid "Outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Statystyka ruchu wychodzącego interfejsu sieciowego. Zwraca liczbę całkowitą"
 
 #: include/views/configuration.item.edit.php:325
 #: include/views/configuration.item.edit.php:346
@@ -11287,7 +11287,7 @@ msgstr "Przegląd wg proxy"
 #: include/views/monitoring.sysmap.edit.php:86
 #: include/views/monitoring.sysmap.edit.php:91
 msgid "Owner"
-msgstr ""
+msgstr "Właściciel"
 
 #: include/classes/setup/CFrontendSetup.php:311
 msgid "PHP bcmath"
@@ -11377,13 +11377,13 @@ msgstr "Nie znaleziono rozszerzenia PHP mbstring (parametr konfiguracji PHP --en
 #: include/classes/setup/CFrontendSetup.php:635
 #, c-format
 msgid "PHP option \"%1$s\""
-msgstr ""
+msgstr "Opcja PHP \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:374
 #: include/classes/setup/CFrontendSetup.php:639
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
-msgstr ""
+msgstr "Opcja PHP \"%1$s\" musi być ustawiona na \"%2$s\""
 
 #: include/classes/setup/CFrontendSetup.php:584
 msgid "PHP session"
@@ -11458,24 +11458,24 @@ msgstr "PROBLEM"
 #: include/views/configuration.host.prototype.edit.php:361
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "PSK"
-msgstr ""
+msgstr "PSK"
 
 #: include/classes/api/services/CHost.php:1553
 #: include/classes/api/services/CProxy.php:665
 msgid "PSK cannot be empty."
-msgstr ""
+msgstr "PSK nie może być puste"
 
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
-msgstr ""
+msgstr "Tożsamość PSK"
 
 #: include/classes/api/services/CHost.php:1549
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr ""
+msgstr "Tożsamość PSK nie może być pusta"
 
 #: include/classes/api/services/CHost.php:1564
 #: include/classes/api/services/CProxy.php:676
@@ -11493,7 +11493,7 @@ msgstr "Parametr"
 
 #: include/classes/debug/CProfiler.php:156
 msgid "Parameters"
-msgstr ""
+msgstr "Parametry"
 
 #: include/views/configuration.host.discovery.edit.php:43
 #: include/views/configuration.host.prototype.edit.php:55
@@ -11574,7 +11574,7 @@ msgstr "Hasło nie jest dostępne dla użytkowników z %1$s."
 #: include/classes/api/services/CMediatype.php:555
 #, c-format
 msgid "Password required for media type \"%1$s\"."
-msgstr ""
+msgstr "Hasło wymagane dla typu mediów \"%1$s\"."
 
 #: profile.php:119 users.php:201
 msgid "Password should not be empty"
@@ -11583,7 +11583,7 @@ msgstr "Hasło nie powinno być puste"
 #: include/classes/debug/CProfiler.php:137
 #, c-format
 msgid "Peak memory usage: %1$s"
-msgstr ""
+msgstr "Szczytowe zużycie pamięci: %1$s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
@@ -11616,7 +11616,7 @@ msgstr "Linia procentowa (z prawej)"
 #: include/classes/items/CHelpItems.php:89
 #: include/classes/items/CHelpItems.php:371
 msgid "Performs a DNS query. Returns character string with the required type of information"
-msgstr ""
+msgstr "Wykonuje zapytanie DNS. Zwraca ciąg znaków z wymaganym typem informacji"
 
 #: app/views/report.services.php:24
 #: include/views/configuration.host.discovery.edit.php:198
@@ -11682,16 +11682,16 @@ msgstr "Odtwórz dźwięk"
 #: include/classes/setup/CSetupWizard.php:342
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
-msgstr ""
+msgstr "Proszę sprawdzić parametry konfiguracji. Jeżeli wszystko jest poprawne, należy nacisnąć przycisk \"%1$s\", lub można zmienić parametry konfiguracji przyciskiem \"%2$s\"."
 
 #: include/classes/setup/CSetupWizard.php:272
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
-msgstr ""
+msgstr "Proszę ręcznie utworzyć bazę danych i ustawić parametry konfiguracji dla połączenia do tej bazy. Naciśnij przycisk \"%1$s\", gdy skończysz."
 
 #: include/classes/setup/CSetupWizard.php:301
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr ""
+msgstr "Proszę wprowadzić nazwę hosta lub adres IP hosta oraz numer portu serwera Zabbix, oraz (opcjonalnie) nazwę instalacji."
 
 #: jsLoader.php:147
 msgid "Please select two elements"
@@ -11728,7 +11728,7 @@ msgstr "Pole port nie może być puste dla interfejsu hosta."
 
 #: include/forms.inc.php:579 include/views/configuration.host.list.php:44
 msgid "Port like"
-msgstr ""
+msgstr "Port podobny do"
 
 #: include/views/js/configuration.discovery.edit.js.php:44
 msgid "Port range"
@@ -11753,7 +11753,7 @@ msgstr "Dane"
 #: include/classes/setup/CSetupWizard.php:49
 #: include/classes/setup/CSetupWizard.php:340
 msgid "Pre-installation summary"
-msgstr ""
+msgstr "Podsumowanie przed instalacją"
 
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:116
@@ -11825,7 +11825,7 @@ msgstr "Protokół prywatności"
 #: include/views/monitoring.slideconf.edit.php:240
 #: include/views/monitoring.sysmap.edit.php:343
 msgid "Private"
-msgstr ""
+msgstr "Prywatne"
 
 #: include/views/configuration.action.edit.php:837
 #: include/views/configuration.host.discovery.edit.php:173
@@ -11881,13 +11881,13 @@ msgstr "Problemy"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Procent użycia procesora dla procesu. Zwraca liczbę zmiennoprzecinkową"
 
 #: include/views/monitoring.screen.list.php:66
 #: include/views/monitoring.slideconf.list.php:57
 #: include/views/monitoring.sysmap.list.php:51
 msgid "Properties"
-msgstr ""
+msgstr "Właściwości"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:262
@@ -11956,7 +11956,7 @@ msgstr "Zaktualizowano proxy"
 #: include/views/monitoring.slideconf.edit.php:241
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr ""
+msgstr "Publiczny"
 
 #: include/views/configuration.action.edit.php:822
 #: include/views/configuration.host.discovery.edit.php:162
@@ -11980,7 +11980,7 @@ msgstr "Kolejka"
 
 #: queue.php:66
 msgid "Queue of items to be updated"
-msgstr ""
+msgstr "Kolejka pozycji do zaktualizowania"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -12003,7 +12003,7 @@ msgstr "Tylko do odczytu"
 #: include/views/js/monitoring.sysmap.edit.js.php:12
 #: include/views/js/monitoring.sysmap.edit.js.php:45
 msgid "Read-only"
-msgstr ""
+msgstr "Tylko do odczytu"
 
 #: include/forms.inc.php:256 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:93
@@ -12370,7 +12370,7 @@ msgstr "Odtwórz tylko nagłówki"
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:559
 msgid "Retrieving contents of a file. Returns text"
-msgstr ""
+msgstr "Pobieranie zawartości pliku. Zwraca tekst"
 
 #: include/views/general.warning.php:27
 msgid "Retry"
@@ -12479,7 +12479,7 @@ msgstr "Uruchom zdalne polecenia na hostach"
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
+msgstr "Uruchamia określone polecenie na hoście. Zwraca tekstowy rezultat polecenia; 1 - w trybie bez oczekiwania (niezależnie od wyniku polecenia)"
 
 #: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
@@ -12535,7 +12535,7 @@ msgstr "Serwer SMTP"
 
 #: app/views/administration.mediatype.edit.php:59
 msgid "SMTP server port"
-msgstr ""
+msgstr "Port SMTP serwera"
 
 #: include/hosts.inc.php:465 include/items.inc.php:287
 msgid "SNMP"
@@ -12555,7 +12555,7 @@ msgstr "OID SNMP"
 
 #: include/forms.inc.php:559
 msgid "SNMP OID like"
-msgstr ""
+msgstr "OID SNMP podobne do"
 
 #: disc_prototypes.php:96 host_discovery.php:75
 #: include/views/configuration.host.discovery.edit.php:109
@@ -12568,7 +12568,7 @@ msgstr "Hasło SNMP"
 
 #: include/forms.inc.php:533
 msgid "SNMP community like"
-msgstr ""
+msgstr "Hasło SNMP podobne do"
 
 #: include/views/configuration.host.edit.php:157
 #: include/views/configuration.host.edit.php:243
@@ -12583,7 +12583,7 @@ msgstr "Pułapka SNMP"
 
 #: include/classes/api/services/CItemGeneral.php:421
 msgid "SNMP trap key is invalid."
-msgstr "Błędny klucz pułapki SNMP."
+msgstr "Nieprawidłowy klucz pułapki SNMP."
 
 #: include/discovery.inc.php:66 include/items.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:175
@@ -12603,7 +12603,7 @@ msgstr "Agent SNMPv3"
 #: include/classes/debug/CProfiler.php:132
 #, c-format
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
-msgstr ""
+msgstr "Licznik SQL: %1$s (select: %2$s | execute: %3$s)"
 
 #: include/items.inc.php:1308
 #: include/views/configuration.host.discovery.edit.php:185
@@ -12657,11 +12657,11 @@ msgstr "Podmiot weryfikujący SSL"
 
 #: app/views/administration.mediatype.edit.php:68
 msgid "SSL/TLS"
-msgstr ""
+msgstr "SSL/TLS"
 
 #: app/views/administration.mediatype.edit.php:67
 msgid "STARTTLS"
-msgstr ""
+msgstr "STARTTLS"
 
 #: include/httptest.inc.php:301
 msgid "Safari"
@@ -12679,7 +12679,7 @@ msgstr "Sobota"
 #: include/classes/setup/CSetupWizard.php:388
 #, c-format
 msgid "Save it as \"%1$s\""
-msgstr ""
+msgstr "Zapisz jako \"%1$s\""
 
 #: include/views/configuration.httpconf.edit.php:250
 msgid "Scenario"
@@ -12700,7 +12700,7 @@ msgstr "Zaplanowane sprawdzenia"
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
-msgstr ""
+msgstr "Harmonogramowanie"
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
 #: include/views/monitoring.screen.constructor.edit.php:541
@@ -12741,7 +12741,7 @@ msgstr "Rozpiętość kolumny w komórce X - %2$s Y - %3$s ekranu \"%1$s\" jest 
 #: include/classes/api/services/CScreen.php:942
 #, c-format
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "Ekran \"%1$s\" jest publiczny i współdzielenie w trybie tylko do odczytu jest zabronione."
 
 #: include/classes/api/services/CScreenItem.php:822
 #, c-format
@@ -12767,12 +12767,12 @@ msgstr "Usunięto ekran"
 
 #: include/classes/api/services/CScreen.php:759
 msgid "Screen name cannot be empty."
-msgstr ""
+msgstr "Nazwa ekranu nie może być pusta."
 
 #: include/classes/api/services/CScreen.php:473
 #: include/classes/api/services/CScreen.php:808
 msgid "Screen owner cannot be empty."
-msgstr ""
+msgstr "Właściciel ekranu nie może być pusty."
 
 #: screenedit.php:331 screenedit.php:371
 msgid "Screen should contain at least one row and column."
@@ -12820,7 +12820,7 @@ msgstr "Dodano skrypt"
 #: include/classes/api/services/CScript.php:398
 #: include/classes/api/services/CScript.php:442
 msgid "Script command cannot be empty."
-msgstr ""
+msgstr "Polecenie skryptu nie może być puste."
 
 #: app/controllers/CControllerScriptDelete.php:72
 msgid "Script deleted"
@@ -12848,17 +12848,17 @@ msgstr "Nazwa skryptu \"%1$s\" została już użyta w ścieżce menu dla skryptu
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr ""
+msgstr "Nazwa skryptu nie może być pusta."
 
 #: app/views/administration.mediatype.edit.php:105
 msgid "Script parameters"
-msgstr ""
+msgstr "Parametry skryptu"
 
 #: include/classes/api/services/CMediatype.php:340
 #: include/classes/api/services/CMediatype.php:632
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "W parametrach skryptu \"%1$s\" brakuje ostatniego znaku końca linii dla typu mediów \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:124
 msgid "Script profiler"
@@ -12950,7 +12950,7 @@ msgstr "Nazwa ochrony"
 
 #: include/forms.inc.php:537
 msgid "Security name like"
-msgstr ""
+msgstr "Nazwa ochrony podobna do"
 
 #: events.php:326 include/classes/html/CMultiSelect.php:54
 #: include/forms.inc.php:523
@@ -13015,11 +13015,11 @@ msgstr "Usunięto wybrane akcje"
 
 #: app/views/monitoring.acknowledge.edit.php:63
 msgid "Selected and all unacknowledged PROBLEM events"
-msgstr ""
+msgstr "Wybrane i wszystkie niepotwierdzone zdarzenia PROBLEM"
 
 #: app/views/monitoring.acknowledge.edit.php:68
 msgid "Selected and all unacknowledged events"
-msgstr ""
+msgstr "Wybrane i wszystkie niepotwierdzone zdarzenia"
 
 #: include/views/js/monitoring.sysmaps.js.php:209
 msgid "Selected elements"
@@ -13168,7 +13168,7 @@ msgstr "Sesja zakończona, proszę zalogować się ponownie."
 
 #: include/actions.inc.php:889
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "Ustaw tryb inwentarza hosta"
 
 #: events.php:420 include/classes/screens/CScreenEvents.php:37
 #: include/classes/screens/CScreenHistory.php:149
@@ -13194,21 +13194,21 @@ msgstr "Poziom (malejąco)"
 #: include/views/monitoring.slideconf.edit.php:256
 #: include/views/monitoring.sysmap.edit.php:359
 msgid "Sharing"
-msgstr ""
+msgstr "Współdzielenie"
 
 #: include/classes/api/services/CMap.php:484
 #: include/classes/api/services/CMap.php:905
 #: include/classes/api/services/CMap.php:978
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "Brak wartości w opcji współdzielenia \"%1$s\" dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:514
 #: include/classes/api/services/CScreen.php:851
 #: include/classes/api/services/CScreen.php:924
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "Brak wartości w opcji współdzielenia \"%1$s\" dla ekranu \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:695 tr_status.php:700
@@ -13309,7 +13309,7 @@ msgstr "Zaloguj się"
 
 #: app/views/layout.htmlpage.menu.php:56
 msgid "Sign out"
-msgstr ""
+msgstr "Wyloguj"
 
 #: include/views/js/configuration.graph.edit.js.php:39
 msgid "Simple"
@@ -13390,7 +13390,7 @@ msgstr "Pokaz slajdów \"%1$s\" już istnieje."
 #: include/screens.inc.php:366 include/screens.inc.php:374
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "Pokaz slajdów \"%1$s\" jest publiczny i współdzielenie w trybie tylko do odczytu jest zabronione."
 
 #: include/screens.inc.php:212
 #, c-format
@@ -13411,7 +13411,7 @@ msgstr "Pokaz slajdów musi zawierać slajdy."
 
 #: include/screens.inc.php:219 include/screens.inc.php:343
 msgid "Slide show owner cannot be empty."
-msgstr ""
+msgstr "Właściciel pokazu slajdów nie może być pusty."
 
 #: slideconf.php:133
 msgid "Slide show updated"
@@ -13475,7 +13475,7 @@ msgstr "Oprogramowanie E"
 #: include/classes/items/CHelpItems.php:229
 #: include/classes/items/CHelpItems.php:511
 msgid "Software architecture information. Returns string"
-msgstr ""
+msgstr "Informacje o architekturze oprogramowania. Zwraca ciąg znaków"
 
 #: include/views/monitoring.screen.constructor.edit.php:453
 msgid "Sort entries by"
@@ -13665,7 +13665,7 @@ msgstr "Styl"
 
 #: include/forms.inc.php:593
 msgid "Subfilter"
-msgstr ""
+msgstr "Podfiltr"
 
 #: app/views/administration.proxy.edit.php:120
 #: include/views/administration.auditacts.list.php:75
@@ -13687,7 +13687,7 @@ msgstr "Audyt udany"
 #: include/classes/items/CHelpItems.php:109
 #: include/classes/items/CHelpItems.php:391
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Suma statystyk ruchu przychodzącego i wychodzącego interfejsu sieciowego. Zwraca liczbę całkowitą"
 
 #: popup_trexpr.php:412
 msgid "Sum of values of a period T is < N"
@@ -13726,17 +13726,17 @@ msgstr "Nazwisko"
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:523
 msgid "Swap in (from device into memory) statistics. Returns integer"
-msgstr ""
+msgstr "Statystyki wymiany (z urządzenia do pamięci). Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:527
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr ""
+msgstr "Statystyki wymiany (z pamięci do urządzenia). Zwraca liczbę całkowitą"
 
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:531
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Przestrzeń wymiany w bajtach lub procentach z ogółem. Zwraca liczbę całkowitą dla bajtów; liczbę zmiennoprzecinkową dla procentów"
 
 #: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
@@ -13749,7 +13749,7 @@ msgstr "Zmiana metody uwierzytelniania spowoduje zresetowanie wszystkich sesji p
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:455
 msgid "System boot time. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Czas uruchomienia systemu. Zwraca liczbę całkowitą (znacznik czasu Unix)"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:155
 msgid "System default"
@@ -13762,12 +13762,12 @@ msgstr "Błąd systemowy."
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:479
 msgid "System host name. Returns string"
-msgstr ""
+msgstr "Systemowa nazwa hosta. Zwraca ciąg znaków"
 
 #: include/classes/items/CHelpItems.php:225
 #: include/classes/items/CHelpItems.php:507
 msgid "System statistics. Returns integer or float"
-msgstr ""
+msgstr "Statystyki systemu. Zwraca liczbę całkowitą lub zmiennoprzecinkową"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
@@ -13777,12 +13777,12 @@ msgstr "Stan systemu"
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:499
 msgid "System time. Returns integer with type as utc; string - with type as local"
-msgstr ""
+msgstr "Czas systemowy. Zwraca liczbę całkowitą dla typu utc; ciąg znaków dla typu local"
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:539
 msgid "System uptime in seconds. Returns integer"
-msgstr ""
+msgstr "Czas działania systemu w sekundach. Zwraca liczbę całkowitą"
 
 #: jsLoader.php:128
 msgctxt "Thursday short"
@@ -13895,7 +13895,7 @@ msgstr "Powiązania szablonu"
 
 #: include/views/hostmacros.php:173
 msgid "Template macros"
-msgstr ""
+msgstr "Makra szablonu"
 
 #: include/views/configuration.template.edit.php:73 templates.php:54
 msgid "Template name"
@@ -13921,7 +13921,7 @@ msgstr "Zaktualizowano szablon"
 
 #: include/views/hostmacros.php:46
 msgid "Template value"
-msgstr ""
+msgstr "Wartość szablonu"
 
 #: include/classes/api/services/CTemplate.php:995
 #, c-format
@@ -14024,11 +14024,11 @@ msgstr "Koordynata Y elementu ekranu umieszczonego w punkcie X - %1$s i Y - %2$s
 #: include/views/configuration.application.list.php:97
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Aplikacja nie jest już wykrywana i zostanie usunięta za %1$s (o %2$s %3$s)."
 
 #: include/views/configuration.application.list.php:92
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Aplikacja nie jest już wykrywana i zostanie usunięta przy następnym przetwarzaniu reguły wykrywania."
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
@@ -14050,7 +14050,7 @@ msgstr "Nie można wykryć grupy hostów i zostanie ona wykasowana za %1$s (%2$s
 
 #: include/html.inc.php:623
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Grupa hostów nie jest już wykrywana i zostanie usunięta przy następnym przetwarzaniu reguły wykrywania."
 
 #: include/html.inc.php:655
 #, c-format
@@ -14059,7 +14059,7 @@ msgstr "Nie można wykryć hosta i zostanie on wykasowany za %1$s (%2$s o %3$s).
 
 #: include/html.inc.php:650
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Host nie jest już wykrywany i zostanie usunięty przy następnym przetwarzaniu reguły wykrywania."
 
 #: include/classes/api/services/CImage.php:392
 #, c-format
@@ -14084,12 +14084,12 @@ msgstr "Nie można wykryć pozycji i zostanie ona wykasowana za %1$s (%2$s o %3$
 
 #: include/html.inc.php:677
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Pozycja nie jest już wykrywana i zostanie usunięta przy następnym przetwarzaniu reguły wykrywania."
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:435
 msgid "The number of processes. Returns integer"
-msgstr ""
+msgstr "Liczba procesów. Zwraca liczbę całkowitą"
 
 #: include/classes/core/CJsonRpc.php:175
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -14146,7 +14146,7 @@ msgstr "Ten rok"
 
 #: popup_trexpr.php:153
 msgid "Threshold"
-msgstr ""
+msgstr "Próg"
 
 #: include/func.inc.php:217
 msgid "Thu"
@@ -14210,19 +14210,19 @@ msgstr "Przesunięcie czasu"
 
 #: popup_trexpr.php:618
 msgid "Time to reach threshold estimated based on period T is < N"
-msgstr ""
+msgstr "Czas do osiągnięcia progu bazując na okresie T jest < N"
 
 #: popup_trexpr.php:628
 msgid "Time to reach threshold estimated based on period T is = N"
-msgstr ""
+msgstr "Czas do osiągnięcia progu bazując na okresie T jest = N"
 
 #: popup_trexpr.php:623
 msgid "Time to reach threshold estimated based on period T is > N"
-msgstr ""
+msgstr "Czas do osiągnięcia progu bazując na okresie T jest > N"
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
+msgstr "Czas do osiągnięcia progu bazując na okresie T NIE jest N"
 
 #: include/views/monitoring.screen.constructor.edit.php:609
 msgid "Time type"
@@ -14282,12 +14282,12 @@ msgstr "Ogółem"
 #: include/classes/debug/CProfiler.php:128
 #, c-format
 msgid "Total SQL time: %1$s"
-msgstr ""
+msgstr "Czas SQL ogółem: %1$s"
 
 #: include/classes/debug/CProfiler.php:126
 #, c-format
 msgid "Total time: %1$s"
-msgstr ""
+msgstr "Czas ogółem: %1$s"
 
 #: include/page_footer.php:46
 msgid "Transaction has not been closed. Aborting..."
@@ -14330,7 +14330,7 @@ msgstr "Trendy"
 
 #: include/forms.inc.php:563
 msgid "Trends (in days)"
-msgstr ""
+msgstr "Trendy (w dniach)"
 
 #: events.php:276 events.php:322 include/actions.inc.php:43
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:488
@@ -14454,7 +14454,7 @@ msgstr "Nazwa wyzwalacza"
 
 #: include/views/monitoring.dashconf.php:107
 msgid "Trigger name like"
-msgstr ""
+msgstr "Nazwa wyzwalacza podobna do"
 
 #: include/audit.inc.php:34
 #: include/views/configuration.trigger.prototype.edit.php:266
@@ -14469,7 +14469,7 @@ msgstr "Prototyp wyzwalacza \"%1$s\" zawiera prototypy pozycji z wielu reguł wy
 #: include/classes/import/CConfigurationImport.php:1157
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "Prototyp wyzwalacza \"%1$s\" zależy od nieistniejącego wyzwalacza \"%2$s\"."
 
 #: include/classes/api/services/CTriggerPrototype.php:1460
 #, c-format
@@ -14482,7 +14482,7 @@ msgstr "Dodano prototyp wyzwalaczy"
 
 #: include/classes/api/services/CTriggerPrototype.php:1192
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
-msgstr ""
+msgstr "Prototyp wyzwalacza nie może zależeć od wyzwalacza, który po nim dziedziczy."
 
 #: trigger_prototypes.php:234
 msgid "Trigger prototype deleted"
@@ -14756,7 +14756,7 @@ msgstr "URL C"
 #: include/classes/api/services/CMap.php:1153
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
-msgstr ""
+msgstr "Nazwa URL powinna być unikalna dla mapy \"%1$s\"."
 
 #: include/html.inc.php:108
 msgid "URL parameter cannot be array."
@@ -14770,7 +14770,7 @@ msgstr "Nazwa parametru URL jest pusta."
 #: include/classes/api/services/CMap.php:1147
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
-msgstr ""
+msgstr "URL powinien mieć oba pola \"name\" (nazwa) i \"url\" dla mapy \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:162
 #: include/views/monitoring.sysmap.edit.php:270 jsLoader.php:217
@@ -14787,11 +14787,11 @@ msgstr "Ukraiński (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:155
 msgid "Unable to create the configuration file."
-msgstr ""
+msgstr "Nie można utworzyć pliku konfiguracji."
 
 #: include/classes/core/CConfigFile.php:151
 msgid "Unable to overwrite the existing configuration file."
-msgstr ""
+msgstr "Nie można nadpisać istniejącego pliku konfiguracji."
 
 #: include/classes/db/DbBackend.php:63
 msgid "Unable to select configuration."
@@ -15112,7 +15112,7 @@ msgstr "Zaktualizowano"
 #: include/hosts.inc.php:554
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "Zaktualizowano stan hosta \"%1$s\"."
 
 #: app/views/monitoring.widget.discovery.view.php:62
 #: app/views/monitoring.widget.hosts.view.php:383
@@ -15218,7 +15218,7 @@ msgstr "Wykorzystywane w akcjach"
 
 #: include/views/administration.general.valuemapping.list.php:44
 msgid "Used in items"
-msgstr ""
+msgstr "Używane w pozycjach"
 
 #: app/views/monitoring.acknowledge.edit.php:34 httpconf.php:57
 #: include/acknow.inc.php:49 include/actions.inc.php:1183
@@ -15234,17 +15234,17 @@ msgstr "Użytkownik"
 #: include/classes/api/services/CUser.php:546
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
-msgstr ""
+msgstr "Użytkownik \"%1$s\" jest właścicielem mapy \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:570
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
-msgstr ""
+msgstr "Użytkownik \"%1$s\" jest właścicielem ekranu \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:592
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
-msgstr ""
+msgstr "Użytkownik \"%1$s\" jest właścicielem pokazu slajdów \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15343,13 +15343,13 @@ msgstr "Grupa użytkowników dla wiadomości o wyłączeniu bazy danych \"%1$s\"
 #: include/classes/api/services/CMap.php:969
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Brak parametrów współdzielenia grupy użytkowników: %1$s dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:579
 #: include/classes/api/services/CScreen.php:915
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "Brak parametrów współdzielenia grupy użytkowników: %1$s dla ekranu \"%2$s\"."
 
 #: include/menu.inc.php:270
 #: include/views/administration.usergroups.edit.php:22
@@ -15370,7 +15370,7 @@ msgstr "Użytkownik nie może siebie usunąć."
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "Brak parametrów makra użytkownika: %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -15421,13 +15421,13 @@ msgstr "Sesje użytkownika"
 #: include/classes/api/services/CMap.php:896
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Brak parametrów współdzielenia użytkownika: %1$s dla mapy \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:505
 #: include/classes/api/services/CScreen.php:842
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "Brak parametrów współdzielenia użytkownika: %1$s dla ekranu \"%2$s\"."
 
 #: include/views/administration.users.edit.php:388
 #: include/views/administration.users.edit.php:392
@@ -15754,12 +15754,12 @@ msgstr[2] "Usunięto mapę wartości"
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
 msgid "Value map is missing parameters: %1$s"
-msgstr ""
+msgstr "Brak parametrów mapy wartości: %1$s"
 
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/api/services/CValueMap.php:423
 msgid "Value map name cannot be empty."
-msgstr ""
+msgstr "Nazwa mapy wartości nie może być pusta."
 
 #: adm.valuemapping.php:105
 msgid "Value map updated"
@@ -15774,16 +15774,16 @@ msgstr "Mapowanie wartości"
 
 #: include/views/conf.import.php:46
 msgid "Value mappings"
-msgstr ""
+msgstr "Mapowanie wartości"
 
 #: include/views/conf.import.php:69
 msgid "Value mappings for value maps will be updated!"
-msgstr ""
+msgstr "Mapowanie wartości dla map wartości zostanie zaktualizowane!"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Wartość dowolnego licznika wydajności Windows. Zwraca liczbę całkowitą, zmiennoprzecinkową, ciąg znaków lub tekst (zależnie od zapytania)"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -15809,7 +15809,7 @@ msgstr "Szczegółowo"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:343
 msgid "Version of Zabbix agent. Returns string"
-msgstr ""
+msgstr "Wersja agenta Zabbix. Zwraca ciąg znaków"
 
 #: include/views/monitoring.screen.constructor.edit.php:649
 msgid "Vertical"
@@ -15980,11 +15980,11 @@ msgstr "Tygodniowo"
 
 #: include/classes/setup/CSetupWizard.php:33
 msgid "Welcome"
-msgstr ""
+msgstr "Witamy"
 
 #: include/classes/setup/CSetupWizard.php:153
 msgid "Welcome to"
-msgstr ""
+msgstr "Witamy w"
 
 #: include/views/administration.users.edit.php:200 popup_media.php:135
 msgid "When active"
@@ -16182,7 +16182,7 @@ msgstr "Y-m-d H:i:s"
 #: include/classes/import/validators/C30XmlValidator.php:884
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/views/report.services.php:38 app/views/report.services.php:54
 #: report4.php:113 report4.php:133
@@ -16209,7 +16209,7 @@ msgstr "Wczoraj"
 #: include/func.inc.php:1669
 #, c-format
 msgid "You are logged in as \"%1$s\"."
-msgstr ""
+msgstr "Jesteś zalogowany jako \"%1$s\"."
 
 #: include/views/administration.users.edit.php:144
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -16222,7 +16222,7 @@ msgstr "Brak praw do zmiany uprawnień użytkownika \"%s\"."
 
 #: include/func.inc.php:1686
 msgid "You are not logged in"
-msgstr ""
+msgstr "Nie zalogowano."
 
 #: popup.php:486
 msgid "You can not switch hosts for current selection."
@@ -16299,7 +16299,7 @@ msgstr "Administrator Zabbixa"
 
 #: app/views/layout.htmlpage.menu.php:36
 msgid "Zabbix Share"
-msgstr ""
+msgstr "Współdzielenie Zabbix"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -16360,7 +16360,7 @@ msgstr "Nie ustawiono adresu IP lub numeru portu serwera Zabbix'a!"
 #: include/classes/setup/CSetupWizard.php:45
 #: include/classes/setup/CSetupWizard.php:299
 msgid "Zabbix server details"
-msgstr ""
+msgstr "Szczegóły serwera Zabbix"
 
 #: include/classes/screens/CScreenServerInfo.php:81
 msgid "Zabbix server info"
@@ -16408,11 +16408,11 @@ msgstr "[Błędna wartość dla miesiąca: \"%s\"]"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
 #: include/classes/validators/CNewValidator.php:231
 msgid "a character string is expected"
-msgstr ""
+msgstr "oczekiwano ciągu znaków"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
-msgstr ""
+msgstr "dotyczy wyłącznie danych przefiltrowanych"
 
 #: include/hosts.inc.php:462
 msgid "agent"
@@ -16444,7 +16444,7 @@ msgstr "wszystkie media"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:186
 msgid "an array is expected"
-msgstr ""
+msgstr "oczekiwano tablicy"
 
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
@@ -16484,13 +16484,13 @@ msgstr "śr"
 #: include/views/administration.general.trigger.options.edit.php:53
 #: include/views/administration.general.trigger.options.edit.php:61
 msgid "blinking"
-msgstr ""
+msgstr "migotanie"
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:418
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
-msgstr ""
+msgstr "nie może być puste"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
@@ -16499,7 +16499,7 @@ msgstr "sprawdź wyrażenie od \"%1$s\""
 
 #: include/views/hostmacros.php:38
 msgid "configure"
-msgstr ""
+msgstr "konfiguracja"
 
 #: include/func.inc.php:564 include/views/configuration.item.list.php:244
 #: include/views/configuration.item.list.php:245
@@ -16581,7 +16581,7 @@ msgstr "hh"
 #: include/classes/import/validators/C10XmlValidator.php:363
 msgctxt "XML time format"
 msgid "hh.mm"
-msgstr ""
+msgstr "hh.mm"
 
 #: include/classes/api/services/CMap.php:618
 #: include/classes/api/services/CMap.php:1038
@@ -16657,15 +16657,15 @@ msgstr "m"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1639
 msgid "m-d"
-msgstr ""
+msgstr "m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "m-d H:i"
-msgstr ""
+msgstr "m-d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
-msgstr ""
+msgstr "makro jest puste"
 
 #: include/views/js/administration.general.macros.edit.js.php:42
 msgid "macro(s)"
@@ -16874,7 +16874,7 @@ msgstr "szablon o ID \"%1$s\" został przekazany %2$s razy"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:115
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr ""
+msgstr "brak tag-a \"%1$s\""
 
 #: include/classes/api/services/CMap.php:622
 #: include/classes/api/services/CMap.php:1042 include/events.inc.php:34
@@ -16888,7 +16888,7 @@ msgstr "wpisz tekst do wyszukania"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"
-msgstr ""
+msgstr "nieoczekiwany koniec okresu"
 
 #: include/classes/parsers/CItemKey.php:178
 msgid "unexpected end of key"
@@ -16896,13 +16896,13 @@ msgstr "niespodziewany koniec klucza"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "nieoczekiwany koniec makra"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr ""
+msgstr "nieoczekiwany tag \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
@@ -16912,7 +16912,7 @@ msgstr "nieznany"
 
 #: include/classes/import/validators/CXmlValidator.php:62
 msgid "unsupported version number"
-msgstr ""
+msgstr "niewspierany numer wersji"
 
 #: include/views/administration.general.macros.edit.php:44
 #: include/views/hostmacros.php:85
