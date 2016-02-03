@@ -56,6 +56,11 @@ class CLink extends CTag {
 		return $this;
 	}
 
+	public function setUrl($url = null) {
+		$this->url = $url;
+		return $this;
+	}
+
 	public function toString($destroy = true) {
 		$url = $this->url;
 
