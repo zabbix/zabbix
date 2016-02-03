@@ -40,12 +40,18 @@ $header = (new CForm('get'))
 	->setName('slideHeaderForm');
 
 $controls = new CList();
-$controls->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);',
-	[
-		'screens.php' => _('Screens'),
-		'slides.php' => _('Slide shows')
-	]
-));
+$controls
+	->addItem(
+		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+			'screens.php' => _('Screens'),
+			'slides.php' => _('Slide shows')
+		])
+	)
+	->addItem($data['screen']['editable']
+		? (new CButton('edit', _('Edit slide show')))
+			->onClick('redirect("slideconf.php?form=update&slideshowid='.$data['screen']['slideshowid'].'")')
+		: null
+	);
 
 $favourite_icon = $this->data['screen']
 	? get_icon('favourite', [

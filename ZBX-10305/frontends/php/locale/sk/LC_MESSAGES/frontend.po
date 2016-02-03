@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-20 17:30+0200\n"
-"PO-Revision-Date: 2016-01-21 16:06+0300\n"
+"POT-Creation-Date: 2016-02-03 10:48+0200\n"
+"PO-Revision-Date: 2016-01-28 13:53+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,10 +13,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1453385211.0\n"
+"X-POOTLE-MTIME: 1453982017.0\n"
 
-#: include/classes/import/validators/C10XmlValidator.php:344
-#: include/classes/import/validators/C10XmlValidator.php:361
+# "%1$s" je očakávanáX
+#: include/classes/import/validators/C10XmlValidator.php:346
+#: include/classes/import/validators/C10XmlValidator.php:363
 #: include/classes/import/validators/C20XmlValidator.php:821
 #: include/classes/import/validators/C30XmlValidator.php:884
 #, c-format
@@ -31,6 +32,12 @@ msgstr "\"%1$s\" je očakávaná"
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" musí byť v intervale od 1970.01.01 do 2038.01.18."
+
+#: include/classes/import/validators/C10XmlValidator.php:381
+#: include/classes/import/validators/C10XmlValidator.php:403
+#: include/classes/import/validators/C10XmlValidator.php:424
+msgid "\"host:key\" pair is expected"
+msgstr ""
 
 #: include/func.inc.php:453
 #, c-format
@@ -117,9 +124,9 @@ msgstr[2] "%1$s sekúnd"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "Zaznamenané %4$s neúspešné prihlásenie. Posledný pokus bol z %1$s na %2$s o %3$s."
-msgstr[1] "Zaznamenané %4$s neúspešné prihlásenia. Posledný pokus bol z %1$s na %2$s o %3$s."
-msgstr[2] "Zaznamenané %4$s neúspešných prihlásení. Posledný pokus bol z %1$s na %2$s o %3$s."
+msgstr[0] "Zaznamenané %4$s neúspešné prihlásenie. Posledný pokus bol z IP %1$s dátum %2$s o %3$s."
+msgstr[1] "Zaznamenané %4$s neúspešné prihlásenia. Posledný pokus bol z IP %1$s dátum %2$s o %3$s."
+msgstr[2] "Zaznamenané %4$s neúspešných prihlásení. Posledný pokus bol z IP %1$s dátum %2$s o %3$s."
 
 #: app/views/monitoring.discovery.view.php:134
 #, c-format
@@ -180,7 +187,7 @@ msgstr "100 najčastejších spúšťačov"
 msgid "30 seconds"
 msgstr "30 sekúnd"
 
-#: include/views/configuration.graph.edit.php:249
+#: include/views/configuration.graph.edit.php:253
 msgid "3D view"
 msgstr "3D pohľad"
 
@@ -251,7 +258,7 @@ msgstr "Prístup zamietnutý!"
 msgid "Account is blocked for %s seconds"
 msgstr "Konto je zablokované na %s sekúnd"
 
-#: events.php:419 include/actions.inc.php:150 include/actions.inc.php:338
+#: events.php:422 include/actions.inc.php:150 include/actions.inc.php:338
 #: include/blocks.inc.php:631 include/blocks.inc.php:796
 #: include/events.inc.php:198 include/events.inc.php:302
 #: include/views/configuration.action.edit.php:1060 tr_status.php:285
@@ -295,7 +302,7 @@ msgstr "Potvrdenia"
 #: include/views/administration.general.iconmap.edit.php:48
 #: include/views/administration.general.regularexpressions.edit.php:47
 #: include/views/administration.general.valuemapping.edit.php:46
-#: include/views/administration.users.edit.php:196
+#: include/views/administration.users.edit.php:200
 #: include/views/configuration.action.edit.php:78
 #: include/views/configuration.action.edit.php:391
 #: include/views/configuration.action.edit.php:395
@@ -304,7 +311,7 @@ msgstr "Potvrdenia"
 #: include/views/configuration.action.edit.php:765
 #: include/views/configuration.action.edit.php:941
 #: include/views/configuration.action.edit.php:1095
-#: include/views/configuration.graph.edit.php:278
+#: include/views/configuration.graph.edit.php:282
 #: include/views/configuration.host.discovery.edit.php:198
 #: include/views/configuration.host.discovery.edit.php:288
 #: include/views/configuration.host.edit.php:567
@@ -315,7 +322,7 @@ msgstr "Potvrdenia"
 #: include/views/configuration.item.prototype.edit.php:271
 #: include/views/configuration.maintenance.edit.php:105
 #: include/views/configuration.services.edit.php:97
-#: include/views/configuration.services.edit.php:139
+#: include/views/configuration.services.edit.php:140
 #: include/views/configuration.template.edit.php:393
 #: include/views/configuration.trigger.prototype.edit.php:141
 #: include/views/configuration.trigger.prototype.edit.php:274
@@ -402,7 +409,7 @@ msgstr "Operácie akcie"
 msgid "Action updated"
 msgstr "Akcia aktualizovaná"
 
-#: events.php:420 include/blocks.inc.php:632 include/blocks.inc.php:797
+#: events.php:423 include/blocks.inc.php:632 include/blocks.inc.php:797
 #: include/events.inc.php:199 include/menu.inc.php:225
 #: include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:22
@@ -458,8 +465,8 @@ msgstr "Aktívny do"
 #: include/views/administration.usergroups.edit.php:134
 #: include/views/administration.usergroups.edit.php:167
 #: include/views/administration.users.edit.php:72
-#: include/views/administration.users.edit.php:257
-#: include/views/administration.users.edit.php:419
+#: include/views/administration.users.edit.php:261
+#: include/views/administration.users.edit.php:423
 #: include/views/common.filter.trigger.php:142
 #: include/views/configuration.action.edit.php:369
 #: include/views/configuration.action.edit.php:592
@@ -469,8 +476,8 @@ msgstr "Aktívny do"
 #: include/views/configuration.action.edit.php:1119
 #: include/views/configuration.application.edit.php:58
 #: include/views/configuration.discovery.edit.php:111
-#: include/views/configuration.graph.edit.php:287
-#: include/views/configuration.graph.edit.php:371
+#: include/views/configuration.graph.edit.php:291
+#: include/views/configuration.graph.edit.php:375
 #: include/views/configuration.host.discovery.edit.php:234
 #: include/views/configuration.host.discovery.edit.php:333
 #: include/views/configuration.host.discovery.edit.php:369
@@ -494,9 +501,9 @@ msgstr "Aktívny do"
 #: include/views/configuration.item.prototype.edit.php:428
 #: include/views/configuration.maintenance.edit.php:147
 #: include/views/configuration.maintenance.edit.php:211
-#: include/views/configuration.services.edit.php:125
-#: include/views/configuration.services.edit.php:314
-#: include/views/configuration.services.edit.php:349
+#: include/views/configuration.services.edit.php:126
+#: include/views/configuration.services.edit.php:315
+#: include/views/configuration.services.edit.php:350
 #: include/views/configuration.template.edit.php:435
 #: include/views/configuration.template.edit.php:484
 #: include/views/configuration.trigger.prototype.edit.php:64
@@ -555,7 +562,7 @@ msgstr "Pridať novú alebo existujúcu aplikáciu"
 msgid "Add new or existing host groups"
 msgstr "Pridať novú alebo existujúcu skupinu zariadení"
 
-#: include/views/configuration.graph.edit.php:293
+#: include/views/configuration.graph.edit.php:297
 #: include/views/configuration.trigger.prototype.edit.php:314
 #: include/views/configuration.trigger.prototype.massupdate.php:95
 msgid "Add prototype"
@@ -1170,8 +1177,8 @@ msgstr "Využitie CPU v percentách. Vráti desatinné číslo"
 msgid "Calculate SLA, acceptable SLA (in %)"
 msgstr "Výpočet SLA, akceptovateľná SLA (v %)"
 
-#: include/items.inc.php:101 include/views/configuration.graph.edit.php:127
-#: include/views/configuration.graph.edit.php:188
+#: include/items.inc.php:101 include/views/configuration.graph.edit.php:129
+#: include/views/configuration.graph.edit.php:191
 msgid "Calculated"
 msgstr "Vypočítaná"
 
@@ -1206,8 +1213,9 @@ msgstr "Kanada (136 znakov)"
 #: include/views/js/configuration.discovery.edit.js.php:536
 #: include/views/js/configuration.discovery.edit.js.php:605
 #: include/views/js/configuration.discovery.edit.js.php:635
-#: include/views/js/conf.import.js.php:16 jsLoader.php:105 tr_logform.php:383
-#: tr_logform.php:389
+#: include/views/js/conf.import.js.php:16
+#: include/views/monitoring.slideconf.edit.php:265 jsLoader.php:105
+#: tr_logform.php:383 tr_logform.php:389
 msgid "Cancel"
 msgstr "Zrušiť"
 
@@ -1454,7 +1462,7 @@ msgstr "Nie je možné vytvoriť prototyp grafu pre zisteného hosta \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
-msgstr "Nie je možné otvoriť ďalšie pripojenie k databáze."
+msgstr "Nie je možné otvoriť ďalšie spojenie k databáze."
 
 #: include/classes/api/services/CTrigger.php:1338
 #: include/classes/api/services/CTriggerPrototype.php:1087
@@ -2240,8 +2248,8 @@ msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "Nie je možné nastaviť \"templateid\" pre prototyp spúšťača \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:896
-#: include/classes/api/services/CHost.php:1662
-#: include/classes/api/services/CHost.php:1790
+#: include/classes/api/services/CHost.php:1668
+#: include/classes/api/services/CHost.php:1796
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "Nie je možné nastaviť inventárne polia pre zakázaný inventár."
 
@@ -2330,7 +2338,7 @@ msgstr "Nie je možné aktualizovať \"%1$s\" pre položku \"%2$s\"."
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "Nie je možné aktualizovať \"%1$s\" pre spúšťač \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1774
+#: include/classes/api/services/CHost.php:1780
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "Nie je možné aktualizovať \"%2$s\" pre zisteného hosta \"%1$s\"."
@@ -2499,8 +2507,8 @@ msgstr "Nie je možné aktualizovať mapu siete"
 msgid "Cannot update proxy"
 msgstr "Nie je možné aktualizovať proxy"
 
-#: include/classes/api/services/CProxy.php:752
-#: include/classes/api/services/CProxy.php:843
+#: include/classes/api/services/CProxy.php:758
+#: include/classes/api/services/CProxy.php:849
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "Nie je možné aktualizovať proxy pre zisteného hosta \"%1$s\"."
@@ -2574,7 +2582,7 @@ msgstr "Nie je možné aktualizovať web scenár"
 
 #: include/views/js/configuration.discovery.edit.js.php:602
 msgid "Cannot validate discovery check: invalid request or connection to Zabbix server failed."
-msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové pripojenie k Zabbix serveru."
+msgstr "Nie je možné skontrolovať zisťovaciu kontrolu: neplatná požiadavka alebo problémové spojenie so Zabbix serverom."
 
 #: include/views/administration.general.regularexpressions.edit.php:46
 msgid "Case sensitive"
@@ -2582,15 +2590,11 @@ msgstr "Rozlišovať veľkosť písmen"
 
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
-msgstr ""
-"Spracovávať všetky SNMP trapy, ktoré vyberie regulárny výraz. Ak nie je "
-"definovaný regulárny výraz, potom sa spracovávajú všetky trapy."
+msgstr "Spracovávať všetky SNMP trapy, ktoré vyberie regulárny výraz. Ak nie je definovaný regulárny výraz, potom sa spracovávajú všetky trapy."
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
-msgstr ""
-"Spracovávať všetky SNMP trapy, ktoré nie su spracované nejakou snmptrap[] "
-"položkou."
+msgstr "Spracovávať všetky SNMP trapy, ktoré nie su spracované nejakou snmptrap[] položkou."
 
 #: include/views/monitoring.screen.constructor.edit.php:706
 msgid "Center"
@@ -2696,9 +2700,7 @@ msgstr "Kontrola úspešného TCP spojenia na zadaný port. Vráti 0 - neúspeš
 
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
-msgstr ""
-"Kontrola, či server je dostupný cez ICMP ping. 0 - ICMP ping zlyhal. 1 - "
-"ICMP ping úspešný."
+msgstr "Kontrola, či server je dostupný cez ICMP ping. 0 - ICMP ping zlyhal. 1 - ICMP ping úspešný."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:403
@@ -2775,7 +2777,7 @@ msgstr "Kruhové odkazovanie šablón nie je povolené."
 msgid "Clear"
 msgstr "Vyčistiť"
 
-#: include/views/configuration.httpconf.list.php:157
+#: include/views/configuration.httpconf.list.php:159
 #: include/views/configuration.item.list.php:263
 msgid "Clear history"
 msgstr "Vyčistiť históriu"
@@ -2802,7 +2804,7 @@ msgstr "Hodiny"
 #: include/views/configuration.action.edit.php:1108
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.discovery.edit.php:103
-#: include/views/configuration.graph.edit.php:363
+#: include/views/configuration.graph.edit.php:367
 #: include/views/configuration.host.discovery.edit.php:354
 #: include/views/configuration.host.edit.php:807
 #: include/views/configuration.hostgroups.edit.php:77
@@ -2835,7 +2837,7 @@ msgstr "Zavrieť konštruktéra výrazu"
 msgid "Collapse"
 msgstr "Zavrieť"
 
-#: include/views/configuration.graph.edit.php:277
+#: include/views/configuration.graph.edit.php:281
 #: include/views/js/monitoring.sysmaps.js.php:354
 msgid "Colour"
 msgstr "Farba"
@@ -3029,7 +3031,7 @@ msgstr "Nastavenie makier"
 msgid "Configuration of maintenance periods"
 msgstr "Nastavenie plánovaných odstávok"
 
-#: app/controllers/CControllerMediatypeEdit.php:184
+#: app/controllers/CControllerMediatypeEdit.php:185
 #: app/controllers/CControllerMediatypeList.php:109
 msgid "Configuration of media types"
 msgstr "Nastavenie typov médií"
@@ -3113,7 +3115,7 @@ msgstr "Konfigurovať"
 #: include/classes/setup/CSetupWizard.php:41
 #: include/classes/setup/CSetupWizard.php:270
 msgid "Configure DB connection"
-msgstr "Konfigurovať pripojenie DB"
+msgstr "Konfigurovať DB spojenie"
 
 #: app/views/administration.script.edit.php:97
 msgid "Confirmation text"
@@ -3134,12 +3136,12 @@ msgstr "Pripojiť k"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Connection security"
-msgstr "Bezpečnosť pripojenia"
+msgstr "Bezpečnosť spojenia"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
 msgid "Connection timeout of %1$s seconds exceeded when connecting to Zabbix server \"%2$s\"."
-msgstr "Časový limit pripojenie %1$s sekúnd vypršal pri pripájaní k Zabbix serveru \"%2$s\"."
+msgstr "Časový limit spojenie %1$s sekúnd vypršal pri spájaní so Zabbix serverom \"%2$s\"."
 
 #: include/classes/server/CZabbixServer.php:282
 #, c-format
@@ -3148,7 +3150,7 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Incorrect DNS server configuration.\n"
 msgstr ""
-"Pripojenie k Zabbix serveru \"%s\" zlyhalo. Možné dôvody:\n"
+"Spojenie so Zabbix serverom \"%s\" zlyhalo. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
 "2. Nesprávne nastavenie DNS servera.\n"
 
@@ -3161,9 +3163,9 @@ msgid ""
 "3. Zabbix server daemon not running;\n"
 "4. Firewall is blocking TCP connection.\n"
 msgstr ""
-"Pripojenie k Zabbix serveru \"%s\" bolo odmietnuté. Možné dôvody:\n"
+"Spojenie so Zabbix serverom \"%s\" bolo odmietnuté. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
-"2. Bezpečnostné nastavenia (napríklad SELinux) blokujú pripojenie;\n"
+"2. Bezpečnostné nastavenia (napríklad SELinux) blokujú spojenie;\n"
 "3. Zabbix server démon nie je spustený;\n"
 "4. Firewall blokuje TCP spojenie.\n"
 
@@ -3174,33 +3176,33 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
-"Časový limit pripojenia k Zabbix serveru \"%s\" vypršal. Možné dôvody:\n"
+"Časový limit spojenia so Zabbix serverom \"%s\" vypršal. Možné dôvody:\n"
 "1. Nesprávne nastavenie IP/DNS Zabbix servera v súbore \"zabbix.conf.php\";\n"
 "2. Firewall blokuje TCP spojenie.\n"
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr "Pripojenia"
+msgstr "Spojenia"
 
 #: include/views/configuration.host.edit.php:773
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:358
 msgid "Connections from host"
-msgstr "Pripojenia z hosta"
+msgstr "Spojenia z hosta"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr "Pripojenia z proxy"
+msgstr "Spojenia z proxy"
 
 #: include/views/configuration.host.edit.php:765
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:350
 msgid "Connections to host"
-msgstr "Pripojenia k hostovi"
+msgstr "Spojenia k hostovi"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr "Pripojenia k proxy"
+msgstr "Spojenia k proxy"
 
 #: include/views/monitoring.screen.list.php:67
 #: include/views/monitoring.sysmap.list.php:52
@@ -3506,8 +3508,8 @@ msgstr "Vlastné intervaly"
 msgid "Custom label"
 msgstr "Vlastný popis"
 
-#: include/classes/api/services/CMap.php:649
-#: include/classes/api/services/CMap.php:1073
+#: include/classes/api/services/CMap.php:654
+#: include/classes/api/services/CMap.php:1078
 #, c-format
 msgid "Custom label for map \"%2$s\" elements of type \"%1$s\" may not be empty."
 msgstr "Vlastný popis pre elementy typu \"%1$s\" v mape \"%2$s\" nemôže byť prázdny."
@@ -3541,7 +3543,7 @@ msgstr "Vlastné prezentácie"
 msgid "Czech (cs_CZ)"
 msgstr "Česky (cs_CZ)"
 
-#: include/classes/import/validators/C10XmlValidator.php:344
+#: include/classes/import/validators/C10XmlValidator.php:346
 msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
@@ -3554,8 +3556,8 @@ msgstr "DD.MM.YY"
 msgid "DES"
 msgstr "DES"
 
-#: include/maps.inc.php:482 include/maps.inc.php:562 include/maps.inc.php:648
-#: include/maps.inc.php:736
+#: include/maps.inc.php:503 include/maps.inc.php:583 include/maps.inc.php:669
+#: include/maps.inc.php:757
 msgid "DISABLED"
 msgstr "VYPNUTÉ"
 
@@ -3563,7 +3565,7 @@ msgstr "VYPNUTÉ"
 msgid "DISCOVERED"
 msgstr "DISCOVERED"
 
-#: app/views/administration.proxy.edit.php:53 events.php:399
+#: app/views/administration.proxy.edit.php:53 events.php:402
 #: include/views/inventory.host.view.php:95
 #: include/views/js/configuration.host.edit.js.php:24 search.php:127
 msgid "DNS"
@@ -3869,7 +3871,7 @@ msgstr "Oneskorené o"
 #: include/views/configuration.hostgroups.list.php:148
 #: include/views/configuration.host.list.php:271
 #: include/views/configuration.host.prototype.list.php:137
-#: include/views/configuration.httpconf.list.php:160
+#: include/views/configuration.httpconf.list.php:162
 #: include/views/configuration.item.list.php:268
 #: include/views/configuration.item.prototype.list.php:122
 #: include/views/configuration.maintenance.list.php:78
@@ -3915,11 +3917,11 @@ msgstr "Zmazať zisťovacie pravidlo?"
 msgid "Delete expression?"
 msgstr "Zmazať výraz?"
 
-#: include/views/configuration.graph.edit.php:351
+#: include/views/configuration.graph.edit.php:355
 msgid "Delete graph prototype?"
 msgstr "Zmazať prototyp grafu?"
 
-#: include/views/configuration.graph.edit.php:351
+#: include/views/configuration.graph.edit.php:355
 msgid "Delete graph?"
 msgstr "Zmazať graf?"
 
@@ -3927,7 +3929,7 @@ msgstr "Zmazať graf?"
 msgid "Delete history of selected items?"
 msgstr "Zmazať históriu označených položiek?"
 
-#: include/views/configuration.httpconf.list.php:158
+#: include/views/configuration.httpconf.list.php:160
 msgid "Delete history of selected web scenarios?"
 msgstr "Zmazať históriu označených scenárov?"
 
@@ -4096,7 +4098,7 @@ msgstr "Zmazať označené prototypy spúšťačov?"
 msgid "Delete selected triggers?"
 msgstr "Zmazať označené spúšťače?"
 
-#: include/views/administration.users.edit.php:407
+#: include/views/administration.users.edit.php:411
 msgid "Delete selected user?"
 msgstr "Zmazať označeného používateľa?"
 
@@ -4120,7 +4122,7 @@ msgstr[2] "Zmazať označené mapovanie hodnôt? Je použité pre %d položiek!"
 msgid "Delete selected value maps?"
 msgstr "Zmazať označenú hodnotu máp?"
 
-#: include/views/configuration.httpconf.list.php:160
+#: include/views/configuration.httpconf.list.php:162
 msgid "Delete selected web scenarios?"
 msgstr "Zmazať označené scenáre?"
 
@@ -4234,7 +4236,7 @@ msgstr "Rozdiel (rýchlosť za sekundu)"
 msgid "Deny"
 msgstr "Zakázať"
 
-#: include/views/configuration.services.edit.php:329
+#: include/views/configuration.services.edit.php:330
 #: include/views/configuration.trigger.prototype.edit.php:306
 #: include/views/configuration.trigger.prototype.edit.php:323
 #: include/views/configuration.triggers.edit.php:306
@@ -4247,7 +4249,7 @@ msgid "Dependent"
 msgstr "Podradená závislosť (tento ovplyvňuje)"
 
 #: include/triggers.inc.php:951
-#: include/views/configuration.services.edit.php:122
+#: include/views/configuration.services.edit.php:123
 #: include/views/configuration.trigger.prototype.list.php:88
 #: include/views/configuration.triggers.list.php:137 popup.php:1135
 #: tr_status.php:544
@@ -4259,7 +4261,7 @@ msgid "Deployment status"
 msgstr "Stav nasadenia"
 
 #: app/views/administration.proxy.edit.php:88
-#: app/views/administration.script.edit.php:62 events.php:400 events.php:415
+#: app/views/administration.script.edit.php:62 events.php:403 events.php:418
 #: include/classes/screens/CScreenEvents.php:37
 #: include/views/administration.auditlogs.list.php:65
 #: include/views/configuration.host.discovery.edit.php:251
@@ -4376,7 +4378,7 @@ msgstr "Rozmer (stĺpce x riadky)"
 #: include/views/configuration.host.discovery.list.php:148
 #: include/views/configuration.host.list.php:268
 #: include/views/configuration.host.prototype.list.php:134
-#: include/views/configuration.httpconf.list.php:156
+#: include/views/configuration.httpconf.list.php:158
 #: include/views/configuration.item.list.php:262
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:157
@@ -4458,7 +4460,7 @@ msgstr "Zakázať označené prototypy spúšťačov?"
 msgid "Disable selected triggers?"
 msgstr "Zakázať označené spúšťače?"
 
-#: include/views/configuration.httpconf.list.php:156
+#: include/views/configuration.httpconf.list.php:158
 msgid "Disable selected web scenarios?"
 msgstr "Zakázať označené scenáre?"
 
@@ -4472,7 +4474,7 @@ msgstr "Zakázať označené scenáre?"
 #: include/views/administration.usergroups.list.php:53
 #: include/views/administration.usergroups.list.php:85
 #: include/views/administration.usergroups.list.php:94
-#: include/views/administration.users.edit.php:206
+#: include/views/administration.users.edit.php:210
 #: include/views/administration.users.list.php:134
 #: include/views/administration.users.list.php:136
 #: include/views/configuration.action.list.php:79
@@ -4504,7 +4506,7 @@ msgstr "Zistené"
 msgid "Discovered device"
 msgstr "Zistené zariadenie"
 
-#: events.php:276 include/menu.inc.php:103 include/menu.inc.php:229
+#: events.php:277 include/menu.inc.php:103 include/menu.inc.php:229
 #: include/views/configuration.action.list.php:30
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.host.list.php:246
@@ -4691,12 +4693,12 @@ msgstr "Stiahnuť konfiguračný súbor"
 #: app/views/monitoring.discovery.view.php:171
 #: app/views/report.services.php:54 app/views/report.services.php:55
 #: app/views/report.services.php:56 app/views/report.services.php:57
-#: include/views/configuration.services.edit.php:150
-#: include/views/configuration.services.edit.php:192
+#: include/views/configuration.services.edit.php:151
+#: include/views/configuration.services.edit.php:193
 msgid "Downtime"
 msgstr "Prestoj"
 
-#: include/views/configuration.graph.edit.php:268
+#: include/views/configuration.graph.edit.php:272
 msgid "Draw style"
 msgstr "Štýl vykreslenia"
 
@@ -4725,8 +4727,8 @@ msgstr "Duplicitný \"popis\" hodnoty \"%1$s\" pre typ média."
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
 msgstr "Duplicitné \"meno\" hodnoty \"%1$s\" pre prototyp aplikácie v prototype položky \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:396
-#: include/classes/api/services/CMap.php:810
+#: include/classes/api/services/CMap.php:401
+#: include/classes/api/services/CMap.php:815
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
 msgstr "Duplicitné \"meno\" hodnoty \"%1$s\" pre mapu."
@@ -4763,14 +4765,14 @@ msgstr "Duplicitné meno prototypu skupiny \"%2$s\" pre prototyp hosta \"%1$s\".
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr "Duplicitné ID skupiny hostov \"%2$s\" pre prototyp hosta \"%1$s\"."
 
-#: include/classes/api/services/CHost.php:1610
-#: include/classes/api/services/CHost.php:1820
+#: include/classes/api/services/CHost.php:1616
+#: include/classes/api/services/CHost.php:1826
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "Kopírovanie hosta. Host s rovnakým host menom \"%s\" už existuje."
 
-#: include/classes/api/services/CHost.php:1617
-#: include/classes/api/services/CHost.php:1840
+#: include/classes/api/services/CHost.php:1623
+#: include/classes/api/services/CHost.php:1846
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "Kopírovanie hosta. Host s rovnakým zobrazovaným menom \"%s\" už existuje v dátach."
@@ -4790,8 +4792,8 @@ msgstr "Kopírovanie mena závažnosti \"%s\"."
 msgid "Duplicate user alias \"%s\"."
 msgstr "Kopírovanie používateľského aliasu \"%s\"."
 
-#: include/classes/api/services/CMap.php:504
-#: include/classes/api/services/CMap.php:924
+#: include/classes/api/services/CMap.php:509
+#: include/classes/api/services/CMap.php:929
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
 msgstr "Duplicitné userid \"%1$s\" v používateľoch pre mapu \"%2$s\"."
@@ -4802,20 +4804,19 @@ msgstr "Duplicitné userid \"%1$s\" v používateľoch pre mapu \"%2$s\"."
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
 msgstr "Duplicitné userid \"%1$s\" v používateľoch pre obrazovky \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:578
-#: include/classes/api/services/CMap.php:997
+#: include/classes/api/services/CMap.php:583
+#: include/classes/api/services/CMap.php:1002
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr "Duplicitné usrgrpid \"%1$s\" v používatelských skupinách pre mapu \"%2$s\"."
+msgstr "Duplicitné usrgrpid \"%1$s\" v používateľských skupinách pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:613
 #: include/classes/api/services/CScreen.php:948
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
-"Duplicitné usrgrpid \"%1$s\" v používateľských skupinách pre obrazovku \"%2$s\"."
+msgstr "Duplicitné usrgrpid \"%1$s\" v používateľských skupinách pre obrazovku \"%2$s\"."
 
-#: events.php:418 include/events.inc.php:196 include/events.inc.php:302
+#: events.php:421 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
 msgid "Duration"
 msgstr "Trvanie"
@@ -4836,7 +4837,7 @@ msgstr "Dynamická položka"
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
 msgstr "Každá URL by mala mať jedinečné meno. Prosim uistite sa, že existuje len jedna URL s takýmto menom"
 
-#: include/views/administration.users.edit.php:242
+#: include/views/administration.users.edit.php:246
 #: include/views/configuration.action.edit.php:451
 #: include/views/configuration.action.edit.php:467
 #: include/views/configuration.maintenance.edit.php:114
@@ -4848,6 +4849,18 @@ msgstr "Každá URL by mala mať jedinečné meno. Prosim uistite sa, že existu
 #: include/views/monitoring.triggerComment.php:53
 msgid "Edit"
 msgstr "Aktualizovať"
+
+#: app/views/monitoring.map.view.php:38
+msgid "Edit map"
+msgstr ""
+
+#: include/views/monitoring.screen.php:47
+msgid "Edit screen"
+msgstr ""
+
+#: include/views/monitoring.slides.php:51
+msgid "Edit slide show"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Edit trigger"
@@ -4948,9 +4961,9 @@ msgstr "Prázdny host."
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:554
 #: include/classes/api/services/CItemPrototype.php:705
-#: include/classes/api/services/CMap.php:345
-#: include/classes/api/services/CMap.php:371
-#: include/classes/api/services/CMap.php:768
+#: include/classes/api/services/CMap.php:350
+#: include/classes/api/services/CMap.php:376
+#: include/classes/api/services/CMap.php:773
 #: include/classes/api/services/CMediatype.php:176
 #: include/classes/api/services/CMediatype.php:380
 #: include/classes/api/services/CProxy.php:448
@@ -4986,7 +4999,7 @@ msgstr "Prázdne vstupné parametre."
 msgid "Empty input."
 msgstr "Prázdny vstup."
 
-#: include/classes/api/services/CMap.php:776
+#: include/classes/api/services/CMap.php:781
 msgid "Empty map ID."
 msgstr "Prázdne ID mapy."
 
@@ -5059,7 +5072,7 @@ msgstr "Prázdne ID web scenára."
 #: include/views/configuration.host.discovery.list.php:145
 #: include/views/configuration.host.list.php:267
 #: include/views/configuration.host.prototype.list.php:131
-#: include/views/configuration.httpconf.list.php:155
+#: include/views/configuration.httpconf.list.php:157
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:116
 #: include/views/configuration.trigger.prototype.list.php:154
@@ -5157,7 +5170,7 @@ msgstr "Povoliť označené prototypy spúšťačov?"
 msgid "Enable selected triggers?"
 msgstr "Povoliť označené spúšťače?"
 
-#: include/views/configuration.httpconf.list.php:155
+#: include/views/configuration.httpconf.list.php:157
 msgid "Enable selected web scenarios?"
 msgstr "Povoliť označené scenáre?"
 
@@ -5172,7 +5185,7 @@ msgstr "Povoliť označené scenáre?"
 #: include/views/administration.usergroups.list.php:49
 #: include/views/administration.usergroups.list.php:81
 #: include/views/administration.usergroups.list.php:93
-#: include/views/administration.users.edit.php:200
+#: include/views/administration.users.edit.php:204
 #: include/views/administration.users.list.php:133
 #: include/views/administration.users.list.php:137
 #: include/views/configuration.action.edit.php:65
@@ -5280,7 +5293,7 @@ msgstr "Podrobnosti zdroju udalostí"
 msgid "Event type"
 msgstr "Typ udalosti"
 
-#: events.php:234 include/menu.inc.php:73
+#: events.php:236 include/menu.inc.php:73
 #: include/views/common.filter.trigger.php:63
 #: include/views/inventory.host.view.php:144 jsLoader.php:188 search.php:130
 #: search.php:234 search.php:286 search.php:336
@@ -5372,7 +5385,7 @@ msgstr "Koláčový"
 msgid "Export"
 msgstr "Export"
 
-#: events.php:280
+#: events.php:281
 msgid "Export to CSV"
 msgstr "Export do CSV súboru"
 
@@ -5485,7 +5498,7 @@ msgstr "Obľúbené jednoduché grafy"
 msgid "Favourite slide shows"
 msgstr "Obľúbené prezentácie"
 
-#: include/views/monitoring.slides.php:56
+#: include/views/monitoring.slides.php:62
 msgid "Favourites"
 msgstr "Obľúbené"
 
@@ -5513,7 +5526,7 @@ msgstr "Pole \"%1$s\" nemôže byť nastavené na NULL."
 msgid "Field \"%1$s\" is mandatory."
 msgstr "Pole \"%1$s\" je povinné."
 
-#: include/classes/api/services/CMap.php:553
+#: include/classes/api/services/CMap.php:558
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Chýbajúca hodnota pola \"%1$s\" pre mapu \"%2$s\"."
@@ -5672,8 +5685,8 @@ msgstr "Fit"
 msgid "Fit to map"
 msgstr "Prispôsobiť mape"
 
-#: include/views/configuration.graph.edit.php:128
-#: include/views/configuration.graph.edit.php:189
+#: include/views/configuration.graph.edit.php:130
+#: include/views/configuration.graph.edit.php:192
 msgid "Fixed"
 msgstr "Pevná"
 
@@ -5733,8 +5746,8 @@ msgid "Friday"
 msgstr "Piatok"
 
 #: app/views/report.services.php:56
-#: include/views/configuration.services.edit.php:251
-#: include/views/configuration.services.edit.php:281
+#: include/views/configuration.services.edit.php:252
+#: include/views/configuration.services.edit.php:282
 #: include/views/js/monitoring.sysmaps.js.php:316
 #: include/views/reports.toptriggers.php:33 report2.php:354 report4.php:174
 #: services.php:187 services.php:193
@@ -5752,7 +5765,7 @@ msgstr "Frontend prístup"
 msgid "Frontend access updated"
 msgstr "Frontend prístup aktualizovaný"
 
-#: include/views/administration.users.edit.php:273
+#: include/views/administration.users.edit.php:277
 msgid "Frontend messaging"
 msgstr "Povoliť frontend správy"
 
@@ -5765,7 +5778,7 @@ msgstr "Vytvoriť úplnú kópiu"
 msgid "Fullscreen"
 msgstr "Celá obrazovka"
 
-#: include/views/configuration.graph.edit.php:266
+#: include/views/configuration.graph.edit.php:270
 #: include/views/configuration.triggers.expression.php:66
 msgid "Function"
 msgstr "Funkcia"
@@ -5849,7 +5862,7 @@ msgid "Gradient line"
 msgstr "Gradientová čiara"
 
 #: include/audit.inc.php:29 include/screens.inc.php:30
-#: include/views/configuration.graph.edit.php:332
+#: include/views/configuration.graph.edit.php:336
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.history.php:77
 #: include/views/monitoring.screen.constructor.edit.php:131 latest.php:524
@@ -5918,7 +5931,7 @@ msgstr "Graf zmazaný"
 msgid "Graph element"
 msgstr "Element grafu"
 
-#: include/screens.inc.php:45 include/views/configuration.graph.edit.php:332
+#: include/screens.inc.php:45 include/views/configuration.graph.edit.php:336
 #: include/views/monitoring.screen.constructor.edit.php:178
 msgid "Graph prototype"
 msgstr "Prototyp grafu"
@@ -5971,7 +5984,7 @@ msgstr "Prototypy grafov"
 msgid "Graph prototypes deleted"
 msgstr "Prototypy grafov zmazané"
 
-#: include/views/js/configuration.graph.edit.js.php:36
+#: include/views/js/configuration.graph.edit.js.php:40
 msgid "Graph sum"
 msgstr "Sumár grafov"
 
@@ -6032,7 +6045,7 @@ msgstr "Grécky (el_GR)"
 msgid "Grid"
 msgstr "Mriežka"
 
-#: app/views/monitoring.web.view.php:28 events.php:269
+#: app/views/monitoring.web.view.php:28 events.php:270
 #: hostinventoriesoverview.php:88
 #: include/classes/screens/CScreenDataOverview.php:55
 #: include/classes/screens/CScreenHostgroupTriggers.php:67
@@ -6056,8 +6069,8 @@ msgstr "Mriežka"
 #: include/views/monitoring.screen.constructor.edit.php:388
 #: include/views/monitoring.screen.constructor.edit.php:495
 #: include/views/monitoring.screen.constructor.edit.php:570
-#: include/views/monitoring.screen.php:69
-#: include/views/monitoring.slides.php:74 popup.php:495 templates.php:572
+#: include/views/monitoring.screen.php:75
+#: include/views/monitoring.slides.php:80 popup.php:495 templates.php:572
 #: tr_status.php:206
 msgid "Group"
 msgstr "Skupina"
@@ -6289,9 +6302,9 @@ msgid "Horizontal align"
 msgstr "Vodorovné zarovnanie"
 
 #: app/views/monitoring.web.view.php:29 app/views/monitoring.web.view.php:36
-#: app/views/monitoring.widget.hosts.view.php:241
-#: app/views/monitoring.widget.hosts.view.php:298 events.php:270
-#: events.php:414 events.php:514 httpconf.php:184 httpconf.php:331
+#: app/views/monitoring.widget.hosts.view.php:254
+#: app/views/monitoring.widget.hosts.view.php:311 events.php:271
+#: events.php:417 events.php:517 httpconf.php:184 httpconf.php:331
 #: httpconf.php:389 httpconf.php:440 include/actions.inc.php:47
 #: include/audit.inc.php:27 include/blocks.inc.php:624
 #: include/blocks.inc.php:792 include/classes/api/services/CHttpTest.php:417
@@ -6324,8 +6337,8 @@ msgstr "Vodorovné zarovnanie"
 #: include/views/js/monitoring.sysmaps.js.php:81
 #: include/views/monitoring.charts.php:25
 #: include/views/monitoring.screen.constructor.edit.php:416
-#: include/views/monitoring.screen.php:70
-#: include/views/monitoring.slides.php:75
+#: include/views/monitoring.screen.php:76
+#: include/views/monitoring.slides.php:81
 #: include/views/reports.toptriggers.php:118 items.php:555 items.php:849
 #: items.php:882 jsLoader.php:141 latest.php:432 latest.php:452 popup.php:487
 #: popup.php:513 popup.php:1200 queue.php:248 report2.php:342 report2.php:367
@@ -6597,7 +6610,7 @@ msgid "Host screens"
 msgstr "Hostove obrazovky"
 
 #: app/views/monitoring.dashboard.view.php:103
-#: app/views/monitoring.widget.hosts.view.php:368
+#: app/views/monitoring.widget.hosts.view.php:381
 msgid "Host status"
 msgstr "Stav hosta"
 
@@ -6622,8 +6635,8 @@ msgstr "Host aktualizovaný"
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "Host s rovnakým menom\"%1$s\" už existuje."
 
-#: include/classes/api/services/CHost.php:1693
-#: include/classes/api/services/CHost.php:1873
+#: include/classes/api/services/CHost.php:1699
+#: include/classes/api/services/CHost.php:1879
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "Host s rovnakým menom\"%s\" už existuje."
@@ -6634,8 +6647,8 @@ msgstr "Host s rovnakým menom\"%s\" už existuje."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "Host s rovnakým zobrazovaným menom \"%1$s\" už existuje."
 
-#: include/classes/api/services/CHost.php:1699
-#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1705
+#: include/classes/api/services/CHost.php:1886
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "Host s rovnakým zobrazovaným menom\"%s\" už existuje."
@@ -6721,7 +6734,7 @@ msgstr "ID"
 msgid "IMAP"
 msgstr "IMAP"
 
-#: app/views/administration.proxy.edit.php:52 events.php:398
+#: app/views/administration.proxy.edit.php:52 events.php:401
 #: include/views/administration.auditlogs.list.php:61
 #: include/views/inventory.host.view.php:95
 #: include/views/js/configuration.host.edit.js.php:23 search.php:126
@@ -6969,10 +6982,10 @@ msgstr "Ikony"
 
 #: include/func.inc.php:1670 include/func.inc.php:1689
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
-msgstr "Pokiaľ si myslíte, že táto správa je zlá, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
+msgstr "Pokiaľ si myslíte, že táto správa je nesprávna, prosím kontaktuje vášho administrátora pre pridelenie potrebných oprávnení."
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:758
+#: include/maps.inc.php:779
 #: include/views/administration.general.image.edit.php:46
 #: include/views/administration.general.image.edit.php:49
 #: include/views/js/monitoring.sysmaps.js.php:21 jsLoader.php:145 map.php:152
@@ -7102,14 +7115,14 @@ msgstr "Vrátane"
 msgid "Incoming traffic statistics on network interface. Returns integer"
 msgstr "Štatistika príchodzej prevádzky na sieťovom rozhraní. Vráti celé číslo"
 
-#: include/classes/api/services/CMap.php:431
-#: include/classes/api/services/CMap.php:866
+#: include/classes/api/services/CMap.php:436
+#: include/classes/api/services/CMap.php:871
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
 msgstr "Nesprávna hodnota \"výška\" pre mapu \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:563
-#: include/classes/api/services/CMap.php:983
+#: include/classes/api/services/CMap.php:568
+#: include/classes/api/services/CMap.php:988
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
 msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľských skupinách pre mapu \"%2$s\"."
@@ -7118,25 +7131,22 @@ msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľských skupin
 #: include/classes/api/services/CScreen.php:934
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
-"Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľských skupinách pre "
-"obrazovku \"%2$s\"."
+msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľských skupinách pre obrazovku \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:489
-#: include/classes/api/services/CMap.php:910
+#: include/classes/api/services/CMap.php:494
+#: include/classes/api/services/CMap.php:915
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateloch pre mapu \"%2$s\"."
+msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľoch pre mapu \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:524
 #: include/classes/api/services/CScreen.php:861
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
-"Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľoch pre obrazovku \"%2$s\"."
+msgstr "Nesprávna hodnota \"oprávnenie\" \"%1$s\" v používateľoch pre obrazovku \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:450
-#: include/classes/api/services/CMap.php:872
+#: include/classes/api/services/CMap.php:455
+#: include/classes/api/services/CMap.php:877
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
 msgstr "Nesprávna hodnota \"súkromné\" \"%1$s\" pre mapu \"%2$s\"."
@@ -7152,20 +7162,20 @@ msgstr "Nesprávna hodnota \"súkromné\" \"%1$s\" pre obrazovku \"%2$s\"."
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Neplatná hodnota pola \"soft\" pre závislosť na službe \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:425
-#: include/classes/api/services/CMap.php:860
+#: include/classes/api/services/CMap.php:430
+#: include/classes/api/services/CMap.php:865
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
 msgstr "Nesprávna hodnota \"šírka\" pre mapu \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:636
-#: include/classes/api/services/CMap.php:643
-#: include/classes/api/services/CMap.php:659
-#: include/classes/api/services/CMap.php:669
-#: include/classes/api/services/CMap.php:1056
-#: include/classes/api/services/CMap.php:1065
-#: include/classes/api/services/CMap.php:1082
-#: include/classes/api/services/CMap.php:1094
+#: include/classes/api/services/CMap.php:641
+#: include/classes/api/services/CMap.php:648
+#: include/classes/api/services/CMap.php:664
+#: include/classes/api/services/CMap.php:674
+#: include/classes/api/services/CMap.php:1061
+#: include/classes/api/services/CMap.php:1070
+#: include/classes/api/services/CMap.php:1087
+#: include/classes/api/services/CMap.php:1099
 #, c-format
 msgid "Incorrect %1$s label type value for map \"%2$s\"."
 msgstr "Neplatná hodnota %1$s typu popisku pre mapu \"%2$s\"."
@@ -7327,13 +7337,13 @@ msgstr "Funkcii boli predané neplatné argumenty"
 #: include/classes/api/services/CHostInterface.php:238
 #: include/classes/api/services/CHostInterface.php:439
 #: include/classes/api/services/CItemGeneral.php:204
-#: include/classes/api/services/CMap.php:460
-#: include/classes/api/services/CMap.php:533
-#: include/classes/api/services/CMap.php:730
-#: include/classes/api/services/CMap.php:793
-#: include/classes/api/services/CMap.php:881
-#: include/classes/api/services/CMap.php:953
-#: include/classes/api/services/CMap.php:1157
+#: include/classes/api/services/CMap.php:465
+#: include/classes/api/services/CMap.php:538
+#: include/classes/api/services/CMap.php:735
+#: include/classes/api/services/CMap.php:798
+#: include/classes/api/services/CMap.php:886
+#: include/classes/api/services/CMap.php:958
+#: include/classes/api/services/CMap.php:1162
 #: include/classes/api/services/CMediatype.php:183
 #: include/classes/api/services/CMediatype.php:413
 #: include/classes/api/services/CScreen.php:495
@@ -7380,14 +7390,14 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "Nepovolené znaky použité pre host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:841
-#: include/classes/api/services/CHost.php:1588
-#: include/classes/api/services/CHost.php:1814
+#: include/classes/api/services/CHost.php:1594
+#: include/classes/api/services/CHost.php:1820
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "Nepovolené znaky použité pre meno hosta \"%s\"."
 
-#: include/classes/api/services/CProxy.php:695
-#: include/classes/api/services/CProxy.php:784
+#: include/classes/api/services/CProxy.php:701
+#: include/classes/api/services/CProxy.php:790
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "Nepovolené znaky použité pre meno proxy \"%1$s\"."
@@ -7445,7 +7455,7 @@ msgstr "Neplatná hodnota eventsource."
 msgid "Incorrect field \"%1$s\" name or value in where statement for table \"%2$s\"."
 msgstr "Neplatné pole \"%1$s\" meno alebo hodnota vo where podmienke pre tabuľku \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:388
+#: include/classes/api/services/CMap.php:393
 msgid "Incorrect fields for sysmap."
 msgstr "Neplatné polia pre sysmap."
 
@@ -7564,8 +7574,8 @@ msgstr "Neplatný parameter DNS pre rozhranie \"%s\"."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "Neplatný parameter port pre rozhranie \"%s\"."
 
-#: include/classes/api/services/CHost.php:1668
-#: include/classes/api/services/CHost.php:1796
+#: include/classes/api/services/CHost.php:1674
+#: include/classes/api/services/CHost.php:1802
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "Neplatné inventárne pole \"%s\"."
@@ -7643,7 +7653,7 @@ msgstr "Neplatná týždňová perióda údržby"
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
 msgstr "Neplatné ID mapy \"%1$s\" v prvku obrazovky."
 
-#: include/classes/api/services/CMap.php:777
+#: include/classes/api/services/CMap.php:782
 msgid "Incorrect map ID."
 msgstr "Neplatné ID mapy."
 
@@ -7788,8 +7798,8 @@ msgstr "Neplatné poradie sorder pre službu \"%1$s\"."
 msgid "Incorrect source value."
 msgstr "Neplatná zdrojová hodnota."
 
-#: include/classes/api/services/CHost.php:1645
-#: include/classes/api/services/CHost.php:1769
+#: include/classes/api/services/CHost.php:1651
+#: include/classes/api/services/CHost.php:1775
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "Neplatný stav pre hosta \"%1$s\"."
@@ -7896,8 +7906,8 @@ msgstr "Nesprávny typ kalkulácie pre akciu \"%1$s\"."
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "Nesprávny typ výpočtu pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:525
-#: include/classes/api/services/CMap.php:945
+#: include/classes/api/services/CMap.php:530
+#: include/classes/api/services/CMap.php:950
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
 msgstr "Nesprávne user ID špecifikované pre mapu \"%1$s\"."
@@ -7908,8 +7918,8 @@ msgstr "Nesprávne user ID špecifikované pre mapu \"%1$s\"."
 msgid "Incorrect user ID specified for screen \"%1$s\"."
 msgstr "Nesprávne user ID špecifikované pre obrazovku \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:595
-#: include/classes/api/services/CMap.php:1014
+#: include/classes/api/services/CMap.php:600
+#: include/classes/api/services/CMap.php:1019
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
 msgstr "Nesprávne user group ID špecifikované pre mapu \"%1$s\"."
@@ -7997,9 +8007,7 @@ msgstr "Neplatné ID mapy hodnôt."
 #: include/classes/api/services/CHost.php:1558
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr ""
-"Nesprávna hodnota použitá v PSK poli. Malo by to byť iba párne číslo z "
-"hexadecimálnych znakov."
+msgstr "Nesprávna hodnota použitá v PSK poli. Malo by to byť iba párne číslo z hexadecimálnych znakov."
 
 #: include/classes/api/services/CHost.php:1541
 msgid "Incorrect value used for connections from host field."
@@ -8017,8 +8025,8 @@ msgstr "Nesprávna hodnota použitá pre spojenia k hostovi poli."
 msgid "Incorrect value used for connections to proxy field."
 msgstr "Nesprávna hodnota použitá pre spojenia k proxy poli."
 
-#: include/classes/api/services/CProxy.php:720
-#: include/classes/api/services/CProxy.php:818
+#: include/classes/api/services/CProxy.php:726
+#: include/classes/api/services/CProxy.php:824
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "Neplatná hodnota použitá pre proxy stav \"%1$s\"."
@@ -8169,7 +8177,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.item.massupdate.php:330
 #: include/views/configuration.item.prototype.edit.php:271
 #: include/views/configuration.item.prototype.list.php:45
-#: include/views/configuration.services.edit.php:139 latest.php:435
+#: include/views/configuration.services.edit.php:140 latest.php:435
 msgid "Interval"
 msgstr "Interval"
 
@@ -8201,8 +8209,13 @@ msgstr "Neplatný JSON. Chyba sa vyskytla na servery počas spracovávania JSON 
 msgid "Invalid Request."
 msgstr "Neplatná požiadavka."
 
-#: include/classes/import/validators/C10XmlValidator.php:344
-#: include/classes/import/validators/C10XmlValidator.php:361
+#: include/classes/import/validators/C10XmlValidator.php:346
+#: include/classes/import/validators/C10XmlValidator.php:363
+#: include/classes/import/validators/C10XmlValidator.php:381
+#: include/classes/import/validators/C10XmlValidator.php:385
+#: include/classes/import/validators/C10XmlValidator.php:403
+#: include/classes/import/validators/C10XmlValidator.php:407
+#: include/classes/import/validators/C10XmlValidator.php:424
 #: include/classes/import/validators/C20XmlValidator.php:821
 #: include/classes/import/validators/C30XmlValidator.php:884
 #: include/classes/import/validators/CXmlValidatorGeneral.php:80
@@ -8228,9 +8241,7 @@ msgstr "Neplatný prvý parameter."
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr ""
-"Neplatný flexibilný interval oneskorenia: \"%1$s\" prekračuje maximálne "
-"oneskorenie \"%2$s\"."
+msgstr "Neplatný flexibilný interval oneskorenia: \"%1$s\" prekračuje maximálne oneskorenie \"%2$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8317,9 +8328,7 @@ msgstr "Neplatný interval \"%1$s\": neplatný krok dna v týždni \"%2$s\"."
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
-msgstr ""
-"Neplatný interval \"%1$s\": začiatočná hodina musí byť menšia alebo rovna "
-"koncovej hodine."
+msgstr "Neplatný interval \"%1$s\": začiatočná hodina musí byť menšia alebo rovna koncovej hodine."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
@@ -8460,8 +8469,8 @@ msgstr "Taliansky (it_IT)"
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:146
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1070
-#: include/views/configuration.graph.edit.php:129
-#: include/views/configuration.graph.edit.php:190
+#: include/views/configuration.graph.edit.php:131
+#: include/views/configuration.graph.edit.php:193
 #: include/views/configuration.triggers.expression.php:60
 #: include/views/monitoring.screen.constructor.edit.php:230
 #: include/views/monitoring.screen.constructor.edit.php:358
@@ -8657,7 +8666,7 @@ msgstr "Položka s kľúčom \"%1$s\" už existuje."
 #: include/html.inc.php:380 include/items.inc.php:705
 #: include/views/configuration.application.list.php:51
 #: include/views/configuration.application.list.php:128
-#: include/views/configuration.graph.edit.php:323
+#: include/views/configuration.graph.edit.php:327
 #: include/views/configuration.host.discovery.list.php:42
 #: include/views/configuration.host.edit.php:348
 #: include/views/configuration.host.list.php:60
@@ -8966,7 +8975,7 @@ msgstr "Posledné hodnoty"
 msgid "Latvian (lv_LV)"
 msgstr "Litovsky (lv_LV)"
 
-#: include/views/js/configuration.graph.edit.js.php:77
+#: include/views/js/configuration.graph.edit.js.php:81
 #: include/views/js/monitoring.sysmaps.js.php:69
 #: include/views/js/monitoring.sysmaps.js.php:234
 #: include/views/monitoring.overview.items.php:52
@@ -9014,14 +9023,14 @@ msgstr "Ukazovateľ stavu spojnice"
 msgid "Link new templates"
 msgstr "Pripojiť nové šablóny"
 
-#: include/classes/api/services/CMap.php:740
-#: include/classes/api/services/CMap.php:1167
+#: include/classes/api/services/CMap.php:745
+#: include/classes/api/services/CMap.php:1172
 #, c-format
 msgid "Link selementid1 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Pole spojnice selementid1 odkazuje na neexistujúci mapový element s ID \"%1$s\" pre mapu \"%2$s\"."
 
-#: include/classes/api/services/CMap.php:748
-#: include/classes/api/services/CMap.php:1175
+#: include/classes/api/services/CMap.php:753
+#: include/classes/api/services/CMap.php:1180
 #, c-format
 msgid "Link selementid2 field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
 msgstr "Pole spojnice selementid2 odkazuje na neexistujúci mapový element s ID \"%1$s\" pre mapu \"%2$s\"."
@@ -9235,7 +9244,7 @@ msgstr "MAC adresa A"
 msgid "MAC address B"
 msgstr "MAC adresa B"
 
-#: include/maps.inc.php:554
+#: include/maps.inc.php:575
 msgid "MAINTENANCE"
 msgstr "ÚDRŽBA"
 
@@ -9302,7 +9311,7 @@ msgstr "Makrá"
 msgid "Macros updated"
 msgstr "Makrá aktualizované"
 
-#: include/audit.inc.php:47 include/maps.inc.php:637 include/maps.inc.php:725
+#: include/audit.inc.php:47 include/maps.inc.php:658 include/maps.inc.php:746
 #: include/menu.inc.php:221
 #: include/views/configuration.maintenance.edit.php:191
 #: include/views/js/monitoring.sysmaps.js.php:138
@@ -9394,16 +9403,16 @@ msgstr "Manuálne odhlásenie"
 msgid "Map"
 msgstr "Mapa"
 
-#: include/classes/api/services/CMap.php:409
-#: include/classes/api/services/CMap.php:826
+#: include/classes/api/services/CMap.php:414
+#: include/classes/api/services/CMap.php:831
 #, c-format
 msgid "Map \"%1$s\" already exists."
 msgstr "Mapa \"%1$s\" už existuje."
 
-#: include/classes/api/services/CMap.php:498
-#: include/classes/api/services/CMap.php:572
-#: include/classes/api/services/CMap.php:918
-#: include/classes/api/services/CMap.php:991
+#: include/classes/api/services/CMap.php:503
+#: include/classes/api/services/CMap.php:577
+#: include/classes/api/services/CMap.php:923
+#: include/classes/api/services/CMap.php:996
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr "Mapa \"%1$s\" je verejná a zdieľanie len na čítanie je nepovolené."
@@ -9420,12 +9429,12 @@ msgstr "Mapa aktualizovaná! Naspäť?"
 msgid "Map label type"
 msgstr "Typ popisku mapy"
 
-#: include/classes/api/services/CMap.php:796
+#: include/classes/api/services/CMap.php:801
 msgid "Map name cannot be empty."
 msgstr "Meno mapy nemôže byť prázdne."
 
-#: include/classes/api/services/CMap.php:438
-#: include/classes/api/services/CMap.php:844
+#: include/classes/api/services/CMap.php:443
+#: include/classes/api/services/CMap.php:849
 msgid "Map owner cannot be empty."
 msgstr "Vlastník mapy nemôže byť prázdny."
 
@@ -9555,8 +9564,8 @@ msgctxt "May short"
 msgid "May"
 msgstr "Máj"
 
-#: include/views/administration.users.edit.php:254
-#: include/views/administration.users.edit.php:367 popup_media.php:27
+#: include/views/administration.users.edit.php:258
+#: include/views/administration.users.edit.php:371 popup_media.php:27
 #: popup_media.php:132 popup_media.php:140 popup_media.php:154
 msgid "Media"
 msgstr "Médiá"
@@ -9653,11 +9662,11 @@ msgstr "Akcie správ"
 msgid "Message text limit"
 msgstr "Limit na text správy"
 
-#: include/views/administration.users.edit.php:287
+#: include/views/administration.users.edit.php:291
 msgid "Message timeout"
 msgstr "Časový limit správy"
 
-#: include/views/administration.users.edit.php:276
+#: include/views/administration.users.edit.php:280
 msgid "Message timeout (seconds)"
 msgstr "Časový limit správy (sekundy)"
 
@@ -9665,7 +9674,7 @@ msgstr "Časový limit správy (sekundy)"
 msgid "Messages"
 msgstr "Správy"
 
-#: include/views/administration.users.edit.php:397
+#: include/views/administration.users.edit.php:401
 msgid "Messaging"
 msgstr "Správy"
 
@@ -9890,7 +9899,7 @@ msgstr "NTLM"
 #: include/views/configuration.discovery.edit.php:36
 #: include/views/configuration.discovery.list.php:37
 #: include/views/configuration.graph.edit.php:55
-#: include/views/configuration.graph.edit.php:262
+#: include/views/configuration.graph.edit.php:266
 #: include/views/configuration.graph.list.php:72
 #: include/views/configuration.host.discovery.edit.php:46
 #: include/views/configuration.host.discovery.list.php:41
@@ -9989,7 +9998,7 @@ msgstr "Sieťová mapa bola zmazaná"
 msgid "Network map updated"
 msgstr "Sieťová mapa aktualizovaná"
 
-#: app/controllers/CControllerMapView.php:118
+#: app/controllers/CControllerMapView.php:120
 #: include/views/monitoring.sysmap.constructor.php:80
 #: include/views/monitoring.sysmap.edit.php:24
 msgid "Network maps"
@@ -10045,7 +10054,7 @@ msgstr "Nová skupina"
 msgid "New regular expression"
 msgstr "Nový regulárny výraz"
 
-#: include/views/configuration.services.edit.php:311
+#: include/views/configuration.services.edit.php:312
 msgid "New service time"
 msgstr "Nový čas služby"
 
@@ -10055,7 +10064,7 @@ msgstr "Nový čas služby"
 msgid "Next step"
 msgstr "Ďalší krok"
 
-#: events.php:747 include/events.inc.php:377 include/func.inc.php:1989
+#: events.php:750 include/events.inc.php:377 include/func.inc.php:1989
 #: include/triggers.inc.php:1227
 #: include/views/administration.users.list.php:69
 #: include/views/administration.users.list.php:72
@@ -10078,7 +10087,7 @@ msgstr "Žiadne \"%1$s\" dané pre graf."
 msgid "No \"%1$s\" given for host prototype."
 msgstr "Žiadne \"%1$s\" dané pre prototyp hosta."
 
-#: include/classes/api/services/CMap.php:775
+#: include/classes/api/services/CMap.php:780
 #, c-format
 msgid "No \"%1$s\" given for map."
 msgstr "Žiadne \"%1$s\" dané pre mapu."
@@ -10285,8 +10294,8 @@ msgstr "Žiadne ID prototypu grafu v prvku obrazovky."
 msgid "No graphs added."
 msgstr "Žiadne grafy neboli pridané."
 
-#: include/classes/api/services/CHost.php:1599
-#: include/classes/api/services/CHost.php:1757
+#: include/classes/api/services/CHost.php:1605
+#: include/classes/api/services/CHost.php:1763
 #, c-format
 msgid "No groups for host \"%1$s\"."
 msgstr "Žiadne skupiny pre host \"%1$s\"."
@@ -10355,14 +10364,14 @@ msgstr "Nenájdené žiadne rozhranie"
 msgid "No interface found."
 msgstr "Nenájdené žiadne rozhranie."
 
-#: include/classes/api/services/CProxy.php:728
-#: include/classes/api/services/CProxy.php:853
+#: include/classes/api/services/CProxy.php:734
+#: include/classes/api/services/CProxy.php:859
 #, c-format
 msgid "No interface provided for proxy \"%s\"."
 msgstr "Žiadne neposkytnuté rozhranie pre proxy \"%s\"."
 
-#: include/classes/api/services/CHost.php:1652
-#: include/classes/api/services/CHost.php:1807
+#: include/classes/api/services/CHost.php:1658
+#: include/classes/api/services/CHost.php:1813
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "Žiadne rozhrania pre host \"%s\"."
@@ -10453,8 +10462,8 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CHostInterface.php:402
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1635
-#: include/classes/api/services/CHost.php:1751
+#: include/classes/api/services/CHost.php:1641
+#: include/classes/api/services/CHost.php:1757
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -10482,15 +10491,15 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CMapElement.php:60
 #: include/classes/api/services/CMapElement.php:119
 #: include/classes/api/services/CMapElement.php:190
-#: include/classes/api/services/CMap.php:357
-#: include/classes/api/services/CMap.php:786
+#: include/classes/api/services/CMap.php:362
+#: include/classes/api/services/CMap.php:791
 #: include/classes/api/services/CMediatype.php:406
 #: include/classes/api/services/CProxy.php:167
 #: include/classes/api/services/CProxy.php:259
 #: include/classes/api/services/CProxy.php:510
-#: include/classes/api/services/CProxy.php:746
-#: include/classes/api/services/CProxy.php:777
-#: include/classes/api/services/CProxy.php:837
+#: include/classes/api/services/CProxy.php:752
+#: include/classes/api/services/CProxy.php:783
+#: include/classes/api/services/CProxy.php:843
 #: include/classes/api/services/CScreenItem.php:387
 #: include/classes/api/services/CScreenItem.php:485
 #: include/classes/api/services/CScreen.php:736
@@ -10562,7 +10571,7 @@ msgstr "Žiadne obrazovky neboli pridané."
 msgid "No script specified for action operation command."
 msgstr "Nie je špecifikovany skript pre akciu príkazu."
 
-#: include/classes/api/services/CProxy.php:716
+#: include/classes/api/services/CProxy.php:722
 msgid "No status for proxy."
 msgstr "Žiaden stav pre proxy."
 
@@ -10658,8 +10667,8 @@ msgstr "Neposlaný"
 msgid "Not supported"
 msgstr "Nepodporované"
 
-#: include/views/configuration.services.edit.php:139
-#: include/views/configuration.services.edit.php:246
+#: include/views/configuration.services.edit.php:140
+#: include/views/configuration.services.edit.php:247
 #: include/views/configuration.services.parent.list.php:50
 msgid "Note"
 msgstr "Poznámka"
@@ -10881,8 +10890,8 @@ msgstr "OEM"
 #: app/views/monitoring.web.view.php:73 chart4.php:161 chart5.php:211
 #: include/classes/screens/CScreenHttpTestDetails.php:101
 #: include/classes/screens/CScreenHttpTestDetails.php:189
-#: include/classes/tree/CServiceTree.php:47 include/maps.inc.php:490
-#: include/maps.inc.php:570 include/maps.inc.php:658 include/maps.inc.php:746
+#: include/classes/tree/CServiceTree.php:47 include/maps.inc.php:511
+#: include/maps.inc.php:591 include/maps.inc.php:679 include/maps.inc.php:767
 #: include/triggers.inc.php:170
 #: include/views/monitoring.overview.triggers.php:31
 msgid "OK"
@@ -10953,7 +10962,7 @@ msgstr "Zapnuté"
 msgid "On status change triggers blink for"
 msgstr "Pri zmena stavu spúšťača blikať po dobu"
 
-#: include/views/administration.users.edit.php:285
+#: include/views/administration.users.edit.php:289
 msgid "Once"
 msgstr "Raz"
 
@@ -10967,8 +10976,8 @@ msgstr "Jeden z objekov je bez skupiny hostov."
 msgid "One time only"
 msgstr "Jednorázovo"
 
-#: include/views/configuration.services.edit.php:155
-#: include/views/configuration.services.edit.php:193
+#: include/views/configuration.services.edit.php:156
+#: include/views/configuration.services.edit.php:194
 msgid "One-time downtime"
 msgstr "Jednorázový prestoj"
 
@@ -11032,8 +11041,8 @@ msgstr "Len Zabbix administrátori môžu zmazať používateľské médiá."
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr "Len kontroly typu Zabbix agent, SNMPv1, SNMPv2 alebo SNMPv3 môžu byť unikátne."
 
-#: include/classes/api/services/CMap.php:442
-#: include/classes/api/services/CMap.php:848
+#: include/classes/api/services/CMap.php:447
+#: include/classes/api/services/CMap.php:853
 msgid "Only administrators can set map owner."
 msgstr "Len administrátori môžu nastaviť vlastníka mapy."
 
@@ -11427,7 +11436,7 @@ msgstr "PHP rozšírenie xmlwriter chýba."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:215 include/maps.inc.php:474 include/triggers.inc.php:171
+#: chart5.php:215 include/maps.inc.php:495 include/triggers.inc.php:171
 #: include/views/monitoring.overview.items.php:32
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11469,6 +11478,12 @@ msgstr "PSK identita"
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
 msgstr "PSK identita nemôže byť prázdna."
+
+#: include/classes/api/services/CHost.php:1564
+#: include/classes/api/services/CProxy.php:676
+#, c-format
+msgid "PSK is too short. Minimum is %1$s hex-digits."
+msgstr ""
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -11592,11 +11607,11 @@ msgstr "Percentil P za čas T je > N"
 msgid "Percentile P of a period T is NOT N"
 msgstr "Percentil P za čas T NIE JE N"
 
-#: graphs.php:52 include/views/configuration.graph.edit.php:106
+#: graphs.php:52 include/views/configuration.graph.edit.php:107
 msgid "Percentile line (left)"
 msgstr "Percentilová čiara (vľavo)"
 
-#: graphs.php:53 include/views/configuration.graph.edit.php:123
+#: graphs.php:53 include/views/configuration.graph.edit.php:125
 msgid "Percentile line (right)"
 msgstr "Percentilová čiara (vpravo)"
 
@@ -11617,7 +11632,7 @@ msgstr "Perióda"
 
 #: include/forms.inc.php:1686
 #: include/views/configuration.maintenance.edit.php:105
-#: include/views/configuration.services.edit.php:189
+#: include/views/configuration.services.edit.php:190
 msgid "Period type"
 msgstr "Typ periódy"
 
@@ -11627,7 +11642,7 @@ msgid "Periods"
 msgstr "Periódy"
 
 #: include/views/administration.usergroups.edit.php:150
-#: include/views/administration.users.edit.php:394
+#: include/views/administration.users.edit.php:398
 #: include/views/monitoring.screen.edit.php:129
 #: include/views/monitoring.screen.edit.php:159
 #: include/views/monitoring.slideconf.edit.php:173
@@ -11637,7 +11652,7 @@ msgstr "Periódy"
 msgid "Permissions"
 msgstr "Oprávnenia"
 
-#: include/views/administration.users.edit.php:392
+#: include/views/administration.users.edit.php:396
 msgid "Permissions can be assigned for user groups only."
 msgstr "Oprávnenia môžu byť priradené len používateľskej skupine, nie k používateľovi."
 
@@ -11657,29 +11672,24 @@ msgstr "Algoritmus umiestňovania"
 msgid "Plain text"
 msgstr "Jednoduchý text"
 
-#: include/views/administration.users.edit.php:307
-#: include/views/administration.users.edit.php:343
+#: include/views/administration.users.edit.php:311
+#: include/views/administration.users.edit.php:347
 msgid "Play"
 msgstr "Prehrať"
 
-#: include/views/administration.users.edit.php:290
+#: include/views/administration.users.edit.php:294
 msgid "Play sound"
 msgstr "Prehrávať zvuk"
 
 #: include/classes/setup/CSetupWizard.php:342
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
-msgstr ""
-"Prosím skontrolujte konfiguračné parametre. Ak sú v poriadku stlačte "
-"tlačidlo \"%1$s\", prípadne tlačidlo \"%2$s\" pre zmenu konfiguračných "
-"parametrov."
+msgstr "Prosím skontrolujte konfiguračné parametre. Ak sú v poriadku stlačte tlačidlo \"%1$s\", prípadne tlačidlo \"%2$s\" pre zmenu konfiguračných parametrov."
 
 #: include/classes/setup/CSetupWizard.php:272
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
-msgstr ""
-"Prosím vytvorte databázu ručne a nastavte konfiguračné parametre databázy. "
-"Stlačte tlačidlo \"%1$s\", keď to vykonáte."
+msgstr "Prosím vytvorte databázu ručne a nastavte konfiguračné parametre databázy. Stlačte tlačidlo \"%1$s\", keď to vykonáte."
 
 #: include/classes/setup/CSetupWizard.php:301
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
@@ -11749,7 +11759,7 @@ msgstr "Predinštalačné zhrnutie"
 
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:116
-#: include/views/configuration.graph.edit.php:345
+#: include/views/configuration.graph.edit.php:349
 msgid "Preview"
 msgstr "Náhľad"
 
@@ -11836,7 +11846,7 @@ msgstr "Úroveň oprávnenia"
 msgid "Probably php-ldap module is missing."
 msgstr "Pravdepodobne chýba php-ldap modul."
 
-#: include/maps.inc.php:526 include/maps.inc.php:607 include/maps.inc.php:696
+#: include/maps.inc.php:547 include/maps.inc.php:628 include/maps.inc.php:717
 #: include/views/common.filter.trigger.php:37
 #: include/views/js/monitoring.sysmaps.js.php:133
 msgid "Problem"
@@ -11865,8 +11875,8 @@ msgstr "Problém, ak najmenej jeden podriadený má problém"
 
 #: app/views/report.services.php:54 app/views/report.services.php:55
 #: app/views/report.services.php:56 app/views/report.services.php:57
-#: chart4.php:165 include/maps.inc.php:520 include/maps.inc.php:601
-#: include/maps.inc.php:690 report2.php:369
+#: chart4.php:165 include/maps.inc.php:541 include/maps.inc.php:622
+#: include/maps.inc.php:711 report2.php:369
 msgid "Problems"
 msgstr "Problémy"
 
@@ -11903,8 +11913,8 @@ msgstr "Proxy \"%1$s\" pre host \"%2$s\" neexistuje."
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "Proxy \"%1$s\" je použitá zisťovacím pravidlom \"%2$s\"."
 
-#: include/classes/api/services/CProxy.php:709
-#: include/classes/api/services/CProxy.php:805
+#: include/classes/api/services/CProxy.php:715
+#: include/classes/api/services/CProxy.php:811
 #, c-format
 msgid "Proxy \"%s\" already exists."
 msgstr "Proxy \"%s\" už existuje."
@@ -12037,7 +12047,7 @@ msgstr "Prijímateľ (zostupne)"
 msgid "Recipient(s)"
 msgstr "Prijímateľ(ia)"
 
-#: include/views/administration.users.edit.php:302
+#: include/views/administration.users.edit.php:306
 msgid "Recovery"
 msgstr "Zotavenie"
 
@@ -12050,7 +12060,7 @@ msgstr "Text správy po zotavení"
 msgid "Recovery subject"
 msgstr "Predmet správy po zotavení"
 
-#: include/views/administration.users.edit.php:176 profile.php:52 users.php:63
+#: include/views/administration.users.edit.php:180 profile.php:52 users.php:63
 msgid "Refresh (in seconds)"
 msgstr "Obnoviť (v sekundách)"
 
@@ -12140,7 +12150,7 @@ msgstr "Vzdialený príkaz"
 #: include/views/administration.general.macros.edit.php:47
 #: include/views/administration.general.regularexpressions.edit.php:70
 #: include/views/administration.general.valuemapping.edit.php:55
-#: include/views/administration.users.edit.php:245
+#: include/views/administration.users.edit.php:249
 #: include/views/common.filter.trigger.php:132
 #: include/views/configuration.action.edit.php:113
 #: include/views/configuration.action.edit.php:453
@@ -12153,8 +12163,8 @@ msgstr "Vzdialený príkaz"
 #: include/views/configuration.item.massupdate.php:359
 #: include/views/configuration.item.prototype.edit.php:300
 #: include/views/configuration.maintenance.edit.php:115
-#: include/views/configuration.services.edit.php:113
-#: include/views/configuration.services.edit.php:171
+#: include/views/configuration.services.edit.php:114
+#: include/views/configuration.services.edit.php:172
 #: include/views/configuration.trigger.prototype.edit.php:190
 #: include/views/configuration.trigger.prototype.edit.php:296
 #: include/views/configuration.trigger.prototype.massupdate.php:77
@@ -12173,12 +12183,12 @@ msgstr "Vzdialený príkaz"
 #: include/views/js/configuration.action.edit.js.php:35
 #: include/views/js/configuration.action.edit.js.php:49
 #: include/views/js/configuration.discovery.edit.js.php:10
-#: include/views/js/configuration.graph.edit.js.php:89
+#: include/views/js/configuration.graph.edit.js.php:93
 #: include/views/js/configuration.host.discovery.edit.js.php:27
 #: include/views/js/configuration.host.edit.js.php:38
 #: include/views/js/configuration.host.prototype.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:22
-#: include/views/js/configuration.services.edit.js.php:77
+#: include/views/js/configuration.services.edit.js.php:84
 #: include/views/js/hostmacros.js.php:14 include/views/js/hostmacros.js.php:46
 #: include/views/js/monitoring.screen.edit.js.php:24
 #: include/views/js/monitoring.screen.edit.js.php:57
@@ -12392,7 +12402,7 @@ msgstr "Vráti informácie príslušné k Zabbix Java gateway. Platné parametre
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí percento stratených ICMP ping paketov."
 
-#: include/views/js/configuration.graph.edit.js.php:78
+#: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:70
 #: include/views/js/monitoring.sysmaps.js.php:235
 #: include/views/monitoring.screen.constructor.edit.php:707
@@ -12420,7 +12430,7 @@ msgstr "Rozsah riadkov"
 msgid "Rows"
 msgstr "Riadky"
 
-#: include/views/administration.users.edit.php:179 profile.php:53 users.php:64
+#: include/views/administration.users.edit.php:183 profile.php:53 users.php:64
 msgid "Rows per page"
 msgstr "Počet riadkov na stránku"
 
@@ -12471,9 +12481,7 @@ msgstr "Spusti vzdialené príkazy na hostoch"
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
-"Spustí špecifikovaný príkaz na hostovi. Vráti text ako výsledok spustenia. 1 "
-"- s nowait módom (bez čakania na výstup z príkazu)"
+msgstr "Spustí špecifikovaný príkaz na hostovi. Vráti text ako výsledok spustenia. 1 - s nowait módom (bez čakania na výstup z príkazu)"
 
 #: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
@@ -12785,9 +12793,9 @@ msgstr "Obrazovka aktualizovaná"
 #: include/views/monitoring.screen.list.php:21
 #: include/views/monitoring.screen.list.php:25
 #: include/views/monitoring.screen.php:23
-#: include/views/monitoring.screen.php:41
+#: include/views/monitoring.screen.php:42
 #: include/views/monitoring.slideconf.list.php:25
-#: include/views/monitoring.slides.php:45 popup.php:83 popup.php:107
+#: include/views/monitoring.slides.php:46 popup.php:83 popup.php:107
 #: search.php:132 search.php:236 search.php:403 search.php:440 search.php:460
 #: templates.php:596 templates.php:734
 msgid "Screens"
@@ -12852,9 +12860,7 @@ msgstr "Parametre skriptu"
 #: include/classes/api/services/CMediatype.php:632
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
-"Parametre skriptu \"%1$s\" chýbajú the last new line feed pre typ média \"%"
-"2$s\"."
+msgstr "Parametre skriptu \"%1$s\" chýbajú the last new line feed pre typ média \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:124
 msgid "Script profiler"
@@ -12924,7 +12930,7 @@ msgstr "Sekundárny POC telefón B"
 msgid "Secondary POC screen name"
 msgstr "Sekundárne POC meno obrazovky"
 
-#: include/views/administration.users.edit.php:286
+#: include/views/administration.users.edit.php:290
 msgid "Seconds"
 msgstr "sekúnd"
 
@@ -12948,7 +12954,7 @@ msgstr "Bezpečnostné meno"
 msgid "Security name like"
 msgstr "Bezpečnostné meno like"
 
-#: events.php:323 include/classes/html/CMultiSelect.php:54
+#: events.php:326 include/classes/html/CMultiSelect.php:54
 #: include/forms.inc.php:523
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
@@ -12957,8 +12963,8 @@ msgstr "Bezpečnostné meno like"
 #: include/views/configuration.action.edit.php:278
 #: include/views/configuration.action.edit.php:290
 #: include/views/configuration.action.edit.php:800
-#: include/views/configuration.graph.edit.php:153
-#: include/views/configuration.graph.edit.php:214
+#: include/views/configuration.graph.edit.php:155
+#: include/views/configuration.graph.edit.php:217
 #: include/views/configuration.item.edit.php:68
 #: include/views/configuration.item.prototype.edit.php:68
 #: include/views/configuration.services.child.list.php:62
@@ -12989,8 +12995,8 @@ msgstr "Bezpečnostné meno like"
 msgid "Select"
 msgstr "Vybrať"
 
-#: include/views/configuration.graph.edit.php:168
-#: include/views/configuration.graph.edit.php:229
+#: include/views/configuration.graph.edit.php:171
+#: include/views/configuration.graph.edit.php:233
 #: include/views/configuration.triggers.expression.php:53
 msgid "Select prototype"
 msgstr "Označ prototyp"
@@ -13037,7 +13043,7 @@ msgstr "Poslať správu používateľom"
 msgid "Send only to"
 msgstr "Poslať len na"
 
-#: include/views/administration.users.edit.php:196 popup_media.php:134
+#: include/views/administration.users.edit.php:200 popup_media.php:134
 msgid "Send to"
 msgstr "Posielať na"
 
@@ -13090,9 +13096,9 @@ msgstr "Server info"
 msgid "Server time"
 msgstr "Čas na servery"
 
-#: events.php:528 include/actions.inc.php:71
+#: events.php:531 include/actions.inc.php:71
 #: include/views/configuration.services.child.list.php:38
-#: include/views/configuration.services.edit.php:328
+#: include/views/configuration.services.edit.php:329
 #: include/views/configuration.services.parent.list.php:35 services.php:480
 #: srv_status.php:142
 msgid "Service"
@@ -13138,7 +13144,7 @@ msgstr "Port služby"
 msgid "Service start time must be less than end time."
 msgstr "Čas štartu služby musi byť menší ako jej koniec."
 
-#: include/views/configuration.services.edit.php:180
+#: include/views/configuration.services.edit.php:181
 msgid "Service times"
 msgstr "Časy služby"
 
@@ -13166,7 +13172,7 @@ msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 msgid "Set host inventory mode"
 msgstr "Nastaviť hostov mód inventára"
 
-#: events.php:417 include/classes/screens/CScreenEvents.php:37
+#: events.php:420 include/classes/screens/CScreenEvents.php:37
 #: include/classes/screens/CScreenHistory.php:149
 #: include/triggers.inc.php:1217 include/views/configuration.item.list.php:139
 #: include/views/configuration.trigger.prototype.edit.php:248
@@ -13192,9 +13198,9 @@ msgstr "Závažnosť (vzostupne)"
 msgid "Sharing"
 msgstr "Zdieľanie"
 
-#: include/classes/api/services/CMap.php:479
-#: include/classes/api/services/CMap.php:900
-#: include/classes/api/services/CMap.php:973
+#: include/classes/api/services/CMap.php:484
+#: include/classes/api/services/CMap.php:905
+#: include/classes/api/services/CMap.php:978
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
 msgstr "Chýbajúce zdieľanie \"%1$s\" v hodnote pre mapu \"%2$s\"."
@@ -13307,7 +13313,7 @@ msgstr "Prihlásiť sa"
 msgid "Sign out"
 msgstr "Odhlásiť sa"
 
-#: include/views/js/configuration.graph.edit.js.php:35
+#: include/views/js/configuration.graph.edit.js.php:39
 msgid "Simple"
 msgstr "Jednoduchý"
 
@@ -13386,8 +13392,7 @@ msgstr "Prezentácia \"%1$s\" už existuje."
 #: include/screens.inc.php:366 include/screens.inc.php:374
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
-"Prezentácia \"%1$s\" je verejná a zdieľanie len na čítanie nie je povolené."
+msgstr "Prezentácia \"%1$s\" je verejná a zdieľanie len na čítanie nie je povolené."
 
 #: include/screens.inc.php:212
 #, c-format
@@ -13416,12 +13421,12 @@ msgstr "Prezentácia aktualizovaná"
 
 #: app/views/monitoring.dashboard.view.php:58
 #: include/views/monitoring.screen.list.php:26
-#: include/views/monitoring.screen.php:42
+#: include/views/monitoring.screen.php:43
 #: include/views/monitoring.slideconf.edit.php:24
 #: include/views/monitoring.slideconf.list.php:21
 #: include/views/monitoring.slideconf.list.php:26
 #: include/views/monitoring.slides.php:23
-#: include/views/monitoring.slides.php:46 popup.php:87
+#: include/views/monitoring.slides.php:47 popup.php:87
 msgid "Slide shows"
 msgstr "Prezentácie"
 
@@ -13491,7 +13496,7 @@ msgstr "Zoradiť spúšťače podľa"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "Zoradenie podľa pola \"%1$s\" nie je dovolené."
 
-#: events.php:274 include/classes/screens/CScreenHistory.php:148
+#: events.php:275 include/classes/screens/CScreenHistory.php:148
 msgid "Source"
 msgstr "Zdroj"
 
@@ -13539,7 +13544,7 @@ msgid "State"
 msgstr "Stav"
 
 #: app/views/administration.mediatype.list.php:45
-#: app/views/monitoring.web.view.php:40 events.php:401 events.php:416
+#: app/views/monitoring.web.view.php:40 events.php:404 events.php:419
 #: include/actions.inc.php:1092 include/actions.inc.php:1149
 #: include/actions.inc.php:1183 include/classes/screens/CScreenActions.php:131
 #: include/classes/screens/CScreenHttpTestDetails.php:86
@@ -13641,8 +13646,8 @@ msgstr "Krok s menom \"%1$s\" už existuje."
 msgid "Steps"
 msgstr "Kroky"
 
-#: include/views/administration.users.edit.php:311
-#: include/views/administration.users.edit.php:347
+#: include/views/administration.users.edit.php:315
+#: include/views/administration.users.edit.php:351
 msgid "Stop"
 msgstr "Zastaviť"
 
@@ -13925,8 +13930,8 @@ msgstr "Hodnota šablóny"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "Šablóna s rovnakým menom \"%1$s\" už existuje."
 
-#: include/classes/api/services/CHost.php:1714
-#: include/classes/api/services/CHost.php:1898
+#: include/classes/api/services/CHost.php:1720
+#: include/classes/api/services/CHost.php:1904
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "Šablóna s rovnakým menom \"%s\" už existuje."
@@ -13937,8 +13942,8 @@ msgstr "Šablóna s rovnakým menom \"%s\" už existuje."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "Šablóna s rovnakým viditeľným menom \"%1$s\" už existuje."
 
-#: include/classes/api/services/CHost.php:1720
-#: include/classes/api/services/CHost.php:1906
+#: include/classes/api/services/CHost.php:1726
+#: include/classes/api/services/CHost.php:1912
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "Šablóna s rovnakým zobrazovaným menom \"%s\" už existuje."
@@ -14025,9 +14030,7 @@ msgstr "Aplikácia nie je zisťovaná a bude zmazaná v %1$s (%2$s na %3$s)."
 
 #: include/views/configuration.application.list.php:92
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
-"Aplikácia nie je zisťovaná a bude zmazaná počas ďalšieho spustenia "
-"zisťovania."
+msgstr "Aplikácia nie je zisťovaná a bude zmazaná počas ďalšieho spustenia zisťovania."
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
@@ -14157,14 +14160,14 @@ msgid "Thursday"
 msgstr "Štvrtok"
 
 #: app/views/report.services.php:56
-#: include/views/configuration.services.edit.php:252
-#: include/views/configuration.services.edit.php:295
+#: include/views/configuration.services.edit.php:253
+#: include/views/configuration.services.edit.php:296
 #: include/views/reports.toptriggers.php:34 report4.php:174 services.php:201
 #: services.php:207
 msgid "Till"
 msgstr "Do"
 
-#: app/views/monitoring.acknowledge.edit.php:34 events.php:397 events.php:413
+#: app/views/monitoring.acknowledge.edit.php:34 events.php:400 events.php:416
 #: include/acknow.inc.php:49 include/actions.inc.php:1092
 #: include/actions.inc.php:1149 include/actions.inc.php:1183
 #: include/classes/screens/CScreenActions.php:126
@@ -14173,9 +14176,9 @@ msgstr "Do"
 #: include/events.inc.php:305
 #: include/views/administration.auditacts.list.php:45
 #: include/views/administration.auditlogs.list.php:59
-#: include/views/configuration.services.edit.php:285
-#: include/views/configuration.services.edit.php:299
-#: include/views/configuration.services.edit.php:330
+#: include/views/configuration.services.edit.php:286
+#: include/views/configuration.services.edit.php:300
+#: include/views/configuration.services.edit.php:331
 #: include/views/configuration.triggers.expression.php:85
 #: include/views/configuration.triggers.expression.php:93 jsLoader.php:134
 #: popup_trexpr.php:33 popup_trexpr.php:130
@@ -14221,8 +14224,7 @@ msgstr "Čas dosiahnutia prahovej hodnoty odhadnutý na základe periódy T je >
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
-"Čas dosiahnutia prahovej hodnoty odhadnutý na základe periódy T NIE JE N"
+msgstr "Čas dosiahnutia prahovej hodnoty odhadnutý na základe periódy T NIE JE N"
 
 #: include/views/monitoring.screen.constructor.edit.php:609
 msgid "Time type"
@@ -14332,7 +14334,7 @@ msgstr "Trendy"
 msgid "Trends (in days)"
 msgstr "Trendy (v dňoch)"
 
-#: events.php:275 events.php:319 include/actions.inc.php:43
+#: events.php:276 events.php:322 include/actions.inc.php:43
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:488
 #: include/maps.inc.php:26 include/triggers.inc.php:1213
 #: include/views/configuration.services.child.list.php:40
@@ -14482,8 +14484,7 @@ msgstr "Prototyp spúšťača pridaný"
 
 #: include/classes/api/services/CTriggerPrototype.php:1192
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
-msgstr ""
-"Prototyp spúšťača nemôže závisieť na spúšťači, ktorý je z neho vytvorený."
+msgstr "Prototyp spúšťača nemôže závisieť na spúšťači, ktorý je z neho vytvorený."
 
 #: trigger_prototypes.php:234
 msgid "Trigger prototype deleted"
@@ -14532,7 +14533,7 @@ msgstr "Prototypy spúšťačov aktualizované"
 msgid "Trigger severities"
 msgstr "Závažnosti spúšťačov"
 
-#: include/actions.inc.php:42 include/views/administration.users.edit.php:357
+#: include/actions.inc.php:42 include/views/administration.users.edit.php:361
 msgid "Trigger severity"
 msgstr "Závažnosť spúšťača"
 
@@ -14643,9 +14644,9 @@ msgstr "Dve položky (\"%1$s\" and \"%2$s\") nie je možné naplniť jedným inv
 #: include/classes/screens/CScreenActions.php:128 include/forms.inc.php:447
 #: include/hosts.inc.php:99 include/views/administration.auditacts.list.php:47
 #: include/views/administration.general.image.list.php:37
-#: include/views/administration.users.edit.php:196
+#: include/views/administration.users.edit.php:200
 #: include/views/configuration.action.edit.php:803
-#: include/views/configuration.graph.edit.php:264
+#: include/views/configuration.graph.edit.php:268
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.discovery.edit.php:61
 #: include/views/configuration.host.discovery.edit.php:198
@@ -14661,7 +14662,7 @@ msgstr "Dve položky (\"%1$s\" and \"%2$s\") nie je možné naplniť jedným inv
 #: include/views/configuration.item.prototype.edit.php:271
 #: include/views/configuration.item.prototype.list.php:48
 #: include/views/configuration.maintenance.list.php:40
-#: include/views/configuration.services.edit.php:139
+#: include/views/configuration.services.edit.php:140
 #: include/views/inventory.host.list.php:62
 #: include/views/js/monitoring.sysmaps.js.php:15
 #: include/views/js/monitoring.sysmaps.js.php:212
@@ -14736,7 +14737,7 @@ msgstr "UP"
 msgid "URL"
 msgstr "URL"
 
-#: include/views/administration.users.edit.php:183
+#: include/views/administration.users.edit.php:187
 msgid "URL (after login)"
 msgstr "URL (po prihlásení)"
 
@@ -14752,8 +14753,8 @@ msgstr "URL B"
 msgid "URL C"
 msgstr "URL C"
 
-#: include/classes/api/services/CMap.php:721
-#: include/classes/api/services/CMap.php:1148
+#: include/classes/api/services/CMap.php:726
+#: include/classes/api/services/CMap.php:1153
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Meno URL musí byť jedinečné v mape \"%1$s\"."
@@ -14766,8 +14767,8 @@ msgstr "URL parameter nemôže byť pole."
 msgid "URL parameter name is empty."
 msgstr "URL parameter meno je prázdny."
 
-#: include/classes/api/services/CMap.php:715
-#: include/classes/api/services/CMap.php:1142
+#: include/classes/api/services/CMap.php:720
+#: include/classes/api/services/CMap.php:1147
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
 msgstr "URL musí mať \"meno\" a \"url\" v mape \"%1$s\"."
@@ -14801,7 +14802,7 @@ msgstr "Nie je možné vybrať konfiguráciu."
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "Nie je možné nahrať súbor, pretože \"file_uploads\" je zakázaný."
 
-#: include/maps.inc.php:537 include/maps.inc.php:618 include/maps.inc.php:707
+#: include/maps.inc.php:558 include/maps.inc.php:639 include/maps.inc.php:728
 msgid "Unacknowledged"
 msgstr "Nepotvrdené"
 
@@ -14840,8 +14841,8 @@ msgid "Units"
 msgstr "Jednotky"
 
 #: app/views/monitoring.web.view.php:79
-#: app/views/monitoring.widget.web.view.php:76 events.php:511 events.php:512
-#: events.php:522 events.php:523 events.php:524 events.php:525
+#: app/views/monitoring.widget.web.view.php:76 events.php:514 events.php:515
+#: events.php:525 events.php:526 events.php:527 events.php:528
 #: include/actions.inc.php:113 include/actions.inc.php:899
 #: include/classes/screens/CScreenHostsInfo.php:89
 #: include/classes/screens/CScreenHttpTestDetails.php:117
@@ -15051,12 +15052,12 @@ msgstr "Dostupný"
 #: include/views/administration.general.valuemapping.edit.php:94
 #: include/views/administration.general.workingtime.edit.php:38
 #: include/views/administration.usergroups.edit.php:158
-#: include/views/administration.users.edit.php:415
+#: include/views/administration.users.edit.php:419
 #: include/views/configuration.action.edit.php:1082
 #: include/views/configuration.action.edit.php:1106
 #: include/views/configuration.application.edit.php:48
 #: include/views/configuration.discovery.edit.php:101
-#: include/views/configuration.graph.edit.php:349
+#: include/views/configuration.graph.edit.php:353
 #: include/views/configuration.host.discovery.edit.php:365
 #: include/views/configuration.host.edit.php:805
 #: include/views/configuration.hostgroups.edit.php:88
@@ -15069,7 +15070,7 @@ msgstr "Dostupný"
 #: include/views/configuration.item.prototype.edit.php:424
 #: include/views/configuration.maintenance.edit.php:144
 #: include/views/configuration.maintenance.edit.php:201
-#: include/views/configuration.services.edit.php:343
+#: include/views/configuration.services.edit.php:344
 #: include/views/configuration.template.edit.php:467
 #: include/views/configuration.trigger.prototype.edit.php:336
 #: include/views/configuration.trigger.prototype.massupdate.php:119
@@ -15115,7 +15116,7 @@ msgid "Updated status of host \"%1$s\"."
 msgstr "Aktualizovaný status hosta \"%1$s\"."
 
 #: app/views/monitoring.widget.discovery.view.php:62
-#: app/views/monitoring.widget.hosts.view.php:370
+#: app/views/monitoring.widget.hosts.view.php:383
 #: app/views/monitoring.widget.issues.view.php:29
 #: app/views/monitoring.widget.status.view.php:27
 #: app/views/monitoring.widget.system.view.php:27
@@ -15185,8 +15186,8 @@ msgstr "Mapa najvyššej úrovne"
 
 #: app/views/monitoring.discovery.view.php:40
 #: app/views/monitoring.discovery.view.php:168
-#: include/views/configuration.services.edit.php:145
-#: include/views/configuration.services.edit.php:191
+#: include/views/configuration.services.edit.php:146
+#: include/views/configuration.services.edit.php:192
 msgid "Uptime"
 msgstr "Doba prevádzky"
 
@@ -15208,7 +15209,7 @@ msgstr "Používať bulk SNMP dopyty"
 msgid "Use custom multiplier"
 msgstr "Použiť vlastný multiplikátor"
 
-#: include/views/administration.users.edit.php:196 popup_media.php:136
+#: include/views/administration.users.edit.php:200 popup_media.php:136
 msgid "Use if severity"
 msgstr "Použiť pri závažnosti"
 
@@ -15225,7 +15226,7 @@ msgstr "Použité v položkách"
 #: include/audit.inc.php:24 include/classes/setup/CSetupWizard.php:251
 #: include/hosts.inc.php:61 include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:60
-#: include/views/administration.users.edit.php:365
+#: include/views/administration.users.edit.php:369
 #: include/views/configuration.action.edit.php:603
 #: include/views/configuration.httpconf.edit.php:126
 msgid "User"
@@ -15259,7 +15260,7 @@ msgstr "Používateľ pridaný"
 msgid "User agent string"
 msgstr "User agent reťazec"
 
-#: include/views/administration.users.edit.php:384
+#: include/views/administration.users.edit.php:388
 msgid "User can't change type for himself"
 msgstr "Používateľ si nemôže sám sebe zmeniť typ"
 
@@ -15339,8 +15340,8 @@ msgstr "Používateľská skupina pre správu o nefunčnej databáze"
 msgid "User group for database down message \"%1$s\"."
 msgstr "Používateľská skupina pre správu o nedostupnej databáze \"%1$s\"."
 
-#: include/classes/api/services/CMap.php:544
-#: include/classes/api/services/CMap.php:964
+#: include/classes/api/services/CMap.php:549
+#: include/classes/api/services/CMap.php:969
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
 msgstr "Skupinové zdieľanie je chýbajúci parameter: %1$s v mape \"%2$s\"."
@@ -15417,22 +15418,20 @@ msgstr "Perióda uloženia údajov používateľských sedení (v dňoch) \"%1$s
 msgid "User sessions"
 msgstr "Používateľské sedenia"
 
-#: include/classes/api/services/CMap.php:470
-#: include/classes/api/services/CMap.php:891
+#: include/classes/api/services/CMap.php:475
+#: include/classes/api/services/CMap.php:896
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
-"Používateľské zdieľanie je chýbajúci parameter: %1$s pre obrazovku \"%2$s\"."
+msgstr "Používateľské zdieľanie je chýbajúci parameter: %1$s pre obrazovku \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:505
 #: include/classes/api/services/CScreen.php:842
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
-"Používateľské zdieľanie je chýbajúci parameter: %1$s pre obrazovku \"%2$s\"."
+msgstr "Používateľské zdieľanie je chýbajúci parameter: %1$s pre obrazovku \"%2$s\"."
 
-#: include/views/administration.users.edit.php:384
 #: include/views/administration.users.edit.php:388
+#: include/views/administration.users.edit.php:392
 #: include/views/administration.users.list.php:50
 msgid "User type"
 msgstr "Typ používateľa"
@@ -15674,20 +15673,20 @@ msgstr "VMware čas prevádzky virtuálneho stroja, <url> - URL VMware služby, 
 msgid "Value"
 msgstr "Hodnota"
 
-#: include/classes/api/services/CMap.php:690
-#: include/classes/api/services/CMap.php:1117
+#: include/classes/api/services/CMap.php:695
+#: include/classes/api/services/CMap.php:1122
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_align\". Choices are: \"%2$s\" and \"%3$s\""
 msgstr "Hodnota \"%1$s\" je neplatná pre parameter \"grid_align\". Možnosti: \"%2$s\" a \"%3$s\""
 
-#: include/classes/api/services/CMap.php:701
-#: include/classes/api/services/CMap.php:1128
+#: include/classes/api/services/CMap.php:706
+#: include/classes/api/services/CMap.php:1133
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\"."
 msgstr "Hodnota \"%1$s\" je neplatná pre parameter \"grid_show\". Možnosti: \"%2$s\" a \"%3$s\"."
 
-#: include/classes/api/services/CMap.php:680
-#: include/classes/api/services/CMap.php:1107
+#: include/classes/api/services/CMap.php:685
+#: include/classes/api/services/CMap.php:1112
 #, c-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\"."
 msgstr "Hodnota \"%1$s\" je neplatná pre parameter \"grid_show\". Možnosti: \"%2$s\"."
@@ -15836,7 +15835,7 @@ msgstr "Pohľad nie je vykresľovaný."
 msgid "Visible name"
 msgstr "Zobrazované meno"
 
-#: include/classes/api/services/CHost.php:1832
+#: include/classes/api/services/CHost.php:1838
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "Zobrazované meno nemôže byť prázdne ak meno hostu chýba."
 
@@ -15988,7 +15987,7 @@ msgstr "Vitajte"
 msgid "Welcome to"
 msgstr "Vitajte"
 
-#: include/views/administration.users.edit.php:196 popup_media.php:135
+#: include/views/administration.users.edit.php:200 popup_media.php:135
 msgid "When active"
 msgstr "Iba v dňoch/časoch"
 
@@ -16062,8 +16061,8 @@ msgstr "Nesprávne polia pre závislosť na službe \"%1$s\"."
 msgid "Wrong fields for element."
 msgstr "Nesprávne polia pre element."
 
-#: include/classes/api/services/CHost.php:1581
-#: include/classes/api/services/CHost.php:1744
+#: include/classes/api/services/CHost.php:1587
+#: include/classes/api/services/CHost.php:1750
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "Nesprávne polia pre hosta \"%1$s\"."
@@ -16097,8 +16096,8 @@ msgstr "Nesprávne polia pre makro \"%1$s\"."
 msgid "Wrong fields for map link."
 msgstr "Nesprávne polia pre linku mapy."
 
-#: include/classes/api/services/CProxy.php:690
-#: include/classes/api/services/CProxy.php:773
+#: include/classes/api/services/CProxy.php:696
+#: include/classes/api/services/CProxy.php:779
 #, c-format
 msgid "Wrong fields for proxy \"%1$s\"."
 msgstr "Nesprávne polia pre proxy \"%1$s\"."
@@ -16151,7 +16150,7 @@ msgstr "XML súbor obsahuje varovania %1$s:"
 msgid "Y"
 msgstr "Y"
 
-#: include/views/configuration.graph.edit.php:246
+#: include/views/configuration.graph.edit.php:250
 msgid "Y axis MAX value"
 msgstr "Maximálna hodnota osy Y"
 
@@ -16160,11 +16159,11 @@ msgstr "Maximálna hodnota osy Y"
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr "Maximálna hodnota pre os Y musí byť väčšia ako minimálna hodnota pre túto os."
 
-#: include/views/configuration.graph.edit.php:185
+#: include/views/configuration.graph.edit.php:188
 msgid "Y axis MIN value"
 msgstr "Minimálna hodnota osy Y"
 
-#: include/views/configuration.graph.edit.php:273
+#: include/views/configuration.graph.edit.php:277
 msgid "Y axis side"
 msgstr "Strana osi Y"
 
@@ -16195,7 +16194,7 @@ msgstr "Rok"
 msgid "Yearly"
 msgstr "Ročne"
 
-#: events.php:747 include/blocks.inc.php:475
+#: events.php:750 include/blocks.inc.php:475
 #: include/classes/screens/CScreenServerInfo.php:31 include/events.inc.php:368
 #: include/func.inc.php:1989 include/triggers.inc.php:1227
 #: include/views/administration.general.valuemapping.list.php:60
@@ -16434,7 +16433,7 @@ msgstr "agent"
 #: include/views/configuration.httpconf.list.php:33
 #: include/views/configuration.triggers.list.php:41
 #: include/views/configuration.triggers.list.php:48
-#: include/views/js/configuration.graph.edit.js.php:51 report2.php:219
+#: include/views/js/configuration.graph.edit.js.php:55 report2.php:219
 #: report2.php:235 report2.php:254 report2.php:287 report2.php:312
 #: report2.php:328 report4.php:89 report4.php:266
 msgid "all"
@@ -16447,6 +16446,11 @@ msgstr "všetky médiá"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:186
 msgid "an array is expected"
 msgstr "pole je očakávané"
+
+#: include/classes/import/validators/C10XmlValidator.php:385
+#: include/classes/import/validators/C10XmlValidator.php:407
+msgid "an empty string is expected"
+msgstr ""
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -16471,8 +16475,8 @@ msgstr "automaticky registrovaný host"
 #: include/classes/graphdraw/CLineGraphDraw.php:2035
 #: include/classes/graphdraw/CLineGraphDraw.php:2057
 #: include/classes/graphdraw/CPieGraphDraw.php:326 include/graphs.inc.php:85
-#: include/views/js/configuration.graph.edit.js.php:46
-#: include/views/js/configuration.graph.edit.js.php:54
+#: include/views/js/configuration.graph.edit.js.php:50
+#: include/views/js/configuration.graph.edit.js.php:58
 msgid "avg"
 msgstr "priemer"
 
@@ -16570,33 +16574,33 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
-#: include/html.inc.php:748 include/views/configuration.services.edit.php:266
-#: include/views/configuration.services.edit.php:274
+#: include/html.inc.php:748 include/views/configuration.services.edit.php:267
+#: include/views/configuration.services.edit.php:275
 msgid "hh"
 msgstr "hh"
 
-#: include/classes/import/validators/C10XmlValidator.php:361
+#: include/classes/import/validators/C10XmlValidator.php:363
 msgctxt "XML time format"
 msgid "hh.mm"
 msgstr "hh.mm"
 
-#: include/classes/api/services/CMap.php:613
-#: include/classes/api/services/CMap.php:1033
+#: include/classes/api/services/CMap.php:618
+#: include/classes/api/services/CMap.php:1038
 msgid "host"
 msgstr "host"
 
-#: include/classes/api/services/CMap.php:609
-#: include/classes/api/services/CMap.php:1029
+#: include/classes/api/services/CMap.php:614
+#: include/classes/api/services/CMap.php:1034
 msgid "host group"
 msgstr "skupina"
 
-#: include/classes/api/services/CMap.php:604
-#: include/classes/api/services/CMap.php:1023
+#: include/classes/api/services/CMap.php:609
+#: include/classes/api/services/CMap.php:1028
 msgid "icon"
 msgstr "ikonka"
 
-#: include/classes/api/services/CMap.php:625
-#: include/classes/api/services/CMap.php:1045
+#: include/classes/api/services/CMap.php:630
+#: include/classes/api/services/CMap.php:1050
 msgid "image"
 msgstr "obrázok"
 
@@ -16630,7 +16634,7 @@ msgstr "kľúč je prázdny"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2033
 #: include/classes/graphdraw/CPieGraphDraw.php:321 include/graphs.inc.php:82
-#: include/views/js/configuration.graph.edit.js.php:48
+#: include/views/js/configuration.graph.edit.js.php:52
 msgid "last"
 msgstr "naposledy"
 
@@ -16672,8 +16676,8 @@ msgstr "makro(á)"
 msgid "maintenance"
 msgstr "údržba"
 
-#: include/classes/api/services/CMap.php:621
-#: include/classes/api/services/CMap.php:1041
+#: include/classes/api/services/CMap.php:626
+#: include/classes/api/services/CMap.php:1046
 msgid "map"
 msgstr "mapa"
 
@@ -16685,16 +16689,16 @@ msgstr "zhody"
 #: include/classes/graphdraw/CLineGraphDraw.php:2036
 #: include/classes/graphdraw/CLineGraphDraw.php:2050
 #: include/classes/graphdraw/CPieGraphDraw.php:317 include/graphs.inc.php:80
-#: include/views/js/configuration.graph.edit.js.php:47
-#: include/views/js/configuration.graph.edit.js.php:55
+#: include/views/js/configuration.graph.edit.js.php:51
+#: include/views/js/configuration.graph.edit.js.php:59
 msgid "max"
 msgstr "max"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2034
 #: include/classes/graphdraw/CLineGraphDraw.php:2047
 #: include/classes/graphdraw/CPieGraphDraw.php:313 include/graphs.inc.php:78
-#: include/views/js/configuration.graph.edit.js.php:45
-#: include/views/js/configuration.graph.edit.js.php:53
+#: include/views/js/configuration.graph.edit.js.php:49
+#: include/views/js/configuration.graph.edit.js.php:57
 msgid "min"
 msgstr "min"
 
@@ -16703,8 +16707,8 @@ msgid "minimum 60 seconds"
 msgstr "minimálne 60 sekúnd"
 
 #: include/html.inc.php:733 include/html.inc.php:756
-#: include/views/configuration.services.edit.php:270
-#: include/views/configuration.services.edit.php:278
+#: include/views/configuration.services.edit.php:271
+#: include/views/configuration.services.edit.php:279
 msgid "mm"
 msgstr "mm"
 
@@ -16747,7 +16751,7 @@ msgstr "nebeží"
 #: hostinventoriesoverview.php:75
 #: include/classes/pagefilter/CPageFilter.php:727
 #: include/classes/pagefilter/CPageFilter.php:789 include/forms.inc.php:1085
-#: include/views/monitoring.screen.php:60 slides.php:186
+#: include/views/monitoring.screen.php:66 slides.php:186
 msgid "not selected"
 msgstr "nie je vybratý"
 
@@ -16755,7 +16759,7 @@ msgstr "nie je vybratý"
 msgid "now"
 msgstr "teraz"
 
-#: app/views/monitoring.widget.hosts.view.php:354 include/blocks.inc.php:444
+#: app/views/monitoring.widget.hosts.view.php:367 include/blocks.inc.php:444
 msgid "of"
 msgstr "z"
 
@@ -16777,7 +16781,7 @@ msgstr "z"
 #: include/classes/setup/CFrontendSetup.php:602
 #: include/classes/setup/CFrontendSetup.php:603
 #: include/classes/setup/CFrontendSetup.php:619
-#: include/views/administration.users.edit.php:229
+#: include/views/administration.users.edit.php:233
 msgid "off"
 msgstr "off"
 
@@ -16795,7 +16799,7 @@ msgstr "off"
 #: include/classes/setup/CFrontendSetup.php:585
 #: include/classes/setup/CFrontendSetup.php:602
 #: include/classes/setup/CFrontendSetup.php:619
-#: include/views/administration.users.edit.php:229
+#: include/views/administration.users.edit.php:233
 #: include/views/monitoring.hostscreen.php:42
 msgid "on"
 msgstr "v"
@@ -16848,7 +16852,7 @@ msgstr "sekúnd"
 msgid "selected"
 msgstr "označené"
 
-#: include/views/configuration.services.edit.php:249
+#: include/views/configuration.services.edit.php:250
 msgid "short description"
 msgstr "krátky popis"
 
@@ -16873,8 +16877,8 @@ msgstr "šablóna ID \"%1$s\" je použitá %2$s krát"
 msgid "the tag \"%1$s\" is missing"
 msgstr "tag \"%1$s\" chýba"
 
-#: include/classes/api/services/CMap.php:617
-#: include/classes/api/services/CMap.php:1037 include/events.inc.php:34
+#: include/classes/api/services/CMap.php:622
+#: include/classes/api/services/CMap.php:1042 include/events.inc.php:34
 #: include/events.inc.php:63
 msgid "trigger"
 msgstr "spúšťač"
