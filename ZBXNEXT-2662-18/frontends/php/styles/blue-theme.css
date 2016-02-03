@@ -1846,6 +1846,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 99; }
 
 .screen-table {
+  background-color: #fff;
   width: 100%; }
   .screen-table td {
     padding: 8px 5px; }
