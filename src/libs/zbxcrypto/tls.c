@@ -2436,15 +2436,9 @@ static void zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
 	const char	*__function_name = "zbx_openssl_locking_cb";
 
 	if (mode & CRYPTO_LOCK)
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "%s() lock #%d from file:[%s] line:%d", __function_name, n, file, line);
 		__zbx_mutex_lock(file, line, crypto_mutexes + n);
-	}
 	else
-	{
 		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
-		zabbix_log(LOG_LEVEL_TRACE, "%s() unlock #%d from file:[%s] line:%d", __function_name, n, file, line);
-	}
 }
 
 static void zbx_openssl_thread_setup(void)
