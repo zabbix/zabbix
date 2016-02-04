@@ -149,7 +149,7 @@ function DBconnect(&$error) {
 					}
 				}
 				else {
-					$error = 'Cannot set UTF-8 locale for web server';
+					$error = 'Cannot set UTF-8 locale for web server.';
 				}
 
 				if ($result) {
