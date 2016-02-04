@@ -306,7 +306,11 @@ elseif (isset($_REQUEST['rmv_row'])) {
 				' AND y<'.zbx_dbstr($rmv_row)
 		);
 
-		$result = DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+		$result = DBexecute(
+			'UPDATE screens SET vsize=(vsize-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND vsize>'.zbx_dbstr($rmv_row)
+		);
 		$result &= DBexecute(
 			'DELETE FROM screens_items'.
 			' WHERE screenid='.zbx_dbstr($screen['screenid']).
@@ -346,7 +350,11 @@ elseif (isset($_REQUEST['rmv_col'])) {
 				' AND x<'.zbx_dbstr($rmv_col)
 		);
 
-		$result = DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
+		$result = DBexecute(
+			'UPDATE screens SET hsize=(hsize-1)'.
+			' WHERE screenid='.zbx_dbstr($screen['screenid']).
+				' AND hsize>'.zbx_dbstr($rmv_col)
+			);
 		$result &= DBexecute(
 			'DELETE FROM screens_items'.
 			' WHERE screenid='.zbx_dbstr($screen['screenid']).
