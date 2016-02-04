@@ -125,7 +125,6 @@ function DBconnect(&$error) {
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
 
-				$result = false;
 				$unicodeprefixes = array('C', 'en_US', 'en_GB');
 				foreach ($unicodeprefixes as $prefix) {
 					$result = setlocale(LC_ALL, array($prefix.'.utf8', $prefix.'.UTF-8'));
@@ -133,10 +132,7 @@ function DBconnect(&$error) {
 						break;
 					}
 				}
-				if (!$result) {
-					$error = 'Cannot set UTF-8 locale for web server';
-				}
-				else {
+				if ($result) {
 					$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 					if (!$DB['DB']) {
 						$error = 'Error connecting to database: '.db2_conn_errormsg();
@@ -144,13 +140,16 @@ function DBconnect(&$error) {
 					}
 					else {
 						$options = array(
-							'db2_attr_case' => DB2_CASE_LOWER,
+							'db2_attr_case' => DB2_CASE_LOWER
 						);
 						db2_set_option($DB['DB'], $options, 1);
 						if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
 							DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
 						}
 					}
+				}
+				else {
+					$error = 'Cannot set UTF-8 locale for web server';
 				}
 
 				if ($result) {
