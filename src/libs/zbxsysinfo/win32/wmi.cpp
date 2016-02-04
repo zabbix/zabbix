@@ -74,6 +74,7 @@ extern "C" void	zbx_co_uninitialize()
 extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*wmi_namespace, *wmi_query;
+	wchar_t			*wmi_namespace_wide, *wmi_query_wide;
 	IWbemClassObject	*pclsObj = 0;
 	ULONG			uReturn = 0;
 	VARIANT			vtProp;
@@ -103,7 +104,9 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, 0, NULL, 0, 0, &pService);
+	wmi_namespace_wide = zbx_utf8_to_unicode(wmi_namespace);
+	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace_wide), NULL, NULL, 0, NULL, 0, 0, &pService);
+	zbx_free(wmi_namespace_wide);
 
 	if (FAILED(hres))
 	{
@@ -121,8 +124,10 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	hres = pService->ExecQuery(_bstr_t("WQL"), _bstr_t(wmi_query),
+	wmi_query_wide = zbx_utf8_to_unicode(wmi_query);
+	hres = pService->ExecQuery(_bstr_t("WQL"), _bstr_t(wmi_query_wide),
 			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+	zbx_free(wmi_query_wide);
 
 	if (FAILED(hres))
 	{
@@ -206,7 +211,7 @@ extern "C" int	WMI_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto out;
 			}
 
-			SET_TEXT_RESULT(result, zbx_strdup(NULL, (char *)_bstr_t(vtProp.bstrVal)));
+			SET_TEXT_RESULT(result, zbx_unicode_to_utf8((wchar_t *)_bstr_t(vtProp.bstrVal)));
 			ret = SYSINFO_RET_OK;
 
 			break;
