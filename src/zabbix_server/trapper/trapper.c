@@ -58,7 +58,8 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = process_hist_data(sock, jp, 0, &info);
+	if (SUCCEED != (ret = process_hist_data(sock, jp, 0, &info)))
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -92,8 +93,8 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	if (SUCCEED != (ret = process_hist_data(sock, jp, proxy_hostid, &error)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\"", host,
-				sock->peer);
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
+				host, sock->peer, error);
 		goto out;
 	}
 

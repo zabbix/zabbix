@@ -173,7 +173,7 @@ static int	process_proxy(void)
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_data;
 	zbx_socket_t		s;
-	char			*answer = NULL, *port = NULL;
+	char			*answer = NULL, *port = NULL, *error = NULL;
 	time_t			now;
 	unsigned char		update_nextcheck;
 
@@ -208,8 +208,6 @@ static int	process_proxy(void)
 
 		if (proxy.proxy_config_nextcheck <= now)
 		{
-			char	*error = NULL;
-
 			zbx_json_clean(&j);
 
 			zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST,
@@ -220,7 +218,6 @@ static int	process_proxy(void)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 						proxy.host, error);
-				zbx_free(error);
 
 				goto network_error;
 			}
@@ -238,8 +235,6 @@ static int	process_proxy(void)
 						zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
 								" \"%s\" at \"%s\": %s", proxy.host, s.peer, error);
 					}
-
-					zbx_free(error);
 				}
 
 				disconnect_proxy(&s);
@@ -262,10 +257,18 @@ static int	process_proxy(void)
 					goto network_error;
 				}
 
-				if (SUCCEED != zbx_json_open(answer, &jp) || SUCCEED != process_host_availability(&jp))
+				if (SUCCEED != zbx_json_open(answer, &jp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-							" host availability data", proxy.host, proxy.addr);
+							" host availability data: %s", proxy.host, proxy.addr,
+							zbx_json_strerror());
+					goto network_error;
+				}
+
+				if (SUCCEED != process_host_availability(&jp, &error))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" host availability data: %s", proxy.host, proxy.addr, error);
 					goto network_error;
 				}
 			}
@@ -282,11 +285,17 @@ retry_history:
 					goto network_error;
 				}
 
-				if (SUCCEED != zbx_json_open(answer, &jp) ||
-						SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, NULL))
+				if (SUCCEED != zbx_json_open(answer, &jp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-							" history data", proxy.host, proxy.addr);
+							" history data: %s", proxy.host, proxy.addr, zbx_json_strerror());
+					goto network_error;
+				}
+
+				if (SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, &error))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" history data: %s", proxy.host, proxy.addr, error);
 					goto network_error;
 				}
 
@@ -310,10 +319,18 @@ retry_dhistory:
 					goto network_error;
 				}
 
-				if (SUCCEED != zbx_json_open(answer, &jp) || SUCCEED != process_dhis_data(&jp))
+				if (SUCCEED != zbx_json_open(answer, &jp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-							" discovery data", proxy.host, proxy.addr);
+							" discovery data: %s", proxy.host, proxy.addr,
+							zbx_json_strerror());
+					goto network_error;
+				}
+
+				if (SUCCEED != process_dhis_data(&jp, &error))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" discovery data: %s", proxy.host, proxy.addr, error);
 					goto network_error;
 				}
 
@@ -337,11 +354,18 @@ retry_autoreg_host:
 					goto network_error;
 				}
 
-				if (SUCCEED != zbx_json_open(answer, &jp) ||
-						SUCCEED != process_areg_data(&jp, proxy.hostid))
+				if (SUCCEED != zbx_json_open(answer, &jp))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
-							" auto registration data", proxy.host, proxy.addr);
+							" auto registration data: %s", proxy.host, proxy.addr,
+							zbx_json_strerror());
+					goto network_error;
+				}
+
+				if (SUCCEED != process_areg_data(&jp, proxy.hostid, &error))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
+							" auto registration data: %s", proxy.host, proxy.addr, error);
 					goto network_error;
 				}
 
@@ -363,8 +387,8 @@ network_error:
 	}
 
 	zbx_free(answer);
-
 	zbx_free(port);
+	zbx_free(error);
 
 	zbx_json_free(&j);
 exit:
