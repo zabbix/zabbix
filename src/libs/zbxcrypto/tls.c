@@ -2433,8 +2433,6 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 
 static void zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
 {
-	const char	*__function_name = "zbx_openssl_locking_cb";
-
 	if (mode & CRYPTO_LOCK)
 		__zbx_mutex_lock(file, line, crypto_mutexes + n);
 	else
@@ -2447,13 +2445,13 @@ static void zbx_openssl_thread_setup(void)
 
 	int	i, num_locks;
 
-	if (NULL == (crypto_mutexes = OPENSSL_malloc(CRYPTO_num_locks() * sizeof(ZBX_MUTEX))))
+	num_locks = CRYPTO_num_locks();
+
+	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(ZBX_MUTEX))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
 		exit(EXIT_FAILURE);
 	}
-
-	num_locks = CRYPTO_num_locks();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() creating %d mutexes", __function_name, num_locks);
 
@@ -2480,10 +2478,9 @@ static void zbx_openssl_thread_cleanup(void)
 	num_locks = CRYPTO_num_locks();
 
 	for (i = 0; i < num_locks; i++)
-		CloseHandle(crypto_mutexes[i]);
+		zbx_mutex_destroy(crypto_mutexes + i);
 
-	OPENSSL_free(crypto_mutexes);
-	crypto_mutexes = NULL;
+	zbx_free(crypto_mutexes);
 }
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
