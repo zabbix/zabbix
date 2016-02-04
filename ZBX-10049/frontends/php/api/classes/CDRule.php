@@ -730,13 +730,13 @@ class CDRule extends CZBXAPI {
 	}
 
 	/**
-	 * Validate the input parameters for create() method
+	 * Validate the input parameters for create() method.
 	 *
 	 * @param array $drules		discovery rules data
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateCreate(array &$drules) {
+	protected function validateCreate(array $drules) {
 		if (!$drules) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
 		}
@@ -753,7 +753,7 @@ class CDRule extends CZBXAPI {
 			}
 			elseif ($drule['name'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s: cannot be empty.', 'name')
+					_s('Incorrect value for field "%1$s": cannot be empty.', 'name')
 				);
 			}
 
@@ -794,7 +794,7 @@ class CDRule extends CZBXAPI {
 			$db_proxies = API::proxy()->get(array(
 				'output' => array('proxyid'),
 				'proxyids' => $proxies,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			foreach ($proxies as $proxy) {
 				if (!array_key_exists($proxy, $db_proxies)) {
@@ -805,14 +805,14 @@ class CDRule extends CZBXAPI {
 	}
 
 	/**
-	 * Validate the input parameters for update() method
+	 * Validate the input parameters for update() method.
 	 *
 	 * @param array $drules			discovery rules data
 	 * @param array $db_drules		db discovery rules data
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$drules, array &$db_drules) {
+	protected function validateUpdate(array $drules, array $db_drules) {
 		if (!$drules) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input.'));
 		}
@@ -836,7 +836,7 @@ class CDRule extends CZBXAPI {
 
 			if (array_key_exists('name', $drule) && $drule['name'] === '') {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s: cannot be empty.', 'name')
+					_s('Incorrect value for field "%1$s": cannot be empty.', 'name')
 				);
 			}
 
@@ -877,7 +877,7 @@ class CDRule extends CZBXAPI {
 			$db_proxies = API::proxy()->get(array(
 				'output' => array('proxyid'),
 				'proxyids' => $proxies,
-				'preservekeys' => true,
+				'preservekeys' => true
 			));
 			foreach ($proxies as $proxy) {
 				if (!array_key_exists($proxy, $db_proxies)) {
