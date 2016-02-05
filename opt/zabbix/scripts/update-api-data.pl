@@ -1,13 +1,16 @@
 #!/usr/bin/perl -w
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $AH_DIR = $0; $AH_DIR =~ s,(.*)/.*/.*,$1,; $AH_DIR = '..' if ($AH_DIR eq $0);
+}
+use lib $AH_DIR;
 
 use strict;
 use warnings;
 use RSM;
 use RSMSLV;
 use ApiHelper;
-use JSON::XS;
 
 use constant JSON_RDDS_SUBSERVICE => 'subService';
 
@@ -273,7 +276,7 @@ foreach (@$tlds_ref)
 		{
 			if (opt('dry-run'))
 			{
-				__prnt(uc($service), " DISABLED");
+				__prnt(uc($service), ' ', AH_ALARMED_DISABLED);
 			}
 			else
 			{
@@ -381,7 +384,7 @@ foreach (keys(%$servicedata))
 		}
 		else
 		{
-			if (ah_save_service_availability($ah_tld, $service, $downtime, $lastclock) != AH_SUCCESS)
+			if (ah_save_service_availability($ah_tld, $service, $downtime) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -407,7 +410,7 @@ foreach (keys(%$servicedata))
 		}
 		else
 		{
-			if (ah_save_alarmed($ah_tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
+			if (ah_save_alarmed($ah_tld, $service, $alarmed_status) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
@@ -526,9 +529,9 @@ foreach (keys(%$servicedata))
 			}
 			else
 			{
-				if (ah_save_incident($ah_tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
+				if (ah_save_incident_state($ah_tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
 				{
-					fail("cannot save incident: ", ah_get_error());
+					fail("cannot save incident state: ", ah_get_error());
 				}
 			}
 
@@ -646,9 +649,9 @@ foreach (keys(%$servicedata))
 					}
 					else
 					{
-						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_results($ah_tld, $service, $eventid, $event_start, $tr_ref, $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
-							fail("cannot save incident: ", ah_get_error());
+							fail("cannot save incident results: ", ah_get_error());
 						}
 					}
 				}
@@ -764,9 +767,9 @@ foreach (keys(%$servicedata))
 					}
 					else
 					{
-						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_results($ah_tld, $service, $eventid, $event_start, $tr_ref, $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
-							fail("cannot save incident: ", ah_get_error());
+							fail("cannot save incident results: ", ah_get_error());
 						}
 					}
 				}
@@ -871,9 +874,9 @@ foreach (keys(%$servicedata))
 					}
 					else
 					{
-						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						if (ah_save_incident_results($ah_tld, $service, $eventid, $event_start, $tr_ref, $tr_ref->{'clock'}) != AH_SUCCESS)
 						{
-							fail("cannot save incident: ", ah_get_error());
+							fail("cannot save incident results: ", ah_get_error());
 						}
 					}
 				}
@@ -917,7 +920,7 @@ sub __prnt_json
 
 	if (opt('debug'))
 	{
-		dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------");
+		dbg(ah_encode_pretty_json($tr_ref), "-----------------------------------------------------------");
 	}
 	else
 	{
@@ -972,7 +975,10 @@ sub __update_false_positives
 
 		dbg("auditlog message: $eventid\t$service\t".ts_str($event_clock)."\t".ts_str($clock)."\tfp:$false_positive\t$tld\n");
 
-		fail("cannot update false_positive status of event with ID $eventid") unless (ah_save_false_positive($tld, $service, $eventid, $event_clock, $false_positive, $clock) == AH_SUCCESS);
+		if (ah_save_false_positive($tld, $service, $event_clock, $eventid, $false_positive, $clock) != AH_SUCCESS)
+		{
+			fail("cannot update false_positive value of event (eventid:$eventid start:[", ts_full($event_clock), "] service:$service false_positive:$false_positive clock:[", ts_full($clock), ")");
+		}
 	}
 
 	ah_save_audit($maxclock) unless ($maxclock == 0);

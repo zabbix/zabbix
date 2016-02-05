@@ -4,30 +4,40 @@ use strict;
 use warnings;
 use File::Path qw(make_path);
 use DateTime::Format::RFC3339;
+use JSON::XS;
 use base 'Exporter';
 
 use constant AH_SUCCESS => 0;
 use constant AH_FAIL => 1;
-use constant AH_BASE_DIR => '/opt/zabbix/sla';
-
-use constant AH_INCIDENT_ACTIVE => 'ACTIVE';
-use constant AH_END_FILE => 'end';
-use constant AH_FALSE_POSITIVE_FILE => 'falsePositive';
-use constant AH_ALARMED_FILE => 'alarmed';
-use constant AH_ALARMED_YES => 'YES';
-use constant AH_ALARMED_NO => 'NO';
-use constant AH_ALARMED_DISABLED => 'DISABLED';
-use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability';
-
-use constant AH_ROOT_ZONE_DIR => 'zz--root';			# map root zone name (.) to something human readable
-use constant AH_CONTINUE_FILE => 'last_update.txt';		# name of the file containing the timestamp of the last
-								# run with --continue
-use constant AH_AUDIT_FILE => AH_BASE_DIR . '/last_audit.txt';	# name of the file containing the timestamp of the last
-								# auditlog entry that was checked (false_positive change)
+use constant AH_ALARMED_YES => 'Yes';
+use constant AH_ALARMED_NO => 'No';
+use constant AH_ALARMED_DISABLED => 'Disabled';
 
 our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error
-		ah_save_alarmed ah_save_service_availability ah_save_incident ah_save_false_positive
-		ah_save_incident_json ah_get_continue_file ah_get_api_tld ah_get_last_audit ah_save_audit);
+		ah_save_alarmed ah_save_service_availability ah_save_incident_state ah_save_false_positive
+		ah_save_incident_results ah_get_continue_file ah_get_api_tld ah_get_last_audit ah_save_audit
+		ah_encode_pretty_json);
+
+use constant AH_BASE_DIR => '/opt/zabbix/sla';
+
+use constant AH_ROOT_ZONE_DIR => 'zz--root';	# map root zone (.) to something human readable
+
+use constant AH_INCIDENT_ACTIVE => 'Active';
+use constant AH_INCIDENT_ENDED => 'Resolved';
+
+use constant AH_ALARMED_FILE => 'alarmed.json';
+use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability.json';
+use constant AH_INCIDENT_STATE_FILE => 'state.json';
+use constant AH_FALSE_POSITIVE_FILE => 'falsePositive.json';
+
+use constant AH_CONTINUE_FILE => AH_BASE_DIR . '/last_update.txt';	# file with timestamp of last run with --continue
+use constant AH_AUDIT_FILE => AH_BASE_DIR . '/last_audit.txt';		# file containing timestamp of last auditlog
+									# entry that was checked (false_positive change)
+
+use constant AH_FALSE_POSITIVE_FALSE => 'False';
+use constant AH_FALSE_POSITIVE_TRUE => 'True';
+
+use constant AH_JSON_FILE_VERSION => 1;
 
 my $error_string = "";
 
@@ -46,7 +56,7 @@ sub __make_base_path
 	$tld = lc($tld);
 	$service = lc($service);
 
-	my $path = AH_BASE_DIR . "/$tld/$service";
+	my $path = AH_BASE_DIR . "/$tld/data/$service";
 	$path .= "/$add_path" if ($add_path);
 
 	make_path($path, {error => \my $err});
@@ -66,11 +76,10 @@ sub __make_inc_path
 {
 	my $tld = shift;
 	my $service = shift;
-	my $start = shift;
-	my $eventid = shift;
+	my $incidentid = shift;
 	my $inc_path_ptr = shift;	# pointer
 
-	return __make_base_path($tld, $service, $inc_path_ptr, "incidents/$start.$eventid");
+	return __make_base_path($tld, $service, $inc_path_ptr, "incidents/$incidentid");
 }
 
 sub __set_error
@@ -107,63 +116,22 @@ sub __write_file
 {
 	my $full_path = shift;
 	my $text = shift;
-	my $clock = shift;
 
-	my $OUTFILE;
+	my $fh;
 
-	unless (open($OUTFILE, '>', $full_path))
+	if (!open($fh, '>', $full_path))
 	{
 		__set_error("cannot open file $full_path: $!");
 		return AH_FAIL;
 	}
 
-	unless (print { $OUTFILE } $text)
+	if (!print { $fh } $text)
 	{
 		__set_error("cannot write to file $full_path: $!");
 		return AH_FAIL;
 	}
 
-	close($OUTFILE);
-
-	utime($clock, $clock, $full_path) if (defined($clock));
-
-	return AH_SUCCESS;
-}
-
-sub __apply_inc_end
-{
-	my $inc_path = shift;
-	my $end = shift;
-	my $lastclock = shift;
-
-	my $end_path = "$inc_path/" . AH_END_FILE;
-
-	return __write_file($end_path, AH_INCIDENT_ACTIVE, $lastclock) unless (defined($end));
-
-	my $dt = DateTime->from_epoch('epoch' => $end);
-	my $f = DateTime::Format::RFC3339->new();
-
-	return __write_file($end_path, $f->format_datetime($dt), $end);
-}
-
-sub __apply_inc_false_positive
-{
-	my $inc_path = shift;
-	my $false_positive = shift;
-	my $clock = shift;
-
-	my $false_positive_path = "$inc_path/" . AH_FALSE_POSITIVE_FILE;
-
-	if ($false_positive != 0)
-	{
-		return __write_file($false_positive_path, '', $clock);
-	}
-
-	if ((-e $false_positive_path) and not unlink($false_positive_path))
-	{
-		__set_file_error($!);
-		return AH_FAIL;
-	}
+	close($fh);
 
 	return AH_SUCCESS;
 }
@@ -173,18 +141,15 @@ sub ah_save_alarmed
 	my $tld = shift;
 	my $service = shift;
 	my $status = shift;
-	my $clock = shift;
 
 	my $base_path;
 
 	return AH_FAIL unless (__make_base_path($tld, $service, \$base_path) == AH_SUCCESS);
 
-	my $alarmed_path = "$base_path/" . AH_ALARMED_FILE;
-
 	# if service is disabled there should be no availability file
 	if ($status eq AH_ALARMED_DISABLED)
 	{
-		my $avail_path = "$base_path/" . AH_SERVICE_AVAILABILITY_FILE;;
+		my $avail_path = $base_path . '/' . AH_SERVICE_AVAILABILITY_FILE;
 
 		if ((-e $avail_path) and not unlink($avail_path))
 		{
@@ -193,7 +158,9 @@ sub ah_save_alarmed
 		}
 	}
 
-	return __write_file($alarmed_path, $status, $clock);
+	my $json_ref = {'alarmed' => $status};
+
+	return __write_file($base_path . '/' . AH_ALARMED_FILE, __encode_json($json_ref));
 }
 
 sub ah_save_service_availability
@@ -201,16 +168,25 @@ sub ah_save_service_availability
 	my $tld = shift;
 	my $service = shift;
 	my $downtime = shift;
-	my $clock = shift;
 
-	my $service_availability_path;
+	my $base_path;
 
-	return AH_FAIL unless (__make_base_path($tld, $service, \$service_availability_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_base_path($tld, $service, \$base_path) == AH_SUCCESS);
 
-	return __write_file("$service_availability_path/" . AH_SERVICE_AVAILABILITY_FILE, $downtime, $clock);
+	my $json_ref = {'serviceAvailability' => $downtime};
+
+	return __write_file($base_path . '/' . AH_SERVICE_AVAILABILITY_FILE, __encode_json($json_ref));
 }
 
-sub ah_save_incident
+sub __incident_id
+{
+	my $start = shift;
+	my $eventid = shift;
+
+	return "$start.$eventid";
+}
+
+sub ah_save_incident_state
 {
 	my $tld = shift;
 	my $service = shift;
@@ -218,54 +194,87 @@ sub ah_save_incident
 	my $start = shift;
 	my $end = shift;
 	my $false_positive = shift;
-	my $lastclock = shift;
+
+	my $incidentid = __incident_id($start, $eventid);
 
 	my $inc_path;
 
-	return AH_FAIL unless (__make_inc_path($tld, $service, $start, $eventid, \$inc_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_inc_path($tld, $service, $incidentid, \$inc_path) == AH_SUCCESS);
 
-	return AH_FAIL unless (__apply_inc_end($inc_path, $end, $lastclock) == AH_SUCCESS);
+	my $json_ref = {'falsePositive' => AH_FALSE_POSITIVE_FALSE, 'updateTime' => undef};
 
-	return __apply_inc_false_positive($inc_path, $false_positive, $start);
+	return AH_FAIL unless (__write_file($inc_path . '/' . AH_FALSE_POSITIVE_FILE, __encode_json($json_ref)) == AH_SUCCESS);
+
+	$json_ref =
+		{
+			'incidents' =>
+			[
+				{
+					'incidentID' => $incidentid,
+					'startTime' => $start,
+					'falsePositive' => ($false_positive == 0 ? AH_FALSE_POSITIVE_FALSE : AH_FALSE_POSITIVE_TRUE),
+					'state' => ($end ? AH_INCIDENT_ENDED : AH_INCIDENT_ACTIVE),
+					'endTime' => $end
+				}
+			]
+		};
+
+	return __write_file($inc_path . '/'. AH_INCIDENT_STATE_FILE, __encode_json($json_ref));
 }
 
 sub ah_save_false_positive
 {
 	my $tld = shift;
 	my $service = shift;
-	my $eventid = shift;	# incident is identified by event ID
-	my $start = shift;
+	my $start = shift;		# incident start time
+	my $eventid = shift;		# incident is identified by event ID
 	my $false_positive = shift;
-	my $clock = shift;
+	my $clock = shift;		# time of flase_positive flag change
 
 	my $inc_path;
 
-	return AH_FAIL unless (__make_inc_path($tld, $service, $start, $eventid, \$inc_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_inc_path($tld, $service, __incident_id($start, $eventid), \$inc_path) == AH_SUCCESS);
 
-	return __apply_inc_false_positive($inc_path, $false_positive, $clock);
+	my $inc_state_file = $inc_path . '/'. AH_INCIDENT_STATE_FILE;
+
+	my $json_ref =
+		{
+			'falsePositive' => ($false_positive == 0 ? AH_FALSE_POSITIVE_FALSE : AH_FALSE_POSITIVE_TRUE),
+			'updateTime' => $clock
+		};
+
+	return AH_FAIL unless (__write_file($inc_path . '/' . AH_FALSE_POSITIVE_FILE, __encode_json($json_ref)) == AH_SUCCESS);
+
+	$json_ref = undef;
+
+	return AH_FAIL unless (__parse_json_file($inc_state_file, \$json_ref) == AH_SUCCESS);
+
+	$json_ref->{'incident'}->{'falsePositive'} = ($false_positive == 0 ? AH_FALSE_POSITIVE_FALSE : AH_FALSE_POSITIVE_TRUE);
+
+	return __write_file($inc_state_file, __encode_json($json_ref));
 }
 
-sub ah_save_incident_json
+sub ah_save_incident_results
 {
 	my $tld = shift;
 	my $service = shift;
 	my $eventid = shift;	# incident is identified by event ID
 	my $start = shift;
-	my $json = shift;
+	my $tr_ref = shift;
 	my $clock = shift;
 
 	my $inc_path;
 
-	return AH_FAIL unless (__make_inc_path($tld, $service, $start, $eventid, \$inc_path) == AH_SUCCESS);
+	my $incidentid = __incident_id($start, $eventid);
 
-	my $json_path = "$inc_path/$clock.$eventid.json";
+	return AH_FAIL unless (__make_inc_path($tld, $service, $incidentid, \$inc_path) == AH_SUCCESS);
 
-	return __write_file($json_path, "$json\n", $clock);
+	return __write_file("$inc_path/$clock.$incidentid.json", __encode_json($tr_ref));
 }
 
 sub ah_get_continue_file
 {
-	return AH_BASE_DIR . '/' . AH_CONTINUE_FILE;
+	return AH_CONTINUE_FILE;
 }
 
 sub ah_get_api_tld
@@ -302,6 +311,60 @@ sub ah_save_audit
 	my $clock = shift;
 
 	return __write_file(AH_AUDIT_FILE, $clock);
+}
+
+sub __encode_json
+{
+	my $json_ref = shift;
+
+	$json_ref->{'version'} = AH_JSON_FILE_VERSION;
+	$json_ref->{'lastModifiedTime'} = time();
+
+	return encode_json($json_ref);
+}
+
+sub ah_encode_pretty_json
+{
+	return JSON->new->utf8(1)->pretty(1)->encode(shift);
+}
+
+sub __read_file
+{
+	my $filename = shift;
+	my $buf_ref = shift;
+
+	my $fh;
+
+	if (!open($fh, '<', $filename))
+	{
+		__set_file_error("cannot open $filename: $!");
+		return AH_FAIL;
+	}
+
+	$$buf_ref = "";
+
+	while (my $line = <$fh>)
+	{
+		$$buf_ref .= $line;
+	}
+
+	close($fh);
+
+	return AH_SUCCESS;
+}
+
+sub __parse_json_file
+{
+	my $file = shift;
+	my $json_ref_ref = shift;	# double ref
+
+	my $buf;
+
+	return AH_FAIL unless (__read_file($file, \$buf) == AH_SUCCESS);
+
+	$$json_ref_ref = decode_json($buf);
+
+	return AH_SUCCESS;
 }
 
 1;
