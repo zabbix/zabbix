@@ -69,7 +69,11 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 #if defined(HAVE_TM_TM_GMTOFF)
 		gmtoff = tm->tm_gmtoff;
 #else
+#ifdef _WINDOWS
+		gmtoff = -_timezone;
+#else
 		gmtoff = -timezone;
+#endif
 #endif
 #ifdef _WINDOWS
 		if (0 < tm->tm_isdst)		/* daylight saving time */
