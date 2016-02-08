@@ -320,7 +320,7 @@ static int	host_get_availability(const DC_HOST *dc_host, unsigned char type, zbx
 	return SUCCEED;
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "activate_host";
 
@@ -348,13 +348,11 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
 				zbx_agent_type_string(item->type), item->host.host);
 	}
-
-	*available = HOST_AVAILABLE_TRUE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, const char *error)
+static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	const char		*__function_name = "deactivate_host";
 
@@ -404,8 +402,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, out.errors_from,
 			out.available);
-
-	*available = HOST_AVAILABLE_FALSE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -667,13 +663,19 @@ static int	get_values(unsigned char poller_type)
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
-					activate_host(&items[i], &timespec, &last_available);
+				{
+					activate_host(&items[i], &timespec);
+					last_available = HOST_AVAILABLE_TRUE;
+				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
-					deactivate_host(&items[i], &timespec, &last_available, results[i].msg);
+				{
+					deactivate_host(&items[i], &timespec, results[i].msg);
+					last_available = HOST_AVAILABLE_FALSE;
+				}
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
@@ -713,7 +715,7 @@ static int	get_values(unsigned char poller_type)
 			}
 
 		}
-		else if (HOST_AVAILABLE_FALSE != last_available)
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
