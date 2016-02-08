@@ -70,8 +70,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 		gmtoff = tm->tm_gmtoff;
 #else
 #ifdef _WINDOWS
-		_get_timezone(&tv.timezone);
-		gmtoff = -tv.timezone;
+		gmtoff = -_timezone;
 #else
 		gmtoff = -timezone;
 #endif
