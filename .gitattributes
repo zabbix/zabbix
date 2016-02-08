@@ -394,6 +394,7 @@ sass/stylesheets/sass/_fonts.scss -text
 sass/stylesheets/sass/_mixins.scss -text
 sass/stylesheets/sass/dark-theme.scss -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
+src/libs/zbxdbupgrade/dbupgrade_3000.c -text
 src/libs/zbxnix/coredump.c -text
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/README svneol=native#text/plain
