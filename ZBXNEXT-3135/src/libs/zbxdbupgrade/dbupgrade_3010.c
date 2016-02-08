@@ -19,10 +19,7 @@
 
 #include "common.h"
 #include "db.h"
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
-#include "sysinfo.h"
-#include "log.h"
 
 /*
  * 3.2 development database patches
