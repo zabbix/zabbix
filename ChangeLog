@@ -3,6 +3,7 @@ Changes for 3.0.0rc2
 New features:
 
 Bug fixes:
+....I..... [ZBX-10361] updated database versioning for v3.0 release (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0rc1
