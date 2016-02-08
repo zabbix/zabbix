@@ -1576,12 +1576,9 @@ static void	dc_add_history_str(ZBX_DC_HISTORY *history, int history_num)
 static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int htext_num)
 {
 	int		i;
-	zbx_uint64_t	id;
 	zbx_db_insert_t	db_insert;
 
-	zbx_db_insert_prepare(&db_insert, "history_text", "id", "itemid", "clock", "ns", "value", NULL);
-
-	id = DBget_maxid_num("history_text", htext_num);
+	zbx_db_insert_prepare(&db_insert, "history_text", "itemid", "clock", "ns", "value", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1596,7 +1593,7 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int ht
 		if (ITEM_VALUE_TYPE_TEXT != h->value_type)
 			continue;
 
-		zbx_db_insert_add_values(&db_insert, id++, h->itemid, h->ts.sec, h->ts.ns, h->value_orig.str);
+		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value_orig.str);
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -1613,13 +1610,10 @@ static void	dc_add_history_text(ZBX_DC_HISTORY *history, int history_num, int ht
 static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlog_num)
 {
 	int			i;
-	zbx_uint64_t		id;
 	zbx_db_insert_t		db_insert;
 
-	zbx_db_insert_prepare(&db_insert, "history_log", "id", "itemid", "clock", "ns", "timestamp", "source",
-			"severity", "value", "logeventid", NULL);
-
-	id = DBget_maxid_num("history_log", hlog_num);
+	zbx_db_insert_prepare(&db_insert, "history_log", "itemid", "clock", "ns", "timestamp", "source", "severity",
+			"value", "logeventid", NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -1634,7 +1628,7 @@ static void	dc_add_history_log(ZBX_DC_HISTORY *history, int history_num, int hlo
 		if (ITEM_VALUE_TYPE_LOG != h->value_type)
 			continue;
 
-		zbx_db_insert_add_values(&db_insert, id++, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
+		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
 				NULL != h->value.str ? h->value.str : "", h->severity, h->value_orig.str,
 				h->logeventid);
 	}

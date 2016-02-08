@@ -878,9 +878,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 {
-	if (0 == strcmp(tablename, "history_log") ||
-			0 == strcmp(tablename, "history_text") ||
-			0 == strcmp(tablename, "events") ||
+	if (0 == strcmp(tablename, "events") ||
 			0 == strcmp(tablename, "dservices") ||
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
