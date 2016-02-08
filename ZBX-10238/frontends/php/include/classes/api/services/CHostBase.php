@@ -69,18 +69,27 @@ abstract class CHostBase extends CApiService {
 			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
 
 			$dbItems = DBselect(
-				'SELECT i.key_'.
+				'SELECT i.key_, i.flags'.
 					' FROM items i'.
 					' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
 					' GROUP BY i.key_'.
 					' HAVING COUNT(i.itemid)>1'
 			);
 			if ($dbItem = DBfetch($dbItems)) {
-				$dbItemHost = API::Item()->get(array(
-					'output' => array('hostid'),
-					'filter' => array('key_' => $dbItem['key_']),
-					'templateids' => zbx_objectValues($linkedTpls, 'templateid')
-				));
+				if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					$dbItemHost = API::ItemPrototype()->get(array(
+						'output' => array('hostid'),
+						'filter' => array('key_' => $dbItem['key_']),
+						'templateids' => zbx_objectValues($linkedTpls, 'templateid')
+					));
+				}
+				else {
+					$dbItemHost = API::Item()->get(array(
+						'output' => array('hostid'),
+						'filter' => array('key_' => $dbItem['key_']),
+						'templateids' => zbx_objectValues($linkedTpls, 'templateid')
+					));
+				}
 				$dbItemHost = reset($dbItemHost);
 
 				$templates = API::Template()->get(array(
