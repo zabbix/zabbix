@@ -69,38 +69,23 @@ abstract class CHostBase extends CApiService {
 			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
 
 			$dbItems = DBselect(
-				'SELECT i.key_, i.flags'.
+				'SELECT i.key_'.
 					' FROM items i'.
 					' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
 					' GROUP BY i.key_'.
 					' HAVING COUNT(i.itemid)>1'
 			);
 			if ($dbItem = DBfetch($dbItems)) {
-				if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$dbItemHost = API::ItemPrototype()->get(array(
-						'output' => array('hostid'),
-						'filter' => array('key_' => $dbItem['key_']),
-						'templateids' => zbx_objectValues($linkedTpls, 'templateid')
-					));
-				}
-				else {
-					$dbItemHost = API::Item()->get(array(
-						'output' => array('hostid'),
-						'filter' => array('key_' => $dbItem['key_']),
-						'templateids' => zbx_objectValues($linkedTpls, 'templateid')
-					));
-				}
-				$dbItemHost = reset($dbItemHost);
-
-				$templates = API::Template()->get(array(
+				$target_template = API::Template()->get(array(
 					'output' => array('name'),
-					'templateids' => array($dbItemHost['hostid'], $targetid),
-					'preservekeys' => true
+					'templateids' => $targetid
 				));
+				$target_template = reset($target_template);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item "%1$s" already exists on "%2$s", inherited from template "%3$s".',
-						$dbItem['key_'], $templates[$targetid]['name'], $templates[$dbItemHost['hostid']]['name']));
+					_s('Item "%1$s" already exists on "%2$s", inherited from another template.',
+						$dbItem['key_'], $target_template['name'])
+					);
 			}
 		}
 
