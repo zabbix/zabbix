@@ -80,13 +80,13 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
-		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
-		db_exec set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
+		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_disconnect db_select
+		db_select2 db_exec set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month max_avail_time get_online_probes get_probe_times probe_offline_at probes2tldhostids
 		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
 		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
-		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
+		get_epp_str_itemids get_dns_test_values get_dns_test_values2 get_rdds_test_values get_rdds_test_values2 get_epp_test_values no_cycle_result
 		get_service_status_itemids get_test_results
 		sql_time_condition get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
@@ -771,6 +771,11 @@ sub db_connect
 	$dbh->{'mysql_use_result'} = 1;
 }
 
+sub db_disconnect
+{
+     $dbh->disconnect();
+}
+
 sub db_select
 {
 	$global_sql = shift;
@@ -829,6 +834,77 @@ sub db_select
 	}
 
 	return $rows_ref;
+}
+
+sub db_select2
+{
+	$global_sql = shift;
+	my $bind_values = shift;
+
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
+	my $sth = $dbh->prepare($global_sql)
+		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
+
+	dbg("[$global_sql]");
+
+	my ($start, $exe, $fetch, $total);
+
+	my @rows;
+	foreach my $bind_value (@$bind_values)
+	{
+		dbg("bind_value:$bind_value");
+
+		if (opt('warnslow'))
+		{
+			$start = time();
+		}
+
+		$sth->execute($bind_value)
+			or fail("cannot execute [$global_sql] bind_value:$bind_value: ", $sth->errstr);
+
+		if (opt('warnslow'))
+		{
+			$exe = time();
+		}
+
+		while (my @row = $sth->fetchrow_array())
+		{
+			push(@rows, \@row);
+		}
+
+		if (opt('warnslow'))
+		{
+			my $now = time();
+			$total = $now - $start;
+
+			if ($total > getopt('warnslow'))
+			{
+				$fetch = $now - $exe;
+				$exe = $exe - $start;
+				wrn("slow query: [$global_sql] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
+			}
+		}
+	}
+
+	if (opt('debug'))
+	{
+		my $rows_num = scalar(@rows);
+
+		dbg("$rows_num row", ($rows_num != 1 ? "s" : ""));
+	}
+
+	if (opt('stats'))
+	{
+		$sql_time += time() - $sec;
+		$sql_count++;
+	}
+
+	return \@rows;
 }
 
 sub db_exec
@@ -1220,7 +1296,10 @@ sub get_probe_times
 	# check probe lastaccess time
 	foreach my $probe (keys(%$probes_ref))
 	{
-		my $times_ref = __get_reachable_times($probe, $probe_avail_limit, $from, $till);
+		my $host = "$probe - mon";
+		my $itemid = get_itemid_by_host($host, PROBE_LASTACCESS_ITEM);
+
+		my $times_ref = __get_lastaccess_times($itemid, $probe_avail_limit, $from, $till);
 
 		my $hostid = $probes_ref->{$probe};
 
@@ -2167,6 +2246,65 @@ sub get_dns_test_values
 	return \%result;
 }
 
+sub get_dns_test_values2
+{
+	my $dns_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+
+	my %result;
+
+	# generate list if itemids
+	my @itemids;
+	foreach my $probe (keys(%$dns_items_ref))
+	{
+		push(@itemids, keys(%{$dns_items_ref->{$probe}}));
+	}
+
+	my @rows;
+	if (scalar(@itemids) != 0)
+	{
+		my $rows_ref = db_select2("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
+
+		foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$rows_ref)
+		{
+			my $itemid = $row_ref->[0];
+			my $value = $row_ref->[1];
+			my $clock = $row_ref->[2];
+
+			my ($nsip, $probe);
+			my $last = 0;
+
+			foreach my $pr (keys(%$dns_items_ref))
+			{
+				my $itemids_ref = $dns_items_ref->{$pr};
+
+				foreach my $i (keys(%$itemids_ref))
+				{
+					if ($i == $itemid)
+					{
+						$nsip = $dns_items_ref->{$pr}->{$i};
+						$probe = $pr;
+						$last = 1;
+						last;
+					}
+				}
+				last if ($last == 1);
+			}
+
+			unless (defined($nsip))
+			{
+				wrn("internal error: Name Server,IP pair of item $itemid not found");
+				next;
+			}
+
+			$result{$probe}->{$nsip}->{$clock} = $value;
+		}
+	}
+
+	return \%result;
+}
+
 sub __find_probe_key_by_itemid
 {
 	my $itemid = shift;
@@ -2329,6 +2467,125 @@ sub get_rdds_test_values
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
 
 	foreach my $row_ref (@$str_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $port = __get_rdds_port($key);
+		my $type = __get_rdds_str_type($key);
+
+		my $subservice;
+                if ($port eq '43')
+                {
+                        $subservice = JSON_RDDS_43;
+                }
+                elsif ($port eq '80')
+                {
+                        $subservice = JSON_RDDS_80;
+                }
+                else
+                {
+                        fail("unknown RDDS port in item (id:$itemid)");
+                }
+
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = $value;
+	}
+
+	foreach my $probe (keys(%pre_result))
+	{
+		foreach my $subservice (keys(%{$pre_result{$probe}}))
+		{
+			foreach my $clock (sort(keys(%{$pre_result{$probe}->{$subservice}})))	# must be sorted by clock
+			{
+				my $h;
+				my $clock_ref = $pre_result{$probe}->{$subservice}->{$clock};
+				foreach my $key (keys(%{$pre_result{$probe}->{$subservice}->{$clock}}))
+				{
+					$h->{$key} = $clock_ref->{$key};
+				}
+				$h->{'clock'} = $clock;
+
+				push(@{$result{$probe}->{$subservice}}, $h);
+			}
+		}
+	}
+
+	return \%result;
+}
+
+sub get_rdds_test_values2
+{
+	my $rdds_dbl_items_ref = shift;
+	my $rdds_str_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+
+	# generate list if itemids
+	my @dbl_itemids;
+	foreach my $probe (keys(%$rdds_dbl_items_ref))
+	{
+		foreach my $itemid (keys(%{$rdds_dbl_items_ref->{$probe}}))
+		{
+			push(@dbl_itemids, $itemid);
+		}
+	}
+
+	my @str_itemids;
+	foreach my $probe (keys(%$rdds_str_items_ref))
+	{
+		foreach my $itemid (keys(%{$rdds_str_items_ref->{$probe}}))
+		{
+			push(@str_itemids, $itemid);
+		}
+	}
+
+	my %result;
+
+	return \%result if (scalar(@dbl_itemids) == 0 || scalar(@str_itemids) == 0);
+
+	# we need pre_result to combine IP and RTT to single test result
+	my %pre_result;
+
+	my $dbl_rows_ref = db_select2("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
+
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $port = __get_rdds_port($key);
+		my $type = __get_rdds_dbl_type($key);
+
+		my $subservice;
+		if ($port eq '43')
+		{
+			$subservice = JSON_RDDS_43;
+		}
+		elsif ($port eq '80')
+		{
+			$subservice = JSON_RDDS_80;
+		}
+		else
+		{
+			fail("unknown RDDS port in item (id:$itemid)");
+		}
+
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? $value : int($value);
+	}
+
+	my $str_rows_ref = db_select2("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
+
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
 		my $value = $row_ref->[1];
@@ -3240,6 +3497,8 @@ sub get_detailed_result
 	my $maps = shift;
 	my $value = shift;
 
+	return undef unless($value);
+
 	my $value_int = int($value);
 
 	return $value_int unless (exists($maps->{$value_int}));
@@ -3740,15 +3999,12 @@ sub __get_pidfile
 }
 
 # Times when probe "lastaccess" within $probe_avail_limit.
-sub __get_reachable_times
+sub __get_lastaccess_times
 {
-	my $probe = shift;
+	my $itemid = shift;
 	my $probe_avail_limit = shift;
 	my $from = shift;
 	my $till = shift;
-
-	my $host = "$probe - mon";
-	my $itemid = get_itemid_by_host($host, PROBE_LASTACCESS_ITEM);
 
 	my ($rows_ref, @times, $last_status);
 
@@ -3832,7 +4088,13 @@ sub __get_probestatus_times
 
 	fail("configuration error: cannot get item \"$key\" at probe host \"$probe\": $errbuf") if ($itemid < 0);
 
-	$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock<" . $times_ref->[0] . " order by clock desc limit 1");
+	$rows_ref = db_select(
+		"select value".
+		" from history_uint".
+		" where itemid=$itemid".
+			" and clock<" . $times_ref->[0].
+		" order by clock desc".
+		" limit 1");
 
 	$last_status = UP;
 	if (scalar(@$rows_ref) != 0)
@@ -3849,7 +4111,12 @@ sub __get_probestatus_times
 		my $from = $times_ref->[$idx++];
 		my $till = $times_ref->[$idx++];
 
-		$rows_ref = db_select("select clock,value from history_uint where itemid=$itemid and clock between $from and $till order by itemid,clock");
+		$rows_ref = db_select(
+			"select clock,value".
+			" from history_uint".
+			" where itemid=$itemid".
+				" and clock between $from and $till".
+			" order by itemid,clock");
 
 		push(@times, $from) if ($last_status == UP);
 
@@ -3902,7 +4169,13 @@ sub __get_configvalue
 
 	while (not $value and $diff < $month)
 	{
-		my $rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between " . ($value_time - $diff) . " and $value_time order by clock desc limit 1");
+		my $rows_ref = db_select(
+			"select value".
+			" from history_uint".
+			" where itemid=$itemid".
+				" and clock between " . ($value_time - $diff) . " and $value_time".
+			" order by clock desc".
+			" limit 1");
 
 		foreach my $row_ref (@$rows_ref)
 		{

@@ -111,10 +111,18 @@ while ($period > 0)
 			$success_values-- if (ZBX_EC_DNS_NS_ERRSIG == $_->[1]);
 		}
 
-		my $test_result = DOWN;
+		my $test_result;
 		my $total_values = scalar(@$values_ref);
 		my $perc = $success_values * 100 / $total_values;
-		$test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
+
+		if ($perc > SLV_UNAVAILABILITY_LIMIT)
+		{
+			$test_result = UP;
+		}
+		else
+		{
+			$test_result = DOWN;
+		}
 
 		push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
 	}
