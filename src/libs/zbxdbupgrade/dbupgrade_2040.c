@@ -19,7 +19,6 @@
 
 #include "common.h"
 #include "db.h"
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
 
 /*
