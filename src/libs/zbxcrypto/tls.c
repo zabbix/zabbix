@@ -2431,15 +2431,15 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 #if defined(HAVE_OPENSSL) && defined(_WINDOWS)
 /* see "man 3ssl threads" and example in OpenSSL crypto/threads/mttest.c */
 
-static void zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
+static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
 {
-	if (mode & CRYPTO_LOCK)
+	if (0 != (mode & CRYPTO_LOCK))
 		__zbx_mutex_lock(file, line, crypto_mutexes + n);
 	else
 		__zbx_mutex_unlock(file, line, crypto_mutexes + n);
 }
 
-static void zbx_openssl_thread_setup(void)
+static void	zbx_openssl_thread_setup(void)
 {
 	const char	*__function_name = "zbx_openssl_thread_setup";
 
@@ -2469,7 +2469,7 @@ static void zbx_openssl_thread_setup(void)
 	/* do not register our own threadid_func() callback, use OpenSSL default one */
 }
 
-static void zbx_openssl_thread_cleanup(void)
+static void	zbx_openssl_thread_cleanup(void)
 {
 	int	i, num_locks;
 
@@ -2483,6 +2483,7 @@ static void zbx_openssl_thread_cleanup(void)
 	zbx_free(crypto_mutexes);
 }
 #endif
+
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
