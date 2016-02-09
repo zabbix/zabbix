@@ -3,6 +3,7 @@ Changes for 3.0.0rc2
 New features:
 
 Bug fixes:
+A.F....... [ZBX-10347] fixed undefined index "macros" in dashboard widget (Oleg)
 ...G...PS. [ZBX-10352] fixed standard file stream redirection after daemonizing when using system log type (wiper)
 ..F....... [ZBX-10350] fixed "Select all" checkbox in application list (Ivo)
 .......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
