@@ -13,10 +13,11 @@
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
-	** You should have received a copy of the GNU General Public License
+** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 if ($this->data['hostid'] == 0) {
 	$create_button = (new CSubmit('form', _('Create application (select host first)')))->setEnabled(false);
@@ -38,13 +39,14 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
-$applicationForm = new CForm();
+$form = (new CForm())->setName('application_form');
 
 // create table
 $applicationTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_applications'))->onClick("checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")
+			(new CCheckBox('all_applications'))
+				->onClick("checkAll('".$form->getName()."', 'all_applications', 'applications');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		($this->data['hostid'] > 0) ? null : _('Host'),
 		make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
@@ -140,7 +142,7 @@ foreach ($this->data['applications'] as $application) {
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$applicationForm->addItem([
+$form->addItem([
 	$applicationTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'applications',
@@ -154,6 +156,6 @@ $applicationForm->addItem([
 ]);
 
 // append form to widget
-$widget->addItem($applicationForm);
+$widget->addItem($form);
 
 return $widget;
