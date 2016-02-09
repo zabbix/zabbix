@@ -420,7 +420,7 @@ class CDRule extends CApiService {
 			if (!array_key_exists('type', $dcheck)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'type'));
 			}
-			elseif (!in_array($dcheck['type'], $dcheck_types)) {
+			elseif (!is_numeric($dcheck['type']) || !in_array($dcheck['type'], $dcheck_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s".', 'type'));
 			}
 
@@ -460,7 +460,9 @@ class CDRule extends CApiService {
 							|| $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_MD5
 								&& $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_SHA) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect authentication protocol for discovery rule "%1$s".', $dcheck['name'])
+							_s('Incorrect value "%1$s" for "%2$s" field.',
+								$dcheck['snmpv3_authprotocol'], 'snmpv3_authprotocol'
+							)
 						);
 					}
 				}
@@ -471,7 +473,9 @@ class CDRule extends CApiService {
 							|| $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_DES
 								&& $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_AES) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Incorrect privacy protocol for discovery rule "%1$s".', $dcheck['name'])
+							_s('Incorrect value "%1$s" for "%2$s" field.',
+								$dcheck['snmpv3_privprotocol'], 'snmpv3_privprotocol'
+							)
 						);
 					}
 				}
