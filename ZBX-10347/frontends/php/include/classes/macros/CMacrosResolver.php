@@ -444,6 +444,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
 					}
 				}
+				unset($usermacros_data);
 
 				// Get user macros values.
 				foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
@@ -561,6 +562,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
 				}
 			}
+			unset($usermacros_data);
 
 			// Get user macros values.
 			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
@@ -674,6 +676,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
 				}
 			}
+			unset($usermacros_data);
 
 			// Get user macros values.
 			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
@@ -982,6 +985,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
 				}
 			}
+			unset($usermacros_data);
 
 			// Get user macros values.
 			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
