@@ -18,4 +18,6 @@ zabbix_sender_LDADD += @SENDER_LIBS@
 
 zabbix_sender_LDFLAGS = @SENDER_LDFLAGS@
 
+zabbix_sender_CFLAGS = @SENDER_CFLAGS@
+
 EXTRA_DIST = win32

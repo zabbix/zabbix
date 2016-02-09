@@ -81,6 +81,8 @@ zabbix_server_CFLAGS = \
 	-DLIBDIR="\"@libdir@\"" \
 	-I@top_srcdir@/src/libs/zbxdbcache
 
+zabbix_server_CFLAGS += @SERVER_CFLAGS@
+
 SERVER_CONFIG = zabbix_server.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(SERVER_CONFIG).d
 EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
