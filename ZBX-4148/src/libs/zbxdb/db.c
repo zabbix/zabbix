@@ -69,9 +69,9 @@ struct ZBX_DB_RESULT
 	int		nrow;
 	int		ncolumn;
 	DB_ROW		values;
-#endif	/* HAVE_SQLITE3 */
+#endif
 };
-#endif	/* HAVE_MYSQL */
+#endif
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
