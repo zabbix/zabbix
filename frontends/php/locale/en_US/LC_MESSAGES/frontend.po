@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 19:22+0200\n"
-"PO-Revision-Date: 2014-02-04 10:36+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"PO-Revision-Date: 2016-02-09 00:05+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1391502970.0\n"
+"X-POOTLE-MTIME: 1454969115.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -3501,7 +3501,7 @@ msgstr "Czech (cs_CZ)"
 #: include/classes/import/validators/C10XmlValidator.php:346
 msgctxt "XML date format"
 msgid "DD.MM.YY"
-msgstr ""
+msgstr "DD.MM.YY"
 
 #: include/views/configuration.host.discovery.edit.php:140
 #: include/views/configuration.item.edit.php:149
@@ -9173,7 +9173,7 @@ msgstr "Low-level discovery rule in \"not supported\" state"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1636
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:125
 msgctxt "Monday short"
@@ -16097,11 +16097,11 @@ msgstr "Y axis side"
 
 #: include/translateDefines.inc.php:33
 msgid "Y-m-d"
-msgstr ""
+msgstr "m/d/Y"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i"
-msgstr ""
+msgstr "m/d/Y h:i A"
 
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
@@ -16111,7 +16111,7 @@ msgstr "m/d/Y h:i:s A"
 #: include/classes/import/validators/C30XmlValidator.php:884
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: app/views/report.services.php:38 app/views/report.services.php:54
 #: report4.php:113 report4.php:133
@@ -16510,7 +16510,7 @@ msgstr "hh"
 #: include/classes/import/validators/C10XmlValidator.php:363
 msgctxt "XML time format"
 msgid "hh.mm"
-msgstr ""
+msgstr "hh.mm"
 
 #: include/classes/api/services/CMap.php:618
 #: include/classes/api/services/CMap.php:1038
@@ -16586,11 +16586,11 @@ msgstr "m"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1639
 msgid "m-d"
-msgstr ""
+msgstr "m/d"
 
 #: include/translateDefines.inc.php:32
 msgid "m-d H:i"
-msgstr ""
+msgstr "m/d h:i A"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
@@ -16862,3 +16862,11 @@ msgstr "y"
 #: include/html.inc.php:726
 msgid "yyyy"
 msgstr "yyyy"
+
+#: include/classes/api/services/CHttpTest.php:698
+msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
+msgstr ""
+
+#: include/classes/api/services/CTemplateScreen.php:699
+msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
+msgstr "Screen \"%1$s\" already exists on template \"%2$2\"."
