@@ -7760,7 +7760,7 @@ msgstr "Otrzymano błędną odpowiedź z serwera Zabbix \"%1$s\"."
 #: include/classes/api/services/CHttpTest.php:698
 #, c-format
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Błędna wartość trybu odzyskiwania dla kroku \"%1$s\" scenariusza sieci www \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:790
 #, c-format
@@ -12716,7 +12716,7 @@ msgstr "Ekran"
 #: include/classes/api/services/CTemplateScreen.php:699
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Ekran \"%1$s\" już istnieje w szablonie \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:458
 #: include/classes/api/services/CScreen.php:790
