@@ -606,6 +606,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = [];
 
 		$types = [
+			'macros' => [
+				'trigger' => ['{TRIGGER.ID}']
+			],
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
@@ -619,6 +622,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$functionids = $this->findFunctions($trigger['expression']);
 
 			$matched_macros = $this->extractMacros([$trigger['url']], $types);
+
+			foreach ($matched_macros['macros']['trigger'] as $macro) {
+				$macro_values[$triggerid][$macro] = $triggerid;
+			}
 
 			foreach ($matched_macros['macros_n']['host'] as $macro => $f_nums) {
 				foreach ($f_nums as $f_num) {
