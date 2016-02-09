@@ -117,6 +117,7 @@ CArrayHelper::sort($mediatypes, ['description']);
 foreach ($mediatypes as &$mediatype) {
 	$mediatype = $mediatype['description'];
 }
+unset($mediatype);
 
 $frm_row = [];
 
