@@ -191,26 +191,40 @@ class CDRule extends CApiService {
 			if (!array_key_exists('name', $drule)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
 			}
-			elseif ($drule['name'] === '') {
+			elseif (is_array($drule['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+			elseif ($drule['name'] === '' || $drule['name'] === null || $drule['name'] === false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": cannot be empty.', 'name')
+					_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
 				);
 			}
 
 			if (!array_key_exists('iprange', $drule)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'iprange', _('cannot be empty'))
+				);
 			}
 			elseif (!$ip_range_validator->validate($drule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $ip_range_validator->getError());
 			}
 
-			if (array_key_exists('delay', $drule) && $drule['delay'] < 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
+			if (array_key_exists('delay', $drule)) {
+				if (is_array($drule['delay'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
+					);
+				}
 			}
 
 			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
 					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['status'], 'status')
+				);
 			}
 
 			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
@@ -292,23 +306,48 @@ class CDRule extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			if (array_key_exists('name', $drule) && $drule['name'] === '') {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": cannot be empty.', 'name')
-				);
+			if (array_key_exists('name', $drule)) {
+				if (is_array($drule['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($drule['name'] === '' || $drule['name'] === null || $drule['name'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
+					);
+				}
+
+				if ($db_drules[$drule['druleid']]['name'] !== $drule['name']) {
+					if (array_key_exists($drule['name'], $drule_names_changed)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Discovery rule "%1$s" already exists.', $drule['name'])
+						);
+					}
+					else {
+						$drule_names_changed[$drule['name']] = $drule['name'];
+					}
+				}
 			}
 
 			if (array_key_exists('iprange', $drule) && !$ip_range_validator->validate($drule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $ip_range_validator->getError());
 			}
 
-			if (array_key_exists('delay', $drule) && $drule['delay'] < 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect delay.'));
+			if (array_key_exists('delay', $drule)) {
+				if (is_array($drule['delay'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
+					);
+				}
 			}
 
 			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
 					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect status.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['status'], 'status')
+				);
 			}
 
 			if (array_key_exists('dchecks', $drule)) {
@@ -322,17 +361,6 @@ class CDRule extends CApiService {
 
 			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
 				$proxies[] = $drule['proxy_hostid'];
-			}
-
-			if (array_key_exists('name', $drule) && $db_drules[$drule['druleid']]['name'] !== $drule['name']) {
-				if (array_key_exists($drule['name'], $drule_names_changed)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Discovery rule "%1$s" already exists.', $drule['name'])
-					);
-				}
-				else {
-					$drule_names_changed[$drule['name']] = $drule['name'];
-				}
 			}
 		}
 
