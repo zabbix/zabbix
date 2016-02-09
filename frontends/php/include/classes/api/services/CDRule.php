@@ -394,13 +394,13 @@ class CDRule extends CApiService {
 		}
 	}
 
-	protected function validateDChecks(array &$dChecks) {
+	protected function validateDChecks(array $dchecks) {
 		$uniq = 0;
 		$item_key_parser = new CItemKey();
 
-		foreach ($dChecks as $dcnum => $dCheck) {
-			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) {
-				if (!in_array($dCheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
+		foreach ($dchecks as $dcnum => $dcheck) {
+			if (array_key_exists('uniq', $dcheck) && ($dcheck['uniq'] == 1)) {
+				if (!in_array($dcheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
 					);
@@ -409,7 +409,7 @@ class CDRule extends CApiService {
 				$uniq++;
 			}
 
-			if (isset($dCheck['ports']) && !validate_port_list($dCheck['ports'])) {
+			if (array_key_exists('ports', $dcheck) && !validate_port_list($dcheck['ports'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
 			}
 
@@ -417,76 +417,67 @@ class CDRule extends CApiService {
 				SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
 			];
 
-			if (!array_key_exists('type', $dCheck)) {
+			if (!array_key_exists('type', $dcheck)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'type'));
 			}
-			elseif (!in_array($dCheck['type'], $dcheck_types)) {
+			elseif (!in_array($dcheck['type'], $dcheck_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s".', 'type'));
 			}
 
-			switch ($dCheck['type']) {
+			switch ($dcheck['type']) {
 				case SVC_AGENT:
-					if (!isset($dCheck['key_'])) {
+					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
 					}
 
-					if ($item_key_parser->parse($dCheck['key_']) != CParser::PARSE_SUCCESS) {
+					if ($item_key_parser->parse($dcheck['key_']) != CParser::PARSE_SUCCESS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Invalid key "%1$s": %2$s.', $dCheck['key_'], $item_key_parser->getError())
+							_s('Invalid key "%1$s": %2$s.', $dcheck['key_'], $item_key_parser->getError())
 						);
 					}
 					break;
 				case SVC_SNMPv1:
 				case SVC_SNMPv2c:
-					if (!isset($dCheck['snmp_community']) || zbx_empty($dCheck['snmp_community'])) {
+					if (!array_key_exists('snmp_community', $dcheck) || $dcheck['snmp_community'] === null
+							|| $dcheck['snmp_community'] === false || $dcheck['snmp_community'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
 					}
 				case SVC_SNMPv3:
-					if (!isset($dCheck['key_']) || zbx_empty($dCheck['key_'])) {
+					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null || $dcheck['key_'] === false
+							|| $dcheck['key_'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
 					}
 					break;
 			}
 
-			// set default values for snmpv3 fields
-			if (!isset($dCheck['snmpv3_securitylevel'])) {
-				$dCheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
-			}
-
-			switch ($dCheck['snmpv3_securitylevel']) {
-				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
-					$dChecks[$dcnum]['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-					$dChecks[$dcnum]['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-					$dChecks[$dcnum]['snmpv3_authpassphrase'] = $dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
-					break;
-				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
-					$dChecks[$dcnum]['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-					$dChecks[$dcnum]['snmpv3_privpassphrase'] = '';
-					break;
-			}
-
 			// validate snmpv3 fields
-			if (isset($dCheck['snmpv3_securitylevel']) && $dCheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+			if (array_key_exists('snmpv3_securitylevel', $dcheck)
+					&& $dcheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 				// snmpv3 authprotocol
-				if (str_in_array($dCheck['snmpv3_securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])) {
-					if (zbx_empty($dCheck['snmpv3_authprotocol'])
-							|| (isset($dCheck['snmpv3_authprotocol'])
-									&& !str_in_array($dCheck['snmpv3_authprotocol'], [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for discovery rule "%1$s".', $dCheck['name']));
+				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
+						|| $dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (!array_key_exists('snmpv3_authprotocol', $dcheck)
+							|| $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_MD5
+								&& $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_SHA) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect authentication protocol for discovery rule "%1$s".', $dcheck['name'])
+						);
 					}
 				}
 
 				// snmpv3 privprotocol
-				if ($dCheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-					if (zbx_empty($dCheck['snmpv3_privprotocol'])
-							|| (isset($dCheck['snmpv3_privprotocol'])
-									&& !str_in_array($dCheck['snmpv3_privprotocol'], [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for discovery rule "%1$s".', $dCheck['name']));
+				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (!array_key_exists('snmpv3_privprotocol', $dcheck)
+							|| $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_DES
+								&& $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_AES) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect privacy protocol for discovery rule "%1$s".', $dcheck['name'])
+						);
 					}
 				}
 			}
 
-			$this->validateDuplicateChecks($dChecks);
+			$this->validateDuplicateChecks($dchecks);
 		}
 
 		if ($uniq > 1) {
@@ -494,19 +485,38 @@ class CDRule extends CApiService {
 		}
 	}
 
-	protected function validateDuplicateChecks(array $dChecks) {
-		$defaultValues = DB::getDefaults('dchecks');
-		foreach ($dChecks as &$dCheck) {
-			$dCheck += $defaultValues;
-			unset($dCheck['uniq']);
-		}
-		unset($dCheck);
+	protected function validateDuplicateChecks(array $dchecks) {
+		$default_values = DB::getDefaults('dchecks');
 
-		while ($current = array_pop($dChecks)) {
-			foreach ($dChecks as $dCheck) {
+		foreach ($dchecks as &$dcheck) {
+			// set default values for snmpv3 fields
+			if (!array_key_exists('snmpv3_securitylevel', $dcheck) || $dcheck['snmpv3_securitylevel'] === null) {
+				$dcheck['snmpv3_securitylevel'] = ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+			}
+
+			switch ($dcheck['snmpv3_securitylevel']) {
+				case ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
+					$dcheck['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+					$dcheck['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+					$dcheck['snmpv3_authpassphrase'] = '';
+					$dcheck['snmpv3_privpassphrase'] = '';
+					break;
+				case ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV:
+					$dcheck['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+					$dcheck['snmpv3_privpassphrase'] = '';
+					break;
+			}
+
+			$dcheck += $default_values;
+			unset($dcheck['uniq']);
+		}
+		unset($dcheck);
+
+		while ($current = array_pop($dchecks)) {
+			foreach ($dchecks as $dcheck) {
 				$equal = true;
-				foreach ($dCheck as $fieldName => $dCheckField) {
-					if (isset($current[$fieldName]) && (strcmp($dCheckField, $current[$fieldName]) !== 0)) {
+				foreach ($dcheck as $field => $value) {
+					if (array_key_exists($field, $current) && (strcmp($value, $current[$field]) !== 0)) {
 						$equal = false;
 						break;
 					}
