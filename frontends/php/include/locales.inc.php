@@ -57,7 +57,7 @@ function getLocales() {
 		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),	'display' => true],
 		'nl_NL' => ['name' => _('Dutch (nl_NL)'),	'display' => false],
 		'fi_FI' => ['name' => _('Finnish (fi_FI)'),	'display' => false],
-		'fr_FR' => ['name' => _('French (fr_FR)'),	'display' => false],
+		'fr_FR' => ['name' => _('French (fr_FR)'),	'display' => true],
 		'ka_GE' => ['name' => _('Georgian (ka_GE)'),	'display' => false],
 		'de_DE' => ['name' => _('German (de_DE)'),	'display' => false],
 		'el_GR' => ['name' => _('Greek (el_GR)'),	'display' => false],
