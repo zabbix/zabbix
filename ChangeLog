@@ -3052,6 +3052,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
 
