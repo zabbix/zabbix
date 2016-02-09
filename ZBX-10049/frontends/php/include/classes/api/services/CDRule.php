@@ -558,21 +558,21 @@ class CDRule extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function create(array $dRules) {
-		$dRules = zbx_toArray($dRules);
-		$this->validateCreate($dRules);
+	public function create(array $drules) {
+		$drules = zbx_toArray($drules);
+		$this->validateCreate($drules);
 
-		$druleids = DB::insert('drules', $dRules);
+		$druleids = DB::insert('drules', $drules);
 
-		$dChecksCreate = [];
-		foreach ($dRules as $dNum => $dRule) {
-			foreach ($dRule['dchecks'] as $dCheck) {
-				$dCheck['druleid'] = $druleids[$dNum];
-				$dChecksCreate[] = $dCheck;
+		$create_dchecks = [];
+		foreach ($drules as $dnum => $drule) {
+			foreach ($drule['dchecks'] as $dcheck) {
+				$dcheck['druleid'] = $druleids[$dnum];
+				$create_dchecks[] = $dcheck;
 			}
 		}
 
-		DB::insert('dchecks', $dChecksCreate);
+		DB::insert('dchecks', $create_dchecks);
 
 		return ['druleids' => $druleids];
 	}
@@ -601,66 +601,68 @@ class CDRule extends CApiService {
 	 *  		uniq => int,
 	 *  	), ...
 	 *  )
-	 * ) $dRules
+	 * ) $drules
 	 *
 	 * @return array
 	 */
-	public function update(array $dRules) {
-		$dRules = zbx_toArray($dRules);
-		$dRuleIds = zbx_objectValues($dRules, 'druleid');
+	public function update(array $drules) {
+		$drules = zbx_toArray($drules);
+		$druleids = zbx_objectValues($drules, 'druleid');
 
-		$dRulesDb = API::DRule()->get([
-			'druleids' => $dRuleIds,
+		$db_drules = API::DRule()->get([
+			'druleids' => $druleids,
 			'output' => API_OUTPUT_EXTEND,
 			'selectDChecks' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$this->validateUpdate($dRules, $dRulesDb);
+		$this->validateUpdate($drules, $db_drules);
 
-		$defaultValues = DB::getDefaults('dchecks');
+		$default_values = DB::getDefaults('dchecks');
 
-		$dRulesUpdate = [];
+		$upd_drules = [];
 
-		foreach ($dRules as $dRule) {
-			$dRulesUpdate[] = [
-				'values' => $dRule,
-				'where' => ['druleid' => $dRule['druleid']]
+		foreach ($drules as $drule) {
+			$upd_drules[] = [
+				'values' => $drule,
+				'where' => ['druleid' => $drule['druleid']]
 			];
 
 			// update dchecks
-			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
+			$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
 
-			$newChecks = [];
-			$oldChecks = [];
+			$new_dchecks = [];
+			$old_dchecks = [];
 
-			foreach ($dRule['dchecks'] as $check) {
-				$check['druleid'] = $dRule['druleid'];
+			foreach ($drule['dchecks'] as $check) {
+				$check['druleid'] = $drule['druleid'];
 
 				if (!isset($check['dcheckid'])) {
-					$newChecks[] = array_merge($defaultValues, $check);
+					$new_dchecks[] = array_merge($default_values, $check);
 				}
 				else {
-					$oldChecks[] = $check;
+					$old_dchecks[] = $check;
 				}
 			}
 
-			$delDCheckIds = array_diff(
-				zbx_objectValues($dbChecks, 'dcheckid'),
-				zbx_objectValues($oldChecks, 'dcheckid')
+			$del_dcheckids = array_diff(
+				zbx_objectValues($db_dchecks, 'dcheckid'),
+				zbx_objectValues($old_dchecks, 'dcheckid')
 			);
 
-			if ($delDCheckIds) {
-				$this->deleteActionConditions($delDCheckIds);
+			if ($del_dcheckids) {
+				$this->deleteActionConditions($del_dcheckids);
 			}
 
-			DB::replace('dchecks', $dbChecks, array_merge($oldChecks, $newChecks));
+			DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
 		}
 
-		DB::update('drules', $dRulesUpdate);
+		if ($upd_drules) {
+			DB::update('drules', $upd_drules);
+		}
 
-		return ['druleids' => $dRuleIds];
+		return ['druleids' => $druleids];
 	}
 
 	/**
