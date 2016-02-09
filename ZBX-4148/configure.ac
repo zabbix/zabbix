@@ -1233,16 +1233,13 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		AC_MSG_RESULT(no)
 	fi
 
-	DB_CPPFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
+	DB_CFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
 	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
 	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
 	
-	AM_CPPFLAGS=$DB_CPPFLAGS
-
-	AC_SUBST(DB_CPPFLAGS)
+	AC_SUBST(DB_CFLAGS)
 	AC_SUBST(DB_LDFLAGS)
 	AC_SUBST(DB_LIBS)
-	AC_SUBST(AM_CPPFLAGS)
 
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
@@ -1643,6 +1640,7 @@ echo "  Server details:
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
+    DB headers:            ${DB_CFLAGS}
     Compiler flags:        ${CFLAGS} ${SERVER_CFLAGS}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
@@ -1662,6 +1660,7 @@ echo "  Proxy details:
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
+    DB headers:            ${DB_CFLAGS}
     Compiler flags:        ${CFLAGS} ${PROXY_CFLAGS}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"

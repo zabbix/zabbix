@@ -20,11 +20,58 @@
 #include "common.h"
 
 #include "zbxdb.h"
+
+#if defined(HAVE_IBM_DB2)
+#	include <sqlcli1.h>
+#elif defined(HAVE_MYSQL)
+#	include "mysql.h"
+#	include "errmsg.h"
+#	include "mysqld_error.h"
+#elif defined(HAVE_ORACLE)
+#	include "oci.h"
+#elif defined(HAVE_POSTGRESQL)
+#	include <libpq-fe.h>
+#elif defined(HAVE_SQLITE3)
+#	include <sqlite3.h>
+#endif
+
 #include "dbschema.h"
 #include "log.h"
 #if defined(HAVE_SQLITE3)
 #	include "mutexs.h"
 #endif
+
+#ifndef HAVE_MYSQL
+struct ZBX_DB_RESULT
+{
+#if defined(HAVE_IBM_DB2)
+	SQLHANDLE	hstmt;
+	SQLSMALLINT	nalloc;
+	SQLSMALLINT	ncolumn;
+	DB_ROW		values;
+	DB_ROW		values_cli;
+	SQLINTEGER	*values_len;
+#elif defined(HAVE_ORACLE)
+	OCIStmt		*stmthp;	/* the statement handle for select operations */
+	int 		ncolumn;
+	DB_ROW		values;
+	ub4		*values_alloc;
+	OCILobLocator	**clobs;
+#elif defined(HAVE_POSTGRESQL)
+	PGresult	*pg_result;
+	int		row_num;
+	int		fld_num;
+	int		cursor;
+	DB_ROW		values;
+#elif defined(HAVE_SQLITE3)
+	int		curow;
+	char		**data;
+	int		nrow;
+	int		ncolumn;
+	DB_ROW		values;
+#endif	/* HAVE_SQLITE3 */
+};
+#endif	/* HAVE_MYSQL */
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
@@ -32,12 +79,32 @@ static int	txn_error = 0;	/* failed transaction */
 extern int	CONFIG_LOG_SLOW_QUERIES;
 
 #if defined(HAVE_IBM_DB2)
+typedef struct
+{
+	SQLHANDLE	henv;
+	SQLHANDLE	hdbc;
+}
+zbx_ibm_db2_handle_t;
+
 static zbx_ibm_db2_handle_t	ibm_db2;
 
-void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
+static int	IBM_DB2server_status();
+static int	zbx_ibm_db2_success(SQLRETURN ret);
+static int	zbx_ibm_db2_success_ext(SQLRETURN ret);
+static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context);
 #elif defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
 #elif defined(HAVE_ORACLE)
+typedef struct
+{
+	OCIEnv		*envhp;
+	OCIError	*errhp;
+	OCISvcCtx	*svchp;
+	OCIServer	*srvhp;
+	OCIStmt		*stmthp;	/* the statement handle for execute operations */
+}
+zbx_oracle_db_handle_t;
+
 static zbx_oracle_db_handle_t	oracle;
 
 /* 64-bit integer binding is supported only starting with Oracle 11.2 */
@@ -46,6 +113,8 @@ static zbx_oracle_db_handle_t	oracle;
 static OCINumber	**oci_ids = NULL;
 static int		oci_ids_alloc = 0;
 static int		oci_ids_num = 0;
+
+static ub4	OCI_DBserver_status();
 
 #elif defined(HAVE_POSTGRESQL)
 static PGconn			*conn = NULL;
@@ -857,7 +926,7 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 #endif
 
 #ifdef HAVE_ORACLE
-int	zbx_db_statement_prepare(const char *sql)
+static int	zbx_db_statement_prepare(const char *sql)
 {
 	sword	err;
 	int	ret = ZBX_DB_OK;
@@ -887,7 +956,7 @@ int	zbx_db_statement_prepare(const char *sql)
 	return ret;
 }
 
-int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
+static int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 {
 	sword	err;
 	int	ret = ZBX_DB_OK, old_alloc, i;
@@ -953,7 +1022,7 @@ int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	return ret;
 }
 
-int	zbx_db_statement_execute()
+static int	zbx_db_statement_execute()
 {
 	const char	*__function_name = "zbx_db_statement_execute";
 
@@ -1236,8 +1305,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
-	result = zbx_malloc(result, sizeof(ZBX_IBM_DB2_RESULT));
-	memset(result, 0, sizeof(ZBX_IBM_DB2_RESULT));
+	result = zbx_malloc(result, sizeof(struct ZBX_DB_RESULT));
+	memset(result, 0, sizeof(struct ZBX_DB_RESULT));
 
 	/* allocate a statement handle */
 	if (SUCCEED != zbx_ibm_db2_success(ret = SQLAllocHandle(SQL_HANDLE_STMT, ibm_db2.hdbc, &result->hstmt)))
@@ -1287,7 +1356,7 @@ error:
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3005, sql);
 		zbx_ibm_db2_log_errors(SQL_HANDLE_STMT, result->hstmt, ERR_Z3005, sql);
 
-		IBM_DB2free_result(result);
+		DBfree_result(result);
 
 		result = (SQL_CD_TRUE == IBM_DB2server_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
@@ -1309,8 +1378,8 @@ error:
 			result = mysql_store_result(conn);
 	}
 #elif defined(HAVE_ORACLE)
-	result = zbx_malloc(NULL, sizeof(ZBX_OCI_DB_RESULT));
-	memset(result, 0, sizeof(ZBX_OCI_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
+	memset(result, 0, sizeof(struct ZBX_DB_RESULT));
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
@@ -1449,12 +1518,12 @@ error:
 		int	server_status;
 
 		server_status = OCI_handle_sql_error(ERR_Z3005, err, sql);
-		OCI_DBfree_result(result);
+		DBfree_result(result);
 
 		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
-	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
 	result->pg_result = PQexec(conn, sql);
 	result->values = NULL;
 	result->cursor = 0;
@@ -1471,7 +1540,7 @@ error:
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		zbx_free(error);
 
-		PG_DBfree_result(result);
+		DBfree_result(result);
 		result = (CONNECTION_OK == PQstatus(conn) ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
 	else	/* init rownum */
@@ -1480,7 +1549,7 @@ error:
 	if (0 == txn_level)
 		zbx_mutex_lock(&sqlite_access);
 
-	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
 	result->curow = 0;
 
 lbl_get_table:
@@ -1492,7 +1561,7 @@ lbl_get_table:
 		zabbix_errlog(ERR_Z3005, 0, error, sql);
 		sqlite3_free(error);
 
-		SQ_DBfree_result(result);
+		DBfree_result(result);
 
 		switch (ret)
 		{
@@ -1564,7 +1633,7 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
  *      olen - size of returned buffer                                        *
  *                                                                            *
  ******************************************************************************/
-size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen)
+static size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen)
 {
 	const u_char	*i = input;
 	char		*o;
@@ -1819,10 +1888,9 @@ int	zbx_db_is_null(const char *field)
 	return FAIL;
 }
 
-#if defined(HAVE_IBM_DB2)
-/* in zbxdb.h - #define DBfree_result   IBM_DB2free_result */
-void	IBM_DB2free_result(DB_RESULT result)
+void	DBfree_result(DB_RESULT result)
 {
+#if defined(HAVE_IBM_DB2)
 	if (NULL == result)
 		return;
 
@@ -1844,11 +1912,9 @@ void	IBM_DB2free_result(DB_RESULT result)
 		SQLFreeHandle(SQL_HANDLE_STMT, result->hstmt);
 
 	zbx_free(result);
-}
+#elif defined(HAVE_MYSQL)
+	mysql_free_result(result);
 #elif defined(HAVE_ORACLE)
-/* in zbxdb.h - #define DBfree_result   OCI_DBfree_result */
-void	OCI_DBfree_result(DB_RESULT result)
-{
 	if (NULL == result)
 		return;
 
@@ -1877,11 +1943,7 @@ void	OCI_DBfree_result(DB_RESULT result)
 		OCIHandleFree((dvoid *)result->stmthp, OCI_HTYPE_STMT);
 
 	zbx_free(result);
-}
 #elif defined(HAVE_POSTGRESQL)
-/* in zbxdb.h - #define DBfree_result   PG_DBfree_result */
-void	PG_DBfree_result(DB_RESULT result)
-{
 	if (NULL == result)
 		return;
 
@@ -1894,11 +1956,7 @@ void	PG_DBfree_result(DB_RESULT result)
 
 	PQclear(result->pg_result);
 	zbx_free(result);
-}
 #elif defined(HAVE_SQLITE3)
-/* in zbxdb.h - #define DBfree_result   SQ_DBfree_result */
-void	SQ_DBfree_result(DB_RESULT result)
-{
 	if (NULL == result)
 		return;
 
@@ -1908,12 +1966,12 @@ void	SQ_DBfree_result(DB_RESULT result)
 	}
 
 	zbx_free(result);
-}
 #endif	/* HAVE_SQLITE3 */
+}
 
 #if defined(HAVE_IBM_DB2)
 /* server status: SQL_CD_TRUE or SQL_CD_FALSE */
-int	IBM_DB2server_status()
+static int	IBM_DB2server_status()
 {
 	int	server_status = SQL_CD_TRUE;
 
@@ -1926,17 +1984,17 @@ int	IBM_DB2server_status()
 	return (SQL_CD_FALSE == server_status ? SQL_CD_TRUE : SQL_CD_FALSE);
 }
 
-int	zbx_ibm_db2_success(SQLRETURN ret)
+static int	zbx_ibm_db2_success(SQLRETURN ret)
 {
 	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret ? SUCCEED : FAIL);
 }
 
-int	zbx_ibm_db2_success_ext(SQLRETURN ret)
+static int	zbx_ibm_db2_success_ext(SQLRETURN ret)
 {
 	return (SQL_SUCCESS == ret || SQL_SUCCESS_WITH_INFO == ret || SQL_NO_DATA_FOUND == ret ? SUCCEED : FAIL);
 }
 
-void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context)
+static void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t err, const char *context)
 {
 	SQLCHAR		tmp_message[SQL_MAX_MESSAGE_LENGTH + 1], sqlstate[SQL_SQLSTATE_SIZE + 1];
 	char		message[SQL_MAX_MESSAGE_LENGTH + SQL_SQLSTATE_SIZE + 2];
@@ -1964,7 +2022,7 @@ void	zbx_ibm_db2_log_errors(SQLSMALLINT htype, SQLHANDLE hndl, zbx_err_codes_t e
 }
 #elif defined(HAVE_ORACLE)
 /* server status: OCI_SERVER_NORMAL or OCI_SERVER_NOT_CONNECTED */
-ub4	OCI_DBserver_status()
+static ub4	OCI_DBserver_status()
 {
 	sword	err;
 	ub4	server_status = OCI_SERVER_NOT_CONNECTED;
