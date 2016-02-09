@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 19:22+0200\n"
-"PO-Revision-Date: 2016-01-21 09:38+0300\n"
+"PO-Revision-Date: 2016-02-03 13:59+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1453361880.0\n"
+"X-POOTLE-MTIME: 1454500790.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -36,7 +36,7 @@ msgstr "\"%s\" musí být v intervalu od 1970.01.01 do 2038.01.18."
 #: include/classes/import/validators/C10XmlValidator.php:403
 #: include/classes/import/validators/C10XmlValidator.php:424
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" dvojice je očekávaná"
 
 #: include/func.inc.php:453
 #, c-format
@@ -4850,15 +4850,15 @@ msgstr "Upravit"
 
 #: app/views/monitoring.map.view.php:38
 msgid "Edit map"
-msgstr ""
+msgstr "Aktualizovat mapu"
 
 #: include/views/monitoring.screen.php:47
 msgid "Edit screen"
-msgstr ""
+msgstr "Aktualizovat obrazovku"
 
 #: include/views/monitoring.slides.php:51
 msgid "Edit slide show"
-msgstr ""
+msgstr "Aktualizovat prezentaci"
 
 #: jsLoader.php:187
 msgid "Edit trigger"
@@ -7760,7 +7760,7 @@ msgstr "Neplatná odpověď přijatá od Zabbix serveru \"%1$s\"."
 #: include/classes/api/services/CHttpTest.php:698
 #, c-format
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Nesprávná hodnota typu stahování pro krok \"%1$s\" scénáře \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:790
 #, c-format
@@ -11485,7 +11485,7 @@ msgstr "PSK identita nemůže být prázdná."
 #: include/classes/api/services/CProxy.php:676
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
-msgstr ""
+msgstr "PSK je příliš krátký. Minimum je %1$s hexadecimalních čísel."
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -12716,7 +12716,7 @@ msgstr "Obrazovka"
 #: include/classes/api/services/CTemplateScreen.php:699
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" už existuje v šabloně \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:458
 #: include/classes/api/services/CScreen.php:790
@@ -16453,7 +16453,7 @@ msgstr "očekává se pole"
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
 msgid "an empty string is expected"
-msgstr ""
+msgstr "prázdný řetězec je očekávan"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
