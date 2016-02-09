@@ -232,6 +232,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								break;
 						}
 					}
+					unset($value);
 				}
 			}
 		}
