@@ -112,9 +112,8 @@ function parse_schema($path){
 		$str .=  "\t\t),\n";
 		$str .=  "\t),\n";
 	}
-	$str .=  ");\n";
-
-	$str .=  '?>';
+	$str .= ");\n";
+	$str .= '?>'."\n";
 
 	return $str;
 }

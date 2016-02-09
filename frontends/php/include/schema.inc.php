@@ -4624,7 +4624,7 @@ return array(
 		),
 	),
 	'user_history' => array(
-		'type' => DB::TABLE_TYPE_CONFIG,
+		'type' => DB::TABLE_TYPE_HISTORY,
 		'key' => 'userhistoryid',
 		'fields' => array(
 			'userhistoryid' => array(
