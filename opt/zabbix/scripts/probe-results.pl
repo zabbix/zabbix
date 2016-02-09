@@ -7,25 +7,28 @@ use warnings;
 use RSM;
 use RSMSLV;
 
-unless ($ARGV[0] && $ARGV[1] && $ARGV[2] && $ARGV[3])
-{
-	print("usage: $0 <tld> <probe> <from> <till>\n");
-	exit(1);
-}
-
-parse_opts();
+parse_opts('tld=s', 'probe=s', 'from=n', 'till=n');
 
 setopt('nolog');
 setopt('dry-run');
 
+my $tld = getopt('tld');
+my $probe = getopt('probe');
+my $from = getopt('from');
+my $till = getopt('till');
+
+foreach my $opt ($tld, $probe, $from, $till)
+{
+	if (!defined($opt))
+	{
+		print("usage: $0 --tld <tld> --probe <probe> --from <from> --till <till>\n");
+		exit(1);
+	}
+}
+
 set_slv_config(get_rsm_config());
 
 db_connect();
-
-my $tld = $ARGV[0];
-my $probe = $ARGV[1];
-my $from = $ARGV[2];
-my $till = $ARGV[3];
 
 my $host = "$tld $probe";
 
@@ -35,7 +38,7 @@ print("**********\n\n");
 
 my $rows_ref = db_select(
     "select h.itemid,h.clock,h.ns,h.value,i2.key_".
-    " from history_uint h, items i2".
+    " from history_uint h,items i2".
     " where i2.itemid=h.itemid".
         " and i2.itemid in".
             " (select i3.itemid".
@@ -65,7 +68,7 @@ print("*********\n\n");
 
 $rows_ref = db_select(
     "select h.itemid,h.clock,h.ns,h.value,i2.key_".
-    " from history h, items i2".
+    " from history h,items i2".
     " where i2.itemid=h.itemid".
         " and i2.itemid in".
             " (select i3.itemid".
