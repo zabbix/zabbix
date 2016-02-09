@@ -815,7 +815,7 @@ class CTemplateScreen extends CScreen {
 		));
 		foreach ($existingScreens as $existingScreen) {
 			$template = DBfetch(DBselect('SELECT h.name FROM hosts h WHERE h.hostid='.$existingScreen['templateid']));
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists on template "%2$2".',
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists on template "%2$s".',
 				$existingScreen['name'], $template['name']));
 		}
 	}
