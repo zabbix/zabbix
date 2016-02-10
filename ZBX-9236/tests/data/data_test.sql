@@ -238,27 +238,27 @@ INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (200000, 200000, 10009, 1, 1, 'FF5555', 0, 2, 0);
 
 -- Add more screens
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200000,'Test screen (graph)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200001,'Test screen (clock)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200002,'Test screen (data overview, left align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200003,'Test screen (history of actions)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200004,'Test screen (history of events)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200005,'Test screen (hosts info, horizontal align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200006,'Test screen (hosts info, vertical align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200007,'Test screen (map)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200008,'Test screen (plain text)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200009,'Test screen (screen)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200010,'Test screen (server info)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200011,'Test screen (simple graph)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200012,'Test screen (status of hostgroup triggers)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200013,'Test screen (status of host triggers)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200014,'Test screen (system status)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200015,'Test screen (triggers info, horizontal align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200016,'Test screen (triggers overview, left align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200017,'Test screen (triggers overview, top align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200018,'Test screen (url)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200019,'Test screen (data overview, top align)',1,1,NULL);
-INSERT INTO screens (screenid, name, hsize, vsize, templateid) VALUES (200020,'Test screen (triggers info, vertical align)',1,1,NULL);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200000, 'Test screen (graph)'                          , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200001, 'Test screen (clock)'                          , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200002, 'Test screen (data overview, left align)'      , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200003, 'Test screen (history of actions)'             , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200004, 'Test screen (history of events)'              , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200005, 'Test screen (hosts info, horizontal align)'   , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200006, 'Test screen (hosts info, vertical align)'     , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200007, 'Test screen (map)'                            , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200008, 'Test screen (plain text)'                     , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200009, 'Test screen (screen)'                         , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200010, 'Test screen (server info)'                    , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200011, 'Test screen (simple graph)'                   , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200012, 'Test screen (status of hostgroup triggers)'   , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200013, 'Test screen (status of host triggers)'        , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200014, 'Test screen (system status)'                  , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200015, 'Test screen (triggers info, horizontal align)', 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200016, 'Test screen (triggers overview, left align)'  , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200017, 'Test screen (triggers overview, top align)'   , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200018, 'Test screen (url)'                            , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200019, 'Test screen (data overview, top align)'       , 1, 1, NULL, 1, 0);
+INSERT INTO screens (screenid, name, hsize, vsize, templateid, userid, private) VALUES (200020, 'Test screen (triggers info, vertical align)'  , 1, 1, NULL, 1, 0);
 
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200000,200000,0,200000,500,100,0,0,0,0,0,0,0,0,'',0,0);
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200001,200001,7,0,500,100,0,0,0,0,0,0,0,0,'',0,0);
@@ -283,21 +283,21 @@ INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, wid
 INSERT INTO screens_items (screenitemid, screenid, resourcetype, resourceid, width, height, x, y, colspan, rowspan, elements, valign, halign, style, url, dynamic, sort_triggers) VALUES (200020,200020,5,4,500,100,0,0,0,0,0,0,0,1,'',0,0);
 
 -- Add slide shows
-INSERT INTO slideshows (slideshowid, name, delay) VALUES (200001,'Test slide show 1',10);
-INSERT INTO slideshows (slideshowid, name, delay) VALUES (200002,'Test slide show 2',10);
-INSERT INTO slideshows (slideshowid, name, delay) VALUES (200003,'Test slide show 3',900);
+INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200001, 'Test slide show 1', 10, 1, 0);
+INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200002, 'Test slide show 2', 10, 1, 0);
+INSERT INTO slideshows (slideshowid, name, delay, userid, private) VALUES (200003, 'Test slide show 3', 900, 1, 0);
 
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200000,200001,200000,0,0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200001,200001,200001,1,0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200003,200002,200002,0,0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200004,200002,200003,1,0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200005,200002,200004,2,15);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200006,200002,200005,3,20);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200007,200003,200007,0,0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200008,200003,200009,1,0);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200009,200003,200016,2,15);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200010,200003,200019,3,20);
-INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200011,200003,200020,4,60);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200000, 200001, 200000, 0, 0);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200001, 200001, 200001, 1, 0);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200003, 200002, 200002, 0, 0);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200004, 200002, 200003, 1, 0);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200005, 200002, 200004, 2, 15);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200006, 200002, 200005, 3, 20);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200007, 200003, 200007, 0, 0);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200008, 200003, 200009, 1, 0);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200009, 200003, 200016, 2, 15);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200010, 200003, 200019, 3, 20);
+INSERT INTO slides (slideid, slideshowid, screenid, step, delay) VALUES (200011, 200003, 200020, 4, 60);
 
 -- Add maintenance periods
 INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680);
@@ -332,7 +332,7 @@ INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timep
 INSERT INTO maintenances_windows (maintenance_timeperiodid, maintenanceid, timeperiodid) VALUES (10,2,10);
 
 -- Add maps
-INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack) VALUES (3,'Test map 1',800,600,NULL,0,0,1,1,1,2);
+INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, userid, private) VALUES (3, 'Test map 1', 800, 600, NULL, 0, 0, 1, 1, 1, 2, 1, 0);
 
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (3,3,0,4,7,NULL,'Test phone icon',0,151,101,NULL,NULL);
 INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, iconid_off, iconid_on, label, label_location, x, y, iconid_disabled, iconid_maintenance) VALUES (4,3,1,1,3,NULL,'Map element (Local network)',0,401,101,NULL,NULL);
@@ -1304,7 +1304,7 @@ INSERT INTO items (itemid,type,snmp_community,snmp_oid,hostid,name,key_,delay,hi
 INSERT INTO triggers (triggerid,expression,description,url,status,value,priority,lastchange,comments,error,templateid,type,state,flags) VALUES (16026,'{16026}=0&{16027}=0','Trigger-map-test-zbx6840','',0,1,0,0,'','',NULL,0,0,0);
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16026,40065,16026,'last','0');
 INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (16027,23287,16026,'last','0');
-INSERT INTO sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location,highlight,expandproblem,markelements,show_unack,grid_size,grid_show,grid_align,label_format,label_type_host,label_type_hostgroup,label_type_trigger,label_type_map,label_type_image,label_string_host,label_string_hostgroup,label_string_trigger,label_string_map,label_string_image,iconmapid,expand_macros,severity_min) VALUES (5,'testZBX6840',800,600,NULL,0,0,0,0,0,0,50,1,1,0,2,2,2,2,2,'','','','','',NULL,0,0);
+INSERT INTO sysmaps (sysmapid, name, width, height, backgroundid, label_type, label_location, highlight, expandproblem, markelements, show_unack, grid_size, grid_show, grid_align, label_format, label_type_host, label_type_hostgroup, label_type_trigger, label_type_map, label_type_image, label_string_host, label_string_hostgroup, label_string_trigger, label_string_map, label_string_image, iconmapid, expand_macros, severity_min, userid, private) VALUES (5, 'testZBX6840', 800, 600, NULL, 0, 0, 0, 0, 0, 0, 50, 1, 1, 0, 2, 2, 2, 2, 2, '', '', '', '', '', NULL, 0, 0, 1, 0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (8,5,10084,0,19,NULL,'Host element (Zabbix Server)',-1,413,268,NULL,NULL,0,0,200,200,0,0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (9,5,16026,2,15,NULL,'Trigger element (zbx6840)',-1,213,218,NULL,NULL,0,0,200,200,0,0);
 

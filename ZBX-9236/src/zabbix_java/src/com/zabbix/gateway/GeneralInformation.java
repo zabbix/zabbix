@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,9 +22,9 @@ package com.zabbix.gateway;
 class GeneralInformation
 {
 	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "21 December 2015";
+	public static final String REVISION_DATE = "3 February 2016";
 	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "3.0.0alpha6";
+	public static final String VERSION = "3.0.0rc2";
 
 	public static void printVersion()
 	{

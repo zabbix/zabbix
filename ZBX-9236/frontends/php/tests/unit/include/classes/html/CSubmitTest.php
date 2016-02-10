@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,14 +38,6 @@ class CSubmitTest extends CTagTest {
 			[
 				['button', 'caption'],
 				'<button type="submit" id="button" name="button" value="caption">caption</button>'
-			],
-			[
-				['button', 'caption', 'callback()'],
-				'<button type="submit" id="button" name="button" onclick="callback()" value="caption">caption</button>'
-			],
-			[
-				['button', 'caption', null, 'my-class'],
-				'<button class="my-class" type="submit" id="button" name="button" value="caption">caption</button>'
 			],
 			// value encoding
 			[

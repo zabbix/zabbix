@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ const char	*help_message[] = {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"  --tls-connect value        How to connect to server or proxy. Values:",
 	"                               unencrypted - connect without encryption",
+	"                                             (default)",
 	"                               psk         - connect using TLS and a pre-shared",
 	"                                             key",
 	"                               cert        - connect using TLS and a",
@@ -184,7 +185,7 @@ unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
 									/* linking with tls.c */
 char	*CONFIG_TLS_CONNECT		= NULL;
-char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in zabbix_sender, just for linking with tls.c */
+char	*CONFIG_TLS_ACCEPT		= NULL;	/* not used in zabbix_sender, just for linking with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
 char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
@@ -193,6 +194,9 @@ char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
+
+int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
+int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_sender, just for linking with tls.c */
 
 /* COMMAND LINE OPTIONS */
 
@@ -262,6 +266,7 @@ typedef struct
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
 #endif
+	int		sync_timestamp;
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -452,8 +457,11 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	/* take TLS data passed from 'main' thread */
-	zbx_tls_take_vars(&sendval_args->tls_vars);
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		/* take TLS data passed from 'main' thread */
+		zbx_tls_take_vars(&sendval_args->tls_vars);
+	}
 #endif
 
 #if !defined(_WINDOWS)
@@ -481,6 +489,16 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
 			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
+		if (1 == sendval_args->sync_timestamp)
+		{
+			zbx_timespec_t	ts;
+
+			zbx_timespec(&ts);
+
+			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
+		}
+
 		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
@@ -605,7 +623,7 @@ static void	parse_commandline(int argc, char **argv)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -716,7 +734,7 @@ static void	parse_commandline(int argc, char **argv)
 	{
 		ch = longopts[i].val;
 
-		if ('v' == ch && 2 < opt_count[ch])	/* '-v' or '-vv' can be specified */
+		if ('v' == ch && 2 < opt_count[(unsigned char)ch])	/* '-v' or '-vv' can be specified */
 		{
 			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
 
@@ -724,7 +742,7 @@ static void	parse_commandline(int argc, char **argv)
 			continue;
 		}
 
-		if ('v' != ch && 1 < opt_count[ch])
+		if ('v' != ch && 1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
@@ -981,27 +999,30 @@ int	main(int argc, char **argv)
 	sendval_args.server = ZABBIX_SERVER;
 	sendval_args.port = ZABBIX_SERVER_PORT;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
-#if defined(_WINDOWS)
-	zbx_tls_init_parent();
-#endif
-	zbx_tls_init_child();
-#else
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_tls_validate_config();
+#if defined(_WINDOWS)
+		zbx_tls_init_parent();
+#endif
+		zbx_tls_init_child();
+#else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 				" support");
 		goto exit;
-	}
 #endif
+	}
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
-	zbx_tls_pass_vars(&sendval_args.tls_vars);
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
+		zbx_tls_pass_vars(&sendval_args.tls_vars);
+	}
 #endif
 	zbx_json_init(&sendval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
@@ -1018,12 +1039,13 @@ int	main(int argc, char **argv)
 				setvbuf(stdin, (char *)NULL, _IOLBF, 1024);
 			}
 		}
-		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
+		else if (NULL == (in = fopen(INPUT_FILE, "r")))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			goto free;
 		}
 
+		sendval_args.sync_timestamp = WITH_TIMESTAMPS;
 		ret = SUCCEED;
 
 		while ((SUCCEED == ret || SUCCEED_PARTIAL == ret) && NULL != fgets(in_line, sizeof(in_line), in))
@@ -1140,9 +1162,6 @@ int	main(int argc, char **argv)
 			{
 				zbx_json_close(&sendval_args.json);
 
-				if (1 == WITH_TIMESTAMPS)
-					zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 				last_send = zbx_time();
 
 				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
@@ -1158,10 +1177,6 @@ int	main(int argc, char **argv)
 		if (FAIL != ret && 0 != buffer_count)
 		{
 			zbx_json_close(&sendval_args.json);
-
-			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
-
 			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
 
@@ -1170,6 +1185,7 @@ int	main(int argc, char **argv)
 	}
 	else
 	{
+		sendval_args.sync_timestamp = 0;
 		total_count++;
 
 		do /* try block simulation */
@@ -1218,10 +1234,13 @@ exit:
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		zbx_tls_free();
 #if defined(_WINDOWS)
-	zbx_tls_library_deinit();
+		zbx_tls_library_deinit();
 #endif
+	}
 #endif
 	zabbix_close_log();
 

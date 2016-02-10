@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -393,6 +393,8 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 			$srcItem['hostid'] = $dstHost['hostid'];
 			$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHost['hostid']);
 		}
+		unset($srcItem);
+
 		if (!API::Item()->create($srcItems)) {
 			return false;
 		}
@@ -442,6 +444,7 @@ function copyItems($srcHostId, $dstHostId) {
 		$srcItem['hostid'] = $dstHostId;
 		$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHostId);
 	}
+	unset($srcItem);
 
 	return API::Item()->create($srcItems);
 }
@@ -470,6 +473,7 @@ function copyApplications($source_hostid, $destination_hostid) {
 		$application['hostid'] = $destination_hostid;
 		unset($application['applicationid'], $application['templateid']);
 	}
+	unset($application);
 
 	return (bool) API::Application()->create($applications_to_create);
 }

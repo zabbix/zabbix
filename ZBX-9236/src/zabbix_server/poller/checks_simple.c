@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ static zbx_vmcheck_t	vmchecks[] =
 {
 	{"cluster.discovery", VMCHECK_FUNC(check_vcenter_cluster_discovery)},
 	{"cluster.status", VMCHECK_FUNC(check_vcenter_cluster_status)},
-	{"eventlog", VMCHECK_FUNC(check_vcenter_eventlog)},
 	{"version", VMCHECK_FUNC(check_vcenter_version)},
 	{"fullname", VMCHECK_FUNC(check_vcenter_fullname)},
 
@@ -136,7 +135,7 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	const char	*__function_name = "get_value_simple";
 
@@ -172,6 +171,15 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
+	}
+	else if (0 == strcmp(request.key, ZBX_VMWARE_PREFIX "eventlog"))
+	{
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+		if (SYSINFO_RET_OK == check_vcenter_eventlog(&request, item, result, add_results))
+			ret = SUCCEED;
+#else
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
+#endif
 	}
 	else
 	{

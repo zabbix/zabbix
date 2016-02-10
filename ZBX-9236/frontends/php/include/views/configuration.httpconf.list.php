@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,9 +137,11 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
-				)))
+				)
+		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(httptest_status2style($httpTest['status'])),
+			->addClass(httptest_status2style($httpTest['status']))
+			->addSID(),
 		$infoIcon
 	]);
 }

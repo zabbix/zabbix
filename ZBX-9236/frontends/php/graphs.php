@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,10 +45,10 @@ $fields = [
 	'show_legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),		null],
 	'ymin_type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null],
 	'ymax_type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),	null],
-	'yaxismin' =>			[T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && ({graphtype} == 0 || {graphtype} == 1)'],
-	'yaxismax' =>			[T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && ({graphtype} == 0 || {graphtype} == 1)'],
-	'ymin_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymin_type}) && {ymin_type} == 3'],
-	'ymax_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymax_type}) && {ymax_type} == 3'],
+	'yaxismin' =>			[T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && isset({graphtype}) && ({graphtype} == '.GRAPH_TYPE_NORMAL.' || {graphtype} == '.GRAPH_TYPE_STACKED.')'],
+	'yaxismax' =>			[T_ZBX_DBL, O_OPT, null,		null,			'(isset({add}) || isset({update})) && isset({graphtype}) && ({graphtype} == '.GRAPH_TYPE_NORMAL.' || {graphtype} == '.GRAPH_TYPE_STACKED.')'],
+	'ymin_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymin_type}) && {ymin_type} == '.GRAPH_YAXIS_TYPE_ITEM_VALUE],
+	'ymax_itemid' =>		[T_ZBX_INT, O_OPT, null,		DB_ID,			'(isset({add}) || isset({update})) && isset({ymax_type}) && {ymax_type} == '.GRAPH_YAXIS_TYPE_ITEM_VALUE],
 	'percent_left' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (left)')],
 	'percent_right' =>		[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100), null, _('Percentile line (right)')],
 	'visible' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 1),	null],
@@ -488,7 +488,7 @@ elseif (isset($_REQUEST['form'])) {
 				}
 				if (isset($link)) {
 					$data['templates'][] = $link;
-					$data['templates'][] = SPACE.'&rArr;'.SPACE;
+					$data['templates'][] = ' &rArr; ';
 				}
 				$parentGraphid = $parentGraph['templateid'];
 			} while ($parentGraphid != 0);
@@ -533,6 +533,7 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = 0;
 		$data['visible'] = getRequest('visible');
 		$data['items'] = getRequest('items', []);
+		$data['templates'] = [];
 
 		if (isset($data['visible']['percent_left'])) {
 			$data['percent_left'] = getRequest('percent_left', 0);

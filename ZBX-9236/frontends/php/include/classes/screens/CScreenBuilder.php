@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -358,7 +358,7 @@ class CScreenBuilder {
 					(new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->onClick('javascript: location.href = "screenedit.php?config=1'.
-							'&screenid='.$this->screen['screenid'].'&add_col='.$i.'";'
+							'&screenid='.$this->screen['screenid'].url_param('templateid').'&add_col='.$i.'";'
 						)
 				))
 					->addClass(ZBX_STYLE_CENTER)
@@ -369,7 +369,8 @@ class CScreenBuilder {
 				(new CDiv('+'))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 					->onClick('javascript: location.href = "screenedit.php?config=1'.
-						'&screenid='.$this->screen['screenid'].'&add_col='.$this->screen['hsize'].'";'
+						'&screenid='.$this->screen['screenid'].url_param('templateid').
+						'&add_col='.$this->screen['hsize'].'";'
 					)
 			))
 				->addClass(ZBX_STYLE_CENTER)
@@ -389,7 +390,7 @@ class CScreenBuilder {
 					(new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->onClick('javascript: location.href = "screenedit.php?config=1'.
-							'&screenid='.$this->screen['screenid'].'&add_row='.$r.'";'
+							'&screenid='.$this->screen['screenid'].url_param('templateid').'&add_row='.$r.'";'
 						)
 				))
 					->addClass(ZBX_STYLE_CENTER)
@@ -439,11 +440,11 @@ class CScreenBuilder {
 				// action
 				if ($this->mode == SCREEN_MODE_EDIT) {
 					if ($screenitem['screenitemid'] != 0) {
-						$action = 'screenedit.php?form=update'.url_param('screenid').
+						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).
 							'&screenitemid='.$screenitem['screenitemid'];
 					}
 					else {
-						$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
+						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).'&x='.$c.'&y='.$r;
 					}
 				}
 				else {
@@ -455,7 +456,7 @@ class CScreenBuilder {
 						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
 						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
 								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0))) {
-					$screenView = new CView('configuration.screen.constructor.edit', ['screen' => $this->screen]);
+					$screenView = new CView('monitoring.screen.constructor.edit', ['screen' => $this->screen]);
 					$item = $screenView->render();
 					$isEditForm = true;
 				}
@@ -541,12 +542,14 @@ class CScreenBuilder {
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				if ($emptyScreenRow) {
-					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";';
+					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_row='.$r.'";';
 				}
 				else {
 					$removeRowLink = 'javascript:'.
 						' if (confirm('.CJs::encodeJson(_('This screen-row is not empty. Delete it?')).')) {'.
-							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";'.
+							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
+							url_param('templateid').'&rmv_row='.$r.'";'.
 						' }';
 				}
 
@@ -568,7 +571,8 @@ class CScreenBuilder {
 					(new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->onClick('javascript: location.href = "screenedit.php'.
-							'?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";'
+							'?screenid='.$this->screen['screenid'].url_param('templateid').
+							'&add_row='.$this->screen['vsize'].'";'
 						)
 				))
 					->addClass(ZBX_STYLE_CENTER)
@@ -579,11 +583,13 @@ class CScreenBuilder {
 				if (isset($emptyScreenColumns[$i])) {
 					$removeColumnLink = 'javascript:'.
 						' if (confirm('.CJs::encodeJson(_('This screen-column is not empty. Delete it?')).')) {'.
-							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";'.
+							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
+								url_param('templateid').'&rmv_col='.$i.'";'.
 						' }';
 				}
 				else {
-					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";';
+					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1'.
+						'&screenid='.$this->screen['screenid'].url_param('templateid').'&rmv_col='.$i.'";';
 				}
 
 				$newColumns[] = (new CCol(

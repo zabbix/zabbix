@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -461,9 +461,8 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_PROXY_PASSIVE	0x04
 #define ZBX_PROGRAM_TYPE_PROXY		0x06	/* ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
 #define ZBX_PROGRAM_TYPE_AGENTD		0x08
-#define ZBX_PROGRAM_TYPE_AGENT		0x10
-#define ZBX_PROGRAM_TYPE_SENDER		0x20
-#define ZBX_PROGRAM_TYPE_GET		0x40
+#define ZBX_PROGRAM_TYPE_SENDER		0x10
+#define ZBX_PROGRAM_TYPE_GET		0x20
 const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
@@ -611,6 +610,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ZBX_HTTPITEM_TYPE_SPEED		2
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
+
+/* proxy_history flags */
+#define PROXY_HISTORY_FLAG_META		0x01
+#define PROXY_HISTORY_FLAG_NOVALUE	0x02
 
 /* user permissions */
 typedef enum
@@ -762,11 +765,13 @@ typedef enum
 zbx_httptest_auth_t;
 
 #define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
+#define ZBX_TASK_FLAG_FOREGROUND      0x02
 
 typedef struct
 {
 	zbx_task_t	task;
 	int		flags;
+	int		data;
 }
 ZBX_TASK_EX;
 
@@ -1015,6 +1020,7 @@ const char	*zbx_event_value_string(unsigned char source, unsigned char object, u
 
 #ifdef _WINDOWS
 const OSVERSIONINFOEX	*zbx_win_getversion();
+void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value);
 wchar_t	*zbx_acp_to_unicode(const char *acp_string);
 wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 int	zbx_acp_to_unicode_static(const char *acp_string, wchar_t *wide_string, int wide_size);
@@ -1061,7 +1067,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
 int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 
-int	MAIN_ZABBIX_ENTRY();
+int	MAIN_ZABBIX_ENTRY(int flags);
 
 zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
 zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
@@ -1122,6 +1128,7 @@ char	*zbx_dyn_escape_shell_single_quote(const char *text);
 #define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
 #define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
 #define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
+#define HOST_TLS_PSK_LEN_MIN		32				/* for 16 hex-encoded bytes (128-bit PSK) */
 
 typedef struct
 {
@@ -1134,5 +1141,10 @@ zbx_function_t;
 void	zbx_function_clean(zbx_function_t *func);
 int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length);
 int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out);
+
+#ifndef _WINDOWS
+unsigned int	zbx_alarm_on(unsigned int seconds);
+unsigned int	zbx_alarm_off(void);
+#endif
 
 #endif

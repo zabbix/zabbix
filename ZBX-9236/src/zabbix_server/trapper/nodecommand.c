@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,11 +121,12 @@ finish:
 		send = j.buffer;
 	}
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, send))
 		zabbix_log(LOG_LEVEL_WARNING, "Error sending result of command");
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send); alarm(0);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending back command '%s' result '%s'", data, send);
+	zbx_alarm_off();
 
 	zbx_json_free(&j);
 	zbx_free(result);

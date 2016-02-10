@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -558,8 +558,6 @@ function get_next_palette($palette = 0, $palettetype = 0) {
  * @param string   $marks	"t" - top, "r" - right, "b" - bottom, "l" - left
  */
 function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
-	global $colors;
-
 	$polygons = 5;
 	$gims = [
 		't' => [0, 0, -6, -6, -3, -9, 3, -9, 6, -6],
@@ -604,21 +602,24 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
 		}
 	}
 
+	$color = get_color($im, $color);
+	$polygon_color = get_color($im, '960000');
+
 	if (strpos($marks, 't') !== false) {
 		imagefilledpolygon($im, $gims['t'], $polygons, $color);
-		imagepolygon($im, $gims['t'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['t'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'r') !== false) {
 		imagefilledpolygon($im, $gims['r'], $polygons, $color);
-		imagepolygon($im, $gims['r'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['r'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'b') !== false) {
 		imagefilledpolygon($im, $gims['b'], $polygons, $color);
-		imagepolygon($im, $gims['b'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['b'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'l') !== false) {
 		imagefilledpolygon($im, $gims['l'], $polygons, $color);
-		imagepolygon($im, $gims['l'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['l'], $polygons, $polygon_color);
 	}
 }
 
@@ -941,24 +942,4 @@ function calcMaxLengthAfterDot($calcValues) {
 	}
 
 	return $maxLength;
-}
-
-/**
- * Allocate color for an image.
- *
- * @param resource 	$image
- * @param string	$color		a hexadecimal color identifier like "1F2C33"
- * @param int 		$alpha
- */
-function get_color($image, $color, $alpha = 0) {
-	$red = hexdec('0x'.substr($color, 0, 2));
-	$green = hexdec('0x'.substr($color, 2, 2));
-	$blue = hexdec('0x'.substr($color, 4, 2));
-
-	if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-			&& @imagecreatetruecolor(1, 1)) {
-		return imagecolorexactalpha($image, $red, $green, $blue, $alpha);
-	}
-
-	return imagecolorallocate($image, $red, $green, $blue);
 }

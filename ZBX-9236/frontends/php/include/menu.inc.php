@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,7 +81,13 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'screens.php',
 					'label' => _('Screens'),
-					'sub_pages' => ['slides.php']
+					'sub_pages' => [
+						'screenconf.php',
+						'screenedit.php',
+						'screen.import.php',
+						'slides.php',
+						'slideconf.php'
+					]
 				],
 				[
 					'url' => 'zabbix.php',
@@ -189,7 +195,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				],
 				[
 					'url' => 'templates.php',
-					'label' => _('Templates')
+					'label' => _('Templates'),
+					'sub_pages' => [
+						'screenconf.php',
+						'screenedit.php'
+					]
 				],
 				[
 					'url' => 'hosts.php',
@@ -217,15 +227,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'actionconf.php',
 					'label' => _('Actions')
-				],
-				[
-					'url' => 'screenconf.php',
-					'label' => _('Screens'),
-					'sub_pages' => ['screenedit.php']
-				],
-				[
-					'url' => 'slideconf.php',
-					'label' => _('Slide shows'),
 				],
 				[
 					'url' => 'discoveryconf.php',
@@ -348,7 +349,26 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 
 			if ($action == null) {
 				$sub_menu_active = ($page['file'] == $sub_page['url']);
-				$sub_menu_active |= (isset($sub_page['sub_pages']) && str_in_array($page['file'], $sub_page['sub_pages']));
+
+				// Quick and dirty hack to display correct menu for templated screens.
+				if (array_key_exists('sub_pages', $sub_page)) {
+					if ((str_in_array('screenconf.php', $sub_page['sub_pages'])
+							|| str_in_array('screenedit.php', $sub_page['sub_pages']))
+								&& ($page['file'] === 'screenconf.php' || $page['file'] === 'screenedit.php')) {
+						if ($label === 'view') {
+							$sub_menu_active |= getRequest('templateid') ? false : true;
+						}
+						elseif ($label === 'config') {
+							$sub_menu_active |= getRequest('templateid') ? true : false;
+						}
+					}
+					elseif (str_in_array($page['file'], $sub_page['sub_pages'])) {
+						$sub_menu_active |= true;
+					}
+				}
+				else {
+					$sub_menu_active |= false;
+				}
 			}
 			else {
 				$sub_menu_active = array_key_exists('active_if', $sub_page) && str_in_array($action, $sub_page['active_if']);
@@ -391,7 +411,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		$mmenu_entry = (new CListItem(
 			(new CLink($menu['label']))
 				->setAttribute('tabindex', 0)
-				->removeSID()
 		))
 			->addClass($menu_class)
 			->setId($label);

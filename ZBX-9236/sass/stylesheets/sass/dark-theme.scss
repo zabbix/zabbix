@@ -4,7 +4,7 @@ $light-red: #503434;
 $lighter-red: #473232;
 
 $dark-yellow: #e99003;
-$yellow: #423601;
+$yellow: #a78820;
 $light-yellow: #2f280a;
 $lighter-yellow: #2f280a;
 
@@ -79,10 +79,10 @@ $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
 
-$link-main-nav-color: rgba(#fff, 0.75);
+$link-main-nav-color: rgba(#fff, 0.85);
 $link-main-nav-hover-color: rgba(#fff, 1);
 $link-main-nav-active-color: rgba(#fff, 1);
-$link-main-nav-visited-color: rgba(#fff, 0.75);
+$link-main-nav-visited-color: rgba(#fff, 0.85);
 
 $link-main-subnav-color: rgba(#fff, 0.75);
 $link-main-subnav-hover-color: rgba(#fff, 1);
@@ -94,6 +94,22 @@ $clock-face-color: #383838;
 $clock-hand-color: #f2f2f2;
 $clock-hand-sec-color: #69808d;
 $clock-lines-color: #4f4f4f;
+
+.top-nav-help {
+	background: url(../img/icon-sprite.svg) no-repeat -77px -30px !important;
+}
+.top-nav-profile {
+	background: url(../img/icon-sprite.svg) no-repeat -77px -102px !important;
+}
+.top-nav-signout {
+	background: url(../img/icon-sprite.svg) no-repeat -77px -138px !important;
+}
+.top-nav-zbbshare {
+	background: url(../img/icon-sprite.svg) no-repeat -77px -66px !important;
+}
+.btn-search{
+	background: url(../img/icon-sprite.svg) no-repeat -83px -7px !important;
+}
 
 // Important! @import string should come after variables
 @import 'screen.scss';
