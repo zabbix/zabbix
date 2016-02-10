@@ -41,7 +41,6 @@
 #	include "mutexs.h"
 #endif
 
-#ifndef HAVE_MYSQL
 struct ZBX_DB_RESULT
 {
 #if defined(HAVE_IBM_DB2)
@@ -51,6 +50,8 @@ struct ZBX_DB_RESULT
 	DB_ROW		values;
 	DB_ROW		values_cli;
 	SQLINTEGER	*values_len;
+#elif defined(HAVE_MYSQL)
+	MYSQL_RES	*result;
 #elif defined(HAVE_ORACLE)
 	OCIStmt		*stmthp;	/* the statement handle for select operations */
 	int 		ncolumn;
@@ -71,7 +72,6 @@ struct ZBX_DB_RESULT
 	DB_ROW		values;
 #endif
 };
-#endif
 
 static int	txn_level = 0;	/* transaction level, nested transactions are not supported */
 static int	txn_error = 0;	/* failed transaction */
@@ -1361,9 +1361,14 @@ error:
 		result = (SQL_CD_TRUE == IBM_DB2server_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL)
+	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
+	result->result = NULL;
+
 	if (NULL == conn)
 	{
 		zabbix_errlog(ERR_Z3003);
+
+		DBfree_result(result);
 		result = NULL;
 	}
 	else
@@ -1372,10 +1377,11 @@ error:
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 
+			DBfree_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error() ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
 		else
-			result = mysql_store_result(conn);
+			result->result = mysql_store_result(conn);
 	}
 #elif defined(HAVE_ORACLE)
 	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
@@ -1754,7 +1760,10 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_MYSQL)
-	return mysql_fetch_row(result);
+	if (NULL == result->result)
+		return NULL;
+
+	return (DB_ROW)mysql_fetch_row(result->result);
 #elif defined(HAVE_ORACLE)
 	if (OCI_NO_DATA == (rc = OCIStmtFetch2(result->stmthp, oracle.errhp, 1, OCI_FETCH_NEXT, 0, OCI_DEFAULT)))
 		return NULL;
@@ -1913,7 +1922,11 @@ void	DBfree_result(DB_RESULT result)
 
 	zbx_free(result);
 #elif defined(HAVE_MYSQL)
-	mysql_free_result(result);
+	if (NULL == result)
+		return;
+
+	mysql_free_result(result->result);
+	zbx_free(result);
 #elif defined(HAVE_ORACLE)
 	if (NULL == result)
 		return;

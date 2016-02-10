@@ -28,12 +28,8 @@
 
 #define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
 
-typedef char	**DB_ROW;	/* assuming that MYSQL_ROW is char ** as well */
-#ifdef HAVE_MYSQL
-typedef struct st_mysql_res	*DB_RESULT;	/* assuming MYSQL_RES is defined as struct st_mysql_res */
-#else
+typedef char	**DB_ROW;
 typedef struct ZBX_DB_RESULT	*DB_RESULT;
-#endif
 
 #ifdef HAVE_SQLITE3
 	/* we have to put double % here for sprintf */
