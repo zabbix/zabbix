@@ -58,37 +58,6 @@ abstract class CHostBase extends CApiService {
 			);
 		}
 
-		// check if any templates linked to targets have more than one unique item key/application
-		foreach ($targetIds as $targetid) {
-			$linkedTpls = API::Template()->get(array(
-				'nopermissions' => true,
-				'output' => array('templateid'),
-				'hostids' => $targetid
-			));
-
-			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
-
-			$dbItems = DBselect(
-				'SELECT i.key_'.
-					' FROM items i'.
-					' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
-					' GROUP BY i.key_'.
-					' HAVING COUNT(i.itemid)>1'
-			);
-			if ($dbItem = DBfetch($dbItems)) {
-				$target_template = API::Template()->get(array(
-					'output' => array('name'),
-					'templateids' => $targetid
-				));
-				$target_template = reset($target_template);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Item "%1$s" already exists on "%2$s", inherited from another template.',
-						$dbItem['key_'], $target_template['name'])
-					);
-			}
-		}
-
 		// get DB templates which exists in all targets
 		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
 		$mas = array();
