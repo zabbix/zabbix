@@ -926,7 +926,7 @@ static sword	zbx_oracle_statement_execute(ub4 *nrows)
 #endif
 
 #ifdef HAVE_ORACLE
-static int	zbx_db_statement_prepare(const char *sql)
+int	zbx_db_statement_prepare(const char *sql)
 {
 	sword	err;
 	int	ret = ZBX_DB_OK;
@@ -956,7 +956,7 @@ static int	zbx_db_statement_prepare(const char *sql)
 	return ret;
 }
 
-static int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
+int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 {
 	sword	err;
 	int	ret = ZBX_DB_OK, old_alloc, i;
@@ -1022,7 +1022,7 @@ static int	zbx_db_bind_parameter(int position, void *buffer, unsigned char type)
 	return ret;
 }
 
-static int	zbx_db_statement_execute()
+int	zbx_db_statement_execute()
 {
 	const char	*__function_name = "zbx_db_statement_execute";
 
