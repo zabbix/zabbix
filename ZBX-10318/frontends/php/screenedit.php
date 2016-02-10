@@ -367,6 +367,7 @@ elseif (isset($_REQUEST['rmv_col'])) {
 					_('Column deleted')
 				);
 			}
+		}
 
 		DBend($result);
 	}
