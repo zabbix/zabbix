@@ -68,6 +68,11 @@ int	zbx_db_rollback(void);
 int	zbx_db_txn_level(void);
 int	zbx_db_txn_error(void);
 
+#ifdef HAVE_ORACLE
+int		zbx_db_statement_prepare(const char *sql);
+int		zbx_db_bind_parameter(int position, void *buffer, unsigned char type);
+int		zbx_db_statement_execute();
+#endif
 int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
