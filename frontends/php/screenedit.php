@@ -292,43 +292,35 @@ elseif (isset($_REQUEST['add_col'])) {
 
 	DBend($result);
 }
-elseif (isset($_REQUEST['rmv_row'])) {
+elseif (hasRequest('rmv_row') && $screen['vsize'] > getRequest('rmv_row')) {
+	// Remove screen row.
+
+	$rmv_row = getRequest('rmv_row', 0);
 	if ($screen['vsize'] > 1) {
-		$rmv_row = getRequest('rmv_row', 0);
 
 		DBstart();
-		// reduce the rowspan of the items that are displayed in the removed row
-		DBexecute(
-			'UPDATE screens_items'.
-				' SET rowspan=(rowspan-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y+rowspan>'.zbx_dbstr($rmv_row).
-				' AND y<'.zbx_dbstr($rmv_row)
-		);
+		$result = true;
 
-		$result = DBexecute(
-			'UPDATE screens SET vsize=(vsize-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND vsize>'.zbx_dbstr($rmv_row)
-		);
-		$result &= DBexecute(
-			'DELETE FROM screens_items'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y='.zbx_dbstr($rmv_row)
-		);
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET y=(y-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y>'.zbx_dbstr($rmv_row)
-		);
+		foreach ($screen['screenitems'] as $key => $item) {
+			if ($item['y'] > $rmv_row) {
+				$item['y'] = $item['y']-1;
+				$result &= API::ScreenItem()->update($item);
+			}
+			elseif ($item['y'] == $rmv_row) {
+				$result &= API::ScreenItem()->delete([$item['screenitemid']]);
+			}
+		}
+
+		$result &= API::Screen()->update([
+			'screenid' => $screen['screenid'],
+			'vsize' => $screen['vsize']-1,
+		]);
 
 		if ($result) {
 			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
 				_('Row deleted')
 			);
 		}
-
 		DBend($result);
 	}
 	else {
@@ -336,7 +328,7 @@ elseif (isset($_REQUEST['rmv_row'])) {
 		show_error_message(_('Impossible to remove last row and column.'));
 	}
 }
-elseif ($screen['hsize'] > getRequest('rmv_col')) {
+elseif (hasRequest('rmv_col') && $screen['hsize'] > getRequest('rmv_col')) {
 	// Remove screen column.
 
 	$rmv_col = getRequest('rmv_col', 0);
