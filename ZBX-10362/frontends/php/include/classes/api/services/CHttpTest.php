@@ -695,7 +695,7 @@ class CHttpTest extends CApiService {
 
 			if (isset($step['retrieve_mode'])) {
 				$retrieveModeValidator->messageInvalid = _s(
-					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$".',
+					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$s".',
 					$step['name'],
 					$httpTest['name']
 				);
