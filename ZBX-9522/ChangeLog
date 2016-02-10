@@ -3,6 +3,10 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
+A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -20,7 +24,7 @@ A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix t
 
 Bug fixes:
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
-A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (Cemeris)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
@@ -1689,6 +1693,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
 
