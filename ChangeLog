@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] enabled French translation to be displayed by default (zal
 A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-10362] fixed resolving of {TRIGGER.ID} macro in trigger URL field (Sasha)
 A......... [ZBX-10358] fixed error messages in template screen cloning and web scenarios step validation (Oleg)
 A.F....... [ZBX-10347] fixed undefined index "macros" in dashboard widget (Oleg)
 ...G...PS. [ZBX-10352] fixed standard file stream redirection after daemonizing when using system log type (wiper)
