@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,11 @@ else {
 
 if ($this->data['alias'] != ZBX_GUEST_USER) {
 	$userFormList->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($this->data['autologin']));
-	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [$autologoutCheckBox, $autologoutTextBox]);
+	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [
+		$autologoutCheckBox,
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		$autologoutTextBox
+	]);
 }
 
 $userFormList
@@ -200,15 +204,13 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$status = (new CLink(_('Enabled'), '#'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
-				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);')
-				->removeSID();
+				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);');
 		}
 		else {
 			$status = (new CLink(_('Disabled'), '#'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_RED)
-				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);')
-				->removeSID();
+				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
 		}
 
 		$mediaUrl = 'popup_media.php'.

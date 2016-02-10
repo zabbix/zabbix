@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ $icons = (new CList())
 		(new CForm('get', 'search.php'))
 			->addItem([
 				(new CTextBox('search', '', false, 255))
-					->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
 					->setAttribute('autocomplete', 'off')
 					->addClass(ZBX_STYLE_SEARCH),
 				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
@@ -33,14 +32,12 @@ $icons = (new CList())
 	->addItem(
 		(new CLink('Share', 'https://share.zabbix.com/'))
 			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
-			->removeSID()
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Zabbix Share'))
 	)
 	->addItem(
 		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.0/'))
 			->addClass(ZBX_STYLE_TOP_NAV_HELP)
-			->removeSID()
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Help'))
 	);
@@ -57,10 +54,12 @@ $icons->addItem(
 	(new CLink(SPACE, 'index.php?reconnect=1'))
 		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setAttribute('title', _('Sign out'))
+		->addSID()
 );
 
 // 1st level menu
 $top_menu = (new CDiv())
+	->addItem(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
 	->addItem(
 		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
 	)
@@ -89,7 +88,7 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		}
 		$url->removeArgument('sid');
 
-		$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->removeSID();
+		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
 		if ($sub_page['selected']) {
 			$sub_menu_item->addClass(ZBX_STYLE_SELECTED);
 		}

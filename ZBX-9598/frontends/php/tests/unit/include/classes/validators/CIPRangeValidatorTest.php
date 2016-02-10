@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			[['ipRangeLimit' => 268435456], '64.0.0.0/4'],
 			[['ipRangeLimit' => 2147483648], '0.0.0.0/1'],
 			[['ipRangeLimit' => 4294967296], '0.0.0.0/0'],
-			[[], "192.168.1.1-2\t\n\r,\t\n\r192.168.1.2-3"],
+			[[], "192.168.1.1-2\t\r\n,\t\r\n192.168.1.2-3"],
 		];
 	}
 
@@ -154,7 +154,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 				'Invalid IP address range "fe80::c0a8:0/129".'
 			],
 			[[], // contains vertical tab character \0x0B
-				"192.168.1.1-2\t\n\r,192.168.1.2-3",
+				"192.168.1.1-2\t\r\n,192.168.1.2-3",
 				'Invalid IP address range "192.168.1.2-3".'
 			]
 		];

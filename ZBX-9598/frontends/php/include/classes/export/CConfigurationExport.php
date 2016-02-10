@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -235,9 +235,9 @@ class CConfigurationExport {
 	 */
 	protected function gatherGroups(array $groupIds) {
 		$this->data['groups'] = API::HostGroup()->get([
+			'output' => ['name'],
 			'groupids' => $groupIds,
-			'preservekeys' => true,
-			'output' => API_OUTPUT_EXTEND
+			'preservekeys' => true
 		]);
 	}
 
@@ -251,16 +251,14 @@ class CConfigurationExport {
 			'templateids' => $templateIds,
 			'output' => ['host', 'name', 'description'],
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);
 
-		// merge host groups with all groups
-		$templateGroups = [];
-
 		foreach ($templates as &$template) {
-			$templateGroups += zbx_toHash($template['groups'], 'groupid');
+			// merge host groups with all groups
+			$this->data['groups'] += zbx_toHash($template['groups'], 'groupid');
 
 			$template['screens'] = [];
 			$template['applications'] = [];
@@ -269,22 +267,16 @@ class CConfigurationExport {
 		}
 		unset($template);
 
-		$this->data['groups'] += $templateGroups;
-
 		// applications
 		$applications = API::Application()->get([
+			'output' => ['hostid', 'name'],
 			'hostids' => $templateIds,
-			'output' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'preservekeys' => true
 		]);
 
 		foreach ($applications as $application) {
-			if (!isset($templates[$application['hostid']]['applications'])) {
-				$templates[$application['hostid']]['applications'] = [];
-			}
-
-			$templates[$application['hostid']]['applications'][] = $application;
+			$templates[$application['hostid']]['applications'][] = ['name' => $application['name']];
 		}
 
 		// screens
@@ -326,17 +318,15 @@ class CConfigurationExport {
 			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'bulk'],
 			'selectInventory' => true,
 			'selectMacros' => API_OUTPUT_EXTEND,
-			'selectGroups' => API_OUTPUT_EXTEND,
+			'selectGroups' => ['groupid', 'name'],
 			'selectParentTemplates' => API_OUTPUT_EXTEND,
 			'hostids' => $hostIds,
 			'preservekeys' => true
 		]);
 
-		// merge host groups with all groups
-		$hostGroups = [];
-
 		foreach ($hosts as &$host) {
-			$hostGroups += zbx_toHash($host['groups'], 'groupid');
+			// merge host groups with all groups
+			$this->data['groups'] += zbx_toHash($host['groups'], 'groupid');
 
 			$host['applications'] = [];
 			$host['discoveryRules'] = [];
@@ -344,23 +334,17 @@ class CConfigurationExport {
 		}
 		unset($host);
 
-		$this->data['groups'] += $hostGroups;
-
 		// applications
 		$applications = API::Application()->get([
-			'hostids' => $hostIds,
 			'output' => ['hostid', 'name'],
+			'hostids' => $hostIds,
 			'inherited' => false,
 			'preservekeys' => true,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
 		foreach ($applications as $application) {
-			if (!isset($hosts[$application['hostid']]['applications'])) {
-				$hosts[$application['hostid']]['applications'] = [];
-			}
-
-			$hosts[$application['hostid']]['applications'][] = $application;
+			$hosts[$application['hostid']]['applications'][] = ['name' => $application['name']];
 		}
 
 		// proxies
@@ -394,9 +378,9 @@ class CConfigurationExport {
 	 */
 	protected function gatherHostItems(array $hostIds) {
 		$items = API::Item()->get([
-			'hostids' => $hostIds,
 			'output' => $this->dataFields['item'],
-			'selectApplications' => API_OUTPUT_EXTEND,
+			'selectApplications' => ['name', 'flags'],
+			'hostids' => $hostIds,
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
@@ -420,9 +404,9 @@ class CConfigurationExport {
 	 */
 	protected function gatherTemplateItems(array $templateIds) {
 		$items = API::Item()->get([
-			'hostids' => $templateIds,
 			'output' => $this->dataFields['item'],
-			'selectApplications' => API_OUTPUT_EXTEND,
+			'selectApplications' => ['name', 'flags'],
+			'hostids' => $templateIds,
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
@@ -566,6 +550,7 @@ class CConfigurationExport {
 			foreach ($item['filter']['conditions'] as &$condition) {
 				unset($condition['item_conditionid'], $condition['itemid']);
 			}
+			unset($condition);
 		}
 		unset($item);
 
@@ -671,11 +656,11 @@ class CConfigurationExport {
 
 		foreach ($hostPrototypes as $hostPrototype) {
 			foreach ($hostPrototype['groupLinks'] as $groupLink) {
-				$groupIds[$groupLink['groupid']] = $groupLink['groupid'];
+				$groupIds[$groupLink['groupid']] = true;
 			}
 		}
 
-		$groups = $this->getGroupsReferences($groupIds);
+		$groups = $this->getGroupsReferences(array_keys($groupIds));
 
 		// export the groups used in group prototypes
 		$this->data['groups'] += $groups;
@@ -684,7 +669,6 @@ class CConfigurationExport {
 			foreach ($hostPrototype['groupLinks'] as &$groupLink) {
 				$groupLink['groupid'] = $groups[$groupLink['groupid']];
 			}
-
 			unset($groupLink);
 
 			$items[$hostPrototype['discoveryRule']['itemid']]['hostPrototypes'][] = $hostPrototype;
@@ -1202,19 +1186,18 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function getGroupsReferences(array $groupIds) {
-		$ids = [];
-
 		$groups = API::HostGroup()->get([
 			'groupids' => $groupIds,
 			'output' => ['name'],
 			'preservekeys' => true
 		]);
 
-		foreach ($groups as $id => $group) {
-			$ids[$id] = ['name' => $group['name']];
+		foreach ($groups as &$group) {
+			$group = ['name' => $group['name']];
 		}
+		unset($group);
 
-		return $ids;
+		return $groups;
 	}
 
 	/**

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 
 	init_result(&agent_result);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
 	{
@@ -80,7 +80,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	else if (NULL != result && ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
 
-	alarm(0);
+	zbx_alarm_off();
 
 	free_result(&agent_result);
 
@@ -205,7 +205,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 
 	init_result(&agent_result);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	if (SUCCEED != (ret = function(&item, &agent_result)))
 	{
@@ -216,7 +216,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	else if (NULL != result && ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
 
-	alarm(0);
+	zbx_alarm_off();
 
 	free_result(&agent_result);
 

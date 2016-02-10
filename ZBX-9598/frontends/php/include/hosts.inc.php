@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -551,7 +551,7 @@ function updateHostStatus($hostids, $status) {
 		$host_new = $host;
 		$host_new['status'] = $status;
 		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
-		info(_('Updated status of host').' "'.$host['host'].'"');
+		info(_s('Updated status of host "%1$s".', $host['host']));
 	}
 
 	return DB::update('hosts', [

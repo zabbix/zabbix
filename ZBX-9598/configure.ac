@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2015 Zabbix SIA
+dnl Copyright (C) 2001-2016 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[3.0.0alpha6])
+AC_INIT([Zabbix],[3.0.0rc2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -60,7 +60,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   zone.h nlist.h kvm.h linux/kernel.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
+  Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h libperfstat.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
   dlfcn.h sys/utsname.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
@@ -1236,12 +1236,14 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	DB_CPPFLAGS="$IBM_DB2_CPPFLAGS $MYSQL_CFLAGS $ORACLE_CPPFLAGS $POSTGRESQL_CFLAGS $SQLITE3_CPPFLAGS"
 	DB_LDFLAGS="$IBM_DB2_LDFLAGS $MYSQL_LDFLAGS $ORACLE_LDFLAGS $POSTGRESQL_LDFLAGS $SQLITE3_LDFLAGS"
 	DB_LIBS="$IBM_DB2_LIBS $MYSQL_LIBS $ORACLE_LIBS $POSTGRESQL_LIBS $SQLITE3_LIBS"
+	
+	AM_CPPFLAGS=$DB_CPPFLAGS
 
 	AC_SUBST(DB_CPPFLAGS)
 	AC_SUBST(DB_LDFLAGS)
 	AC_SUBST(DB_LIBS)
+	AC_SUBST(AM_CPPFLAGS)
 
-	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
 

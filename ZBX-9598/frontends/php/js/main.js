@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -554,7 +554,7 @@ function hide_color_picker() {
 	}
 
 	color_picker.style.zIndex = 1000;
-	color_picker.style.visibility = 'hidden';
+	color_picker.style.display = 'none';
 	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
 	curr_lbl = null;
 	curr_txt = null;
@@ -572,7 +572,7 @@ function show_color_picker(id) {
 	color_picker.y = pos.top;
 	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
-	color_picker.style.visibility = 'visible';
+	color_picker.style.display = null;
 }
 
 function create_color_picker() {
@@ -679,7 +679,6 @@ function changeWidgetState(obj, widgetId, url) {
 function sendAjaxData(url, options) {
 	var url = new Curl(url);
 	url.setArgument('output', 'ajax');
-	url.addSID();
 
 	options.type = 'post';
 	options.url = url.getUrl();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -76,8 +76,7 @@ foreach ($this->data['hosts'] as $host) {
 
 	$row = [
 		(new CLink($host['name'], '?hostid='.$host['hostid'].url_param('groupid')))
-			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-			->removeSID(),
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null),
 		$hostGroups,
 		zbx_str2links($host['inventory']['name']),
 		zbx_str2links($host['inventory']['type']),

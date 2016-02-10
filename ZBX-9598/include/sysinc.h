@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -163,10 +163,6 @@
 
 #ifdef HAVE_KSTAT_H
 #	include <kstat.h>
-#endif
-
-#ifdef HAVE_LDAP
-#	include <ldap.h>
 #endif
 
 #ifdef HAVE_WINLDAP_H
@@ -332,10 +328,6 @@
 #	include <unistd.h>
 #endif
 
-#ifdef HAVE_LBER_H
-#	include <lber.h>
-#endif
-
 #ifdef HAVE_SYS_IPC_H
 #	include <sys/ipc.h>
 #endif
@@ -436,6 +428,11 @@
 
 #ifdef HAVE_DLFCN_H
 #	include <dlfcn.h>
+#endif
+
+#ifdef HAVE_ZONE_H
+#	include <zone.h>
+#	include <utmpx.h>
 #endif
 
 #endif

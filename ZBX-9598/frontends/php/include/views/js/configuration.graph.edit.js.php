@@ -1,9 +1,13 @@
 <script type="text/x-jquery-tmpl" id="itemTpl">
 <tr id="items_#{number}" class="sortable">
 	<!-- icon + hidden -->
-	<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-		<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+	<?php if ($this->data['templates']): ?>
+		<td>
+	<?php else: ?>
+		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+			<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+	<?php endif ?>
 		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 		<input type="hidden" id="items_#{number}_graphid" name="items[#{number}][graphid]" value="#{graphid}">
 		<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -21,7 +25,11 @@
 
 	<!-- name -->
 	<td>
-		<span id="items_#{number}_name" class="link" onclick="">#{name}</span>
+		<?php if ($this->data['templates']): ?>
+			<span id="items_#{number}_name">#{name}</span>
+		<?php else: ?>
+			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+		<?php endif ?>
 	</td>
 
 	<!-- type -->
@@ -80,9 +88,11 @@
 	<td>
 		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
 	</td>
-	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
-	</td>
+	<?php if (!$this->data['templates']): ?>
+		<td class="<?= ZBX_STYLE_NOWRAP ?>">
+			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
+		</td>
+	<?php endif ?>
 </tr>
 </script>
 <script type="text/javascript">
@@ -113,8 +123,10 @@
 		jQuery('#lbl_items_' + number + '_color').attr('title', '#' + color);
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
-		incrementNextColor();
-		rewriteNameLinks();
+		colorPalette.incrementNextColor();
+		<?php if (!$this->data['templates']): ?>
+			rewriteNameLinks();
+		<?php endif ?>
 	}
 
 	function addPopupValues(list) {
@@ -136,7 +148,7 @@
 					yaxisside: 0,
 					sortorder: number,
 					flags: (typeof list.values[i].flags === 'undefined') ? 0 : list.values[i].flags,
-					color: getNextColor(1),
+					color: colorPalette.getNextColor(),
 					name: list.values[i].name
 				},
 				itemTpl = new Template(jQuery('#itemTpl').html());
@@ -148,8 +160,10 @@
 			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
 		}
 
-		activateSortable();
-		rewriteNameLinks();
+		<?php if (!$this->data['templates']): ?>
+			activateSortable();
+			rewriteNameLinks();
+		<?php endif ?>
 	}
 
 	function getOnlyHostParam() {
@@ -160,6 +174,7 @@
 		<?php endif ?>
 	}
 
+<?php if (!$this->data['templates']): ?>
 	function rewriteNameLinks() {
 		var size = jQuery('#itemsTable tr.sortable').length;
 
@@ -175,6 +190,7 @@
 			jQuery('#items_' + i + '_name').attr('onclick', nameLink);
 		}
 	}
+<?php endif ?>
 
 	function removeItem(obj) {
 		var number = jQuery(obj).data('remove');
@@ -183,7 +199,9 @@
 		jQuery('#items_' + number).remove();
 
 		recalculateSortOrder();
-		activateSortable();
+		<?php if (!$this->data['templates']): ?>
+			activateSortable();
+		<?php endif ?>
 	}
 
 	function recalculateSortOrder() {
@@ -253,9 +271,12 @@
 			i++;
 		});
 
-		rewriteNameLinks();
+		<?php if (!$this->data['templates']): ?>
+			rewriteNameLinks();
+		<?php endif ?>
 	}
 
+<?php if (!$this->data['templates']): ?>
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
 			itemsTableWidth = itemsTable.width(),
@@ -307,6 +328,7 @@
 	function activateSortable() {
 		jQuery('#itemsTable').sortable({disabled: (jQuery('#itemsTable tr.sortable').length < 2)});
 	}
+<?php endif ?>
 
 	jQuery(function($) {
 		$('#tab_previewTab').click(function() {
@@ -360,20 +382,14 @@
 		});
 
 		<?php if (!empty($this->data['templateid'])): ?>
-			$('#graphTab .input, #graphTab .button').each(function() {
-				$(this).attr('disabled', 'disabled');
-			});
-			$('#itemsTable').sortable({disabled: true});
+			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
+			$('select', '#itemsTable').prop('disabled', true);
 
 			var size = $('#itemsTable tr.sortable').length;
 
 			for (var i = 0; i < size; i++) {
-				$('.ui-icon').attr('class', 'ui-icon ui-icon-arrowthick-2-n-s state-disabled');
-				$('#items_' + i + '_name').removeAttr('onclick');
-				$('#items_' + i + '_name').removeAttr('class');
 				$('#items_' + i + '_color').removeAttr('onchange');
 				$('#lbl_items_' + i + '_color').removeAttr('onclick');
-				$('#lbl_items_' + i + '_color').attr('class', 'colorpickerLabel');
 			}
 		<?php endif ?>
 
@@ -419,6 +435,8 @@
 			$('form[name="graphForm"]').submit();
 		});
 
-		initSortable();
+		<?php if (!$this->data['templates']): ?>
+			initSortable();
+		<?php endif ?>
 	});
 </script>

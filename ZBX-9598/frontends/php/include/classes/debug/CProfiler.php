@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,9 +120,7 @@ class CProfiler {
 		global $DB;
 
 		$debug = [];
-		$debug[] = (new CLink())
-			->setAttribute('name', 'debug')
-			->removeSid();
+		$debug[] = (new CLink())->setAttribute('name', 'debug');
 		$debug[] = '******************** '._('Script profiler').' ********************';
 		$debug[] = BR();
 		$debug[] = _s('Total time: %1$s', round($this->stopTime - $this->startTime, 6));

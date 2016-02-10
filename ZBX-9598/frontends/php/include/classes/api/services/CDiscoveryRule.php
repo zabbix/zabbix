@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1174,6 +1174,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				unset($gitem['gitemid'], $gitem['graphid']);
 			}
+			unset($gitem);
 
 			// replace the old axis items with the new one with the same key
 			if ($graph['ymin_itemid']) {
@@ -1185,6 +1186,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$graph['ymax_itemid'] = $dstItems[$yMaxSrcItem['key_']]['itemid'];
 			}
 		}
+		unset($graph);
 
 		// save graphs
 		$rs = API::GraphPrototype()->create($dstGraphs);
