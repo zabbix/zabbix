@@ -336,39 +336,34 @@ elseif (isset($_REQUEST['rmv_row'])) {
 		show_error_message(_('Impossible to remove last row and column.'));
 	}
 }
-elseif (isset($_REQUEST['rmv_col'])) {
+elseif ($screen['hsize'] > getRequest('rmv_col')) {
 	// Remove screen column.
 
+	$rmv_col = getRequest('rmv_col', 0);
 	if ($screen['hsize'] > 1) {
-		$rmv_col = getRequest('rmv_col', 0);
-
 		DBstart();
-		if ($screen['hsize'] > $rmv_col) {
-			// TODO: $screen_items[n] should have only 'screenitemid' and 'x' so array_intersect_key() should be used.
-			$result = true;
-			// TODO: Merge screen and screen item updates in to one API::Screen()->update().
-			foreach ($screen['screenitems'] as $key => $item) {
-				if ($item['x'] > $rmv_col) {
-					$item['x'] = $item['x']-1;
-					$result &= API::ScreenItem()->update($item);
-				}
-				elseif ($item['x'] == $rmv_col) {
-					$result &= API::ScreenItem()->delete([$item['screenitemid']]);
-				}
+		$result = true;
+
+		foreach ($screen['screenitems'] as $key => $item) {
+			if ($item['x'] > $rmv_col) {
+				$item['x'] = $item['x']-1;
+				$result &= API::ScreenItem()->update($item);
 			}
-
-			$result &= API::Screen()->update([
-				'screenid' => $screen['screenid'],
-				'hsize' => $screen['hsize']-1,
-			]);
-
-			if ($result) {
-				add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-					_('Column deleted')
-				);
+			elseif ($item['x'] == $rmv_col) {
+				$result &= API::ScreenItem()->delete([$item['screenitemid']]);
 			}
 		}
 
+		$result &= API::Screen()->update([
+			'screenid' => $screen['screenid'],
+			'hsize' => $screen['hsize']-1,
+		]);
+
+		if ($result) {
+			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+				_('Column deleted')
+			);
+		}
 		DBend($result);
 	}
 	else {
