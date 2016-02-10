@@ -337,41 +337,36 @@ elseif (isset($_REQUEST['rmv_row'])) {
 	}
 }
 elseif (isset($_REQUEST['rmv_col'])) {
+	// Remove screen column.
+
 	if ($screen['hsize'] > 1) {
 		$rmv_col = getRequest('rmv_col', 0);
 
 		DBstart();
-		// reduce the colspan of the items that are displayed in the removed column
-		DBexecute(
-			'UPDATE screens_items'.
-				' SET colspan=(colspan-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x+colspan>'.zbx_dbstr($rmv_col).
-				' AND x<'.zbx_dbstr($rmv_col)
-		);
+		if ($screen['hsize'] > $rmv_col) {
+			// TODO: $screen_items[n] should have only 'screenitemid' and 'x' so array_intersect_key() should be used.
+			$result = true;
+			// TODO: Merge screen and screen item updates in to one API::Screen()->update().
+			foreach ($screen['screenitems'] as $key => $item) {
+				if ($item['x'] > $rmv_col) {
+					$item['x'] = $item['x']-1;
+					$result &= API::ScreenItem()->update($item);
+				}
+				elseif ($item['x'] == $rmv_col) {
+					$result &= API::ScreenItem()->delete([$item['screenitemid']]);
+				}
+			}
 
-		$result = DBexecute(
-			'UPDATE screens SET hsize=(hsize-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND hsize>'.zbx_dbstr($rmv_col)
-			);
-		$result &= DBexecute(
-			'DELETE FROM screens_items'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x='.zbx_dbstr($rmv_col)
-		);
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET x=(x-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x>'.zbx_dbstr($rmv_col)
-		);
+			$result &= API::Screen()->update([
+				'screenid' => $screen['screenid'],
+				'hsize' => $screen['hsize']-1,
+			]);
 
-		if ($result) {
-			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-				_('Column deleted')
-			);
-		}
+			if ($result) {
+				add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+					_('Column deleted')
+				);
+			}
 
 		DBend($result);
 	}
