@@ -13,18 +13,30 @@ use constant AH_ALARMED_YES => 'Yes';
 use constant AH_ALARMED_NO => 'No';
 use constant AH_ALARMED_DISABLED => 'Disabled';
 
-our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED ah_get_error
+use constant AH_STATUS_UP => 'Up';
+use constant AH_STATUS_DOWN => 'Down';
+use constant AH_ENABLED_YES => 'Yes';
+use constant AH_ENABLED_NO => 'No';
+
+use constant AH_FALSE_POSITIVE_TRUE => 'True';
+use constant AH_FALSE_POSITIVE_FALSE => 'False';
+
+use constant AH_INCIDENT_ACTIVE => 'Active';
+use constant AH_INCIDENT_ENDED => 'Resolved';
+
+our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED AH_STATUS_UP AH_STATUS_DOWN
+		AH_ENABLED_YES AH_ENABLED_NO AH_FALSE_POSITIVE_TRUE AH_FALSE_POSITIVE_FALSE AH_INCIDENT_ACTIVE
+		AH_INCIDENT_ENDED
+		ah_get_error
 		ah_save_alarmed ah_save_service_availability ah_save_incident_state ah_save_false_positive
 		ah_save_incident_results ah_get_continue_file ah_get_api_tld ah_get_last_audit ah_save_audit
-		ah_encode_pretty_json);
+		ah_encode_pretty_json ah_save_tld_status);
 
 use constant AH_BASE_DIR => '/opt/zabbix/sla';
 
 use constant AH_ROOT_ZONE_DIR => 'zz--root';	# map root zone (.) to something human readable
 
-use constant AH_INCIDENT_ACTIVE => 'Active';
-use constant AH_INCIDENT_ENDED => 'Resolved';
-
+use constant AH_TLD_STATE_FILE => 'state.json';
 use constant AH_ALARMED_FILE => 'alarmed.json';
 use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability.json';
 use constant AH_INCIDENT_STATE_FILE => 'state.json';
@@ -33,9 +45,6 @@ use constant AH_FALSE_POSITIVE_FILE => 'falsePositive.json';
 use constant AH_CONTINUE_FILE => AH_BASE_DIR . '/last_update.txt';	# file with timestamp of last run with --continue
 use constant AH_AUDIT_FILE => AH_BASE_DIR . '/last_audit.txt';		# file containing timestamp of last auditlog
 									# entry that was checked (false_positive change)
-
-use constant AH_FALSE_POSITIVE_FALSE => 'False';
-use constant AH_FALSE_POSITIVE_TRUE => 'True';
 
 use constant AH_JSON_FILE_VERSION => 1;
 
@@ -49,14 +58,12 @@ sub ah_get_error
 sub __make_base_path
 {
 	my $tld = shift;
-	my $service = shift;
 	my $result_path_ptr = shift;	# pointer
 	my $add_path = shift;
 
 	$tld = lc($tld);
-	$service = lc($service);
 
-	my $path = AH_BASE_DIR . "/$tld/data/$service";
+	my $path = AH_BASE_DIR . "/$tld/data";
 	$path .= "/$add_path" if ($add_path);
 
 	make_path($path, {error => \my $err});
@@ -72,6 +79,22 @@ sub __make_base_path
 	return AH_SUCCESS;
 }
 
+sub __make_service_path
+{
+	my $tld = shift;
+	my $service = shift;
+	my $service_path_ptr = shift;	# pointer
+	my $add_path = shift;
+
+	$service = lc($service);
+
+	my $path = $service;
+
+	$path .= "/$add_path" if ($add_path);
+
+	return __make_base_path($tld, $service_path_ptr, $path);
+}
+
 sub __make_inc_path
 {
 	my $tld = shift;
@@ -79,7 +102,7 @@ sub __make_inc_path
 	my $incidentid = shift;
 	my $inc_path_ptr = shift;	# pointer
 
-	return __make_base_path($tld, $service, $inc_path_ptr, "incidents/$incidentid");
+	return __make_service_path($tld, $service, $inc_path_ptr, "incidents/$incidentid");
 }
 
 sub __set_error
@@ -93,7 +116,7 @@ sub __set_file_error
 
 	$error_string = "";
 
-	if (@$err)
+	if (ref($err) eq "ARRAY")
 	{
 		for my $diag (@$err)
 		{
@@ -110,6 +133,8 @@ sub __set_file_error
 			return;
 		}
 	}
+
+$error_string = join('', $err, @_);
 }
 
 sub __write_file
@@ -142,14 +167,14 @@ sub ah_save_alarmed
 	my $service = shift;
 	my $status = shift;
 
-	my $base_path;
+	my $service_path;
 
-	return AH_FAIL unless (__make_base_path($tld, $service, \$base_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_service_path($tld, $service, \$service_path) == AH_SUCCESS);
 
 	# if service is disabled there should be no availability file
 	if ($status eq AH_ALARMED_DISABLED)
 	{
-		my $avail_path = $base_path . '/' . AH_SERVICE_AVAILABILITY_FILE;
+		my $avail_path = $service_path . '/' . AH_SERVICE_AVAILABILITY_FILE;
 
 		if ((-e $avail_path) and not unlink($avail_path))
 		{
@@ -160,7 +185,7 @@ sub ah_save_alarmed
 
 	my $json_ref = {'alarmed' => $status};
 
-	return __write_file($base_path . '/' . AH_ALARMED_FILE, __encode_json($json_ref));
+	return __write_file($service_path . '/' . AH_ALARMED_FILE, __encode_json($json_ref));
 }
 
 sub ah_save_service_availability
@@ -169,13 +194,13 @@ sub ah_save_service_availability
 	my $service = shift;
 	my $downtime = shift;
 
-	my $base_path;
+	my $service_path;
 
-	return AH_FAIL unless (__make_base_path($tld, $service, \$base_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_service_path($tld, $service, \$service_path) == AH_SUCCESS);
 
 	my $json_ref = {'serviceAvailability' => $downtime};
 
-	return __write_file($base_path . '/' . AH_SERVICE_AVAILABILITY_FILE, __encode_json($json_ref));
+	return __write_file($service_path . '/' . AH_SERVICE_AVAILABILITY_FILE, __encode_json($json_ref));
 }
 
 sub __incident_id
@@ -326,6 +351,66 @@ sub __encode_json
 sub ah_encode_pretty_json
 {
 	return JSON->new->utf8(1)->pretty(1)->encode(shift);
+}
+
+sub ah_save_tld_status
+{
+	my $tld = shift;
+	my $tld_ref = shift;
+
+	my $base_path;
+
+	return AH_FAIL unless (__make_base_path($tld, \$base_path) == AH_SUCCESS);
+
+	my $buf;
+	my $json_ref;
+	my $file = $base_path . '/' . AH_TLD_STATE_FILE;
+
+	if (__read_file($file, \$buf) == AH_SUCCESS)
+	{
+		$json_ref = decode_json($buf);
+	}
+	else
+	{
+		$json_ref = {'tld' => $tld};
+	}
+
+	$json_ref->{'status'} = $tld_ref->{'status'};
+
+	foreach my $service (keys(%{$tld_ref->{'services'}}))
+	{
+		my $service_idx = -1;
+
+		if ($json_ref->{'testedService'})
+		{
+			my $idx = 0;
+			foreach my $service_ptr (@{$json_ref->{'testedService'}})
+			{
+				if (lc($service) eq lc($service_ptr->{'service'}))
+				{
+					$service_idx = $idx;
+					last;
+				}
+
+				$idx++;
+			}
+		}
+
+		if ($service_idx == -1)
+		{
+			# add
+			push(@{$json_ref->{'testedService'}}, $tld_ref->{'services'}->{$service});
+			$service_idx = scalar(@{$json_ref->{'testedService'}}) - 1;
+		}
+		else
+		{
+			$json_ref->{'testedService'}->[$service_idx] = $tld_ref->{'services'}->{$service};
+		}
+
+		$json_ref->{'testedService'}->[$service_idx]->{'service'} = uc($service);
+	}
+
+	return __write_file($file, __encode_json($json_ref));
 }
 
 sub __read_file

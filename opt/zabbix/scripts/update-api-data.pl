@@ -16,7 +16,7 @@ use constant JSON_RDDS_SUBSERVICE => 'subService';
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n');
 
 # do not write any logs
 setopt('nolog');
@@ -121,7 +121,14 @@ foreach my $service (keys(%services))
 	fail("$service delay (", $services{$service}{'delay'}, ") is not multiple of 60") unless ($services{$service}{'delay'} % 60 == 0);
 }
 
-my $now = time();
+my $now = opt('now') ? getopt('now') : time();
+
+dbg("now:", ts_full($now));
+
+# rolling week incidents
+my ($rollweek_from, $rollweek_till) = get_rollweek_bounds(getopt('now'));
+
+wrn("rolling week from ", ts_full($rollweek_from), " till ", ts_full($rollweek_till));
 
 my $tlds_ref;
 if (opt('tld'))
@@ -252,12 +259,12 @@ if (!$from)
     exit(0);
 }
 
-my $tlds_processed = 0;
+my $tlds_to_process = 0;
 foreach (@$tlds_ref)
 {
-	$tlds_processed++;
+	$tlds_to_process++;
 
-	last if (opt('limit') && $tlds_processed == getopt('limit'));
+	last if (opt('limit') && $tlds_to_process == getopt('limit'));
 
 	# NB! This is needed in order to set the value globally.
 	$tld = $_;
@@ -274,18 +281,7 @@ foreach (@$tlds_ref)
 	{
 		if (tld_service_enabled($tld, $service) != SUCCESS)
 		{
-			if (opt('dry-run'))
-			{
-				__prnt(uc($service), ' ', AH_ALARMED_DISABLED);
-			}
-			else
-			{
-				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
-				{
-					fail("cannot save alarmed: ", ah_get_error());
-				}
-			}
-
+			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
 			next;
 		}
 
@@ -296,31 +292,20 @@ foreach (@$tlds_ref)
 		if ($lastclock == E_FAIL)
 		{
 			wrn(uc($service), ": configuration error, item $lastclock_key not found");
+			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
 			next;
 		}
 
 		if ($lastclock == 0)
 		{
 			wrn(uc($service), ": no rolling week data in the database yet");
-
-			if (opt('dry-run'))
-			{
-				__prnt(uc($service), " DISABLED");
-			}
-			else
-			{
-				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
-				{
-					fail("cannot save alarmed: ", ah_get_error());
-				}
-			}
-
+			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
 			next;
 		}
 
 		dbg("lastclock:$lastclock");
 
-		$servicedata->{$tld}->{$service}->{'lastclock'} = $lastclock;
+		$servicedata->{$tld}->{'services'}->{$service}->{'lastclock'} = $lastclock;
 	}
 }
 
@@ -346,14 +331,36 @@ foreach (keys(%$servicedata))
 
 	my $ah_tld = ah_get_api_tld($tld);
 
-	foreach my $service (keys(%{$servicedata->{$tld}}))
+	my $tld_status->{'status'} = AH_STATUS_UP;
+
+	foreach my $service (keys(%{$servicedata->{$tld}->{'services'}}))
 	{
-		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
+		my $lastclock = $servicedata->{$tld}->{'services'}->{$service}->{'lastclock'};
+		my $alarmed = $servicedata->{$tld}->{'services'}->{$service}->{'alarmed'};
 
 		my $delay = $services{$service}{'delay'};
 		my $service_from = $services{$service}{'from'};
 		my $service_till = $services{$service}{'till'};
 		my $avail_key = $services{$service}{'avail_key'};
+
+		if (defined($alarmed) && $alarmed eq AH_ALARMED_DISABLED)
+		{
+			$tld_status->{'services'}->{$service}->{'enabled'} = AH_ENABLED_NO;
+
+			if (opt('dry-run'))
+			{
+				__prnt(uc($service), ' alarmed:', AH_ALARMED_DISABLED);
+			}
+			else
+			{
+				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				{
+					fail("cannot save alarmed: ", ah_get_error());
+				}
+			}
+
+			next;
+		}
 
 		if (!$service_from || !$service_till)
 		{
@@ -372,9 +379,17 @@ foreach (keys(%$servicedata))
 			next;
 		}
 
-		# we need down time in minutes, not percent, that's why we can't use "rsm.slv.$service.rollweek" value
-		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
-		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
+		my $downtime_key = "rsm.slv.$service.downtime";
+		my $downtime;
+
+		# we must have a special calculation key for that ($downtime_key)
+		#my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
+
+		if (__get_downtime($hostid, $service, $downtime_key, getopt('now'), \$downtime, \$errbuf) != SUCCESS)
+		{
+			wrn("configuration error: service $service enabled but item \"$downtime_key\" was not found: $errbuf");
+			$downtime = 0.0;
+		}
 
 		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') || opt('debug'));
 
@@ -395,26 +410,29 @@ foreach (keys(%$servicedata))
 		# get availability
 		my $incidents = get_incidents($avail_itemid, $now);
 
-		my $alarmed_status = AH_ALARMED_NO;
+		$alarmed = AH_ALARMED_NO;
 		if (scalar(@$incidents) != 0)
 		{
 			if ($incidents->[0]->{'false_positive'} == 0 && !defined($incidents->[0]->{'end'}))
 			{
-				$alarmed_status = AH_ALARMED_YES;
+				$alarmed = AH_ALARMED_YES;
 			}
 		}
 
 		if (opt('dry-run'))
 		{
-			__prnt(uc($service), " alarmed:$alarmed_status");
+			__prnt(uc($service), " alarmed:$alarmed");
 		}
 		else
 		{
-			if (ah_save_alarmed($ah_tld, $service, $alarmed_status) != AH_SUCCESS)
+			if (ah_save_alarmed($ah_tld, $service, $alarmed) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
 		}
+
+		$tld_status->{'services'}->{$service}->{'enabled'} = AH_ENABLED_YES;
+		$tld_status->{'services'}->{$service}->{'status'} = (($alarmed eq AH_ALARMED_YES) ? AH_STATUS_DOWN : AH_STATUS_UP);
 
 		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref);
 
@@ -465,7 +483,7 @@ foreach (keys(%$servicedata))
 				" from history_uint".
 				" where itemid=$avail_itemid".
 					" and ".sql_time_condition($start, $end).
-				" order by clock");
+				" order by itemid,clock");
 
 			my @test_results;
 
@@ -507,7 +525,7 @@ foreach (keys(%$servicedata))
 					}
 					else
 					{
-						wrn("unknown status: $value (expected UP (0) or DOWN (1))");
+						wrn("unknown status: $value (expected UP (" . UP . ") or DOWN (" . DOWN . "))");
 					}
 				}
 
@@ -886,6 +904,43 @@ foreach (keys(%$servicedata))
 				fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
 			}
 		}
+
+		# if we are here the service is enabled, check tld status
+		if ($tld_status->{'services'}->{$service}->{'status'} eq AH_STATUS_DOWN)
+		{
+			$tld_status->{'status'} = AH_STATUS_DOWN;
+		}
+
+		$tld_status->{'services'}->{$service}->{'emergencyThreshold'} = $downtime;
+
+		# rolling week incidents
+		my $rw_incidents = get_incidents($avail_itemid, $rollweek_from, $rollweek_till);
+
+		foreach (@$incidents)
+		{
+			my $hash =
+			{
+				'incidentID' => $_->{'start'} . '.' . $_->{'eventid'},
+				'startTime' => $_->{'start'},
+				'falsePositive' => ($_->{'false_positive'} == 0 ? AH_FALSE_POSITIVE_FALSE : AH_FALSE_POSITIVE_TRUE),
+				'state' => ($_->{'end'} ? AH_INCIDENT_ENDED : AH_INCIDENT_ACTIVE),
+				'endTime' => $_->{'end'}
+			};
+
+			push(@{$tld_status->{'services'}->{$service}->{'incidents'}}, $hash);
+		}
+	}
+
+	if (opt('dry-run'))
+	{
+		__prnt("status: ", $tld_status->{'status'});
+	}
+	else
+	{
+		if (ah_save_tld_status($ah_tld, $tld_status) != AH_SUCCESS)
+		{
+			fail("cannot save TLD status: ", ah_get_error());
+		}
 	}
 }
 # unset TLD (for the logs)
@@ -1107,6 +1162,46 @@ sub __get_config_minclock
 	fail("no data in the database yet") unless ($minclock);
 
 	return $minclock;
+}
+
+sub __get_downtime
+{
+	my $hostid = shift;
+	my $service = shift;
+	my $key = shift;
+	my $clock = shift;
+	my $downtime_ref = shift;
+	my $errbuf_ref = shift;
+
+	my $errbuf;
+
+	my $itemid = get_itemid_by_hostid($hostid, $key, $errbuf_ref);
+
+	return E_FAIL if ($itemid < 0);
+
+	$clock = time() unless($clock);
+
+	my $from = truncate_from($clock);
+	my $till = $from + 59;
+
+	my $rows_ref = db_select(
+		"select value".
+		" from history".
+		" where itemid=$itemid".
+			" and ".sql_time_condition($from, $till).
+		" order by itemid,clock");
+
+	if (scalar(@$rows_ref) == 0)
+	{
+		wrn(uc($service), ": no downtime value in the database between ", ts_full($from), " and ", ts_full($till), ", using 0.0 ($key)");
+		$$downtime_ref = 0.0;
+	}
+	else
+	{
+		$$downtime_ref = $rows_ref->[0]->[0];
+	}
+
+	return SUCCESS;
 }
 
 __END__

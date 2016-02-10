@@ -37,7 +37,7 @@ my $rows_ref = db_select(
 	" where h.host='$tld'".
 		" and i.hostid=h.hostid".
 		" and i.itemid=hi.itemid".
-		" and i.key_ like 'rsm.slv.%.avail'".
+		" and i.key_ like 'rsm.slv.%'".
 		" and hi.clock between $from and $till".
         " order by hi.clock,hi.ns");
 

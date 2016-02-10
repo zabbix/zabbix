@@ -972,25 +972,16 @@ sub get_interval_bounds
 # Get time bounds of the rolling week, shift back to guarantee all probe results.
 sub get_rollweek_bounds
 {
-	my $from = shift;	# beginning of rolling week (till current time if not specified)
+	my $now = shift;	# specify different current time
 
 	my $rollweek_seconds = __get_macro('{$RSM.ROLLWEEK.SECONDS}');
 
-	my $till;
+	my ($from, $till);
 
-	if ($from)
-	{
-		$from = truncate_from($from);
-		$till = $from + $rollweek_seconds;
-	}
-	else
-	{
-		# select till current time
-		$till = int(time()) - ROLLWEEK_SHIFT_BACK;
+	$now = int(time()) unless ($now);
 
-		$till = truncate_from($till);
-		$from = $till - $rollweek_seconds;
-	}
+	$till = truncate_from($now) - ROLLWEEK_SHIFT_BACK;
+	$from = $till - $rollweek_seconds;
 
 	$till--;
 
