@@ -686,6 +686,7 @@ abstract class CItemGeneral extends CApiService {
 				$updateGraphs[] = $graph;
 			}
 		}
+		unset($graph);
 
 		// if there are graphs, that have an y*_itemid column set, but the
 		// y*_type column is not set to GRAPH_YAXIS_TYPE_ITEM_VALUE, set y*_itemid to NULL.
