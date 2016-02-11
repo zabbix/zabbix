@@ -94,7 +94,7 @@ class CSchemaValidator extends CValidator {
 			unset($unvalidatedFields[$field]);
 
 			// if the value is present
-			if (isset($array[$field])) {
+			if (array_key_exists($field, $array)) {
 				// validate it if a validator is given, skip it otherwise
 				if ($validator && !$validator->validate($array[$field])) {
 					$this->setError($validator->getError());
@@ -103,7 +103,7 @@ class CSchemaValidator extends CValidator {
 				}
 			}
 			// if no value is given, check if it's required
-			elseif (isset($required[$field])) {
+			elseif (array_key_exists($field, $required)) {
 				$this->error($this->messageRequired, $field);
 
 				return false;

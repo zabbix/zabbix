@@ -40,7 +40,7 @@ class CPartialSchemaValidator extends CSchemaValidator implements CPartialValida
 			unset($unvalidatedFields[$field]);
 
 			// if the value is present
-			if (isset($array[$field])) {
+			if (array_key_exists($field, $array)) {
 				// validate it if a validator is given, skip it otherwise
 				if ($validator && !$validator->validate($array[$field])) {
 					$this->setError($validator->getError());
