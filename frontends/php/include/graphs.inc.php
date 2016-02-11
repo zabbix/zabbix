@@ -209,28 +209,28 @@ function get_min_itemclock_by_itemid($items) {
 		if ($itemids) {
 			switch ($type) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					$table_name = ($max['history'] > $max['trends']) ? 'history' : 'trends';
+					$sql_from = ($max['history'] > $max['trends']) ? 'history' : 'trends';
 					break;
 				case ITEM_VALUE_TYPE_STR:
-					$table_name = 'history_str';
+					$sql_from = 'history_str';
 					break;
 				case ITEM_VALUE_TYPE_LOG:
-					$table_name = 'history_log';
+					$sql_from = 'history_log';
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					$table_name = ($max['history'] > $max['trends']) ? 'history_uint' : 'trends_uint';
+					$sql_from = ($max['history'] > $max['trends']) ? 'history_uint' : 'trends_uint';
 					break;
 				case ITEM_VALUE_TYPE_TEXT:
-					$table_name = 'history_text';
+					$sql_from = 'history_text';
 					break;
 				default:
-					$table_name = 'history';
+					$sql_from = 'history';
 			}
 
 			foreach ($itemids as $itemid) {
 				$sql_unions[] =
 					'SELECT MIN(h.clock) AS clock'.
-					' FROM '.$table_name.' h'.
+					' FROM '.$sql_from.' h'.
 					' WHERE h.itemid='.zbx_dbstr($itemid);
 			}
 		}
