@@ -258,7 +258,9 @@ class CScreenBuilder {
 						'itemids' => $options['itemids'],
 						'webitems' => true,
 						'selectHosts' => ['name'],
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+						'output' => [
+							'itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid', 'history', 'trends'
+						],
 						'preservekeys' => true
 					]);
 
