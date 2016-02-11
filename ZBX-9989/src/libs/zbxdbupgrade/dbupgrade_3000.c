@@ -17,17 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package com.zabbix.gateway;
+#include "common.h"
+#include "db.h"
+#include "zbxdbupgrade.h"
+#include "dbupgrade.h"
 
-class GeneralInformation
+/*
+ * 3.0 maintenance database patches
+ */
+
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_3000000(void)
 {
-	public static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	public static final String REVISION_DATE = "10 February 2016";
-	public static final String REVISION = "{ZABBIX_REVISION}";
-	public static final String VERSION = "3.0.0rc2";
-
-	public static void printVersion()
-	{
-		System.out.printf("%s v%s (revision %s) (%s)\n", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE);
-	}
+	return SUCCEED;
 }
+
+#endif
+
+DBPATCH_START(3000)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(3000000, 0, 1)
+
+DBPATCH_END()
