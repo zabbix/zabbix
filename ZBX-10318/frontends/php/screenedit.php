@@ -246,19 +246,25 @@ elseif (hasRequest('delete')) {
 	$result = DBend($screenitemid);
 	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
-elseif (isset($_REQUEST['add_row'])) {
+elseif (hasRequest('add_row')) {
 	DBstart();
 
-	$result = DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
-
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		'vsize' => $screen['vsize']+1,
+	]);
 	$add_row = getRequest('add_row', 0);
 	if ($screen['vsize'] > $add_row) {
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET y=(y+1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y>='.zbx_dbstr($add_row)
-		);
+		$screen_items = $screen['screenitems'];
+		usort($screen_items, function($a, $b) {
+			return 0-bccomp($a['y'], $b['y']);
+		});
+		foreach ($screen_items as $item) {
+			if ($item['y'] >= $add_row) {
+				$item['y'] = $item['y']+1;
+				$result &= API::ScreenItem()->update($item);
+			}
+		}
 	}
 
 	if ($result) {
@@ -269,19 +275,27 @@ elseif (isset($_REQUEST['add_row'])) {
 
 	DBend($result);
 }
-elseif (isset($_REQUEST['add_col'])) {
+elseif (hasRequest('add_col')) {
+	// Add screen column
+
 	DBstart();
 
-	$result = DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
-
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		'hsize' => $screen['hsize']+1,
+	]);
 	$add_col = getRequest('add_col', 0);
 	if ($screen['hsize'] > $add_col) {
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET x=(x+1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x>='.zbx_dbstr($add_col)
-		);
+		$screen_items = $screen['screenitems'];
+		usort($screen_items, function($a, $b) {
+			return 0-bccomp($a['x'], $b['x']);
+		});
+		foreach ($screen_items as $item) {
+			if ($item['x'] >= $add_col) {
+				$item['x'] = $item['x']+1;
+				$result &= API::ScreenItem()->update($item);
+			}
+		}
 	}
 
 	if ($result) {
@@ -297,11 +311,15 @@ elseif (hasRequest('rmv_row') && $screen['vsize'] > getRequest('rmv_row')) {
 
 	$rmv_row = getRequest('rmv_row', 0);
 	if ($screen['vsize'] > 1) {
-
 		DBstart();
+
 		$result = true;
 
-		foreach ($screen['screenitems'] as $key => $item) {
+		$screen_items = $screen['screenitems'];
+		usort($screen_items, function($a, $b) {
+			return bccomp($a['y'], $b['y']);
+		});
+		foreach ($screen_items as $item) {
 			if ($item['y'] > $rmv_row) {
 				$item['y'] = $item['y']-1;
 				$result &= API::ScreenItem()->update($item);
@@ -334,9 +352,14 @@ elseif (hasRequest('rmv_col') && $screen['hsize'] > getRequest('rmv_col')) {
 	$rmv_col = getRequest('rmv_col', 0);
 	if ($screen['hsize'] > 1) {
 		DBstart();
+
 		$result = true;
 
-		foreach ($screen['screenitems'] as $key => $item) {
+		$screen_items = $screen['screenitems'];
+		usort($screen_items, function($a, $b) {
+			return bccomp($a['x'], $b['x']);
+		});
+		foreach ($screen_items as $item) {
 			if ($item['x'] > $rmv_col) {
 				$item['x'] = $item['x']-1;
 				$result &= API::ScreenItem()->update($item);
