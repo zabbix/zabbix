@@ -121,13 +121,18 @@ if (hasRequest('add') || hasRequest('update')) {
 	$dChecks = getRequest('dchecks', []);
 	$uniq = getRequest('uniqueness_criteria', 0);
 
-	foreach ($dChecks as $dcnum => $check) {
+	foreach ($dChecks as $dcnum => &$check) {
 		if (substr($check['dcheckid'], 0, 3) === 'new') {
-			unset($dChecks[$dcnum]['dcheckid']);
+			unset($check['dcheckid']);
 		}
 
-		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
+		$check['uniq'] = ($uniq == $dcnum) ? 1 : 0;
+
+		if (array_key_exists('name', $check)) {
+			unset($check['name']);
+		}
 	}
+	unset($check);
 
 	$discoveryRule = [
 		'name' => getRequest('name'),
