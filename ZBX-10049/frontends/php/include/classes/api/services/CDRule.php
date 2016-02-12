@@ -244,7 +244,7 @@ class CDRule extends CApiService {
 				]),
 				'snmpv3_authprotocol' => new CStringValidator([
 					'regex' => '/^(0|1)$/',
-					'messageEmpty' => _('Empty discovery check "snmpv3_authprotocol" field for discovery rule "%1$s".'),
+					'messageEmpty' => _('Empty discovery check field "snmpv3_authprotocol" for discovery rule "%1$s".'),
 					'messageRegex' => _(
 						'Incorrect discovery check "snmpv3_authprotocol" value for discovery rule "%1$s".'
 					),
@@ -266,7 +266,7 @@ class CDRule extends CApiService {
 				]),
 				'snmpv3_privprotocol' => new CStringValidator([
 					'regex' => '/^(0|1)$/',
-					'messageEmpty' => _('Empty discovery check "snmpv3_privprotocol" field for discovery rule "%1$s".'),
+					'messageEmpty' => _('Empty discovery check field "snmpv3_privprotocol" for discovery rule "%1$s".'),
 					'messageRegex' => _(
 						'Incorrect discovery check "snmpv3_privprotocol" value for discovery rule "%1$s".'
 					),
@@ -277,7 +277,7 @@ class CDRule extends CApiService {
 				'snmpv3_securitylevel' => new CStringValidator([
 					'regex' => '/^([0-2])$/',
 					'messageEmpty' => _(
-						'Empty discovery check "snmpv3_securitylevel" field for discovery rule "%1$s".'
+						'Empty discovery check field "snmpv3_securitylevel" for discovery rule "%1$s".'
 					),
 					'messageRegex' => _(
 						'Incorrect discovery check "snmpv3_securitylevel" value for discovery rule "%1$s".'
