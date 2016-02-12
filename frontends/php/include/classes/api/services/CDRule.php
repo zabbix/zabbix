@@ -396,7 +396,7 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$drule_names_changed = [];
+		$check_names = [];
 
 		// Fetch missing data from DB.
 		$drules = $this->extendFromObjects(zbx_toHash($drules, 'druleid'), $db_drules, ['name']);
@@ -412,32 +412,32 @@ class CDRule extends CApiService {
 			$drule_validator->setObjectName(array_key_exists('name', $drule) ? $drule['name'] : '');
 			$this->checkPartialValidator($drule, $drule_validator);
 
-			// Check drule name duplicates in input data.
 			if ($db_drules[$drule['druleid']]['name'] !== $drule['name']) {
-				if (array_key_exists($drule['name'], $drule_names_changed)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Discovery rule "%1$s" already exists.', $drule['name'])
-					);
-				}
-				else {
-					$drule_names_changed[$drule['name']] = $drule['name'];
-				}
+				$check_names[] = $drule;
 			}
 		}
 
-		// Check drule name duplicates in DB.
-		if ($drule_names_changed) {
-			$dublicate_names = API::getApiService()->select($this->tableName(), [
+		if ($check_names) {
+			// Check drule name duplicates in input data.
+			$dublicate_names = CArrayHelper::findDuplicate($check_names, 'name');
+			if ($dublicate_names) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Discovery rule "%1$s" already exists.', $dublicate_names['name'])
+				);
+			}
+
+			// Check drule name duplicates in DB.
+			$db_dublicate_names = API::getApiService()->select($this->tableName(), [
 				'output' => ['name'],
-				'filter' => ['name' => $drule_names_changed],
+				'filter' => ['name' => zbx_objectValues($check_names, 'name')],
 				'limit' => 1
 			]);
 
-			if ($dublicate_names) {
-				$dublicate_name = reset($dublicate_names);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.',
-					$dublicate_name['name']
-				));
+			if ($db_dublicate_names) {
+				$db_dublicate_name = reset($db_dublicate_names);
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Discovery rule "%1$s" already exists.', $db_dublicate_name['name'])
+				);
 			}
 		}
 
