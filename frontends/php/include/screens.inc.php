@@ -78,6 +78,117 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 	return false;
 }
 
+/**
+ * Add screen row or column
+ *
+ * @param array $screen
+ * @param string $message
+ * @param string $group_type with value 'add_row' or 'add_col'
+ */
+function addScreenCellGroup($screen, $message, $group_type) {
+	xdebug_start_trace();
+	$add_num = getRequest($group_type, 0);
+	switch ($group_type) {
+		case 'add_row':
+			$size = 'vsize';
+			$axis = 'y';
+			break;
+		case 'add_col':
+			$size = 'hsize';
+			$axis = 'x';
+			break;
+		default:
+			return;
+	}
+	DBstart();
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		$size => $screen[$size]+1,
+	]);
+
+	if ($add_num < $screen[$size]) {
+		$screen_items = $screen['screenitems'];
+
+		usort($screen_items, function($a, $b) use ($axis) {
+			return bccomp($b[$axis], $a[$axis]);
+		});
+
+		foreach ($screen_items as $item) {
+			if ($item[$axis] >= $add_num) {
+				$item[$axis] = $item[$axis]+1;
+				$result &= API::ScreenItem()->update($item);
+			}
+		}
+	}
+
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			$message
+		);
+	}
+	DBend($result);
+	xdebug_stop_trace();
+}
+
+/**
+ * Remove screen row or column.
+ *
+ * @param array $screen
+ * @param string $message
+ * @param string $group_type with value 'add_row' or 'add_col'
+ */
+function removeScreenCellGroup($screen, $message, $group_type) {
+	$rmv_num = getRequest($group_type, 0);
+	switch ($group_type) {
+		case 'rmv_row':
+			$size = 'vsize';
+			$axis = 'y';
+			break;
+		case 'rmv_col':
+			$size = 'hsize';
+			$axis = 'x';
+			break;
+		default:
+			return;
+	}
+
+	if ($screen[$size] == 1) {
+		error(_('Screen should contain at least one row and column.'));
+		show_error_message(_('Impossible to remove last row and column.'));
+	}
+	elseif ($rmv_num < $screen[$size]) {
+		DBstart();
+		$result = true;
+		$screen_items = $screen['screenitems'];
+
+		usort($screen_items, function($a, $b) use ($axis) {
+			return bccomp($a[$axis], $b[$axis]);
+		});
+
+		foreach ($screen_items as $item) {
+			if ($item[$axis] > $rmv_num) {
+				$item[$axis] = $item[$axis]-1;
+				$result &= API::ScreenItem()->update($item);
+			}
+			elseif ($item[$axis] == $rmv_num) {
+				$result &= API::ScreenItem()->delete([$item['screenitemid']]);
+			}
+		}
+
+		$result &= API::Screen()->update([
+			'screenid' => $screen['screenid'],
+			$size => $screen[$size]-1,
+		]);
+
+		if ($result) {
+			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+				$message
+			);
+		}
+		DBend($result);
+	}
+}
+
 function getSlideshowScreens($slideshowId, $step) {
 	$dbSlides = DBfetch(DBselect(
 		'SELECT MIN(s.step) AS min_step,MAX(s.step) AS max_step'.

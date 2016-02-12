@@ -247,144 +247,16 @@ elseif (hasRequest('delete')) {
 	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
 elseif (hasRequest('add_row')) {
-	DBstart();
-
-	$result = API::Screen()->update([
-		'screenid' => $screen['screenid'],
-		'vsize' => $screen['vsize']+1,
-	]);
-	$add_row = getRequest('add_row', 0);
-	if ($screen['vsize'] > $add_row) {
-		$screen_items = $screen['screenitems'];
-		usort($screen_items, function($a, $b) {
-			return 0-bccomp($a['y'], $b['y']);
-		});
-		foreach ($screen_items as $item) {
-			if ($item['y'] >= $add_row) {
-				$item['y'] = $item['y']+1;
-				$result &= API::ScreenItem()->update($item);
-			}
-		}
-	}
-
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Row added')
-		);
-	}
-
-	DBend($result);
+	addScreenCellGroup($screen, _('Row added'), 'add_row');
 }
 elseif (hasRequest('add_col')) {
-	// Add screen column
-
-	DBstart();
-
-	$result = API::Screen()->update([
-		'screenid' => $screen['screenid'],
-		'hsize' => $screen['hsize']+1,
-	]);
-	$add_col = getRequest('add_col', 0);
-	if ($screen['hsize'] > $add_col) {
-		$screen_items = $screen['screenitems'];
-		usort($screen_items, function($a, $b) {
-			return 0-bccomp($a['x'], $b['x']);
-		});
-		foreach ($screen_items as $item) {
-			if ($item['x'] >= $add_col) {
-				$item['x'] = $item['x']+1;
-				$result &= API::ScreenItem()->update($item);
-			}
-		}
-	}
-
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Column added')
-		);
-	}
-
-	DBend($result);
+	addScreenCellGroup($screen, _('Column added'), 'add_col');
 }
-elseif (hasRequest('rmv_row') && $screen['vsize'] > getRequest('rmv_row')) {
-	// Remove screen row.
-
-	$rmv_row = getRequest('rmv_row', 0);
-	if ($screen['vsize'] > 1) {
-		DBstart();
-
-		$result = true;
-
-		$screen_items = $screen['screenitems'];
-		usort($screen_items, function($a, $b) {
-			return bccomp($a['y'], $b['y']);
-		});
-		foreach ($screen_items as $item) {
-			if ($item['y'] > $rmv_row) {
-				$item['y'] = $item['y']-1;
-				$result &= API::ScreenItem()->update($item);
-			}
-			elseif ($item['y'] == $rmv_row) {
-				$result &= API::ScreenItem()->delete([$item['screenitemid']]);
-			}
-		}
-
-		$result &= API::Screen()->update([
-			'screenid' => $screen['screenid'],
-			'vsize' => $screen['vsize']-1,
-		]);
-
-		if ($result) {
-			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-				_('Row deleted')
-			);
-		}
-		DBend($result);
-	}
-	else {
-		error(_('Screen should contain at least one row and column.'));
-		show_error_message(_('Impossible to remove last row and column.'));
-	}
+elseif (hasRequest('rmv_row')) {
+	removeScreenCellGroup($screen, _('Row deleted'), 'rmv_row');
 }
-elseif (hasRequest('rmv_col') && $screen['hsize'] > getRequest('rmv_col')) {
-	// Remove screen column.
-
-	$rmv_col = getRequest('rmv_col', 0);
-	if ($screen['hsize'] > 1) {
-		DBstart();
-
-		$result = true;
-
-		$screen_items = $screen['screenitems'];
-		usort($screen_items, function($a, $b) {
-			return bccomp($a['x'], $b['x']);
-		});
-		foreach ($screen_items as $item) {
-			if ($item['x'] > $rmv_col) {
-				$item['x'] = $item['x']-1;
-				$result &= API::ScreenItem()->update($item);
-			}
-			elseif ($item['x'] == $rmv_col) {
-				$result &= API::ScreenItem()->delete([$item['screenitemid']]);
-			}
-		}
-
-		$result &= API::Screen()->update([
-			'screenid' => $screen['screenid'],
-			'hsize' => $screen['hsize']-1,
-		]);
-
-		if ($result) {
-			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-				_('Column deleted')
-			);
-		}
-		DBend($result);
-	}
-	else {
-		error(_('Screen should contain at least one row and column.'));
-		show_error_message(_('Impossible to remove last row and column.'));
-	}
+elseif (hasRequest('rmv_col')) {
+	removeScreenCellGroup($screen, _('Column deleted'), 'rmv_col');
 }
 
 /*
