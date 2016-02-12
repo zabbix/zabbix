@@ -28,17 +28,6 @@ typedef long	ssize_t;
 #	endif
 #endif
 
-#if defined(HAVE_POLARSSL)
-#	if defined(_WINDOWS) && defined(uint32_t)
-#		undef uint32_t
-#	endif
-#	include <polarssl/ssl.h>
-#elif defined(HAVE_GNUTLS)
-#	include <gnutls/gnutls.h>
-#elif defined(HAVE_OPENSSL)
-#	include <openssl/ssl.h>
-#endif
-
 #if defined(_WINDOWS)
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
@@ -74,6 +63,10 @@ zbx_buf_type_t;
 #define ZBX_STAT_BUF_LEN	2048
 #define ZBX_SOCKET_PEER_BUF_LEN	129
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+typedef struct ZBX_TLS_CTX	*zbx_tls_context_t;
+#endif
+
 typedef struct
 {
 	ZBX_SOCKET			socket;
@@ -81,14 +74,8 @@ typedef struct
 	size_t				read_bytes;
 	char				*buffer;
 	char				*next_line;
-#if defined(HAVE_POLARSSL)
-	ssl_context			*tls_ctx;
-#elif defined(HAVE_GNUTLS)
-	gnutls_session_t		tls_ctx;
-	gnutls_psk_client_credentials_t	tls_psk_client_creds;
-	gnutls_psk_server_credentials_t	tls_psk_server_creds;
-#elif defined(HAVE_OPENSSL)
-	SSL				*tls_ctx;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_context_t		tls_ctx;
 #endif
 	unsigned int 			connection_type;	/* type of connection actually established: */
 								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */

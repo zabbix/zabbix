@@ -22,10 +22,6 @@
 #include "log.h"
 #include "../zbxcrypto/tls_tcp.h"
 
-#if defined(HAVE_POLARSSL)
-#	include <polarssl/error.h>
-#endif
-
 #if defined(HAVE_IPV6)
 #	define ZBX_SOCKADDR struct sockaddr_storage
 #else
@@ -228,6 +224,10 @@ static void	zbx_socket_clean(zbx_socket_t *s)
 	memset(s, 0, sizeof(zbx_socket_t));
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_ctx_alloc(&s->tls_ctx);
+#endif
 }
 
 /******************************************************************************
@@ -243,6 +243,10 @@ static void	zbx_socket_free(zbx_socket_t *s)
 {
 	if (ZBX_BUF_TYPE_DYN == s->buf_type)
 		zbx_free(s->buffer);
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_free(s->tls_ctx);
+#endif
 }
 
 /******************************************************************************
@@ -628,154 +632,6 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
-static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
-{
-#if defined(_WINDOWS)
-	double	sec;
-#endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL == s->tls_ctx)		/* unencrypted connection */
-	{
-#endif
-		ssize_t	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		if (ZBX_PROTO_ERROR == (res = ZBX_TCP_WRITE(s->socket, buf, len)))
-		{
-			zbx_set_socket_strerror("ZBX_TCP_WRITE() failed: %s",
-					strerror_from_system(zbx_socket_last_error()));
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-		}
-
-		return res;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	}
-	else	/* TLS connection */
-	{
-#if defined(HAVE_POLARSSL)
-		int	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		do
-		{
-			res = ssl_write(s->tls_ctx, (const unsigned char *)buf, len);
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-		}
-		while (POLARSSL_ERR_NET_WANT_WRITE == res && 0 == zbx_timed_out);
-
-		if (1 == zbx_timed_out)
-		{
-			zbx_set_socket_strerror("ssl_write() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-
-		if (0 > res)
-		{
-			char	err[128];	/* 128 bytes are enough for PolarSSL error messages */
-
-			polarssl_strerror(res, err, sizeof(err));
-			zbx_set_socket_strerror("ssl_write() failed: %s", err);
-
-			return ZBX_PROTO_ERROR;
-		}
-
-		return (ssize_t)res;
-#elif defined(HAVE_GNUTLS)
-		ssize_t	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		do
-		{
-			res = gnutls_record_send(s->tls_ctx, buf, len);
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-		}
-		while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && 0 == zbx_timed_out);
-
-		if (1 == zbx_timed_out)
-		{
-			zbx_set_socket_strerror("gnutls_record_send() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-
-		if (0 > res)
-		{
-			zbx_set_socket_strerror("gnutls_record_send() failed: " ZBX_FS_SSIZE_T " %s",
-					(zbx_fs_ssize_t)res, gnutls_strerror(res));
-
-			return ZBX_PROTO_ERROR;
-		}
-
-		return res;
-#elif defined(HAVE_OPENSSL)
-		int	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		if (0 >= (res = SSL_write(s->tls_ctx, buf, (int)len)))
-		{
-			/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
-			/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
-
-			int	error_code;
-
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-			if (1 == zbx_timed_out)
-			{
-				zbx_set_socket_strerror("SSL_write() timed out");
-				return ZBX_PROTO_ERROR;
-			}
-
-			error_code = SSL_get_error(s->tls_ctx, res);
-
-			if (0 == res && SSL_ERROR_ZERO_RETURN == error_code)
-			{
-				zbx_set_socket_strerror("connection closed during write");
-			}
-			else
-			{
-				char	*error = NULL;
-				size_t	error_alloc = 0, error_offset = 0;
-
-				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS write returned error code"
-						" %d:", error_code);
-				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-				zbx_set_socket_strerror("%s: %s", error, info_buf);
-				zbx_free(error);
-			}
-
-			return ZBX_PROTO_ERROR;
-		}
-
-		return (ssize_t)res;
-#endif
-	}
-#endif
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_send_ext                                                 *
@@ -811,6 +667,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 	zbx_uint64_t	len64_le;
 	ssize_t		bytes_sent = 0, written = 0;
 	size_t		send_bytes;
+	char		*error = NULL;
 	int		ret = SUCCEED;
 
 	if (0 != timeout)
@@ -835,9 +692,10 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 		while (written < (ssize_t)send_bytes)
 		{
-			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, header_buf + written,
+			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, &error, header_buf + written,
 					send_bytes - (size_t)written)))
 			{
+				zbx_set_socket_strerror("%s", error);
 				ret = FAIL;
 				goto cleanup;
 			}
@@ -854,14 +712,17 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		else
 			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, len - (size_t)written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, data + written, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, &error, data + written, send_bytes)))
 		{
+			zbx_set_socket_strerror("%s", error);
 			ret = FAIL;
 			goto cleanup;
 		}
 		written += bytes_sent;
 	}
 cleanup:
+	zbx_free(error);
+
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
@@ -1355,8 +1216,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 void	zbx_tcp_unaccept(zbx_socket_t *s)
 {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != s->tls_ctx)
-		zbx_tls_close(s);
+	zbx_tls_close(s);
 #endif
 	if (!s->accepted) return;
 
@@ -1529,156 +1389,6 @@ out:
 	return line;
 }
 
-static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
-{
-#if defined(_WINDOWS)
-	double	sec;
-#endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL == s->tls_ctx)		/* unencrypted connection */
-	{
-#endif
-		ssize_t	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		if (ZBX_PROTO_ERROR == (res = ZBX_TCP_READ(s->socket, buf, len)))
-		{
-			zbx_set_socket_strerror("ZBX_TCP_READ() failed: %s",
-					strerror_from_system(zbx_socket_last_error()));
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-		}
-
-		return res;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	}
-	else	/* TLS connection */
-	{
-#if defined(HAVE_POLARSSL)
-		int	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		do
-		{
-			res = ssl_read(s->tls_ctx, (unsigned char *)buf, len);
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-		}
-		while (POLARSSL_ERR_NET_WANT_READ == res && 0 == zbx_timed_out);
-
-		if (1 == zbx_timed_out)
-		{
-			zbx_set_socket_strerror("ssl_read() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-
-		if (0 > res)
-		{
-			char	err[128];	/* 128 bytes are enough for PolarSSL error messages */
-
-			polarssl_strerror(res, err, sizeof(err));
-			zbx_set_socket_strerror("ssl_read() failed: %s", err);
-
-			return ZBX_PROTO_ERROR;
-		}
-
-		return (ssize_t)res;
-#elif defined(HAVE_GNUTLS)
-		ssize_t	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		do
-		{
-			res = gnutls_record_recv(s->tls_ctx, buf, len);
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-		}
-		while ((GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res) && 0 == zbx_timed_out);
-
-		if (1 == zbx_timed_out)
-		{
-			zbx_set_socket_strerror("gnutls_record_recv() timed out");
-			return ZBX_PROTO_ERROR;
-		}
-
-		if (0 > res)
-		{
-			/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
-#if defined(_WINDOWS)
-			zbx_set_socket_strerror("gnutls_record_recv() failed: %Id %s", res, gnutls_strerror(res));
-#else
-			zbx_set_socket_strerror("gnutls_record_recv() failed: %zd %s", res, gnutls_strerror(res));
-#endif
-			return ZBX_PROTO_ERROR;
-		}
-
-		return res;
-#elif defined(HAVE_OPENSSL)
-		int	res;
-
-#if defined(_WINDOWS)
-		zbx_timed_out = 0;
-		sec = zbx_time();
-#endif
-		if (0 >= (res = SSL_read(s->tls_ctx, buf, (int)len)))
-		{
-			/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
-			/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
-
-			int	error_code;
-#if defined(_WINDOWS)
-			if (s->timeout < zbx_time() - sec)
-				zbx_timed_out = 1;
-#endif
-			if (1 == zbx_timed_out)
-			{
-				zbx_set_socket_strerror("SSL_read() timed out");
-				return ZBX_PROTO_ERROR;
-			}
-
-			error_code = SSL_get_error(s->tls_ctx, res);
-
-			if (0 == res && SSL_ERROR_ZERO_RETURN == error_code)
-			{
-				zbx_set_socket_strerror("connection closed during read");
-			}
-			else
-			{
-				char	*error = NULL;
-				size_t	error_alloc = 0, error_offset = 0;
-
-				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS read returned error code"
-						" %d:", error_code);
-				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-				zbx_set_socket_strerror("%s: %s", error, info_buf);
-				zbx_free(error);
-			}
-
-			return ZBX_PROTO_ERROR;
-		}
-
-		return (ssize_t)res;
-#endif
-	}
-#endif
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_recv_ext                                                 *
@@ -1704,6 +1414,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 	size_t		allocated = 8 * ZBX_STAT_BUF_LEN, buf_dyn_bytes = 0, buf_stat_bytes = 0, header_bytes = 0;
 	zbx_uint64_t	expected_len = 16 * ZBX_MEBIBYTE;
 	unsigned char	expect = ZBX_TCP_EXPECT_HEADER;
+	char		*error = NULL;
 
 	if (0 != timeout)
 		zbx_socket_timeout_set(s, timeout);
@@ -1713,10 +1424,13 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
-	while (0 != (nbytes = zbx_tls_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
+	while (0 != (nbytes = zbx_tls_read(s, &error, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
 	{
 		if (ZBX_PROTO_ERROR == nbytes)
+		{
+			zbx_set_socket_strerror("%s", error);
 			goto out;
+		}
 
 		if (ZBX_BUF_TYPE_STAT == s->buf_type)
 			buf_stat_bytes += nbytes;
@@ -1869,6 +1583,8 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 	s->read_bytes = buf_stat_bytes + buf_dyn_bytes;
 	s->buffer[s->read_bytes] = '\0';
 out:
+	zbx_free(error);
+
 	if (0 != timeout)
 		zbx_socket_timeout_cleanup(s);
 
