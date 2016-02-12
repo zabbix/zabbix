@@ -1404,23 +1404,20 @@ if test "x$want_openssl" = "xyes"; then
 	TLS_LDFLAGS="$OPENSSL_LDFLAGS"
 	TLS_LIBS="$OPENSSL_LIBS"
 fi
-SERVER_CFLAGS="$SERVER_CFLAGS $TLS_CFLAGS"
+AC_SUBST(TLS_CFLAGS)
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $TLS_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $TLS_LIBS"
 
-PROXY_CFLAGS="$PROXY_CFLAGS $TLS_CFLAGS"
 PROXY_LDFLAGS="$PROXY_LDFLAGS $TLS_LDFLAGS"
 PROXY_LIBS="$PROXY_LIBS $TLS_LIBS"
 
-AGENT_CFLAGS="$AGENT_CFLAGS $TLS_CFLAGS"
 AGENT_LDFLAGS="$AGENT_LDFLAGS $TLS_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $TLS_LIBS"
 
-ZBXGET_CFLAGS="$ZBXGET_CFLAGS $TLS_CFLAGS"
 ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $TLS_LDFLAGS"
 ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
 
-SENDER_CFLAGS="$SENDER_CFLAGS $TLS_CFLAGS"
 SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
 SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
 
@@ -1633,14 +1630,15 @@ if test "x$server" != "xno"; then
 
 echo "  Server details:
     With database:         ${have_db}
+    DB headers:            ${DB_CFLAGS}
     WEB Monitoring:        ${have_web_monitoring}
     Native Jabber:         ${have_jabber}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
+    TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
-    DB headers:            ${DB_CFLAGS}
     Compiler flags:        ${CFLAGS} ${SERVER_CFLAGS}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
@@ -1654,13 +1652,14 @@ if test "x$proxy" != "xno"; then
 
 echo "  Proxy details:
     With database:         ${have_db}
+    DB headers:            ${DB_CFLAGS}
     WEB Monitoring:        ${have_web_monitoring}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
+    TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
-    DB headers:            ${DB_CFLAGS}
     Compiler flags:        ${CFLAGS} ${PROXY_CFLAGS}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"
@@ -1674,6 +1673,7 @@ if test "x$agent" != "xno"; then
 
 echo "  Agent details:
     TLS:                   ${have_tls}
+    TLS headers:           ${TLS_CFLAGS}
     Compiler flags:        ${CFLAGS} ${AGENT_CFLAGS}
     Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
     Libraries:             ${LIBS} ${AGENT_LIBS}"
