@@ -123,7 +123,6 @@ else {
 	show_table_header(_('Notifications'), $form);
 
 	$header = array();
-	$users = array();
 	$db_users = DBselect(
 			'SELECT u.*'.
 			' FROM users u'.
@@ -192,32 +191,24 @@ else {
 			break;
 	}
 
-	// initialize periods array
-	$periods = array();
-	foreach ($intervals as $from => $till) {
-		$periods[$from] = array();
-		foreach ($users as $userid => $alias) {
-			$periods[$from][$userid] = array();
-			$periods[$from][$userid]['total'] = 0;
-			$periods[$from][$userid]['medias'] = array();
-			foreach ($media_types as $media_type_nr => $mt) {
-				$periods[$from][$userid]['medias'][$media_type_nr] = 0;
-			}
-		}
+	// time till
+	$maxTime = ($year == $currentYear) ? time() : mktime(0, 0, 0, 1, 1, $year + 1);
+
+	// fetch alerts
+	$alerts = array();
+	foreach (eventSourceObjects() as $sourceObject) {
+		$alerts = array_merge($alerts, API::Alert()->get(array(
+			'output' => array('mediatypeid', 'userid', 'clock'),
+			'eventsource' => $sourceObject['source'],
+			'eventobject' => $sourceObject['object'],
+			'mediatypeids' => (get_request('media_type')) ? get_request('media_type') : null,
+			'time_from' => $minTime,
+			'time_till' => $maxTime
+		)));
 	}
+	// sort alerts in chronological order so we could easily iterate through them later
+	CArrayHelper::sort($alerts, array('clock'));
 
-	// collect data by period
-	$alerts = API::Alert()->getAlertsCountByIntervals(array(
-		'intervals' => $intervals,
-		'media_type' => getRequest('media_type', 0)
-	));
-
-	foreach($alerts as $adata) {
-		$periods[$adata['period_from']][$adata['userid']]['medias'][$adata['mediatypeid']] = $adata['alerts_count'];
-		$periods[$adata['period_from']][$adata['userid']]['total'] += $adata['alerts_count'];
-	}
-
-	// generate data table
 	$table->setHeader($header, 'vertical_header');
 	foreach ($intervals as $from => $till) {
 		// interval start
@@ -228,7 +219,37 @@ else {
 			$row[] = zbx_date2str($dateFormat, min($till, time()));
 		}
 
-		foreach ($periods[$from] as $s) {
+		// counting alert count for each user and media type
+		$summary = array();
+		foreach ($users as $userid => $alias) {
+			$summary[$userid] = array();
+			$summary[$userid]['total'] = 0;
+			$summary[$userid]['medias'] = array();
+			foreach ($media_types as $media_type_nr => $mt) {
+				$summary[$userid]['medias'][$media_type_nr] = 0;
+			}
+		}
+
+		// loop through alerts until we reach an alert from the next interval
+		while ($alert = current($alerts)) {
+			if ($alert['clock'] >= $till) {
+				break;
+			}
+
+			if (isset($summary[$alert['userid']])) {
+				$summary[$alert['userid']]['total']++;
+				if (isset($summary[$alert['userid']]['medias'][$alert['mediatypeid']])) {
+					$summary[$alert['userid']]['medias'][$alert['mediatypeid']]++;
+				}
+				else {
+					$summary[$alert['userid']]['medias'][$alert['mediatypeid']] = 1;
+				}
+			}
+
+			next($alerts);
+		}
+
+		foreach ($summary as $s) {
 			array_push($row, array($s['total'], ($media_type == 0) ? SPACE.'('.implode('/', $s['medias']).')' : ''));
 		}
 
