@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Zabbix" default="build" basedir=".">
+	<target name="init-common">
+		<!-- Delete build directories from the previous run -->
+		<delete dir="${basedir}/build/logs" failonerror="off"/>
+		<!-- Create the different build directories -->
+		<mkdir dir="${basedir}/build/logs" />
+	</target>
+
+	<target name="init-builbdir">
+		<property name="builddir" value="${BUILDDIR}"/>
+		<property name="svn" value="${SVN}"/>
+		<property name="dbtype" value="${DBTYPE}"/>
+		<property name="dbhost" value="${DBHOST}"/>
+		<property name="dbname" value="${DBNAME}"/>
+		<property name="dbuser" value="${DBUSER}"/>
+		<property name="dbpassword" value="${DBPASSWORD}"/>
+		<property name="url" value="${URL}"/>
+
+		<delete dir="${builddir}" failonerror="off"/>
+
+		<exec executable="svn" failonerror="on">
+			<arg line="checkout ${svn} ${builddir}"/>
+		</exec>
+	</target>
+
+	<target name="create-configs" depends="init-common,init-builbdir">
+		<!-- Create bootstrap.php -->
+		<copy overwrite="true" file="${builddir}/frontends/php/tests/bootstrap.php.template" tofile="${builddir}/frontends/php/tests/bootstrap.php"/>
+		<replace file="${builddir}/frontends/php/tests/bootstrap.php" token="{URL}" value="${url}"/>
+
+		<!-- Create PHP config file -->
+		<copy overwrite="true" file="${builddir}/tests/templates/zabbix.conf.php" tofile="${builddir}/frontends/php/conf/zabbix.conf.php"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBTYPE}" value="${dbtype}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBHOST}" value="${dbhost}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBUSER}" value="${dbuser}"/>
+		<replace file="${builddir}/frontends/php/conf/zabbix.conf.php" token="{DBPASSWORD}" value="${dbpassword}"/>
+	</target>
+
+	<target name="make-dbschema" depends="init-builbdir">
+		<!-- Create database schema -->
+		<exec executable="./bootstrap.sh" dir="${builddir}" failonerror="on"></exec>
+		<exec executable="./configure" dir="${builddir}" failonerror="on"></exec>
+		<exec executable="make" dir="${builddir}" failonerror="on">
+			<arg line="dbschema"/>
+		</exec>
+	</target>
+
+	<target name="init-postgresql" depends="create-configs,make-dbschema">
+		<!-- Create PostgreSQL database -->
+		<exec executable="psql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--username=${dbuser}"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="--command 'drop database if exists ${dbname}'"/>
+		</exec>
+		<exec executable="psql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--username=${dbuser}"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="--command 'create database ${dbname}'"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/database/postgresql/schema.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--username=${dbuser}"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/database/postgresql/images.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--username=${dbuser}"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/database/postgresql/data.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--username=${dbuser}"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+		<exec executable="psql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
+			<arg line="--host=${dbhost}"/>
+			<arg line="--username=${dbuser}"/>
+			<arg line="--set ON_ERROR_STOP=1"/>
+			<arg line="${dbname}"/>
+		</exec>
+	</target>
+
+	<target name="init-mysql" depends="create-configs,make-dbschema">
+		<!-- Create MySQL database -->
+		<exec executable="mysql" failonerror="on">
+			<arg line="-h ${dbhost}"/>
+			<arg line="-u${dbuser} -e 'drop database if exists ${dbname};'"/>
+		</exec>
+		<exec executable="mysql" failonerror="on">
+			<arg line="-h ${dbhost}"/>
+			<arg line="-u${dbuser} -e 'create database ${dbname} character set utf8;'"/>
+		</exec>
+		<exec executable="mysql" input="${builddir}/database/mysql/schema.sql" failonerror="on">
+			<arg line="-h ${dbhost}"/>
+			<arg line="-u${dbuser} ${dbname}"/>
+		</exec>
+		<exec executable="mysql" input="${builddir}/database/mysql/images.sql" failonerror="on">
+			<arg line="-h ${dbhost}"/>
+			<arg line="-u${dbuser} ${dbname}"/>
+		</exec>
+		<exec executable="mysql" input="${builddir}/database/mysql/data.sql" failonerror="on">
+			<arg line="-h ${dbhost}"/>
+			<arg line="-u${dbuser} ${dbname}"/>
+		</exec>
+		<exec executable="mysql" input="${builddir}/tests/data/data_test.sql" failonerror="on">
+			<arg line="-h ${dbhost}"/>
+			<arg line="-u${dbuser} ${dbname}"/>
+		</exec>
+	</target>
+
+	<target name="test-phpunit" depends="init-common">
+		<exec executable="phpunit" dir="${basedir}/frontends/php/tests/unit" failonerror="off">
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="include/"/>
+		</exec>
+	</target>
+
+	<target name="test-frontend">
+		<exec executable="phpunit" dir="${builddir}/frontends/php/tests" failonerror="off">
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${builddir}/frontends/php/tests/bootstrap.php frontend.php"/>
+		</exec>
+	</target>
+
+	<target name="build-phpunit" depends="test-phpunit"/>
+	<target name="build-mysql" depends="init-mysql,test-frontend"/>
+	<target name="build-postgresql" depends="init-postgresql,test-frontend"/>
+
+	<!-- Default target -->
+	<target name="build" depends="build-phpunit,build-mysql,build-postgresql"/>
+</project>
