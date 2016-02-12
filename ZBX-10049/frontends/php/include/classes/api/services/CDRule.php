@@ -226,6 +226,7 @@ class CDRule extends CApiService {
 					'messageInvalid' => _('Incorrect discovery check ID for discovery rule "%1$s".')
 				]),
 				'key_' => new CStringValidator([
+					'empty' => true,
 					'messageInvalid' => _('Incorrect discovery check "key_" value for discovery rule "%1$s".')
 				]),
 				'ports' => new CStringValidator([
@@ -394,13 +395,6 @@ class CDRule extends CApiService {
 		if (!$drules) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
-
-		// Validate given IDs.
-		$this->checkObjectIds($drules, 'druleid',
-			_('No "%1$s" given for discovery rule.'),
-			_('Empty discovery rule ID.'),
-			_('Incorrect discovery rule ID.')
-		);
 
 		$drule_names_changed = [];
 
@@ -676,27 +670,33 @@ class CDRule extends CApiService {
 	 */
 	public function update(array $drules) {
 		$drules = zbx_toArray($drules);
+
+		// Validate given IDs.
+		$this->checkObjectIds($drules, 'druleid',
+			_('No "%1$s" given for discovery rule.'),
+			_('Empty discovery rule ID.'),
+			_('Incorrect discovery rule ID.')
+		);
+
 		$druleids = zbx_objectValues($drules, 'druleid');
 
 		$db_drules = API::DRule()->get([
+			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'nextcheck', 'status'],
 			'druleids' => $druleids,
-			'output' => API_OUTPUT_EXTEND,
-			'selectDChecks' => API_OUTPUT_EXTEND,
+			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname'],
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$this->validateUpdate($drules, $db_drules);
 
-		$default_values = DB::getDefaults('dchecks');
-
-		$upd_drules = [];
-
 		foreach ($drules as $drule) {
-			$upd_drules[] = [
-				'values' => $drule,
-				'where' => ['druleid' => $drule['druleid']]
-			];
+			// update drule if it's modified
+			if (DB::recordModified($this->tableName(), $db_drules[$drule['druleid']], $drule)) {
+				DB::updateByPk($this->tableName(), $drule['druleid'], $drule);
+			}
 
 			// update dchecks
 			$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
@@ -704,14 +704,16 @@ class CDRule extends CApiService {
 			$new_dchecks = [];
 			$old_dchecks = [];
 
-			foreach ($drule['dchecks'] as $check) {
-				$check['druleid'] = $drule['druleid'];
+			if (array_key_exists('dchecks', $drule)) {
+				foreach ($drule['dchecks'] as $check) {
+					$check['druleid'] = $drule['druleid'];
 
-				if (!isset($check['dcheckid'])) {
-					$new_dchecks[] = array_merge($default_values, $check);
-				}
-				else {
-					$old_dchecks[] = $check;
+					if (!isset($check['dcheckid'])) {
+						$new_dchecks[] = $check;
+					}
+					else {
+						$old_dchecks[] = $check;
+					}
 				}
 			}
 
@@ -725,10 +727,6 @@ class CDRule extends CApiService {
 			}
 
 			DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
-		}
-
-		if ($upd_drules) {
-			DB::update('drules', $upd_drules);
 		}
 
 		return ['druleids' => $druleids];
