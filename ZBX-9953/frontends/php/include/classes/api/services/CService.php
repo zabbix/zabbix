@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -587,19 +587,21 @@ class CService extends CApiService {
 
 			if ($usedSeviceIds) {
 				// add service alarms
-				$intervalConditions = [];
-				foreach ($intervals as $interval) {
-					$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
-				}
-				$query = DBselect(
-					'SELECT *'.
-					' FROM service_alarms sa'.
-					' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
-						' AND ('.implode(' OR ', $intervalConditions).')'.
-					' ORDER BY sa.clock,sa.servicealarmid'
-				);
-				while ($data = DBfetch($query)) {
-					$services[$data['serviceid']]['alarms'][] = $data;
+				if ($intervals) {
+					$intervalConditions = [];
+					foreach ($intervals as $interval) {
+						$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
+					}
+					$query = DBselect(
+						'SELECT *'.
+						' FROM service_alarms sa'.
+						' WHERE '.dbConditionInt('sa.serviceid', $usedSeviceIds).
+							' AND ('.implode(' OR ', $intervalConditions).')'.
+						' ORDER BY sa.clock,sa.servicealarmid'
+					);
+					while ($data = DBfetch($query)) {
+						$services[$data['serviceid']]['alarms'][] = $data;
+					}
 				}
 
 				// add problem triggers
@@ -918,7 +920,7 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function checkAlgorithm(array $service) {
-		if (!isset($service['algorithm']) || !serviceAlgorythm($service['algorithm'])) {
+		if (!isset($service['algorithm']) || !serviceAlgorithm($service['algorithm'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect algorithm for service "%1$s".', $service['name']));
 		}
 	}

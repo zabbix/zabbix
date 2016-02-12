@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -367,13 +367,7 @@ $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => [
-		'hostid',
-		'name',
-		'description',
-		'status',
-		'maintenanceid',
-		'maintenance_status',
-		'maintenance_type'
+		'hostid', 'name', 'description', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'
 	],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 	'selectDependencies' => API_OUTPUT_EXTEND,
@@ -382,7 +376,12 @@ $triggers = API::Trigger()->get([
 	'preservekeys' => true
 ]);
 
-$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+if ($showDetails) {
+	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
+	);
+}
 
 order_result($triggers, $sortField, $sortOrder);
 
@@ -558,7 +557,7 @@ foreach ($triggers as $trigger) {
 	$dependenciesTable = (new CTable())
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addRow(_('Dependent').':');
-	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
+	if (array_key_exists($trigger['triggerid'], $triggerIdsDown) && $triggerIdsDown[$trigger['triggerid']]) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
 		foreach ($depTriggers as $depTrigger) {
@@ -581,7 +580,7 @@ foreach ($triggers as $trigger) {
 
 	if ($showDetails) {
 		$description[] = BR();
-		$description[] = explode_exp($trigger['expression'], true, true);
+		$description[] = $trigger['expression'];
 	}
 
 	// host js menu
@@ -654,8 +653,7 @@ foreach ($triggers as $trigger) {
 							'&backurl='.$page['file']
 					))
 						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_RED)
-						->removeSID(),
+						->addClass(ZBX_STYLE_RED),
 					CViewHelper::showNum($trigger['event_count'])
 				];
 			}
@@ -667,8 +665,7 @@ foreach ($triggers as $trigger) {
 						'&backurl='.$page['file']
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREEN)
-					->removeSID();
+					->addClass(ZBX_STYLE_GREEN);
 			}
 		}
 		else {

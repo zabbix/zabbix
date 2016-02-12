@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,7 +236,7 @@ if ($type == SHOW_TRIGGERS) {
 
 	$triggers = API::Trigger()->get($options);
 
-	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 	// Pass already filtered 'groupid' to menu pop-up "Events" link.
 	foreach ($triggers as &$trigger) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@
 #include "zbxjson.h"
 #include "log.h"
 #include "proxy.h"
+#include "../../libs/zbxcrypto/tls.h"
 
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
@@ -38,10 +39,11 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 	const char	*__function_name = "connect_to_proxy";
 	int		ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d", __function_name, proxy->addr,
-			proxy->port, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() address:%s port:%hu timeout:%d conn:%u", __function_name, proxy->addr,
+			proxy->port, timeout, (unsigned int)proxy->tls_connect);
 
-	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout)))
+	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout,
+			proxy->tls_connect, proxy->tls_arg1, proxy->tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 		ret = NETWORK_ERROR;
@@ -84,7 +86,7 @@ static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_socket_t *sock)
 				zbx_socket_strerror());
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": %s", proxy->host, sock->buffer);
+		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": [%s]", proxy->host, sock->buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -118,7 +120,7 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data)
+static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "get_data_from_proxy";
 	zbx_socket_t	s;
@@ -133,6 +135,10 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 	if (SUCCEED == (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 	{
+		/* get connection timestamp if required */
+		if (NULL != ts)
+			zbx_timespec(ts);
+
 		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 				if (SUCCEED == (ret = zbx_send_response(&s, SUCCEED, NULL, 0)))
@@ -174,6 +180,7 @@ static int	process_proxy(void)
 	char			*answer = NULL, *port = NULL;
 	time_t			now;
 	unsigned char		update_nextcheck;
+	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -227,18 +234,16 @@ static int	process_proxy(void)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\","
 						" datalen " ZBX_FS_SIZE_T,
-						proxy.host, get_ip_by_socket(&s), (zbx_fs_size_t)j.buffer_size);
+						proxy.host, s.peer, (zbx_fs_size_t)j.buffer_size);
 
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
 				{
-					char	*error = NULL;
-
 					if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
-								" \"%s\" at \"%s\": %s",
-								proxy.host, get_ip_by_socket(&s), error);
+								" \"%s\" at \"%s\": %s", proxy.host, s.peer, error);
 					}
+
 					zbx_free(error);
 				}
 
@@ -252,8 +257,17 @@ static int	process_proxy(void)
 		if (proxy.proxy_data_nextcheck <= now)
 		{
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer))
+					ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no host"
+							" availability data: check allowed connection types and"
+							" access rights", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 					process_host_availability(&jp);
 
@@ -263,11 +277,20 @@ static int	process_proxy(void)
 				goto network_error;
 retry_history:
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_HISTORY_DATA, &answer))
+					ZBX_PROTO_VALUE_HISTORY_DATA, &answer, &ts))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no history"
+							" data: check allowed connection types and access rights",
+							proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
-					process_hist_data(NULL, &jp, proxy.hostid, NULL, 0);
+					process_hist_data(NULL, &jp, proxy.hostid, &ts, NULL);
 
 					if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 					{
@@ -278,14 +301,24 @@ retry_history:
 						}
 					}
 				}
+
 				zbx_free(answer);
 			}
 			else
 				goto network_error;
 retry_dhistory:
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer))
+					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, NULL))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no discovery"
+							" data: check allowed connection types and access rights",
+							proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
 					process_dhis_data(&jp);
@@ -299,14 +332,24 @@ retry_dhistory:
 						}
 					}
 				}
+
 				zbx_free(answer);
 			}
 			else
 				goto network_error;
 retry_autoreg_host:
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer))
+					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, NULL))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no auto"
+							" registration data: check allowed connection types and"
+							" access rights", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
 					process_areg_data(&jp, proxy.hostid);
@@ -320,6 +363,7 @@ retry_autoreg_host:
 						}
 					}
 				}
+
 				zbx_free(answer);
 			}
 			else
@@ -352,12 +396,15 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
@@ -365,6 +412,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"

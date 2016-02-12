@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,10 @@ function local_generateHeader($data) {
 	echo $pageHeader->getOutput();
 
 	if ($data['fullscreen'] == 0) {
+		global $ZBX_SERVER_NAME;
+
 		$pageMenu = new CView('layout.htmlpage.menu', [
+			'server_name' => isset($ZBX_SERVER_NAME) ? $ZBX_SERVER_NAME : '',
 			'menu' => [
 				'main_menu' => $main_menu,
 				'sub_menus' => $sub_menus,
@@ -71,14 +74,14 @@ function local_generateHeader($data) {
 
 	// if a user logs in after several unsuccessful attempts, display a warning
 	if ($failedAttempts = CProfile::get('web.login.attempt.failed', 0)) {
-		$attempip = CProfile::get('web.login.attempt.ip', '');
-		$attempdate = CProfile::get('web.login.attempt.clock', 0);
+		$attempt_ip = CProfile::get('web.login.attempt.ip', '');
+		$attempt_date = CProfile::get('web.login.attempt.clock', 0);
 
 		$error_msg = _n('%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s.',
 			'%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s.',
-			$attempip,
-			zbx_date2str(DATE_FORMAT, $attempdate),
-			zbx_date2str(TIME_FORMAT, $attempdate),
+			$attempt_ip,
+			zbx_date2str(DATE_FORMAT, $attempt_date),
+			zbx_date2str(TIME_FORMAT, $attempt_date),
 			$failedAttempts
 		);
 		error($error_msg);
@@ -103,19 +106,20 @@ function local_generateFooter($fullscreen) {
 function local_showMessage() {
 	global $ZBX_MESSAGES;
 
-	if (array_key_exists('messageOk', $_SESSION) || array_key_exists('messageError', $_SESSION)) {
-		if (array_key_exists('messages', $_SESSION)) {
-			$ZBX_MESSAGES = $_SESSION['messages'];
-			unset($_SESSION['messages']);
+	if (CSession::keyExists('messageOk') || CSession::keyExists('messageError')) {
+		if (CSession::keyExists('messages')) {
+			$ZBX_MESSAGES = CSession::getValue('messages');
+			CSession::unsetValue(['messages']);
 		}
 
-		if (array_key_exists('messageOk', $_SESSION)) {
-			show_messages(true, $_SESSION['messageOk']);
+		if (CSession::keyExists('messageOk')) {
+			show_messages(true, CSession::getValue('messageOk'));
 		}
 		else {
-			show_messages(false, null, $_SESSION['messageError']);
+			show_messages(false, null, CSession::getValue('messageError'));
 		}
-		unset($_SESSION['messageOk'], $_SESSION['messageError']);
+
+		CSession::unsetValue(['messageOk', 'messageError']);
 	}
 }
 

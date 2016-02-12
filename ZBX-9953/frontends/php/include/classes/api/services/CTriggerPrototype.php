@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -388,11 +388,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 			}
 			else {
-				// expand expression
-				if ($options['expandExpression'] !== null && isset($triggerPrototype['expression'])) {
-					$triggerPrototype['expression'] = explode_exp($triggerPrototype['expression'], false, true);
-				}
-
 				$result[$triggerPrototype['triggerid']] = $triggerPrototype;
 			}
 		}
@@ -403,6 +398,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+		}
+
+		// expand expression
+		if ($options['expandExpression'] !== null && $result && array_key_exists('expression', reset($result))) {
+			$result = CMacrosResolverHelper::resolveTriggerExpressions($result,
+				['resolve_usermacros' => true, 'resolve_macros' => true]
+			);
 		}
 
 		// removing keys (hash -> array)
@@ -501,14 +503,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'preservekeys' => true
 		]);
 
+		$dbTriggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggerPrototypes);
+
 		$this->validateUpdate($triggerPrototypes, $dbTriggerPrototypes);
 
 		foreach ($triggerPrototypes as &$triggerPrototype) {
 			$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototype['triggerid']];
 
 			if (isset($triggerPrototype['expression'])) {
-				$expressionFull = explode_exp($dbTriggerPrototype['expression']);
-				if (strcmp($triggerPrototype['expression'], $expressionFull) == 0) {
+				if ($triggerPrototype['expression'] === $dbTriggerPrototype['expression']) {
 					unset($triggerPrototype['expression']);
 				}
 			}
@@ -600,10 +603,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototypeId];
 
 				if ($dbTriggerPrototype['templateid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete templated trigger "%1$s:%2$s".',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete templated trigger "%1$s:%2$s".',
 						$dbTriggerPrototype['description'],
-						explode_exp($dbTriggerPrototype['expression'])
+						CMacrosResolverHelper::resolveTriggerExpression($dbTriggerPrototype['expression'])
 					));
 				}
 			}
@@ -725,9 +727,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'nopermissions' => true
 		]);
 
-		$descriptionChanged = false;
-		$expressionChanged = false;
+		$dbTriggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggerPrototypes);
+
 		foreach ($triggerPrototypes as &$triggerPrototype) {
+			$descriptionChanged = false;
+			$expressionChanged = false;
+
 			$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototype['triggerid']];
 			$hosts = zbx_objectValues($dbTriggerPrototype['hosts'], 'name');
 
@@ -736,14 +741,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$descriptionChanged = true;
 			}
 
-			$expressionFull = explode_exp($dbTriggerPrototype['expression']);
 			if (isset($triggerPrototype['expression'])
-					&& strcmp($expressionFull, $triggerPrototype['expression']) != 0) {
+					&& $dbTriggerPrototype['expression'] !== $triggerPrototype['expression']) {
 				$expressionChanged = true;
 				$expressionFull = $triggerPrototype['expression'];
 			}
 
-			if ($descriptionChanged || $expressionChanged) {
+			if ($expressionChanged) {
 				$expressionData = new CTriggerExpression();
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
@@ -754,9 +758,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 						'Trigger expression must contain at least one host:key reference.'
 					));
 				}
-			}
 
-			if ($expressionChanged) {
 				DB::delete('functions', ['triggerid' => $triggerPrototype['triggerid']]);
 
 				try {
@@ -773,17 +775,17 @@ class CTriggerPrototype extends CTriggerGeneral {
 					$triggerPrototype['dependencies'] = $dbTriggerPrototype['dependencies'];
 				}
 			}
-			else {
-				$expression = $triggerPrototype['expression'];
-			}
 
 			$triggerPrototypeUpdate = $triggerPrototype;
-			$triggerPrototypeUpdate['expression'] = $expression;
 
 			if (!$descriptionChanged) {
 				unset($triggerPrototypeUpdate['description']);
 			}
-			if (!$expressionChanged) {
+
+			if ($expressionChanged) {
+				$triggerPrototypeUpdate['expression'] = $expression;
+			}
+			else {
 				unset($triggerPrototypeUpdate['expression']);
 			}
 
@@ -1338,15 +1340,14 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$triggerPrototypes = $this->get([
+			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'output' => [
-				'triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'
-			]
+			'preservekeys' => true
 		]);
 
+		$triggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($triggerPrototypes);
+
 		foreach ($triggerPrototypes as $triggerPrototype) {
-			$triggerPrototype['expression'] = explode_exp($triggerPrototype['expression']);
 			$this->inherit($triggerPrototype, $data['hostids']);
 		}
 

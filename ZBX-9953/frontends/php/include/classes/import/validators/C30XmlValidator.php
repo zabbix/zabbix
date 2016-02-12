@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,6 +55,12 @@ class C30XmlValidator {
 					'ipmi_privilege' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_username' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_password' =>			['type' => XML_STRING | XML_REQUIRED],
+					'tls_connect' =>			['type' => XML_STRING | XML_REQUIRED],
+					'tls_accept' =>				['type' => XML_STRING | XML_REQUIRED],
+					'tls_issuer' =>				['type' => XML_STRING | XML_REQUIRED],
+					'tls_subject' =>			['type' => XML_STRING | XML_REQUIRED],
+					'tls_psk_identity' =>		['type' => XML_STRING | XML_REQUIRED],
+					'tls_psk' =>				['type' => XML_STRING | XML_REQUIRED],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -847,6 +853,17 @@ class C30XmlValidator {
 						]]
 					]]
 				]]
+			]],
+			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
+				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'mappings' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'mapping', 'rules' => [
+						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+							'value' =>					['type' => XML_STRING | XML_REQUIRED],
+							'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]]
+				]]
 			]]
 		]];
 
@@ -1014,18 +1031,17 @@ class C30XmlValidator {
 	 * @throws Exception			if the element is invalid
 	 */
 	public function validateYMinItem($data, array $parent_data = null, $path) {
-		if (zbx_is_int($parent_data['ymin_type_1'])) {
-			if ($parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$rules = ['type' => XML_ARRAY, 'rules' => [
-					'host' =>	['type' => XML_STRING | XML_REQUIRED],
-					'key' =>	['type' => XML_STRING | XML_REQUIRED]
-				]];
-
-				$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
-			}
+		if (zbx_is_int($parent_data['ymin_type_1']) && $parent_data['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$rules = ['type' => XML_ARRAY, 'rules' => [
+				'host' =>	['type' => XML_STRING | XML_REQUIRED],
+				'key' =>	['type' => XML_STRING | XML_REQUIRED]
+			]];
+		}
+		else {
+			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return $data;
+		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
 	}
 
 	/**
@@ -1038,18 +1054,17 @@ class C30XmlValidator {
 	 * @throws Exception			if the element is invalid
 	 */
 	public function validateYMaxItem($data, array $parent_data = null, $path) {
-		if (zbx_is_int($parent_data['ymax_type_1'])) {
-			if ($parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
-				$rules = ['type' => XML_ARRAY, 'rules' => [
-					'host' =>	['type' => XML_STRING | XML_REQUIRED],
-					'key' =>	['type' => XML_STRING | XML_REQUIRED]
-				]];
-
-				$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
-			}
+		if (zbx_is_int($parent_data['ymax_type_1']) && $parent_data['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			$rules = ['type' => XML_ARRAY, 'rules' => [
+				'host' =>	['type' => XML_STRING | XML_REQUIRED],
+				'key' =>	['type' => XML_STRING | XML_REQUIRED]
+			]];
+		}
+		else {
+			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return $data;
+		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
 	}
 
 	/**

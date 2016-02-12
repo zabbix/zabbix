@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,19 +28,6 @@ $widget = (new CWidget())
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
-/*
-$widget->addHeaderRowNumber(array(
-	'[ ',
-	new CLink(
-		$this->data['showdisabled'] ? _('Hide disabled trigger prototypes') : _('Show disabled trigger prototypes'),
-		'trigger_prototypes.php?'.
-			'showdisabled='.($this->data['showdisabled'] ? 0 : 1).
-			'&parent_discoveryid='.$this->data['parent_discoveryid']
-	),
-	' ]'
-));
-*/
-
 // create form
 $triggersForm = (new CForm())
 	->setName('triggersForm')
@@ -58,16 +45,14 @@ $triggersTable = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], ['html' => true]);
+
 foreach ($this->data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $this->data['parent_discoveryid'];
 
 	// description
 	$description = [];
-
-	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-	$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-	$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
@@ -140,9 +125,11 @@ foreach ($this->data['triggers'] as $trigger) {
 				: 'triggerprototype.massdisable'
 			).
 			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(triggerIndicatorStyle($trigger['status']));
+			'&parent_discoveryid='.$this->data['parent_discoveryid']
+	))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(triggerIndicatorStyle($trigger['status']))
+		->addSID();
 
 	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);
@@ -151,7 +138,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		$checkBox,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
-		triggerExpression($trigger, true),
+		$trigger['expression'],
 		$status
 	]);
 }

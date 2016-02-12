@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -273,7 +273,7 @@ abstract class CHostGeneral extends CHostBase {
 		while ($trigger = DBfetch($dbTriggers)) {
 			$triggers[$trigger['flags']][$trigger['triggerid']] = [
 				'description' => $trigger['description'],
-				'expression' => explode_exp($trigger['expression']),
+				'expression' => $trigger['expression'],
 				'triggerid' => $trigger['triggerid'],
 				'host' => $trigger['host']
 			];
@@ -283,6 +283,9 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if (!empty($triggers[ZBX_FLAG_DISCOVERY_NORMAL])) {
+			$triggers[ZBX_FLAG_DISCOVERY_NORMAL] =
+				CMacrosResolverHelper::resolveTriggerExpressions($triggers[ZBX_FLAG_DISCOVERY_NORMAL]);
+
 			if ($clear) {
 				$result = API::Trigger()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_NORMAL]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));
@@ -300,6 +303,9 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if (!empty($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+			$triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE] =
+				CMacrosResolverHelper::resolveTriggerExpressions($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+
 			if ($clear) {
 				$result = API::TriggerPrototype()->delete(array_keys($triggers[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
 				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear triggers'));

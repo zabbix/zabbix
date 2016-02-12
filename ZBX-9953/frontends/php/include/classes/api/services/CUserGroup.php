@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ class CUserGroup extends CApiService {
 
 		// permissions
 		if ($userType != USER_TYPE_SUPER_ADMIN) {
-			if ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			if (!$options['editable']) {
 				$sqlParts['where'][] = 'g.usrgrpid IN ('.
 					'SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
@@ -528,41 +528,41 @@ class CUserGroup extends CApiService {
 	/**
 	 * Delete user groups.
 	 *
-	 * @param array $userGroupIds
+	 * @param array $usergroupids
 	 *
 	 * @return array
 	 */
-	public function delete(array $userGroupIds) {
-		$this->validateDelete($userGroupIds);
+	public function delete(array $usergroupids) {
+		$this->validateDelete($usergroupids);
 
-		$operationIds = $delelteOperationIds = [];
-
-		$dbOperations = DBselect(
+		$db_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_grp om'.
-			' WHERE '.dbConditionInt('om.usrgrpid', $userGroupIds)
-		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
+			' WHERE '.dbConditionInt('om.usrgrpid', $usergroupids)
+		));
 
-		$dbOperations = DBselect(
-			'SELECT DISTINCT o.operationid'.
+		DB::delete('opmessage_grp', ['usrgrpid' => $usergroupids]);
+
+		// delete empty operations
+		$del_operations = DBFetchArray(DBselect(
+			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationIds).
-				' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)'
-		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$delelteOperationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
+			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($db_operations, 'operationid')).
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
+		));
+
+		DB::delete('operations', ['operationid' => zbx_objectValues($del_operations, 'operationid')]);
+		DB::delete('rights', ['groupid' => $usergroupids]);
+		DB::delete('users_groups', ['usrgrpid' => $usergroupids]);
+		DB::delete('usrgrp', ['usrgrpid' => $usergroupids]);
+
+		$actionids = zbx_objectValues($del_operations, 'actionid');
+		if ($actionids) {
+			$this->disableActionsWithoutOperations($actionids);
 		}
 
-		DB::delete('opmessage_grp', ['usrgrpid' => $userGroupIds]);
-		DB::delete('operations', ['operationid' => $delelteOperationIds]);
-		DB::delete('rights', ['groupid' => $userGroupIds]);
-		DB::delete('users_groups', ['usrgrpid' => $userGroupIds]);
-		DB::delete('usrgrp', ['usrgrpid' => $userGroupIds]);
-
-		return ['usrgrpids' => $userGroupIds];
+		return ['usrgrpids' => $usergroupids];
 	}
 
 	/**
@@ -730,5 +730,41 @@ class CUserGroup extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Disable actions that do not have operations.
+	 */
+	protected function disableActionsWithoutOperations(array $actionids) {
+		$actions = DBFetchArray(DBselect(
+			'SELECT DISTINCT a.actionid'.
+			' FROM actions a'.
+			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
+				' AND '.dbConditionInt('a.actionid', $actionids)
+		));
+
+		$actions_without_operations = zbx_objectValues($actions, 'actionid');
+		if ($actions_without_operations) {
+			$this->disableActions($actions_without_operations);
+		}
+	}
+
+	/**
+	 * Disable actions.
+	 *
+	 * @param array $actionids
+	 */
+	protected function disableActions(array $actionids) {
+		$update = [
+			'values' => ['status' => ACTION_STATUS_DISABLED],
+			'where' => ['actionid' => $actionids]
+		];
+		DB::update('actions', $update);
+
+		foreach($actionids as $actionid) {
+			add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
+				_('Action disabled due to deletion of user group.'), null
+			);
+		}
 	}
 }

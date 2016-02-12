@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,87 +19,109 @@
 **/
 
 
-/**
- * A parser for custom macros.
- */
 class CMacroParser extends CParser {
 
 	/**
-	 * A character that must be present right after the opening curly brace.
-	 *
-	 * For example "$" for user macros like "{$MACRO}".
+	 * Macro name.
 	 *
 	 * @var string
 	 */
-	protected $prefixChar;
+	private $macro;
 
 	/**
-	 * @param string $prefixChar
+	 * Reference number.
+	 *
+	 * @var int
 	 */
-	public function __construct($prefixChar) {
-		$this->prefixChar = $prefixChar;
+	private $n;
+
+	/**
+	 * @var CSetParser
+	 */
+	private $set_parser;
+
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'allow_reference' => true		support of reference {MACRO<1-9>}
+	 *
+	 * @var array
+	 */
+	private $options = ['allow_reference' => false];
+
+	/**
+	 * Array of strings to search for.
+	 *
+	 * @param array $macros		the list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}']
+	 */
+	public function __construct(array $macros, array $options = []) {
+		$this->set_parser = new CSetParser(array_map(function($macro) { return substr($macro, 1, -1); }, $macros));
+
+		if (array_key_exists('allow_reference', $options)) {
+			$this->options['allow_reference'] = $options['allow_reference'];
+		}
 	}
 
 	/**
-	 * @param string    $source
-	 * @param int       $startPos
+	 * Find one of the given strings at the given position.
 	 *
-	 * @return bool|CParserResult
+	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
 	 */
-	public function parse($source, $startPos = 0) {
-		$this->pos = $startPos;
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
+		$this->macro = '';
+		$this->n = 0;
 
-		if (!isset($source[$this->pos]) || $source[$this->pos] != '{') {
-			return false;
+		$p = $pos;
+
+		if (!isset($source[$p]) || $source[$p] != '{') {
+			return self::PARSE_FAIL;
+		}
+		$p++;
+
+		if ($this->set_parser->parse($source, $p) == self::PARSE_FAIL) {
+			return self::PARSE_FAIL;
+		}
+		$p += $this->set_parser->getLength();
+
+		if ($this->options['allow_reference']) {
+			if (isset($source[$p]) && $source[$p] >= '1' && $source[$p] <= '9') {
+				$this->n = (int) $source[$p];
+				$p++;
+			}
 		}
 
-		$this->pos++;
+		if (!isset($source[$p]) || $source[$p] != '}') {
+			$this->n = 0;
 
-		if (!isset($source[$this->pos]) || $source[$this->pos] !== $this->prefixChar) {
-			return false;
+			return self::PARSE_FAIL;
 		}
+		$p++;
 
-		$this->pos++;
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+		$this->macro = $this->set_parser->getMatch();
 
-		// make sure there's at least one valid macro char
-		if (!isset($source[$this->pos]) || !$this->isMacroChar($source[$this->pos])) {
-			return false;
-		}
-
-		$this->pos++;
-
-		// skip the remaining macro chars
-		while (isset($source[$this->pos]) && $this->isMacroChar($source[$this->pos])) {
-			$this->pos++;
-		}
-
-		if (!isset($source[$this->pos]) || $source[$this->pos] != '}') {
-			return false;
-		}
-
-		$macroLength = $this->pos - $startPos + 1;
-
-		$result = new CParserResult();
-		$result->source = $source;
-		$result->pos = $startPos;
-		$result->length = $macroLength;
-		$result->match = substr($source, $startPos, $macroLength);
-
-		return $result;
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}
 
 	/**
-	 * Returns true if the char is allowed in the macro, false otherwise
+	 * Returns the macro name like HOST.HOST.
 	 *
-	 * @param string    $c
-	 *
-	 * @return bool
+	 * @return string
 	 */
-	private function isMacroChar($c) {
-		if (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9')) {
-			return true;
-		}
+	public function getMacro() {
+		return $this->macro;
+	}
 
-		return false;
+	/**
+	 * Returns the reference.
+	 *
+	 * @return int
+	 */
+	public function getN() {
+		return $this->n;
 	}
 }

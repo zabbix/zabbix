@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,7 +187,9 @@ class CScreenBuilder {
 			$options['screenitem'] = reset($options['screenitem']);
 		}
 
-		if (zbx_empty($options['resourcetype']) && !zbx_empty($options['screenitem']['resourcetype'])) {
+		if (zbx_empty($options['resourcetype'])
+				&& array_key_exists('screenitem', $options)
+				&& !zbx_empty($options['screenitem']['resourcetype'])) {
 			$options['resourcetype'] = $options['screenitem']['resourcetype'];
 		}
 
@@ -279,6 +281,9 @@ class CScreenBuilder {
 				$options = self::appendTemplatedScreenOption($options);
 				return new CScreenLldSimpleGraph($options);
 
+			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
+				return new CScreenHttpTestDetails($options);
+
 			default:
 				return null;
 		}
@@ -336,21 +341,41 @@ class CScreenBuilder {
 		}
 
 		// create screen table
-		$screenTable = new CTable();
-		$screenTable->addClass(
-			in_array($this->mode, [SCREEN_MODE_PREVIEW, SCREEN_MODE_SLIDESHOW]) ? 'screen-table' : 'screen-table dashed-border'
-		);
-		$screenTable->setId(self::makeScreenTableId($this->screen['screenid']));
+		$screenTable = (new CTable())
+			->setId(self::makeScreenTableId($this->screen['screenid']))
+			->addClass(ZBX_STYLE_SCREEN_TABLE);
+
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$screenTable->addClass(ZBX_STYLE_DASHED_BORDER);
+		}
 
 		// action top row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$newColumns = [''];
+			$newColumns = [(new CCol())->addClass(ZBX_STYLE_CELL_WIDTH)];
 
-			for ($i = 0, $size = $this->screen['hsize'] + 1; $i < $size; $i++) {
-				$newColumns[] = (new CDiv('+'))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i.'";');
+			for ($i = 0, $size = $this->screen['hsize']; $i < $size; $i++) {
+				$newColumns[] = (new CCol(
+					(new CDiv('+'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->onClick('javascript: location.href = "screenedit.php?config=1'.
+							'&screenid='.$this->screen['screenid'].url_param('templateid').'&add_col='.$i.'";'
+						)
+				))
+					->addClass(ZBX_STYLE_CENTER)
+					->addClass(ZBX_STYLE_MIDDLE);
 			}
+
+			$newColumns[] = (new CCol(
+				(new CDiv('+'))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->onClick('javascript: location.href = "screenedit.php?config=1'.
+						'&screenid='.$this->screen['screenid'].url_param('templateid').
+						'&add_col='.$this->screen['hsize'].'";'
+					)
+			))
+				->addClass(ZBX_STYLE_CENTER)
+				->addClass(ZBX_STYLE_MIDDLE)
+				->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$screenTable->addRow($newColumns);
 		}
@@ -361,9 +386,15 @@ class CScreenBuilder {
 
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$newColumns[] = (new CDiv('+'))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->onClick('javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r.'";');
+				$newColumns[] = (new CCol(
+					(new CDiv('+'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->onClick('javascript: location.href = "screenedit.php?config=1'.
+							'&screenid='.$this->screen['screenid'].url_param('templateid').'&add_row='.$r.'";'
+						)
+				))
+					->addClass(ZBX_STYLE_CENTER)
+					->addClass(ZBX_STYLE_MIDDLE);
 			}
 
 			for ($c = 0; $c < $this->screen['hsize']; $c++) {
@@ -407,11 +438,14 @@ class CScreenBuilder {
 				}
 
 				// action
-				if ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] != 0) {
-					$action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
-				}
-				elseif ($this->mode == SCREEN_MODE_EDIT && $screenitem['screenitemid'] == 0) {
-					$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
+				if ($this->mode == SCREEN_MODE_EDIT) {
+					if ($screenitem['screenitemid'] != 0) {
+						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).
+							'&screenitemid='.$screenitem['screenitemid'];
+					}
+					else {
+						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).'&x='.$c.'&y='.$r;
+					}
 				}
 				else {
 					$action = null;
@@ -422,7 +456,7 @@ class CScreenBuilder {
 						&& (isset($_REQUEST['form']) && $_REQUEST['form'] == 'update')
 						&& ((isset($_REQUEST['x']) && $_REQUEST['x'] == $c && isset($_REQUEST['y']) && $_REQUEST['y'] == $r)
 								|| (isset($_REQUEST['screenitemid']) && bccomp($_REQUEST['screenitemid'], $screenitem['screenitemid']) == 0))) {
-					$screenView = new CView('configuration.screen.constructor.edit', ['screen' => $this->screen]);
+					$screenView = new CView('monitoring.screen.constructor.edit', ['screen' => $this->screen]);
 					$item = $screenView->render();
 					$isEditForm = true;
 				}
@@ -445,12 +479,7 @@ class CScreenBuilder {
 					]);
 
 					if (!empty($screenBase)) {
-						if ($this->mode == SCREEN_MODE_EDIT && !empty($screenitem['screenitemid'])) {
-							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').'&screenitemid='.$screenitem['screenitemid'];
-						}
-						elseif ($this->mode == SCREEN_MODE_EDIT && empty($screenitem['screenitemid'])) {
-							$screenBase->action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
-						}
+						$screenBase->action = $action;
 
 						$item = $screenBase->get();
 					}
@@ -459,34 +488,15 @@ class CScreenBuilder {
 					}
 				}
 				// change/empty cell
+				elseif ($this->mode == SCREEN_MODE_EDIT) {
+					$item =[
+						(new CDiv(
+							(new CLink(_('Change'), $action))->addClass('empty_change_link')
+						))->addClass(ZBX_STYLE_CENTER)
+					];
+				}
 				else {
-					$item = [SPACE];
-					if ($this->mode == SCREEN_MODE_EDIT) {
-						array_push($item, BR(), (new CLink(_('Change'), $action))->addClass('empty_change_link'));
-					}
-				}
-
-				// align
-				$halign = 'def';
-				if ($screenitem['halign'] == HALIGN_CENTER) {
-					$halign = 'cntr';
-				}
-				if ($screenitem['halign'] == HALIGN_LEFT) {
-					$halign = 'left';
-				}
-				if ($screenitem['halign'] == HALIGN_RIGHT) {
-					$halign = 'right';
-				}
-
-				$valign = 'def';
-				if ($screenitem['valign'] == VALIGN_MIDDLE) {
-					$valign = 'mdl';
-				}
-				if ($screenitem['valign'] == VALIGN_TOP) {
-					$valign = 'top';
-				}
-				if ($screenitem['valign'] == VALIGN_BOTTOM) {
-					$valign = 'bttm';
+					$item = null;
 				}
 
 				if ($this->mode == SCREEN_MODE_EDIT && !$isEditForm) {
@@ -498,14 +508,32 @@ class CScreenBuilder {
 				}
 
 				// colspan/rowspan
-				$newColumn = (new CCol($item))
-					->addClass($halign)
-					->addClass($valign)
-					->addClass('screenitem');
-				if (!empty($screenitem['colspan'])) {
+				$newColumn = (new CCol($item))->addClass('screenitem');
+
+				if ($screenitem['halign'] == HALIGN_CENTER || $isEditForm) {
+					$newColumn->addClass(ZBX_STYLE_CENTER);
+				}
+				elseif ($screenitem['halign'] == HALIGN_LEFT) {
+					$newColumn->addClass(ZBX_STYLE_LEFT);
+				}
+				elseif ($screenitem['halign'] == HALIGN_RIGHT) {
+					$newColumn->addClass(ZBX_STYLE_RIGHT);
+				}
+
+				if ($screenitem['valign'] == VALIGN_MIDDLE || $isEditForm) {
+					$newColumn->addClass(ZBX_STYLE_MIDDLE);
+				}
+				elseif ($screenitem['valign'] == VALIGN_TOP) {
+					$newColumn->addClass(ZBX_STYLE_TOP);
+				}
+				elseif ($screenitem['valign'] == VALIGN_BOTTOM) {
+					$newColumn->addClass(ZBX_STYLE_BOTTOM);
+				}
+
+				if ($screenitem['colspan'] > 1) {
 					$newColumn->setColSpan($screenitem['colspan']);
 				}
-				if (!empty($screenitem['rowspan'])) {
+				if ($screenitem['rowspan'] > 1) {
 					$newColumn->setRowSpan($screenitem['rowspan']);
 				}
 				$newColumns[] = $newColumn;
@@ -514,17 +542,24 @@ class CScreenBuilder {
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				if ($emptyScreenRow) {
-					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";';
+					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_row='.$r.'";';
 				}
 				else {
 					$removeRowLink = 'javascript:'.
 						' if (confirm('.CJs::encodeJson(_('This screen-row is not empty. Delete it?')).')) {'.
-							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r.'";'.
+							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
+							url_param('templateid').'&rmv_row='.$r.'";'.
 						' }';
 				}
-				$newColumns[] = (new CDiv('−'))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->onClick($removeRowLink);
+
+				$newColumns[] = (new CCol(
+					(new CDiv('−'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->onClick($removeRowLink)
+				))
+					->addClass(ZBX_STYLE_CENTER)
+					->addClass(ZBX_STYLE_MIDDLE);
 			}
 			$screenTable->addRow(new CRow($newColumns));
 		}
@@ -532,32 +567,45 @@ class CScreenBuilder {
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$newColumns = [
-				(new CDiv('+'))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->onClick('javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize'].'";')
+				(new CCol(
+					(new CDiv('+'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->onClick('javascript: location.href = "screenedit.php'.
+							'?screenid='.$this->screen['screenid'].url_param('templateid').
+							'&add_row='.$this->screen['vsize'].'";'
+						)
+				))
+					->addClass(ZBX_STYLE_CENTER)
+					->addClass(ZBX_STYLE_MIDDLE)
 			];
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
 				if (isset($emptyScreenColumns[$i])) {
 					$removeColumnLink = 'javascript:'.
 						' if (confirm('.CJs::encodeJson(_('This screen-column is not empty. Delete it?')).')) {'.
-							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";'.
+							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
+								url_param('templateid').'&rmv_col='.$i.'";'.
 						' }';
 				}
 				else {
-					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i.'";';
+					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1'.
+						'&screenid='.$this->screen['screenid'].url_param('templateid').'&rmv_col='.$i.'";';
 				}
 
-				$newColumns[] = (new CDiv('−'))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->onClick($removeColumnLink);
+				$newColumns[] = (new CCol(
+					(new CDiv('−'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->onClick($removeColumnLink)
+				))
+					->addClass(ZBX_STYLE_CENTER)
+					->addClass(ZBX_STYLE_MIDDLE);
 			}
 
 			$newColumns[] = '';
 			$screenTable->addRow($newColumns);
 		}
 
-		return (new CDiv($screenTable))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
+		return $screenTable;
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,8 +138,8 @@ $fields = [
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	// filter
-	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_hostid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -164,7 +164,7 @@ $fields = [
 	'filter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
 	'filter_ipmi_sensor' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
-	'subfilter_set' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'subfilter_set' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_apps' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_value_types' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
@@ -1049,11 +1049,10 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
 
 	// valuemap
-	$data['valuemaps'] = DBfetchArray(DBselect(
-		'SELECT v.valuemapid,v.name FROM valuemaps v'
-	));
-
-	order_result($data['valuemaps'], 'name');
+	$data['valuemaps'] = API::ValueMap()->get([
+		'output' => ['valuemapid', 'name']
+	]);
+	CArrayHelper::sort($data['valuemaps'], ['name']);
 
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
@@ -1371,7 +1370,6 @@ else {
 		'output' => API_OUTPUT_EXTEND,
 		'selectHosts' => ['hostid', 'name', 'host'],
 		'selectFunctions' => API_OUTPUT_EXTEND,
-		'selectItems' => ['itemid', 'hostid', 'key_', 'type', 'flags', 'status'],
 		'preservekeys' => true
 	]);
 	$data['triggerRealHosts'] = getParentHostsByTriggers($data['itemTriggers']);

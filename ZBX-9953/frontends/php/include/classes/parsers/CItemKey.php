@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,32 +21,40 @@
 
 /**
  * Class is used to validate and parse item keys.
- *
- * Example of usage:
- *		$itemKey = new CItemKey('test.key[a, b, c]');
- *		echo $itemKey->isValid(); // true
- *		echo $itemKey->getKeyId(); // test.key
- *		print_r($itemKey->parameters()); // array('a', 'b', 'c')
  */
-class CItemKey {
+class CItemKey extends CParser {
 
 	const STATE_NEW = 0;
 	const STATE_END = 1;
 	const STATE_UNQUOTED = 2;
 	const STATE_QUOTED = 3;
+	const STATE_END_OF_PARAMS = 4;
 
-	private $keyId = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
+	const PARAM_ARRAY = 0;
+	const PARAM_UNQUOTED = 1;
+	const PARAM_QUOTED = 2;
+
+	private $key = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
 	private $parameters = [];
-	private $isValid = true;
 	private $error = '';
 
 	/**
-	 * Parse key and determine if it is valid.
+	 * An options array
 	 *
-	 * @param string $key
+	 * Supported options:
+	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
+	 *
+	 * @var array
 	 */
-	public function __construct($key) {
-		$this->parseKey($key);
+	private $options = ['18_simple_checks' => false];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct($options = []) {
+		if (array_key_exists('18_simple_checks', $options)) {
+			$this->options['18_simple_checks'] = $options['18_simple_checks'];
+		}
 	}
 
 	/**
@@ -58,10 +66,6 @@ class CItemKey {
 	 * @return string
 	 */
 	private function errorMessage($key, $pos) {
-		if (!isset($key[$pos])) {
-			return ($pos == 0) ? _('key is empty') : _('unexpected end of key');
-		}
-
 		for ($i = $pos, $chunk = '', $maxChunkSize = 50; isset($key[$i]); $i++) {
 			if (0x80 != (0xc0 & ord($key[$i])) && $maxChunkSize-- == 0) {
 				break;
@@ -77,135 +81,187 @@ class CItemKey {
 	}
 
 	/**
+	 * Check if given character is a valid key id char
+	 * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
+	 * don't forget to take look in there before changing anything.
+	 *
+	 * @param string $char
+	 * @return bool
+	 */
+	function isKeyChar($char) {
+		return (
+			($char >= 'a' && $char <= 'z')
+			|| $char == '.' || $char == '_' || $char == '-'
+			|| ($char >= 'A' && $char <= 'Z')
+			|| ($char >= '0' && $char <= '9')
+		);
+	}
+
+	/**
 	 * Parse key and parameters and put them into $this->parameters array.
 	 *
-	 * @param string $key
+	 * @param string	$data
+	 * @param int		$offset
 	 */
-	private function parseKey($key) {
-		$pos = 0;
+	public function parse($data, $offset = 0) {
+		$this->length = 0;
+		$this->match = '';
+		$this->key = '';
+		$this->parameters = [];
 
-		// checking every byte, one by one, until first 'not key_id' char is reached
-		while (isset($key[$pos])) {
-			if (!isKeyIdChar($key[$pos])) {
-				break; // $pos now points to the first 'not a key name' char
+		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
+			// Code is not missing here.
+		}
+
+		// is key empty?
+		if ($p == $offset) {
+			$this->error = isset($data[$p])
+				? $this->errorMessage(substr($data, $offset), 0)
+				: _('key is empty');
+
+			return self::PARSE_FAIL;
+		}
+
+		$_18_simple_check = false;
+
+		// old-style simple checks
+		if ($this->options['18_simple_checks'] && isset($data[$p]) && $data[$p] === ',') {
+			$p++;
+
+			$user_macro_parser = new CUserMacroParser();
+
+			if ($user_macro_parser->parse($data, $p) != CParser::PARSE_FAIL) {
+				$p += $user_macro_parser->getLength();
 			}
-			$this->keyId .= $key[$pos++];
-		}
-
-		// checking if key is empty
-		if ($pos == 0) {
-			$this->isValid = false;
-			$this->error = $this->errorMessage($key, $pos);
-			return;
-		}
-
-		// invalid symbol instead of '[', which would be the beginning of params
-		if (isset($key[$pos]) && $key[$pos] != '[') {
-			$this->isValid = false;
-			$this->error = $this->errorMessage($key, $pos);
-			return;
-		}
-
-		$state = self::STATE_END;
-		$level = 0;
-		$num = 0;
-
-		while (isset($key[$pos])) {
-			if ($level == 0) {
-				// first square bracket + Zapcat compatibility
-				if ($state == self::STATE_END && $key[$pos] == '[') {
-					$state = self::STATE_NEW;
+			// numeric parameter or empty parameter
+			else {
+				for (; isset($data[$p]) && $data[$p] > '0' && $data[$p] < '9'; $p++) {
+					// Code is not missing here.
 				}
-				else {
+			}
+
+			$_18_simple_check = true;
+		}
+
+		$this->key = substr($data, $offset, $p - $offset);
+		$p2 = $p;
+
+		if (!$_18_simple_check) {
+			// Zapcat compatibility.
+			for (; isset($data[$p2]) && $data[$p2] == '['; $p = $p2) {
+				$_parameters = [
+					'type' => self::PARAM_ARRAY,
+					'raw' => '',
+					'pos' => $p2 - $offset,
+					'parameters' => []
+				];
+
+				if (!$this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
 					break;
 				}
-			}
 
+				$_parameters['raw'] = substr($data, $p, $p2 - $p);
+
+				$this->parameters[] = $_parameters;
+			}
+		}
+
+		$this->length = $p - $offset;
+		$this->match = substr($data, $offset, $this->length);
+
+		if (!isset($data[$p])) {
+			$this->error = '';
+			return self::PARSE_SUCCESS;
+		}
+
+		$this->error = !isset($data[$p2])
+			? _('unexpected end of key')
+			: $this->errorMessage(substr($data, $offset), $p2 - $offset);
+
+		return self::PARSE_SUCCESS_CONT;
+	}
+
+	private function parseKeyParameters($data, &$pos, array &$parameters) {
+		$state = self::STATE_NEW;
+		$num = 0;
+
+		for ($p = $pos + 1; isset($data[$p]); $p++) {
 			switch ($state) {
 				// a new parameter started
 				case self::STATE_NEW:
-					switch ($key[$pos]) {
+					switch ($data[$p]) {
 						case ' ':
 							break;
 
 						case ',':
-							if ($level == 1) {
-								if (!isset($this->parameters[$num])) {
-									$this->parameters[$num] = '';
-								}
-								$num++;
-							}
+							$parameters[$num++] = [
+								'type' => self::PARAM_UNQUOTED,
+								'raw' => '',
+								'pos' => $p - $pos
+							];
 							break;
 
 						case '[':
-							$level++;
-							if ($level == 2) {
-								$l = $pos;
-							}
-							break;
+							$_p = $p;
+							$_parameters = [
+								'type' => self::PARAM_ARRAY,
+								'raw' => '',
+								'pos' => $p - $pos,
+								'parameters' => []
+							];
 
-						case ']':
-							if ($level == 1) {
-								if (!isset($this->parameters[$num])) {
-									$this->parameters[$num] = '';
-								}
-								$num++;
+							if (!$this->parseKeyParameters($data, $_p, $_parameters['parameters'])) {
+								break 3;
 							}
-							elseif ($level == 2) {
-								$this->parameters[$num] = '';
-								for ($l++; $l < $pos; $l++) {
-									$this->parameters[$num] .= $key[$l];
-								}
-							}
-							$level--;
+
+							$_parameters['raw'] = substr($data, $p, $_p - $p);
+							$parameters[$num] = $_parameters;
+
+							$p = $_p - 1;
 							$state = self::STATE_END;
 							break;
 
+						case ']':
+							$parameters[$num] = [
+								'type' => self::PARAM_UNQUOTED,
+								'raw' => '',
+								'pos' => $p - $pos
+							];
+							$state = self::STATE_END_OF_PARAMS;
+							break;
+
 						case '"':
+							$parameters[$num] = [
+								'type' => self::PARAM_QUOTED,
+								'raw' => $data[$p],
+								'pos' => $p - $pos
+							];
 							$state = self::STATE_QUOTED;
-							if ($level == 1) {
-								$l = $pos;
-							}
 							break;
 
 						default:
+							$parameters[$num] = [
+								'type' => self::PARAM_UNQUOTED,
+								'raw' => $data[$p],
+								'pos' => $p - $pos
+							];
 							$state = self::STATE_UNQUOTED;
-							if ($level == 1) {
-								$l = $pos;
-							}
 					}
 					break;
 
 				// end of parameter
 				case self::STATE_END:
-					switch ($key[$pos]) {
+					switch ($data[$p]) {
 						case ' ':
 							break;
 
 						case ',':
 							$state = self::STATE_NEW;
-							if ($level == 1) {
-								if (!isset($this->parameters[$num])) {
-									$this->parameters[$num] = '';
-								}
-								$num++;
-							}
+							$num++;
 							break;
 
 						case ']':
-							if ($level == 1) {
-								if (!isset($this->parameters[$num])) {
-									$this->parameters[$num] = '';
-								}
-								$num++;
-							}
-							elseif ($level == 2) {
-								$this->parameters[$num] = '';
-								for ($l++; $l < $pos; $l++) {
-									$this->parameters[$num] .= $key[$l];
-								}
-							}
-							$level--;
+							$state = self::STATE_END_OF_PARAMS;
 							break;
 
 						default:
@@ -215,50 +271,39 @@ class CItemKey {
 
 				// an unquoted parameter
 				case self::STATE_UNQUOTED:
-					if ($key[$pos] == ']' || $key[$pos] == ',') {
-						if ($level == 1) {
-							$this->parameters[$num] = '';
-							for (; $l < $pos; $l++) {
-								$this->parameters[$num] .= $key[$l];
-							}
-						}
-						$pos--;
-						$state = self::STATE_END;
+					switch ($data[$p]) {
+						case ']':
+							$state = self::STATE_END_OF_PARAMS;
+							break;
+
+						case ',':
+							$state = self::STATE_NEW;
+							$num++;
+							break;
+
+						default:
+							$parameters[$num]['raw'] .= $data[$p];
 					}
 					break;
 
 				// a quoted parameter
 				case self::STATE_QUOTED:
-					if ($key[$pos] == '"' && $key[$pos - 1] != '\\') {
-						if ($level == 1) {
-							$this->parameters[$num] = '';
-							for ($l++; $l < $pos; $l++) {
-								if ($key[$l] != '\\' || $key[$l + 1] != '"') {
-									$this->parameters[$num] .= $key[$l];
-								}
-							}
-						}
+					$parameters[$num]['raw'] .= $data[$p];
+
+					if ($data[$p] == '"' && $data[$p - 1] != '\\') {
 						$state = self::STATE_END;
 					}
 					break;
+
+				// end of parameters
+				case self::STATE_END_OF_PARAMS:
+					break 2;
 			}
-
-			$pos++;
 		}
 
-		if ($pos == 0 || isset($key[$pos]) || $level != 0) {
-			$this->isValid = false;
-			$this->error = $this->errorMessage($key, $pos);
-		}
-	}
+		$pos = $p;
 
-	/**
-	 * Returns the result of validation.
-	 *
-	 * @return bool
-	 */
-	public function isValid() {
-		return $this->isValid;
+		return ($state == self::STATE_END_OF_PARAMS);
 	}
 
 	/**
@@ -275,8 +320,8 @@ class CItemKey {
 	 *
 	 * @return string
 	 */
-	public function getKeyId() {
-		return $this->keyId;
+	public function getKey() {
+		return $this->key;
 	}
 
 	/**
@@ -284,7 +329,73 @@ class CItemKey {
 	 *
 	 * @return array
 	 */
-	public function getParameters() {
+	public function getParamsRaw() {
 		return $this->parameters;
+	}
+
+	/**
+	 * Returns the number of key parameters.
+	 *
+	 * @return int
+	 */
+	public function getParamsNum() {
+		$num = 0;
+
+		foreach ($this->parameters as $parameter) {
+			$num += count($parameter['parameters']);
+		}
+
+		return $num;
+	}
+
+	/*
+	 * Unquotes special symbols in item key parameter
+	 *
+	 * @param string $param
+	 *
+	 * @return string
+	 */
+	public static function unquoteParam($param) {
+		$unquoted = '';
+
+		for ($p = 1; isset($param[$p]); $p++) {
+			if ($param[$p] == '\\' && $param[$p + 1] == '"') {
+				continue;
+			}
+
+			$unquoted .= $param[$p];
+		}
+
+		return substr($unquoted, 0, -1);
+	}
+
+	/**
+	 * Returns an unquoted parameter.
+	 *
+	 * @param int $n	the number of the requested parameter
+	 *
+	 * @return string|null
+	 */
+	public function getParam($n) {
+		$num = 0;
+
+		foreach ($this->parameters as $parameter) {
+			foreach ($parameter['parameters'] as $param) {
+				if ($num++ == $n) {
+					switch ($param['type']) {
+						case self::PARAM_ARRAY:
+							// return parameter without square brackets
+							return substr($param['raw'], 1, strlen($param['raw']) - 2);
+						case self::PARAM_UNQUOTED:
+							// return parameter without any changes
+							return $param['raw'];
+						case self::PARAM_QUOTED:
+							return $this->unquoteParam($param['raw']);
+					}
+				}
+			}
+		}
+
+		return null;
 	}
 }

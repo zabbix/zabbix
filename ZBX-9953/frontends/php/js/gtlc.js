@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,6 +138,7 @@ var timeControl = {
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
 					var graphUrl = new Curl(obj.src);
+					graphUrl.unsetArgument('sid');
 					graphUrl.setArgument('width', obj.objDims.width);
 
 					obj.src = graphUrl.getUrl();
@@ -325,7 +326,7 @@ var CTimeLine = Class.create({
 	_period:	null,	// selected period
 	_now:		false,	// state if time is set to NOW
 	_isNow:		false,	// state if time is set to NOW (for outside usage)
-	minperiod:	3600,	// minimal allowed period
+	minperiod:	60,		// minimal allowed period
 	maxperiod:	null,	// max period in seconds
 
 	initialize: function(period, starttime, usertime, endtime, maximumPeriod, isNow) {
@@ -1096,8 +1097,8 @@ var CScrollBar = Class.create({
 	appendZoomLinks: function() {
 		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
-		var zooms = [3600, 7200, 10800, 21600, 43200, 86400, 259200, 604800, 1209600, 2592000, 7776000, 15552000,
-			31536000
+		var zooms = [300, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400, 259200, 604800, 1209600, 2592000,
+			7776000, 15552000, 31536000
 		];
 		var links = 0;
 
@@ -1141,7 +1142,7 @@ var CScrollBar = Class.create({
 	appendNavLinks: function() {
 		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
-		var moves = [3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
+		var moves = [300, 3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
 		var links = 0;
 
 		var tmp_laquo = document.createElement('span');
@@ -1490,12 +1491,12 @@ var sbox = Class.create({
 
 		this.sbox_id = id;
 		this.containerId = '#flickerfreescreen_' + id;
-		this.shiftT = parseInt(tc.objDims.shiftYtop);
+		this.shiftT = parseInt(tc.objDims.shiftYtop) + 1;
 		this.shiftL = shiftL;
 		this.shiftR = shiftR;
 		this.additionShiftL = 0;
 		this.areaWidth = width;
-		this.areaHeight = parseInt(tc.objDims.graphHeight);
+		this.areaHeight = parseInt(tc.objDims.graphHeight) + 1;
 		this.box.width = width;
 	},
 
@@ -1588,7 +1589,7 @@ var sbox = Class.create({
 			this.period = this.calcPeriod();
 
 			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
+				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
 			}
 		}
 	},
@@ -1663,7 +1664,7 @@ var sbox = Class.create({
 		this.dom_obj = document.createElement('div');
 		this.dom_obj.id = id;
 		this.dom_obj.className = 'box_on';
-		this.dom_obj.style.height = (this.areaHeight + 2) + 'px';
+		this.dom_obj.style.height = this.areaHeight + 'px';
 
 		jQuery(this.grphobj).parent().append(this.dom_obj);
 	},
@@ -1765,11 +1766,11 @@ var sbox = Class.create({
 
 	optimizeEvent: function(e) {
 		if (!empty(e.pageX) && !empty(e.pageY)) {
-			this.mouse_event.left = e.pageX - jQuery(this.containerId).position().left;
+			this.mouse_event.left = e.pageX;
 			this.mouse_event.top = e.pageY;
 		}
 		else if (!empty(e.clientX) && !empty(e.clientY)) {
-			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - jQuery(this.containerId).position().left;
+			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 			this.mouse_event.top = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 		}
 		else {

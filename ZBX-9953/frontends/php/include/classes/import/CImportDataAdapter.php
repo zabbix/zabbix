@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,8 +126,10 @@ class CImportDataAdapter {
 				}
 
 				$hosts[] = CArrayHelper::getByKeys($host, [
-					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status', 'description',
-					'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name', 'inventory_mode'
+					'inventory', 'proxy', 'groups', 'templates', 'macros', 'interfaces', 'host', 'status',
+					'description', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'name',
+					'inventory_mode', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'tls_psk_identity',
+					'tls_psk'
 				]);
 			}
 		}
@@ -164,6 +166,15 @@ class CImportDataAdapter {
 		}
 
 		return $applications;
+	}
+
+	/**
+	 * Get value maps from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getValueMaps() {
+		return array_key_exists('value_maps', $this->data) ? $this->data['value_maps'] : [];
 	}
 
 	/**

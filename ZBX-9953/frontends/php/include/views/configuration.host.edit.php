@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,10 +31,13 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
-	->setName('web.hosts.host.php.')
+	->setName('hostsForm')
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
-	->addVar('flags', $data['flags']);
+	->addVar('flags', $data['flags'])
+	->addVar('tls_connect', $data['tls_connect'])
+	->addVar('tls_accept', $data['tls_accept'])
+	->setAttribute('id', 'hostForm');
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -560,7 +563,6 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$ignoredTemplates = [];
 
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
@@ -615,7 +617,6 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
@@ -758,6 +759,42 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 }
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+
+// Encryption form list.
+$encryption_form_list = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+	)
+	->addRow(_('Connections from host'), [
+		[(new CCheckBox('tls_in_none'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('Certificate')]
+	])
+	->addRow(_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
+
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 /*
  * footer

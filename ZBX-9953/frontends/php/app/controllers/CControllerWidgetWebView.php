@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,11 +90,11 @@ class CControllerWidgetWebView extends CController {
 			$filter['maintenance'] = ($maintenance == 0) ? 0 : null;
 		}
 
-		$data = [
-			'filter' => $filter
-		];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData([
+			'filter' => $filter,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

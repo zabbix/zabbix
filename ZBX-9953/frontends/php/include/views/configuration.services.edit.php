@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ $servicesFormList->addRow(_('Parent service'), [
 
 // append algorithm to form list
 $servicesFormList->addRow(_('Status calculation algorithm'),
-	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorythm())
+	new CComboBox('algorithm', $this->data['algorithm'], null, serviceAlgorithm())
 );
 
 // append SLA to form list
@@ -92,7 +92,6 @@ $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $
  * Dependencies tab
  */
 $servicesChildTable = (new CTable())
-	->setNoDataMessage(_('No dependencies defined.'))
 	->setAttribute('style', 'width: 100%;')
 	->setId('service_children')
 	->setHeader([_('Services'), _('Soft'), _('Trigger'), _('Action')]);
@@ -105,7 +104,8 @@ foreach ($this->data['children'] as $child) {
 			[
 				$childrenLink,
 				new CVar('children['.$child['serviceid'].'][name]', $child['name']),
-				new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
+				new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid']),
+				new CVar('children['.$child['serviceid'].'][trigger]', $child['trigger'])
 			],
 			(new CCheckBox('children['.$child['serviceid'].'][soft]'))
 				->setChecked(isset($child['soft']) && !empty($child['soft'])),
@@ -136,7 +136,6 @@ $servicesDependenciesFormList->addRow(
  */
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = (new CTable())
-	->setNoDataMessage(_('No times defined. Work 24x7.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
 

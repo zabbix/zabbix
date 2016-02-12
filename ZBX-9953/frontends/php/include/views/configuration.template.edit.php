@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ if ($data['templateId'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
-	->setName('tpl_for')
+	->setName('templatesForm')
 	->addVar('form', $data['form'])
 	->addVar('groupid', $data['groupId']);
 
@@ -389,7 +389,6 @@ $tmplList = new CFormList();
 $ignoredTemplates = [];
 
 $linkedTemplateTable = (new CTable())
-	->setNoDataMessage(_('No templates linked.'))
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 

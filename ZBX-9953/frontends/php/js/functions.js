@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,13 +114,6 @@ function removeObjectById(id) {
 }
 
 /**
- * Converts all HTML entities into the corresponding symbols.
- */
-jQuery.unescapeHtml = function(html) {
-	return jQuery('<div />').html(html).text();
-}
-
-/**
  * Converts all HTML symbols into HTML entities.
  */
 jQuery.escapeHtml = function(html) {
@@ -221,80 +214,38 @@ function getUniqueId() {
 }
 
 /**
- * Color palette, (implementation from PHP)
+ * Color palette object used for geting different colors from color palette.
  */
-var prevColor = {'color': 0, 'gradient': 0};
+var colorPalette = (function() {
+	'use strict';
 
-function incrementNextColor() {
-	prevColor['color']++;
-	if (prevColor['color'] == 7) {
-		prevColor['color'] = 0;
+	var current_color = 0,
+		palette = [
+			'1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
+			'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
+		];
 
-		prevColor['gradient']++;
-		if (prevColor['gradient'] == 3) {
-			prevColor['gradient'] = 0;
+	return {
+		incrementNextColor: function() {
+			if (++current_color == palette.length) {
+				current_color = 0;
+			}
+		},
+
+		/**
+		 * Gets next color from palette.
+		 *
+		 * @return string	hexadecimal color code
+		 */
+		getNextColor: function() {
+			var color = palette[current_color];
+
+			this.incrementNextColor();
+
+			return color;
 		}
 	}
-}
-
-function getNextColor(paletteType) {
-	var palette, gradient, hexColor, r, g, b;
-
-	switch (paletteType) {
-		case 1:
-			palette = [200, 150, 255, 100, 50, 0];
-			break;
-		case 2:
-			palette = [100, 50, 200, 150, 250, 0];
-			break;
-		case 0:
-		default:
-			palette = [255, 200, 150, 100, 50, 0];
-			break;
-	}
-
-	gradient = palette[prevColor['gradient']];
-	r = (100 < gradient) ? 0 : 255;
-	g = r;
-	b = r;
-
-	switch (prevColor['color']) {
-		case 0:
-			g = gradient;
-			break;
-		case 1:
-			r = gradient;
-			break;
-		case 2:
-			b = gradient;
-			break;
-		case 3:
-			b = gradient;
-			r = b;
-			break;
-		case 4:
-			b = gradient;
-			g = b;
-			break;
-		case 5:
-			g = gradient;
-			r = g;
-			break;
-		case 6:
-			b = gradient;
-			g = b;
-			r = b;
-			break;
-	}
-
-	incrementNextColor();
-
-	hexColor = ('0' + parseInt(r, 10).toString(16)).slice(-2)
-				+ ('0' + parseInt(g, 10).toString(16)).slice(-2)
-				+ ('0' + parseInt(b, 10).toString(16)).slice(-2);
-
-	return hexColor.toUpperCase();
-}
+}());
 
 /**
  * Used for php ctweenbox object.
@@ -417,7 +368,8 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 	}
 
 	var days = Math.floor((timestamp - years * 31536000 - months * 2592000) / 86400),
-		hours = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
+		hours = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600),
+		minutes = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400 - hours * 3600) / 60);
 
 	// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
 	if (months == 12) {
@@ -435,6 +387,9 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		if (hours.toString().length == 1) {
 			hours = '0' + hours;
 		}
+		if (minutes.toString().length == 1) {
+			minutes = '0' + minutes;
+		}
 	}
 
 	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
@@ -443,6 +398,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		? days + locale['S_DAY_SHORT'] + ' '
 		: ((days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ');
 	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 
 	return str;
 }
@@ -517,139 +473,191 @@ function stripslashes(str) {
 	});
 }
 
+function overlayDialogueDestroy() {
+	jQuery('#overlay_bg, #overlay_dialogue').remove();
+	jQuery('body').css({'overflow': ''});
+	jQuery('body[style=""]').removeAttr('style');
+}
+
+/**
+ * Display modal window
+ *
+ * @param string title					modal window title
+ * @param object content				window content
+ * @param array  buttons				window buttons
+ * @param string buttons[]['title']
+ * @param string buttons[]['class']
+ * @param bool	 buttons[]['cancel']	(optional) it means what this button has cancel action
+ * @param bool	 buttons[]['focused']
+ * @param bool   buttons[]['enabled']
+ * @param object buttons[]['click']
+ */
+function overlayDialogue(params) {
+	var overlay_bg = jQuery('<div>', {
+		id: 'overlay_bg',
+		class: 'overlay-bg',
+		css: {
+			'display': 'none'
+		}
+	});
+
+	var overlay_dialogue_footer = jQuery('<div>', {
+		class: 'overlay-dialogue-footer'
+	});
+
+	var button_focused = null,
+		cancel_action = null;
+
+	jQuery.each(params.buttons, function(index, obj) {
+		var button = jQuery('<button>', {
+			type: 'button',
+			text: obj.title
+		}).click(function() {
+			obj.action();
+			overlayDialogueDestroy();
+			return false;
+		});
+
+		if ('class' in obj) {
+			button.addClass(obj.class);
+		}
+
+		if ('enabled' in obj && obj.enabled === false) {
+			button.attr('disabled', 'disabled');
+		}
+
+		if ('focused' in obj && obj.focused === true) {
+			button_focused = button;
+		}
+
+		if ('cancel' in obj && obj.cancel === true) {
+			cancel_action = obj.action;
+		}
+
+		overlay_dialogue_footer.append(button);
+	});
+
+	overlay_dialogue = jQuery('<div>', {
+		id: 'overlay_dialogue',
+		class: 'overlay-dialogue',
+		css: {
+			'position': 'fixed',
+			'top': '40%',
+			'left': '50%',
+			'display': 'none'
+		}
+	})
+		.append(
+			jQuery('<span>', {
+				class: 'overlay-close-btn'
+			})
+				.click(function() {
+					if (cancel_action !== null) {
+						cancel_action();
+					}
+					overlayDialogueDestroy();
+					return false;
+				})
+		)
+		.append(
+			jQuery('<div>', {
+				class: 'dashbrd-widget-head'
+			}).append(jQuery('<h4>').text(params.title))
+		)
+		.append(
+			jQuery('<div>', {
+				class: 'overlay-dialogue-body'
+			}).append(params.content)
+		)
+		.append(overlay_dialogue_footer)
+		.on('keypress keydown', function(e) {
+			if (e.which == 27) { // ESC
+				if (cancel_action !== null) {
+					cancel_action();
+				}
+				overlayDialogueDestroy();
+				return false;
+			}
+		});
+
+	overlay_bg
+		.appendTo('body')
+		.show();
+	overlay_dialogue
+		.appendTo('body')
+		.css({
+			'margin-top': '-' + (overlay_dialogue.outerHeight() / 2) + 'px',
+			'margin-left': '-' + (overlay_dialogue.outerWidth() / 2) + 'px'
+		})
+		.show();
+
+	var focusable = jQuery(':focusable', overlay_dialogue);
+
+	if (focusable.length > 0) {
+		var first_focusable = focusable.filter(':first'),
+			last_focusable = focusable.filter(':last');
+
+		first_focusable.on('keydown', function(e) {
+			if (e.keyCode == 9 && e.shiftKey) {
+				last_focusable.focus();
+				return false;
+			}
+		});
+
+		last_focusable.on('keydown', function(e) {
+			if (e.keyCode == 9 && !e.shiftKey) {
+				first_focusable.focus();
+				return false;
+			}
+		});
+	}
+
+	jQuery('body').css({'overflow': 'hidden'});
+
+	if (button_focused !== null) {
+		button_focused.focus();
+	}
+}
+
 /**
  * Execute script.
  *
- * @param string hostId			host id
- * @param string scriptId		script id
+ * @param string hostid			host id
+ * @param string scriptid		script id
  * @param string confirmation	confirmation text
  */
-function executeScript(hostId, scriptId, confirmation) {
+function executeScript(hostid, scriptid, confirmation) {
 	var execute = function() {
-		if (!empty(hostId)) {
-			openWinCentered('scripts_exec.php?hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
+		if (hostid !== null) {
+			openWinCentered('scripts_exec.php?hostid=' + hostid + '&scriptid=' + scriptid, 'Tools', 950, 470,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 		}
 	};
 
 	if (confirmation.length > 0) {
-		var scriptDialog = jQuery('#scriptDialog');
-
-		if (scriptDialog.length == 0) {
-			scriptDialog = jQuery('<div>', {
-				id: 'scriptDialog',
-				css: {
-					display: 'none',
-					'white-space': 'normal'
-				}
-			});
-
-			jQuery('body').append(scriptDialog);
-		}
-
-		scriptDialog
-			.text(confirmation)
-			.dialog({
-				buttons: [
-					{text: t('Execute'), click: function() {
-						jQuery(this).dialog('destroy');
+		overlayDialogue({
+			'title': t('Execution confirmation'),
+			'content': jQuery('<span>').text(confirmation),
+			'buttons': [
+				{
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'focused': (hostid === null),
+					'action': function() {}
+				},
+				{
+					'title': t('Execute'),
+					'enabled': (hostid !== null),
+					'focused': (hostid !== null),
+					'action': function() {
 						execute();
-					}},
-					{text: t('Cancel'), click: function() {
-						jQuery(this).dialog('destroy');
-					}}
-				],
-				draggable: true,
-				modal: true,
-				width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
-				resizable: false,
-				minWidth: 200,
-				minHeight: 100,
-				title: t('Execution confirmation'),
-				close: function() {
-					jQuery(this).dialog('destroy');
+					}
 				}
-			});
-
-		if (empty(hostId)) {
-			jQuery('.ui-dialog-buttonset .ui-button:first').prop('disabled', true).addClass('ui-state-disabled');
-			jQuery('.ui-dialog-buttonset .ui-button:last').addClass('main').focus();
-		}
-		else {
-			jQuery('.ui-dialog-buttonset .ui-button:first').addClass('main');
-		}
+			]
+		});
 	}
 	else {
 		execute();
 	}
-}
-
-/**
- * Makes all elements which are not supported for printing view to disappear by including css file.
- *
- * @param bool show
- */
-function printLess(show) {
-	if (!jQuery('#printLess').length) {
-		jQuery('<link rel="stylesheet" type="text/css" id="printLess">')
-			.appendTo('head')
-			.attr('href', './styles/print.css');
-
-		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
-			if (jQuery(this).find('input, form, select, .menu_icon').length) {
-				jQuery(this).addClass('hide-all-children');
-			}
-		});
-
-		jQuery('body')
-			.prepend('<div class="printless">&laquo;BACK</div>')
-			.click(function() {
-				printLess(false);
-			});
-	}
-
-	jQuery('#printLess').prop('disabled', !show);
-}
-
-/**
- * Display jQuery model window.
- *
- * @param string title					modal window title
- * @param string text					window message
- * @param array  buttons				window buttons
- * @param array  buttons[]['text']		button text
- * @param object buttons[]['click']		button click action
- */
-function showModalWindow(title, text, buttons) {
-	var modalWindow = jQuery('#modalWindow');
-
-	if (modalWindow.length == 0) {
-		modalWindow = jQuery('<div>', {
-			id: 'modalWindow',
-			css: {
-				padding: '10px',
-				display: 'none',
-				'white-space': 'normal'
-			}
-		});
-
-		jQuery('body').append(modalWindow);
-	}
-
-	modalWindow
-		.text(text)
-		.dialog({
-			title: title,
-			buttons: buttons,
-			draggable: true,
-			modal: true,
-			resizable: false,
-			width: 'inherit',
-			minWidth: 200,
-			minHeight: 120,
-			close: function() {
-				jQuery(this).dialog('destroy');
-			}
-		});
 }

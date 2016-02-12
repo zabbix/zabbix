@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -319,6 +319,10 @@ if (isset($_REQUEST['form'])) {
 	// host prototype edit form
 	if (getRequest('hostid') && !getRequest('form_refresh')) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
+
+		if (!array_key_exists('inventory_mode', $data['host_prototype']['inventory'])) {
+			$data['host_prototype']['inventory']['inventory_mode'] = HOST_INVENTORY_DISABLED;
+		}
 
 		$data['groups'] = API::HostGroup()->get([
 			'output' => API_OUTPUT_EXTEND,

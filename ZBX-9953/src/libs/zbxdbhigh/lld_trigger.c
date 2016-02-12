@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ typedef struct
 	char			*url_orig;
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
-	zbx_vector_ptr_t	dependants;
+	zbx_vector_ptr_t	dependents;
 #define ZBX_FLAG_LLD_TRIGGER_UNSET			__UINT64_C(0x00)
 #define ZBX_FLAG_LLD_TRIGGER_DISCOVERED			__UINT64_C(0x01)
 #define ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION		__UINT64_C(0x02)
@@ -148,7 +148,7 @@ typedef struct
 	/* the current iteration number, used during dependency validation */
 	int			iter_num;
 
-	/* the number of dependants */
+	/* the number of dependents */
 	int			parents;
 
 	/* trigger dependency list */
@@ -198,7 +198,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 
 static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 {
-	zbx_vector_ptr_destroy(&trigger->dependants);
+	zbx_vector_ptr_destroy(&trigger->dependents);
 	zbx_vector_ptr_clear_ext(&trigger->dependencies, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&trigger->dependencies);
 	zbx_vector_ptr_clear_ext(&trigger->functions, (zbx_clean_func_t)lld_function_free);
@@ -360,7 +360,7 @@ static void	lld_triggers_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_pt
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
-		zbx_vector_ptr_create(&trigger->dependants);
+		zbx_vector_ptr_create(&trigger->dependents);
 
 		zbx_vector_ptr_append(triggers, trigger);
 	}
@@ -715,6 +715,18 @@ static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functio
 		if ('{' != (*expression)[l])
 			continue;
 
+		if ('$' == (*expression)[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+				l += macro_r;
+			else
+				l++;
+
+			continue;
+		}
+
 		for (r = l + 1; '\0' != (*expression)[r] && '}' != (*expression)[r]; r++)
 			;
 
@@ -771,6 +783,18 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 
 		if ('{' != expression[l])
 			continue;
+
+		if ('$' == expression[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(expression + l, &macro_r, &context_l, &context_r))
+				l += macro_r;
+			else
+				l++;
+
+			continue;
+		}
 
 		for (r = l + 1; '\0' != expression[r] && '}' != expression[r]; r++)
 			;
@@ -1028,7 +1052,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
-		zbx_vector_ptr_create(&trigger->dependants);
+		zbx_vector_ptr_create(&trigger->dependents);
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
@@ -1188,7 +1212,7 @@ static void 	lld_trigger_dependency_make(zbx_lld_trigger_prototype_t *trigger_pr
 					}
 				}
 
-				zbx_vector_ptr_append(&dep_trigger->dependants, trigger);
+				zbx_vector_ptr_append(&dep_trigger->dependents, trigger);
 
 				dependency->trigger_up = dep_trigger;
 				dependency->flags = ZBX_FLAG_LLD_DEPENDENCY_DISCOVERED;
@@ -1527,7 +1551,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 			zbx_vector_ptr_create(&db_trigger->functions);
 			zbx_vector_ptr_create(&db_trigger->dependencies);
-			zbx_vector_ptr_create(&db_trigger->dependants);
+			zbx_vector_ptr_create(&db_trigger->dependents);
 
 			zbx_vector_ptr_append(&db_triggers, db_trigger);
 		}
@@ -1640,6 +1664,18 @@ static void	lld_expression_create(char **expression, zbx_vector_ptr_t *functions
 	{
 		if ('{' != (*expression)[l])
 			continue;
+
+		if ('$' == (*expression)[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+				l += macro_r;
+			else
+				l++;
+
+			continue;
+		}
 
 		for (r = l + 1; '\0' != (*expression)[r] && '}' != (*expression)[r]; r++)
 			;
@@ -2134,7 +2170,7 @@ static zbx_lld_trigger_node_t	*lld_trigger_cache_append(zbx_hashset_t *cache, zb
  * Parameters: cache           - [IN] the trigger cache                       *
  *             trigger         - [IN] the trigger to add                      *
  *             triggerids_up   - [OUT] identifiers of generic trigger         *
- *                                     dependants                             *
+ *                                     dependents                             *
  *             triggerids_down - [OUT] identifiers of generic trigger         *
  *                                     dependencies                           *
  *                                                                            *
@@ -2189,9 +2225,9 @@ static void	lld_trigger_cache_add_trigger_node(zbx_hashset_t *cache, zbx_lld_tri
 	if (0 != trigger->triggerid)
 		zbx_vector_uint64_append(triggerids_up, trigger->triggerid);
 
-	for (i = 0; i < trigger->dependants.values_num; i++)
+	for (i = 0; i < trigger->dependents.values_num; i++)
 	{
-		lld_trigger_cache_add_trigger_node(cache, trigger->dependants.values[i], triggerids_up,
+		lld_trigger_cache_add_trigger_node(cache, trigger->dependents.values[i], triggerids_up,
 				triggerids_down);
 	}
 
@@ -2259,10 +2295,10 @@ static void	lld_trigger_cache_init(zbx_hashset_t *cache, zbx_vector_ptr_t *trigg
 			lld_trigger_cache_add_trigger_node(cache, trigger, &triggerids_up, &triggerids_down);
 	}
 
-	/* keep trying to load generic dependants/dependencies until there are nothing to load */
+	/* keep trying to load generic dependents/dependencies until there are nothing to load */
 	while (0 != triggerids_up.values_num || 0 != triggerids_down.values_num)
 	{
-		/* load dependants */
+		/* load dependents */
 		if (0 != triggerids_down.values_num)
 		{
 			sql_offset = 0;

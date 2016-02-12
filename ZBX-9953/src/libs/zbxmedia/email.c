@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -371,11 +371,12 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	const char	*OK_354 = "354";
 	const char	*response;
 
-	alarm(timeout);
+	zbx_alarm_on(timeout);
 
 	/* connect to and receive an initial greeting from SMTP server */
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, 0))
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, 0, ZBX_TCP_SEC_UNENCRYPTED, NULL,
+			NULL))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_socket_strerror());
@@ -537,7 +538,7 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 close:
 	zbx_tcp_close(&s);
 out:
-	alarm(0);
+	zbx_alarm_off();
 
 	return ret;
 }

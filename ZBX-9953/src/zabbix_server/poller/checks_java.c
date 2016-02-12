@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,9 +71,11 @@ static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errc
 
 				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 				{
-					if (SUCCEED == set_result_type(&results[i],
-								items[i].value_type, items[i].data_type, value))
+					if (SUCCEED == set_result_type(&results[i], items[i].value_type,
+							items[i].data_type, value))
+					{
 						errcodes[i] = SUCCEED;
+					}
 					else
 						errcodes[i] = NOTSUPPORTED;
 				}
@@ -201,8 +203,8 @@ void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (err = zbx_tcp_connect(&s, CONFIG_SOURCE_IP,
-					CONFIG_JAVA_GATEWAY, CONFIG_JAVA_GATEWAY_PORT, CONFIG_TIMEOUT)))
+	if (SUCCEED == (err = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, CONFIG_JAVA_GATEWAY, CONFIG_JAVA_GATEWAY_PORT,
+			CONFIG_TIMEOUT, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@
 
 ZBX_COLLECTOR_DATA	*collector = NULL;
 
-extern unsigned char	process_type;
-extern int		server_num, process_num;
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 #ifndef _WINDOWS
 static int		shm_id;
@@ -193,7 +193,7 @@ void	init_collector_data()
 	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
-	zbx_procstat_init(&collector->procstat);
+	zbx_procstat_init();
 #endif
 
 	if (FAIL == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
@@ -229,7 +229,7 @@ void	free_collector_data()
 		return;
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
-	zbx_procstat_destroy(&collector->procstat);
+	zbx_procstat_destroy();
 #endif
 
 	if (ZBX_NONEXISTENT_SHMID != collector->diskstat_shmid)
@@ -441,6 +441,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("collector [processing data]");
 #ifdef _WINDOWS
 		collect_perfstat();

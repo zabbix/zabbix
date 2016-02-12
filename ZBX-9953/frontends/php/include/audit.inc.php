@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,12 +54,8 @@ function audit_resource2str($resource_type = null) {
 		natsort($resources);
 		return $resources;
 	}
-	elseif (isset($resources[$resource_type])) {
-		return $resources[$resource_type];
-	}
-	else {
-		return _('Unknown resource');
-	}
+
+	return isset($resources[$resource_type]) ? $resources[$resource_type] : _('Unknown resource');
 }
 
 function add_audit($action, $resourcetype, $details) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,62 +28,89 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
 	);
 
-$valueMappingForm = (new CForm())
-	->setName('valueMappingForm')
-	->addVar('form', $this->data['form']);
+$form = (new CForm())->addVar('form', $data['form']);
 
-if ($this->data['valuemapid'] != 0) {
-	$valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
+if ($data['valuemapid'] != 0) {
+	$form->addVar('valuemapid', $data['valuemapid']);
 }
 
-$valueMappingFormList = (new CFormList())
+$form_list = (new CFormList())
 	->addRow(_('Name'),
-		(new CTextBox('mapname', $this->data['mapname'], false, 64))
+		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-// mappings
-$mappingsTable = (new CTable())
-	->setNoDataMessage(null)
-	->setId('mappingsTable')
-	->addRow([_('Value'), SPACE, _('Mapped to'), SPACE])
-	->addRow((new CCol(
-		(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	))->setColSpan(4));
-$valueMappingFormList->addRow(_('Mappings'), (new CDiv($mappingsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$table = (new CTable())
+	->setId('mappings_table')
+	->setHeader([_('Value'), '', _('Mapped to'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
 
-// add mappings to form by js
-if ($this->data['mappings']) {
-	zbx_add_post_js('mappingsManager.addExisting('.zbx_jsvalue($this->data['mappings']).');');
-}
-else {
-	zbx_add_post_js('mappingsManager.addNew();');
+foreach ($data['mappings'] as $i => $mapping) {
+	$table->addRow([
+		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'&rArr;',
+		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CButton('mappings['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+		],
+		'form_row'
+	);
 }
 
-// append tab
-$valueMappingTab = new CTabView();
-$valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormList);
+$table->addRow([
+	(new CCol(
+		(new CButton('mapping_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(4)
+]);
+
+$form_list->addRow(_('Mappings'),
+	(new CDiv($table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+);
+
+// append form list to tab
+$tab_view = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_list);
 
 // append buttons
-if ($this->data['valuemapid'] != 0) {
-	$valueMappingTab->setFooter(makeFormFooter(
+if ($data['valuemapid'] != 0) {
+	if ($data['valuemap_count'] == 0) {
+		$confirm_message = _('Delete selected value mapping?');
+	}
+	else {
+		$confirm_message = _n(
+			'Delete selected value mapping? It is used for %d item!',
+			'Delete selected value mapping? It is used for %d items!',
+			$data['valuemap_count']
+		);
+	}
+
+	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
+			new CButton('clone', _('Clone')),
+			(new CRedirectButton(_('Delete'),
+				'adm.valuemapping.php?action=valuemap.delete&valuemapids[]='.$data['valuemapid'].'&sid='.$data['sid'],
+				$confirm_message
+			))->setId('delete'),
 			new CButtonCancel()
 		]
 	));
 }
 else {
-	$valueMappingTab->setFooter(makeFormFooter(
+	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$valueMappingForm->addItem($valueMappingTab);
+$form->addItem($tab_view);
 
-$widget->addItem($valueMappingForm);
+$widget->addItem($form);
 
 return $widget;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@
 
 #	define ZBX_MUTEX_NAME		wchar_t *
 
-#	define ZBX_MUTEX_LOG		TEXT("ZBX_MUTEX_LOG")
-#	define ZBX_MUTEX_PERFSTAT	TEXT("ZBX_MUTEX_PERFSTAT")
+#	define ZBX_MUTEX_LOG		zbx_mutex_create_per_process_name(L"ZBX_MUTEX_LOG")
+#	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT")
 
 #else	/* not _WINDOWS */
 
@@ -66,5 +66,9 @@ int	zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 void	__zbx_mutex_lock(const char *filename, int line, ZBX_MUTEX *mutex);
 void	__zbx_mutex_unlock(const char *filename, int line, ZBX_MUTEX *mutex);
 int	zbx_mutex_destroy(ZBX_MUTEX *mutex);
+
+#ifdef _WINDOWS
+ZBX_MUTEX_NAME	zbx_mutex_create_per_process_name(const ZBX_MUTEX_NAME prefix);
+#endif
 
 #endif	/* ZABBIX_MUTEXS_H */

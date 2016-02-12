@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -333,6 +333,13 @@ class API {
 	}
 
 	/**
+	 * @return CTrend
+	 */
+	public static function Trend() {
+		return self::getApi('trend');
+	}
+
+	/**
 	 * @return CTrigger
 	 */
 	public static function Trigger() {
@@ -372,6 +379,13 @@ class API {
 	 */
 	public static function UserMedia() {
 		return self::getApi('usermedia');
+	}
+
+	/**
+	 * @return CValueMap
+	 */
+	public static function ValueMap() {
+		return self::getApi('valuemap');
 	}
 
 	/**

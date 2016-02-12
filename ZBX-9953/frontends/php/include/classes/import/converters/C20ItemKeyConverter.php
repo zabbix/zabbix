@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,17 @@
 class C20ItemKeyConverter extends CConverter {
 
 	/**
+	 * Item key parser.
+	 *
+	 * @var CItemKey
+	 */
+	protected $item_key_parser;
+
+	public function __construct() {
+		$this->item_key_parser = new CItemKey();
+	}
+
+	/**
 	 * Convert item key
 	 *
 	 * @param string	$value	item key
@@ -32,17 +43,16 @@ class C20ItemKeyConverter extends CConverter {
 	 * @return string			converted item key
 	 */
 	public function convert($value) {
-		$item_key = new CItemKey($value);
-
-		if (!$item_key->isValid()) {
+		if ($this->item_key_parser->parse($value) != CParser::PARSE_SUCCESS) {
 			return $value;
 		}
 
-		if ($item_key->getKeyId() !== 'net.tcp.service' && $item_key->getKeyId() !== 'net.tcp.service.perf') {
+		if ($this->item_key_parser->getKey() !== 'net.tcp.service'
+				&& $this->item_key_parser->getKey() !== 'net.tcp.service.perf') {
 			return $value;
 		}
 
-		if (!$item_key->getParameters() || $item_key->getParameters()[0] !== 'ntp') {
+		if ($this->item_key_parser->getParamsNum() == 0 || $this->item_key_parser->getParam(0) !== 'ntp') {
 			return $value;
 		}
 

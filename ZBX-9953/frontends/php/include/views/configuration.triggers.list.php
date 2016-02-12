@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,12 +18,39 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
+require_once dirname(__FILE__).'/js/configuration.triggers.list.js.php';
+
 if (!$this->data['hostid']) {
 	$create_button = (new CSubmit('form', _('Create trigger (select host first)')))->setEnabled(false);
 }
 else {
 	$create_button = new CSubmit('form', _('Create trigger'));
 }
+
+$filter = (new CFilter('web.triggers.filter.state'))
+	->addColumn(
+		(new CFormList())
+			->addRow(_('Severity'),
+				new CSeverity([
+					'name' => 'filter_priority', 'value' => (int) $this->data['filter_priority'], 'all' => true
+				])
+			)
+			->addRow(_('State'),
+				(new CRadioButtonList('filter_state', (int) $this->data['filter_state']))
+					->addValue(_('all'), -1)
+					->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
+					->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
+					->setModern(true)
+			)
+			->addRow(_('Status'),
+				(new CRadioButtonList('filter_status', (int) $this->data['filter_status']))
+					->addValue(_('all'), -1)
+					->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
+					->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
+					->setModern(true)
+			)
+	);
 
 $widget = (new CWidget())
 	->setTitle(_('Triggers'))
@@ -40,6 +67,8 @@ $widget = (new CWidget())
 if ($this->data['hostid']) {
 	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));
 }
+
+$widget->addItem($filter);
 
 // create form
 $triggersForm = (new CForm())
@@ -60,6 +89,8 @@ $triggersTable = (new CTableInfo())
 		$this->data['showInfoColumn'] ? _('Info') : null
 	]);
 
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], ['html' => true]);
+
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 
@@ -67,8 +98,6 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$description = [];
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-	$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-	$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
@@ -158,7 +187,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			'&hostid='.$this->data['hostid'].
 			'&g_triggerid='.$triggerid))
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
+		->addSID();
 
 	// hosts
 	$hosts = null;
@@ -180,7 +210,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		triggerExpression($trigger, true),
+		$trigger['expression'],
 		$status,
 		$info
 	]);

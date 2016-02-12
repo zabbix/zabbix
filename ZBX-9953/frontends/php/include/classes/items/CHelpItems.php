@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,7 +218,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
-					'description' => _('Run specified command on the host. Returns text result of the command')
+					'description' => _('Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)')
 				],
 				[
 					'key' => 'system.stat[resource,<type>]',
@@ -500,7 +500,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.run[command,<mode>]',
-					'description' => _('Run specified command on the host. Returns text result of the command')
+					'description' => _('Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)')
 				],
 				[
 					'key' => 'system.stat[resource,<type>]',
@@ -620,7 +620,7 @@ class CHelpItems {
 			ITEM_TYPE_SIMPLE => [
 				[
 					'key' => 'icmpping[<target>,<packets>,<interval>,<size>,<timeout>]',
-					'description' => _('Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.')
+					'description' => _('Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful.')
 				],
 				[
 					'key' => 'icmppingloss[<target>,<packets>,<interval>,<size>,<timeout>]',
@@ -850,11 +850,11 @@ class CHelpItems {
 			ITEM_TYPE_SNMPTRAP => [
 				[
 					'key' => 'snmptrap.fallback',
-					'description' => _('Catches all SNMP traps that are not caught by any of the snmptrap[] items from a corresponding address of the interface.')
+					'description' => _('Catches all SNMP traps that were not caught by any of snmptrap[] items.')
 				],
 				[
 					'key' => 'snmptrap[<regex>]',
-					'description' => _('Catches all SNMP traps from a corresponding address that match regex. Default regex is an empty string.')
+					'description' => _('Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap.')
 				]
 			],
 			ITEM_TYPE_INTERNAL => [

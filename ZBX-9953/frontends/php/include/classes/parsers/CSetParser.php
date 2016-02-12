@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ class CSetParser extends CParser {
 	 *
 	 * @var array
 	 */
-	protected $needles = [];
+	private $needles = [];
 
 	/**
 	 * Array of chars that are used in the given strings with chars as keys.
 	 *
 	 * @var array
 	 */
-	protected $chars = [];
+	private $chars = [];
 
 	/**
 	 * Array of strings to search for.
@@ -42,7 +42,6 @@ class CSetParser extends CParser {
 	 */
 	public function __construct(array $needles) {
 		$this->needles = array_flip($needles);
-
 		$this->chars = array_flip(str_split(implode($needles)));
 	}
 
@@ -51,34 +50,31 @@ class CSetParser extends CParser {
 	 *
 	 * The parser implements a greedy algorithm, i.e., looks for the longest match.
 	 */
-	public function parse($source, $startPos = 0) {
-		$this->pos = $startPos;
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
 
+		$length = 0;
 		$match = null;
-		$matchPos = null;
-		$token = '';
-		while (isset($source[$this->pos]) && isset($this->chars[$source[$this->pos]])) {
-			$token .= $source[$this->pos];
 
-			$this->pos++;
+		$token = '';
+		for ($p = $pos; isset($source[$p]) && isset($this->chars[$source[$p]]); $p++) {
+			$token .= $source[$p];
 
 			// when we found a match, keep looking to see of there may be a longer match
 			if (isset($this->needles[$token])) {
+				$length = $p - $pos + 1;
 				$match = $token;
-				$matchPos = $this->pos;
 			}
 		}
 
-		if ($matchPos === null) {
-			return false;
+		if ($match === null) {
+			return self::PARSE_FAIL;
 		}
 
-		$result = new CParserResult();
-		$result->source = $source;
-		$result->match = $match;
-		$result->pos = $startPos;
-		$result->length = $matchPos - $startPos;
+		$this->length = $length;
+		$this->match = $match;
 
-		return $result;
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}
 }

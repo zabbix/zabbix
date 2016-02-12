@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,205 +64,51 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Collect data
  */
-$httpTest = API::HttpTest()->get([
+$httptest = API::HttpTest()->get([
+	'output' => ['httptestid', 'name', 'hostid'],
 	'httptestids' => getRequest('httptestid'),
-	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
 ]);
-$httpTest = reset($httpTest);
-if (!$httpTest) {
+$httptest = reset($httptest);
+if (!$httptest) {
 	access_deny();
 }
 
-$httpTest['lastfailedstep'] = 0;
-$httpTest['error'] = '';
+$http_test_name = CMacrosResolverHelper::resolveHttpTestName($httptest['hostid'], $httptest['name']);
 
-// fetch http test execution data
-$httpTestData = Manager::HttpTest()->getLastData([$httpTest['httptestid']]);
+// Create details widget.
+$details_screen = CScreenBuilder::getScreen([
+	'resourcetype' => SCREEN_RESOURCE_HTTPTEST_DETAILS,
+	'mode' => SCREEN_MODE_JS,
+	'dataId' => 'httptest_details',
+	'profileIdx2' => $httptest['httptestid']
+]);
 
-if ($httpTestData) {
-	$httpTestData = reset($httpTestData);
-}
-
-// fetch HTTP step items
-$query = DBselect(
-	'SELECT i.value_type,i.valuemapid,i.units,i.itemid,hi.type AS httpitem_type,hs.httpstepid'.
-	' FROM items i,httpstepitem hi,httpstep hs'.
-	' WHERE hi.itemid=i.itemid'.
-		' AND hi.httpstepid=hs.httpstepid'.
-		' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
-);
-$httpStepItems = [];
-$items = [];
-while ($item = DBfetch($query)) {
-	$items[] = $item;
-	$httpStepItems[$item['httpstepid']][$item['httpitem_type']] = $item;
-}
-
-// fetch HTTP item history
-$itemHistory = Manager::History()->getLast($items);
-
-/*
- * Display
- */
-$widget = (new CWidget())
-	->setTitle(
-		_('Details of web scenario').': '.
-		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
-	)
+(new CWidget())
+	->setTitle(_('Details of web scenario').': '.$http_test_name)
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
 			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
 			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		)
-	);
-
-// append table to widget
-$httpdetailsTable = (new CTableInfo())
-	->setHeader([
-		_('Step'),
-		_('Speed'),
-		_('Response time'),
-		_('Response code'),
-		_('Status')
-	]);
-
-$db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($httpTest['httptestid']).' ORDER BY no');
-
-$totalTime = [
-	'value' => 0,
-	'value_type' => null,
-	'valuemapid' => null,
-	'units' => null
-];
-
-$itemIds = [];
-while ($httpstep_data = DBfetch($db_httpsteps)) {
-	$httpStepItemsByType = $httpStepItems[$httpstep_data['httpstepid']];
-
-	$status['msg'] = _('OK');
-	$status['style'] = ZBX_STYLE_GREEN;
-	$status['afterError'] = false;
-
-	if (!isset($httpTestData['lastfailedstep'])) {
-		$status['msg'] = _('Never executed');
-		$status['style'] = ZBX_STYLE_GREY;
-	}
-	elseif ($httpTestData['lastfailedstep'] != 0) {
-		if ($httpTestData['lastfailedstep'] == $httpstep_data['no']) {
-			$status['msg'] = ($httpTestData['error'] === null)
-				? _('Unknown error')
-				: _s('Error: %1$s', $httpTestData['error']);
-			$status['style'] = ZBX_STYLE_RED;
-		}
-		elseif ($httpTestData['lastfailedstep'] < $httpstep_data['no']) {
-			$status['msg'] = _('Unknown');
-			$status['style'] = ZBX_STYLE_GREY;
-			$status['afterError'] = true;
-		}
-	}
-
-	foreach ($httpStepItemsByType as &$httpStepItem) {
-		// calculate the total time it took to execute the scenario
-		// skip steps that come after a failed step
-		if (!$status['afterError'] && $httpStepItem['httpitem_type'] == HTTPSTEP_ITEM_TYPE_TIME) {
-			$totalTime['value_type'] = $httpStepItem['value_type'];
-			$totalTime['valuemapid'] = $httpStepItem['valuemapid'];
-			$totalTime['units'] = $httpStepItem['units'];
-
-			if (isset($itemHistory[$httpStepItem['itemid']])) {
-				$history = $itemHistory[$httpStepItem['itemid']][0];
-
-				$totalTime['value'] += $history['value'];
-			}
-		}
-
-		$itemIds[] = $httpStepItem['itemid'];
-	}
-	unset($httpStepItem);
-
-	// step speed
-	$speedItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_IN];
-	if (!$status['afterError'] && isset($itemHistory[$speedItem['itemid']]) && $itemHistory[$speedItem['itemid']][0]['value'] > 0) {
-		$speed = formatHistoryValue($itemHistory[$speedItem['itemid']][0]['value'], $speedItem);
-	}
-	else {
-		$speed = UNKNOWN_VALUE;
-	}
-
-	// step response time
-	$respTimeItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_TIME];
-	if (!$status['afterError'] && isset($itemHistory[$respTimeItem['itemid']]) && $itemHistory[$respTimeItem['itemid']][0]['value'] > 0) {
-		$respTime = formatHistoryValue($itemHistory[$respTimeItem['itemid']][0]['value'], $respTimeItem);
-	}
-	else {
-		$respTime = UNKNOWN_VALUE;
-	}
-
-	// step response code
-	$respItem = $httpStepItemsByType[HTTPSTEP_ITEM_TYPE_RSPCODE];
-	if (!$status['afterError'] && isset($itemHistory[$respItem['itemid']]) && $itemHistory[$respItem['itemid']][0]['value'] > 0) {
-		$resp = formatHistoryValue($itemHistory[$respItem['itemid']][0]['value'], $respItem);
-	}
-	else {
-		$resp = UNKNOWN_VALUE;
-	}
-
-	$httpdetailsTable->addRow([
-		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpstep_data['name']),
-		$speed,
-		$respTime,
-		$resp,
-		(new CSpan($status['msg']))->addClass($status['style'])
-	]);
-}
-
-if (!isset($httpTestData['lastfailedstep'])) {
-	$status['msg'] = _('Never executed');
-	$status['style'] = ZBX_STYLE_GREY;
-}
-elseif ($httpTestData['lastfailedstep'] != 0) {
-	$status['msg'] = ($httpTestData['error'] === null)
-		? _('Unknown error')
-		: _s('Error: %1$s', $httpTestData['error']);
-	$status['style'] = ZBX_STYLE_RED;
-}
-else {
-	$status['msg'] = _('OK');
-	$status['style'] = ZBX_STYLE_GREEN;
-}
-
-$httpdetailsTable->addRow([
-	bold(_('TOTAL')),
-	SPACE,
-	bold(($totalTime['value']) ? formatHistoryValue($totalTime['value'], $totalTime) : UNKNOWN_VALUE),
-	SPACE,
-	(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
-]);
-
-$widget->addItem($httpdetailsTable)->show();
+	)
+	->addItem($details_screen->get())
+	->show();
 
 echo BR();
-
-// create graphs widget
-$graphsWidget = new CWidget();
-
-$filterForm = (new CFilter('web.httpdetails.filter.state'))
-	->addNavigator();
-$graphsWidget->addItem($filterForm);
 
 $graphs = [];
 
 // dims
-$graphDims = getGraphDims();
-$graphDims['width'] = -50;
-$graphDims['graphHeight'] = 150;
+$graph_dims = getGraphDims();
+$graph_dims['width'] = -50;
+$graph_dims['graphHeight'] = 150;
 
 /*
  * Graph in
  */
-$graphInScreen = new CScreenBase([
+$graph_in = new CScreenBase([
 	'resourcetype' => SCREEN_RESOURCE_GRAPH,
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_in',
@@ -271,40 +117,47 @@ $graphInScreen = new CScreenBase([
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime')
 ]);
-$graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
+
+$httptest_manager = new CHttpTestManager();
+$itemids = $httptest_manager->getHttpStepItems($httptest['httptestid']);
+$itemids = zbx_objectValues($itemids, 'itemid');
+
+$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemids));
 
 $src = 'chart3.php?height=150'.
-	'&name='._('Speed').
+	'&name='.$http_test_name.': '._('Speed').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
-	'&httptestid='.$httpTest['httptestid'].
+	'&httptestid='.$httptest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
-	'&period='.$graphInScreen->timeline['period'].
-	'&stime='.$graphInScreen->timeline['stime'].
-	'&profileIdx='.$graphInScreen->profileIdx.
-	'&profileIdx2='.$graphInScreen->profileIdx2;
+	'&period='.$graph_in->timeline['period'].
+	'&stime='.$graph_in->timeline['stime'].
+	'&profileIdx='.$graph_in->profileIdx.
+	'&profileIdx2='.$graph_in->profileIdx2;
 
 $graphs[] = (new CDiv(new CLink(null, $src)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_in')
 	->setAttribute('data-timestamp', time());
 
-$timeControlData = [
+$time_control_data = [
 	'id' => 'graph_in',
 	'containerid' => 'flickerfreescreen_graph_in',
 	'src' => $src,
-	'objDims' => $graphDims,
+	'objDims' => $graph_dims,
 	'loadSBox' => 1,
 	'loadImage' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 ];
-zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($graphInScreen->timeline).', '.zbx_jsvalue($timeControlData).');');
-$graphInScreen->insertFlickerfreeJs();
+zbx_add_post_js('timeControl.addObject("graph_in", '.zbx_jsvalue($graph_in->timeline).', '.
+	zbx_jsvalue($time_control_data).');'
+);
+$graph_in->insertFlickerfreeJs();
 
 /*
  * Graph time
  */
-$graphTimeScreen = new CScreenBase([
+$graph_time = new CScreenBase([
 	'resourcetype' => SCREEN_RESOURCE_GRAPH,
 	'mode' => SCREEN_MODE_PREVIEW,
 	'dataId' => 'graph_time',
@@ -315,39 +168,41 @@ $graphTimeScreen = new CScreenBase([
 ]);
 
 $src = 'chart3.php?height=150'.
-	'&name='._('Response time').
+	'&name='.$http_test_name.': '._('Response time').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
-	'&httptestid='.$httpTest['httptestid'].
+	'&httptestid='.$httptest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
-	'&period='.$graphTimeScreen->timeline['period'].
-	'&stime='.$graphTimeScreen->timeline['stime'].
-	'&profileIdx='.$graphTimeScreen->profileIdx.
-	'&profileIdx2='.$graphTimeScreen->profileIdx2;
+	'&period='.$graph_time->timeline['period'].
+	'&stime='.$graph_time->timeline['stime'].
+	'&profileIdx='.$graph_time->profileIdx.
+	'&profileIdx2='.$graph_time->profileIdx2;
 
 $graphs[] = (new CDiv(new CLink(null, $src)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_time')
 	->setAttribute('data-timestamp', time());
 
-$timeControlData = [
+$time_control_data = [
 	'id' => 'graph_time',
 	'containerid' => 'flickerfreescreen_graph_time',
 	'src' => $src,
-	'objDims' => $graphDims,
+	'objDims' => $graph_dims,
 	'loadSBox' => 1,
 	'loadImage' => 1,
 	'periodFixed' => CProfile::get('web.httptest.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
 ];
-zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graphInScreen->timeline).', '.zbx_jsvalue($timeControlData).');');
-$graphTimeScreen->insertFlickerfreeJs();
+zbx_add_post_js('timeControl.addObject("graph_time", '.zbx_jsvalue($graph_in->timeline).', '.
+	zbx_jsvalue($time_control_data).');'
+);
+$graph_time->insertFlickerfreeJs();
 
 // scroll
-CScreenBuilder::insertScreenScrollJs(['timeline' => $graphInScreen->timeline]);
-CScreenBuilder::insertScreenRefreshTimeJs();
-CScreenBuilder::insertProcessObjectsJs();
+CScreenBuilder::insertScreenStandardJs(['timeline' => $graph_in->timeline]);
 
-$graphsWidget
+// Create graphs widget.
+(new CWidget())
+	->addItem((new CFilter('web.httpdetails.filter.state'))->addNavigator())
 	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
 	->show();
 

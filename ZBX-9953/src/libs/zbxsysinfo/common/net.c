@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,11 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 
 	*value_int = 0;
 
-	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (SUCCEED != (net = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
+			NULL)))
+	{
 		goto out;
+	}
 
 	if (NULL != request)
 		net = zbx_tcp_send_raw(&s, request);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,8 +42,6 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // destination form
 	$dstfrm	= getRequest('dstfrm',	0);
 	$new_groups = getRequest('new_groups', []);
-
-	show_table_header(_('User groups'));
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -90,9 +88,7 @@ if(form){
 			_('Name')
 		]);
 
-	$userGroups = DBfetchArray(DBselect(
-		'SELECT ug.usrgrpid,ug.name FROM usrgrp ug'
-	));
+	$userGroups = DBfetchArray(DBselect('SELECT ug.usrgrpid,ug.name FROM usrgrp ug'));
 
 	order_result($userGroups, 'name');
 
@@ -107,6 +103,10 @@ if(form){
 	$table->setFooter(new CCol(new CSubmit('select', _('Select'))));
 
 	$form->addItem($table);
-	$form->show();
+
+	(new CWidget())
+		->setTitle($page['title'])
+		->addItem($form)
+		->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

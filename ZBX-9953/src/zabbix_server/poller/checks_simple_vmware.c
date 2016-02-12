@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -654,7 +654,8 @@ out:
 	return ret;
 }
 
-static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT_RESULT *result)
+static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const DC_ITEM *item,
+		AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	const char		*__function_name = "vmware_get_events";
 
@@ -663,7 +664,6 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 	zbx_uint64_t		key;
 	char			*value, xpath[MAX_STRING_LEN];
 	int			i, ret = SYSINFO_RET_FAIL;
-	zbx_log_t		*log;
 	struct tm		tm;
 	time_t			t;
 
@@ -697,6 +697,8 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 
 		for (i = 0; i < ids.values_num; i++)
 		{
+			AGENT_RESULT	*add_result;
+
 			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
 					ZBX_XPATH_LN("fullFormattedMessage"), ids.values[i]);
 
@@ -704,49 +706,62 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 				continue;
 
 			zbx_replace_invalid_utf8(value);
-			log = add_log_result(result, value);
-			log->logeventid = ids.values[i];
-			log->lastlogsize = ids.values[i];
 
-			zbx_free(value);
+			add_result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
 
-			/* timestamp */
+			init_result(add_result);
 
-			zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key") "[.='" ZBX_FS_UI64 "']/.."
-					ZBX_XPATH_LN("createdTime"), ids.values[i]);
-
-			if (NULL == (value = zbx_xml_read_value(events, xpath)))
-				continue;
-
-			/* 2013-06-04T14:19:23.406298Z */
-			if (6 == sscanf(value, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year, &tm.tm_mon, &tm.tm_mday,
-					&tm.tm_hour, &tm.tm_min, &tm.tm_sec))
-
+			if (SUCCEED == (ret = set_result_type(add_result, item->value_type, item->flags, value)))
 			{
-				int		tz_offset;
+				set_result_meta(add_result, ids.values[i], 0);
+
+				if (ITEM_VALUE_TYPE_LOG == item->value_type)
+				{
+					char	*timestamp;
+
+					add_result->log->logeventid = ids.values[i];
+					add_result->log->timestamp = 0;
+
+					zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key")
+							"[.='" ZBX_FS_UI64 "']/.." ZBX_XPATH_LN("createdTime"),
+							ids.values[i]);
+
+					if (NULL != (timestamp = zbx_xml_read_value(events, xpath)))
+					{
+						/* 2013-06-04T14:19:23.406298Z */
+						if (6 == sscanf(timestamp, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year,
+								&tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
+								&tm.tm_sec))
+						{
+							int		tz_offset;
 #if defined(HAVE_TM_TM_GMTOFF)
-				struct tm	*ptm;
-				time_t		now;
+							struct tm	*ptm;
+							time_t		now;
 
-				now = time(NULL);
-				ptm = localtime(&now);
-				tz_offset = ptm->tm_gmtoff;
+							now = time(NULL);
+							ptm = localtime(&now);
+							tz_offset = ptm->tm_gmtoff;
 #else
-				tz_offset = -timezone;
+							tz_offset = -timezone;
 #endif
-				tm.tm_year -= 1900;
-				tm.tm_mon--;
-				tm.tm_isdst = -1;
+							tm.tm_year -= 1900;
+							tm.tm_mon--;
+							tm.tm_isdst = -1;
 
-				if (0 < (t = mktime(&tm)))
-					log->timestamp = (int)t + tz_offset;
+							if (0 < (t = mktime(&tm)))
+								add_result->log->timestamp = (int)t + tz_offset;
+						}
+
+						zbx_free(timestamp);
+					}
+				}
 			}
 
 			zbx_free(value);
+
+			zbx_vector_ptr_append(add_results, add_result);
 		}
 	}
-	else
-		set_log_result_empty(result);
 
 	zbx_vector_uint64_destroy(&ids);
 
@@ -755,13 +770,14 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, AGENT
 
 	ret = SYSINFO_RET_OK;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s events:%d", __function_name, sysinfo_ret_string(ret),
+			add_results->values_num);
 
 	return ret;
 }
 
-int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result)
+int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RESULT *result,
+		zbx_vector_ptr_t *add_results)
 {
 	const char		*__function_name = "check_vcenter_eventlog";
 
@@ -781,13 +797,10 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const char *username, const c
 
 	zbx_vmware_lock();
 
-	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
-	{
-		set_log_result_empty(result);
+	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
-	}
 
-	ret = vmware_get_events(service->data->events, request->lastlogsize, result);
+	ret = vmware_get_events(service->data->events, request->lastlogsize, item, result, add_results);
 unlock:
 	zbx_vmware_unlock();
 out:
@@ -839,7 +852,7 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 {
 	const char		*__function_name = "check_vcenter_fullname";
 
-	char			*url, *fullname;
+	char			*url, *fullname = NULL;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
@@ -867,7 +880,8 @@ int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const c
 unlock:
 	zbx_vmware_unlock();
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, sysinfo_ret_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s fullname:[%s]", __function_name, sysinfo_ret_string(ret),
+			ZBX_NULL2STR(fullname));
 
 	return ret;
 }
@@ -1686,7 +1700,7 @@ int	check_vcenter_vm_cluster_name(AGENT_REQUEST *request, const char *username, 
 	for (i = 0; i < service->data->hvs.values_num; i++)
 	{
 		zbx_vmware_hv_t	*hv = service->data->hvs.values[i];
-		zbx_vmware_vm_t		*vm;
+		zbx_vmware_vm_t	*vm;
 
 		if (NULL != (vm = vm_get(&hv->vms, uuid)))
 		{
@@ -1711,7 +1725,7 @@ out:
 int	check_vcenter_vm_cpu_ready(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	const char	*__function_name = "check_vcenter_vm_cpu_ready";
+	const char		*__function_name = "check_vcenter_vm_cpu_ready";
 
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;

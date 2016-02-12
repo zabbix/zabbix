@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "proxy.h"
 
 #include "proxyconfig.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 /******************************************************************************
  *                                                                            *
@@ -43,11 +44,11 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, &error))
+	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, sock, &error))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
-				" \"%s\": %s", get_ip_by_socket(sock), error);
+				" \"%s\": %s", sock->peer, error);
 		goto out;
 	}
 
@@ -59,23 +60,23 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",
-				host, get_ip_by_socket(sock), error);
+				host, sock->peer, error);
 		goto clean;
 	}
 
 	zabbix_log(LOG_LEVEL_WARNING, "sending configuration data to proxy \"%s\" at \"%s\", datalen " ZBX_FS_SIZE_T,
-			host, get_ip_by_socket(sock), (zbx_fs_size_t)j.buffer_size);
+			host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
-				host, get_ip_by_socket(sock), zbx_socket_strerror());
+				host, sock->peer, zbx_socket_strerror());
 	}
 
-	alarm(0);
+	zbx_alarm_off();
 clean:
 	zbx_json_free(&j);
 out:
@@ -104,14 +105,16 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
-				" \"%s\": %s", get_ip_by_socket(sock), zbx_json_strerror());
+				" \"%s\": %s", sock->peer, zbx_json_strerror());
 		zbx_send_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
-	}
-	else
-	{
-		process_proxyconfig(&jp_data);
-		zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+		goto out;
 	}
 
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
+		goto out;
+
+	process_proxyconfig(&jp_data);
+	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

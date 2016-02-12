@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ $fields = [
 	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_dependency' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -80,7 +79,6 @@ $fields = [
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
 
@@ -129,9 +127,6 @@ if ($triggerPrototypeIds) {
 	}
 }
 
-$showDisabled = getRequest('showdisabled', 0);
-CProfile::update('web.triggers.showdisabled', $showDisabled, PROFILE_TYPE_INT);
-
 /*
  * Actions
  */
@@ -172,27 +167,28 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		// Update only changed fields.
 
-		$oldTriggerPrototype = API::TriggerPrototype()->get([
+		$old_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
 		]);
-		if (!$oldTriggerPrototype) {
+		if (!$old_trigger_prototypes) {
 			access_deny();
 		}
 
-		$oldTriggerPrototype = reset($oldTriggerPrototype);
-		$oldTriggerPrototype['dependencies'] = zbx_toHash(
-			zbx_objectValues($oldTriggerPrototype['dependencies'], 'triggerid')
+		$old_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($old_trigger_prototypes);
+
+		$old_trigger_prototype = reset($old_trigger_prototypes);
+		$old_trigger_prototype['dependencies'] = zbx_toHash(
+			zbx_objectValues($old_trigger_prototype['dependencies'], 'triggerid')
 		);
-		$oldTriggerPrototype['expression'] = explode_exp($oldTriggerPrototype['expression']);
 
 		$newDependencies = $trigger['dependencies'];
-		$oldDependencies = $oldTriggerPrototype['dependencies'];
+		$oldDependencies = $old_trigger_prototype['dependencies'];
 
-		unset($trigger['dependencies'], $oldTriggerPrototype['dependencies']);
+		unset($trigger['dependencies'], $old_trigger_prototype['dependencies']);
 
-		$triggerToUpdate = array_diff_assoc($trigger, $oldTriggerPrototype);
+		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger_prototype);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
 
 		// dependencies
@@ -360,15 +356,12 @@ else {
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'discovery_rule' => $discoveryRule,
 		'hostid' => $discoveryRule['hostid'],
-		'showdisabled' => getRequest('showdisabled', 1),
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => $config,
 		'dependencyTriggers' => []
 	];
-
-	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	// get triggers
 	$options = [
@@ -378,9 +371,6 @@ else {
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	];
-	if (empty($data['showdisabled'])) {
-		$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
-	}
 	$data['triggers'] = API::TriggerPrototype()->get($options);
 
 	order_result($data['triggers'], $sortField, $sortOrder);
@@ -391,8 +381,6 @@ else {
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid'],
 		'selectHosts' => ['hostid', 'host'],
-		'selectItems' => ['itemid', 'type', 'hostid', 'key_', 'status', 'flags'],
-		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);

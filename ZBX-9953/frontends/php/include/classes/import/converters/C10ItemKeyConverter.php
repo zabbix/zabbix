@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,12 +27,12 @@ class C10ItemKeyConverter extends CConverter {
 	/**
 	 * Parser for user macros.
 	 *
-	 * @var CMacroParser
+	 * @var CUserMacroParser
 	 */
-	protected $userMacroParser;
+	protected $user_macro_parser;
 
 	public function __construct() {
-		$this->userMacroParser = new CMacroParser('$');
+		$this->user_macro_parser = new CUserMacroParser();
 	}
 
 	public function convert($value) {
@@ -43,14 +43,12 @@ class C10ItemKeyConverter extends CConverter {
 		];
 
 		$parts = explode(',', $value);
+
 		if (count($parts) <= 2) {
 			$key = $parts[0];
 
 			if (isset($parts[1]) && $parts[1] !== '') {
-				// user macro
-				$result = $this->userMacroParser->parse($parts[1], 0);
-
-				if ($result !== false && !isset($parts[1][$result->length])) {
+				if ($this->user_macro_parser->parse($parts[1] == CParser::PARSE_SUCCESS)) {
 					$port = ',,'.$parts[1];
 				}
 				// numeric parameter or empty parameter
@@ -82,5 +80,4 @@ class C10ItemKeyConverter extends CConverter {
 
 		return $value;
 	}
-
 }

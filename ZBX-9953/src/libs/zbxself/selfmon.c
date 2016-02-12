@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,22 +236,6 @@ int	get_process_type_by_name(const char *proc_type_str)
 	}
 
 	return ZBX_PROCESS_TYPE_UNKNOWN;
-}
-
-const char	*get_daemon_type_string(unsigned char daemon_type)
-{
-	switch (daemon_type)
-	{
-		case ZBX_DAEMON_TYPE_SERVER:
-			return "server";
-		case ZBX_DAEMON_TYPE_PROXY_ACTIVE:
-		case ZBX_DAEMON_TYPE_PROXY_PASSIVE:
-			return "proxy";
-		case ZBX_DAEMON_TYPE_AGENT:
-			return "agent";
-		default:
-			return "unknown";
-	}
 }
 
 #ifndef _WINDOWS

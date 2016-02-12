@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,27 +26,50 @@ $widget = (new CWidget())
 		->addItem((new CList())
 			->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
 			->addItem(new CSubmit('form', _('Create value map')))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=valuemap")'))
 		)
 	);
 
-$valueMappingTable = (new CTableInfo())->setHeader([_('Name'), _('Value map')]);
+$form = (new CForm())
+	->setName('valuemap_form');
 
-foreach ($this->data['valuemaps'] as $valuemap) {
-	order_result($valuemap['maps'], 'value');
+$table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_valuemaps'))
+				->onClick("checkAll('".$form->getName()."', 'all_valuemaps', 'valuemapids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		_('Value map'),
+		_('Used in items')
+	]);
 
+foreach ($data['valuemaps'] as $valuemap) {
 	$mappings = [];
-	foreach ($valuemap['maps'] as $map) {
-		$mappings[] = $map['value'].' &rArr; '.$map['newvalue'];
+
+	foreach ($valuemap['mappings'] as $mapping) {
+		$mappings[] = $mapping['value'].' &rArr; '.$mapping['newvalue'];
 		$mappings[] = BR();
 	}
 	array_pop($mappings);
 
-	$valueMappingTable->addRow([
+	$table->addRow([
+		new CCheckBox('valuemapids['.$valuemap['valuemapid'].']', $valuemap['valuemapid']),
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
-		$mappings
+		$mappings,
+		$valuemap['used_in_items'] ? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN) : ''
 	]);
 }
 
-$widget->addItem($valueMappingTable);
+$form->addItem([
+	$table,
+	$data['paging'],
+	new CActionButtonList('action', 'valuemapids', [
+		'valuemap.export' => ['name' => _('Export')],
+		'valuemap.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected value maps?')]
+	])
+]);
+
+$widget->addItem($form);
 
 return $widget;

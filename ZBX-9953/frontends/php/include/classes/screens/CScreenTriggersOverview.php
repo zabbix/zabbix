@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ class CScreenTriggersOverview extends CScreenBase {
 			'preservekeys' => true
 		]);
 
-		$hostIds = array_keys($hosts);
+		$hostids = array_keys($hosts);
 
 		$options = [
 			'output' => [
@@ -44,7 +44,7 @@ class CScreenTriggersOverview extends CScreenBase {
 			],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-			'hostids' => $hostIds,
+			'hostids' => $hostids,
 			'monitored' => true,
 			'skipDependent' => true,
 			'sortfield' => 'description',
@@ -54,16 +54,17 @@ class CScreenTriggersOverview extends CScreenBase {
 		// application filter
 		if ($this->screenitem['application'] !== '') {
 			$applications = API::Application()->get([
-				'output' => ['applicationid'],
-				'hostids' => $hostIds,
-				'search' => ['name' => $this->screenitem['application']]
+				'output' => [],
+				'hostids' => $hostids,
+				'search' => ['name' => $this->screenitem['application']],
+				'preservekeys' => true
 			]);
-			$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
+			$options['applicationids'] = array_keys($applications);
 		}
 
 		$triggers = API::Trigger()->get($options);
 
-		$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+		$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 		/*
 		 * Each screen cell with "Triggers overview" depends on one specific group which in this case is 'resourceid'.
@@ -74,8 +75,22 @@ class CScreenTriggersOverview extends CScreenBase {
 		}
 		unset($trigger);
 
-		return $this->getOutput(getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'],
-			$this->screenid
-		));
+		$groups = API::HostGroup()->get([
+			'output' => ['name'],
+			'groupids' => [$this->screenitem['resourceid']]
+		]);
+
+		$header = (new CDiv([
+			new CTag('h4', true, _('Triggers overview')),
+			(new CList())->addItem([_('Group'), ':', SPACE, $groups[0]['name']])
+		]))->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD);
+
+		$table = getTriggersOverview($hosts, $triggers, $this->pageFile, $this->screenitem['style'], $this->screenid);
+
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput(new CUiWidget(uniqid(), [$header, $table, $footer]));
 	}
 }

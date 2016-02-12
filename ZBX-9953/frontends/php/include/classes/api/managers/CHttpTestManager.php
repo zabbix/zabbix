@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -895,6 +895,8 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function updateStepsReal($httpTest, $websteps) {
+		$item_key_parser = new CItemKey();
+
 		// get all used keys
 		$webstepids = zbx_objectValues($websteps, 'httpstepid');
 		$dbKeys = DBfetchArrayAssoc(DBselect(
@@ -925,13 +927,12 @@ class CHttpTestManager {
 
 				if (isset($httpTest['name']) || isset($webstep['name'])) {
 					if (!isset($httpTest['name']) || !isset($webstep['name'])) {
-						$key = new CItemKey($stepitem['key_']);
-						$params = $key->getParameters();
+						$item_key_parser->parse($stepitem['key_']);
 						if (!isset($httpTest['name'])) {
-							$httpTest['name'] = $params[0];
+							$httpTest['name'] = $item_key_parser->getParam(0);
 						}
 						if (!isset($webstep['name'])) {
-							$webstep['name'] = $params[1];
+							$webstep['name'] = $item_key_parser->getParam(1);
 						}
 					}
 
@@ -1088,5 +1089,21 @@ class CHttpTestManager {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Get httptest step items by "httptestid".
+	 *
+	 * @param string $httptestid		ID of a web scenario
+	 *
+	 * @return array
+	 */
+	public function getHttpStepItems($httptestid) {
+		return DBfetchArray(DBselect(
+			'SELECT hi.itemid'.
+			' FROM httpstepitem hi,httpstep hs'.
+			' WHERE hi.httpstepid=hs.httpstepid'.
+				' AND hs.httptestid='.zbx_dbstr($httptestid)
+		));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,10 +112,10 @@ abstract class CMapElement extends CApiService {
 			}
 		}
 
-		if (($hostIds && !API::Host()->isWritable($hostIds))
-				|| ($groupIds && !API::HostGroup()->isWritable($groupIds))
-				|| ($triggerIds && !API::Trigger()->isWritable($triggerIds))
-				|| ($mapIds && !API::Map()->isWritable($mapIds))) {
+		if (($hostIds && !API::Host()->isReadable($hostIds))
+				|| ($groupIds && !API::HostGroup()->isReadable($groupIds))
+				|| ($triggerIds && !API::Trigger()->isReadable($triggerIds))
+				|| ($mapIds && !API::Map()->isReadable($mapIds))) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}

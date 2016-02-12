@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -530,8 +530,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'host_profile' => '',
-					'host_profiles_ext' => '',
+					'host_profile' => [],
+					'host_profiles_ext' => [],
 				],
 				[
 					'name' => 'host1',
@@ -626,7 +626,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'host' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
 					'inventory' => [
-						'inventory_mode' => HOST_INVENTORY_DISABLED
+						'inventory_mode' => HOST_INVENTORY_MANUAL
 					]
 				],
 				[
@@ -720,7 +720,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'items' => ''
+					'items' => []
 				],
 				[
 					'name' => 'host1',
@@ -731,7 +731,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'key' => 'item',
-							'applications' => ''
+							'applications' => []
 						],
 						[
 							'description' => 'My item',
@@ -760,7 +760,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						]
 					]
 				]
-			],
+			]
 		]);
 
 		$expectedResult = $this->createExpectedResult([
@@ -778,7 +778,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
-					'items' => ''
+					'items' => []
 				],
 				[
 					'host' => 'host1',
@@ -792,7 +792,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'key' => 'item',
-							'applications' => ''
+							'applications' => []
 						],
 						[
 							'name' => 'My item',
@@ -803,8 +803,16 @@ class C10ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'name' => 'Application 2'
-								],
+								]
 							]
+						]
+					],
+					'applications' => [
+						[
+							'name' => 'Application 1'
+						],
+						[
+							'name' => 'Application 2'
 						]
 					]
 				]
@@ -825,8 +833,16 @@ class C10ImportConverterTest extends CImportConverterTest {
 								],
 								[
 									'name' => 'Application 2'
-								],
+								]
 							]
+						]
+					],
+					'applications' => [
+						[
+							'name' => 'Application 1'
+						],
+						[
+							'name' => 'Application 2'
 						]
 					]
 				]
@@ -1236,7 +1252,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'templates' => ''
+					'templates' => []
 				],
 				[
 					'name' => 'host2',
@@ -1272,7 +1288,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'inventory' => [
 						'inventory_mode' => HOST_INVENTORY_DISABLED
 					],
-					'templates' => ''
+					'templates' => []
 				],
 				[
 					'host' => 'host2',
@@ -1349,6 +1365,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'name' => 'graph3',
+							'graphtype' => GRAPH_TYPE_NORMAL,
 							'ymin_item_key' => 'host2:ftp,1',
 							'ymax_item_key' => 'host2:ftp,2',
 							'graph_elements' => [
@@ -1365,6 +1382,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 						],
 						[
 							'name' => 'two-host graph',
+							'graphtype' => GRAPH_TYPE_NORMAL,
+							'ymin_item_key' => 'host:min[:1]',
+							'ymax_item_key' => 'host:max[:2]',
 							'graph_elements' => [
 								[
 									'item' => 'host2:item'
@@ -1382,6 +1402,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 					'graphs' => [
 						[
 							'name' => 'two-host graph',
+							'graphtype' => GRAPH_TYPE_NORMAL,
+							'ymin_item_key' => '',
+							'ymax_item_key' => '',
 							'graph_elements' => [
 								[
 									'item' => 'host2:item'
@@ -1400,6 +1423,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 						[
 							// same name as for the host graph but a different item
 							'name' => 'graph2',
+							'graphtype' => GRAPH_TYPE_NORMAL,
+							'ymin_item_key' => '',
+							'ymax_item_key' => '',
 							'graph_elements' => [
 								[
 									'item' => 'template:item'
@@ -1416,8 +1442,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'graph1',
 					'type' => GRAPH_TYPE_BAR,
-					'ymin_item_1' => '',
-					'ymax_item_1' => '',
+					'ymin_item_1' => [],
+					'ymax_item_1' => [],
 					'graph_items' => [
 						[
 							'item' => [
@@ -1449,6 +1475,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'name' => 'graph3',
+					'type' => GRAPH_TYPE_NORMAL,
 					'ymin_item_1' => [
 						'host' => 'host2',
 						'key' => 'net.tcp.service[ftp,,1]'
@@ -1480,6 +1507,15 @@ class C10ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'name' => 'two-host graph',
+					'type' => GRAPH_TYPE_NORMAL,
+					'ymin_item_1' => [
+						'host' => 'host',
+						'key' => 'min[:1]'
+					],
+					'ymax_item_1' => [
+						'host' => 'host',
+						'key' => 'max[:2]'
+					],
 					'graph_items' => [
 						[
 							'item' => [
@@ -1497,6 +1533,9 @@ class C10ImportConverterTest extends CImportConverterTest {
 				],
 				[
 					'name' => 'graph2',
+					'type' => GRAPH_TYPE_NORMAL,
+					'ymin_item_1' => [],
+					'ymax_item_1' => [],
 					'graph_items' => [
 						[
 							'item' => [
@@ -1643,8 +1682,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'sysmaps' => [
 				[],
 				[
-					'selements' => '',
-					'links' => '',
+					'selements' => [],
+					'links' => [],
 				],
 				[
 					'selements' => [
@@ -1665,21 +1704,23 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 							'elementid' => [
 								'host' => 'host',
-								'description' => 'trigger'
+								'description' => 'trigger',
+								'expression' => '{host:item.last()}'
 							]
 						]
 					],
 					'links' => [
 						[],
 						[
-							'linktriggers' => ''
+							'linktriggers' => []
 						],
 						[
 							'linktriggers' => [
 								[
 									'triggerid' => [
 										'host' => 'host',
-										'description' => 'trigger'
+										'description' => 'trigger',
+										'expression' => '{host:item.last()}'
 									]
 								]
 							]
@@ -1693,8 +1734,8 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'maps' => [
 				[],
 				[
-					'selements' => '',
-					'links' => '',
+					'selements' => [],
+					'links' => [],
 				],
 				[
 					'selements' => [
@@ -1713,20 +1754,22 @@ class C10ImportConverterTest extends CImportConverterTest {
 							'selementid' => 2,
 							'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 							'element' => [
-								'description' => 'trigger'
+								'description' => 'trigger',
+								'expression' => '{host:item.last()}'
 							]
 						]
 					],
 					'links' => [
 						[],
 						[
-							'linktriggers' => ''
+							'linktriggers' => []
 						],
 						[
 							'linktriggers' => [
 								[
 									'trigger' => [
-										'description' => 'trigger'
+										'description' => 'trigger',
+										'expression' => '{host:item.last()}'
 									]
 								]
 							]

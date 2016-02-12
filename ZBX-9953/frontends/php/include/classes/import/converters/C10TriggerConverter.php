@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class C10TriggerConverter extends CConverter {
 	 *
 	 * @var CFunctionMacroParser
 	 */
-	protected $functionMacroParser;
+	protected $function_macro_parser;
 
 	/**
 	 * Converted used to convert simple check item keys.
@@ -39,7 +39,7 @@ class C10TriggerConverter extends CConverter {
 	protected $itemKeyConverter;
 
 	public function __construct() {
-		$this->functionMacroParser = new CFunctionMacroParser(['18_simple_checks' => true]);
+		$this->function_macro_parser = new CFunctionMacroParser(['18_simple_checks' => true]);
 		$this->itemKeyConverter = new C10ItemKeyConverter();
 	}
 
@@ -54,21 +54,14 @@ class C10TriggerConverter extends CConverter {
 		$new_expression = '';
 
 		for ($pos = 0; isset($expression[$pos]); $pos++) {
-			if ($expression[$pos] == '{') {
-				$result = $this->functionMacroParser->parse($expression, $pos);
+			if ($this->function_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$new_expression .= '{'.
+					$this->function_macro_parser->getHost().':'.
+					$this->itemKeyConverter->convert($this->function_macro_parser->getItem()).'.'.
+					$this->function_macro_parser->getFunction().
+				'}';
 
-				if ($result) {
-					$new_expression .= '{'.
-						$result->expression['host'].':'.
-						$this->itemKeyConverter->convert($result->expression['item']).'.'.
-						$result->expression['function'].
-					'}';
-
-					$pos += $result->length - 1;
-				}
-				else {
-					$new_expression .= $expression[$pos];
-				}
+				$pos += $this->function_macro_parser->getLength() - 1;
 			}
 			else {
 				$new_expression .= $expression[$pos];
@@ -77,5 +70,4 @@ class C10TriggerConverter extends CConverter {
 
 		return $new_expression;
 	}
-
 }

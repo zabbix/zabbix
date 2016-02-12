@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ $table = (new CTable())
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 64))
-		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 255))
 		->addClass('macro')
+		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->setAttribute('placeholder', '{$MACRO}');
 
 	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ define('UNRESOLVED_MACRO_STRING', '*'._('UNKNOWN').'*');
  */
 define('DATE_TIME_FORMAT_SECONDS', _('Y-m-d H:i:s'));
 define('DATE_TIME_FORMAT', _('Y-m-d H:i'));
+define('DATE_TIME_FORMAT_SHORT', _('m-d H:i'));
 define('DATE_FORMAT', _('Y-m-d'));
 define('TIME_FORMAT_SECONDS', _('H:i:s'));
 define('TIME_FORMAT', _('H:i'));

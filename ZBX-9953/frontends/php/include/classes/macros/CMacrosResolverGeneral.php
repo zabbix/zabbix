@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,20 +21,8 @@
 
 class CMacrosResolverGeneral {
 
-	const PATTERN_HOST = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)}';
-	const PATTERN_HOST_ID = '{(HOST\.ID)}';
-	const PATTERN_HOST_FUNCTION = '{(HOSTNAME|HOST\.HOST|HOST\.NAME)([1-9]?)}';
-	const PATTERN_HOST_FUNCTION2 = '{(HOST\.ID|HOST\.HOST|HOST\.NAME)([1-9]?)}';
 	const PATTERN_HOST_INTERNAL = 'HOST\.HOST|HOSTNAME';
 	const PATTERN_MACRO_PARAM = '[1-9]?';
-	const PATTERN_INTERFACE = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
-	const PATTERN_INTERFACE_FUNCTION = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN|HOST\.PORT)([1-9]?)}';
-	const PATTERN_INTERFACE_FUNCTION2 = '{(HOST\.IP|HOST\.DNS|HOST\.CONN|HOST\.PORT)([1-9]?)}';
-	const PATTERN_INTERFACE_FUNCTION_WITHOUT_PORT = '{(IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)([1-9]?)}';
-	const PATTERN_ITEM_FUNCTION = '{(ITEM\.LASTVALUE|ITEM\.VALUE)([1-9]?)}';
-	const PATTERN_ITEM_NUMBER = '\$[1-9]';
-	const PATTERN_ITEM_MACROS = '{(HOSTNAME|HOST\.HOST|HOST\.NAME|IPADDRESS|HOST\.IP|HOST\.DNS|HOST\.CONN)}';
-	const PATTERN_TRIGGER = '{(TRIGGER\.ID)}';
 
 	/**
 	 * Interface priorities.
@@ -60,73 +48,455 @@ class CMacrosResolverGeneral {
 	 * If macro reference non existing value it expands to empty string.
 	 *
 	 * @param string $expression
-	 * @param string $text
+	 * @param array  $references
 	 *
 	 * @return array
 	 */
-	protected function getTriggerReference($expression, $text) {
-		$result = [];
+	protected function resolveTriggerReferences($expression, $references) {
+		$matched_macros = $this->getMacroPositions($expression, ['usermacros' => true]);
 
-		// search for reference macros $1, $2, $3, ...
-		preg_match_all('/\$([1-9])/', $text, $refNumbers);
-
-		if (empty($refNumbers)) {
-			return $result;
+		// Replace user macros with string 'macro' to make values search easier.
+		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+			$expression = substr_replace($expression, 'macro', $pos, strlen($macro));
 		}
 
-		// replace functionids with string 'function' to make values search easier
+		// Replace functionids with string 'function' to make values search easier.
 		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
 
-		// search for numeric values in expression
+		// Search for numeric values in expression.
 		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
 
-		foreach ($refNumbers[1] as $i) {
-			$result['$'.$i] = isset($values[0][$i - 1]) ? $values[0][$i - 1] : '';
+		foreach ($references as $reference => &$value) {
+			$i = (int) $reference[1] - 1;
+			$value = array_key_exists($i, $values[0]) ? $values[0][$i] : '';
 		}
+		unset($value);
 
-		return $result;
+		return $references;
 	}
 
 	/**
-	 * Find macros in text by pattern.
+	 * Checking existence of the macros.
 	 *
-	 * @param string $pattern
 	 * @param array  $texts
+	 * @param array  $type
+	 *
+	 * @return bool
+	 */
+	protected function hasMacros(array $texts, array $types) {
+		foreach ($texts as $text) {
+			if ($this->getMacroPositions($text, $types)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Transform types, used in extractMacros() function to types which can be used in getMacroPositions().
+	 *
+	 * @param array  $types
 	 *
 	 * @return array
 	 */
-	protected function findMacros($pattern, array $texts) {
-		$result = [];
-
-		foreach ($texts as $text) {
-			preg_match_all('/'.$pattern.'/', $text, $matches);
-
-			$result = array_merge($result, $matches[0]);
+	protected function transformToPositionTypes(array $types) {
+		foreach (['macros', 'macros_n'] as $type) {
+			if (array_key_exists($type, $types)) {
+				$patterns = [];
+				foreach ($types[$type] as $key => $_patterns) {
+					$patterns = array_merge($patterns, $_patterns);
+				}
+				$types[$type] = $patterns;
+			}
 		}
 
-		return array_unique($result);
+		return $types;
 	}
 
 	/**
-	 * Find macros with function position.
+	 * Extract positions of the macros from a string.
 	 *
-	 * @param string $pattern
 	 * @param string $text
+	 * @param array  $types
+	 * @param bool   $types['usermacros']
+	 * @param array  $types['macros'][<macro_patterns>]
+	 * @param array  $types['macros_n'][<macro_patterns>]
+	 * @param bool   $types['references']
+	 * @param bool   $types['lldmacros']
+	 * @param bool   $types['functionids']
 	 *
-	 * @return array	where key is found macro and value is array with related function position
+	 * @return array
 	 */
-	protected function findFunctionMacros($pattern, $text) {
-		$result = [];
+	protected function getMacroPositions($text, array $types) {
+		$macros = [];
+		$extract_usermacros = array_key_exists('usermacros', $types);
+		$extract_macros = array_key_exists('macros', $types);
+		$extract_macros_n = array_key_exists('macros_n', $types);
+		$extract_references = array_key_exists('references', $types);
+		$extract_lldmacros = array_key_exists('lldmacros', $types);
+		$extract_functionids = array_key_exists('functionids', $types);
 
-		preg_match_all('/'.$pattern.'/', $text, $matches);
-
-		foreach ($matches[1] as $num => $macro) {
-			$fNum = empty($matches[2][$num]) ? 0 : $matches[2][$num];
-
-			$result[$macro][$fNum] = $fNum;
+		if ($extract_usermacros) {
+			$user_macro_parser = new CUserMacroParser();
 		}
 
-		return $result;
+		if ($extract_macros) {
+			$macro_parser = new CMacroParser($types['macros']);
+		}
+
+		if ($extract_macros_n) {
+			$macro_n_parser = new CMacroParser($types['macros_n'], ['allow_reference' => true]);
+		}
+
+		if ($extract_references) {
+			$reference_parser = new CReferenceParser();
+		}
+
+		if ($extract_lldmacros) {
+			$lld_macro_parser = new CLLDMacroParser();
+		}
+
+		if ($extract_functionids) {
+			$functionid_parser = new CFunctionIdParser();
+		}
+
+		for ($pos = 0; isset($text[$pos]); $pos++) {
+			if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $user_macro_parser->getMatch();
+				$pos += $user_macro_parser->getLength() - 1;
+			}
+			elseif ($extract_macros && $macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $macro_parser->getMatch();
+				$pos += $macro_parser->getLength() - 1;
+			}
+			elseif ($extract_macros_n && $macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $macro_n_parser->getMatch();
+				$pos += $macro_n_parser->getLength() - 1;
+			}
+			elseif ($extract_references && $reference_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $reference_parser->getMatch();
+				$pos += $reference_parser->getLength() - 1;
+			}
+			elseif ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $lld_macro_parser->getMatch();
+				$pos += $lld_macro_parser->getLength() - 1;
+			}
+			elseif ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $functionid_parser->getMatch();
+				$pos += $functionid_parser->getLength() - 1;
+			}
+		}
+
+		return $macros;
+	}
+
+	/**
+	 * Extract macros from a string.
+	 *
+	 * @param array  $texts
+	 * @param array  $types
+	 * @param bool   $types['usermacros']
+	 * @param array  $types['macros'][][<macro_patterns>]
+	 * @param array  $types['macros_n'][][<macro_patterns>]
+	 * @param bool   $types['references']
+	 * @param bool   $types['lldmacros']
+	 * @param bool   $types['functionids']
+	 *
+	 * @return array
+	 */
+	protected function extractMacros(array $texts, array $types) {
+		$macros = [];
+		$extract_usermacros = array_key_exists('usermacros', $types);
+		$extract_macros = array_key_exists('macros', $types);
+		$extract_macros_n = array_key_exists('macros_n', $types);
+		$extract_references = array_key_exists('references', $types);
+		$extract_lldmacros = array_key_exists('lldmacros', $types);
+		$extract_functionids = array_key_exists('functionids', $types);
+
+		if ($extract_usermacros) {
+			$macros['usermacros'] = [];
+
+			$user_macro_parser = new CUserMacroParser();
+		}
+
+		if ($extract_macros) {
+			$macros['macros'] = [];
+
+			foreach ($types['macros'] as $key => $macro_patterns) {
+				$types['macros'][$key] = new CMacroParser($macro_patterns);
+				$macros['macros'][$key] = [];
+			}
+		}
+
+		if ($extract_macros_n) {
+			$macros['macros_n'] = [];
+
+			foreach ($types['macros_n'] as $key => $macro_patterns) {
+				$types['macros_n'][$key] = new CMacroParser($macro_patterns, ['allow_reference' => true]);
+				$macros['macros_n'][$key] = [];
+			}
+		}
+
+		if ($extract_references) {
+			$macros['references'] = [];
+
+			$reference_parser = new CReferenceParser();
+		}
+
+		if ($extract_lldmacros) {
+			$macros['lldmacros'] = [];
+
+			$lld_macro_parser = new CLLDMacroParser();
+		}
+
+		if ($extract_functionids) {
+			$macros['functionids'] = [];
+
+			$functionid_parser = new CFunctionIdParser();
+		}
+
+		foreach ($texts as $text) {
+			for ($pos = 0; isset($text[$pos]); $pos++) {
+				if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['usermacros'][$user_macro_parser->getMatch()] = null;
+					$pos += $user_macro_parser->getLength() - 1;
+					continue;
+				}
+
+				if ($extract_macros) {
+					foreach ($types['macros'] as $key => $macro_parser) {
+						if ($macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+							$macros['macros'][$key][$macro_parser->getMatch()] = true;
+							$pos += $macro_parser->getLength() - 1;
+							continue 2;
+						}
+					}
+				}
+
+				if ($extract_macros_n) {
+					foreach ($types['macros_n'] as $key => $macro_n_parser) {
+						if ($macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+							$macros['macros_n'][$key][$macro_n_parser->getMacro()][] = $macro_n_parser->getN();
+							$pos += $macro_n_parser->getLength() - 1;
+							continue 2;
+						}
+					}
+				}
+
+				if ($extract_references && $reference_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['references'][$reference_parser->getMatch()] = null;
+					$pos += $reference_parser->getLength() - 1;
+					continue;
+				}
+
+				if ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['lldmacros'][$lld_macro_parser->getMatch()] = null;
+					$pos += $lld_macro_parser->getLength() - 1;
+					continue;
+				}
+
+				if ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['functionids'][$functionid_parser->getMatch()] = null;
+					$pos += $functionid_parser->getLength() - 1;
+					continue;
+				}
+			}
+		}
+
+		if ($extract_macros) {
+			foreach ($types['macros'] as $key => $macro_parser) {
+				$macros['macros'][$key] = array_keys($macros['macros'][$key]);
+			}
+		}
+
+		return $macros;
+	}
+
+	/**
+	 * Returns the list of the item key parameters.
+	 *
+	 * @param string $params_raw
+	 *
+	 * @return array
+	 */
+	private function getItemKeyParameters($params_raw) {
+		$item_key_parameters = [];
+
+		foreach ($params_raw as $param_raw) {
+			switch ($param_raw['type']) {
+				case CItemKey::PARAM_ARRAY:
+					$item_key_parameters = array_merge($item_key_parameters,
+						$this->getItemKeyParameters($param_raw['parameters'])
+					);
+					break;
+
+				case CItemKey::PARAM_UNQUOTED:
+					$item_key_parameters[] = $param_raw['raw'];
+					break;
+
+				case CItemKey::PARAM_QUOTED:
+					$item_key_parameters[] = CItemKey::unquoteParam($param_raw['raw']);
+					break;
+			}
+		}
+
+		return $item_key_parameters;
+	}
+
+	/**
+	 * Extract macros from an item key.
+	 *
+	 * @param string $key		an item key
+	 * @param array  $types		the types of macros (see extractMacros() for more details)
+	 *
+	 * @return array			see extractMacros() for more details
+	 */
+	protected function extractItemKeyMacros($key, array $types) {
+		$item_key_parser = new CItemKey();
+
+		$item_key_parameters = [];
+		if ($item_key_parser->parse($key) == CParser::PARSE_SUCCESS) {
+			$item_key_parameters = $this->getItemKeyParameters($item_key_parser->getParamsRaw());
+		}
+
+		return $this->extractMacros($item_key_parameters, $types);
+	}
+
+	/**
+	 * Extract macros from a trigger function.
+	 *
+	 * @param string $function	a trigger function, for example 'last({$LAST})'
+	 * @param array  $types		the types of macros (see extractMacros() for more details)
+	 *
+	 * @return array			see extractMacros() for more details
+	 */
+	protected function extractFunctionMacros($function, array $types) {
+		$function_parser = new CFunctionParser();
+
+		$function_parameters = [];
+		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
+				switch ($param_raw['type']) {
+					case CFunctionParser::PARAM_UNQUOTED:
+						$function_parameters[] = $param_raw['raw'];
+						break;
+
+					case CFunctionParser::PARAM_QUOTED:
+						$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+						break;
+				}
+			}
+		}
+
+		return $this->extractMacros($function_parameters, $types);
+	}
+
+	/**
+	 * Resolves macros in the item key parameters.
+	 *
+	 * @param string $key_chain		an item key chain
+	 * @param string $params_raw
+	 * @param array  $macros		the list of macros (['{<MACRO>}' => '<value>', ...])
+	 * @param array  $types			the types of macros (see getMacroPositions() for more details)
+	 *
+	 * @return string
+	 */
+	private function resolveItemKeyParamsMacros($key_chain, array $params_raw, array $macros, array $types) {
+		foreach (array_reverse($params_raw) as $param_raw) {
+			$param = $param_raw['raw'];
+			$forced = false;
+
+			switch ($param_raw['type']) {
+				case CItemKey::PARAM_ARRAY:
+					$param = $this->resolveItemKeyParamsMacros($param, $param_raw['parameters'], $macros, $types);
+					break;
+
+				case CItemKey::PARAM_QUOTED:
+					$param = CItemKey::unquoteParam($param);
+					$forced = true;
+					// break; is not missing here
+
+				case CItemKey::PARAM_UNQUOTED:
+					$matched_macros = $this->getMacroPositions($param, $types);
+
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
+					}
+
+					$param = quoteItemKeyParam($param, $forced);
+					break;
+			}
+
+			$key_chain = substr_replace($key_chain, $param, $param_raw['pos'], strlen($param_raw['raw']));
+		}
+
+		return $key_chain;
+	}
+
+	/**
+	 * Resolves macros in the item key.
+	 *
+	 * @param string $key		an item key
+	 * @param array  $macros	the list of macros (['{<MACRO>}' => '<value>', ...])
+	 * @param array  $types		the types of macros (see getMacroPositions() for more details)
+	 *
+	 * @return string
+	 */
+	protected function resolveItemKeyMacros($key, array $macros, array $types) {
+		$item_key_parser = new CItemKey();
+
+		if ($item_key_parser->parse($key) == CParser::PARSE_SUCCESS) {
+			$key = $this->resolveItemKeyParamsMacros($key, $item_key_parser->getParamsRaw(), $macros, $types);
+		}
+
+		return $key;
+	}
+
+	/**
+	 * Resolves macros in the trigger function parameters.
+	 *
+	 * @param string $function	a trigger function
+	 * @param array  $macros	the list of macros (['{<MACRO>}' => '<value>', ...])
+	 * @param array  $types		the types of macros (see getMacroPositions() for more details)
+	 *
+	 * @return string
+	 */
+	protected function resolveFunctionMacros($function, array $macros, array $types) {
+		$function_parser = new CFunctionParser();
+
+		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			$params_raw = $function_parser->getParamsRaw();
+			$function_chain = $params_raw['raw'];
+
+			foreach (array_reverse($params_raw['parameters']) as $param_raw) {
+				$param = $param_raw['raw'];
+				$forced = false;
+
+				switch ($param_raw['type']) {
+					case CFunctionParser::PARAM_QUOTED:
+						$param = CFunctionParser::unquoteParam($param);
+						$forced = true;
+						// break; is not missing here
+
+					case CFunctionParser::PARAM_UNQUOTED:
+						$matched_macros = $this->getMacroPositions($param, $types);
+
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
+						}
+
+						$param = quoteFunctionParam($param, $forced);
+						break;
+				}
+
+				$function_chain = substr_replace($function_chain, $param, $param_raw['pos'], strlen($param_raw['raw']));
+			}
+
+			$function = substr_replace($function, $function_chain, $params_raw['pos'], strlen($params_raw['raw']));
+		}
+
+		return $function;
 	}
 
 	/**
@@ -137,20 +507,30 @@ class CMacrosResolverGeneral {
 	 * @return array	where key is function id position in expression and value is function id
 	 */
 	protected function findFunctions($expression) {
-		preg_match_all('/\{([0-9]+)\}/', $expression, $matches);
+		$functionids = [];
 
-		$functions = [];
+		$functionid_parser = new CFunctionIdParser();
+		$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$user_macro_parser = new CUserMacroParser();
 
-		foreach ($matches[1] as $i => $functionid) {
-			$functions[$i + 1] = $functionid;
+		for ($pos = 0, $i = 1; isset($expression[$pos]); $pos++) {
+			if ($functionid_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$pos += $functionid_parser->getLength() - 1;
+				$functionids[$i++] = substr($functionid_parser->getMatch(), 1, -1);
+			}
+			elseif ($user_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$pos += $user_macro_parser->getLength() - 1;
+			}
+			elseif ($macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$pos += $macro_parser->getLength() - 1;
+			}
 		}
 
-		// macro without number is same as 1. but we need to distinguish them, so it's treated as 0
-		if (isset($functions[1])) {
-			$functions[0] = $functions[1];
+		if (array_key_exists(1, $functionids)) {
+			$functionids[0] = $functionids[1];
 		}
 
-		return $functions;
+		return $functionids;
 	}
 
 	/**
@@ -197,28 +577,6 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get {ITEM.VALUE} macro.
-	 * For triggers macro is resolved in same way as {ITEM.LASTVALUE} macro. Separate methods are created for event description,
-	 * where {ITEM.VALUE} macro resolves in different way.
-	 *
-	 * @param mixed $lastValue
-	 * @param array $item
-	 * @param array $trigger
-	 *
-	 * @return string
-	 */
-	protected function getItemValueMacro($lastValue, array $item, array $trigger) {
-		if ($this->config === 'eventDescription') {
-			$value = item_get_history($item, $trigger['clock'], $trigger['ns']);
-
-			return ($value === null) ? UNRESOLVED_MACRO_STRING : formatHistoryValue($value, $item);
-		}
-		else {
-			return $this->getItemLastValueMacro($lastValue, $item);
-		}
-	}
-
-	/**
 	 * Get interface macros.
 	 *
 	 * @param array $macros
@@ -240,7 +598,7 @@ class CMacrosResolverGeneral {
 					' AND n.main=1'
 			);
 
-			// macro should be resolved to interface with highest priority ($priorities)
+			// Macro should be resolved to interface with highest priority ($priorities).
 			$interfaces = [];
 
 			while ($dbInterface = DBfetch($dbInterfaces)) {
@@ -284,10 +642,11 @@ class CMacrosResolverGeneral {
 	 * @param array $macros
 	 * @param array $triggers
 	 * @param array $macroValues
+	 * @param bool  $events			resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields
 	 *
 	 * @return array
 	 */
-	protected function getItemMacros(array $macros, array $triggers, array $macroValues) {
+	protected function getItemMacros(array $macros, array $triggers, array $macroValues, $events) {
 		if ($macros) {
 			$functions = DbFetchArray(DBselect(
 				'SELECT f.triggerid,f.functionid,i.itemid,i.value_type,i.units,i.valuemapid'.
@@ -299,7 +658,7 @@ class CMacrosResolverGeneral {
 
 			$history = Manager::History()->getLast($functions, 1, ZBX_HISTORY_PERIOD);
 
-			// false passed to DBfetch to get data without null converted to 0, which is done by default
+			// False passed to DBfetch to get data without null converted to 0, which is done by default.
 			foreach ($functions as $func) {
 				foreach ($macros[$func['functionid']] as $macro => $fNums) {
 					$lastValue = isset($history[$func['itemid']]) ? $history[$func['itemid']][0]['value'] : null;
@@ -309,7 +668,17 @@ class CMacrosResolverGeneral {
 							$replace = $this->getItemLastValueMacro($lastValue, $func);
 							break;
 						case 'ITEM.VALUE':
-							$replace = $this->getItemValueMacro($lastValue, $func, $triggers[$func['triggerid']]);
+							if ($events) {
+								$trigger = $triggers[$func['triggerid']];
+								$value = item_get_history($func, $trigger['clock'], $trigger['ns']);
+
+								$replace = ($value === null)
+									? UNRESOLVED_MACRO_STRING
+									: formatHistoryValue($value, $func);
+							}
+							else {
+								$replace = $this->getItemLastValueMacro($lastValue, $func);
+							}
 							break;
 					}
 
@@ -386,135 +755,194 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macros with values.
 	 *
-	 * @param array $data			Macros to resolve ([hostids => [hostid], macros => [macro => null]])
+	 * @param array $data
+	 * @param array $data[<id>]			any identificator
+	 * @param array $data['hostids']	the list of host ids; [<hostid1>, ...]
+	 * @param array $data['macros']		the list of user macros to resolve, ['<usermacro1>' => null, ...]
 	 *
 	 * @return array
 	 */
 	protected function getUserMacros(array $data) {
-		/*
-		 * User macros
-		 */
-		$hostIds = [];
-
+		// User macros.
+		$hostids = [];
 		foreach ($data as $element) {
-			foreach ($element['hostids'] as $hostId) {
-				$hostIds[$hostId] = $hostId;
+			foreach ($element['hostids'] as $hostid) {
+				$hostids[$hostid] = true;
 			}
 		}
 
-		if (!$hostIds) {
+		if (!$hostids) {
 			return $data;
 		}
 
-		// hostid => [templateid]
-		$hostTemplates = [];
+		/*
+		 * @var array $host_templates
+		 * @var array $host_templates[<hostid>]		array of templates
+		 */
+		$host_templates = [];
 
-		// hostid => [macro => value]
-		$hostMacros = [];
+		/*
+		 * @var array  $host_macros
+		 * @var array  $host_macros[<hostid>]
+		 * @var array  $host_macros[<hostid>][<macro>]				macro base without curly braces
+		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context); can be null
+		 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context1>' => '<value1>', ...]
+		 */
+		$host_macros = [];
+
+		$user_macro_parser = new CUserMacroParser();
 
 		do {
-			$dbHosts = API::Host()->get([
-				'hostids' => $hostIds,
+			$db_hosts = API::Host()->get([
+				'hostids' => array_keys($hostids),
 				'templated_hosts' => true,
 				'output' => ['hostid'],
 				'selectParentTemplates' => ['templateid'],
 				'selectMacros' => ['macro', 'value']
 			]);
 
-			$hostIds = [];
+			$hostids = [];
 
-			if ($dbHosts) {
-				foreach ($dbHosts as $dbHost) {
-					$hostTemplates[$dbHost['hostid']] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
+			foreach ($db_hosts as $db_host) {
+				$host_templates[$db_host['hostid']] = zbx_objectValues($db_host['parentTemplates'], 'templateid');
 
-					foreach ($dbHost['macros'] as $dbMacro) {
-						if (!isset($hostMacros[$dbHost['hostid']])) {
-							$hostMacros[$dbHost['hostid']] = [];
-						}
-
-						$hostMacros[$dbHost['hostid']][$dbMacro['macro']] = $dbMacro['value'];
+				foreach ($db_host['macros'] as $db_macro) {
+					if ($user_macro_parser->parse($db_macro['macro']) != CParser::PARSE_SUCCESS) {
+						continue;
 					}
-				}
 
-				foreach ($dbHosts as $dbHost) {
-					// only unprocessed templates will be populated
-					foreach ($hostTemplates[$dbHost['hostid']] as $templateId) {
-						if (!isset($hostTemplates[$templateId])) {
-							$hostIds[$templateId] = $templateId;
-						}
+					$macro = $user_macro_parser->getMacro();
+					$context = $user_macro_parser->getContext();
+
+					if (!array_key_exists($db_host['hostid'], $host_macros)) {
+						$host_macros[$db_host['hostid']] = [];
+					}
+
+					if (!array_key_exists($macro, $host_macros[$db_host['hostid']])) {
+						$host_macros[$db_host['hostid']][$macro] = ['value' => null, 'contexts' => []];
+					}
+
+					if ($context === null) {
+						$host_macros[$db_host['hostid']][$macro]['value'] = $db_macro['value'];
+					}
+					else {
+						$host_macros[$db_host['hostid']][$macro]['contexts'][$context] = $db_macro['value'];
 					}
 				}
 			}
-		} while ($hostIds);
 
-		$allMacrosResolved = true;
+			foreach ($db_hosts as $db_host) {
+				// Only unprocessed templates will be populated.
+				foreach ($host_templates[$db_host['hostid']] as $templateid) {
+					if (!array_key_exists($templateid, $host_templates)) {
+						$hostids[$templateid] = true;
+					}
+				}
+			}
+		} while ($hostids);
+
+		$all_macros_resolved = true;
+
+		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($data as &$element) {
-			$hostIds = [];
-
-			foreach ($element['hostids'] as $hostId) {
-				$hostIds[$hostId] = $hostId;
+			$hostids = [];
+			foreach ($element['hostids'] as $hostid) {
+				$hostids[$hostid] = true;
 			}
 
-			natsort($hostIds);
+			$hostids = array_keys($hostids);
+			natsort($hostids);
 
-			foreach ($element['macros'] as $macro => &$value) {
-				$value = $this->getHostUserMacros($hostIds, $macro, $hostTemplates, $hostMacros);
+			foreach ($element['macros'] as $usermacro => &$value) {
+				if ($user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
+					$value = $this->getHostUserMacros($hostids, $user_macro_parser->getMacro(),
+						$user_macro_parser->getContext(), $host_templates, $host_macros
+					);
 
-				if ($value === null) {
-					$allMacrosResolved = false;
+					if ($value['value'] === null) {
+						$all_macros_resolved = false;
+					}
+				}
+				else {
+					// This macro cannot be resolved.
+					$value = ['value' => $usermacro, 'value_default' => null];
 				}
 			}
 			unset($value);
 		}
 		unset($element);
 
-		if ($allMacrosResolved) {
-			// there are no more hosts with unresolved macros
-			return $data;
-		}
+		if (!$all_macros_resolved) {
+			// Global macros.
+			$db_global_macros = API::UserMacro()->get([
+				'output' => ['macro', 'value'],
+				'globalmacro' => true
+			]);
 
-		/*
-		 * Global macros
-		 */
-		$dbGlobalMacros = API::UserMacro()->get([
-			'output' => ['macro', 'value'],
-			'globalmacro' => true
-		]);
+			/*
+			 * @var array  $global_macros
+			 * @var array  $global_macros[<macro>]				macro base without curly braces
+			 * @var string $global_macros[<macro>]['value']		base macro value (without context); can be null
+			 * @var array  $global_macros[<macro>]['contexts']	context values; ['<context1>' => '<value1>', ...]
+			 */
+			$global_macros = [];
 
-		if ($dbGlobalMacros) {
-			$dbGlobalMacros = zbx_toHash($dbGlobalMacros, 'macro');
+			foreach ($db_global_macros as $db_global_macro) {
+				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
+					$macro = $user_macro_parser->getMacro();
+					$context = $user_macro_parser->getContext();
 
-			$allMacrosResolved = true;
+					if (!array_key_exists($macro, $global_macros)) {
+						$global_macros[$macro] = ['value' => null, 'contexts' => []];
+					}
+
+					if ($context === null) {
+						$global_macros[$macro]['value'] = $db_global_macro['value'];
+					}
+					else {
+						$global_macros[$macro]['contexts'][$context] = $db_global_macro['value'];
+					}
+				}
+			}
 
 			foreach ($data as &$element) {
-				foreach ($element['macros'] as $macro => &$value) {
-					if ($value === null) {
-						if (isset($dbGlobalMacros[$macro])) {
-							$value = $dbGlobalMacros[$macro]['value'];
-						}
-						else {
-							$allMacrosResolved = false;
+				foreach ($element['macros'] as $usermacro => &$value) {
+					if ($value['value'] === null && $user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
+						$macro = $user_macro_parser->getMacro();
+						$context = $user_macro_parser->getContext();
+
+						if (array_key_exists($macro, $global_macros)) {
+							if ($context !== null && array_key_exists($context, $global_macros[$macro]['contexts'])) {
+								$value['value'] = $global_macros[$macro]['contexts'][$context];
+							}
+							elseif ($global_macros[$macro]['value'] !== null) {
+								if ($context === null) {
+									$value['value'] = $global_macros[$macro]['value'];
+								}
+								elseif ($value['value_default'] === null) {
+									$value['value_default'] = $global_macros[$macro]['value'];
+								}
+							}
 						}
 					}
 				}
 				unset($value);
 			}
 			unset($element);
-
-			if ($allMacrosResolved) {
-				// there are no more hosts with unresolved macros
-				return $data;
-			}
 		}
 
-		/*
-		 * Unresolved macros stay as is
-		 */
 		foreach ($data as &$element) {
-			foreach ($element['macros'] as $macro => &$value) {
-				if ($value === null) {
-					$value = $macro;
+			foreach ($element['macros'] as $usermacro => &$value) {
+				if ($value['value'] !== null) {
+					$value = $value['value'];
+				}
+				elseif ($value['value_default'] !== null) {
+					$value = $value['value_default'];
+				}
+				else {
+					// Unresolved macro.
+					$value = $usermacro;
 				}
 			}
 			unset($value);
@@ -527,40 +955,67 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get user macro from the requested hosts.
 	 *
-	 * @param array  $hostIds		The sorted list of hosts where macros will be looked for (hostid => hostid)
-	 * @param string $macro			Macro to resolve
-	 * @param array  $hostTemplates	The list of linked templates (hostid => [templateid])
-	 * @param array  $hostMacros	The list of macros on hosts (hostid => [macro => value])
+	 * Use the base value returned by host macro as default value when expanding expand global macro. This will ensure
+	 * the following user macro resolving priority:
+	 *  1) host/template context macro
+	 *  2) global context macro
+	 *  3) host/template base (default) macro
+	 *  4) global base (default) macro
+	 *
+	 * @param array  $hostids			The sorted list of hosts where macros will be looked for (hostid => hostid)
+	 * @param string $macro				Macro base without curly braces, for example: SNMP_COMMUNITY
+	 * @param string $context			Macro context to resolve
+	 * @param array  $host_templates	The list of linked templates (see getUserMacros() for more details)
+	 * @param array  $host_macros		The list of macros on hosts (see getUserMacros() for more details)
+	 * @param string $value_default		Value
 	 *
 	 * @return array
 	 */
-	protected function getHostUserMacros(array $hostIds, $macro, array $hostTemplates, array $hostMacros) {
-		foreach ($hostIds as $hostId) {
-			if (isset($hostMacros[$hostId]) && isset($hostMacros[$hostId][$macro])) {
-				return $hostMacros[$hostId][$macro];
-			}
-		}
+	private function getHostUserMacros(array $hostids, $macro, $context, array $host_templates, array $host_macros,
+			$value_default = null) {
+		foreach ($hostids as $hostid) {
+			if (array_key_exists($hostid, $host_macros) && array_key_exists($macro, $host_macros[$hostid])) {
+				if ($context !== null && array_key_exists($context, $host_macros[$hostid][$macro]['contexts'])) {
+					return [
+						'value' => $host_macros[$hostid][$macro]['contexts'][$context],
+						'value_default' => $value_default
+					];
+				}
 
-		if (!$hostTemplates) {
-			return null;
-		}
-
-		$templateIds = [];
-
-		foreach ($hostIds as $hostId) {
-			if (isset($hostTemplates[$hostId])) {
-				foreach ($hostTemplates[$hostId] as $templateId) {
-					$templateIds[$templateId] = $templateId;
+				if ($host_macros[$hostid][$macro]['value'] !== null) {
+					if ($context === null) {
+						return ['value' => $host_macros[$hostid][$macro]['value'], 'value_default' => $value_default];
+					}
+					elseif ($value_default === null) {
+						$value_default = $host_macros[$hostid][$macro]['value'];
+					}
 				}
 			}
 		}
 
-		if ($templateIds) {
-			natsort($templateIds);
-
-			return $this->getHostUserMacros($templateIds, $macro, $hostTemplates, $hostMacros);
+		if (!$host_templates) {
+			return ['value' => null, 'value_default' => $value_default];
 		}
 
-		return null;
+		$templateids = [];
+
+		foreach ($hostids as $hostid) {
+			if (array_key_exists($hostid, $host_templates)) {
+				foreach ($host_templates[$hostid] as $templateid) {
+					$templateids[$templateid] = true;
+				}
+			}
+		}
+
+		if ($templateids) {
+			$templateids = array_keys($templateids);
+			natsort($templateids);
+
+			return $this->getHostUserMacros($templateids, $macro, $context, $host_templates, $host_macros,
+				$value_default
+			);
+		}
+
+		return ['value' => null, 'value_default' => $value_default];
 	}
 }

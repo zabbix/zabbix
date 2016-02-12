@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,98 +20,62 @@
 
 
 function condition_operator2str($operator) {
-	switch ($operator) {
-		case CONDITION_OPERATOR_EQUAL:
-			return '=';
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			return '<>';
-		case CONDITION_OPERATOR_LIKE:
-			return _('like');
-		case CONDITION_OPERATOR_NOT_LIKE:
-			return _('not like');
-		case CONDITION_OPERATOR_IN:
-			return _('in');
-		case CONDITION_OPERATOR_MORE_EQUAL:
-			return '>=';
-		case CONDITION_OPERATOR_LESS_EQUAL:
-			return '<=';
-		case CONDITION_OPERATOR_NOT_IN:
-			return _('not in');
-		default:
-			return _('Unknown');
-	}
+	$operators = [
+		CONDITION_OPERATOR_EQUAL  => '=',
+		CONDITION_OPERATOR_NOT_EQUAL  => '<>',
+		CONDITION_OPERATOR_LIKE  => _('like'),
+		CONDITION_OPERATOR_NOT_LIKE  => _('not like'),
+		CONDITION_OPERATOR_IN => _('in'),
+		CONDITION_OPERATOR_MORE_EQUAL => '>=',
+		CONDITION_OPERATOR_LESS_EQUAL => '<=',
+		CONDITION_OPERATOR_NOT_IN => _('not in')
+	];
+
+	return $operators[$operator];
 }
 
-function condition_type2str($conditionType) {
-	switch ($conditionType) {
-		case CONDITION_TYPE_TRIGGER_VALUE:
-			return _('Trigger value');
-		case CONDITION_TYPE_MAINTENANCE:
-			return _('Maintenance status');
-		case CONDITION_TYPE_TRIGGER_NAME:
-			return _('Trigger name');
-		case CONDITION_TYPE_TRIGGER_SEVERITY:
-			return _('Trigger severity');
-		case CONDITION_TYPE_TRIGGER:
-			return _('Trigger');
-		case CONDITION_TYPE_HOST_NAME:
-			return _('Host name');
-		case CONDITION_TYPE_HOST_GROUP:
-			return _('Host group');
-		case CONDITION_TYPE_TEMPLATE:
-			return _('Template');
-		case CONDITION_TYPE_HOST:
-			return _('Host');
-		case CONDITION_TYPE_TIME_PERIOD:
-			return _('Time period');
-		case CONDITION_TYPE_DRULE:
-			return _('Discovery rule');
-		case CONDITION_TYPE_DCHECK:
-			return _('Discovery check');
-		case CONDITION_TYPE_DOBJECT:
-			return _('Discovery object');
-		case CONDITION_TYPE_DHOST_IP:
-			return _('Host IP');
-		case CONDITION_TYPE_DSERVICE_TYPE:
-			return _('Service type');
-		case CONDITION_TYPE_DSERVICE_PORT:
-			return _('Service port');
-		case CONDITION_TYPE_DSTATUS:
-			return _('Discovery status');
-		case CONDITION_TYPE_DUPTIME:
-			return _('Uptime/Downtime');
-		case CONDITION_TYPE_DVALUE:
-			return _('Received value');
-		case CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-			return _('Event acknowledged');
-		case CONDITION_TYPE_APPLICATION:
-			return _('Application');
-		case CONDITION_TYPE_PROXY:
-			return _('Proxy');
-		case CONDITION_TYPE_EVENT_TYPE:
-			return _('Event type');
-		case CONDITION_TYPE_HOST_METADATA:
-			return _('Host metadata');
-		default:
-			return _('Unknown');
-	}
+function condition_type2str($type) {
+	$types = [
+		CONDITION_TYPE_TRIGGER_VALUE => _('Trigger value'),
+		CONDITION_TYPE_MAINTENANCE => _('Maintenance status'),
+		CONDITION_TYPE_TRIGGER_NAME => _('Trigger name'),
+		CONDITION_TYPE_TRIGGER_SEVERITY => _('Trigger severity'),
+		CONDITION_TYPE_TRIGGER => _('Trigger'),
+		CONDITION_TYPE_HOST_NAME => _('Host name'),
+		CONDITION_TYPE_HOST_GROUP => _('Host group'),
+		CONDITION_TYPE_TEMPLATE => _('Template'),
+		CONDITION_TYPE_HOST => _('Host'),
+		CONDITION_TYPE_TIME_PERIOD => _('Time period'),
+		CONDITION_TYPE_DRULE => _('Discovery rule'),
+		CONDITION_TYPE_DCHECK => _('Discovery check'),
+		CONDITION_TYPE_DOBJECT => _('Discovery object'),
+		CONDITION_TYPE_DHOST_IP => _('Host IP'),
+		CONDITION_TYPE_DSERVICE_TYPE => _('Service type'),
+		CONDITION_TYPE_DSERVICE_PORT => _('Service port'),
+		CONDITION_TYPE_DSTATUS => _('Discovery status'),
+		CONDITION_TYPE_DUPTIME => _('Uptime/Downtime'),
+		CONDITION_TYPE_DVALUE => _('Received value'),
+		CONDITION_TYPE_EVENT_ACKNOWLEDGED => _('Event acknowledged'),
+		CONDITION_TYPE_APPLICATION => _('Application'),
+		CONDITION_TYPE_PROXY => _('Proxy'),
+		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
+		CONDITION_TYPE_HOST_METADATA => _('Host metadata')
+	];
+
+	return $types[$type];
 }
 
 function discovery_object2str($object = null) {
-	$discoveryObjects = [
+	$objects = [
 		EVENT_OBJECT_DHOST => _('Device'),
 		EVENT_OBJECT_DSERVICE => _('Service')
 	];
 
 	if ($object === null) {
-		return $discoveryObjects;
+		return $objects;
 	}
-	elseif (isset($discoveryObjects[$object])) {
-		return $discoveryObjects[$object];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return $objects[$object];
 }
 
 /**
@@ -1140,8 +1104,8 @@ function getActionMessages(array $alerts) {
 			$retries = '';
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
-			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_ORANGE);
+			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
 		}
 		else {
 			$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
@@ -1195,7 +1159,7 @@ function getActionCommands(array $alerts) {
 				break;
 
 			case ALERT_STATUS_NOT_SENT:
-				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 				break;
 
 			default:
@@ -1216,12 +1180,14 @@ function getActionCommands(array $alerts) {
 }
 
 function makeActionHints($alerts, $mediatypes, $users, $status) {
-	$table = (new CTableInfo())->setHeader([_('User'), _('Details'), _('Status'), _('Info')]);
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Details'), _('Status'), _('Info')]);
+
+	$popup_rows = 0;
 
 	foreach ($alerts as $alert) {
 		switch ($status) {
 			case ALERT_STATUS_NOT_SENT:
-				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 				break;
 
 			case ALERT_STATUS_SENT:
@@ -1249,7 +1215,17 @@ function makeActionHints($alerts, $mediatypes, $users, $status) {
 				$message = '';
 		}
 
-		$table->addRow([$user, $message, $status_str, $alert['error'] === '' ? '' : makeErrorIcon($alert['error'])]);
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+			$user,
+			$message,
+			$status_str,
+			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+		]);
+
+		if (++$popup_rows == ZBX_WIDGET_ROWS) {
+			break;
+		}
 	}
 
 	return $table;
@@ -1261,11 +1237,11 @@ function makeEventsActions($eventids) {
 	}
 
 	$result = DBselect(
-		'SELECT a.eventid,a.mediatypeid,a.userid,a.message,a.status,a.alerttype,a.error'.
+		'SELECT a.eventid,a.mediatypeid,a.userid,a.clock,a.message,a.status,a.alerttype,a.error'.
 		' FROM alerts a'.
 		' WHERE '.dbConditionInt('a.eventid', $eventids).
 			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-		' ORDER BY a.alertid'
+		' ORDER BY a.alertid DESC'
 	);
 
 	$events = [];
@@ -1284,6 +1260,7 @@ function makeEventsActions($eventids) {
 		}
 
 		$event = [
+			'clock' => $row['clock'],
 			'alerttype' => $row['alerttype'],
 			'error' => $row['error']
 		];
@@ -1328,21 +1305,21 @@ function makeEventsActions($eventids) {
 
 	foreach ($events as $eventid => &$event) {
 		$event = (new CList([
-			count($event[ALERT_STATUS_SENT]) != 0
+			$event[ALERT_STATUS_SENT]
 				? (new CSpan(count($event[ALERT_STATUS_SENT])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 					->addClass(ZBX_STYLE_GREEN)
 					->setHint(makeActionHints($event[ALERT_STATUS_SENT], $mediatypes, $users, ALERT_STATUS_SENT))
 				: '',
-			count($event[ALERT_STATUS_NOT_SENT]) != 0
+			$event[ALERT_STATUS_NOT_SENT]
 				? (new CSpan(count($event[ALERT_STATUS_NOT_SENT])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_ORANGE)
+					->addClass(ZBX_STYLE_YELLOW)
 					->setHint(
 						makeActionHints($event[ALERT_STATUS_NOT_SENT], $mediatypes, $users, ALERT_STATUS_NOT_SENT)
 					)
 				: '',
-			count($event[ALERT_STATUS_FAILED]) != 0
+			$event[ALERT_STATUS_FAILED]
 				? (new CSpan(count($event[ALERT_STATUS_FAILED])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 					->addClass(ZBX_STYLE_RED)
@@ -1378,10 +1355,6 @@ function eventType($type = null) {
 	if (is_null($type)) {
 		return $types;
 	}
-	elseif (isset($types[$type])) {
-		return $types[$type];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return $types[$type];
 }

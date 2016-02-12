@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,10 +187,9 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerName(array $trigger) {
-		$macros = self::resolveTriggerNames([$trigger]);
-		$macros = reset($macros);
+		$triggers = self::resolveTriggerNames([$trigger['triggerid'] => $trigger]);
 
-		return $macros['description'];
+		return $triggers[$trigger['triggerid']]['description'];
 	}
 
 	/**
@@ -199,15 +198,16 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param array $triggers
+	 * @param bool  $references_only
 	 *
 	 * @return array
 	 */
-	public static function resolveTriggerNames(array $triggers) {
+	public static function resolveTriggerNames(array $triggers, $references_only = false) {
 		self::init();
 
-		return self::$macrosResolver->resolve([
-			'config' => 'triggerName',
-			'data' => zbx_toHash($triggers, 'triggerid')
+		return self::$macrosResolver->resolveTriggerNames($triggers, [
+			'references_only' => $references_only,
+			'events' => false
 		]);
 	}
 
@@ -221,10 +221,9 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerDescription(array $trigger) {
-		$macros = self::resolveTriggerDescriptions([$trigger]);
-		$macros = reset($macros);
+		$triggers = self::resolveTriggerDescriptions([$trigger['triggerid'] => $trigger]);
 
-		return $macros['comments'];
+		return $triggers[$trigger['triggerid']]['comments'];
 	}
 
 	/**
@@ -239,10 +238,7 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerDescriptions(array $triggers) {
 		self::init();
 
-		return self::$macrosResolver->resolve([
-			'config' => 'triggerDescription',
-			'data' => zbx_toHash($triggers, 'triggerid')
-		]);
+		return self::$macrosResolver->resolveTriggerDescriptions($triggers);
 	}
 
 	/**
@@ -256,13 +252,10 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array
 	 */
-	public static function resolveTriggerUrl(array $triggers) {
+	public static function resolveTriggerUrls(array $triggers) {
 		self::init();
 
-		return self::$macrosResolver->resolve([
-			'config' => 'triggerUrl',
-			'data' => $triggers
-		]);
+		return self::$macrosResolver->resolveTriggerUrls($triggers);
 	}
 
 	/**
@@ -299,26 +292,54 @@ class CMacrosResolverHelper {
 			' WHERE '.dbConditionInt('t.triggerid', $triggerIds)
 		));
 
-		return self::$macrosResolver->resolve([
-			'config' => 'triggerName',
-			'data' => zbx_toHash($triggers, 'triggerid')
+		return self::$macrosResolver->resolveTriggerNames(zbx_toHash($triggers, 'triggerid'), [
+			'references_only' => false,
+			'events' => false
 		]);
 	}
 
 	/**
-	 * Resolve macros in trigger reference.
+	 * Resolve macros in trigger expression.
 	 *
 	 * @static
 	 *
 	 * @param string $expression
-	 * @param string $text
+	 * @param array  $options		see resolveTriggerExpressions() for more details
 	 *
 	 * @return string
 	 */
-	public static function resolveTriggerReference($expression, $text) {
+	public static function resolveTriggerExpression($expression, array $options = []) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerReference($expression, $text);
+		return self::$macrosResolver->resolveTriggerExpressions([['expression' => $expression]], [
+			'html' => array_key_exists('html', $options) && $options['html'],
+			'resolve_usermacros' => array_key_exists('resolve_usermacros', $options) && $options['resolve_usermacros'],
+			'resolve_macros' => array_key_exists('resolve_macros', $options) && $options['resolve_macros']
+		])[0]['expression'];
+	}
+
+	/**
+	 * Resolve macros in trigger expressions.
+	 *
+	 * @static
+	 *
+	 * @param array  $triggers
+	 * @param string $triggers[]['expression']
+	 * @param array  $options
+	 * @param bool   $options['html']				(optional) returns formatted trigger expression
+	 * @param bool   $options['resolve_usermacros']	(optional) resolve user macros
+	 * @param bool   $options['resolve_macros']		(optional) resolve macros in item keys and functions
+	 *
+	 * @return array
+	 */
+	public static function resolveTriggerExpressions(array $triggers, array $options = []) {
+		self::init();
+
+		return self::$macrosResolver->resolveTriggerExpressions($triggers, [
+			'html' => array_key_exists('html', $options) && $options['html'],
+			'resolve_usermacros' => array_key_exists('resolve_usermacros', $options) && $options['resolve_usermacros'],
+			'resolve_macros' => array_key_exists('resolve_macros', $options) && $options['resolve_macros']
+		]);
 	}
 
 	/**
@@ -333,16 +354,9 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerExpressionUserMacro(array $trigger) {
-		if (zbx_empty($trigger['expression'])) {
-			return $trigger['expression'];
-		}
-
 		self::init();
 
-		$triggers = self::$macrosResolver->resolve([
-			'config' => 'triggerExpressionUser',
-			'data' => zbx_toHash([$trigger], 'triggerid')
-		]);
+		$triggers = self::$macrosResolver->resolveTriggerExpressionUserMacro(zbx_toHash([$trigger], 'triggerid'));
 		$trigger = reset($triggers);
 
 		return $trigger['expression'];
@@ -360,13 +374,12 @@ class CMacrosResolverHelper {
 	public static function resolveEventDescription(array $event) {
 		self::init();
 
-		$macros = self::$macrosResolver->resolve([
-			'config' => 'eventDescription',
-			'data' => [$event['triggerid'] => $event]
+		$events = self::$macrosResolver->resolveTriggerNames([$event['triggerid'] => $event], [
+			'references_only' => false,
+			'events' => true
 		]);
-		$macros = reset($macros);
 
-		return $macros['description'];
+		return $events[$event['triggerid']]['description'];
 	}
 
 	/**

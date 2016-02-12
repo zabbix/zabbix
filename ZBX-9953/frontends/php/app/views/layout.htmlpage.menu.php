@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,41 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$page_menu = (new CTag('header', true))->setAttribute('role', 'banner');
-$page_menu_div = (new CDiv())
-	->addClass('nav')
-	->setAttribute('role', 'navigation');
-
-$top_menu_items = (new CList($data['menu']['main_menu']))->addClass('top-nav');
-
-// 1st level menu
-$top_menu = (new CDiv($top_menu_items))
-	->addClass('top-nav-container')
-	->setId('mmenu');
-
 $icons = (new CList())
-	->addClass('top-nav-icons')
+	->addClass(ZBX_STYLE_TOP_NAV_ICONS)
 	->addItem(
 		(new CForm('get', 'search.php'))
 			->addItem([
 				(new CTextBox('search', '', false, 255))
-					->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
 					->setAttribute('autocomplete', 'off')
-					->addClass('search'),
-				(new CSubmitButton(SPACE))->addClass('btn-search')
+					->addClass(ZBX_STYLE_SEARCH),
+				(new CSubmitButton(SPACE))->addClass(ZBX_STYLE_BTN_SEARCH)
 			])
 	)
 	->addItem(
 		(new CLink('Share', 'https://share.zabbix.com/'))
-			->addClass('top-nav-zbbshare')
-			->removeSID()
+			->addClass(ZBX_STYLE_TOP_NAV_ZBBSHARE)
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Zabbix Share'))
 	)
 	->addItem(
-		(new CLink(SPACE, 'http://www.zabbix.com/documentation/'))
-			->addClass('top-nav-help')
-			->removeSID()
+		(new CLink(SPACE, 'http://www.zabbix.com/documentation/3.0/'))
+			->addClass(ZBX_STYLE_TOP_NAV_HELP)
 			->setAttribute('target', '_blank')
 			->setAttribute('title', _('Help'))
 	);
@@ -60,31 +45,40 @@ $icons = (new CList())
 if (!$data['user']['is_guest']) {
 	$icons->addItem(
 		(new CLink(SPACE, 'profile.php'))
-			->addClass('top-nav-profile')
+			->addClass(ZBX_STYLE_TOP_NAV_PROFILE)
 			->setAttribute('title', getUserFullname($data['user']))
 	);
 }
 
 $icons->addItem(
 	(new CLink(SPACE, 'index.php?reconnect=1'))
-		->addClass('top-nav-signout')
+		->addClass(ZBX_STYLE_TOP_NAV_SIGNOUT)
 		->setAttribute('title', _('Sign out'))
+		->addSID()
 );
 
-$top_menu->addItem($icons);
+// 1st level menu
+$top_menu = (new CDiv())
+	->addItem(new CLink((new CDiv())->addClass(ZBX_STYLE_LOGO), 'zabbix.php?action=dashboard.view'))
+	->addItem(
+		(new CList($data['menu']['main_menu']))->addClass(ZBX_STYLE_TOP_NAV)
+	)
+	->addItem($icons)
+	->addClass(ZBX_STYLE_TOP_NAV_CONTAINER)
+	->setId('mmenu');
 
-$page_menu_div->addItem($top_menu);
+$sub_menu_div = (new CDiv())
+	->addClass(ZBX_STYLE_TOP_SUBNAV_CONTAINER)
+	->onMouseover('javascript: MMenu.submenu_mouseOver();')
+	->onMouseout('javascript: MMenu.mouseOut();');
 
 // 2nd level menu
-$menu_divs = [];
-$menu_selected = false;
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
-	$sub_menu_row = (new CList())->addClass('top-subnav');
-	foreach ($sub_menu as $id => $sub_page) {
-		if (empty($sub_page['menu_text'])) {
-			$sub_page['menu_text'] = SPACE;
-		}
+	$sub_menu_row = (new CList())
+		->addClass(ZBX_STYLE_TOP_SUBNAV)
+		->setId('sub_'.$label);
 
+	foreach ($sub_menu as $id => $sub_page) {
 		$url = new CUrl($sub_page['menu_url']);
 		if ($sub_page['menu_action'] !== null) {
 			$url->setArgument('action', $sub_page['menu_action']);
@@ -94,38 +88,37 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		}
 		$url->removeArgument('sid');
 
-		$sub_menu_item = (new CLink($sub_page['menu_text'], $url->getUrl()))->removeSID();
+		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
 		if ($sub_page['selected']) {
-			$sub_menu_item->addClass('selected');
+			$sub_menu_item->addClass(ZBX_STYLE_SELECTED);
 		}
 
 		$sub_menu_row->addItem($sub_menu_item);
 	}
 
-	$sub_menu_div = (new CDiv($sub_menu_row))
-		->addClass('top-subnav-container')
-		->setId('sub_'.$label)
-		->onMouseover('javascript: MMenu.submenu_mouseOver();')
-		->onMouseout('javascript: MMenu.mouseOut();');
-
-	if ($data['menu']['selected'] == $label) {
-		$menu_selected = true;
-		$sub_menu_div->setAttribute('style', 'display: block;');
+	if ($data['menu']['selected'] === $label) {
+		$sub_menu_row->setAttribute('style', 'display: block;');
 		insert_js('MMenu.def_label = '.zbx_jsvalue($label));
 	}
 	else {
-		$sub_menu_div->setAttribute('style', 'display: none;');
+		$sub_menu_row->setAttribute('style', 'display: none;');
 	}
-	$menu_divs[] = $sub_menu_div;
+	$sub_menu_div->addItem($sub_menu_row);
 }
 
-$sub_menu_div = (new CDiv(SPACE))
-	->setId('sub_empty')
-	->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
+if ($data['server_name'] !== '') {
+	$sub_menu_div->addItem(
+		(new CDiv($data['server_name']))->addClass(ZBX_STYLE_SERVER_NAME)
+	);
+}
 
-$menu_divs[] = $sub_menu_div;
-
-$page_menu_div->addItem($menu_divs);
-$page_menu
-	->addItem($page_menu_div)
+(new CTag('header', true))
+	->setAttribute('role', 'banner')
+	->addItem(
+		(new CDiv())
+			->addItem($top_menu)
+			->addItem($sub_menu_div)
+			->addClass(ZBX_STYLE_NAV)
+			->setAttribute('role', 'navigation')
+	)
 	->show();

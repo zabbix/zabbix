@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -112,15 +112,15 @@ class CProfiler {
 	}
 
 	/**
-	 * Output profiling data.
+	 * Make profiling data.
+	 *
+	 * @return CPre
 	 */
-	public function show() {
+	public function make() {
 		global $DB;
 
 		$debug = [];
-		$debug[] = (new CLink())
-			->setAttribute('name', 'debug')
-			->removeSid();
+		$debug[] = (new CLink())->setAttribute('name', 'debug');
 		$debug[] = '******************** '._('Script profiler').' ********************';
 		$debug[] = BR();
 		$debug[] = _s('Total time: %1$s', round($this->stopTime - $this->startTime, 6));
@@ -182,12 +182,18 @@ class CProfiler {
 			$debug[] = BR();
 		}
 
-		$debug = (new CPre())
+		return (new CPre())
 			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
 			->setAttribute('name', 'zbx_debug_info')
 			->addStyle('display: none;')
-			->addItem($debug)
-			->show();
+			->addItem($debug);
+	}
+
+	/**
+	 * Output profiling data.
+	 */
+	public function show() {
+		return $this->make()->show();
 	}
 
 	/**

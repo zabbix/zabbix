@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,16 +155,20 @@ class CTag extends CObject {
 	}
 
 	/**
-	 * Adds a hint box to the elemt.
+	 * Adds a hint box to the element.
 	 *
-	 * @param string|array|CTag     $text          hint content
-	 * @param string                $spanClass     wrap the content in a span element and assign a this class to the span
-	 * @param bool                  $freezeOnCLick if set to true, it will be possible to "freeze" the hint box via a mouse
-	 *                                          click
+	 * @param string|array|CTag		$text				Hint content.
+	 * @param string				$span_class			Wrap the content in a span element and assign this class
+	 *													to the span.
+	 * @param bool					$freeze_on_click	If set to true, it will be possible to "freeze" the hint box
+	 *													via a mouse click.
+	 * @param string				$styles				Custom css styles.
+	 *													Syntax:
+	 *														property1: value1; property2: value2; property(n): value(n)
 	 *
 	 * @return bool
 	 */
-	public function setHint($text, $spanClass = '', $freezeOnClick = true) {
+	public function setHint($text, $span_class = '', $freeze_on_click = true, $styles = '') {
 		if (empty($text)) {
 			return $this;
 		}
@@ -172,10 +176,16 @@ class CTag extends CObject {
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->onMouseover('hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
-		if ($freezeOnClick) {
-			$this->onClick('hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
+		$this->onMouseover(
+			'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$span_class.'", "'.$styles.'");'
+		);
+
+		if ($freeze_on_click) {
+			$this->onClick(
+				'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$span_class.'", false, "'.$styles.'");'
+			);
 		}
+
 		return $this;
 	}
 

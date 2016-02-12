@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1349,7 +1349,7 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 
 	if (ITEM_IPMI_SENSOR_LEN_MAX <= sz_c_name)
 	{
-		zbx_snprintf(error, max_error_len, "IPMI command is too long [%.*s]", sz_c_name, command);
+		zbx_snprintf(error, max_error_len, "IPMI command is too long [%.*s]", (int)sz_c_name, command);
 		goto fail;
 	}
 

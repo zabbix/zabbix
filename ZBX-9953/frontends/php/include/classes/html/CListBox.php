@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ class CListBox extends CComboBox {
 	public function __construct($name = 'listbox', $value = null, $size = 5, $action = null, array $items = []) {
 		parent::__construct($name, $value, $action, $items);
 		$this->setAttribute('multiple', 'multiple');
-		$this->addClass(ZBX_STYLE_SELECT_MULTIPLE);
 		$this->setAttribute('size', $size);
 	}
 }

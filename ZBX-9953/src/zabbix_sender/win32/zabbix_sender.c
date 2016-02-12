@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ const char	title_message[] = "";
 const char	*usage_message[] = {NULL};
 
 const char	*help_message[] = {NULL};
+
+unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
@@ -58,7 +60,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&sock, source, address, port, GET_SENDER_TIMEOUT,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{

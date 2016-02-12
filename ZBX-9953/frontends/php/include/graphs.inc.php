@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -405,14 +405,14 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 	$_REQUEST['stime'] = getRequest('stime');
 
 	if ($_REQUEST['period'] < ZBX_MIN_PERIOD) {
-		show_message(_n('Minimum time period to display is %1$s hour.',
-			'Minimum time period to display is %1$s hours.',
-			(int) ZBX_MIN_PERIOD / SEC_PER_HOUR
+		show_error_message(_n('Minimum time period to display is %1$s minute.',
+			'Minimum time period to display is %1$s minutes.',
+			(int) ZBX_MIN_PERIOD / SEC_PER_MIN
 		));
 		$_REQUEST['period'] = ZBX_MIN_PERIOD;
 	}
 	elseif ($_REQUEST['period'] > ZBX_MAX_PERIOD) {
-		show_message(_n('Maximum time period to display is %1$s day.',
+		show_error_message(_n('Maximum time period to display is %1$s day.',
 			'Maximum time period to display is %1$s days.',
 			(int) ZBX_MAX_PERIOD / SEC_PER_DAY
 		));
@@ -558,8 +558,6 @@ function get_next_palette($palette = 0, $palettetype = 0) {
  * @param string   $marks	"t" - top, "r" - right, "b" - bottom, "l" - left
  */
 function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
-	global $colors;
-
 	$polygons = 5;
 	$gims = [
 		't' => [0, 0, -6, -6, -3, -9, 3, -9, 6, -6],
@@ -604,21 +602,24 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
 		}
 	}
 
+	$color = get_color($im, $color);
+	$polygon_color = get_color($im, '960000');
+
 	if (strpos($marks, 't') !== false) {
 		imagefilledpolygon($im, $gims['t'], $polygons, $color);
-		imagepolygon($im, $gims['t'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['t'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'r') !== false) {
 		imagefilledpolygon($im, $gims['r'], $polygons, $color);
-		imagepolygon($im, $gims['r'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['r'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'b') !== false) {
 		imagefilledpolygon($im, $gims['b'], $polygons, $color);
-		imagepolygon($im, $gims['b'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['b'], $polygons, $polygon_color);
 	}
 	if (strpos($marks, 'l') !== false) {
 		imagefilledpolygon($im, $gims['l'], $polygons, $color);
-		imagepolygon($im, $gims['l'], $polygons, $colors['Dark Red']);
+		imagepolygon($im, $gims['l'], $polygons, $polygon_color);
 	}
 }
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -551,7 +551,7 @@ function updateHostStatus($hostids, $status) {
 		$host_new = $host;
 		$host_new['status'] = $status;
 		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
-		info(_('Updated status of host').' "'.$host['host'].'"');
+		info(_s('Updated status of host "%1$s".', $host['host']));
 	}
 
 	return DB::update('hosts', [
@@ -773,6 +773,8 @@ function isTemplate($hostId) {
  * @return array
  */
 function getInheritedMacros(array $hostids) {
+	$user_macro_parser = new CUserMacroParser();
+
 	$all_macros = [];
 	$global_macros = [];
 
@@ -810,9 +812,54 @@ function getInheritedMacros(array $hostids) {
 				'macros' => []
 			];
 
+			/*
+			 * Global macros are overwritten by template macros and template macros are overwritten by host macros.
+			 * Macros with contexts require additional checking for contexts, since {$MACRO:} is the same as
+			 * {$MACRO:""}.
+			 */
 			foreach ($db_template['macros'] as $dbMacro) {
-				$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
-				$all_macros[$dbMacro['macro']] = true;
+				if (array_key_exists($dbMacro['macro'], $all_macros)) {
+					$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+					$all_macros[$dbMacro['macro']] = true;
+				}
+				else {
+					$user_macro_parser->parse($dbMacro['macro']);
+					$tpl_macro = $user_macro_parser->getMacro();
+					$tpl_context = $user_macro_parser->getContext();
+
+					if ($tpl_context === null) {
+						$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+						$all_macros[$dbMacro['macro']] = true;
+					}
+					else {
+						$match_found = false;
+
+						foreach ($global_macros as $global_macro => $global_value) {
+							$user_macro_parser->parse($global_macro);
+							$gbl_macro = $user_macro_parser->getMacro();
+							$gbl_context = $user_macro_parser->getContext();
+
+							if ($tpl_macro === $gbl_macro && $tpl_context === $gbl_context) {
+								$match_found = true;
+
+								unset($global_macros[$global_macro], $hosts[$hostid][$global_macro],
+									$all_macros[$global_macro]
+								);
+
+								$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+								$all_macros[$dbMacro['macro']] = true;
+								$global_macros[$dbMacro['macro']] = $global_value;
+
+								break;
+							}
+						}
+
+						if (!$match_found) {
+							$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+							$all_macros[$dbMacro['macro']] = true;
+						}
+					}
+				}
 			}
 		}
 
@@ -925,6 +972,8 @@ function getInheritedMacros(array $hostids) {
  * @return array
  */
 function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
+	$user_macro_parser = new CUserMacroParser();
+
 	foreach ($inherited_macros as &$inherited_macro) {
 		$inherited_macro['type'] = MACRO_TYPE_INHERITED;
 		$inherited_macro['value'] = array_key_exists('template', $inherited_macro)
@@ -933,14 +982,56 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	}
 	unset($inherited_macro);
 
+	/*
+	 * Global macros and template macros are overwritten by host macros. Macros with contexts require additional
+	 * checking for contexts, since {$MACRO:} is the same as {$MACRO:""}.
+	 */
 	foreach ($host_macros as &$host_macro) {
 		if (array_key_exists($host_macro['macro'], $inherited_macros)) {
 			$host_macro = array_merge($inherited_macros[$host_macro['macro']], $host_macro);
 			unset($inherited_macros[$host_macro['macro']]);
 		}
 		else {
-			$host_macro['type'] = 0x00;
+			/*
+			 * Cannot use array dereferencing because "$host_macro['macro']" may contain invalid macros
+			 * which results in empty array.
+			 */
+			if ($user_macro_parser->parse($host_macro['macro']) == CParser::PARSE_SUCCESS) {
+				$hst_macro = $user_macro_parser->getMacro();
+				$hst_context = $user_macro_parser->getContext();
+
+				if ($hst_context === null) {
+					$host_macro['type'] = 0x00;
+				}
+				else {
+					$match_found = false;
+
+					foreach ($inherited_macros as $inherited_macro => $inherited_values) {
+						// Safe to use array dereferencing since these values come from database.
+						$user_macro_parser->parse($inherited_macro);
+						$inh_macro = $user_macro_parser->getMacro();
+						$inh_context = $user_macro_parser->getContext();
+
+						if ($hst_macro === $inh_macro && $hst_context === $inh_context) {
+							$match_found = true;
+
+							$host_macro = array_merge($inherited_macros[$inherited_macro], $host_macro);
+							unset($inherited_macros[$inherited_macro]);
+
+							break;
+						}
+					}
+
+					if (!$match_found) {
+						$host_macro['type'] = 0x00;
+					}
+				}
+			}
+			else {
+				$host_macro['type'] = 0x00;
+			}
 		}
+
 		$host_macro['type'] |= MACRO_TYPE_HOSTMACRO;
 	}
 	unset($host_macro);

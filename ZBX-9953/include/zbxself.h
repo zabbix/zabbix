@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,6 @@
 int		get_process_type_by_name(const char *proc_type_str);
 int		get_process_type_forks(unsigned char process_type);
 const char	*get_process_type_string(unsigned char process_type);
-const char	*get_daemon_type_string(unsigned char daemon_type);
 
 #ifndef _WINDOWS
 void		init_selfmon_collector(void);

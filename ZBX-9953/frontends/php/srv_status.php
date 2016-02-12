@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,9 +59,10 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	$service = reset($service);
 
 	if ($service) {
-		$table = (new CTable())
-			->addClass('chart')
-			->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))
+		$table = (new CDiv())
+			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+			->addClass(ZBX_STYLE_CENTER)
+			->addItem(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))
 			->show();
 	}
 	else {
@@ -105,8 +106,10 @@ else {
 	]);
 
 	// expand trigger descriptions
-	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	$triggers = zbx_objectValues(
+		array_filter($services, function($service) { return (bool) $service['trigger']; }), 'trigger'
+	);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
@@ -139,8 +142,9 @@ else {
 			'caption' => _('Service'),
 			'status' => _('Status'),
 			'reason' => _('Reason'),
-			'sla' => _('Problem time'),
-			'sla2' => nbsp(_('SLA').' / '._('Acceptable SLA'))
+			'sla' => (new CColHeader(_('Problem time')))->setColSpan(2),
+			'sla2' => null,
+			'sla3' => nbsp(_('SLA').' / '._('Acceptable SLA'))
 		]
 	);
 

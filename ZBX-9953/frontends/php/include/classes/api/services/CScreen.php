@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@
 
 /**
  * Class containing methods for operations with screens.
- *
- * @package API
  */
 class CScreen extends CApiService {
 
@@ -44,9 +42,9 @@ class CScreen extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
+		$user_data = self::$userData;
 
-		$sqlParts = [
+		$sql_parts = [
 			'select'	=> ['screens' => 's.screenid'],
 			'from'		=> ['screens' => 'screens s'],
 			'where'		=> ['template' => 's.templateid IS NULL'],
@@ -57,6 +55,7 @@ class CScreen extends CApiService {
 
 		$defOptions = [
 			'screenids'					=> null,
+			'userids'					=> null,
 			'screenitemids'				=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -70,6 +69,8 @@ class CScreen extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectScreenItems'			=> null,
+			'selectUsers'				=> null,
+			'selectUserGroups'			=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -79,241 +80,317 @@ class CScreen extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
+		if ($options['countOutput'] !== null) {
+			$count_output = true;
+			$options['output'] = ['screenid'];
+			$options['countOutput'] = null;
+			$options['limit'] = null;
+		}
+		else {
+			$count_output = false;
+		}
+
+		// Editable + permission check.
+		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN
+				&& !$options['nopermissions']) {
+			$public_screens = '';
+
+			if ($options['editable']) {
+				$permission = PERM_READ_WRITE;
+			}
+			else {
+				$permission = PERM_READ;
+				$public_screens = ' OR s.private='.PUBLIC_SHARING;
+			}
+
+			$user_groups = getUserGroupsByUserId($user_data['userid']);
+
+			$sql_parts['where'][] = '(EXISTS ('.
+					'SELECT NULL'.
+					' FROM screen_user su'.
+					' WHERE s.screenid=su.screenid'.
+						' AND su.userid='.$user_data['userid'].
+						' AND su.permission>='.$permission.
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM screen_usrgrp sg'.
+					' WHERE s.screenid=sg.screenid'.
+						' AND '.dbConditionInt('sg.usrgrpid', $user_groups).
+						' AND sg.permission>='.$permission.
+				')'.
+				' OR s.userid='.$user_data['userid'].
+				$public_screens.
+			')';
+		}
+
 		// screenids
 		if (!is_null($options['screenids'])) {
 			zbx_value2array($options['screenids']);
-			$sqlParts['where'][] = dbConditionInt('s.screenid', $options['screenids']);
+			$sql_parts['where'][] = dbConditionInt('s.screenid', $options['screenids']);
+		}
+
+		// userids
+		if ($options['userids'] !== null) {
+			zbx_value2array($options['userids']);
+
+			$sql_parts['where'][] = dbConditionInt('s.userid', $options['userids']);
 		}
 
 		// screenitemids
 		if (!is_null($options['screenitemids'])) {
 			zbx_value2array($options['screenitemids']);
 
-			$sqlParts['from']['screens_items'] = 'screens_items si';
-			$sqlParts['where']['ssi'] = 'si.screenid=s.screenid';
-			$sqlParts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
+			$sql_parts['from']['screens_items'] = 'screens_items si';
+			$sql_parts['where']['ssi'] = 'si.screenid=s.screenid';
+			$sql_parts['where'][] = dbConditionInt('si.screenitemid', $options['screenitemids']);
 		}
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->dbFilter('screens s', $options, $sqlParts);
+			$this->dbFilter('screens s', $options, $sql_parts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
-			zbx_db_search('screens s', $options, $sqlParts);
+			zbx_db_search('screens s', $options, $sql_parts);
 		}
 
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
+			$sql_parts['limit'] = $options['limit'];
 		}
 
-		$screenIds = [];
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+		$screenids = [];
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$res = DBselect($this->createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 		while ($screen = DBfetch($res)) {
-			if ($options['countOutput'] !== null) {
-				if ($options['groupCount'] !== null) {
-					$result[] = $screen;
-				}
-				else {
-					$result = $screen['rowscount'];
-				}
-			}
-			else {
-				$screenIds[$screen['screenid']] = $screen['screenid'];
-
-				$result[$screen['screenid']] = $screen;
-			}
+			$screenids[$screen['screenid']] = true;
+			$result[$screen['screenid']] = $screen;
 		}
 
 		// editable + PERMISSION CHECK
-		if ($userType == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
+		if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions'] && $screenids) {
+			$db_screen_items = DBselect(
+				'SELECT si.screenid,si.resourcetype,si.resourceid,si.style'.
+				' FROM screens_items si'.
+				' WHERE '.dbConditionInt('si.screenid', array_keys($screenids)).
+					' AND '.dbConditionInt('si.resourcetype', [
+						SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+						SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
+						SCREEN_RESOURCE_HOST_TRIGGERS, SCREEN_RESOURCE_GRAPH, SCREEN_RESOURCE_SIMPLE_GRAPH,
+						SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK, SCREEN_RESOURCE_MAP, SCREEN_RESOURCE_SCREEN
+					]).
+					' AND si.resourceid<>0'
+			);
+
+			$screens = [];
+
+			while ($db_screen_item = DBfetch($db_screen_items)) {
+				if (!array_key_exists($db_screen_item['screenid'], $screens)) {
+					$screens[$db_screen_item['screenid']] = [
+						'groups' => [], 'hosts' => [], 'graphs' => [], 'items' => [], 'maps' => [], 'screens' => []
+					];
+				}
+
+				switch ($db_screen_item['resourcetype']) {
+					case SCREEN_RESOURCE_HOSTS_INFO:
+					case SCREEN_RESOURCE_TRIGGERS_INFO:
+					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+					case SCREEN_RESOURCE_DATA_OVERVIEW:
+					case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
+						$screens[$db_screen_item['screenid']]['groups'][$db_screen_item['resourceid']] = true;
+						break;
+
+					case SCREEN_RESOURCE_HOST_TRIGGERS:
+						$screens[$db_screen_item['screenid']]['hosts'][$db_screen_item['resourceid']] = true;
+						break;
+
+					case SCREEN_RESOURCE_GRAPH:
+						$screens[$db_screen_item['screenid']]['graphs'][$db_screen_item['resourceid']] = true;
+						break;
+
+					case SCREEN_RESOURCE_SIMPLE_GRAPH:
+					case SCREEN_RESOURCE_PLAIN_TEXT:
+						$screens[$db_screen_item['screenid']]['items'][$db_screen_item['resourceid']] = true;
+						break;
+
+					case SCREEN_RESOURCE_CLOCK:
+						if ($db_screen_item['style'] == TIME_TYPE_HOST) {
+							$screens[$db_screen_item['screenid']]['items'][$db_screen_item['resourceid']] = true;
+						}
+						break;
+
+					case SCREEN_RESOURCE_MAP:
+						$screens[$db_screen_item['screenid']]['maps'][$db_screen_item['resourceid']] = true;
+						break;
+
+					case SCREEN_RESOURCE_SCREEN:
+						$screens[$db_screen_item['screenid']]['screens'][$db_screen_item['resourceid']] = true;
+						break;
+				}
+			}
+
+			// groups
+			$groups = [];
+
+			foreach ($screens as $screenid => $resources) {
+				foreach ($resources['groups'] as $groupid => $foo) {
+					$groups[$groupid][$screenid] = true;
+				}
+			}
+
+			if ($groups) {
+				$db_groups = API::HostGroup()->get([
+					'output' => [],
+					'groupids' => array_keys($groups),
+					'preservekeys' => true
+				]);
+
+				foreach ($groups as $groupid => $resources) {
+					if (!array_key_exists($groupid, $db_groups)) {
+						foreach ($resources as $screenid => $foo) {
+							unset($screens[$screenid], $result[$screenid]);
+						}
+					}
+				}
+			}
+
+			// hosts
+			$hosts = [];
+
+			foreach ($screens as $screenid => $resources) {
+				foreach ($resources['hosts'] as $hostid => $foo) {
+					$hosts[$hostid][$screenid] = true;
+				}
+			}
+
+			if ($hosts) {
+				$db_hosts = API::Host()->get([
+					'output' => [],
+					'hostids' => array_keys($hosts),
+					'preservekeys' => true
+				]);
+
+				foreach ($hosts as $hostid => $resources) {
+					if (!array_key_exists($hostid, $db_hosts)) {
+						foreach ($resources as $screenid => $foo) {
+							unset($screens[$screenid], $result[$screenid]);
+						}
+					}
+				}
+			}
+
+			// graphs
+			$graphs = [];
+
+			foreach ($screens as $screenid => $resources) {
+				foreach ($resources['graphs'] as $graphid => $foo) {
+					$graphs[$graphid][$screenid] = true;
+				}
+			}
+
+			if ($graphs) {
+				$db_graphs = API::Graph()->get([
+					'output' => [],
+					'graphids' => array_keys($graphs),
+					'preservekeys' => true
+				]);
+
+				foreach ($graphs as $graphid => $resources) {
+					if (!array_key_exists($graphid, $db_graphs)) {
+						foreach ($resources as $screenid => $foo) {
+							unset($screens[$screenid], $result[$screenid]);
+						}
+					}
+				}
+			}
+
+			// items
+			$items = [];
+
+			foreach ($screens as $screenid => $resources) {
+				foreach ($resources['items'] as $itemid => $foo) {
+					$items[$itemid][$screenid] = true;
+				}
+			}
+
+			if ($items) {
+				$db_items = API::Item()->get([
+					'output' => [],
+					'itemids' => array_keys($items),
+					'webitems' => true,
+					'preservekeys' => true
+				]);
+
+				foreach ($items as $itemid => $resources) {
+					if (!array_key_exists($itemid, $db_items)) {
+						foreach ($resources as $screenid => $foo) {
+							unset($screens[$screenid], $result[$screenid]);
+						}
+					}
+				}
+			}
+
+			// maps
+			$maps = [];
+
+			foreach ($screens as $screenid => $resources) {
+				foreach ($resources['maps'] as $sysmapid => $foo) {
+					$maps[$sysmapid][$screenid] = true;
+				}
+			}
+
+			if ($maps) {
+				$db_maps = API::Map()->get([
+					'output' => [],
+					'sysmapids' => array_keys($maps),
+					'preservekeys' => true
+				]);
+
+				foreach ($maps as $sysmapid => $resources) {
+					if (!array_key_exists($sysmapid, $db_maps)) {
+						foreach ($resources as $screenid => $foo) {
+							unset($screens[$screenid], $result[$screenid]);
+						}
+					}
+				}
+			}
+
+			// screens
+			$_screens = [];
+
+			foreach ($screens as $screenid => $resources) {
+				foreach ($resources['screens'] as $_screenid => $foo) {
+					$_screens[$_screenid][$screenid] = true;
+				}
+			}
+
+			if ($_screens) {
+				$db_screens = API::Screen()->get([
+					'output' => [],
+					'screenids' => array_keys($_screens),
+					'preservekeys' => true
+				]);
+
+				foreach ($_screens as $_screenid => $resources) {
+					if (!array_key_exists($_screenid, $db_screens)) {
+						foreach ($resources as $screenid => $foo) {
+							unset($screens[$screenid], $result[$screenid]);
+						}
+					}
+				}
+			}
 		}
-		elseif ($result) {
-			$groupsToCheck = [];
-			$hostsToCheck = [];
-			$graphsToCheck = [];
-			$itemsToCheck = [];
-			$mapsToCheck = [];
-			$screensToCheck = [];
-			$screensItems = [];
 
-			$dbScreenItems = DBselect('SELECT si.* FROM screens_items si WHERE '.dbConditionInt('si.screenid', $screenIds));
-
-			while ($screenItem = DBfetch($dbScreenItems)) {
-				$screensItems[$screenItem['screenitemid']] = $screenItem;
-
-				if ($screenItem['resourceid']) {
-					switch ($screenItem['resourcetype']) {
-						case SCREEN_RESOURCE_HOSTS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_INFO:
-						case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
-						case SCREEN_RESOURCE_DATA_OVERVIEW:
-						case SCREEN_RESOURCE_HOSTGROUP_TRIGGERS:
-							$groupsToCheck[] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_HOST_TRIGGERS:
-							$hostsToCheck[] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_GRAPH:
-							$graphsToCheck[] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_SIMPLE_GRAPH:
-						case SCREEN_RESOURCE_PLAIN_TEXT:
-							$itemsToCheck[] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_CLOCK:
-							if ($screenItem['style'] == TIME_TYPE_HOST) {
-								$itemsToCheck[] = $screenItem['resourceid'];
-							}
-							break;
-
-						case SCREEN_RESOURCE_MAP:
-							$mapsToCheck[] = $screenItem['resourceid'];
-							break;
-
-						case SCREEN_RESOURCE_SCREEN:
-							$screensToCheck[] = $screenItem['resourceid'];
-							break;
-					}
-				}
+		if ($count_output) {
+			if ($options['groupCount'] !== null) {
+				return [['rowscount' => count($result)]];
 			}
-
-			$groupsToCheck = array_unique($groupsToCheck);
-			$hostsToCheck = array_unique($hostsToCheck);
-			$graphsToCheck = array_unique($graphsToCheck);
-			$itemsToCheck = array_unique($itemsToCheck);
-			$mapsToCheck = array_unique($mapsToCheck);
-			$screensToCheck = array_unique($screensToCheck);
-
-			// group
-			$allowedGroups = API::HostGroup()->get([
-				'output' => ['groupid'],
-				'groupids' => $groupsToCheck,
-				'editable' => $options['editable']
-			]);
-			$allowedGroups = zbx_objectValues($allowedGroups, 'groupid');
-
-			// host
-			$allowedHosts = API::Host()->get([
-				'output' => ['hostid'],
-				'hostids' => $hostsToCheck,
-				'editable' => $options['editable']
-			]);
-			$allowedHosts = zbx_objectValues($allowedHosts, 'hostid');
-
-			// graph
-			$allowedGraphs = API::Graph()->get([
-				'output' => ['graphid'],
-				'graphids' => $graphsToCheck,
-				'editable' => $options['editable']
-			]);
-			$allowedGraphs = zbx_objectValues($allowedGraphs, 'graphid');
-
-			// item
-			$allowedItems = API::Item()->get([
-				'output' => ['itemid'],
-				'itemids' => $itemsToCheck,
-				'webitems' => true,
-				'editable' => $options['editable']
-			]);
-			$allowedItems = zbx_objectValues($allowedItems, 'itemid');
-
-			// map
-			$allowedMaps = API::Map()->get([
-				'output' => ['sysmapid'],
-				'sysmapids' => $mapsToCheck,
-				'editable' => $options['editable']
-			]);
-			$allowedMaps = zbx_objectValues($allowedMaps, 'sysmapid');
-
-			// screen
-			$allowedScreens = API::Screen()->get([
-				'output' => ['screenid'],
-				'screenids' => $screensToCheck,
-				'editable' => $options['editable']
-			]);
-			$allowedScreens = zbx_objectValues($allowedScreens, 'screenid');
-
-			$restrGroups = array_diff($groupsToCheck, $allowedGroups);
-			$restrHosts = array_diff($hostsToCheck, $allowedHosts);
-			$restrGraphs = array_diff($graphsToCheck, $allowedGraphs);
-			$restrItems = array_diff($itemsToCheck, $allowedItems);
-			$restrMaps = array_diff($mapsToCheck, $allowedMaps);
-			$restrScreens = array_diff($screensToCheck, $allowedScreens);
-
-			// group
-			foreach ($restrGroups as $resourceId) {
-				foreach ($screensItems as $screenItemId => $screenItem) {
-					if (bccomp($screenItem['resourceid'], $resourceId) == 0
-							&& uint_in_array($screenItem['resourcetype'], [
-								SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO, SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
-								SCREEN_RESOURCE_DATA_OVERVIEW, SCREEN_RESOURCE_HOSTGROUP_TRIGGERS])) {
-						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
-					}
-				}
+			else {
+				return count($result);
 			}
-
-			// host
-			foreach ($restrHosts as $resourceId) {
-				foreach ($screensItems as $screenItemId => $screenItem) {
-					if (bccomp($screenItem['resourceid'], $resourceId) == 0
-							&& uint_in_array($screenItem['resourcetype'], [SCREEN_RESOURCE_HOST_TRIGGERS])) {
-						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
-					}
-				}
-			}
-
-			// graph
-			foreach ($restrGraphs as $resourceId) {
-				foreach ($screensItems as $screenItemId => $screenItem) {
-					if (bccomp($screenItem['resourceid'], $resourceId) == 0 && $screenItem['resourcetype'] == SCREEN_RESOURCE_GRAPH) {
-						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
-					}
-				}
-			}
-
-			// item
-			foreach ($restrItems as $resourceId) {
-				foreach ($screensItems as $screenItemId => $screenItem) {
-					if (bccomp($screenItem['resourceid'], $resourceId) == 0
-							&& uint_in_array($screenItem['resourcetype'], [SCREEN_RESOURCE_CLOCK,
-								SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT])) {
-						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
-					}
-				}
-			}
-
-			// map
-			foreach ($restrMaps as $resourceId) {
-				foreach ($screensItems as $screenItemId => $screenItem) {
-					if (bccomp($screenItem['resourceid'], $resourceId) == 0
-							&& $screenItem['resourcetype'] == SCREEN_RESOURCE_MAP) {
-						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
-					}
-				}
-			}
-
-			// screen
-			foreach ($restrScreens as $resourceId) {
-				foreach ($screensItems as $screenItemId => $screenItem) {
-					if (bccomp($screenItem['resourceid'], $resourceId) == 0
-							&& $screenItem['resourcetype'] == SCREEN_RESOURCE_SCREEN) {
-						unset($result[$screenItem['screenid']], $screensItems[$screenItemId]);
-					}
-				}
-			}
-		}
-
-		if ($options['countOutput'] !== null) {
-			return $result;
 		}
 
 		if ($result) {
@@ -331,15 +408,21 @@ class CScreen extends CApiService {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $screens
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $screens) {
-		$screenDbFields = ['name' => null];
+		if (!$screens) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$user_data = self::$userData;
+
+		$screen_db_fields = ['name' => null];
 
 		foreach ($screens as &$screen) {
-			if (!check_db_fields($screenDbFields, $screen)) {
+			if (!check_db_fields($screen_db_fields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 
@@ -355,13 +438,202 @@ class CScreen extends CApiService {
 		}
 		unset($screen);
 
-		$dbScreens = API::getApiService()->select('screens', [
+		// Check for duplicate names.
+		$duplicate = CArrayHelper::findDuplicate($screens, 'name');
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "name" value "%1$s" for screen.', $duplicate['name'])
+			);
+		}
+
+		// Check if screen already exists.
+		$db_screens = $this->get([
+			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($screens, 'name')],
-			'output' => ['name']
+			'nopermissions' => true,
+			'limit' => 1
 		]);
 
-		foreach ($dbScreens as $dbScreen) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $dbScreen['name']));
+		if ($db_screens) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $db_screens[0]['name']));
+		}
+
+		$private_validator = new CLimitedSetValidator([
+			'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
+		]);
+
+		$permission_validator = new CLimitedSetValidator([
+			'values' => [PERM_READ, PERM_READ_WRITE]
+		]);
+
+		foreach ($screens as $screen) {
+			// Check if owner can be set.
+			if (array_key_exists('userid', $screen)) {
+				if ($screen['userid'] === '' || $screen['userid'] === null || $screen['userid'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen owner cannot be empty.'));
+				}
+				elseif ($screen['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set screen owner.'));
+				}
+			}
+
+			// Check for invalid "private" values.
+			if (array_key_exists('private', $screen)) {
+				if (!$private_validator->validate($screen['private'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect "private" value "%1$s" for screen "%2$s".', $screen['private'], $screen['name'])
+					);
+				}
+			}
+
+			$userids = [];
+
+			// Screen user shares.
+			if (array_key_exists('users', $screen)) {
+				if (!is_array($screen['users'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
+				$required_fields = ['userid', 'permission'];
+
+				foreach ($screen['users'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'User sharing is missing parameters: %1$s for screen "%2$s".',
+							implode(', ', $missing_keys),
+							$screen['name']
+						));
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Sharing option "%1$s" is missing a value for screen "%2$s".',
+									$field,
+									$screen['name']
+								));
+							}
+						}
+					}
+
+					if (!$permission_validator->validate($share['permission'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect "permission" value "%1$s" in users for screen "%2$s".',
+							$share['permission'],
+							$screen['name']
+						));
+					}
+
+					if (array_key_exists('private', $screen) && $screen['private'] == PUBLIC_SHARING
+							&& $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Screen "%1$s" is public and read-only sharing is disallowed.', $screen['name'])
+						);
+					}
+
+					if (array_key_exists($share['userid'], $userids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Duplicate userid "%1$s" in users for screen "%2$s".', $share['userid'], $screen['name'])
+						);
+					}
+
+					$userids[$share['userid']] = $share['userid'];
+				}
+			}
+
+			if (array_key_exists('userid', $screen) && $screen['userid']) {
+				$userids[$screen['userid']] = $screen['userid'];
+			}
+
+			// Users validation.
+			if ($userids) {
+				$db_users = API::User()->get([
+					'userids' => $userids,
+					'countOutput' => true
+				]);
+
+				if (count($userids) != $db_users) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect user ID specified for screen "%1$s".', $screen['name'])
+					);
+				}
+			}
+
+			// Screen user group shares.
+			if (array_key_exists('userGroups', $screen)) {
+				if (!is_array($screen['userGroups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
+				$shared_user_groupids = [];
+				$required_fields = ['usrgrpid', 'permission'];
+
+				foreach ($screen['userGroups'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'User group sharing is missing parameters: %1$s for screen "%2$s".',
+							implode(', ', $missing_keys),
+							$screen['name']
+						));
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Field "%1$s" is missing a value for screen "%2$s".',
+									$field,
+									$screen['name']
+								));
+							}
+						}
+					}
+
+					if (!$permission_validator->validate($share['permission'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect "permission" value "%1$s" in user groups for screen "%2$s".',
+							$share['permission'],
+							$screen['name']
+						));
+					}
+
+					if (array_key_exists('private', $screen) && $screen['private'] == PUBLIC_SHARING
+							&& $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Screen "%1$s" is public and read-only sharing is disallowed.', $screen['name'])
+						);
+					}
+
+					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Duplicate usrgrpid "%1$s" in user groups for screen "%2$s".',
+							$share['usrgrpid'],
+							$screen['name']
+						));
+					}
+
+					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
+				}
+
+				if ($shared_user_groupids) {
+					$db_user_groups = API::UserGroup()->get([
+						'usrgrpids' => $shared_user_groupids,
+						'countOutput' => true
+					]);
+
+					if (count($shared_user_groupids) != $db_user_groups) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect user group ID specified for screen "%1$s".', $screen['name'])
+						);
+					}
+				}
+
+				unset($shared_user_groupids);
+			}
 		}
 	}
 
@@ -377,45 +649,96 @@ class CScreen extends CApiService {
 
 		$this->validateCreate($screens);
 
-		$screenIds = DB::insert('screens', $screens);
+		foreach ($screens as &$screen) {
+			if (!array_key_exists('templateid', $screen)) {
+				$screen['userid'] = array_key_exists('userid', $screen) ? $screen['userid'] : self::$userData['userid'];
+			}
+		}
+		unset($screen);
 
-		// create screen items
+		$screenids = DB::insert('screens', $screens);
+
+		$shared_users = [];
+		$shared_user_groups = [];
 		$screenItems = [];
+
 		foreach ($screens as $key => $screen) {
-			if (isset($screen['screenitems'])) {
+			// Screen user shares.
+			if (array_key_exists('users', $screen)) {
+				foreach ($screen['users'] as $user) {
+					$shared_users[] = [
+						'screenid' => $screenids[$key],
+						'userid' => $user['userid'],
+						'permission' => $user['permission']
+					];
+				}
+			}
+
+			// Screen user group shares.
+			if (array_key_exists('userGroups', $screen)) {
+				foreach ($screen['userGroups'] as $user_group) {
+					$shared_user_groups[] = [
+						'screenid' => $screenids[$key],
+						'usrgrpid' => $user_group['usrgrpid'],
+						'permission' => $user_group['permission']
+					];
+				}
+			}
+
+			// Create screen items.
+			if (array_key_exists('screenitems', $screen)) {
 				foreach ($screen['screenitems'] as $screenItem) {
-					$screenItem['screenid'] = $screenIds[$key];
+					$screenItem['screenid'] = $screenids[$key];
 
 					$screenItems[] = $screenItem;
 				}
 			}
 		}
 
+		DB::insert('screen_user', $shared_users);
+		DB::insert('screen_usrgrp', $shared_user_groups);
+
 		if ($screenItems) {
 			API::ScreenItem()->create($screenItems);
 		}
 
-		return ['screenids' => $screenIds];
+
+		return ['screenids' => $screenids];
 	}
 
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $screens
-	 * @param array $dbScreens	array of existing screens with screen IDs as keys
+	 * @param array $db_screens		array of existing screens with screen IDs as keys.
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $screens, array $dbScreens) {
+	protected function validateUpdate(array $screens, array $db_screens) {
+		if (!$screens) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$user_data = self::$userData;
+
+		// Validate given IDs.
+		$this->checkObjectIds($screens, 'screenid',
+			_('No "%1$s" given for screen.'),
+			_('Empty screen ID.'),
+			_('Incorrect screen ID.')
+		);
+
+		$check_names = [];
+
 		foreach ($screens as $screen) {
-			if (!isset($dbScreens[$screen['screenid']])) {
+			if (!array_key_exists($screen['screenid'], $db_screens)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 		}
 
-		$screens = $this->extendObjects($this->tableName(), $screens, ['name']);
+		$screens = $this->extendFromObjects(zbx_toHash($screens, 'screenid'), $db_screens, ['name']);
 
 		foreach ($screens as $screen) {
 			// "templateid" is not allowed
@@ -426,16 +749,225 @@ class CScreen extends CApiService {
 				);
 			}
 
-			if (isset($screen['name'])) {
-				$dbScreenExist = API::getApiService()->select('screens', [
-					'filter' => ['name' => $screen['name']],
-					'output' => ['screenid']
-				]);
-				$dbScreenExist = reset($dbScreenExist);
+			if (array_key_exists('name', $screen)) {
+				// Validate "name" field.
+				if (array_key_exists('name', $screen)) {
+					if (is_array($screen['name'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+					}
+					elseif ($screen['name'] === '' || $screen['name'] === null || $screen['name'] === false) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen name cannot be empty.'));
+					}
 
-				if ($dbScreenExist && bccomp($dbScreenExist['screenid'], $screen['screenid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" already exists.', $screen['name']));
+					if ($db_screens[$screen['screenid']]['name'] !== $screen['name']) {
+						$check_names[] = $screen;
+					}
 				}
+			}
+		}
+
+		if ($check_names) {
+			// Check for duplicate names.
+			$duplicate = CArrayHelper::findDuplicate($check_names, 'name');
+			if ($duplicate) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate "name" value "%1$s" for screen.', $duplicate['name'])
+				);
+			}
+
+			$db_screen_names = $this->get([
+				'output' => ['screenid', 'name'],
+				'filter' => ['name' => zbx_objectValues($check_names, 'name')],
+				'nopermissions' => true
+			]);
+			$db_screen_names = zbx_toHash($db_screen_names, 'name');
+
+			// Check for existing names.
+			foreach ($check_names as $screen) {
+				if (array_key_exists($screen['name'], $db_screen_names)
+						&& bccomp($db_screen_names[$screen['name']]['screenid'], $screen['screenid']) != 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Screen "%1$s" already exists.', $screen['name'])
+					);
+				}
+			}
+		}
+
+		$private_validator = new CLimitedSetValidator([
+			'values' => [PUBLIC_SHARING, PRIVATE_SHARING]
+		]);
+
+		$permission_validator = new CLimitedSetValidator([
+			'values' => [PERM_READ, PERM_READ_WRITE]
+		]);
+
+		foreach ($screens as $screen) {
+			// Check if owner can be set.
+			if (array_key_exists('userid', $screen)) {
+				if ($screen['userid'] === '' || $screen['userid'] === null || $screen['userid'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Screen owner cannot be empty.'));
+				}
+				elseif ($screen['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+						&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Only administrators can set screen owner.'));
+				}
+			}
+
+			// Unset extra field.
+			unset($db_screens[$screen['screenid']]['userid']);
+
+			$screen = array_merge($db_screens[$screen['screenid']], $screen);
+
+			if (!$private_validator->validate($screen['private'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect "private" value "%1$s" for screen "%2$s".', $screen['private'], $screen['name'])
+				);
+			}
+
+			$userids = [];
+
+			// Screen user shares.
+			if (array_key_exists('users', $screen)) {
+				if (!is_array($screen['users'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
+				$required_fields = ['userid', 'permission'];
+
+				foreach ($screen['users'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'User sharing is missing parameters: %1$s for screen "%2$s".',
+							implode(', ', $missing_keys),
+							$screen['name']
+						));
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Sharing option "%1$s" is missing a value for screen "%2$s".',
+									$field,
+									$screen['name']
+								));
+							}
+						}
+					}
+
+					if (!$permission_validator->validate($share['permission'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect "permission" value "%1$s" in users for screen "%2$s".',
+							$share['permission'],
+							$screen['name']
+						));
+					}
+
+					if ($screen['private'] == PUBLIC_SHARING && $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Screen "%1$s" is public and read-only sharing is disallowed.', $screen['name'])
+						);
+					}
+
+					if (array_key_exists($share['userid'], $userids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Duplicate userid "%1$s" in users for screen "%2$s".', $share['userid'], $screen['name'])
+						);
+					}
+
+					$userids[$share['userid']] = $share['userid'];
+				}
+			}
+
+			if (array_key_exists('userid', $screen) && $screen['userid']) {
+				$userids[$screen['userid']] = $screen['userid'];
+			}
+
+			// Users validation.
+			if ($userids) {
+				$db_users = API::User()->get([
+					'userids' => $userids,
+					'countOutput' => true
+				]);
+
+				if (count($userids) != $db_users) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect user ID specified for screen "%1$s".', $screen['name'])
+					);
+				}
+			}
+
+			// Screen user group shares.
+			if (array_key_exists('userGroups', $screen)) {
+				if (!is_array($screen['userGroups'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
+				$shared_user_groupids = [];
+				$required_fields = ['usrgrpid', 'permission'];
+
+				foreach ($screen['userGroups'] as $share) {
+					// Check required parameters.
+					$missing_keys = checkRequiredKeys($share, $required_fields);
+					if ($missing_keys) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'User group sharing is missing parameters: %1$s for screen "%2$s".',
+							implode(', ', $missing_keys),
+							$screen['name'])
+						);
+					}
+					else {
+						foreach ($required_fields as $field) {
+							if ($share[$field] === '' || $share[$field] === null) {
+								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+									'Sharing option "%1$s" is missing a value for screen "%2$s".',
+									$field,
+									$screen['name']
+								));
+							}
+						}
+					}
+
+					if (!$permission_validator->validate($share['permission'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect "permission" value "%1$s" in user groups for screen "%2$s".',
+							$share['permission'],
+							$screen['name']
+						));
+					}
+
+					if ($screen['private'] == PUBLIC_SHARING && $share['permission'] == PERM_READ) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Screen "%1$s" is public and read-only sharing is disallowed.', $screen['name'])
+						);
+					}
+
+					if (array_key_exists($share['usrgrpid'], $shared_user_groupids)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Duplicate usrgrpid "%1$s" in user groups for screen "%2$s".',
+							$share['usrgrpid'],
+							$screen['name']
+						));
+					}
+
+					$shared_user_groupids[$share['usrgrpid']] = $share['usrgrpid'];
+				}
+
+				if ($shared_user_groupids) {
+					$db_user_groups = API::UserGroup()->get([
+						'usrgrpids' => $shared_user_groupids,
+						'countOutput' => true
+					]);
+
+					if (count($shared_user_groupids) != $db_user_groups) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect user group ID specified for screen "%1$s".', $screen['name'])
+						);
+					}
+				}
+
+				unset($shared_user_groupids);
 			}
 		}
 	}
@@ -457,48 +989,118 @@ class CScreen extends CApiService {
 			_('Incorrect screen ID.')
 		);
 
-		$dbScreens = $this->get([
-			'output' => ['screenid', 'hsize', 'vsize'],
+		$db_screens = $this->get([
+			'output' => ['name', 'screenid', 'hsize', 'vsize', 'private'],
 			'selectScreenItems' => ['screenitemid', 'x', 'y', 'colspan', 'rowspan'],
+			'selectUsers' => ['screenuserid', 'screenid', 'userid', 'permission'],
+			'selectUserGroups' => ['screenusrgrpid', 'screenid', 'usrgrpid', 'permission'],
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		$this->validateUpdate($screens, $dbScreens);
-		$this->updateReal($screens);
-		$this->truncateScreenItems($screens, $dbScreens);
+		$this->validateUpdate($screens, $db_screens);
+		$this->updateReal($screens, $db_screens);
+		$this->truncateScreenItems($screens, $db_screens);
 
 		return ['screenids' => zbx_objectValues($screens, 'screenid')];
 	}
 
 	/**
-	 * Saves screens and screen items.
+	 * Saves screens and screen data.
 	 *
 	 * @param array $screens
+	 * @param array $db_screens	array of existing screens with screen IDs as keys
 	 */
-	protected function updateReal(array $screens) {
-		$update = [];
+	protected function updateReal(array $screens, array $db_screens) {
+		$update_screens = [];
 
 		foreach ($screens as $screen) {
-			$screenId = $screen['screenid'];
-			unset($screen['screenid'], $screen['screenitems']);
+			$screenid = $screen['screenid'];
+			unset($screen['screenid'], $screen['screenitems'], $screen['users'], $screen['userGroups']);
 
 			if ($screen) {
-				$update[] = [
+				$update_screens[] = [
 					'values' => $screen,
-					'where' => ['screenid' => $screenId]
+					'where' => ['screenid' => $screenid]
 				];
 			}
 		}
 
-		DB::update('screens', $update);
+		DB::update('screens', $update_screens);
 
-		// replace screen items
+		$shared_userids_to_delete = [];
+		$shared_users_to_update = [];
+		$shared_users_to_add = [];
+		$shared_user_groupids_to_delete = [];
+		$shared_user_groups_to_update = [];
+		$shared_user_groups_to_add = [];
+
 		foreach ($screens as $screen) {
-			if (isset($screen['screenitems'])) {
+			$db_screen = $db_screens[$screen['screenid']];
+
+			// Screen user shares.
+			if (array_key_exists('users', $screen)) {
+				$user_shares_diff = zbx_array_diff($screen['users'], $db_screen['users'], 'userid');
+
+				foreach ($user_shares_diff['both'] as $update_user_share) {
+					$shared_users_to_update[] = [
+						'values' => $update_user_share,
+						'where' => ['userid' => $update_user_share['userid'], 'screenid' => $screen['screenid']]
+					];
+				}
+
+				foreach ($user_shares_diff['first'] as $new_shared_user) {
+					$new_shared_user['screenid'] = $screen['screenid'];
+					$shared_users_to_add[] = $new_shared_user;
+				}
+
+				$shared_userids_to_delete = array_merge($shared_userids_to_delete,
+					zbx_objectValues($user_shares_diff['second'], 'screenuserid')
+				);
+			}
+
+			// Screen user group shares.
+			if (array_key_exists('userGroups', $screen)) {
+				$user_group_shares_diff = zbx_array_diff($screen['userGroups'], $db_screen['userGroups'], 'usrgrpid');
+
+				foreach ($user_group_shares_diff['both'] as $update_user_share) {
+					$shared_user_groups_to_update[] = [
+						'values' => $update_user_share,
+						'where' => ['usrgrpid' => $update_user_share['usrgrpid'], 'screenid' => $screen['screenid']]
+					];
+				}
+
+				foreach ($user_group_shares_diff['first'] as $new_shared_user_group) {
+					$new_shared_user_group['screenid'] = $screen['screenid'];
+					$shared_user_groups_to_add[] = $new_shared_user_group;
+				}
+
+				$shared_user_groupids_to_delete = array_merge($shared_user_groupids_to_delete,
+					zbx_objectValues($user_group_shares_diff['second'], 'screenusrgrpid')
+				);
+			}
+
+			// Replace screen items.
+			if (array_key_exists('screenitems', $screen)) {
 				$this->replaceItems($screen['screenid'], $screen['screenitems']);
 			}
+		}
+
+		// User shares.
+		DB::insert('screen_user', $shared_users_to_add);
+		DB::update('screen_user', $shared_users_to_update);
+
+		if ($shared_userids_to_delete) {
+			DB::delete('screen_user', ['screenuserid' => $shared_userids_to_delete]);
+		}
+
+		// User group shares.
+		DB::insert('screen_usrgrp', $shared_user_groups_to_add);
+		DB::update('screen_usrgrp', $shared_user_groups_to_update);
+
+		if ($shared_user_groupids_to_delete) {
+			DB::delete('screen_usrgrp', ['screenusrgrpid' => $shared_user_groupids_to_delete]);
 		}
 	}
 
@@ -573,19 +1175,27 @@ class CScreen extends CApiService {
 	/**
 	 * Validate input for delete method.
 	 *
-	 * @param array $screenIds
+	 * @param array $screenids
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $screenIds) {
-		$dbScreens = $this->get([
+	protected function validateDelete(array $screenids) {
+		if (!$screenids) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$db_screens = $this->get([
 			'output' => ['screenid'],
-			'screenids' => $screenIds,
+			'screenids' => $screenids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($screenIds as $screenId) {
-			if (!isset($dbScreens[$screenId])) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		foreach ($screenids as $screenid) {
+			if (!array_key_exists($screenid, $db_screens)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 		}
 	}
@@ -593,24 +1203,24 @@ class CScreen extends CApiService {
 	/**
 	 * Delete screen.
 	 *
-	 * @param array $screenIds
+	 * @param array $screenids
 	 *
 	 * @return array
 	 */
-	public function delete(array $screenIds) {
-		$this->validateDelete($screenIds);
+	public function delete(array $screenids) {
+		$this->validateDelete($screenids);
 
-		DB::delete('screens_items', ['screenid' => $screenIds]);
-		DB::delete('screens_items', ['resourceid' => $screenIds, 'resourcetype' => SCREEN_RESOURCE_SCREEN]);
-		DB::delete('slides', ['screenid' => $screenIds]);
-		DB::delete('screens', ['screenid' => $screenIds]);
+		DB::delete('screens_items', ['screenid' => $screenids]);
+		DB::delete('screens_items', ['resourceid' => $screenids, 'resourcetype' => SCREEN_RESOURCE_SCREEN]);
+		DB::delete('slides', ['screenid' => $screenids]);
+		DB::delete('screens', ['screenid' => $screenids]);
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.screenids',
 			'source' => 'screenid',
-			'value_id' => $screenIds
+			'value_id' => $screenids
 		]);
 
-		return ['screenids' => $screenIds];
+		return ['screenids' => $screenids];
 	}
 
 	/**
@@ -673,10 +1283,90 @@ class CScreen extends CApiService {
 				'preservekeys' => true
 			]);
 
-			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
+			$relation_map = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
 			$screenItems = $this->unsetExtraFields($screenItems, ['screenid', 'screenitemid'], $options['selectScreenItems']);
-			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
+			$result = $relation_map->mapMany($result, $screenItems, 'screenitems');
+		}
+
+		// Adding user shares.
+		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'screenid', 'userid', 'screen_user');
+			// Get all allowed users.
+			$related_users = API::User()->get([
+				'output' => ['userid'],
+				'userids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			$related_userids = zbx_objectValues($related_users, 'userid');
+
+			if ($related_userids) {
+				$users = API::getApiService()->select('screen_user', [
+					'output' => $this->outputExtend($options['selectUsers'], ['screenid', 'userid']),
+					'filter' => ['screenid' => $screenIds, 'userid' => $related_userids],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($users, 'screenid', 'screenuserid');
+
+				$users = $this->unsetExtraFields($users, ['screenuserid', 'userid', 'permission'],
+					$options['selectUsers']
+				);
+
+				foreach ($users as &$user) {
+					unset($user['screenid']);
+				}
+				unset($user);
+
+				$result = $relation_map->mapMany($result, $users, 'users');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['users'] = [];
+				}
+				unset($row);
+			}
+		}
+
+		// Adding user group shares.
+		if ($options['selectUserGroups'] !== null && $options['selectUserGroups'] != API_OUTPUT_COUNT) {
+			$relation_map = $this->createRelationMap($result, 'screenid', 'usrgrpid', 'screen_usrgrp');
+			// Get all allowed groups.
+			$related_groups = API::UserGroup()->get([
+				'output' => ['usrgrpid'],
+				'usrgrpids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			$related_groupids = zbx_objectValues($related_groups, 'usrgrpid');
+
+			if ($related_groupids) {
+				$user_groups = API::getApiService()->select('screen_usrgrp', [
+					'output' => $this->outputExtend($options['selectUserGroups'], ['screenid', 'usrgrpid']),
+					'filter' => ['screenid' => $screenIds, 'usrgrpid' => $related_groupids],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($user_groups, 'screenid', 'screenusrgrpid');
+
+				$user_groups = $this->unsetExtraFields($user_groups, ['screenusrgrpid', 'usrgrpid', 'permission'],
+					$options['selectUserGroups']
+				);
+
+				foreach ($user_groups as &$user_group) {
+					unset($user_group['screenid']);
+				}
+				unset($user_group);
+
+				$result = $relation_map->mapMany($result, $user_groups, 'userGroups');
+			}
+			else {
+				foreach ($result as &$row) {
+					$row['userGroups'] = [];
+				}
+				unset($row);
+			}
 		}
 
 		return $result;

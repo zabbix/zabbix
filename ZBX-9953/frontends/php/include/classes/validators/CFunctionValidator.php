@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -244,7 +244,7 @@ class CFunctionValidator extends CValidator {
 					['type' => 'sec_num', 'mandat' => true],
 					['type' => 'sec_zero', 'can_be_empty' => true],
 					['type' => 'num', 'mandat' => true],
-					['type' => 'str', 'can_be_empty' => true],
+					['type' => 'str', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesNum
 			]
@@ -296,6 +296,8 @@ class CFunctionValidator extends CValidator {
 			_('Invalid fourth parameter.')
 		];
 
+		$user_macro_parser = new CUserMacroParser();
+
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check
 			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
@@ -313,7 +315,7 @@ class CFunctionValidator extends CValidator {
 			}
 
 			// user macro
-			if (preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum])) {
+			if ($user_macro_parser->parse($value['functionParamList'][$aNum]) == CParser::PARSE_SUCCESS) {
 				continue;
 			}
 

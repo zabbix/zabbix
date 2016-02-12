@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,14 +29,14 @@ class C20TriggerConverter extends CConverter {
 	 *
 	 * @var CFunctionMacroParser
 	 */
-	protected $functionMacroParser;
+	protected $function_macro_parser;
 
 	/**
 	 * A parser for LLD macros.
 	 *
 	 * @var CMacroParser
 	 */
-	protected $lldMacroParser;
+	protected $lld_macro_parser;
 
 	/**
 	 * An item key converter.
@@ -45,13 +45,9 @@ class C20TriggerConverter extends CConverter {
 	 */
 	protected $itemKeyConverter;
 
-	/**
-	 * @param CFunctionMacroParser  $functionMacroParser
-	 * @param CMacroParser          $lldMacroParser
-	 */
 	public function __construct() {
-		$this->functionMacroParser = new CFunctionMacroParser();
-		$this->lldMacroParser = new CMacroParser('#');
+		$this->function_macro_parser = new CFunctionMacroParser();
+		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->itemKeyConverter = new C20ItemKeyConverter();
 	}
 
@@ -67,30 +63,27 @@ class C20TriggerConverter extends CConverter {
 	public function convert($expression) {
 		// find all the operators that need to be replaced
 		$found_operators = [];
-		$pos = 0;
-		while (isset($expression[$pos])) {
+		for ($pos = 0; isset($expression[$pos]); $pos++) {
 			switch ($expression[$pos]) {
 				case '{':
 					// skip function macros
-					$result = $this->functionMacroParser->parse($expression, $pos);
-
-					if ($result) {
+					if ($this->function_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
 						$new_expression = '{'.
-							$result->expression['host'].':'.
-							$this->itemKeyConverter->convert($result->expression['item']).'.'.
-							$result->expression['function'].
+							$this->function_macro_parser->getHost().':'.
+							$this->itemKeyConverter->convert($this->function_macro_parser->getItem()).'.'.
+							$this->function_macro_parser->getFunction().
 						'}';
 
-						$expression = substr_replace($expression, $new_expression, $pos, $result->length);
+						$expression = substr_replace($expression, $new_expression, $pos,
+							$this->function_macro_parser->getLength()
+						);
 
 						$pos += strlen($new_expression) - 1;
 					}
 					else {
 						// if it's not a function macro, try to parse it as an LLD macro
-						$result = $this->lldMacroParser->parse($expression, $pos);
-
-						if ($result) {
-							$pos += $result->length - 1;
+						if ($this->lld_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+							$pos += $this->lld_macro_parser->getLength() - 1;
 						}
 					}
 					// otherwise just continue as is, other macros don't contain any of these characters
@@ -102,8 +95,6 @@ class C20TriggerConverter extends CConverter {
 					$found_operators[$pos] = $expression[$pos];
 					break;
 			}
-
-			$pos++;
 		}
 
 		// replace the operators

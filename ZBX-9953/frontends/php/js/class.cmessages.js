@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -379,7 +379,7 @@ var CMessageList = Class.create({
 		this.dom.container.setAttribute('id', 'zbx_messages');
 		this.dom.container.className = 'overlay-dialogue notif';
 		this.dom.container.style.right = '0px';
-		this.dom.container.style.top = '115px';
+		this.dom.container.style.top = '126px';
 		$(this.dom.container).hide();
 
 		// close all

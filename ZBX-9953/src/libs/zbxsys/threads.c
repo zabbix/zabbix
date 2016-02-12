@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,9 +55,19 @@ int	zbx_fork()
  ******************************************************************************/
 int	zbx_child_fork()
 {
-	pid_t	pid;
+	pid_t		pid;
+	sigset_t	mask, orig_mask;
+
+	/* block SIGTERM, SIGINT and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGCHLD);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
 	pid = zbx_fork();
+
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
 
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
 	if (0 == pid)
@@ -65,7 +75,6 @@ int	zbx_child_fork()
 
 	return pid;
 }
-
 #else
 int	zbx_win_exception_filter(unsigned int code, struct _EXCEPTION_POINTERS *ep);
 
@@ -82,7 +91,6 @@ static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 		zbx_thread_exit(EXIT_SUCCESS);
 	}
 }
-
 #endif
 
 /******************************************************************************
@@ -174,7 +182,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if (0 >= waitpid(thread, &status, 0))
 	{
-		zbx_error("Error on thread waiting.");
+		zbx_error("Error waiting for process with PID %d: %s", (int)thread, zbx_strerror(errno));
 		return ZBX_THREAD_ERROR;
 	}
 

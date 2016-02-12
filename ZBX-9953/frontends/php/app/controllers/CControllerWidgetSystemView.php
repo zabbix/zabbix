@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,11 +102,11 @@ class CControllerWidgetSystemView extends CController {
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = [
-			'filter' => $filter
-		];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData([
+			'filter' => $filter,
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ $data['triggers'] = API::Trigger()->get([
 	'preservekeys' => true
 ]);
 
-$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrl($data['triggers']);
+$data['triggers'] = CMacrosResolverHelper::resolveTriggerUrls($data['triggers']);
 
 $hostIds = [];
 

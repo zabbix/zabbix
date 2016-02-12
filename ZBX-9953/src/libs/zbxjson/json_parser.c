@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,17 +93,32 @@ static int	json_parse_string(const char *start, char **error)
 			if ('\0' == *(++ptr))
 				return json_error("invalid escape sequence in string", escape_start, error);
 
-			if ('u' == *ptr)
+			switch (*ptr)
 			{
-				/* check if the \u is followed with 4 hex digits */
-				for (i = 0; i < 4; i++)
-				{
-					if (0 == isxdigit((unsigned char)*(++ptr)))
+				case '"':
+				case '\\':
+				case '/':
+				case 'b':
+				case 'f':
+				case 'n':
+				case 'r':
+				case 't':
+					break;
+				case 'u':
+					/* check if the \u is followed with 4 hex digits */
+					for (i = 0; i < 4; i++)
 					{
-						return json_error("invalid escape sequence in string",
-								escape_start, error);
+						if (0 == isxdigit((unsigned char)*(++ptr)))
+						{
+							return json_error("invalid escape sequence in string",
+									escape_start, error);
+						}
 					}
-				}
+
+					break;
+				default:
+					return json_error("invalid escape sequence in string data",
+							escape_start, error);
 			}
 		}
 

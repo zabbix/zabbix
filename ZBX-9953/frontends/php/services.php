@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -289,8 +289,11 @@ if (isset($_REQUEST['pservices'])) {
 	}
 
 	// expand trigger descriptions
-	$triggers = zbx_objectValues($parentServices, 'trigger');
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	$triggers = zbx_objectValues(
+		array_filter($parentServices, function($service) { return (bool) $service['trigger']; }), 'trigger'
+	);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
+
 	foreach ($parentServices as $key => $parentService) {
 		$parentServices[$key]['trigger'] = !empty($parentService['trigger'])
 			? $triggers[$parentService['trigger']['triggerid']]['description']
@@ -330,8 +333,11 @@ elseif (isset($_REQUEST['cservices'])) {
 	}
 
 	// expand trigger descriptions
-	$triggers = zbx_objectValues($childServices, 'trigger');
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	$triggers = zbx_objectValues(
+		array_filter($childServices, function($service) { return (bool) $service['trigger']; }), 'trigger'
+	);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
+
 	foreach ($childServices as $key => $childService) {
 		$childServices[$key]['trigger'] = !empty($childService['trigger'])
 			? $triggers[$childService['trigger']['triggerid']]['description']
@@ -388,8 +394,11 @@ elseif (isset($_REQUEST['form'])) {
 			]);
 
 			// expand trigger descriptions
-			$triggers = zbx_objectValues($childServices, 'trigger');
-			$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+			$triggers = zbx_objectValues(
+				array_filter($childServices, function($service) { return (bool) $service['trigger']; }), 'trigger'
+			);
+			$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
+
 			foreach ($service['dependencies'] as $dependency) {
 				$childService = $childServices[$dependency['servicedownid']];
 				$data['children'][] = [
@@ -453,8 +462,10 @@ else {
 	]);
 
 	// triggers
-	$triggers = zbx_objectValues($services, 'trigger');
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	$triggers = zbx_objectValues(
+		array_filter($services, function($service) { return (bool) $service['trigger']; }), 'trigger'
+	);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
 
 	foreach ($services as &$service) {
 		if ($service['trigger']) {
@@ -467,6 +478,7 @@ else {
 	createServiceConfigurationTree($services, $treeData);
 	$tree = new CServiceTree('service_conf_tree', $treeData, [
 		'caption' => _('Service'),
+		'action' => _('Action'),
 		'algorithm' => _('Status calculation'),
 		'description' => _('Trigger')
 	]);

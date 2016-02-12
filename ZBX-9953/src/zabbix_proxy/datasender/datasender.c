@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,13 @@
 #include "zbxjson.h"
 #include "proxy.h"
 #include "zbxself.h"
+#include "dbcache.h"
 
 #include "datasender.h"
 #include "../servercomms.h"
+#include "../../libs/zbxcrypto/tls.h"
 
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 /******************************************************************************
@@ -41,6 +43,7 @@ static void	host_availability_sender(struct zbx_json *j)
 {
 	const char	*__function_name = "host_availability_sender";
 	zbx_socket_t	sock;
+	int		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -48,7 +51,7 @@ static void	host_availability_sender(struct zbx_json *j)
 	zbx_json_addstring(j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_HOST_AVAILABILITY, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED == get_host_availability_data(j))
+	if (SUCCEED == get_host_availability_data(j, &ts))
 	{
 		char	*error = NULL;
 
@@ -57,8 +60,10 @@ static void	host_availability_sender(struct zbx_json *j)
 		if (SUCCEED != put_data_to_server(&sock, j, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send host availability data to server at \"%s\": %s",
-					get_ip_by_socket(&sock), error);
+					sock.peer, error);
 		}
+		else
+			zbx_set_availability_diff_ts(ts);
 
 		zbx_free(error);
 		disconnect_server(&sock);
@@ -108,7 +113,7 @@ static void	history_sender(struct zbx_json *j, int *records, const char *tag,
 		{
 			*records = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send history data to server at \"%s\": %s",
-					get_ip_by_socket(&sock), error);
+					sock.peer, error);
 		}
 
 		zbx_free(error);
@@ -142,9 +147,12 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -153,6 +161,8 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
 				get_process_type_string(process_type), records, sec);
 

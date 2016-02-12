@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,10 @@ static int	parent_pid = -1;
 
 extern pid_t	*threads;
 extern int	threads_num;
+
+#ifdef HAVE_SIGQUEUE
+extern unsigned char	program_type;
+#endif
 
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num);
@@ -164,7 +168,6 @@ static void	zbx_signal_process_by_pid(int pid, int flags)
 		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: process pid:%d is not a Zabbix child"
 				" process", ZBX_RTC_GET_DATA(flags));
 	}
-
 }
 
 #endif
@@ -184,8 +187,7 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags))
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
-	int			flags;
-	extern unsigned char	daemon_type;
+	int	flags;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -213,7 +215,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
 						" cannot be performed for a passive proxy");
@@ -259,7 +261,7 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
  ******************************************************************************/
-static void	set_daemon_signal_handlers()
+static void	set_daemon_signal_handlers(void)
 {
 	struct sigaction	phan;
 
@@ -284,19 +286,26 @@ static void	set_daemon_signal_handlers()
  * Parameters: allow_root - allow root permission for application             *
  *             user       - user on the system to which to drop the           *
  *                          privileges                                        *
+ *             flags      - daemon startup flags                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
  ******************************************************************************/
-int	daemon_start(int allow_root, const char *user)
+int	daemon_start(int allow_root, const char *user, unsigned int flags)
 {
 	pid_t		pid;
 	struct passwd	*pwd;
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{
+		if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
+		{
+			zbx_error("cannot run as root!");
+			exit(EXIT_FAILURE);
+		}
+
 		if (NULL == user)
 			user = "zabbix";
 
@@ -345,22 +354,25 @@ int	daemon_start(int allow_root, const char *user)
 #endif
 	}
 
-	if (0 != (pid = zbx_fork()))
-		exit(EXIT_SUCCESS);
-
-	setsid();
-
-	signal(SIGHUP, SIG_IGN);
-
-	if (0 != (pid = zbx_fork()))
-		exit(EXIT_SUCCESS);
-
-	if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
-		assert(0);
-
 	umask(0002);
 
-	redirect_std(CONFIG_LOG_FILE);
+	if (0 == (flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		if (0 != (pid = zbx_fork()))
+			exit(EXIT_SUCCESS);
+
+		setsid();
+
+		signal(SIGHUP, SIG_IGN);
+
+		if (0 != (pid = zbx_fork()))
+			exit(EXIT_SUCCESS);
+
+		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
+			assert(0);
+
+		zbx_redirect_stdio(LOG_TYPE_FILE == CONFIG_LOG_TYPE ? CONFIG_LOG_FILE : NULL);
+	}
 
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(EXIT_FAILURE);
@@ -377,10 +389,10 @@ int	daemon_start(int allow_root, const char *user)
 	/* other cases, SIGCHLD is set to SIG_DFL in zbx_child_fork(). */
 	zbx_set_child_signal_handler();
 
-	return MAIN_ZABBIX_ENTRY();
+	return MAIN_ZABBIX_ENTRY(flags);
 }
 
-void	daemon_stop()
+void	daemon_stop(void)
 {
 	/* this function is registered using atexit() to be called when we terminate */
 	/* there should be nothing like logging or calls to exit() beyond this point */

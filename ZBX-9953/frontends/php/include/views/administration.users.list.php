@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,6 +77,7 @@ foreach ($this->data['users'] as $user) {
 		? (new CLink(_('Blocked'), 'users.php?action=user.massunblock&group_userid[]='.$userId))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
+			->addSID()
 		: (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 
 	// user groups
@@ -104,15 +105,6 @@ foreach ($this->data['users'] as $user) {
 			->addClass($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED
 				? ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_RED
 				: ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_GREEN);
-	}
-
-	// user type style
-	$userTypeStyle = ZBX_STYLE_GREEN;
-	if ($user['type'] == USER_TYPE_ZABBIX_ADMIN) {
-		$userTypeStyle = ZBX_STYLE_ORANGE;
-	}
-	if ($user['type'] == USER_TYPE_SUPER_ADMIN) {
-		$userTypeStyle = ZBX_STYLE_RED;
 	}
 
 	// gui access style

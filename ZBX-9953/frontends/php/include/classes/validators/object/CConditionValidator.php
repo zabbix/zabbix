@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,14 +43,39 @@ class CConditionValidator extends CValidator {
 	public $messageUnusedCondition;
 
 	/**
+	 * Error message if several triggers are compared with "and".
+	 *
+	 * @var string
+	 */
+	public $messageAndWithSeveralTriggers;
+
+	/**
 	 * Validates the given condition formula and checks if the given conditions match the formula.
 	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
-	public function validate($object)
-	{
+	public function validate($object) {
+		if ($object['evaltype'] == CONDITION_EVAL_TYPE_AND) {
+			// get triggers count in formula
+			$trigger_count = 0;
+			foreach ($object['conditions'] as $condition) {
+				if (array_key_exists('conditiontype', $condition) && array_key_exists('operator', $condition)
+						&& $condition['conditiontype'] == CONDITION_TYPE_TRIGGER
+						&& $condition['operator'] == CONDITION_OPERATOR_EQUAL) {
+					$trigger_count++;
+				}
+			}
+
+			// check if multiple triggers are compared with AND
+			if ($trigger_count > 1) {
+				$this->error($this->messageAndWithSeveralTriggers);
+
+				return false;
+			}
+		}
+
 		// validate only custom expressions
 		if ($object['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			return true;

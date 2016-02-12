@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ function permission2str($permission) {
 		PERM_DENY => _('Deny')
 	];
 
-	return isset($permissions[$permission]) ? $permissions[$permission] : _('Unknown');
+	return $permissions[$permission];
 }
 
 /**
@@ -50,7 +50,7 @@ function authentication2str($type) {
 		ZBX_AUTH_HTTP => _('HTTP authentication')
 	];
 
-	return isset($authentications[$type]) ? $authentications[$type] : _('Unknown');
+	return $authentications[$type];
 }
 
 /***********************************************

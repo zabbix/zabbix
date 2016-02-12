@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,13 +78,12 @@ class CTree {
 	}
 
 	private function makeRow($id) {
-		$td = $this->makeCell($id);
+		$tr = (new CRow())->setId('id_'.$id);
+		if ($this->tree[$id]['parentid'] != 0) {
+			$tr->setAttribute('style', 'display: none;');
+		}
 
-		$tr = new CRow();
-		$tr->addItem($td);
-		$tr->setId('id_'.$id);
-		$tr->setAttribute('style', $this->tree[$id]['parentid'] != '0' ? 'display: none;' : '');
-
+		$tr->addItem($this->makeCell($id));
 		foreach ($this->fields as $value) {
 			$tr->addItem($this->makeCol($id, $value));
 		}
@@ -105,19 +104,23 @@ class CTree {
 
 	private function makeCell($id) {
 		$td = new CCol();
-		$level = max(1, $this->tree[$id]['Level']);
-		$td->setAttribute('style', 'padding-left:'. (2 * $level) .'em;');
+
+		$caption = new CSpan();
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
-			$div = (new CDiv((new CSpan())->addClass('arrow-right')))
+			$caption->addItem((new CDiv((new CSpan())->addClass('arrow-right')))
 				->addClass('treeview')
 				->onClick($this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);')
-				->setId('idi_'.$id);
-
-			$td->addItem($div);
+				->setId('idi_'.$id)
+			);
 		}
+		$caption->addItem($this->tree[$id]['caption']);
 
-		$td->addItem($this->tree[$id]['caption']);
+		if ($this->tree[$id]['Level'] != 0) {
+			$level = $this->tree[$id]['Level'];
+			$caption->setAttribute('style', 'padding-left:'.(2 * $level).'em;');
+		}
+		$td->addItem($caption);
 
 		return $td;
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -251,9 +251,7 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 			}
 		}
 
-		$table = (new CTable())
-			->setNoDataMessage(_('No accessible resources'))
-			->addClass('calculated');
+		$table = new CTable();
 		if (!$isHeaderDisplayed) {
 			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
 			$isHeaderDisplayed = true;
@@ -376,41 +374,31 @@ function getItemFilterForm(&$items) {
 
 	// type select
 	$fTypeVisibility = [];
-	$cmbType = new CComboBox('filter_type', $filter_type);
-	$cmbType->setId('filter_type');
-	$cmbType->addItem(-1, _('all'));
-	foreach (['filter_delay_label', 'filter_delay'] as $vItem) {
-		zbx_subarray_push($fTypeVisibility, -1, $vItem);
-	}
+	$cmbType = new CComboBox('filter_type', $filter_type, null, [-1 => _('all')]);
+	zbx_subarray_push($fTypeVisibility, -1, 'filter_delay_row');
 
-	$itemTypes = item_type2str();
-	unset($itemTypes[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
+	$item_types = item_type2str();
+	unset($item_types[ITEM_TYPE_HTTPTEST]); // httptest items are only for internal zabbix logic
 
-	$cmbType->addItems($itemTypes);
+	$cmbType->addItems($item_types);
 
-	foreach ($itemTypes as $typeNum => $typeLabel) {
-		if ($typeNum != ITEM_TYPE_TRAPPER) {
-			zbx_subarray_push($fTypeVisibility, $typeNum, 'filter_delay_label');
-			zbx_subarray_push($fTypeVisibility, $typeNum, 'filter_delay');
+	foreach ($item_types as $type => $name) {
+		if ($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_SNMPTRAP) {
+			zbx_subarray_push($fTypeVisibility, $type, 'filter_delay_row');
 		}
 
-		switch ($typeNum) {
+		switch ($type) {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
-				$snmp_types = [
-					'filter_snmp_community_label', 'filter_snmp_community',
-					'filter_snmp_oid_label', 'filter_snmp_oid',
-					'filter_port_label', 'filter_port'
-				];
-				foreach ($snmp_types as $vItem) {
-					zbx_subarray_push($fTypeVisibility, $typeNum, $vItem);
-				}
+				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_community_row');
+				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
+				zbx_subarray_push($fTypeVisibility, $type, 'filter_port_row');
 				break;
+
 			case ITEM_TYPE_SNMPV3:
-				foreach (['filter_snmpv3_securityname_label', 'filter_snmpv3_securityname', 'filter_snmp_oid_label',
-					'filter_snmp_oid', 'filter_port_label', 'filter_port'] as $vItem) {
-					zbx_subarray_push($fTypeVisibility, $typeNum, $vItem);
-				}
+				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmpv3_securityname_row');
+				zbx_subarray_push($fTypeVisibility, $type, 'filter_snmp_oid_row');
+				zbx_subarray_push($fTypeVisibility, $type, 'filter_port_row');
 				break;
 		}
 	}
@@ -420,65 +408,9 @@ function getItemFilterForm(&$items) {
 	// type of information select
 	$fVTypeVisibility = [];
 
-	$cmbValType = new CComboBox('filter_value_type', $filter_value_type);
-	$cmbValType->addItem(-1, _('all'));
-	$cmbValType->addItem(ITEM_VALUE_TYPE_UINT64, _('Numeric (unsigned)'));
-	$cmbValType->addItem(ITEM_VALUE_TYPE_FLOAT, _('Numeric (float)'));
-	$cmbValType->addItem(ITEM_VALUE_TYPE_STR, _('Character'));
-	$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, _('Log'));
-	$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT, _('Text'));
-
-	foreach (['filter_data_type_label','filter_data_type'] as $vItem) {
-		zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
-	}
+	zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, 'filter_data_type_row');
 
 	zbx_add_post_js("var filterValueTypeSwitcher = new CViewSwitcher('filter_value_type', 'change', ".zbx_jsvalue($fVTypeVisibility, true).');');
-
-	// status select
-	$cmbStatus = new CComboBox('filter_status', $filter_status);
-	$cmbStatus->addItem(-1, _('all'));
-	foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
-		$cmbStatus->addItem($status, item_status2str($status));
-	}
-
-	// state select
-	$cmbState = new CComboBox('filter_state', $filter_state);
-	$cmbState->addItem(-1, _('all'));
-	foreach ([ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED] as $state) {
-		$cmbState->addItem($state, itemState($state));
-	}
-
-	// update interval
-	$updateIntervalLabel = (new CSpan(_('Update interval (in sec)')))->setId('filter_delay_label');
-
-	$updateIntervalInput = (new CNumericBox('filter_delay', $filter_delay, 5, false, true))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
-
-	// data type
-	$dataTypeLabel = (new CSpan(bold(_('Data type').NAME_DELIMITER)))->setId('filter_data_type_label');
-
-	$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
-	$dataTypeInput->addItem(-1, _('all'));
-	$dataTypeInput->addItems(item_data_type2str());
-
-	// SNMP community
-	$snmpCommunityLabel = (new CSpan(_('SNMP community like')))->setId('filter_snmp_community_label');
-	$snmpCommunityField = (new CTextBox('filter_snmp_community', $filter_snmp_community))
-		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
-
-	// SNMPv3 security name
-	$snmpSecurityLabel = (new CSpan(_('Security name like')))->setId('filter_snmpv3_securityname_label');
-	$snmpSecurityField = (new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
-		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
-
-	// SNMP OID
-	$snmpOidLabel = (new CSpan(_('SNMP OID like')))->setId('filter_snmp_oid_label');
-	$snmpOidField = (new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
-
-	// port
-	$portLabel = (new CSpan(_('Port like')))->setId('filter_port_label');
-	$portField = (new CNumericBox('filter_port', $filter_port, 5, false, true))
-		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 	// row 1
 	$groupFilter = null;
@@ -513,8 +445,23 @@ function getItemFilterForm(&$items) {
 	);
 
 	$filterColumn2->addRow(_('Type'), $cmbType);
-	$filterColumn3->addRow(_('Type of information'), $cmbValType);
-	$filterColumn4->addRow(_('State'), $cmbState);
+	$filterColumn3->addRow(_('Type of information'),
+		new CComboBox('filter_value_type', $filter_value_type, null, [
+			-1 => _('all'),
+			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+			ITEM_VALUE_TYPE_STR => _('Character'),
+			ITEM_VALUE_TYPE_LOG => _('Log'),
+			ITEM_VALUE_TYPE_TEXT => _('Text')
+		])
+	);;
+	$filterColumn4->addRow(_('State'),
+		new CComboBox('filter_state', $filter_state, null, [
+			-1 => _('all'),
+			ITEM_STATE_NORMAL => itemState(ITEM_STATE_NORMAL),
+			ITEM_STATE_NOTSUPPORTED => itemState(ITEM_STATE_NOTSUPPORTED)
+		])
+	);
 
 	// row 2
 	$hostFilterData = null;
@@ -550,9 +497,23 @@ function getItemFilterForm(&$items) {
 		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-	$filterColumn2->addRow($updateIntervalLabel, $updateIntervalInput);
-	$filterColumn3->addRow($dataTypeLabel, $dataTypeInput);
-	$filterColumn4->addRow(_('Status'), $cmbStatus);
+	$filterColumn2->addRow(_('Update interval (in sec)'),
+		(new CNumericBox('filter_delay', $filter_delay, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+		'filter_delay_row'
+	);
+	$filterColumn3->addRow(_('Data type'),
+		(new CComboBox('filter_data_type', $filter_data_type))
+			->addItem(-1, _('all'))
+			->addItems(item_data_type2str()),
+		'filter_data_type_row'
+	);
+	$filterColumn4->addRow(_('Status'),
+		new CComboBox('filter_status', $filter_status, null, [
+			-1 => _('all'),
+			ITEM_STATUS_ACTIVE => item_status2str(ITEM_STATUS_ACTIVE),
+			ITEM_STATUS_DISABLED => item_status2str(ITEM_STATUS_DISABLED)
+		])
+	);
 
 	// row 3
 	$filterColumn1->addRow(_('Application'),
@@ -569,7 +530,16 @@ function getItemFilterForm(&$items) {
 						.', 0, 0, "application");')
 		]
 	);
-	$filterColumn2->addRow([$snmpCommunityLabel, $snmpSecurityLabel], [$snmpCommunityField, $snmpSecurityField]);
+	$filterColumn2->addRow(_('SNMP community like'),
+		(new CTextBox('filter_snmp_community', $filter_snmp_community))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		'filter_snmp_community_row'
+	);
+	$filterColumn2->addRow(_('Security name like'),
+		(new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		'filter_snmpv3_securityname_row'
+	);
+
 	$filterColumn3->addRow(_('History (in days)'),
 		(new CNumericBox('filter_history', $filter_history, 8, false, true))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -586,7 +556,10 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Name like'),
 		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn2->addRow($snmpOidLabel, $snmpOidField);
+	$filterColumn2->addRow(_('SNMP OID like'),
+		(new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		'filter_snmp_oid_row'
+	);
 	$filterColumn3->addRow(_('Trends (in days)'),
 		(new CNumericBox('filter_trends', $filter_trends, 8, false, true))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
@@ -603,7 +576,10 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Key like'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn2->addRow($portLabel, $portField);
+	$filterColumn2->addRow(_('Port like'),
+		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+		'filter_port_row'
+	);
 
 	$form->addColumn($filterColumn1);
 	$form->addColumn($filterColumn2);
@@ -1244,16 +1220,23 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	// valuemapid
 	if ($data['limited']) {
-		if (!empty($data['valuemapid'])) {
-			if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($data['valuemapid'])))) {
-				$data['valuemaps'] = $map_data['name'];
+		if ($data['valuemapid'] != 0) {
+			$valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
+				'valuemapids' => [$data['valuemapid']]
+			]);
+
+			if ($valuemaps) {
+				$data['valuemaps'] = $valuemaps[0]['name'];
 			}
 		}
 	}
 	else {
-		$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v'));
+		$data['valuemaps'] = API::ValueMap()->get([
+			'output' => ['valemapid', 'name']
+		]);
 
-		order_result($data['valuemaps'], 'name');
+		CArrayHelper::sort($data['valuemaps'], ['name']);
 	}
 
 	// possible host inventories
@@ -1438,8 +1421,9 @@ function getTriggerFormData($exprAction) {
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
-		$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
-		$data['trigger'] = reset($trigger);
+		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+		$data['trigger'] = reset($triggers);
 
 		// get templates
 		$tmp_triggerid = $data['triggerid'];
@@ -1482,7 +1466,7 @@ function getTriggerFormData($exprAction) {
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = explode_exp($data['trigger']['expression']);
+		$data['expression'] = $data['trigger']['expression'];
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $data['trigger']['description'];

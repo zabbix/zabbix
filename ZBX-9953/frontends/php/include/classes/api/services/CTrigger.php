@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -456,13 +456,10 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		// expand expression
-		if ($options['expandExpression'] !== null) {
-			foreach ($result as &$trigger) {
-				if (isset($trigger['expression'])) {
-					$trigger['expression'] = explode_exp($trigger['expression'], false, true);
-				}
-			}
-			unset($trigger);
+		if ($options['expandExpression'] !== null && $result && array_key_exists('expression', reset($result))) {
+			$result = CMacrosResolverHelper::resolveTriggerExpressions($result,
+				['resolve_usermacros' => true, 'resolve_macros' => true]
+			);
 		}
 
 		// removing keys (hash -> array)
@@ -494,6 +491,8 @@ class CTrigger extends CTriggerGeneral {
 				'editable' => true,
 				'preservekeys' => true
 			]);
+
+			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
 
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 				'allowed' => ['triggerid', 'status'],
@@ -541,13 +540,12 @@ class CTrigger extends CTriggerGeneral {
 			$expressionChanged = true;
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
-				if (isset($trigger['expression'])) {
-					$expressionFull = explode_exp($dbTrigger['expression']);
-					if (strcmp($trigger['expression'], $expressionFull) == 0) {
-						$expressionChanged = false;
-					}
+
+				if (array_key_exists('expression', $trigger) && $trigger['expression'] === $dbTrigger['expression']) {
+					$expressionChanged = false;
 				}
-				if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0) {
+				if (array_key_exists('description', $trigger)
+						&& strcmp($trigger['description'], $dbTrigger['description']) == 0) {
 					unset($trigger['description']);
 				}
 			}
@@ -1053,11 +1051,14 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		]);
 
-		$descriptionChanged = false;
-		$expressionChanged = false;
+		$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
+
 		$changedPriorityTriggerIds = [];
 
 		foreach ($triggers as &$trigger) {
+			$descriptionChanged = false;
+			$expressionChanged = false;
+
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
@@ -1068,8 +1069,7 @@ class CTrigger extends CTriggerGeneral {
 				$trigger['description'] = $dbTrigger['description'];
 			}
 
-			$oldExpression = explode_exp($dbTrigger['expression']);
-			if (isset($trigger['expression']) && strcmp($oldExpression, $trigger['expression']) != 0) {
+			if (isset($trigger['expression']) && $dbTrigger['expression'] !== $trigger['expression']) {
 				$this->validateItems($trigger);
 
 				$expressionChanged = true;
@@ -1085,7 +1085,7 @@ class CTrigger extends CTriggerGeneral {
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression();
-				$oldExpressionData->parse($oldExpression);
+				$oldExpressionData->parse($dbTrigger['expression']);
 				// check if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
 				$newTemplates = zbx_toHash($expressionData->getHosts());
@@ -1166,7 +1166,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// restore the full expression to properly validate dependencies
-			$trigger['expression'] = $expressionChanged ? explode_exp($trigger['expression']) : $oldExpression;
+			$trigger['expression'] = $expressionChanged ? $expressionFull : $dbTrigger['expression'];
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'],
@@ -1200,8 +1200,9 @@ class CTrigger extends CTriggerGeneral {
 			'preservekeys' => true
 		]);
 
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+
 		foreach ($triggers as $trigger) {
-			$trigger['expression'] = explode_exp($trigger['expression']);
 			$this->inherit($trigger, $data['hostids']);
 		}
 
@@ -1791,7 +1792,9 @@ class CTrigger extends CTriggerGeneral {
 		));
 		if ($trigger) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Cannot delete templated trigger "%1$s:%2$s".', $trigger['description'],	explode_exp($trigger['expression']))
+				_s('Cannot delete templated trigger "%1$s:%2$s".', $trigger['description'],
+					CMacrosResolverHelper::resolveTriggerExpression($trigger['expression'])
+				)
 			);
 		}
 	}

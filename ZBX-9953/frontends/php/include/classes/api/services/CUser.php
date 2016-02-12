@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ class CUser extends CApiService {
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+			if (!$options['editable']) {
 				$sqlParts['from']['users_groups'] = 'users_groups ug';
 				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
 				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
@@ -510,62 +510,143 @@ class CUser extends CApiService {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @param array $userids
 	 *
-	 * @param array $userIds
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $userIds) {
-		if (!$userIds) {
+	protected function validateDelete(array $userids) {
+		if (!$userids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$this->checkPermissions($userIds);
-		$this->checkDeleteCurrentUser($userIds);
-		$this->checkDeleteInternal($userIds);
+		$this->checkPermissions($userids);
+		$this->checkDeleteCurrentUser($userids);
+		$this->checkDeleteInternal($userids);
+
+		// Check if deleted users have a map.
+		$user_maps = API::Map()->get([
+			'output' => ['name', 'userid'],
+			'userids' => $userids
+		]);
+
+		if ($user_maps) {
+			// Get first problem user and map.
+			$user_map = reset($user_maps);
+
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userids' => [$user_map['userid']],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is map "%2$s" owner.', $db_user['alias'], $user_map['name'])
+			);
+		}
+
+		// Check if deleted users have a screen.
+		$user_screens = API::Screen()->get([
+			'output' => ['name', 'userid'],
+			'userids' => $userids
+		]);
+
+		if ($user_screens) {
+			// Get first problem user and screen.
+			$user_screen = reset($user_screens);
+
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userids' => [$user_screen['userid']],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is screen "%2$s" owner.', $db_user['alias'], $user_screen['name'])
+			);
+		}
+
+		// Check if deleted users have a slide show.
+		$user_slideshow = DBfetch(DBselect(
+			'SELECT s.name,s.userid'.
+			' FROM slideshows s'.
+			' WHERE '.dbConditionInt('s.userid', $userids)
+		));
+
+		if ($user_slideshow) {
+			$db_users = $this->get([
+				'output' => ['alias'],
+				'userids' => [$user_slideshow['userid']],
+				'limit' => 1
+			]);
+
+			// Get first problem user.
+			$db_user = reset($db_users);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User "%1$s" is slide show "%2$s" owner.', $db_user['alias'], $user_slideshow['name'])
+			);
+		}
 	}
 
 	/**
 	 * Delete user.
 	 *
-	 * @param array $userIds
+	 * @param array $userids
 	 *
 	 * @return array
 	 */
-	public function delete(array $userIds) {
-		$this->validateDelete($userIds);
+	public function delete(array $userids) {
+		$this->validateDelete($userids);
 
-		// delete action operation msg
-		$operationids = [];
-		$dbOperations = DBselect(
+		// Get users for audit log.
+		$db_users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => $userids
+		]);
+
+		// Delete action operation msg.
+		$db_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
-			' WHERE '.dbConditionInt('om.userid', $userIds)
-		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
+			' WHERE '.dbConditionInt('om.userid', $userids)
+		));
 
-		DB::delete('opmessage_usr', ['userid' => $userIds]);
+		DB::delete('opmessage_usr', ['userid' => $userids]);
 
-		// delete empty operations
-		$delOperationids = [];
-		$dbOperations = DBselect(
-			'SELECT DISTINCT o.operationid'.
+		// Delete empty operations.
+		$del_operations = DBFetchArray(DBselect(
+			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)'
-		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($db_operations, 'operationid')).
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
+		));
+
+		DB::delete('operations', ['operationid' => zbx_objectValues($del_operations, 'operationid')]);
+		DB::delete('media', ['userid' => $userids]);
+		DB::delete('profiles', ['userid' => $userids]);
+		DB::delete('users_groups', ['userid' => $userids]);
+		DB::delete('users', ['userid' => $userids]);
+
+		$actionids = zbx_objectValues($del_operations, 'actionid');
+		if ($actionids) {
+			$this->disableActionsWithoutOperations($actionids);
 		}
 
-		DB::delete('operations', ['operationid' => $delOperationids]);
-		DB::delete('media', ['userid' => $userIds]);
-		DB::delete('profiles', ['userid' => $userIds]);
-		DB::delete('users_groups', ['userid' => $userIds]);
-		DB::delete('users', ['userid' => $userIds]);
+		// Audit log.
+		foreach ($db_users as $db_user) {
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER,
+				'User alias ['.$db_user['alias'].'] name ['.$db_user['name'].'] surname ['.$db_user['surname'].']'
+			);
+		}
 
-		return ['userids' => $userIds];
+		return ['userids' => $userids];
 	}
 
 	/**
@@ -1315,6 +1396,42 @@ class CUser extends CApiService {
 		if (in_array($guest['userid'], $userIds)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER)
+			);
+		}
+	}
+
+	/**
+	 * Disable actions that do not have operations.
+	 */
+	protected function disableActionsWithoutOperations(array $actionids) {
+		$actions = DBFetchArray(DBselect(
+			'SELECT DISTINCT a.actionid'.
+			' FROM actions a'.
+			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
+				' AND '.dbConditionInt('a.actionid', $actionids)
+		));
+
+		$actions_without_operations = zbx_objectValues($actions, 'actionid');
+		if ($actions_without_operations) {
+			$this->disableActions($actions_without_operations);
+		}
+	}
+
+	/**
+	 * Disable actions.
+	 *
+	 * @param array $actionids
+	 */
+	protected function disableActions(array $actionids) {
+		$update = [
+			'values' => ['status' => ACTION_STATUS_DISABLED],
+			'where' => ['actionid' => $actionids]
+		];
+		DB::update('actions', $update);
+
+		foreach($actionids as $actionid) {
+			add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
+				_('Action disabled due to deletion of user.'), null
 			);
 		}
 	}

@@ -1,12 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-	<meta charset="utf-8">
+   <head>
+   <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Zabbix | Hosts</title>
-        <!--<link rel="stylesheet" href="stylesheets/screen.css">-->
-        <link rel="stylesheet" href="stylesheets/dark-theme.css">
+        <link rel="stylesheet" href="stylesheets/screen.css">
+        <!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
         <link rel="icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
@@ -15,32 +16,33 @@
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
         <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
         <meta name="msapplication-TileColor" content="#d40000">
-	</head>
+   </head>
 <body>
 
-	<div class="article">
+   <div class="article">
       <ul class="action-menu" style="top: 10px; left: 650px">
       <li><h3>Favourite screens</h3></li>
-      <li><span class="action-menu-item">Add</span></li>
-      <li><span class="action-menu-item">Remove<span class="arrow-right"></span></span></a>
+      <li><a href="" class="action-menu-item">Add</a></li>
+      <li><a href="" class="action-menu-item">Remove<span class="arrow-right"></span></a>
       <ul class="action-menu" style="top: 47px; left: 203px;">
-      <li><span class="action-menu-item">Zabbix server</span></li>
+      <li><a href="" class="action-menu-item">Zabbix server</a></li>
       </ul></li>
-      <li><span class="action-menu-item">Remove all</span></li>
+      <li><a href="" class="action-menu-item">Remove all</a></li>
       <li><div></div></li>
       <li><h3>Favourite slide shows</h3></li>
-      <li><span class="action-menu-item selected">Add</span></li>
-      <li><span class="action-menu-item-disabled">Remove</span></li>
-      <li><span class="action-menu-item-disabled">Remove all</span></li>
+      <li><a href="" class="action-menu-item selected">Add</a></li>
+      <li><a class="action-menu-item-disabled">Remove</a></li>
+      <li><a class="action-menu-item-disabled">Remove all</a></li>
       </ul>
 <!--
       <ul class="action-menu" style="top: 58px; left: 840px">
       <li><a href="#">Zabbix server</a></li>
       </ul>
 -->
-      <div class="overlay-dialogue" style="top: 10px; left: 10px">
+      <div class="overlay-dialogue" style="top: 20px; left: 20px; max-width: 500px">
       <span class="overlay-close-btn"></span>
-            <table class="list-table">
+      <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</div><div class="overlay-descr-url"><a href="">A random link goes here</a></div>
+            <!--<table class="list-table">
             <thead>
             <tr>
                   <th>Host</th>
@@ -59,54 +61,207 @@
                   <tr><td><a href="#">vSphere 004</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
                   <tr><td><a href="#">vSphere 005</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
             </tbody>
-            </table>
+            </table>-->
+            <table class="list-table" id="t5603d1928c1e4">
+   <thead>
+      <tr>
+         <th>Time</th>
+         <th>Status</th>
+         <th>Duration</th>
+         <th>Age</th>
+         <th>Ack</th>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>2015-09-08 13:47:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>15d 23h 45m</td>
+         <td>15d 23h 45m</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=183267&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-05 06:14:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>1m 4d 7h</td>
+         <td>1m 20d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=181305&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-05 05:32:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>42m</td>
+         <td>1m 20d 8h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=181290&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-04 06:11:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 21m</td>
+         <td>1m 21d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180744&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-04 05:38:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>33m</td>
+         <td>1m 21d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180739&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-03 06:08:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 30m</td>
+         <td>1m 22d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180486&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-03 05:38:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>30m</td>
+         <td>1m 22d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180479&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-02 06:14:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 24m</td>
+         <td>1m 23d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180267&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-02 05:47:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>27m</td>
+         <td>1m 23d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180262&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-01 06:02:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 45m</td>
+         <td>1m 24d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180109&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-08-01 05:41:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>21m</td>
+         <td>1m 24d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=180105&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-31 06:02:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 39m</td>
+         <td>1m 25d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179919&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-31 05:38:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>24m</td>
+         <td>1m 25d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179914&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-30 06:05:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 33m</td>
+         <td>1m 26d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179477&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-30 05:35:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>30m</td>
+         <td>1m 26d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179476&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-29 05:59:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 36m</td>
+         <td>1m 27d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179301&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-29 05:17:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>42m</td>
+         <td>1m 27d 8h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179300&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-28 06:02:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 15m</td>
+         <td>1m 28d 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=179055&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-27 05:17:58</td>
+         <td><span style="color: #DC0000">PROBLEM</span></td>
+         <td>1d 45m</td>
+         <td>1m 29d 8h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=178660&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+      <tr>
+         <td>2015-07-26 05:59:58</td>
+         <td><span style="color: #00AA00">OK</span></td>
+         <td>23h 18m</td>
+         <td>2m 7h</td>
+         <td><a class="link-alt red" href="zabbix.php?action=acknowledge.edit&amp;eventids[]=178597&amp;backurl=zabbix.php%3Faction%3Ddashboard.view">No</a></td>
+      </tr>
+   </tbody>
+</table>
       </div>
 
-	<div class="overlay-dialogue" style="top: 280px; left: 10px">
+   <div class="overlay-dialogue" style="top: 300px; left: 10px">
       <span class="overlay-close-btn"></span>
-	<div class="dashbrd-widget-head cursor-move"><h4>Edit map element</h4></div>
-	<ul class="table-forms">
+   <div class="dashbrd-widget-head cursor-move"><h4>Edit map element</h4></div>
+   <ul class="table-forms">
             <li>
             <div class="table-forms-td-left"><label for="HostName">Type</label></div>
-		<div class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="HostName">Show</label></div>
-		<div class="table-forms-td-right"><ul id="" class="radio-segmented"><li><input type="radio" id="valign_0" name="valign" value="1"><label for="valign_0">Host group</label></li><li><input type="radio" id="valign_1" name="valign" value="0" checked="checked"><label for="valign_1">Host group elements</label></li></ul></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="HostName">Area type</label></div>
-		<div class="table-forms-td-right"><ul id="" class="radio-segmented"><li><input type="radio" id="valign_0" name="valign" value="1"><label for="valign_0">Fit to map</label></li><li><input type="radio" id="valign_1" name="valign" value="0" checked="checked"><label for="valign_1">Custom size</label></li></ul></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="VisibleName">Label</label></div>
-		<div class="table-forms-td-right"><textarea id="VisibleName"></textarea></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="HostName">Label location</label></div>
-		<div class="table-forms-td-right"><select><option>Bottom</option></select></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="HostName">Host</label></div>
-		<div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="HostName">Application</label></div>
-		<div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left">Icons</div>
-		<div class="table-forms-td-right"><label for="UseIconmap"><input type="checkbox" id="UseIconmap">Automatic icon selection</label><table><tr><td><label>Default</label>
-		<select>
-		    <option value="2">Cloud_(24)</option>
-		    <option value="3">Cloud_(48)</option>
-		    <option value="4">Cloud_(64)</option>
-		    <option value="5">Cloud_(96)</option>
-		    <option value="1">Cloud_(128)</option>
-		    <option value="7">Crypto-router_(24)</option>
-		</select></td><td><label>Problem</label>
-		<select>
-		<option value="0">Default</option>
+      <div class="table-forms-td-right"><select size="1" name="elementtype" id="elementType"><option value="0">Host</option><option value="1">Map</option><option value="2">Trigger</option><option value="3">Host group</option></select></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Show</label></div>
+      <div class="table-forms-td-right"><ul id="" class="radio-segmented"><li><input type="radio" id="valign_0" name="valign" value="1"><label for="valign_0">Host group</label></li><li><input type="radio" id="valign_1" name="valign" value="0" checked="checked"><label for="valign_1">Host group elements</label></li></ul></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Area type</label></div>
+      <div class="table-forms-td-right"><ul id="" class="radio-segmented"><li><input type="radio" id="valign_0" name="valign" value="1"><label for="valign_0">Fit to map</label></li><li><input type="radio" id="valign_1" name="valign" value="0" checked="checked"><label for="valign_1">Custom size</label></li></ul></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="VisibleName">Label</label></div>
+      <div class="table-forms-td-right"><textarea id="VisibleName"></textarea></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Label location</label></div>
+      <div class="table-forms-td-right"><input type="checkbox"><div class="form-input-margin"></div><select><option>Bottom</option></select></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Host</label></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Application</label></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left">Icons</div>
+      <div class="table-forms-td-right"><label for="UseIconmap"><input type="checkbox" id="UseIconmap">Automatic icon selection</label><table><tr><td><label>Default</label>
+      <select>
+          <option value="2">Cloud_(24)</option>
+          <option value="3">Cloud_(48)</option>
+          <option value="4">Cloud_(64)</option>
+          <option value="5">Cloud_(96)</option>
+          <option value="1">Cloud_(128)</option>
+          <option value="7">Crypto-router_(24)</option>
+      </select></td><td><label>Problem</label>
+      <select>
+      <option value="0">Default</option>
             <option value="2">Cloud_(24)</option>
             <option value="3">Cloud_(48)</option>
             <option value="4">Cloud_(64)</option>
@@ -124,9 +279,9 @@
             <option value="93">Rackmountable_1U_server_2D_(64)</option>
             <option value="94">Rackmountable_1U_server_2D_(96)</option>
         </select></td></tr><tr><td><label>Maintenance</label>
-		<select>
-		<option value="0">Default</option>
-		<option value="2">Cloud_(24)</option>
+      <select>
+      <option value="0">Default</option>
+      <option value="2">Cloud_(24)</option>
             <option value="3">Cloud_(48)</option>
             <option value="93">Rackmountable_1U_server_2D_(64)</option>
             <option value="94">Rackmountable_1U_server_2D_(96)</option>
@@ -145,21 +300,21 @@
             <option value="119">Rackmountable_5U_server_3D_(128)</option>
             <option value="87">Rack_42_(64)</option>
         </select></td></tr></tbody></table></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label for="HostName">Coordinates</label></div>
-		<div class="table-forms-td-right"><div class="form-input-margin"><input type="number" id="HostName"><label>X</label></div><div class="form-input-margin"><input type="number" id="HostName"><label>Y</label></div></div>
-		</li>
-		<li>
-		<div class="table-forms-td-left"><label>URLs</label></div>
-		<div class="table-forms-td-right"><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><button type="button" class="btn-link">Add</button></td><td></td></tr></tbody></table></div>
-		</li>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label for="HostName">Coordinates</label></div>
+      <div class="table-forms-td-right"><div class="form-input-margin"><input type="number" id="HostName"><label>X</label></div><div class="form-input-margin"><input type="number" id="HostName"><label>Y</label></div></div>
+      </li>
+      <li>
+      <div class="table-forms-td-left"><label>URLs</label></div>
+      <div class="table-forms-td-right"><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><button type="button" class="btn-link">Add</button></td><td></td></tr></tbody></table></div>
+      </li>
     <li><div class="table-forms-td-left"></div><div class="table-forms-td-right tfoot-buttons"><button type="button">Apply</button><button type="button" class="btn-alt">Remove</button><button type="button" class="btn-alt">Cancel</button></div>
     </li>
-		</ul>
-	</div>
+      </ul>
+   </div>
 
-      <div class="overlay-dialogue calendar" style="top: 280px; left: 1210px">
+      <div class="overlay-dialogue calendar" style="top: 280px; left: 1210px; z-index: 10000">
       <div class="calendar-header">
       <div class="calendar-year"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
       <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
@@ -213,78 +368,78 @@
 </div>
       </div>
 
-	<div class="overlay-dialogue" style="top: 280px; left: 620px">
-	<div class="dashbrd-widget-head cursor-move"><h4>Mass update elements (2)</h4></div>
-	<table class="table-forms">
-		<tfoot>
-		<tr>
-		<td class="table-forms-td-left"></td>
-		<td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
-		</tr>
-		</tfoot>
-		<tbody>
-		<tr>
-		<td class="table-forms-td-right" colspan="2">
-		<div class="maps-container">
-			<table class="list-table">
-			<tbody>
-			<tr>
-				<td>Host</td>
-				<td>Zabbix server</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			<tr>
-				<td>Image</td>
-				<td>Server_(96)</td>
-			</tr>
-			</tbody>
-			</table>
-		</div>
-		</td>
-		</tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label</label></td>
-		<td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
-		</tr>
+   <div class="overlay-dialogue" style="top: 300px; left: 640px">
+   <div class="dashbrd-widget-head cursor-move"><h4>Mass update elements (2)</h4></div>
+   <table class="table-forms">
+      <tfoot>
+      <tr>
+      <td class="table-forms-td-left"></td>
+      <td class="table-forms-td-right"><button type="button" class="btn-alt">Cancel</button><button type="button" class="btn-alt">Remove</button><button type="button">Apply</button></td>
+      </tr>
+      </tfoot>
+      <tbody>
+      <tr>
+      <td class="table-forms-td-right" colspan="2">
+      <div class="maps-container">
+         <table class="list-table">
+         <tbody>
+         <tr>
+            <td>Host</td>
+            <td>Zabbix server</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         <tr>
+            <td>Image</td>
+            <td>Server_(96)</td>
+         </tr>
+         </tbody>
+         </table>
+      </div>
+      </td>
+      </tr>
+      <tr>
+      <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label</label></td>
+      <td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
+      </tr>
             <tr>
             <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label location</label></td>
-            <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
+            <td class="table-forms-td-right"><input type="checkbox"><div class="form-input-margin"></div><select><option>Bottom</option></select></td>
             </tr>
-		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Automatic icon selection</label></td>
-		<td class="table-forms-td-right"><input type="checkbox"></td>
-		</tr>
+      <tr>
+      <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Automatic icon selection</label></td>
+      <td class="table-forms-td-right"><input type="checkbox"></td>
+      </tr>
             <tr>
             <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (default)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
@@ -301,8 +456,8 @@
             <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (disabled)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
-		</tbody>
-	</table>
+      </tbody>
+   </table>
       <div class="dashbrd-widget-head"><h4>Links between the selected elements</h4></div>
       <table class="table-forms">
             <tfoot>
@@ -351,12 +506,12 @@
             
             </tbody>
       </table>
-	</div>
+   </div>
 
-	</div>
-	<div class="footer">
-	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
-	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
-	</div>
+   </div>
+   <div class="footer">
+   <!--<a href="http://www.zabbix.com" target="_blank" class="logo"></a>-->
+   Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+   </div>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,72 +149,75 @@ class CScreenBase {
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
 		$this->resourcetype = isset($options['resourcetype']) ? $options['resourcetype'] : null;
-		$this->isTemplatedScreen = isset($options['isTemplatedScreen']) ? $options['isTemplatedScreen'] : false;
-		$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
-		$this->action = !empty($options['action']) ? $options['action'] : null;
-		$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
-		$this->hostid = isset($options['hostid']) ? $options['hostid'] : 0;
 		$this->dataId = !empty($options['dataId']) ? $options['dataId'] : null;
-
-		// get page file
-		if (!empty($options['pageFile'])) {
-			$this->pageFile = $options['pageFile'];
-		}
-		else {
-			global $page;
-			$this->pageFile = $page['file'];
-		}
-
-		// calculate timeline
-		$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
 		$this->profileIdx2 = !empty($options['profileIdx2']) ? $options['profileIdx2'] : null;
-		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
-		$this->timeline = !empty($options['timeline']) ? $options['timeline'] : null;
-		if (empty($this->timeline)) {
-			$this->timeline = $this->calculateTime([
-				'profileIdx' => $this->profileIdx,
-				'profileIdx2' => $this->profileIdx2,
-				'updateProfile' => $this->updateProfile,
-				'period' => !empty($options['period']) ? $options['period'] : null,
-				'stime' => !empty($options['stime']) ? $options['stime'] : null
-			]);
-		}
 
-		// get screenitem
-		if (!empty($options['screenitem'])) {
-			$this->screenitem = $options['screenitem'];
-		}
-		elseif (!empty($options['screenitemid'])) {
-			if ($this->hostid != 0) {
-				$this->screenitem = API::TemplateScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'hostids' => $this->hostid,
-					'output' => API_OUTPUT_EXTEND
-				]);
+		if ($this->resourcetype != SCREEN_RESOURCE_HTTPTEST_DETAILS) {
+			$this->isTemplatedScreen = isset($options['isTemplatedScreen']) ? $options['isTemplatedScreen'] : false;
+			$this->screenid = !empty($options['screenid']) ? $options['screenid'] : null;
+			$this->action = !empty($options['action']) ? $options['action'] : null;
+			$this->groupid = !empty($options['groupid']) ? $options['groupid'] : null;
+			$this->hostid = isset($options['hostid']) ? $options['hostid'] : 0;
+
+			// get page file
+			if (!empty($options['pageFile'])) {
+				$this->pageFile = $options['pageFile'];
 			}
 			else {
-				$this->screenitem = API::ScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND
+				global $page;
+				$this->pageFile = $page['file'];
+			}
+
+			// calculate timeline
+			$this->profileIdx = !empty($options['profileIdx']) ? $options['profileIdx'] : '';
+			$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
+			$this->timeline = !empty($options['timeline']) ? $options['timeline'] : null;
+			if (empty($this->timeline)) {
+				$this->timeline = $this->calculateTime([
+					'profileIdx' => $this->profileIdx,
+					'profileIdx2' => $this->profileIdx2,
+					'updateProfile' => $this->updateProfile,
+					'period' => !empty($options['period']) ? $options['period'] : null,
+					'stime' => !empty($options['stime']) ? $options['stime'] : null
 				]);
 			}
 
-			$this->screenitem = reset($this->screenitem);
-		}
+			// get screenitem
+			if (!empty($options['screenitem'])) {
+				$this->screenitem = $options['screenitem'];
+			}
+			elseif (!empty($options['screenitemid'])) {
+				if ($this->hostid != 0) {
+					$this->screenitem = API::TemplateScreenItem()->get([
+						'screenitemids' => $options['screenitemid'],
+						'hostids' => $this->hostid,
+						'output' => API_OUTPUT_EXTEND
+					]);
+				}
+				else {
+					$this->screenitem = API::ScreenItem()->get([
+						'screenitemids' => $options['screenitemid'],
+						'output' => API_OUTPUT_EXTEND
+					]);
+				}
 
-		// get screenid
-		if (empty($this->screenid) && !empty($this->screenitem)) {
-			$this->screenid = $this->screenitem['screenid'];
-		}
+				$this->screenitem = reset($this->screenitem);
+			}
 
-		// get resourcetype
-		if (is_null($this->resourcetype) && !empty($this->screenitem['resourcetype'])) {
-			$this->resourcetype = $this->screenitem['resourcetype'];
-		}
+			// get screenid
+			if (empty($this->screenid) && !empty($this->screenitem)) {
+				$this->screenid = $this->screenitem['screenid'];
+			}
 
-		// create action url
-		if (empty($this->action)) {
-			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.$this->screenitem['screenitemid'];
+			// get resourcetype
+			if (is_null($this->resourcetype) && !empty($this->screenitem['resourcetype'])) {
+				$this->resourcetype = $this->screenitem['resourcetype'];
+			}
+
+			// create action url
+			if (empty($this->action)) {
+				$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.$this->screenitem['screenitemid'];
+			}
 		}
 	}
 
@@ -263,19 +266,18 @@ class CScreenBase {
 			$this->insertFlickerfreeJs($flickerfreeData);
 		}
 
-		if ($this->mode == SCREEN_MODE_EDIT) {
-			$div = (new CDiv([$item, BR(), new CLink(_('Change'), $this->action)]))
-				->addClass('flickerfreescreen')
-				->setId($this->getScreenId());
-		}
-		else {
-			$div = (new CDiv($item))
-				->addClass('flickerfreescreen')
-				->setId($this->getScreenId());
-		}
+		$div = (new CDiv($item))
+			->addClass('flickerfreescreen')
+			->setAttribute('data-timestamp', $this->timestamp)
+			->setId($this->getScreenId());
 
-		$div->setAttribute('data-timestamp', $this->timestamp);
-		$div->addStyle('position: relative;');
+		if ($this->mode == SCREEN_MODE_EDIT) {
+			$div->addItem(
+				(new CDiv([
+					new CLink(_('Change'), $this->action)
+				]))->addClass(ZBX_STYLE_CENTER)
+			);
+		}
 
 		return $div;
 	}
@@ -285,25 +287,30 @@ class CScreenBase {
 	 *
 	 * @param array $data
 	 */
-	public function insertFlickerfreeJs($data = []) {
+	public function insertFlickerfreeJs(array $data = []) {
 		$jsData = [
 			'id' => $this->getDataId(),
 			'isFlickerfree' => $this->isFlickerfree,
-			'pageFile' => $this->pageFile,
 			'resourcetype' => $this->resourcetype,
 			'mode' => $this->mode,
-			'timestamp' => $this->timestamp,
 			'interval' => CWebUser::$data['refresh'],
-			'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
-			'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
-			'groupid' => $this->groupid,
-			'hostid' => $this->hostid,
-			'timeline' => $this->timeline,
-			'profileIdx' => $this->profileIdx,
 			'profileIdx2' => $this->profileIdx2,
-			'updateProfile' => $this->updateProfile,
-			'data' => !empty($data) ? $data : null
 		];
+
+		if ($this->resourcetype != SCREEN_RESOURCE_HTTPTEST_DETAILS) {
+			$jsData += [
+				'pageFile' => $this->pageFile,
+				'timestamp' => $this->timestamp,
+				'screenitemid' => !empty($this->screenitem['screenitemid']) ? $this->screenitem['screenitemid'] : null,
+				'screenid' => !empty($this->screenitem['screenid']) ? $this->screenitem['screenid'] : $this->screenid,
+				'groupid' => $this->groupid,
+				'hostid' => $this->hostid,
+				'timeline' => $this->timeline,
+				'profileIdx' => $this->profileIdx,
+				'updateProfile' => $this->updateProfile,
+				'data' => !empty($data) ? $data : null
+			];
+		}
 
 		zbx_add_post_js('window.flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
 	}
@@ -344,13 +351,17 @@ class CScreenBase {
 		}
 		else {
 			if ($options['period'] < ZBX_MIN_PERIOD) {
-				show_message(_n('Minimum time period to display is %1$s hour.',
-						'Minimum time period to display is %1$s hours.', (int) ZBX_MIN_PERIOD / SEC_PER_HOUR));
+				show_error_message(_n('Minimum time period to display is %1$s minute.',
+					'Minimum time period to display is %1$s minutes.',
+					(int) ZBX_MIN_PERIOD / SEC_PER_MIN
+				));
 				$options['period'] = ZBX_MIN_PERIOD;
 			}
 			elseif ($options['period'] > ZBX_MAX_PERIOD) {
-				show_message(_n('Maximum time period to display is %1$s day.',
-						'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY));
+				show_error_message(_n('Maximum time period to display is %1$s day.',
+					'Maximum time period to display is %1$s days.',
+					(int) ZBX_MAX_PERIOD / SEC_PER_DAY
+				));
 				$options['period'] = ZBX_MAX_PERIOD;
 			}
 		}
@@ -422,27 +433,5 @@ class CScreenBase {
 			'usertime' => $usertime,
 			'isNow' => $isNow
 		];
-	}
-
-	/**
-	 * Easy way to view time data.
-	 *
-	 * @static
-	 *
-	 * @param array		$options
-	 * @param int		$options['period']
-	 * @param string	$options['stime']
-	 * @param string	$options['stimeNow']
-	 * @param string	$options['starttime']
-	 * @param string	$options['usertime']
-	 * @param int		$options['isNow']
-	 */
-	public static function debugTime(array $time = []) {
-		return 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
-				'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>'.
-				'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>'.
-				'stimeNow='.date('F j, Y, g:i a', zbxDateToTime($time['stimeNow'])).', ('.$time['stimeNow'].')<br/>'.
-				'usertime='.date('F j, Y, g:i a', zbxDateToTime($time['usertime'])).', ('.$time['usertime'].')<br/>'.
-				'isnow='.$time['isNow'].'<br/>';
 	}
 }

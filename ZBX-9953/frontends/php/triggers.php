@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,8 +51,20 @@ $fields = [
 	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_targetid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'copy_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
-	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	'visible' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	// filter
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_priority' =>	[T_ZBX_INT, O_OPT, null,
+		IN([
+			-1, TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
+			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
+		]), null
+	],
+	'filter_state' =>		[T_ZBX_INT, O_OPT, null,	IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null],
+	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
+		IN([-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]), null
+	],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
@@ -84,7 +96,6 @@ $fields = [
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
 
@@ -167,25 +178,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		// update only changed fields
 
-		$oldTrigger = API::Trigger()->get([
+		$old_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
 		]);
-		if (!$oldTrigger) {
+		if (!$old_triggers) {
 			access_deny();
 		}
 
-		$oldTrigger = reset($oldTrigger);
-		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
-		$oldTrigger['expression'] = explode_exp($oldTrigger['expression']);
+		$old_triggers = CMacrosResolverHelper::resolveTriggerExpressions($old_triggers);
+
+		$old_trigger = reset($old_triggers);
+		$old_trigger['dependencies'] = zbx_toHash(zbx_objectValues($old_trigger['dependencies'], 'triggerid'));
 
 		$newDependencies = $trigger['dependencies'];
-		$oldDependencies = $oldTrigger['dependencies'];
+		$oldDependencies = $old_trigger['dependencies'];
 
-		unset($trigger['dependencies'], $oldTrigger['dependencies']);
+		unset($trigger['dependencies'], $old_trigger['dependencies']);
 
-		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
+		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
 
 		// dependencies
@@ -386,17 +398,28 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.triggers.filter_priority', getRequest('filter_priority', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.triggers.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.triggers.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.triggers.filter_priority');
+		CProfile::delete('web.triggers.filter_state');
+		CProfile::delete('web.triggers.filter_status');
+	}
+
 	$config = select_config();
 
 	$data = [
-		'showdisabled' => getRequest('showdisabled', 1),
+		'filter_priority' => CProfile::get('web.triggers.filter_priority', -1),
+		'filter_state' => CProfile::get('web.triggers.filter_state', -1),
+		'filter_status' => CProfile::get('web.triggers.filter_status', -1),
 		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => $config
 	];
-
-	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
 	$data['pageFilter'] = new CPageFilter([
 		'groups' => ['with_hosts_and_templates' => true, 'editable' => true],
@@ -423,9 +446,27 @@ else {
 			$options['output'] = ['triggerid', $sortField];
 		}
 
-		if (empty($data['showdisabled'])) {
-			$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
+		if ($data['filter_priority'] != -1) {
+			$options['filter']['priority'] = $data['filter_priority'];
 		}
+
+		switch ($data['filter_state']) {
+			case TRIGGER_STATE_NORMAL:
+				$options['filter']['state'] = TRIGGER_STATE_NORMAL;
+				$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
+				break;
+
+			case TRIGGER_STATE_UNKNOWN:
+				$options['filter']['state'] = TRIGGER_STATE_UNKNOWN;
+				$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
+				break;
+
+			default:
+				if ($data['filter_status'] != -1) {
+					$options['filter']['status'] = $data['filter_status'];
+				}
+		}
+
 		if ($data['pageFilter']->hostid > 0) {
 			$options['hostids'] = $data['pageFilter']->hostid;
 		}
@@ -451,8 +492,6 @@ else {
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state'],
 		'selectHosts' => ['hostid', 'host', 'name'],
-		'selectItems' => ['itemid', 'hostid', 'key_', 'type', 'flags', 'status'],
-		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')

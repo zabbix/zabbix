@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,14 +331,15 @@ static zbx_hash_t	lld_item_application_hash_func(const void *data)
 
 static int	lld_item_application_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_item_application_t	*item_application1 = d1, *item_application2 = d2;
-	int					rc;
+	const zbx_lld_item_application_t	*ia1 = (zbx_lld_item_application_t *)d1;
+	const zbx_lld_item_application_t	*ia2 = (zbx_lld_item_application_t *)d2;
 
-	if (0 != (rc = memcmp(&item_application1->item_ref, &item_application2->item_ref, sizeof(zbx_lld_item_ref_t))))
-		return rc;
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->item_ref.itemid, ia2->item_ref.itemid);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->item_ref.item, ia2->item_ref.item);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->application_ref.applicationid, ia2->application_ref.applicationid);
+	ZBX_RETURN_IF_NOT_EQUAL(ia1->application_ref.application, ia2->application_ref.application);
 
-	return memcmp(&item_application1->application_ref, &item_application2->application_ref,
-			sizeof(zbx_lld_application_ref_t));
+	return 0;
 }
 
 static void	lld_application_prototype_free(zbx_lld_application_prototype_t *application_prototype)
@@ -823,6 +824,100 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 
 /******************************************************************************
  *                                                                            *
+ * Function: substitute_formula_macros                                        *
+ *                                                                            *
+ * Purpose: substitutes lld macros in calculated item formula expression      *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] the expression                               *
+ *             jp_row - [IN] the lld data row                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
+{
+	char		*exp, *tmp, *e, *func, *key, *host = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
+	zbx_function_t	funcdata;
+	int		i;
+
+	exp = zbx_malloc(NULL, exp_alloc);
+	tmp = zbx_malloc(NULL, tmp_alloc);
+
+	for (e = *data; '\0' != *e; e += len)
+	{
+		/* get function data or jump over part of the string that is not a function */
+		if (FAIL == zbx_function_parse(&funcdata, e, &len))
+		{
+			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
+			continue;
+		}
+
+		/* substitute LLD macros in the part of the string that was jumped over */
+		if (0 != tmp_offset)
+		{
+			size_t	tmp_len;
+
+			substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			tmp_len = strlen(tmp);
+
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_len);
+
+			if (++tmp_len > tmp_alloc)
+				tmp_alloc = tmp_len;
+
+			tmp_offset = 0;
+		}
+
+		/* substitute LLD macros in function parameters (if any) */
+		if (0 < funcdata.nparam)
+		{
+			/* substitute LLD macro in the item key (first parameter) the same way as elsewhere */
+			if (SUCCEED == parse_host_key(funcdata.params[0], &host, &key))
+			{
+				zbx_free(funcdata.params[0]);
+				substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+				if (NULL != host)
+				{
+					funcdata.params[0] = zbx_dsprintf(NULL, "%s:%s", host, key);
+					zbx_free(host);
+					zbx_free(key);
+				}
+				else
+				{
+					funcdata.params[0] = key;
+					key = NULL;
+				}
+			}
+
+			/* substitute LLD macros in the rest of the parameters (simple replacement) */
+			for (i = 1; i < funcdata.nparam; i++)
+				substitute_discovery_macros(&funcdata.params[i], jp_row, ZBX_MACRO_ANY, NULL, 0);
+		}
+
+		/* substitute the original function in the string with the new one (with substituted LLD macros) */
+		zbx_function_tostr(&funcdata, e, len, &func);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
+
+		/* cleanup */
+		zbx_free(func);
+		zbx_function_clean(&funcdata);
+	}
+
+	/* substitute the LLD macros in the remainder of the string that was jumped over */
+	if (0 != tmp_offset)
+	{
+		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
+	}
+
+	zbx_free(tmp);
+
+	zbx_free(*data);
+	*data = exp;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: lld_item_make                                                    *
  *                                                                            *
  * Purpose: creates a new item based on item prototype and lld data row       *
@@ -864,7 +959,12 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->params = zbx_strdup(NULL, item_prototype->params);
 	item->params_orig = NULL;
-	substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+	if (ITEM_TYPE_CALCULATED == item_prototype->type)
+		substitute_formula_macros(&item->params, jp_row);
+	else
+		substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
 	zbx_lrtrim(item->params, ZBX_WHITESPACE);
 
 	item->ipmi_sensor = zbx_strdup(NULL, item_prototype->ipmi_sensor);
@@ -942,8 +1042,14 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->params);
-	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
+	if (ITEM_TYPE_CALCULATED == item_prototype->type)
+		substitute_formula_macros(&buffer, jp_row);
+	else
+		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+
 	if (0 != strcmp(item->params, buffer))
 	{
 		item->params_orig = item->params;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -339,7 +339,8 @@ $widget = (new CWidget())
 	);
 
 // Filter
-$filterForm = new CFilter('web.latest.filter.state');
+$filterForm = (new CFilter('web.latest.filter.state'))
+	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(
@@ -429,7 +430,8 @@ if ($filter['showDetails']) {
 		$singleHostSelected
 			? null
 			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 13%'),
-		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)
+			->addStyle('width: '.($singleHostSelected ? 34 : 21).'%'),
 		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
 		(new CColHeader(_('History')))->addStyle('width: 5%'),
 		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
@@ -448,7 +450,8 @@ else {
 		$singleHostSelected
 			? null
 			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 17%'),
-		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder)
+			->addStyle('width: '.($singleHostSelected ? 57 : 40).'%'),
 		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),

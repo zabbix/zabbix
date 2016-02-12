@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -378,7 +378,7 @@ function getMenuPopupMap(options) {
 				label: t('Triggers')
 			};
 
-			if (options.gotos.showTriggers) {
+			if (!options.gotos.showTriggers) {
 				triggers.disabled = true;
 			}
 			else {
@@ -400,7 +400,7 @@ function getMenuPopupMap(options) {
 				label: t('Graphs')
 			};
 
-			if (options.gotos.showGraphs) {
+			if (!options.gotos.showGraphs) {
 				graphs.disabled = true;
 			}
 			else {
@@ -422,7 +422,7 @@ function getMenuPopupMap(options) {
 				label: t('Host screens')
 			};
 
-			if (options.gotos.showScreens) {
+			if (!options.gotos.showScreens) {
 				screens.disabled = true;
 			}
 			else {
@@ -455,11 +455,10 @@ function getMenuPopupMap(options) {
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
 			var events = {
-				label: t('Events'),
-				url: url.getUrl()
+				label: t('Events')
 			};
 
-			if (options.gotos.showEvents) {
+			if (!options.gotos.showEvents) {
 				events.disabled = true;
 			}
 			else {
@@ -469,6 +468,7 @@ function getMenuPopupMap(options) {
 					url.setArgument(name, value);
 				});
 
+				events.url = url.getUrl();
 			}
 
 			gotos[gotos.length] = events;
@@ -556,14 +556,14 @@ function getMenuPopupRefresh(options) {
 					});
 				}
 
-				jQuery('span').each(function() {
-					var span = jQuery(this);
+				jQuery('a').each(function() {
+					var link = jQuery(this);
 
-					if (span.data('value') == currentRate) {
-						span.addClass('selected');
+					if (link.data('value') == currentRate) {
+						link.addClass('selected');
 					}
 					else {
-						span.removeClass('selected');
+						link.removeClass('selected');
 					}
 				});
 
@@ -580,64 +580,6 @@ function getMenuPopupRefresh(options) {
 
 	return [{
 		label: options.multiplier ? t('Refresh time multiplier') : t('Refresh time'),
-		items: items
-	}];
-}
-
-/**
- * Get menu popup service configuration section data.
- *
- * @param string options['serviceid']		service id
- * @param string options['name']			service name
- * @param bool   options['deletable']		service has dependencies and cannot be deleted
- *
- * @return array
- */
-function getMenuPopupServiceConfiguration(options) {
-	var items = [];
-
-	if (options.serviceid === null) {
-		// add
-		items[items.length] = {
-			label: t('Add child'),
-			url: new Curl('services.php?form=1&parentname=' + options.name).getUrl()
-		};
-	}
-	else {
-		// add
-		items[items.length] = {
-			label: t('Add child'),
-			url: new Curl('services.php?form=1&parentid=' + options.serviceid + '&parentname=' + options.name).getUrl()
-		};
-
-		// edit
-		items[items.length] = {
-			label: t('Edit'),
-			url: new Curl('services.php?form=1&serviceid=' + options.serviceid).getUrl()
-		};
-
-		var del = {
-				label: t('Delete')
-			};
-
-		// delete
-		if (options.deletable) {
-			del.clickCallback = function() {
-				jQuery(this).closest('.action-menu').fadeOut(100);
-
-				if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
-					window.location = new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl();
-				}
-			};
-		}
-		else {
-			del.disabled = true;
-		}
-		items[items.length] = del;
-	}
-
-	return [{
-		label: sprintf(t('Service "%1$s"'), options.name),
 		items: items
 	}];
 }
@@ -912,7 +854,7 @@ function getMenuPopupScriptData(scripts, hostId) {
 					item.clickCallback = function(e) {
 						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
 						cancelEvent(e);
-						jQuery(this).closest('.action-menu').fadeOut(100);
+						jQuery(this).closest('.action-menu-top').fadeOut(100);
 					};
 				}
 
@@ -932,7 +874,7 @@ jQuery(function($) {
 	 * Menu popup.
 	 *
 	 * @param array  sections				menu sections
-	 * @param string sections[n]['label']	section title
+	 * @param string sections[n]['label']	(optional) section title
 	 * @param array  sections[n]['items']	section menu data (see createMenuItem() for available options)
 	 * @param object event					menu popup call event
 	 *
@@ -978,8 +920,10 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					var h3 = $('<h3>').text(section.label);
-					var sectionItem = $('<li>').append(h3);
+					if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
+						var h3 = $('<h3>').text(section.label);
+						var sectionItem = $('<li>').append(h3);
+					}
 
 					// add section delimited for all sections except first one
 					if (i > 0) {
@@ -1033,11 +977,6 @@ jQuery(function($) {
 
 					clearTimeout(window.menuPopupTimeoutHandler);
 				})
-				.mouseleave(function() {
-					menuPopup.data('is-active', false);
-
-					closeInactiveMenuPopup(menuPopup, 500);
-				})
 				.position({
 					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
 					my: 'left top',
@@ -1045,7 +984,12 @@ jQuery(function($) {
 				});
 		}
 
-		closeInactiveMenuPopup(menuPopup, 2000);
+		$(document).click(function(e) {
+			if (!menuPopup.is(e.target) && menuPopup.has(e.target).length === 0) {
+				menuPopup.data('is-active', false);
+				menuPopup.fadeOut(0);
+			}
+		});
 	};
 
 	/**
@@ -1062,47 +1006,46 @@ jQuery(function($) {
 	 */
 	function createMenuItem(options) {
 		var item = $('<li>'),
-			span = $('<span>');
+			link = $('<a>');
 
 		if (typeof options.label !== 'undefined') {
+			link.text(options.label);
+
 			if (typeof options.items !== 'undefined' && options.items.length > 0) {
 				// if submenu exists
-				span.html(jQuery.escapeHtml(options.label) + '<span class="arrow-right"></span>');
-			}
-			else {
-				span.html(jQuery.escapeHtml(options.label));
+				link.append($('<span>', {'class': 'arrow-right'}));
 			}
 		}
 
 		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
 			$.each(options.data, function(key, value) {
-				span.data(key, value);
+				link.data(key, value);
 			});
 		}
 
 		if (typeof options.disabled !== 'undefined' && options.disabled) {
-			span.addClass('action-menu-item-disabled');
+			link.addClass('action-menu-item-disabled');
 		}
 		else {
-			span.addClass('action-menu-item');
+			link.addClass('action-menu-item');
 
 			if (typeof options.url !== 'undefined') {
-				span.attr('onclick', 'location.href=\'' + options.url + '\'');
+				link.attr('href', options.url);
 			}
 
 			if (typeof options.clickCallback !== 'undefined') {
-				span.click(options.clickCallback);
+				link.click(options.clickCallback);
 			}
 		}
 
 		if (typeof options.selected !== 'undefined' && options.selected) {
-			span.addClass('selected');
+			link.addClass('selected');
 		}
 
-		item.append(span);
+		item.append(link);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>', {'class' : 'action-menu'} );
+			var menu = $('<ul>', {'class' : 'action-menu'});
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
@@ -1145,27 +1088,5 @@ jQuery(function($) {
 		}
 
 		return item;
-	}
-
-	/**
-	 * Closing menu after delay.
-	 *
-	 * @param object menuPopup		menu popup
-	 * @param int    delay			delay to close menu popup
-	 */
-	function closeInactiveMenuPopup(menuPopup, delay) {
-		clearTimeout(window.menuPopupTimeoutHandler);
-
-		window.menuPopupTimeoutHandler = setTimeout(function() {
-			if (!menuPopup.data('is-active')) {
-				menuPopup.data('is-active', false);
-
-				$('.action-menu-top', menuPopup).each(function() {
-					$(this).menu('collapseAll', null, true);
-				});
-
-				menuPopup.fadeOut(0);
-			}
-		}, delay);
 	}
 });

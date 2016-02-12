@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,9 @@ if (!$this->data['filterSet']) {
 
 $current_time = time();
 
+$this->data['itemTriggers'] =
+	CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], ['html' => true]);
+
 foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
@@ -107,6 +110,7 @@ foreach ($this->data['items'] as $item) {
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(itemIndicatorStyle($item['status'], $item['state']))
+		->addSID()
 	);
 
 	// info
@@ -172,13 +176,12 @@ foreach ($this->data['items'] as $item) {
 			$trigger['error'] = '';
 		}
 
-		$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
-			triggerExpression($trigger, true),
+			$trigger['expression'],
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
@@ -217,9 +220,11 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = (new CButton(null))
-			->addClass(ZBX_STYLE_BTN_WIZARD_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
+		$menuIcon = (new CSpan(
+			(new CButton(null))
+				->addClass(ZBX_STYLE_ICON_WZRD_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers))
+		))->addClass(ZBX_STYLE_REL_CONTAINER);
 	}
 	else {
 		$menuIcon = '';
@@ -236,8 +241,8 @@ foreach ($this->data['items'] as $item) {
 		$triggerInfo,
 		CHtml::encode($item['key_']),
 		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
-		convertUnitsS(SEC_PER_DAY * $item['history']),
-		($item['trends'] !== '') ? convertUnitsS(SEC_PER_DAY * $item['trends']) : '',
+		$item['history']._x('d', 'day short'),
+		($item['trends'] !== '') ? $item['trends']._x('d', 'day short') : '',
 		item_type2str($item['type']),
 		CHtml::encode($item['applications_list']),
 		$status,

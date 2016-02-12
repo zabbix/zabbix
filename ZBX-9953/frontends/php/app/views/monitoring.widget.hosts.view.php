@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -180,7 +180,20 @@ foreach ($triggers as $trigger) {
 
 			if (!isset($hosts_data[$group['groupid']]['hostids_all'][$host['hostid']])) {
 				$hosts_data[$group['groupid']]['hostids_all'][$host['hostid']] = $host['hostid'];
-				$hosts_data[$group['groupid']]['problematic']++;
+
+				/*
+				 * Display acknowledged problem triggers in "Without problems" column when filter dashboard is
+				 * enabled and is set to display "Unacknowledged only". Host and trigger must not be in
+				 * unacknowledged lists. Count as problematic host otherwise.
+				 */
+				if ($data['filter']['extAck'] == EXTACK_OPTION_UNACK
+						&& !array_key_exists($host['hostid'], $hosts_with_unack_triggers)
+						&& !array_key_exists($trigger['triggerid'], $triggers_unack)) {
+					$hosts_data[$group['groupid']]['ok']++;
+				}
+				else {
+					$hosts_data[$group['groupid']]['problematic']++;
+				}
 			}
 		}
 	}
@@ -250,11 +263,6 @@ foreach ($groups as $group) {
 					continue;
 				}
 
-				if ($popup_rows >= ZBX_WIDGET_ROWS) {
-					break;
-				}
-				$popup_rows++;
-
 				$host_data = $lastUnack_host_list[$hostid];
 
 				$r = new CRow();
@@ -272,6 +280,10 @@ foreach ($groups as $group) {
 					$r->addItem((new CCol($trigger_count))->addClass(getSeverityStyle($severity, $trigger_count)));
 				}
 				$table_inf->addRow($r);
+
+				if (++$popup_rows == ZBX_WIDGET_ROWS) {
+					break;
+				}
 			}
 			$lastUnack_count = (new CSpan($hosts_data[$group['groupid']]['lastUnack']))
 				->addClass(ZBX_STYLE_LINK_ACTION)
@@ -307,10 +319,6 @@ foreach ($groups as $group) {
 			if (!isset($problematic_host_list[$hostid])) {
 				continue;
 			}
-			if ($popup_rows >= ZBX_WIDGET_ROWS) {
-				break;
-			}
-			$popup_rows++;
 
 			$host_data = $problematic_host_list[$hostid];
 
@@ -326,6 +334,10 @@ foreach ($groups as $group) {
 				$r->addItem((new CCol($trigger_count))->addClass(getSeverityStyle($severity, $trigger_count)));
 			}
 			$table_inf->addRow($r);
+
+			if (++$popup_rows == ZBX_WIDGET_ROWS) {
+				break;
+			}
 		}
 		$problematic_count = (new CSpan($hosts_data[$group['groupid']]['problematic']))
 			->addClass(ZBX_STYLE_LINK_ACTION)
@@ -365,8 +377,15 @@ foreach ($groups as $group) {
 	$table->addRow($group_row);
 }
 
-echo (new CJson())->encode([
+$output = [
 	'header' => _('Host status'),
-	'body' => (new CDiv($table))->toString(),
-	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+	'body' => (new CDiv([getMessages(), $table]))->toString(),
+	'footer' => (new CListItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))))->toString()
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

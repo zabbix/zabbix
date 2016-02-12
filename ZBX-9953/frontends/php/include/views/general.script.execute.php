@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,17 +19,10 @@
 **/
 
 
-$scriptWidget = new CWidget();
-
-$scriptForm = new CForm();
-
-$scriptTab = new CTabView();
-$scriptTab->addTab('scriptTab', _s(
-	'Result of "%s"', $this->data['info']['name']),
-	(new CSpan($this->data['message']))->addClass('pre')->addClass('fixedfont')
-);
-$scriptForm->addItem($scriptTab);
-
-$scriptWidget->addItem($scriptForm);
-
-return $scriptWidget;
+return (new CWidget())
+	->addItem(
+		(new CForm())
+			->addItem(
+				(new CTabView())->addTab('scriptTab', null, new CPre($data['message']))
+			)
+	);

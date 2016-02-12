@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -223,6 +223,7 @@ class CDRule extends CApiService {
 
 	protected function validateDChecks(array &$dChecks) {
 		$uniq = 0;
+		$item_key_parser = new CItemKey();
 
 		foreach ($dChecks as $dcnum => $dCheck) {
 			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) {
@@ -245,12 +246,10 @@ class CDRule extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
 					}
 
-					$itemKey = new CItemKey($dCheck['key_']);
-					if (!$itemKey->isValid()) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid key "%1$s": %2$s.',
-							$dCheck['key_'],
-							$itemKey->getError()
-						));
+					if ($item_key_parser->parse($dCheck['key_']) != CParser::PARSE_SUCCESS) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid key "%1$s": %2$s.', $dCheck['key_'], $item_key_parser->getError())
+						);
 					}
 					break;
 				case SVC_SNMPv1:

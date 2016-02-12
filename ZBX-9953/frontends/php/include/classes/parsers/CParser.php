@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,29 +20,38 @@
 
 abstract class CParser {
 
-	/**
-	 * Current cursor position.
-	 *
-	 * @var int
-	 */
-	protected $pos;
+	const PARSE_FAIL = -1;
+	const PARSE_SUCCESS = 0;
+	const PARSE_SUCCESS_CONT = 1;
 
-	/**
-	 * Returns the current cursor position.
-	 *
-	 * @return int
-	 */
-	public function getPos() {
-		return $this->pos;
-	}
+	protected $length = 0;
+	protected $match = '';
 
 	/**
 	 * Try to parse the string starting from the given position.
 	 *
 	 * @param string	$source		string to parse
-	 * @param int 		$startPos	position to start from
+	 * @param int 		$pos		position to start from
 	 *
-	 * @return CParserResult|bool   returns a CParserResult object if a match has been found or false otherwise
+	 * @return int
 	 */
-	abstract public function parse($source, $startPos = 0);
+	abstract public function parse($source, $pos = 0);
+
+	/**
+	 * Returns length of the parsed element.
+	 *
+	 * @return int
+	 */
+	public function getLength() {
+		return $this->length;
+	}
+
+	/**
+	 * Returns parsed element.
+	 *
+	 * @return string
+	 */
+	public function getMatch() {
+		return $this->match;
+	}
 }

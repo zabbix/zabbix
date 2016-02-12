@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,8 +45,6 @@ class CTriggerExpression {
 	/**
 	 * An array of trigger functions like {Zabbix server:agent.ping.last(0)}
 	 * The array isn't unique. Same functions can repeat.
-	 *
-	 * @see CFunctionMacroParserResult::$expression     for a detailed array structure
 	 *
 	 * @deprecated  use result tokens instead
 	 *
@@ -102,30 +100,37 @@ class CTriggerExpression {
 	/**
 	 * Parser for the {TRIGGER.VALUE} macro.
 	 *
-	 * @var CSetParser
+	 * @var CMacroParser
 	 */
-	protected $macroParser;
+	protected $macro_parser;
 
 	/**
 	 * Parser for function macros.
 	 *
 	 * @var CFunctionMacroParser
 	 */
-	protected $functionMacroParser;
+	protected $function_macro_parser;
 
 	/**
-	 * Parser for user macros.
+	 * Parser for trigger functions.
 	 *
-	 * @var CMacroParser
+	 * @var CFunctionParser
 	 */
-	protected $userMacroParser;
+	protected $function_parser;
 
 	/**
 	 * Parser for LLD macros.
 	 *
-	 * @var CMacroParser
+	 * @var CLLDMacroParser
 	 */
-	protected $lldMacroParser;
+	protected $lld_macro_parser;
+
+	/**
+	 * Parser for user macros.
+	 *
+	 * @var CUserMacroParser
+	 */
+	protected $user_macro_parser;
 
 	/**
 	 * Chars that should be treated as spaces.
@@ -153,10 +158,11 @@ class CTriggerExpression {
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
-		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
-		$this->functionMacroParser = new CFunctionMacroParser();
-		$this->userMacroParser = new CMacroParser('$');
-		$this->lldMacroParser = new CMacroParser('#');
+		$this->macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
+		$this->function_macro_parser = new CFunctionMacroParser();
+		$this->function_parser = new CFunctionParser();
+		$this->lld_macro_parser = new CLLDMacroParser();
+		$this->user_macro_parser = new CUserMacroParser();
 	}
 
 	/**
@@ -493,22 +499,17 @@ class CTriggerExpression {
 	 * @param CParser   $parser
 	 * @param int       $tokenType
 	 *
-	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
+	 * @return bool
 	 */
 	protected function parseUsing(CParser $parser, $tokenType) {
-		$j = $this->pos;
-
-		$result = $parser->parse($this->expression, $j);
-
-		if (!$result) {
+		if ($parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		$this->pos += $result->length - 1;
+		$this->result->addToken($tokenType, $parser->getMatch(), $this->pos, $parser->getLength());
+		$this->pos += $parser->getLength() - 1;
 
-		$this->result->addToken($tokenType, $result->match, $result->pos, $result->length);
-
-		return $result;
+		return true;
 	}
 
 	/**
@@ -525,16 +526,14 @@ class CTriggerExpression {
 	 */
 	private function parseConstant() {
 		if ($this->parseFunctionMacro() || $this->parseNumber()
-				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)
-				|| $this->parseUsing($this->userMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
-
+				|| $this->parseUsing($this->user_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)
+				|| $this->parseUsing($this->macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
 		}
 
 		// LLD macro support for trigger prototypes
-		if (($this->options['lldmacros']
-			&& $this->parseUsing($this->lldMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO))) {
-
+		if ($this->options['lldmacros']
+				&& $this->parseUsing($this->lld_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 			return true;
 		}
 
@@ -550,26 +549,43 @@ class CTriggerExpression {
 	private function parseFunctionMacro() {
 		$startPos = $this->pos;
 
-		$result = $this->functionMacroParser->parse($this->expression, $this->pos);
-
-		if (!$result) {
+		if ($this->function_macro_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		$this->pos += $result->length - 1;
+		if ($this->function_parser->parse($this->function_macro_parser->getFunction()) == CParser::PARSE_FAIL) {
+			return false;
+		}
 
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO, $result->match,
-			$startPos, $result->length,
+		$this->pos += $this->function_macro_parser->getLength() - 1;
+
+		$function_param_list = [];
+
+		for ($n = 0; $n < $this->function_parser->getParamsNum(); $n++) {
+			$function_param_list[] = $this->function_parser->getParam($n);
+		}
+
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
+			$this->function_macro_parser->getMatch(), $startPos, $this->function_macro_parser->getLength(),
 			[
-				'host' => $result->expression['host'],
-				'item' => $result->expression['item'],
-				'function' => $result->expression['function'],
-				'functionName' => $result->expression['functionName'],
-				'functionParams' => $result->expression['functionParamList']
+				'host' => $this->function_macro_parser->getHost(),
+				'item' => $this->function_macro_parser->getItem(),
+				'function' => $this->function_macro_parser->getFunction(),
+				'functionName' => $this->function_parser->getFunction(),
+				'functionParams' => $function_param_list
 			]
 		);
 
-		$this->expressions[] = $result->expression;
+		$this->expressions[] = [
+			'expression' => $this->function_macro_parser->getMatch(),
+			'pos' => $startPos,
+			'host' => $this->function_macro_parser->getHost(),
+			'item' => $this->function_macro_parser->getItem(),
+			'function' => $this->function_macro_parser->getFunction(),
+			'functionName' => $this->function_parser->getFunction(),
+			'functionParam' => $this->function_parser->getParameters(),
+			'functionParamList' => $function_param_list
+		];
 
 		return true;
 	}
@@ -609,7 +625,6 @@ class CTriggerExpression {
 		$suffix = null;
 		if (isset($this->expression[$j])
 				&& strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
-
 			$suffix = $this->expression[$j];
 			$j++;
 		}
@@ -621,9 +636,7 @@ class CTriggerExpression {
 			substr($this->expression, $this->pos, $numberLength),
 			$this->pos,
 			$numberLength,
-			[
-				'suffix' => $suffix
-			]
+			['suffix' => $suffix]
 		);
 
 		$this->pos = $j - 1;

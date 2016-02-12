@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,13 @@
 #define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
 
 #define LOG_TYPE_UNDEFINED	0
-#define LOG_TYPE_SYSLOG		1
+#define LOG_TYPE_SYSTEM		1
 #define LOG_TYPE_FILE		2
+#define LOG_TYPE_CONSOLE	3
+
+#define ZBX_OPTION_LOGTYPE_SYSTEM	"system"
+#define ZBX_OPTION_LOGTYPE_FILE		"file"
+#define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
 typedef enum
 {
@@ -71,10 +76,11 @@ char		*strerror_from_system(unsigned long error);
 char		*strerror_from_module(unsigned long error, const wchar_t *module);
 #endif
 
-#if defined(_WINDOWS)
-#	define redirect_std(filename)
-#else
-	void	redirect_std(const char *filename);
-#endif
+void		zbx_redirect_stdio(const char *filename);
+
+void		zbx_handle_log(void);
+
+int		zbx_get_log_type(const char *logtype);
+int		zbx_validate_log_parameters(ZBX_TASK_EX *task);
 
 #endif

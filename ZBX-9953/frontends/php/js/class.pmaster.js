@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -329,11 +329,14 @@ var CDoll = Class.create({
 			if (is_null(resp.responseJSON)) {
 				// If plaintext, slide show data
 				this._domobj.html(resp.responseText);
+				this._domobj_footer.html('');
 			}
 			else
 			{
+				var debug = is_null(resp.responseJSON.debug) ? '' : resp.responseJSON.debug;
+
 				// Dashboard widget data comes in JSON
-				this._domobj.html(resp.responseJSON.body);
+				this._domobj.html(resp.responseJSON.body + debug);
 				this._domobj_header.html(resp.responseJSON.header);
 				this._domobj_footer.html(resp.responseJSON.footer);
 			}

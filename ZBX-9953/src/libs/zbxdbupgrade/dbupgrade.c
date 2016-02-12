@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ zbx_db_version_t;
 
 #define ZBX_FIRST_DB_VERSION		2010000
 
-extern unsigned char	daemon_type;
+extern unsigned char	program_type;
 
 
 #ifndef HAVE_SQLITE3
@@ -626,6 +626,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2050)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(3000)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -633,6 +634,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2030), "2.4 development"},
 	{DBPATCH_VERSION(2040), "2.4 maintenance"},
 	{DBPATCH_VERSION(2050), "3.0 development"},
+	{DBPATCH_VERSION(3000), "3.0 maintenance"},
 	{NULL}
 };
 
@@ -709,7 +711,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
-				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy", required);
+				get_program_type_string(program_type), required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
 		goto out;
@@ -741,8 +743,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
 				" Required mandatory version: %08d.",
-				ZBX_DAEMON_TYPE_SERVER == daemon_type ? "server" : "proxy",
-				db_mandatory, db_optional, required);
+				get_program_type_string(program_type), db_mandatory, db_optional, required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
 			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");

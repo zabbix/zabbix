@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
 #include "zbxmodules.h"
 #include "zbxserver.h"
 
+#include "zbxnix.h"
 #include "daemon.h"
 #include "zbxself.h"
 #include "../libs/zbxnix/control.h"
@@ -52,6 +53,7 @@
 #include "../zabbix_server/selfmon/selfmon.h"
 #include "../zabbix_server/vmware/vmware.h"
 #include "setproctitle.h"
+#include "../libs/zbxcrypto/tls.h"
 
 #define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
 
@@ -59,34 +61,38 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"[-c config-file] -R runtime-option",
-	"-h",
-	"-V",
+	"[-c config-file]", NULL,
+	"[-c config-file]", "-R runtime-option", NULL,
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 
 const char	*help_message[] = {
-	"A Zabbix daemon that collects monitoring data from devices and sends it to Zabbix server.",
+	"A Zabbix daemon that collects monitoring data from devices and sends it to",
+	"Zabbix server.",
 	"",
 	"Options:",
-	"  -c --config config-file               Absolute path to the configuration file",
-	"                                        (default: \"" DEFAULT_CONFIG_FILE "\")",
+	"  -c --config config-file        Absolute path to the configuration file",
+	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+	"  -f --foreground                Run Zabbix proxy in foreground",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
-	"      " ZBX_CONFIG_CACHE_RELOAD "               Reload configuration cache",
-	"      " ZBX_HOUSEKEEPER_EXECUTE "               Execute the housekeeper",
-	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
-	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
+	"      " ZBX_CONFIG_CACHE_RELOAD "        Reload configuration cache",
+	"      " ZBX_HOUSEKEEPER_EXECUTE "        Execute the housekeeper",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target  Increase log level, affects all processes if",
+	"                                 target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
+	"                                 target is not specified",
 	"",
 	"      Log level control targets:",
-	"        pid                             Process identifier",
-	"        process-type                    All processes of specified type (e.g., poller)",
-	"        process-type,N                  Process type and number (e.g., poller,3)",
+	"        pid                      Process identifier",
+	"        process-type             All processes of specified type (e.g., poller)",
+	"        process-type,N           Process type and number (e.g., poller,3)",
 	"",
-	"  -h --help                             Display this help message",
-	"  -V --version                          Display version number",
+	"  -h --help                      Display this help message",
+	"  -V --version                   Display version number",
 	NULL	/* end of text */
 };
 
@@ -96,6 +102,7 @@ const char	*help_message[] = {
 static struct zbx_option	longopts[] =
 {
 	{"config",		1,	NULL,	'c'},
+	{"foreground",		0,	NULL,	'f'},
 	{"runtime-control",	1,	NULL,	'R'},
 	{"help",		0,	NULL,	'h'},
 	{"version",		0,	NULL,	'V'},
@@ -103,14 +110,14 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:hVR:";
+static char	shortopts[] = "c:hVR:f";
 
 /* end of COMMAND LINE OPTIONS */
 
 int	threads_num = 0;
 pid_t	*threads = NULL;
 
-unsigned char	daemon_type		= ZBX_DAEMON_TYPE_PROXY_ACTIVE;
+unsigned char	program_type		= ZBX_PROGRAM_TYPE_PROXY_ACTIVE;
 
 unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
@@ -155,7 +162,7 @@ int	CONFIG_PROXYDATA_FREQUENCY	= 1;
 
 int	CONFIG_SENDER_FREQUENCY		= 30;
 int	CONFIG_HISTSYNCER_FORKS		= 4;
-int	CONFIG_HISTSYNCER_FREQUENCY	= 5;
+int	CONFIG_HISTSYNCER_FREQUENCY	= 1;
 int	CONFIG_CONFSYNCER_FORKS		= 1;
 
 int	CONFIG_VMWARE_FORKS		= 0;
@@ -164,9 +171,9 @@ int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
 zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * ZBX_MEBIBYTE;
+zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 0;
-zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE		= 16 * ZBX_MEBIBYTE;
 zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 0;
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
 
@@ -178,9 +185,7 @@ char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_TMPDIR			= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
-#ifdef HAVE_IPV6
 char	*CONFIG_FPING6_LOCATION		= NULL;
-#endif
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -215,11 +220,24 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 char	*CONFIG_USER			= NULL;
 
 /* web monitoring */
-#ifdef HAVE_LIBCURL
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
-#endif
+
+/* TLS parameters */
+unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
+unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
+
+char	*CONFIG_TLS_CONNECT		= NULL;
+char	*CONFIG_TLS_ACCEPT		= NULL;
+char	*CONFIG_TLS_CA_FILE		= NULL;
+char	*CONFIG_TLS_CRL_FILE		= NULL;
+char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
+char	*CONFIG_TLS_CERT_FILE		= NULL;
+char	*CONFIG_TLS_KEY_FILE		= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -360,7 +378,9 @@ static void	zbx_set_defaults(void)
 		free_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
+	}
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
@@ -398,8 +418,11 @@ static void	zbx_set_defaults(void)
 	if (ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE)
 	{
 		CONFIG_CONFSYNCER_FORKS = CONFIG_DATASENDER_FORKS = 0;
-		daemon_type = ZBX_DAEMON_TYPE_PROXY_PASSIVE;
+		program_type = ZBX_PROGRAM_TYPE_PROXY_PASSIVE;
 	}
+
+	if (NULL == CONFIG_LOG_TYPE_STR)
+		CONFIG_LOG_TYPE_STR = zbx_strdup(CONFIG_LOG_TYPE_STR, ZBX_OPTION_LOGTYPE_FILE);
 }
 
 /******************************************************************************
@@ -411,22 +434,22 @@ static void	zbx_set_defaults(void)
  * Author: Alexei Vladishev, Rudolfs Kreicbergs                               *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_validate_config(void)
+static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
 	char	*ch_error;
+	int	err = 0;
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
-
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
+	else if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter '%s': %s", CONFIG_HOSTNAME,
 				ch_error);
 		zbx_free(ch_error);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_IPMIPOLLER_FORKS +
@@ -434,36 +457,59 @@ static void	zbx_validate_config(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"StartPollersUnreachable\" configuration parameter must not be 0"
 				" if regular, IPMI or Java pollers are started");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && 0 < CONFIG_JAVAPOLLER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (ZBX_PROXYMODE_ACTIVE == CONFIG_PROXYMODE &&	NULL == CONFIG_SERVER)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Server\" configuration parameter is not defined."
 				" This parameter is mandatory for active proxies.");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
-
-#if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
-	if (0 != CONFIG_VMWARE_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start vmware collector because Zabbix proxy is built without VMware"
-				" support");
-		exit(EXIT_FAILURE);
-	}
+#if !defined(HAVE_IPV6)
+	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
+#if !defined(HAVE_LIBCURL)
+	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
+#endif
+#if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
+	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_VMWARE_FORKS, "VMware support"));
+
+	/* parameters VMwareFrequency, VMwarePerfFrequency, VMwareCacheSize, VMwareTimeout are not checked here */
+	/* because they have non-zero default values */
+#endif
+
+	if (SUCCEED != zbx_validate_log_parameters(task))
+		err = 1;
+
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", CONFIG_TLS_SERVER_CERT_ISSUER, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", CONFIG_TLS_SERVER_CERT_SUBJECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", CONFIG_TLS_PSK_IDENTITY, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", CONFIG_TLS_PSK_FILE, "TLS support"));
+#endif
+	if (0 != err)
+		exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -477,7 +523,7 @@ static void	zbx_validate_config(void)
  * Comments: will terminate process if parsing fails                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_load_config(void)
+static void	zbx_load_config(ZBX_TASK_EX *task)
 {
 	static struct cfg_line	cfg[] =
 	{
@@ -523,7 +569,7 @@ static void	zbx_load_config(void)
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(8) * ZBX_GIBIBYTE},
 		{"HistoryCacheSize",		&CONFIG_HISTORY_CACHE_SIZE,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"HistoryTextCacheSize",	&CONFIG_TEXT_CACHE_SIZE,		TYPE_UINT64,
+		{"HistoryIndexCacheSize",	&CONFIG_HISTORY_INDEX_CACHE_SIZE,	TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			24},
@@ -532,7 +578,7 @@ static void	zbx_load_config(void)
 		{"ProxyOfflineBuffer",		&CONFIG_PROXY_OFFLINE_BUFFER,		TYPE_INT,
 			PARM_OPT,	1,			720},
 		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
-			PARM_OPT,	0,			SEC_PER_HOUR},
+			PARM_OPT,	0,			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX},
 		{"ConfigFrequency",		&CONFIG_PROXYCONFIG_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_WEEK},
 		{"DataSenderFrequency",		&CONFIG_PROXYDATA_FREQUENCY,		TYPE_INT,
@@ -541,10 +587,8 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"FpingLocation",		&CONFIG_FPING_LOCATION,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-#ifdef HAVE_IPV6
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
@@ -564,6 +608,8 @@ static void	zbx_load_config(void)
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			5},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"LogType",			&CONFIG_LOG_TYPE_STR,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -607,14 +653,32 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-#ifdef HAVE_LIBCURL
 		{"SSLCALocation",		&CONFIG_SSL_CA_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SSLCertLocation",		&CONFIG_SSL_CERT_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
+		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
+			PARM_OPT,	0,			0},
+		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSServerCertIssuer",		&CONFIG_TLS_SERVER_CERT_ISSUER,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSServerCertSubject",	&CONFIG_TLS_SERVER_CERT_SUBJECT,	TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -625,7 +689,12 @@ static void	zbx_load_config(void)
 
 	zbx_set_defaults();
 
-	zbx_validate_config();
+	CONFIG_LOG_TYPE = zbx_get_log_type(CONFIG_LOG_TYPE_STR);
+
+	zbx_validate_config(task);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_validate_config();
+#endif
 }
 
 /******************************************************************************
@@ -672,7 +741,7 @@ int	main(int argc, char **argv)
 				break;
 			case 'R':
 				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t.flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t.data))
 					exit(EXIT_FAILURE);
 
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
@@ -685,6 +754,9 @@ int	main(int argc, char **argv)
 				version();
 				exit(EXIT_SUCCESS);
 				break;
+			case 'f':
+				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
+				break;
 			default:
 				usage();
 				exit(EXIT_FAILURE);
@@ -696,9 +768,9 @@ int	main(int argc, char **argv)
 	if (1 < opt_c || 1 < opt_r)
 	{
 		if (1 < opt_c)
-			zbx_error("option \"-c\" specified multiple times");
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
 		if (1 < opt_r)
-			zbx_error("option \"-R\" specified multiple times");
+			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
 
 		exit(EXIT_FAILURE);
 	}
@@ -721,27 +793,30 @@ int	main(int argc, char **argv)
 	/* required for simple checks */
 	init_metrics();
 
-	zbx_load_config();
+	zbx_load_config(&t);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
-		exit(SUCCEED == zbx_sigusr_send(t.flags) ? EXIT_SUCCESS : EXIT_FAILURE);
+		exit(SUCCEED == zbx_sigusr_send(t.data) ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
-
-	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
+	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER, t.flags);
 }
 
-int	MAIN_ZABBIX_ENTRY()
+int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
 	int		i, db_type;
 
-	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
-		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
-	else
-		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
+	{
+		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
+				ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
+				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+	}
+
+	zabbix_open_log(CONFIG_LOG_TYPE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 #ifdef HAVE_NETSNMP
 #	define SNMP_FEATURE_STATUS 	"YES"
@@ -778,6 +853,11 @@ int	MAIN_ZABBIX_ENTRY()
 #else
 #	define IPV6_FEATURE_STATUS 	" NO"
 #endif
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define TLS_FEATURE_STATUS	"YES"
+#else
+#	define TLS_FEATURE_STATUS	" NO"
+#endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
 			ZBX_PROXYMODE_PASSIVE == CONFIG_PROXYMODE ? "passive" : "active",
@@ -791,8 +871,16 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                  " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:          " SSH2_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+
+	if (SUCCEED != zbx_coredump_disable())
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
+		exit(EXIT_FAILURE);
+	}
 
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
@@ -849,6 +937,9 @@ int	MAIN_ZABBIX_ENTRY()
 		}
 	}
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_parent();
+#endif
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
 	for (i = 0; i < threads_num; i++)

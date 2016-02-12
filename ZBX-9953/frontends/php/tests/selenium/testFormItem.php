@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1015,7 +1015,7 @@ class testFormItem extends CWebTest {
 				$this->zbxTestTextPresent(['Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.']);
 				$this->assertVisible('delayFlexTable');
 
-				$this->zbxTestTextPresent('New flexible interval', 'Interval (in sec)', 'Period');
+				$this->zbxTestTextPresent('New flexible interval', 'Update interval (in sec)', 'Period');
 				$this->assertVisible('new_delay_flex_delay');
 				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@maxlength", 5);
 				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@size", 5);
@@ -1031,7 +1031,7 @@ class testFormItem extends CWebTest {
 				$this->zbxTestTextNotPresent(['Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.']);
 				$this->assertNotVisible('delayFlexTable');
 
-				$this->zbxTestTextNotPresent('New flexible interval', 'Interval (in sec)', 'Period');
+				$this->zbxTestTextNotPresent('New flexible interval', 'Update interval (in sec)', 'Period');
 				$this->assertNotVisible('new_delay_flex_period');
 				$this->assertNotVisible('new_delay_flex_delay');
 				$this->assertNotVisible('add_delay_flex');

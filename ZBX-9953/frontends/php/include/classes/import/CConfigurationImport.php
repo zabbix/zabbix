@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,8 @@ class CConfigurationImport {
 			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
-			'images' => ['updateExisting' => false, 'createMissing' => false]
+			'images' => ['updateExisting' => false, 'createMissing' => false],
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
 		$this->options = array_merge($this->options, $options);
@@ -119,6 +120,7 @@ class CConfigurationImport {
 
 		// import objects
 		$this->processApplications();
+		$this->processValueMaps();
 		$this->processItems();
 		$this->processTriggers();
 		$this->processDiscoveryRules();
@@ -207,6 +209,10 @@ class CConfigurationImport {
 			foreach ($applications as $app) {
 				$applicationsRefs[$host][$app['name']] = $app['name'];
 			}
+		}
+
+		foreach ($this->getFormattedValueMaps() as $valuemap) {
+			$valueMapsRefs[$valuemap['name']] = $valuemap['name'];
 		}
 
 		foreach ($this->getFormattedItems() as $host => $items) {
@@ -588,6 +594,48 @@ class CConfigurationImport {
 
 		// refresh applications because templated ones can be inherited to host and used in items
 		$this->referencer->refreshApplications();
+	}
+
+	/**
+	 * Import value maps.
+	 */
+	protected function processValueMaps() {
+		if (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting']) {
+			return;
+		}
+
+		$all_valuemaps = $this->getFormattedValueMaps();
+
+		if (!$all_valuemaps) {
+			return;
+		}
+
+		$valuemaps_to_create = [];
+		$valuemaps_to_update = [];
+
+		foreach ($all_valuemaps as $valuemap) {
+			$valuemapid = $this->referencer->resolveValueMap($valuemap['name']);
+
+			if ($valuemapid) {
+				$valuemap['valuemapid'] = $valuemapid;
+				$valuemaps_to_update[] = $valuemap;
+			}
+			else {
+				$valuemaps_to_create[] = $valuemap;
+			}
+		}
+
+		if ($this->options['valueMaps']['createMissing'] && $valuemaps_to_create) {
+			$valuemapids = API::ValueMap()->create($valuemaps_to_create);
+
+			foreach ($valuemaps_to_create as $key => $valuemap) {
+				$this->referencer->addValueMapRef($valuemap['name'], $valuemapids['valuemapids'][$key]);
+			}
+		}
+
+		if ($this->options['valueMaps']['updateExisting'] && $valuemaps_to_update) {
+			API::ValueMap()->update($valuemaps_to_update);
+		}
 	}
 
 	/**
@@ -1899,6 +1947,19 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['applications'];
+	}
+
+	/**
+	 * Get formatted value maps.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedValueMaps() {
+		if (!isset($this->formattedData['valueMaps'])) {
+			$this->formattedData['valueMaps'] = $this->adapter->getValueMaps();
+		}
+
+		return $this->formattedData['valueMaps'];
 	}
 
 	/**

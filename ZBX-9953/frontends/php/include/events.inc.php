@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,19 +252,52 @@ function make_small_eventlist($startEvent, $backurl) {
 			$duration,
 			zbx_date2age($event['clock']),
 			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null,
-			isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : SPACE
+			(new CCol(isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ''))
+				->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 
 	return $table;
 }
 
-function make_popup_eventlist($triggerId, $eventId, $backurl) {
+/**
+ * Create table with trigger description and events.
+ *
+ * @param array  $trigger							An array of trigger data.
+ * @param string $trigger['triggerid']				Trigger ID to select events.
+ * @param string $trigger['description']			Trigger description.
+ * @param string $trigger['url']					Trigger URL.
+ * @param string $trigger['lastEvent']['eventid']	Last event ID
+ * @param string $backurl							URL to return to.
+ *
+ * @return CDiv
+ */
+function make_popup_eventlist($trigger, $backurl) {
+	// Show trigger description and URL.
+	$div = (new CDiv());
+
+	if ($trigger['comments'] !== '') {
+		$div->addItem(
+			(new CDiv())
+				->addItem(zbx_str2links($trigger['comments']))
+				->addClass(ZBX_STYLE_OVERLAY_DESCR)
+		);
+	}
+
+	if ($trigger['url'] !== '') {
+		$div->addItem(
+			(new CDiv())
+				->addItem(new CLink($trigger['url'], $trigger['url']))
+				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
+		);
+	}
+
+	// Select and show events.
 	$config = select_config();
 
 	$table = new CTableInfo();
 
-	// if acknowledges are turned on, we show 'ack' column
+	// If acknowledges are turned on, we show 'ack' column.
 	if ($config['event_ack_enable']) {
 		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age'), _('Ack')]);
 	}
@@ -272,39 +305,43 @@ function make_popup_eventlist($triggerId, $eventId, $backurl) {
 		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age')]);
 	}
 
-	$events = API::Event()->get([
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'output' => API_OUTPUT_EXTEND,
-		'objectids' => $triggerId,
-		'eventid_till' => $eventId,
-		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => ['clock', 'eventid'],
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => ZBX_WIDGET_ROWS
-	]);
-
-	$lclock = time();
-
-	foreach ($events as $event) {
-		$duration = zbx_date2age($lclock, $event['clock']);
-		$lclock = $event['clock'];
-
-		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
-
-		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
-
-		$table->addRow([
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-			$eventStatusSpan,
-			$duration,
-			zbx_date2age($event['clock']),
-			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null
+	if ($trigger['lastEvent']) {
+		$events = API::Event()->get([
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'output' => API_OUTPUT_EXTEND,
+			'objectids' => [$trigger['triggerid']],
+			'eventid_till' => $trigger['lastEvent']['eventid'],
+			'select_acknowledges' => API_OUTPUT_COUNT,
+			'sortfield' => ['clock', 'eventid'],
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => ZBX_WIDGET_ROWS
 		]);
+
+		$lclock = time();
+
+		foreach ($events as $event) {
+			$duration = zbx_date2age($lclock, $event['clock']);
+			$lclock = $event['clock'];
+
+			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+
+			// add colors and blinking to span depending on configuration and trigger parameters
+			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
+
+			$table->addRow([
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+				$eventStatusSpan,
+				$duration,
+				zbx_date2age($event['clock']),
+				$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null
+			]);
+		}
 	}
 
-	return $table;
+	$div->addItem($table);
+
+	return $div;
 }
 
 /**
@@ -330,18 +367,16 @@ function getEventAckState($event, $backurl) {
 	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
 		$ack = (new CLink(_('Yes'), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREEN)
-			->removeSID();
+			->addClass(ZBX_STYLE_GREEN);
 		if (is_array($event['acknowledges'])) {
-			$ack->setHint(makeAckTab($event), '', false);
+			$ack->setHint(makeAckTab(array_slice($event['acknowledges'], 0, ZBX_WIDGET_ROWS)), '', false);
 		}
 		$ack = [$ack, CViewHelper::showNum($acknowledges_num)];
 	}
 	else {
 		$ack = (new CLink(_('No'), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_RED)
-			->removeSID();
+			->addClass(ZBX_STYLE_RED);
 	}
 
 	return $ack;

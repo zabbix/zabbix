@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1387,8 +1387,14 @@ class CAction extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s".', $operation['opcommand']['port']));
 							}
 						}
-						elseif (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $operation['opcommand']['port'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s".', $operation['opcommand']['port']));
+						else {
+							$user_macro_parser = new CUserMacroParser();
+
+							if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
+								);
+							}
 						}
 					}
 
@@ -1833,7 +1839,8 @@ class CAction extends CApiService {
 				new CConditionValidator([
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for action "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for action "%1$s" is not defined.'),
-					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".')
+					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".'),
+					'messageAndWithSeveralTriggers' => _('Comparing several triggers with "and" is not allowed.')
 				])
 			],
 			'required' => ['evaltype', 'conditions'],
@@ -1935,7 +1942,7 @@ class CAction extends CApiService {
 	 *
 	 * @param $actions
 	 */
-	public function validateCreate($actions) {
+	protected function validateCreate($actions) {
 		$actionDbFields = [
 			'name'        => null,
 			'eventsource' => null
@@ -2024,7 +2031,7 @@ class CAction extends CApiService {
 	 *
 	 * @internal param array $actionDb
 	 */
-	public function validateUpdate($actions, $actionsDb) {
+	protected function validateUpdate($actions, $actionsDb) {
 		foreach ($actions as $action) {
 			if (isset($action['actionid']) && !isset($actionsDb[$action['actionid']])) {
 				self::exception(

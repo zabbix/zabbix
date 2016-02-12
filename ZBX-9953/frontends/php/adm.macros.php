@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,12 +53,6 @@ if (hasRequest('update')) {
 			unset($macros[$idx]);
 		}
 	}
-
-	foreach ($macros as &$macro) {
-		// transform macros to uppercase {$aaa} => {$AAA}
-		$macro['macro'] = mb_strtoupper($macro['macro']);
-	}
-	unset($macro);
 
 	// update
 	$macrosToUpdate = [];
