@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 21:17+0200\n"
-"PO-Revision-Date: 2016-02-09 17:55+0300\n"
+"PO-Revision-Date: 2016-02-11 15:12+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1455033334.0\n"
+"X-POOTLE-MTIME: 1455196325.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -350,7 +350,7 @@ msgstr "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s sec
 #: include/classes/api/services/CAction.php:2137
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr "Action \"%1$s\" has no operations defined."
+msgstr "Action \"%1$s\" no operations defined."
 
 #: actionconf.php:187
 msgid "Action added"
@@ -746,7 +746,7 @@ msgstr "Application added"
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Application deleted"
-msgstr[1] "Application deleted"
+msgstr[1] "Applications deleted"
 
 #: include/classes/core/CJsonRpc.php:194
 msgid "Application error."
@@ -1206,7 +1206,7 @@ msgstr "Cancel"
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Cannot acknowledge event"
-msgstr[1] "Cannot acknowledge event"
+msgstr[1] "Cannot acknowledge events"
 
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
@@ -1501,7 +1501,7 @@ msgstr "Cannot delete action"
 msgid "Cannot delete application"
 msgid_plural "Cannot delete applications"
 msgstr[0] "Cannot delete application"
-msgstr[1] "Cannot delete application"
+msgstr[1] "Cannot delete applications"
 
 #: include/classes/api/services/CTrigger.php:961
 #: include/classes/api/services/CTriggerPrototype.php:853
@@ -1561,7 +1561,7 @@ msgstr "Cannot delete graphs created by low level discovery."
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] "Cannot delete group"
-msgstr[1] "Cannot delete group"
+msgstr[1] "Cannot delete groups"
 
 #: hosts.php:661 hosts.php:674
 msgid "Cannot delete host"
@@ -1611,7 +1611,7 @@ msgstr "Cannot delete maintenance"
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Cannot delete media type"
-msgstr[1] "Cannot delete media type"
+msgstr[1] "Cannot delete media types"
 
 #: sysmaps.php:252
 msgid "Cannot delete network map"
@@ -1621,7 +1621,7 @@ msgstr "Cannot delete network map"
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Cannot delete proxy"
-msgstr[1] "Cannot delete proxy"
+msgstr[1] "Cannot delete proxies"
 
 #: adm.regexps.php:198
 msgid "Cannot delete regular expression"
@@ -1637,7 +1637,7 @@ msgstr "Cannot delete screen"
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Cannot delete script"
-msgstr[1] "Cannot delete script"
+msgstr[1] "Cannot delete scripts"
 
 #: include/classes/api/services/CScript.php:460
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
@@ -1733,7 +1733,7 @@ msgstr "Cannot delete user media."
 msgid "Cannot delete value map"
 msgid_plural "Cannot delete value maps"
 msgstr[0] "Cannot delete value map"
-msgstr[1] "Cannot delete value map"
+msgstr[1] "Cannot delete value maps"
 
 #: httpconf.php:151 httpconf.php:461
 msgid "Cannot delete web scenario"
@@ -1780,7 +1780,7 @@ msgstr[1] "Cannot disable item prototypes"
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "Cannot disable media type"
-msgstr[1] "Cannot disable media type"
+msgstr[1] "Cannot disable media types"
 
 #: triggers.php:318
 msgid "Cannot disable trigger"
@@ -1804,7 +1804,7 @@ msgstr[1] "Cannot disable user groups"
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Cannot disable web scenario"
-msgstr[1] "Cannot disable web scenario"
+msgstr[1] "Cannot disable web scenarios"
 
 #: queue.php:60
 msgid "Cannot display item queue."
@@ -1855,7 +1855,7 @@ msgstr[1] "Cannot enable item prototypes"
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Cannot enable media type"
-msgstr[1] "Cannot enable media type"
+msgstr[1] "Cannot enable media types"
 
 #: triggers.php:317
 msgid "Cannot enable trigger"
@@ -5164,7 +5164,7 @@ msgstr "English (en_GB)"
 
 #: include/locales.inc.php:53
 msgid "English (en_US)"
-msgstr "English (US)"
+msgstr "English (en_US)"
 
 #: include/actions.inc.php:1149 include/items.inc.php:35 popup.php:123
 msgid "Error"
@@ -5202,7 +5202,7 @@ msgstr "Event ID of last log entry matching regular expression T, then N NOT 1, 
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "Event acknowledged"
-msgstr[1] "Event acknowledged"
+msgstr[1] "Events acknowledged"
 
 #: include/profiles.inc.php:162
 #, c-format
@@ -5495,12 +5495,12 @@ msgstr "Field \"%1$s\" is not correct: %2$s"
 #: include/validate.inc.php:146
 #, c-format
 msgid "Field \"%1$s\" is not integer."
-msgstr "Field \"%1$s\" is not an integer."
+msgstr "Field \"%1$s\" is not integer."
 
 #: include/validate.inc.php:204
 #, c-format
 msgid "Field \"%1$s\" is not string."
-msgstr "Field \"%1$s\" is not a string."
+msgstr "Field \"%1$s\" is not string."
 
 #: include/classes/api/services/CMediatype.php:802
 #, c-format
@@ -6042,7 +6042,7 @@ msgstr "Group added"
 msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] "Group deleted"
-msgstr[1] "Group deleted"
+msgstr[1] "Groups deleted"
 
 #: adm.other.php:34 include/views/administration.general.other.edit.php:47
 msgid "Group for discovered hosts"
@@ -6289,7 +6289,7 @@ msgstr "Horizontal align"
 msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "Host"
-msgstr[1] "Host"
+msgstr[1] "Hosts"
 
 #: include/classes/api/services/CHost.php:859
 #: include/classes/api/services/CTemplate.php:430
@@ -9522,19 +9522,19 @@ msgstr "Media type added"
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Media type deleted"
-msgstr[1] "Media type deleted"
+msgstr[1] "Media types deleted"
 
 #: app/controllers/CControllerMediatypeDisable.php:68
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] "Media type disabled"
-msgstr[1] "Media type disabled"
+msgstr[1] "Media types disabled"
 
 #: app/controllers/CControllerMediatypeEnable.php:68
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] "Media type enabled"
-msgstr[1] "Media type enabled"
+msgstr[1] "Media types enabled"
 
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
@@ -11858,7 +11858,7 @@ msgstr "Proxy added"
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy deleted"
-msgstr[1] "Proxy deleted"
+msgstr[1] "Proxies deleted"
 
 #: app/views/administration.proxy.edit.php:87
 msgid "Proxy hosts"
@@ -12758,7 +12758,7 @@ msgstr "Script command cannot be empty."
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Script deleted"
-msgstr[1] "Script deleted"
+msgstr[1] "Scripts deleted"
 
 #: include/classes/api/services/CScript.php:565
 #, c-format
@@ -15667,7 +15667,7 @@ msgstr "Value map added"
 msgid "Value map deleted"
 msgid_plural "Value maps deleted"
 msgstr[0] "Value map deleted"
-msgstr[1] "Value map deleted"
+msgstr[1] "Value maps deleted"
 
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
@@ -15827,7 +15827,7 @@ msgstr "Web scenario deleted"
 msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] "Web scenario disabled"
-msgstr[1] "Web scenario disabled"
+msgstr[1] "Web scenarios disabled"
 
 #: httpconf.php:401
 msgid "Web scenario enabled"

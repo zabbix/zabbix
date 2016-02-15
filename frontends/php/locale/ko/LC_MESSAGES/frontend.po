@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 19:22+0200\n"
-"PO-Revision-Date: 2016-02-08 05:49+0300\n"
+"PO-Revision-Date: 2016-02-10 20:16+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454903369.0\n"
+"X-POOTLE-MTIME: 1455128208.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -7838,7 +7838,7 @@ msgstr "\"%2$s\" 항목의 값 \"%1$s\"가 올바르지 않습니다: %3$s에서
 #: include/classes/db/DB.php:352
 #, c-format
 msgid "Incorrect value \"%1$s\" for float field \"%2$s\"."
-msgstr "부동소수점 항목\"%2$s\"의 값 \"%1$s\"가 올바르지 않습니다."
+msgstr "float 항목\"%2$s\"의 값 \"%1$s\"가 올바르지 않습니다."
 
 #: include/classes/db/DB.php:346
 #, c-format
@@ -7889,7 +7889,7 @@ msgstr "값의 맵ID가 올바르지 않습니다."
 #: include/classes/api/services/CHost.php:1559
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr "PSK필드에 이용된 값이 올바르지 않습니다. 16진수 문자열로 구성되어 있지 않습니다."
+msgstr "PSK 필드에 이용된 값이 올바르지 않습니다. 16진수 문자열로 구성되어 있지 않습니다."
 
 #: include/classes/api/services/CHost.php:1542
 msgid "Incorrect value used for connections from host field."
@@ -8335,7 +8335,7 @@ msgstr "이슈"
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
-msgstr "발행인"
+msgstr "발행인(Issuer)"
 
 #: include/classes/api/services/CUser.php:141
 msgid "It is not possible to filter by user password."
@@ -11335,12 +11335,12 @@ msgstr "PSK를 설정해 주세요."
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
-msgstr "PSK유저 이름"
+msgstr "PSK 아이덴티티"
 
 #: include/classes/api/services/CHost.php:1550
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr "PSK유저 명을 설정해 주세요."
+msgstr "PSK 아이덴티티를 설정해 주세요."
 
 #: include/classes/api/services/CHost.php:1565
 #: include/classes/api/services/CProxy.php:676
@@ -14550,7 +14550,7 @@ msgstr "데이터형"
 
 #: include/classes/api/services/CItemGeneral.php:346
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr "Zabbix어그리게이트를 이용하는 경우 데이터형을 \"수치(정수)\"나 \"수치(부동소수)\"로 설정해주십시오."
+msgstr "Zabbix어그리게이트를 이용하는 경우 데이터형을 \"수치(unsigned)\"나 \"수치 (float)\"로 설정해주십시오."
 
 #: include/forms.inc.php:863
 msgid "Types"

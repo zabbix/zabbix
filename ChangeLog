@@ -1,6 +1,7 @@
 Changes for 3.0.0rc3
 
 New features:
+A.F....... [ZBX-1357] updated English (United States), Italian, Japanese, Korean, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ....I..... [ZBX-10380] fixed upgrade of an empty proxy database (Sasha)
