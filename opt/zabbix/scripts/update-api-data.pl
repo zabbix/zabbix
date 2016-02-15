@@ -11,6 +11,7 @@ use warnings;
 use RSM;
 use RSMSLV;
 use ApiHelper;
+use TLD_constants qw(:ec);
 use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
@@ -77,6 +78,8 @@ my $cfg_dns_valuemaps;
 my $cfg_dns_max_value;
 
 my $cfg_dns_statusmaps = get_statusmaps('dns');
+
+my $cfg_dns_minonline = get_macro_dns_probe_online();
 
 foreach my $service (keys(%{$services}))
 {
@@ -578,7 +581,7 @@ foreach (keys(%$servicedata))
 				if (!$dns_tests_ref)
 				{
 					$dns_tests_ref = get_dns_test_values($dns_items_ref, $values_from, $values_till,
-						$services->{$service}->{'valuemaps'}, $delay);
+						$services->{$service}->{'valuemaps'}, $delay, $service);
 				}
 
 				$tests_ref = $dns_tests_ref;
@@ -1104,6 +1107,13 @@ sub __create_cycle_hash
 		$interface_ref->{'interface'} = $interface;
 		$interface_ref->{'status'} = undef;
 
+		# TODO: in case of DNSSEC the interface status and status on every probe is currently
+		# not supported, we need to calculate these manually.
+
+		my $dnssec_total_probes = 0;
+		my $dnssec_success_probes = 0;
+		my $dnssec_probes_online = 0;
+
 		foreach my $probe (keys(%{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}}))
 		{
 			my $probe_ref;
@@ -1111,17 +1121,26 @@ sub __create_cycle_hash
 			$probe_ref->{'city'} = $probe;
 			$probe_ref->{'status'} = $cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'};
 
+			my $dnssec_success_ns = 0;
+
+			$dnssec_probes_online++ if (defined($probe_ref->{'status'}) && $probe_ref->{'status'} ne PROBE_OFFLINE_STR);
+
 			foreach my $target (keys(%{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'}}))
 			{
 				my $status = AH_STATUS_UP;
 				foreach my $metric_ref (@{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'}->{$target}})
 				{
 					# TODO: for EPP check 'upd' field here
-					if (!$metric_ref->{'rtt'} || (__check_test($metric_ref->{'rtt'}, $service_ref->{'max_value'}) != SUCCESS))
+					if (__check_test($interface, $metric_ref->{'rtt'}, $metric_ref->{'description'}, $service_ref->{'max_value'}) != SUCCESS)
 					{
 						$status = AH_STATUS_DOWN;
 						last;
 					}
+				}
+
+				if ($interface eq JSON_INTERFACE_DNSSEC)
+				{
+					$dnssec_success_ns++ if ($status eq AH_STATUS_UP);
 				}
 
 				my $test_data_ref;
@@ -1133,7 +1152,40 @@ sub __create_cycle_hash
 				push(@{$probe_ref->{'testData'}}, $test_data_ref);
 			}
 
+			if ($interface eq JSON_INTERFACE_DNSSEC)
+			{
+				$probe_ref->{'status'} = ($dnssec_success_ns >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
+
+				$dnssec_success_probes++ if ($probe_ref->{'status'} eq AH_STATUS_UP);
+
+				$dnssec_total_probes++;
+			}
+
 			push(@{$interface_ref->{'probes'}}, $probe_ref);
+		}
+
+		if ($interface eq JSON_INTERFACE_DNSSEC)
+		{
+			if ($dnssec_probes_online < $cfg_dns_minonline)
+			{
+				$interface_ref->{'status'} = AH_STATUS_UP;	# TODO: indicate that the interface is up only because not available probes online
+				$hash->{'status'} = AH_STATUS_UP;
+			}
+			else
+			{
+				my $perc = $dnssec_success_probes * 100 / $dnssec_total_probes;
+
+				if ($perc > SLV_UNAVAILABILITY_LIMIT)
+				{
+					$interface_ref->{'status'} = AH_STATUS_UP;
+					$hash->{'status'} = AH_STATUS_UP;
+				}
+				else
+				{
+					$interface_ref->{'status'} = AH_STATUS_DOWN;
+					$hash->{'status'} = AH_STATUS_DOWN;
+				}
+			}
 		}
 
 		push(@{$hash->{'testedInterface'}}, $interface_ref);
@@ -1144,8 +1196,28 @@ sub __create_cycle_hash
 
 sub __check_test
 {
+	my $interface = shift;
 	my $value = shift;
+	my $description = shift;
 	my $max_value = shift;
+
+	if ($interface eq JSON_INTERFACE_DNSSEC)
+	{
+		if (defined($description))
+		{
+			my $error_code_len = length(ZBX_EC_DNS_NS_ERRSIG);
+			my $error_code = substr($description, 0, $error_code_len);
+
+			if ($error_code eq ZBX_EC_DNS_NS_ERRSIG)
+			{
+				return E_FAIL;
+			}
+		}
+
+		return SUCCESS;
+	}
+
+	return E_FAIL unless ($value);
 
 	return (is_service_error($value) == SUCCESS or $value > $max_value) ? E_FAIL : SUCCESS;
 }
@@ -1162,6 +1234,11 @@ sub __interface_status
 	{
 		my $minns = $service_ref->{'minns'};
 		$status = (($value >= $minns) ? AH_STATUS_UP : AH_STATUS_DOWN);
+	}
+	elsif ($interface eq JSON_INTERFACE_DNSSEC)
+	{
+		# TODO: dnssec status on a particular probe is not supported currently,
+		# make this calculation in function __create_cycle_hash() for now.
 	}
 	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
 	{

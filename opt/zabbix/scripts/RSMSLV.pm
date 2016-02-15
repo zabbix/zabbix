@@ -57,10 +57,11 @@ use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time
 use constant PROBE_ONLINE_STR	=> 'Online';
 use constant PROBE_OFFLINE_STR	=> 'Offline';
 use constant PROBE_NORESULT_STR	=> 'No result';
- 
+
+use constant JSON_INTERFACE_DNS		=> 'DNS';
+use constant JSON_INTERFACE_DNSSEC	=> 'DNSSEC';
 use constant JSON_INTERFACE_RDDS43	=> 'RDDS43';
 use constant JSON_INTERFACE_RDDS80	=> 'RDDS80';
-use constant JSON_INTERFACE_DNS		=> 'DNS';
 
 use constant JSON_TAG_TARGET_IP		=> 'targetIP';
 use constant JSON_TAG_CLOCK		=> 'clock';
@@ -79,7 +80,7 @@ our %OPTS; # specified command-line options
 our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
 		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR
-		AVAIL_SHIFT_BACK JSON_INTERFACE_RDDS43 JSON_INTERFACE_RDDS80 JSON_INTERFACE_DNS
+		AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43 JSON_INTERFACE_RDDS80
 		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
@@ -2188,6 +2189,18 @@ sub get_dns_test_values
 	my $end = shift;
 	my $valuemaps = shift;
 	my $delay = shift;
+	my $service = shift;
+
+	my $interface;
+
+	if (uc($service) eq 'DNS')
+	{
+		$interface = JSON_INTERFACE_DNS;
+	}
+	else
+	{
+		$interface = JSON_INTERFACE_DNSSEC;
+	}
 
 	my $result;
 
@@ -2259,7 +2272,7 @@ sub get_dns_test_values
 
 			my $cycleclock = cycle_start($clock, $delay);
 
-			push(@{$result->{$cycleclock}->{JSON_INTERFACE_DNS()}->{$probe}->{$ns}},
+			push(@{$result->{$cycleclock}->{$interface}->{$probe}->{$ns}},
 				{
 					JSON_TAG_TARGET_IP() => $ip,
 					JSON_TAG_RTT() => $real_value,
