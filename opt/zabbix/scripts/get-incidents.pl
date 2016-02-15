@@ -6,7 +6,7 @@ use strict;
 use RSM;
 use RSMSLV;
 
-parse_opts("tld=s", "from=n", "till=n");
+parse_opts("tld=s", "from=n", "till=n", "failed!");
 
 # do not write any logs
 setopt('nolog');
@@ -46,16 +46,21 @@ foreach (@$tlds_ref)
 			my $end = $_->{'end'};
 			my $false_positive = $_->{'false_positive'};
 
-			my $time_condition = defined($end) ? "clock between $start and $end" : "clock>=$start";
+			my $failed_tests = "";
 
-			my $rows_ref = db_select(
-				"select count(*)".
-				" from history_uint".
-				" where itemid=$itemid".
-					" and value=".DOWN.
-					" and ".sql_time_condition($start, $end));
+			if (opt('failed'))
+			{
+				my $time_condition = defined($end) ? "clock between $start and $end" : "clock>=$start";
 
-			my $failed_tests = $rows_ref->[0]->[0];
+				my $rows_ref = db_select(
+					"select count(*)".
+					" from history_uint".
+					" where itemid=$itemid".
+						" and value=".DOWN.
+						" and ".sql_time_condition($start, $end));
+
+				$failed_tests = ',' . $rows_ref->[0]->[0];
+			}
 
 			my $status;
 			if ($false_positive != 0)
@@ -72,7 +77,7 @@ foreach (@$tlds_ref)
 			}
 
 			# "IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident"
-			print("$eventid,$tld,$service,$status,$start,", (defined($end) ? $end : ""), ",$failed_tests\n");
+			print("$eventid,$tld,$service,$status,$start,", (defined($end) ? $end : ""), "$failed_tests (", ts_full($start), ")\n");
 		}
 	}
 }
@@ -92,7 +97,7 @@ IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident
 
 =head1 SYNOPSIS
 
-get-incidents.pl [--tld tld] [--from timestamp] [--till timestamp] [--debug] [--help]
+get-incidents.pl [--tld tld] [--from timestamp] [--till timestamp] [--failed] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -110,6 +115,10 @@ incident at the specified time it will be displayed with full details.
 =item B<--till> timestamp
 
 Optionally specify the end of period for getting incidents.
+
+=item B<--failed>
+
+Include number if failed tests within incident in the output.
 
 =item B<--debug>
 
