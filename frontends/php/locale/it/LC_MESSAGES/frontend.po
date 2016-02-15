@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 19:22+0200\n"
-"PO-Revision-Date: 2015-12-29 16:19+0300\n"
+"PO-Revision-Date: 2016-02-11 13:10+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1451398758.0\n"
+"X-POOTLE-MTIME: 1455189017.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -36,7 +36,7 @@ msgstr "\"%s\" deve essere compresa tra 1970.01.01 e 2038.01.18."
 #: include/classes/import/validators/C10XmlValidator.php:403
 #: include/classes/import/validators/C10XmlValidator.php:424
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "prevista coppia \"host:key\""
 
 #: include/func.inc.php:453
 #, c-format
@@ -676,11 +676,11 @@ msgstr "Tutte le mappe"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
-msgstr ""
+msgstr "Tutte le screen"
 
 #: include/views/monitoring.slides.php:27
 msgid "All slide shows"
-msgstr ""
+msgstr "Termina Slide Show"
 
 #: include/html.inc.php:306
 msgid "All templates"
@@ -1337,7 +1337,7 @@ msgstr "Impossibile aggiungere l'espressione regolare"
 
 #: screenconf.php:202
 msgid "Cannot add screen"
-msgstr "Impossibile aggiungere la schermata"
+msgstr "Impossibile aggiungere la screen"
 
 #: app/controllers/CControllerScriptCreate.php:47
 #: app/controllers/CControllerScriptCreate.php:100
@@ -1350,7 +1350,7 @@ msgstr "Impossibile aggiungere il servizio"
 
 #: slideconf.php:156
 msgid "Cannot add slide show"
-msgstr "Impossibile aggiungere la presentazione"
+msgstr "Impossibile aggiungere la Slide Show"
 
 #: templates.php:244
 msgid "Cannot add template"
@@ -1632,7 +1632,7 @@ msgstr[1] "Impossibile rimuovere le espressioni regolari"
 
 #: screenconf.php:282
 msgid "Cannot delete screen"
-msgstr "Impossibile rimuovere la schermata"
+msgstr "Impossibile rimuovere la screen"
 
 #: app/controllers/CControllerScriptDelete.php:75
 msgid "Cannot delete script"
@@ -1664,7 +1664,7 @@ msgstr "Impossibile rimuovere il servizio"
 
 #: slideconf.php:187 slideconf.php:208
 msgid "Cannot delete slide show"
-msgstr "Impossibile rimuovere la presentazione"
+msgstr "Impossibile rimuovere la Slide Show"
 
 #: templates.php:372 templates.php:386 templates.php:411
 msgid "Cannot delete template"
@@ -1884,7 +1884,7 @@ msgstr[1] "Impossibile abilitare scenari web"
 
 #: scripts_exec.php:69
 msgid "Cannot execute script"
-msgstr ""
+msgstr "Impossibile eseguire lo script."
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
@@ -1894,7 +1894,7 @@ msgstr "Impossibile trovare immagine di sfondo \"%1$s\" utilizzata nella mappa \
 #: include/classes/import/importers/CAbstractScreenImporter.php:80
 #, c-format
 msgid "Cannot find graph \"%1$s\" used in screen \"%2$s\"."
-msgstr "Impossibile trovare grafico \"%1$s\" utilizzato nella schermata \"%2$s\"."
+msgstr "Impossibile trovare grafico \"%1$s\" utilizzato nella screen \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:213
 #, c-format
@@ -1904,7 +1904,7 @@ msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella mappa \"%2$s\"."
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find group \"%1$s\" used in screen \"%2$s\"."
-msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella schermata \"%2$s\"."
+msgstr "Impossibile trovare gruppo \"%1$s\" utilizzato nella screen \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:221
 #, c-format
@@ -1914,7 +1914,7 @@ msgstr "Impossibile trovare host \"%1$s\" utilizzato nella mappa \"%2$s\"."
 #: include/classes/import/importers/CAbstractScreenImporter.php:69
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr "Impossibile trovare host \"%1$s\" utilizzato nella schermata \"%2$s\"."
+msgstr "Impossibile trovare host \"%1$s\" utilizzato nella screen \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:889
 #, c-format
@@ -1982,7 +1982,7 @@ msgstr "Non trovo l'item \"%1$s\" su \"%2$s\" utilizzato nel trigger prototipo \
 #: include/classes/import/importers/CAbstractScreenImporter.php:99
 #, c-format
 msgid "Cannot find item \"%1$s\" used in screen \"%2$s\"."
-msgstr "Impossibile trovare item \"%1$s\" utilizzato nella schermata \"%2$s\"."
+msgstr "Impossibile trovare item \"%1$s\" utilizzato nella screen \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:205
 #, c-format
@@ -1992,7 +1992,7 @@ msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella mappa \"%2$s\"."
 #: include/classes/import/importers/CAbstractScreenImporter.php:107
 #, c-format
 msgid "Cannot find map \"%1$s\" used in screen \"%2$s\"."
-msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella schermata \"%2$s\"."
+msgstr "Impossibile trovare mappa \"%1$s\" utilizzata nella screen \"%2$s\"."
 
 #: include/js.inc.php:187
 msgid "Cannot find objects with name"
@@ -2001,7 +2001,7 @@ msgstr "Impossibile trovare oggetti con nome"
 #: include/classes/import/importers/CAbstractScreenImporter.php:115
 #, c-format
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
-msgstr "Impossibile trovare schermata \"%1$s\" utilizzata nella schermata \"%2$s\"."
+msgstr "Impossibile trovare screen \"%1$s\" utilizzata nella screen \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:912
 #, c-format
@@ -2048,8 +2048,10 @@ msgstr "Impossibile implodere espressione \"%s\"."
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] "Non è possibile importare la schermata \"%1$s\": sottoschermata \"%2$s\" inesistente."
-msgstr[1] "Non è possibile importare la schermata \"%1$s\": sottoschermate \"%2$s\" inesistenti."
+msgstr[0] ""
+"Non è possibile importare la screen \"%1$s\": subscreen \"%2$s\" inesistente."
+msgstr[1] ""
+"Non è possibile importare la screen \"%1$s\": subscreen \"%2$s\" inesistenti."
 
 #: include/classes/import/importers/CTemplateImporter.php:119
 #, c-format
@@ -2174,7 +2176,7 @@ msgstr "Impossibile impostare \"%1$s\" per l'item \"%2$s\"."
 #: include/classes/api/services/CTemplateScreen.php:629
 #, c-format
 msgid "Cannot set \"%1$s\" for template screen \"%2$s\"."
-msgstr ""
+msgstr "Non e' possibile definire \"%1$s\"  per la template screen \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:532
 #, c-format
@@ -2189,7 +2191,7 @@ msgstr "Impossibile impostare campo \"templateId\" per l'applicazione prototipo 
 #: include/classes/api/services/CScreen.php:433
 #, c-format
 msgid "Cannot set \"templateid\" for screen \"%1$s\"."
-msgstr "Impossibile impostare \"templateid\" per la schermata \"%1$s\"."
+msgstr "Impossibile impostare \"templateid\" per la screen \"%1$s\"."
 
 #: include/classes/api/services/CTriggerPrototype.php:475
 #: include/classes/api/services/CTriggerPrototype.php:1491
@@ -2321,12 +2323,12 @@ msgstr "Impossibile aggiornare \"templateid\" per il prototipo di grafico \"%1$s
 #: include/classes/api/services/CScreen.php:748
 #, c-format
 msgid "Cannot update \"templateid\" for screen \"%1$s\"."
-msgstr "Impossibile aggiornare \"templateid\" per la schermata \"%1$s\"."
+msgstr "Impossibile aggiornare \"templateid\" per la screen \"%1$s\"."
 
 #: include/classes/api/services/CTemplateScreen.php:619
 #, c-format
 msgid "Cannot update \"templateid\" for template screen \"%1$s\"."
-msgstr "Impossibile aggiornare \"templateid\" per il template schermata \"%1$s\"."
+msgstr "Impossibile aggiornare \"templateid\" per il template screen \"%1$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:61
 msgid "Cannot update a discovered graph."
@@ -2469,7 +2471,7 @@ msgstr "Impossibile aggiornare l'espressione regolare"
 
 #: screenconf.php:144 screenedit.php:230 screenedit.php:247
 msgid "Cannot update screen"
-msgstr "Impossibile aggiornare la schermata"
+msgstr "Impossibile aggiornare la screen"
 
 #: app/controllers/CControllerScriptUpdate.php:48
 #: app/controllers/CControllerScriptUpdate.php:108
@@ -2482,7 +2484,7 @@ msgstr "Impossibile aggiornare il servizio"
 
 #: slideconf.php:141
 msgid "Cannot update slide show"
-msgstr "Impossibile aggiornare la presentazione"
+msgstr "Impossibile aggiornare la Slide Show"
 
 #: templates.php:234
 msgid "Cannot update template"
@@ -2541,10 +2543,14 @@ msgstr "Case sensitive"
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
 msgstr ""
+"Catture tutte le trap SNMP che corrispondono alla regex. Se la regex non è "
+"specificata, cattura ogni trap."
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
+"Cattura tutte le trap SNMP che non sono state catturate da item di tipo "
+"snmptrap[]."
 
 #: include/views/monitoring.screen.constructor.edit.php:710
 msgid "Center"
@@ -2651,6 +2657,8 @@ msgstr "Controlla se è possibile stabilire una connessione TCP sulla porta spec
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
 msgstr ""
+"Controlla se il server è accessibile via ping ICMP. 0 - ICMP ping fallito. 1 "
+"- ICMP ping riuscito."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:403
@@ -3010,7 +3018,7 @@ msgstr "Configurazione script"
 
 #: slideconf.php:25
 msgid "Configuration of slide shows"
-msgstr "Configurazione presentazioni"
+msgstr "Configurazione Slide Show"
 
 #: templates.php:38
 msgid "Configuration of templates"
@@ -3152,7 +3160,7 @@ msgstr "Connessioni verso l'host"
 
 #: app/views/administration.proxy.edit.php:97
 msgid "Connections to proxy"
-msgstr ""
+msgstr "Connessione al proxy"
 
 #: include/views/monitoring.screen.list.php:82
 #: include/views/monitoring.sysmap.list.php:57
@@ -3294,7 +3302,7 @@ msgstr "Crea proxy"
 
 #: include/views/monitoring.screen.list.php:34
 msgid "Create screen"
-msgstr "Crea schermata"
+msgstr "Crea screen"
 
 #: app/views/administration.script.list.php:30
 msgid "Create script"
@@ -3302,7 +3310,7 @@ msgstr "Crea script"
 
 #: include/views/monitoring.slideconf.list.php:29
 msgid "Create slide show"
-msgstr "Crea presentazione"
+msgstr "Crea Slide Show"
 
 #: templates.php:573
 msgid "Create template"
@@ -3920,7 +3928,7 @@ msgstr "Rimuovere espressione regolare?"
 
 #: include/views/monitoring.screen.edit.php:217
 msgid "Delete screen?"
-msgstr "Rimuovere schermata?"
+msgstr "Rimuovere screen?"
 
 #: app/views/administration.script.edit.php:122
 msgid "Delete script?"
@@ -4033,7 +4041,7 @@ msgstr "Rimuovere script selezionati?"
 
 #: include/views/monitoring.slideconf.list.php:87
 msgid "Delete selected slide shows?"
-msgstr "Rimuovere presentazioni selezionate?"
+msgstr "Rimuovere Slide Show selezionate?"
 
 #: templates.php:752
 msgid "Delete selected templates?"
@@ -4081,7 +4089,7 @@ msgstr "Eliminare servizio %1$s\"?"
 
 #: include/views/monitoring.slideconf.edit.php:264
 msgid "Delete slide show?"
-msgstr "Rimuovere presentazione?"
+msgstr "Rimuovere Slide Show?"
 
 #: include/views/configuration.template.edit.php:471
 msgid "Delete template?"
@@ -4683,7 +4691,7 @@ msgstr "Valore \"nome\" duplicato \"%1$s\" per la mappa."
 #: include/classes/api/services/CScreen.php:774
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for screen."
-msgstr ""
+msgstr "Valore \"nome\" duplicato per la screen \"%1$s\"."
 
 #: include/classes/api/services/CValueMap.php:355
 #: include/classes/api/services/CValueMap.php:437
@@ -4748,7 +4756,7 @@ msgstr "Userid duplicato \"%1$s\" sugli utenti per la mappa \"%2$s\"."
 #: include/classes/api/services/CScreen.php:875
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "Userid \"%1$s\" duplicata negli utenti della screen \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:583
 #: include/classes/api/services/CMap.php:1002
@@ -4760,7 +4768,7 @@ msgstr "Usrgrpid \"%1$s\" nel gurppo utenti per la mappa \"%2$s\"."
 #: include/classes/api/services/CScreen.php:948
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "Usrgrpid \"%1$s\" duplicato nel gruppo utenti della screen \"%2$s\"."
 
 #: events.php:421 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4798,15 +4806,15 @@ msgstr "Modifica"
 
 #: app/views/monitoring.map.view.php:38
 msgid "Edit map"
-msgstr ""
+msgstr "Edita mappa"
 
 #: include/views/monitoring.screen.php:47
 msgid "Edit screen"
-msgstr ""
+msgstr "Edita screen"
 
 #: include/views/monitoring.slides.php:51
 msgid "Edit slide show"
-msgstr ""
+msgstr "Editare Slide Show"
 
 #: jsLoader.php:187
 msgid "Edit trigger"
@@ -4987,15 +4995,15 @@ msgstr "Risposta vuota ricevuta dal server Zabbix \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:988
 msgid "Empty screen ID for screen."
-msgstr "ID schermata assente per la schermata"
+msgstr "ID screen assente per la screen."
 
 #: include/classes/api/services/CTemplateScreen.php:586
 msgid "Empty screen ID for template screen."
-msgstr "ID schermata assente per il template schermata."
+msgstr "ID screen assente per il template screen."
 
 #: include/classes/api/services/CScreen.php:727
 msgid "Empty screen ID."
-msgstr ""
+msgstr "Screen ID assente."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -5441,7 +5449,7 @@ msgstr "Grafico semplice preferito"
 
 #: jsLoader.php:193
 msgid "Favourite slide shows"
-msgstr "Presentazione preferita"
+msgstr "Slide Show preferita"
 
 #: include/views/monitoring.slides.php:62
 msgid "Favourites"
@@ -5486,7 +5494,7 @@ msgstr "Campo \"%1$s\" non ha un valore per il tipo media \"%2$s\"."
 #: include/classes/api/services/CScreen.php:588
 #, c-format
 msgid "Field \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "Campo \"%1$s\" non è presente un valore per la screen \"%2$s\"."
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5542,7 +5550,7 @@ msgstr "Il file è troppo grande, la dimensione massima di caricamento è %1$s b
 #: include/classes/mvc/CView.php:93
 #, c-format
 msgid "File provided to a view does not exist. Tried to find \"%s\"."
-msgstr "Il file fornito alla schermata non esiste. Si è provato a trovare \"%s\"."
+msgstr "Il file fornito alla screen non esiste. Si è provato a trovare \"%s\"."
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:579
@@ -7071,6 +7079,8 @@ msgstr "Valore \"permesso\" errato \"%1$s\" nei gruppi utenti per la mappa \"%2$
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
 msgstr ""
+"Valore \"permesso\" \"%1$s\" non corretto nel gruppo di utenti per la screen \"%"
+"2$s\"."
 
 #: include/classes/api/services/CMap.php:494
 #: include/classes/api/services/CMap.php:915
@@ -7083,6 +7093,7 @@ msgstr "Valore \"permesso\" errato \"%1$s\" negli utenti per la mappa \"%2$s\"."
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
 msgstr ""
+"Valore \"permesso\" \"%1$s\" non corretto per gli utenti della screen \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:455
 #: include/classes/api/services/CMap.php:877
@@ -7094,7 +7105,7 @@ msgstr "Valore \"private\" errato \"%1$s\" per la mappa \"%2$s\"."
 #: include/classes/api/services/CScreen.php:823
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
-msgstr ""
+msgstr "Errato valore \"privato\" \"%1$s\" per la screen \"%2$s\"."
 
 #: include/classes/api/services/CService.php:1131
 #, c-format
@@ -7449,12 +7460,12 @@ msgstr "Funzione errata utilizzata"
 #: include/classes/api/services/CScreenItem.php:692
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
-msgstr "ID grafico \"%1$s\" non corretto per elemento schermata."
+msgstr "ID grafico \"%1$s\" non corretto per elemento screen."
 
 #: include/classes/api/services/CScreenItem.php:709
 #, c-format
 msgid "Incorrect graph prototype ID \"%1$s\" provided for screen element."
-msgstr "Errato grafico prototipo ID \"%1$s\" fornito per elemento schermata."
+msgstr "Errato grafico prototipo ID \"%1$s\" fornito per elemento screen."
 
 #: include/classes/api/services/CHostPrototype.php:396
 #: include/classes/api/services/CHostPrototype.php:403
@@ -7469,12 +7480,12 @@ msgstr "Prototipi gruppo errati per il prototipo host \"%1$s\"."
 #: include/classes/api/services/CScreenItem.php:675
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
-msgstr "ID host \"%1$s\" non corretto per elemento schermata."
+msgstr "ID host \"%1$s\" non corretto per elemento screen."
 
 #: include/classes/api/services/CScreenItem.php:658
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
-msgstr "ID gruppo host \"%1$s\" non corretto per elemento schermata."
+msgstr "ID gruppo host \"%1$s\" non corretto per elemento screen."
 
 #: include/classes/api/services/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
@@ -7526,7 +7537,7 @@ msgstr "Modalita' di inventario non corretta nell'operazione dell'azione."
 #: include/classes/api/services/CScreenItem.php:727
 #, c-format
 msgid "Incorrect item ID \"%1$s\" provided for screen element."
-msgstr "ID item \"%1$s\" non corretto per elemento schermata."
+msgstr "ID item \"%1$s\" non corretto per elemento screen."
 
 #: include/classes/api/services/CGraphGeneral.php:278
 msgid "Incorrect item for axis value."
@@ -7540,7 +7551,7 @@ msgstr "Fornita chiave item \"%1$s\" errata per l'espressione del trigger in \"%
 #: include/classes/api/services/CScreenItem.php:744
 #, c-format
 msgid "Incorrect item prototype ID \"%1$s\" provided for screen element."
-msgstr "Errato item prototipo ID \"%1$s\" fornito per elemento schermata."
+msgstr "Errato item prototipo ID \"%1$s\" fornito per elemento screen."
 
 #: include/classes/validators/CFunctionValidator.php:281
 #, c-format
@@ -7590,7 +7601,7 @@ msgstr "Periodo della settimana per la manutenzione errato"
 #: include/classes/api/services/CScreenItem.php:761
 #, c-format
 msgid "Incorrect map ID \"%1$s\" provided for screen element."
-msgstr "ID mappa \"%1$s\" non corretto per elemento schermata."
+msgstr "ID mappa \"%1$s\" non corretto per elemento screen."
 
 #: include/classes/api/services/CMap.php:782
 msgid "Incorrect map ID."
@@ -7598,7 +7609,7 @@ msgstr "ID mappa errato."
 
 #: include/classes/api/services/CScreenItem.php:637
 msgid "Incorrect max columns provided for screen element."
-msgstr "Valore max colonne errato per l'elemento dello schermata."
+msgstr "Valore max colonne errato per l'elemento dello screen."
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
@@ -7691,7 +7702,7 @@ msgstr "Errata regular expression \"%1$s\": \"%2$s\""
 
 #: include/classes/api/services/CScreenItem.php:489
 msgid "Incorrect resource type provided for screen item."
-msgstr "Fornito tipo di risorsa errato per l'item della schermata."
+msgstr "Fornito tipo di risorsa errato per l'item della screen."
 
 #: include/classes/server/CZabbixServer.php:238
 #, c-format
@@ -7706,16 +7717,16 @@ msgstr "Errato metodo di recupero valore per il passo \"%1$s\" per lo scenario w
 #: include/classes/api/services/CScreenItem.php:790
 #, c-format
 msgid "Incorrect screen ID \"%1$s\" provided for screen element."
-msgstr "Errato ID Schermata \"%1$s\" fornita come elemento schermata."
+msgstr "Errato ID screen \"%1$s\" fornita come elemento screen."
 
 #: include/classes/api/services/CScreen.php:728
 #: include/classes/api/services/CScreen.php:989
 msgid "Incorrect screen ID."
-msgstr "ID schermata non corretto."
+msgstr "ID screen non corretto."
 
 #: include/screens.inc.php:200 include/screens.inc.php:320
 msgid "Incorrect screen provided for slide show."
-msgstr "Fornita schermata errata per la presentazione."
+msgstr "Fornita screen errata per la Slide Show."
 
 #: include/services.inc.php:491 include/services.inc.php:500
 msgid "Incorrect service end time."
@@ -7760,11 +7771,11 @@ msgstr "Stato errato."
 
 #: include/classes/api/services/CScreenItem.php:643
 msgid "Incorrect style provided for screen element."
-msgstr "Stile errato fornito per l'elemento schermata."
+msgstr "Stile errato fornito per l'elemento screen."
 
 #: include/classes/api/services/CTemplateScreen.php:587
 msgid "Incorrect template screen ID."
-msgstr "Template ID schermata non corretto."
+msgstr "Template ID screen non corretto."
 
 #: include/classes/api/services/CUser.php:312
 #, c-format
@@ -7856,7 +7867,7 @@ msgstr "ID utente specificato errato per la mappa \"%1$s\"."
 #: include/classes/api/services/CScreen.php:896
 #, c-format
 msgid "Incorrect user ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "ID user specificato non corretto per la screen \"%1$s\"."
 
 #: include/classes/api/services/CMap.php:600
 #: include/classes/api/services/CMap.php:1019
@@ -7868,7 +7879,7 @@ msgstr "ID gruppo utente specificato errato per la mappa \"%1$s\"."
 #: include/classes/api/services/CScreen.php:965
 #, c-format
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "ID gruppo utenti specificato non corretto per la screen \"%1$s\"."
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -8198,77 +8209,79 @@ msgstr "Parametro hostid non valido per la macro \"%1$s\"."
 #: items.php:601
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:395
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": %2$s."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:306
 #: include/classes/validators/CItemDelayFlexValidator.php:321
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hour step \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": step ora errato \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:269
 #: include/classes/validators/CItemDelayFlexValidator.php:282
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hours \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": ore errate \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:375
 #: include/classes/validators/CItemDelayFlexValidator.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minute step \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": step minuto errato \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:338
 #: include/classes/validators/CItemDelayFlexValidator.php:351
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minutes \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": minuti errati \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:127
 #: include/classes/validators/CItemDelayFlexValidator.php:140
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day \"%2$s\"."
-msgstr ""
+msgstr "ntervallo errato \"%1$s\": giorno mese errato \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:165
 #: include/classes/validators/CItemDelayFlexValidator.php:180
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day step \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": step secondi errato \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:446
 #: include/classes/validators/CItemDelayFlexValidator.php:461
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid second step \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": step secondi errato \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:408
 #: include/classes/validators/CItemDelayFlexValidator.php:421
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid seconds \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": secondi non validi \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:198
 #: include/classes/validators/CItemDelayFlexValidator.php:211
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": giorno settimana non valido \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:236
 #: include/classes/validators/CItemDelayFlexValidator.php:251
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day step \"%2$s\"."
-msgstr ""
+msgstr "Intervallo errato \"%1$s\": step giorno settimana non valido \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
 msgstr ""
+"Intervallo errato \"%1$s\": ora di partenza deve essere inferiore o uguale "
+"all'ora di fine."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
@@ -8284,11 +8297,15 @@ msgstr "Intervallo non valido \"%1$s\": il giorno del mese di partenza deve esse
 #, c-format
 msgid "Invalid interval \"%1$s\": starting second must be less or equal to ending second."
 msgstr ""
+"Intervallo non valido \"%1$s\": secondo di partenza deve essere inferiore o "
+"uguale al secondo di fine."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:222
 #, c-format
 msgid "Invalid interval \"%1$s\": starting week day must be less or equal to ending week day."
 msgstr ""
+"Intervallo errato \"%1$s\": giorno della settimana di partenza deve essere "
+"inferiore o uguale al giorno della settimana di fine."
 
 #: include/classes/api/services/CDiscoveryRule.php:42
 #, c-format
@@ -8313,7 +8330,7 @@ msgstr "Key non valida \"%1$s\": %2$s."
 #: include/classes/api/services/CUserMacro.php:650
 #, c-format
 msgid "Invalid macro \"%1$s\": %2$s."
-msgstr ""
+msgstr "Macro non valida \"%1$s\": %2$s."
 
 #: maintenance.php:324
 msgid "Invalid maintenance period"
@@ -8393,7 +8410,7 @@ msgstr "Problema"
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:375
 msgid "Issuer"
-msgstr ""
+msgstr "Emittente"
 
 #: include/classes/api/services/CUser.php:141
 msgid "It is not possible to filter by user password."
@@ -8998,7 +9015,7 @@ msgstr "Collegato a"
 #: include/views/js/monitoring.sysmaps.js.php:302
 #: include/views/js/monitoring.sysmaps.js.php:313
 msgid "Links"
-msgstr ""
+msgstr "Collegamenti"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -9008,13 +9025,13 @@ msgstr "La lista è vuota"
 #: include/views/monitoring.slideconf.edit.php:244
 #: include/views/monitoring.sysmap.edit.php:347
 msgid "List of user group shares"
-msgstr ""
+msgstr "Elenco condivisioni per gruppo utenti"
 
 #: include/views/monitoring.screen.edit.php:201
 #: include/views/monitoring.slideconf.edit.php:249
 #: include/views/monitoring.sysmap.edit.php:352
 msgid "List of user shares"
-msgstr ""
+msgstr "Lista condivisioni utente"
 
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
@@ -9047,7 +9064,7 @@ msgstr "Tempo di caricamento di tutta la pagina web (in secondi). Restituisce va
 
 #: include/classes/screens/CScreenClock.php:92
 msgid "Local"
-msgstr ""
+msgstr "Locale"
 
 #: include/classes/screens/CScreenHistory.php:147
 #: include/views/monitoring.screen.constructor.edit.php:614
@@ -9164,7 +9181,7 @@ msgstr "Regola discovery di basso livello in stato \"non supportata\"."
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1636
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: jsLoader.php:125
 msgctxt "Monday short"
@@ -9342,7 +9359,7 @@ msgstr "Mappa"
 #: include/classes/api/services/CMap.php:831
 #, c-format
 msgid "Map \"%1$s\" already exists."
-msgstr ""
+msgstr "Mappa \"%1$s\" già presente."
 
 #: include/classes/api/services/CMap.php:503
 #: include/classes/api/services/CMap.php:577
@@ -9351,10 +9368,11 @@ msgstr ""
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"Mappa \"%1$s\" e' pubblica e la condivisione in sola-lettura non e' permessa."
 
 #: include/views/js/monitoring.sysmaps.js.php:2
 msgid "Map element"
-msgstr ""
+msgstr "Elementi mappa"
 
 #: sysmap.php:83
 msgid "Map is updated! Return?"
@@ -9366,12 +9384,12 @@ msgstr "Tipo etichetta mappa"
 
 #: include/classes/api/services/CMap.php:801
 msgid "Map name cannot be empty."
-msgstr ""
+msgstr "Nome mappa non puo' esse assente"
 
 #: include/classes/api/services/CMap.php:443
 #: include/classes/api/services/CMap.php:849
 msgid "Map owner cannot be empty."
-msgstr ""
+msgstr "Proprietario mappa non puo' essere assente."
 
 #: sysmap.php:86
 msgid "Map update failed."
@@ -9384,7 +9402,7 @@ msgstr "Mappato a"
 #: include/classes/api/services/CValueMap.php:501
 #, c-format
 msgid "Mapping is missing parameters: %1$s for value map \"%2$s\"."
-msgstr ""
+msgstr "Parametri mancanti per mappatura: %1$s per il valore mappa \"%2$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/administration.general.valuemapping.edit.php:71
@@ -9540,7 +9558,7 @@ msgstr[1] "Tipo di supporto abilitato"
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
 msgid "Media type is missing parameters: %1$s"
-msgstr ""
+msgstr "Parametro tipo media assente: %1$s"
 
 #: app/controllers/CControllerMediatypeUpdate.php:153
 msgid "Media type updated"
@@ -9655,8 +9673,8 @@ msgstr "Severity minima"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Periodo di tempo minimo per visualizzare è %1$s minuto."
+msgstr[1] "Periodo di tempo minimo per visualizzare è %1$s minuti."
 
 #: include/views/common.filter.trigger.php:71
 #: include/views/monitoring.sysmap.edit.php:212
@@ -10023,28 +10041,28 @@ msgstr "Nessun \"%1$s\" fornito per il prototipo host."
 #: include/classes/api/services/CMap.php:780
 #, c-format
 msgid "No \"%1$s\" given for map."
-msgstr ""
+msgstr "Nessun \"%1$s\" dato per la mappa."
 
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
 msgid "No \"%1$s\" given for media type."
-msgstr ""
+msgstr "Nessun \"%1$s\" dato per il tipo media."
 
 #: include/classes/api/services/CScreen.php:726
 #: include/classes/api/services/CScreen.php:987
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr "Nessun \"%1$s\" fornito per la schermata."
+msgstr "Nessun \"%1$s\" fornito per la screen."
 
 #: include/classes/api/services/CTemplateScreen.php:585
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr "Nessun \"%1$s\" fornito per il template schermata."
+msgstr "Nessun \"%1$s\" fornito per il template screen."
 
 #: include/classes/api/services/CValueMap.php:395
 #, c-format
 msgid "No \"%1$s\" given for value map."
-msgstr ""
+msgstr "Nessun \"%1$s\" dato per il valore mappa."
 
 #: include/classes/api/services/CHttpTest.php:297
 #, c-format
@@ -10101,7 +10119,7 @@ msgstr "Nessuna interfaccia SNMP trovata."
 
 #: include/classes/api/services/CScreenItem.php:604
 msgid "No URL provided for screen element."
-msgstr "Nessun URL fornito per l'elemento della schermata."
+msgstr "Nessun URL fornito per l'elemento della screen."
 
 #: include/views/configuration.host.edit.php:222
 #: include/views/configuration.host.prototype.edit.php:99
@@ -10148,7 +10166,7 @@ msgstr "Nessuna condizione definita."
 #: include/classes/screens/CScreenClock.php:74
 #: include/classes/screens/CScreenClock.php:78
 msgid "No data"
-msgstr ""
+msgstr "Nessuna data"
 
 #: include/views/configuration.maintenance.edit.php:44
 #: include/views/configuration.maintenance.list.php:65
@@ -10195,7 +10213,7 @@ msgstr "Nessun ID regola di discovery fornito."
 #: include/views/configuration.host.prototype.edit.php:352
 #: include/views/configuration.host.prototype.edit.php:359
 msgid "No encryption"
-msgstr ""
+msgstr "Nessuna encryption"
 
 #: include/blocks.inc.php:731 include/blocks.inc.php:815 tr_status.php:673
 msgid "No events"
@@ -10212,7 +10230,7 @@ msgstr "Nessun file è stato caricato."
 
 #: include/classes/api/services/CScreenItem.php:525
 msgid "No graph ID provided for screen element."
-msgstr "Nessun ID grafico fornito per l'elemento della schermata."
+msgstr "Nessun ID grafico fornito per l'elemento della screen."
 
 #: include/graphs.inc.php:285
 #, c-format
@@ -10221,7 +10239,7 @@ msgstr "Nessun item del grafico con graphid \"%s\"."
 
 #: include/classes/api/services/CScreenItem.php:534
 msgid "No graph prototype ID provided for screen element."
-msgstr "Nessun ID grafico prototipo fornito per l'elemento schermata."
+msgstr "Nessun ID grafico prototipo fornito per l'elemento screen."
 
 #: include/blocks.inc.php:114
 msgid "No graphs added."
@@ -10261,7 +10279,7 @@ msgstr "Nessun ID gruppo host per il prototipo gruppo."
 
 #: include/classes/api/services/CScreenItem.php:507
 msgid "No host group ID provided for screen element."
-msgstr "Nessun ID gruppo host fornito per l'elemento della schermata."
+msgstr "Nessun ID gruppo host fornito per l'elemento della screen."
 
 #: include/hosts.inc.php:487
 #, c-format
@@ -10312,15 +10330,16 @@ msgstr "Nessuna interfaccia per l'host \"%s\"."
 #: include/classes/api/services/CAction.php:1457
 msgid "No inventory mode specified for action operation."
 msgstr ""
+"Nessuna modalita' d'inventario specificata per l'operazione dell'azione."
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
 msgid "No item ID provided for screen element."
-msgstr "Nessun ID item fornito per l'elemento della schermata."
+msgstr "Nessun ID item fornito per l'elemento della screen."
 
 #: include/classes/api/services/CScreenItem.php:544
 msgid "No item prototype ID provided for screen element."
-msgstr "Nessun ID item prototipo fornito per l'elemento schermata."
+msgstr "Nessun ID item prototipo fornito per l'elemento screen."
 
 #: include/items.inc.php:533
 #, c-format
@@ -10342,7 +10361,7 @@ msgstr "Nessuna macro trovata."
 
 #: include/classes/api/services/CScreenItem.php:577
 msgid "No map ID provided for screen element."
-msgstr "Nessun ID mappa fornito per l'elemento della schermata."
+msgstr "Nessun ID mappa fornito per l'elemento della screen."
 
 #: include/blocks.inc.php:172
 msgid "No maps added."
@@ -10494,11 +10513,11 @@ msgstr "Nessun destinatario per il messaggio dell'operazione azione."
 
 #: include/classes/api/services/CScreenItem.php:585
 msgid "No screen ID provided for screen element."
-msgstr "Nessun ID schermata fornito per l'elemento della schermata."
+msgstr "Nessun ID schermata fornito per l'elemento della screen."
 
 #: include/blocks.inc.php:251
 msgid "No screens added."
-msgstr "Nessuna schermata aggiunta."
+msgstr "Nessuna screen aggiunta."
 
 #: include/classes/api/services/CAction.php:1369
 msgid "No script specified for action operation command."
@@ -10977,16 +10996,17 @@ msgstr "Solo i check Zabbix agent, SNMPv1, SNMPv2 e SNMPv3 possono essere unici.
 #: include/classes/api/services/CMap.php:447
 #: include/classes/api/services/CMap.php:853
 msgid "Only administrators can set map owner."
-msgstr ""
+msgstr "Solo l'amministratore puo' definire il proprietario della mappa."
 
 #: include/classes/api/services/CScreen.php:477
 #: include/classes/api/services/CScreen.php:812
 msgid "Only administrators can set screen owner."
-msgstr ""
+msgstr "Solo l'amministratore puo' definire il proprietario della screen."
 
 #: include/screens.inc.php:225 include/screens.inc.php:349
 msgid "Only administrators can set slide show owner."
 msgstr ""
+"Solo l'amministratore puo' configurare il proprietario della Slide Show."
 
 #: include/blocks.inc.php:487
 msgid "Only items assigned to enabled hosts are counted"
@@ -11003,20 +11023,20 @@ msgstr "Può esser cambiato un solo nome di gruppo utente per volta."
 #: app/views/monitoring.acknowledge.edit.php:58
 msgid "Only selected event"
 msgid_plural "Only selected events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Solo evento selezionato"
+msgstr[1] "Solo eventi selezionati"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
-msgstr ""
+msgstr "Solo il super admin puo' creare le mappe valore."
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
-msgstr ""
+msgstr "Solo il super admin puo' cancellare le mappe valore."
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "Solo il super admin puo' aggiornare le mappe valore."
 
 #: include/services.inc.php:264
 #, c-format
@@ -11221,7 +11241,7 @@ msgstr "Panoramica per proxy"
 #: include/views/monitoring.sysmap.edit.php:86
 #: include/views/monitoring.sysmap.edit.php:91
 msgid "Owner"
-msgstr ""
+msgstr "Proprietario"
 
 #: include/classes/setup/CFrontendSetup.php:311
 msgid "PHP bcmath"
@@ -11311,13 +11331,13 @@ msgstr "Estensione PHP mbstring mancante (parametro di configurazione di PHP --e
 #: include/classes/setup/CFrontendSetup.php:635
 #, c-format
 msgid "PHP option \"%1$s\""
-msgstr ""
+msgstr "PHP opzione \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:374
 #: include/classes/setup/CFrontendSetup.php:639
 #, c-format
 msgid "PHP option \"%1$s\" must be set to \"%2$s\""
-msgstr ""
+msgstr "PHP opzione %1$s\" deve essere configurata come \"%2$s\""
 
 #: include/classes/setup/CFrontendSetup.php:584
 msgid "PHP session"
@@ -11392,30 +11412,30 @@ msgstr "PROBLEMA"
 #: include/views/configuration.host.prototype.edit.php:361
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "PSK"
-msgstr ""
+msgstr "PSK"
 
 #: include/classes/api/services/CHost.php:1554
 #: include/classes/api/services/CProxy.php:665
 msgid "PSK cannot be empty."
-msgstr ""
+msgstr "PSK non può essere vuota."
 
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
-msgstr ""
+msgstr "PSK identity"
 
 #: include/classes/api/services/CHost.php:1550
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr ""
+msgstr "PSK identity può essere vuota."
 
 #: include/classes/api/services/CHost.php:1565
 #: include/classes/api/services/CProxy.php:676
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
-msgstr ""
+msgstr "PSK troppo corta. Minimo è %1$s hex-digits."
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -11508,7 +11528,7 @@ msgstr "Password non disponibile per gli utenti con %1$s."
 #: include/classes/api/services/CMediatype.php:555
 #, c-format
 msgid "Password required for media type \"%1$s\"."
-msgstr ""
+msgstr "Password richiesta per il tipo media \"%1$s\"."
 
 #: profile.php:119 users.php:201
 msgid "Password should not be empty"
@@ -11737,7 +11757,7 @@ msgstr "Telefono POC primario B"
 
 #: include/hosts.inc.php:404
 msgid "Primary POC screen name"
-msgstr "Nome schermata POC primaria"
+msgstr "Nome screen POC primaria"
 
 #: include/views/configuration.host.discovery.edit.php:145
 #: include/views/configuration.item.edit.php:154
@@ -11759,7 +11779,7 @@ msgstr "Protocollo di privacy"
 #: include/views/monitoring.slideconf.edit.php:240
 #: include/views/monitoring.sysmap.edit.php:343
 msgid "Private"
-msgstr ""
+msgstr "Privato"
 
 #: include/views/configuration.action.edit.php:837
 #: include/views/configuration.host.discovery.edit.php:173
@@ -11815,13 +11835,13 @@ msgstr "Problemi"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Processi CPU percentuale di utilizzo. Restituisce decimali"
 
 #: include/views/monitoring.screen.list.php:81
 #: include/views/monitoring.slideconf.list.php:64
 #: include/views/monitoring.sysmap.list.php:56
 msgid "Properties"
-msgstr ""
+msgstr "Proprietà"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:266
@@ -11889,7 +11909,7 @@ msgstr "Proxy aggiornato"
 #: include/views/monitoring.slideconf.edit.php:241
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr ""
+msgstr "Pubblico"
 
 #: include/views/configuration.action.edit.php:822
 #: include/views/configuration.host.discovery.edit.php:162
@@ -11936,7 +11956,7 @@ msgstr "Sola lettura"
 #: include/views/js/monitoring.sysmap.edit.js.php:12
 #: include/views/js/monitoring.sysmap.edit.js.php:45
 msgid "Read-only"
-msgstr ""
+msgstr "Sola-lettura"
 
 #: include/forms.inc.php:256 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:93
@@ -12412,6 +12432,9 @@ msgstr "Esegui comandi remoti sugli host"
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
 msgstr ""
+"Esegui comando specificato sull'host. Restituisce risultati di tipo testo "
+"provennienti dall'esecuzione del comando; 1 - con modalita' nowait (a "
+"prescindere dal risultato di comando)"
 
 #: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
@@ -12632,41 +12655,41 @@ msgstr "Controllo pianificato"
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
-msgstr ""
+msgstr "Schedulazione"
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
 #: include/views/monitoring.screen.constructor.edit.php:545
 #: include/views/monitoring.screen.edit.php:125
 #: include/views/monitoring.slideconf.edit.php:120
 msgid "Screen"
-msgstr "Schermata"
+msgstr "Screen"
 
 #: include/classes/api/services/CTemplateScreen.php:699
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr "La schermata \"%1$s\" esiste già nel template \"%2$s\"."
+msgstr "La screen \"%1$s\" esiste già nel template \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:458
 #: include/classes/api/services/CScreen.php:790
 #, c-format
 msgid "Screen \"%1$s\" already exists."
-msgstr "La schermata \"%1$s\" esiste già."
+msgstr "La screen \"%1$s\" esiste già."
 
 #: include/classes/api/services/CScreenItem.php:936
 #: include/classes/api/services/CScreenItem.php:960
 #, c-format
 msgid "Screen \"%1$s\" cell X - %2$s Y - %3$s is already taken."
-msgstr "Schermata \"%1$s\" cella X - %2$s Y - %3$s gia' utilizzata."
+msgstr "Screen \"%1$s\" cella X - %2$s Y - %3$s gia' utilizzata."
 
 #: include/classes/api/services/CScreenItem.php:836
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is incorrect."
-msgstr "Schermata \"%1$s\" span cell colonna X - %2$s Y - %3$s non corretta."
+msgstr "Screen \"%1$s\" span cell colonna X - %2$s Y - %3$s non corretta."
 
 #: include/classes/api/services/CScreenItem.php:885
 #, c-format
 msgid "Screen \"%1$s\" column span in cell X - %2$s Y - %3$s is too big."
-msgstr "Schermata \"%1$s\" span cell colonna X - %2$s Y - %3$s è troppo grande."
+msgstr "Screen \"%1$s\" span cell colonna X - %2$s Y - %3$s è troppo grande."
 
 #: include/classes/api/services/CScreen.php:533
 #: include/classes/api/services/CScreen.php:607
@@ -12675,45 +12698,48 @@ msgstr "Schermata \"%1$s\" span cell colonna X - %2$s Y - %3$s è troppo grande.
 #, c-format
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"Screen \"%1$s\" è pubblica e la condivisione in sola-lettura non è consentita."
 
 #: include/classes/api/services/CScreenItem.php:822
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is incorrect."
-msgstr "Schermata \"%1$s\" estensione riga nella cella X - %2$s Y - %3$s non è corretto."
+msgstr ""
+"Screen \"%1$s\" estensione riga nella cella X - %2$s Y - %3$s non è corretto."
 
 #: include/classes/api/services/CScreenItem.php:872
 #, c-format
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
-msgstr "Schermata \"%1$s\" estensione riga nella cella X - %2$s Y - %3$s è troppo grande."
+msgstr ""
+"Screen \"%1$s\" estensione riga nella cella X - %2$s Y - %3$s è troppo grande."
 
 #: screenconf.php:201
 msgid "Screen added"
-msgstr "Schermata aggiunta"
+msgstr "Screen aggiunta"
 
 #: include/views/monitoring.screen.constructor.edit.php:749
 msgid "Screen cell configuration"
-msgstr "Configurazione cella schermata"
+msgstr "Configurazione cella screen"
 
 #: screenconf.php:282
 msgid "Screen deleted"
-msgstr "Schermata rimossa"
+msgstr "Screen rimossa"
 
 #: include/classes/api/services/CScreen.php:759
 msgid "Screen name cannot be empty."
-msgstr ""
+msgstr "Nome screen non puo' essere vuota."
 
 #: include/classes/api/services/CScreen.php:473
 #: include/classes/api/services/CScreen.php:808
 msgid "Screen owner cannot be empty."
-msgstr ""
+msgstr "Il proprietario della screen non puo' essere vuoto."
 
 #: screenedit.php:331 screenedit.php:371
 msgid "Screen should contain at least one row and column."
-msgstr "La schermata deve contenere almeno una riga e una colonna."
+msgstr "La screen deve contenere almeno una riga e una colonna."
 
 #: screenconf.php:143 screenedit.php:230 screenedit.php:247
 msgid "Screen updated"
-msgstr "Schermata aggiornata"
+msgstr "Screen aggiornata"
 
 #: app/views/monitoring.dashboard.view.php:57 include/html.inc.php:411
 #: include/menu.inc.php:83 include/views/configuration.template.edit.php:353
@@ -12784,13 +12810,15 @@ msgstr "Nome script non puo' essere vuoto."
 
 #: app/views/administration.mediatype.edit.php:105
 msgid "Script parameters"
-msgstr ""
+msgstr "Parametri script"
 
 #: include/classes/api/services/CMediatype.php:340
 #: include/classes/api/services/CMediatype.php:632
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
 msgstr ""
+"I parametri degli script \"%1$s\" perdono l'ultima new line feed per il tipo "
+"di supporto \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:124
 msgid "Script profiler"
@@ -12858,7 +12886,7 @@ msgstr "Telefono POC secondario B"
 
 #: include/hosts.inc.php:439
 msgid "Secondary POC screen name"
-msgstr "Nome schermata POC secondaria"
+msgstr "Nome screen POC secondaria"
 
 #: include/views/administration.users.edit.php:290
 msgid "Seconds"
@@ -12947,11 +12975,11 @@ msgstr "Azioni selezionate eliminate"
 
 #: app/views/monitoring.acknowledge.edit.php:63
 msgid "Selected and all unacknowledged PROBLEM events"
-msgstr ""
+msgstr "Selezionati e tutti gli eventi PROBLEMA non riconosciuti"
 
 #: app/views/monitoring.acknowledge.edit.php:68
 msgid "Selected and all unacknowledged events"
-msgstr ""
+msgstr "Selezionati e tutti gli eventi non riconosciuti"
 
 #: include/views/js/monitoring.sysmaps.js.php:209
 msgid "Selected elements"
@@ -13100,7 +13128,7 @@ msgstr "Sessione terminata, rieffettua il login, per favore."
 
 #: include/actions.inc.php:889
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "Definisci modalita' inventario per host"
 
 #: events.php:420 include/classes/screens/CScreenEvents.php:37
 #: include/classes/screens/CScreenHistory.php:149
@@ -13126,21 +13154,21 @@ msgstr "Severity (discendente)"
 #: include/views/monitoring.slideconf.edit.php:256
 #: include/views/monitoring.sysmap.edit.php:359
 msgid "Sharing"
-msgstr ""
+msgstr "Condivisioni"
 
 #: include/classes/api/services/CMap.php:484
 #: include/classes/api/services/CMap.php:905
 #: include/classes/api/services/CMap.php:978
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "Opzioni condivisione \"%1$s\" valore assente per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:514
 #: include/classes/api/services/CScreen.php:851
 #: include/classes/api/services/CScreen.php:924
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "Opzioni condivisione \"%1$s\" valore assente per la screen \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:394
 #: tr_status.php:695 tr_status.php:700
@@ -13309,43 +13337,45 @@ msgstr "Diapositiva"
 
 #: include/audit.inc.php:44
 msgid "Slide show"
-msgstr "Presentazione"
+msgstr "Slide Show"
 
 #: include/screens.inc.php:335
 #, c-format
 msgid "Slide show \"%1$s\" already exists."
-msgstr "Slide show \"%1$s\" già esiste."
+msgstr "Slide Show \"%1$s\" già esistente."
 
 #: include/screens.inc.php:243 include/screens.inc.php:262
 #: include/screens.inc.php:366 include/screens.inc.php:374
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
 msgstr ""
+"Slide Show \"%1$s\" e' pubblica e non e' permessa la condivisione in sola-"
+"lettura."
 
 #: include/screens.inc.php:212
 #, c-format
 msgid "Slide show \"%s\" already exists."
-msgstr "La presentazione \"%s\" esiste già."
+msgstr "La Slide Show \"%s\" esiste già."
 
 #: slideconf.php:155
 msgid "Slide show added"
-msgstr "Presentazione aggiunta"
+msgstr "Slide Show aggiunta"
 
 #: slideconf.php:187 slideconf.php:208
 msgid "Slide show deleted"
-msgstr "Presentazione rimossa"
+msgstr "Slide Show rimossa"
 
 #: include/screens.inc.php:184 include/screens.inc.php:304
 msgid "Slide show must contain slides."
-msgstr "La presentazione deve contenere diapositive."
+msgstr "La Slide Show deve contenere diapositive."
 
 #: include/screens.inc.php:219 include/screens.inc.php:343
 msgid "Slide show owner cannot be empty."
-msgstr ""
+msgstr "Il propritario della Slide Show non puo' essere assente."
 
 #: slideconf.php:140
 msgid "Slide show updated"
-msgstr "Presentazione aggiornata"
+msgstr "Slide Show aggiornata"
 
 #: app/views/monitoring.dashboard.view.php:58
 #: include/views/monitoring.screen.list.php:29
@@ -13356,7 +13386,7 @@ msgstr "Presentazione aggiornata"
 #: include/views/monitoring.slides.php:23
 #: include/views/monitoring.slides.php:47 popup.php:87
 msgid "Slide shows"
-msgstr "Presentazioni"
+msgstr "Slide Show"
 
 #: include/views/monitoring.slideconf.edit.php:162
 msgid "Slides"
@@ -13825,7 +13855,7 @@ msgstr "Collegamento template"
 
 #: include/views/hostmacros.php:173
 msgid "Template macros"
-msgstr ""
+msgstr "Template macro"
 
 #: include/views/configuration.template.edit.php:73 templates.php:54
 msgid "Template name"
@@ -13835,7 +13865,7 @@ msgstr "Nome template"
 #: include/classes/api/services/CTemplateScreen.php:646
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
-msgstr "Template schermata \"%1$s\" gia' presente."
+msgstr "Template screen \"%1$s\" gia' presente."
 
 #: include/views/conf.import.php:31
 msgid "Template screens"
@@ -13944,12 +13974,16 @@ msgstr "Il \"%1$s.%2$s\" metodo deve essere chiamato senza il parametro \"auth\"
 #: include/classes/api/services/CScreenItem.php:984
 #, c-format
 msgid "The X coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr "La coordinata X dell'elemento schermata situato a X - %1$s s e Y - %2$s della schermata \"%3$s\" è troppo grande."
+msgstr ""
+"La coordinata X dell'elemento screen situato a X - %1$s s e Y - %2$s della "
+"screen \"%3$s\" è troppo grande."
 
 #: include/classes/api/services/CScreenItem.php:996
 #, c-format
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
-msgstr "La coordinata Y di elemento dello schermo situato a X - %1$s e Y - %2$s della schermata \"%3$s\" è troppo grande."
+msgstr ""
+"La coordinata Y d'elemento per la screen situato a X - %1$s e Y - %2$s della "
+"screen \"%3$s\" è troppo grande."
 
 #: include/views/configuration.application.list.php:99
 #, c-format
@@ -14057,11 +14091,11 @@ msgstr "Questo mese"
 
 #: include/classes/screens/CScreenBuilder.php:585
 msgid "This screen-column is not empty. Delete it?"
-msgstr "Questa colonna della schermata non è vuota. Cancellarla?"
+msgstr "Questa colonna della screen non è vuota. Cancellarla?"
 
 #: include/classes/screens/CScreenBuilder.php:550
 msgid "This screen-row is not empty. Delete it?"
-msgstr "Questa riga della schermata non è vuota. Cancellarla?"
+msgstr "Questa riga della screen non è vuota. Cancellarla?"
 
 #: srv_status.php:35
 msgid "This week"
@@ -14073,7 +14107,7 @@ msgstr "Quest'anno"
 
 #: popup_trexpr.php:153
 msgid "Threshold"
-msgstr ""
+msgstr "Soglia"
 
 #: include/func.inc.php:217
 msgid "Thu"
@@ -14137,19 +14171,19 @@ msgstr "Spostamento temporale"
 
 #: popup_trexpr.php:618
 msgid "Time to reach threshold estimated based on period T is < N"
-msgstr ""
+msgstr "Tempo per raggiungere la soglia stimato sulla base periodo T è < N"
 
 #: popup_trexpr.php:628
 msgid "Time to reach threshold estimated based on period T is = N"
-msgstr ""
+msgstr "Tempo per raggiungere la soglia stimato sulla base periodo T è = N"
 
 #: popup_trexpr.php:623
 msgid "Time to reach threshold estimated based on period T is > N"
-msgstr ""
+msgstr "Tempo per raggiungere la soglia stimato sulla base periodo T è > N"
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
+msgstr "Tempo per raggiungere la soglia stimato sulla base periodo T è NOT N"
 
 #: include/views/monitoring.screen.constructor.edit.php:613
 msgid "Time type"
@@ -14678,7 +14712,7 @@ msgstr "URL C"
 #: include/classes/api/services/CMap.php:1153
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
-msgstr ""
+msgstr "Nome URL deve essere unico per la mappa \"%1$s\"."
 
 #: include/html.inc.php:108
 msgid "URL parameter cannot be array."
@@ -14692,7 +14726,7 @@ msgstr "Il nome del parametro URL è vuoto."
 #: include/classes/api/services/CMap.php:1147
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
-msgstr ""
+msgstr "URL deve avere entrambe i campi \"nome\" e \"url\" per la mappa \"%1$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:162
 #: include/views/monitoring.sysmap.edit.php:270 jsLoader.php:217
@@ -15034,7 +15068,7 @@ msgstr "Aggiornato"
 #: include/hosts.inc.php:554
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "Aggiorna stato per host \"%1$s\"."
 
 #: app/views/monitoring.widget.discovery.view.php:62
 #: app/views/monitoring.widget.hosts.view.php:383
@@ -15140,7 +15174,7 @@ msgstr "Utilizzato nelle azioni"
 
 #: include/views/administration.general.valuemapping.list.php:44
 msgid "Used in items"
-msgstr ""
+msgstr "Usati negli item"
 
 #: app/views/monitoring.acknowledge.edit.php:34 httpconf.php:57
 #: include/acknow.inc.php:49 include/actions.inc.php:1183
@@ -15156,17 +15190,17 @@ msgstr "Utente"
 #: include/classes/api/services/CUser.php:546
 #, c-format
 msgid "User \"%1$s\" is map \"%2$s\" owner."
-msgstr ""
+msgstr "Utente \"%1$s\" e' il proprietario della mappa \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:570
 #, c-format
 msgid "User \"%1$s\" is screen \"%2$s\" owner."
-msgstr ""
+msgstr "Utente \"%1$s\" e' il proprietario della screen \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:592
 #, c-format
 msgid "User \"%1$s\" is slide show \"%2$s\" owner."
-msgstr ""
+msgstr "Utente \"%1$s\" e' proprietario della Slide Show \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:288
 #, c-format
@@ -15263,13 +15297,14 @@ msgstr "Gruppo Utente per segnalazione problemi Database \"%1$s\"."
 #: include/classes/api/services/CMap.php:969
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Condivisioni gruppo utenti assenza parametri: %1$s per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:579
 #: include/classes/api/services/CScreen.php:915
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
+"Condivisioni gruppo utente assenza parametri: %1$s per la screen \"%2$s\"."
 
 #: include/menu.inc.php:274
 #: include/views/administration.usergroups.edit.php:22
@@ -15290,7 +15325,7 @@ msgstr "L'utente non ha i permessi per cancellare se stesso."
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "User macro parametri mancanti: %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -15341,13 +15376,13 @@ msgstr "Sessioni utente"
 #: include/classes/api/services/CMap.php:896
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "Condivisioni utente assenza parametri: %1$s per la mappa \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:505
 #: include/classes/api/services/CScreen.php:842
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "Condivisioni utente assenza parametri: %1$s per la screen \"%2$s\"."
 
 #: include/views/administration.users.edit.php:388
 #: include/views/administration.users.edit.php:392
@@ -15673,12 +15708,12 @@ msgstr[1] "Mappa valori rimossa"
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
 msgid "Value map is missing parameters: %1$s"
-msgstr ""
+msgstr "Mappa valori parametri mancanti: %1$s"
 
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/api/services/CValueMap.php:423
 msgid "Value map name cannot be empty."
-msgstr ""
+msgstr "Nome mappa valore non puo' essere vuoto."
 
 #: adm.valuemapping.php:105
 msgid "Value map updated"
@@ -15693,11 +15728,11 @@ msgstr "Mappatura valori"
 
 #: include/views/conf.import.php:46
 msgid "Value mappings"
-msgstr ""
+msgstr "Mappa valori"
 
 #: include/views/conf.import.php:69
 msgid "Value mappings for value maps will be updated!"
-msgstr ""
+msgstr "Le associazioni dei valori per le mappe valore verrà aggiornato!"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
@@ -16366,7 +16401,7 @@ msgstr "è previsto un array di dati"
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
 msgid "an empty string is expected"
-msgstr ""
+msgstr "è prevista una stringa vuota"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -16407,7 +16442,7 @@ msgstr "lampeggiante"
 #: include/classes/api/services/CMediatype.php:418
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
-msgstr ""
+msgstr "non può essere vuoto"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
@@ -16574,15 +16609,15 @@ msgstr "m"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1639
 msgid "m-d"
-msgstr ""
+msgstr "m-d"
 
 #: include/translateDefines.inc.php:32
 msgid "m-d H:i"
-msgstr ""
+msgstr "m-d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "macro is empty"
-msgstr ""
+msgstr "macro vuota"
 
 #: include/views/js/administration.general.macros.edit.js.php:42
 msgid "macro(s)"
@@ -16805,7 +16840,7 @@ msgstr "digita qui per cercare"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"
-msgstr ""
+msgstr "Fine intervallo non valido"
 
 #: include/classes/parsers/CItemKey.php:178
 msgid "unexpected end of key"
@@ -16813,7 +16848,7 @@ msgstr "fine della key non prevista"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "Fine della macro non valida"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
