@@ -1619,11 +1619,9 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 		if (0 > res)
 		{
 			/* in case of rehandshake a GNUTLS_E_REHANDSHAKE will be returned, deal with it as with error */
-#if defined(_WINDOWS)
-			zbx_set_socket_strerror("gnutls_record_recv() failed: %Id %s", res, gnutls_strerror(res));
-#else
-			zbx_set_socket_strerror("gnutls_record_recv() failed: %zd %s", res, gnutls_strerror(res));
-#endif
+			zbx_set_socket_strerror("gnutls_record_recv() failed: " ZBX_FS_SSIZE_T " %s",
+					(zbx_fs_ssize_t)res, gnutls_strerror(res));
+
 			return ZBX_PROTO_ERROR;
 		}
 
