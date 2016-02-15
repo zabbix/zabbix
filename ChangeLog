@@ -3,6 +3,7 @@ Changes for 3.0.0rc3
 New features:
 
 Bug fixes:
+....I..... [ZBX-10380] fixed upgrade of an empty proxy database (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0rc2
