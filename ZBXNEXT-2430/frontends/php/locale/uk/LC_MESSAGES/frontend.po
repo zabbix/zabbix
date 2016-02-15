@@ -3,17 +3,18 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 19:22+0200\n"
-"PO-Revision-Date: 2016-02-09 17:03+0300\n"
+"PO-Revision-Date: 2016-02-14 16:26+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455030190.0\n"
+"X-POOTLE-MTIME: 1455459960.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -2684,7 +2685,9 @@ msgstr "Перевірки"
 #: include/classes/items/CHelpItems.php:85
 #: include/classes/items/CHelpItems.php:367
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr "Перевіряє доступность DNS сервісу. Повертає 0 - DNS не доступний (сервер не відповів або DNS запит не виконано); 1 - DNS доступний"
+msgstr ""
+"Перевіряє доступність DNS сервісу. Повертає 0 - DNS не доступний (сервер не "
+"відповів або DNS запит не виконано); 1 - DNS доступний"
 
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:563
@@ -5615,7 +5618,7 @@ msgstr "Заповнений регіон"
 #: include/classes/html/CFilter.php:146
 #: include/views/monitoring.dashconf.php:126
 msgid "Filter"
-msgstr "Фільтрувати"
+msgstr "Фільтр"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -8599,7 +8602,7 @@ msgstr "Прототип елемента даних оновлено"
 #: include/views/configuration.item.prototype.list.php:23
 #: include/views/configuration.template.edit.php:290 popup.php:99
 msgid "Item prototypes"
-msgstr "Прототипи елемента даних видалено"
+msgstr "Прототипи елементів даних"
 
 #: disc_prototypes.php:435
 msgid "Item prototypes deleted"
@@ -13736,7 +13739,7 @@ msgstr "Статистика swap in (з пристрою в пам'ять). П�
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:527
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr "Статистика swap out (з пристрою в пам'ять). Повертає ціле число"
+msgstr "Статистика swap out (з пам'яті в пристрій). Повертає ціле число"
 
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:531
@@ -16652,7 +16655,7 @@ msgstr "правило низькорівневого виявлення"
 #: include/func.inc.php:566 jsLoader.php:101
 msgctxt "minute short"
 msgid "m"
-msgstr "м"
+msgstr "хв"
 
 #: include/func.inc.php:563 jsLoader.php:98
 msgctxt "month short"
