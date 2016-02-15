@@ -501,20 +501,22 @@ static int	DBpatch_2050055(void)
 			"select severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,"
 				"severity_color_5"
 			" from config")))
+	{
 		return FAIL;
-
-	if (NULL == (row = DBfetch(result))) {
-		goto out;
 	}
 
-	if (0 == strcmp(row[0], "DBDBDB") && 0 == strcmp(row[1], "D6F6FF") &&
+	if (NULL != (row = DBfetch(result)) &&
+			0 == strcmp(row[0], "DBDBDB") && 0 == strcmp(row[1], "D6F6FF") &&
 			0 == strcmp(row[2], "FFF6A5") && 0 == strcmp(row[3], "FFB689") &&
-			0 == strcmp(row[4], "FF9999") && 0 == strcmp(row[5], "FF3838")) {
+			0 == strcmp(row[4], "FF9999") && 0 == strcmp(row[5], "FF3838"))
+	{
 		if (ZBX_DB_OK > DBexecute(
 				"update config set severity_color_0='97AAB3',severity_color_1='7499FF',"
 					"severity_color_2='FFC859',severity_color_3='FFA059',"
 					"severity_color_4='E97659',severity_color_5='E45959'"))
+		{
 			goto out;
+		}
 	}
 
 	ret = SUCCEED;
