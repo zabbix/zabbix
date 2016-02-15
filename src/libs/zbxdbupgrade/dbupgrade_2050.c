@@ -1078,7 +1078,7 @@ static int	DBpatch_2050111(void)
 static int	DBpatch_2050112(void)
 {
 	const ZBX_TABLE table =
-		{"slideshow_user",	"slideshowuserid",	0,
+		{"slideshow_user", "slideshowuserid", 0,
 			{
 				{"slideshowuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"slideshowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -1145,6 +1145,33 @@ static int	DBpatch_2050119(void)
 	const ZBX_FIELD	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("slideshow_usrgrp", 2, &field);
+}
+
+static int	DBpatch_2050120(void)
+{
+	/* private=0 -> PUBLIC_SHARING */
+	if (ZBX_DB_OK <= DBexecute("update sysmaps set private=0"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2050121(void)
+{
+	/* private=0 -> PUBLIC_SHARING */
+	if (ZBX_DB_OK <= DBexecute("update screens set private=0"))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_2050122(void)
+{
+	/* private=0 -> PUBLIC_SHARING */
+	if (ZBX_DB_OK <= DBexecute("update slideshows set private=0"))
+		return SUCCEED;
+
+	return FAIL;
 }
 
 #endif
@@ -1260,5 +1287,8 @@ DBPATCH_ADD(2050116, 0, 1)
 DBPATCH_ADD(2050117, 0, 1)
 DBPATCH_ADD(2050118, 0, 1)
 DBPATCH_ADD(2050119, 0, 1)
+DBPATCH_ADD(2050120, 0, 1)
+DBPATCH_ADD(2050121, 0, 1)
+DBPATCH_ADD(2050122, 0, 1)
 
 DBPATCH_END()
