@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-09 19:22+0200\n"
-"PO-Revision-Date: 2016-02-09 14:08+0300\n"
+"PO-Revision-Date: 2016-02-15 03:43+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455019682.0\n"
+"X-POOTLE-MTIME: 1455500630.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -8944,13 +8944,13 @@ msgstr "リストがありません"
 #: include/views/monitoring.slideconf.edit.php:244
 #: include/views/monitoring.sysmap.edit.php:347
 msgid "List of user group shares"
-msgstr "共有ユーザーグループ"
+msgstr "共有するユーザーグループ"
 
 #: include/views/monitoring.screen.edit.php:201
 #: include/views/monitoring.slideconf.edit.php:249
 #: include/views/monitoring.sysmap.edit.php:352
 msgid "List of user shares"
-msgstr "共有ユーザー"
+msgstr "共有するユーザー"
 
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
@@ -9380,12 +9380,12 @@ msgstr "最大列数"
 
 #: adm.gui.php:43 include/views/administration.general.gui.edit.php:47
 msgid "Max count of elements to show inside table cell"
-msgstr "一覧表示の最大項目数"
+msgstr "テーブルセル内のリストの最大項目数"
 
 #: include/profiles.inc.php:177
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "一覧表示の最大項目数 \"%1$s\"。"
+msgstr "テーブルセル内のリストの最大項目数 \"%1$s\"。"
 
 #: adm.gui.php:50 include/views/administration.general.gui.edit.php:56
 msgid "Max count of events per trigger to show"
@@ -10496,7 +10496,7 @@ msgstr "コメントなし"
 
 #: include/forms.inc.php:571 include/forms.inc.php:746
 msgid "Not Templated items"
-msgstr "テンプレートではないアイテム"
+msgstr "直接設定されているアイテム"
 
 #: include/classes/api/services/CTrigger.php:1383
 #: include/classes/api/services/CTriggerPrototype.php:1135
@@ -11334,12 +11334,12 @@ msgstr "PSKを設定してください。"
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "PSK identity"
-msgstr "PSKユーザー名"
+msgstr "PSKアイデンティティ"
 
 #: include/classes/api/services/CHost.php:1550
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr "PSKユーザー名を設定してください。"
+msgstr "PSKアイデンティティを設定してください。"
 
 #: include/classes/api/services/CHost.php:1565
 #: include/classes/api/services/CProxy.php:676
