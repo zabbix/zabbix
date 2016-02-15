@@ -1639,9 +1639,9 @@ echo "  Server details:
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
-    Compiler flags:        ${CFLAGS} ${SERVER_CFLAGS}
-    Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
-    Libraries:             ${LIBS} ${SERVER_LIBS}"
+    Compiler flags:        ${SERVER_CFLAGS} ${CFLAGS}
+    Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
+    Libraries:             ${SERVER_LIBS} ${LIBS}"
 
 fi
 
@@ -1660,9 +1660,9 @@ echo "  Proxy details:
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
-    Compiler flags:        ${CFLAGS} ${PROXY_CFLAGS}
-    Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
-    Libraries:             ${LIBS} ${PROXY_LIBS}"
+    Compiler flags:        ${PROXY_CFLAGS} ${CFLAGS}
+    Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
+    Libraries:             ${PROXY_LIBS} ${LIBS}"
 
 fi
 
@@ -1674,9 +1674,9 @@ if test "x$agent" != "xno"; then
 echo "  Agent details:
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
-    Compiler flags:        ${CFLAGS} ${AGENT_CFLAGS}
-    Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
-    Libraries:             ${LIBS} ${AGENT_LIBS}"
+    Compiler flags:        ${AGENT_CFLAGS} ${CFLAGS}
+    Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
+    Libraries:             ${AGENT_LIBS} ${LIBS}"
 
 fi
 
