@@ -1471,8 +1471,8 @@ class CConfigurationImport {
 			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer,
 				$this->importedObjectContainer
 			);
-			$screenImporter->import($screens);
 			$screenImporter->delete($screens);
+			$screenImporter->import($screens);
 		}
 	}
 
