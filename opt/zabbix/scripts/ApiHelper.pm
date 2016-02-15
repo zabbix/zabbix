@@ -343,7 +343,7 @@ sub __encode_json
 	my $json_ref = shift;
 
 	$json_ref->{'version'} = AH_JSON_FILE_VERSION;
-	$json_ref->{'lastModifiedTime'} = time();
+	$json_ref->{'lastUpdateApiDatabase'} = time();
 
 	return encode_json($json_ref);
 }
