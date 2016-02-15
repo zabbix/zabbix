@@ -76,10 +76,9 @@ my $cfg_dns_delay = undef;
 my $cfg_dns_minns;
 my $cfg_dns_valuemaps;
 my $cfg_dns_max_value;
+my $cfg_dns_minonline;
 
 my $cfg_dns_statusmaps = get_statusmaps('dns');
-
-my $cfg_dns_minonline = get_macro_dns_probe_online();
 
 foreach my $service (keys(%{$services}))
 {
@@ -91,12 +90,14 @@ foreach my $service (keys(%{$services}))
 			$cfg_dns_minns = get_macro_minns();
 			$cfg_dns_valuemaps = get_valuemaps('dns');
 			$cfg_dns_max_value = get_macro_dns_udp_rtt_low();
+			$cfg_dns_minonline = get_macro_dns_probe_online();
 		}
 
 		$services->{$service}->{'delay'} = $cfg_dns_delay;
 		$services->{$service}->{'minns'} = $cfg_dns_minns;
 		$services->{$service}->{'valuemaps'} = $cfg_dns_valuemaps;
 		$services->{$service}->{'max_value'} = $cfg_dns_max_value;
+		$services->{$service}->{'minonline'} = $cfg_dns_minonline;
 		$services->{$service}->{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]';	# 0 - down, 1 - up
 		$services->{$service}->{'key_rtt'} = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	}
@@ -105,6 +106,7 @@ foreach my $service (keys(%{$services}))
 		$services->{$service}->{'delay'} = get_macro_rdds_delay();
 		$services->{$service}->{'valuemaps'} = get_valuemaps($service);
 		$services->{$service}->{'max_value'} = get_macro_rdds_rtt_low();
+		$services->{$service}->{'minonline'} = get_macro_rdds_probe_online();
 		$services->{$service}->{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
 		$services->{$service}->{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 		$services->{$service}->{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
@@ -118,6 +120,7 @@ foreach my $service (keys(%{$services}))
 		# TODO: max_value for EPP is based on the command
 		$services->{$service}->{'delay'} = get_macro_epp_delay();
 		$services->{$service}->{'valuemaps'} = get_valuemaps($service);
+		$services->{$service}->{'minonline'} = get_macro_epp_probe_online();
 		$services->{$service}->{'key_status'} = 'rsm.epp[{$RSM.TLD},';	# 0 - down, 1 - up
 		$services->{$service}->{'key_ip'} = 'rsm.epp.ip[{$RSM.TLD}]';
 		$services->{$service}->{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
@@ -607,6 +610,7 @@ foreach (keys(%$servicedata))
 					{
 						# the status is set later
 						$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = undef;
+
 						if (probe_offline_at($probe_times_ref, $probe, $cycleclock) != 0)
 						{
 							$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
@@ -1093,7 +1097,7 @@ sub __create_cycle_hash
 	my $cycle_ref = shift;
 	my $service_ref = shift;
 
-	my $hash =
+	my $cycle =
 	{
 		'tld' => $tld,
 		'clock' => $cycleclock,
@@ -1110,9 +1114,9 @@ sub __create_cycle_hash
 		# TODO: in case of DNSSEC the interface status and status on every probe is currently
 		# not supported, we need to calculate these manually.
 
-		my $dnssec_total_probes = 0;
-		my $dnssec_success_probes = 0;
-		my $dnssec_probes_online = 0;
+		my $test_total_probes = 0;
+		my $test_success_probes = 0;
+		my $test_probes_online = 0;
 
 		foreach my $probe (keys(%{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}}))
 		{
@@ -1123,7 +1127,7 @@ sub __create_cycle_hash
 
 			my $dnssec_success_ns = 0;
 
-			$dnssec_probes_online++ if (defined($probe_ref->{'status'}) && $probe_ref->{'status'} ne PROBE_OFFLINE_STR);
+			$test_probes_online++ if (defined($probe_ref->{'status'}) && $probe_ref->{'status'} ne PROBE_OFFLINE_STR);
 
 			foreach my $target (keys(%{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'}}))
 			{
@@ -1155,43 +1159,56 @@ sub __create_cycle_hash
 			if ($interface eq JSON_INTERFACE_DNSSEC)
 			{
 				$probe_ref->{'status'} = ($dnssec_success_ns >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
+			}
 
-				$dnssec_success_probes++ if ($probe_ref->{'status'} eq AH_STATUS_UP);
+			if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
+			{
+				$test_success_probes++ if ($probe_ref->{'status'} eq AH_STATUS_UP);
 
-				$dnssec_total_probes++;
+				$test_total_probes++;
 			}
 
 			push(@{$interface_ref->{'probes'}}, $probe_ref);
 		}
 
-		if ($interface eq JSON_INTERFACE_DNSSEC)
+		if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
 		{
-			if ($dnssec_probes_online < $cfg_dns_minonline)
+			my $interface_status;
+
+			if ($test_probes_online < $service_ref->{'minonline'})
 			{
-				$interface_ref->{'status'} = AH_STATUS_UP;	# TODO: indicate that the interface is up only because not available probes online
-				$hash->{'status'} = AH_STATUS_UP;
+				$interface_status = AH_STATUS_UP;	# TODO: indicate that the interface is up only because not available probes online
 			}
 			else
 			{
-				my $perc = $dnssec_success_probes * 100 / $dnssec_total_probes;
+				my $perc = $test_success_probes * 100 / $test_total_probes;
 
 				if ($perc > SLV_UNAVAILABILITY_LIMIT)
 				{
-					$interface_ref->{'status'} = AH_STATUS_UP;
-					$hash->{'status'} = AH_STATUS_UP;
+					$interface_status = AH_STATUS_UP;
 				}
 				else
 				{
-					$interface_ref->{'status'} = AH_STATUS_DOWN;
-					$hash->{'status'} = AH_STATUS_DOWN;
+					$interface_status = AH_STATUS_DOWN;
 				}
 			}
+
+			$interface_ref->{'status'} = $interface_status;
+
+			if ($interface eq JSON_INTERFACE_DNSSEC)
+			{
+				$cycle->{'status'} = $interface_status;
+			}
+		}
+		elsif ($interface eq JSON_INTERFACE_DNS)
+		{
+			$interface_ref->{'status'} = $cycle->{'status'};
 		}
 
-		push(@{$hash->{'testedInterface'}}, $interface_ref);
+		push(@{$cycle->{'testedInterface'}}, $interface_ref);
 	}
 
-	return $hash;
+	return $cycle;
 }
 
 sub __check_test
@@ -1232,8 +1249,7 @@ sub __interface_status
 
 	if ($interface eq JSON_INTERFACE_DNS)
 	{
-		my $minns = $service_ref->{'minns'};
-		$status = (($value >= $minns) ? AH_STATUS_UP : AH_STATUS_DOWN);
+		$status = ($value >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
 	}
 	elsif ($interface eq JSON_INTERFACE_DNSSEC)
 	{
@@ -1250,6 +1266,8 @@ sub __interface_status
 	{
 		fail("$interface: unsupported interface");
 	}
+
+	return $status;
 }
 
 __END__
