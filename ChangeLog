@@ -3,6 +3,7 @@ Changes for 3.1.0
 New features:
 
 Bug fixes:
+..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.1rc1
