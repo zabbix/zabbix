@@ -201,7 +201,8 @@ $fields = [
 	'writeonly' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'noempty' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	'select' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'submitParent' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null]
+	'submitParent' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'templateid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null]
 ];
 
 // unset disabled item types
@@ -267,6 +268,7 @@ $group = getRequest('group', '');
 $host = getRequest('host', '');
 $onlyHostid = getRequest('only_hostid');
 $parentDiscoveryId = getRequest('parent_discoveryid');
+$templateid = getRequest('templateid');
 
 if (isset($onlyHostid)) {
 	$_REQUEST['hostid'] = $onlyHostid;
@@ -446,6 +448,9 @@ if (isset($onlyHostid)) {
 }
 if (getRequest('screenid')) {
 	$frmTitle->addVar('screenid', getRequest('screenid'));
+}
+if (hasRequest('templateid')) {
+	$frmTitle->addVar('templateid', $templateid);
 }
 
 // adding param to a form, so that it would remain when page is refreshed
@@ -726,6 +731,11 @@ elseif ($srctbl == 'templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($templates as &$template) {
+		// dont show itself
+		if (bccomp($template['templateid'], $templateid) == 0) {
+			continue;
+		}
+
 		if ($multiselect) {
 			$checkBox = new CCheckBox('templates['.$template['templateid'].']', $template['templateid']);
 		}
