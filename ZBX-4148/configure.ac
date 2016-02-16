@@ -1303,13 +1303,13 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_snmp="yes"
 		fi
 	fi
-	SERVER_CFLAGS="$SERVER_CFLAGS $SNMP_CFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $SNMP_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $SNMP_LIBS"
 
-	PROXY_CFLAGS="$PROXY_CFLAGS $SNMP_CFLAGS"
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SNMP_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SNMP_LIBS"
+
+	AC_SUBST(SNMP_CFLAGS)
 
 	dnl Check for LIBSSH2 [by default - skip] at least of version 1.0.0.
 	LIBSSH2_CHECK_CONFIG([no])
@@ -1636,6 +1636,7 @@ echo "  Server details:
     Native Jabber:         ${have_jabber}
     Jabber headers:        ${JABBER_CPPFLAGS}
     SNMP:                  ${have_snmp}
+    SNMP headers:          ${SNMP_CFLAGS}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
@@ -1659,6 +1660,7 @@ echo "  Proxy details:
     DB headers:            ${DB_CFLAGS}
     WEB Monitoring:        ${have_web_monitoring}
     SNMP:                  ${have_snmp}
+    SNMP headers:          ${SNMP_CFLAGS}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
