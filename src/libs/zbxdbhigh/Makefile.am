@@ -26,3 +26,7 @@ libzbxdbhigh_a_SOURCES = \
 	template.h
 
 libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/
+
+if WITH_ODBC
+libzbxdbhigh_a_CFLAGS += @UNIXODBC_CFLAGS@
+endif
