@@ -11,6 +11,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9984] fixed incorrect template listing in linking form (Gunars)
 A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
 ..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
 
