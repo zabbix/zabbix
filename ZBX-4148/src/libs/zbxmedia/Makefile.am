@@ -11,3 +11,7 @@ libzbxmedia_a_SOURCES = \
 			eztexting.c \
 			$(JABBER_SOURCES) \
 			sms.c
+
+if JABBER
+libzbxmedia_a_CFLAGS = @JABBER_CPPFLAGS@
+endif

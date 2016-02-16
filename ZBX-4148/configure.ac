@@ -1256,9 +1256,10 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_jabber="yes"
 		fi
 	fi
-	SERVER_CFLAGS="$SERVER_CFLAGS $JABBER_CPPFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $JABBER_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $JABBER_LIBS"
+
+	AC_SUBST(JABBER_CPPFLAGS)
 
 	dnl Check for LIBXML2 [by default - skip]
 	LIBXML2_CHECK_CONFIG([no])
@@ -1269,13 +1270,13 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_libxml2="yes"
 		fi
 	fi
-	SERVER_CFLAGS="$SERVER_CFLAGS $LIBXML2_CFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBXML2_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $LIBXML2_LIBS"
 
-	PROXY_CFLAGS="$PROXY_CFLAGS $LIBXML2_CFLAGS"
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBXML2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $LIBXML2_LIBS"
+
+	AC_SUBST(LIBXML2_CFLAGS)
 
 	dnl Checking for unixODBC support
 	LIBUNIXODBC_CHECK_CONFIG([no])
@@ -1285,13 +1286,13 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 		fi
 		have_unixodbc="yes"
 	fi
-	SERVER_CFLAGS="$SERVER_CFLAGS $UNIXODBC_CFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $UNIXODBC_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $UNIXODBC_LIBS"
 
-	PROXY_CFLAGS="$PROXY_CFLAGS $UNIXODBC_CFLAGS"
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $UNIXODBC_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $UNIXODBC_LIBS"
+
+	AC_SUBST(UNIXODBC_CFLAGS)
 
 	dnl Check for Net-SNMP [by default - skip]
 	LIBNETSNMP_CHECK_CONFIG([no])
@@ -1633,12 +1634,15 @@ echo "  Server details:
     DB headers:            ${DB_CFLAGS}
     WEB Monitoring:        ${have_web_monitoring}
     Native Jabber:         ${have_jabber}
+    Jabber headers:        ${JABBER_CPPFLAGS}
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
+    ODBC headers:          ${UNIXODBC_CFLAGS}
+    LIBXML2 headers:       ${LIBXML2_CFLAGS}
     Compiler flags:        ${SERVER_CFLAGS} ${CFLAGS}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
     Libraries:             ${SERVER_LIBS} ${LIBS}"
@@ -1660,6 +1664,8 @@ echo "  Proxy details:
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
+    ODBC headers:          ${UNIXODBC_CFLAGS}
+    LIBXML2 headers:       ${LIBXML2_CFLAGS}
     Compiler flags:        ${PROXY_CFLAGS} ${CFLAGS}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}"

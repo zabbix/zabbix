@@ -25,3 +25,7 @@ libzbxpoller_a_SOURCES = \
 	poller.c poller.h
 
 libzbxpoller_a_CFLAGS = -I@top_srcdir@/src/libs/zbxsysinfo/simple -I@top_srcdir@/src/libs/zbxdbcache
+
+if WITH_ODBC
+libzbxpoller_a_CFLAGS += @UNIXODBC_CFLAGS@
+endif
