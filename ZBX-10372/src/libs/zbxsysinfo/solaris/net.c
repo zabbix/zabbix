@@ -25,9 +25,12 @@
 
 static int	get_kstat_named_field(const char *name, const char *field, kstat_named_t *returned_data, char **error)
 {
+	/* on Solaris 11+ network interfaces have several statistics modules (link, unix), */
+	/* so perform lookup on all modules only if no link module was found               */
+	static int	link_module = 1;
 	int		ret = FAIL;
 	kstat_ctl_t	*kc;
-	kstat_t		*kp;
+	kstat_t		*kp = NULL;
 	kstat_named_t	*kn;
 
 	if (NULL == (kc = kstat_open()))
@@ -36,10 +39,19 @@ static int	get_kstat_named_field(const char *name, const char *field, kstat_name
 		return FAIL;
 	}
 
-	if (NULL == (kp = kstat_lookup(kc, NULL, -1, (char *)name)))
+	if (1 == link_module)
+		kp = kstat_lookup(kc, "link", 0, (char *)name);
+
+	if (NULL == kp)
 	{
-		*error = zbx_dsprintf(*error, "Cannot look up in kernel statistics facility: %s", zbx_strerror(errno));
-		goto clean;
+		link_module = 0;
+
+		if (NULL == (kp = kstat_lookup(kc, NULL, -1, (char *)name)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot look up in kernel statistics facility: %s",
+					zbx_strerror(errno));
+			goto clean;
+		}
 	}
 
 	if (-1 == kstat_read(kc, kp, 0))
