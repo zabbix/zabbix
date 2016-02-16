@@ -1,3 +1,37 @@
+Changes for 3.1.0
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 3.0.1rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0
+
+3.0.0rc3 was released as 3.0.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0rc3
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), Italian, Japanese, Korean, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+..F....... [ZBX-10385] fixed "Case sensistive" checkbox on regular expression test function (Sasha)
+..F....... [ZBX-10381] fixed validation of length of a command in the Administration->Scripts form (Sasha)
+....I..... [ZBX-10384] fixed upgrade of screens, maps and slide shows to make public them for simple users (Sasha)
+..F....... [ZBX-10382] fixed "Too few arguments" error in the user profile form (Sasha)
+....I..... [ZBX-10380] fixed upgrade of an empty proxy database (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0rc2
 
 New features:
@@ -445,6 +479,8 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
 A......... [ZBX-10358] fixed error messages in template screen cloning and web scenarios step validation (Oleg)
 .......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
 ...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
@@ -1191,6 +1227,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
 .......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
 ...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
