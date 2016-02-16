@@ -387,13 +387,6 @@
 #	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
-/* Net-SNMP is used */
-#ifdef HAVE_NETSNMP
-#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
-#	include <net-snmp/net-snmp-config.h>
-#	include <net-snmp/net-snmp-includes.h>
-#endif
-
 /* Required for advanced sigaction */
 #ifdef HAVE_SYS_UCONTEXT_H
 #	include <sys/ucontext.h>

@@ -29,3 +29,5 @@ libzbxpoller_a_CFLAGS = -I@top_srcdir@/src/libs/zbxsysinfo/simple -I@top_srcdir@
 if WITH_ODBC
 libzbxpoller_a_CFLAGS += @UNIXODBC_CFLAGS@
 endif
+
+libzbxpoller_a_CFLAGS += @SNMP_CFLAGS@
