@@ -469,8 +469,9 @@ if (hasRequest('form')) {
 
 	// Get linked templates.
 	$data['linkedTemplates'] = API::Template()->get([
+		'output' => ['templateid', 'name'],
 		'templateids' => $templateIds,
-		'output' => ['templateid', 'name']
+		'preservekeys' => true
 	]);
 	CArrayHelper::sort($data['linkedTemplates'], ['name']);
 
