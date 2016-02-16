@@ -551,7 +551,7 @@ class CScreen extends CZBXAPI {
 		));
 
 		$this->validateUpdate($screens, $dbScreens);
-		$this->updateReal($screens);
+		$screens = $this->updateReal($screens);
 		$this->truncateScreenItems($screens, $dbScreens);
 
 		return array('screenids' => zbx_objectValues($screens, 'screenid'));
@@ -561,6 +561,8 @@ class CScreen extends CZBXAPI {
 	 * Saves screens and screen items.
 	 *
 	 * @param array $screens
+	 *
+	 * @return array
 	 */
 	protected function updateReal(array $screens) {
 		$update = array();
@@ -580,11 +582,14 @@ class CScreen extends CZBXAPI {
 		DB::update('screens', $update);
 
 		// replace screen items
-		foreach ($screens as $screen) {
+		foreach ($screens as &$screen) {
 			if (isset($screen['screenitems'])) {
-				$this->replaceItems($screen['screenid'], $screen['screenitems']);
+				$screen['screenitems'] = $this->replaceItems($screen['screenid'], $screen['screenitems']);
 			}
 		}
+		unset($screen);
+
+		return $screens;
 	}
 
 	/**
@@ -608,11 +613,15 @@ class CScreen extends CZBXAPI {
 		$deleteScreenItemIds = array();
 		$updateScreenItems = array();
 		foreach ($screens as $screen) {
-			$dbScreen = $dbScreens[$screen['screenid']];
-			$dbScreenItems = $dbScreen['screenitems'];
+			if (array_key_exists('screenitems', $screen)) {
+				$screen_items = $screen['screenitems'];
+			}
+			else {
+				$screen_items = $dbScreens[$screen['screenid']]['screenitems'];
+			}
 
 			if (isset($screen['hsize'])) {
-				foreach ($dbScreenItems as $dbScreenItem) {
+				foreach ($screen_items as $dbScreenItem) {
 					// delete screen items that are located on the deleted columns
 					if ($dbScreenItem['x'] > $screen['hsize'] - 1) {
 						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
@@ -629,7 +638,7 @@ class CScreen extends CZBXAPI {
 			}
 
 			if (isset($screen['vsize'])) {
-				foreach ($dbScreenItems as $dbScreenItem) {
+				foreach ($screen_items as $dbScreenItem) {
 					// delete screen items that are located on the deleted rows
 					if ($dbScreenItem['y'] > $screen['vsize'] - 1) {
 						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
@@ -704,6 +713,8 @@ class CScreen extends CZBXAPI {
 	 *
 	 * @param int   $screenId		The ID of the target screen
 	 * @param array $screenItems	An array of screen items
+	 *
+	 * @return array
 	 */
 	protected function replaceItems($screenId, $screenItems) {
 		foreach ($screenItems as &$screenItem) {
@@ -740,9 +751,17 @@ class CScreen extends CZBXAPI {
 		if ($updateScreenItems) {
 			API::ScreenItem()->update($updateScreenItems);
 		}
+
+		$created_items = array();
 		if ($createScreenItems) {
-			API::ScreenItem()->create($createScreenItems);
+			$new_ids = API::ScreenItem()->create($createScreenItems);
+
+			foreach ($new_ids as $id_key => $new_id) {
+				$created_items[$new_id] = $createScreenItems[$id_key];
+			}
 		}
+
+		return array_merge($updateScreenItems, $created_items);
 	}
 
 	protected function applyQueryNodeOptions($tableName, $tableAlias, array $options, array $sqlParts) {
