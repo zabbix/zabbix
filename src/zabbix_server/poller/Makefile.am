@@ -30,4 +30,4 @@ if WITH_ODBC
 libzbxpoller_a_CFLAGS += @UNIXODBC_CFLAGS@
 endif
 
-libzbxpoller_a_CFLAGS += @SNMP_CFLAGS@
+libzbxpoller_a_CFLAGS += @SNMP_CFLAGS@ @SSH2_CFLAGS@ @OPENIPMI_CFLAGS@
