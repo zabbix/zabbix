@@ -76,20 +76,17 @@ class CLocalApiClient extends CApiClient {
 		// check that no authentication token is passed to methods that don't require it
 		if (!$requiresAuthentication && $auth !== null) {
 			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
-			$response->errorMessage = _s(
-				'The "%1$s.%2$s" method must be called without the "auth" parameter.',
+			$response->errorMessage = _s('The "%1$s.%2$s" method must be called without the "auth" parameter.',
 				$requestApi, $requestMethod
 			);
 
 			return $response;
 		}
 
-		// check for incompatibile API options countOutput, sortfield usage
+		// Check for incompatibile API options countOutput, sortfield usage.
 		if (array_key_exists('countOutput', $params) &&  array_key_exists('sortfield', $params)) {
 			$response->errorCode = ZBX_API_ERROR_INTERNAL;
-			$response->errorMessage = _s('Incompatible options "%1$s", "%2$s" used.',
-				'countOutput', 'sortfield'
-			);
+			$response->errorMessage = _s('Incompatible options "%1$s", "%2$s" used.', 'countOutput', 'sortfield');
 
 			return $response;
 		}
@@ -122,10 +119,8 @@ class CLocalApiClient extends CApiClient {
 		}
 		catch (Exception $e) {
 			if ($newTransaction) {
-				/*
-				 * If we're calling user.login and authentication failed - commit the transaction to
-				 * save the failed attempt data
-				 */
+				// if we're calling user.login and authentication failed - commit the transaction to save the
+				// failed attempt data
 				if ($api === 'user' && $method === 'login') {
 					DBend(true);
 				}
