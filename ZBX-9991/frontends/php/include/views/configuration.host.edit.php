@@ -90,10 +90,11 @@ else {
 	$original_templates = array();
 }
 
-
-if (getRequest('hostid')
-		&& ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-			|| (!hasRequest('form_refresh') && getRequest('form') === 'update'))) {
+if (getRequest('hostid') != 0
+		&& (($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+				&& getRequest('form_refresh') <= 1)
+			|| (!hasRequest('form_refresh')
+				&& getRequest('form') === 'update'))) {
 	// Load data from DB for host update and for discovered host clone.
 
 	$proxy_hostid = $dbHost['proxy_hostid'];
