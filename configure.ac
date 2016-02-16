@@ -1444,17 +1444,16 @@ if test "x$want_ldap" = "xyes"; then
 		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
 	fi
 fi
-SERVER_CFLAGS="$SERVER_CFLAGS $LDAP_CPPFLAGS"
 SERVER_LDFLAGS="$SERVER_LDFLAGS $LDAP_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $LDAP_LIBS"
 
-PROXY_CFLAGS="$PROXY_CFLAGS $LDAP_CPPFLAGS"
 PROXY_LDFLAGS="$PROXY_LDFLAGS $LDAP_LDFLAGS"
 PROXY_LIBS="$PROXY_LIBS $LDAP_LIBS"
 
-AGENT_CFLAGS="$AGENT_CFLAGS $LDAP_CPPFLAGS"
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LDAP_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
+
+AC_SUBST(LDAP_CPPFLAGS)
 
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
@@ -1486,9 +1485,10 @@ LIBICONV_CHECK_CONFIG([no])
 if test "x$found_iconv" != "xyes"; then
 	AC_MSG_ERROR([Unable to use iconv (libiconv check failed)])
 fi
-CFLAGS="$CFLAGS $ICONV_CFLAGS"
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
+
+AC_SUBST(ICONV_CFLAGS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
@@ -1705,6 +1705,7 @@ fi
 
 echo "
   LDAP support:          ${found_ldap}
+  LDAP headers:          ${LDAP_CPPFLAGS}
   IPv6 support:          ${have_ipv6}"
 
 echo
