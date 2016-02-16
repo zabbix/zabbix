@@ -626,6 +626,7 @@ extern zbx_dbpatch_t	DBPATCH_VERSION(2020)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2030)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2040)[];
 extern zbx_dbpatch_t	DBPATCH_VERSION(2050)[];
+extern zbx_dbpatch_t	DBPATCH_VERSION(3000)[];
 
 static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2010), "2.2 development"},
@@ -633,6 +634,7 @@ static zbx_db_version_t dbversions[] = {
 	{DBPATCH_VERSION(2030), "2.4 development"},
 	{DBPATCH_VERSION(2040), "2.4 maintenance"},
 	{DBPATCH_VERSION(2050), "3.0 development"},
+	{DBPATCH_VERSION(3000), "3.0 maintenance"},
 	{NULL}
 };
 

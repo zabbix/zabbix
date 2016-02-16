@@ -166,7 +166,7 @@ nav a:link, .nav a:link, nav a:visited, .nav a:visited, nav a:hover, .nav a:hove
 .top-nav-container {
   height: 49px;
   line-height: 49px;
-  overflow: hidden;
+  position: relative;
   background-color: #2b2b2b; }
 
 .top-nav {
@@ -405,8 +405,7 @@ footer, .footer {
   width: 95px;
   height: 25px;
   margin: 12px 9px 0 13px;
-  background: #fff url(../img/icon-sprite.svg) no-repeat 0 -720px;
-  background-size: 95px; }
+  background: url(../img/icon-sprite.svg) no-repeat 0 -903px; }
 
 .list-table {
   width: 100%;
@@ -759,6 +758,10 @@ footer, .footer {
   -moz-box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5);
   box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
 
+.suggest-found {
+  font-weight: bold;
+  color: #e99003; }
+
 .scrollbar {
   position: relative;
   margin: 0 auto;
@@ -1035,7 +1038,14 @@ footer, .footer {
       position: relative;
       z-index: 2; }
     .radio-segmented input[type="radio"]:checked[disabled] + label {
-      background-color: #a3a3a3 !important; }
+      background-color: #a3a3a3 !important;
+      -webkit-transition: none;
+      -moz-transition: none;
+      transition: none; }
+    .radio-segmented input[type="radio"][disabled] + label {
+      -webkit-transition: none;
+      -moz-transition: none;
+      transition: none; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
@@ -1851,6 +1861,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   z-index: 99; }
 
 .screen-table {
+  background-color: #2b2b2b;
   width: 100%; }
   .screen-table td {
     padding: 8px 5px; }
@@ -1900,14 +1911,16 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: absolute;
   z-index: 98;
   overflow: hidden;
-  background-color: rgba(66, 54, 1, 0.5);
-  border: 1px solid rgba(66, 54, 1, 0.5); }
+  background-color: rgba(167, 136, 32, 0.35);
+  border: 1px solid rgba(233, 144, 3, 0.6);
+  border-top: none;
+  border-bottom: none; }
 
 .ui-selectable-helper {
   position: absolute;
   z-index: 100;
-  background-color: rgba(66, 54, 1, 0.5);
-  border: 1px solid rgba(66, 54, 1, 0.5); }
+  background-color: rgba(167, 136, 32, 0.35);
+  border: 1px solid rgba(233, 144, 3, 0.6); }
 
 #map-area .map-element-area-bg {
   background-color: rgba(69, 69, 69, 0.35); }
@@ -2116,7 +2129,7 @@ td.active-bg {
   color: #4b0c0c;
   background-color: #e45959; }
 
-.list-table tbody tr.row-selected, .suggest-found, .drag-drop-area {
+.list-table tbody tr.row-selected, .drag-drop-area {
   background-color: #2f280a; }
 
 .active-indic {

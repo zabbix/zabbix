@@ -300,7 +300,7 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 	}
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "activate_host";
 	zbx_host_availability_t	in, out;
@@ -334,8 +334,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
 				zbx_agent_type_string(item->type), item->host.host);
 	}
-
-	*available = HOST_AVAILABLE_TRUE;
 out:
 	zbx_host_availability_clean(&out);
 	zbx_host_availability_clean(&in);
@@ -343,7 +341,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, const char *error)
+static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	const char		*__function_name = "deactivate_host";
 	zbx_host_availability_t	in, out;
@@ -359,11 +357,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 		goto out;
 
 	if (FAIL == host_get_availability(&item->host, agent_type, &in))
-		goto out;
-
-	/* if the item is still flagged as unreachable while the host is reachable, */
-	/* it means that this is item rather than network failure                   */
-	if (0 == in.agents[agent_type].errors_from && 0 != item->unreachable)
 		goto out;
 
 	if (FAIL == DChost_deactivate(item->host.hostid, agent_type, ts, &in.agents[agent_type],
@@ -407,8 +400,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name,
 			out.agents[agent_type].errors_from, out.agents[agent_type].available);
-
-	*available = HOST_AVAILABLE_FALSE;
 out:
 	zbx_host_availability_clean(&out);
 	zbx_host_availability_clean(&in);
@@ -684,14 +675,20 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
-					activate_host(&items[i], &timespec, &last_available);
+				{
+					activate_host(&items[i], &timespec);
+					last_available = HOST_AVAILABLE_TRUE;
+				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
-					deactivate_host(&items[i], &timespec, &last_available, results[i].msg);
+				{
+					deactivate_host(&items[i], &timespec, results[i].msg);
+					last_available = HOST_AVAILABLE_FALSE;
+				}
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
@@ -756,7 +753,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				}
 			}
 		}
-		else if (HOST_AVAILABLE_FALSE != last_available)
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,

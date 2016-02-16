@@ -23,8 +23,9 @@ $this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())
 	->addRow(_('Message'),
-		(new CTextArea('message', '', ['maxlength' => 255]))
+		(new CTextArea('message'))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setMaxLength(255)
 			->setAttribute('autofocus', 'autofocus')
 	);
 

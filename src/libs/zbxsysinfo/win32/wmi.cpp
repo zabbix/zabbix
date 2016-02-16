@@ -77,8 +77,8 @@ extern "C" void	zbx_co_uninitialize()
  *                                                                            *
  * Purpose: retrieves WMI value and stores it in the provided memory location *
  *                                                                            *
- * Parameters: wmi_namespace [IN]  - the object path of the WMI namespace     *
- *             wmi_query     [IN]  - WQL query                                *
+ * Parameters: wmi_namespace [IN]  - object path of the WMI namespace (UTF-8) *
+ *             wmi_query     [IN]  - WQL query (UTF-8)                        *
  *             vtProp        [OUT] - pointer to memory for the queried value  *
  *                                                                            *
  * Return value: SYSINFO_RET_OK   - *vtProp contains the retrieved WMI value  *
@@ -89,7 +89,7 @@ extern "C" void	zbx_co_uninitialize()
  *           intended format using VariantChangeType()                        *
  *                                                                            *
  ******************************************************************************/
-extern "C" int	zbx_wmi_get_variant(char *wmi_namespace, char *wmi_query, VARIANT *vtProp)
+extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query, VARIANT *vtProp)
 {
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
@@ -98,6 +98,8 @@ extern "C" int	zbx_wmi_get_variant(char *wmi_namespace, char *wmi_query, VARIANT
 	ULONG			uReturn = 0;
 	int			ret = SYSINFO_RET_FAIL;
 	HRESULT			hres;
+	wchar_t			*wmi_namespace_wide;
+	wchar_t			*wmi_query_wide;
 
 	/* obtain the initial locator to Windows Management on a particular host computer */
 	hres = CoCreateInstance(CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID *) &pLoc);
@@ -108,7 +110,10 @@ extern "C" int	zbx_wmi_get_variant(char *wmi_namespace, char *wmi_query, VARIANT
 		goto out;
 	}
 
-	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace), NULL, NULL, 0, NULL, 0, 0, &pService);
+	wmi_namespace_wide = zbx_utf8_to_unicode(wmi_namespace);
+	hres = pLoc->ConnectServer(_bstr_t(wmi_namespace_wide), NULL, NULL, 0, NULL, 0, 0, &pService);
+	zbx_free(wmi_namespace_wide);
+
 	if (FAILED(hres))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain %s WMI service", wmi_namespace);
@@ -125,8 +130,10 @@ extern "C" int	zbx_wmi_get_variant(char *wmi_namespace, char *wmi_query, VARIANT
 		goto out;
 	}
 
-	hres = pService->ExecQuery(_bstr_t("WQL"), _bstr_t(wmi_query),
+	wmi_query_wide = zbx_utf8_to_unicode(wmi_query);
+	hres = pService->ExecQuery(_bstr_t("WQL"), _bstr_t(wmi_query_wide),
 			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, NULL, &pEnumerator);
+	zbx_free(wmi_query_wide);
 
 	if (FAILED(hres))
 	{
@@ -178,8 +185,8 @@ out:
  * Purpose: wrapper function for zbx_wmi_get_variant(), stores the retrieved  *
  *          WMI value as UTF-8 encoded string                                 *
  *                                                                            *
- * Parameters: wmi_namespace [IN]  - the object path of the WMI namespace     *
- *             wmi_query     [IN]  - WQL query                                *
+ * Parameters: wmi_namespace [IN]  - object path of the WMI namespace (UTF-8) *
+ *             wmi_query     [IN]  - WQL query (UTF-8)                        *
  *             utf8_value    [OUT] - address of the pointer to the retrieved  *
  *                                   value (dynamically allocated)            *
  *                                                                            *
@@ -188,7 +195,7 @@ out:
  *           to check for this condition). Callers must free *utf8_value.     *
  *                                                                            *
  ******************************************************************************/
-extern "C" void	zbx_wmi_get(char *wmi_namespace, char *wmi_query, char **utf8_value)
+extern "C" void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, char **utf8_value)
 {
 	VARIANT		vtProp;
 	HRESULT		hres;
