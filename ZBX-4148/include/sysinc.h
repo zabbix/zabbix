@@ -392,10 +392,6 @@
 #	include <sys/ucontext.h>
 #endif
 
-#ifdef HAVE_ICONV
-#	include <iconv.h>
-#endif
-
 #ifdef HAVE_IO_H
 #	include <io.h>
 #endif
