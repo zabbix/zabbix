@@ -1322,13 +1322,13 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_ssh2="yes"
 		fi
 	fi
-	SERVER_CFLAGS="$SERVER_CFLAGS $SSH2_CFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $SSH2_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $SSH2_LIBS"
 
-	PROXY_CFLAGS="$PROXY_CFLAGS $SSH2_CFLAGS"
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $SSH2_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $SSH2_LIBS"
+
+	AC_SUBST(SSH2_CFLAGS)
 
 	found_openipmi="no"
 	dnl Check for libOpenIPMI [by default - skip]
@@ -1340,13 +1340,13 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			have_ipmi="yes"
 		fi
 	fi
-	SERVER_CFLAGS="$SERVER_CFLAGS $OPENIPMI_CFLAGS"
 	SERVER_LDFLAGS="$SERVER_LDFLAGS $OPENIPMI_LDFLAGS"
 	SERVER_LIBS="$SERVER_LIBS $OPENIPMI_LIBS"
 
-	PROXY_CFLAGS="$PROXY_CFLAGS $OPENIPMI_CFLAGS"
 	PROXY_LDFLAGS="$PROXY_LDFLAGS $OPENIPMI_LDFLAGS"
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
+
+	AC_SUBST(OPENIPMI_CFLAGS)
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
@@ -1638,7 +1638,9 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     SNMP headers:          ${SNMP_CFLAGS}
     IPMI:                  ${have_ipmi}
+    IPMI headers:          ${OPENIPMI_CFLAGS}
     SSH:                   ${have_ssh2}
+    SSH headers:           ${SSH2_CFLAGS}
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
@@ -1662,7 +1664,9 @@ echo "  Proxy details:
     SNMP:                  ${have_snmp}
     SNMP headers:          ${SNMP_CFLAGS}
     IPMI:                  ${have_ipmi}
+    IPMI headers:          ${OPENIPMI_CFLAGS}
     SSH:                   ${have_ssh2}
+    SSH headers:           ${SSH2_CFLAGS}
     TLS:                   ${have_tls}
     TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
