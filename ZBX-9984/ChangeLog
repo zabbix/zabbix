@@ -1,12 +1,95 @@
+Changes for 3.0.1rc1
+
+New features:
+
+Bug fixes:
+A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0
+
+3.0.0rc3 was released as 3.0.0 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0rc3
+
+New features:
+A.F....... [ZBX-1357] updated English (United States), Italian, Japanese, Korean, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+..F....... [ZBX-10385] fixed "Case sensistive" checkbox on regular expression test function (Sasha)
+..F....... [ZBX-10381] fixed validation of length of a command in the Administration->Scripts form (Sasha)
+....I..... [ZBX-10384] fixed upgrade of screens, maps and slide shows to make public them for simple users (Sasha)
+..F....... [ZBX-10382] fixed "Too few arguments" error in the user profile form (Sasha)
+....I..... [ZBX-10380] fixed upgrade of an empty proxy database (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0rc2
+
+New features:
+A.F....... [ZBX-1357] enabled French translation to be displayed by default (zalex_ua)
+A.F....... [ZBX-1357] updated Czech, English (United States), French, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+
+Bug fixes:
+..F....... [ZBX-10362] fixed resolving of {TRIGGER.ID} macro in trigger URL field (Sasha)
+A......... [ZBX-10358] fixed error messages in template screen cloning and web scenarios step validation (Oleg)
+A.F....... [ZBX-10347] fixed undefined index "macros" in dashboard widget (Oleg)
+...G...PS. [ZBX-10352] fixed standard file stream redirection after daemonizing when using system log type (wiper)
+..F....... [ZBX-10350] fixed "Select all" checkbox in application list (Ivo)
+.......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
+....I..... [ZBX-10361] updated database versioning for v3.0 release (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0rc1
+
+New features:
+..F....... [ZBXNEXT-2662] added a new filter in Monitoring -> Screens (Sasha)
+..F....... [ZBXNEXT-2662] added a new filter in Monitoring -> Screens -> Slide shows (Sasha)
+..F....... [ZBXNEXT-2662] added a new filter in Monitoring -> Maps (Sasha)
+..F....... [ZBXNEXT-2662] updated default colors for graph elements (Cemeris, Pavel, Sasha)
+A.F....... [ZBX-1357] enabled English (United States), Korean, Ukrainian translations to be displayed by default (zalex_ua)
+....I..... [ZBXNEXT-3122] added Windows ReFS to the list of file system types discovered by default (asaveljevs)
+..F....... [ZBXNEXT-3124] added edit buttons in map, screen and slide show views (Ivo)
+
+Bug fixes:
+...G...... [ZBX-10336] fixed agent crash with TLS OpenSSL on MS Windows; thanks to Kenneth Palmertree for patch (Andris)
+..F....... [ZBX-10345] fixed screen, map and slide show update by a simple user (Oleg)
+...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query (Sandis)
+A.F....... [ZBX-10339] fixed undefined index "conditiontype" when adding LLD rule (Gunars)
+..F....... [ZBX-10305] fixed incorrect menu highlighting and removed dropdown control for templated screens (Ivo)
+.......PS. [ZBX-9661] fixed bug when VMware collectors could sometimes use 100% of CPU without processing any data (wiper)
+..F....... [ZBXNEXT-2662] fixed background of the screens (Pavel)
+..F....... [ZBX-9784] fixed host clone form to work with prototype v1.7.1 (Gunars)
+A......... [ZBX-10325] fixed importing of host prototypes from Zabbix 2.4 (Sasha)
+A......... [ZBX-10325] fixed validation of graph items when importing XML files (Sasha)
+...G...PS. [ZBX-9640] improved server/proxy/agent item value timestamp synchronization (wiper)
+A.FGI..PS. [ZBXNEXT-1263] fixed number of bugs in encryption support, increased minimum PSK length to 128 bits (Andris, asaveljevs, Oleg)
+...G...PS. [ZBX-10333] fixed treatment of empty results from agent as network errors (gleb)
+..F....... [ZBX-10327] fixed brightness of the selections (Pavel, Sasha)
+...G...... [ZBX-10331] fixed starting agent as Windows service with multiple agents option (wiper)
+..F....... [ZBX-10289] fixed top menu element overlapping (Pavel)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0beta2
 
 New features:
 A.F....... [ZBX-1357] updated Czech, Italian, Japanese, Georgian, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-10163] fixed expression area changes in lld rule filters when selecting different type of calculation (Cemeris)
+....I..... [ZBX-4069] fixed LDAP and Oracle DB compilation conflict (viktors)
+..F....... [ZBX-10297] fixed changing web scenario status from list view (Cemeris)
+..F....... [ZBX-10158] fixed threshold parameters for triggers "70% os Process CPU Load on {HOST.NAME}" and "{HOST.NAME} is not reachable" in template "JMX Generic" (Gunars)
+..F....... [ZBXNEXT-2662] added escaping of the HTML entities and tags in the GUI notifications (Sasha)
+..F....... [ZBXNEXT-2662] added space between Auto-logout elements in the user profile form (Sasha)
+..F....... [ZBXNEXT-2662] fixed flickering of disabled radios (Pavel)
+..F....... [ZBXNEXT-2662] fixed logo white background (Pavel)
+..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
+..F....... [ZBX-10280] fixed exporting of historical events to CSV file (Gunars)
+..F....... [ZBX-10163] fixed expression area changes in LLD rule filters when selecting different type of calculation (Cemeris)
 ..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-10182] fixed percentile line checkbox checking (Cemeris)
+..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
 ...G...... [ZBX-9877] changed system.uname on Windows to get data from WMI, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
 ..F....... [ZBX-10282] fixed undefined index "eztext_limit" in media types (Gunars)
@@ -15,7 +98,7 @@ A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gu
 ........S. [ZBX-10284] fixed possible crash when removing all cached actions during configuration sync (wiper)
 ...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
 A......... [ZBX-10285] fixed map export fatal error (Gunars)
-..F....... [ZBX-9969] fixed triggers, graphs and screens access from maps (Cemeris)
+..F....... [ZBX-9969] fixed availability of action menu popups for map elements (Cemeris)
 .........T [ZBX-9730] removed unused value map template "Host status" and added new - "Host availability" (viktors)
 A.F....... [ZBX-10230] fixed and improved translatable strings (zalex_ua)
 
@@ -40,7 +123,7 @@ Bug fixes:
 A......... [ZBX-10226] fixed trigger prototype updateReal API method (Gunars)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
 A.F....... [ZBX-10246] fixed updating and creating media type (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 .......PS. [ZBX-10266] fixed uninitialized variable in VMware code reported by Coverity (CIDs 118958, 118960, 118962, 118965) (dimir)
 ...G...PS. [ZBX-10239] fixed agent collector crashes on Linux while gathering data for proc.cpu.util[], fixed unsafe use of stack in logging functions (Sandis)
 A.F....... [ZBX-10182] fixed API to disallow update of templated host graphs and disabled form fields for templated host graph update (Cemeris)
@@ -389,6 +472,15 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
+A......... [ZBX-10358] fixed error messages in template screen cloning and web scenarios step validation (Oleg)
+.......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
+...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
+.......PS. [ZBX-9661] fixed bug when VMware collectors could sometimes use 100% of CPU without processing any data (wiper)
+..F....... [ZBX-9784] fixed host clone form to work with prototype v1.7.1 (Gunars)
+...G...PS. [ZBX-9640] improved server/proxy/agent item value timestamp synchronization (wiper)
+..F....... [ZBX-10227] fixed exporting events to CSV for selected host (Gunars)
 ..F....... [ZBX-10112] fixed displaying trigger name in IT service dependencies after error (Gunars)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
@@ -397,7 +489,7 @@ A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gu
 ..F....... [ZBX-10165] fixed construction of host discovery filter expression (Gunars)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 ........S. [ZBX-7006] implemented trend cache cleanup procedure which forces hourly flush of deleted, disabled or rarely updated item trends (dimir, gleb)
@@ -1128,13 +1220,20 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+.......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
+...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
+.......PS. [ZBX-9661] fixed bug when VMware collectors could sometimes use 100% of CPU without processing any data (wiper)
+..F....... [ZBX-8635] fixed undefined index in trigger expression constructor popup (Cemeris)
+..F....... [ZBX-10155] disallowed creating host prototype triggers without any host:key reference (Cemeris)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
 ...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
 ..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (Cemeris)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
@@ -2483,8 +2582,10 @@ Changes for 2.0.17rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -4171,6 +4272,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
 

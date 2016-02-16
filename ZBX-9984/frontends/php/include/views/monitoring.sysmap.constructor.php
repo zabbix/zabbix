@@ -23,7 +23,7 @@ include('include/views/js/monitoring.sysmaps.js.php');
 
 // create menu
 $menu = (new CList())
-	->addClass('object-group')
+	->addClass(ZBX_STYLE_OBJECT_GROUP)
 	->addItem([
 		_('Icon').':'.SPACE,
 		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),

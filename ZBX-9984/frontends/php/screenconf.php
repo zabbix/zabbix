@@ -62,6 +62,10 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
+	// filter
+	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_name' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -155,8 +159,12 @@ if (hasRequest('add') || hasRequest('update')) {
 			$screen['users'] = getRequest('users', []);
 			$screen['userGroups'] = getRequest('userGroups', []);
 
+			// Only administrators can set screen owner.
+			if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+				unset($screen['userid']);
+			}
 			// Screen update with inaccessible user.
-			if ($screen['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+			elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $screen['userid'] === '') {
 				$user_exist = API::User()->get([
 					'output' => ['userid'],
 					'userids' => [$screen['userid']]
@@ -356,6 +364,7 @@ if (hasRequest('form')) {
 }
 else {
 	CProfile::delete('web.screens.elementid');
+
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
 	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
@@ -381,10 +390,26 @@ else {
 		]);
 	}
 	else {
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.screenconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		}
+		elseif (hasRequest('filter_rst')) {
+			DBStart();
+			CProfile::delete('web.screenconf.filter_name');
+			DBend();
+		}
+
+		$data['filter'] = [
+			'name' => CProfile::get('web.screenconf.filter_name', '')
+		];
+
 		$data['screens'] = API::Screen()->get([
 			'output' => ['screenid', 'name', 'hsize', 'vsize'],
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'],
+			'search' => [
+				'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
+			],
 			'preservekeys' => true
 		]);
 
@@ -392,17 +417,14 @@ else {
 
 		if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 			$editable_screens = API::Screen()->get([
-				'output' => ['screenid', 'name', 'hsize', 'vsize'],
+				'output' => [],
+				'screenids' => array_keys($data['screens']),
 				'editable' => true,
-				'sortfield' => $sortField,
-				'limit' => $config['search_limit'],
 				'preservekeys' => true
 			]);
 
 			foreach ($data['screens'] as &$screen) {
-				if (array_key_exists($screen['screenid'], $editable_screens)) {
-					$screen['editable'] = true;
-				}
+				$screen['editable'] = array_key_exists($screen['screenid'], $editable_screens);
 			}
 			unset($screen);
 		}

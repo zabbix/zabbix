@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 $widget = (new CWidget())
 	->setTitle(_('Regular expressions'))
 	->setControls((new CForm())
@@ -33,7 +34,7 @@ $form = (new CForm())->setName('regularExpressionsForm');
 $regExpTable = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_regexps'))->onClick("checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
+			(new CCheckBox('all_regexps'))->onClick("checkAll('".$form->getName()."', 'all_regexps', 'regexpids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		_('Name'),
 		_('Expressions')
