@@ -10,6 +10,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0
