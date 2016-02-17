@@ -3,6 +3,7 @@ Changes for 3.1.0
 New features:
 
 Bug fixes:
+..F....... [ZBX-10311] fixed user media edition by guest with Zabbix super admin user type (Cemeris)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
