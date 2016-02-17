@@ -12,6 +12,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9048] fixed accessing history using url with itemids parameter (Cemeris)
 ..F....... [ZBX-10311] fixed user media edition by guest with Zabbix super admin user type (Cemeris)
 ..F....... [ZBX-9984] fixed incorrect template listing in linking form (Gunars)
 A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
