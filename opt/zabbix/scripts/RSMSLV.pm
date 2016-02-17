@@ -1334,10 +1334,12 @@ sub probe_offline_at
 	my $probe = shift;
 	my $clock = shift;
 
+	dbg("check if $probe was online at ", ts_full($clock));
+
 	# if a probe was down for the whole period it won't be in a hash
 	unless (exists($probe_times_ref->{$probe}))
 	{
-		dbg("Probe $probe does not exist in a hash, OFFLINE");
+		dbg("does not exist in a hash, OFFLINE");
 		return 1;	# offline
 	}
 
@@ -1351,11 +1353,14 @@ sub probe_offline_at
 		my $from = $times_ref->[$clock_index++];
 		my $till = $times_ref->[$clock_index++];
 
-		if (($from < $clock) and ($clock < $till))
+		if (($from <= $clock) and ($clock <= $till))
 		{
+			dbg("found in online period: probe ONLINE");
 			return 0;	# online
 		}
 	}
+
+	dbg("not found in online periods: probe OFFLINE");
 
 	return 1;	# offline
 }
