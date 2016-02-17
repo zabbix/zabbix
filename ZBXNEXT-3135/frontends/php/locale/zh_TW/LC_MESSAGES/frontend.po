@@ -3,9 +3,9 @@
 # 20120720T0924
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 2.3\n"
+"Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-03 10:48+0200\n"
+"POT-Creation-Date: 2016-02-09 19:22+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -225,7 +225,7 @@ msgstr "最末和前一個值之前的絕對差異不是 N"
 msgid "Acceptable SLA"
 msgstr "可接受的SLA"
 
-#: include/func.inc.php:1667
+#: include/func.inc.php:1668
 msgid "Access denied"
 msgstr ""
 
@@ -386,12 +386,12 @@ msgid "Action updated"
 msgstr "動作已更新"
 
 #: events.php:423 include/blocks.inc.php:632 include/blocks.inc.php:797
-#: include/events.inc.php:199 include/menu.inc.php:225
+#: include/events.inc.php:199 include/menu.inc.php:229
 #: include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:22
-#: include/views/monitoring.screen.list.php:57
-#: include/views/monitoring.slideconf.list.php:48
-#: include/views/monitoring.sysmap.list.php:43
+#: include/views/monitoring.screen.list.php:72
+#: include/views/monitoring.slideconf.list.php:56
+#: include/views/monitoring.sysmap.list.php:49
 msgid "Actions"
 msgstr "動作"
 
@@ -504,7 +504,7 @@ msgstr "作用中直到"
 #: include/views/js/monitoring.sysmaps.js.php:168
 #: include/views/js/monitoring.sysmaps.js.php:357
 #: include/views/monitoring.history.php:133
-#: include/views/monitoring.screen.constructor.edit.php:759
+#: include/views/monitoring.screen.constructor.edit.php:763
 #: include/views/monitoring.screen.edit.php:132
 #: include/views/monitoring.screen.edit.php:162
 #: include/views/monitoring.screen.edit.php:224
@@ -518,7 +518,7 @@ msgstr "作用中直到"
 #: include/views/monitoring.sysmap.edit.php:283
 #: include/views/monitoring.sysmap.edit.php:313
 #: include/views/monitoring.sysmap.edit.php:374 jsLoader.php:182
-#: popup_media.php:142 tr_logform.php:279 tr_logform.php:388 tr_status.php:695
+#: popup_media.php:143 tr_logform.php:279 tr_logform.php:388 tr_status.php:695
 msgid "Add"
 msgstr "新增"
 
@@ -564,7 +564,7 @@ msgstr "已新增"
 msgid "Admin"
 msgstr "管理者"
 
-#: include/menu.inc.php:238
+#: include/menu.inc.php:242
 msgid "Administration"
 msgstr "管理"
 
@@ -714,13 +714,13 @@ msgstr "包括任何字元字串"
 #: applications.php:126 httpconf.php:41 include/actions.inc.php:59
 #: include/audit.inc.php:32 include/forms.inc.php:519
 #: include/views/configuration.application.edit.php:36
-#: include/views/configuration.application.list.php:50
+#: include/views/configuration.application.list.php:52
 #: include/views/configuration.httpconf.edit.php:62
 #: include/views/configuration.httpconf.edit.php:67
 #: include/views/configuration.httpconf.list.php:78
 #: include/views/inventory.host.view.php:168
 #: include/views/js/monitoring.sysmaps.js.php:115
-#: include/views/monitoring.screen.constructor.edit.php:508 latest.php:374
+#: include/views/monitoring.screen.constructor.edit.php:512 latest.php:374
 msgid "Application"
 msgstr "應用集"
 
@@ -758,7 +758,7 @@ msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
 
 #: include/forms.inc.php:858 include/html.inc.php:370
 #: include/views/configuration.application.edit.php:23
-#: include/views/configuration.application.list.php:29
+#: include/views/configuration.application.list.php:30
 #: include/views/configuration.host.edit.php:325
 #: include/views/configuration.host.list.php:59
 #: include/views/configuration.host.list.php:230
@@ -907,7 +907,7 @@ msgstr "八月"
 msgid "August"
 msgstr "八月"
 
-#: app/views/administration.mediatype.edit.php:73 include/menu.inc.php:266
+#: app/views/administration.mediatype.edit.php:73 include/menu.inc.php:270
 #: include/views/administration.authentication.edit.php:22
 #: include/views/configuration.httpconf.edit.php:252
 #: include/views/configuration.httpconf.list.php:76
@@ -1096,7 +1096,7 @@ msgstr "二元邏輯"
 
 #: include/views/js/monitoring.sysmaps.js.php:68
 #: include/views/js/monitoring.sysmaps.js.php:233
-#: include/views/monitoring.screen.constructor.edit.php:719
+#: include/views/monitoring.screen.constructor.edit.php:723
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Bottom"
 msgstr "底部"
@@ -1305,7 +1305,7 @@ msgstr "無法新增超過一個 \"圖形總計\"類型的項目於圖形 \"%1$s
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr ""
 
-#: sysmaps.php:199
+#: sysmaps.php:207
 msgid "Cannot add network map"
 msgstr "無法新增網路拓墣圖"
 
@@ -1323,7 +1323,7 @@ msgstr "無法新增系統代理程式"
 msgid "Cannot add regular expression"
 msgstr "無法新增正規表示式"
 
-#: screenconf.php:194
+#: screenconf.php:202
 msgid "Cannot add screen"
 msgstr "無法新增篩選"
 
@@ -1336,7 +1336,7 @@ msgstr "無法新增脚本"
 msgid "Cannot add service"
 msgstr "無法新增服務"
 
-#: slideconf.php:149
+#: slideconf.php:156
 msgid "Cannot add slide show"
 msgstr "無法新增簡報片展示"
 
@@ -1392,11 +1392,11 @@ msgstr "無法改變授權方式為Zabbix內部"
 msgid "Cannot clear history"
 msgstr "無法清除歷史"
 
-#: include/classes/api/services/CDiscoveryRule.php:1192
+#: include/classes/api/services/CDiscoveryRule.php:1194
 msgid "Cannot clone graph prototypes."
 msgstr "無法克隆圖形原型"
 
-#: include/classes/api/services/CDiscoveryRule.php:1240
+#: include/classes/api/services/CDiscoveryRule.php:1242
 msgid "Cannot clone host prototypes."
 msgstr ""
 
@@ -1572,7 +1572,7 @@ msgstr "無法刪除圖示對應"
 msgid "Cannot delete image"
 msgstr "無法删除圖片"
 
-#: include/classes/api/services/CHost.php:1009
+#: include/classes/api/services/CHost.php:1010
 msgid "Cannot delete inventory."
 msgstr "無法刪除資產紀錄."
 
@@ -1601,7 +1601,7 @@ msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "無法刪除示警媒介類型"
 
-#: sysmaps.php:244
+#: sysmaps.php:252
 msgid "Cannot delete network map"
 msgstr "無法刪除網路拓墣圖"
 
@@ -1615,7 +1615,7 @@ msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] "無法删除正規表示式 "
 
-#: screenconf.php:274
+#: screenconf.php:282
 msgid "Cannot delete screen"
 msgstr "無法刪除篩選"
 
@@ -1646,7 +1646,7 @@ msgstr "無法刪除所選的動作"
 msgid "Cannot delete service"
 msgstr "無法删除服務"
 
-#: slideconf.php:180 slideconf.php:201
+#: slideconf.php:187 slideconf.php:208
 msgid "Cannot delete slide show"
 msgstr "無法刪除簡報片展示"
 
@@ -1887,7 +1887,7 @@ msgstr ""
 #: include/classes/api/services/CDiscoveryRule.php:972
 #: include/classes/api/services/CDiscoveryRule.php:1058
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:386
-#: include/items.inc.php:437
+#: include/items.inc.php:439
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "找不到用於項目鍵\"%2$s\"的主機介面於 \"%1$s\" ."
@@ -2037,7 +2037,7 @@ msgstr ""
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
-#: include/classes/api/services/CHost.php:987
+#: include/classes/api/services/CHost.php:988
 msgid "Cannot link template"
 msgstr "無法連結模板"
 
@@ -2054,7 +2054,7 @@ msgstr ""
 msgid "Cannot logout."
 msgstr "不能登出"
 
-#: include/classes/api/services/CHost.php:845
+#: include/classes/api/services/CHost.php:846
 msgid "Cannot mass update host name."
 msgstr "不能大量更新主機名稱."
 
@@ -2062,7 +2062,7 @@ msgstr "不能大量更新主機名稱."
 msgid "Cannot mass update template name."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:835
+#: include/classes/api/services/CHost.php:836
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可見主機名稱"
 
@@ -2158,9 +2158,9 @@ msgstr "無法設置 \"templateid\"給篩選\"%1$s\"."
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "無法設置 \"templateid\"給觸發器原型\"%1$s\"."
 
-#: include/classes/api/services/CHost.php:896
-#: include/classes/api/services/CHost.php:1668
-#: include/classes/api/services/CHost.php:1796
+#: include/classes/api/services/CHost.php:897
+#: include/classes/api/services/CHost.php:1669
+#: include/classes/api/services/CHost.php:1797
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr ""
 
@@ -2210,7 +2210,7 @@ msgstr "無法斷連和清除項目"
 msgid "Cannot unlink and clear triggers"
 msgstr "無法斷連和清除觸發器"
 
-#: include/classes/api/services/CHost.php:962
+#: include/classes/api/services/CHost.php:963
 msgid "Cannot unlink template"
 msgstr "無法斷連模板"
 
@@ -2249,7 +2249,7 @@ msgstr ""
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1780
+#: include/classes/api/services/CHost.php:1781
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr ""
@@ -2359,7 +2359,7 @@ msgstr ""
 msgid "Cannot update host"
 msgstr "無法更新主機"
 
-#: include/classes/api/services/CHost.php:803
+#: include/classes/api/services/CHost.php:804
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
 msgstr ""
 
@@ -2409,7 +2409,7 @@ msgstr "無法更新維修"
 msgid "Cannot update media type"
 msgstr "無法更新媒介型態"
 
-#: sysmaps.php:192
+#: sysmaps.php:200
 msgid "Cannot update network map"
 msgstr "無法更新網路拓墣圖"
 
@@ -2428,7 +2428,7 @@ msgstr ""
 msgid "Cannot update regular expression"
 msgstr "無法更新正規表示式"
 
-#: screenconf.php:140 screenedit.php:230 screenedit.php:247
+#: screenconf.php:144 screenedit.php:230 screenedit.php:247
 msgid "Cannot update screen"
 msgstr "無法更新篩選"
 
@@ -2441,7 +2441,7 @@ msgstr "無法更新脚本"
 msgid "Cannot update service"
 msgstr "無法更新服務"
 
-#: slideconf.php:134
+#: slideconf.php:141
 msgid "Cannot update slide show"
 msgstr "無法更新簡報片展示"
 
@@ -2507,7 +2507,7 @@ msgstr ""
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:706
+#: include/views/monitoring.screen.constructor.edit.php:710
 msgid "Center"
 msgstr "中"
 
@@ -2523,7 +2523,7 @@ msgid "Certificate"
 msgstr ""
 
 #: include/classes/screens/CScreenBase.php:277
-#: include/classes/screens/CScreenBuilder.php:493
+#: include/classes/screens/CScreenBuilder.php:494
 #: include/classes/screens/CScreenMap.php:61
 #: include/views/configuration.services.edit.php:51
 #: include/views/hostmacros.php:100 include/views/js/hostmacros.js.php:37
@@ -2733,7 +2733,7 @@ msgstr "Clock"
 msgid "Clone"
 msgstr "克隆"
 
-#: include/func.inc.php:1764 include/views/js/monitoring.sysmaps.js.php:185
+#: include/func.inc.php:1765 include/views/js/monitoring.sysmaps.js.php:185
 #: include/views/js/monitoring.sysmaps.js.php:284
 #: include/views/js/monitoring.sysmaps.js.php:373 tr_testexpr.php:193
 msgid "Close"
@@ -2771,7 +2771,7 @@ msgstr ""
 msgid "Column deleted"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:722 screenedit.php:72
+#: include/views/monitoring.screen.constructor.edit.php:726 screenedit.php:72
 msgid "Column span"
 msgstr "列跨幅"
 
@@ -3115,8 +3115,8 @@ msgstr ""
 msgid "Connections to proxy"
 msgstr ""
 
-#: include/views/monitoring.screen.list.php:67
-#: include/views/monitoring.sysmap.list.php:52
+#: include/views/monitoring.screen.list.php:82
+#: include/views/monitoring.sysmap.list.php:57
 msgid "Constructor"
 msgstr ""
 
@@ -3170,11 +3170,11 @@ msgstr ""
 msgid "Create action"
 msgstr "創建動作"
 
-#: include/views/configuration.application.list.php:25
+#: include/views/configuration.application.list.php:26
 msgid "Create application"
 msgstr "創建應用集"
 
-#: include/views/configuration.application.list.php:22
+#: include/views/configuration.application.list.php:23
 msgid "Create application (select host first)"
 msgstr ""
 
@@ -3252,7 +3252,7 @@ msgstr ""
 msgid "Create proxy"
 msgstr "創建系統代理程式"
 
-#: include/views/monitoring.screen.list.php:29
+#: include/views/monitoring.screen.list.php:34
 msgid "Create screen"
 msgstr "創建篩選"
 
@@ -3300,7 +3300,7 @@ msgstr ""
 msgid "Create web scenario (select host first)"
 msgstr ""
 
-#: include/classes/api/managers/CApplicationManager.php:73
+#: include/classes/api/managers/CApplicationManager.php:74
 #, c-format
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 應用集 \"%1$s\" 於 \"%2$s\"."
@@ -3747,7 +3747,7 @@ msgstr "預設的佈景主題 \"%1$s\"."
 
 #: include/views/configuration.discovery.list.php:39
 #: include/views/monitoring.slideconf.edit.php:121
-#: include/views/monitoring.slideconf.list.php:46
+#: include/views/monitoring.slideconf.list.php:54
 msgid "Delay"
 msgstr "延遲"
 
@@ -3767,13 +3767,13 @@ msgstr "延遲因"
 #: app/views/administration.script.list.php:94
 #: include/classes/html/CButtonDelete.php:25 include/services.inc.php:118
 #: include/views/administration.auditlogs.list.php:41
-#: include/views/administration.general.regularexpressions.list.php:75
+#: include/views/administration.general.regularexpressions.list.php:76
 #: include/views/administration.general.valuemapping.edit.php:97
 #: include/views/administration.general.valuemapping.list.php:69
 #: include/views/administration.usergroups.list.php:151
 #: include/views/administration.users.list.php:147
 #: include/views/configuration.action.list.php:112
-#: include/views/configuration.application.list.php:150
+#: include/views/configuration.application.list.php:152
 #: include/views/configuration.discovery.list.php:74
 #: include/views/configuration.graph.list.php:162
 #: include/views/configuration.host.discovery.list.php:151
@@ -3786,9 +3786,9 @@ msgstr "延遲因"
 #: include/views/configuration.maintenance.list.php:78
 #: include/views/configuration.trigger.prototype.list.php:161
 #: include/views/configuration.triggers.list.php:231
-#: include/views/monitoring.screen.list.php:95
-#: include/views/monitoring.slideconf.list.php:80
-#: include/views/monitoring.sysmap.list.php:75 templates.php:752
+#: include/views/monitoring.screen.list.php:110
+#: include/views/monitoring.slideconf.list.php:87
+#: include/views/monitoring.sysmap.list.php:80 templates.php:752
 msgid "Delete"
 msgstr "删除"
 
@@ -3897,7 +3897,7 @@ msgstr "删除所選的"
 msgid "Delete selected actions?"
 msgstr "刪除所選的動作?"
 
-#: include/views/configuration.application.list.php:150
+#: include/views/configuration.application.list.php:152
 msgid "Delete selected applications?"
 msgstr "删除所選的應用集?"
 
@@ -3967,7 +3967,7 @@ msgstr "删除所選的維修期間?"
 msgid "Delete selected map?"
 msgstr ""
 
-#: include/views/monitoring.sysmap.list.php:75
+#: include/views/monitoring.sysmap.list.php:80
 msgid "Delete selected maps?"
 msgstr "删除所選的拓墣圖?"
 
@@ -3979,11 +3979,11 @@ msgstr "刪除所選的示警媒介類型?"
 msgid "Delete selected proxies?"
 msgstr "删除所選的系統代理程式?"
 
-#: include/views/administration.general.regularexpressions.list.php:75
+#: include/views/administration.general.regularexpressions.list.php:76
 msgid "Delete selected regular expressions?"
 msgstr "删除所選的正規表示式?"
 
-#: include/views/monitoring.screen.list.php:95
+#: include/views/monitoring.screen.list.php:110
 msgid "Delete selected screens?"
 msgstr "刪除所選的篩選?"
 
@@ -3991,7 +3991,7 @@ msgstr "刪除所選的篩選?"
 msgid "Delete selected scripts?"
 msgstr "删除所選的脚本?"
 
-#: include/views/monitoring.slideconf.list.php:80
+#: include/views/monitoring.slideconf.list.php:87
 msgid "Delete selected slide shows?"
 msgstr "刪除所選的簡報片展示?"
 
@@ -4077,7 +4077,7 @@ msgstr "已刪除: 探索規則 \"%1$s\" 於 \"%2$s\"."
 msgid "Deleted: Graph \"%1$s\" on \"%2$s\"."
 msgstr "已刪除: 圖形 \"%1$s\" 於 \"%2$s\"."
 
-#: include/classes/api/services/CHost.php:1322
+#: include/classes/api/services/CHost.php:1323
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已刪除: 主機 \"%1$s\"."
@@ -4202,7 +4202,7 @@ msgid "Detailed host information. Returns string"
 msgstr ""
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1183
-#: include/blocks.inc.php:467 include/func.inc.php:1736
+#: include/blocks.inc.php:467 include/func.inc.php:1737
 #: include/views/administration.auditlogs.list.php:66
 #: include/views/configuration.action.edit.php:391
 #: include/views/configuration.action.edit.php:395
@@ -4272,7 +4272,7 @@ msgstr "在最後與前一個值之間的差異不是 N"
 msgid "Different information about specific process(es). Returns float"
 msgstr ""
 
-#: include/views/monitoring.screen.list.php:56
+#: include/views/monitoring.screen.list.php:71
 msgid "Dimension (cols x rows)"
 msgstr "圖表規格 (列 x 行)"
 
@@ -4280,7 +4280,7 @@ msgstr "圖表規格 (列 x 行)"
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.usergroups.list.php:144
 #: include/views/configuration.action.list.php:111
-#: include/views/configuration.application.list.php:149
+#: include/views/configuration.application.list.php:151
 #: include/views/configuration.discovery.list.php:73
 #: include/views/configuration.host.discovery.list.php:148
 #: include/views/configuration.host.list.php:268
@@ -4326,7 +4326,7 @@ msgstr "停用所選的系統代理程式所監測的主機?"
 msgid "Disable selected actions?"
 msgstr "停用所選的動作?"
 
-#: include/views/configuration.application.list.php:149
+#: include/views/configuration.application.list.php:151
 msgid "Disable selected applications?"
 msgstr "停用所選的應用集?"
 
@@ -4413,7 +4413,7 @@ msgstr ""
 msgid "Discovered device"
 msgstr "已探索到的裝置"
 
-#: events.php:277 include/menu.inc.php:103 include/menu.inc.php:229
+#: events.php:277 include/menu.inc.php:103 include/menu.inc.php:233
 #: include/views/configuration.action.list.php:30
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.host.list.php:246
@@ -4551,12 +4551,12 @@ msgstr ""
 msgid "Display stacked graph"
 msgstr ""
 
-#: include/func.inc.php:1537 search.php:251 search.php:347 search.php:488
+#: include/func.inc.php:1538 search.php:251 search.php:347 search.php:488
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "顯示 已探索的 %2$s中的%1$s"
 
-#: include/func.inc.php:1559
+#: include/func.inc.php:1560
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr ""
@@ -4668,14 +4668,14 @@ msgstr ""
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1616
-#: include/classes/api/services/CHost.php:1826
+#: include/classes/api/services/CHost.php:1617
+#: include/classes/api/services/CHost.php:1827
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "重複的主機. 有相同主機名稱\"%s\"的主機已存於資料中."
 
-#: include/classes/api/services/CHost.php:1623
-#: include/classes/api/services/CHost.php:1846
+#: include/classes/api/services/CHost.php:1624
+#: include/classes/api/services/CHost.php:1847
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "重複的主機. 有相同主機可視名稱\"%s\"的主機已存於資料中."
@@ -4732,7 +4732,7 @@ msgstr "持續時間(秒)"
 msgid "Dutch (nl_NL)"
 msgstr "荷蘭(nl_NL)"
 
-#: include/views/monitoring.screen.constructor.edit.php:739
+#: include/views/monitoring.screen.constructor.edit.php:743
 msgid "Dynamic item"
 msgstr "動態監控項"
 
@@ -4859,7 +4859,7 @@ msgstr ""
 #: include/classes/api/services/CHostGroup.php:432
 #: include/classes/api/services/CHostGroup.php:509
 #: include/classes/api/services/CHostInterface.php:391
-#: include/classes/api/services/CHost.php:1170
+#: include/classes/api/services/CHost.php:1171
 #: include/classes/api/services/CHostPrototype.php:906
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:554
@@ -4970,7 +4970,7 @@ msgstr ""
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.usergroups.list.php:143
 #: include/views/configuration.action.list.php:110
-#: include/views/configuration.application.list.php:148
+#: include/views/configuration.application.list.php:150
 #: include/views/configuration.discovery.list.php:72
 #: include/views/configuration.host.discovery.list.php:145
 #: include/views/configuration.host.list.php:267
@@ -5031,7 +5031,7 @@ msgstr ""
 msgid "Enable selected actions?"
 msgstr "啟用所選的動作?"
 
-#: include/views/configuration.application.list.php:148
+#: include/views/configuration.application.list.php:150
 msgid "Enable selected applications?"
 msgstr "啟用所選的應用集"
 
@@ -5104,7 +5104,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:407
 #: include/views/configuration.trigger.prototype.edit.php:257
 #: include/views/configuration.triggers.edit.php:262
-#: include/views/monitoring.dashconf.php:35 popup_media.php:137
+#: include/views/monitoring.dashconf.php:35 popup_media.php:138
 msgid "Enabled"
 msgstr "已啟用"
 
@@ -5243,7 +5243,7 @@ msgstr "執行在"
 msgid "Executed"
 msgstr ""
 
-#: include/items.inc.php:1306
+#: include/items.inc.php:1310
 #: include/views/configuration.host.discovery.edit.php:181
 #: include/views/configuration.item.edit.php:192
 #: include/views/configuration.item.prototype.edit.php:190
@@ -5282,8 +5282,8 @@ msgstr "Exploded"
 
 #: include/views/administration.general.valuemapping.list.php:68
 #: include/views/configuration.host.list.php:269
-#: include/views/monitoring.screen.list.php:92
-#: include/views/monitoring.sysmap.list.php:74 templates.php:751
+#: include/views/monitoring.screen.list.php:107
+#: include/views/monitoring.sysmap.list.php:79 templates.php:751
 msgid "Export"
 msgstr ""
 
@@ -5333,7 +5333,7 @@ msgstr "表示式類型"
 
 #: include/views/administration.general.regularexpressions.edit.php:99
 #: include/views/administration.general.regularexpressions.edit.php:127
-#: include/views/administration.general.regularexpressions.list.php:39
+#: include/views/administration.general.regularexpressions.list.php:40
 msgid "Expressions"
 msgstr "表示式"
 
@@ -5574,7 +5574,7 @@ msgstr "完成"
 msgid "Finnish (fi_FI)"
 msgstr "芬蘭語 (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1505
+#: include/forms.inc.php:1831 include/func.inc.php:1506
 #: include/maintenances.inc.php:111
 msgid "First"
 msgstr "首"
@@ -5625,7 +5625,7 @@ msgstr ""
 msgid "Forecast for next t seconds based on period T is NOT N"
 msgstr ""
 
-#: include/items.inc.php:1310 include/views/configuration.item.edit.php:200
+#: include/items.inc.php:1314 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
 msgid "Formula"
 msgstr "公式"
@@ -5705,7 +5705,7 @@ msgstr "圖形化使用者介面"
 msgid "GUI access disabled."
 msgstr "圖形化使用者介面存取已停用"
 
-#: include/menu.inc.php:244
+#: include/menu.inc.php:248
 msgid "General"
 msgstr "一般"
 
@@ -5751,7 +5751,7 @@ msgstr ""
 msgid "Go to"
 msgstr "到"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1680
+#: app/views/system.warning.php:26 include/func.inc.php:1681
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5767,7 +5767,7 @@ msgstr "漸層線"
 #: include/views/configuration.graph.edit.php:336
 #: include/views/monitoring.charts.php:26
 #: include/views/monitoring.history.php:77
-#: include/views/monitoring.screen.constructor.edit.php:131 latest.php:524
+#: include/views/monitoring.screen.constructor.edit.php:135 latest.php:524
 #: latest.php:704 report2.php:371
 msgid "Graph"
 msgstr "圖形"
@@ -5834,7 +5834,7 @@ msgid "Graph element"
 msgstr "圖形組件"
 
 #: include/screens.inc.php:45 include/views/configuration.graph.edit.php:336
-#: include/views/monitoring.screen.constructor.edit.php:178
+#: include/views/monitoring.screen.constructor.edit.php:182
 msgid "Graph prototype"
 msgstr ""
 
@@ -5956,7 +5956,7 @@ msgstr "網格"
 #: include/classes/screens/CScreenHostTriggers.php:133
 #: include/classes/screens/CScreenTriggersOverview.php:85
 #: include/screens.inc.php:562
-#: include/views/configuration.application.list.php:33
+#: include/views/configuration.application.list.php:34
 #: include/views/configuration.copy.elements.php:61
 #: include/views/configuration.graph.list.php:46
 #: include/views/configuration.host.list.php:27
@@ -5968,9 +5968,9 @@ msgstr "網格"
 #: include/views/monitoring.charts.php:24
 #: include/views/monitoring.overview.items.php:45
 #: include/views/monitoring.overview.triggers.php:79
-#: include/views/monitoring.screen.constructor.edit.php:388
-#: include/views/monitoring.screen.constructor.edit.php:495
-#: include/views/monitoring.screen.constructor.edit.php:570
+#: include/views/monitoring.screen.constructor.edit.php:392
+#: include/views/monitoring.screen.constructor.edit.php:499
+#: include/views/monitoring.screen.constructor.edit.php:574
 #: include/views/monitoring.screen.php:75
 #: include/views/monitoring.slides.php:80 popup.php:495 templates.php:572
 #: tr_status.php:206
@@ -6108,9 +6108,9 @@ msgstr ""
 #: graphs.php:42 include/views/configuration.graph.edit.php:64
 #: include/views/configuration.graph.list.php:74
 #: include/views/js/monitoring.sysmaps.js.php:47
-#: include/views/monitoring.screen.constructor.edit.php:684
+#: include/views/monitoring.screen.constructor.edit.php:688
 #: include/views/monitoring.sysmap.edit.php:109
-#: include/views/monitoring.sysmap.list.php:42 screenedit.php:68
+#: include/views/monitoring.sysmap.list.php:48 screenedit.php:68
 #: sysmaps.php:50
 msgid "Height"
 msgstr "高"
@@ -6194,11 +6194,11 @@ msgstr ""
 msgid "History storage period (in days)"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:648
+#: include/views/monitoring.screen.constructor.edit.php:652
 msgid "Horizontal"
 msgstr "横向"
 
-#: include/views/monitoring.screen.constructor.edit.php:703
+#: include/views/monitoring.screen.constructor.edit.php:707
 msgid "Horizontal align"
 msgstr "横向對齊"
 
@@ -6217,8 +6217,8 @@ msgstr "横向對齊"
 #: include/classes/setup/CSetupWizard.php:282 include/forms.inc.php:483
 #: include/maps.inc.php:24 include/triggers.inc.php:865
 #: include/triggers.inc.php:1209
-#: include/views/configuration.application.list.php:34
-#: include/views/configuration.application.list.php:49
+#: include/views/configuration.application.list.php:35
+#: include/views/configuration.application.list.php:51
 #: include/views/configuration.graph.list.php:47
 #: include/views/configuration.host.edit.php:556
 #: include/views/configuration.host.massupdate.php:385
@@ -6237,7 +6237,7 @@ msgstr "横向對齊"
 #: include/views/js/monitoring.sysmaps.js.php:17
 #: include/views/js/monitoring.sysmaps.js.php:81
 #: include/views/monitoring.charts.php:25
-#: include/views/monitoring.screen.constructor.edit.php:416
+#: include/views/monitoring.screen.constructor.edit.php:420
 #: include/views/monitoring.screen.php:76
 #: include/views/monitoring.slides.php:81
 #: include/views/reports.toptriggers.php:118 items.php:555 items.php:849
@@ -6249,7 +6249,7 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] "主機"
 
-#: include/classes/api/services/CHost.php:858
+#: include/classes/api/services/CHost.php:859
 #: include/classes/api/services/CTemplate.php:430
 #, c-format
 msgid "Host \"%1$s\" already exists."
@@ -6260,7 +6260,7 @@ msgstr "主機 \"%1$s\" 已存在."
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
 msgstr "主機\"%1$s\"是以系統代理程式\"%2$s\"來監控的."
 
-#: include/views/monitoring.screen.constructor.edit.php:440
+#: include/views/monitoring.screen.constructor.edit.php:444
 msgid "Host (ascending)"
 msgstr "主機(升冪)"
 
@@ -6510,11 +6510,11 @@ msgstr "主機狀態"
 msgid "Host subnet mask"
 msgstr "主機子網路遮罩"
 
-#: include/views/monitoring.screen.constructor.edit.php:612
+#: include/views/monitoring.screen.constructor.edit.php:616
 msgid "Host time"
 msgstr "主機時間"
 
-#: include/classes/api/services/CHost.php:705
+#: include/classes/api/services/CHost.php:706
 msgid "Host update failed."
 msgstr "主機更新失敗."
 
@@ -6527,8 +6527,8 @@ msgstr "主機已更新"
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1699
-#: include/classes/api/services/CHost.php:1879
+#: include/classes/api/services/CHost.php:1700
+#: include/classes/api/services/CHost.php:1880
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "名稱同樣為 \"%s\" 的主機已存在."
@@ -6539,16 +6539,16 @@ msgstr "名稱同樣為 \"%s\" 的主機已存在."
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1705
-#: include/classes/api/services/CHost.php:1886
+#: include/classes/api/services/CHost.php:1706
+#: include/classes/api/services/CHost.php:1887
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "可視名稱同樣為 \"%s\" 的主機已存在."
 
 #: app/views/administration.proxy.edit.php:87
 #: app/views/administration.proxy.list.php:50 include/forms.inc.php:212
-#: include/forms.inc.php:853 include/items.inc.php:722
-#: include/menu.inc.php:137 include/menu.inc.php:202
+#: include/forms.inc.php:853 include/items.inc.php:726
+#: include/menu.inc.php:137 include/menu.inc.php:206
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.graph.list.php:71
 #: include/views/configuration.host.discovery.list.php:45
@@ -6590,7 +6590,7 @@ msgstr "主機資訊"
 
 #: include/views/monitoring.overview.items.php:50
 #: include/views/monitoring.overview.triggers.php:84
-#: include/views/monitoring.screen.constructor.edit.php:654
+#: include/views/monitoring.screen.constructor.edit.php:658
 msgid "Hosts location"
 msgstr "主機位置"
 
@@ -6736,7 +6736,7 @@ msgstr "IT服務相依關係"
 msgid "IT service parent"
 msgstr "IT服務上層"
 
-#: include/menu.inc.php:109 include/menu.inc.php:233
+#: include/menu.inc.php:109 include/menu.inc.php:237
 #: include/views/administration.general.housekeeper.edit.php:62
 #: include/views/configuration.services.edit.php:26
 #: include/views/configuration.services.list.php:23 srv_status.php:26
@@ -6872,7 +6872,7 @@ msgstr "圖示對應並未啟用"
 msgid "Icons"
 msgstr "圖示"
 
-#: include/func.inc.php:1670 include/func.inc.php:1689
+#: include/func.inc.php:1671 include/func.inc.php:1690
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "假如您認為這個訊息是錯的, 請諮詢您的管理者關於如何取得需要的許可權."
 
@@ -6936,7 +6936,7 @@ msgstr "立即地"
 #: include/views/administration.general.valuemapping.list.php:29
 #: include/views/configuration.host.list.php:29
 #: include/views/conf.import.php:109 include/views/conf.import.php:113
-#: include/views/monitoring.screen.list.php:38
+#: include/views/monitoring.screen.list.php:43
 #: include/views/monitoring.sysmap.list.php:27 templates.php:575
 msgid "Import"
 msgstr "匯入"
@@ -7281,9 +7281,9 @@ msgstr "不正確的計算SLA值予服務\"%1$s\"."
 msgid "Incorrect characters used for host \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:841
-#: include/classes/api/services/CHost.php:1594
-#: include/classes/api/services/CHost.php:1820
+#: include/classes/api/services/CHost.php:842
+#: include/classes/api/services/CHost.php:1595
+#: include/classes/api/services/CHost.php:1821
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "不正確的字元用於主機名稱\"%s\"."
@@ -7466,8 +7466,8 @@ msgstr "給予了不正確的介面DNS參數\"%s\"."
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "給予了不正確的介面埠參數\"%s\"."
 
-#: include/classes/api/services/CHost.php:1674
-#: include/classes/api/services/CHost.php:1802
+#: include/classes/api/services/CHost.php:1675
+#: include/classes/api/services/CHost.php:1803
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "不正確的資產紀錄欄位\"%s\"."
@@ -7652,7 +7652,8 @@ msgid "Incorrect response received from Zabbix server \"%1$s\"."
 msgstr ""
 
 #: include/classes/api/services/CHttpTest.php:698
-msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$\"."
+#, c-format
+msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
 msgstr ""
 
 #: include/classes/api/services/CScreenItem.php:790
@@ -7690,8 +7691,8 @@ msgstr "予服務\"%1$s\"不正確的排序次序."
 msgid "Incorrect source value."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1651
-#: include/classes/api/services/CHost.php:1775
+#: include/classes/api/services/CHost.php:1652
+#: include/classes/api/services/CHost.php:1776
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr ""
@@ -7896,12 +7897,12 @@ msgstr ""
 msgid "Incorrect value map ID."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1558
+#: include/classes/api/services/CHost.php:1559
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1541
+#: include/classes/api/services/CHost.php:1542
 msgid "Incorrect value used for connections from host field."
 msgstr ""
 
@@ -7909,7 +7910,7 @@ msgstr ""
 msgid "Incorrect value used for connections from proxy field."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1537
+#: include/classes/api/services/CHost.php:1538
 msgid "Incorrect value used for connections to host field."
 msgstr ""
 
@@ -7936,7 +7937,7 @@ msgstr "印尼語 (id_ID)"
 #: include/classes/html/CFormList.php:74
 #: include/classes/screens/CScreenActions.php:132
 #: include/views/administration.auditacts.list.php:51
-#: include/views/configuration.application.list.php:52
+#: include/views/configuration.application.list.php:54
 #: include/views/configuration.host.discovery.list.php:50
 #: include/views/configuration.hostgroups.list.php:51
 #: include/views/configuration.host.list.php:70
@@ -8318,7 +8319,7 @@ msgstr "所給的\"%s\"為無效的檢視名稱.  可用的: \"a-z\" 和 \".\"."
 msgid "Inventory"
 msgstr "資產記錄"
 
-#: include/classes/api/services/CHost.php:1028
+#: include/classes/api/services/CHost.php:1029
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
 msgstr ""
@@ -8364,9 +8365,9 @@ msgstr "意大利語 (it_IT)"
 #: include/views/configuration.graph.edit.php:131
 #: include/views/configuration.graph.edit.php:193
 #: include/views/configuration.triggers.expression.php:60
-#: include/views/monitoring.screen.constructor.edit.php:230
-#: include/views/monitoring.screen.constructor.edit.php:358
-#: include/views/monitoring.screen.constructor.edit.php:631 items.php:554
+#: include/views/monitoring.screen.constructor.edit.php:234
+#: include/views/monitoring.screen.constructor.edit.php:362
+#: include/views/monitoring.screen.constructor.edit.php:635 items.php:554
 #: items.php:849 items.php:882 tr_logform.php:244
 msgid "Item"
 msgstr "項目"
@@ -8441,7 +8442,7 @@ msgid "Item not selected"
 msgstr ""
 
 #: include/forms.inc.php:1070
-#: include/views/monitoring.screen.constructor.edit.php:277
+#: include/views/monitoring.screen.constructor.edit.php:281
 msgid "Item prototype"
 msgstr "項目原型"
 
@@ -8536,7 +8537,7 @@ msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目."
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為未知的項目組件."
 
-#: include/classes/api/services/CItemGeneral.php:936
+#: include/classes/api/services/CItemGeneral.php:937
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
@@ -8547,9 +8548,9 @@ msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
 msgid "Item with key \"%1$s\" already exists."
 msgstr ""
 
-#: include/html.inc.php:380 include/items.inc.php:705
-#: include/views/configuration.application.list.php:51
-#: include/views/configuration.application.list.php:128
+#: include/html.inc.php:380 include/items.inc.php:709
+#: include/views/configuration.application.list.php:53
+#: include/views/configuration.application.list.php:130
 #: include/views/configuration.graph.edit.php:327
 #: include/views/configuration.host.discovery.list.php:42
 #: include/views/configuration.host.edit.php:348
@@ -8745,7 +8746,7 @@ msgstr "標示位置"
 msgid "Language"
 msgstr "語言"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1532
+#: include/forms.inc.php:1835 include/func.inc.php:1533
 #: include/maintenances.inc.php:115
 msgid "Last"
 msgstr "末"
@@ -8793,7 +8794,7 @@ msgstr "最近7天"
 msgid "Last change"
 msgstr "上次修改于"
 
-#: include/views/monitoring.screen.constructor.edit.php:438
+#: include/views/monitoring.screen.constructor.edit.php:442
 msgid "Last change (descending)"
 msgstr "最後改變(降冪)"
 
@@ -8862,8 +8863,8 @@ msgstr "拉脱維亞語(lv_LV)"
 #: include/views/js/monitoring.sysmaps.js.php:234
 #: include/views/monitoring.overview.items.php:52
 #: include/views/monitoring.overview.triggers.php:86
-#: include/views/monitoring.screen.constructor.edit.php:656
-#: include/views/monitoring.screen.constructor.edit.php:705
+#: include/views/monitoring.screen.constructor.edit.php:660
+#: include/views/monitoring.screen.constructor.edit.php:709
 #: include/views/monitoring.sysmap.edit.php:196
 msgid "Left"
 msgstr "左側"
@@ -8997,7 +8998,7 @@ msgid "Local"
 msgstr ""
 
 #: include/classes/screens/CScreenHistory.php:147
-#: include/views/monitoring.screen.constructor.edit.php:610
+#: include/views/monitoring.screen.constructor.edit.php:614
 msgid "Local time"
 msgstr "當地時間"
 
@@ -9066,8 +9067,8 @@ msgstr "日誌與SNMP捉捕器不符"
 msgid "Logged in as"
 msgstr "登入為"
 
-#: auditlogs.php:130 include/func.inc.php:1677 include/func.inc.php:1692
-#: include/menu.inc.php:296 include/views/administration.auditlogs.list.php:37
+#: auditlogs.php:130 include/func.inc.php:1678 include/func.inc.php:1693
+#: include/menu.inc.php:300 include/views/administration.auditlogs.list.php:37
 #: include/views/administration.authentication.edit.php:98
 #: include/views/administration.users.list.php:53
 msgid "Login"
@@ -9194,7 +9195,7 @@ msgid "Macros updated"
 msgstr "巨集已更新"
 
 #: include/audit.inc.php:47 include/maps.inc.php:658 include/maps.inc.php:746
-#: include/menu.inc.php:221
+#: include/menu.inc.php:225
 #: include/views/configuration.maintenance.edit.php:191
 #: include/views/js/monitoring.sysmaps.js.php:138
 msgid "Maintenance"
@@ -9280,7 +9281,7 @@ msgstr "手動登出"
 #: include/audit.inc.php:40 include/maps.inc.php:27 include/screens.inc.php:34
 #: include/views/js/monitoring.sysmaps.js.php:18
 #: include/views/js/monitoring.sysmaps.js.php:102
-#: include/views/monitoring.screen.constructor.edit.php:307
+#: include/views/monitoring.screen.constructor.edit.php:311
 #: include/views/monitoring.sysmap.edit.php:276 jsLoader.php:142 map.php:25
 msgid "Map"
 msgstr "拓墣圖"
@@ -9384,8 +9385,8 @@ msgstr "批量更新"
 msgid "Mass update elements"
 msgstr "大量更新組件"
 
-#: include/views/monitoring.screen.constructor.edit.php:184
-#: include/views/monitoring.screen.constructor.edit.php:283 screenedit.php:70
+#: include/views/monitoring.screen.constructor.edit.php:188
+#: include/views/monitoring.screen.constructor.edit.php:287 screenedit.php:70
 msgid "Max columns"
 msgstr ""
 
@@ -9446,7 +9447,7 @@ msgstr "五月"
 
 #: include/views/administration.users.edit.php:258
 #: include/views/administration.users.edit.php:371 popup_media.php:27
-#: popup_media.php:132 popup_media.php:140 popup_media.php:154
+#: popup_media.php:133 popup_media.php:141 popup_media.php:155
 msgid "Media"
 msgstr "示警媒介"
 
@@ -9492,7 +9493,7 @@ msgid "Media type updated"
 msgstr "示警媒介類型已更新"
 
 #: app/views/administration.mediatype.edit.php:24
-#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:281
+#: app/views/administration.mediatype.list.php:27 include/menu.inc.php:285
 msgid "Media types"
 msgstr "示警媒介類型"
 
@@ -9558,7 +9559,7 @@ msgstr "訊息中"
 msgid "Method not found."
 msgstr "未發現方法."
 
-#: include/views/monitoring.screen.constructor.edit.php:718
+#: include/views/monitoring.screen.constructor.edit.php:722
 msgid "Middle"
 msgstr "居中"
 
@@ -9761,7 +9762,7 @@ msgstr ""
 #: include/views/administration.general.iconmap.list.php:33
 #: include/views/administration.general.image.edit.php:37
 #: include/views/administration.general.regularexpressions.edit.php:94
-#: include/views/administration.general.regularexpressions.list.php:38
+#: include/views/administration.general.regularexpressions.list.php:39
 #: include/views/administration.general.valuemapping.edit.php:38
 #: include/views/administration.general.valuemapping.list.php:42
 #: include/views/administration.usergroups.list.php:37
@@ -9809,12 +9810,12 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:165
 #: include/views/js/monitoring.sysmaps.js.php:212
 #: include/views/monitoring.screen.edit.php:112
-#: include/views/monitoring.screen.list.php:55
+#: include/views/monitoring.screen.list.php:70
 #: include/views/monitoring.slideconf.edit.php:103
-#: include/views/monitoring.slideconf.list.php:45
+#: include/views/monitoring.slideconf.list.php:53
 #: include/views/monitoring.sysmap.edit.php:100
 #: include/views/monitoring.sysmap.edit.php:219
-#: include/views/monitoring.sysmap.list.php:40 items.php:42 latest.php:388
+#: include/views/monitoring.sysmap.list.php:46 items.php:42 latest.php:388
 #: latest.php:433 latest.php:453 maintenance.php:43 maintenance.php:209
 #: maintenance.php:240 popup_httpstep.php:36 popup.php:557 popup.php:709
 #: popup.php:790 popup.php:871 popup.php:953 popup.php:1019 popup.php:1048
@@ -9839,6 +9840,9 @@ msgid "Name for group prototype \"%1$s\" must contain macros."
 msgstr ""
 
 #: include/forms.inc.php:556 include/views/configuration.host.list.php:35
+#: include/views/monitoring.screen.list.php:53
+#: include/views/monitoring.slideconf.list.php:39
+#: include/views/monitoring.sysmap.list.php:32
 msgid "Name like"
 msgstr ""
 
@@ -9860,15 +9864,15 @@ msgstr ""
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
 msgstr ""
 
-#: sysmaps.php:198
+#: sysmaps.php:206
 msgid "Network map added"
 msgstr "網路拓墣圖已新增"
 
-#: sysmaps.php:244
+#: sysmaps.php:252
 msgid "Network map deleted"
 msgstr "網路拓墣圖已刪除"
 
-#: sysmaps.php:191
+#: sysmaps.php:199
 msgid "Network map updated"
 msgstr "網路拓墣圖已新增"
 
@@ -9924,7 +9928,7 @@ msgstr "新的群組"
 msgid "New host group"
 msgstr "新的主機群組"
 
-#: include/views/administration.general.regularexpressions.list.php:27
+#: include/views/administration.general.regularexpressions.list.php:28
 msgid "New regular expression"
 msgstr "新的正規表示式"
 
@@ -9938,7 +9942,7 @@ msgstr "新的服務時間"
 msgid "Next step"
 msgstr ""
 
-#: events.php:750 include/events.inc.php:377 include/func.inc.php:1989
+#: events.php:750 include/events.inc.php:377 include/func.inc.php:1990
 #: include/triggers.inc.php:1227
 #: include/views/administration.users.list.php:69
 #: include/views/administration.users.list.php:72
@@ -10168,13 +10172,13 @@ msgstr ""
 msgid "No graphs added."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1605
-#: include/classes/api/services/CHost.php:1763
+#: include/classes/api/services/CHost.php:1606
+#: include/classes/api/services/CHost.php:1764
 #, c-format
 msgid "No groups for host \"%1$s\"."
 msgstr "沒有主機[%1$s]的群組"
 
-#: include/classes/api/services/CHost.php:827
+#: include/classes/api/services/CHost.php:828
 msgid "No groups for hosts."
 msgstr "沒有主機群組"
 
@@ -10244,8 +10248,8 @@ msgstr "沒有找到介面."
 msgid "No interface provided for proxy \"%s\"."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1658
-#: include/classes/api/services/CHost.php:1813
+#: include/classes/api/services/CHost.php:1659
+#: include/classes/api/services/CHost.php:1814
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "沒有主機\"%s\"的介面."
@@ -10263,12 +10267,12 @@ msgstr "沒有提供項目給篩選組件."
 msgid "No item prototype ID provided for screen element."
 msgstr ""
 
-#: include/items.inc.php:529
+#: include/items.inc.php:533
 #, c-format
 msgid "No item with itemid \"%1$s\"."
 msgstr "沒有含項目ID\"%1$s\"的項目."
 
-#: include/items.inc.php:512
+#: include/items.inc.php:516
 #, c-format
 msgid "No item with itemid=\"%1$s\"."
 msgstr "沒有含項目ID\"%1$s\"的項目."
@@ -10335,9 +10339,9 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:402
 #: include/classes/api/services/CHostInterface.php:639
-#: include/classes/api/services/CHost.php:1515
-#: include/classes/api/services/CHost.php:1641
-#: include/classes/api/services/CHost.php:1757
+#: include/classes/api/services/CHost.php:1516
+#: include/classes/api/services/CHost.php:1642
+#: include/classes/api/services/CHost.php:1758
 #: include/classes/api/services/CHostPrototype.php:1019
 #: include/classes/api/services/CHostPrototype.php:1034
 #: include/classes/api/services/CHostPrototype.php:1047
@@ -10403,7 +10407,7 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:413
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1654
+#: include/func.inc.php:1655
 msgid "No permissions to referred object or it does not exist!"
 msgstr "沒有所說的物件的許可權或其不存在!"
 
@@ -10646,7 +10650,7 @@ msgstr "自Epoch起的秒數是 > N"
 msgid "Number of seconds since the Epoch is NOT N"
 msgstr "自Epoch起的秒數不是 N"
 
-#: include/views/monitoring.slideconf.list.php:47
+#: include/views/monitoring.slideconf.list.php:55
 msgid "Number of slides"
 msgstr ""
 
@@ -11334,7 +11338,7 @@ msgstr "問題"
 msgid "PSK"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1553
+#: include/classes/api/services/CHost.php:1554
 #: include/classes/api/services/CProxy.php:665
 msgid "PSK cannot be empty."
 msgstr ""
@@ -11346,12 +11350,12 @@ msgstr ""
 msgid "PSK identity"
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1549
+#: include/classes/api/services/CHost.php:1550
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1564
+#: include/classes/api/services/CHost.php:1565
 #: include/classes/api/services/CProxy.php:676
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
@@ -11757,14 +11761,14 @@ msgstr "問題"
 msgid "Process CPU utilisation percentage. Returns float"
 msgstr ""
 
-#: include/views/monitoring.screen.list.php:66
-#: include/views/monitoring.slideconf.list.php:57
-#: include/views/monitoring.sysmap.list.php:51
+#: include/views/monitoring.screen.list.php:81
+#: include/views/monitoring.slideconf.list.php:64
+#: include/views/monitoring.sysmap.list.php:56
 msgid "Properties"
 msgstr ""
 
 #: app/views/administration.proxy.edit.php:24
-#: app/views/administration.proxy.list.php:27 include/menu.inc.php:262
+#: app/views/administration.proxy.list.php:27 include/menu.inc.php:266
 #: popup.php:51
 msgid "Proxies"
 msgstr "系統代理程式"
@@ -11846,7 +11850,7 @@ msgstr "公開金鑰"
 msgid "Public key file"
 msgstr "公開金鑰檔"
 
-#: include/menu.inc.php:291 queue.php:25
+#: include/menu.inc.php:295 queue.php:25
 msgid "Queue"
 msgstr "隊列"
 
@@ -11904,11 +11908,11 @@ msgstr ""
 msgid "Recipient"
 msgstr "接收者"
 
-#: include/views/monitoring.screen.constructor.edit.php:462
+#: include/views/monitoring.screen.constructor.edit.php:466
 msgid "Recipient (ascending)"
 msgstr "接收者(升冪)"
 
-#: include/views/monitoring.screen.constructor.edit.php:461
+#: include/views/monitoring.screen.constructor.edit.php:465
 msgid "Recipient (descending)"
 msgstr "接收者(降冪)"
 
@@ -12000,7 +12004,7 @@ msgstr "正規表示式已更新"
 
 #: include/html.inc.php:806
 #: include/views/administration.general.regularexpressions.edit.php:25
-#: include/views/administration.general.regularexpressions.list.php:22
+#: include/views/administration.general.regularexpressions.list.php:23
 msgid "Regular expressions"
 msgstr "正規表示式"
 
@@ -12198,7 +12202,7 @@ msgstr "已解決"
 
 #: include/views/administration.auditlogs.list.php:45
 #: include/views/administration.auditlogs.list.php:62
-#: include/views/monitoring.screen.constructor.edit.php:90 popup_right.php:24
+#: include/views/monitoring.screen.constructor.edit.php:94 popup_right.php:24
 msgid "Resource"
 msgstr "資源"
 
@@ -12273,7 +12277,7 @@ msgstr ""
 #: include/views/js/configuration.graph.edit.js.php:82
 #: include/views/js/monitoring.sysmaps.js.php:70
 #: include/views/js/monitoring.sysmaps.js.php:235
-#: include/views/monitoring.screen.constructor.edit.php:707
+#: include/views/monitoring.screen.constructor.edit.php:711
 #: include/views/monitoring.sysmap.edit.php:197
 msgid "Right"
 msgstr "右"
@@ -12290,7 +12294,7 @@ msgstr ""
 msgid "Row deleted"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:725 screenedit.php:73
+#: include/views/monitoring.screen.constructor.edit.php:729 screenedit.php:73
 msgid "Row span"
 msgstr "行寬度"
 
@@ -12475,7 +12479,7 @@ msgstr "SNMPv3 端點代理程式"
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 msgstr ""
 
-#: include/items.inc.php:1308
+#: include/items.inc.php:1312
 #: include/views/configuration.host.discovery.edit.php:185
 #: include/views/configuration.item.edit.php:196
 #: include/views/configuration.item.prototype.edit.php:194
@@ -12573,15 +12577,16 @@ msgid "Scheduling"
 msgstr ""
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
-#: include/views/monitoring.screen.constructor.edit.php:541
+#: include/views/monitoring.screen.constructor.edit.php:545
 #: include/views/monitoring.screen.edit.php:125
 #: include/views/monitoring.slideconf.edit.php:120
 msgid "Screen"
 msgstr "篩選"
 
 #: include/classes/api/services/CTemplateScreen.php:699
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr "篩選\"%1$s\"已存在於模板\"%2$2\"中."
+#, c-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CScreen.php:458
 #: include/classes/api/services/CScreen.php:790
@@ -12623,15 +12628,15 @@ msgstr ""
 msgid "Screen \"%1$s\" row span in cell X - %2$s Y - %3$s is too big."
 msgstr ""
 
-#: screenconf.php:193
+#: screenconf.php:201
 msgid "Screen added"
 msgstr "篩選已新增"
 
-#: include/views/monitoring.screen.constructor.edit.php:745
+#: include/views/monitoring.screen.constructor.edit.php:749
 msgid "Screen cell configuration"
 msgstr "篩選格位組態"
 
-#: screenconf.php:274
+#: screenconf.php:282
 msgid "Screen deleted"
 msgstr "篩選已删除"
 
@@ -12648,7 +12653,7 @@ msgstr ""
 msgid "Screen should contain at least one row and column."
 msgstr "篩選應包含至少一個行和列."
 
-#: screenconf.php:139 screenedit.php:230 screenedit.php:247
+#: screenconf.php:143 screenedit.php:230 screenedit.php:247
 msgid "Screen updated"
 msgstr "篩選已更新"
 
@@ -12659,7 +12664,7 @@ msgstr "篩選已更新"
 #: include/views/monitoring.screen.constructor.list.php:22
 #: include/views/monitoring.screen.edit.php:24
 #: include/views/monitoring.screen.list.php:21
-#: include/views/monitoring.screen.list.php:25
+#: include/views/monitoring.screen.list.php:28
 #: include/views/monitoring.screen.php:23
 #: include/views/monitoring.screen.php:42
 #: include/views/monitoring.slideconf.list.php:25
@@ -12742,7 +12747,7 @@ msgid "Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
 #: app/views/administration.script.edit.php:25
-#: app/views/administration.script.list.php:27 include/menu.inc.php:287
+#: app/views/administration.script.list.php:27 include/menu.inc.php:291
 #: jsLoader.php:212 scripts_exec.php:24
 msgid "Scripts"
 msgstr "脚本"
@@ -12840,20 +12845,20 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:108
 #: include/views/js/monitoring.sysmaps.js.php:120
 #: include/views/monitoring.overview.items.php:69
-#: include/views/monitoring.screen.constructor.edit.php:115
-#: include/views/monitoring.screen.constructor.edit.php:123
-#: include/views/monitoring.screen.constructor.edit.php:162
-#: include/views/monitoring.screen.constructor.edit.php:170
-#: include/views/monitoring.screen.constructor.edit.php:214
-#: include/views/monitoring.screen.constructor.edit.php:222
-#: include/views/monitoring.screen.constructor.edit.php:261
-#: include/views/monitoring.screen.constructor.edit.php:269
-#: include/views/monitoring.screen.constructor.edit.php:310
-#: include/views/monitoring.screen.constructor.edit.php:341
-#: include/views/monitoring.screen.constructor.edit.php:349
-#: include/views/monitoring.screen.constructor.edit.php:544
-#: include/views/monitoring.screen.constructor.edit.php:619
-#: include/views/monitoring.screen.constructor.edit.php:626 jsLoader.php:178
+#: include/views/monitoring.screen.constructor.edit.php:119
+#: include/views/monitoring.screen.constructor.edit.php:127
+#: include/views/monitoring.screen.constructor.edit.php:166
+#: include/views/monitoring.screen.constructor.edit.php:174
+#: include/views/monitoring.screen.constructor.edit.php:218
+#: include/views/monitoring.screen.constructor.edit.php:226
+#: include/views/monitoring.screen.constructor.edit.php:265
+#: include/views/monitoring.screen.constructor.edit.php:273
+#: include/views/monitoring.screen.constructor.edit.php:314
+#: include/views/monitoring.screen.constructor.edit.php:345
+#: include/views/monitoring.screen.constructor.edit.php:353
+#: include/views/monitoring.screen.constructor.edit.php:548
+#: include/views/monitoring.screen.constructor.edit.php:623
+#: include/views/monitoring.screen.constructor.edit.php:630 jsLoader.php:178
 #: latest.php:378 popup.php:597 popup.php:681 popup.php:762 popup.php:843
 #: popup.php:925 popup.php:1003 popup.php:1176 popup.php:1316 popup.php:1391
 #: popup.php:1498 popup.php:1568 popup.php:1636 popup.php:1699 popup.php:1874
@@ -12909,7 +12914,7 @@ msgstr "送出訊息給用戶"
 msgid "Send only to"
 msgstr "僅送到"
 
-#: include/views/administration.users.edit.php:200 popup_media.php:134
+#: include/views/administration.users.edit.php:200 popup_media.php:135
 msgid "Send to"
 msgstr "收件人"
 
@@ -12958,7 +12963,7 @@ msgstr "伺服器"
 msgid "Server info"
 msgstr "伺服器資訊"
 
-#: include/views/monitoring.screen.constructor.edit.php:611
+#: include/views/monitoring.screen.constructor.edit.php:615
 msgid "Server time"
 msgstr "伺服器時間"
 
@@ -13054,7 +13059,7 @@ msgstr ""
 msgid "Severity"
 msgstr "嚴重性"
 
-#: include/views/monitoring.screen.constructor.edit.php:439
+#: include/views/monitoring.screen.constructor.edit.php:443
 msgid "Severity (descending)"
 msgstr "嚴重性(降冪)"
 
@@ -13120,10 +13125,10 @@ msgstr "展示無資料項目"
 msgid "Show legend"
 msgstr "展示圖標"
 
-#: include/views/monitoring.screen.constructor.edit.php:363
-#: include/views/monitoring.screen.constructor.edit.php:432
-#: include/views/monitoring.screen.constructor.edit.php:449
-#: include/views/monitoring.screen.constructor.edit.php:471 screenedit.php:74
+#: include/views/monitoring.screen.constructor.edit.php:367
+#: include/views/monitoring.screen.constructor.edit.php:436
+#: include/views/monitoring.screen.constructor.edit.php:453
+#: include/views/monitoring.screen.constructor.edit.php:475 screenedit.php:74
 msgid "Show lines"
 msgstr "展示線條"
 
@@ -13135,7 +13140,7 @@ msgstr "展示所選的"
 msgid "Show selected groups"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:366
+#: include/views/monitoring.screen.constructor.edit.php:370
 msgid "Show text as HTML"
 msgstr "展示HTML文字"
 
@@ -13261,11 +13266,11 @@ msgstr ""
 msgid "Slide show \"%s\" already exists."
 msgstr "簡報片展示\"%s\"已存在."
 
-#: slideconf.php:148
+#: slideconf.php:155
 msgid "Slide show added"
 msgstr "簡報片展示已新增."
 
-#: slideconf.php:180 slideconf.php:201
+#: slideconf.php:187 slideconf.php:208
 msgid "Slide show deleted"
 msgstr "簡報片展示已刪除"
 
@@ -13277,12 +13282,12 @@ msgstr "簡報片展示必需包含簡報片."
 msgid "Slide show owner cannot be empty."
 msgstr ""
 
-#: slideconf.php:133
+#: slideconf.php:140
 msgid "Slide show updated"
 msgstr "簡報片展示已更新"
 
 #: app/views/monitoring.dashboard.view.php:58
-#: include/views/monitoring.screen.list.php:26
+#: include/views/monitoring.screen.list.php:29
 #: include/views/monitoring.screen.php:43
 #: include/views/monitoring.slideconf.edit.php:24
 #: include/views/monitoring.slideconf.list.php:21
@@ -13341,7 +13346,7 @@ msgstr "軟體應用程式E"
 msgid "Software architecture information. Returns string"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:453
+#: include/views/monitoring.screen.constructor.edit.php:457
 msgid "Sort entries by"
 msgstr ""
 
@@ -13349,7 +13354,7 @@ msgstr ""
 msgid "Sort order (0->999)"
 msgstr "排序次(0->999)"
 
-#: include/views/monitoring.screen.constructor.edit.php:436
+#: include/views/monitoring.screen.constructor.edit.php:440
 msgid "Sort triggers by"
 msgstr "依此排序觸發器:"
 
@@ -13435,11 +13440,11 @@ msgstr "州"
 msgid "Status"
 msgstr "狀態"
 
-#: include/views/monitoring.screen.constructor.edit.php:460
+#: include/views/monitoring.screen.constructor.edit.php:464
 msgid "Status (ascending)"
 msgstr "狀態(升冪)"
 
-#: include/views/monitoring.screen.constructor.edit.php:459
+#: include/views/monitoring.screen.constructor.edit.php:463
 msgid "Status (descending)"
 msgstr "狀態(降冪)"
 
@@ -13523,7 +13528,7 @@ msgstr "儲存值"
 msgid "Straight"
 msgstr "Straight"
 
-#: include/views/monitoring.screen.constructor.edit.php:646
+#: include/views/monitoring.screen.constructor.edit.php:650
 msgid "Style"
 msgstr "風格"
 
@@ -13721,7 +13726,7 @@ msgstr "Telnet"
 msgid "Template"
 msgstr "模板"
 
-#: include/classes/api/services/CHost.php:869
+#: include/classes/api/services/CHost.php:870
 #: include/classes/api/services/CTemplate.php:420
 #, c-format
 msgid "Template \"%1$s\" already exists."
@@ -13792,8 +13797,8 @@ msgstr ""
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1720
-#: include/classes/api/services/CHost.php:1904
+#: include/classes/api/services/CHost.php:1721
+#: include/classes/api/services/CHost.php:1905
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "含有相同名稱\"%1$s\"的模板已連結到主機."
@@ -13804,8 +13809,8 @@ msgstr "含有相同名稱\"%1$s\"的模板已連結到主機."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CHost.php:1726
-#: include/classes/api/services/CHost.php:1912
+#: include/classes/api/services/CHost.php:1727
+#: include/classes/api/services/CHost.php:1913
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "含有相同可視名稱\"%1$s\"的模板已連結到主機."
@@ -13885,12 +13890,12 @@ msgstr ""
 msgid "The Y coordinate of screen element located at X - %1$s and Y - %2$s of screen \"%3$s\" is too big."
 msgstr ""
 
-#: include/views/configuration.application.list.php:97
+#: include/views/configuration.application.list.php:99
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
 msgstr ""
 
-#: include/views/configuration.application.list.php:92
+#: include/views/configuration.application.list.php:94
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
@@ -13986,11 +13991,11 @@ msgstr "這欄位是由項目\"%s\"自動填入的."
 msgid "This month"
 msgstr "本月"
 
-#: include/classes/screens/CScreenBuilder.php:581
+#: include/classes/screens/CScreenBuilder.php:585
 msgid "This screen-column is not empty. Delete it?"
 msgstr "這篩選-列不是空白. 刪除它?"
 
-#: include/classes/screens/CScreenBuilder.php:548
+#: include/classes/screens/CScreenBuilder.php:550
 msgid "This screen-row is not empty. Delete it?"
 msgstr "這篩選-行不是空白. 刪除它?"
 
@@ -14041,11 +14046,11 @@ msgstr "直到"
 msgid "Time"
 msgstr "時間"
 
-#: include/views/monitoring.screen.constructor.edit.php:456
+#: include/views/monitoring.screen.constructor.edit.php:460
 msgid "Time (ascending)"
 msgstr "時間(升冪)"
 
-#: include/views/monitoring.screen.constructor.edit.php:455
+#: include/views/monitoring.screen.constructor.edit.php:459
 msgid "Time (descending)"
 msgstr "時間(降冪)"
 
@@ -14082,7 +14087,7 @@ msgstr ""
 msgid "Time to reach threshold estimated based on period T is NOT N"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:609
+#: include/views/monitoring.screen.constructor.edit.php:613
 msgid "Time type"
 msgstr "時間類型"
 
@@ -14126,8 +14131,8 @@ msgstr "今天"
 #: include/views/js/monitoring.sysmaps.js.php:236
 #: include/views/monitoring.overview.items.php:51
 #: include/views/monitoring.overview.triggers.php:85
-#: include/views/monitoring.screen.constructor.edit.php:657
-#: include/views/monitoring.screen.constructor.edit.php:717
+#: include/views/monitoring.screen.constructor.edit.php:661
+#: include/views/monitoring.screen.constructor.edit.php:721
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Top"
 msgstr "頂部"
@@ -14520,7 +14525,7 @@ msgstr "兩個項目 (\"%1$s\"和\"%2$s\")不能填入一個主機資產紀錄�
 #: include/views/monitoring.screen.edit.php:190
 #: include/views/monitoring.slideconf.edit.php:238
 #: include/views/monitoring.sysmap.edit.php:341 latest.php:438
-#: popup_media.php:133 popup.php:507 popup.php:1209 tr_logform.php:287
+#: popup_media.php:134 popup.php:507 popup.php:1209 tr_logform.php:287
 #: tr_logform.php:292
 msgid "Type"
 msgstr "類型"
@@ -14533,11 +14538,11 @@ msgstr "類型(全細節)"
 msgid "Type (OK)"
 msgstr "類型(OK)"
 
-#: include/views/monitoring.screen.constructor.edit.php:458
+#: include/views/monitoring.screen.constructor.edit.php:462
 msgid "Type (ascending)"
 msgstr "類型(升冪)"
 
-#: include/views/monitoring.screen.constructor.edit.php:457
+#: include/views/monitoring.screen.constructor.edit.php:461
 msgid "Type (descending)"
 msgstr "類型(降冪)"
 
@@ -14579,7 +14584,7 @@ msgstr "上線"
 #: include/views/configuration.trigger.prototype.edit.php:247
 #: include/views/configuration.triggers.edit.php:252
 #: include/views/js/monitoring.sysmaps.js.php:165
-#: include/views/monitoring.screen.constructor.edit.php:666
+#: include/views/monitoring.screen.constructor.edit.php:670
 #: include/views/monitoring.sysmap.edit.php:219 jsLoader.php:216
 #: popup_httpstep.php:37 tr_logform.php:373
 msgid "URL"
@@ -14750,7 +14755,7 @@ msgstr "未知的資源"
 msgid "Unknown step failed: %1$s"
 msgstr ""
 
-#: include/items.inc.php:887
+#: include/items.inc.php:891
 msgid "Unknown value type"
 msgstr "未知的值類型"
 
@@ -14926,12 +14931,12 @@ msgstr "上"
 #: include/views/configuration.triggers.massupdate.php:113
 #: include/views/js/configuration.discovery.edit.js.php:351
 #: include/views/monitoring.dashconf.php:129
-#: include/views/monitoring.screen.constructor.edit.php:750
+#: include/views/monitoring.screen.constructor.edit.php:754
 #: include/views/monitoring.screen.edit.php:214
 #: include/views/monitoring.slideconf.edit.php:261
 #: include/views/monitoring.sysmap.constructor.php:57
 #: include/views/monitoring.sysmap.edit.php:364
-#: include/views/monitoring.triggerComment.php:45 popup_media.php:142
+#: include/views/monitoring.triggerComment.php:45 popup_media.php:143
 #: tr_logform.php:382
 msgid "Update"
 msgstr "更新"
@@ -14984,7 +14989,7 @@ msgstr ""
 msgid "Updated: %s"
 msgstr "已更新: %s"
 
-#: include/classes/api/managers/CApplicationManager.php:122
+#: include/classes/api/managers/CApplicationManager.php:123
 #, c-format
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 應用程式\"%1$s\"於\"%2$s\"."
@@ -15057,7 +15062,7 @@ msgstr ""
 msgid "Use custom multiplier"
 msgstr "使用自訂倍數"
 
-#: include/views/administration.users.edit.php:200 popup_media.php:136
+#: include/views/administration.users.edit.php:200 popup_media.php:137
 msgid "Use if severity"
 msgstr "用此如果示警度"
 
@@ -15196,7 +15201,7 @@ msgstr ""
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
 msgstr ""
 
-#: include/menu.inc.php:270
+#: include/menu.inc.php:274
 #: include/views/administration.usergroups.edit.php:22
 #: include/views/administration.usergroups.list.php:22
 #: include/views/monitoring.screen.edit.php:129
@@ -15298,7 +15303,7 @@ msgstr "使用別名\"%s\"的用戶已存在."
 msgid "Username"
 msgstr "用戶名稱"
 
-#: include/menu.inc.php:274
+#: include/menu.inc.php:278
 #: include/views/administration.usergroups.edit.php:55
 #: include/views/administration.usergroups.list.php:130
 #: include/views/administration.users.edit.php:28
@@ -15654,11 +15659,11 @@ msgstr ""
 msgid "Version of Zabbix agent. Returns string"
 msgstr ""
 
-#: include/views/monitoring.screen.constructor.edit.php:649
+#: include/views/monitoring.screen.constructor.edit.php:653
 msgid "Vertical"
 msgstr "垂直的"
 
-#: include/views/monitoring.screen.constructor.edit.php:715
+#: include/views/monitoring.screen.constructor.edit.php:719
 msgid "Vertical align"
 msgstr "縱向對齊"
 
@@ -15677,7 +15682,7 @@ msgstr "檢視未能形成."
 msgid "Visible name"
 msgstr "可見的名稱"
 
-#: include/classes/api/services/CHost.php:1838
+#: include/classes/api/services/CHost.php:1839
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "如果缺少主機名稱, 可見的名稱不能是空白."
 
@@ -15825,16 +15830,16 @@ msgstr ""
 msgid "Welcome to"
 msgstr ""
 
-#: include/views/administration.users.edit.php:200 popup_media.php:135
+#: include/views/administration.users.edit.php:200 popup_media.php:136
 msgid "When active"
 msgstr "當作用中時"
 
 #: graphs.php:41 include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:73
 #: include/views/js/monitoring.sysmaps.js.php:41
-#: include/views/monitoring.screen.constructor.edit.php:681
+#: include/views/monitoring.screen.constructor.edit.php:685
 #: include/views/monitoring.sysmap.edit.php:105
-#: include/views/monitoring.sysmap.list.php:41 screenedit.php:67
+#: include/views/monitoring.sysmap.list.php:47 screenedit.php:67
 #: sysmaps.php:49
 msgid "Width"
 msgstr "寬"
@@ -15899,8 +15904,8 @@ msgstr "錯誤的服務\"%1$s\"其相依關係欄位."
 msgid "Wrong fields for element."
 msgstr "錯誤的組件欄位."
 
-#: include/classes/api/services/CHost.php:1587
-#: include/classes/api/services/CHost.php:1750
+#: include/classes/api/services/CHost.php:1588
+#: include/classes/api/services/CHost.php:1751
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "錯誤的主機欄位\"%1$s\"."
@@ -16034,7 +16039,7 @@ msgstr "每年"
 
 #: events.php:750 include/blocks.inc.php:475
 #: include/classes/screens/CScreenServerInfo.php:31 include/events.inc.php:368
-#: include/func.inc.php:1989 include/triggers.inc.php:1227
+#: include/func.inc.php:1990 include/triggers.inc.php:1227
 #: include/views/administration.general.valuemapping.list.php:60
 #: include/views/administration.users.list.php:68
 #: include/views/configuration.httpconf.list.php:131 tr_status.php:661
@@ -16045,7 +16050,7 @@ msgstr "是"
 msgid "Yesterday"
 msgstr ""
 
-#: include/func.inc.php:1669
+#: include/func.inc.php:1670
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr ""
@@ -16059,7 +16064,7 @@ msgstr "您無法選擇某些語言, 因為這些語系並未安裝於web伺服�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "您未被允許來幫用戶\"%s\"轉換優先權."
 
-#: include/func.inc.php:1686
+#: include/func.inc.php:1687
 msgid "You are not logged in"
 msgstr ""
 
@@ -16087,8 +16092,8 @@ msgstr "您沒有指定目標為動作操作的全域腳本\"%s\"."
 
 #: include/classes/api/services/CGraph.php:543
 #: include/classes/api/services/CGraphPrototype.php:558
-#: include/classes/api/services/CHost.php:732
-#: include/classes/api/services/CHost.php:793
+#: include/classes/api/services/CHost.php:733
+#: include/classes/api/services/CHost.php:794
 #: include/classes/api/services/CMaintenance.php:536
 #: include/classes/api/services/CMaintenance.php:642
 #: include/classes/api/services/CMaintenance.php:654
@@ -16116,11 +16121,11 @@ msgstr "您沒有許可權來更新其它用戶."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "您沒有許可權來來更新用戶或用戶不存在."
 
-#: include/func.inc.php:1669
+#: include/func.inc.php:1670
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:1688
+#: include/func.inc.php:1689
 msgid "You must login to view this page."
 msgstr "您必需登入才能瀏覽此頁面."
 

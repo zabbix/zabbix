@@ -170,6 +170,7 @@ class C10ImportConverter extends CConverter {
 			unset($host['triggers']);
 			unset($host['graphs']);
 		}
+		unset($host);
 
 		return $content;
 	}
@@ -206,6 +207,7 @@ class C10ImportConverter extends CConverter {
 			unset($host['triggers']);
 			unset($host['graphs']);
 		}
+		unset($host);
 
 		return $content;
 	}
@@ -698,7 +700,7 @@ class C10ImportConverter extends CConverter {
 
 				unset($graphItem['periods_cnt']);
 			}
-			unset($graph);
+			unset($graphItem);
 		}
 		unset($graph);
 
@@ -828,7 +830,6 @@ class C10ImportConverter extends CConverter {
 
 					unset($selement['iconid_unknown']);
 				}
-
 				unset($selement);
 			}
 
@@ -931,8 +932,8 @@ class C10ImportConverter extends CConverter {
 			foreach ($array[$key] as &$content) {
 				$content = [$wrapperKey => $content];
 			}
+			unset($content);
 		}
-		unset($content);
 
 		return $array;
 	}

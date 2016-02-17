@@ -171,8 +171,8 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document) {
 }
 
 function checkAll(form_name, chkMain, shkName) {
-	var frmForm = document.forms[form_name];
-	var value = frmForm.elements[chkMain].checked;
+	var frmForm = document.forms[form_name],
+		value = frmForm.elements[chkMain].checked;
 
 	chkbxRange.checkObjectAll(shkName, value);
 	chkbxRange.update(shkName);
