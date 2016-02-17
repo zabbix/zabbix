@@ -724,12 +724,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
-
-				if (!isset($expressionData->expressions[0])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _(
-						'Trigger expression must contain at least one host:key reference.'
-					));
-				}
 			}
 
 			if ($expressionChanged) {
@@ -1003,7 +997,11 @@ class CTriggerPrototype extends CTriggerGeneral {
 		if (!$triggerExpression->parse($triggerPrototype['expression'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 		}
-
+		if (!$triggerExpression->expressions) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_('Trigger expression must contain at least one host:key reference.')
+			);
+		}
 		$expressionHostnames = $triggerExpression->getHosts();
 		$this->checkTemplatesAndHostsTogether($expressionHostnames);
 
