@@ -1016,7 +1016,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				if (0 < (status = mysql_next_result(conn)))
 				{
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-					ret = ZBX_DB_FAIL;
+					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
 			while (0 == status);
