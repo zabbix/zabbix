@@ -375,8 +375,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 	}
 
 	// add the LIMIT clause
-	$query = DBaddLimit($query, $limit, $offset);
-	if(!$query) {
+	if(!$query = DBaddLimit($query, $limit, $offset)) {
 		return false;
 	}
 
@@ -385,20 +384,17 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			$result = @mysqli_query($DB['DB'], $query);
-			if (!$result) {
+			if (!$result = mysqli_query($DB['DB'], $query)) {
 				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
-			$result = @pg_query($DB['DB'], $query);
-			if (!$result) {
+			if (!$result = pg_query($DB['DB'], $query)) {
 				error('Error in query ['.$query.'] ['.pg_last_error().']');
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			$result = @oci_parse($DB['DB'], $query);
-			if (!$result) {
+			if (!$result = oci_parse($DB['DB'], $query)) {
 				$e = @oci_error();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
@@ -413,12 +409,11 @@ function DBselect($query, $limit = null, $offset = 0) {
 				$options['autocommit'] = DB2_AUTOCOMMIT_OFF;
 			}
 
-			$result = db2_prepare($DB['DB'], $query);
-			if (!$result) {
+			if (!$result = db2_prepare($DB['DB'], $query)) {
 				$e = @db2_stmt_errormsg($result);
 				error('SQL error ['.$query.'] in ['.$e.']');
 			}
-			elseif (@db2_execute($result, $options) !== true) {
+			elseif (true !== @db2_execute($result, $options)) {
 				$e = @db2_stmt_errormsg($result);
 				error('SQL error ['.$query.'] in ['.$e.']');
 				$result = false;
@@ -428,8 +423,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 			if ($DB['TRANSACTIONS'] == 0) {
 				lock_sqlite3_access();
 			}
-			$result = $DB['DB']->query($query);
-			if ($result === false) {
+			if (false === ($result = $DB['DB']->query($query))) {
 				error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 			}
 			if ($DB['TRANSACTIONS'] == 0) {
