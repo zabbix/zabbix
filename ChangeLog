@@ -3,7 +3,6 @@ Changes for 3.1.0
 New features:
 
 Bug fixes:
-..F....... [ZBX-9048] fixed accessing history using url with itemids parameter (Cemeris)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
