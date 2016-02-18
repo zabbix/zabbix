@@ -107,9 +107,8 @@ if (getRequest('hostid') != 0
 }
 else {
 	$hostGroups = getRequest('groups', array());
-	$groupid = getRequest('groupid');
-	if (!hasRequest('form_refresh') && $groupid != 0) {
-		$hostGroups[] = $groupid;
+	if (!hasRequest('form_refresh') && $groupId != 0) {
+		$hostGroups[] = $groupId;
 	}
 
 	$newGroupName = getRequest('newgroup', '');
