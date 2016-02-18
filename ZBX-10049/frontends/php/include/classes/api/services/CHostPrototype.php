@@ -1014,12 +1014,44 @@ class CHostPrototype extends CHostBase {
 		return count($ids) == $count;
 	}
 
-	protected function link(array $templateIds, array $targetIds) {
-		if (!$this->isWritable($targetIds)) {
+	protected function link(array $templateids, array $targetids) {
+		if (!$this->isWritable($targetids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		return parent::link($templateIds, $targetIds);
+		$links = parent::link($templateids, $targetids);
+
+		foreach ($targetids as $targetid) {
+			$linked_templates = API::Template()->get([
+				'output' => [],
+				'hostids' => [$targetid],
+				'nopermissions' => true
+			]);
+
+			$result = DBselect(
+				'SELECT i.key_,count(*)'.
+				' FROM items i'.
+				' WHERE '.dbConditionInt('i.hostid', array_merge($templateids, array_keys($linked_templates))).
+				' GROUP BY i.key_'.
+				' HAVING count(*)>1',
+				1
+			);
+			if ($row = DBfetch($result)) {
+				$target_templates = API::HostPrototype()->get([
+					'output' => ['name'],
+					'hostids' => [$targetid],
+					'nopermissions' => true
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Item "%1$s" already exists on "%2$s", inherited from another template.', $row['key_'],
+						$target_templates[0]['name']
+					)
+				);
+			}
+		}
+
+		return $links;
 	}
 
 	/**

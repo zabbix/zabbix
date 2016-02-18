@@ -2168,9 +2168,10 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "false PSK identity for host \"%s\" item"
 								" \"%s\" (not every rejected item might be reported):"
-								" configured identity \"%s\", received identity \"%s\"",
-								items[i].host.host, items[i].key_orig,
-								items[i].host.tls_psk_identity, attr.psk_identity);
+								" configured identity \"%s\", received identity"
+								" \"%.*s\"", items[i].host.host, items[i].key_orig,
+								items[i].host.tls_psk_identity,
+								(int)attr.psk_identity_len, attr.psk_identity);
 						flag_host_allow = 0;
 						continue;
 					}
