@@ -609,41 +609,41 @@ class CScreen extends CZBXAPI {
 		$updateScreenItems = array();
 		foreach ($screens as $screen) {
 			if (array_key_exists('screenitems', $screen)) {
-				$screen_items = $screen['screenitems'];
+				continue;
 			}
-			else {
-				$screen_items = $dbScreens[$screen['screenid']]['screenitems'];
-			}
+
+			$dbScreen = $dbScreens[$screen['screenid']];
+			$dbScreenItems = $dbScreen['screenitems'];
 
 			if (isset($screen['hsize'])) {
-				foreach ($screen_items as $screen_item) {
+				foreach ($dbScreenItems as $dbScreenItem) {
 					// delete screen items that are located on the deleted columns
-					if ($screen_item['x'] > $screen['hsize'] - 1) {
-						$deleteScreenItemIds[$screen_item['screenitemid']] = $screen_item['screenitemid'];
+					if ($dbScreenItem['x'] > $screen['hsize'] - 1) {
+						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
 					}
 					// reduce the colspan of screenitems that are displayed on the deleted columns
-					elseif (($screen_item['x'] + $screen_item['colspan']) > $screen['hsize']) {
-						$colspan = $screen['hsize'] - $screen_item['x'];
+					elseif (($dbScreenItem['x'] + $dbScreenItem['colspan']) > $screen['hsize']) {
+						$colspan = $screen['hsize'] - $dbScreenItem['x'];
 
-						$screenItemId = $screen_item['screenitemid'];
-						$updateScreenItems[$screenItemId]['screenitemid'] = $screen_item['screenitemid'];
+						$screenItemId = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['screenitemid'] = $dbScreenItem['screenitemid'];
 						$updateScreenItems[$screenItemId]['colspan'] = $colspan;
 					}
 				}
 			}
 
 			if (isset($screen['vsize'])) {
-				foreach ($screen_items as $screen_item) {
+				foreach ($dbScreenItems as $dbScreenItem) {
 					// delete screen items that are located on the deleted rows
-					if ($screen_item['y'] > $screen['vsize'] - 1) {
-						$deleteScreenItemIds[$screen_item['screenitemid']] = $screen_item['screenitemid'];
+					if ($dbScreenItem['y'] > $screen['vsize'] - 1) {
+						$deleteScreenItemIds[$dbScreenItem['screenitemid']] = $dbScreenItem['screenitemid'];
 					}
 					// reduce the rowspan of screenitems that are displayed on the deleted rows
-					elseif (($screen_item['y'] + $screen_item['rowspan']) > $screen['vsize']) {
-						$rowspan = $screen['vsize'] - $screen_item['y'];
+					elseif (($dbScreenItem['y'] + $dbScreenItem['rowspan']) > $screen['vsize']) {
+						$rowspan = $screen['vsize'] - $dbScreenItem['y'];
 
-						$screenItemId = $screen_item['screenitemid'];
-						$updateScreenItems[$screenItemId]['screenitemid'] = $screen_item['screenitemid'];
+						$screenItemId = $dbScreenItem['screenitemid'];
+						$updateScreenItems[$screenItemId]['screenitemid'] = $dbScreenItem['screenitemid'];
 						$updateScreenItems[$screenItemId]['rowspan'] = $rowspan;
 					}
 				}
