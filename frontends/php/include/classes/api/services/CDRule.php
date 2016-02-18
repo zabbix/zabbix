@@ -189,7 +189,7 @@ class CDRule extends CApiService {
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists('name', $drule)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'name'));
 			}
 			elseif (is_array($drule['name'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
@@ -300,7 +300,7 @@ class CDRule extends CApiService {
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists('druleid', $drule)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'druleid'));
 			}
 			elseif (!array_key_exists($drule['druleid'], $db_drules)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -421,7 +421,9 @@ class CDRule extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'type'));
 			}
 			elseif (!is_numeric($dcheck['type']) || !in_array($dcheck['type'], $dcheck_types)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s".', 'type'));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['type'], 'type')
+				);
 			}
 
 			switch ($dcheck['type']) {
