@@ -1,0 +1,4571 @@
+@import '_reset.scss';
+@import '_colors.scss';
+@import '_fonts.scss';
+@import '_mixins.scss';
+
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	font: {
+		family: $font-stack;
+		size: $font-body-size;
+	}
+	line-height: $body-line-height;
+	color: $font-color;
+	background-color: $body-bg-color;
+	margin-bottom: 60px; 
+	min-width: 950px;
+}
+
+a {
+  
+	&:link {
+		color: $link-color;
+		text-decoration: none;
+		outline: 0;
+		@include transition(color .2s ease-out);
+	}
+
+	&:visited {
+		color: $link-visited-color;
+		text-decoration: none; 
+	}
+
+	&:hover {
+		color: $link-hover-color; 
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+
+	&:active {
+		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
+	}
+
+	img {
+		border: none;
+		vertical-align: top;
+	}
+}
+
+.link-action {
+	border-bottom: 1px dotted;
+	cursor: pointer;
+
+	&:link {
+		@extend %link-action-style;
+	}
+
+	&:visited {
+		@extend %link-action-style;
+	}
+
+	&:hover {
+		@extend %link-action-style;
+	}
+
+	&:active {
+		@extend %link-action-style;
+	}
+}
+
+%link-action-style {
+	border-bottom: 1px dotted;
+	text-decoration: none;
+}
+
+.link-alt {
+	text-decoration: none;
+	cursor: pointer;
+
+	&:link {
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+	}
+
+	&:visited {
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+	}
+
+	&:hover {
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+
+	&:focus {
+		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+	}
+
+	&:active {
+		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
+	}
+}
+
+h1 {
+	font-size: $font-h1-size;
+	line-height: $h1-line-height;
+	border-bottom: 1px solid $ui-border-color;
+	padding: 0 0 5px 0;
+}
+
+h2 {
+	font-size: $font-h2-size;
+	line-height: $h2-line-height;
+}
+
+h3 {
+	font-size: $font-h3-size;
+	text-transform: $font-transform;
+	color: $font-alt-color;
+	letter-spacing: 0.0688em;
+	text-rendering: optimizeLegibility;
+}
+
+h4 {
+	font-size: $font-h4-size;
+	color: $font-color;
+	line-height: $h4-line-height;
+}
+
+sup {
+	font-size: $font-h3-size;
+	color: $font-alt-color;
+}
+
+b {
+	font-weight: bold;
+}
+
+strong {
+	@extend b;
+}
+
+em {
+	font-style: italic;
+}
+
+ol {
+	list-style: decimal;
+	list-style-position: inside;
+
+	li {
+		padding: 0 0 0.7em 0;
+	} 
+}
+
+p {
+	margin: 0 0 0.7em 0;
+}
+
+pre {
+	font: {
+		family: $font-stack-mono;
+		size: $font-mono-size;
+	}
+	@extend %space-pre-wrap;
+
+	a {
+		@extend %space-pre-wrap;
+	}
+
+	td {
+		@extend %space-pre-wrap;
+	}
+
+	span {
+		@extend %space-pre-wrap;
+	}
+}
+
+%space-pre-wrap {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+:-ms-input-placeholder {
+	color: #6d6d6d !important;
+}
+
+// Main Navigation
+nav {
+	background-color: $main-subnav-bg-color;
+
+	a {
+
+		&:link {
+			@extend %no-border;
+		}
+
+		&:visited {
+			@extend %no-border;
+		}
+
+		&:hover {
+			@extend %no-border;
+		}
+
+		&:focus {
+			@extend %no-border;
+		}
+
+		&:active {
+			@extend %no-border;
+		}
+	}
+}
+
+.nav {
+	@extend nav;
+}
+
+%no-border {
+	border: none;
+}
+
+.top-nav-container {
+	height: 49px;
+	line-height: 49px;
+	position: relative;
+	background-color: $main-nav-bg-color;
+}
+
+.top-nav {
+	font-size: $font-top-nav-size;
+	background-color: $main-nav-bg-color;
+	display: inline-block;
+
+	li {
+		display: block;
+		float: left;
+
+		&.selected {
+			position: relative;
+
+			&::after{
+				content:'';
+				position: absolute;
+				bottom: -1px;
+				left: 0;
+				right: 0;
+				margin: 0 auto;
+				width: 0; 
+				height: 0;
+				font-size: 0;
+				line-height: 0;
+				border-left: 9px solid transparent;
+				border-right: 9px solid transparent;
+			    border-bottom: 9px solid $main-subnav-bg-color;
+			}
+
+			a, a:hover {
+				color: $link-main-nav-active-color;
+			}
+	    }
+	}
+
+	a {
+		padding: 17px 13px;
+		color: $link-main-nav-color;
+		text-decoration: none;
+		cursor: pointer;
+		outline: 0;
+
+		&:link {
+			color: $link-main-nav-color;
+		}
+
+		&:visited {
+			color: $link-main-nav-visited-color;
+		}
+
+		&:hover {
+			color: $link-main-nav-hover-color;
+		}
+
+		&:focus {
+			color: $link-main-nav-active-color;
+		}
+
+		&:active {
+			color: $link-main-nav-active-color;
+		}
+	}
+}
+
+ul.top-nav-icons {
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	li {
+		display: block;
+		float: left;
+
+		.search-suggest {
+			min-width: 186px;
+
+			li {
+				float: none;
+
+				a {
+					opacity: inherit;
+					width: inherit;
+				}
+			}
+		}
+	}
+
+	a {
+		display: block;
+		width: 38px;
+		height: 49px;
+		line-height: 49px;
+		color: $link-main-nav-active-color;
+		font-size: $font-h3-size;
+		text-decoration: none;
+		@include opacity(0.75);
+		@include transition(opacity .2s ease-out);
+
+		&:hover {
+			@include opacity(1);
+		}
+
+		&:focus {
+			@include opacity(1);
+		}
+    }
+
+	.top-nav-help {
+		background: url(../img/icon-sprite.svg) no-repeat 1px -30px;
+	}
+
+	.top-nav-profile {
+		background: url(../img/icon-sprite.svg) no-repeat 1px -102px;
+	}
+
+	.top-nav-signout {
+		background: url(../img/icon-sprite.svg) no-repeat 1px -138px;
+		width: 44px;
+	}
+
+	.top-nav-zbbshare {
+		background: url(../img/icon-sprite.svg) no-repeat 1px -66px;
+	    width: auto;
+		padding: 0 12px 0 27px;
+		-webkit-transform-style: preserve-3d;
+	}
+
+	form {
+		position: relative;
+	}
+
+	input {
+		background-color: darken($main-nav-bg-color, 7%);
+		border: 1px solid darken($main-nav-bg-color, 10%);
+		width: 198px;
+		margin: 6px 7px 0 0;
+		color: $font-color;
+		padding: 4px 24px 4px 5px;
+		@include opacity(1);
+
+		&:focus {
+			background-color: $form-bg-color;
+			border: 1px solid $form-border-color;
+			@include opacity(1);
+		}
+
+		&:focus + .btn-search {
+			@include opacity(1);
+		}
+	}
+}
+
+.top-subnav-container {
+	height: 32px;
+	line-height: 32px;
+	background-color: $main-subnav-bg-color;
+	position: relative;
+	padding: 0 13px;
+}
+
+.top-subnav {
+	background-color: $main-subnav-bg-color;
+	position: absolute;
+	left: 0;
+
+	li {
+		display: block;
+		float: left;
+		padding: 0 12px;
+
+		&:last-child {
+			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
+		}
+	}
+}
+
+.top-subnav a {
+	padding: 9px 1px;
+
+	&:link {
+		color: $link-main-subnav-color;
+	}
+
+	&:visited {
+		color: $link-main-subnav-visited-color;
+	}
+
+	&:hover {
+		color: $link-main-subnav-hover-color;
+	}
+
+	&:focus {
+		color: $link-main-subnav-active-color;
+	}
+
+	&:active {
+		color: $link-main-subnav-active-color;
+	}
+
+	&.selected {
+		color: $link-main-subnav-active-color;
+		padding: 9px 1px 6px 1px;
+		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
+	}
+}
+
+.arrow-up {
+	@extend %arrow;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-bottom: 6px solid $font-color;
+}
+
+.arrow-down {
+	@extend %arrow;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 6px solid $font-color;
+}
+
+.arrow-left {
+	@extend %arrow;
+	border-bottom: 4px solid transparent;
+	border-top: 4px solid transparent;
+	border-right: 6px solid $font-color;
+}
+
+.arrow-right {
+	@extend %arrow;
+	border-bottom: 4px solid transparent;
+	border-top: 4px solid transparent;
+	border-left: 6px solid $font-color;
+}
+
+%arrow {
+	width: 0; 
+	height: 0; 
+	font-size: 0;
+	line-height: 0;
+	display: inline-block;
+	@include transform(scale(.9999));
+}
+
+.header-title {
+	position: relative;
+	margin: 0 0 10px 0;
+
+	ul {
+		position: absolute;
+		right: 0;
+		bottom: 6px;
+
+		li {
+			display: block;
+			float: left;
+			position: relative;
+			padding: 0 0 0 14px;
+		}
+	}
+}
+
+// Article
+article {
+	padding: 13px 13px 0 13px;
+}
+
+.article {
+	@extend article;
+}
+
+// Obgect Group Navigation
+.object-group {
+	margin: 0 0 10px 0;
+	
+	li {
+		display: inline-block;
+		padding: 0 5px 0 0;
+		vertical-align: middle;
+
+		span {
+			padding: 4px 7px;
+		}
+
+		.status-container {
+			margin: 0 5px 0 0;
+
+			span {
+				padding: 2px 3px 1px 3px;
+			}
+		}
+	}
+
+	.selected {
+		background-color: $ui-bg-color;
+		@include box-shadow(inset 0 0 0 1px $ui-border-color);
+		@include border-radius(2px);
+	}
+
+	.arrow-right {
+		border-left-color: $font-color;
+	}
+}
+
+.hor-list {
+	
+	li {
+		display: inline-block;
+		margin: 0 6px 0 0;
+
+		&:last-child {
+			margin: 0;
+		}
+	}
+}
+
+// Footer
+footer {
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 30px;
+	text-align: center;
+	color: $font-alt-color;
+
+	a {
+
+		&.logo {
+			border: none;
+		}
+	}
+}
+
+.footer {
+	@extend footer;
+}
+
+.logo {
+	float: left;
+	display: block;
+	width: 95px;
+	height: 25px;
+	margin: 12px 9px 0 13px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
+}
+
+// Tables
+.list-table {
+	width: 100%;
+    background-color: $ui-bg-color;
+    border: 1px solid $ui-border-color;
+	
+	thead th {
+		font-size: $font-h3-size;
+		color: $font-alt-color;
+		text-transform: $font-transform;
+		letter-spacing: 0.0688em;
+		text-rendering: optimizeLegibility;
+		height: 100%;
+		overflow: hidden;
+		white-space: nowrap;
+	    padding: 8px 5px 6px 5px;
+	    vertical-align: bottom;
+	    border-bottom: 2px solid $table-border-color;
+	    text-align: left;
+
+	    .arrow-up {
+	    	margin: 0 0 0 4px;
+	    	border-bottom-color: $font-alt-color;
+	    }
+
+	    .arrow-right {
+	    	margin: 0 0 0 4px;
+	    	border-left-color: $font-alt-color;
+	    }
+
+	    .arrow-down {
+	    	margin: 0 0 0 4px;
+	    	border-top-color: $font-alt-color;
+	    }
+
+	    .treeview {
+
+	    	span {
+	    		margin: 0;
+	    	}
+	    }
+
+	    a {
+	    	display: block;
+	    	position: relative;
+	    	margin: -1em;
+	    	padding: 1em;
+	    	border: none;
+	    	@include transition(background-color .2s ease-out);
+
+	    	&:hover {
+	    		text-decoration: none;
+	    		background-color: $ui-hover-color
+	    	}
+
+	    	&:focus {
+	    		text-decoration: none;
+	    		background-color: $ui-hover-color
+	    	}
+
+	    	&:active {
+	    		text-decoration: none;
+	    		background-color: $ui-hover-color
+	    	}	    
+	    }
+	}
+
+	tbody tr {
+		@include transition(background-color .2s ease-out);
+
+		&:hover {
+			background-color: $ui-hover-color;
+		}
+
+		&.row-selected {
+			@extend %found-bg;
+		}
+
+		&.nothing-to-show {
+				@extend %nothing-to-show;
+			}
+
+		&:last-child td {
+			border-bottom: none;
+		}
+	}
+
+	td {
+		padding: 8px 5px;
+		vertical-align: middle;
+		border-bottom: 1px solid $table-border-color;
+	}
+
+	.vertical_rotation_inner {
+		white-space: nowrap;
+		@include rotate(270);
+	}
+}
+
+.table-paging {
+	text-align: center;
+	background-color: $ui-bg-color;
+	margin-top: -1px;
+	padding: 7px 5px;
+	overflow: hidden;
+	position: relative;
+	border: 1px solid $ui-border-color;
+	border-top-color: $table-border-color;
+
+	a {
+		@extend %paging-btn;
+	}
+}
+
+.paging-btn-container {
+	min-height: 24px;
+	position: relative;
+}
+
+.table-stats {
+	color: $font-alt-color;
+	display: inline-block;
+    padding: 4px 0;
+    position: absolute;
+    right: 5px;
+}
+
+.radio-switch {
+	cursor: default;
+	background-color: $form-bg-color;
+	@extend %paging-btn;
+}
+
+%paging-btn {
+	display: inline-block;
+	margin-left: -1px;
+	padding: 3px 11px;
+	background-color: $btn-form-bg-color;
+	border: 1px solid $form-border-color;
+	text-decoration: none;
+	color: $font-color;
+	@include transition(background-color .2s ease-out);
+
+	&:hover {
+		color: $font-color;
+		background-color: $btn-form-hover-color;
+	}
+
+	&:focus {
+		color: $font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $form-border-focus-color;
+		z-index: 10;
+		position: relative;
+	}
+
+	&:active {
+		color: $font-color;
+		background-color: $btn-form-hover-color;
+		z-index: 10;
+		position: relative;
+	}
+
+	&:first-of-type {
+		@include border-radius(2px 0 0 2px);
+	}
+
+	&:last-of-type {
+		@include border-radius(0 2px 2px 0);
+	}
+
+	&.paging-selected {
+		color: $font-selected-color;
+		border-color: $ui-bg-selected-color;
+		background-color: $ui-bg-selected-color;	
+		position: relative;
+		z-index: 1;
+
+		&:hover {
+			background-color: darken($ui-bg-selected-color, 4%);
+		}
+
+		&:focus {
+			background-color: darken($ui-bg-selected-color, 4%);
+			border-color: $form-border-focus-color;
+			position: relative;
+		}
+
+		&:active {
+			background-color: darken($ui-bg-selected-color, 4%);
+			border-color: $form-border-focus-color;
+			position: relative;
+		}
+	}
+}
+
+.treeview-plus {
+	font: {
+		size: $font-top-nav-size;
+		weight: bold;
+	}
+	display: inline-block;
+	background-color: $ui-bg-color;
+	border: 1px solid $form-border-color;
+	cursor: pointer;
+	width: 12px;
+	height: 12px;
+	line-height: 12px;
+	text-align: center;
+	@include border-radius(2px);
+
+	&:hover {
+		background-color: $ui-hover-color;
+	}
+
+	&:focus {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
+	&:active {
+		background-color: $ui-hover-color;
+	}
+}
+
+.treeview {
+	display: inline-block;
+	width: 16px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+
+	.arrow-right {
+		border-left-color: $font-alt-color;
+	}
+
+	.arrow-down {
+		margin: 0 0 2px 0;
+		border-top-color: $font-alt-color;
+	}
+
+	&:hover .arrow-right {
+		border-left-color: $link-color;
+	}
+
+	&:focus .arrow-right {
+		border-left-color: $link-color;
+	}
+
+	&:hover .arrow-down {
+		border-top-color: $link-color;
+	}
+
+	&:focus .arrow-down {
+		border-top-color: $link-color;
+	}
+}
+
+.table {
+	display: table;
+}
+
+.row {
+	display: table-row;
+}
+
+.cell {
+	display: table-cell;
+	vertical-align: top;
+}
+
+.adm-img {
+	width: 75%;
+	text-align: center;
+	margin: 0 auto;
+
+	.cell {
+		vertical-align: bottom;
+		padding: 20px 0 20px 0;
+	}
+}
+
+.cell-width {
+	width: 8px;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.overflow-table {
+	overflow-x: auto;
+	position: relative;
+	@extend %webkit-hor-scrollbar;
+}
+
+// Filters
+.filter-btn-container {
+	text-align: center;
+}
+
+.filter-container {
+	padding: 15px 0 10px 0;
+	margin: 0 0 10px 0;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+
+	.table {
+		border-bottom: 1px solid $table-border-color;
+	}
+
+	.filter-forms {
+		padding: 0 10px;
+	}
+
+	.list-table {                                       
+		margin-bottom: -10px;
+		border: none;
+
+		thead {
+
+			th {
+				font-size: $font-form-size;
+				text-transform: none;
+				text-rendering: auto;
+				letter-spacing: normal;
+				color: initial;
+				padding: 8px 5px 5px 5px;
+				border-bottom-width: 1px;
+			}
+		}
+	}
+}
+
+.subfilter-enabled {
+	display: inline-block;
+	position: relative;
+	height: 18px;
+	padding: 0 4px;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	@include border-radius(2px);
+
+	a {
+		color: $font-selected-color;
+		text-decoration: none;
+		cursor: default;
+	}
+
+	sup {
+		color: lighten($ui-bg-selected-color, 25%);
+	}
+}
+
+.filter-forms {
+	margin: 0 auto;
+	text-align: center;
+	white-space: nowrap;
+	background-color: $ui-bg-color;
+
+	.cell {
+		text-align: left;
+		padding: 0 20px 5px 20px;
+
+		&:first-child {
+			padding-left: 0;
+		}
+
+		&:last-child {
+			padding-right: 0;
+			border-right: none;
+		}
+
+		button {
+			margin: 0;
+		}
+	}
+
+	button {
+		margin: 10px 5px 0 5px;
+	}
+}
+
+.multiselect-wrapper {
+	position: relative;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.multiselect {
+	@extend %form-input-style;
+	@extend .multiselect-button;
+	position: relative;
+	margin-right: 3px;
+	min-height: 24px;
+	white-space: normal;
+
+	&.active {
+		border-color: $form-border-focus-color;
+	}
+
+	input[type="text"] {
+		border: none;
+		background: none;
+		box-sizing: border-box;
+		width: 100%;
+		padding-bottom: 2px;
+		min-height: 20px;
+	}
+
+	.multiselect-list {
+		padding-left: 2px;
+		padding-bottom: 2px;
+
+		li {
+			display: inline-block;
+			margin: 2px 14px 0 0;
+			white-space: nowrap;
+
+			.subfilter-enabled {
+				padding: 0 9px 0 4px;
+				line-height: 18px;
+			}
+
+			&.selected {
+
+				.subfilter-enabled {
+					background-color: lighten($ui-bg-selected-color, 10%);
+				}
+
+				.subfilter-disable-btn {
+					background-color: lighten($ui-bg-selected-color, 10%);
+					@include opacity(1);
+
+					&:active {
+						background-color: lighten($ui-bg-selected-color, 10%);
+						@include opacity(1);
+					}
+				}
+			}
+		}
+	}
+}
+
+.multiselect-button {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.multiselect-suggest {
+	padding: 0 5px;
+	white-space: normal;
+	color: $font-alt-color;
+	background-color: $form-bg-color;
+
+	li {
+		display: block;
+		height: inherit;
+		line-height: normal;
+		color: $font-color;
+		padding: 0.4em 5px;
+		margin: 0 -5px;
+		cursor: pointer;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		@include transition(background-color .2s ease-out);
+
+		&.suggest-hover {
+			background-color: $action-hover-color;
+		}
+	}
+}
+
+.multiselect-matches {
+	padding: 0.4em 5px;
+	color: $font-color;
+	font-weight: bold; 
+	@extend .multiselect-suggest;
+}
+
+.available {
+	position: absolute;
+	z-index: 1000;
+	margin-top: 1px;
+	border: 1px solid $action-border-color;
+	border-top: none;
+	max-height: 400px;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+	@include box-shadow(0 6px 10px 0 $action-shadow-color);
+}
+
+.suggest-found {
+	font-weight: bold;
+	color: $dark-yellow;
+}
+
+// Timeline
+.scrollbar {
+	position: relative;
+	margin: 0 auto;
+	margin-bottom: 10px;
+	line-height: 1em;
+	height: 52px;
+
+	.selected {
+		font-weight: bold;
+	}
+}
+
+.sublevel {
+	height: 22px;
+	border: 1px solid $action-hover-color;
+	background-color: $action-hover-color;
+	margin: 5px 0;
+	@include border-radius(2px);
+	
+	button {
+
+		&:first-child {
+			float: left;
+			margin-left: -1px;
+		}
+
+		&:last-child {
+			float: right;
+			margin-right: -1px;
+		}
+	}
+
+	.btn-grey {
+		height: 22px;
+		line-height: 22px;
+		background-color: $btn-form-bg-color;
+		margin-top: -1px;
+	}
+}
+
+.info {
+	height: 14px;
+
+	.zoom {
+		float: left;
+		white-space: nowrap;
+
+		a {
+			margin: 0 4px;
+		}
+	}
+
+	.timeline {
+		float: right;
+		white-space: nowrap;
+	}
+}
+
+.overlevel {
+	position: absolute;
+	top: 14px;
+	left: 30px;
+	height: 24px;
+	margin: 5px 0;
+}
+
+.bar {
+	position: absolute;
+	z-index: 1;
+	height: 22px;
+	border: 1px solid $form-border-color;
+	@include border-radius(2px);
+}
+
+.icon {
+	position: relative;
+	height: 22px;
+	background-color: $form-bg-color;
+	border-color: $form-border-color;
+	@include border-radius(2px);
+	@include transition(background-color .2s ease-out);
+
+	&:hover {
+		background-color: $ui-hover-color;
+	}
+
+	&:focus {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
+	&:active {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
+	.center {
+		width: 10px;
+		height: 22px;
+		background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
+		margin: 0 auto;
+	}
+}
+
+.ghost {
+	position: absolute;
+	top: 0;
+	height: 22px;
+	line-height: 22px;
+	border: 1px solid $form-border-color;
+	@include border-radius(2px);
+}
+
+.left_arr {
+	position: absolute;
+	top: 1px;
+	width: auto;
+	height: 22px;
+	line-height: 22px;
+	padding: 0 5px;
+	z-index: 99;
+	cursor: e-resize;
+}
+
+.right_arr {
+	@extend .left_arr;
+}
+
+.subline {
+	height: 14px;
+
+	.nav_links {
+		float: left;
+		@extend .zoom;
+
+		a {
+			margin: 0 4px;
+		} 
+	}
+
+	.period {
+		float: right;
+		text-align: right;
+		margin-left: 8px;
+	}
+
+	.info_period {
+		@extend .period;
+	}
+}
+
+// Forms
+.table-forms-container {
+	margin: 0 0 10px 0;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+	padding: 10px;
+	text-align: left;
+
+	> .ui-tabs-nav {
+		margin: -10px -10px 10px -10px;
+	}
+}
+
+.form-btns {
+
+	button {
+		margin: 10px 6px 5px 6px;
+	}
+}
+
+.table-forms {
+	display: table;
+	width: 100%;
+	color: $font-color;
+
+	li {
+		display: table-row;
+	}
+
+	.multiselect-suggest {
+
+		li {
+			display: block;
+		}
+	}
+
+	th {
+		font-size: $font-h3-size;
+		color: $font-alt-color;
+		text-transform: $font-transform;
+		letter-spacing: 0.0688em;
+		text-rendering: optimizeLegibility;
+		padding: 0 5px 0 0;
+
+		&:last-child {
+			padding: 0;
+		}
+	}
+
+	tfoot {
+
+		.table-forms-td-right {
+			padding-top: 5px;
+		}
+
+		button {
+			margin: 0 10px 0 0;
+		}
+	}
+
+	.tfoot-buttons {
+		@extend tfoot;
+	}
+
+	.table-forms-td-left {
+		display: table-cell;
+		padding: 5px 0;
+		text-align: right;
+		vertical-align: top;
+		width: 15%;
+		white-space: nowrap;
+
+		label {
+			display: block;
+			height: 24px;
+			line-height: 24px;
+		}
+	}
+
+	.table-forms-td-right {
+		display: table-cell;
+		padding: 5px 0 5px 10px;
+		vertical-align: middle;
+		width: 85%;
+
+		td {
+			padding: 5px 5px 5px 0;
+			position: relative;
+
+			&.td-drag-icon {
+				padding: 0 11px 0 0;
+				vertical-align: middle;
+			}
+
+			.drag-icon {
+				position: absolute;
+				top: 5px;
+				margin-right: 5px;
+			}
+
+			 &.center {
+			 	text-align: center;
+			 	vertical-align: middle;
+
+			 	.btn-grey {
+			 		margin: 3px 0;
+			 	}
+			 }
+		}
+	}
+
+	h4 {
+		margin-bottom: -5px;
+	}
+
+	.hor-list {
+
+		li {
+			display: inline-block;
+		}
+	}
+}
+
+.table-forms-separator {
+	display: inline-block;
+	padding: 5px;
+	position: relative;
+	border: 1px solid $table-border-color;
+	@include box-sizing(border-box);
+}
+
+.drag-drop-area {
+	@extend %found-bg;
+}
+
+.margin-top {
+	display: block;
+	margin: 4px 0 0 0;
+}
+
+.form-new-group {
+	border: 5px solid $lighter-green;
+	padding: 4px 0;
+	margin-left: -5px;
+	@include border-radius(2px);
+}
+
+.list-check-radio {
+
+	li {
+		display: block;
+		padding: .3em 0;
+	}
+
+	label {
+		padding: 0 0 0 16px;
+		display: inline-block;
+		text-indent: -13px;
+		max-width: 600px;
+
+		input[type="checkbox"] {
+			left: -3px;
+			margin: 0;
+		}
+
+		input[type="radio"] {
+			left: -3px;
+			margin: 0;
+		}
+	}
+}
+
+.list-hor-check-radio {
+	@extend .list-check-radio;
+
+	li {
+		display: inline-block;
+		margin-right: 15px;
+		padding: .3em 0 0 0;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+}
+
+.radio-segmented {
+	white-space: nowrap;
+
+	li {
+		position: relative;
+		display: inline-block;
+		margin: 0 -1px 0 0;
+
+		&:first-child label {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child label {
+			@include border-radius(0 2px 2px 0);
+		}
+
+		&:only-child label {
+			@include border-radius(2px);
+		}
+	}
+
+	label {
+		padding: 4px 11px;
+		border: 1px solid $form-border-color;
+		@include transition(background-color .2s ease-out);
+	}
+
+	input[type="radio"] {
+		position: absolute;
+		clip: rect(1px, 1px, 1px, 1px);
+
+		+ label {
+			color: $font-color;
+			border-color: $form-border-color;
+			background-color: $form-bg-color;
+
+			&:hover {
+				background-color: $btn-form-hover-color;
+			}
+
+			&:active {
+				border-color: $form-border-color;
+				background-color: $btn-form-hover-color;
+			}
+		}
+
+		&:focus + label {
+			border-color: $form-border-focus-color;
+			background-color: $btn-form-hover-color;
+			position: relative;
+			z-index: 2;
+		}
+
+		&:checked + label {
+			color: $white;
+			border-color: $ui-bg-selected-color;
+			background-color: $ui-bg-selected-color;;	
+			position: relative;
+			z-index: 1;
+		}
+
+		&:checked:focus + label {
+			border-color: $form-border-focus-color;	
+			position: relative;
+			z-index: 2;
+		}
+
+		&:checked[disabled] + label {
+			background-color: lighten($ui-bg-selected-color, 33%) !important;
+			@include transition(none);
+		}
+
+		&[disabled] + label {
+			@include transition(none);
+			@extend %form-disabled;
+		}
+	}
+}
+
+label {
+	input[type="checkbox"] {
+		margin-right: 3px;
+	}
+
+	input[type="radio"] {
+		margin-right: 3px;
+	}
+}
+
+input {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
+	
+	&[type="text"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="password"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="search"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="number"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="email"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="time"] {
+		@extend %form-input-height-padding;
+		@extend %form-input-style;
+	}
+
+	&[type="file"] {
+		padding: 1px;
+		@extend %form-input-style;
+	}
+
+	&[type="checkbox"] {
+		@extend %form-check-radio-style;
+	}
+
+	&[type="radio"] {
+		@extend %form-check-radio-style;
+	}
+
+	&[disabled] {
+		@extend %form-disabled;
+	}
+
+	&[readonly] {
+		color: $font-color!important;
+		@extend %form-disabled;
+	}  
+}
+
+textarea {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
+	padding: 4px 5px;
+	overflow: auto;
+	@extend %form-input-style;
+	@extend %webkit-scrollbar;
+
+	&[disabled] {
+		@extend %form-disabled;
+	}
+
+	&[readonly] {
+		color: $font-color!important;
+		@extend %form-disabled;
+	}   
+}
+
+select {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
+	padding: 3px 3px 3px 0;
+	background-color: $form-bg-color;
+	@extend %form-input-style;
+	@extend %webkit-scrollbar;
+
+	option {
+		color: $font-color;
+
+		&[disabled] {
+			@extend %form-disabled;
+		}
+	}
+
+	&[multiple] {
+		padding: 4px 5px;
+		width: 300px;
+		height: 150px;
+
+		option {
+			padding: 0;
+		}
+	}
+
+	&[disabled] {
+		@extend %form-disabled;
+	}
+
+	&[readonly] {
+		color: $font-color!important;
+		@extend %form-disabled;
+	}   
+}
+
+.form-input-margin {
+	display: inline-block;
+	margin: 0 3px 0 0;
+}
+
+%form-check-radio-style {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	vertical-align: middle;
+	position: relative;
+	top: -1px;
+	overflow: hidden;
+	width: 13px;
+	height: 13px;
+	background: none;
+}
+
+%form-input-height-padding {
+	padding: 0 5px;
+	min-height: 24px;
+}
+
+%form-input-style {
+	border: 1px solid $form-border-color;
+	color: $font-color;
+	background-color: $form-bg-color;
+	outline: 0;
+	@include box-sizing(border-box);
+	@include transition(border-color .2s ease-out);
+
+	&:focus {
+		border-color: $form-border-focus-color;
+	}
+}
+
+button::-moz-focus-inner {
+	padding: 0;
+	border: 0;
+	vertical-align: middle;
+}
+
+button {
+	font-family: $font-stack;
+	color: $btn-font-color;
+	background-color: $btn-bg-color;
+	border: 1px solid $btn-bg-color;
+	padding: 0 11px;
+	min-height: 24px;
+	cursor: pointer;
+	outline: 0;
+	@include border-radius(2px);
+	@include transition(border-color, background-color .2s ease-out);
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+}
+
+.btn-alt {
+	color: $btn-alt-font-color;
+	background-color: $btn-alt-bg-color;
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+}
+
+.btn-grey {
+	color: $btn-form-font-color;
+	background-color: $btn-form-bg-color;
+	border-color: $btn-form-border-color;
+	vertical-align: top;
+
+	&:hover {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $btn-form-border-color;
+	}
+
+	&:focus {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
+	&:active {
+		color: $btn-form-font-color;
+		background-color: $btn-form-hover-color;
+		border-color: $form-border-focus-color;
+	}
+}
+
+.btn-link {
+	background-color: $transparent;
+	border: none;
+	color: $link-color;
+	font-size: inherit;
+	border-bottom: 1px dotted $link-color;
+	padding: 0;
+	min-height: inherit;
+	@include border-radius(0);
+
+	&:hover {
+		@extend .btn-link;
+	}
+
+	&:focus {
+		@extend .btn-link;
+	}
+
+	&:active {
+		@extend .btn-link;
+	}
+}
+
+.btn-search {
+	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
+	position: absolute;
+	border: none;
+	top: 13px;
+	right: 8px;
+	width: 24px;
+	min-height: 22px;
+	padding: 0;
+	@include opacity(0.75);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@extend %btn-search-hover-focus;
+	}
+
+	&:active {
+		@extend %btn-search-hover-focus;
+	}
+
+	&:focus {
+		@extend %btn-search-hover-focus;
+	}
+}
+
+.filter-trigger {
+	position: relative;
+	padding-right: 21px;
+	min-width: 94px;
+	@include border-radius(2px 2px 0 0);
+
+	&.filter-active {
+		color: $font-color;
+		background-color: $ui-bg-color;
+		border: 1px solid $ui-border-color;
+		border-bottom: none;
+		margin-bottom: -1px;
+
+		.arrow-up {
+			position: absolute;
+			top: 45%;
+			margin: 0 0 0 6px;
+			border-bottom-color: $font-color;
+		}
+	}
+
+	.arrow-down {
+		position: absolute;
+		top: 45%;
+		margin: 0 0 0 6px;
+		border-top-color: $white;
+	}
+}
+
+$icon-btn: (
+	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
+	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
+	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
+	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
+
+);
+
+@each $icon-btn, $bgimage in $icon-btn {
+    .btn-#{$icon-btn} {
+        background: $bgimage;
+        @extend %button-icon-size;
+    }
+}
+
+$icon-widget-btn: (
+	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+);
+
+@each $icon-widget-btn, $bgimage in $icon-widget-btn {
+    .btn-#{$icon-widget-btn} {
+        background: $bgimage;
+        @extend %btn-widget;
+    }
+}
+
+%btn-widget {
+	border: none;
+	width: 30px;
+	height: 28px;
+	min-height: 0;
+	padding: 0;
+	-webkit-transform-style: preserve-3d;
+	@include opacity(0.5);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@extend %btn-widget-hover-active;
+	}
+
+	&:focus {
+		@extend %btn-widget-hover-active;
+	}
+
+	&:active {
+		@extend %btn-widget-hover-active;
+	}
+}
+
+%button-icon-size {
+	width: 24px;
+	height: 24px;
+	padding: 0;
+}
+
+%btn-disabled {
+	color: $btn-disabled-font-color;
+	background-color: $btn-disabled-bg-color;
+	border-color: $btn-disabled-border-color;
+	cursor: default;
+}
+
+%form-disabled {
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color !important;
+	border-color: $form-disabled-border-color;
+}
+
+.disabled {
+	cursor: default !important;
+	@include opacity(0.35);
+
+	.subfilter-enabled {
+		color: darken($ui-bg-selected-color, 35%);
+	}
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 25%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover {
+			color: darken($ui-bg-selected-color, 35%);
+		}
+
+		&:focus {
+			color: darken($ui-bg-selected-color, 35%);
+		}
+
+		&:active {
+			color: darken($ui-bg-selected-color, 35%);
+		}
+	}
+}
+
+%btn-search-hover-focus {
+	background-color: $transparent;
+	@include opacity(1);
+}
+
+%btn-widget-hover-active {
+	background-color: $transparent;
+	@include opacity(1);
+}
+
+button[disabled] {
+	@extend %btn-disabled;
+
+	&:hover {
+		@extend %btn-disabled;
+	}
+
+	&:active {
+		@extend %btn-disabled;
+	}
+}
+
+.action-buttons {
+	margin: 10px 0 0 0;
+	color: $font-alt-color;
+
+	button {
+		margin: 0 10px 10px 0;
+	}
+}
+
+.selected-item-count {
+	display: inline-block;
+	margin: 0 14px 0 0;
+}
+
+.ui-tabs-nav {
+	height: 36px;
+	line-height: 36px;
+	border-bottom: 1px solid $table-border-color;
+
+	li {
+		display: inline-block;
+
+		a {
+			@extend %no-border;
+			padding: 11px 13px;
+			@include transition(background-color .2s ease-out);
+
+			&:hover {
+				background-color: $ui-hover-color;
+			}
+
+			&:focus {
+				background-color: $ui-hover-color;
+			}
+
+			&:active {
+				background-color: $ui-hover-color;
+			}
+		} 
+
+		&.ui-tabs-active:first-child {
+			border-left: 0;
+		}
+
+		&.ui-tabs-active {
+
+			a {
+				padding: 11px 13px 9px 13px;
+				background-color: $transparent;
+				color: $font-color;
+				text-decoration: none;
+				cursor: default;
+				border-bottom: 3px solid $ui-tab-bg-selected-color;
+			}
+		}
+
+		&.ui-state-disabled {
+
+			a {
+				cursor: default;
+				color: $btn-disabled-font-color;
+				background-color: $transparent;
+			}
+		}
+	}
+}
+
+$var-icons: (
+	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
+);
+
+@each $var-icons, $bgimage in $var-icons {
+    .icon-#{$var-icons} {
+    	margin: 0 18px 0 0;
+    	&::before {
+    		background: $bgimage;
+    		@extend %var-icons;
+    	}
+    }
+}
+
+$form-icon-btn: (
+	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
+	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -617px
+);
+
+@each $form-icon-btn, $bgimage in $form-icon-btn {
+    .icon-#{$form-icon-btn} {
+        background: $transparent $bgimage;
+        @extend %form-icon-btn;
+
+        @if $form-icon-btn == 'wzrd-action' {
+        	margin-top: -16px;
+        }
+    }
+}
+
+%form-icon-btn {
+	border: none;
+	position: absolute;
+	cursor: pointer;
+	@extend %button-icon-size;
+	@include opacity(0.75);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+
+	&:focus {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+
+	&:active {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+}
+
+%var-icons {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	position: absolute;
+	content: '';
+}
+
+.drag-icon {
+	margin-left: -9px;
+	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
+	@extend %button-icon-size;
+}
+
+// Sign in, Installation
+
+.setup-container  {
+	background-color: $ui-bg-color;
+	width: 766px;
+	height: 420px;
+	margin: 0 auto;
+	margin-top: 5%;
+	padding: 42px;
+	vertical-align: top;
+	position: relative;
+	border: 1px solid $ui-border-color;
+
+	h1 {
+		border: none;
+		margin: 3px 0 11px 0;
+		padding: 0;
+	}
+
+	.signin-logo {
+		margin: 0 0 37px 0;
+	}
+}
+
+.setup-left {
+	float: left;
+	width: 198px;
+	padding-right: 10px;
+
+	ul {
+		margin: -4px 0 0 -42px;
+
+		li {
+			padding: 4px 0 4px 42px;
+
+			&.setup-left-current {
+				border-left: 3px solid $ui-tab-bg-selected-color;
+				color: $font-alt-color;
+				padding-left: 39px;
+			}
+		}
+	}
+}
+
+.setup-right {
+	width: auto;
+	margin-left: 198px;
+}
+
+.setup-right-body {
+	padding-right: 5px;
+	max-height: 345px;
+	overflow-y: auto;
+
+	.list-table {
+		border: none;
+	}
+
+	.table-forms-td-left {
+		text-align: left;
+		width: auto;
+	}
+
+	.table-forms-td-right {
+		width: 100%;
+	}
+
+	h1 {
+		margin: 25% 0 0.4em 0;
+	}
+
+	@extend %webkit-scrollbar;
+}
+
+.setup-title {
+	color: $font-alt-color;
+	height: 345px;
+	display: table-cell;
+	vertical-align: middle;
+	font-size: $font-setup-title;
+	line-height: $setup-title-line-height;
+
+	span {
+		display: block;
+		font-size: $font-setup-sup-title;
+	}
+}
+
+.setup-footer {
+	position: absolute;
+	bottom: 32px;
+	width: 766px;
+	text-align: right;
+
+	div {
+		float: right;
+	}
+
+	button {
+		margin: 0 0 0 10px;
+
+		&.float-left {
+			margin: 0;
+			float: left;
+		}
+	}
+}
+
+.signin-container {
+	background-color: $ui-bg-color;
+	width: 280px;
+	margin: 0 auto;
+	margin-top: 5%;
+	padding: 42px 42px 39px 42px;
+	border: 1px solid $ui-border-color;
+
+	h1 {
+		border: none;
+		margin: 0 0 17px 0;
+		padding: 0;
+	}
+
+	ul li {
+		padding: 16px 0 0 0; 
+		font-size: $font-top-nav-size;
+
+		&.sign-in-txt {
+			text-align: center;
+		}
+	}
+
+	label {                                                                                                                                                                                                                                                                                                              
+		display: inline-block;
+		margin: 0 0 2px 0;
+	}
+
+	input {
+
+		&[type="text"] {
+			@extend %signin-input;
+		}
+
+		&[type="password"] {
+			@extend %signin-input;
+		}
+	}
+
+	button {
+		font-size: $font-form-size;
+		margin: 7px 0;
+		min-height: 35px;
+		line-height: 35px;
+		width: 100%;
+	}
+}
+
+.signin-logo {
+	margin: 0 auto;
+	margin-bottom: 21px;
+	width: 114px;
+	height: 30px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
+}
+
+.signin-links {
+	width: 100%;
+	text-align: center;
+	color: $font-alt-color;
+	margin: 11px 0 0 0;
+}
+
+%signin-input {
+	padding: 9px 5px;
+	width: 100%;
+}
+
+// Dashboard
+.widget-placeholder {
+
+	.cell {
+		min-width: 250px;
+
+		&:last-child {
+
+			.dashbrd-widget {
+				margin: 0 0 10px 0;
+			}
+		}
+	}
+}
+
+.dashbrd-widget {
+	min-width: 250px;
+	margin: 0 10px 10px 0;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
+
+	.list-table {
+		border: none;
+
+		th {
+			@extend %dashbrd-widget-td;
+		}
+		
+		td {
+			@extend %dashbrd-widget-td;
+		}
+
+		tbody tr {
+
+			&:last-child td {
+				border-bottom: 1px solid $table-border-color;
+			}
+		}
+	}
+
+	.debug-output {
+		margin: 10px 10px 0 10px;
+		max-height: 300px;
+		border-color: $table-border-color;
+	}
+
+	.msg-good, .msg-bad {
+		margin: 0 10px;
+	}
+}
+
+%nothing-to-show {
+	text-align: center;
+	color: $font-alt-color;
+	@include transition(0s);
+
+	td:hover {
+		background-color: $ui-bg-color;
+	}
+}
+
+%dashbrd-widget-td {
+	padding-right: 10px;
+	padding-left: 10px;
+}
+
+.dashbrd-widget-head {
+	position: relative;
+	padding: 8px 60px 8px 10px;
+
+	h4 {
+		color: h4-widget-color($font-color);
+		font-weight: bold;
+	}
+
+	ul {
+		position: absolute;
+		top: 0;
+		right: 0;
+
+		li {
+			display: block;
+			float: left;
+			padding: 0;
+
+			select {
+				margin: 4px 0;
+			}
+		}
+	}
+}
+
+.dashbrd-widget-foot {
+	text-align: right;
+	color: $font-alt-color;
+	margin: 0 10px;
+
+	li {
+		display: inline-block;
+		padding: 8px 0 8px 13px
+	}
+} 
+
+// Action Menus, Pop-up Menus
+.action-menu {
+	position: absolute;
+	z-index: 1000;
+	padding: 5px 15px 5px 25px;
+	min-width: 166px;
+	max-width: 250px;
+	background-color: $ui-bg-color;
+	border: 1px solid $action-border-color;
+	border-bottom-color: darken($action-border-color, 1%);
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+
+	li {
+		display: block;
+
+		div {
+			border-top: 1px solid $table-border-color;
+			margin: 5px -15px 5px -25px;
+		}
+	}
+
+	.action-menu-item {
+		display: block;
+		height: 24px;
+		line-height: 24px;
+		cursor: pointer;
+		color: $font-color;
+		text-decoration: none;
+		border: none;
+		padding: 0 15px 0 25px;
+		margin: 0 -15px 0 -25px;
+		position: relative;
+		@extend %overflow-ellipsis; 
+		@include transition(background-color .2s ease-out);
+
+		&:hover {
+			background-color: $action-hover-color;
+		}
+
+		&:active {
+			background-color: $action-hover-color;
+		}
+
+		&.selected {
+
+			&::before {
+				display: block;
+				width: 24px;
+				height: 24px;
+				position: absolute;
+				left: 0;
+				content: '';
+				background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+			}
+		}
+
+		.arrow-right {
+			position: absolute;
+			right: 10px;
+			top: 8px;
+			height: auto;
+			line-height: auto;
+			padding: 0;
+			margin: 0;
+			border-left-color: $font-alt-color;
+		}
+	}
+
+	.action-menu-item-disabled {
+		display: block;
+		height: 24px;
+		line-height: 24px;
+		color: $font-alt-color;
+		border: none;
+		cursor: default;
+	}
+
+	h3 {
+		height: 24px;
+		line-height: 24px;
+		@extend %overflow-ellipsis;
+	}
+}
+
+.search-suggest {
+	position: absolute;
+	z-index: 1000;
+	padding: 0 5px;
+	min-width: 16px;
+	color: $font-alt-color;
+	background-color: $form-bg-color;
+	border: 1px solid $action-border-color;
+	border-top: none;
+	@include box-shadow(0 6px 10px 0 $action-shadow-color);
+
+	li {
+		display: block;
+		height: inherit;
+		line-height: normal;
+		color: $font-color;
+		padding: 0.4em 5px;
+		margin: 0 -5px;
+		cursor: pointer;
+		@include transition(background-color .2s ease-out);
+
+		&.suggest-hover {
+			background-color: $action-hover-color;
+		}
+	}
+}
+
+.overlay-dialogue {
+	position: absolute;
+	z-index: 1000;
+	padding: 15px;
+	background-color: $ui-bg-color;
+	border: 1px solid $action-border-color;
+	border-bottom-color: darken($action-border-color, 1%);
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+
+	.list-table {
+		border: none;
+
+		th {
+			@extend %dashbrd-widget-td;
+		}
+		
+		td {
+			@extend %dashbrd-widget-td;
+		}
+	}
+
+	.table-forms-td-left {
+		text-align: left;
+	}
+
+	.table-forms-td-right {
+
+		td {
+			vertical-align: middle;
+
+			label {
+				display: block;
+			}
+		}
+	}
+
+	.dashbrd-widget-head {
+		margin: -10px -10px 6px -10px;
+	}
+
+	.maps-container {
+		max-height: 128px;
+		overflow-y: auto;
+		margin-left: -10px;
+		@extend %webkit-scrollbar;
+	}
+}
+
+.overlay-dialogue-body {
+	margin: 0 0 50px 0;
+}
+
+.overlay-dialogue-footer {
+	text-align: right;
+
+	button {
+		margin: 0 0 0 10px;
+	}
+}
+
+.overlay-bg {
+	background-color: $white;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	@include opacity(0.35);
+}
+
+.pop-up {
+	min-width: initial;
+	margin-bottom: 0;
+
+	article {
+		padding: 13px;
+	}
+
+	h1 {
+		border-bottom: none;
+		padding: 0;
+	}
+
+	.header-title {
+
+		ul {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+		}
+	}
+
+	.dashbrd-widget-head {
+		padding: 8px 10px;
+	}
+}
+
+.calendar {
+	width: 200px;
+
+	.selected {
+		background-color: $ui-bg-selected-color;
+		color: $white;
+
+		&:hover {
+			@extend .selected
+			}
+		}
+
+	table {
+		width: 100%;
+		margin: 5px 0;
+
+		thead {
+			text-transform: $font-transform;
+			color: $font-alt-color;
+		}
+
+		tbody {
+			text-align: center;
+
+			td {
+				padding: 4px;
+				@include transition(background-color .2s ease-out);
+
+				&:hover {
+					background-color: $action-hover-color;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+}
+
+.calendar-header {
+	text-align: center;
+
+	.btn-grey {
+		border: none;
+		background-color: $transparent;
+	}
+}
+
+.calendar-year {
+	height: 24px;
+	line-height: 26px;
+
+	button:first-child {
+		float: left;
+	}
+
+	button:last-child {
+		float: right;
+	}
+}
+
+.calendar-month {
+	@extend .calendar-year;
+}
+
+.calendar-time {
+	text-align: center;
+
+	input[type="text"] {
+		width: 32px;
+	}
+}
+
+.calendar-footer {
+	margin: 26px 0 0 0;
+	text-align: right;
+
+	.btn-grey {
+		float: left;
+		margin-top: 0;
+	}
+}
+
+// Problem notification overlay
+.notif {
+	width: 250px;
+
+	.dashbrd-widget-head {
+		margin: -11px 0 7px -9px;
+		padding: 0;
+
+		ul {
+			position: relative;
+			display: inline-block;
+
+			li {
+				float: none;
+				display: inline-block;
+			}
+		}
+	}
+
+}
+
+.notif-body {
+	max-height: 600px;
+	padding: 0 5px 0 0;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+
+	h4 {
+		display: block;
+		max-width: 250px;
+		padding-bottom: 0.083em;
+		@extend %overflow-ellipsis;
+	}
+
+	p {
+		margin: 0.25em 0 0 0;
+	}
+
+	li {
+		padding: 0 0 10px 19px;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+}
+
+.notif-indic {
+	width: 14px;
+	height: 14px;
+	float: left;
+	margin: 2px 0 0 -19px;
+	@include border-radius(2px);
+}
+
+.notif-indic-container {
+	border-top: 1px solid $table-border-color;
+	margin: 0 0 0 -19px;
+	padding: 14px 0 0 0;
+
+	.notif-indic {
+		float: none;
+		display: inline-block;
+		margin: 0 2px 0 0;
+	}
+}
+
+// Maps, Screens, Graphs
+.box_on {
+	position: absolute;
+	z-index: 99;
+}
+
+.screen-table {
+	background-color: $ui-bg-color;
+	width: 100%;
+
+	td {
+		padding: 8px 5px;
+	}
+
+	.table-forms {
+		text-align: left;
+	}
+
+	.list-table {
+		border: none;
+
+		td {
+			text-align: left;
+			border: none;
+			border-bottom: 1px solid $table-border-color;
+		}
+	}
+
+	.dashbrd-widget {
+		margin: 0;
+		border: none;
+	}
+
+	.dashbrd-widget-head {
+		text-align: left;
+		padding: 8px;
+
+		li {
+			line-height: 2.9em;
+		}
+	}
+
+	.dashbrd-widget-foot {
+		margin: 0;
+	}
+
+	.nothing-to-show {
+
+		td {
+			text-align: center !important;
+		}
+	}
+}
+
+.dashed-border {
+
+	td {
+		border: 1px dashed $table-border-color;
+	}
+}
+
+.top {
+	vertical-align: top;
+}
+
+.right {
+	text-align: right;
+}
+
+.bottom {
+	vertical-align: bottom;
+}
+
+.left {
+	text-align: left;
+}
+
+.center {
+	text-align: center;
+}
+
+.middle {
+	vertical-align: middle;
+}
+
+
+.graph-selection {
+	position: absolute;
+	z-index: 98;
+	overflow: hidden;
+	background-color: rgba($yellow,0.35);
+	border: 1px solid rgba($dark-yellow,0.6);
+	border-top: none;
+	border-bottom: none;
+}
+
+.ui-selectable-helper {
+	position: absolute;
+	z-index: 100;
+	background-color: rgba($yellow,0.35);
+	border: 1px solid rgba($dark-yellow,0.6);
+}
+
+#map-area {
+
+	.map-element-area-bg {
+		background-color: rgba($action-hover-color,0.35);
+	}
+}
+
+.map-element-selected {
+	border: 3px dashed $dark-yellow;
+	margin: -3px;
+}
+
+// Debug, Overlay Description
+.debug-output {
+	max-height: 600px;
+	overflow-y: auto;
+	padding: 11px;
+	margin: 10px 13px 0 13px;
+	background-color: $lighter-yellow !important;
+	border: 1px solid $ui-border-color;
+	@extend %webkit-scrollbar;
+}
+
+.btn-debug {
+	position: fixed;
+	bottom: 13px;
+	right: 13px;
+	z-index: 15000;
+	padding: 4px 11px;
+	border: 1px solid $ui-border-color;
+	background-color: rgba($body-bg-color, .8);
+	@include border-radius(2px);
+}
+
+.overlay-descr {
+	max-height: 150px;
+	overflow-y: auto;
+	padding: 0 11px 0 11px;
+	margin: 5px 0;
+	background-color: $ui-bg-color;
+	@extend %webkit-scrollbar;
+	@extend %scroll-vert-shadow;
+}
+
+.overlay-descr-url {
+	padding: 3px 11px 7px 11px;
+}
+
+%scroll-vert-shadow {
+	background:
+	// Shadow covers
+	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+	linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
+	// Shadows
+	radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+	radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+	background:
+	// Shadow covers
+	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
+	// Shadows
+	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
+	background-repeat: no-repeat;
+	background-color: $ui-bg-color;
+	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
+	background-attachment: local, local, scroll, scroll;
+}
+
+// Alerts
+.green {
+	color: $green;
+}
+
+a.green {
+	@extend .green;
+}
+
+.red {
+	color: $red;
+}
+
+a.red {
+	@extend .red;
+}
+
+select.red {
+	@extend .red;
+}
+
+select {
+
+	option.red {
+		@extend .red;
+	}
+}
+
+.orange {
+	color: $orange;
+}
+
+a.orange {
+	@extend .orange;
+}
+
+.yellow {
+	color: $dark-yellow;
+}
+
+a.yellow {
+	@extend .yellow;
+}
+
+.grey {
+	color: $font-alt-color;
+}
+
+a.grey {
+	@extend .grey;
+}
+
+.blue {
+	color: $blue;
+}
+
+a.blue {
+	@extend .blue;
+}
+
+.progress-bar-container {
+	display: inline-block;
+	white-space: nowrap;
+	position: relative;
+
+	&:hover {
+
+		.progress-bar-label {
+			display: block;
+		}
+	}
+
+	a {
+		border: none;
+	}
+}
+
+.progress-bar-bg {
+	padding: 3px 0 2px 0;
+    font-size: $font-h3-size;
+    line-height: 1em;
+    display: inline-block;
+
+	&.green-bg {
+		background-color: darken(desaturate($alt-green, 10%), 16%);
+	}
+
+	&.red-bg {
+		background-color: darken(desaturate($alt-red, 10%), 5%);
+	}
+}
+
+.progress-bar-label {
+	display: none;
+	color: $white;
+	font-size: $font-h3-size;
+
+	span {
+		position: absolute;
+
+		&:first-child {
+			left: .35em;
+		}
+
+		&:last-child {
+			right: .35em;
+		}
+	}
+}
+
+.status-container {
+	display: inline-block;
+	white-space: nowrap;
+	margin: 2px 3px 2px 0;
+
+	&:last-child {
+		margin: 0;
+	}
+
+	span {
+		@include border-radius(0);
+
+		&:only-child {
+			@include border-radius(2px)
+		}
+
+		&:first-child:not(:only-child) {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child:not(:only-child) {
+			@include border-radius(0 2px 2px 0);
+		}
+	}
+}
+
+.status-green {
+    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
+	background-color: darken(desaturate($alt-green, 10%), 16%);
+	@extend %status;
+}
+
+.status-red {
+	border: 1px solid darken(desaturate($alt-red, 10%), 9%);
+	background-color: darken(desaturate($alt-red, 10%), 5%);
+	@extend %status;
+}
+
+.status-grey {
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
+	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+	@extend %status;
+}
+
+.status-yellow {
+	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
+	background-color: darken(desaturate($alt-yellow, 10%), 16%);
+	@extend %status;
+}
+
+%status {
+	padding: 2px 3px 1px 3px;
+	color: $white;
+	font-size: $font-h3-size;
+	text-transform: $font-transform;
+	text-align: center;
+	min-width: 0.7em;
+	line-height: 1em;
+	display: inline-block;
+	@include border-radius(2px); 
+}
+
+.green-bg {
+	background-color: $alt-green;
+}
+
+.red-bg {
+	background-color: $alt-red;
+}
+
+.na-bg {
+	color: darken($alt-blue-grey,45%);
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .na-bg;
+		}
+	}
+}
+td.na-bg {
+	border-left: none;
+
+	~ td.na-bg {
+		border-left: 1px dotted $table-border-color;
+	}
+}
+
+.log-na-bg {
+	color: darken($alt-blue-grey,45%);
+	background-color: $alt-blue-grey;
+}
+td.log-na-bg {
+	@extend td.na-bg;
+}
+
+.normal-bg {
+	color: darken($alt-green,45%);
+	@extend .green-bg;
+}
+td.normal-bg {
+	@extend td.na-bg;
+}
+
+.active-bg {
+	color: darken($alt-green,45%);
+	@extend .green-bg;
+}
+
+td.active-bg {
+	color: darken($alt-green,45%);
+	@extend .active-bg;
+}
+
+.info-bg {
+	color: darken($alt-dark-blue,45%);
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .info-bg;
+		}
+	}
+}
+td.info-bg {
+	@extend td.na-bg;
+}
+
+.log-info-bg {
+	color: darken($alt-dark-blue,45%);
+	background-color: $alt-dark-blue;
+}
+td.log-info-bg {
+	@extend td.na-bg;
+}
+
+.average-bg {
+	color: darken($alt-orange,45%);
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .average-bg;
+		}
+	}
+}
+td.average-bg {
+	@extend td.na-bg;
+}
+
+.warning-bg {
+	color: darken($alt-yellow,45%);
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .warning-bg;
+		}
+	}
+}
+td.warning-bg {
+	@extend td.na-bg;
+}
+
+.log-warning-bg {
+	color: darken($alt-yellow,45%);
+	background-color: $alt-yellow;
+}
+td.log-warning-bg {
+	@extend td.na-bg;
+}
+
+
+.high-bg {
+	color: darken($alt-dark-orange,45%);
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .high-bg;
+		}
+	}
+}
+td.high-bg {
+	@extend td.na-bg;
+}
+
+.log-high-bg {
+	color: darken($alt-dark-orange,45%);
+	background-color: $alt-dark-orange;
+}
+td.log-high-bg {
+	@extend td.na-bg;
+}
+
+.disaster-bg {
+	color: darken($alt-red,45%);
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .disaster-bg;
+		}
+	}
+}
+td.disaster-bg {
+	@extend td.na-bg;
+}
+
+.log-disaster-bg {
+	color: darken($alt-red,45%);
+	background-color: $alt-red;
+}
+td.log-disaster-bg {
+	@extend td.na-bg;
+}
+
+.inactive-bg {
+	color: darken($alt-red,45%);
+	background-color: $alt-red;
+}
+
+td.inactive-bg {
+	@extend .inactive-bg;
+}
+
+%found-bg {
+	background-color: $lighter-yellow;
+}
+
+.active-indic {
+	width: 8px;
+	height: 8px;
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	border: 2px solid $body-bg-color;
+	background-color: darken(desaturate($alt-green, 10%), 16%);
+	@include border-radius(4px);
+}
+
+.msg-good {
+	color: darken(desaturate($green, 10%), 20%);
+	border: 1px solid $light-green;
+	background-color: $lighter-green;
+	@extend %msg;
+
+	.link-action {
+		color: darken(desaturate($green, 10%), 20%);
+	}
+
+	.overlay-close-btn {
+		color: $green;
+	}
+
+	ul {
+		border-top-color: $light-green;
+	}
+
+	button {
+		background-color: $white;
+		color: darken(desaturate($green, 10%), 20%);
+		border-color: $light-green;
+	}
+}
+
+.msg-bad {
+	color: darken(desaturate($red, 10%), 20%);
+	border: 1px solid $light-red;
+	background-color: $lighter-red;
+	@extend %msg;
+
+	.link-action {
+		color: darken(desaturate($red, 10%), 20%);
+	}
+
+	.overlay-close-btn {
+		color: $red;
+	}
+
+	ul {
+		border-top-color: $light-red;
+	}
+
+	button {
+		background-color: $white;
+		color: darken(desaturate($red, 10%), 20%);
+		border-color: $light-red;
+	}
+}
+
+.msg-details {
+	font-size: $font-form-size;
+	text-align: left;
+	max-height: 300px;
+    padding: 0 5px 0 0;
+    overflow-y: auto;
+    @extend %webkit-scrollbar;
+
+	.link-action {
+		position: absolute;
+		top: 7px;
+		left: 15px;
+		margin-bottom: 20px;
+	}
+
+	ul {
+		font-size: $font-msg-reset-size;
+
+		li {
+			margin: .5em 0 .5em 1em;
+
+			&::before {
+				content: '\2013';
+				float: left;
+				margin-left: -1em;
+			}
+
+			&:only-child {
+				margin-left: 0;
+			} 
+		}
+
+		&.msg-details-border {
+			margin: 8px 0 0 0;
+			border-top-width: 1px;
+			border-top-style: dashed;
+		}
+	}
+}
+
+.msg-buttons {
+	text-align: right;
+	margin: 10px 0 0 0;
+
+	button {
+		margin: 0 0 0 10px;
+	}
+}
+
+%msg {
+	font-size: $font-top-nav-size;
+	padding: 7px 15px;
+	margin: 0 0 12px 0;
+	text-align: center;
+	position: relative;
+	@include border-radius(2px);
+
+	.overlay-close-btn {
+		font-size: $font-top-nav-size;
+	}
+}
+
+.msg-bad-global {
+	display: none;
+	position: fixed;
+	bottom: 0;
+	z-index: 10000;
+	width: 100%;
+	padding: 5px 5px;
+	text-align: center;
+	color: darken($alt-yellow,50%);
+	background-color: $alt-yellow;
+	border-top: 1px solid darken($alt-yellow,5%);
+}
+
+.msg-global {
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 5%;
+	max-width: 25%;
+}
+
+// Close/Remove icon
+
+%close-icon {
+	display: block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+	color: $font-alt-color;
+	font-size: $font-h2-size;
+	font-weight: bold;
+	text-decoration: none;
+	cursor: pointer;
+	@include opacity(0.5);
+	@include transition(opacity .2s ease-out);
+
+	&::before {
+		content:"\00d7";
+	}
+
+	&:hover {
+		@include opacity(1);
+		text-decoration: none;
+	}
+
+	&:focus {
+		@include opacity(1);
+		text-decoration: none;
+	}
+
+	&:active {
+		@include opacity(1);
+		text-decoration: none;
+	}
+}
+
+.overlay-close-btn {
+	position: absolute;
+	z-index: 1000;
+	top: 0;
+	right: 0;
+	@extend %close-icon;
+	@include border-radius(0 0 0 2px);
+}
+
+a.overlay-close-btn {
+	@extend .overlay-close-btn; 
+}
+
+.subfilter-disable-btn {
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: -12px;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	@extend %close-icon;
+	@include border-radius(2px);
+	@include opacity(1);
+
+	&:hover {
+		color: darken($font-selected-color, 5%);
+	}
+
+	&:focus {
+		color: darken($font-selected-color, 10%);
+	}
+
+	&:active {
+		color: darken($font-selected-color, 10%);
+	}
+}
+
+// Color picker
+.color-picker {
+	height: 20px;
+
+	div {
+		display: inline-block;
+		width: 18px;
+		height: 18px;
+		border: 1px solid $ui-bg-color;
+
+		&:hover {
+			cursor: pointer;
+			@include box-shadow(inset 0 0 0 1px $ui-bg-color);
+			border-color: $alt-dark-blue;
+		}
+
+		&:active {
+			cursor: pointer;
+			@include box-shadow(inset 0 0 0 2px $ui-bg-color);
+		}
+	}
+}
+
+.input-color-picker {
+	position: relative;
+	display: inline-block;
+
+	div {
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 20px;
+		height: 20px;
+	}
+
+	input[type="text"] {
+		padding-left: 25px;
+	}
+}
+
+.preloader-container {
+	border-radius: 50%;
+	padding: 7px;
+	display: inline-block;
+	margin: 0 auto;
+	background-color: rgba($ui-bg-color, .8);
+}
+
+.preloader {
+	border-radius: 50%;
+	width: 20px;
+	height: 20px;
+	margin: 0 auto;
+	border: 2px solid #ccd5d9;
+	border-bottom: 2px solid #0275b8;
+	animation: load 0.6s infinite linear;
+}
+
+@keyframes load {
+	to { @include rotate(360); }
+}
+
+$browser-logos: (
+	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
+	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,
+	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
+	opera: url(../img/browser-sprite.png) no-repeat -66px -66px,
+	safari: url(../img/browser-sprite.png) no-repeat 0 -132px
+
+);
+
+@each $browser, $bgimage in $browser-logos {
+    .browser-logo-#{$browser} {
+        background: $bgimage;
+        @extend %browser-logo-style;
+    }
+}
+
+%browser-logo-style {
+	width: 66px;
+    height: 66px;
+    margin: 0 auto;
+    margin-bottom: 5px;
+}
+
+.browser-warning-container {
+	margin-top: 5%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 766px;
+	text-align: center;
+	padding: 28px 28px 10px 28px;
+	@extend .table-forms-container;
+
+	h2 {
+		text-align: left;
+	}
+
+	p {
+		margin: 0.7em 0;
+		text-align: left;
+	}
+
+	li {
+		display: inline-block;
+		margin: 25px 20px;
+	}
+}
+
+.browser-warning-footer {
+	border-top: 1px solid $table-border-color;
+	margin: 25px 0 0 0;
+	padding: 10px 0 0 0;
+	text-align: center;
+}
+
+%webkit-scrollbar {
+	&::-webkit-scrollbar {
+		width: 9px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background-color: $scrollbar-track-color;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: $scrollbar-thumb-color;
+		border: 1px solid darken($scrollbar-thumb-color,5%);
+	}
+}
+
+%webkit-hor-scrollbar {
+	&::-webkit-scrollbar {
+		height: 9px;
+	}
+
+	@extend %webkit-scrollbar;
+}
+
+.cursor-move {
+	cursor: move;
+}
+
+tr.cursor-move {
+
+	td * {
+		cursor: move;
+	}
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+%overflow-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.overflow-ellipsis {
+	table-layout: fixed;
+	@extend %overflow-ellipsis;
+
+	td {
+		@extend %overflow-ellipsis;
+	}
+
+	th {
+		@extend %overflow-ellipsis;
+
+		a {
+			@extend %overflow-ellipsis;
+		}
+	}
+}
+
+.rel-container {
+	position: relative;
+	display: inline-block;
+}
+
+.server-name {
+	color: $font-alt-color;
+	float: right;
+	white-space: nowrap;
+	overflow: hidden;
+	@extend %overflow-ellipsis;
+}
+
+.list-hor-min-width {
+
+	li {
+		display: inline-block;
+		min-width: 1.4em;
+		margin-right: .4em;
+
+		&:last-child {
+			min-width: auto;
+			margin-right: 0;
+		}
+	}
+}
+
+.uppercase {
+	text-transform: $font-transform;
+}
+
+// Analog Clock
+.clock {
+	text-align: center;
+	display: inline-block;
+}
+
+.time-zone {
+	margin: 0 0 .5em 0;
+	white-space: nowrap;
+}
+
+.local-clock {
+	margin: .5em 0 0 0;
+	white-space: nowrap;
+}
+
+.clock-face {
+	fill: $clock-face-color;
+}
+
+.clock-hand {
+	fill: $clock-hand-color;
+}
+
+.clock-hand-sec {
+	fill: $clock-hand-sec-color;
+}
+
+.clock-lines {
+	fill: $clock-lines-color;
+}
+
+/*doc
+---
+//title: About
+name: about
+category: About
+---
+
+##About the Zabbix Styleguide
+
+The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel every time there is a need to implement an already existing UI pattern, developers can consult with the styleguide.
+
+* A common design language inside the company and community
+* More modular approach to design, reusable components
+* A single source of information for front-end developers
+
+May the force be with you!
+*/
+
+/*doc
+---
+//title: Components
+name: components
+category: Components
+---
+*/
+
+/*doc
+---
+parent: components
+title: Typography
+name: typography
+---
+
+The default font face is Arial. Relative units (em) should be used to set the type size and line height.
+
+##Headings
+
+```html_example
+<h1>Main Heading</h1><br>
+<h2>Section Header</h2><br>
+<h3>Contextual Menu Heading</h3><br>
+<h4>Widget and Dialog Heading</h4>
+```
+
+##Paragraphs
+
+Paragraphs are used to visually separate blocks of multiple sentences.
+
+```html_example
+<p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
+<p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Tables
+name: table
+---
+
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Test host</a></td>
+            <td><a href="">Applications</a></td>
+            <td><a href="">Items</a></td>
+            <td><a href="">Triggers</a></td>
+            <td><a href="">Graphs</a></td>
+            <td><a href="">Discovery</a></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr class="row-selected">
+            <td><input type="checkbox" checked=""></td>
+            <td><a href="">Zabbix server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Main server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Backup server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+
+##Table with Pagination
+
+Pagination is used to separate large amounts of tabular data into descrete peices.
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Test host</a></td>
+            <td><a href="">Applications</a></td>
+            <td><a href="">Items</a></td>
+            <td><a href="">Triggers</a></td>
+            <td><a href="">Graphs</a></td>
+            <td><a href="">Discovery</a></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr class="row-selected">
+            <td><input type="checkbox" checked=""></td>
+            <td><a href="">Zabbix server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Main server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Backup server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+<div class="table-paging">
+   <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
+</div>
+```
+
+##Table with No Results
+
+In cases when no data can be shown, table should be accompanied by an explanatory text. It should not be left blank.
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr class="nothing-to-show">
+            <td colspan="11">We couldn't find any results</td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+
+##Tables with Elements and Highlights
+
+Besides textual information tables may contain other elements like icons. Table cells may be highlighted with various colors, for example to indicate severity level.
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Example</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>Alert labels</td>
+            <td>asdasasdasd</td>
+            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
+         </tr>
+         <tr>
+            <td>Icons</td>
+            <td>asdasasdasd</td>
+            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
+         </tr>
+         <tr>
+            <td>Links with icons</td>
+            <td>asdasasdasd</td>
+            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
+         </tr>
+         <tr>
+            <td>Labels</td>
+            <td>asdasasdasd</td>
+            <td>
+               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
+               <div class="status-container"><span class="status-red">label</span></div>
+            </td>
+         </tr>
+         <tr>
+            <td>Tree</td>
+            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
+            <td>
+               <div class="treeview"><span class="arrow-right"></span></div>
+               <a href="#">Collapsed</a> 
+               <div class="treeview"><span class="arrow-down"></span></div>
+               <a href="#">Expanded</a>
+            </td>
+         </tr>
+          <tr>
+            <td>Severity</td>
+            <td>asdasd</td>
+            <td class="normal-bg">
+               <span class="link-action">25</span> 
+            </td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Forms
+name: forms
+---
+
+Forms contain UI elements that are used to submit information.
+
+##Primary Button
+
+```html_example
+<button type="button">Primary Button</button>
+<button type="button" disabled>Primary Button</button>
+```
+
+##Secondary Button
+
+```html_example
+<button type="button" class="btn-alt">Secondary Button</button>
+<button type="button" class="btn-alt" disabled>Secondary Button</button>
+```
+
+##Form Button
+
+```html_example
+<button type="button" class="btn-grey">Form Button</button>
+<button type="button" class="btn-grey" disabled>Form Button</button>
+```
+
+##Link Button
+
+```html_example
+<button type="button" class="btn-link">Link Button</button>
+<button type="button" class="btn-link" disabled>Link Button</button>
+```
+
+##Icon Button
+
+```html_example
+<button type="button" class="btn-max" title="Maximize"></button>
+<button type="button" class="btn-max" title="Maximize" disabled></button>
+```
+
+##Inputs
+
+Text on html5 input types 
+
+```html_example
+<ul class="table-forms">
+   <li>
+      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
+      <div class="table-forms-td-right">
+         <input type="text" placeholder="Text" id="DefaultInput">
+         <div class="red">You can't leave this empty.</div>
+      </div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
+      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
+   </li>
+   <li>
+      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
+      <div class="table-forms-td-right">
+         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+      </div>
+   </li>
+</ul>
+```
+
+##Selects
+
+```html_example
+<select>
+   <option>Select options</option>
+   <option>Option 1</option>
+   <option>Option 2</option>
+   <option>Option 3</option>
+</select>
+<select disabled>
+   <option>Select options</option>
+   <option>Option 1</option>
+   <option>Option 2</option>
+   <option>Option 3</option>
+</select>
+```
+
+## Radios
+
+```html_example
+<label for="Radio"><input type="radio" id="Radio">I am a radio</label>
+<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
+```
+
+## Segmented Radio Controls
+
+```html_example
+<p>
+<ul class="radio-segmented">
+   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
+</ul>
+</p>
+```
+
+## Checkboxes
+
+```html_example
+<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
+<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
+```
+
+## Radio and Checkbox Lists
+
+```html_example
+<ul class="list-check-radio">
+   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+</ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Dialogs
+name: dialog
+---
+
+Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clicking/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
+
+##Alert Dialogs
+
+Alert dialogs are used to urgently inform the user about a certain situation. Primary action button, labeled with the specific action, should be furthest to the right and continue the process. Secondary action button should be placed to the left of the primary action button and return the user to the general screen. Avoid labeling buttons with *No*, *Ok*, *Confirm*, *Done* and asking equally uninformative questions like *Are you sure?*
+
+```html_example
+<div class="overlay-dialogue">
+   <!--<span class="overlay-close-btn"></span>-->
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Delete the selected item?</h4>
+   </div>
+   <div class="overlay-dialogue-body">Some explanatory information</div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
+</div>
+
+<div class="overlay-dialogue">
+   <!--<span class="overlay-close-btn"></span>-->
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Delete the selected item?</h4>
+   </div>
+   <div class="overlay-dialogue-body"></div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
+</div>
+```
+
+##Dialogs with Scrollable Content
+
+In exceptional cases dialogs may contain additional information inside a scrollable area.
+
+```html_example
+<div class="overlay-dialogue" style="max-width: 500px">
+   <span class="overlay-close-btn"></span>
+   <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments.
+   </div>
+   <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Duration</th>
+            <th>Age</th>
+            <th>Ack</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>2015-09-08 13:47:58</td>
+            <td><span class="red">PROBLEM</span></td>
+            <td>15d 23h 45m</td>
+            <td>15d 23h 45m</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-05 06:14:58</td>
+            <td><span class="green">OK</span></td>
+            <td>1m 4d 7h</td>
+            <td>1m 20d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-05 05:32:58</td>
+            <td><span class="red">PROBLEM</span></td>
+            <td>42m</td>
+            <td>1m 20d 8h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-04 06:11:58</td>
+            <td><span class="green">OK</span></td>
+            <td>23h 21m</td>
+            <td>1m 21d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-04 05:38:58</td>
+            <td><span class="red">PROBLEM</span></td>
+            <td>33m</td>
+            <td>1m 21d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+
+##Contextual Dialogs
+
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
+
+```html_example
+<ul class="action-menu">
+   <li>
+      <h3>Favourite screens</h3>
+   </li>
+   <li><span class="action-menu-item">Add</span></li>
+   <li>
+      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
+      <ul class="action-menu" style="top: 47px; left: 203px;">
+         <li><span class="action-menu-item">Zabbix server</span></li>
+      </ul>
+   </li>
+   <li><span class="action-menu-item">Remove all</span></li>
+   <li>
+      <div></div>
+   </li>
+   <li>
+      <h3>Favourite slide shows</h3>
+   </li>
+   <li><span class="action-menu-item selected">Add</span></li>
+   <li><span class="action-menu-item-disabled">Remove</span></li>
+   <li><span class="action-menu-item-disabled">Remove all</span></li>
+</ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Notifications
+name: notifications
+---
+
+Notificatiions are used to provide feedback after certain actions or give information.
+
+##Success Notification
+
+Success notification appears after an action has been completed without errors. Has green background.
+
+```html_example
+<div class="msg-good">
+   Well done! You successfully added new parameters.
+   <div class="msg-details">
+      <span class="link-action">Details</span>
+      <ul class="msg-details-border">
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+      </ul>
+   </div>
+   <span class="overlay-close-btn" title="Close"></span>
+</div>
+```
+
+##Error Notification
+
+Error notification appears after an action has been completed with errors or an error in general. Has red background.
+
+```html_example
+<div class="msg-bad">
+   Oh snap! Check form fields and try submitting again.
+   <div class="msg-details">
+      <span class="link-action">Details</span>
+      <ul class="msg-details-border">
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+      </ul>
+   </div>
+   <span class="overlay-close-btn" title="Close"></span>
+</div>
+```
+
+##Global Notification
+
+Global notification.
+
+```html_example
+<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Icons
+name: icons
+---
+
+Icons:
+
+```html_example
+<div class="icon-help"></div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Datepickers
+name: date
+---
+
+Datepickers are used to select a single date or a date range.
+
+```html_example
+<div class="overlay-dialogue calendar">
+   <div class="calendar-header">
+      <div class="calendar-year">
+         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
+      </div>
+      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+   </div>
+   <table>
+      <thead>
+         <tr>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+            <th>S</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td class="grey">29</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+         </tr>
+         <tr>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+         </tr>
+         <tr>
+            <td>14</td>
+            <td>15</td>
+            <td class="selected">16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+         </tr>
+         <tr>
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+            <td>27</td>
+         </tr>
+         <tr>
+            <td>28</td>
+            <td>29</td>
+            <td>30</td>
+            <td>31</td>
+            <td class="grey">1</td>
+            <td class="grey">2</td>
+            <td class="grey">3</td>
+         </tr>
+         <tr>
+            <td class="grey">4</td>
+            <td class="grey">5</td>
+            <td class="grey">6</td>
+            <td class="grey">7</td>
+            <td class="grey">8</td>
+            <td class="grey">9</td>
+            <td class="grey">10</td>
+         </tr>
+      </tbody>
+   </table>
+   <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
+   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Navigation
+name: navigation
+---
+
+##Main Navigation
+
+Main navigation is used to jump between high level sections of the application.
+
+```html_example
+<nav role="navigation">
+   <div class="top-nav-container">
+      <ul class="top-nav">
+         <li class="selected"><a href="#">Monitoring</a></li>
+         <li><a href="#">Inventory</a></li>
+         <li><a href="#">Reports</a></li>
+         <li><a href="#">Configuration</a></li>
+         <li><a href="#">Administration</a></li>
+      </ul>
+      <!--<ul class="top-nav-icons">
+         <li>
+            <form><input type="text"><button type="button" class="btn-search"></button></form>
+         </li>
+         <li><a href="#" class="top-nav-help" title="Help"></a></li>
+         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
+         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
+         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
+      </ul>-->
+   </div>
+   <div class="top-subnav-container">
+      <ul class="top-subnav">
+         <li><a href="#" class="selected">Dashboard</a></li>
+         <li><a href="#">Overview</a></li>
+         <li><a href="#">Web</a></li>
+         <li><a href="#">Latest data</a></li>
+         <li><a href="#">Triggers</a></li>
+         <li><a href="#">Events</a></li>
+         <li><a href="#">Graphs</a></li>
+         <li><a href="#">Screens</a></li>
+         <li><a href="#">Maps</a></li>
+         <li><a href="#">Discovery</a></li>
+         <li><a href="#">IT services</a></li>
+      </ul>
+      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
+   </div>
+</nav>
+```
+
+##Object Navigation
+
+```html_example
+<ul class="object-group">
+   <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
+   <li class="green">Enabled</li>
+   <li>
+      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+   </li>
+   <li><span class="selected"><a href="#">Discovery</a></span></li>
+   <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
+   <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
+   <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
+   <li><span><a href="#">Graphs</a>&nbsp;<sup>11</sup></span></li>
+   <li><span><a href="#">Discovery rules</a>&nbsp;<sup>2</sup></span></li>
+   <li><span><a href="#">Web scenarios</a></span></li>
+</ul>
+```
+
+##Tabs
+
+Tabs are used to switch between sections of grouped content. Don't use tabs as a navigation between urelated content.
+
+```html_example
+<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Links
+name: links
+---
+
+A link is used to navigate through different parts of the front-end. *Alternative* links are used to indicate a particular state or type. *Action* links are used call out any additional content, like contextual menus and popovers.
+
+```html_example
+<p><a href="#">Default link</a></p>
+<p><a href="#" class="grey link-alt">Alternative link</a></p>
+<p><a href="#" class="green link-alt">Alternative link</a></p>
+<p><a href="#" class="red link-alt">Alternative link</a></p>
+<p><span class="link-action">Action link</span></p>
+<p><span class="green link-action">Action link</span></p>
+<p><span class="yellow link-action">Action link</span></p>
+<span class="red link-action">Action link</span>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Labels
+name: labels
+---
+
+Labels add information. Different colors 
+
+```html_example
+<div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Progress Indicators
+name: progress
+---
+
+Progress indocators are used to show data retrieval or an ongoing computation. Use progress indicators to make UI look more fast and responsive.
+
+```html_example
+<div class="preloader-container">
+   <div class="preloader"></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Widgets
+name: widgets
+---
+
+Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*. Widgets can be collapsed and expanded.
+
+```html_example
+<div class="dashbrd-widget">
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Favorite screens</h4>
+      <ul>
+         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
+         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
+         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
+      </ul>
+   </div>
+   <table class="list-table">
+      <tbody>
+         <tr>
+            <td><a href="#">Zabbix server</a></td>
+         </tr>
+         <tr>
+            <td><a href="#">My 2nd megaserver</a></td>
+         </tr>
+      </tbody>
+   </table>
+   <ul class="dashbrd-widget-foot">
+      <li><a href="#">Screens</a></li>
+      <li><a href="#">Slide shows</a></li>
+   </ul>
+</div>
+```
+*/
