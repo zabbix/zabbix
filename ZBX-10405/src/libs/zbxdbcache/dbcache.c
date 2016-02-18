@@ -281,7 +281,7 @@ void	*DCget_stats(int request)
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_PFREE:
-			value_double = 100 * ((double)hc_mem->free_size) / hc_mem->total_size;
+			value_double = 100 * (double)hc_mem->free_size / hc_mem->total_size;
 			ret = (void *)&value_double;
 			break;
 		case ZBX_STATS_TREND_TOTAL:
@@ -297,7 +297,7 @@ void	*DCget_stats(int request)
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_TREND_PFREE:
-			value_double = 100 * ((double)trend_mem->free_size / trend_mem->orig_size);
+			value_double = 100 * (double)trend_mem->free_size / trend_mem->orig_size;
 			ret = (void *)&value_double;
 			break;
 		case ZBX_STATS_HISTORY_INDEX_TOTAL:
@@ -313,7 +313,7 @@ void	*DCget_stats(int request)
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_INDEX_PFREE:
-			value_double = 100 * ((double)hc_index_mem->free_size) / hc_index_mem->total_size;
+			value_double = 100 * (double)hc_index_mem->free_size / hc_index_mem->total_size;
 			ret = (void *)&value_double;
 			break;
 		default:
