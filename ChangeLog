@@ -12,6 +12,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10341] fixed template screen import (Oleg)
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
 ..F....... [ZBX-10311] fixed user media edition by guest with Zabbix super admin user type (Cemeris)
 ..F....... [ZBX-9984] fixed incorrect template listing in linking form (Gunars)
