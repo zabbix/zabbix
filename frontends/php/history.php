@@ -67,6 +67,7 @@ if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'timeline') {
 		navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);
 	}
+
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod' && isset($_REQUEST['favid'])) {
 		CProfile::update('web.history.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
@@ -82,20 +83,19 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 $_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
-$itemids = zbx_toArray(getRequest('itemids'));
 
 /*
  * Display
  */
 $items = API::Item()->get([
-	'itemids' => $itemids,
+	'itemids' => getRequest('itemids'),
 	'webitems' => true,
 	'selectHosts' => ['name'],
 	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid', 'history', 'trends'],
 	'preservekeys' => true
 ]);
 
-foreach ($itemids as $itemid) {
+foreach (getRequest('itemids') as $itemid) {
 	if (!isset($items[$itemid])) {
 		access_deny();
 	}
@@ -106,7 +106,7 @@ $items = CMacrosResolverHelper::resolveItemNames($items);
 $item = reset($items);
 
 $data = [
-	'itemids' => $itemids,
+	'itemids' => getRequest('itemids'),
 	'items' => $items,
 	'value_type' => $item['value_type'],
 	'action' => getRequest('action'),
@@ -120,8 +120,8 @@ $data = [
 ];
 
 // render view
-$history_view = new CView('monitoring.history', $data);
-$history_view->render();
-$history_view->show();
+$historyView = new CView('monitoring.history', $data);
+$historyView->render();
+$historyView->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
