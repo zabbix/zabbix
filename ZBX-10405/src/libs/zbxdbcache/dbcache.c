@@ -2825,41 +2825,44 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		return SUCCEED;
 	}
 
-	switch (item_value->value_type)
+	if (0 == (ZBX_DC_FLAG_NOVALUE & item_value->flags))
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			(*data)->value.dbl = item_value->value.value_dbl;
-			cache->stats.history_float_counter++;
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			(*data)->value.ui64 = item_value->value.value_uint;
-			cache->stats.history_uint_counter++;
-			break;
-		case ITEM_VALUE_TYPE_STR:
-			if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
-				return FAIL;
+		switch (item_value->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				(*data)->value.dbl = item_value->value.value_dbl;
+				cache->stats.history_float_counter++;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				(*data)->value.ui64 = item_value->value.value_uint;
+				cache->stats.history_uint_counter++;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
+					return FAIL;
 
-			cache->stats.history_str_counter++;
-			break;
-		case ITEM_VALUE_TYPE_TEXT:
-			if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
-				return FAIL;
+				cache->stats.history_str_counter++;
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
+					return FAIL;
 
-			cache->stats.history_text_counter++;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
-				return FAIL;
+				cache->stats.history_text_counter++;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
+					return FAIL;
 
-			cache->stats.history_log_counter++;
-			break;
+				cache->stats.history_log_counter++;
+				break;
+		}
+
+		cache->stats.history_counter++;
 	}
 
 	(*data)->value_type = item_value->value_type;
 	(*data)->lastlogsize = item_value->lastlogsize;
 	(*data)->mtime = item_value->mtime;
-
-	cache->stats.history_counter++;
 
 	return SUCCEED;
 }
@@ -2950,29 +2953,32 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	history->lastlogsize = data->lastlogsize;
 	history->mtime = data->mtime;
 
-	switch (data->value_type)
+	if (0 == (ZBX_DC_FLAG_NOVALUE & data->flags))
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			history->value_orig.dbl = data->value.dbl;
-			history->value.dbl = 0;
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			history->value_orig.ui64 = data->value.ui64;
-			history->value.ui64 = 0;
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			history->value_orig.str = data->value.str;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			history->value_orig.str = data->value.log->value;
-			history->value.str = data->value.log->source;
+		switch (data->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				history->value_orig.dbl = data->value.dbl;
+				history->value.dbl = 0;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				history->value_orig.ui64 = data->value.ui64;
+				history->value.ui64 = 0;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				history->value_orig.str = data->value.str;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				history->value_orig.str = data->value.log->value;
+				history->value.str = data->value.log->source;
 
-			history->timestamp = data->value.log->timestamp;
-			history->severity = data->value.log->severity;
-			history->logeventid = data->value.log->logeventid;
+				history->timestamp = data->value.log->timestamp;
+				history->severity = data->value.log->severity;
+				history->logeventid = data->value.log->logeventid;
 
-			break;
+				break;
+		}
 	}
 }
 
