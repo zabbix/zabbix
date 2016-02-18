@@ -3663,7 +3663,7 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 	zbx_vmware_lock();
 
 	stats->memory_total = vmware_mem->total_size;
-	stats->memory_used = vmware_mem->used_size;
+	stats->memory_used = vmware_mem->total_size - vmware_mem->free_size;
 
 	zbx_vmware_unlock();
 
