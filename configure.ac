@@ -1152,10 +1152,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 			ORACLE_LDFLAGS="$ORACLE_OCI_LDFLAGS"
 			ORACLE_LIBS="$ORACLE_OCI_LIBS"
 
-			AC_SUBST(ORACLE_CPPFLAGS)
-			AC_SUBST(ORACLE_LDFLAGS)
-			AC_SUBST(ORACLE_LIBS)
-
 			AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
 		else
 			AC_MSG_ERROR([Oracle OCI library not found])
@@ -1466,16 +1462,15 @@ fi
 if test "x$found_curl" = "xyes"; then
 	have_web_monitoring="cURL"
 fi
-SERVER_CFLAGS="$SERVER_CFLAGS $LIBCURL_CPPFLAGS"
+CFLAGS="$LIBCURL_CPPFLAGS $CFLAGS"
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $LIBCURL_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $LIBCURL_LIBS"
 
-PROXY_CFLAGS="$PROXY_CFLAGS $LIBCURL_CPPFLAGS"
 PROXY_LDFLAGS="$PROXY_LDFLAGS $LIBCURL_LDFLAGS"
 PROXY_LIBS="$PROXY_LIBS $LIBCURL_LIBS"
 
 dnl Starting from 2.0 agent can do web monitoring
-AGENT_CFLAGS="$AGENT_CFLAGS $LIBCURL_CPPFLAGS"
 AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBCURL_LDFLAGS"
 AGENT_LIBS="$AGENT_LIBS $LIBCURL_LIBS"
 
@@ -1493,23 +1488,18 @@ AC_SUBST(ICONV_CFLAGS)
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
 
-AC_SUBST(SERVER_CFLAGS)
 AC_SUBST(SERVER_LDFLAGS)
 AC_SUBST(SERVER_LIBS)
 
-AC_SUBST(PROXY_CFLAGS)
 AC_SUBST(PROXY_LDFLAGS)
 AC_SUBST(PROXY_LIBS)
 
-AC_SUBST(AGENT_CFLAGS)
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
 
-AC_SUBST(ZBXGET_CFLAGS)
 AC_SUBST(ZBXGET_LDFLAGS)
 AC_SUBST(ZBXGET_LIBS)
 
-AC_SUBST(SENDER_CFLAGS)
 AC_SUBST(SENDER_LDFLAGS)
 AC_SUBST(SENDER_LIBS)
 
@@ -1624,29 +1614,64 @@ Configuration:
   Compilation arch:      ${ARCH}
 
   Compiler:              ${CC}
+  Compiler flags:        ${CFLAGS}
 
+  Library-specific flags:"
+
+if test "x$DB_CFLAGS" != "x"; then
+	echo "    database:              ${DB_CFLAGS}"
+fi
+
+if test "x$JABBER_CPPFLAGS" != "x"; then
+	echo "    Jabber:                ${JABBER_CPPFLAGS}"
+fi
+
+if test "x$LIBXML2_CFLAGS" != "x"; then
+	echo "    libXML2:               ${LIBXML2_CFLAGS}"
+fi
+
+if test "x$UNIXODBC_CFLAGS" != "x"; then
+	echo "    unixODBC:              ${UNIXODBC_CFLAGS}"
+fi
+
+if test "x$SNMP_CFLAGS" != "x"; then
+	echo "    Net-SNMP:              ${SNMP_CFLAGS}"
+fi
+
+if test "x$OPENIPMI_CFLAGS" != "x"; then
+	echo "    OpenIPMI:              ${OPENIPMI_CFLAGS}"
+fi
+
+if test "x$SSH2_CFLAGS" != "x"; then
+	echo "    libssh2:               ${SSH2_CFLAGS}"
+fi
+
+if test "x$TLS_CFLAGS" != "x"; then
+	echo "    TLS:                   ${TLS_CFLAGS}"
+fi
+
+if test "x$LDAP_CPPFLAGS" != "x"; then
+	echo "    LDAP:                  ${LDAP_CPPFLAGS}"
+fi
+
+if test "x$ICONV_CFLAGS" != "x"; then
+	echo "    iconv:                 ${ICONV_CFLAGS}"
+fi
+
+echo "
   Enable server:         ${server}"
 
 if test "x$server" != "xno"; then
 
 echo "  Server details:
     With database:         ${have_db}
-    DB headers:            ${DB_CFLAGS}
     WEB Monitoring:        ${have_web_monitoring}
     Native Jabber:         ${have_jabber}
-    Jabber headers:        ${JABBER_CPPFLAGS}
     SNMP:                  ${have_snmp}
-    SNMP headers:          ${SNMP_CFLAGS}
     IPMI:                  ${have_ipmi}
-    IPMI headers:          ${OPENIPMI_CFLAGS}
     SSH:                   ${have_ssh2}
-    SSH headers:           ${SSH2_CFLAGS}
     TLS:                   ${have_tls}
-    TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
-    ODBC headers:          ${UNIXODBC_CFLAGS}
-    LIBXML2 headers:       ${LIBXML2_CFLAGS}
-    Compiler flags:        ${SERVER_CFLAGS} ${CFLAGS}
     Linker flags:          ${SERVER_LDFLAGS} ${LDFLAGS}
     Libraries:             ${SERVER_LIBS} ${LIBS}"
 
@@ -1659,20 +1684,12 @@ if test "x$proxy" != "xno"; then
 
 echo "  Proxy details:
     With database:         ${have_db}
-    DB headers:            ${DB_CFLAGS}
     WEB Monitoring:        ${have_web_monitoring}
     SNMP:                  ${have_snmp}
-    SNMP headers:          ${SNMP_CFLAGS}
     IPMI:                  ${have_ipmi}
-    IPMI headers:          ${OPENIPMI_CFLAGS}
     SSH:                   ${have_ssh2}
-    SSH headers:           ${SSH2_CFLAGS}
     TLS:                   ${have_tls}
-    TLS headers:           ${TLS_CFLAGS}
     ODBC:                  ${have_unixodbc}
-    ODBC headers:          ${UNIXODBC_CFLAGS}
-    LIBXML2 headers:       ${LIBXML2_CFLAGS}
-    Compiler flags:        ${PROXY_CFLAGS} ${CFLAGS}
     Linker flags:          ${PROXY_LDFLAGS} ${LDFLAGS}
     Libraries:             ${PROXY_LIBS} ${LIBS}"
 
@@ -1685,8 +1702,6 @@ if test "x$agent" != "xno"; then
 
 echo "  Agent details:
     TLS:                   ${have_tls}
-    TLS headers:           ${TLS_CFLAGS}
-    Compiler flags:        ${AGENT_CFLAGS} ${CFLAGS}
     Linker flags:          ${AGENT_LDFLAGS} ${LDFLAGS}
     Libraries:             ${AGENT_LIBS} ${LIBS}"
 
@@ -1705,7 +1720,6 @@ fi
 
 echo "
   LDAP support:          ${found_ldap}
-  LDAP headers:          ${LDAP_CPPFLAGS}
   IPv6 support:          ${have_ipv6}"
 
 echo
