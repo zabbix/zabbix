@@ -3,6 +3,7 @@ Changes for 3.1.0
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10405] fixed history cache shared memory leak when processing log item meta values (wiper)
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
@@ -12,6 +13,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10405] fixed history cache shared memory leak when processing log item meta values (wiper)
 ..F....... [ZBX-10341] fixed template screen import (Oleg)
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
 ..F....... [ZBX-10311] fixed user media edition by guest with Zabbix super admin user type (Cemeris)
