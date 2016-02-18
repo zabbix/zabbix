@@ -4,6 +4,7 @@ New features:
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new host groups list (Cemeris)
 ..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
 .......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
