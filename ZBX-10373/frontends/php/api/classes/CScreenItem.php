@@ -673,7 +673,7 @@ class CScreenItem extends CZBXAPI {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
 						_s(
-							'Screen "%1$s" cell X - %2$s Y - %3$s is already taken2.',
+							'Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
 							$db_screens[$screen_item['screenid']]['name'],
 							$screen_item['x'],
 							$screen_item['y']
