@@ -39,14 +39,12 @@ $widget = (new CWidget())
 $header = (new CForm('get'))
 	->setName('slideHeaderForm');
 
-$controls = new CList();
-$controls
-	->addItem(
-		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-			'screens.php' => _('Screens'),
-			'slides.php' => _('Slide shows')
-		])
-	);
+$controls = (new CList())->addItem(
+	new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	])
+);
 
 $favourite_icon = $this->data['screen']
 	? get_icon('favourite', [
