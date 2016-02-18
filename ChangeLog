@@ -3,7 +3,6 @@ Changes for 3.1.0
 New features:
 
 Bug fixes:
-.......PS. [ZBX-10405] fixed history cache shared memory leak when processing log item meta values (wiper)
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
