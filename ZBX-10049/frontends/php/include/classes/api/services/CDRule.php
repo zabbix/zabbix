@@ -167,149 +167,6 @@ class CDRule extends CApiService {
 	}
 
 	/**
-	 * Returns the parameters for creating a discovery rule validator.
-	 *
-	 * @return array
-	 */
-	protected function getDruleSchema() {
-		return [
-			'validators' => [
-				'name' => new CStringValidator([
-					'messageEmpty' => _('Empty discovery rule name.'),
-					'messageInvalid' => _('Incorrect value "%1$s" for discovery rule name.')
-				]),
-				'iprange' => new CIPRangeValidator([
-					'ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT
-				]),
-				'delay' => new CStringValidator([
-					'regex' => '/^([1-9]|[0-9]{2,5}|[0-5][0-9]{5}|60[0-3][0-9]{3}|604([0-7][0-9]{2}|[0-8]00))$/',
-					'messageEmpty' => _('Empty delay for discovery rule "%1$s".'),
-					'messageRegex' => _('Incorrect delay for discovery rule "%1$s".'),
-					'messageInvalid' => _('Incorrect delay for discovery rule "%1$s".')
-				]),
-				'proxy_hostid' => new CIdValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect proxy ID for discovery rule "%1$s".')
-				]),
-				'status' => new CLimitedSetValidator([
-					'values' => [
-						DRULE_STATUS_DISABLED,
-						DRULE_STATUS_ACTIVE
-					],
-					'messageInvalid' => _('Incorrect status for discovery rule "%1$s".')
-				]),
-				'dchecks' => new CCollectionValidator([
-					'messageEmpty' => _('Cannot save discovery rule without checks.'),
-					'messageInvalid' => _('Incorrect checks for discovery rule "%1$s".')
-				])
-			],
-			'required' => ['name', 'iprange', 'dchecks'],
-			'messageRequired' => _('No "%2$s" given for discovery rule "%1$s".'),
-			'messageUnsupported' => _('Unsupported parameter "%2$s" for discovery rule "%1$s".')
-		];
-	}
-
-	/**
-	 * Returns the parameters for creating a discovery check validator.
-	 *
-	 * @return array
-	 */
-	protected function getDCheckSchema() {
-		$dcheck_types = [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
-			SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
-		];
-
-		return [
-			'validators' => [
-				'dcheckid' => new CIdValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect discovery check ID for discovery rule "%1$s".')
-				]),
-				'key_' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect discovery check "key_" value for discovery rule "%1$s".')
-				]),
-				'ports' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect discovery check "ports" value for discovery rule "%1$s".')
-				]),
-				'snmp_community' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' => _('Incorrect discovery check "snmp_community" value for discovery rule "%1$s".')
-				]),
-				'snmpv3_authpassphrase' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' =>
-						_('Incorrect discovery check "snmpv3_authpassphrase" value for discovery rule "%1$s".')
-				]),
-				'snmpv3_authprotocol' => new CStringValidator([
-					'regex' => '/^(0|1)$/',
-					'messageEmpty' => _('Empty discovery check field "snmpv3_authprotocol" for discovery rule "%1$s".'),
-					'messageRegex' => _(
-						'Incorrect discovery check "snmpv3_authprotocol" value for discovery rule "%1$s".'
-					),
-					'messageInvalid' => _(
-						'Incorrect discovery check "snmpv3_authprotocol" value for discovery rule "%1$s".'
-					)
-				]),
-				'snmpv3_contextname' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' => _(
-						'Incorrect discovery check "snmpv3_contextname" value for discovery rule "%1$s".'
-					)
-				]),
-				'snmpv3_privpassphrase' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' => _(
-						'Incorrect discovery check "snmpv3_privpassphrase" value for discovery rule "%1$s".'
-					)
-				]),
-				'snmpv3_privprotocol' => new CStringValidator([
-					'regex' => '/^(0|1)$/',
-					'messageEmpty' => _('Empty discovery check field "snmpv3_privprotocol" for discovery rule "%1$s".'),
-					'messageRegex' => _(
-						'Incorrect discovery check "snmpv3_privprotocol" value for discovery rule "%1$s".'
-					),
-					'messageInvalid' => _(
-						'Incorrect discovery check "snmpv3_privprotocol" value for discovery rule "%1$s".'
-					)
-				]),
-				'snmpv3_securitylevel' => new CStringValidator([
-					'regex' => '/^([0-2])$/',
-					'messageEmpty' => _(
-						'Empty discovery check field "snmpv3_securitylevel" for discovery rule "%1$s".'
-					),
-					'messageRegex' => _(
-						'Incorrect discovery check "snmpv3_securitylevel" value for discovery rule "%1$s".'
-					),
-					'messageInvalid' => _(
-						'Incorrect discovery check "snmpv3_securitylevel" value for discovery rule "%1$s".'
-					)
-				]),
-				'snmpv3_securityname' => new CStringValidator([
-					'empty' => true,
-					'messageInvalid' => _(
-						'Incorrect discovery check "snmpv3_securityname" value for discovery rule "%1$s".'
-					)
-				]),
-				'type' => new CLimitedSetValidator([
-					'values' => $dcheck_types,
-					'messageInvalid' => _('Incorrect discovery check type for discovery rule "%1$s".')
-				]),
-				'uniq' => new CStringValidator([
-					'regex' => '/^(0|1)$/',
-					'messageEmpty' => _('Incorrect discovery check "uniq" value for discovery rule "%1$s".'),
-					'messageRegex' => _('Incorrect discovery check "uniq" value for discovery rule "%1$s".'),
-					'messageInvalid' => _('Incorrect discovery check "uniq" value for discovery rule "%1$s".')
-				])
-			],
-			'required' => ['type'],
-			'messageRequired' => _('No  discovery check "%2$s" given for discovery rule "%1$s".'),
-			'messageUnsupported' => _('Unsupported  discovery check parameter "%2$s" for discovery rule "%1$s".')
-		];
-	}
-
-	/**
 	 * Validate the input parameters for create() method.
 	 *
 	 * @param array $drules		Discovery rules data.
@@ -326,18 +183,63 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$drule_validator = new CPartialSchemaValidator($this->getDruleSchema());
+		$proxies = [];
+
+		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
 
 		foreach ($drules as $drule) {
-			$drule_validator->setObjectName(
-				array_key_exists('name', $drule) && $drule['name'] !== null
-				? $drule['name']
-				: ''
-			);
-			$this->checkValidator($drule, $drule_validator);
+			if (!array_key_exists('name', $drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "name" is required.'));
+			}
+			elseif (is_array($drule['name'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+			elseif ($drule['name'] === '' || $drule['name'] === null || $drule['name'] === false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
+				);
+			}
+
+			if (!array_key_exists('iprange', $drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'iprange', _('cannot be empty'))
+				);
+			}
+			elseif (!$ip_range_validator->validate($drule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $ip_range_validator->getError());
+			}
+
+			if (array_key_exists('delay', $drule)) {
+				if (is_array($drule['delay'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
+					);
+				}
+			}
+
+			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
+					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['status'], 'status')
+				);
+			}
+
+			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
+				$this->validateDChecks($drule['dchecks']);
+			}
+			else {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+			}
+
+			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
+				$proxies[] = $drule['proxy_hostid'];
+			}
 		}
 
-		// Check drule name duplicates in input data.
+		// Check host name duplicates.
 		$dublicate_names = CArrayHelper::findDuplicate($drules, 'name');
 		if ($dublicate_names) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -345,7 +247,7 @@ class CDRule extends CApiService {
 			);
 		}
 
-		// Check drule name duplicates in DB.
+		// Checking to the duplicate names.
 		$db_dublicate_names = API::getApiService()->select($this->tableName(), [
 			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($drules, 'name')],
@@ -359,8 +261,6 @@ class CDRule extends CApiService {
 			);
 		}
 
-		// Check proxy IDs.
-		$proxies = zbx_objectValues($drules, 'proxy_hostid');
 		if ($proxies) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
@@ -368,14 +268,11 @@ class CDRule extends CApiService {
 				'preservekeys' => true
 			]);
 			foreach ($proxies as $proxy) {
-				if ($proxy != 0 && !array_key_exists($proxy, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect proxy ID "%1$s".', $proxy));
+				if (!array_key_exists($proxy, $db_proxies)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
 				}
 			}
 		}
-
-		// Validate discovery checks.
-		$this->validateDChecks($drules);
 	}
 
 	/**
@@ -396,53 +293,93 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$check_names = [];
+		$proxies = [];
+		$drule_names_changed = [];
 
-		// Fetch missing data from DB.
-		$drules = $this->extendFromObjects(zbx_toHash($drules, 'druleid'), $db_drules, ['name']);
-
-		$drule_validator = new CPartialSchemaValidator($this->getDruleSchema());
-		$drule_validator->setValidator('druleid', null);
+		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
 
 		foreach ($drules as $drule) {
-			if (!array_key_exists($drule['druleid'], $db_drules)) {
+			if (!array_key_exists('druleid', $drule)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Field "druleid" is required.'));
+			}
+			elseif (!array_key_exists($drule['druleid'], $db_drules)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
-			$drule_validator->setObjectName(array_key_exists('name', $drule) ? $drule['name'] : '');
-			$this->checkPartialValidator($drule, $drule_validator);
+			if (array_key_exists('name', $drule)) {
+				if (is_array($drule['name'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($drule['name'] === '' || $drule['name'] === null || $drule['name'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'name', _('cannot be empty'))
+					);
+				}
 
-			if ($db_drules[$drule['druleid']]['name'] !== $drule['name']) {
-				$check_names[] = $drule;
+				if ($db_drules[$drule['druleid']]['name'] !== $drule['name']) {
+					if (array_key_exists($drule['name'], $drule_names_changed)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Discovery rule "%1$s" already exists.', $drule['name'])
+						);
+					}
+					else {
+						$drule_names_changed[$drule['name']] = $drule['name'];
+					}
+				}
 			}
-		}
 
-		if ($check_names) {
-			// Check drule name duplicates in input data.
-			$dublicate_names = CArrayHelper::findDuplicate($check_names, 'name');
-			if ($dublicate_names) {
+			if (array_key_exists('iprange', $drule) && !$ip_range_validator->validate($drule['iprange'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $ip_range_validator->getError());
+			}
+
+			if (array_key_exists('delay', $drule)) {
+				if (is_array($drule['delay'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['delay'], 'delay')
+					);
+				}
+			}
+
+			if (array_key_exists('status', $drule) && $drule['status'] != DRULE_STATUS_DISABLED
+					&& $drule['status'] != DRULE_STATUS_ACTIVE) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Discovery rule "%1$s" already exists.', $dublicate_names['name'])
+					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['status'], 'status')
 				);
 			}
 
-			// Check drule name duplicates in DB.
-			$db_dublicate_names = API::getApiService()->select($this->tableName(), [
+			if (array_key_exists('dchecks', $drule)) {
+				if ($drule['dchecks']) {
+					$this->validateDChecks($drule['dchecks']);
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
+				}
+			}
+
+			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
+				$proxies[] = $drule['proxy_hostid'];
+			}
+		}
+
+		// Validate drule duplicate names.
+		if ($drule_names_changed) {
+			$dublicate_names = API::getApiService()->select($this->tableName(), [
 				'output' => ['name'],
-				'filter' => ['name' => zbx_objectValues($check_names, 'name')],
+				'filter' => ['name' => $drule_names_changed],
 				'limit' => 1
 			]);
 
-			if ($db_dublicate_names) {
-				$db_dublicate_name = reset($db_dublicate_names);
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Discovery rule "%1$s" already exists.', $db_dublicate_name['name'])
-				);
+			if ($dublicate_names) {
+				$dublicate_name = reset($dublicate_names);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.',
+					$dublicate_name['name']
+				));
 			}
 		}
 
-		// Check proxy IDs.
-		$proxies = zbx_objectValues($drules, 'proxy_hostid');
 		if ($proxies) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
@@ -450,105 +387,105 @@ class CDRule extends CApiService {
 				'preservekeys' => true
 			]);
 			foreach ($proxies as $proxy) {
-				if ($proxy != 0 && !array_key_exists($proxy, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect proxy ID "%1$s".', $proxy));
+				if (!array_key_exists($proxy, $db_proxies)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
 				}
 			}
 		}
-
-		// Validate discovery checks.
-		$this->validateDChecks($drules);
 	}
 
-	protected function validateDChecks(array $drules) {
+	protected function validateDChecks(array $dchecks) {
+		$uniq = 0;
 		$item_key_parser = new CItemKey();
-		$dcheck_validator = new CPartialSchemaValidator($this->getDCheckSchema());
 
-		foreach ($drules as $drule) {
-			if (!array_key_exists('dchecks', $drule)) {
-				continue;
+		foreach ($dchecks as $dcnum => $dcheck) {
+			if (array_key_exists('uniq', $dcheck) && ($dcheck['uniq'] == 1)) {
+				if (!in_array($dcheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
+					);
+				}
+
+				$uniq++;
 			}
 
-			$uniq = 0;
+			if (array_key_exists('ports', $dcheck) && !validate_port_list($dcheck['ports'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
+			}
 
-			foreach ($drule['dchecks'] as $dcnum => $dcheck) {
-				$drule_name = array_key_exists('name', $drule) ? $drule['name'] : '';
-				$dcheck_validator->setObjectName($drule_name);
-				$this->checkValidator($dcheck, $dcheck_validator);
+			$dcheck_types = [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,
+				SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET
+			];
 
-				if (array_key_exists('uniq', $dcheck) && ($dcheck['uniq'] == 1)) {
-					if (!in_array($dcheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
+			if (!array_key_exists('type', $dcheck)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'type'));
+			}
+			elseif (!is_numeric($dcheck['type']) || !in_array($dcheck['type'], $dcheck_types)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s".', 'type'));
+			}
+
+			switch ($dcheck['type']) {
+				case SVC_AGENT:
+					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
+					}
+
+					if ($item_key_parser->parse($dcheck['key_']) != CParser::PARSE_SUCCESS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
+							_s('Invalid key "%1$s": %2$s.', $dcheck['key_'], $item_key_parser->getError())
 						);
 					}
-
-					$uniq++;
-				}
-
-				if (array_key_exists('ports', $dcheck) && !validate_port_list($dcheck['ports'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect port range.'));
-				}
-
-				switch ($dcheck['type']) {
-					case SVC_AGENT:
-						if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
-						}
-
-						if ($item_key_parser->parse($dcheck['key_']) != CParser::PARSE_SUCCESS) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Invalid key "%1$s": %2$s.', $dcheck['key_'], $item_key_parser->getError())
-							);
-						}
-						break;
-					case SVC_SNMPv1:
-					case SVC_SNMPv2c:
-						if (!array_key_exists('snmp_community', $dcheck) || $dcheck['snmp_community'] === null
-								|| $dcheck['snmp_community'] === false || $dcheck['snmp_community'] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
-						}
-					case SVC_SNMPv3:
-						if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null || $dcheck['key_'] === false
-								|| $dcheck['key_'] === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
-						}
-						break;
-				}
-
-				// validate snmpv3 fields
-				if (array_key_exists('snmpv3_securitylevel', $dcheck)
-						&& $dcheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-					// snmpv3 authprotocol
-					if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-							|| $dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-						if (!array_key_exists('snmpv3_authprotocol', $dcheck)
-								|| $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_MD5
-									&& $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_SHA) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect authentication protocol for discovery rule "%1$s".', $drule_name)
-							);
-						}
+					break;
+				case SVC_SNMPv1:
+				case SVC_SNMPv2c:
+					if (!array_key_exists('snmp_community', $dcheck) || $dcheck['snmp_community'] === null
+							|| $dcheck['snmp_community'] === false || $dcheck['snmp_community'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP community.'));
 					}
+				case SVC_SNMPv3:
+					if (!array_key_exists('key_', $dcheck) || $dcheck['key_'] === null || $dcheck['key_'] === false
+							|| $dcheck['key_'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect SNMP OID.'));
+					}
+					break;
+			}
 
-					// snmpv3 privprotocol
-					if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
-						if (!array_key_exists('snmpv3_privprotocol', $dcheck)
-								|| $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_DES
-									&& $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_AES) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('Incorrect privacy protocol for discovery rule "%1$s".', $drule_name)
-							);
-						}
+			// validate snmpv3 fields
+			if (array_key_exists('snmpv3_securitylevel', $dcheck)
+					&& $dcheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+				// snmpv3 authprotocol
+				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
+						|| $dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (!array_key_exists('snmpv3_authprotocol', $dcheck)
+							|| $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_MD5
+								&& $dcheck['snmpv3_authprotocol'] != ITEM_AUTHPROTOCOL_SHA) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value "%1$s" for "%2$s" field.',
+								$dcheck['snmpv3_authprotocol'], 'snmpv3_authprotocol'
+							)
+						);
+					}
+				}
+
+				// snmpv3 privprotocol
+				if ($dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					if (!array_key_exists('snmpv3_privprotocol', $dcheck)
+							|| $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_DES
+								&& $dcheck['snmpv3_privprotocol'] != ITEM_PRIVPROTOCOL_AES) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Incorrect value "%1$s" for "%2$s" field.',
+								$dcheck['snmpv3_privprotocol'], 'snmpv3_privprotocol'
+							)
+						);
 					}
 				}
 			}
 
-			$this->validateDuplicateChecks($drule['dchecks']);
+			$this->validateDuplicateChecks($dchecks);
+		}
 
-			if ($uniq > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
-			}
+		if ($uniq > 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only one check can be unique.'));
 		}
 	}
 
@@ -670,33 +607,27 @@ class CDRule extends CApiService {
 	 */
 	public function update(array $drules) {
 		$drules = zbx_toArray($drules);
-
-		// Validate given IDs.
-		$this->checkObjectIds($drules, 'druleid',
-			_('No "%1$s" given for discovery rule.'),
-			_('Empty discovery rule ID.'),
-			_('Incorrect discovery rule ID.')
-		);
-
 		$druleids = zbx_objectValues($drules, 'druleid');
 
 		$db_drules = API::DRule()->get([
-			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'nextcheck', 'status'],
 			'druleids' => $druleids,
-			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-				'snmpv3_privprotocol', 'snmpv3_contextname'],
+			'output' => API_OUTPUT_EXTEND,
+			'selectDChecks' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$this->validateUpdate($drules, $db_drules);
 
+		$default_values = DB::getDefaults('dchecks');
+
+		$upd_drules = [];
+
 		foreach ($drules as $drule) {
-			// update drule if it's modified
-			if (DB::recordModified($this->tableName(), $db_drules[$drule['druleid']], $drule)) {
-				DB::updateByPk($this->tableName(), $drule['druleid'], $drule);
-			}
+			$upd_drules[] = [
+				'values' => $drule,
+				'where' => ['druleid' => $drule['druleid']]
+			];
 
 			// update dchecks
 			$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
@@ -704,16 +635,14 @@ class CDRule extends CApiService {
 			$new_dchecks = [];
 			$old_dchecks = [];
 
-			if (array_key_exists('dchecks', $drule)) {
-				foreach ($drule['dchecks'] as $check) {
-					$check['druleid'] = $drule['druleid'];
+			foreach ($drule['dchecks'] as $check) {
+				$check['druleid'] = $drule['druleid'];
 
-					if (!isset($check['dcheckid'])) {
-						$new_dchecks[] = $check;
-					}
-					else {
-						$old_dchecks[] = $check;
-					}
+				if (!isset($check['dcheckid'])) {
+					$new_dchecks[] = array_merge($default_values, $check);
+				}
+				else {
+					$old_dchecks[] = $check;
 				}
 			}
 
@@ -727,6 +656,10 @@ class CDRule extends CApiService {
 			}
 
 			DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
+		}
+
+		if ($upd_drules) {
+			DB::update('drules', $upd_drules);
 		}
 
 		return ['druleids' => $druleids];
