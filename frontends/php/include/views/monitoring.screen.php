@@ -36,13 +36,12 @@ $widget = (new CWidget())
 	]))
 	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
-$controls = (new CList())
-	->addItem(
-		new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
-			'screens.php' => _('Screens'),
-			'slides.php' => _('Slide shows')
-		])
-	);
+$controls = (new CList())->addItem(
+	new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	])
+);
 
 // Append screens combobox to page header.
 $form = (new CForm())
