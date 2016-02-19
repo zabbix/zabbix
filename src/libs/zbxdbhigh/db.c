@@ -2611,8 +2611,8 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		const zbx_host_availability_t *ha)
 {
 	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
-	char	delim = ' ';
-	int	i;
+	char		delim = ' ';
+	int		i;
 
 	if (FAIL == zbx_host_availability_is_set(ha))
 		return FAIL;
