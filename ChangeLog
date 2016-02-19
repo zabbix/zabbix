@@ -5,7 +5,6 @@ A......... [ZBX-9859] improved performance of screen.get method for an unprivile
 
 Bug fixes:
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
-..F....... [ZBX-10155] disallowed creating host prototype triggers without any host:key reference (Cemeris)
 A......... [ZBX-10238] fixed error message when linking two templates with same item keys (Gunars, Sasha)
 ..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
 A......... [ZBX-10358] fixed error messages in template screen cloning and web scenarios step validation (Oleg)
