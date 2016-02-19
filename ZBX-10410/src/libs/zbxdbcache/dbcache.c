@@ -2654,25 +2654,36 @@ static void	hc_queue_item(zbx_hc_item_t *item)
  *                                                                            *
  * Function: hc_get_item                                                      *
  *                                                                            *
- * Purpose: returns history item by itemid, creating new one if necessary     *
+ * Purpose: returns history item by itemid                                    *
  *                                                                            *
  * Parameters: itemid - [IN] the item id                                      *
  *                                                                            *
- * Return value: the history item                                             *
+ * Return value: tthe history item or NULL if the requested item is not in    *
+ *               history cache                                                *
  *                                                                            *
  ******************************************************************************/
 static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
 {
-	zbx_hc_item_t	*item;
+	return (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid);
+}
 
-	if (NULL == (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)))
-	{
-		zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL};
+/******************************************************************************
+ *                                                                            *
+ * Function: hc_add_item                                                      *
+ *                                                                            *
+ * Purpose: adds a new item to history cache                                  *
+ *                                                                            *
+ * Parameters: itemid - [IN] the item id                                      *
+ *                      [IN] the item data                                    *
+ *                                                                            *
+ * Return value: the added history item                                       *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
+{
+	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, data, data};
 
-		item = (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
-	}
-
-	return item;
+	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
 
 /******************************************************************************
@@ -2889,7 +2900,6 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
 
 	for (i = 0; i < item_values_num; i++)
 	{
-		int		update_queue;
 		zbx_hc_data_t	*data = NULL;
 
 		item_value = &item_values[i];
@@ -2904,20 +2914,16 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
 			LOCK_CACHE;
 		}
 
-		item = hc_get_item(item_value->itemid);
-
-		/* new items must be inserted in queue */
-		update_queue = (NULL == item->tail);
-
-		if (NULL == item->head)
-			item->tail = data;
-		else
-			item->head->next = data;
-
-		item->head = data;
-
-		if (0 != update_queue)
+		if (NULL == (item = hc_get_item(item_value->itemid)))
+		{
+			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
+		}
+		else
+		{
+			item->head->next = data;
+			item->head = data;
+		}
 	}
 }
 
@@ -3087,7 +3093,7 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
-	zbx_hc_data_t	*data_next;
+	zbx_hc_data_t	*data_free;
 	int		next_sync;
 
 	for (i = 0; i < history_items->values_num; i++)
@@ -3096,11 +3102,11 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 		if (NULL == (item = (zbx_hc_item_t *)history_items->values[i]))
 			continue;
 
-		data_next = item->tail->next;
+		data_free = item->tail;
+		item->tail = item->tail->next;
+		hc_free_data(data_free);
 
-		hc_free_data(item->tail);
-
-		if (NULL == (item->tail = data_next))
+		if (NULL == item->tail)
 		{
 			zbx_hashset_remove(&cache->history_items, item);
 			continue;
@@ -3156,7 +3162,7 @@ static void	hc_update_history_queue()
 	/* queue unmarked items, reset item status */
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		if (ZBX_HC_ITEM_STATUS_QUEUED != item->status)
+		if (ZBX_HC_ITEM_STATUS_QUEUED != item->status && NULL != item->tail)
 			hc_queue_item(item);
 
 		item->status = ZBX_HC_ITEM_STATUS_NORMAL;
