@@ -2658,7 +2658,7 @@ static void	hc_queue_item(zbx_hc_item_t *item)
  *                                                                            *
  * Parameters: itemid - [IN] the item id                                      *
  *                                                                            *
- * Return value: tthe history item or NULL if the requested item is not in    *
+ * Return value: the history item or NULL if the requested item is not in     *
  *               history cache                                                *
  *                                                                            *
  ******************************************************************************/
