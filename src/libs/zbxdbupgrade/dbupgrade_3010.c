@@ -22,22 +22,40 @@
 #include "dbupgrade.h"
 
 /*
- * 2.2 maintenance database patches
+ * 3.2 development database patches
  */
 
 #ifndef HAVE_SQLITE3
 
-static int	DBpatch_2020000(void)
+static int	DBpatch_3010000(void)
 {
-	return SUCCEED;
+	return DBdrop_index("history_log", "history_log_2");
+}
+
+static int	DBpatch_3010001(void)
+{
+	return DBdrop_field("history_log", "id");
+}
+
+static int	DBpatch_3010002(void)
+{
+	return DBdrop_index("history_text", "history_text_2");
+}
+
+static int	DBpatch_3010003(void)
+{
+	return DBdrop_field("history_text", "id");
 }
 
 #endif
 
-DBPATCH_START(2020)
+DBPATCH_START(3010)
 
 /* version, duplicates flag, mandatory flag */
 
-DBPATCH_ADD(2020000, 0, 1)
+DBPATCH_ADD(3010000, 0, 1)
+DBPATCH_ADD(3010001, 0, 1)
+DBPATCH_ADD(3010002, 0, 1)
+DBPATCH_ADD(3010003, 0, 1)
 
 DBPATCH_END()

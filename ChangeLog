@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
