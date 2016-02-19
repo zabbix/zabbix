@@ -12,6 +12,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10415] fixed host availabilty update errors on Oracle database (wiper)
 ..F....... [ZBX-10398] fixed misplaced "Edit screen" and "Edit slide show" buttons when screen is having dynamic elements (Ivo)
 .......PS. [ZBX-10405] fixed history cache shared memory leak when processing log item meta values (wiper)
 ..F....... [ZBX-10341] fixed template screen import (Oleg)
