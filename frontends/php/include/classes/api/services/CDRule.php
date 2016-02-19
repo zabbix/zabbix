@@ -183,8 +183,6 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$proxies = [];
-
 		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
 
 		foreach ($drules as $drule) {
@@ -210,8 +208,8 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('delay', $drule)) {
-				if (is_array($drule['delay'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				if (!zbx_is_int($drule['delay'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'delay'));
 				}
 				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -233,42 +231,39 @@ class CDRule extends CApiService {
 			else {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 			}
-
-			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
-				$proxies[] = $drule['proxy_hostid'];
-			}
 		}
 
-		// Check host name duplicates.
-		$dublicate_names = CArrayHelper::findDuplicate($drules, 'name');
-		if ($dublicate_names) {
+		// Check drule name duplicates in input data.
+		$dublicate = CArrayHelper::findDuplicate($drules, 'name');
+		if ($dublicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s" already exists.', $dublicate_names['name'])
+				_s('Discovery rule "%1$s" already exists.', $dublicate['name'])
 			);
 		}
 
-		// Checking to the duplicate names.
-		$db_dublicate_names = API::getApiService()->select($this->tableName(), [
+		// Check drule name duplicates in DB.
+		$db_dublicate = $this->get([
 			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($drules, 'name')],
 			'limit' => 1
 		]);
 
-		if ($db_dublicate_names) {
-			$db_dublicate_name = reset($db_dublicate_names);
+		if ($db_dublicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s" already exists.', $db_dublicate_name['name'])
+				_s('Discovery rule "%1$s" already exists.', $db_dublicate[0]['name'])
 			);
 		}
 
-		if ($proxies) {
+		// Check proxy IDs.
+		$proxy_hostids = zbx_objectValues($drules, 'proxy_hostid');
+		if ($proxy_hostids) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
-				'proxyids' => $proxies,
+				'proxyids' => $proxy_hostids,
 				'preservekeys' => true
 			]);
-			foreach ($proxies as $proxy) {
-				if (!array_key_exists($proxy, $db_proxies)) {
+			foreach ($proxy_hostids as $proxy_hostid) {
+				if ($proxy_hostid != 0 && !array_key_exists($proxy_hostid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
 				}
 			}
@@ -293,7 +288,6 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$proxies = [];
 		$drule_names_changed = [];
 
 		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
@@ -317,14 +311,7 @@ class CDRule extends CApiService {
 				}
 
 				if ($db_drules[$drule['druleid']]['name'] !== $drule['name']) {
-					if (array_key_exists($drule['name'], $drule_names_changed)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Discovery rule "%1$s" already exists.', $drule['name'])
-						);
-					}
-					else {
-						$drule_names_changed[$drule['name']] = $drule['name'];
-					}
+					$drule_names_changed[] = $drule;
 				}
 			}
 
@@ -333,8 +320,8 @@ class CDRule extends CApiService {
 			}
 
 			if (array_key_exists('delay', $drule)) {
-				if (is_array($drule['delay'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				if (!zbx_is_int($drule['delay'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'delay'));
 				}
 				elseif ($drule['delay'] < 1 || $drule['delay'] > SEC_PER_WEEK) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -358,36 +345,41 @@ class CDRule extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot save discovery rule without checks.'));
 				}
 			}
-
-			if (array_key_exists('proxy_hostid', $drule) && $drule['proxy_hostid']) {
-				$proxies[] = $drule['proxy_hostid'];
-			}
 		}
 
-		// Validate drule duplicate names.
 		if ($drule_names_changed) {
-			$dublicate_names = API::getApiService()->select($this->tableName(), [
+			// Check drule name duplicates in input data.
+			$dublicate = CArrayHelper::findDuplicate($drule_names_changed, 'name');
+			if ($dublicate) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Discovery rule "%1$s" already exists.', $dublicate['name'])
+				);
+			}
+
+			// Check drule name duplicates in DB.
+			$db_dublicate = $this->get([
 				'output' => ['name'],
-				'filter' => ['name' => $drule_names_changed],
+				'filter' => ['name' => zbx_objectValues($drule_names_changed, 'name')],
 				'limit' => 1
 			]);
 
-			if ($dublicate_names) {
-				$dublicate_name = reset($dublicate_names);
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Discovery rule "%1$s" already exists.',
-					$dublicate_name['name']
-				));
+			if ($db_dublicate) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Discovery rule "%1$s" already exists.', $db_dublicate[0]['name'])
+				);
 			}
 		}
 
-		if ($proxies) {
+		// Check proxy IDs.
+		$proxy_hostids = zbx_objectValues($drules, 'proxy_hostid');
+		if ($proxy_hostids) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
-				'proxyids' => $proxies,
+				'proxyids' => $proxy_hostids,
 				'preservekeys' => true
 			]);
-			foreach ($proxies as $proxy) {
-				if (!array_key_exists($proxy, $db_proxies)) {
+			foreach ($proxy_hostids as $proxy_hostid) {
+				if ($proxy_hostid != 0 && !array_key_exists($proxy_hostid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
 				}
 			}
@@ -398,7 +390,19 @@ class CDRule extends CApiService {
 		$uniq = 0;
 		$item_key_parser = new CItemKey();
 
+		if (!is_array($dchecks)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'dchecks', _('an array is expected'))
+			);
+		}
+
 		foreach ($dchecks as $dcnum => $dcheck) {
+			if (!is_array($dcheck)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'dchecks', _('an array is expected'))
+				);
+			}
+
 			if (array_key_exists('uniq', $dcheck) && ($dcheck['uniq'] == 1)) {
 				if (!in_array($dcheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -422,7 +426,7 @@ class CDRule extends CApiService {
 			}
 			elseif (!is_numeric($dcheck['type']) || !in_array($dcheck['type'], $dcheck_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.', $drule['type'], 'type')
+					_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['type'], 'type')
 				);
 			}
 
@@ -438,6 +442,7 @@ class CDRule extends CApiService {
 						);
 					}
 					break;
+
 				case SVC_SNMPv1:
 				case SVC_SNMPv2c:
 					if (!array_key_exists('snmp_community', $dcheck) || $dcheck['snmp_community'] === null
@@ -612,9 +617,11 @@ class CDRule extends CApiService {
 		$druleids = zbx_objectValues($drules, 'druleid');
 
 		$db_drules = API::DRule()->get([
+			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'nextcheck', 'status'],
+			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
+				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
+				'snmpv3_privprotocol', 'snmpv3_contextname'],
 			'druleids' => $druleids,
-			'output' => API_OUTPUT_EXTEND,
-			'selectDChecks' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -626,42 +633,40 @@ class CDRule extends CApiService {
 		$upd_drules = [];
 
 		foreach ($drules as $drule) {
-			$upd_drules[] = [
-				'values' => $drule,
-				'where' => ['druleid' => $drule['druleid']]
-			];
-
-			// update dchecks
-			$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
-
-			$new_dchecks = [];
-			$old_dchecks = [];
-
-			foreach ($drule['dchecks'] as $check) {
-				$check['druleid'] = $drule['druleid'];
-
-				if (!isset($check['dcheckid'])) {
-					$new_dchecks[] = array_merge($default_values, $check);
-				}
-				else {
-					$old_dchecks[] = $check;
-				}
+			// Update drule if it's modified.
+			if (DB::recordModified('drules', $db_drules[$drule['druleid']], $drule)) {
+				DB::updateByPk('drules', $drule['druleid'], $drule);
 			}
 
-			$del_dcheckids = array_diff(
-				zbx_objectValues($db_dchecks, 'dcheckid'),
-				zbx_objectValues($old_dchecks, 'dcheckid')
-			);
+			if (array_key_exists('dchecks', $drule)) {
+				// Update dchecks.
+				$db_dchecks = $db_drules[$drule['druleid']]['dchecks'];
 
-			if ($del_dcheckids) {
-				$this->deleteActionConditions($del_dcheckids);
+				$new_dchecks = [];
+				$old_dchecks = [];
+
+				foreach ($drule['dchecks'] as $check) {
+					$check['druleid'] = $drule['druleid'];
+
+					if (!isset($check['dcheckid'])) {
+						$new_dchecks[] = array_merge($default_values, $check);
+					}
+					else {
+						$old_dchecks[] = $check;
+					}
+				}
+
+				$del_dcheckids = array_diff(
+					zbx_objectValues($db_dchecks, 'dcheckid'),
+					zbx_objectValues($old_dchecks, 'dcheckid')
+				);
+
+				if ($del_dcheckids) {
+					$this->deleteActionConditions($del_dcheckids);
+				}
+
+				DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
 			}
-
-			DB::replace('dchecks', $db_dchecks, array_merge($old_dchecks, $new_dchecks));
-		}
-
-		if ($upd_drules) {
-			DB::update('drules', $upd_drules);
 		}
 
 		return ['druleids' => $druleids];
