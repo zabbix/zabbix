@@ -264,7 +264,9 @@ class CDRule extends CApiService {
 			]);
 			foreach ($proxy_hostids as $proxy_hostid) {
 				if ($proxy_hostid != 0 && !array_key_exists($proxy_hostid, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
+					);
 				}
 			}
 		}
@@ -380,7 +382,9 @@ class CDRule extends CApiService {
 			]);
 			foreach ($proxy_hostids as $proxy_hostid) {
 				if ($proxy_hostid != 0 && !array_key_exists($proxy_hostid, $db_proxies)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
+					);
 				}
 			}
 		}
