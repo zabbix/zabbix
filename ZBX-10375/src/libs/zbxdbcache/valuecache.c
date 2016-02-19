@@ -676,7 +676,7 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
  *                                                                            *
  ******************************************************************************/
 
-#define REFCOUNT_FIELD_SIZE	sizeof(uint32_t)
+#define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
@@ -1106,10 +1106,10 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 				return NULL;
 		}
 
-		*(uint32_t *)ptr = 0;
+		*(zbx_uint32_t *)ptr = 0;
 	}
 
-	(*(uint32_t *)ptr)++;
+	(*(zbx_uint32_t *)ptr)++;
 
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
@@ -1139,7 +1139,7 @@ static size_t	vc_item_strfree(char *str)
 	{
 		void	*ptr = str - REFCOUNT_FIELD_SIZE;
 
-		if (0 == --(*(uint32_t *)ptr))
+		if (0 == --(*(zbx_uint32_t *)ptr))
 		{
 			freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
 			zbx_hashset_remove(&vc_cache->strpool, ptr);
