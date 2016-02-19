@@ -4422,13 +4422,8 @@ return [
 		],
 	],
 	'history_log' => [
-		'key' => 'id',
+		'key' => '',
 		'fields' => [
-			'id' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'itemid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -4480,13 +4475,8 @@ return [
 		],
 	],
 	'history_text' => [
-		'key' => 'id',
+		'key' => '',
 		'fields' => [
-			'id' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'itemid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
