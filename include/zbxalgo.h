@@ -24,7 +24,7 @@
 
 /* generic */
 
-typedef uint32_t zbx_hash_t;
+typedef zbx_uint32_t zbx_hash_t;
 
 zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed);

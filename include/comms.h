@@ -29,9 +29,6 @@ typedef long	ssize_t;
 #endif
 
 #if defined(HAVE_POLARSSL)
-#	if defined(_WINDOWS) && defined(uint32_t)
-#		undef uint32_t
-#	endif
 #	include <polarssl/ssl.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
