@@ -3,6 +3,7 @@ Changes for 3.1.0
 New features:
 
 Bug fixes:
+..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
 
 --------------------------------------------------------------------------------
