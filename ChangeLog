@@ -11,6 +11,7 @@ Changes for 3.0.1rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10398] fixed misplaced "Edit screen" and "Edit slide show" buttons when screen is having dynamic elements (Ivo)
 .......PS. [ZBX-10405] fixed history cache shared memory leak when processing log item meta values (wiper)
 ..F....... [ZBX-10341] fixed template screen import (Oleg)
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
