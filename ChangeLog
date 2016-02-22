@@ -1365,6 +1365,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.17rc1
 
 New features:
+A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
