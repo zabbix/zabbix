@@ -1123,6 +1123,7 @@ function zbx_array_merge() {
 			$result[$key] = $value;
 		}
 	}
+	unset($array);
 
 	return $result;
 }

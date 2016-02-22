@@ -107,8 +107,8 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 }
 else {
 	$userFormList->addRow(_('Password'),
-		(new CSpan(_s('Unavailable for users with %1$s.')))->addClass(authentication2str($data['auth_type'])
-	));
+		new CSpan(_s('Unavailable for users with %1$s.', authentication2str($data['auth_type'])))
+	);
 }
 
 // append languages to form list

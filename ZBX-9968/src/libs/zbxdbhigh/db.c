@@ -2611,8 +2611,8 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		const zbx_host_availability_t *ha)
 {
 	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
-	char	delim = ' ';
-	int	i;
+	char		delim = ' ';
+	int		i;
 
 	if (FAIL == zbx_host_availability_is_set(ha))
 		return FAIL;
@@ -2654,7 +2654,7 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		}
 	}
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64 "\n;", ha->hostid);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64, ha->hostid);
 
 	return SUCCEED;
 }
