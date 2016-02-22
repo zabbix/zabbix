@@ -10557,7 +10557,7 @@ msgstr "Комплексный экран \"%1$s\" добавлен."
 #: api/classes/CTemplateScreen.php:818
 #, php-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Комплексный экран \"%1$s\" уже существует у шаблона \"%2$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764

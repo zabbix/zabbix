@@ -10552,7 +10552,7 @@ msgstr "Tela \"%1$s\" adicionada."
 #: api/classes/CTemplateScreen.php:818
 #, php-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "A tela \"%1$s\" já existe no template \"%2$s\"."
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
