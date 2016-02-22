@@ -1316,8 +1316,8 @@ out:
  *             action     - [OUT] action data                                 *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
- * Comments: If 'action' is not NULL, it gathers information about it. If     *
- *           information could not be gathered, its 'actionid' is set to 0.   *
+ * Comments: 'action' is filled with information about action. If information *
+ *           could not be gathered, 'action->actionid' is set to 0.           *
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, char **error)
