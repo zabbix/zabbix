@@ -892,7 +892,6 @@ class CHost extends CHostGeneral {
 				);
 			}
 			DB::insert('hosts_groups', $groupsToAdd);
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['host'], 'hosts', null, null);
 
 			$options = array();
 			$options['hosts'] = $host;
@@ -1180,12 +1179,6 @@ class CHost extends CHostGeneral {
 				'values' => $data,
 				'where' => array('hostid' => $hostids)
 			));
-
-			foreach ($hostids as $hostid) {
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostid, $updHosts[$hostid]['host'], 'hosts',
-					$updHosts[$hostid], $data
-				);
-			}
 		}
 
 		if (isset($updateStatus)) {

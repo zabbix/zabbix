@@ -593,9 +593,6 @@ class CGraph extends CGraphGeneral {
 		foreach ($delGraphs as $graph) {
 			$host = reset($graph['hosts']);
 			info(_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $host['name']));
-			add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, $graph['graphid'], $graph['name'],
-				_s('Deleted: Graph "%1$s" on "%2$s".', $graph['name'], $host['name'])
-			);
 		}
 
 		return array('graphids' => $graphids);

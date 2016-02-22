@@ -179,24 +179,13 @@ abstract class CGraphGeneral extends CZBXAPI {
 	protected function createReal($graph) {
 		$graphids = DB::insert('graphs', array($graph));
 		$graphid = reset($graphids);
-		add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH, $graphid, $graph['name'],
-			array_key_exists('flags', $graph) && $graph['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
-				? _('Graph prototype added')
-				: _('Graph added')
-		);
 
 		foreach ($graph['gitems'] as &$gitem) {
 			$gitem['graphid'] = $graphid;
 		}
 		unset($gitem);
 
-		$gitemids = DB::insert('graphs_items', $graph['gitems']);
-
-		foreach ($gitemids as $gitemid) {
-			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH_ELEMENT, $gitemid, null,
-				_('New item for the graph').' ['.$graph['name'].']'
-			);
-		}
+		DB::insert('graphs_items', $graph['gitems']);
 
 		return $graphid;
 	}
@@ -216,10 +205,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 		// update the graph if it's modified
 		if (DB::recordModified('graphs', $dbGraph, $graph)) {
 			DB::updateByPk($this->tableName(), $graph['graphid'], $graph);
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH, $graph['graphid'], $graph['name'],
-				'graphs', $dbGraph, $graph
-			);
 		}
 
 		// delete remaining items only if new items or items that require update are set
@@ -232,10 +217,6 @@ abstract class CGraphGeneral extends CZBXAPI {
 				if (!empty($gitem['gitemid']) && isset($dbGitemIds[$gitem['gitemid']])) {
 					if (DB::recordModified('graphs_items', $dbGitems[$gitem['gitemid']], $gitem)) {
 						DB::updateByPk('graphs_items', $gitem['gitemid'], $gitem);
-
-						add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH_ELEMENT, $gitem['gitemid'],
-							'', 'graphs_items', $dbGitems[$gitem['gitemid']], $gitem
-						);
 					}
 
 					// remove this graph item from the collection so it won't get deleted
@@ -250,20 +231,10 @@ abstract class CGraphGeneral extends CZBXAPI {
 
 			if ($deleteGitemIds) {
 				DB::delete('graphs_items', array('gitemid' => $deleteGitemIds));
-
-				foreach ($deleteGitemIds as $delete_gitemid) {
-					add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH_ELEMENT, $delete_gitemid,'', null);
-				}
 			}
 
 			if ($insertGitems) {
-				$gitemids = DB::insert('graphs_items', $insertGitems);
-
-				foreach ($gitemids as $gitemid) {
-					add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_GRAPH_ELEMENT, $gitemid, null,
-						_('New item for the graph').' ['.$graph['name'].']'
-					);
-				}
+				DB::insert('graphs_items', $insertGitems);
 			}
 		}
 
