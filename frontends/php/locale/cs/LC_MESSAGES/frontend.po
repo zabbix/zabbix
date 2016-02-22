@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 21:13+0200\n"
+"POT-Creation-Date: 2016-02-22 21:19+0200\n"
 "PO-Revision-Date: 2015-08-11 08:36+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -7656,7 +7656,7 @@ msgstr "Neplatná odpověď přijatá od Zabbix serveru \"%1$s\"."
 #: include/classes/api/services/CHttpTest.php:694
 #, c-format
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Nesprávná hodnota typu stahování pro krok \"%1$s\" scénáře \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:799
 #, c-format
@@ -12591,7 +12591,7 @@ msgstr "Obrazovka \"%1$s\" přidána."
 #: include/classes/api/services/CTemplateScreen.php:699
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" už existuje v šabloně \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:432
 #: include/classes/api/services/CScreen.php:505

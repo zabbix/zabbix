@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 21:13+0200\n"
-"PO-Revision-Date: 2015-03-07 10:33+0300\n"
+"POT-Creation-Date: 2016-02-22 21:19+0200\n"
+"PO-Revision-Date: 2016-01-24 10:39+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1425717193.0\n"
+"X-POOTLE-MTIME: 1453624741.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -7657,7 +7657,7 @@ msgstr "Neplatná odpoveď prijatá od Zabbix servera \"%1$s\"."
 #: include/classes/api/services/CHttpTest.php:694
 #, c-format
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota Typu sťahovania pre krok \"%1$s\" scenára \"%2$s\"."
 
 #: include/classes/api/services/CScreenItem.php:799
 #, c-format
@@ -12592,7 +12592,7 @@ msgstr "Obrazovka \"%1$s\" pridaná."
 #: include/classes/api/services/CTemplateScreen.php:699
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" už existuje v šablóne \"%2$s\"."
 
 #: include/classes/api/services/CScreen.php:432
 #: include/classes/api/services/CScreen.php:505
@@ -13885,7 +13885,7 @@ msgstr[2] "Obrázok je použitý v mapách %1$s."
 #: include/views/configuration.item.list.php:138
 #, c-format
 msgid "The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Položka už nie je zistená a bude zmazaná v %1$s (%2$s na %3$s)."
+msgstr "Položka už nie je zisťovaná a bude zmazaná v %1$s (%2$s na %3$s)."
 
 #: include/views/configuration.item.list.php:133
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."

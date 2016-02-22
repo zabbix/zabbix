@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 21:13+0200\n"
-"PO-Revision-Date: 2015-08-06 03:08+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"POT-Creation-Date: 2016-02-22 21:19+0200\n"
+"PO-Revision-Date: 2016-02-09 14:18+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1438823309.0\n"
+"X-POOTLE-MTIME: 1455020321.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -2646,7 +2646,7 @@ msgstr "すでに存在します。"
 #: include/classes/parsers/CTriggerExpression.php:461
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr "条件式の%1$s\"から始まる部分を確認してください。"
+msgstr "条件式の\"%1$s\"から始まる部分を確認してください。"
 
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:523
@@ -4446,7 +4446,7 @@ msgstr "Discovered by"
 
 #: include/views/monitoring.discovery.php:39
 msgid "Discovered device"
-msgstr "発見されたホスト"
+msgstr "発見されたデバイス"
 
 #: events.php:334 hosts.php:865 hosts.php:959 include/html.inc.php:351
 #: include/menu.inc.php:76 include/menu.inc.php:203
@@ -7548,7 +7548,7 @@ msgstr "Zabbixサーバー\"%1$s\"から正しくない値を受信しました�
 #: include/classes/api/services/CHttpTest.php:694
 #, c-format
 msgid "Incorrect retrieve mode value for step \"%1$s\" of web scenario \"%2$s\"."
-msgstr ""
+msgstr "Webシナリオ\"%2$s\"のステップ\"%1$s\"の取得モードの値が正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:799
 #, c-format
@@ -12463,7 +12463,7 @@ msgstr "スクリーン\"%1$s\"を追加しました。"
 #: include/classes/api/services/CTemplateScreen.php:699
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%1$s\"はテンプレート\"%2$s\"にすでに存在します。"
 
 #: include/classes/api/services/CScreen.php:432
 #: include/classes/api/services/CScreen.php:505
@@ -13893,11 +13893,11 @@ msgstr "タイムスタンプ"
 
 #: popup_trexpr.php:403
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (=条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がない場合 N = 1、その他の場合 N =0 (=条件)"
 
 #: popup_trexpr.php:408
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (#条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がない場合 N = 1、その他の場合 N =0 (#条件)"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:415
