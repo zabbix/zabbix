@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 19:20+0200\n"
+"POT-Creation-Date: 2016-02-22 23:58+0200\n"
 "PO-Revision-Date: 2014-10-27 07:32+0300\n"
 "Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -732,13 +732,13 @@ msgstr "於每 %4$s 的第 %3$s 天 之 %1$s:%2$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "於每週的每 %3$s 之  %1$s:%2$s"
+msgstr[0] ""
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] "於每天的 %1$s:%2$s"
+msgstr[0] ""
 
 #: include/forms.inc.php:1792
 msgid "At (hour:minute)"
