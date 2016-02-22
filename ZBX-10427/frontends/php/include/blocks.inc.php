@@ -450,6 +450,8 @@ function make_hoststat_summary($filter) {
 	));
 
 	if ($filter['extAck']) {
+		$hosts_with_unack_triggers = array();
+
 		$triggers_unack = API::Trigger()->get(array(
 			'nodeids' => get_current_nodeid(),
 			'monitored' => true,
@@ -485,7 +487,7 @@ function make_hoststat_summary($filter) {
 				$host = $hosts[$trigger_host['hostid']];
 			}
 
-			if ($filter['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])) {
+			if ($filter['extAck'] && array_key_exists($host['hostid'], $hosts_with_unack_triggers)) {
 				if (!isset($lastUnack_host_list[$host['hostid']])) {
 					$lastUnack_host_list[$host['hostid']] = array();
 					$lastUnack_host_list[$host['hostid']]['host'] = $host['name'];
