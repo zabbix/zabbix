@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-22 19:16+0200\n"
-"PO-Revision-Date: 2015-03-26 11:35+0300\n"
+"PO-Revision-Date: 2016-01-28 09:32+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1427362534.0\n"
+"X-POOTLE-MTIME: 1453966356.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -4848,7 +4848,7 @@ msgstr "Puste ID ekranu dla szablonu ekranu."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
-msgstr "Pusty okres czasu."
+msgstr "Pusty okres."
 
 #: include/views/administration.auditlogs.list.php:48
 msgid "Enable"
@@ -7427,18 +7427,18 @@ msgstr "Błędny motyw dla użytkownika \"%1$s\"."
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
 msgid "Incorrect time period \"%1$s\" start day must be less or equal to end day."
-msgstr "Błędny okres czasu \"%1$s\" dzień początkowy musi być mniejszy lub równy z dniem końcowym."
+msgstr "Błędny okres \"%1$s\" dzień początkowy musi być mniejszy lub równy z dniem końcowym."
 
 #: include/classes/validators/CTimePeriodValidator.php:105
 #, c-format
 msgid "Incorrect time period \"%1$s\" start time must be less than end time."
-msgstr "Błędny okres czasu \"%1$s\" czas początkowy musi być mniejszy od czasu końcowego."
+msgstr "Błędny okres \"%1$s\" czas początkowy musi być mniejszy od czasu końcowego."
 
 #: include/classes/validators/CTimePeriodValidator.php:89
 #: include/classes/validators/CTimePeriodValidator.php:94
 #, c-format
 msgid "Incorrect time period \"%1$s\"."
-msgstr "Błędny okres czasu \"%1$s\"."
+msgstr "Błędny okres \"%1$s\"."
 
 #: api/classes/CService.php:1197
 #, c-format
@@ -7711,7 +7711,7 @@ msgstr "Nieprawidłowy klucz \"%1$s\" dla prototypu pozycji \"%2$s\" w \"%3$s\":
 #: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr "nieprawidłowy klucz \"%1$s\": %2$s."
+msgstr "Nieprawidłowy klucz \"%1$s\": %2$s."
 
 #: maintenance.php:306
 msgid "Invalid maintenance period"
@@ -7755,12 +7755,12 @@ msgstr "Nieprawidłowy trzeci parametr."
 
 #: disc_prototypes.php:198 host_discovery.php:179 items.php:357
 msgid "Invalid time period"
-msgstr "Nieprawidłowy okres czasu"
+msgstr "Nieprawidłowy okres"
 
 #: include/classes/class.cview.php:62
 #, c-format
 msgid "Invalid view name given \"%s\". Allowed chars: \"a-z\" and \".\"."
-msgstr "Podano błędną nazwę widoku \"%s\". Dozwolone znaki: \"a-z\" and \".\"."
+msgstr "Podano nieprawidłową nazwę widoku \"%s\". Dozwolone znaki: \"a-z\" and \".\"."
 
 #: include/menu.inc.php:101
 #: include/views/configuration.host.massupdate.php:316
@@ -8910,9 +8910,9 @@ msgstr "Maksymalna liczba procesów wspierana przez system operacyjny."
 #, c-format
 msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
-msgstr[0] "Maksymalny okres czasu do wyświetlenia to %1$s dzień."
-msgstr[1] "Maksymalny okres czasu do wyświetlenia to %1$s dni."
-msgstr[2] "Maksymalny okres czasu do wyświetlenia to %1$s dni."
+msgstr[0] "Maksymalny okres do wyświetlenia to %1$s dzień."
+msgstr[1] "Maksymalny okres do wyświetlenia to %1$s dni."
+msgstr[2] "Maksymalny okres do wyświetlenia to %1$s dni."
 
 #: popup_trexpr.php:259
 msgid "Maximum value for period T is < N"
@@ -9109,9 +9109,9 @@ msgstr "Minimalny poziom"
 #, c-format
 msgid "Minimum time period to display is %1$s hour."
 msgid_plural "Minimum time period to display is %1$s hours."
-msgstr[0] "Minimalny okres czasu do wyświetlenia to %1$s godzina."
-msgstr[1] "Minimalny okres czasu do wyświetlenia to %1$s godziny."
-msgstr[2] "Minimalny okres czasu do wyświetlenia to %1$s godzin."
+msgstr[0] "Minimalny okres do wyświetlenia to %1$s godzina."
+msgstr[1] "Minimalny okres do wyświetlenia to %1$s godziny."
+msgstr[2] "Minimalny okres do wyświetlenia to %1$s godzin."
 
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:310
 msgid "Minimum trigger severity"
@@ -9648,11 +9648,11 @@ msgstr "Bez zbierania danych"
 
 #: popup_trexpr.php:511
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
-msgstr "Nie otrzymano danych w okresie czasu T, wtedy N = 1, 0 - w przeciwnym przypadku"
+msgstr "Nie otrzymano danych w okresie T, wtedy N = 1, 0 - w przeciwnym przypadku"
 
 #: popup_trexpr.php:516
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr "Nie otrzymano danych w okresie czasu T, wtedy N NOT 1, 0 - w przeciwnym przypadku"
+msgstr "Nie otrzymano danych w okresie T, wtedy N NOT 1, 0 - w przeciwnym przypadku"
 
 #: api/classes/CHostInterface.php:840
 #, c-format
@@ -12081,7 +12081,7 @@ msgstr "Pułapka SNMP"
 
 #: api/classes/CItemGeneral.php:366
 msgid "SNMP trap key is invalid."
-msgstr "Błędny klucz pułapki SNMP."
+msgstr "Nieprawidłowy klucz pułapki SNMP."
 
 #: include/discovery.inc.php:66 include/items.inc.php:84
 #: include/views/js/configuration.discovery.edit.js.php:178
@@ -12261,7 +12261,7 @@ msgstr "Dodano ekran \"%1$s\"."
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Ekran \"%1$s\" już istnieje w szablonie \"%2$s\"."
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format

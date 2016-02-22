@@ -1,6 +1,7 @@
 Changes for 2.2.12rc1
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (Taiwan), English (United States), French, Japanese, Korean, Polish, Russian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:

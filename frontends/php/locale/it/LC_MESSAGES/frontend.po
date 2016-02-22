@@ -12202,7 +12202,7 @@ msgstr "Schermata \"%1$s\" aggiunta."
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "La schermata \"%1$s\" esiste già nel template \"%2$s\"."
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format

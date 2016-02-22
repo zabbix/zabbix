@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-22 19:16+0200\n"
-"PO-Revision-Date: 2013-12-17 21:07+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"PO-Revision-Date: 2016-02-11 18:11+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1387307248.0\n"
+"X-POOTLE-MTIME: 1455207100.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -325,7 +325,7 @@ msgstr "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s sec
 #: api/classes/CAction.php:742
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr "Action \"%1$s\" has no operations defined."
+msgstr "Action \"%1$s\" no operations defined."
 
 #: actionconf.php:158
 msgid "Action added"
@@ -1195,7 +1195,7 @@ msgstr "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is mi
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr "CPU(s) utilization. Processor load in percents. The CPU, type and mode are optional. If CPU is missing all is used. If type is missing user is used. If mode is missing avg1 is used."
+msgstr "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -1214,7 +1214,7 @@ msgstr "Calculate check sum of a given file. Check sum of the file calculate by 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used. In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
+msgstr "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:96
 #: include/views/configuration.graph.edit.php:154
@@ -1440,7 +1440,7 @@ msgstr "Cannot add web scenario"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "Cannot change authentication"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -1844,7 +1844,7 @@ msgstr[1] "Cannot disable user groups"
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Cannot disable web scenario"
-msgstr[1] "Cannot disable web scenario"
+msgstr[1] "Cannot disable web scenarios"
 
 #: queue.php:61
 msgid "Cannot display item queue."
@@ -1900,7 +1900,7 @@ msgstr[1] "Cannot enable item prototypes"
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Cannot enable media type"
-msgstr[1] "Cannot enable media type"
+msgstr[1] "Cannot enable media types"
 
 #: triggers.php:287
 msgid "Cannot enable trigger"
@@ -2107,7 +2107,7 @@ msgstr "Cannot include view file \"%s\"."
 
 #: popup_trexpr.php:778
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Cannot insert trigger expression"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
@@ -2119,7 +2119,7 @@ msgstr "Cannot link template"
 
 #: api/classes/CUser.php:1099
 msgid "Cannot login."
-msgstr ""
+msgstr "Cannot login."
 
 #: api/classes/CUser.php:1021
 msgid "Cannot logout."
@@ -2194,7 +2194,7 @@ msgstr "Cannot send command, check connection with Zabbix server \"%1$s\"."
 #: api/classes/CHostGroup.php:493
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Cannot set \"%1$s\" for host group \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:248
 #, c-format
@@ -2292,12 +2292,12 @@ msgstr "Cannot update \"%1$s\" for a discovered trigger."
 #: api/classes/CAction.php:666
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr ""
+msgstr "Cannot update \"%1$s\" for action \"%2$s\"."
 
 #: api/classes/CHostGroup.php:535
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "Cannot update \"%1$s\" for host group \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
@@ -4446,7 +4446,7 @@ msgstr "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from anoth
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Discovery rule \"%1$s\" already exists on \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:668
 #, c-format
@@ -4798,11 +4798,11 @@ msgstr "Empty response received from Zabbix server \"%1$s\"."
 
 #: api/classes/CScreen.php:541
 msgid "Empty screen ID for screen."
-msgstr ""
+msgstr "Empty screen ID for screen."
 
 #: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
-msgstr ""
+msgstr "Empty screen ID for template screen."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -4943,7 +4943,7 @@ msgstr "English (en_GB)"
 
 #: include/locales.inc.php:56
 msgid "English (en_US)"
-msgstr "English (US)"
+msgstr "English (en_US)"
 
 #: include/actions.inc.php:834 include/actions.inc.php:910
 #: include/classes/screens/CScreenActions.php:130 include/items.inc.php:35
@@ -5057,7 +5057,7 @@ msgstr "Execute SQL error [%1$s] in [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Execute WMI query and return the first selected object."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
@@ -5232,7 +5232,7 @@ msgstr "Field \"%1$s\" is mandatory."
 #: include/validate.inc.php:314
 #, c-format
 msgid "Field \"%1$s\" is not IP range."
-msgstr "Field \"%1$s\" is not an IP range."
+msgstr "Field \"%1$s\" is not IP range."
 
 #: include/validate.inc.php:308
 #, c-format
@@ -5242,17 +5242,17 @@ msgstr "Field \"%1$s\" is not IP."
 #: include/validate.inc.php:320
 #, c-format
 msgid "Field \"%1$s\" is not integer list or range."
-msgstr "Field \"%1$s\" is not an integer list or range."
+msgstr "Field \"%1$s\" is not integer list or range."
 
 #: include/validate.inc.php:326
 #, c-format
 msgid "Field \"%1$s\" is not integer."
-msgstr "Field \"%1$s\" is not an integer."
+msgstr "Field \"%1$s\" is not integer."
 
 #: include/validate.inc.php:384
 #, c-format
 msgid "Field \"%1$s\" is not string."
-msgstr "Field \"%1$s\" is not a string."
+msgstr "Field \"%1$s\" is not string."
 
 #: include/validate.inc.php:463
 #, c-format
@@ -5288,7 +5288,7 @@ msgstr "File provided to a view does not exist. Tried to find \"%s\"."
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:543
 msgid "File time information. Number of seconds.The mode is optional. If mode is missing modify is used."
-msgstr "File time information. Number of seconds. The mode is optional. If mode is missing modify is used."
+msgstr "File time information. Number of seconds.The mode is optional. If mode is missing modify is used."
 
 #: include/graphs.inc.php:67
 msgid "Filled region"
@@ -5430,7 +5430,7 @@ msgstr "Function"
 #: popup_trexpr.php:699
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -5642,12 +5642,12 @@ msgstr "Graph prototype"
 #: api/classes/CGraphPrototype.php:799
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 
 #: api/classes/CGraphPrototype.php:805
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Graph prototype \"%1$s\" must have at least one item prototype."
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -6340,7 +6340,7 @@ msgstr "Host updated"
 #: api/classes/CTemplate.php:908
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Host with the same name \"%1$s\" already exists."
 
 #: api/classes/CHost.php:822
 #, c-format
@@ -6350,7 +6350,7 @@ msgstr "Host with the same name \"%s\" already exists."
 #: api/classes/CTemplate.php:526 api/classes/CTemplate.php:875
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Host with the same visible name \"%1$s\" already exists."
 
 #: api/classes/CHost.php:828
 #, c-format
@@ -7017,7 +7017,7 @@ msgstr "Incorrect characters used for Node name."
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
-msgstr ""
+msgstr "Incorrect characters used for Template name \"%1$s\""
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
@@ -7037,7 +7037,7 @@ msgstr "Incorrect characters used for proxy name \"%1$s\"."
 #: api/classes/CTemplate.php:916
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr ""
+msgstr "Incorrect characters used for template name \"%1$s\"."
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
@@ -7266,7 +7266,7 @@ msgstr "Incorrect parameter is used for icon map \"%s\"."
 #: api/classes/CAction.php:650
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
-msgstr ""
+msgstr "Incorrect parameters for action update method \"%1$s\"."
 
 #: api/classes/CAction.php:804
 msgid "Incorrect parameters for condition."
@@ -7328,7 +7328,7 @@ msgstr "Incorrect screen ID \"%1$s\" provided for screen element."
 
 #: api/classes/CScreen.php:542
 msgid "Incorrect screen ID."
-msgstr ""
+msgstr "Incorrect screen ID."
 
 #: include/screens.inc.php:171 include/screens.inc.php:229
 msgid "Incorrect screen provided for slide show."
@@ -7371,7 +7371,7 @@ msgstr "Incorrect status."
 
 #: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
-msgstr ""
+msgstr "Incorrect template screen ID."
 
 #: api/classes/CUser.php:362
 #, c-format
@@ -7650,22 +7650,22 @@ msgstr "Invalid hostid for macro \"%1$s\"."
 #: api/classes/CDiscoveryRule.php:42
 #, c-format
 msgid "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Invalid key \"%1$s\" for discovery rule \"%2$s\" on \"%3$s\": %4$s."
 
 #: api/classes/CItem.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Invalid key \"%1$s\" for item \"%2$s\" on \"%3$s\": %4$s."
 
 #: api/classes/CItemPrototype.php:39
 #, c-format
 msgid "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
-msgstr ""
+msgstr "Invalid key \"%1$s\" for item prototype \"%2$s\" on \"%3$s\": %4$s."
 
 #: api/classes/CDRule.php:311 discoveryconf.php:101
 #, c-format
 msgid "Invalid key \"%1$s\": %2$s."
-msgstr ""
+msgstr "Invalid key \"%1$s\": %2$s."
 
 #: maintenance.php:306
 msgid "Invalid maintenance period"
@@ -7724,7 +7724,7 @@ msgstr "Inventory"
 #: api/classes/CHost.php:1292
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
-msgstr ""
+msgstr "Inventory disabled for host \"%1$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
@@ -7843,7 +7843,7 @@ msgstr "Item in \"not supported\" state"
 
 #: popup_trexpr.php:773
 msgid "Item not selected"
-msgstr ""
+msgstr "Item not selected"
 
 #: include/forms.inc.php:1153
 msgid "Item prototype"
@@ -7857,7 +7857,7 @@ msgstr "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from anoth
 #: api/classes/CItemPrototype.php:38
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr ""
+msgstr "Item prototype \"%1$s\" already exists on \"%2$s\"."
 
 #: disc_prototypes.php:305
 msgid "Item prototype added"
@@ -8117,7 +8117,7 @@ msgstr "LDAP authentication"
 
 #: authentication.php:140
 msgid "LDAP authentication changed"
-msgstr ""
+msgstr "LDAP authentication changed"
 
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
@@ -8471,11 +8471,11 @@ msgstr "Login failed \"%s\"."
 #: api/classes/CUser.php:1104
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
-msgstr ""
+msgstr "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 
 #: authentication.php:119
 msgid "Login name or password is incorrect!"
-msgstr ""
+msgstr "Login name or password is incorrect!"
 
 #: api/classes/CUser.php:984 api/classes/CUser.php:1003
 #: api/classes/CUser.php:1052
@@ -9464,12 +9464,12 @@ msgstr "No \"%1$s\" given for host prototype."
 #: api/classes/CScreen.php:540
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "No \"%1$s\" given for screen."
 
 #: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "No \"%1$s\" given for template screen."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -9703,7 +9703,7 @@ msgstr "No groups for template"
 #: api/classes/CTemplate.php:460
 #, c-format
 msgid "No groups for template \"%1$s\"."
-msgstr ""
+msgstr "No groups for template \"%1$s\"."
 
 #: api/classes/CHost.php:1461
 msgid "No host ID given."
@@ -11056,7 +11056,7 @@ msgstr "Password (once again)"
 #: users.php:163
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr ""
+msgstr "Password is unavailable for users with %1$s."
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
@@ -12201,7 +12201,7 @@ msgstr "Screen \"%1$s\" added."
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Screen \"%1$s\" already exists on template \"%2$s\"."
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format
@@ -12817,7 +12817,7 @@ msgstr "Slide show"
 #: include/screens.inc.php:243
 #, c-format
 msgid "Slide show \"%1$s\" already exists."
-msgstr ""
+msgstr "Slide show \"%1$s\" already exists."
 
 #: include/screens.inc.php:181
 #, c-format
@@ -13335,7 +13335,7 @@ msgstr "Template with item key \"%1$s\" already linked to host."
 #: api/classes/CTemplate.php:900
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
-msgstr ""
+msgstr "Template with the same name \"%1$s\" already exists."
 
 #: api/classes/CHost.php:838
 #, c-format
@@ -13345,7 +13345,7 @@ msgstr "Template with the same name \"%s\" already exists."
 #: api/classes/CTemplate.php:519 api/classes/CTemplate.php:867
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
-msgstr ""
+msgstr "Template with the same visible name \"%1$s\" already exists."
 
 #: api/classes/CHost.php:844
 #, c-format
@@ -13826,12 +13826,12 @@ msgstr "Trigger prototype"
 #: api/classes/CTriggerPrototype.php:927
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 
 #: api/classes/CTriggerPrototype.php:933
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
-msgstr ""
+msgstr "Trigger prototype \"%1$s\" must contain at least one item prototype."
 
 #: trigger_prototypes.php:184
 msgid "Trigger prototype added"
@@ -14143,7 +14143,7 @@ msgstr "Unacknowledged only"
 #: include/views/administration.users.edit.php:107
 #, c-format
 msgid "Unavailable for users with %1$s."
-msgstr ""
+msgstr "Unavailable for users with %1$s."
 
 #: include/views/administration.users.list.php:135
 msgid "Unblock selected"
@@ -14193,7 +14193,7 @@ msgstr "Unknown action"
 
 #: httpdetails.php:163 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
-msgstr ""
+msgstr "Unknown error"
 
 #: include/classes/validators/CTriggerFunctionValidator.php:249
 msgid "Unknown function."
@@ -14218,7 +14218,7 @@ msgstr "Unknown resource"
 #: httpmon.php:157
 #, c-format
 msgid "Unknown step failed: %1$s"
-msgstr ""
+msgstr "Unknown step failed: %1$s"
 
 #: include/items.inc.php:931
 msgid "Unknown value type"
@@ -14511,12 +14511,12 @@ msgstr "User group"
 #: api/classes/CUserGroup.php:685
 #, c-format
 msgid "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
-msgstr ""
+msgstr "User group \"%1$s\" is the only group that user \"%2$s\" belongs to."
 
 #: api/classes/CUserGroup.php:668
 #, c-format
 msgid "User group \"%1$s\" is used in configuration for database down messages."
-msgstr ""
+msgstr "User group \"%1$s\" is used in configuration for database down messages."
 
 #: api/classes/CUserGroup.php:657
 #, c-format
@@ -14693,7 +14693,7 @@ msgstr "VMware hypervisor network output statistics, <url> - VMware service URL,
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14789,7 +14789,7 @@ msgstr "VMware virtual machine network interface output statistics, <url> - VMwa
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14866,22 +14866,22 @@ msgstr "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed
 #: include/validate.inc.php:372
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
-msgstr ""
+msgstr "Value \"%2$s\" of \"%1$s\" has incorrect decimal format."
 
 #: include/validate.inc.php:343 include/validate.inc.php:359
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Value \"%2$s\" of \"%1$s\" has too many digits after the decimal point: it cannot have more than %3$s digits."
 
 #: include/validate.inc.php:339
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
-msgstr ""
+msgstr "Value \"%2$s\" of \"%1$s\" has too many digits before the decimal point: it cannot have more than %3$s digits."
 
 #: include/validate.inc.php:335
 #, c-format
 msgid "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
-msgstr ""
+msgstr "Value \"%2$s\" of \"%1$s\" is too long: it cannot have more than %3$s digits before the decimal point and more than %4$s digits after the decimal point."
 
 #: include/classes/items/CHelpItems.php:899
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
@@ -14986,7 +14986,7 @@ msgstr "Vertical align"
 
 #: include/locales.inc.php:84
 msgid "Vietnamese (vi_VN)"
-msgstr ""
+msgstr "Vietnamese (vi_VN)"
 
 #: include/classes/class.cview.php:129
 msgid "View is not rendered."
@@ -15085,11 +15085,11 @@ msgstr "Web scenario step \"%1$s\" already exists."
 
 #: api/classes/CHttpTest.php:623
 msgid "Web scenario step URL cannot be empty."
-msgstr ""
+msgstr "Web scenario step URL cannot be empty."
 
 #: api/classes/CHttpTest.php:618
 msgid "Web scenario step name cannot be empty."
-msgstr ""
+msgstr "Web scenario step name cannot be empty."
 
 #: api/classes/CHttpTest.php:600
 msgid "Web scenario step name should contain only printable characters."
@@ -15819,7 +15819,7 @@ msgstr "in"
 #: api/classes/CItemKey.php:76
 #, c-format
 msgid "incorrect syntax near \"%1$s\""
-msgstr ""
+msgstr "incorrect syntax near \"%1$s\""
 
 #: include/events.inc.php:37
 msgctxt "event source"
@@ -15836,7 +15836,7 @@ msgstr "item"
 
 #: api/classes/CItemKey.php:62
 msgid "key is empty"
-msgstr ""
+msgstr "key is empty"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1829
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
@@ -15921,7 +15921,7 @@ msgstr "new"
 #: include/views/configuration.item.massupdate.php:508
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "new"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1924
 #: include/classes/graphdraw/CPieGraphDraw.php:343
@@ -16009,7 +16009,7 @@ msgstr "other"
 #: include/page_header.php:125 include/views/general.warning.php:22
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "refreshed every %1$s sec."
 
 #: include/views/administration.general.gui.edit.php:35
 msgid "remember selected"
@@ -16079,7 +16079,7 @@ msgstr "type here to search"
 
 #: api/classes/CItemKey.php:62
 msgid "unexpected end of key"
-msgstr ""
+msgstr "unexpected end of key"
 
 #: include/classes/class.frontendsetup.php:199
 #: include/classes/class.frontendsetup.php:337
