@@ -607,6 +607,9 @@ class CGraphPrototype extends CGraphGeneral {
 
 		foreach ($delGraphs as $graph) {
 			info(_s('Graph prototype "%s" deleted.', $graph['name']));
+			add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, $graph['graphid'], $graph['name'],
+				_s('Graph prototype "%s" deleted.', $graph['name'])
+			);
 		}
 
 		return array('graphids' => $delGraphPrototypeIds);
