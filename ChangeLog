@@ -13,6 +13,7 @@ Changes for 3.0.1rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-10291] fixed server crash in escalator process if escalation is in progress and action is deleted (Andris)
 ..F....... [ZBX-10427] fixed "Undefined variable" errors in "Host status" widget (Sasha)
 
 --------------------------------------------------------------------------------
