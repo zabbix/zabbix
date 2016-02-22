@@ -57,13 +57,13 @@ function getLocales() {
 		'cs_CZ' => array('name' => _('Czech (cs_CZ)'),		'display' => true),
 		'nl_NL' => array('name' => _('Dutch (nl_NL)'),		'display' => false),
 		'fi_FI' => array('name' => _('Finnish (fi_FI)'),	'display' => false),
-		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => false),
+		'fr_FR' => array('name' => _('French (fr_FR)'),		'display' => true),
 		'de_DE' => array('name' => _('German (de_DE)'),		'display' => false),
 		'el_GR' => array('name' => _('Greek (el_GR)'),		'display' => false),
 		'hu_HU' => array('name' => _('Hungarian (hu_HU)'),	'display' => false),
 		'id_ID' => array('name' => _('Indonesian (id_ID)'),	'display' => false),
 		'it_IT' => array('name' => _('Italian (it_IT)'),	'display' => true),
-		'ko_KR' => array('name' => _('Korean (ko_KR)'),		'display' => false),
+		'ko_KR' => array('name' => _('Korean (ko_KR)'),		'display' => true),
 		'ja_JP' => array('name' => _('Japanese (ja_JP)'),	'display' => true),
 		'lv_LV' => array('name' => _('Latvian (lv_LV)'),	'display' => false),
 		'lt_LT' => array('name' => _('Lithuanian (lt_LT)'),	'display' => false),
@@ -71,14 +71,14 @@ function getLocales() {
 		'pl_PL' => array('name' => _('Polish (pl_PL)'),		'display' => true),
 		'pt_BR' => array('name' => _('Portuguese (pt_BR)'),	'display' => true),
 		'pt_PT' => array('name' => _('Portuguese (pt_PT)'),	'display' => false),
-		'ro_RO' => array('name' => _('Romanian (ro_RO)'),	'display' => false),
+		'ro_RO' => array('name' => _('Romanian (ro_RO)'),	'display' => true),
 		'ru_RU' => array('name' => _('Russian (ru_RU)'),	'display' => true),
 		'sk_SK' => array('name' => _('Slovak (sk_SK)'),		'display' => true),
 		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
 		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
 		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
-		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => false),
-		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => false)
+		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true),
+		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => true)
 	);
 }
 
