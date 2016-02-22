@@ -66,7 +66,7 @@ function getLocales() {
 		'hu_HU' => array('name' => _('Hungarian (hu_HU)'),	'display' => false),
 		'id_ID' => array('name' => _('Indonesian (id_ID)'),	'display' => false),
 		'it_IT' => array('name' => _('Italian (it_IT)'),	'display' => true),
-		'ko_KR' => array('name' => _('Korean (ko_KR)'),		'display' => false),
+		'ko_KR' => array('name' => _('Korean (ko_KR)'),		'display' => true),
 		'ja_JP' => array('name' => _('Japanese (ja_JP)'),	'display' => true),
 		'lv_LV' => array('name' => _('Latvian (lv_LV)'),	'display' => false),
 		'lt_LT' => array('name' => _('Lithuanian (lt_LT)'),	'display' => false),
@@ -80,7 +80,7 @@ function getLocales() {
 		'es_ES' => array('name' => _('Spanish (es_ES)'),	'display' => false),
 		'sv_SE' => array('name' => _('Swedish (sv_SE)'),	'display' => false),
 		'tr_TR' => array('name' => _('Turkish (tr_TR)'),	'display' => false),
-		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => false),
+		'uk_UA' => array('name' => _('Ukrainian (uk_UA)'),	'display' => true),
 		'vi_VN' => array('name' => _('Vietnamese (vi_VN)'),	'display' => false)
 	);
 }
