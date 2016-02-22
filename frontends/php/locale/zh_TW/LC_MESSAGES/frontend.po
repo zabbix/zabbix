@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 19:16+0200\n"
-"PO-Revision-Date: 2014-09-02 10:34+0300\n"
+"POT-Creation-Date: 2016-02-22 19:20+0200\n"
+"PO-Revision-Date: 2014-10-27 07:32+0300\n"
 "Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1409646850.0\n"
+"X-POOTLE-MTIME: 1414387967.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -599,7 +599,7 @@ msgstr "容許的主機"
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:555
 msgid "Amount of memory size in bytes. If mode is missing total is used."
-msgstr ""
+msgstr "記憶體大小，單位為Bytes。若未指定模式，則顯示全部記憶體。"
 
 #: tr_status.php:281 tr_status.php:287
 msgid "Any"
@@ -716,29 +716,29 @@ msgstr "區域標籤"
 #: include/maintenances.inc.php:56
 #, c-format
 msgid "At %1$s:%2$s on %3$s"
-msgstr ""
+msgstr "於 %3$s 的 %1$s:%2$s"
 
 #: include/maintenances.inc.php:125
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "於每 %5$s 的 %3$s %4$s 之 %1$s:%2$s"
 
 #: include/maintenances.inc.php:134
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "於每 %4$s 的第 %3$s 天 之 %1$s:%2$s"
 
 #: include/maintenances.inc.php:83
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] ""
+msgstr[0] "於每週的每 %3$s 之  %1$s:%2$s"
 
 #: include/maintenances.inc.php:63
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] ""
+msgstr[0] "於每天的 %1$s:%2$s"
 
 #: include/forms.inc.php:1792
 msgid "At (hour:minute)"
@@ -755,7 +755,7 @@ msgstr "必須創建至少一個維修期間."
 
 #: include/classes/class.frontendsetup.php:225
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
-msgstr ""
+msgstr "至少需支援 MySQL, PostgreSQL, Oracle, SQLite3 或 IBM DB2 的其中之一"
 
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
@@ -820,14 +820,14 @@ msgstr "認證方式改為系統內部"
 #: include/views/configuration.item.massupdate.php:159
 #: include/views/js/configuration.discovery.edit.js.php:83
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "驗證密碼"
 
 #: include/views/configuration.item.edit.php:148
 #: include/views/configuration.item.massupdate.php:149
 #: include/views/js/configuration.discovery.edit.js.php:71
 #: include/views/js/configuration.discovery.edit.js.php:88
 msgid "Authentication protocol"
-msgstr ""
+msgstr "驗證之通訊協定"
 
 #: include/views/configuration.action.list.php:35
 msgid "Auto registration"
@@ -953,7 +953,7 @@ msgstr "最新(近)數據 T 之 位元運算 AND 及遮罩為 N"
 
 #: popup_trexpr.php:526
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr ""
+msgstr "最新(近)數據 T 之 位元運算 AND 且遮罩不為 N"
 
 #: include/classes/core/ZBase.php:235
 msgid "Black & Blue"
@@ -989,7 +989,7 @@ msgstr "轉亮"
 
 #: include/locales.inc.php:57
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "保加利亞語 (bg_BG)"
 
 #: tr_status.php:854
 msgid "Bulk acknowledge"
@@ -1045,7 +1045,7 @@ msgstr "主機群組的組態"
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr ""
+msgstr "原型主機之組態"
 
 #: hosts.php:653 hosts.php:718 hosts.php:767
 msgid "CONFIGURATION OF HOSTS"
@@ -1053,7 +1053,7 @@ msgstr "主機的組態"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr ""
+msgstr "主機之組態"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1152,12 +1152,12 @@ msgstr "觸發器的組態"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr ""
+msgstr "用戶群組的組態"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr ""
+msgstr "用戶的組態"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1179,22 +1179,22 @@ msgstr "Zabbix的組態"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:447
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr ""
+msgstr "CPU資訊 - 預設會列出所有CPU的完整資訊"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:423
 msgid "CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage."
-msgstr ""
+msgstr "CPU負載 / 處理器負載。CPU及模式為選填項目。若未設定CPU，則全數套用。若未設定模式，將套用avg1。註：此值非百分比。"
 
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr ""
+msgstr "CPU使用率 / 處理器使用率。cpu、型別、模式為選填項目。若未設定cpu則全數套用。若未設定type則套用user，若未設定模式，則採用 avg1。"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
 msgid "Calculate MD5 check sum of a given file. String MD5 hash of the file. Can be used for files less than 64MB, unsupported otherwise. Example: vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
-msgstr ""
+msgstr "計算指定檔案之MD5雜湊值。該檔內文之MD5雜湊值。僅適用於小於64MB之檔案，其餘不支援。例如：vfs.file.md5sum[/usr/local/etc/zabbix_agentd.conf]"
 
 #: include/views/configuration.services.edit.php:66 services.php:44
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1203,12 +1203,12 @@ msgstr "計算SLA, 可接受的SAL(%計)"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:515
 msgid "Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum. Example: vfs.file.cksum[/etc/passwd]"
-msgstr ""
+msgstr "計算指定檔案之Check Sum 檢驗值。以UNIX內建工具 cksum之運算標準來計算該檔案之Check Sum 檢驗值。例如：vfs.file.cksum[/etc/passwd]"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:551
 msgid "Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free]."
-msgstr ""
+msgstr "計算指定分區之硬碟空間，單位為KB。若未指定模式，則全數使用。若為掛載分區，則回傳本機檔案系統的未使用空間。例如：vfs.fs.size[/tmp,free]"
 
 #: include/items.inc.php:97 include/views/configuration.graph.edit.php:96
 #: include/views/configuration.graph.edit.php:154
@@ -1259,17 +1259,17 @@ msgstr "無法知悉事件"
 #: api/classes/CGraph.php:761
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "無法於圖表「%2$s」加入非數值項目「%1$s」"
 
 #: api/classes/CGraphPrototype.php:707 api/classes/CGraphPrototype.php:769
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "無法於原型圖表「%2$s」加入非數值項目「%1$s」"
 
 #: include/reports.inc.php:512
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\"."
-msgstr ""
+msgstr "無法加入非數值項目「%1$s」"
 
 #: actionconf.php:158
 msgid "Cannot add action"
@@ -1277,7 +1277,7 @@ msgstr "無法新增操作"
 
 #: actionconf.php:233
 msgid "Cannot add action condition"
-msgstr ""
+msgstr "無法新增操作條件"
 
 #: applications.php:108
 msgid "Cannot add application"
@@ -1302,7 +1302,7 @@ msgstr "無法新增圖表"
 
 #: graphs.php:230
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "無法新增原型圖表"
 
 #: hostgroups.php:212 usergrps.php:186
 msgid "Cannot add group"
@@ -1314,7 +1314,7 @@ msgstr "無法新增主機"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "無法新增原型主機"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1335,11 +1335,11 @@ msgstr ""
 
 #: disc_prototypes.php:305
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "無法新增原型項目"
 
 #: api/classes/CApplication.php:600
 msgid "Cannot add items."
-msgstr ""
+msgstr "無法新增項目"
 
 #: adm.macros.php:120
 msgid "Cannot add macro."
@@ -1361,7 +1361,7 @@ msgstr "無法新增超過一個 \"圖形總計\"類型的項目於圖形 \"%1$s
 #: api/classes/CGraphPrototype.php:43
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "無法於「%1$s」新增一個以上的「圖表加總」類之項目"
 
 #: sysmaps.php:171
 msgid "Cannot add network map"
@@ -1370,7 +1370,7 @@ msgstr "無法新增網路拓墣圖"
 #: httpconf.php:193
 #, c-format
 msgid "Cannot add new application \"%1$s\"."
-msgstr ""
+msgstr "無法新增應用集「%1$s」"
 
 #: nodes.php:84
 msgid "Cannot add node"
@@ -1410,7 +1410,7 @@ msgstr "無法新增觸發器"
 
 #: trigger_prototypes.php:184
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "無法新增原型觸發器"
 
 #: users.php:248
 msgid "Cannot add user"
@@ -1430,11 +1430,11 @@ msgstr "無法新增值對應"
 
 #: httpconf.php:146
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "無法新增網頁情境"
 
 #: authentication.php:152
 msgid "Cannot change authentication"
-msgstr ""
+msgstr "無法變更身份驗證"
 
 #: authentication.php:193
 msgid "Cannot change authentication method to HTTP"
@@ -1458,7 +1458,7 @@ msgstr "無法克隆圖形原型"
 
 #: api/classes/CDiscoveryRule.php:1001
 msgid "Cannot clone host prototypes."
-msgstr ""
+msgstr "無法複製原型主機"
 
 #: api/classes/CDiscoveryRule.php:837
 msgid "Cannot clone item prototypes."
@@ -1488,7 +1488,7 @@ msgstr "無法複製觸發器 \"%1$s:%2$s\", 因為在其表示式中有多重�
 #: api/classes/CHostPrototype.php:151
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "無法於偵測到的主機「%1$s」創建主機原型"
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1522,7 +1522,7 @@ msgstr "無法創建拓墣圖 \"%s\"."
 
 #: httpconf.php:150
 msgid "Cannot create new application, web scenario is already assigned to application."
-msgstr ""
+msgstr "無法建立新的應用集，網頁情境已指定其應用集"
 
 #: include/js.inc.php:265
 msgid "Cannot create new element"
@@ -1568,7 +1568,7 @@ msgstr "無法刪除圖形原型"
 
 #: graphs.php:293
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "無法刪除原型圖表"
 
 #: api/classes/CItem.php:729
 msgid "Cannot delete graph."
@@ -1592,11 +1592,11 @@ msgstr "無法刪除主機"
 
 #: api/classes/CDiscoveryRule.php:413
 msgid "Cannot delete host prototype."
-msgstr ""
+msgstr "無法刪除原型主機"
 
 #: host_prototypes.php:119 host_prototypes.php:244
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "無法刪除原型主機"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1616,7 +1616,7 @@ msgstr "無法刪除項目"
 
 #: disc_prototypes.php:206
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "無法刪除原型項目"
 
 #: disc_prototypes.php:340
 msgid "Cannot delete item prototypes"
@@ -1780,27 +1780,27 @@ msgstr[0] ""
 #: host_discovery.php:286
 msgid "Cannot disable discovery rules"
 msgid_plural "Cannot disable discovery rules"
-msgstr[0] ""
+msgstr[0] "無法停用偵測規則"
 
 #: hostgroups.php:289 hosts.php:629 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] ""
+msgstr[0] "無法停用主機"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] ""
+msgstr[0] "無法停用原型主機"
 
 #: applications.php:213 items.php:682
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
-msgstr[0] ""
+msgstr[0] "無法停用項目"
 
 #: disc_prototypes.php:329
 msgid "Cannot disable item prototype"
 msgid_plural "Cannot disable item prototypes"
-msgstr[0] ""
+msgstr[0] "無法停用原型項目"
 
 #: media_types.php:166
 #, fuzzy
@@ -1811,22 +1811,22 @@ msgstr[0] "無法關閉示警媒介"
 #: triggers.php:288
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
-msgstr[0] ""
+msgstr[0] "無法停用觸發器"
 
 #: trigger_prototypes.php:264
 msgid "Cannot disable trigger prototype"
 msgid_plural "Cannot disable trigger prototypes"
-msgstr[0] ""
+msgstr[0] "無法停用原型觸發器"
 
 #: usergrps.php:348
 msgid "Cannot disable user group"
 msgid_plural "Cannot disable user groups"
-msgstr[0] ""
+msgstr[0] "無法停用用戶群組"
 
 #: httpconf.php:299
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
-msgstr[0] ""
+msgstr[0] "無法停用網頁情境"
 
 #: queue.php:61
 msgid "Cannot display item queue."
@@ -1880,22 +1880,22 @@ msgstr[0] "無法刪除示警媒介"
 #: triggers.php:287
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
-msgstr[0] ""
+msgstr[0] "無法啟用觸發器"
 
 #: trigger_prototypes.php:263
 msgid "Cannot enable trigger prototype"
 msgid_plural "Cannot enable trigger prototypes"
-msgstr[0] ""
+msgstr[0] "無法啟用原型觸發器"
 
 #: usergrps.php:347
 msgid "Cannot enable user group"
 msgid_plural "Cannot enable user groups"
-msgstr[0] ""
+msgstr[0] "無法啟用用戶群組"
 
 #: httpconf.php:298
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
-msgstr[0] ""
+msgstr[0] "無法啟用網頁情境"
 
 #: include/classes/import/CXmlImport18.php:676
 #: include/classes/import/importers/CMapImporter.php:188

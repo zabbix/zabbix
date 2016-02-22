@@ -12260,7 +12260,7 @@ msgstr "Obrazovka \"%1$s\" přidána."
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Obrazovka \"%1$s\" už existuje v šabloně \"%2$s\"."
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format

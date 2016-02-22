@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-22 19:16+0200\n"
-"PO-Revision-Date: 2015-08-06 03:07+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2016-02-09 14:12+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1438823224.0\n"
+"X-POOTLE-MTIME: 1455019923.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -2584,7 +2584,7 @@ msgstr "すでに存在します。"
 #: include/classes/parsers/CTriggerExpression.php:290
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
-msgstr "条件式の%1$s\"から始まる部分を確認してください。"
+msgstr "条件式の\"%1$s\"から始まる部分を確認してください。"
 
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:523
@@ -12144,7 +12144,7 @@ msgstr "スクリーン\"%1$s\"を追加しました。"
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "スクリーン\"%1$s\"はテンプレート\"%2$s\"にすでに存在します。"
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format
@@ -13544,11 +13544,11 @@ msgstr "タイムスタンプ"
 
 #: popup_trexpr.php:413
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (=条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がない場合 N = 1、その他の場合 N =0 (=条件)"
 
 #: popup_trexpr.php:418
 msgid "Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise"
-msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がある場合 N = 1、その他の場合 N =0 (#条件)"
+msgstr "タイムスタンプがZabbixサーバーの時刻とT秒以上の差がない場合 N = 1、その他の場合 N =0 (#条件)"
 
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:415

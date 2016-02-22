@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-22 19:16+0200\n"
-"PO-Revision-Date: 2015-10-20 20:48+0300\n"
+"PO-Revision-Date: 2015-11-26 18:04+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1445366923.0\n"
+"X-POOTLE-MTIME: 1448553857.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -12262,7 +12262,7 @@ msgstr "Комплексный экран \"%1$s\" добавлен."
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr ""
+msgstr "Комплексный экран \"%1$s\" уже существует у шаблона \"%2$s\"."
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format
@@ -12998,7 +12998,7 @@ msgstr "Скорость"
 
 #: include/graphs.inc.php:25 popup.php:1500
 msgid "Stacked"
-msgstr "Стэкируемый"
+msgstr "Стекируемый"
 
 #: popup.php:80
 msgid "Standard items"
