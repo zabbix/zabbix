@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:13+0200\n"
+"POT-Creation-Date: 2016-02-22 18:01+0200\n"
 "PO-Revision-Date: 2014-09-13 22:34+0300\n"
 "Last-Translator: lucho <luislopez72@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -4085,7 +4085,7 @@ msgstr "Entrada vacía."
 msgid "Empty macro."
 msgstr "Macro vacía."
 
-#: api/classes/CService.php:1108
+#: api/classes/CService.php:1110
 msgid "Empty name."
 msgstr "Nombre vacío."
 
@@ -5795,7 +5795,7 @@ msgstr "En progreso"
 msgid "Include"
 msgstr "Incluir"
 
-#: api/classes/CService.php:1330
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "valor de campo \"programa\" incluido incorrecto para dependencia de servicio \"%1$s\"."
@@ -5826,7 +5826,7 @@ msgstr "SNMP OID incorrecto."
 msgid "Incorrect SNMP community."
 msgstr "Incorrecta comunidad de SNMP "
 
-#: api/classes/CService.php:1160
+#: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "SLA aceptable incorrecto para el servicio \"%1$s\"."
@@ -5940,7 +5940,7 @@ msgstr ""
 msgid "Incorrect action operationid."
 msgstr "Acción de operationid incorrecta."
 
-#: api/classes/CService.php:1123
+#: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Algoritmo para servicio \"%1$s\" incorrecto"
@@ -5959,7 +5959,7 @@ msgstr "Los argumentos enviados enviados para la función, son incorrectos."
 msgid "Incorrect arguments passed to method."
 msgstr "Argumentos enviados al método incorrectos"
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Valores de calculo de SLA incorrectos para el servicio \"%1$s\"."
@@ -6206,12 +6206,12 @@ msgstr "Parámetros para mantenimiento incorrectos."
 msgid "Incorrect parameters for user group."
 msgstr "Parámetros para grupo de usuarios incorrectos."
 
-#: api/classes/CService.php:1208
+#: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Incorrecto padre de servicio \"%1$s\"."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1213
 msgid "Incorrect parent service."
 msgstr "Servicio padre incorrecto"
 
@@ -6253,12 +6253,12 @@ msgstr ""
 msgid "Incorrect service time type."
 msgstr ""
 
-#: api/classes/CService.php:1177
+#: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1231
+#: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr ""
@@ -6283,7 +6283,7 @@ msgstr "Hora de inicio en periodo de tiempo \"%1$s\" debe de ser menor o igual q
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Incorrecto periodo de tiempo \"%1$s\""
 
-#: api/classes/CService.php:1192
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Incorrecto ID de filtro para servicio\"%1$s\""
@@ -6492,7 +6492,7 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1471 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
@@ -8473,8 +8473,8 @@ msgstr ""
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
@@ -10554,7 +10554,8 @@ msgid "Screen \"%1$s\" added."
 msgstr ""
 
 #: api/classes/CTemplateScreen.php:818
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
+#, php-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
@@ -10882,27 +10883,27 @@ msgstr "Hora del sevidor"
 msgid "Service"
 msgstr "Servicio"
 
-#: api/classes/CService.php:1298
+#: api/classes/CService.php:1300
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr ""
 
-#: api/classes/CService.php:1319
+#: api/classes/CService.php:1321
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr ""
 
-#: api/classes/CService.php:1398
+#: api/classes/CService.php:1400
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr ""
 
-#: api/classes/CService.php:1373
+#: api/classes/CService.php:1375
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr ""
 
-#: api/classes/CService.php:1216
+#: api/classes/CService.php:1218
 msgid "Service cannot be parent and child at the same time."
 msgstr ""
 
@@ -10938,7 +10939,7 @@ msgstr "Servicio actualizado"
 msgid "Services"
 msgstr "Servicios"
 
-#: api/classes/CService.php:1449
+#: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
 msgstr ""
 

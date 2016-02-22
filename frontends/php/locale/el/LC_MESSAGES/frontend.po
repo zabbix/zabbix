@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:13+0200\n"
+"POT-Creation-Date: 2016-02-22 18:01+0200\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -4077,7 +4077,7 @@ msgstr "Κενή εισαγωγή."
 msgid "Empty macro."
 msgstr "Κενή μακροεντολή."
 
-#: api/classes/CService.php:1108
+#: api/classes/CService.php:1110
 msgid "Empty name."
 msgstr "Κενό όνομα."
 
@@ -5787,7 +5787,7 @@ msgstr "Σε εξέλιξη"
 msgid "Include"
 msgstr "Συμπεριλαμβάνω"
 
-#: api/classes/CService.php:1330
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Λανθασμένη \"soft\" τιμή πεδίου για εξάρτηση με υπηρεσία \"%1$s\"."
@@ -5818,7 +5818,7 @@ msgstr "Λανθασμένο SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Λανθασμένο SNMP community."
 
-#: api/classes/CService.php:1160
+#: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Λανθασμένη αποδοχή SLA για υπηρεσία \"%1$s\"."
@@ -5931,7 +5931,7 @@ msgstr "Λανθασμένος χρήστης εργασίας ενέργεια�
 msgid "Incorrect action operationid."
 msgstr "Λανθασμένη ενέργεια operationid."
 
-#: api/classes/CService.php:1123
+#: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Λανθασμένος αλγόριθμος για υπηρεσία \"%1$s\"."
@@ -5950,7 +5950,7 @@ msgstr "Λανθασμένες μεταβλητές πέρασαν στη συν
 msgid "Incorrect arguments passed to method."
 msgstr "Λανθασμένα ορίσματα πέρασαν στη μέθοδο."
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Λανθασμένη τιμή υπολογισμού SLA για υπηρεσία \"%1$s\"."
@@ -6196,12 +6196,12 @@ msgstr "Λανθασμένες παράμετροι για συντήρηση."
 msgid "Incorrect parameters for user group."
 msgstr "Λανθασμένες παράμετροι για ομάδα χρηστών."
 
-#: api/classes/CService.php:1208
+#: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Λανθασμένος γονέας για υπηρεσία \"%1$s\"."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1213
 msgid "Incorrect parent service."
 msgstr "Λανθασμένη γονική υπηρεσία."
 
@@ -6243,12 +6243,12 @@ msgstr "Λανθασμένη ώρα έναρξης υπηρεσίας."
 msgid "Incorrect service time type."
 msgstr "Λανθασμένος τύπος χρόνου υπηρεσίας."
 
-#: api/classes/CService.php:1177
+#: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Λανθασμένη σειρά ταξινόμησης για την υπηρεσία \"%1$s\"."
 
-#: api/classes/CService.php:1231
+#: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Λανθασμένη κατάσταση για την υπηρεσία \"%1$s\"."
@@ -6273,7 +6273,7 @@ msgstr "Λανθασμένη χρονική περίοδος \"%1$s\" αρχικ
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Λανθασμένη χρονική περίοδος \"%1$s\"."
 
-#: api/classes/CService.php:1192
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Λανθασμένο αναγνωριστικό εναύσματος για την υπηρεσία \"%1$s\"."
@@ -6482,7 +6482,7 @@ msgstr "Άκυρη περίοδος συντήρησης"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1471 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Άκυρες παράμετροι μεθόδου."
@@ -8463,8 +8463,8 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
@@ -10545,8 +10545,9 @@ msgid "Screen \"%1$s\" added."
 msgstr "Οθόνη \"%1$s\" προστέθηκε."
 
 #: api/classes/CTemplateScreen.php:818
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr "Οθόνη \"%1$s\" υπάρχει ήδη στο σχεδιότυπο \"%2$2\"."
+#, php-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
+msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
@@ -10873,27 +10874,27 @@ msgstr "Ώρα εξυπηρετητή"
 msgid "Service"
 msgstr "Υπηρεσία"
 
-#: api/classes/CService.php:1298
+#: api/classes/CService.php:1300
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Η υπηρεσία \"%1$s\" δεν διαγράφεται, επειδή εξαρτάται από άλλη υπηρεσία."
 
-#: api/classes/CService.php:1319
+#: api/classes/CService.php:1321
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Η υπηρεσία \"%1$s\" δεν μπορεί να αυτοεξαρτάται."
 
-#: api/classes/CService.php:1398
+#: api/classes/CService.php:1400
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Η υπηρεσία \"%1$s\" δεν μπορεί να συνδέεται με έναυσμα και να έχει θυγατρικό την ίδια στιγμή."
 
-#: api/classes/CService.php:1373
+#: api/classes/CService.php:1375
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Η υπηρεσία \"%1$s\" είναι ήδη διασυνδεδεμένη σε διαφορετική υπηρεσία."
 
-#: api/classes/CService.php:1216
+#: api/classes/CService.php:1218
 msgid "Service cannot be parent and child at the same time."
 msgstr "Η υπηρεσία δεν μπορεί να είναι γονική και θυγατρική την ίδια στιγμή."
 
@@ -10929,7 +10930,7 @@ msgstr "Υπηρεσία ενημερώθηκε"
 msgid "Services"
 msgstr "Υπηρεσίες"
 
-#: api/classes/CService.php:1449
+#: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
 msgstr "Οι υπηρεσίες σχηματίζουν κυκλική εξάρτηση."
 

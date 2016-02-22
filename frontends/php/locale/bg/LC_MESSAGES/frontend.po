@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:13+0200\n"
+"POT-Creation-Date: 2016-02-22 18:01+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -4081,7 +4081,7 @@ msgstr "Празен вход."
 msgid "Empty macro."
 msgstr "Празно макро."
 
-#: api/classes/CService.php:1108
+#: api/classes/CService.php:1110
 msgid "Empty name."
 msgstr "Празно име."
 
@@ -5797,7 +5797,7 @@ msgstr "В процес на изпълнение"
 msgid "Include"
 msgstr "Включва"
 
-#: api/classes/CService.php:1330
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Неправилна стойност на поле \"soft\" за зависимостта на услугата \"%1$s\"."
@@ -5828,7 +5828,7 @@ msgstr "Неправилен SNMP OID."
 msgid "Incorrect SNMP community."
 msgstr "Неправилно SNMP community."
 
-#: api/classes/CService.php:1160
+#: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Неправилно допустимо SLA за услуга \"%1$s\"."
@@ -5941,7 +5941,7 @@ msgstr "Неправилно действие в операция потреби
 msgid "Incorrect action operationid."
 msgstr "Неправилно действие в id на операция. "
 
-#: api/classes/CService.php:1123
+#: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Неправилен алгоритъм за услуга \"%1$s\"."
@@ -5960,7 +5960,7 @@ msgstr "Подадени са неправилни аргументи за фу�
 msgid "Incorrect arguments passed to method."
 msgstr "Подадени са неправилни аргументи за метода."
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Неправилно изчислена стойност SLA за услуга \"%1$s\"."
@@ -6206,12 +6206,12 @@ msgstr "Неправилен параметър за поддръжка"
 msgid "Incorrect parameters for user group."
 msgstr "Неправилен параметър за потребителска група."
 
-#: api/classes/CService.php:1208
+#: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Неправилен родител за услуга \"%1$s\"."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1213
 msgid "Incorrect parent service."
 msgstr "Неправилен родител за услуга."
 
@@ -6253,12 +6253,12 @@ msgstr "Неправилно време за започване на услуг�
 msgid "Incorrect service time type."
 msgstr "Неправилен тип време за услугата."
 
-#: api/classes/CService.php:1177
+#: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Неправилно подреждане за услуга \"%1$s\"."
 
-#: api/classes/CService.php:1231
+#: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Неправилно състояние за услуга  \"%1$s\"."
@@ -6283,7 +6283,7 @@ msgstr "Неправилен времеви период \"%1$s\". Начало�
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Неправилен времеви период \"%1$s\"."
 
-#: api/classes/CService.php:1192
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Неправилно ID на тригер за услуга \"%1$s\"."
@@ -6492,7 +6492,7 @@ msgstr "Невалиден период на поддръжка"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1471 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Невалидни параметри на метода."
@@ -8476,8 +8476,8 @@ msgstr "Нямате право на достъп до системата."
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
@@ -10562,8 +10562,9 @@ msgid "Screen \"%1$s\" added."
 msgstr "Екран \"%1$s\" добавен."
 
 #: api/classes/CTemplateScreen.php:818
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr "Екран \"%1$s\" вече съществува в шаблон \"%2$2\"."
+#, php-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
+msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
@@ -10890,27 +10891,27 @@ msgstr "Време на сървъра"
 msgid "Service"
 msgstr "Услуга"
 
-#: api/classes/CService.php:1298
+#: api/classes/CService.php:1300
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Услуга \"%1$s\" не може да бъде изтрита, защото друга услуга зависи от нея."
 
-#: api/classes/CService.php:1319
+#: api/classes/CService.php:1321
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Услуга \"%1$s\" не може да бъде зависима от себе си."
 
-#: api/classes/CService.php:1398
+#: api/classes/CService.php:1400
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Услуга \"%1$s\" не може да бъде свързан към тригер и да бъде подчинена едновременно."
 
-#: api/classes/CService.php:1373
+#: api/classes/CService.php:1375
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Услуга \"%1$s\" е здраво свързана с друга услуга."
 
-#: api/classes/CService.php:1216
+#: api/classes/CService.php:1218
 msgid "Service cannot be parent and child at the same time."
 msgstr "Услугата не може да бъде родител и подчинен в същото време."
 
@@ -10946,7 +10947,7 @@ msgstr "Услуга актуализирана"
 msgid "Services"
 msgstr "Услуги"
 
-#: api/classes/CService.php:1449
+#: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
 msgstr "Услугите образуват кръгова зависимост."
 
