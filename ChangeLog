@@ -13,6 +13,7 @@ Changes for 3.0.1rc2
 New features:
 
 Bug fixes:
+..F....... [ZBX-10427] fixed "Undefined variable" errors in "Host status" widget (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.1rc1
