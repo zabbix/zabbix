@@ -33,6 +33,11 @@ $this->addJsFile('js/flickerfreescreen.js');
 			->addItem(
 				(new CList())
 					->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()])
+					->addItem($data['map']['editable']
+						? (new CButton('edit', _('Edit map')))
+							->onClick('redirect("sysmap.php?sysmapid='.$data['map']['sysmapid'].'")')
+						: null
+					)
 					->addItem(get_icon('favourite', [
 						'fav' => 'web.favorite.sysmapids',
 						'elname' => 'sysmapid',
