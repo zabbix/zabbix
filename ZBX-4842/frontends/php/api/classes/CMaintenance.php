@@ -448,6 +448,10 @@ class CMaintenance extends CZBXAPI {
 					'maintenanceid' => $maintenanceids[$mnum]
 				);
 			}
+
+			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenanceids[$mnum],
+				$maintenance['name'], null
+			);
 		}
 		DB::insert('maintenances_hosts', $insertHosts);
 		DB::insert('maintenances_groups', $insertGroups);
@@ -633,6 +637,10 @@ class CMaintenance extends CZBXAPI {
 				);
 				DB::delete('maintenances_groups', $deleteGroups);
 			}
+
+			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, $maintenance['maintenanceid'],
+				$updMaintenances[$maintenance['maintenanceid']]['name'], null
+			);
 		}
 
 		DB::insert('maintenances_hosts', $insertHosts);
@@ -657,7 +665,7 @@ class CMaintenance extends CZBXAPI {
 			$options = array(
 				'maintenanceids' => $maintenanceids,
 				'editable' => true,
-				'output' => array('maintenanceid'),
+				'output' => array('maintenanceid', 'name'),
 				'preservekeys' => true
 			);
 			$maintenances = $this->get($options);
@@ -699,6 +707,13 @@ class CMaintenance extends CZBXAPI {
 			DB::delete('maintenances_hosts', $midCond);
 			DB::delete('maintenances_groups', $midCond);
 			DB::delete('maintenances', $midCond);
+
+			foreach ($maintenances as $maintenanceid => $maintenance) {
+				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $maintenanceid, $maintenance['name'],
+					'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']'
+				);
+			}
+
 			return array('maintenanceids' => $maintenanceids);
 	}
 
