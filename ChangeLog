@@ -1,10 +1,10 @@
 Changes for 2.0.17rc1
 
 New features:
-.......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
 ....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
