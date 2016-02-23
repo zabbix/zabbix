@@ -122,7 +122,7 @@ class CScreenDiscovery extends CScreenBase {
 		$dhosts = zbx_toHash($dhosts, 'dhostid');
 
 		$header = [
-			make_sorting_header(_('Discovered device'), 'ip', $sort, $sortorder),
+			make_sorting_header(_('Discovered device'), 'ip', $sort, $sortorder, 'zabbix.php?action=discovery.view'),
 			_('Monitored host'),
 			_('Uptime').'/'._('Downtime')
 		];
