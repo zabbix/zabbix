@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:13+0200\n"
-"PO-Revision-Date: 2013-07-01 20:21+0200\n"
+"POT-Creation-Date: 2016-02-22 18:05+0200\n"
+"PO-Revision-Date: 2013-07-01 20:21+0300\n"
 "Last-Translator: Jaba <janis.jaunbalodis@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: lv\n"
@@ -11,8 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1372702893.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
@@ -4072,7 +4073,7 @@ msgstr ""
 msgid "Empty macro."
 msgstr ""
 
-#: api/classes/CService.php:1108
+#: api/classes/CService.php:1110
 msgid "Empty name."
 msgstr ""
 
@@ -5781,7 +5782,7 @@ msgstr ""
 msgid "Include"
 msgstr "Iekļaut"
 
-#: api/classes/CService.php:1330
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr ""
@@ -5812,7 +5813,7 @@ msgstr ""
 msgid "Incorrect SNMP community."
 msgstr ""
 
-#: api/classes/CService.php:1160
+#: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr ""
@@ -5925,7 +5926,7 @@ msgstr ""
 msgid "Incorrect action operationid."
 msgstr ""
 
-#: api/classes/CService.php:1123
+#: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr ""
@@ -5944,7 +5945,7 @@ msgstr ""
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr ""
@@ -6190,12 +6191,12 @@ msgstr ""
 msgid "Incorrect parameters for user group."
 msgstr ""
 
-#: api/classes/CService.php:1208
+#: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1213
 msgid "Incorrect parent service."
 msgstr ""
 
@@ -6237,12 +6238,12 @@ msgstr ""
 msgid "Incorrect service time type."
 msgstr ""
 
-#: api/classes/CService.php:1177
+#: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1231
+#: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr ""
@@ -6267,7 +6268,7 @@ msgstr ""
 msgid "Incorrect time period \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1192
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr ""
@@ -6476,7 +6477,7 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1471 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
@@ -8461,8 +8462,8 @@ msgstr ""
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
@@ -10543,7 +10544,8 @@ msgid "Screen \"%1$s\" added."
 msgstr ""
 
 #: api/classes/CTemplateScreen.php:818
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
+#, php-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
@@ -10871,27 +10873,27 @@ msgstr "Servera laiks"
 msgid "Service"
 msgstr "Serviss"
 
-#: api/classes/CService.php:1298
+#: api/classes/CService.php:1300
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr ""
 
-#: api/classes/CService.php:1319
+#: api/classes/CService.php:1321
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr ""
 
-#: api/classes/CService.php:1398
+#: api/classes/CService.php:1400
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr ""
 
-#: api/classes/CService.php:1373
+#: api/classes/CService.php:1375
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr ""
 
-#: api/classes/CService.php:1216
+#: api/classes/CService.php:1218
 msgid "Service cannot be parent and child at the same time."
 msgstr ""
 
@@ -10927,7 +10929,7 @@ msgstr ""
 msgid "Services"
 msgstr "Servisi"
 
-#: api/classes/CService.php:1449
+#: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
 msgstr ""
 

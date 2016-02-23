@@ -2181,7 +2181,7 @@ return array(
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
-				'default' => '60',
+				'default' => '10',
 			),
 		),
 	),
@@ -5481,7 +5481,7 @@ return array(
 		),
 	),
 	'item_discovery' => array(
-		'type' => DB::TABLE_TYPE_HISTORY,
+		'type' => DB::TABLE_TYPE_CONFIG,
 		'key' => 'itemdiscoveryid',
 		'fields' => array(
 			'itemdiscoveryid' => array(
@@ -5724,3 +5724,4 @@ return array(
 		),
 	),
 );
+?>
