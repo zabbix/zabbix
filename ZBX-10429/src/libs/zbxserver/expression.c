@@ -3781,7 +3781,14 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 				break;
 			}
 
-			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
+			if (SUCCEED != is_double_suffix(func->value) || '-' == *func->value)
+			{
+				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, '(');
+				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
+				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ')');
+			}
+			else
+				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
 		}
 
 		if (NULL == tr->new_error)
