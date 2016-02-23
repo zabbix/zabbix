@@ -578,8 +578,8 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					arg2 = get_rparam(&request, 1);
 					arg3 = get_rparam(&request, 2);
 
-					if (0 != strcmp(arg3, "maintenance") && 0 != strcmp(arg3, "items") &&
-							0 != strcmp(arg3, "items_unsupported") || '\0' != *arg2)
+					if ((0 != strcmp(arg3, "maintenance") && 0 != strcmp(arg3, "items") &&
+							0 != strcmp(arg3, "items_unsupported")) || '\0' != *arg2)
 					{
 						goto clean;
 					}
