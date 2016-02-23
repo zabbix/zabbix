@@ -48,8 +48,6 @@ zabbix_agentd_CFLAGS = \
 	-DSYSCONFDIR="\"@sysconfdir@\"" \
 	-DLIBDIR="\"@libdir@\""
 
-zabbix_agentd_CFLAGS += @AGENT_CFLAGS@
-
 AGENTD_CONFIG = zabbix_agentd.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(AGENTD_CONFIG).d
 MODULES_DIR = $(DESTDIR)@libdir@

@@ -64,8 +64,6 @@ zabbix_proxy_CFLAGS = \
 	-DDATADIR="\"@datadir@\"" \
 	-DLIBDIR="\"@libdir@\""
 
-zabbix_proxy_CFLAGS += @PROXY_CFLAGS@
-
 PROXY_CONFIG = zabbix_proxy.conf
 INCLUDE_DIR = $(DESTDIR)@sysconfdir@/$(PROXY_CONFIG).d
 EXSCRIPTS_DIR = $(DESTDIR)@datadir@/zabbix/externalscripts
