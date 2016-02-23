@@ -16,5 +16,3 @@ zabbix_get_LDADD = \
 zabbix_get_LDADD += @ZBXGET_LIBS@
 
 zabbix_get_LDFLAGS = @ZBXGET_LDFLAGS@
-
-zabbix_get_CFLAGS = @ZBXGET_CFLAGS@
