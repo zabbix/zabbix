@@ -50,43 +50,24 @@ jQuery(function($) {
 		},
 
 		refresh: function(id, isSelfRefresh) {
-			var screen = this.screens[id];
-			var ajaxParams = ['mode', 'resourcetype', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx',
-				'profileIdx2', 'updateProfile', 'screenitemid', 'data'];
+			var screen = this.screens[id], ajaxParams;
 
-			/*
-			 * Define screen required parameters
-			 *
-			 * Keep in sync with CScreenBase
-			 */
-			var requiredParameters = [
-				// mode			screenid		hostid	pageFile		profileIdx2		screenitemid	timeline
-				//		resourcetype	groupid					profileIdx		updateProfile	data
-				// 0	1		2		3		4		5		6		7		8		9		10		11
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_GRAPH
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SIMPLE_GRAPH
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_MAP
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_PLAIN_TEXT
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HOSTS_INFO
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_TRIGGERS_INFO
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SERVER_INFO
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_CLOCK
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SCREEN
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_TRIGGERS_OVERVIEW
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_DATA_OVERVIEW
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_URL
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_ACTIONS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_EVENTS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HOSTGROUP_TRIGGERS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_SYSTEM_STATUS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HOST_TRIGGERS
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_HISTORY
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_CHART
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-				[true,	false,	true,	true,	true,	true,	true,	true,	true,	true,	false,	true], // SCREEN_RESOURCE_LLD_GRAPH
-				[true,	true,	false,	false,	false,	false,	false,	true,	false,	false,	false,	false], // SCREEN_RESOURCE_HTTPTEST_DETAILS
-				[true,	true,	false,	false,	false,	false,	false,	false,	false,	false,	true,	false] // SCREEN_RESOURCE_DISCOVERY
-			];
+			switch (screen.resourcetype) {
+				case 21:
+					// SCREEN_RESOURCE_HTTPTEST_DETAILS
+					ajaxParams = ['mode', 'resourcetype', 'profileIdx2'];
+					break;
+
+				case 22:
+					// SCREEN_RESOURCE_DISCOVERY
+					ajaxParams = ['mode', 'resourcetype', 'data'];
+					break;
+
+				default:
+					ajaxParams = ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
+						'updateProfile', 'screenitemid', 'timeline'
+					];
+			}
 
 			if (empty(screen.id)) {
 				return;
@@ -104,16 +85,12 @@ jQuery(function($) {
 			ajaxUrl.setArgument('method', 'screen.get');
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
 
-			var isRequired = requiredParameters[screen.resourcetype];
-
 			for (var i = 0; i < ajaxParams.length; i++) {
-				if (isRequired[i]) {
-					ajaxUrl.setArgument(ajaxParams[i], empty(screen[ajaxParams[i]]) ? null : screen[ajaxParams[i]]);
-				}
+				ajaxUrl.setArgument(ajaxParams[i], empty(screen[ajaxParams[i]]) ? null : screen[ajaxParams[i]]);
 			}
 
 			// timeline params
-			if (isRequired[11]) {
+			if ($.inArray('timeline', ajaxParams) > -1) {
 				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}
