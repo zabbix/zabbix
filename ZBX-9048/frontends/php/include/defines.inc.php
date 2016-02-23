@@ -133,6 +133,7 @@ define('T_ZBX_CLR',			5);
 define('T_ZBX_DBL_BIG',		9);
 define('T_ZBX_DBL_STR',		10);
 define('T_ZBX_TP',			11);
+define('T_ZBX_ARR_INT',			12);
 
 define('O_MAND',	0);
 define('O_OPT',		1);

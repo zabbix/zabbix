@@ -37,7 +37,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	'isset({favobj})'],
+	'itemids' =>		[T_ZBX_ARR_INT, O_MAND, P_SYS,	DB_ID,	'isset({favobj})'],
 	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
 	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
 	'filter_task' =>	[T_ZBX_STR, O_OPT, null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null],

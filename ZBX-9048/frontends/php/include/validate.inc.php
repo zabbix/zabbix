@@ -122,25 +122,30 @@ function unset_all() {
 	}
 }
 
-function check_type(&$field, $flags, &$var, $type, $caption = null) {
+function check_type(&$field, $flags, &$var, $type, $caption = null, $custom_message = '') {
 	if ($caption === null) {
 		$caption = $field;
-	}
-
-	if (is_array($var)) {
-		$err = ZBX_VALID_OK;
-
-		foreach ($var as $v) {
-			$err |= check_type($field, $flags, $v, $type);
-		}
-
-		return $err;
 	}
 
 	$error = false;
 	$message = '';
 
-	if ($type == T_ZBX_INT) {
+	if ($type == T_ZBX_ARR_INT) {
+		$custom_message = _s('Field "%1$s" is not an array of integers.', $caption);
+	}
+	if (is_array($var)) {
+		$err = ZBX_VALID_OK;
+		if ($type == T_ZBX_ARR_INT) {
+			$type = T_ZBX_INT;
+		}
+
+		foreach ($var as $v) {
+			$err |= check_type($field, $flags, $v, $type, null, $custom_message);
+		}
+
+		return $err;
+	}
+	elseif ($type == T_ZBX_INT) {
 		if (!zbx_is_int($var)) {
 			$error = true;
 			$message = _s('Field "%1$s" is not integer.', $caption);
@@ -220,8 +225,12 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 			$message = _s('Field "%1$s" is not correct: %2$s', $caption, $timePeriodValidator->getError());
 		}
 	}
+	elseif ($type == T_ZBX_ARR_INT) {
+		$error = true;
+	}
 
 	if ($error) {
+		$message = ($custom_message !== '') ? $custom_message : $message;
 		if ($flags & P_SYS) {
 			error($message);
 
