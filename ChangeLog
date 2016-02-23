@@ -1,7 +1,7 @@
 Changes for 2.4.8rc1
 
 New features:
-A.F....... [ZBX-1357] enabled French, Korean, Romanian, Ukrainian, Vietnamese translations to be displayed by default (zalex_ua)
+A.F....... [ZBX-1357] enabled French, Greek, Korean, Romanian, Ukrainian, Vietnamese translations to be displayed by default (zalex_ua)
 A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Romanian, Russian, Slovak, Spanish, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
