@@ -2,9 +2,9 @@
 
 BEGIN
 {
-	our $AH_DIR = $0; $AH_DIR =~ s,(.*)/.*/.*,$1,; $AH_DIR = '..' if ($AH_DIR eq $0);
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
 }
-use lib $AH_DIR;
+use lib $MYDIR;
 
 use strict;
 use warnings;
@@ -126,7 +126,7 @@ foreach my $service (keys(%{$services}))
 		$services->{$service}->{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
 	}
 
-	$services->{$service}->{'avail_key'} = "rsm.slv.$service.avail";
+	$services->{$service}->{'key_avail'} = "rsm.slv.$service.avail";
 
 	fail("$service delay (", $services->{$service}->{'delay'}, ") is not multiple of 60") unless ($services->{$service}->{'delay'} % 60 == 0);
 }
@@ -361,7 +361,7 @@ foreach (keys(%$servicedata))
 		my $delay = $services->{$service}->{'delay'};
 		my $service_from = $services->{$service}->{'from'};
 		my $service_till = $services->{$service}->{'till'};
-		my $avail_key = $services->{$service}->{'avail_key'};
+		my $key_avail = $services->{$service}->{'key_avail'};
 
 		if (defined($alarmed) && $alarmed eq AH_ALARMED_DISABLED)
 		{
@@ -391,11 +391,11 @@ foreach (keys(%$servicedata))
 
 		my $errbuf;
 		my $hostid = get_hostid($tld);
-		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key, \$errbuf);
+		my $avail_itemid = get_itemid_by_hostid($hostid, $key_avail, \$errbuf);
 
 		if ($avail_itemid < 0)
 		{
-			wrn("configuration error: service $service enabled but item \"$avail_key\" was not found: $errbuf");
+			wrn("configuration error: service $service enabled but item \"$key_avail\" was not found: $errbuf");
 			next;
 		}
 
@@ -518,11 +518,6 @@ foreach (keys(%$servicedata))
 				my $value = $row_ref->[0];
 				my $clock = $row_ref->[1];
 
-				my $result;
-
-				$result->{'tld'} = $tld;
-				$result->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
-
 				my $cycleclock = cycle_start($clock, $delay);
 
 				# We have the test resulting value (Up or Down) at "clock". Now we need to select the
@@ -555,7 +550,8 @@ foreach (keys(%$servicedata))
 					}
 				}
 
-				$cycles->{$cycleclock} = $result;
+				$cycles->{$cycleclock}->{'tld'} = $tld;
+				$cycles->{$cycleclock}->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
 			}
 
 			if (!$values_from)
@@ -595,12 +591,12 @@ foreach (keys(%$servicedata))
 					$values_from, $values_till, $services->{$service}->{'valuemaps'}, $delay);
 			}
 
-			# run through values from probes (ordered by clock)
+			# add results to appropriate cycles
 			foreach my $cycleclock (keys(%$tests_ref))
 			{
 				if (!$cycles->{$cycleclock})
 				{
-					no_cycle_result($service, $avail_key, $cycleclock);
+					no_cycle_result($service, $key_avail, $cycleclock);
 					next;
 				}
 
@@ -695,7 +691,7 @@ foreach (keys(%$servicedata))
 			# 		{
 			# 			if ($clock < $cycles[$cycles_idx]->{'start'})
 			# 			{
-			# 				no_cycle_result($service, $avail_key, $probe, $clock);
+			# 				no_cycle_result($service, $key_avail, $probe, $clock);
 			# 				next;
 			# 			}
 
@@ -704,7 +700,7 @@ foreach (keys(%$servicedata))
 
 			# 			if ($cycles_idx == $cycles_count)
 			# 			{
-			# 				no_cycle_result($service, $avail_key, $probe, $clock);
+			# 				no_cycle_result($service, $key_avail, $probe, $clock);
 			# 				next;
 			# 			}
 

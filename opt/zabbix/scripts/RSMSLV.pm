@@ -89,8 +89,8 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
-		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_disconnect db_select
-		db_select2 db_exec set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
+		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_disconnect db_select db_select_binds
+		db_exec set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month max_avail_time get_online_probes get_probe_times probe_offline_at probes2tldhostids
 		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
@@ -357,13 +357,13 @@ sub __get_itemid_by_sql
 
 	if (scalar(@$rows_ref) == 0)
 	{
-		$$errbuf = "itemid not found (sql was [$sql])" if ($errbuf);
+		$$errbuf = "item not found (sql was [$sql])" if ($errbuf);
 		return -1;
 	}
 
 	if (scalar(@$rows_ref) > 1)
 	{
-		$$errbuf = "more than one itemid found (sql was [$sql])" if ($errbuf);
+		$$errbuf = "more than one item found (sql was [$sql])" if ($errbuf);
 		return -1;
 	}
 
@@ -845,7 +845,7 @@ sub db_select
 	return $rows_ref;
 }
 
-sub db_select2
+sub db_select_binds
 {
 	$global_sql = shift;
 	my $bind_values = shift;
@@ -2210,28 +2210,17 @@ sub get_dns_test_values
 	my $result;
 
 	# generate list if itemids
-	my $itemids_str = '';
+	my @itemids;
 	foreach my $probe (keys(%$dns_items_ref))
 	{
-		my $itemids_ref = $dns_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
-		{
-			$itemids_str .= ',' unless ($itemids_str eq '');
-			$itemids_str .= $itemid;
-		}
+		push(@itemids, keys(%{$dns_items_ref->{$probe}}));
 	}
 
-	if ($itemids_str ne '')
+	if (scalar(@itemids) != 0)
 	{
-		my $rows_ref = db_select(
-			"select itemid,value,clock".
-			" from history".
-			" where itemid in ($itemids_str)".
-				" and " . sql_time_condition($start, $end).
-			" order by clock");
+		my $rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
 
-		foreach my $row_ref (@$rows_ref)
+		foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$rows_ref)
 		{
 			my $itemid = $row_ref->[0];
 			my $value = $row_ref->[1];
@@ -2305,10 +2294,9 @@ sub get_dns_test_values2
 		push(@itemids, keys(%{$dns_items_ref->{$probe}}));
 	}
 
-	my @rows;
 	if (scalar(@itemids) != 0)
 	{
-		my $rows_ref = db_select2("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
+		my $rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
 
 		foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$rows_ref)
 		{
@@ -2447,44 +2435,32 @@ sub get_rdds_test_values
 	my $delay = shift;
 
 	# generate list if itemids
-	my $dbl_itemids_str = '';
+	my @dbl_itemids;
 	foreach my $probe (keys(%$rdds_dbl_items_ref))
 	{
-		my $itemids_ref = $rdds_dbl_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
+		foreach my $itemid (keys(%{$rdds_dbl_items_ref->{$probe}}))
 		{
-			$dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
-			$dbl_itemids_str .= $itemid;
+			push(@dbl_itemids, $itemid);
 		}
 	}
 
-	my $str_itemids_str = '';
+	my @str_itemids;
 	foreach my $probe (keys(%$rdds_str_items_ref))
 	{
-		my $itemids_ref = $rdds_str_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
+		foreach my $itemid (keys(%{$rdds_str_items_ref->{$probe}}))
 		{
-			$str_itemids_str .= ',' unless ($str_itemids_str eq '');
-			$str_itemids_str .= $itemid;
+			push(@str_itemids, $itemid);
 		}
 	}
 
-	return undef if ($dbl_itemids_str eq '' || $str_itemids_str eq '');
+	return undef if (scalar(@dbl_itemids) == 0 || scalar(@str_itemids) == 0);
 
 	my $result;
-
-	my $dbl_rows_ref = db_select(
-		"select itemid,value,clock".
-		" from history".
-		" where itemid in ($dbl_itemids_str)".
-			" and " . sql_time_condition($start, $end).
-		" order by clock");
-
 	my $target = '';
 
-	foreach my $row_ref (@$dbl_rows_ref)
+	my $dbl_rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
+
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
 		my $value = $row_ref->[1];
@@ -2538,19 +2514,24 @@ sub get_rdds_test_values
 		my $cycleclock = cycle_start($clock, $delay);
 
 		my $cur_desc = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()};
-		if ($cur_desc)
-		{
-			$description = "$cur_desc; $description";
-		}
 
 		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{$real_value_tag} = $real_value;
 		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_CLOCK()} = $clock;
-		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()} = $description;
+
+		if ($description)
+		{
+			if ($cur_desc && ($cur_desc ne $description))
+			{
+				$description = "$cur_desc; $description";
+			}
+
+			$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()} = $description;
+		}
 	}
 
-	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
 
-	foreach my $row_ref (@$str_rows_ref)
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
 		my $ip = $row_ref->[1];
@@ -2622,7 +2603,7 @@ sub get_rdds_test_values2
 	# we need pre_result to combine IP and RTT to single test result
 	my $pre_result;
 
-	my $dbl_rows_ref = db_select2("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
+	my $dbl_rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
 
 	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
 	{
@@ -2654,7 +2635,7 @@ sub get_rdds_test_values2
 		$pre_result->{$probe}->{$interface}->{$clock}->{$type} = ($type eq 'rtt') ? $value : int($value);
 	}
 
-	my $str_rows_ref = db_select2("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
+	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
 
 	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
