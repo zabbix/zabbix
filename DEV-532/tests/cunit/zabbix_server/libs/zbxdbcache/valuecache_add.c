@@ -478,8 +478,6 @@ static void	cuvc_suite_add2_test2()
  *             1005.2, 1005.5, 1005.7}
  *
  * get_value(100001, STR, 1005.0)
- *    returned:
- *       {1004.7}
  *    cached:
  *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
  *
@@ -523,8 +521,6 @@ static void	cuvc_suite_add2_test3()
  *             1005.2, 1005.5, 1005.7}
  *
  * get_value(100001, STR, 1005.7)
- *    returned:
- *       {1004.7}
  *    cached:
  *       [100001] {1005.2, 1005.5, 1005.7}
  *
@@ -538,18 +534,17 @@ static void	cuvc_suite_add2_test3()
  */
 static void	cuvc_suite_add2_test4()
 {
-	zbx_timespec_t			ts = {1005, 700};
-	history_value_t			value = {.str = "1005:000"};
+	zbx_timespec_t			ts1 = {1005, 700}, ts2 = {1004, 900};
+	history_value_t			value = {.str = "1004:900"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
 	zbx_history_record_t		record;
 
 	ZBX_CU_LEAK_CHECK_START();
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
+	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
 
-	ts.ns = 0;
-	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
+	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts2, &value));
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
@@ -725,6 +720,133 @@ static void	cuvc_suite_add2_test7()
 	vc_remove_item(item);
 
 	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1005.7)
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
+ *
+ * add_value(100001, STR, 1005.0)
+ *    cached:
+ *       [100001] {}
+ *
+ * get_value(100001, STR, 1005.7)
+ *    cached:
+ *       [100001] {1005.0, 1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *   cached:
+ *
+ */
+static void	cuvc_suite_add2_test8()
+{
+	zbx_timespec_t			ts1 = {1005, 700}, ts2 = {1005, 000};
+	history_value_t			value = {.str = "1005:000"};
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+	zbx_vc_item_t			*item;
+	zbx_history_record_t		record;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
+	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
+
+	CU_ASSERT(SUCCEED == cuvc_add_str(value.str, &ts2));
+	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts2, &value));
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_cache_str(item, NULL);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_cache_str(item, "1005:000", "1005:200", "1005:500", "1005:700", NULL);
+
+	vc_remove_item(item);
+
+	cuvc_remove_str(value.str, &ts2);
+
+	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
+
+	ZBX_CU_LEAK_CHECK_END();
+}
+
+/*
+ * database:
+ *   [100001] {1001.2, 1001.5, 1001.7, 1002.2, 1002.5, 1002.7, 1003.2, 1003.5, 1003.7, 1004.2, 1004.5, 1004.7,
+ *             1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.7)
+ *    cached:
+ *       [100001] {1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ * add_value(100001, STR, 1004.0)
+ *    cached:
+ *       [100001] {1005.2, 1005.5, 1005.7}
+ *
+ * get_value(100001, STR, 1004.7)
+ *    cached:
+ *       [100001] {1004.0, 1004.2, 1004.5, 1004.7, 1005.2, 1005.5, 1005.7}
+ *
+ * remove(100001)
+ *   cached:
+ *
+ */
+static void	cuvc_suite_add2_test9()
+{
+	zbx_timespec_t			ts1 = {1004, 700}, ts2 = {1004, 000};
+	history_value_t			value = {.str = "1004:000"};
+	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
+	zbx_vc_item_t			*item;
+	zbx_history_record_t		record;
+
+	ZBX_CU_LEAK_CHECK_START();
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
+	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_cache_str(item, "1004:200", "1004:500", "1004:700", "1005:200", "1005:500", "1005:700", NULL);
+
+	CU_ASSERT(SUCCEED == cuvc_add_str(value.str, &ts2));
+	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts2, &value));
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_cache_str(item, "1005:200", "1005:500", "1005:700", NULL);
+
+	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
+
+	item = zbx_hashset_search(&vc_cache->items, &itemid);
+	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
+
+	cuvc_check_cache_str(item, "1004:000", "1004:200", "1004:500", "1004:700", "1005:200", "1005:500", "1005:700",
+			NULL);
+
+	vc_remove_item(item);
+
+	cuvc_remove_str(value.str, &ts2);
+
+	zbx_history_record_clear(&record, ITEM_VALUE_TYPE_STR);
 
 	ZBX_CU_LEAK_CHECK_END();
 }
@@ -913,20 +1035,19 @@ static void	cuvc_suite_add3_test3()
  */
 static void	cuvc_suite_add3_test4()
 {
-	zbx_timespec_t			ts = {1005, 700};
-	history_value_t			value = {.str = "1005:000"};
+	zbx_timespec_t			ts1 = {1005, 700}, ts2 = {1004, 900};
+	history_value_t			value = {.str = "1004:900"};
 	zbx_uint64_t			itemid = CUVC_ITEMID_STR;
 	zbx_vc_item_t			*item;
 	zbx_history_record_t		record;
 
 	ZBX_CU_LEAK_CHECK_START();
 
-	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &record));
+	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
 
 	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
 
-	ts.ns = 0;
-	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts, &value));
+	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts2, &value));
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
 	CU_ASSERT_PTR_NOT_NULL_FATAL(item);

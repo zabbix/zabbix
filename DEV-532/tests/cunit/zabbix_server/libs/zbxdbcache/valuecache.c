@@ -61,32 +61,31 @@ static int	cuvc_write_history(zbx_uint64_t itemid, zbx_vector_history_record_t *
 {
 	int		i, ret = FAIL;
 	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	id = 1;
 
 	switch (value_type)
 	{
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_db_insert_prepare(&db_insert, "history_log", "id", "itemid", "value", "timestamp", "source",
+			zbx_db_insert_prepare(&db_insert, "history_log", "itemid", "value", "timestamp", "source",
 					"severity", "logeventid", "clock", "ns", NULL);
 
 			for (i = 0; i < records->values_num; i++)
 			{
 				zbx_history_record_t	*record = &records->values[i];
 
-				zbx_db_insert_add_values(&db_insert, id++, itemid, record->value.log->value,
+				zbx_db_insert_add_values(&db_insert, itemid, record->value.log->value,
 						record->value.log->timestamp, record->value.log->source,
 						record->value.log->severity, record->value.log->logeventid,
 						record->timestamp.sec, record->timestamp.ns);
 			}
 			break;
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_db_insert_prepare(&db_insert, "history_text", "id", "itemid", "value", "clock", "ns", NULL);
+			zbx_db_insert_prepare(&db_insert, "history_text", "itemid", "value", "clock", "ns", NULL);
 
 			for (i = 0; i < records->values_num; i++)
 			{
 				zbx_history_record_t	*record = &records->values[i];
 
-				zbx_db_insert_add_values(&db_insert, id++, itemid, record->value.str,
+				zbx_db_insert_add_values(&db_insert, itemid, record->value.str,
 						record->timestamp.sec, record->timestamp.ns);
 
 			}
@@ -285,18 +284,25 @@ static void	cuvc_check_cache_str(zbx_vc_item_t *item, ...)
 	va_list		args;
 	const char	*value;
 	zbx_vc_chunk_t	*chunk;
+	int		index = 0;
 
 	va_start(args, item);
 
-	for (chunk = item->tail; NULL != chunk; chunk = chunk->next)
+	for (chunk = item->tail, value = va_arg(args, const char *); NULL != value || NULL != chunk;
+			value = va_arg(args, const char *))
 	{
-		int i;
+		CU_ASSERT_PTR_NOT_NULL_FATAL(chunk);
+		CU_ASSERT_PTR_NOT_NULL_FATAL(value);
 
-		for (i = chunk->first_value; i <= chunk->last_value; i++)
+		if (index < chunk->first_value)
+			index = chunk->first_value;
+
+		ZBX_CU_ASSERT_STRING_EQ(chunk->slots[index].value.str, value);
+
+		if (++index > chunk->last_value)
 		{
-			value = va_arg(args, const char *);
-			CU_ASSERT_PTR_NOT_NULL_FATAL(value);
-			ZBX_CU_ASSERT_STRING_EQ(chunk->slots[i].value.str, value);
+			chunk = chunk->next;
+			index = 0;
 		}
 	}
 
@@ -558,6 +564,43 @@ static int	cuvc_init_str()
 	cuvc_free_space = vc_mem->free_size;
 
 	return curet;
+}
+
+static int	cuvc_add_str(const char *value, zbx_timespec_t *ts)
+{
+	int				ret;
+	zbx_vector_history_record_t	records;
+
+	zbx_vector_history_record_create(&records);
+
+	DBbegin();
+
+	cuvc_add_record_str(&records, value, ts->sec, ts->ns);
+
+	ret = cuvc_write_history(CUVC_ITEMID_STR, &records, ITEM_VALUE_TYPE_STR);
+
+	DBcommit();
+
+	zbx_history_record_vector_destroy(&records, ITEM_VALUE_TYPE_STR);
+
+	return ret;
+}
+
+static int	cuvc_remove_str(const char *value, zbx_timespec_t *ts)
+{
+	char	*value_esc;
+	DBbegin();
+
+	value_esc = DBdyn_escape_string(value);
+
+	DBexecute("delete from history_str where value='%s' and clock=%d and ns=%d",
+			value_esc, ts->sec, ts->ns);
+
+	DBcommit();
+
+	zbx_free(value_esc);
+
+	return SUCCEED;
 }
 
 static int	cuvc_clean_str()
@@ -875,6 +918,10 @@ int	ZBX_CU_MODULE(valuecache)
 			cuvc_suite_add2_test6);
 	ZBX_CU_ADD_TEST(suite, "add value after the beginning of cached data, check db coverage",
 			cuvc_suite_add2_test7);
+	ZBX_CU_ADD_TEST(suite, "add value at the beginning of cached data with matching timestamp seconds",
+			cuvc_suite_add2_test8);
+	ZBX_CU_ADD_TEST(suite, "add value at the beginning of cached data with matching timestamp seconds (2)",
+			cuvc_suite_add2_test9);
 	ZBX_CU_ADD_TEST(suite, "remove items", cuvc_suite_add2_cleanup);
 
 	/* test suite: add3                                                                       */

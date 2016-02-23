@@ -19,7 +19,7 @@
 
 #include "zbxcunit.c"
 
-#define daemon_start(arg, user)	zabbix_server_entry()
+#define daemon_start(arg, user, flags)	zabbix_server_entry()
 
 void	intialize_cu_tests();
 void	run_cu_tests();
