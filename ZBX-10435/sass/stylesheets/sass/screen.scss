@@ -1357,6 +1357,7 @@ footer {
 	display: inline-block;
 	padding: 5px;
 	position: relative;
+	vertical-align: top;
 	border: 1px solid $table-border-color;
 	@include box-sizing(border-box);
 }
