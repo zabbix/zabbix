@@ -767,9 +767,7 @@ static void	cuvc_suite_add2_test8()
 	CU_ASSERT(SUCCEED == zbx_vc_add_value(itemid, ITEM_VALUE_TYPE_STR, &ts2, &value));
 
 	item = zbx_hashset_search(&vc_cache->items, &itemid);
-	CU_ASSERT_PTR_NOT_NULL_FATAL(item);
-
-	cuvc_check_cache_str(item, NULL);
+	CU_ASSERT_PTR_NULL_FATAL(item);
 
 	CU_ASSERT(SUCCEED == zbx_vc_get_value(itemid, ITEM_VALUE_TYPE_STR, &ts1, &record));
 
