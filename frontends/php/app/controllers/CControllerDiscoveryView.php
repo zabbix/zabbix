@@ -77,7 +77,7 @@ class CControllerDiscoveryView extends CController {
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'druleid' => $this->getInput('druleid', 0),
 			'sort' => $sort,
-			'sortorder' => $sortorder,
+			'sortorder' => $sortorder
 		];
 
 		$data['pageFilter'] = new CPageFilter([
