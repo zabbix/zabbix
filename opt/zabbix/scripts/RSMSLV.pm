@@ -69,6 +69,8 @@ use constant JSON_TAG_RTT		=> 'rtt';
 use constant JSON_TAG_UPD		=> 'upd';
 use constant JSON_TAG_DESCRIPTION	=> 'description';
 
+use constant SEC_PER_WEEK		=> 604800;
+
 our ($result, $dbh, $tld);
 
 my $total_sec;
@@ -97,12 +99,12 @@ our @EXPORT = qw($result $dbh $tld
 		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_dns_test_values2 get_rdds_test_values get_rdds_test_values2 get_epp_test_values no_cycle_result
 		get_service_status_itemids get_probe_results
-		sql_time_condition get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
+		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
 		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
 		get_real_services_period dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts
 		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
-		cycle_start usage);
+		cycle_start cycle_end usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -3153,6 +3155,186 @@ sub get_incidents
 	return \@incidents;
 }
 
+sub get_incidents2
+{
+	my $itemid = shift;
+	my $delay = shift;
+	my $from = shift;
+	my $till = shift;
+
+	my (@incidents, $rows_ref, $row_ref);
+
+	$rows_ref = db_select(
+		"select distinct t.triggerid".
+		" from triggers t,functions f".
+		" where t.triggerid=f.triggerid".
+			" and f.itemid=$itemid".
+			" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
+
+	my $rows = scalar(@$rows_ref);
+
+	unless ($rows == 1)
+	{
+		wrn("configuration error: item $itemid must have one not classified trigger (found: $rows)");
+		return \@incidents;
+	}
+
+	my $triggerid = $rows_ref->[0]->[0];
+
+	my $last_trigger_value = TRIGGER_VALUE_FALSE;
+
+	if (defined($from))
+	{
+		# First check for ongoing incident.
+
+		my $attempts = 5;
+
+		undef($row_ref);
+
+		my $attempt = 0;
+
+		my $clock_till = $from;
+		my $clock_from = $clock_till - SEC_PER_WEEK;
+		$clock_till--;
+
+		while ($attempt++ < $attempts && !defined($row_ref))
+		{
+			$rows_ref = db_select(
+				"select max(clock)".
+				" from events".
+				" where object=".EVENT_OBJECT_TRIGGER.
+					" and source=".EVENT_SOURCE_TRIGGERS.
+					" and objectid=$triggerid".
+					" and " . sql_time_condition($clock_from, $clock_till));
+
+			$row_ref = $rows_ref->[0];
+
+			$clock_till = $clock_from - 1;
+			$clock_from -= (SEC_PER_WEEK * $attempt * 2);
+		}
+
+		if (!defined($row_ref))
+		{
+			$rows_ref = db_select(
+				"select max(clock)".
+				" from events".
+				" where object=".EVENT_OBJECT_TRIGGER.
+					" and source=".EVENT_SOURCE_TRIGGERS.
+					" and objectid=$triggerid".
+					" and clock<$clock_from");
+
+			$row_ref = $rows_ref->[0];
+		}
+
+		if (defined($row_ref) and defined($row_ref->[0]))
+		{
+			my $preincident_clock = $row_ref->[0];
+
+			$rows_ref = db_select(
+				"select eventid,clock,value,false_positive".
+				" from events".
+				" where object=".EVENT_OBJECT_TRIGGER.
+					" and source=".EVENT_SOURCE_TRIGGERS.
+					" and objectid=$triggerid".
+					" and clock=$preincident_clock".
+				" order by ns desc".
+				" limit 1");
+
+			$row_ref = $rows_ref->[0];
+
+			my $eventid = $row_ref->[0];
+			my $clock = $row_ref->[1];
+			my $value = $row_ref->[2];
+			my $false_positive = $row_ref->[3];
+
+			dbg("reading pre-event $eventid: clock:" . ts_str($clock) . " ($clock), value:", ($value == 0 ? 'OK' : 'PROBLEM'), ", false_positive:$false_positive") if (opt('debug'));
+
+			# do not add 'value=TRIGGER_VALUE_TRUE' to SQL above just for corner case of 2 events at the same second
+			if ($value == TRIGGER_VALUE_TRUE)
+			{
+				push(@incidents, __make_incident($eventid, $false_positive, cycle_start($clock, $delay)));
+
+				$last_trigger_value = TRIGGER_VALUE_TRUE;
+			}
+		}
+	}
+
+	# now check for incidents within given period
+	$rows_ref = db_select(
+		"select eventid,clock,value,false_positive".
+		" from events".
+		" where object=".EVENT_OBJECT_TRIGGER.
+			" and source=".EVENT_SOURCE_TRIGGERS.
+			" and objectid=$triggerid".
+			" and ".sql_time_condition($from, $till).
+		" order by clock,ns");
+
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $eventid = $row_ref->[0];
+		my $clock = $row_ref->[1];
+		my $value = $row_ref->[2];
+		my $false_positive = $row_ref->[3];
+
+		dbg("reading event $eventid: clock:" . ts_str($clock) . " ($clock), value:", ($value == 0 ? 'OK' : 'PROBLEM'), ", false_positive:$false_positive") if (opt('debug'));
+
+		# ignore non-resolved false_positive incidents (corner case)
+		if ($value == TRIGGER_VALUE_TRUE && $last_trigger_value == TRIGGER_VALUE_TRUE)
+		{
+			my $idx = scalar(@incidents) - 1;
+
+			if ($incidents[$idx]->{'false_positive'} != 0)
+			{
+				# replace with current
+				$incidents[$idx]->{'eventid'} = $eventid;
+				$incidents[$idx]->{'false_positive'} = $false_positive;
+				$incidents[$idx]->{'start'} = cycle_start($clock, $delay);
+			}
+		}
+
+		next if ($value == $last_trigger_value);
+
+		if ($value == TRIGGER_VALUE_FALSE)
+		{
+			# event that closes the incident
+			my $idx = scalar(@incidents) - 1;
+
+			$incidents[$idx]->{'end'} = cycle_end($clock, $delay);
+		}
+		else
+		{
+			# event that starts an incident
+			push(@incidents, __make_incident($eventid, $false_positive, cycle_start($clock, $delay)));
+		}
+
+		$last_trigger_value = $value;
+	}
+
+	# DEBUG
+	if (opt('debug'))
+	{
+		foreach (@incidents)
+		{
+			my $eventid = $_->{'eventid'};
+			my $inc_from = $_->{'start'};
+			my $inc_till = $_->{'end'};
+			my $false_positive = $_->{'false_positive'};
+
+			if (opt('debug'))
+			{
+				my $str = "$eventid";
+				$str .= " (false positive)" if ($false_positive != 0);
+				$str .= ": " . ts_str($inc_from) . " ($inc_from) -> ";
+				$str .= $inc_till ? ts_str($inc_till) . " ($inc_till)" : "null";
+
+				dbg($str);
+			}
+		}
+	}
+
+	return \@incidents;
+}
+
 sub get_downtime
 {
 	my $itemid = shift;
@@ -3944,6 +4126,14 @@ sub cycle_start
 	my $delay = shift;
 
 	return $sec - ($sec % $delay);
+}
+
+sub cycle_end
+{
+	my $sec = shift;
+	my $delay = shift;
+
+	return $sec + $delay - ($sec % $delay);
 }
 
 sub usage

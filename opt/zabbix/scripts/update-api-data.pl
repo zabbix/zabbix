@@ -16,7 +16,7 @@ use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n', 'base=s');
 
 # do not write any logs
 setopt('nolog');
@@ -34,6 +34,14 @@ set_slv_config(get_rsm_config());
 db_connect();
 
 __validate_input();
+
+if (opt('base'))
+{
+	if (ah_set_base_dir(getopt('base')) != AH_SUCCESS)
+	{
+		fail("cannot set base directory: ", ah_get_error());
+	}
+}
 
 my $opt_from = getopt('from');
 
@@ -428,7 +436,7 @@ foreach (keys(%$servicedata))
 		dbg("getting current $service availability (delay:$delay)");
 
 		# get availability
-		my $incidents = get_incidents($avail_itemid, $now);
+		my $incidents = get_incidents2($avail_itemid, $delay, $now);
 
 		$alarmed = AH_ALARMED_NO;
 		if (scalar(@$incidents) != 0)
@@ -472,7 +480,7 @@ foreach (keys(%$servicedata))
 			$epp_str_items_ref = get_epp_str_itemids($tld, getopt('probe'), $services->{'epp'}->{'key_ip'});
 		}
 
-		$incidents = get_incidents($avail_itemid, $service_from, $service_till);
+		$incidents = get_incidents2($avail_itemid, $delay, $service_from, $service_till);
 
 		foreach (@$incidents)
 		{
@@ -802,7 +810,7 @@ foreach (keys(%$servicedata))
 
 		# rolling week incidents
 		__prnt("getting rolling week incidents ", selected_period($rollweek_from, $rollweek_till));
-		my $rw_incidents = get_incidents($avail_itemid, $rollweek_from, $rollweek_till);
+		my $rw_incidents = get_incidents2($avail_itemid, $delay, $rollweek_from, $rollweek_till);
 
 		foreach (@$incidents)
 		{
@@ -920,7 +928,8 @@ sub __update_false_positives
 
 		if (ah_save_false_positive($tld, $service, $event_clock, $eventid, $false_positive, $clock) != AH_SUCCESS)
 		{
-			fail("cannot update false_positive value of event (eventid:$eventid start:[", ts_full($event_clock), "] service:$service false_positive:$false_positive clock:[", ts_full($clock), ")");
+			wrn("cannot update false_positive value of event (eventid:$eventid start:[", ts_full($event_clock), "] service:$service false_positive:$false_positive clock:[", ts_full($clock), "): ",
+				ah_get_error());
 		}
 	}
 
@@ -1325,6 +1334,14 @@ Note, that continue token is not updated if this option was specified together w
 Only calculate data from specified probe.
 
 This option can only be used for debugging purposes and must be used together with option --dry-run .
+
+=item B<--now> timestamp
+
+Run script as if current time would be as specified.
+
+=item B<--base> directory
+
+Specify different base directory (default /opt/zabbix/sla).
 
 =item B<--dry-run>
 

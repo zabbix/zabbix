@@ -30,9 +30,9 @@ our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISA
 		ah_get_error
 		ah_save_alarmed ah_save_service_availability ah_save_incident_state ah_save_false_positive
 		ah_save_incident_results ah_get_continue_file ah_get_api_tld ah_get_last_audit ah_save_audit
-		ah_encode_pretty_json ah_save_tld_status);
+		ah_encode_pretty_json ah_save_tld_status ah_set_base_dir);
 
-use constant AH_BASE_DIR => '/opt/zabbix/sla';
+my $AH_BASE_DIR = '/opt/zabbix/sla';
 
 use constant AH_ROOT_ZONE_DIR => 'zz--root';	# map root zone (.) to something human readable
 
@@ -42,9 +42,8 @@ use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability.json';
 use constant AH_INCIDENT_STATE_FILE => 'state.json';
 use constant AH_FALSE_POSITIVE_FILE => 'falsePositive.json';
 
-use constant AH_CONTINUE_FILE => AH_BASE_DIR . '/last_update.txt';	# file with timestamp of last run with --continue
-use constant AH_AUDIT_FILE => AH_BASE_DIR . '/last_audit.txt';		# file containing timestamp of last auditlog
-									# entry that was checked (false_positive change)
+use constant AH_CONTINUE_FILE => 'last_update.txt';	# file with timestamp of last run with --continue
+use constant AH_AUDIT_FILE => 'last_audit.txt';		# file containing timestamp of last auditlog entry that was checked (false_positive change)
 
 use constant AH_JSON_FILE_VERSION => 1;
 
@@ -55,16 +54,9 @@ sub ah_get_error
 	return $error_string;
 }
 
-sub __make_base_path
+sub __make_path
 {
-	my $tld = shift;
-	my $result_path_ptr = shift;	# pointer
-	my $add_path = shift;
-
-	$tld = lc($tld);
-
-	my $path = AH_BASE_DIR . "/$tld/data";
-	$path .= "/$add_path" if ($add_path);
+	my $path = shift;
 
 	make_path($path, {error => \my $err});
 
@@ -73,6 +65,22 @@ sub __make_base_path
 		__set_file_error($err);
 		return AH_FAIL;
 	}
+
+	return AH_SUCCESS;
+}
+
+sub __make_tld_path
+{
+	my $tld = shift;
+	my $result_path_ptr = shift;	# pointer
+	my $add_path = shift;
+
+	$tld = lc($tld);
+
+	my $path = $AH_BASE_DIR . "/$tld/data";
+	$path .= "/$add_path" if ($add_path);
+
+	return AH_FAIL unless (__make_path($path) == AH_SUCCESS);
 
 	$$result_path_ptr = $path;
 
@@ -92,7 +100,7 @@ sub __make_service_path
 
 	$path .= "/$add_path" if ($add_path);
 
-	return __make_base_path($tld, $service_path_ptr, $path);
+	return __make_tld_path($tld, $service_path_ptr, $path);
 }
 
 sub __make_inc_path
@@ -134,7 +142,7 @@ sub __set_file_error
 		}
 	}
 
-$error_string = join('', $err, @_);
+	$error_string = join('', $err, @_);
 }
 
 sub __write_file
@@ -299,7 +307,7 @@ sub ah_save_incident_results
 
 sub ah_get_continue_file
 {
-	return AH_CONTINUE_FILE;
+	return $AH_BASE_DIR . '/' . AH_CONTINUE_FILE;
 }
 
 sub ah_get_api_tld
@@ -314,7 +322,7 @@ sub ah_get_api_tld
 # get the time of last audit log entry that was checked
 sub ah_get_last_audit
 {
-	my $audit_file = AH_AUDIT_FILE;
+	my $audit_file = $AH_BASE_DIR . '/' . AH_AUDIT_FILE;
 	my $handle;
 
 	if (-e $audit_file)
@@ -335,7 +343,7 @@ sub ah_save_audit
 {
 	my $clock = shift;
 
-	return __write_file(AH_AUDIT_FILE, $clock);
+	return __write_file($AH_BASE_DIR . '/' . AH_AUDIT_FILE, $clock);
 }
 
 sub __encode_json
@@ -360,7 +368,7 @@ sub ah_save_tld_status
 
 	my $base_path;
 
-	return AH_FAIL unless (__make_base_path($tld, \$base_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_tld_path($tld, \$base_path) == AH_SUCCESS);
 
 	my $buf;
 	my $json_ref;
@@ -411,6 +419,13 @@ sub ah_save_tld_status
 	}
 
 	return __write_file($file, __encode_json($json_ref));
+}
+
+sub ah_set_base_dir
+{
+	$AH_BASE_DIR = shift;
+
+	return __make_path($AH_BASE_DIR);
 }
 
 sub __read_file

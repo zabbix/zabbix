@@ -77,7 +77,7 @@ foreach (@$tlds_ref)
 			}
 
 			# "IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident"
-			print("$eventid,$tld,$service,$status,$start,", (defined($end) ? $end : ""), "$failed_tests (", ts_full($start), ")\n");
+			print("$eventid,$tld,$service,$status," . ts_full($start) . ",", (defined($end) ? ts_full($end) : ""), "$failed_tests\n");
 		}
 	}
 }
