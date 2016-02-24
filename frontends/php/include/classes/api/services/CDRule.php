@@ -293,7 +293,7 @@ class CDRule extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array $drules, array $db_drules) {
+	protected function validateUpdate(array $drules) {
 		// Check permissions.
 		if (self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -303,11 +303,7 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$drule_names_changed = [];
-		$proxy_hostids = [];
-
-		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
-
+		// Validate given IDs.
 		foreach ($drules as $drule) {
 			if (!zbx_is_int($drule['druleid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'druleid'));
@@ -315,7 +311,21 @@ class CDRule extends CApiService {
 			elseif (!array_key_exists('druleid', $drule)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'druleid'));
 			}
-			elseif (!array_key_exists($drule['druleid'], $db_drules)) {
+		}
+
+		$db_drules = $this->get([
+			'output' => ['druleid', 'name'],
+			'druleids' => zbx_objectValues($drules, 'druleid'),
+			'preservekeys' => true
+		]);
+
+		$drule_names_changed = [];
+		$proxy_hostids = [];
+
+		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
+
+		foreach ($drules as $drule) {
+			if (!array_key_exists($drule['druleid'], $db_drules)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
 
@@ -648,6 +658,8 @@ class CDRule extends CApiService {
 		$drules = zbx_toArray($drules);
 		$druleids = zbx_objectValues($drules, 'druleid');
 
+		$this->validateUpdate($drules);
+
 		$db_drules = API::DRule()->get([
 			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'nextcheck', 'status'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
@@ -658,8 +670,6 @@ class CDRule extends CApiService {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		$this->validateUpdate($drules, $db_drules);
 
 		$default_values = DB::getDefaults('dchecks');
 
