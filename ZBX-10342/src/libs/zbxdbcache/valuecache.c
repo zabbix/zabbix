@@ -1674,13 +1674,13 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 		item->status = 0;
 
 	/* try to remove chunks with all history values older than maximum request range */
-	while (NULL != chunk && chunk->slots[chunk->first_value].timestamp.sec < timestamp)
+	while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
 	{
 		zbx_vc_chunk_t	*next;
 
 		/* If chunk contains values with timestamp greater or equal - remove */
-		/* only the values with less timestamp. Otherwise remove the whole   */
-		/* chunk and check the next one.                                     */
+		/* only the values with less timestamp. Otherwise remove the while   */
+		/* chunk and check next one.                                         */
 		if (chunk->slots[chunk->last_value].timestamp.sec >= timestamp)
 		{
 			while (chunk->slots[next->first_value].timestamp.sec < timestamp)
@@ -1694,6 +1694,15 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 
 		next = chunk->next;
 		vch_item_remove_chunk(item, chunk);
+
+		/* empty items must be removed to avoid situation when a new value is added to cache */
+		/* while other values with matching timestamp seconds are not cached                 */
+		if (NULL == next)
+		{
+			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			break;
+		}
+
 		chunk = next;
 	}
 }
