@@ -146,8 +146,6 @@ dbg("now:", ts_full($now));
 # rolling week incidents
 my ($rollweek_from, $rollweek_till) = get_rollweek_bounds(getopt('now'));
 
-__prnt("rolling week from ", ts_full($rollweek_from), " till ", ts_full($rollweek_till));
-
 my $tlds_ref;
 if (opt('tld'))
 {
@@ -231,7 +229,6 @@ elsif (opt('from'))
 	if (opt('period'))
 	{
 		$check_till = $check_from + getopt('period') * 60 - 1;
-		__prnt(sprintf("got option 'period', using: %s", selected_period($check_from, $check_till)));
 	}
 	else
 	{
@@ -247,8 +244,6 @@ elsif (opt('period'))
 
 fail("cannot get the beginning of calculation period") unless(defined($check_from));
 fail("cannot get the end of calculation period") unless(defined($check_till));
-
-__prnt("check_from:", ts_full($check_from), " check_till:", ts_full($check_till), " last_time_till:", ts_full($last_time_till));
 
 if ($check_till < $check_from)
 {
@@ -334,8 +329,6 @@ foreach (@$tlds_ref)
 }
 
 undef($tld);
-
-__prnt(sprintf("getting probe statuses for period: %s", selected_period($from, $till)));
 
 my $all_probes_ref = get_probes();
 
@@ -808,7 +801,6 @@ foreach (keys(%$servicedata))
 		$tld_status->{'services'}->{$service}->{'emergencyThreshold'} = $downtime;
 
 		# rolling week incidents
-		__prnt("getting rolling week incidents ", selected_period($rollweek_from, $rollweek_till));
 		my $rw_incidents = get_incidents2($avail_itemid, $delay, $rollweek_from, $rollweek_till);
 
 		foreach (@$incidents)
