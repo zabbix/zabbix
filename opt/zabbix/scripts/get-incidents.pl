@@ -1,6 +1,10 @@
 #!/usr/bin/perl -w
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use RSM;
@@ -37,6 +41,12 @@ foreach (@$tlds_ref)
 		my $key = "rsm.slv.$service.avail";
 
 		my $itemid = get_itemid_by_host($tld, $key);
+		if (!$itemid)
+		{
+			wrn("configuration error: ", rsm_slv_error());
+			next;
+		}
+
 		my $incidents = get_incidents($itemid, $from, $till);
 
 		foreach (@$incidents)

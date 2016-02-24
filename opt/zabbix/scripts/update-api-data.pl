@@ -397,13 +397,12 @@ foreach (keys(%$servicedata))
 			next;
 		}
 
-		my $errbuf;
 		my $hostid = get_hostid($tld);
-		my $avail_itemid = get_itemid_by_hostid($hostid, $key_avail, \$errbuf);
 
-		if ($avail_itemid < 0)
+		my $avail_itemid = get_itemid_by_hostid($hostid, $key_avail);
+		if (!$avail_itemid)
 		{
-			wrn("configuration error: service $service enabled but item \"$key_avail\" was not found: $errbuf");
+			wrn("configuration error: ", rsm_slv_error());
 			next;
 		}
 
@@ -413,9 +412,9 @@ foreach (keys(%$servicedata))
 		# we must have a special calculation key for that ($downtime_key)
 		#my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		if (__get_downtime($hostid, $service, $downtime_key, getopt('now'), \$downtime, \$errbuf) != SUCCESS)
+		if (__get_downtime($hostid, $service, $downtime_key, getopt('now'), \$downtime) != SUCCESS)
 		{
-			wrn("configuration error: service $service enabled but item \"$downtime_key\" was not found: $errbuf");
+			wrn("configuration error: ", rsm_slv_error());
 			$downtime = 0.0;
 		}
 
@@ -1062,13 +1061,10 @@ sub __get_downtime
 	my $key = shift;
 	my $clock = shift;
 	my $downtime_ref = shift;
-	my $errbuf_ref = shift;
 
-	my $errbuf;
+	my $itemid = get_itemid_by_hostid($hostid, $key);
 
-	my $itemid = get_itemid_by_hostid($hostid, $key, $errbuf_ref);
-
-	return E_FAIL if ($itemid < 0);
+	return E_FAIL unless ($itemid);
 
 	$clock = time() unless($clock);
 

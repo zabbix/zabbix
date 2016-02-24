@@ -2,7 +2,11 @@
 #
 # DNSSEC proper resolution
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*/.*,$1,; $MYDIR = '..' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use warnings;
@@ -60,8 +64,11 @@ while ($period > 0)
 	foreach (@$tlds_ref)
 	{
 		$tld = $_;
+		my $itemid = get_itemid_by_host($tld, $cfg_key_out);
 
-		if (avail_value_exists($value_ts, get_itemid_by_host($tld, $cfg_key_out)) == SUCCESS)
+		next unless ($itemid);
+
+		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
 		{
 			# value already exists
 			next unless (opt('dry-run'));

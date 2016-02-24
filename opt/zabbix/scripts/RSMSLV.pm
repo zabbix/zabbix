@@ -16,43 +16,43 @@ use Sys::Syslog;
 use Data::Dumper;
 use Time::HiRes qw(time);
 
-use constant SUCCESS => 0;
-use constant E_FAIL => -1;
+use constant SUCCESS	=> 0;
+use constant E_FAIL	=> -1;
 
-use constant UP => 1;
-use constant DOWN => 0;
-use constant ONLINE => 1;
-use constant OFFLINE => 0;
-use constant SLV_UNAVAILABILITY_LIMIT => 49; # NB! must be in sync with frontend
+use constant UP		=> 1;
+use constant DOWN	=> 0;
+use constant ONLINE	=> 1;
+use constant OFFLINE	=> 0;
 
-use constant MAX_SERVICE_ERROR => -200; # -200, -201 ...
-use constant RDDS_UP => 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
-use constant MIN_LOGIN_ERROR => -205;
-use constant MAX_LOGIN_ERROR => -203;
-use constant MIN_INFO_ERROR => -211;
-use constant MAX_INFO_ERROR => -209;
+use constant SLV_UNAVAILABILITY_LIMIT	=> 49; # NB! must be in sync with frontend
 
-use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
-use constant EVENT_OBJECT_TRIGGER => 0;
-use constant EVENT_SOURCE_TRIGGERS => 0;
-use constant TRIGGER_VALUE_FALSE => 0;
-use constant TRIGGER_VALUE_TRUE => 1;
-use constant INCIDENT_FALSE_POSITIVE => 1; # NB! must be in sync with frontend
-use constant SENDER_BATCH_COUNT => 250;
-use constant PROBE_LASTACCESS_ITEM => 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
-use constant PROBE_GROUP_NAME => 'Probes';
-use constant PROBE_KEY_MANUAL => 'rsm.probe.status[manual]';
-use constant PROBE_KEY_AUTOMATIC => 'rsm.probe.status[automatic,%]'; # match all in SQL
+use constant MAX_SERVICE_ERROR	=> -200; # -200, -201 ...
+use constant RDDS_UP		=> 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
+use constant MIN_LOGIN_ERROR	=> -205;
+use constant MAX_LOGIN_ERROR	=> -203;
+use constant MIN_INFO_ERROR	=> -211;
+use constant MAX_INFO_ERROR	=> -209;
+
+use constant TRIGGER_SEVERITY_NOT_CLASSIFIED	=> 0;
+use constant EVENT_OBJECT_TRIGGER		=> 0;
+use constant EVENT_SOURCE_TRIGGERS		=> 0;
+use constant TRIGGER_VALUE_FALSE		=> 0;
+use constant TRIGGER_VALUE_TRUE			=> 1;
+use constant INCIDENT_FALSE_POSITIVE		=> 1; # NB! must be in sync with frontend
+use constant SENDER_BATCH_COUNT			=> 250;
+use constant PROBE_LASTACCESS_ITEM		=> 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
+use constant PROBE_GROUP_NAME			=> 'Probes';
+use constant PROBE_KEY_MANUAL			=> 'rsm.probe.status[manual]';
+use constant PROBE_KEY_AUTOMATIC		=> 'rsm.probe.status[automatic,%]'; # match all in SQL
 
 # In order to do the calculation we should wait till all the results
 # are available on the server (from proxies). We shift back 2 minutes
 # in case of "availability" and 3 minutes in case of "rolling week"
 # calculations.
 # NB! These numbers must be in sync with Frontend (details page)!
-use constant AVAIL_SHIFT_BACK => 120; # seconds (must be divisible by 60 without remainder)
-use constant ROLLWEEK_SHIFT_BACK => 180; # seconds (must be divisible by 60 without remainder)
-
-use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time bound of the period for the value timestamp)
+use constant AVAIL_SHIFT_BACK		=> 120; # seconds (must be divisible by 60 without remainder)
+use constant ROLLWEEK_SHIFT_BACK	=> 180; # seconds (must be divisible by 60 without remainder)
+use constant RESULT_TIMESTAMP_SHIFT	=> 29; # seconds (shift back from upper time bound of the period for the value timestamp)
 
 use constant PROBE_ONLINE_STR	=> 'Online';
 use constant PROBE_OFFLINE_STR	=> 'Offline';
@@ -69,7 +69,7 @@ use constant JSON_TAG_RTT		=> 'rtt';
 use constant JSON_TAG_UPD		=> 'upd';
 use constant JSON_TAG_DESCRIPTION	=> 'description';
 
-use constant SEC_PER_WEEK		=> 604800;
+use constant SEC_PER_WEEK	=> 604800;
 
 our ($result, $dbh, $tld);
 
@@ -104,7 +104,7 @@ our @EXPORT = qw($result $dbh $tld
 		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
 		get_real_services_period dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts
 		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
-		cycle_start cycle_end usage);
+		cycle_start cycle_end rsm_slv_error usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -118,6 +118,8 @@ my @_sender_values;	# used to send values to Zabbix server
 my $POD2USAGE_FILE;	# usage message file
 
 my $global_sql;
+
+my $__rsm_slv_error = "";
 
 sub get_macro_minns
 {
@@ -309,9 +311,17 @@ sub get_item_data
 sub get_itemid_by_key
 {
 	my $key = shift;
-	my $errbuf = shift;
 
-	return __get_itemid_by_sql("select itemid from items where key_='$key'", $errbuf);
+	my $errbuf;
+
+	my $itemid = __get_itemid_by_sql("select itemid from items where key_='$key'", \$errbuf);
+
+	if (!$itemid)
+	{
+		$__rsm_slv_error = "cannot get itemid of item \"$key\": $errbuf";
+	}
+
+	return $itemid;
 }
 
 sub get_itemid_by_host
@@ -326,8 +336,11 @@ sub get_itemid_by_host
 	    		" and h.host='$host'".
 			" and i.key_='$key'");
 
-	fail("cannot find item ($key) at host ($host)") if (scalar(@$rows_ref) == 0);
-	fail("more than one item ($key) at host ($host)") if (scalar(@$rows_ref) > 1);
+	if (scalar(@$rows_ref) == 0)
+	{
+		$__rsm_slv_error = "cannot find item \"$key\" at host \"$host\"";
+		return;
+	}
 
 	return $rows_ref->[0]->[0];
 }
@@ -336,18 +349,34 @@ sub get_itemid_by_hostid
 {
 	my $hostid = shift;
 	my $key = shift;
-	my $errbuf = shift;
 
-	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_='$key'", $errbuf);
+	my $errbuf;
+
+	my $itemid = __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_='$key'", \$errbuf);
+
+	if (!$itemid)
+	{
+		$__rsm_slv_error = "cannot get itemid of item \"$key\" on hostid $hostid: $errbuf";
+	}
+
+	return $itemid;
 }
 
 sub get_itemid_like_by_hostid
 {
 	my $hostid = shift;
 	my $key = shift;
-	my $errbuf = shift;
 
-	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_ like '$key'", $errbuf);
+	my $errbuf;
+
+	my $itemid = __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_ like '$key'", \$errbuf);
+
+	if (!$itemid)
+	{
+		$__rsm_slv_error = "cannot get itemid of item like \"$key\" on hostid $hostid: $errbuf";
+	}
+
+	return $itemid;
 }
 
 sub __get_itemid_by_sql
@@ -359,14 +388,14 @@ sub __get_itemid_by_sql
 
 	if (scalar(@$rows_ref) == 0)
 	{
-		$$errbuf = "item not found (sql was [$sql])" if ($errbuf);
-		return -1;
+		$$errbuf = "item not found (sql was [$sql])";
+		return;
 	}
 
 	if (scalar(@$rows_ref) > 1)
 	{
-		$$errbuf = "more than one item found (sql was [$sql])" if ($errbuf);
-		return -1;
+		$$errbuf = "more than one item found (sql was [$sql])";
+		return;
 	}
 
         return $rows_ref->[0]->[0];
@@ -738,7 +767,7 @@ sub tld_service_enabled
 
 	$service_type = uc($service_type) if (defined($service_type));
 
-	return SUCCESS if (not defined($service_type) or $service_type eq 'DNS');
+	return SUCCESS if (!defined($service_type) || ($service_type eq 'DNS'));
 
 	my $host = "Template $tld";
 	my $macro = "{\$RSM.TLD.$service_type.ENABLED}";
@@ -1187,11 +1216,14 @@ sub get_online_probes
 		$hostid = $reachable_probes{$host};
 
 		# get itemid
-		my $errbuf;
 		my $key = PROBE_KEY_MANUAL;
-		my $itemid = get_itemid_by_hostid($hostid, $key, \$errbuf);
 
-		fail("configuration error: cannot get item \"$key\" to check manual online status of probe host \"$host\": $errbuf") if ($itemid < 0);
+		my $itemid = get_itemid_by_hostid($hostid, $key);
+		if (!$itemid)
+		{
+			wrn("configuration error: cannot check manual online status of probe \"$host\": ", rsm_slv_error());
+			next;
+		}
 
 		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
@@ -1231,9 +1263,13 @@ sub get_online_probes
 		# Probe is considered manually up, check automatic status.
 
 		$key = PROBE_KEY_AUTOMATIC;
-		$itemid = get_itemid_like_by_hostid($hostid, $key, \$errbuf);
 
-		fail("configuration error: cannot get item \"$key\" to check automatic online status of probe host \"$host\": $errbuf") if ($itemid < 0);
+		$itemid = get_itemid_like_by_hostid($hostid, $key);
+		if (!$itemid)
+		{
+			wrn("configuration error: cannot check automatic online status of probe \"$host\": ", rsm_slv_error());
+			next;
+		}
 
 		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
@@ -1299,7 +1335,13 @@ sub get_probe_times
 	foreach my $probe (keys(%$probes_ref))
 	{
 		my $host = "$probe - mon";
+
 		my $itemid = get_itemid_by_host($host, PROBE_LASTACCESS_ITEM);
+		if (!$itemid)
+		{
+			wrn("configuration error: ", rsm_slv_error());
+			next;
+		}
 
 		my $times_ref = __get_lastaccess_times($itemid, $probe_avail_limit, $from, $till);
 
@@ -4136,6 +4178,11 @@ sub cycle_end
 	return $sec + $delay - ($sec % $delay);
 }
 
+sub rsm_slv_error
+{
+	return $__rsm_slv_error;
+}
+
 sub usage
 {
 	pod2usage(shift);
@@ -4353,17 +4400,21 @@ sub __get_probestatus_times
 	my $key_match = "i.key_";
 	$key_match .= ($key =~ m/%/) ? " like '$key'" : "='$key'";
 
-	my ($itemid, $errbuf);
+	my $itemid;
 	if ($key =~ m/%/)
 	{
-		$itemid = get_itemid_like_by_hostid($hostid, $key, \$errbuf);
+		$itemid = get_itemid_like_by_hostid($hostid, $key);
 	}
 	else
 	{
-		$itemid = get_itemid_by_hostid($hostid, $key, \$errbuf);
+		$itemid = get_itemid_by_hostid($hostid, $key);
 	}
 
-	fail("configuration error: cannot get item \"$key\" at probe host \"$probe\": $errbuf") if ($itemid < 0);
+	if (!$itemid)
+	{
+		wrn("configuration error: ", rsm_slv_error());
+		return;
+	}
 
 	$rows_ref = db_select(
 		"select value".
@@ -4437,12 +4488,11 @@ sub __get_configvalue
 	my $diff = $hour;
 	my $value = undef;
 
-	my $errbuf;
-
 	my $key = "$item_prefix.configvalue[$item_param]";
-	my $itemid = get_itemid_by_key($key, \$errbuf);
 
-	fail("configuration error: cannot get item \"$key\": $errbuf") if ($itemid < 0);
+	my $itemid = get_itemid_by_key($key);
+
+	return unless ($itemid);
 
 	while (not $value and $diff < $month)
 	{

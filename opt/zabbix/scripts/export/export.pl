@@ -460,21 +460,19 @@ sub __get_test_data
 
 		next if (!$service_from || !$service_till);
 
-		my $errbuf;
 		my $hostid = get_hostid($tld);
-		my $itemid_avail = get_itemid_by_hostid($hostid, $key_avail, \$errbuf);
 
-		if ($itemid_avail < 0)
+		my $itemid_avail = get_itemid_by_hostid($hostid, $key_avail);
+		if (!$itemid_avail)
 		{
-			wrn("configuration error: service $service enabled but item \"$key_avail\" was not found: $errbuf");
+			wrn("configuration error: service $service enabled but item item not found: ", rsm_slv_error());
 			next;
 		}
 
-		my $itemid_rollweek = get_itemid_by_hostid($hostid, $key_rollweek, \$errbuf);
-
-		if ($itemid_rollweek < 0)
+		my $itemid_rollweek = get_itemid_by_hostid($hostid, $key_rollweek);
+		if (!$itemid_rollweek)
 		{
-			wrn("configuration error: service $service enabled but item \"$key_rollweek\" was not found: $errbuf");
+			wrn("configuration error: service $service enabled but item item not found: ", rsm_slv_error());
 			next;
 		}
 
