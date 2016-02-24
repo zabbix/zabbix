@@ -47,8 +47,8 @@ extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE;
 
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
@@ -260,7 +260,7 @@ zbx_host_availability_t;
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
 		zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
-int	DCsync_history(int sync_type);
+int	DCsync_history(int sync_type, int *sync_num);
 void	init_database_cache();
 void	free_database_cache();
 
@@ -282,10 +282,10 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TREND_USED		12
 #define ZBX_STATS_TREND_FREE		13
 #define ZBX_STATS_TREND_PFREE		14
-#define ZBX_STATS_TEXT_TOTAL		15
-#define ZBX_STATS_TEXT_USED		16
-#define ZBX_STATS_TEXT_FREE		17
-#define ZBX_STATS_TEXT_PFREE		18
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	15
+#define ZBX_STATS_HISTORY_INDEX_USED	16
+#define ZBX_STATS_HISTORY_INDEX_FREE	17
+#define ZBX_STATS_HISTORY_INDEX_PFREE	18
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -303,8 +303,10 @@ void	DCconfig_set_item_db_state(zbx_uint64_t itemid, unsigned char state, const 
 void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
-void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids);
+void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
+int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
+void	DCconfig_unlock_all_triggers();
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num);
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
@@ -379,5 +381,21 @@ void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * cons
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
+
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
+#define ZBX_HC_ITEM_STATUS_BUSY		1
+#define ZBX_HC_ITEM_STATUS_QUEUED	2
+
+struct zbx_hc_data_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		status;
+
+	struct zbx_hc_data_t	*tail;
+	struct zbx_hc_data_t	*head;
+}
+zbx_hc_item_t;
 
 #endif
