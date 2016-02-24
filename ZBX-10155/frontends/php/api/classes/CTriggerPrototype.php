@@ -770,11 +770,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if (!$expressionData->parse($expressionFull)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 				}
-
-				if (!isset($expressionData->expressions[0])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Trigger expression must contain at least one host:key reference.'));
-				}
 			}
 
 			if ($expressionChanged) {
@@ -913,6 +908,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param array  $items							array of trigger items
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
+		$itemDiscoveryIds = array();
+
 		if ($items) {
 			$itemDiscoveries = API::getApi()->select('item_discovery', array(
 				'nodeids' => get_current_nodeid(true),
@@ -928,12 +925,13 @@ class CTriggerPrototype extends CTriggerGeneral {
 					$trigger['description']
 				));
 			}
-			elseif (!$itemDiscoveryIds) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" must contain at least one item prototype.',
-					$trigger['description']
-				));
-			}
+		}
+
+		if (!$itemDiscoveryIds) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Trigger prototype "%1$s" must contain at least one item prototype.',
+				$trigger['description']
+			));
 		}
 	}
 }
