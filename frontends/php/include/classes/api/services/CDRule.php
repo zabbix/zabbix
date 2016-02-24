@@ -183,6 +183,8 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$proxy_hostids = [];
+
 		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
 
 		foreach ($drules as $drule) {
@@ -225,6 +227,18 @@ class CDRule extends CApiService {
 				);
 			}
 
+			if (array_key_exists('proxy_hostid', $drule)) {
+				if (!zbx_is_int($drule['proxy_hostid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxy_hostid'], 'proxy_hostid')
+					);
+				}
+
+				if ($drule['proxy_hostid'] > 0) {
+					$proxy_hostids[] = $drule['proxy_hostid'];
+				}
+			}
+
 			if (array_key_exists('dchecks', $drule) && $drule['dchecks']) {
 				$this->validateDChecks($drule['dchecks']);
 			}
@@ -255,7 +269,6 @@ class CDRule extends CApiService {
 		}
 
 		// Check proxy IDs.
-		$proxy_hostids = zbx_objectValues($drules, 'proxy_hostid');
 		if ($proxy_hostids) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
@@ -263,7 +276,7 @@ class CDRule extends CApiService {
 				'preservekeys' => true
 			]);
 			foreach ($proxy_hostids as $proxy_hostid) {
-				if ($proxy_hostid != 0 && !array_key_exists($proxy_hostid, $db_proxies)) {
+				if (!array_key_exists($proxy_hostid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
 					);
@@ -291,11 +304,15 @@ class CDRule extends CApiService {
 		}
 
 		$drule_names_changed = [];
+		$proxy_hostids = [];
 
 		$ip_range_validator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
 
 		foreach ($drules as $drule) {
-			if (!array_key_exists('druleid', $drule)) {
+			if (!zbx_is_int($drule['druleid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'druleid'));
+			}
+			elseif (!array_key_exists('druleid', $drule)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'druleid'));
 			}
 			elseif (!array_key_exists($drule['druleid'], $db_drules)) {
@@ -339,6 +356,18 @@ class CDRule extends CApiService {
 				);
 			}
 
+			if (array_key_exists('proxy_hostid', $drule)) {
+				if (!zbx_is_int($drule['proxy_hostid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxy_hostid'], 'proxy_hostid')
+					);
+				}
+
+				if ($drule['proxy_hostid'] > 0) {
+					$proxy_hostids[] = $drule['proxy_hostid'];
+				}
+			}
+
 			if (array_key_exists('dchecks', $drule)) {
 				if ($drule['dchecks']) {
 					$this->validateDChecks($drule['dchecks']);
@@ -373,7 +402,6 @@ class CDRule extends CApiService {
 		}
 
 		// Check proxy IDs.
-		$proxy_hostids = zbx_objectValues($drules, 'proxy_hostid');
 		if ($proxy_hostids) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
@@ -381,7 +409,7 @@ class CDRule extends CApiService {
 				'preservekeys' => true
 			]);
 			foreach ($proxy_hostids as $proxy_hostid) {
-				if ($proxy_hostid != 0 && !array_key_exists($proxy_hostid, $db_proxies)) {
+				if (!array_key_exists($proxy_hostid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
 					);
