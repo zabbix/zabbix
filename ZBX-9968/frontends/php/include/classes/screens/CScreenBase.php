@@ -191,7 +191,7 @@ class CScreenBase {
 					'profileIdx'		=> false,
 					'profileIdx2'		=> true,
 					'updateProfile'		=> false,
-					'timeline'			=> false,
+					'timeline'			=> false
 				];
 				break;
 
@@ -206,7 +206,7 @@ class CScreenBase {
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
 					'updateProfile'		=> false,
-					'timeline'			=> false,
+					'timeline'			=> false
 				];
 				break;
 
@@ -221,7 +221,7 @@ class CScreenBase {
 					'profileIdx'		=> true,
 					'profileIdx2'		=> true,
 					'updateProfile'		=> true,
-					'timeline'			=> true,
+					'timeline'			=> true
 				];
 		}
 
@@ -373,7 +373,7 @@ class CScreenBase {
 	public function insertFlickerfreeJs(array $data = []) {
 		$jsData = [
 			'id' => $this->getDataId(),
-			'interval' => CWebUser::$data['refresh'],
+			'interval' => CWebUser::$data['refresh']
 		];
 
 		$parameters = $this->parameters;
