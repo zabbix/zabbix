@@ -21,6 +21,8 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
+$groupId = getRequest('groupid', 0);
+
 if (getRequest('hostid', 0) > 0) {
 	$dbHost = $this->data['dbHost'];
 
@@ -173,7 +175,6 @@ if ($hostId > 0 && getRequest('form') != 'clone') {
 	$frmHost->addVar('hostid', $hostId);
 }
 
-$groupId = getRequest('groupid', 0);
 if ($groupId > 0) {
 	$frmHost->addVar('groupid', $groupId);
 }
