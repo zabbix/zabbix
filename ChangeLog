@@ -10,8 +10,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 3.0.1rc2
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-10441] fixed visibility of "Audit" and "Action log" pages for "Zabbix Admin" users (Sasha)
 ........S. [ZBX-10291] fixed server crash in escalator process if escalation is in progress and action is deleted (Andris)
@@ -19,8 +17,6 @@ Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 3.0.1rc1
-
-New features:
 
 Bug fixes:
 A......... [ZBX-10399] fixed "undefined index" errors with broken value maps (Sasha)
