@@ -248,23 +248,23 @@ class CDRule extends CApiService {
 		}
 
 		// Check drule name duplicates in input data.
-		$dublicate = CArrayHelper::findDuplicate($drules, 'name');
-		if ($dublicate) {
+		$duplicate = CArrayHelper::findDuplicate($drules, 'name');
+		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s" already exists.', $dublicate['name'])
+				_s('Discovery rule "%1$s" already exists.', $duplicate['name'])
 			);
 		}
 
 		// Check drule name duplicates in DB.
-		$db_dublicate = $this->get([
+		$db_duplicate = $this->get([
 			'output' => ['name'],
 			'filter' => ['name' => zbx_objectValues($drules, 'name')],
 			'limit' => 1
 		]);
 
-		if ($db_dublicate) {
+		if ($db_duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Discovery rule "%1$s" already exists.', $db_dublicate[0]['name'])
+				_s('Discovery rule "%1$s" already exists.', $db_duplicate[0]['name'])
 			);
 		}
 
@@ -289,7 +289,6 @@ class CDRule extends CApiService {
 	 * Validate the input parameters for update() method.
 	 *
 	 * @param array $drules			Discovery rules data.
-	 * @param array $db_drules		DB discovery rules data.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -305,11 +304,11 @@ class CDRule extends CApiService {
 
 		// Validate given IDs.
 		foreach ($drules as $drule) {
-			if (!zbx_is_int($drule['druleid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'druleid'));
-			}
-			elseif (!array_key_exists('druleid', $drule)) {
+			if (!array_key_exists('druleid', $drule)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'druleid'));
+			}
+			elseif (!is_string($drule['druleid']) && !is_int($drule['druleid']) || !zbx_is_int($drule['druleid'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'druleid'));
 			}
 		}
 
@@ -390,23 +389,23 @@ class CDRule extends CApiService {
 
 		if ($drule_names_changed) {
 			// Check drule name duplicates in input data.
-			$dublicate = CArrayHelper::findDuplicate($drule_names_changed, 'name');
-			if ($dublicate) {
+			$duplicate = CArrayHelper::findDuplicate($drule_names_changed, 'name');
+			if ($duplicate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Discovery rule "%1$s" already exists.', $dublicate['name'])
+					_s('Discovery rule "%1$s" already exists.', $duplicate['name'])
 				);
 			}
 
 			// Check drule name duplicates in DB.
-			$db_dublicate = $this->get([
+			$db_duplicate = $this->get([
 				'output' => ['name'],
 				'filter' => ['name' => zbx_objectValues($drule_names_changed, 'name')],
 				'limit' => 1
 			]);
 
-			if ($db_dublicate) {
+			if ($db_duplicate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Discovery rule "%1$s" already exists.', $db_dublicate[0]['name'])
+					_s('Discovery rule "%1$s" already exists.', $db_duplicate[0]['name'])
 				);
 			}
 		}
