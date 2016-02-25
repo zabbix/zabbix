@@ -303,14 +303,11 @@ class CDRule extends CApiService {
 		}
 
 		// Validate given IDs.
-		foreach ($drules as $drule) {
-			if (!array_key_exists('druleid', $drule)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'druleid'));
-			}
-			elseif (!is_string($drule['druleid']) && !is_int($drule['druleid']) || !zbx_is_int($drule['druleid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is not integer.', 'druleid'));
-			}
-		}
+		$this->checkObjectIds($drules, 'druleid',
+			_('No "%1$s" given for discovery rule.'),
+			_('Empty discovery rule ID.'),
+			_('Incorrect discovery rule ID.')
+		);
 
 		$db_drules = $this->get([
 			'output' => ['druleid', 'name'],
