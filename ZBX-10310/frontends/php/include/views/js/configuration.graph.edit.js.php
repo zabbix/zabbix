@@ -25,11 +25,13 @@
 
 	<!-- name -->
 	<td>
+		<div class="<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>" style="width:280px;">
 		<?php if ($this->data['templates']): ?>
-			<span id="items_#{number}_name">#{name}</span>
+			<span  id="items_#{number}_name">#{name}</span>
 		<?php else: ?>
 			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
 		<?php endif ?>
+		</div>
 	</td>
 
 	<!-- type -->
@@ -281,12 +283,11 @@
 <?php if (!$this->data['templates']): ?>
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
-			itemsTableWidth = itemsTable.width(),
 			itemsTableColumns = jQuery('#itemsTable th'),
 			itemsTableColumnWidths = [];
 
 		itemsTableColumns.each(function(i) {
-			itemsTableColumnWidths[i] = jQuery(this).width();
+			itemsTableColumnWidths[i] = jQuery(this).outerWidth();
 		});
 		itemsTable.sortable({
 			disabled: (jQuery('#itemsTable tr.sortable').length < 2),
@@ -297,21 +298,13 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function() {
-				// force not to change table width
-				itemsTable.width(itemsTableWidth);
-			},
 			helper: function(e, ui) {
-				ui.children().each(function(i, td) {
-					jQuery(td).width(itemsTableColumnWidths[i]);
+				ui.children().each(function(i, tableData) {
+					jQuery(tableData).outerWidth(itemsTableColumnWidths[i]);
 				});
-
-				// when dragging element on safari, it jumps out of the table
 				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2) + 'px');
+					ui.css('left', 0);
 				}
-
 				return ui;
 			},
 			start: function(e, ui) {

@@ -261,25 +261,23 @@ else {
 $itemsTable = (new CTable())
 	->setId('itemsTable')
 	->setHeader([
-		(new CColHeader())->setWidth(15),
-		(new CColHeader())->setWidth(15),
-		(new CColHeader(_('Name')))->setWidth(($this->data['graphtype'] == GRAPH_TYPE_NORMAL) ? 280 : 360),
+		(new CColHeader()),
+		(new CColHeader()),
+		(new CColHeader(_('Name'))),
 		($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED)
-			? (new CColHeader(_('Type')))->setWidth(80)
+			? (new CColHeader(_('Type')))
 			: null,
-		(new CColHeader(_('Function')))->setWidth(80),
+		(new CColHeader(_('Function'))),
 		($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
 			? (new CColHeader(_('Draw style')))
 				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth(80)
 			: null,
 		($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED)
 			? (new CColHeader(_('Y axis side')))
 				->addClass(ZBX_STYLE_NOWRAP)
-				->setWidth(80)
 			: null,
-		(new CColHeader(_('Colour')))->setWidth(100),
-		$is_templated ? null : (new CColHeader(_('Action')))->setWidth(50)
+		(new CColHeader(_('Colour'))),
+		$is_templated ? null : (new CColHeader(_('Action')))
 	]);
 
 $itemsTable->addRow(
@@ -307,7 +305,7 @@ $itemsTable->addRow(
 );
 
 foreach ($this->data['items'] as $n => $item) {
-	$name = $item['host'].NAME_DELIMITER.$item['name_expanded'];
+	$name = $item['name_expanded'];
 
 	if (zbx_empty($item['drawtype'])) {
 		$item['drawtype'] = 0;
