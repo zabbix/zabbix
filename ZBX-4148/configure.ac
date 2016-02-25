@@ -1429,9 +1429,6 @@ if test "x$java" = "xyes"; then
 	fi
 fi
 
-AM_CONDITIONAL(JABBER, test "x$found_jabber" = "xyes")
-AM_CONDITIONAL(WITH_ODBC, test "x$have_unixodbc" = "xyes")
-
 found_ldap="no"
 dnl Check for libLDAP [by default - skip]
 LIBLDAP_CHECK_CONFIG([no])
