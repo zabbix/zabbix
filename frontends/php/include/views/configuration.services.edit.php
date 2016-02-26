@@ -62,7 +62,7 @@ $servicesFormList->addRow(_('Status calculation algorithm'),
 
 // append SLA to form list
 $showslaCheckbox = (new CCheckBox('showsla'))->setChecked($this->data['showsla'] == 1);
-$goodslaTextBox = (new CTextBox('goodsla', (float)$this->data['goodsla'], false, 7))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+$goodslaTextBox = (new CTextBox('goodsla', $this->data['goodsla'], false, 8))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
 }
