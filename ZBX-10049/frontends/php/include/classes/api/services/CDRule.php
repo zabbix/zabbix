@@ -304,9 +304,9 @@ class CDRule extends CApiService {
 
 		// Validate given IDs.
 		$this->checkObjectIds($drules, 'druleid',
-			_('No "%1$s" given for discovery rule.'),
-			_('Empty discovery rule ID.'),
-			_('Incorrect discovery rule ID.')
+			_('Field "%1$s" is mandatory.'),
+			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('cannot be empty')),
+			_s('Incorrect value for field "%1$s"', 'druleid')
 		);
 
 		$db_drules = $this->get([
