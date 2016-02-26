@@ -306,7 +306,7 @@ class CDRule extends CApiService {
 		$this->checkObjectIds($drules, 'druleid',
 			_('Field "%1$s" is mandatory.'),
 			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('cannot be empty')),
-			_s('Incorrect value for field "%1$s"', 'druleid')
+			_s('Incorrect value for field "%1$s": %2$s.', 'druleid', _('a numeric value is expected'))
 		);
 
 		$db_drules = $this->get([
