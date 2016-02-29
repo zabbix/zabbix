@@ -14,6 +14,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10356] fixed user media form "send to" and "period" fields having incorrect "maxlength" property (Ivo)
 .......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
 ........S. [ZBX-10248] moved processing of zabbix[host,,items*] internal items to server if the host is monitored by a proxy (wiper)
 
