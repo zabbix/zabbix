@@ -1673,7 +1673,7 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
 		item->status = 0;
 
-	/* try to remove chunks with all history values older than maximum request range */
+	/* try to remove chunks with all history values older than the timestamp */
 	while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
 	{
 		zbx_vc_chunk_t	*next;
@@ -1734,6 +1734,7 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 	{
 		if (0 < vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
 		{
+			/* If the added value has the same or older timestamp as the first value in cache */
 			/* we can't add it to keep cache consistency. Additionally we must make sure no   */
 			/* values with matching timestamp seconds are kept in cache.                      */
 			vch_item_remove_values(item, value->timestamp.sec + 1);
