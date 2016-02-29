@@ -64,7 +64,7 @@ zbx_buf_type_t;
 #define ZBX_SOCKET_PEER_BUF_LEN	129
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-typedef struct ZBX_TLS_CTX	*zbx_tls_context_t;
+typedef struct zbx_tls_ctx	*zbx_tls_context_t;
 #endif
 
 typedef struct
@@ -75,7 +75,7 @@ typedef struct
 	char				*buffer;
 	char				*next_line;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_context_t		tls_ctx;
+	zbx_tls_context_t		context;
 #endif
 	unsigned int 			connection_type;	/* type of connection actually established: */
 								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */

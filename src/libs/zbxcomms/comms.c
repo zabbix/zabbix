@@ -226,7 +226,7 @@ static void	zbx_socket_clean(zbx_socket_t *s)
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_ctx_alloc(&s->tls_ctx);
+	zbx_tls_ctx_alloc(&s->context);
 #endif
 }
 
@@ -245,7 +245,7 @@ static void	zbx_socket_free(zbx_socket_t *s)
 		zbx_free(s->buffer);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_free(s->tls_ctx);
+	zbx_free(s->context);
 #endif
 }
 
