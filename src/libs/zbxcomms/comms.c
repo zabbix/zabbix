@@ -502,7 +502,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -612,7 +612,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
+			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, &error))
 	{
 		zbx_tcp_close(s);
 		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -692,8 +692,8 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 		while (written < (ssize_t)send_bytes)
 		{
-			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, &error, header_buf + written,
-					send_bytes - (size_t)written)))
+			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, header_buf + written,
+					send_bytes - (size_t)written, &error)))
 			{
 				zbx_set_socket_strerror("%s", error);
 				ret = FAIL;
@@ -712,7 +712,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 		else
 			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, len - (size_t)written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, &error, data + written, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, data + written, send_bytes, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
 			ret = FAIL;
@@ -1165,7 +1165,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 
 			zbx_socket_timeout_set(s, CONFIG_TIMEOUT);
 
-			res = zbx_tls_accept(s, &error, tls_accept);
+			res = zbx_tls_accept(s, tls_accept, &error);
 #if !defined(_WINDOWS)
 			zbx_alarm_off();
 #endif
@@ -1424,7 +1424,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, unsigned char flags, int timeout)
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 	s->buffer = s->buf_stat;
 
-	while (0 != (nbytes = zbx_tls_read(s, &error, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes)))
+	while (0 != (nbytes = zbx_tls_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes, &error)))
 	{
 		if (ZBX_PROTO_ERROR == nbytes)
 		{
