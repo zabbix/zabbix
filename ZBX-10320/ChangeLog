@@ -1,18 +1,28 @@
 Changes for 2.2.12rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Chinese (China), Greek, Korean, Romanian, Ukrainian, Vietnamese translations to be displayed by default (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United States), French, Japanese, Korean, Polish, Russian, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10356] fixed user media form "send to" and "period" fields having incorrect "maxlength" property (Ivo)
+.......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
+.......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
+..F....... [ZBX-9991] fixed functionality that adds last selected host group to new host groups list (Cemeris)
+..F....... [ZBX-10319] fixed graphs consuming 100% CPU when given incorrect "stime" parameter in URL (Ivo)
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+.......PS. [ZBX-10215] fixed host availability not being updated for connection errors on timeouting items (wiper)
+...G...... [ZBX-10313] changed wmi.get[] to accept UTF-8 encoded namespace and WQL query, fixed wmi.get[] to return UTF-8 encoded strings (Sandis)
+.......PS. [ZBX-9661] fixed bug when VMware collectors could sometimes use 100% of CPU without processing any data (wiper)
 ..F....... [ZBX-8635] fixed undefined index in trigger expression constructor popup (Cemeris)
-..F....... [ZBX-10155] disallowed creating host prototype triggers without any host:key reference (Cemeris)
 ..F....... [ZBX-9938] fixed displaying incorrect number of hosts that have acknowledged problematic triggers in dashboard host status widget when "Problem display" is "Unackowledged only" in dashboard filter (Ivo)
 A......... [ZBX-10251] fixed "countOutput" calculation in map.get API method (Gunars)
 ...G...PS. [ZBX-9733] fixed possibility to start several agents on the same port on Windows (asaveljevs)
 ..F....... [ZBX-9991] fixed functionality that adds last selected host group to new template groups list (Cemeris)
 .......PS. [ZBX-10270] fixed HTTP proxy environment variables not being taken into account in Web monitoring (asaveljevs)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 A......... [ZBX-10150] fixed "countOutput" calculation in screen.get API method (Gunars)
 ..F....... [ZBX-10170] fixed column names vertical rotation in Firefox v43 (Gunars)
 .......PS. [ZBX-9904] fixed server response when active proxy sends in historical data, info string was missing (gleb)
@@ -1359,10 +1369,14 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.17rc1
 
 New features:
+A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
+A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
+....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
 A.F....... [ZBX-10232] fixed SQL errors with invalid "year" parameter in IT services report (Gunars)
-A.F....... [ZBX-1357] more details to README file about how to add new language (zalex_ua)
+A.F....... [ZBX-1357] added more details to README file about how to add new language (zalex_ua)
 ........S. [ZBX-10064] fixed history cache synchronisation with database on shutdown (viktors, wiper)
 ........S. [ZBX-9458] fixed low level discovery macro substitution in calculated item formulas (wiper)
 ........S. [ZBX-9928] fixed triple SMS being sent by single action with Cinterion MC35i modem (wiper)
@@ -3049,6 +3063,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
 
