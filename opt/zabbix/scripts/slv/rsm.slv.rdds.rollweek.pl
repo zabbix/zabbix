@@ -2,11 +2,7 @@
 #
 # RDDS rolling week
 
-BEGIN
-{
-	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*/.*,$1,; $MYDIR = '..' if ($MYDIR eq $0);
-}
-use lib $MYDIR;
+use lib '/opt/zabbix/scripts';
 
 use strict;
 use warnings;

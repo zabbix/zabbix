@@ -1,22 +1,21 @@
 #!/usr/bin/perl -w
 
-BEGIN
-{
-	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
-}
-use lib $MYDIR;
+use lib '/opt/zabbix/scripts';
 
 use strict;
 use warnings;
 use RSM;
 use RSMSLV;
 use ApiHelper;
-use TLD_constants qw(:ec);
-use Data::Dumper;
+use JSON::XS;
+
+use constant JSON_RDDS_SUBSERVICE => 'subService';
+use constant JSON_RDDS_43 => 'RDDS43';
+use constant JSON_RDDS_80 => 'RDDS80';
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n', 'base=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n');
 
 # do not write any logs
 setopt('nolog');
@@ -35,14 +34,6 @@ db_connect();
 
 __validate_input();
 
-if (opt('base'))
-{
-	if (ah_set_base_dir(getopt('base')) != AH_SUCCESS)
-	{
-		fail("cannot set base directory: ", ah_get_error());
-	}
-}
-
 my $opt_from = getopt('from');
 
 if (defined($opt_from))
@@ -51,16 +42,16 @@ if (defined($opt_from))
 	dbg("option \"from\" truncated to the start of a minute: $opt_from") if ($opt_from != getopt('from'));
 }
 
-my $services;
+my %services;
 if (opt('service'))
 {
-	$services->{lc(getopt('service'))} = undef;
+	$services{lc(getopt('service'))} = undef;
 }
 else
 {
 	foreach my $service ('dns', 'dnssec', 'rdds', 'epp')
 	{
-		$services->{$service} = undef;
+		$services{$service} = undef;
 	}
 }
 
@@ -83,12 +74,10 @@ if (opt('ignore-file'))
 my $cfg_dns_delay = undef;
 my $cfg_dns_minns;
 my $cfg_dns_valuemaps;
-my $cfg_dns_max_value;
-my $cfg_dns_minonline;
 
 my $cfg_dns_statusmaps = get_statusmaps('dns');
 
-foreach my $service (keys(%{$services}))
+foreach my $service (keys(%services))
 {
 	if ($service eq 'dns' || $service eq 'dnssec')
 	{
@@ -97,66 +86,46 @@ foreach my $service (keys(%{$services}))
 			$cfg_dns_delay = get_macro_dns_udp_delay();
 			$cfg_dns_minns = get_macro_minns();
 			$cfg_dns_valuemaps = get_valuemaps('dns');
-			$cfg_dns_max_value = get_macro_dns_udp_rtt_low();
-			$cfg_dns_minonline = get_macro_dns_probe_online();
 		}
 
-		$services->{$service}->{'delay'} = $cfg_dns_delay;
-		$services->{$service}->{'minns'} = $cfg_dns_minns;
-		$services->{$service}->{'valuemaps'} = $cfg_dns_valuemaps;
-		$services->{$service}->{'max_value'} = $cfg_dns_max_value;
-		$services->{$service}->{'minonline'} = $cfg_dns_minonline;
-		$services->{$service}->{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]';	# 0 - down, 1 - up
-		$services->{$service}->{'key_rtt'} = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+		$services{$service}{'delay'} = $cfg_dns_delay;
+		$services{$service}{'minns'} = $cfg_dns_minns;
+		$services{$service}{'valuemaps'} = $cfg_dns_valuemaps;
+		$services{$service}{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
+		$services{$service}{'key_rtt'} = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	}
 	elsif ($service eq 'rdds')
 	{
-		$services->{$service}->{'delay'} = get_macro_rdds_delay();
-		$services->{$service}->{'valuemaps'} = get_valuemaps($service);
-		$services->{$service}->{'max_value'} = get_macro_rdds_rtt_low();
-		$services->{$service}->{'minonline'} = get_macro_rdds_probe_online();
-		$services->{$service}->{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
-		$services->{$service}->{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
-		$services->{$service}->{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
-		$services->{$service}->{'key_43_upd'} = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-		$services->{$service}->{'key_80_rtt'} = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
-		$services->{$service}->{'key_80_ip'} = 'rsm.rdds.80.ip[{$RSM.TLD}]';
+		$services{$service}{'delay'} = get_macro_rdds_delay();
+		$services{$service}{'valuemaps'} = get_valuemaps($service);
+		$services{$service}{'key_status'} = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+		$services{$service}{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
+		$services{$service}{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
+		$services{$service}{'key_43_upd'} = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+		$services{$service}{'key_80_rtt'} = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
+		$services{$service}{'key_80_ip'} = 'rsm.rdds.80.ip[{$RSM.TLD}]';
 
 	}
 	elsif ($service eq 'epp')
 	{
-		# TODO: max_value for EPP is based on the command
-		$services->{$service}->{'delay'} = get_macro_epp_delay();
-		$services->{$service}->{'valuemaps'} = get_valuemaps($service);
-		$services->{$service}->{'minonline'} = get_macro_epp_probe_online();
-		$services->{$service}->{'key_status'} = 'rsm.epp[{$RSM.TLD},';	# 0 - down, 1 - up
-		$services->{$service}->{'key_ip'} = 'rsm.epp.ip[{$RSM.TLD}]';
-		$services->{$service}->{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
+		$services{$service}{'delay'} = get_macro_epp_delay();
+		$services{$service}{'valuemaps'} = get_valuemaps($service);
+		$services{$service}{'key_status'} = 'rsm.epp[{$RSM.TLD},'; # 0 - down, 1 - up
+		$services{$service}{'key_ip'} = 'rsm.epp.ip[{$RSM.TLD}]';
+		$services{$service}{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
 	}
 
-	$services->{$service}->{'key_avail'} = "rsm.slv.$service.avail";
-
-	fail("$service delay (", $services->{$service}->{'delay'}, ") is not multiple of 60") unless ($services->{$service}->{'delay'} % 60 == 0);
+	$services{$service}{'avail_key'} = "rsm.slv.$service.avail";
 }
 
-my $now = opt('now') ? getopt('now') : time();
-
-dbg("now:", ts_full($now));
-
-# rolling week incidents
-my ($rollweek_from, $rollweek_till) = get_rollweek_bounds(getopt('now'));
+my $now = time();
 
 my $tlds_ref;
 if (opt('tld'))
 {
-	my @tlds = split(',', getopt('tld'));
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-	foreach my $t (@tlds)
-	{
-		fail("TLD $t does not exist.") if (tld_exists($t) == 0);
-	}
-
-	$tlds_ref = \@tlds;
+	$tlds_ref = [ getopt('tld') ];
 }
 else
 {
@@ -245,6 +214,8 @@ elsif (opt('period'))
 fail("cannot get the beginning of calculation period") unless(defined($check_from));
 fail("cannot get the end of calculation period") unless(defined($check_till));
 
+dbg("check_from:", ts_full($check_from), " check_till:", ts_full($check_till), " last_time_till:", ts_full($last_time_till));
+
 if ($check_till < $check_from)
 {
 	info("cannot yet calculate, the latest data not fully available");
@@ -270,7 +241,7 @@ if ($check_till > $last_time_till)
 	exit(0);
 }
 
-my ($from, $till) = get_real_services_period($services, $check_from, $check_till);
+my ($from, $till) = get_real_services_period(\%services, $check_from, $check_till);
 
 if (!$from)
 {
@@ -278,12 +249,12 @@ if (!$from)
     exit(0);
 }
 
-my $tlds_to_process = 0;
+my $tlds_processed = 0;
 foreach (@$tlds_ref)
 {
-	$tlds_to_process++;
+	$tlds_processed++;
 
-	last if (opt('limit') && $tlds_to_process == getopt('limit'));
+	last if (opt('limit') && $tlds_processed == getopt('limit'));
 
 	# NB! This is needed in order to set the value globally.
 	$tld = $_;
@@ -296,11 +267,22 @@ foreach (@$tlds_ref)
 
 	my $ah_tld = ah_get_api_tld($tld);
 
-	foreach my $service (keys(%{$services}))
+	foreach my $service (keys(%services))
 	{
 		if (tld_service_enabled($tld, $service) != SUCCESS)
 		{
-			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
+			if (opt('dry-run'))
+			{
+				__prnt(uc($service), " DISABLED");
+			}
+			else
+			{
+				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				{
+					fail("cannot save alarmed: ", ah_get_error());
+				}
+			}
+
 			next;
 		}
 
@@ -311,24 +293,28 @@ foreach (@$tlds_ref)
 		if ($lastclock == E_FAIL)
 		{
 			wrn(uc($service), ": configuration error, item $lastclock_key not found");
-			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
 			next;
 		}
 
 		if ($lastclock == 0)
 		{
 			wrn(uc($service), ": no rolling week data in the database yet");
-			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
+
+			if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+			{
+				fail("cannot save alarmed: ", ah_get_error());
+			}
+
 			next;
 		}
 
 		dbg("lastclock:$lastclock");
 
-		$servicedata->{$tld}->{'services'}->{$service}->{'lastclock'} = $lastclock;
+		$servicedata->{$tld}->{$service}->{'lastclock'} = $lastclock;
 	}
 }
 
-undef($tld);
+__prnt(sprintf("getting probe statuses for period: %s", selected_period($from, $till)));
 
 my $all_probes_ref = get_probes();
 
@@ -350,38 +336,14 @@ foreach (keys(%$servicedata))
 
 	my $ah_tld = ah_get_api_tld($tld);
 
-	my $tld_status->{'status'} = AH_STATUS_UP;
-
-	my $dns_tests_ref;
-
-	foreach my $service (keys(%{$servicedata->{$tld}->{'services'}}))
+	foreach my $service (keys(%{$servicedata->{$tld}}))
 	{
-		my $lastclock = $servicedata->{$tld}->{'services'}->{$service}->{'lastclock'};
-		my $alarmed = $servicedata->{$tld}->{'services'}->{$service}->{'alarmed'};
+		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
 
-		my $delay = $services->{$service}->{'delay'};
-		my $service_from = $services->{$service}->{'from'};
-		my $service_till = $services->{$service}->{'till'};
-		my $key_avail = $services->{$service}->{'key_avail'};
-
-		if (defined($alarmed) && $alarmed eq AH_ALARMED_DISABLED)
-		{
-			$tld_status->{'services'}->{$service}->{'enabled'} = AH_ENABLED_NO;
-
-			if (opt('dry-run'))
-			{
-				__prnt(uc($service), ' alarmed:', AH_ALARMED_DISABLED);
-			}
-			else
-			{
-				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
-				{
-					fail("cannot save alarmed: ", ah_get_error());
-				}
-			}
-
-			next;
-		}
+		my $delay = $services{$service}{'delay'};
+		my $service_from = $services{$service}{'from'};
+		my $service_till = $services{$service}{'till'};
+		my $avail_key = $services{$service}{'avail_key'};
 
 		if (!$service_from || !$service_till)
 		{
@@ -391,27 +353,31 @@ foreach (keys(%$servicedata))
 		}
 
 		my $hostid = get_hostid($tld);
+		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key);
 
-		my $avail_itemid = get_itemid_by_hostid($hostid, $key_avail);
-		if (!$avail_itemid)
+		if ($avail_itemid < 0)
 		{
-			wrn("configuration error: ", rsm_slv_error());
+			if ($avail_itemid == E_ID_NONEXIST)
+			{
+				wrn("configuration error: service $service enabled but item \"$avail_key\" not found");
+			}
+			elsif ($avail_itemid == E_ID_MULTIPLE)
+			{
+				wrn("configuration error: multiple items with key \"$avail_key\" found");
+			}
+			else
+			{
+				wrn("cannot get ID of $service item ($avail_key): unknown error");
+			}
+
 			next;
 		}
 
-		my $downtime_key = "rsm.slv.$service.downtime";
-		my $downtime;
+		# we need down time in minutes, not percent, that's why we can't use "rsm.slv.$service.rollweek" value
+		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
+		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		# we must have a special calculation key for that ($downtime_key)
-		#my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
-
-		if (__get_downtime($hostid, $service, $downtime_key, getopt('now'), \$downtime) != SUCCESS)
-		{
-			wrn("configuration error: ", rsm_slv_error());
-			$downtime = 0.0;
-		}
-
-		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') || opt('debug'));
+		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
@@ -419,7 +385,7 @@ foreach (keys(%$servicedata))
 		}
 		else
 		{
-			if (ah_save_service_availability($ah_tld, $service, $downtime) != AH_SUCCESS)
+			if (ah_save_service_availability($ah_tld, $service, $downtime, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -428,51 +394,48 @@ foreach (keys(%$servicedata))
 		dbg("getting current $service availability (delay:$delay)");
 
 		# get availability
-		my $incidents = get_incidents2($avail_itemid, $delay, $now);
+		my $incidents = get_incidents($avail_itemid, $now);
 
-		$alarmed = AH_ALARMED_NO;
+		my $alarmed_status = AH_ALARMED_NO;
 		if (scalar(@$incidents) != 0)
 		{
-			if ($incidents->[0]->{'false_positive'} == 0 && !defined($incidents->[0]->{'end'}))
+			if ($incidents->[0]->{'false_positive'} == 0 and not defined($incidents->[0]->{'end'}))
 			{
-				$alarmed = AH_ALARMED_YES;
+				$alarmed_status = AH_ALARMED_YES;
 			}
 		}
 
 		if (opt('dry-run'))
 		{
-			__prnt(uc($service), " alarmed:$alarmed");
+			__prnt(uc($service), " alarmed:$alarmed_status");
 		}
 		else
 		{
-			if (ah_save_alarmed($ah_tld, $service, $alarmed) != AH_SUCCESS)
+			if (ah_save_alarmed($ah_tld, $service, $alarmed_status, $lastclock) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
 		}
 
-		$tld_status->{'services'}->{$service}->{'enabled'} = AH_ENABLED_YES;
-		$tld_status->{'services'}->{$service}->{'status'} = (($alarmed eq AH_ALARMED_YES) ? AH_STATUS_DOWN : AH_STATUS_UP);
-
 		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref);
 
 		if ($service eq 'dns' || $service eq 'dnssec')
 		{
-			$nsips_ref = get_nsips($tld, $services->{$service}->{'key_rtt'}, 1);	# templated
-			$dns_items_ref = get_dns_itemids($nsips_ref, $services->{$service}->{'key_rtt'}, $tld, getopt('probe'));
+			$nsips_ref = get_nsips($tld, $services{$service}{'key_rtt'}, 1);	# templated
+			$dns_items_ref = __get_dns_itemids($nsips_ref, $services{$service}{'key_rtt'}, $tld, getopt('probe'));
 		}
 		elsif ($service eq 'rdds')
 		{
-			$rdds_dbl_items_ref = get_rdds_dbl_itemids($tld, getopt('probe'), $services->{'rdds'}->{'key_43_rtt'}, $services->{'rdds'}->{'key_80_rtt'}, $services->{'rdds'}->{'key_43_upd'});
-			$rdds_str_items_ref = get_rdds_str_itemids($tld, getopt('probe'), $services->{'rdds'}->{'key_43_ip'}, $services->{'rdds'}->{'key_80_ip'});
+			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld, getopt('probe'));
+			$rdds_str_items_ref = __get_rdds_str_itemids($tld, getopt('probe'));
 		}
 		elsif ($service eq 'epp')
 		{
-			$epp_dbl_items_ref = get_epp_dbl_itemids($tld, getopt('probe'), $services->{'epp'}->{'key_rtt'});
-			$epp_str_items_ref = get_epp_str_itemids($tld, getopt('probe'), $services->{'epp'}->{'key_ip'});
+			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld, getopt('probe'));
+			$epp_str_items_ref = __get_epp_str_itemids($tld, getopt('probe'));
 		}
 
-		$incidents = get_incidents2($avail_itemid, $delay, $service_from, $service_till);
+		$incidents = get_incidents($avail_itemid, $service_from, $service_till);
 
 		foreach (@$incidents)
 		{
@@ -484,14 +447,14 @@ foreach (keys(%$servicedata))
 			my $start = $event_start;
 			my $end = $event_end;
 
-			if (defined($service_from) && $service_from > $event_start)
+			if (defined($service_from) and $service_from > $event_start)
 			{
 				$start = $service_from;
 			}
 
 			if (defined($service_till))
 			{
-				if (!defined($event_end) || (defined($event_end) && $service_till < $event_end))
+				if (not defined($event_end) or (defined($event_end) and $service_till < $event_end))
 				{
 					$end = $service_till;
 				}
@@ -503,22 +466,23 @@ foreach (keys(%$servicedata))
 				" from history_uint".
 				" where itemid=$avail_itemid".
 					" and ".sql_time_condition($start, $end).
-				" order by itemid,clock");
+				" order by clock");
 
-			my $cycles;
+			my @test_results;
 
 			my $status_up = 0;
 			my $status_down = 0;
-
-			my $values_from;
-			my $values_till;
 
 			foreach my $row_ref (@$rows_ref)
 			{
 				my $value = $row_ref->[0];
 				my $clock = $row_ref->[1];
 
-				my $cycleclock = cycle_start($clock, $delay);
+				my $result;
+
+				$result->{'tld'} = $tld;
+				$result->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
+				$result->{'clock'} = $clock;
 
 				# We have the test resulting value (Up or Down) at "clock". Now we need to select the
 				# time bounds (start/end) of all data points from all proxies.
@@ -529,10 +493,8 @@ foreach (keys(%$servicedata))
 				#   |.....................................|...................................|
 				#   0 seconds <--zero or more minutes--> 30                                  59
 				#
-				my $end = $cycleclock + $delay - 1;
-
-				$values_from = $cycleclock if (!$values_from || $cycleclock < $values_from);
-				$values_till = $end if (!$values_till || $end > $values_till);
+				$result->{'start'} = $clock - $delay + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
+				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
 
 				if (opt('dry-run'))
 				{
@@ -546,15 +508,16 @@ foreach (keys(%$servicedata))
 					}
 					else
 					{
-						wrn("unknown status: $value (expected UP (" . UP . ") or DOWN (" . DOWN . "))");
+						wrn("unknown status: $value (expected UP (0) or DOWN (1))");
 					}
 				}
 
-				$cycles->{$cycleclock}->{'tld'} = $tld;
-				$cycles->{$cycleclock}->{'status'} = get_result_string($cfg_dns_statusmaps, $value);
+				push(@test_results, $result);
 			}
 
-			if (!$values_from)
+			my $test_results_count = scalar(@test_results);
+
+			if ($test_results_count == 0)
 			{
 				wrn("$service: no results within incident (id:$eventid clock:$event_start)");
 				last;
@@ -567,273 +530,378 @@ foreach (keys(%$servicedata))
 			}
 			else
 			{
-				if (ah_save_incident_state($ah_tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
+				if (ah_save_incident($ah_tld, $service, $eventid, $event_start, $event_end, $false_positive, $lastclock) != AH_SUCCESS)
 				{
-					fail("cannot save incident state: ", ah_get_error());
+					fail("cannot save incident: ", ah_get_error());
 				}
 			}
 
-			my $tests_ref;
+			my $values_from = $test_results[0]->{'start'};
+			my $values_till = $test_results[$test_results_count - 1]->{'end'};
 
-			if ($service eq 'dns' || $service eq 'dnssec')
+			if ($service eq 'dns' or $service eq 'dnssec')
 			{
-				if (!$dns_tests_ref)
-				{
-					$dns_tests_ref = get_dns_test_values($dns_items_ref, $values_from, $values_till,
-						$services->{$service}->{'valuemaps'}, $delay, $service);
-				}
+				my $minns = $services{$service}{'minns'};
 
-				$tests_ref = $dns_tests_ref;
-			}
-			elsif ($service eq 'rdds')
-			{
-				$tests_ref = get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref,
-					$values_from, $values_till, $services->{$service}->{'valuemaps'}, $delay);
-			}
+				my $values_ref = __get_dns_test_values($dns_items_ref, $values_from, $values_till);
 
-			# add results to appropriate cycles
-			foreach my $cycleclock (keys(%$tests_ref))
-			{
-				if (!$cycles->{$cycleclock})
+				# run through values from probes (ordered by clock)
+				foreach my $probe (keys(%$values_ref))
 				{
-					no_cycle_result($service, $key_avail, $cycleclock);
-					next;
-				}
+					my $nsips_ref = $values_ref->{$probe};
 
-				foreach my $interface (keys(%{$tests_ref->{$cycleclock}}))
-				{
-					foreach my $probe (keys(%{$tests_ref->{$cycleclock}->{$interface}}))
+					dbg("probe:$probe");
+
+					foreach my $nsip (keys(%$nsips_ref))
 					{
-						# the status is set later
-						$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = undef;
+						my $endvalues_ref = $nsips_ref->{$nsip};
 
-						if (probe_offline_at($probe_times_ref, $probe, $cycleclock) != 0)
+						my ($ns, $ip) = split(',', $nsip);
+
+						dbg("  ", scalar(keys(%$endvalues_ref)), " values for $nsip:") if (opt('debug'));
+
+						my $test_result_index = 0;
+
+						foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
 						{
-							$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
-						}
+							if ($clock < $test_results[$test_result_index]->{'start'})
+							{
+								__no_status_result($service, $avail_key, $probe, $clock, $nsip);
+								next;
+							}
 
-						$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'} = $tests_ref->{$cycleclock}->{$interface}->{$probe};
+							# move to corresponding test result
+							$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+
+							if ($test_result_index == $test_results_count)
+							{
+								__no_status_result($service, $avail_key, $probe, $clock, $nsip);
+								next;
+							}
+
+							my $tr_ref = $test_results[$test_result_index];
+							$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
+
+							if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
+							{
+								$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
+							}
+							else
+							{
+								push(@{$tr_ref->{'probes'}->{$probe}->{'details'}->{$ns}}, {'clock' => $clock, 'rtt' => $endvalues_ref->{$clock}, 'ip' => $ip});
+							}
+						}
 					}
 				}
-			}
 
-			# add probes that are missing results
-			foreach my $probe (keys(%$all_probes_ref))
-			{
-				foreach my $cycleclock (keys(%$cycles))
+				# add probes that are missing results
+				foreach my $probe (keys(%$all_probes_ref))
 				{
-					my $found = 0;
-
-					foreach my $interface (keys(%{$cycles->{$cycleclock}->{'interfaces'}}))
+					foreach my $tr_ref (@test_results)
 					{
-						foreach my $cycle_probe (keys(%{$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}}))
+						my $found = 0;
+
+						my $probes_ref = $tr_ref->{'probes'};
+						foreach my $tr_ref_probe (keys(%$probes_ref))
 						{
-							if ($cycle_probe eq $probe)
+							if ($tr_ref_probe eq $probe)
 							{
-								dbg("\"$cycle_probe\" found!");
+								dbg("\"$tr_ref_probe\" found!");
 
 								$found = 1;
 								last;
 							}
 						}
 
-						$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+						$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+					}
+				}
+
+				# get results from probes: number of working Name Servers
+				my $itemids_ref = __get_status_itemids($tld, $services{$service}{'key_status'});
+				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+
+				foreach my $tr_ref (@test_results)
+				{
+					# set status
+					my $tr_start = $tr_ref->{'start'};
+					my $tr_end = $tr_ref->{'end'};
+
+					delete($tr_ref->{'start'});
+					delete($tr_ref->{'end'});
+
+					my $probes_ref = $tr_ref->{'probes'};
+					foreach my $probe (keys(%$probes_ref))
+					{
+						foreach my $status_ref (@{$statuses_ref->{$probe}})
+						{
+							next if ($status_ref->{'clock'} < $tr_start);
+							last if ($status_ref->{'clock'} > $tr_end);
+
+							if (not defined($probes_ref->{$probe}->{'status'}))
+							{
+								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} >= $minns ? "Up" : "Down");
+							}
+						}
+					}
+
+					if (opt('dry-run'))
+					{
+						__prnt_json($tr_ref);
+					}
+					else
+					{
+						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						{
+							fail("cannot save incident: ", ah_get_error());
+						}
 					}
 				}
 			}
-
-			# get results from probes, working services: (dns: number of NS, rdds: 43, 80)
-			my $itemids_ref = get_service_status_itemids($tld, $services->{$service}->{'key_status'});
-			my $probe_results_ref = get_probe_results($itemids_ref, $values_from, $values_till);
-
-			foreach my $cycleclock (keys(%$cycles))
+			elsif ($service eq 'rdds')
 			{
-				# set status on particular probe
-				foreach my $interface (keys(%{$cycles->{$cycleclock}->{'interfaces'}}))
+				my $values_ref = __get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref, $values_from, $values_till);
+
+				# run through values from probes (ordered by clock)
+				foreach my $probe (keys(%$values_ref))
 				{
-					foreach my $probe (keys(%{$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}}))
+					my $subservices_ref = $values_ref->{$probe};
+
+					dbg("probe:$probe");
+
+					foreach my $subservice (keys(%$subservices_ref))
 					{
-						foreach my $probe_result_ref (@{$probe_results_ref->{$probe}})
+						my $test_result_index = 0;
+
+						foreach my $endvalues_ref (@{$subservices_ref->{$subservice}})
 						{
-							if (!defined($cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'}))
+							my $clock = $endvalues_ref->{'clock'};
+
+							if ($clock < $test_results[$test_result_index]->{'start'})
 							{
-								$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} =
-									__interface_status($interface, $probe_result_ref->{'value'}, $services->{$service});
+								__no_status_result($subservice, $avail_key, $probe, $clock);
+								next;
+							}
+
+							# move to corresponding test result
+							$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+
+							if ($test_result_index == $test_results_count)
+							{
+								__no_status_result($subservice, $avail_key, $probe, $clock);
+								next;
+							}
+
+							my $tr_ref = $test_results[$test_result_index];
+							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = undef;	# the status is set later
+
+							if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
+							{
+								$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
+							}
+							else
+							{
+								push(@{$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'details'}}, $endvalues_ref);
 							}
 						}
 					}
 				}
 
-				# create the needed JSON format
-				my $cycle_hash = __create_cycle_hash($tld, $cycleclock, $cycles->{$cycleclock}, $services->{$service});
-
-				if (opt('dry-run'))
+				# add probes that are missing results
+				foreach my $probe (keys(%$all_probes_ref))
 				{
-					__prnt_json($cycle_hash);
-				}
-				else
-				{
-					if (ah_save_incident_results($ah_tld, $service, $eventid, $event_start, $cycle_hash, $cycleclock) != AH_SUCCESS)
+					foreach my $tr_ref (@test_results)
 					{
-						fail("cannot save incident results: ", ah_get_error());
+						my $subservices_ref = $tr_ref->{+JSON_RDDS_SUBSERVICE};
+
+						foreach my $subservice (keys(%$subservices_ref))
+						{
+							my $probes_ref = $subservices_ref->{$subservice};
+
+							my $found = 0;
+
+							foreach my $tr_ref_probe (keys(%$probes_ref))
+							{
+								if ($tr_ref_probe eq $probe)
+								{
+									$found = 1;
+									last;
+								}
+							}
+
+							$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+						}
+					}
+				}
+
+				# get results from probes: working services (rdds43, rdds80)
+				my $itemids_ref = __get_status_itemids($tld, $services{$service}{'key_status'});
+				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+
+				foreach my $tr_ref (@test_results)
+				{
+					# set status
+					my $tr_start = $tr_ref->{'start'};
+					my $tr_end = $tr_ref->{'end'};
+
+					delete($tr_ref->{'start'});
+					delete($tr_ref->{'end'});
+
+					my $subservices_ref = $tr_ref->{+JSON_RDDS_SUBSERVICE};
+
+					foreach my $subservice (keys(%$subservices_ref))
+					{
+						my $probes_ref = $subservices_ref->{$subservice};
+
+						foreach my $probe (keys(%$probes_ref))
+						{
+							foreach my $status_ref (@{$statuses_ref->{$probe}})
+							{
+								next if ($status_ref->{'clock'} < $tr_start);
+								last if ($status_ref->{'clock'} > $tr_end);
+
+								if (not defined($probes_ref->{$probe}->{'status'}))
+								{
+									my $service_only = ($subservice eq JSON_RDDS_43 ? 2 : 3); # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+
+									$probes_ref->{$probe}->{'status'} = (($status_ref->{'value'} == 1 or $status_ref->{'value'} == $service_only) ? "Up" : "Down");
+								}
+							}
+						}
+					}
+
+					if (opt('dry-run'))
+					{
+						__prnt_json($tr_ref);
+					}
+					else
+					{
+						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						{
+							fail("cannot save incident: ", ah_get_error());
+						}
 					}
 				}
 			}
-			# elsif ($service eq 'epp')
-			# {
-			# 	my $tests_ref = get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
-
-			# 	foreach my $probe (keys(%$tests_ref))
-			# 	{
-			# 		my $cycles_idx = 0;
-
-			# 		foreach my $clock (sort(keys(%{$tests_ref->{$probe}})))	# must be sorted by clock
-			# 		{
-			# 			if ($clock < $cycles[$cycles_idx]->{'start'})
-			# 			{
-			# 				no_cycle_result($service, $key_avail, $probe, $clock);
-			# 				next;
-			# 			}
-
-			# 			# move to corresponding test result
-			# 			$cycles_idx++ while ($cycles_idx < $cycles_count && $clock > $cycles[$cycles_idx]->{'end'});
-
-			# 			if ($cycles_idx == $cycles_count)
-			# 			{
-			# 				no_cycle_result($service, $key_avail, $probe, $clock);
-			# 				next;
-			# 			}
-
-			# 			my $cycle_ref = $cycles[$cycles_idx];
-
-			# 			$cycle_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
-
-			# 			if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
-			# 			{
-			# 				$cycle_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
-			# 			}
-			# 			else
-			# 			{
-			# 				foreach my $type (keys(%{$tests_ref->{$probe}->{$clock}}))
-			# 				{
-			# 					$tests_ref->{$probe}->{$clock}->{$type} = get_detailed_result($services->{$service}->{'valuemaps'}, $tests_ref->{$probe}->{$clock}->{$type});
-			# 				}
-
-			# 				$cycle_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $tests_ref->{$probe}->{$clock};
-			# 			}
-			# 		}
-			# 	}
-
-			# 	# add probes that are missing results
-			# 	foreach my $probe (keys(%$all_probes_ref))
-			# 	{
-			# 		foreach my $cycle_ref (@cycles)
-			# 		{
-			# 			my $found = 0;
-
-			# 			foreach my $cycle_ref_probe (keys(%{$cycle_ref->{'probes'}}))
-			# 			{
-			# 				if ($cycle_ref_probe eq $probe)
-			# 				{
-			# 					dbg("\"$cycle_ref_probe\" found!");
-
-			# 					$found = 1;
-			# 					last;
-			# 				}
-			# 			}
-
-			# 			$cycle_ref->{'probes'}->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
-			# 		}
-			# 	}
-
-			# 	# get results from probes: EPP down (0) or up (1)
-			# 	my $itemids_ref = get_service_status_itemids($tld, $services->{$service}->{'key_status'});
-                        #         my $probe_results_ref = get_probe_results($itemids_ref, $values_from, $values_till);
-
-			# 	foreach my $cycle_ref (@cycles)
-                        #         {
-			# 		# set status
-			# 		my $cycle_start = $cycle_ref->{'start'};
-			# 		my $cycle_end = $cycle_ref->{'end'};
-
-			# 		delete($cycle_ref->{'start'});
-			# 		delete($cycle_ref->{'end'});
-
-			# 		foreach my $probe (keys(%{$cycle_ref->{'probes'}}))
-			# 		{
-			# 			foreach my $probe_result_ref (@{$probe_results_ref->{$probe}})
-			# 			{
-			# 				next if ($probe_result_ref->{'clock'} < $cycle_start);
-			# 				last if ($probe_result_ref->{'clock'} > $cycle_end);
-
-			# 				if (!defined($cycle_ref->{'probes'}->{$probe}->{'status'}))
-			# 				{
-			# 					$cycle_ref->{'probes'}->{$probe}->{'status'} = ($probe_result_ref->{'value'} == 1 ? "Up" : "Down");
-			# 				}
-			# 			}
-			# 		}
-
-			# 		if (opt('dry-run'))
-			# 		{
-			# 			__prnt_json($cycle_ref);
-			# 		}
-			# 		else
-			# 		{
-			# 			if (ah_save_incident_results($ah_tld, $service, $eventid, $event_start, $cycle_ref, $cycle_ref->{'clock'}) != AH_SUCCESS)
-			# 			{
-			# 				fail("cannot save incident results: ", ah_get_error());
-			# 			}
-			# 		}
-			# 	}
-			# }
-			# else
-			# {
-			# 	fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
-			# }
-		}
-
-		# if we are here the service is enabled, check tld status
-		if ($tld_status->{'services'}->{$service}->{'status'} eq AH_STATUS_DOWN)
-		{
-			$tld_status->{'status'} = AH_STATUS_DOWN;
-		}
-
-		$tld_status->{'services'}->{$service}->{'emergencyThreshold'} = $downtime;
-
-		# rolling week incidents
-		my $rw_incidents = get_incidents2($avail_itemid, $delay, $rollweek_from, $rollweek_till);
-
-		foreach (@$incidents)
-		{
-			my $hash =
+			elsif ($service eq 'epp')
 			{
-				'incidentID' => $_->{'start'} . '.' . $_->{'eventid'},
-				'startTime' => $_->{'start'},
-				'falsePositive' => ($_->{'false_positive'} == 0 ? AH_FALSE_POSITIVE_FALSE : AH_FALSE_POSITIVE_TRUE),
-				'state' => ($_->{'end'} ? AH_INCIDENT_ENDED : AH_INCIDENT_ACTIVE),
-				'endTime' => $_->{'end'}
-			};
+				dbg("EPP results calculation is not implemented yet");
 
-			push(@{$tld_status->{'services'}->{$service}->{'incidents'}}, $hash);
-		}
-	}
+				my $values_ref = __get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
 
-	if (opt('dry-run'))
-	{
-		__prnt("status: ", $tld_status->{'status'});
-	}
-	else
-	{
-		if (ah_save_tld_status($ah_tld, $tld_status) != AH_SUCCESS)
-		{
-			fail("cannot save TLD status: ", ah_get_error());
+				foreach my $probe (keys(%$values_ref))
+				{
+					my $endvalues_ref = $values_ref->{$probe};
+
+					my $test_result_index = 0;
+
+					foreach my $clock (sort(keys(%$endvalues_ref))) # must be sorted by clock
+					{
+						if ($clock < $test_results[$test_result_index]->{'start'})
+						{
+							__no_status_result($service, $avail_key, $probe, $clock);
+							next;
+						}
+
+						# move to corresponding test result
+						$test_result_index++ while ($test_result_index < $test_results_count and $clock > $test_results[$test_result_index]->{'end'});
+
+						if ($test_result_index == $test_results_count)
+						{
+							__no_status_result($service, $avail_key, $probe, $clock);
+							next;
+						}
+
+						my $tr_ref = $test_results[$test_result_index];
+						$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
+
+						if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
+						{
+							$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
+						}
+						else
+						{
+							$tr_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $endvalues_ref->{$clock};
+						}
+					}
+				}
+
+				# add probes that are missing results
+				foreach my $probe (keys(%$all_probes_ref))
+				{
+					foreach my $tr_ref (@test_results)
+					{
+						my $found = 0;
+
+						my $probes_ref = $tr_ref->{'probes'};
+						foreach my $tr_ref_probe (keys(%$probes_ref))
+						{
+							if ($tr_ref_probe eq $probe)
+							{
+								dbg("\"$tr_ref_probe\" found!");
+
+								$found = 1;
+								last;
+							}
+						}
+
+						$probes_ref->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
+					}
+				}
+
+				# get results from probes: EPP down (0) or up (1)
+				my $itemids_ref = __get_status_itemids($tld, $services{$service}{'key_status'});
+                                my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
+
+				foreach my $tr_ref (@test_results)
+                                {
+                                        # set status
+                                        my $tr_start = $tr_ref->{'start'};
+                                        my $tr_end = $tr_ref->{'end'};
+
+                                        delete($tr_ref->{'start'});
+                                        delete($tr_ref->{'end'});
+
+                                        my $probes_ref = $tr_ref->{'probes'};
+
+					foreach my $probe (keys(%$probes_ref))
+					{
+						foreach my $status_ref (@{$statuses_ref->{$probe}})
+						{
+							next if ($status_ref->{'clock'} < $tr_start);
+							last if ($status_ref->{'clock'} > $tr_end);
+
+							if (not defined($probes_ref->{$probe}->{'status'}))
+							{
+								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} == 1 ? "Up" : "Down");
+							}
+						}
+					}
+
+					if (opt('dry-run'))
+					{
+						__prnt_json($tr_ref);
+					}
+					else
+					{
+						if (ah_save_incident_json($ah_tld, $service, $eventid, $event_start, encode_json($tr_ref), $tr_ref->{'clock'}) != AH_SUCCESS)
+						{
+							fail("cannot save incident: ", ah_get_error());
+						}
+					}
+				}
+			}
+			else
+			{
+				fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
+			}
 		}
 	}
 }
 # unset TLD (for the logs)
 $tld = undef;
 
-if (defined($continue_file) && !opt('dry-run'))
+if (defined($continue_file) and not opt('dry-run'))
 {
 	unless (write_file($continue_file, $till) == SUCCESS)
 	{
@@ -844,12 +912,698 @@ if (defined($continue_file) && !opt('dry-run'))
 	dbg("last update: ", ts_str($till));
 }
 
-unless (opt('dry-run') || opt('tld'))
+unless (opt('dry-run') or opt('tld'))
 {
 	__update_false_positives();
 }
 
 slv_exit(SUCCESS);
+
+# values are organized like this:
+# {
+#           'WashingtonDC' => {
+#                               'ns1,192.0.34.201' => {
+#                                                       '1418994681' => '-204.0000',
+#                                                       '1418994621' => '-204.0000'
+#                                                     },
+#                               'ns2,2620:0:2d0:270::1:201' => {
+#                                                                '1418994681' => '-204.0000',
+#                                                                '1418994621' => '-204.0000'
+#                                                              }
+#                             },
+# ...
+sub __get_dns_test_values
+{
+	my $dns_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+
+	my %result;
+
+	# generate list if itemids
+	my $itemids_str = '';
+	foreach my $probe (keys(%$dns_items_ref))
+	{
+		my $itemids_ref = $dns_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$itemids_str .= ',' unless ($itemids_str eq '');
+			$itemids_str .= $itemid;
+		}
+	}
+
+	if ($itemids_str ne '')
+	{
+		my $rows_ref = db_select("select itemid,value,clock from history where itemid in ($itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+		foreach my $row_ref (@$rows_ref)
+		{
+			my $itemid = $row_ref->[0];
+			my $value = $row_ref->[1];
+			my $clock = $row_ref->[2];
+
+			my ($nsip, $probe);
+			my $last = 0;
+
+			foreach my $pr (keys(%$dns_items_ref))
+			{
+				my $itemids_ref = $dns_items_ref->{$pr};
+
+				foreach my $i (keys(%$itemids_ref))
+				{
+					if ($i == $itemid)
+					{
+						$nsip = $dns_items_ref->{$pr}->{$i};
+						$probe = $pr;
+						$last = 1;
+						last;
+					}
+				}
+				last if ($last == 1);
+			}
+
+			unless (defined($nsip))
+			{
+				wrn("internal error: Name Server,IP pair of item $itemid not found");
+				next;
+			}
+
+			$result{$probe}->{$nsip}->{$clock} = get_detailed_result($services{'dns'}{'valuemaps'}, $value);
+		}
+	}
+
+	return \%result;
+}
+
+sub __find_probe_key_by_itemid
+{
+	my $itemid = shift;
+	my $items_ref = shift;
+
+	my ($probe, $key);
+	my $last = 0;
+
+	foreach my $pr (keys(%$items_ref))
+	{
+		my $itemids_ref = $items_ref->{$pr};
+
+		foreach my $i (keys(%$itemids_ref))
+		{
+			if ($i == $itemid)
+			{
+				$probe = $pr;
+				$key = $items_ref->{$pr}->{$i};
+				$last = 1;
+				last;
+			}
+		}
+		last if ($last == 1);
+	}
+
+	return ($probe, $key);
+}
+
+# values are organized like this:
+# {
+#           'WashingtonDC' => {
+#                               '80' => {
+#                                         '1418994206' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+#                                         '1418994086' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+#                               '43' => {
+#                                         '1418994206' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+#                                         '1418994086' => {
+#                                                           'ip' => '192.0.34.201',
+#                                                           'rtt' => '127.0000'
+#                                                         },
+# ...
+sub __get_rdds_test_values
+{
+	my $rdds_dbl_items_ref = shift;
+	my $rdds_str_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+
+	# generate list if itemids
+	my $dbl_itemids_str = '';
+	foreach my $probe (keys(%$rdds_dbl_items_ref))
+	{
+		my $itemids_ref = $rdds_dbl_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
+			$dbl_itemids_str .= $itemid;
+		}
+	}
+
+	my $str_itemids_str = '';
+	foreach my $probe (keys(%$rdds_str_items_ref))
+	{
+		my $itemids_ref = $rdds_str_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$str_itemids_str .= ',' unless ($str_itemids_str eq '');
+			$str_itemids_str .= $itemid;
+		}
+	}
+
+	my %result;
+
+	return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+
+	# we need pre_result to combine IP and RTT to single test result
+	my %pre_result;
+
+	my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+	foreach my $row_ref (@$dbl_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $port = __get_rdds_port($key);
+		my $type = __get_rdds_dbl_type($key);
+
+		my $subservice;
+		if ($port eq '43')
+		{
+			$subservice = JSON_RDDS_43;
+		}
+		elsif ($port eq '80')
+		{
+			$subservice = JSON_RDDS_80;
+		}
+		else
+		{
+			fail("unknown RDDS port in item (id:$itemid)");
+		}
+
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($services{'rdds'}{'valuemaps'}, $value) : int($value);
+	}
+
+	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+	foreach my $row_ref (@$str_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $port = __get_rdds_port($key);
+		my $type = __get_rdds_str_type($key);
+
+		my $subservice;
+                if ($port eq '43')
+                {
+                        $subservice = JSON_RDDS_43;
+                }
+                elsif ($port eq '80')
+                {
+                        $subservice = JSON_RDDS_80;
+                }
+                else
+                {
+                        fail("unknown RDDS port in item (id:$itemid)");
+                }
+
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = $value;
+	}
+
+	foreach my $probe (keys(%pre_result))
+	{
+		foreach my $subservice (keys(%{$pre_result{$probe}}))
+		{
+			foreach my $clock (sort(keys(%{$pre_result{$probe}->{$subservice}})))	# must be sorted by clock
+			{
+				my $h;
+				my $clock_ref = $pre_result{$probe}->{$subservice}->{$clock};
+				foreach my $key (keys(%{$pre_result{$probe}->{$subservice}->{$clock}}))
+				{
+					$h->{$key} = $clock_ref->{$key};
+				}
+				$h->{'clock'} = $clock;
+
+				push(@{$result{$probe}->{$subservice}}, $h);
+			}
+		}
+	}
+
+	return \%result;
+}
+
+# values are organized like this:
+# {
+#         'WashingtonDC' => {
+#                 '1418994206' => {
+#                               'ip' => '192.0.34.201',
+#                               'login' => '127.0000',
+#                               'update' => '366.0000'
+#                               'info' => '366.0000'
+#                 },
+#                 '1418994456' => {
+#                               'ip' => '192.0.34.202',
+#                               'login' => '121.0000',
+#                               'update' => '263.0000'
+#                               'info' => '321.0000'
+#                 },
+# ...
+sub __get_epp_test_values
+{
+	my $epp_dbl_items_ref = shift;
+	my $epp_str_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+
+	my %result;
+
+	# generate list if itemids
+	my $dbl_itemids_str = '';
+	foreach my $probe (keys(%$epp_dbl_items_ref))
+	{
+		my $itemids_ref = $epp_dbl_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
+			$dbl_itemids_str .= $itemid;
+		}
+	}
+
+	my $str_itemids_str = '';
+	foreach my $probe (keys(%$epp_str_items_ref))
+	{
+		my $itemids_ref = $epp_str_items_ref->{$probe};
+
+		foreach my $itemid (keys(%$itemids_ref))
+		{
+			$str_itemids_str .= ',' unless ($str_itemids_str eq '');
+			$str_itemids_str .= $itemid;
+		}
+	}
+
+	return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+
+	my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+	foreach my $row_ref (@$dbl_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_dbl_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $type = __get_epp_dbl_type($key);
+
+		$result{$probe}->{$clock}->{$type} = get_detailed_result($services{'epp'}{'valuemaps'}, $value);
+	}
+
+	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+
+	foreach my $row_ref (@$str_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_str_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $type = __get_epp_str_type($key);
+
+		$result{$probe}->{$clock}->{$type} = $value;
+	}
+
+	return \%result;
+}
+
+# return itemids grouped by Probes:
+#
+# {
+#    'Amsterdam' => {
+#         'itemid1' => 'ns2,2620:0:2d0:270::1:201',
+#         'itemid2' => 'ns1,192.0.34.201'
+#    },
+#    'London' => {
+#         'itemid3' => 'ns2,2620:0:2d0:270::1:201',
+#         'itemid4' => 'ns1,192.0.34.201'
+#    }
+# }
+sub __get_dns_itemids
+{
+	my $nsips_ref = shift; # array reference of NS,IP pairs
+	my $key = shift;
+	my $tld = shift;
+	my $probe = shift;
+
+	my @keys;
+	push(@keys, "'" . $key . $_ . "]'") foreach (@$nsips_ref);
+
+	my $keys_str = join(',', @keys);
+
+	my $host_value = ($probe ? "$tld $probe" : "$tld %");
+
+	my $rows_ref = db_select(
+		"select h.host,i.itemid,i.key_".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+			" and h.host like '$host_value'".
+			" and i.templateid is not null".
+			" and i.key_ in ($keys_str)");
+
+	my %result;
+
+	my $tld_length = length($tld) + 1; # white space
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $host = $row_ref->[0];
+		my $itemid = $row_ref->[1];
+		my $key = $row_ref->[2];
+
+		# remove TLD from host name to get just the Probe name
+		my $_probe = ($probe ? $probe : substr($host, $tld_length));
+
+		$result{$_probe}->{$itemid} = get_nsip_from_key($key);
+	}
+
+	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
+
+	return \%result;
+}
+
+sub __get_rdds_port
+{
+	my $key = shift;
+
+	# rsm.rdds.43... <-- returns 43 or 80
+	return substr($key, 9, 2);
+}
+
+sub __get_rdds_dbl_type
+{
+	my $key = shift;
+
+	# rsm.rdds.43.rtt... rsm.rdds.43.upd[... <-- returns "rtt" or "upd"
+	return substr($key, 12, 3);
+}
+
+sub __get_rdds_str_type
+{
+	# NB! This is done for consistency, perhaps in the future there will be more string items, not just "ip".
+	return 'ip';
+}
+
+sub __get_epp_dbl_type
+{
+	my $key = shift;
+
+	chop($key); # remove last char ']'
+
+	# rsm.epp.rtt[{$RSM.TLD},login <-- returns "login" (other options: "update", "info")
+        return substr($key, 23);
+}
+
+sub __get_epp_str_type
+{
+	# NB! This is done for consistency, perhaps in the future there will be more string items, not just "ip".
+	return 'ip';
+}
+
+# return itemids of dbl items grouped by Probes:
+#
+# {
+#    'Amsterdam' => {
+#         'itemid1' => 'rsm.rdds.43.rtt...',
+#         'itemid2' => 'rsm.rdds.43.upd...',
+#         'itemid3' => 'rsm.rdds.80.rtt...'
+#    },
+#    'London' => {
+#         'itemid4' => 'rsm.rdds.43.rtt...',
+#         'itemid5' => 'rsm.rdds.43.upd...',
+#         'itemid6' => 'rsm.rdds.80.rtt...'
+#    }
+# }
+sub __get_rdds_dbl_itemids
+{
+	my $tld = shift;
+	my $probe = shift;
+
+	return __get_itemids_by_complete_key($tld, $probe, $services{'rdds'}{'key_43_rtt'}, $services{'rdds'}{'key_80_rtt'}, $services{'rdds'}{'key_43_upd'});
+}
+
+# return itemids of string items grouped by Probes:
+#
+# {
+#    'Amsterdam' => {
+#         'itemid1' => 'rsm.rdds.43.ip...',
+#         'itemid2' => 'rsm.rdds.80.ip...'
+#    },
+#    'London' => {
+#         'itemid3' => 'rsm.rdds.43.ip...',
+#         'itemid4' => 'rsm.rdds.80.ip...'
+#    }
+# }
+sub __get_rdds_str_itemids
+{
+	my $tld = shift;
+	my $probe = shift;
+
+	return __get_itemids_by_complete_key($tld, $probe, $services{'rdds'}{'key_43_ip'}, $services{'rdds'}{'key_80_ip'});
+}
+
+sub __get_epp_dbl_itemids
+{
+	my $tld = shift;
+	my $probe = shift;
+
+	return __get_itemids_by_incomplete_key($tld, $probe, $services{'epp'}{'key_rtt'});
+}
+
+sub __get_epp_str_itemids
+{
+	my $tld = shift;
+	my $probe = shift;
+
+	return __get_itemids_by_complete_key($tld, $probe, $services{'epp'}{'key_ip'});
+}
+
+# $keys_str - list of complete keys
+sub __get_itemids_by_complete_key
+{
+	my $tld = shift;
+	my $probe = shift;
+
+	my $keys_str = "'" . join("','", @_) . "'";
+
+	my $host_value = ($probe ? "$tld $probe" : "$tld %");
+
+	my $rows_ref = db_select(
+		"select h.host,i.itemid,i.key_".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+			" and h.host like '$host_value'".
+			" and i.key_ in ($keys_str)".
+			" and i.templateid is not null");
+
+	my %result;
+
+	my $tld_length = length($tld) + 1; # white space
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $host = $row_ref->[0];
+		my $itemid = $row_ref->[1];
+		my $key = $row_ref->[2];
+
+		# remove TLD from host name to get just the Probe name
+		my $_probe = ($probe ? $probe : substr($host, $tld_length));
+
+		$result{$_probe}->{$itemid} = $key;
+	}
+
+	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
+
+	return \%result;
+}
+
+# call this function with list of incomplete keys after $tld, e. g.:
+# __get_itemids_by_incomplete_key("example", "aaa[", "bbb[", ...)
+sub __get_itemids_by_incomplete_key
+{
+	my $tld = shift;
+	my $probe = shift;
+
+	my $keys_cond = "(key_ like '" . join("%' or key_ like '", @_) . "%')";
+
+	my $host_value = ($probe ? "$tld $probe" : "$tld %");
+
+	my $rows_ref = db_select(
+		"select h.host,i.itemid,i.key_".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+			" and h.host like '$host_value'".
+			" and i.templateid is not null".
+			" and $keys_cond");
+
+	my %result;
+
+	my $tld_length = length($tld) + 1; # white space
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $host = $row_ref->[0];
+		my $itemid = $row_ref->[1];
+		my $key = $row_ref->[2];
+
+		# remove TLD from host name to get just the Probe name
+		my $_probe = ($probe ? $probe : substr($host, $tld_length));
+
+		$result{$_probe}->{$itemid} = $key;
+	}
+
+	fail("cannot find items ('", join("','", @_), "') at host ($tld *)") if (scalar(keys(%result)) == 0);
+
+	return \%result;
+}
+
+# returns hash reference of Probe=>itemid of specified key
+#
+# {
+#    'Amsterdam' => 'itemid1',
+#    'London' => 'itemid2',
+#    ...
+# }
+sub __get_status_itemids
+{
+	my $tld = shift;
+	my $key = shift;
+
+	my $key_condition = (substr($key, -1) eq ']' ? "i.key_='$key'" : "i.key_ like '$key%'");
+
+	my $sql =
+		"select h.host,i.itemid".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+			" and i.templateid is not null".
+			" and $key_condition".
+			" and h.host like '$tld %'".
+		" group by h.host,i.itemid";
+
+	my $rows_ref = db_select($sql);
+
+	fail("no items matching '$key' found at host '$tld %'") if (scalar(@$rows_ref) == 0);
+
+	my %result;
+
+	my $tld_length = length($tld) + 1; # white space
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $host = $row_ref->[0];
+		my $itemid = $row_ref->[1];
+
+		# remove TLD from host name to get just the Probe name
+		my $probe = substr($host, $tld_length);
+
+		$result{$probe} = $itemid;
+	}
+
+	return \%result;
+}
+
+#
+# {
+#     'Probe1' =>
+#     [
+#         {
+#             'clock' => 1234234234,
+#             'value' => 'Up'
+#         },
+#         {
+#             'clock' => 1234234294,
+#             'value' => 'Up'
+#         }
+#     ],
+#     'Probe2' =>
+#     [
+#         {
+#             'clock' => 1234234234,
+#             'value' => 'Down'
+#         },
+#         {
+#             'clock' => 1234234294,
+#             'value' => 'Up'
+#         }
+#     ]
+# }
+#
+sub __get_probe_statuses
+{
+	my $itemids_ref = shift;
+	my $from = shift;
+	my $till = shift;
+
+	my %result;
+
+	# generate list if itemids
+	my $itemids_str = '';
+	foreach my $probe (keys(%$itemids_ref))
+	{
+		$itemids_str .= ',' unless ($itemids_str eq '');
+		$itemids_str .= $itemids_ref->{$probe};
+	}
+
+	if ($itemids_str ne '')
+	{
+		my $rows_ref = db_select("select itemid,value,clock from history_uint where itemid in ($itemids_str) and " . sql_time_condition($from, $till). " order by clock");
+
+		foreach my $row_ref (@$rows_ref)
+		{
+			my $itemid = $row_ref->[0];
+			my $value = $row_ref->[1];
+			my $clock = $row_ref->[2];
+
+			my $probe;
+			foreach my $pr (keys(%$itemids_ref))
+			{
+				my $i = $itemids_ref->{$pr};
+
+				if ($i == $itemid)
+				{
+					$probe = $pr;
+
+					last;
+				}
+			}
+
+			fail("internal error: Probe of item (itemid:$itemid) not found") unless (defined($probe));
+
+			push(@{$result{$probe}}, {'value' => $value, 'clock' => $clock});
+		}
+	}
+
+	return \%result;
+}
 
 sub __prnt
 {
@@ -858,15 +1612,15 @@ sub __prnt
 
 sub __prnt_json
 {
-	my $cycle_ref = shift;
+	my $tr_ref = shift;
 
 	if (opt('debug'))
 	{
-		dbg(ah_encode_pretty_json($cycle_ref), "-----------------------------------------------------------");
+		dbg(JSON->new->utf8(1)->pretty(1)->encode($tr_ref), "-----------------------------------------------------------");
 	}
 	else
 	{
-		__prnt(ts_str($cycle_ref->{'clock'}), " ", $cycle_ref->{'status'});
+		__prnt(ts_str($tr_ref->{'clock'}), " ", $tr_ref->{'status'});
 	}
 }
 
@@ -917,11 +1671,7 @@ sub __update_false_positives
 
 		dbg("auditlog message: $eventid\t$service\t".ts_str($event_clock)."\t".ts_str($clock)."\tfp:$false_positive\t$tld\n");
 
-		if (ah_save_false_positive($tld, $service, $event_clock, $eventid, $false_positive, $clock) != AH_SUCCESS)
-		{
-			wrn("cannot update false_positive value of event (eventid:$eventid start:[", ts_full($event_clock), "] service:$service false_positive:$false_positive clock:[", ts_full($clock), "): ",
-				ah_get_error());
-		}
+		fail("cannot update false_positive status of event with ID $eventid") unless (ah_save_false_positive($tld, $service, $eventid, $event_clock, $false_positive, $clock) == AH_SUCCESS);
 	}
 
 	ah_save_audit($maxclock) unless ($maxclock == 0);
@@ -931,20 +1681,20 @@ sub __validate_input
 {
 	if (opt('service'))
 	{
-		if (getopt('service') ne 'dns' && getopt('service') ne 'dnssec' && getopt('service') ne 'rdds' && getopt('service') ne 'epp')
+		if (getopt('service') ne 'dns' and getopt('service') ne 'dnssec' and getopt('service') ne 'rdds' and getopt('service') ne 'epp')
 		{
 			print("Error: \"", getopt('service'), "\" - unknown service\n");
 			usage();
 		}
 	}
 
-	if (opt('tld') && opt('ignore-file'))
+	if (opt('tld') and opt('ignore-file'))
 	{
 		print("Error: options --tld and --ignore-file cannot be used together\n");
 		usage();
 	}
 
-	if (opt('continue') && opt('from'))
+	if (opt('continue') and opt('from'))
         {
                 print("Error: options --continue and --from cannot be used together\n");
                 usage();
@@ -952,6 +1702,12 @@ sub __validate_input
 
 	if (opt('probe'))
 	{
+		if (not opt('dry-run'))
+		{
+			print("Error: option --probe can only be used together with --dry-run\n");
+			usage();
+		}
+
 		my $probe = getopt('probe');
 
 		my $probes_ref = get_probes();
@@ -1001,11 +1757,11 @@ sub __get_min_clock
 	my $key_condition;
 	if ($service eq 'dns' || $service eq 'dnssec' || $service eq 'epp')
 	{
-		$key_condition = "key_='" . $services->{$service}->{'key_status'} . "'";
+		$key_condition = "key_='" . $services{$service}{'key_status'} . "'";
 	}
 	elsif ($service eq 'rdds')
 	{
-		$key_condition = "key_ like '" . $services->{$service}->{'key_status'} . "%'";
+		$key_condition = "key_ like '" . $services{$service}{'key_status'} . "%'";
 	}
 
 	my $rows_ref = db_select("select hostid from hosts where host like '$tld %'");
@@ -1023,6 +1779,22 @@ sub __get_min_clock
 	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$config_minclock");
 
 	return $rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : $config_minclock;
+}
+
+sub __no_status_result
+{
+	my $service = shift;
+	my $avail_key = shift;
+	my $probe = shift;
+	my $clock = shift;
+	my $details = shift;
+
+	wrn("Service availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
+		"performed at ", ts_str($clock), " ($clock) on probe $probe. This means the test period was not" .
+		" handled by SLV availability cron job ($avail_key). This may happen e. g. if cron was not running" .
+		" at some point. In order to fix this problem please run".
+		"\n  $avail_key.pl --from $clock".
+		"\nmanually to add missing service availability result.");
 }
 
 sub __get_config_minclock
@@ -1044,223 +1816,6 @@ sub __get_config_minclock
 	fail("no data in the database yet") unless ($minclock);
 
 	return $minclock;
-}
-
-sub __get_downtime
-{
-	my $hostid = shift;
-	my $service = shift;
-	my $key = shift;
-	my $clock = shift;
-	my $downtime_ref = shift;
-
-	my $itemid = get_itemid_by_hostid($hostid, $key);
-
-	return E_FAIL unless ($itemid);
-
-	$clock = time() unless($clock);
-
-	my $from = truncate_from($clock);
-	my $till = $from + 59;
-
-	my $rows_ref = db_select(
-		"select value".
-		" from history".
-		" where itemid=$itemid".
-			" and ".sql_time_condition($from, $till).
-		" order by itemid,clock");
-
-	if (scalar(@$rows_ref) == 0)
-	{
-		wrn(uc($service), ": no downtime value in the database between ", ts_full($from), " and ", ts_full($till), ", using 0.0 ($key)");
-		$$downtime_ref = 0.0;
-	}
-	else
-	{
-		$$downtime_ref = $rows_ref->[0]->[0];
-	}
-
-	return SUCCESS;
-}
-
-sub __create_cycle_hash
-{
-	my $tld = shift;
-	my $cycleclock = shift;
-	my $cycle_ref = shift;
-	my $service_ref = shift;
-
-	my $cycle =
-	{
-		'tld' => $tld,
-		'clock' => $cycleclock,
-		'status' => $cycle_ref->{'status'}
-	};
-
-	foreach my $interface (keys(%{$cycle_ref->{'interfaces'}}))
-	{
-		my $interface_ref;
-
-		$interface_ref->{'interface'} = $interface;
-		$interface_ref->{'status'} = undef;
-
-		# TODO: in case of DNSSEC the interface status and status on every probe is currently
-		# not supported, we need to calculate these manually.
-
-		my $test_total_probes = 0;
-		my $test_success_probes = 0;
-		my $test_probes_online = 0;
-
-		foreach my $probe (keys(%{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}}))
-		{
-			my $probe_ref;
-
-			$probe_ref->{'city'} = $probe;
-			$probe_ref->{'status'} = $cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'};
-
-			my $dnssec_success_ns = 0;
-
-			$test_probes_online++ if (defined($probe_ref->{'status'}) && $probe_ref->{'status'} ne PROBE_OFFLINE_STR);
-
-			foreach my $target (keys(%{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'}}))
-			{
-				my $status = AH_STATUS_UP;
-				foreach my $metric_ref (@{$cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'}->{$target}})
-				{
-					# TODO: for EPP check 'upd' field here
-					if (__check_test($interface, $metric_ref->{'rtt'}, $metric_ref->{'description'}, $service_ref->{'max_value'}) != SUCCESS)
-					{
-						$status = AH_STATUS_DOWN;
-						last;
-					}
-				}
-
-				if ($interface eq JSON_INTERFACE_DNSSEC)
-				{
-					$dnssec_success_ns++ if ($status eq AH_STATUS_UP);
-				}
-
-				my $test_data_ref;
-
-				$test_data_ref->{'target'} = $target;
-				$test_data_ref->{'status'} = $status;
-				$test_data_ref->{'metrics'} = $cycle_ref->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'targets'}->{$target};
-
-				push(@{$probe_ref->{'testData'}}, $test_data_ref);
-			}
-
-			if ($interface eq JSON_INTERFACE_DNSSEC)
-			{
-				$probe_ref->{'status'} = ($dnssec_success_ns >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
-			}
-
-			if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
-			{
-				$test_success_probes++ if ($probe_ref->{'status'} eq AH_STATUS_UP);
-
-				$test_total_probes++;
-			}
-
-			push(@{$interface_ref->{'probes'}}, $probe_ref);
-		}
-
-		if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
-		{
-			my $interface_status;
-
-			if ($test_probes_online < $service_ref->{'minonline'})
-			{
-				$interface_status = AH_STATUS_UP;	# TODO: indicate that the interface is up only because not available probes online
-			}
-			else
-			{
-				my $perc = $test_success_probes * 100 / $test_total_probes;
-
-				if ($perc > SLV_UNAVAILABILITY_LIMIT)
-				{
-					$interface_status = AH_STATUS_UP;
-				}
-				else
-				{
-					$interface_status = AH_STATUS_DOWN;
-				}
-			}
-
-			$interface_ref->{'status'} = $interface_status;
-
-			if ($interface eq JSON_INTERFACE_DNSSEC)
-			{
-				$cycle->{'status'} = $interface_status;
-			}
-		}
-		elsif ($interface eq JSON_INTERFACE_DNS)
-		{
-			$interface_ref->{'status'} = $cycle->{'status'};
-		}
-
-		push(@{$cycle->{'testedInterface'}}, $interface_ref);
-	}
-
-	return $cycle;
-}
-
-sub __check_test
-{
-	my $interface = shift;
-	my $value = shift;
-	my $description = shift;
-	my $max_value = shift;
-
-	if ($interface eq JSON_INTERFACE_DNSSEC)
-	{
-		if (defined($description))
-		{
-			my $error_code_len = length(ZBX_EC_DNS_NS_ERRSIG);
-			my $error_code = substr($description, 0, $error_code_len);
-
-			if ($error_code eq ZBX_EC_DNS_NS_ERRSIG)
-			{
-				return E_FAIL;
-			}
-		}
-
-		return SUCCESS;
-	}
-
-	return E_FAIL unless ($value);
-
-	return (is_service_error($value) == SUCCESS or $value > $max_value) ? E_FAIL : SUCCESS;
-}
-
-sub __interface_status
-{
-	my $interface = shift;
-	my $value = shift;
-	my $service_ref = shift;
-
-	my $status;
-
-	if ($interface eq JSON_INTERFACE_DNS)
-	{
-		$status = ($value >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
-	}
-	elsif ($interface eq JSON_INTERFACE_DNSSEC)
-	{
-		# TODO: dnssec status on a particular probe is not supported currently,
-		# make this calculation in function __create_cycle_hash() for now.
-	}
-	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
-	{
-		my $service_only = ($interface eq JSON_INTERFACE_RDDS43 ? 2 : 3);	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
-
-		$status = (($value == 1 || $value == $service_only) ? AH_STATUS_UP : AH_STATUS_DOWN);
-	}
-	else
-	{
-		fail("$interface: unsupported interface");
-	}
-
-	return $status;
 }
 
 __END__
@@ -1322,14 +1877,6 @@ Note, that continue token is not updated if this option was specified together w
 Only calculate data from specified probe.
 
 This option can only be used for debugging purposes and must be used together with option --dry-run .
-
-=item B<--now> timestamp
-
-Run script as if current time would be as specified.
-
-=item B<--base> directory
-
-Specify different base directory (default /opt/zabbix/sla).
 
 =item B<--dry-run>
 

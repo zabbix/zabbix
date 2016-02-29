@@ -225,12 +225,11 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 	// get test result for DNS service
 	if ($data['type'] == RSM_DNS) {
 		$probeResultItems = API::Item()->get(array(
-			'output' => array('itemid', 'value_type', 'key_'),
 			'hostids' => $data['probe']['hostid'],
+			'output' => array('itemid', 'value_type', 'key_'),
 			'filter' => array(
 				'key_' => PROBE_DNS_UDP_ITEM
-			),
-			'monitored' => true
+			)
 		));
 
 		$probeResultItem = reset($probeResultItems);
@@ -255,13 +254,12 @@ if ($data['host'] && $data['time'] && $data['slvItemId'] && $data['type'] !== nu
 
 	// get items
 	$probeItems = API::Item()->get(array(
-		'output' => array('itemid', 'key_', 'hostid', 'valuemapid', 'units', 'value_type'),
 		'hostids' => $host['hostid'],
+		'output' => array('itemid', 'key_', 'hostid', 'valuemapid', 'units', 'value_type'),
 		'search' => array(
 			'key_' => PROBE_DNS_UDP_ITEM_RTT
 		),
 		'startSearch' => true,
-		'monitored' => true,
 		'preservekeys' => true
 	));
 
