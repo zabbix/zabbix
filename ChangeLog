@@ -14,6 +14,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
 ........S. [ZBX-10248] moved processing of zabbix[host,,items*] internal items to server if the host is monitored by a proxy (wiper)
 
 --------------------------------------------------------------------------------
@@ -512,6 +513,7 @@ A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean,
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
 ..F....... [ZBX-9991] fixed functionality that adds last selected host group to new host groups list (Cemeris)
 ..F....... [ZBX-10356] fixed user media form "send to" and "period" fields having incorrect "maxlength" property (Ivo)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
@@ -1266,6 +1268,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
 ..F....... [ZBX-10356] fixed user media form "send to" and "period" fields having incorrect "maxlength" property (Ivo)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 .......PS. [ZBX-10366] fixed parsing of VMware responses containing too deep XML data (wiper)
