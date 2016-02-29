@@ -3567,7 +3567,7 @@ void	zbx_tls_ctx_alloc(zbx_tls_context_t *context)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_POLARSSL)
-int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, char *tls_arg2, char **error)
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
@@ -3801,7 +3801,7 @@ out:
 	return ret;
 }
 #elif defined(HAVE_GNUTLS)
-int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, char *tls_arg2, char **error)
 {
 	const char		*__function_name = "zbx_tls_connect";
 	int			ret = FAIL, res;
@@ -4098,7 +4098,7 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
+int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, char *tls_arg2, char **error)
 {
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
@@ -4371,7 +4371,7 @@ out1:
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_POLARSSL)
-int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 {
 	const char		*__function_name = "zbx_tls_accept";
 	int			ret = FAIL, res;
@@ -4590,7 +4590,7 @@ out:
 	return ret;
 }
 #elif defined(HAVE_GNUTLS)
-int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 {
 	const char			*__function_name = "zbx_tls_accept";
 	int				ret = FAIL, res;
@@ -4886,7 +4886,7 @@ out1:
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
-int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
+int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 {
 	const char	*__function_name = "zbx_tls_accept";
 	const char	*cipher_name;
@@ -5121,7 +5121,7 @@ out1:
 }
 #endif
 
-ssize_t	zbx_tls_write(zbx_socket_t *s, char **error, const char *buf, size_t len)
+ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
 {
 #if defined(_WINDOWS)
 	double	sec;
@@ -5269,7 +5269,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, char **error, const char *buf, size_t len
 #endif
 }
 
-ssize_t	zbx_tls_read(zbx_socket_t *s, char **error, char *buf, size_t len)
+ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 {
 #if defined(_WINDOWS)
 	double	sec;
