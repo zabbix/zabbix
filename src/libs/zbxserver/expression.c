@@ -2259,6 +2259,31 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: wrap_negative_double_suffix                                      *
+ *                                                                            *
+ * Purpose: wrap a replacement string that represents a negative number in    *
+ *          parentheses (for instance, turn "-123.456M" into "(-123.456M)")   *
+ *                                                                            *
+ * Parameters: replace_to - [IN] replacement string                           *
+ *                                                                            *
+ * Return value: wrapped "replace_to" if negative, original string otherwise  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*wrap_negative_double_suffix(char *replace_to)
+{
+	char	*wrapped;
+
+	if ('-' != *replace_to)
+		return replace_to;
+
+	wrapped = zbx_dsprintf(NULL, "(%s)", replace_to);
+	zbx_free(replace_to);
+
+	return wrapped;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_simple_macros                                         *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -2274,7 +2299,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, ret, res = SUCCEED;
+	int			N_functionid, require_numeric, ret, res = SUCCEED;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2319,6 +2344,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 		ret = SUCCEED;
 		N_functionid = 1;
+		require_numeric = 0;
 
 		if ('1' <= *(br - 2) && *(br - 2) <= '9')
 		{
@@ -3223,14 +3249,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
+					require_numeric = 1;
 					cache_trigger_hostids(&hostids, event->trigger.expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
-
-					if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) &&
-							NULL != error)
-					{
-						zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
-					}
 				}
 			}
 		}
@@ -3334,9 +3355,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 			{
+				require_numeric = 1;
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
-				if (NULL != replace_to && FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
-					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_SCRIPT))
@@ -3370,7 +3390,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN, 0);
 		}
 
-		if (FAIL == ret)
+		if (1 == require_numeric && NULL != replace_to)
+		{
+			if (SUCCEED == (res = is_double_suffix(replace_to)))
+				replace_to = wrap_negative_double_suffix(replace_to);
+			else if (NULL != error)
+				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
+		}
+		else if (FAIL == ret)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", bl);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
@@ -3754,7 +3781,14 @@ static void	zbx_substitute_functions_results(zbx_vector_ptr_t *ifuncs, zbx_vecto
 				break;
 			}
 
-			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
+			if (SUCCEED != is_double_suffix(func->value) || '-' == *func->value)
+			{
+				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, '(');
+				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
+				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ')');
+			}
+			else
+				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
 		}
 
 		if (NULL == tr->new_error)
@@ -4059,7 +4093,11 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 			}
 			else if (0 != (flags & ZBX_MACRO_NUMERIC))
 			{
-				if (SUCCEED != is_double_suffix(replace_to))
+				if (SUCCEED == is_double_suffix(replace_to))
+				{
+					replace_to = wrap_negative_double_suffix(replace_to);
+				}
+				else
 				{
 					zbx_snprintf(error, max_error_len, "macro \"%s\" value is not numeric", *data + l);
 					ret = FAIL;
