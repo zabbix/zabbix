@@ -41,7 +41,7 @@
 #	include "mutexs.h"
 #endif
 
-struct ZBX_DB_RESULT
+struct zbx_db_result
 {
 #if defined(HAVE_IBM_DB2)
 	SQLHANDLE	hstmt;
@@ -1305,8 +1305,8 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", txn_level, sql);
 
 #if defined(HAVE_IBM_DB2)
-	result = zbx_malloc(result, sizeof(struct ZBX_DB_RESULT));
-	memset(result, 0, sizeof(struct ZBX_DB_RESULT));
+	result = zbx_malloc(result, sizeof(struct zbx_db_result));
+	memset(result, 0, sizeof(struct zbx_db_result));
 
 	/* allocate a statement handle */
 	if (SUCCEED != zbx_ibm_db2_success(ret = SQLAllocHandle(SQL_HANDLE_STMT, ibm_db2.hdbc, &result->hstmt)))
@@ -1361,7 +1361,7 @@ error:
 		result = (SQL_CD_TRUE == IBM_DB2server_status() ? NULL : (DB_RESULT)ZBX_DB_DOWN);
 	}
 #elif defined(HAVE_MYSQL)
-	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->result = NULL;
 
 	if (NULL == conn)
@@ -1384,8 +1384,8 @@ error:
 			result->result = mysql_store_result(conn);
 	}
 #elif defined(HAVE_ORACLE)
-	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
-	memset(result, 0, sizeof(struct ZBX_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
+	memset(result, 0, sizeof(struct zbx_db_result));
 
 	err = OCIHandleAlloc((dvoid *)oracle.envhp, (dvoid **)&result->stmthp, OCI_HTYPE_STMT, (size_t)0, (dvoid **)0);
 
@@ -1529,7 +1529,7 @@ error:
 		result = (ZBX_DB_DOWN == server_status ? (DB_RESULT)(intptr_t)server_status : NULL);
 	}
 #elif defined(HAVE_POSTGRESQL)
-	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->pg_result = PQexec(conn, sql);
 	result->values = NULL;
 	result->cursor = 0;
@@ -1555,7 +1555,7 @@ error:
 	if (0 == txn_level)
 		zbx_mutex_lock(&sqlite_access);
 
-	result = zbx_malloc(NULL, sizeof(struct ZBX_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(struct zbx_db_result));
 	result->curow = 0;
 
 lbl_get_table:
