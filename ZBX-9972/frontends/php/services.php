@@ -39,7 +39,7 @@ $fields = [
 	'serviceid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'name' => 							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'algorithm' =>						[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'showsla' =>						[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'showsla' =>						[T_ZBX_INT, O_OPT, null,	IN([SERVICE_SHOW_SLA_OFF, SERVICE_SHOW_SLA_ON]),	null],
 	'goodsla' => 						[T_ZBX_DBL, O_OPT, null,	BETWEEN(0, 100), null, _('Calculate SLA, acceptable SLA (in %)')],
 	'sortorder' => 						[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 999), null, _('Sort order (0->999)')],
 	'times' =>							[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -118,7 +118,6 @@ if (isset($_REQUEST['delete']) && isset($_REQUEST['serviceid'])) {
 }
 
 if (isset($_REQUEST['form'])) {
-	$_REQUEST['showsla'] = getRequest('showsla', 0);
 	$result = false;
 
 	// save
@@ -412,7 +411,7 @@ elseif (isset($_REQUEST['form'])) {
 	else {
 		$data['name'] = getRequest('name', '');
 		$data['algorithm'] = getRequest('algorithm', SERVICE_ALGORITHM_MAX);
-		$data['showsla'] = getRequest('showsla', 0);
+		$data['showsla'] = getRequest('showsla', SERVICE_SHOW_SLA_OFF);
 		$data['goodsla'] = getRequest('goodsla', SERVICE_SLA);
 		$data['sortorder'] = getRequest('sortorder', 0);
 		$data['triggerid'] = getRequest('triggerid', 0);
