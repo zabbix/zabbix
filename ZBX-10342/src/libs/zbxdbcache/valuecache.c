@@ -1683,7 +1683,7 @@ static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
 		/* chunk and check next one.                                         */
 		if (chunk->slots[chunk->last_value].timestamp.sec >= timestamp)
 		{
-			while (chunk->slots[next->first_value].timestamp.sec < timestamp)
+			while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
 			{
 				vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->first_value);
 				chunk->first_value++;
