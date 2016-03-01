@@ -59,6 +59,10 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			['Apiinfo', 'Version', [], '',
 				ZBX_API_ERROR_PARAMETERS, 'The "Apiinfo.Version" method must be called without the "auth" parameter.'
 			],
+			// no params
+			['Apiinfo', 'Version', null, null,
+				ZBX_API_ERROR_PARAMETERS, 'Cannot call method "Apiinfo.Version" without parameters.'
+			],
 		];
 	}
 
@@ -67,7 +71,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @dataProvider incorrectCallProvider()
 	 */
-	public function testCallIncorrect($api, $method, array $params, $auth, $expectedErrorCode, $expectedErrorMessage) {
+	public function testCallIncorrect($api, $method, $params, $auth, $expectedErrorCode, $expectedErrorMessage) {
 		// setup a mock user API to authenticate the user
 		$userMock = $this->getMock('CUser', ['checkAuthentication']);
 		$userMock->expects($this->any())->method('checkAuthentication')->will($this->returnValue([
