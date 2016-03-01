@@ -140,7 +140,7 @@ foreach (@$tlds_ref)
 		$items_ref = get_all_items($key, $tld);
 	}
 
-	my $result = get_results($tld, $value_ts, $probe_times_ref, $items_ref, \&check_item_value);
+	my $result = get_results($tld, $value_ts, $probe_times_ref, $items_ref, \&__check_test);
 
 	foreach my $nsip (keys(%$result))
 	{
@@ -170,7 +170,7 @@ $tld = undef;
 
 slv_exit(SUCCESS);
 
-sub check_item_value
+sub __check_test
 {
 	my $value = shift;
 

@@ -54,12 +54,22 @@ use constant ROLLWEEK_SHIFT_BACK => 180; # seconds (must be divisible by 60 with
 
 use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time bound of the period for the value timestamp)
 
-use constant PROBE_ONLINE_STR => 'Online';
-use constant PROBE_OFFLINE_STR => 'Offline';
-use constant PROBE_NORESULT_STR => 'No result';
+use constant PROBE_ONLINE_STR	=> 'Online';
+use constant PROBE_OFFLINE_STR	=> 'Offline';
+use constant PROBE_NORESULT_STR	=> 'No result';
 
-use constant JSON_RDDS_43 => 'RDDS43';
-use constant JSON_RDDS_80 => 'RDDS80';
+use constant JSON_INTERFACE_DNS		=> 'DNS';
+use constant JSON_INTERFACE_DNSSEC	=> 'DNSSEC';
+use constant JSON_INTERFACE_RDDS43	=> 'RDDS43';
+use constant JSON_INTERFACE_RDDS80	=> 'RDDS80';
+
+use constant JSON_TAG_TARGET_IP		=> 'targetIP';
+use constant JSON_TAG_CLOCK		=> 'clock';
+use constant JSON_TAG_RTT		=> 'rtt';
+use constant JSON_TAG_UPD		=> 'upd';
+use constant JSON_TAG_DESCRIPTION	=> 'description';
+
+use constant SEC_PER_WEEK		=> 604800;
 
 our ($result, $dbh, $tld);
 
@@ -72,7 +82,8 @@ our %OPTS; # specified command-line options
 our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
 		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR
-		AVAIL_SHIFT_BACK JSON_RDDS_43 JSON_RDDS_80
+		AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43 JSON_INTERFACE_RDDS80
+		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
@@ -80,20 +91,20 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
-		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
+		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_disconnect db_select db_select_binds
 		db_exec set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month max_avail_time get_online_probes get_probe_times probe_offline_at probes2tldhostids
 		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
 		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
-		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
-		get_service_status_itemids get_test_results
-		sql_time_condition get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
+		get_epp_str_itemids get_dns_test_values get_dns_test_values2 get_rdds_test_values get_rdds_test_values2 get_epp_test_values no_cycle_result
+		get_service_status_itemids get_probe_results
+		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
 		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
 		get_real_services_period dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts
 		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
-		usage);
+		cycle_start cycle_end usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -348,13 +359,13 @@ sub __get_itemid_by_sql
 
 	if (scalar(@$rows_ref) == 0)
 	{
-		$$errbuf = "itemid not found (sql was [$sql])" if ($errbuf);
+		$$errbuf = "item not found (sql was [$sql])" if ($errbuf);
 		return -1;
 	}
 
 	if (scalar(@$rows_ref) > 1)
 	{
-		$$errbuf = "more than one itemid found (sql was [$sql])" if ($errbuf);
+		$$errbuf = "more than one item found (sql was [$sql])" if ($errbuf);
 		return -1;
 	}
 
@@ -771,6 +782,11 @@ sub db_connect
 	$dbh->{'mysql_use_result'} = 1;
 }
 
+sub db_disconnect
+{
+     $dbh->disconnect();
+}
+
 sub db_select
 {
 	$global_sql = shift;
@@ -829,6 +845,77 @@ sub db_select
 	}
 
 	return $rows_ref;
+}
+
+sub db_select_binds
+{
+	$global_sql = shift;
+	my $bind_values = shift;
+
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
+	my $sth = $dbh->prepare($global_sql)
+		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
+
+	dbg("[$global_sql]");
+
+	my ($start, $exe, $fetch, $total);
+
+	my @rows;
+	foreach my $bind_value (@$bind_values)
+	{
+		dbg("bind_value:$bind_value");
+
+		if (opt('warnslow'))
+		{
+			$start = time();
+		}
+
+		$sth->execute($bind_value)
+			or fail("cannot execute [$global_sql] bind_value:$bind_value: ", $sth->errstr);
+
+		if (opt('warnslow'))
+		{
+			$exe = time();
+		}
+
+		while (my @row = $sth->fetchrow_array())
+		{
+			push(@rows, \@row);
+		}
+
+		if (opt('warnslow'))
+		{
+			my $now = time();
+			$total = $now - $start;
+
+			if ($total > getopt('warnslow'))
+			{
+				$fetch = $now - $exe;
+				$exe = $exe - $start;
+				wrn("slow query: [$global_sql] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
+			}
+		}
+	}
+
+	if (opt('debug'))
+	{
+		my $rows_num = scalar(@rows);
+
+		dbg("$rows_num row", ($rows_num != 1 ? "s" : ""));
+	}
+
+	if (opt('stats'))
+	{
+		$sql_time += time() - $sec;
+		$sql_count++;
+	}
+
+	return \@rows;
 }
 
 sub db_exec
@@ -896,25 +983,16 @@ sub get_interval_bounds
 # Get time bounds of the rolling week, shift back to guarantee all probe results.
 sub get_rollweek_bounds
 {
-	my $from = shift;	# beginning of rolling week (till current time if not specified)
+	my $now = shift;	# specify different current time
 
 	my $rollweek_seconds = __get_macro('{$RSM.ROLLWEEK.SECONDS}');
 
-	my $till;
+	my ($from, $till);
 
-	if ($from)
-	{
-		$from = truncate_from($from);
-		$till = $from + $rollweek_seconds;
-	}
-	else
-	{
-		# select till current time
-		$till = int(time()) - ROLLWEEK_SHIFT_BACK;
+	$now = int(time()) unless ($now);
 
-		$till = truncate_from($till);
-		$from = $till - $rollweek_seconds;
-	}
+	$till = truncate_from($now) - ROLLWEEK_SHIFT_BACK;
+	$from = $till - $rollweek_seconds;
 
 	$till--;
 
@@ -1220,7 +1298,10 @@ sub get_probe_times
 	# check probe lastaccess time
 	foreach my $probe (keys(%$probes_ref))
 	{
-		my $times_ref = __get_reachable_times($probe, $probe_avail_limit, $from, $till);
+		my $host = "$probe - mon";
+		my $itemid = get_itemid_by_host($host, PROBE_LASTACCESS_ITEM);
+
+		my $times_ref = __get_lastaccess_times($itemid, $probe_avail_limit, $from, $till);
 
 		my $hostid = $probes_ref->{$probe};
 
@@ -1255,10 +1336,12 @@ sub probe_offline_at
 	my $probe = shift;
 	my $clock = shift;
 
+	dbg("check if $probe was online at ", ts_full($clock));
+
 	# if a probe was down for the whole period it won't be in a hash
 	unless (exists($probe_times_ref->{$probe}))
 	{
-		dbg("Probe $probe does not exist in a hash, OFFLINE");
+		dbg("does not exist in a hash, OFFLINE");
 		return 1;	# offline
 	}
 
@@ -1272,11 +1355,14 @@ sub probe_offline_at
 		my $from = $times_ref->[$clock_index++];
 		my $till = $times_ref->[$clock_index++];
 
-		if (($from < $clock) and ($clock < $till))
+		if (($from <= $clock) and ($clock <= $till))
 		{
+			dbg("found in online period: probe ONLINE");
 			return 0;	# online
 		}
 	}
+
+	dbg("not found in online periods: probe OFFLINE");
 
 	return 1;	# offline
 }
@@ -2108,27 +2194,113 @@ sub get_dns_test_values
 	my $dns_items_ref = shift;
 	my $start = shift;
 	my $end = shift;
+	my $valuemaps = shift;
+	my $delay = shift;
+	my $service = shift;
+
+	my $interface;
+
+	if (uc($service) eq 'DNS')
+	{
+		$interface = JSON_INTERFACE_DNS;
+	}
+	else
+	{
+		$interface = JSON_INTERFACE_DNSSEC;
+	}
+
+	my $result;
+
+	# generate list if itemids
+	my @itemids;
+	foreach my $probe (keys(%$dns_items_ref))
+	{
+		push(@itemids, keys(%{$dns_items_ref->{$probe}}));
+	}
+
+	if (scalar(@itemids) != 0)
+	{
+		my $rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
+
+		foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$rows_ref)
+		{
+			my $itemid = $row_ref->[0];
+			my $value = $row_ref->[1];
+			my $clock = $row_ref->[2];
+
+			my ($nsip, $probe);
+			my $last = 0;
+
+			foreach my $pr (keys(%$dns_items_ref))
+			{
+				my $itemids_ref = $dns_items_ref->{$pr};
+
+				foreach my $i (keys(%$itemids_ref))
+				{
+					if ($i == $itemid)
+					{
+						$nsip = $dns_items_ref->{$pr}->{$i};
+						$probe = $pr;
+						$last = 1;
+						last;
+					}
+				}
+				last if ($last == 1);
+			}
+
+			unless (defined($nsip))
+			{
+				wrn("internal error: Name Server,IP pair of item $itemid not found");
+				next;
+			}
+
+			my ($ns, $ip) = split(',', $nsip);
+
+			my ($description, $real_value);
+
+			$real_value = $value;
+
+			if ($real_value < 0)
+			{
+				$description = $real_value;
+				undef($real_value);
+			}
+
+			my $cycleclock = cycle_start($clock, $delay);
+
+			push(@{$result->{$cycleclock}->{$interface}->{$probe}->{$ns}},
+				{
+					JSON_TAG_TARGET_IP() => $ip,
+					JSON_TAG_RTT() => $real_value,
+					JSON_TAG_CLOCK() => $clock,
+					JSON_TAG_DESCRIPTION() => get_detailed_result($valuemaps, $description)
+				});
+		}
+	}
+
+	return $result;
+}
+
+sub get_dns_test_values2
+{
+	my $dns_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
 
 	my %result;
 
 	# generate list if itemids
-	my $itemids_str = '';
+	my @itemids;
 	foreach my $probe (keys(%$dns_items_ref))
 	{
-		my $itemids_ref = $dns_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
-		{
-			$itemids_str .= ',' unless ($itemids_str eq '');
-			$itemids_str .= $itemid;
-		}
+		push(@itemids, keys(%{$dns_items_ref->{$probe}}));
 	}
 
-	if ($itemids_str ne '')
+	if (scalar(@itemids) != 0)
 	{
-		my $rows_ref = db_select("select itemid,value,clock from history where itemid in ($itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+		my $rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
 
-		foreach my $row_ref (@$rows_ref)
+		foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$rows_ref)
 		{
 			my $itemid = $row_ref->[0];
 			my $value = $row_ref->[1];
@@ -2261,42 +2433,181 @@ sub get_rdds_test_values
 	my $rdds_str_items_ref = shift;
 	my $start = shift;
 	my $end = shift;
+	my $valuemaps = shift;
+	my $delay = shift;
 
 	# generate list if itemids
-	my $dbl_itemids_str = '';
+	my @dbl_itemids;
 	foreach my $probe (keys(%$rdds_dbl_items_ref))
 	{
-		my $itemids_ref = $rdds_dbl_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
+		foreach my $itemid (keys(%{$rdds_dbl_items_ref->{$probe}}))
 		{
-			$dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
-			$dbl_itemids_str .= $itemid;
+			push(@dbl_itemids, $itemid);
 		}
 	}
 
-	my $str_itemids_str = '';
+	my @str_itemids;
 	foreach my $probe (keys(%$rdds_str_items_ref))
 	{
-		my $itemids_ref = $rdds_str_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
+		foreach my $itemid (keys(%{$rdds_str_items_ref->{$probe}}))
 		{
-			$str_itemids_str .= ',' unless ($str_itemids_str eq '');
-			$str_itemids_str .= $itemid;
+			push(@str_itemids, $itemid);
 		}
 	}
 
-	my %result;
+	return undef if (scalar(@dbl_itemids) == 0 || scalar(@str_itemids) == 0);
 
-	return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+	my $result;
+	my $target = '';
+
+	my $dbl_rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
+
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $value = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid")
+			unless (defined($probe) and defined($key));
+
+		my $port = __get_rdds_port($key);
+		my $type = __get_rdds_dbl_type($key);	# rtt (double) or upd (int, if EPP is enabled)
+
+		my $interface;
+		if ($port eq '43')
+		{
+			$interface = JSON_INTERFACE_RDDS43;
+		}
+		elsif ($port eq '80')
+		{
+			$interface = JSON_INTERFACE_RDDS80;
+		}
+		else
+		{
+			fail("unknown RDDS port in item (id:$itemid)");
+		}
+
+		my ($real_value, $description, $real_value_tag);
+
+		if ($type eq 'rtt')
+		{
+			$real_value_tag = JSON_TAG_RTT;
+			$real_value = $value;
+		}
+		elsif ($type eq 'upd')
+		{
+			$real_value_tag = JSON_TAG_UPD;
+			$real_value = int($value);
+		}
+		else
+		{
+			fail("unknown $interface item key (itemid:$itemid), expected 'rtt' or 'upd' value");
+		}
+
+		if ($real_value < 0)
+		{
+			$description = get_detailed_result($valuemaps, $real_value);
+			undef($real_value);
+		}
+
+		my $cycleclock = cycle_start($clock, $delay);
+
+		my $cur_desc = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()};
+
+		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{$real_value_tag} = $real_value;
+		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_CLOCK()} = $clock;
+
+		if ($description)
+		{
+			if ($cur_desc && ($cur_desc ne $description))
+			{
+				$description = "$cur_desc; $description";
+			}
+
+			$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()} = $description;
+		}
+	}
+
+	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
+
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
+	{
+		my $itemid = $row_ref->[0];
+		my $ip = $row_ref->[1];
+		my $clock = $row_ref->[2];
+
+		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
+
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+
+		my $port = __get_rdds_port($key);
+		my $type = __get_rdds_str_type($key);
+
+		my $interface;
+                if ($port eq '43')
+                {
+                        $interface = JSON_INTERFACE_RDDS43;
+                }
+                elsif ($port eq '80')
+                {
+                        $interface = JSON_INTERFACE_RDDS80;
+                }
+                else
+                {
+                        fail("unknown RDDS port in item (id:$itemid)");
+                }
+
+		if ($type ne 'ip')
+		{
+			fail("internal error: unknown item key (itemid:$itemid), expected item key representing the IP involved in $interface test");
+		}
+
+		my $cycleclock = cycle_start($clock, $delay);
+
+		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_TARGET_IP()} = $ip;
+	}
+
+	return $result;
+}
+
+sub get_rdds_test_values2
+{
+	my $rdds_dbl_items_ref = shift;
+	my $rdds_str_items_ref = shift;
+	my $start = shift;
+	my $end = shift;
+	my $delay = shift;
+
+	# generate list if itemids
+	my @dbl_itemids;
+	foreach my $probe (keys(%$rdds_dbl_items_ref))
+	{
+		foreach my $itemid (keys(%{$rdds_dbl_items_ref->{$probe}}))
+		{
+			push(@dbl_itemids, $itemid);
+		}
+	}
+
+	my @str_itemids;
+	foreach my $probe (keys(%$rdds_str_items_ref))
+	{
+		foreach my $itemid (keys(%{$rdds_str_items_ref->{$probe}}))
+		{
+			push(@str_itemids, $itemid);
+		}
+	}
+
+	return undef if (scalar(@dbl_itemids) == 0 || scalar(@str_itemids) == 0);
 
 	# we need pre_result to combine IP and RTT to single test result
-	my %pre_result;
+	my $pre_result;
 
-	my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+	my $dbl_rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
 
-	foreach my $row_ref (@$dbl_rows_ref)
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
 		my $value = $row_ref->[1];
@@ -2309,29 +2620,29 @@ sub get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_dbl_type($key);
 
-		my $subservice;
+		my $interface;
 		if ($port eq '43')
 		{
-			$subservice = JSON_RDDS_43;
+			$interface = JSON_INTERFACE_RDDS43;
 		}
 		elsif ($port eq '80')
 		{
-			$subservice = JSON_RDDS_80;
+			$interface = JSON_INTERFACE_RDDS80;
 		}
 		else
 		{
 			fail("unknown RDDS port in item (id:$itemid)");
 		}
 
-		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? $value : int($value);
+		$pre_result->{$probe}->{$interface}->{$clock}->{$type} = ($type eq 'rtt') ? $value : int($value);
 	}
 
-	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
 
-	foreach my $row_ref (@$str_rows_ref)
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
-		my $value = $row_ref->[1];
+		my $ip = $row_ref->[1];
 		my $clock = $row_ref->[2];
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
@@ -2341,43 +2652,69 @@ sub get_rdds_test_values
 		my $port = __get_rdds_port($key);
 		my $type = __get_rdds_str_type($key);
 
-		my $subservice;
+		my $interface;
                 if ($port eq '43')
                 {
-                        $subservice = JSON_RDDS_43;
+                        $interface = JSON_INTERFACE_RDDS43;
                 }
                 elsif ($port eq '80')
                 {
-                        $subservice = JSON_RDDS_80;
+                        $interface = JSON_INTERFACE_RDDS80;
                 }
                 else
                 {
                         fail("unknown RDDS port in item (id:$itemid)");
                 }
 
-		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = $value;
+		if (!$pre_result->{$probe}->{$interface}->{$clock})
+		{
+			# Sometimes there is small difference (1 second) in the clocked of saved rtt
+			# (or upd) and ip values, the values must be still grouped together. In such
+			# cases find the clock of rtt (or upd) and use that as the timestamp of IP.
+
+			my $search_from = cycle_start($clock, $delay);
+			my $search_till = $search_from + $delay - 1;
+
+			foreach my $dbl_clock (keys(%{$pre_result->{$probe}->{$interface}}))
+			{
+				if ($dbl_clock > $search_from && $search_till > $clock)
+				{
+					wrn("$interface: resulting IP clock adjusted (from ", ts_full($clock), " to ", ts_full($dbl_clock), ")");
+					$clock = $dbl_clock;
+					last;
+				}
+			}
+		}
+
+		fail("internal error: cannot find result (rtt or upd) of the $interface test against IP $ip (clock:", ts_full($clock), ", itemid:$itemid)")
+			unless ($pre_result->{$probe}->{$interface}->{$clock});
+
+		$pre_result->{$probe}->{$interface}->{$clock}->{$type} = $ip;
 	}
 
-	foreach my $probe (keys(%pre_result))
+	my $result;
+
+	foreach my $probe (keys(%$pre_result))
 	{
-		foreach my $subservice (keys(%{$pre_result{$probe}}))
+		foreach my $interface (keys(%{$pre_result->{$probe}}))
 		{
-			foreach my $clock (sort(keys(%{$pre_result{$probe}->{$subservice}})))	# must be sorted by clock
+			foreach my $clock (sort(keys(%{$pre_result->{$probe}->{$interface}})))	# must be sorted by clock
 			{
 				my $h;
-				my $clock_ref = $pre_result{$probe}->{$subservice}->{$clock};
-				foreach my $key (keys(%{$pre_result{$probe}->{$subservice}->{$clock}}))
+
+				foreach my $key (keys(%{$pre_result->{$probe}->{$interface}->{$clock}}))
 				{
-					$h->{$key} = $clock_ref->{$key};
+					$h->{$key} = $pre_result->{$probe}->{$interface}->{$key};
 				}
+
 				$h->{'clock'} = $clock;
 
-				push(@{$result{$probe}->{$subservice}}, $h);
+				push(@{$result->{$probe}->{$interface}}, $h);
 			}
 		}
 	}
 
-	return \%result;
+	return $result;
 }
 
 # values are organized like this:
@@ -2473,16 +2810,14 @@ sub no_cycle_result
 {
 	my $service = shift;
 	my $avail_key = shift;
-	my $probe = shift;
 	my $clock = shift;
 	my $details = shift;
 
-	wrn(uc($service), " availability result is missing for ", uc($service), " test ", ($details ? "($details) " : ''),
-		"performed at ", ts_str($clock), " ($clock) on probe $probe. This means the test period was not" .
-		" handled by SLV availability cron job ($avail_key). This may happen e. g. if cron was not running" .
-		" at some point. In order to fix this problem please run".
-		"\n  $avail_key.pl --from $clock".
-		"\nmanually to add missing service availability result.");
+	wrn(uc($service), " service availability result is missing for timestamp ", ts_str($clock), " ($clock).".
+		" This means for that period the SLV availability script ($avail_key) was not run.".
+		" This may happen e. g. if cron was not running at some point. In order to fix this problem".
+		" please run the following script:".
+		"\n  $avail_key.pl --from $clock");
 }
 
 # returns hash reference of Probe=>itemid of specified key (e. g. 'rsm.dns.udp[{$RSM.TLD}]')
@@ -2562,7 +2897,7 @@ sub get_service_status_itemids
 #     ]
 # }
 #
-sub get_test_results
+sub get_probe_results
 {
 	my $itemids_ref = shift;
 	my $from = shift;
@@ -2805,12 +3140,195 @@ sub get_incidents
 			my $inc_till = $_->{'end'};
 			my $false_positive = $_->{'false_positive'};
 
-			my $str = "$eventid";
-			$str .= " (false positive)" if ($false_positive != 0);
-			$str .= ": " . ts_str($inc_from) . " ($inc_from) -> ";
-			$str .= $inc_till ? ts_str($inc_till) . " ($inc_till)" : "null";
+			if (opt('debug'))
+			{
+				my $str = "$eventid";
+				$str .= " (false positive)" if ($false_positive != 0);
+				$str .= ": " . ts_str($inc_from) . " ($inc_from) -> ";
+				$str .= $inc_till ? ts_str($inc_till) . " ($inc_till)" : "null";
 
-			dbg($str);
+				dbg($str);
+			}
+		}
+	}
+
+	return \@incidents;
+}
+
+sub get_incidents2
+{
+	my $itemid = shift;
+	my $delay = shift;
+	my $from = shift;
+	my $till = shift;
+
+	my (@incidents, $rows_ref, $row_ref);
+
+	$rows_ref = db_select(
+		"select distinct t.triggerid".
+		" from triggers t,functions f".
+		" where t.triggerid=f.triggerid".
+			" and f.itemid=$itemid".
+			" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
+
+	my $rows = scalar(@$rows_ref);
+
+	unless ($rows == 1)
+	{
+		wrn("configuration error: item $itemid must have one not classified trigger (found: $rows)");
+		return \@incidents;
+	}
+
+	my $triggerid = $rows_ref->[0]->[0];
+
+	my $last_trigger_value = TRIGGER_VALUE_FALSE;
+
+	if (defined($from))
+	{
+		# First check for ongoing incident.
+
+		my $attempts = 5;
+
+		undef($row_ref);
+
+		my $attempt = 0;
+
+		my $clock_till = $from;
+		my $clock_from = $clock_till - SEC_PER_WEEK;
+		$clock_till--;
+
+		while ($attempt++ < $attempts && !defined($row_ref))
+		{
+			$rows_ref = db_select(
+				"select max(clock)".
+				" from events".
+				" where object=".EVENT_OBJECT_TRIGGER.
+					" and source=".EVENT_SOURCE_TRIGGERS.
+					" and objectid=$triggerid".
+					" and " . sql_time_condition($clock_from, $clock_till));
+
+			$row_ref = $rows_ref->[0];
+
+			$clock_till = $clock_from - 1;
+			$clock_from -= (SEC_PER_WEEK * $attempt * 2);
+		}
+
+		if (!defined($row_ref))
+		{
+			$rows_ref = db_select(
+				"select max(clock)".
+				" from events".
+				" where object=".EVENT_OBJECT_TRIGGER.
+					" and source=".EVENT_SOURCE_TRIGGERS.
+					" and objectid=$triggerid".
+					" and clock<$clock_from");
+
+			$row_ref = $rows_ref->[0];
+		}
+
+		if (defined($row_ref) and defined($row_ref->[0]))
+		{
+			my $preincident_clock = $row_ref->[0];
+
+			$rows_ref = db_select(
+				"select eventid,clock,value,false_positive".
+				" from events".
+				" where object=".EVENT_OBJECT_TRIGGER.
+					" and source=".EVENT_SOURCE_TRIGGERS.
+					" and objectid=$triggerid".
+					" and clock=$preincident_clock".
+				" order by ns desc".
+				" limit 1");
+
+			$row_ref = $rows_ref->[0];
+
+			my $eventid = $row_ref->[0];
+			my $clock = $row_ref->[1];
+			my $value = $row_ref->[2];
+			my $false_positive = $row_ref->[3];
+
+			dbg("reading pre-event $eventid: clock:" . ts_str($clock) . " ($clock), value:", ($value == 0 ? 'OK' : 'PROBLEM'), ", false_positive:$false_positive") if (opt('debug'));
+
+			# do not add 'value=TRIGGER_VALUE_TRUE' to SQL above just for corner case of 2 events at the same second
+			if ($value == TRIGGER_VALUE_TRUE)
+			{
+				push(@incidents, __make_incident($eventid, $false_positive, cycle_start($clock, $delay)));
+
+				$last_trigger_value = TRIGGER_VALUE_TRUE;
+			}
+		}
+	}
+
+	# now check for incidents within given period
+	$rows_ref = db_select(
+		"select eventid,clock,value,false_positive".
+		" from events".
+		" where object=".EVENT_OBJECT_TRIGGER.
+			" and source=".EVENT_SOURCE_TRIGGERS.
+			" and objectid=$triggerid".
+			" and ".sql_time_condition($from, $till).
+		" order by clock,ns");
+
+	foreach my $row_ref (@$rows_ref)
+	{
+		my $eventid = $row_ref->[0];
+		my $clock = $row_ref->[1];
+		my $value = $row_ref->[2];
+		my $false_positive = $row_ref->[3];
+
+		dbg("reading event $eventid: clock:" . ts_str($clock) . " ($clock), value:", ($value == 0 ? 'OK' : 'PROBLEM'), ", false_positive:$false_positive") if (opt('debug'));
+
+		# ignore non-resolved false_positive incidents (corner case)
+		if ($value == TRIGGER_VALUE_TRUE && $last_trigger_value == TRIGGER_VALUE_TRUE)
+		{
+			my $idx = scalar(@incidents) - 1;
+
+			if ($incidents[$idx]->{'false_positive'} != 0)
+			{
+				# replace with current
+				$incidents[$idx]->{'eventid'} = $eventid;
+				$incidents[$idx]->{'false_positive'} = $false_positive;
+				$incidents[$idx]->{'start'} = cycle_start($clock, $delay);
+			}
+		}
+
+		next if ($value == $last_trigger_value);
+
+		if ($value == TRIGGER_VALUE_FALSE)
+		{
+			# event that closes the incident
+			my $idx = scalar(@incidents) - 1;
+
+			$incidents[$idx]->{'end'} = cycle_end($clock, $delay);
+		}
+		else
+		{
+			# event that starts an incident
+			push(@incidents, __make_incident($eventid, $false_positive, cycle_start($clock, $delay)));
+		}
+
+		$last_trigger_value = $value;
+	}
+
+	# DEBUG
+	if (opt('debug'))
+	{
+		foreach (@incidents)
+		{
+			my $eventid = $_->{'eventid'};
+			my $inc_from = $_->{'start'};
+			my $inc_till = $_->{'end'};
+			my $false_positive = $_->{'false_positive'};
+
+			if (opt('debug'))
+			{
+				my $str = "$eventid";
+				$str .= " (false positive)" if ($false_positive != 0);
+				$str .= ": " . ts_str($inc_from) . " ($inc_from) -> ";
+				$str .= $inc_till ? ts_str($inc_till) . " ($inc_till)" : "null";
+
+				dbg($str);
+			}
 		}
 	}
 
@@ -3111,7 +3629,7 @@ sub get_nsip_values
 	my $times_ref = shift; # from, till, ...
 	my $items_ref = shift;
 
-	my %result;
+	my $result;
 
 	if (scalar(@$itemids_ref) != 0)
 	{
@@ -3154,9 +3672,9 @@ sub get_nsip_values
 
 				fail("internal error: name server of item $itemid not found") unless (defined($nsip));
 
-				if (exists($result{$nsip}))
+				if (exists($result->{$nsip}))
 				{
-					push(@{$result{$nsip}->{'values'}}, $value);
+					push(@{$result->{$nsip}->{'values'}}, $value);
 				}
 				else
 				{
@@ -3165,13 +3683,13 @@ sub get_nsip_values
 					$h{'itemid'} = $itemid;
 					$h{'values'} = [$value];
 
-					$result{$nsip} = \%h;
+					$result->{$nsip} = \%h;
 				}
 			}
 		}
 	}
 
-	return \%result;
+	return $result;
 }
 
 sub __get_valuemappings
@@ -3180,13 +3698,13 @@ sub __get_valuemappings
 
 	my $rows_ref = db_select("select m.value,m.newvalue from valuemaps v,mappings m where v.valuemapid=m.valuemapid and v.name='$vmname'");
 
-	my %result;
+	my $result;
 	foreach my $row_ref (@$rows_ref)
 	{
-		$result{$row_ref->[0]} = $row_ref->[1];
+		$result->{$row_ref->[0]} = $row_ref->[1];
 	}
 
-	return \%result;
+	return $result;
 }
 
 sub get_valuemaps
@@ -3239,6 +3757,8 @@ sub get_detailed_result
 {
 	my $maps = shift;
 	my $value = shift;
+
+	return undef unless($value);
 
 	my $value_int = int($value);
 
@@ -3600,6 +4120,22 @@ sub write_file
 	return SUCCESS;
 }
 
+sub cycle_start
+{
+	my $sec = shift;
+	my $delay = shift;
+
+	return $sec - ($sec % $delay);
+}
+
+sub cycle_end
+{
+	my $sec = shift;
+	my $delay = shift;
+
+	return $sec + $delay - ($sec % $delay);
+}
+
 sub usage
 {
 	pod2usage(shift);
@@ -3740,15 +4276,12 @@ sub __get_pidfile
 }
 
 # Times when probe "lastaccess" within $probe_avail_limit.
-sub __get_reachable_times
+sub __get_lastaccess_times
 {
-	my $probe = shift;
+	my $itemid = shift;
 	my $probe_avail_limit = shift;
 	my $from = shift;
 	my $till = shift;
-
-	my $host = "$probe - mon";
-	my $itemid = get_itemid_by_host($host, PROBE_LASTACCESS_ITEM);
 
 	my ($rows_ref, @times, $last_status);
 
@@ -3832,7 +4365,13 @@ sub __get_probestatus_times
 
 	fail("configuration error: cannot get item \"$key\" at probe host \"$probe\": $errbuf") if ($itemid < 0);
 
-	$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock<" . $times_ref->[0] . " order by clock desc limit 1");
+	$rows_ref = db_select(
+		"select value".
+		" from history_uint".
+		" where itemid=$itemid".
+			" and clock<" . $times_ref->[0].
+		" order by clock desc".
+		" limit 1");
 
 	$last_status = UP;
 	if (scalar(@$rows_ref) != 0)
@@ -3849,7 +4388,12 @@ sub __get_probestatus_times
 		my $from = $times_ref->[$idx++];
 		my $till = $times_ref->[$idx++];
 
-		$rows_ref = db_select("select clock,value from history_uint where itemid=$itemid and clock between $from and $till order by itemid,clock");
+		$rows_ref = db_select(
+			"select clock,value".
+			" from history_uint".
+			" where itemid=$itemid".
+				" and clock between $from and $till".
+			" order by itemid,clock");
 
 		push(@times, $from) if ($last_status == UP);
 
@@ -3902,7 +4446,13 @@ sub __get_configvalue
 
 	while (not $value and $diff < $month)
 	{
-		my $rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between " . ($value_time - $diff) . " and $value_time order by clock desc limit 1");
+		my $rows_ref = db_select(
+			"select value".
+			" from history_uint".
+			" where itemid=$itemid".
+				" and clock between " . ($value_time - $diff) . " and $value_time".
+			" order by clock desc".
+			" limit 1");
 
 		foreach my $row_ref (@$rows_ref)
 		{
