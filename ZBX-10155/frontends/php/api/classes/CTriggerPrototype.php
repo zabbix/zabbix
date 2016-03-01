@@ -908,18 +908,18 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param array  $items							array of trigger items
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
-		$itemDiscoveryIds = array();
+		$item_discoveryids = array();
 
 		if ($items) {
-			$itemDiscoveries = API::getApi()->select('item_discovery', array(
+			$item_discoveries = API::getApi()->select('item_discovery', array(
 				'nodeids' => get_current_nodeid(true),
 				'output' => array('parent_itemid'),
 				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
 			));
 
-			$itemDiscoveryIds = array_flip(zbx_objectValues($itemDiscoveries, 'parent_itemid'));
+			$item_discoveryids = array_flip(zbx_objectValues($item_discoveries, 'parent_itemid'));
 
-			if (count($itemDiscoveryIds) > 1) {
+			if (count($item_discoveryids) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
 					$trigger['description']
@@ -927,7 +927,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 		}
 
-		if (!$itemDiscoveryIds) {
+		if (!$item_discoveryids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Trigger prototype "%1$s" must contain at least one item prototype.',
 				$trigger['description']
