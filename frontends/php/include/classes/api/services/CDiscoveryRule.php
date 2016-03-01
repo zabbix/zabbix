@@ -374,7 +374,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		} while (!empty($parentItemids));
 
-		$delRulesChilds = $this->get([
+		$delRulesChildren = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childTuleids,
 			'nopermissions' => true,
@@ -382,7 +382,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectHosts' => ['name']
 		]);
 
-		$delRules = array_merge($delRules, $delRulesChilds);
+		$delRules = array_merge($delRules, $delRulesChildren);
 		$ruleids = array_merge($ruleids, $childTuleids);
 
 		$iprototypeids = [];
