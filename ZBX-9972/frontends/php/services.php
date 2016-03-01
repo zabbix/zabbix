@@ -144,7 +144,7 @@ if (isset($_REQUEST['form'])) {
 			'parentid' => getRequest('parentid'),
 			'dependencies' => $dependencies
 		];
-		if(hasRequest('goodsla') === true) {
+		if (hasRequest('goodsla')) {
 			$request['goodsla'] = getRequest('goodsla');
 		}
 
