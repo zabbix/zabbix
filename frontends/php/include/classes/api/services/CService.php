@@ -202,37 +202,36 @@ class CService extends CApiService {
 	 */
 	public function validateUpdate(array $services) {
 		foreach ($services as $service) {
-			if (!isset($service['serviceid']) || !is_numeric($service['serviceid'])
-					|| $service['serviceid'] <= 0) {
+			if (empty($service['serviceid'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
 			}
 		}
 
 		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
 
+		$services = $this->extendObjects($this->tableName(), $services, ['name']);
 		foreach ($services as $service) {
-			if (array_key_exists('name', $service)) {
-				$this->checkName($service);
-			}
-			if (array_key_exists('algorithm', $service)) {
+			$this->checkName($service);
+
+			if (isset($service['algorithm'])) {
 				$this->checkAlgorithm($service);
 			}
-			if (array_key_exists('showsla', $service)) {
+			if (isset($service['showsla'])) {
 				$this->checkShowSla($service);
 			}
-			if (array_key_exists('goodsla', $service)) {
+			if (isset($service['goodsla'])) {
 				$this->checkGoodSla($service);
 			}
-			if (array_key_exists('sortorder', $service)) {
+			if (isset($service['sortorder'])) {
 				$this->checkSortOrder($service);
 			}
-			if (array_key_exists('triggerid', $service)){
+			if (isset($service['triggerid'])) {
 				$this->checkTriggerId($service);
 			}
-			if (array_key_exists('status', $service)) {
+			if (isset($service['status'])) {
 				$this->checkStatus($service);
 			}
-			if (array_key_exists('parentid', $service)) {
+			if (isset($service['parentid'])) {
 				$this->checkParentId($service);
 			}
 
