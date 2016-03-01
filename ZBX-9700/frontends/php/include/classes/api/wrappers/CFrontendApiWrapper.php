@@ -54,11 +54,11 @@ class CFrontendApiWrapper extends CApiWrapper {
 	 * If the API call has been unsuccessful - add an error message and return false, instead of an array.
 	 *
 	 * @param string 	$method
-	 * @param array 	$params
+	 * @param mixed 	$params
 	 *
 	 * @return mixed
 	 */
-	protected function callMethod($method, array $params) {
+	protected function callMethod($method, $params) {
 		API::setWrapper();
 		$response = parent::callMethod($method, $params);
 		API::setWrapper($this);
@@ -86,7 +86,7 @@ class CFrontendApiWrapper extends CApiWrapper {
 	/**
 	 * Call the client method. Pass the "auth" parameter only to the methods that require it.
 	 */
-	protected function callClientMethod($method, array $params) {
+	protected function callClientMethod($method, $params) {
 		$auth = ($this->requiresAuthentication($this->api, $method)) ? $this->auth : null;
 
 		return $this->client->callMethod($this->api, $method, $params, $auth);
