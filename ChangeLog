@@ -80,7 +80,7 @@ A......... [ZBX-9340] fixed "data" property not being returned by API when error
 ...G...... [ZBX-9796] fixed item key vfs.fs.size operation for NetBSD and HP-UX (viktors)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
-........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
+........S. [ZBX-9667] fixed disabled triggers or triggers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 .......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
