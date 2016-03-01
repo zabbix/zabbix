@@ -377,8 +377,8 @@ class CHttpTest extends CApiService {
 			'preservekeys' => true,
 			'selectHosts' => API_OUTPUT_EXTEND
 		];
-		$delHttpTestChilds = $this->get($options);
-		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChilds);
+		$delHttpTestChildren = $this->get($options);
+		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChildren);
 		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
 
 		$itemidsDel = [];
