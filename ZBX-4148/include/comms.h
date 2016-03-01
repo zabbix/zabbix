@@ -34,6 +34,7 @@ typedef long	ssize_t;
 #	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
 #	define zbx_socket_last_error()	WSAGetLastError()
 
+#	define ZBX_PROTO_AGAIN		WSAEINTR
 #	define ZBX_PROTO_ERROR		SOCKET_ERROR
 #	define ZBX_SOCKET_ERROR		INVALID_SOCKET
 #else
@@ -42,6 +43,7 @@ typedef long	ssize_t;
 #	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) close(s)
 #	define zbx_socket_last_error()	errno
 
+#	define ZBX_PROTO_AGAIN		EINTR
 #	define ZBX_PROTO_ERROR		-1
 #	define ZBX_SOCKET_ERROR		-1
 #endif
