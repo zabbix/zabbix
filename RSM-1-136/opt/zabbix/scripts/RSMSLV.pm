@@ -304,17 +304,14 @@ sub get_itemid_by_host
 	my $host = shift;
 	my $key = shift;
 
-	my $rows_ref = db_select(
+	my $sql = db_select(
 		"select i.itemid".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
 	    		" and h.host='$host'".
 			" and i.key_='$key'");
 
-	fail("cannot find item ($key) at host ($host)") if (scalar(@$rows_ref) == 0);
-	fail("more than one item ($key) at host ($host)") if (scalar(@$rows_ref) > 1);
-
-	return $rows_ref->[0]->[0];
+	return __get_itemid_by_sql($sql);
 }
 
 sub get_itemid_by_hostid

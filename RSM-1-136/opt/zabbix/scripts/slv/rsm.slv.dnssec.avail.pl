@@ -61,7 +61,15 @@ while ($period > 0)
 	{
 		$tld = $_;
 
-		if (avail_value_exists($value_ts, get_itemid_by_host($tld, $cfg_key_out)) == SUCCESS)
+		my $itemid = get_itemid_by_host($tld, $cfg_key_out);
+
+		if ($itemid < 0)
+		{
+			dbg("target item \"$cfg_key_out\" does not exist at host \"$tld\"");
+			next;
+		}
+
+		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
 		{
 			# value already exists
 			next unless (opt('dry-run'));
