@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ void	recv_areg_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != (ret = get_active_proxy_id(jp, &proxy_hostid, host, sock, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse autoregistration data from active proxy at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 		goto out;
 	}
 
@@ -110,7 +110,7 @@ out:
 	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send auto registration data to server at \"%s\": %s",
-				get_ip_by_socket(sock), error);
+				sock->peer, error);
 	}
 
 	zbx_json_free(&j);

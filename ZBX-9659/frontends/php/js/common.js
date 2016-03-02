@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -171,8 +171,8 @@ function add_variable(o_el, s_name, x_value, s_formname, o_document) {
 }
 
 function checkAll(form_name, chkMain, shkName) {
-	var frmForm = document.forms[form_name];
-	var value = frmForm.elements[chkMain].checked;
+	var frmForm = document.forms[form_name],
+		value = frmForm.elements[chkMain].checked;
 
 	chkbxRange.checkObjectAll(shkName, value);
 	chkbxRange.update(shkName);
@@ -389,7 +389,7 @@ function PopUp(url, width, height, form_name) {
 	return false;
 }
 
-function redirect(uri, method, needle) {
+function redirect(uri, method, needle, invert_needle) {
 	method = method || 'get';
 	var url = new Curl(uri);
 
@@ -404,12 +404,17 @@ function redirect(uri, method, needle) {
 		domBody.appendChild(postForm);
 		postForm.setAttribute('method', 'post');
 
+		invert_needle = (typeof(invert_needle) != 'undefined' && invert_needle);
+
 		var args = url.getArguments();
 		for (var key in args) {
 			if (empty(args[key])) {
 				continue;
 			}
-			if (typeof(needle) != 'undefined' && key.indexOf(needle) > -1) {
+
+			var is_needle = (typeof(needle) != 'undefined' && key.indexOf(needle) > -1);
+
+			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				action += '&' + key + '=' + args[key];
 				continue;
 			}

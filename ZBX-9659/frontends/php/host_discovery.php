@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -350,8 +350,8 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
 		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
 	$messageFailed = $enable
-		? _n('Cannot enable discovery rules', 'Cannot enable discovery rules', $updated)
-		: _n('Cannot disable discovery rules', 'Cannot disable discovery rules', $updated);
+		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
+		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }

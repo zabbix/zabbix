@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,6 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "log.h"
-
-#ifdef HAVE_ZONE_H
-#	include "zone.h"
-#	include "utmpx.h"
-#endif
 
 int	SYSTEM_BOOTTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

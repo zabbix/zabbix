@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ class CIPRangeValidator extends CIPValidator {
 		$this->maxIPRange = '';
 
 		foreach (explode(',', $ranges) as $range) {
-			$range = trim($range, " \t\n\r");
+			$range = trim($range, " \t\r\n");
 
 			if (!$this->isValidMask($range) && !$this->isValidRange($range)) {
 				$this->setError(_s('Invalid IP address range "%1$s".', $range));

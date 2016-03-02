@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,7 +54,9 @@ $scriptFormList->addRow(_('Execute on'),
 		->setModern(true)
 );
 $scriptFormList->addRow(_('Commands'),
-	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	(new CTextArea('command', $data['command']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setMaxLength(255)
 );
 $scriptFormList->addRow(_('Command'),
 	(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
