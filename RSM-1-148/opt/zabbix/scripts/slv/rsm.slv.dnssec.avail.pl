@@ -2,7 +2,11 @@
 #
 # DNSSEC proper resolution
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*/.*,$1,; $MYDIR = '..' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use warnings;
@@ -60,8 +64,11 @@ while ($period > 0)
 	foreach (@$tlds_ref)
 	{
 		$tld = $_;
+		my $itemid = get_itemid_by_host($tld, $cfg_key_out);
 
-		if (avail_value_exists($value_ts, get_itemid_by_host($tld, $cfg_key_out)) == SUCCESS)
+		next unless ($itemid);
+
+		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
 		{
 			# value already exists
 			next unless (opt('dry-run'));
@@ -111,10 +118,18 @@ while ($period > 0)
 			$success_values-- if (ZBX_EC_DNS_NS_ERRSIG == $_->[1]);
 		}
 
-		my $test_result = DOWN;
+		my $test_result;
 		my $total_values = scalar(@$values_ref);
 		my $perc = $success_values * 100 / $total_values;
-		$test_result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
+
+		if ($perc > SLV_UNAVAILABILITY_LIMIT)
+		{
+			$test_result = UP;
+		}
+		else
+		{
+			$test_result = DOWN;
+		}
 
 		push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
 	}
