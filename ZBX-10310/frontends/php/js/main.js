@@ -412,10 +412,12 @@ var hintBox = {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {
-			if (d) {
-				e = d;
+			if (!jQuery(this).data('hint-disabled')) {
+				if (d) {
+					e = d;
+				}
+				hintBox.showHint(e, target, hintText, className, false, styles);
 			}
-			hintBox.showHint(e, target, hintText, className, false, styles);
 
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);

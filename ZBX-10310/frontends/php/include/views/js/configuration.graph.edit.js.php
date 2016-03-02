@@ -5,7 +5,7 @@
 		<td>
 	<?php else: ?>
 		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-			<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+			<div class="<?= ZBX_STYLE_CURSOR_MOVE.' '.ZBX_STYLE_DRAG_ICON ?>"></div>
 			<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 	<?php endif ?>
 		<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
@@ -27,9 +27,11 @@
 	<td>
 		<div class="<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>" style="width:280px;">
 		<?php if ($this->data['templates']): ?>
-			<span  id="items_#{number}_name">#{name}</span>
+			<span id="items_#{number}_name" onmouseover="setHintWrapper(this, '#{name}')">#{name}</span>
 		<?php else: ?>
-			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
+			<a href="javascript:void(0)">
+				<span id="items_#{number}_name" onmouseover="setHintWrapper(this, '#{name}')">#{name}</span>
+			</a>
 		<?php endif ?>
 		</div>
 	</td>
@@ -309,9 +311,11 @@
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				jQuery('span', ui.item).data('hint-disabled', true);
 			},
 			stop: function(e, ui) {
 				jQuery(ui.item).children().width('');
+				jQuery('span', ui.item).data('hint-disabled', false);
 			}
 		});
 	}
@@ -320,6 +324,12 @@
 		jQuery('#itemsTable').sortable({disabled: (jQuery('#itemsTable tr.sortable').length < 2)});
 	}
 <?php endif ?>
+
+	function setHintWrapper(dom, name) {
+		if (jQuery(dom).outerWidth() > jQuery(dom).closest('div').outerWidth()) {
+			hintBox.HintWraper(event, dom, name, '', '');
+		}
+	}
 
 	jQuery(function($) {
 		$('#tab_previewTab').click(function() {

@@ -305,7 +305,7 @@ $itemsTable->addRow(
 );
 
 foreach ($this->data['items'] as $n => $item) {
-	$name = $item['name_expanded'];
+	$name = $item['host'].NAME_DELIMITER.$item['name_expanded'];
 
 	if (zbx_empty($item['drawtype'])) {
 		$item['drawtype'] = 0;
