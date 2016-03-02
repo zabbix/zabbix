@@ -27,10 +27,10 @@
 	<td>
 		<div class="<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>" style="width:280px;">
 		<?php if ($this->data['templates']): ?>
-			<span id="items_#{number}_name" onmouseover="setHintWrapper(this, '#{name}')">#{name}</span>
+			<span id="items_#{number}_name" onmouseover="setHintWrapper(this, event, '#{name}')">#{name}</span>
 		<?php else: ?>
 			<a href="javascript:void(0)">
-				<span id="items_#{number}_name" onmouseover="setHintWrapper(this, '#{name}')">#{name}</span>
+				<span id="items_#{number}_name" onmouseover="setHintWrapper(this, event, '#{name}')">#{name}</span>
 			</a>
 		<?php endif ?>
 		</div>
@@ -325,9 +325,9 @@
 	}
 <?php endif ?>
 
-	function setHintWrapper(dom, name) {
+	function setHintWrapper(dom, ev, name) {
 		if (jQuery(dom).outerWidth() > jQuery(dom).closest('div').outerWidth()) {
-			hintBox.HintWraper(event, dom, name, '', '');
+			hintBox.HintWraper(ev, dom, name, '', '');
 		}
 	}
 
