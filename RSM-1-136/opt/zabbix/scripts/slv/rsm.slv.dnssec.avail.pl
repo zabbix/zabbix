@@ -65,7 +65,7 @@ while ($period > 0)
 
 		if ($itemid < 0)
 		{
-			dbg("target item \"$cfg_key_out\" does not exist at host \"$tld\"");
+			dbg("item \"$cfg_key_out\" does not exist at host \"$tld\"");
 			next;
 		}
 
