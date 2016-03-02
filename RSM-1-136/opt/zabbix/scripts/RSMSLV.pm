@@ -304,12 +304,12 @@ sub get_itemid_by_host
 	my $host = shift;
 	my $key = shift;
 
-	my $sql = db_select(
+	my $sql =
 		"select i.itemid".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
 	    		" and h.host='$host'".
-			" and i.key_='$key'");
+			" and i.key_='$key'";
 
 	return __get_itemid_by_sql($sql);
 }
