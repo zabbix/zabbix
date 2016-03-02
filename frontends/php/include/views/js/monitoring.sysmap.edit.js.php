@@ -103,7 +103,7 @@
 			$('#name').focus();
 
 			// Set map to private.
-			$('input[name=private][value=' + <?= SYSMAP_PRIVATE ?> + ']').prop('checked', true);
+			$('input[name=private][value=' + <?= PRIVATE_SHARING ?> + ']').prop('checked', true);
 
 			// Switch to first tab so multiselect is visible and only then add data and resize.
 			$('#tab_sysmap_tab').trigger('click');
@@ -134,7 +134,7 @@
 
 			value = list.values[i];
 			if (typeof value.permission === 'undefined') {
-				if (jQuery('input[name=private]:checked').val() == <?= SYSMAP_PRIVATE ?>) {
+				if (jQuery('input[name=private]:checked').val() == <?= PRIVATE_SHARING ?>) {
 					value.permission = <?= PERM_READ ?>;
 				}
 				else {

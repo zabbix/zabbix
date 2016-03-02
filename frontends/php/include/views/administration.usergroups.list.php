@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,9 +49,11 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 		? (new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisabledebug&usrgrpid='.$userGroupId))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_ORANGE)
+			->addSID()
 		: (new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenabledebug&usrgrpid='.$userGroupId))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN);
+			->addClass(ZBX_STYLE_GREEN)
+			->addSID();
 
 	// gui access
 	$guiAccess = user_auth_type2str($usrgrp['gui_access']);
@@ -68,16 +70,22 @@ foreach ($this->data['usergroups'] as $usrgrp) {
 			? GROUP_GUI_ACCESS_SYSTEM
 			: $usrgrp['gui_access'] + 1;
 
-		$guiAccess = (new CLink($guiAccess, 'usergrps.php?action=usergroup.set_gui_access&set_gui_access='.$nextGuiAuth.'&usrgrpid='.$userGroupId))
-			->addClass($guiAccessStyle);
+		$guiAccess = (new CLink(
+			$guiAccess,
+			'usergrps.php?action=usergroup.set_gui_access&set_gui_access='.$nextGuiAuth.'&usrgrpid='.$userGroupId
+		))
+			->addClass($guiAccessStyle)
+			->addSID();
 
 		$usersStatus = ($usrgrp['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CLink(_('Enabled'), 'usergrps.php?action=usergroup.massdisable&usrgrpid='.$userGroupId))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
+				->addSID()
 			: (new CLink(_('Disabled'), 'usergrps.php?action=usergroup.massenable&usrgrpid='.$userGroupId))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED);
+				->addClass(ZBX_STYLE_RED)
+				->addSID();
 	}
 	else {
 		$guiAccess = (new CSpan($guiAccess))->addClass($guiAccessStyle);

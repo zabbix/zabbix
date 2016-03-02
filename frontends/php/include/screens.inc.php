@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,12 +58,6 @@ function screen_resources($resource = null) {
 	}
 }
 
-function get_screen_by_screenid($screenid) {
-	$dbScreen = DBfetch(DBselect('SELECT s.* FROM screens s WHERE s.screenid='.zbx_dbstr($screenid)));
-
-	return empty($dbScreen) ? false : $dbScreen;
-}
-
 function check_screen_recursion($mother_screenid, $child_screenid) {
 	if (bccomp($mother_screenid , $child_screenid) == 0) {
 		return true;
@@ -112,11 +106,7 @@ function getSlideshowScreens($slideshowId, $step) {
 function slideshow_accessible($slideshowid, $perm) {
 	$result = false;
 
-	$sql = 'SELECT s.slideshowid'.
-			' FROM slideshows s'.
-			' WHERE s.slideshowid='.zbx_dbstr($slideshowid);
-
-	if (DBselect($sql)) {
+	if (get_slideshow_by_slideshowid($slideshowid, PERM_READ)) {
 		$result = true;
 
 		$screenids = [];
@@ -149,51 +139,143 @@ function slideshow_accessible($slideshowid, $perm) {
 	return $result;
 }
 
-function get_slideshow_by_slideshowid($slideshowid) {
-	return DBfetch(DBselect('SELECT s.* FROM slideshows s WHERE s.slideshowid='.zbx_dbstr($slideshowid)));
+function get_slideshow_by_slideshowid($slideshowid, $permission) {
+	$user_data = CWebUser::$data;
+
+	$condition = '';
+	if ($user_data['type'] != USER_TYPE_SUPER_ADMIN && $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+		$public_slideshows = '';
+
+		if ($permission == PERM_READ) {
+			$public_slideshows = ' OR s.private='.PUBLIC_SHARING;
+		}
+
+		$user_groups = getUserGroupsByUserId($user_data['userid']);
+
+		$condition = ' AND (EXISTS ('.
+				'SELECT NULL'.
+				' FROM slideshow_user su'.
+				' WHERE s.slideshowid=su.slideshowid'.
+					' AND su.userid='.$user_data['userid'].
+					' AND su.permission>='.$permission.
+			')'.
+			' OR EXISTS ('.
+				'SELECT NULL'.
+				' FROM slideshow_usrgrp sg'.
+				' WHERE s.slideshowid=sg.slideshowid'.
+					' AND '.dbConditionInt('sg.usrgrpid', $user_groups).
+					' AND sg.permission>='.$permission.
+			')'.
+			' OR s.userid='.$user_data['userid'].
+			$public_slideshows.
+		')';
+	}
+
+	return DBfetch(DBselect(
+		'SELECT s.* FROM slideshows s WHERE s.slideshowid='.zbx_dbstr($slideshowid).$condition
+	));
 }
 
-function add_slideshow($name, $delay, $slides) {
-	// validate slides
-	if (empty($slides)) {
+function add_slideshow($data) {
+	$user_data = CWebUser::$data;
+
+	// Validate slides.
+	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
+
 		return false;
 	}
 
-	// validate screens
-	$screenids = zbx_objectValues($slides, 'screenid');
+	// Validate screens.
+	$screenids = zbx_objectValues($data['slides'], 'screenid');
+
 	$screens = API::Screen()->get([
+		'output' => ['screenid'],
 		'screenids' => $screenids,
-		'output' => ['screenid']
+		'preservekeys' => true
 	]);
-	$screens = ZBX_toHash($screens, 'screenid');
+
 	foreach ($screenids as $screenid) {
-		if (!isset($screens[$screenid])) {
+		if (!array_key_exists($screenid, $screens)) {
 			error(_('Incorrect screen provided for slide show.'));
+
 			return false;
 		}
 	}
 
-	// validate slide name
+	// Validate slide name.
 	$db_slideshow = DBfetch(DBselect(
-		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($name)
+		'SELECT s.slideshowid FROM slideshows s WHERE s.name='.zbx_dbstr($data['name'])
 	));
 
 	if ($db_slideshow) {
-		error(_s('Slide show "%s" already exists.', $name));
+		error(_s('Slide show "%s" already exists.', $data['name']));
+
+		return false;
+	}
+
+	// Validate slide show owner.
+	if ($data['userid'] === null) {
+		error(_('Slide show owner cannot be empty.'));
+
+		return false;
+	}
+	elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+			&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+		error(_('Only administrators can set slide show owner.'));
 
 		return false;
 	}
 
 	$slideshowid = get_dbid('slideshows', 'slideshowid');
 	$result = DBexecute(
-		'INSERT INTO slideshows (slideshowid,name,delay)'.
-		' VALUES ('.zbx_dbstr($slideshowid).','.zbx_dbstr($name).','.zbx_dbstr($delay).')'
+		'INSERT INTO slideshows (slideshowid,name,delay,userid,private)'.
+		' VALUES ('.zbx_dbstr($slideshowid).','.zbx_dbstr($data['name']).','.zbx_dbstr($data['delay']).','.
+			zbx_dbstr($data['userid']).','.zbx_dbstr($data['private']).')'
 	);
+
+
+	// User shares.
+	$shared_users = [];
+
+	foreach ($data['users'] as $user) {
+		if ($data['private'] == PUBLIC_SHARING && $user['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+
+		$shared_users[] = [
+			'slideshowid' => $slideshowid,
+			'userid' => $user['userid'],
+			'permission' => $user['permission']
+		];
+	}
+
+	DB::insert('slideshow_user', $shared_users);
+
+	// User group shares.
+	$shared_user_groups = [];
+
+	foreach ($data['userGroups'] as $user_group) {
+		if ($data['private'] == PUBLIC_SHARING && $user_group['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+
+		$shared_user_groups[] = [
+			'slideshowid' => $slideshowid,
+			'usrgrpid' => $user_group['usrgrpid'],
+			'permission' => $user_group['permission']
+		];
+	}
+
+	DB::insert('slideshow_usrgrp', $shared_user_groups);
 
 	// create slides
 	$i = 0;
-	foreach ($slides as $slide) {
+	foreach ($data['slides'] as $slide) {
 		$slideid = get_dbid('slides', 'slideid');
 
 		// set default delay
@@ -205,6 +287,7 @@ function add_slideshow($name, $delay, $slides) {
 			'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
 			' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.($i++).','.zbx_dbstr($slide['delay']).')'
 		);
+
 		if (!$result) {
 			return false;
 		}
@@ -213,70 +296,197 @@ function add_slideshow($name, $delay, $slides) {
 	return $slideshowid;
 }
 
-function update_slideshow($slideshowid, $name, $delay, $slides) {
-	// validate slides
-	if (empty($slides)) {
+function update_slideshow($data) {
+	$user_data = CWebUser::$data;
+
+	// Validate slides.
+	if (empty($data['slides'])) {
 		error(_('Slide show must contain slides.'));
+
 		return false;
 	}
 
-	// validate screens
-	$screenids = zbx_objectValues($slides, 'screenid');
+	// validate screens.
+	$screenids = zbx_objectValues($data['slides'], 'screenid');
+
 	$screens = API::Screen()->get([
+		'output' => ['screenid'],
 		'screenids' => $screenids,
-		'output' => ['screenid']
+		'preservekeys' => true
 	]);
-	$screens = ZBX_toHash($screens, 'screenid');
+
 	foreach ($screenids as $screenid) {
-		if (!isset($screens[$screenid])) {
+		if (!array_key_exists($screenid, $screens)) {
 			error(_('Incorrect screen provided for slide show.'));
+
 			return false;
 		}
 	}
 
-	// validate slide name
-	$dbSlideshow = DBfetch(DBselect(
+	// Validate slide name.
+	$db_slideshow = DBfetch(DBselect(
 		'SELECT s.slideshowid'.
 		' FROM slideshows s'.
-		' WHERE s.name='.zbx_dbstr($name).
-			' AND s.slideshowid<>'.zbx_dbstr($slideshowid)
+		' WHERE s.name='.zbx_dbstr($data['name']).
+			' AND s.slideshowid<>'.zbx_dbstr($data['slideshowid'])
 	));
-	if ($dbSlideshow) {
-		error(_s('Slide show "%1$s" already exists.', $name));
+
+	if ($db_slideshow) {
+		error(_s('Slide show "%1$s" already exists.', $data['name']));
+
 		return false;
 	}
 
-	$dbSlideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($slideshowid)));
-	$dbSlideshow = $dbSlideshow[0];
-	$changed = false;
-	$slideshow = ['name' => $name, 'delay' => $delay];
+	// Validate slide show owner.
+	if (array_key_exists('userid', $data)) {
+		if ($data['userid'] === null || $data['userid'] === '') {
+			error(_('Slide show owner cannot be empty.'));
 
-	foreach ($slideshow as $key => $val) {
-		if ((string) $val !== (string) $dbSlideshow[$key]) {
-			$changed = true;
-			break;
+			return false;
+		}
+		elseif ($data['userid'] != $user_data['userid'] && $user_data['type'] != USER_TYPE_SUPER_ADMIN
+				&& $user_data['type'] != USER_TYPE_ZABBIX_ADMIN) {
+			error(_('Only administrators can set slide show owner.'));
+
+			return false;
 		}
 	}
 
-	if ($changed) {
-		$result = DBexecute(
-			'UPDATE slideshows'.
-			' SET name='.zbx_dbstr($name).',delay='.zbx_dbstr($delay).
-			' WHERE slideshowid='.zbx_dbstr($slideshowid)
-		);
+	$to_update = $data;
+	unset($to_update['slideshowid'], $to_update['slides'], $to_update['users'], $to_update['userGroups']);
 
-		if (!$result) {
+	DB::update('slideshows', [
+		'values' => $to_update,
+		'where' => ['slideshowid' => $data['slideshowid']]
+	]);
+
+	// Read-only sharing validation.
+	foreach ($data['users'] as $user) {
+		if ($data['private'] == PUBLIC_SHARING && $user['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
 			return false;
 		}
+	}
+
+	foreach ($data['userGroups'] as $user_group) {
+		if ($data['private'] == PUBLIC_SHARING && $user_group['permission'] == PERM_READ) {
+			error(_s('Slide show "%1$s" is public and read-only sharing is disallowed.', $data['name']));
+
+			return false;
+		}
+	}
+
+	$shared_userids_to_delete = [];
+	$shared_users_to_update = [];
+	$shared_users_to_add = [];
+	$shared_user_groupids_to_delete = [];
+	$shared_user_groups_to_update = [];
+	$shared_user_groups_to_add = [];
+
+	// Slide show user shares.
+	$db_slideshow['users'] = DBfetchArray(DBselect(
+		'SELECT s.userid,s.permission,s.slideshowuserid'.
+		' FROM slideshow_user s'.
+		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+	));
+
+	$userids = [];
+	foreach ($db_slideshow['users'] as $user) {
+		$userids[] = $user['userid'];
+	}
+
+	$allowed_users = API::User()->get([
+		'output' => ['userid'],
+		'userids' => $userids,
+		'preservekeys' => true
+	]);
+
+	foreach ($db_slideshow['users'] as $key => $user) {
+		if (!array_key_exists($user['userid'], $allowed_users)) {
+			unset($db_slideshow['users'][$key]);
+		}
+	}
+
+	$user_shares_diff = zbx_array_diff($data['users'], $db_slideshow['users'], 'userid');
+
+	foreach ($user_shares_diff['both'] as $update_user_share) {
+		$shared_users_to_update[] = [
+			'values' => $update_user_share,
+			'where' => ['userid' => $update_user_share['userid'], 'slideshowid' => $data['slideshowid']]
+		];
+	}
+
+	foreach ($user_shares_diff['first'] as $new_shared_user) {
+		$new_shared_user['slideshowid'] = $data['slideshowid'];
+		$shared_users_to_add[] = $new_shared_user;
+	}
+
+	$shared_userids_to_delete = zbx_objectValues($user_shares_diff['second'], 'slideshowuserid');
+
+	// Slide show user group shares.
+	$db_slideshow['userGroups'] = DBfetchArray(DBselect(
+		'SELECT s.usrgrpid,s.permission,s.slideshowusrgrpid'.
+		' FROM slideshow_usrgrp s'.
+		' WHERE s.slideshowid='.zbx_dbstr(getRequest('slideshowid'))
+	));
+
+	$usrgrpids = [];
+	foreach ($db_slideshow['userGroups'] as $user_group) {
+		$usrgrpids[] = $user_group['usrgrpid'];
+	}
+
+	$allowed_user_groups = API::UserGroup()->get([
+		'output' => ['usrgrpid'],
+		'usrgrpids' => $usrgrpids,
+		'preservekeys' => true
+	]);
+
+	foreach ($db_slideshow['userGroups'] as $key => $user_group) {
+		if (!array_key_exists($user_group['usrgrpid'], $allowed_user_groups)) {
+			unset($db_slideshow['userGroups'][$key]);
+		}
+	}
+
+	$user_group_shares_diff = zbx_array_diff($data['userGroups'], $db_slideshow['userGroups'], 'usrgrpid');
+
+	foreach ($user_group_shares_diff['both'] as $update_user_share) {
+		$shared_user_groups_to_update[] = [
+			'values' => $update_user_share,
+			'where' => ['usrgrpid' => $update_user_share['usrgrpid'], 'slideshowid' => $data['slideshowid']]
+		];
+	}
+
+	foreach ($user_group_shares_diff['first'] as $new_shared_user_group) {
+		$new_shared_user_group['slideshowid'] = $data['slideshowid'];
+		$shared_user_groups_to_add[] = $new_shared_user_group;
+	}
+
+	$shared_user_groupids_to_delete = zbx_objectValues($user_group_shares_diff['second'], 'slideshowusrgrpid');
+
+	// User shares.
+	DB::insert('slideshow_user', $shared_users_to_add);
+	DB::update('slideshow_user', $shared_users_to_update);
+
+	if ($shared_userids_to_delete) {
+		DB::delete('slideshow_user', ['slideshowuserid' => $shared_userids_to_delete]);
+	}
+
+	// User group shares.
+	DB::insert('slideshow_usrgrp', $shared_user_groups_to_add);
+	DB::update('slideshow_usrgrp', $shared_user_groups_to_update);
+
+	if ($shared_user_groupids_to_delete) {
+		DB::delete('slideshow_usrgrp', ['slideshowusrgrpid' => $shared_user_groupids_to_delete]);
 	}
 
 	// get slides
-	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($slideshowid)), 'slideid');
+	$db_slides = DBfetchArrayAssoc(DBselect('SELECT s.* FROM slides s WHERE s.slideshowid='.zbx_dbstr($data['slideshowid'])), 'slideid');
 
 	$slidesToDel = zbx_objectValues($db_slides, 'slideid');
 	$slidesToDel = zbx_toHash($slidesToDel);
 	$step = 0;
-	foreach ($slides as $slide) {
+	foreach ($data['slides'] as $slide) {
 		$slide['delay'] = $slide['delay'] ? $slide['delay'] : 0;
 		if (isset($db_slides[$slide['slideid']])) {
 			// update slide
@@ -294,7 +504,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 			$slideid = get_dbid('slides', 'slideid');
 			$result = DBexecute(
 				'INSERT INTO slides (slideid,slideshowid,screenid,step,delay)'.
-				' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($slideshowid).','.zbx_dbstr($slide['screenid']).','.zbx_dbstr($step).','.zbx_dbstr($slide['delay']).')'
+				' VALUES ('.zbx_dbstr($slideid).','.zbx_dbstr($data['slideshowid']).','.zbx_dbstr($slide['screenid']).','.zbx_dbstr($step).','.zbx_dbstr($slide['delay']).')'
 			);
 		}
 		$step ++;
@@ -312,9 +522,13 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 }
 
 function delete_slideshow($slideshowid) {
-	$result = DBexecute('DELETE FROM slideshows where slideshowid='.zbx_dbstr($slideshowid));
-	$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
-	$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
+	$result = false;
+
+	if (get_slideshow_by_slideshowid($slideshowid, PERM_READ_WRITE)) {
+		$result = DBexecute('DELETE FROM slideshows where slideshowid='.zbx_dbstr($slideshowid));
+		$result &= DBexecute('DELETE FROM slides where slideshowid='.zbx_dbstr($slideshowid));
+		$result &= DBexecute('DELETE FROM profiles WHERE idx=\'web.favorite.screenids\' AND source=\'slideshowid\' AND value_id='.zbx_dbstr($slideshowid));
+	}
 
 	return (bool) $result;
 }

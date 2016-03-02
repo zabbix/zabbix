@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2458,7 +2458,7 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
  *                                                                            *
  * Purpose: removes trigger dependency                                        *
  *                                                                            *
- * Parameters: from  - [IN] the reference to dependent triger                 *
+ * Parameters: from  - [IN] the reference to dependent trigger                *
  *             to    - [IN] the reference to trigger the from depends on      *
  *             error - [OUT] the error message                                *
  *                                                                            *

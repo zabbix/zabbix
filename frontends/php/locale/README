@@ -15,5 +15,10 @@ If you want to start translating in a new language, run add_new_language.sh and
 
   $ ./add_new_language.sh et
 
+It's important to check and make sure that "Plural-Forms" value is set correctly.
+
 For this script language template is needed. Running update_po.sh will generate
  one as frontend.pot (which add_new_language.sh requires).
+
+After new language po file has been created, need to add the language codes to 
+ PHP code in include/locales.inc.php file.

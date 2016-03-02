@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,44 +56,6 @@ abstract class CHostBase extends CApiService {
 				ZBX_API_ERROR_PARAMETERS,
 				_s('Cannot pass duplicate template IDs for the linkage: %s.', implode(', ', $duplicatesFound))
 			);
-		}
-
-		// check if any templates linked to targets have more than one unique item key/application
-		foreach ($targetIds as $targetid) {
-			$linkedTpls = API::Template()->get([
-				'nopermissions' => true,
-				'output' => ['templateid'],
-				'hostids' => $targetid
-			]);
-
-			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
-
-			$dbItems = DBselect(
-				'SELECT i.key_'.
-					' FROM items i'.
-					' WHERE '.dbConditionInt('i.hostid', $templateIdsAll).
-					' GROUP BY i.key_'.
-					' HAVING COUNT(i.itemid)>1'
-			);
-			if ($dbItem = DBfetch($dbItems)) {
-				$dbItemHost = API::Item()->get([
-					'output' => ['hostid'],
-					'filter' => ['key_' => $dbItem['key_']],
-					'templateids' => $templateIdsAll
-				]);
-				$dbItemHost = reset($dbItemHost);
-
-				$template = API::Template()->get([
-					'output' => ['name'],
-					'templateids' => $dbItemHost['hostid']
-				]);
-
-				$template = reset($template);
-
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Template "%1$s" with item key "%2$s" already linked to host.',
-						$template['name'], $dbItem['key_']));
-			}
 		}
 
 		// get DB templates which exists in all targets

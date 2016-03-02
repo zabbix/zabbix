@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -211,7 +211,7 @@ function getFavouriteScreensData() {
 
 			if ($favourite['source'] === 'slideshowid') {
 				if (slideshow_accessible($sourceId, PERM_READ)) {
-					$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
+					$dbSlideshow = get_slideshow_by_slideshowid($sourceId, PERM_READ);
 
 					if ($dbSlideshow) {
 						$slideshows[] = [

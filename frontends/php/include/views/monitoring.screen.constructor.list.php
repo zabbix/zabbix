@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,23 +19,24 @@
 **/
 
 
-$screenWidget = (new CWidget())->setTitle(_('Screens').': '.$this->data['screen']['name']);
-if (!empty($this->data['screen']['templateid'])) {
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
+$widget = (new CWidget())->setTitle(_('Screens').': '.$data['screen']['name']);
+
+if ($data['screen']['templateid']) {
+	$widget->addItem(get_header_host_table('screens', $data['screen']['templateid']));
 }
 
 $screenBuilder = new CScreenBuilder([
 	'isFlickerfree' => false,
-	'screen' => $this->data['screen'],
+	'screen' => $data['screen'],
 	'mode' => SCREEN_MODE_EDIT,
 	'updateProfile' => false
 ]);
 
-$screenWidget->addItem(
+$widget->addItem(
 	(new CDiv($screenBuilder->show()))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 );
 
-$screenBuilder->insertInitScreenJs($this->data['screenid']);
+$screenBuilder->insertInitScreenJs($data['screenid']);
 $screenBuilder->insertProcessObjectsJs();
 
-return $screenWidget;
+return $widget;

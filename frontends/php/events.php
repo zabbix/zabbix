@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@ if ($csvExport) {
 	if (hasRequest('stime')) {
 		$stime = getRequest('stime');
 
-		if ($stime + $period > time()) {
+		if (bccomp($stime + $period, date(TIMESTAMP_FORMAT, time())) == 1) {
 			$stime = date(TIMESTAMP_FORMAT, time() - $period);
 		}
 	}
@@ -159,6 +159,21 @@ $till = $from + $period;
 /*
  * Display
  */
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	$pageFilter = new CPageFilter([
+		'groups' => [
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true
+		],
+		'hosts' => [
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true
+		],
+		'hostid' => getRequest('hostid'),
+		'groupid' => getRequest('groupid')
+	]);
+}
+
 if ($csvExport) {
 	if (!hasRequest('hostid')) {
 		$_REQUEST['hostid'] = 0;
@@ -169,19 +184,6 @@ if ($csvExport) {
 }
 else {
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$pageFilter = new CPageFilter([
-			'groups' => [
-				'monitored_hosts' => true,
-				'with_monitored_triggers' => true
-			],
-			'hosts' => [
-				'monitored_hosts' => true,
-				'with_monitored_triggers' => true
-			],
-			'hostid' => getRequest('hostid'),
-			'groupid' => getRequest('groupid')
-		]);
-
 		// try to find matching trigger when host is changed
 		// use the host ID from the page filter since it may not be present in the request
 		// if all hosts are selected, preserve the selected trigger
@@ -245,12 +247,11 @@ else {
 	}
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
+		$frmForm->addVar('groupid', $pageFilter->groupid, 'groupid_csv');
+		$frmForm->addVar('hostid', $pageFilter->hostid, 'hostid_csv');
+
 		if ($triggerId) {
 			$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
-		}
-		else {
-			$frmForm->addVar('groupid', getRequest('groupid'), 'groupid_csv');
-			$frmForm->addVar('hostid', getRequest('hostid'), 'hostid_csv');
 		}
 	}
 
@@ -283,12 +284,15 @@ else {
 	$frmForm->addItem($controls);
 	$eventsWidget->setControls($frmForm);
 
-	$filterForm = new CFilter('web.events.filter.state');
+	$filterForm = (new CFilter('web.events.filter.state'))
+		->addVar('fullscreen', getRequest('fullscreen'));
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		$filterForm->addVar('triggerid', $triggerId)
 			->addVar('stime', $stime)
 			->addVar('period', $period);
+		$filterForm->addVar('groupid', $pageFilter->groupid);
+		$filterForm->addVar('hostid', $pageFilter->hostid);
 
 		if ($triggerId > 0) {
 			$dbTrigger = API::Trigger()->get([
@@ -410,7 +414,7 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 else {
 	$header = [
 		_('Time'),
-		(getRequest('hostid', 0) == 0) ? _('Host') : null,
+		($pageFilter->hostid == 0) ? _('Host') : null,
 		_('Description'),
 		_('Status'),
 		_('Severity'),
@@ -708,7 +712,7 @@ else {
 			]);
 
 			// fetch scripts for the host JS menu
-			if (!$csvExport && getRequest('hostid', 0) == 0) {
+			if (!$csvExport && $pageFilter->hostid == 0) {
 				$scripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
@@ -738,7 +742,7 @@ else {
 				if ($csvExport) {
 					$csvRows[] = [
 						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-						(getRequest('hostid', 0) == 0) ? $host['name'] : null,
+						($pageFilter->hostid == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
 						getSeverityName($trigger['priority'], $config),
@@ -767,7 +771,7 @@ else {
 					// host JS menu link
 					$hostName = null;
 
-					if (getRequest('hostid', 0) == 0) {
+					if ($pageFilter->hostid == 0) {
 						$hostName = (new CSpan($host['name']))
 							->addClass(ZBX_STYLE_LINK_ACTION)
 							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));

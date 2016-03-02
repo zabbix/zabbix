@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class CMacrosResolverGeneral {
 
 		// Replace user macros with string 'macro' to make values search easier.
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$text = substr_replace($expression, 'macro', $pos, strlen($macro));
+			$expression = substr_replace($expression, 'macro', $pos, strlen($macro));
 		}
 
 		// Replace functionids with string 'function' to make values search easier.

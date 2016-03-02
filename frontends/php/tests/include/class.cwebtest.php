@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
+require_once 'PHPUnit/Extensions/Selenium2TestCase.php';
 
 require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/../../include/defines.inc.php';
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/dbfunc.php';
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);
 
-class CWebTest extends PHPUnit_Extensions_SeleniumTestCase {
+class CWebTest extends PHPUnit_Extensions_Selenium2TestCase {
 
 	protected $captureScreenshotOnFailure = TRUE;
 	protected $screenshotPath = '/home/hudson/public_html/screenshots';
