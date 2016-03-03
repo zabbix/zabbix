@@ -907,6 +907,9 @@ static int	DBpatch_2030094(void)
 	{
 		expr_offset = 0;
 
+		if ('\0' == *row[1])
+			continue;
+
 		for (p = row[1]; '\0' != *p; p++)
 		{
 			if (NULL == strchr("#&|", *p))
