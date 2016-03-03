@@ -232,12 +232,11 @@
 
 	function initSortable() {
 		var slideTable = jQuery('#slideTable'),
-			slideTableWidth = slideTable.width(),
-			slideTableColumns = jQuery('#slideTable .header td'),
+			slideTableColumns = jQuery('#slideTable td'),
 			slideTableColumnWidths = [];
 
-		slideTableColumns.each(function() {
-			slideTableColumnWidths[slideTableColumnWidths.length] = jQuery(this).width();
+		slideTableColumns.each(function(i) {
+			slideTableColumnWidths[i] = jQuery(this).outerWidth();
 		});
 
 		slideTable.sortable({
@@ -251,21 +250,9 @@
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
 				ui.children().each(function(i) {
-					var td = jQuery(this);
-
-					td.width(slideTableColumnWidths[i]);
+					jQuery(this).outerWidth(slideTableColumnWidths[i]);
 				});
-
-				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixels to right
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 4) + 'px');
-				}
-
-				slideTableColumns.each(function(i) {
-					jQuery(this).width(slideTableColumnWidths[i]);
-				});
-
+				ui.css('left', '0');
 				return ui;
 			},
 			start: function(e, ui) {
@@ -273,6 +260,7 @@
 				jQuery('span', ui.item).data('hint-disabled', true);
 			},
 			stop: function(e, ui) {
+				jQuery(ui.item).children().width('');
 				jQuery('span', ui.item).data('hint-disabled', false);
 			}
 

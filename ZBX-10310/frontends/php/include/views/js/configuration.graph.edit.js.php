@@ -301,12 +301,10 @@
 			opacity: 0.6,
 			update: recalculateSortOrder,
 			helper: function(e, ui) {
-				ui.children().each(function(i, tableData) {
-					jQuery(tableData).outerWidth(itemsTableColumnWidths[i]);
+				ui.children().each(function(i) {
+					jQuery(this).outerWidth(itemsTableColumnWidths[i]);
 				});
-				if (SF) {
-					ui.css('left', 0);
-				}
+				ui.css('left', '0');
 				return ui;
 			},
 			start: function(e, ui) {
@@ -325,9 +323,10 @@
 	}
 <?php endif ?>
 
-	function setHintWrapper(dom, ev, name) {
-		if (jQuery(dom).outerWidth() > jQuery(dom).closest('div').outerWidth()) {
-			hintBox.HintWraper(ev, dom, name, '', '');
+	function setHintWrapper(dom, e, value) {
+		var obj = jQuery(dom);
+		if (obj.outerWidth() > obj.closest('div').outerWidth()) {
+			hintBox.HintWraper(e, dom, value, '', '');
 		}
 	}
 
