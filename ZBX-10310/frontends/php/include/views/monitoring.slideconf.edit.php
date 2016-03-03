@@ -112,14 +112,13 @@ $slideshow_tab
 
 // append slide table
 $slideTable = (new CTable())
-	->setAttribute('style', 'width: 100%;')
 	->setId('slideTable')
 	->setHeader([
-		(new CColHeader())->setWidth(15),
-		(new CColHeader())->setWidth(15),
+		(new CColHeader()),
+		(new CColHeader()),
 		_('Screen'),
-		(new CColHeader(_('Delay')))->setWidth(70),
-		(new CColHeader(_('Action')))->setWidth(50)
+		(new CColHeader(_('Delay'))),
+		(new CColHeader(_('Action')))
 	]);
 
 $i = 1;
@@ -135,7 +134,13 @@ foreach ($data['slideshow']['slides'] as $key => $slides) {
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
-			$data['slideshow']['screens'][$slides['screenid']]['name'],
+			(new CDiv(
+				(new CSpan($data['slideshow']['screens'][$slides['screenid']]['name']))
+					->addClass('show-hint')
+					->setAttribute('onmouseover', 'setHintWrapper(this, event)')
+			))
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+				->setAttribute('style', 'width:374px'),
 			$delay,
 			(new CCol(
 				(new CButton('remove_'.$key, _('Remove')))
@@ -162,7 +167,6 @@ $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 $slideshow_tab->addRow(_('Slides'),
 	(new CDiv($slideTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // Append tabs to form.

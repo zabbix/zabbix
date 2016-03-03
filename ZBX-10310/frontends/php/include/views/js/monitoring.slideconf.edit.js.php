@@ -8,7 +8,11 @@
 	<td>
 		<span class="rowNum" id="current_slide_#{rowId}">#{rowNum}</span>
 	</td>
-	<td>#{name}</td>
+	<td>
+		<div class="<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>" style="width:374px">
+			<span class="show-hint" onmouseover="setHintWrapper(this, event)">#{name}<span>
+		</div>
+	</td>
 	<td>
 		<input type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
 	</td>
@@ -245,10 +249,6 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function () {
-				// force not to change table width
-				slideTable.width(slideTableWidth);
-			},
 			helper: function(e, ui) {
 				ui.children().each(function(i) {
 					var td = jQuery(this);
@@ -270,7 +270,12 @@
 			},
 			start: function(e, ui) {
 				jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				jQuery('span', ui.item).data('hint-disabled', true);
+			},
+			stop: function(e, ui) {
+				jQuery('span', ui.item).data('hint-disabled', false);
 			}
+
 		});
 	}
 
@@ -280,6 +285,13 @@
 
 	function removeUserShares(userid) {
 		jQuery('#user_shares_' + userid).remove();
+	}
+
+	function setHintWrapper(dom, e) {
+		var obj = jQuery(dom);
+		if (obj.outerWidth() > obj.closest('div').outerWidth()) {
+			hintBox.HintWraper(e, dom, obj.text(), '', '');
+		}
 	}
 
 	jQuery(function() {
