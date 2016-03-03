@@ -14,6 +14,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 .......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
