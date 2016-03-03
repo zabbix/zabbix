@@ -1366,6 +1366,10 @@ footer {
 	@extend %found-bg;
 }
 
+.ui-sortable {
+	position: relative;
+}
+
 .margin-top {
 	display: block;
 	margin: 4px 0 0 0;
