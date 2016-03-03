@@ -3535,9 +3535,9 @@ void	zbx_tls_free(void)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 void	zbx_tls_ctx_alloc(zbx_tls_context_t *tls_ctx)
 {
-	*tls_ctx = zbx_malloc(*tls_ctx, sizeof(struct zbx_tls_ctx));
+	*tls_ctx = zbx_malloc(*tls_ctx, sizeof(struct zbx_tls_context));
 
-	memset(*tls_ctx, 0, sizeof(struct zbx_tls_ctx));
+	memset(*tls_ctx, 0, sizeof(struct zbx_tls_context));
 }
 
 int	zbx_tls_is_encrypted(zbx_tls_context_t tls_ctx)
