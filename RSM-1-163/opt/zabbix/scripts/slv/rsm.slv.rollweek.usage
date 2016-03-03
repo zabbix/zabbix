@@ -1,0 +1,49 @@
+=head1 NAME
+
+rsm.slv.*.rollweek.pl - scripts to calculate different service rolling week unavailability and save to the database
+
+=head1 SYNOPSIS
+
+rsm.slv.*.rollweek.pl [--from <timestamp>] [--tld <tld>] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--from> timestamp
+
+Specify Unix timestamp of the beginning of the rolling week.
+
+=item B<--tld> tld
+
+Specify TLD.
+
+=item B<--dry-run>
+
+Print data to the screen, do not write anything to the filesystem.
+
+=item B<--warnslow> seconds
+
+Issue a warning in case an SQL query takes more than specified number of seconds. A floating-point number
+is supported as seconds (i. e. 0.5, 1, 1.5 are valid).
+
+=item B<--debug>
+
+Run the script in debug mode. This means printing more information.
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+B<These scripts> are meant to be run by cron but can be run manually in order to cover the data in
+time periods when cron was not running.
+
+=head1 EXAMPLES
+
+./rsm.slv.*.rollweek.pl --from 1420063200 --period 10
+
+=cut
