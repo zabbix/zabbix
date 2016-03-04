@@ -2475,6 +2475,7 @@ $form-icon-btn: (
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
+	@extend %space-pre-wrap;
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	.list-table {
