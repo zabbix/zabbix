@@ -169,8 +169,8 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 			'monitored_hosts' => true,
 			'with_monitored_triggers' => true
 		],
-		'hostid' => getRequest('hostid'),
-		'groupid' => getRequest('groupid')
+		'hostid' => getRequest('hostid', hasRequest('filter_set') ? 0 : null),
+		'groupid' => getRequest('groupid', hasRequest('filter_set') ? 0 : null)
 	]);
 }
 
