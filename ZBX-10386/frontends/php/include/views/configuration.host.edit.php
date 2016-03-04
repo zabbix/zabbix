@@ -21,6 +21,8 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
+$groupid = getRequest('groupid', 0);
+
 if (getRequest('hostid', 0) > 0) {
 	$dbHost = $this->data['dbHost'];
 
@@ -43,12 +45,12 @@ else {
 	$originalTemplates = array();
 }
 
-$cloningDiscoveredHost = (in_array(getRequest('form'), array('clone', 'full_clone'))
-	&& (getRequest('form_refresh') == 1) && ($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-);
+if (getRequest('hostid') != 0
+		&& (($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+				&& (!hasRequest('form_refresh') || getRequest('form_refresh') == 1))
+			|| (!hasRequest('form_refresh') && getRequest('form') === 'update'))) {
+	// Load data from DB for host update and for discovered host clone.
 
-// Use data from database when host is opened and form is shown for first time or discovered host is being cloned.
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHost)) {
 	$proxyHostId = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visibleName = $dbHost['name'];
@@ -66,7 +68,7 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 	$macros = order_macros($dbHost['macros'], 'macro');
 	$hostGroups = zbx_objectValues($dbHost['groups'], 'groupid');
 
-	if ($cloningDiscoveredHost) {
+	if (getRequest('form_refresh') == 1) {
 		$status = getRequest('status', HOST_STATUS_NOT_MONITORED);
 		$description = getRequest('description', '');
 		$hostInventory = getRequest('host_inventory', array());
@@ -107,8 +109,8 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloningDiscoveredHo
 }
 else {
 	$hostGroups = getRequest('groups', array());
-	if (hasRequest('groupid') && (getRequest('groupid', 0) > 0) && empty($hostGroups)) {
-		array_push($hostGroups, getRequest('groupid'));
+	if (!hasRequest('form_refresh') && $groupid != 0) {
+		$hostGroups[] = $groupid;
 	}
 
 	$newGroupName = getRequest('newgroup', '');
@@ -173,9 +175,8 @@ if ($hostId > 0 && getRequest('form') != 'clone') {
 	$frmHost->addVar('hostid', $hostId);
 }
 
-$groupId = getRequest('groupid', 0);
-if ($groupId > 0) {
-	$frmHost->addVar('groupid', $groupId);
+if ($groupid > 0) {
+	$frmHost->addVar('groupid', $groupid);
 }
 
 // LLD rule link
