@@ -35,10 +35,6 @@ class CRedirectButtonTest extends CTagTest {
 				['caption', 'http://google.com', 'Are you sure?'],
 				'<button type="button" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
 			],
-			[
-				['caption', 'http://google.com', null, 'my-class'],
-				'<button class="my-class" type="button" data-url="http://google.com">caption</button>'
-			],
 			// caption encoding
 			[
 				['</button>'],

@@ -273,15 +273,15 @@ void	*DCget_stats(int request)
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_USED:
-			value_uint = hc_mem->used_size;
+			value_uint = hc_mem->total_size - hc_mem->free_size;
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_FREE:
-			value_uint = hc_mem->total_size - hc_mem->used_size;
+			value_uint = hc_mem->free_size;
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_PFREE:
-			value_double = 100 * (double)(hc_mem->total_size - hc_mem->used_size) / hc_mem->total_size;
+			value_double = 100 * (double)hc_mem->free_size / hc_mem->total_size;
 			ret = (void *)&value_double;
 			break;
 		case ZBX_STATS_TREND_TOTAL:
@@ -297,7 +297,7 @@ void	*DCget_stats(int request)
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_TREND_PFREE:
-			value_double = 100 * ((double)trend_mem->free_size / trend_mem->orig_size);
+			value_double = 100 * (double)trend_mem->free_size / trend_mem->orig_size;
 			ret = (void *)&value_double;
 			break;
 		case ZBX_STATS_HISTORY_INDEX_TOTAL:
@@ -305,16 +305,15 @@ void	*DCget_stats(int request)
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_INDEX_USED:
-			value_uint = hc_index_mem->used_size;
+			value_uint = hc_index_mem->total_size - hc_index_mem->free_size;
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_INDEX_FREE:
-			value_uint = hc_index_mem->total_size - hc_index_mem->used_size;
+			value_uint = hc_index_mem->free_size;
 			ret = (void *)&value_uint;
 			break;
 		case ZBX_STATS_HISTORY_INDEX_PFREE:
-			value_double = 100 * (double)(hc_index_mem->total_size - hc_index_mem->used_size) /
-					hc_index_mem->total_size;
+			value_double = 100 * (double)hc_index_mem->free_size / hc_index_mem->total_size;
 			ret = (void *)&value_double;
 			break;
 		default:
@@ -2826,41 +2825,44 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		return SUCCEED;
 	}
 
-	switch (item_value->value_type)
+	if (0 == (ZBX_DC_FLAG_NOVALUE & item_value->flags))
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			(*data)->value.dbl = item_value->value.value_dbl;
-			cache->stats.history_float_counter++;
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			(*data)->value.ui64 = item_value->value.value_uint;
-			cache->stats.history_uint_counter++;
-			break;
-		case ITEM_VALUE_TYPE_STR:
-			if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
-				return FAIL;
+		switch (item_value->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				(*data)->value.dbl = item_value->value.value_dbl;
+				cache->stats.history_float_counter++;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				(*data)->value.ui64 = item_value->value.value_uint;
+				cache->stats.history_uint_counter++;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
+					return FAIL;
 
-			cache->stats.history_str_counter++;
-			break;
-		case ITEM_VALUE_TYPE_TEXT:
-			if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
-				return FAIL;
+				cache->stats.history_str_counter++;
+				break;
+			case ITEM_VALUE_TYPE_TEXT:
+				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str, &item_value->value.value_str))
+					return FAIL;
 
-			cache->stats.history_text_counter++;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
-				return FAIL;
+				cache->stats.history_text_counter++;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
+					return FAIL;
 
-			cache->stats.history_log_counter++;
-			break;
+				cache->stats.history_log_counter++;
+				break;
+		}
+
+		cache->stats.history_counter++;
 	}
 
 	(*data)->value_type = item_value->value_type;
 	(*data)->lastlogsize = item_value->lastlogsize;
 	(*data)->mtime = item_value->mtime;
-
-	cache->stats.history_counter++;
 
 	return SUCCEED;
 }
@@ -2951,29 +2953,32 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 	history->lastlogsize = data->lastlogsize;
 	history->mtime = data->mtime;
 
-	switch (data->value_type)
+	if (0 == (ZBX_DC_FLAG_NOVALUE & data->flags))
 	{
-		case ITEM_VALUE_TYPE_FLOAT:
-			history->value_orig.dbl = data->value.dbl;
-			history->value.dbl = 0;
-			break;
-		case ITEM_VALUE_TYPE_UINT64:
-			history->value_orig.ui64 = data->value.ui64;
-			history->value.ui64 = 0;
-			break;
-		case ITEM_VALUE_TYPE_STR:
-		case ITEM_VALUE_TYPE_TEXT:
-			history->value_orig.str = data->value.str;
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			history->value_orig.str = data->value.log->value;
-			history->value.str = data->value.log->source;
+		switch (data->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+				history->value_orig.dbl = data->value.dbl;
+				history->value.dbl = 0;
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				history->value_orig.ui64 = data->value.ui64;
+				history->value.ui64 = 0;
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				history->value_orig.str = data->value.str;
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				history->value_orig.str = data->value.log->value;
+				history->value.str = data->value.log->source;
 
-			history->timestamp = data->value.log->timestamp;
-			history->severity = data->value.log->severity;
-			history->logeventid = data->value.log->logeventid;
+				history->timestamp = data->value.log->timestamp;
+				history->severity = data->value.log->severity;
+				history->logeventid = data->value.log->logeventid;
 
-			break;
+				break;
+		}
 	}
 }
 
@@ -3440,7 +3445,9 @@ void	DCupdate_hosts_availability()
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+		if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
