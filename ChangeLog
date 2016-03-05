@@ -14,6 +14,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10422] fixed layout of the history tables (Sasha)
 ..F....... [ZBX-10386] fixed slideshow refresh rate (Ivo)
 A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
