@@ -932,6 +932,7 @@ footer, .footer {
   display: inline-block;
   padding: 5px;
   position: relative;
+  vertical-align: top;
   border: 1px solid #ebeef0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
