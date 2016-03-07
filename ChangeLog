@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
 A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
 .......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
