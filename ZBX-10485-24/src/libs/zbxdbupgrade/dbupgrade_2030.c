@@ -901,12 +901,13 @@ static int	DBpatch_2030094(void)
 	char		*p, *expr = NULL, *expr_esc;
 	size_t		expr_alloc = 0, expr_offset;
 
+	zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "");
+
 	result = DBselect("select triggerid,expression from triggers");
 
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
 		expr_offset = 0;
-		zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "");
 
 		for (p = row[1]; '\0' != *p; p++)
 		{
