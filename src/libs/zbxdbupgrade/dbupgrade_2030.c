@@ -906,6 +906,7 @@ static int	DBpatch_2030094(void)
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
 		expr_offset = 0;
+		zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "");
 
 		for (p = row[1]; '\0' != *p; p++)
 		{
