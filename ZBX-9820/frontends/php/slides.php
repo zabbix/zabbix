@@ -122,12 +122,22 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 			$widgetRefreshRate = substr(getRequest('widgetRefreshRate'), 1);
 
 			CProfile::update('web.slides.rf_rate.'.WIDGET_SLIDESHOW, $widgetRefreshRate, PROFILE_TYPE_STR, $elementId);
-
-			$delay = ($screen['delay'] > 0) ? $screen['delay'] : $dbSlideshow['delay'];
-
-			echo 'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.CJs::encodeJson($delay * $widgetRefreshRate).');'."\n"
-				.'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();';
 		}
+		else {
+			$widgetRefreshRate = CProfile::get('web.slides.rf_rate.'.WIDGET_SLIDESHOW, 1,
+				getRequest('elementid', CProfile::get('web.slides.elementid'))
+			);
+		}
+
+		$delay = ($screen['delay'] > 0) ? $screen['delay'] : $dbSlideshow['delay'];
+
+		insert_js(
+			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].frequency('.
+				CJs::encodeJson($delay * $widgetRefreshRate).
+			');'.
+			"\n".
+			'PMasters["slideshows"].dolls["'.WIDGET_SLIDESHOW.'"].restartDoll();'
+		);
 	}
 }
 
