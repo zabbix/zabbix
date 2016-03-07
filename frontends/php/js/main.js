@@ -1006,16 +1006,13 @@ jQuery(function ($) {
 					"transform-origin": transform,
 					"-webkit-transform-origin": transform,
 					"-moz-transform-origin": transform,
-					"-o-transform-origin": transform
+					"-o-transform-origin": transform,
+					"-ms-transform-origin": transform
 				};
 
+				// For regular fonts IE leaves extra spaces that are impossible to remove and are hard to read.
 				if (IE) {
 					css['font-family'] = 'monospace';
-					css['-ms-transform-origin'] = '50% 50%';
-				}
-
-				if (IE9) {
-					css['-ms-transform-origin'] = transform;
 				}
 
 				var divInner = $('<div>', {
