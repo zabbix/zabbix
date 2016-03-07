@@ -6,6 +6,9 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
+........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
+.......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
 .......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
 ..F....... [ZBX-10356] fixed user media form "send to" and "period" fields having incorrect "maxlength" property (Ivo)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
@@ -79,7 +82,7 @@ A......... [ZBX-9340] fixed "data" property not being returned by API when error
 ...G...... [ZBX-9796] fixed item key vfs.fs.size operation for NetBSD and HP-UX (viktors)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
-........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
+........S. [ZBX-9667] fixed disabled triggers or triggers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 .......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
