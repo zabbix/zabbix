@@ -104,8 +104,7 @@
 
 	jQuery(function($) {
 		var stepTable = $('#httpStepTable'),
-			stepTableWidth = stepTable.width(),
-			stepTableColumns = $('#httpStepTable .header td'),
+			stepTableColumns = $('#httpStepTable td'),
 			stepTableColumnWidths = [];
 
 		stepTableColumns.each(function() {
@@ -121,33 +120,28 @@
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
-			create: function () {
-				// force not to change table width
-				stepTable.width(stepTableWidth);
-			},
 			helper: function(e, ui) {
 				ui.children().each(function(i) {
-					var td = $(this);
-
-					td.width(stepTableColumnWidths[i]);
+					jQuery(this).width(stepTableColumnWidths[i]);
 				});
-
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2) + 'px');
-				}
-
-				stepTableColumns.each(function(i) {
-					$(this).width(stepTableColumnWidths[i]);
-				});
+				ui.css('left', '0');
 
 				return ui;
 			},
 			start: function(e, ui) {
-				// fix placeholder not to change height while object is being dragged
 				$(ui.placeholder).height($(ui.helper).height());
+				jQuery('span', ui.item).data('hint-disabled', true);
+			},
+			stop: function(e, ui) {
+				jQuery(ui.item).children().width('');
+				jQuery('span', ui.item).each(function() {
+					var obj = jQuery(this);
+					if (obj.outerWidth() > obj.closest('div').outerWidth()) {
+						obj.data('hint-disabled', false);
+					}
+				});
 			}
+
 		});
 
 		// http step add pop up
@@ -209,5 +203,15 @@
 
 		$('#agent').trigger('change');
 		$('#authentication').trigger('change');
+		$('.show-hint').each(function(i) {
+			var obj = jQuery(this);
+			if (obj.outerWidth() <= obj.closest('div').outerWidth()) {
+				obj.data('hint-disabled', true);
+			}
+			else {
+				obj.closest('div').addClass('<?= ZBX_STYLE_OVERFLOW_ELLIPSIS ?>');
+			}
+		});
+
 	});
 </script>

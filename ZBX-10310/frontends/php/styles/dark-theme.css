@@ -150,7 +150,7 @@ pre {
   font-family: "Courier New", Courier, monospace;
   font-size: 1em; }
 
-pre, pre a, pre td, pre span {
+pre, pre a, pre td, pre span, .overlay-dialogue {
   white-space: pre-wrap;
   word-wrap: break-word; }
 
@@ -948,6 +948,9 @@ footer, .footer {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
+
+.ui-sortable {
+  position: relative; }
 
 .margin-top {
   display: block;

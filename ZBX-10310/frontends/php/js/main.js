@@ -434,7 +434,7 @@ var hintBox = {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
-		if (!isStatic) {
+		if (!isStatic && !jQuery(target).data('hint-disabled')) {
 			target.isStatic = true;
 			hintBox.showHint(e, target, hint, className, true, styles);
 

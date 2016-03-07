@@ -155,16 +155,13 @@ $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
 	->setId('httpStepTable')
 	->setHeader([
-		(new CColHeader())->setWidth('15'),
-		(new CColHeader())->setWidth('15'),
-		(new CColHeader(_('Name')))->setWidth('150'),
-		(new CColHeader(_('Timeout')))->setWidth('50'),
-		(new CColHeader(_('URL')))->setWidth('200'),
-		(new CColHeader(_('Required')))->setWidth('75'),
-		(new CColHeader(_('Status codes')))
-			->addClass(ZBX_STYLE_NOWRAP)
-			->setWidth('90'),
-		(new CColHeader(_('Action')))->setWidth('50')
+		(new CColHeader())->setColspan(2),
+		(new CColHeader(_('Name'))),
+		(new CColHeader(_('Timeout'))),
+		(new CColHeader(_('URL'))),
+		(new CColHeader(_('Required'))),
+		(new CColHeader(_('Status codes')))->addClass(ZBX_STYLE_NOWRAP),
+		(new CColHeader(_('Action')))
 	]);
 
 $i = 1;
@@ -189,20 +186,6 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		->addClass('rowNum')
 		->setId('current_step_'.$stepid);
 
-	$name = (new CLink($step['name'], 'javascript:void(0);'))
-		->setId('name_'.$stepid)
-		->setAttribute('name_step', $stepid);
-
-	if (mb_strlen($step['url']) > 70) {
-		$start = mb_substr($step['url'], 0, 35);
-		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
-		$url = (new CSpan($start.SPACE.'...'.SPACE.$end))
-			->setHint($step['url']);
-	}
-	else {
-		$url = $step['url'];
-	}
-
 	if ($this->data['templated']) {
 		$dragHandler = '';
 		$removeButton = '';
@@ -221,11 +204,44 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		(new CRow([
 			$dragHandler,
 			$numSpan,
-			$name,
+			(new CDiv(
+				(new CLink(
+					(new CSpan($step['name']))
+						->setHint($step['name'], '', false, 'max-width:500px;')
+						->setAttribute('data-hint-disabled', 'false')
+						->setAttribute('style', 'white-space:nowrap;')
+						->addClass('show-hint'),
+					'javascript:void(0);'
+				))
+					->setId('name_'.$stepid)
+					->setAttribute('name_step', $stepid)
+			))
+				->setWidth(150),
 			$step['timeout'].SPACE._('sec'),
-			$url,
-			htmlspecialchars($step['required']),
-			$step['status_codes'],
+			(new CDiv(
+				(new CSpan($step['url']))
+					->setHint($step['url'], '', true, 'max-width:500px;')
+					->setAttribute('data-hint-disabled', 'false')
+					->setAttribute('style', 'white-space:nowrap;')
+					->addClass('show-hint')
+			))
+				->setWidth(200),
+			(new CDiv(
+				(new CSpan($step['required']))
+					->setHint($step['required'], '', true, 'max-width:500px;')
+					->setAttribute('data-hint-disabled', 'false')
+					->setAttribute('style', 'white-space:nowrap;')
+					->addClass('show-hint')
+			))
+				->setWidth(75),
+			(new CDiv(
+				(new CSpan($step['status_codes']))
+					->setHint($step['status_codes'], '', true, 'max-width:500px;')
+					->setAttribute('data-hint-disabled', 'false')
+					->setAttribute('style', 'white-space:nowrap;')
+					->addClass('show-hint')
+			))
+				->setWidth(90),
 			(new CCol($removeButton))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
