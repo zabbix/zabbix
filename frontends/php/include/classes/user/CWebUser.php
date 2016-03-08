@@ -79,9 +79,12 @@ class CWebUser {
 		}
 	}
 
+	/**
+	 * Log-out the current user.
+	 */
 	public static function logout() {
 		self::$data['sessionid'] = self::getSessionCookie();
-		self::$data = API::User()->logout();
+		self::$data = API::User()->logout([]);
 		CSession::destroy();
 		zbx_unsetcookie('zbx_sessionid');
 	}
