@@ -79,6 +79,9 @@ class CWebUser {
 		}
 	}
 
+	/**
+	 * Log-out the current user.
+	 */
 	public static function logout() {
 		self::$data['sessionid'] = self::getSessionCookie();
 		self::$data = API::User()->logout([]);

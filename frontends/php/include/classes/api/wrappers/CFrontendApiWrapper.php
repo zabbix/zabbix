@@ -85,6 +85,11 @@ class CFrontendApiWrapper extends CApiWrapper {
 
 	/**
 	 * Call the client method. Pass the "auth" parameter only to the methods that require it.
+	 *
+	 * @param string $method		API method
+	 * @param array  $params		API parameters
+	 *
+	 * @return CApiClientResponse
 	 */
 	protected function callClientMethod($method, $params) {
 		$auth = ($this->requiresAuthentication($this->api, $method)) ? $this->auth : null;
