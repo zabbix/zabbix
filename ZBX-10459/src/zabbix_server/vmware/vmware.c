@@ -87,9 +87,9 @@ static zbx_vmware_t	*vmware = NULL;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-/* XML_PARSE_HUGE option was introduced in libxml together with xml parsing limits,      */
-/* therefore having no XML_PARSE_HUGE option should not affect parsing of deep xml data. */
-#ifdef XML_PARSE_HUGE
+/* XML_PARSE_HUGE option was introduced in libxml2 v2.9.0 together with xml parsing limits, */
+/* therefore having no XML_PARSE_HUGE option should not affect parsing of deep xml data.    */
+#if 20900 <= LIBXML_VERSION	/* version 2.9.0 */
 #	define ZBX_XML_PARSE_OPTS	XML_PARSE_HUGE
 #else
 #	define ZBX_XML_PARSE_OPTS	0
