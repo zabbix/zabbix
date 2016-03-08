@@ -1360,6 +1360,35 @@ footer {
 	vertical-align: top;
 	border: 1px solid $table-border-color;
 	@include box-sizing(border-box);
+
+	th {
+		text-align: left;
+	}
+
+	td {
+		vertical-align: top;
+	}
+
+	label {
+		display: inline-block;
+		padding: 4px 0;
+	}
+
+	.btn-link {
+		margin: 5px 0 0 0;
+	}
+
+	.radio-segmented {
+		margin: 4px 0 0 0;
+
+		label {
+			display: inline;
+		}
+	}
+
+	input[type="radio"] {
+		min-height: 24px;
+	}
 }
 
 .drag-drop-area {
