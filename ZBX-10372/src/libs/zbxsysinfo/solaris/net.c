@@ -24,12 +24,9 @@
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)
 {
-	/* on Solaris 11+ network interfaces have several statistics modules (link, unix), */
-	/* so perform lookup on all modules only if no link module was found               */
-	static int	link_module = 1;
 	int		ret = FAIL;
 	kstat_ctl_t	*kc;
-	kstat_t		*kp = NULL;
+	kstat_t		*kp;
 	kstat_named_t	*kn;
 
 	if (NULL == (kc = kstat_open()))
@@ -38,19 +35,24 @@ static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64
 		return FAIL;
 	}
 
-	if (1 == link_module)
-		kp = kstat_lookup(kc, "link", 0, (char *)name);
+	for (kp = kc->kc_chain; NULL != kp; kp = kp->ks_next)	/* traverse all kstat chain */
+	{
+		if (0 != strcmp(name, kp->ks_name))		/* network interface name */
+			continue;
+
+		/* Assume that interfaces in our zone have instance 0. If instance > 0 then it belongs to other zone */
+		/* and should be monitored by Zabbix agent running in that zone where it will have instance number 0. */
+		if (0 != kp->ks_instance)
+			continue;
+
+		if (0 == strcmp("net", kp->ks_class))
+			break;
+	}
 
 	if (NULL == kp)
 	{
-		link_module = 0;
-
-		if (NULL == (kp = kstat_lookup(kc, NULL, -1, (char *)name)))
-		{
-			*error = zbx_dsprintf(*error, "Cannot look up in kernel statistics facility: %s",
-					zbx_strerror(errno));
-			goto clean;
-		}
+		*error = zbx_dsprintf(*error, "Cannot look up interface \"%s\" in kernel statistics facility", name);
+		goto clean;
 	}
 
 	if (-1 == kstat_read(kc, kp, 0))
