@@ -564,7 +564,7 @@ else {
 
 	// source not discovery i.e. trigger
 	else {
-		if ($csvExport || $pageFilter->hostsSelected) {
+		if ($csvExport || $pageFilter->hostsSelected || $triggerId) {
 			$knownTriggerIds = [];
 			$validTriggerIds = [];
 
