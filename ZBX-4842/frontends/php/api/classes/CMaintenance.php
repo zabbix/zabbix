@@ -638,8 +638,16 @@ class CMaintenance extends CZBXAPI {
 				DB::delete('maintenances_groups', $deleteGroups);
 			}
 
-			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, $maintenance['maintenanceid'],
-				$updMaintenances[$maintenance['maintenanceid']]['name'], null
+			add_audit_ext(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_MAINTENANCE,
+				$maintenance['maintenanceid'],
+				array_key_exists('name', $maintenance)
+					? $maintenance['name']
+					: $updMaintenances[$maintenance['maintenanceid']]['name'],
+				'maintenances',
+				$updMaintenances[$maintenance['maintenanceid']],
+				$maintenance
 			);
 		}
 
@@ -710,7 +718,7 @@ class CMaintenance extends CZBXAPI {
 
 			foreach ($maintenances as $maintenanceid => $maintenance) {
 				add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $maintenanceid, $maintenance['name'],
-					'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']'
+					null
 				);
 			}
 
