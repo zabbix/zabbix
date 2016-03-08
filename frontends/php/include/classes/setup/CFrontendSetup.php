@@ -73,7 +73,7 @@ class CFrontendSetup {
 		}
 
 		// check for deprecated PHP 5.6.0 option 'always_populate_raw_post_data'
-		if (version_compare(PHP_VERSION, '5.6', '>=')) {
+		if (version_compare(PHP_VERSION, '5.6', '>=') && version_compare(PHP_VERSION, '7.0', '<')) {
 			$result[] = $this->checkPhpAlwaysPopulateRawPostData();
 		}
 		$result[] = $this->checkPhpSockets();
