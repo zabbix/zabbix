@@ -47,6 +47,16 @@ class CLocalApiClient extends CApiClient {
 		$this->serviceFactory = $factory;
 	}
 
+	/**
+	 * Call the given API service method and return the response.
+	 *
+	 * @param string 	$requestApi			API name
+	 * @param string 	$requestMethod		API method
+	 * @param mixed 	$params				API parameters
+	 * @param string	$auth				Authentication token
+	 *
+	 * @return CApiClientResponse
+	 */
 	public function callMethod($requestApi, $requestMethod, $params, $auth) {
 		global $DB;
 

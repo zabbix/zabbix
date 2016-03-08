@@ -37,6 +37,11 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 		$this->markTestIncomplete();
 	}
 
+	/**
+	 * A set of invalid API methods and parameters.
+	 *
+	 * @return array
+	 */
 	public function incorrectCallProvider() {
 		return [
 			// incorrect api
@@ -62,7 +67,7 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 			// no params
 			['Apiinfo', 'Version', null, null,
 				ZBX_API_ERROR_PARAMETERS, 'Cannot call method "Apiinfo.Version" without parameters.'
-			],
+			]
 		];
 	}
 
