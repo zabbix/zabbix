@@ -211,14 +211,10 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 
 	zbx_value2array($maintenanceids);
 
-	DBstart();
-
 	$goResult = API::Maintenance()->delete($maintenanceids);
 	if ($goResult) {
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
-
-	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
 	clearCookies($goResult);
