@@ -1809,6 +1809,7 @@ out:
  *     port            - [IN] port to send data to                            *
  *     hostname        - [IN] hostname the data comes from                    *
  *     key             - [IN] item key the data belongs to                    *
+ *     processed_bytes - [OUT] number of processed bytes in logfile           *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -1823,7 +1824,8 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *incomplete, char **err_msg, const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern,
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
-		const char *server, unsigned short port, const char *hostname, const char *key)
+		const char *server, unsigned short port, const char *hostname, const char *key,
+		zbx_uint64_t *processed_bytes)
 {
 	const char	*__function_name = "process_log";
 
@@ -1875,9 +1877,12 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		*lastlogsize = l_size;
 		*skip_old_data = 0;
 
-		ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding, regexps, pattern,
-				output_template, p_count, s_count, process_value, server, port, hostname, key,
-				lastlogsize_sent, mtime_sent);
+		if (SUCCEED == (ret = zbx_read2(f, flags, lastlogsize, mtime, big_rec, incomplete, err_msg, encoding,
+				regexps, pattern, output_template, p_count, s_count, process_value, server, port,
+				hostname, key, lastlogsize_sent, mtime_sent)))
+		{
+			*processed_bytes = *lastlogsize - l_size;
+		}
 	}
 	else
 	{
@@ -1891,8 +1896,9 @@ static int	process_log(unsigned char flags, const char *filename, zbx_uint64_t *
 		ret = FAIL;
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s",
-			__function_name, filename, *lastlogsize, NULL != mtime ? *mtime : 0, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d ret:%s"
+			" processed_bytes:" ZBX_FS_UI64, __function_name, filename, *lastlogsize,
+			NULL != mtime ? *mtime : 0, zbx_result_string(ret), *processed_bytes);
 
 	return ret;
 }
@@ -1963,6 +1969,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
+	double			start_time, processing_time = 0.0;
+	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags, filename, *lastlogsize, *mtime);
@@ -2106,6 +2114,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	/* from now assume success - it could be that there is nothing to do */
 	ret = SUCCEED;
 
+	start_time = zbx_time();
+
 	while (i < logfiles_num)
 	{
 		if (0 == logfiles[i].incomplete && (logfiles[i].size != logfiles[i].processed_size ||
@@ -2118,7 +2128,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime : NULL), lastlogsize_sent,
 					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime_sent : NULL), skip_old_data,
 					big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps, pattern,
-					output_template, p_count, s_count, process_value, server, port, hostname, key);
+					output_template, p_count, s_count, process_value, server, port, hostname, key,
+					&processed_bytes_tmp);
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -2131,6 +2142,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 			if (SUCCEED != ret)
 				break;
+
+			processed_bytes += processed_bytes_tmp;
 
 			if (0 >= *p_count || 0 >= *s_count)
 			{
@@ -2152,13 +2165,16 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		i++;
 	}
 
+	processing_time = zbx_time() - start_time;
+
 	/* remember the current logfile list */
 	*logfiles_num_old = logfiles_num;
 
 	if (0 < logfiles_num)
 		*logfiles_old = logfiles;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed_bytes:" ZBX_FS_UI64 " processing_time:%e",
+			__function_name, zbx_result_string(ret), processed_bytes, processing_time);
 
 	return ret;
 }
