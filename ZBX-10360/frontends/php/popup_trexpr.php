@@ -477,12 +477,12 @@ $functions = [
 		'allowed_types' => $allowedTypesAny
 	],
 	'fuzzytime[=]' => [
-		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise.'),
+		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise'),
 		'params' => $param1Sec,
 		'allowed_types' => $allowedTypesAny
 	],
 	'fuzzytime[<>]' => [
-		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise.'),
+		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise'),
 		'params' => $param1Sec,
 		'allowed_types' => $allowedTypesAny
 	],
