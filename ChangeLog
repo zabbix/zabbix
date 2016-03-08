@@ -15,6 +15,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9659] changed setup condition for checking always_populate_raw_post_data (Cemeris)
 ....I...S. [ZBX-10485] fixed database upgrade crash on attempt to substitute old-style comparison operators in empty trigger expressions (gleb, Sasha)
 ..F....... [ZBX-10422] fixed layout of the history tables (Sasha)
 ..F....... [ZBX-10386] fixed slideshow refresh rate (Ivo)
