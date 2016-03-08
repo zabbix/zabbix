@@ -1,34 +1,34 @@
 * text=auto !eol
 /ChangeLog.legend -text
-bin/win32/dev/zabbix_sender.dll -text
-bin/win32/dev/zabbix_sender.lib -text
-bin/win32/zabbix_agentd.exe -text
-bin/win32/zabbix_get.exe -text
-bin/win32/zabbix_sender.exe -text
-bin/win64/dev/zabbix_sender.dll -text
-bin/win64/dev/zabbix_sender.lib -text
-bin/win64/zabbix_agentd.exe -text
-bin/win64/zabbix_get.exe -text
-bin/win64/zabbix_sender.exe -text
+bin/win32/dev/zabbix_sender.dll -text svneol=unset#application/x-dosexec
+bin/win32/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
+bin/win32/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
+bin/win32/zabbix_get.exe -text svneol=unset#application/x-dosexec
+bin/win32/zabbix_sender.exe -text svneol=unset#application/x-dosexec
+bin/win64/dev/zabbix_sender.dll -text svneol=unset#application/x-dosexec
+bin/win64/dev/zabbix_sender.lib -text svneol=unset#application/x-archive
+bin/win64/zabbix_agentd.exe -text svneol=unset#application/x-dosexec
+bin/win64/zabbix_get.exe -text svneol=unset#application/x-dosexec
+bin/win64/zabbix_sender.exe -text svneol=unset#application/x-dosexec
 create/src/data.tmpl -text
 frontends/php/app/.htaccess -text
-frontends/php/audio/alarm_average.wav -text
-frontends/php/audio/alarm_disaster.wav -text
-frontends/php/audio/alarm_high.wav -text
-frontends/php/audio/alarm_information.wav -text
-frontends/php/audio/alarm_ok.wav -text
-frontends/php/audio/alarm_warning.wav -text
-frontends/php/audio/no_sound.wav -text
+frontends/php/audio/alarm_average.wav -text svneol=unset#audio/x-wav
+frontends/php/audio/alarm_disaster.wav -text svneol=unset#audio/x-wav
+frontends/php/audio/alarm_high.wav -text svneol=unset#audio/x-wav
+frontends/php/audio/alarm_information.wav -text svneol=unset#audio/x-wav
+frontends/php/audio/alarm_ok.wav -text svneol=unset#audio/x-wav
+frontends/php/audio/alarm_warning.wav -text svneol=unset#audio/x-wav
+frontends/php/audio/no_sound.wav -text svneol=unset#audio/x-wav
 frontends/php/favicon.ico -text svneol=unset#image/x-icon
-frontends/php/fonts/DejaVuSans.ttf -text
-frontends/php/images/general/arrow_down.png -text
-frontends/php/images/general/arrow_up.png -text
-frontends/php/images/general/no_icon.png -text
-frontends/php/images/general/tr_space.gif -text
-frontends/php/images/general/tr_top_bottom.gif -text
-frontends/php/images/general/tr_top_right.gif -text
-frontends/php/images/general/tr_top_right_bottom.gif -text
-frontends/php/images/general/tree/zero.gif -text
+frontends/php/fonts/DejaVuSans.ttf -text svneol=unset#application/x-font-ttf
+frontends/php/images/general/arrow_down.png -text svneol=unset#image/png
+frontends/php/images/general/arrow_up.png -text svneol=unset#image/png
+frontends/php/images/general/no_icon.png -text svneol=unset#image/png
+frontends/php/images/general/tr_space.gif -text svneol=unset#image/gif
+frontends/php/images/general/tr_top_bottom.gif -text svneol=unset#image/gif
+frontends/php/images/general/tr_top_right.gif -text svneol=unset#image/gif
+frontends/php/images/general/tr_top_right_bottom.gif -text svneol=unset#image/gif
+frontends/php/images/general/tree/zero.gif -text svneol=unset#image/gif
 frontends/php/img/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
 frontends/php/img/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
 frontends/php/img/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
@@ -50,9 +50,9 @@ frontends/php/include/classes/mvc/CControllerResponseFatal.php -text
 frontends/php/include/classes/mvc/CControllerResponseRedirect.php -text
 frontends/php/include/classes/mvc/CRouter.php -text
 frontends/php/include/classes/validators/CNewValidator.php -text
-frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
-frontends/php/js/menupopup.js -text svneol=unset#text/plain
-frontends/php/js/multiselect.js -text svneol=unset#text/plain
+frontends/php/js/flickerfreescreen.js -text
+frontends/php/js/menupopup.js -text
+frontends/php/js/multiselect.js -text
 frontends/php/js/servercheck.js -text
 frontends/php/locale/bg/LC_MESSAGES/frontend.po -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
@@ -84,18 +84,8 @@ frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
 frontends/php/locale/vi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
-frontends/php/robots.txt svneol=native#text/plain
-frontends/php/styles/blue-theme.css svneol=native#text/css
-frontends/php/styles/dark-theme.css svneol=native#text/css
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/unit/include/classes/import/converters/C20ItemKeyConverterTest.php -text
-frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
-frontends/php/tests/unit/include/classes/import/formatters/map.xml svneol=native#text/xml
-frontends/php/tests/unit/include/classes/import/formatters/screen.xml svneol=native#text/xml
-frontends/php/tests/unit/include/classes/import/xml/host18.xml svneol=native#text/xml
-frontends/php/tests/unit/include/classes/import/xml/hostAndTemplate.xml svneol=native#text/xml
-frontends/php/tests/unit/include/classes/import/xml/map.xml svneol=native#text/xml
-frontends/php/tests/unit/include/classes/import/xml/screen.xml svneol=native#text/xml
 include/zbxnix.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
@@ -104,8 +94,6 @@ man/zabbix_sender.man -text
 man/zabbix_server.man -text
 misc/images/README -text
 misc/images/README.dev -text
-misc/images/images_oracle_end.txt svneol=native#text/plain
-misc/images/images_oracle_start.txt svneol=native#text/plain
 misc/images/png_classic/Hub.png -text svneol=unset#image/png
 misc/images/png_classic/Hub_small.png -text svneol=unset#image/png
 misc/images/png_classic/Network.png -text svneol=unset#image/png
@@ -314,9 +302,6 @@ misc/images/png_modern/Zabbix_server_2D_(96).png -text svneol=unset#image/png
 misc/images/png_modern/Zabbix_server_3D_(128).png -text svneol=unset#image/png
 misc/images/png_modern/Zabbix_server_3D_(64).png -text svneol=unset#image/png
 misc/images/png_modern/Zabbix_server_3D_(96).png -text svneol=unset#image/png
-misc/images/png_to_sql.sh svneol=native#text/x-sh
-misc/images/png_to_xml.sh svneol=native#text/x-sh
-misc/images/strip_inkscape_attributes.xslt svneol=native#text/xml
 misc/images/svg/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
 misc/images/svg/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
 misc/images/svg/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
@@ -360,9 +345,7 @@ misc/images/svg/elements/Zabbix_server_2D.svg -text svneol=native#image/svg%2Bxm
 misc/images/svg/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxml
 misc/images/svg/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
 misc/images/svg/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
-misc/images/svg_to_png.sh svneol=native#text/x-sh
 misc/init.d/README -text
-misc/init.d/aix/zabbix_agentd svneol=native#text/x-sh
 misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
@@ -398,12 +381,11 @@ src/libs/zbxdbupgrade/dbupgrade_3000.c -text
 src/libs/zbxdbupgrade/dbupgrade_3010.c -text
 src/libs/zbxnix/coredump.c -text
 src/libs/zbxsysinfo/win32/wmi.cpp -text
-src/zabbix_java/lib/README svneol=native#text/plain
-src/zabbix_java/lib/android-json-4.3_r3.1.jar -text
-src/zabbix_java/lib/logback-classic-0.9.27.jar -text
-src/zabbix_java/lib/logback-core-0.9.27.jar -text
-src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
-src/zabbix_java/tests/junit-4.8.2.jar -text
+src/zabbix_java/lib/android-json-4.3_r3.1.jar -text svneol=unset#application/java-archive
+src/zabbix_java/lib/logback-classic-0.9.27.jar -text svneol=unset#application/java-archive
+src/zabbix_java/lib/logback-core-0.9.27.jar -text svneol=unset#application/java-archive
+src/zabbix_java/lib/slf4j-api-1.6.1.jar -text svneol=unset#application/java-archive
+src/zabbix_java/tests/junit-4.8.2.jar -text svneol=unset#application/java-archive
 tests/data/README -text
 tests/templates/sqlite3.init -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
