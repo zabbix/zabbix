@@ -413,6 +413,10 @@ class CMaintenance extends CApiService {
 					'maintenanceid' => $maintenanceids[$mnum]
 				];
 			}
+
+			add_audit_details(AUDIT_ACTION_ADD, AUDIT_RESOURCE_MAINTENANCE, $maintenanceids[$mnum],
+				$maintenance['name'], null
+			);
 		}
 		DB::insert('maintenances_hosts', $insertHosts);
 		DB::insert('maintenances_groups', $insertGroups);
@@ -622,6 +626,18 @@ class CMaintenance extends CApiService {
 				];
 				DB::delete('maintenances_groups', $deleteGroups);
 			}
+
+			add_audit_ext(
+				AUDIT_ACTION_UPDATE,
+				AUDIT_RESOURCE_MAINTENANCE,
+				$maintenance['maintenanceid'],
+				array_key_exists('name', $maintenance)
+					? $maintenance['name']
+					: $updMaintenances[$maintenance['maintenanceid']]['name'],
+				'maintenances',
+				$updMaintenances[$maintenance['maintenanceid']],
+				$maintenance
+			);
 		}
 
 		DB::insert('maintenances_hosts', $insertHosts);
@@ -643,9 +659,9 @@ class CMaintenance extends CApiService {
 		}
 
 		$options = [
+			'output' => ['maintenanceid', 'name'],
 			'maintenanceids' => $maintenanceids,
 			'editable' => true,
-			'output' => ['maintenanceid'],
 			'preservekeys' => true
 		];
 		$maintenances = $this->get($options);
@@ -687,6 +703,12 @@ class CMaintenance extends CApiService {
 		DB::delete('maintenances_hosts', $midCond);
 		DB::delete('maintenances_groups', $midCond);
 		DB::delete('maintenances', $midCond);
+
+		foreach ($maintenances as $maintenanceid => $maintenance) {
+			add_audit_details(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, $maintenanceid, $maintenance['name'],
+				null
+			);
+		}
 
 		return ['maintenanceids' => $maintenanceids];
 	}
