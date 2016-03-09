@@ -15,7 +15,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
-...G...... [ZBX-10431] fixed net.tcp.listen on Linux when using netlink interface to obtain socket data, thanks to Andrey Melnikov for the patch (wiper)
+...G...... [ZBX-10431] fixed net.tcp.listen on Linux when using netlink interface to obtain socket data; thanks to Andrey Melnikov for patch (wiper)
 A.F....... [ZBX-9700] fixed API receiving null and false instead of an array in method parameters (Ivo)
 ..F....... [ZBX-10379] added context for text strings 'Filter' and 'Subject' (zalex_ua)
 ..F....... [ZBX-10360] improved description for 'fuzzytime' trigger function in expression helper (zalex_ua)
