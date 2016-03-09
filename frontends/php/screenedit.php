@@ -247,16 +247,16 @@ elseif (hasRequest('delete')) {
 	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
 elseif (hasRequest('add_row')) {
-	addScreenCellGroup($screen, _('Row added'), 'add_row');
+	addScreenRow($screen, getRequest('add_row'));
 }
 elseif (hasRequest('add_col')) {
-	addScreenCellGroup($screen, _('Column added'), 'add_col');
+	addScreenColumn($screen, getRequest('add_col'));
 }
 elseif (hasRequest('rmv_row')) {
-	removeScreenCellGroup($screen, _('Row deleted'), 'rmv_row');
+	delScreenRow($screen, getRequest('rmv_row'));
 }
 elseif (hasRequest('rmv_col')) {
-	removeScreenCellGroup($screen, _('Column deleted'), 'rmv_col');
+	delScreenColumn($screen, getRequest('rmv_col'));
 }
 
 /*
