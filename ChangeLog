@@ -15,6 +15,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-4842] improved auditing of maintenance API operations (Gunars)
 ...G...... [ZBX-10431] fixed net.tcp.listen on Linux when using netlink interface to obtain socket data; thanks to Andrey Melnikov for patch (wiper)
 A.F....... [ZBX-9700] fixed API receiving null and false instead of an array in method parameters (Ivo)
 ..F....... [ZBX-10379] added context for text strings 'Filter' and 'Subject' (zalex_ua)
