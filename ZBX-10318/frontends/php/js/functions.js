@@ -214,80 +214,38 @@ function getUniqueId() {
 }
 
 /**
- * Color palette, (implementation from PHP)
+ * Color palette object used for geting different colors from color palette.
  */
-var prevColor = {'color': 0, 'gradient': 0};
+var colorPalette = (function() {
+	'use strict';
 
-function incrementNextColor() {
-	prevColor['color']++;
-	if (prevColor['color'] == 7) {
-		prevColor['color'] = 0;
+	var current_color = 0,
+		palette = [
+			'1A7C11', 'F63100', '2774A4', 'A54F10', 'FC6EA3', '6C59DC', 'AC8C14', '611F27', 'F230E0', '5CCD18',
+			'BB2A02', '5A2B57', '89ABF8', '7EC25C', '274482', '2B5429', '8048B4', 'FD5434', '790E1F', '87AC4D', 'E89DF4'
+		];
 
-		prevColor['gradient']++;
-		if (prevColor['gradient'] == 3) {
-			prevColor['gradient'] = 0;
+	return {
+		incrementNextColor: function() {
+			if (++current_color == palette.length) {
+				current_color = 0;
+			}
+		},
+
+		/**
+		 * Gets next color from palette.
+		 *
+		 * @return string	hexadecimal color code
+		 */
+		getNextColor: function() {
+			var color = palette[current_color];
+
+			this.incrementNextColor();
+
+			return color;
 		}
 	}
-}
-
-function getNextColor(paletteType) {
-	var palette, gradient, hexColor, r, g, b;
-
-	switch (paletteType) {
-		case 1:
-			palette = [200, 150, 255, 100, 50, 0];
-			break;
-		case 2:
-			palette = [100, 50, 200, 150, 250, 0];
-			break;
-		case 0:
-		default:
-			palette = [255, 200, 150, 100, 50, 0];
-			break;
-	}
-
-	gradient = palette[prevColor['gradient']];
-	r = (100 < gradient) ? 0 : 255;
-	g = r;
-	b = r;
-
-	switch (prevColor['color']) {
-		case 0:
-			g = gradient;
-			break;
-		case 1:
-			r = gradient;
-			break;
-		case 2:
-			b = gradient;
-			break;
-		case 3:
-			b = gradient;
-			r = b;
-			break;
-		case 4:
-			b = gradient;
-			g = b;
-			break;
-		case 5:
-			g = gradient;
-			r = g;
-			break;
-		case 6:
-			b = gradient;
-			g = b;
-			r = b;
-			break;
-	}
-
-	incrementNextColor();
-
-	hexColor = ('0' + parseInt(r, 10).toString(16)).slice(-2)
-				+ ('0' + parseInt(g, 10).toString(16)).slice(-2)
-				+ ('0' + parseInt(b, 10).toString(16)).slice(-2);
-
-	return hexColor.toUpperCase();
-}
+}());
 
 /**
  * Used for php ctweenbox object.

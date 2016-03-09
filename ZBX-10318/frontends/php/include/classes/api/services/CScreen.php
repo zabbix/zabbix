@@ -1125,6 +1125,10 @@ class CScreen extends CApiService {
 		$deleteScreenItemIds = [];
 		$updateScreenItems = [];
 		foreach ($screens as $screen) {
+			if (array_key_exists('screenitems', $screen)) {
+				continue;
+			}
+
 			$dbScreen = $dbScreens[$screen['screenid']];
 			$dbScreenItems = $dbScreen['screenitems'];
 

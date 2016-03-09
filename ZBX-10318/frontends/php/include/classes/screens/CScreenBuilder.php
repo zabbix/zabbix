@@ -258,7 +258,9 @@ class CScreenBuilder {
 						'itemids' => $options['itemids'],
 						'webitems' => true,
 						'selectHosts' => ['name'],
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+						'output' => [
+							'itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid', 'history', 'trends'
+						],
 						'preservekeys' => true
 					]);
 
@@ -359,15 +361,19 @@ class CScreenBuilder {
 			$link = clone $link_template;
 			$link->addItem('+');
 			for ($i = 0, $size = $this->screen['hsize']; $i < $size; $i++) {
-					$newColumns[] = (new CCol(
-							$link->setUrl('screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$i)
-					))
+				$newColumns[] = (new CCol(
+					$link->setUrl('screenedit.php?config=1&screenid='.$this->screen['screenid'].url_param('templateid').
+						'&add_col='.$i
+					)
+				))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
 
 			$newColumns[] = (new CCol(
-				$link->setUrl('screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_col='.$this->screen['hsize'])
+				$link->setUrl('screenedit.php?config=1&screenid='.$this->screen['screenid'].url_param('templateid').
+					'&add_col='.$this->screen['hsize']
+				)
 			))
 				->addClass(ZBX_STYLE_CENTER)
 				->addClass(ZBX_STYLE_MIDDLE)
@@ -385,7 +391,9 @@ class CScreenBuilder {
 				$link = clone $link_template;
 				$link
 					->addItem('+')
-					->setUrl('screenedit.php?config=1&screenid='.$this->screen['screenid'].'&add_row='.$r);
+					->setUrl('screenedit.php?config=1&screenid='.$this->screen['screenid'].url_param('templateid').
+						'&add_row='.$r
+					);
 
 				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
@@ -435,11 +443,11 @@ class CScreenBuilder {
 				// action
 				if ($this->mode == SCREEN_MODE_EDIT) {
 					if ($screenitem['screenitemid'] != 0) {
-						$action = 'screenedit.php?form=update'.url_param('screenid').
+						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).
 							'&screenitemid='.$screenitem['screenitemid'];
 					}
 					else {
-						$action = 'screenedit.php?form=update'.url_param('screenid').'&x='.$c.'&y='.$r;
+						$action = 'screenedit.php?form=update'.url_params(['screenid', 'templateid']).'&x='.$c.'&y='.$r;
 					}
 				}
 				else {
@@ -538,7 +546,9 @@ class CScreenBuilder {
 			if ($this->mode == SCREEN_MODE_EDIT) {
 				$link = clone $link_template;
 				$link->addItem('−');
-				$link->setUrl('screenedit.php?screenid='.$this->screen['screenid'].'&rmv_row='.$r);
+				$link->setUrl('screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+					'&rmv_row='.$r
+				);
 				if (!$emptyScreenRow) {
 					$link->addConfirmation(CJs::encodeJson(_('This screen-row is not empty. Delete it?')));
 				}
@@ -556,7 +566,9 @@ class CScreenBuilder {
 		if ($this->mode == SCREEN_MODE_EDIT) {
 			$link = clone $link_template;
 			$link->addItem('+');
-			$link->setUrl('screenedit.php?&screenid='.$this->screen['screenid'].'&add_row='.$this->screen['vsize']);
+			$link->setUrl('screenedit.php?&screenid='.$this->screen['screenid'].url_param('templateid').
+				'&add_row='.$this->screen['vsize']
+			);
 			$newColumns = [
 				(new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
@@ -569,10 +581,14 @@ class CScreenBuilder {
 				if (isset($emptyScreenColumns[$i])) {
 					$link
 						->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')))
-						->setUrl('screenedit.php?&screenid='.$this->screen['screenid'].'&rmv_col='.$i);
+						->setUrl('screenedit.php?&screenid='.$this->screen['screenid'].url_param('templateid').
+							'&rmv_col='.$i
+						);
 				}
 				else {
-					$link->setUrl('screenedit.php?&config=1&screenid='.$this->screen['screenid'].'&rmv_col='.$i);
+					$link->setUrl('screenedit.php?&config=1&screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_col='.$i
+					);
 				}
 				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)

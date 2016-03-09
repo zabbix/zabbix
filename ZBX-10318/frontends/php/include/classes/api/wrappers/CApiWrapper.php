@@ -86,11 +86,11 @@ class CApiWrapper {
 	 * Pre-process and call the client method.
 	 *
 	 * @param string 	$method		API method name
-	 * @param array 	$params		API method parameters
+	 * @param mixed 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
-	protected function callMethod($method, array $params) {
+	protected function callMethod($method, $params) {
 		return $this->callClientMethod($method, $params);
 	}
 
@@ -98,11 +98,11 @@ class CApiWrapper {
 	 * Call the client method and return the result.
 	 *
 	 * @param string 	$method		API method name
-	 * @param array 	$params		API method parameters
+	 * @param mixed 	$params		API method parameters
 	 *
 	 * @return CApiClientResponse
 	 */
-	protected function callClientMethod($method, array $params) {
+	protected function callClientMethod($method, $params) {
 		return $this->client->callMethod($this->api, $method, $params, $this->auth);
 	}
 }

@@ -71,7 +71,7 @@ if (isset($_REQUEST['favobj'])) {
 			$sysmap = reset($sysmap);
 
 			if ($sysmap === false) {
-				throw new Exception(_('Access denied!')."\n\r");
+				throw new Exception(_('Access denied!'));
 			}
 
 			$sysmapUpdate = $json->decode($_REQUEST['sysmap'], true);
@@ -83,7 +83,7 @@ if (isset($_REQUEST['favobj'])) {
 				echo 'if (confirm('.CJs::encodeJson(_('Map is updated! Return?')).')) { location.href = "sysmaps.php"; }';
 			}
 			else {
-				throw new Exception(_('Map update failed.')."\n\r");
+				throw new Exception(_('Map update failed.'));
 			}
 
 			DBend(true);
@@ -98,7 +98,7 @@ if (isset($_REQUEST['favobj'])) {
 
 			ob_clean();
 
-			echo 'alert('.zbx_jsvalue(implode("\n\r", $msg)).');';
+			echo 'alert('.zbx_jsvalue(implode("\r\n", $msg)).');';
 		}
 
 		@ob_flush();

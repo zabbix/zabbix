@@ -205,21 +205,4 @@ class CHistory extends CApiService {
 		}
 		return $result;
 	}
-
-	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$isIdFieldUsed = false;
-
-		if ($options['history'] == ITEM_VALUE_TYPE_LOG || $options['history'] == ITEM_VALUE_TYPE_TEXT) {
-			$this->sortColumns['id'] = 'id';
-			$isIdFieldUsed = true;
-		}
-
-		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($isIdFieldUsed) {
-			unset($this->sortColumns['id']);
-		}
-
-		return $sqlParts;
-	}
 }

@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0rc1');
-define('ZABBIX_API_VERSION',	'3.0.0');
+define('ZABBIX_VERSION',		'3.1.0');
+define('ZABBIX_API_VERSION',	'3.1.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050119);
+define('ZABBIX_DB_VERSION',		3010003);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -247,6 +247,8 @@ define('HOST_ENCRYPTION_NONE',			1);
 define('HOST_ENCRYPTION_PSK',			2);
 define('HOST_ENCRYPTION_CERTIFICATE',	4);
 
+define('PSK_MIN_LEN',	32);
+
 define('HOST_MAINTENANCE_STATUS_OFF',	0);
 define('HOST_MAINTENANCE_STATUS_ON',	1);
 
@@ -436,7 +438,7 @@ define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
 define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
 define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
-define('SERVICE_SLA', 99.05);
+define('SERVICE_SLA', '99.9000');
 
 define('SERVICE_SHOW_SLA_OFF',	0);
 define('SERVICE_SHOW_SLA_ON',	1);
