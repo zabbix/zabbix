@@ -628,7 +628,9 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 {
 	ssize_t	res;
 	int	err;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char	*error = NULL;
+#endif
 #if defined(_WINDOWS)
 	double	sec;
 #endif
@@ -1426,7 +1428,9 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 {
 	ssize_t	res;
 	int	err;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char	*error = NULL;
+#endif
 #if defined(_WINDOWS)
 	double	sec;
 #endif
