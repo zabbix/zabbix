@@ -224,10 +224,6 @@ static void	zbx_socket_clean(zbx_socket_t *s)
 	memset(s, 0, sizeof(zbx_socket_t));
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
-
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_ctx_alloc(&s->tls_ctx);
-#endif
 }
 
 /******************************************************************************
@@ -243,10 +239,6 @@ static void	zbx_socket_free(zbx_socket_t *s)
 {
 	if (ZBX_BUF_TYPE_DYN == s->buf_type)
 		zbx_free(s->buffer);
-
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_free(s->tls_ctx);
-#endif
 }
 
 /******************************************************************************
@@ -641,7 +633,7 @@ static ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 	double	sec;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (0 != zbx_tls_is_encrypted(s->tls_ctx))	/* TLS connection */
+	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
 		if (ZBX_PROTO_ERROR == (res = zbx_tls_write(s, buf, len, &error)))
 		{
@@ -1439,7 +1431,7 @@ static ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len)
 	double	sec;
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (0 != zbx_tls_is_encrypted(s->tls_ctx))	/* TLS connection */
+	if (NULL != s->tls_ctx)	/* TLS connection */
 	{
 		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, &error)))
 		{

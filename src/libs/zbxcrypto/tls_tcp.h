@@ -21,8 +21,6 @@
 #define ZABBIX_TLS_TCP_H
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-void	zbx_tls_ctx_alloc(zbx_tls_context_t *tls_ctx);
-int	zbx_tls_is_encrypted(zbx_tls_context_t tls_ctx);
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, char *tls_arg2, char **error);
 int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error);
