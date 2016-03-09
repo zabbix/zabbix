@@ -68,7 +68,7 @@ class CScreenHistory extends CScreenBase {
 	public $items;
 
 	/**
-	 * Items ids
+	 * Items ids.
 	 *
 	 * @var array
 	 */
