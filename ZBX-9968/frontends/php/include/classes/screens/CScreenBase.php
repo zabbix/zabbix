@@ -179,9 +179,17 @@ class CScreenBase {
 
 		$this->resourcetype = array_key_exists('resourcetype', $options) ? $options['resourcetype'] : null;
 
+		$this->required_parameters = [
+			'isFlickerfree'		=> true,
+			'mode'				=> true,
+			'timestamp'			=> true,
+			'resourcetype'		=> true,
+			'dataId'			=> true
+		];
+
 		switch ($this->resourcetype) {
 			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
-				$this->required_parameters = [
+				$this->required_parameters += [
 					'isTemplatedScreen'	=> false,
 					'screenid'			=> false,
 					'action'			=> false,
@@ -196,7 +204,7 @@ class CScreenBase {
 				break;
 
 			case SCREEN_RESOURCE_DISCOVERY:
-				$this->required_parameters = [
+				$this->required_parameters += [
 					'isTemplatedScreen'	=> false,
 					'screenid'			=> false,
 					'action'			=> false,
@@ -211,7 +219,7 @@ class CScreenBase {
 				break;
 
 			default:
-				$this->required_parameters = [
+				$this->required_parameters += [
 					'isTemplatedScreen'	=> true,
 					'screenid'			=> true,
 					'action'			=> true,
@@ -225,18 +233,10 @@ class CScreenBase {
 				];
 		}
 
-		$this->required_parameters += [
-			'isFlickerfree'		=> true,
-			'mode'				=> true,
-			'timestamp'			=> true,
-			'resourcetype'		=> true,
-			'dataId'			=> true
-		];
-
 		// get screenitem if its required or resource type is null
 		$this->screenitem = [];
-		if (array_key_exists('screenitem', $options)) {
-			$this->screenitem = (array) $options['screenitem'];
+		if (array_key_exists('screenitem', $options) && is_array($options['screenitem'])) {
+			$this->screenitem = $options['screenitem'];
 		}
 		elseif (array_key_exists('screenitemid', $options)) {
 			$screenitem_output = ['screenitemid', 'screenid', 'resourcetype', 'resourceid', 'width', 'height',
@@ -258,7 +258,9 @@ class CScreenBase {
 				]);
 			}
 
-			$this->screenitem = (array) reset($this->screenitem);
+			if ($this->screenitem) {
+				$this->screenitem = reset($this->screenitem);
+			}
 		}
 
 		// get resourcetype
