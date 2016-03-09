@@ -377,8 +377,8 @@ class CHttpTest extends CApiService {
 			'preservekeys' => true,
 			'selectHosts' => API_OUTPUT_EXTEND
 		];
-		$delHttpTestChilds = $this->get($options);
-		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChilds);
+		$delHttpTestChildren = $this->get($options);
+		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChildren);
 		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
 
 		$itemidsDel = [];
@@ -695,7 +695,7 @@ class CHttpTest extends CApiService {
 
 			if (isset($step['retrieve_mode'])) {
 				$retrieveModeValidator->messageInvalid = _s(
-					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$".',
+					'Incorrect retrieve mode value for step "%1$s" of web scenario "%2$s".',
 					$step['name'],
 					$httpTest['name']
 				);

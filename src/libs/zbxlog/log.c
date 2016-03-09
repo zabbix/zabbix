@@ -190,25 +190,25 @@ static void	get_time(struct tm *tm, long *milliseconds)
 #endif
 }
 
-static void	rotate_log(const char *log_filename)
+static void	rotate_log(const char *filename)
 {
 	zbx_stat_t		buf;
 	zbx_uint64_t		new_size;
 	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
 
-	if (0 == CONFIG_LOG_FILE_SIZE || NULL == log_filename || '\0' == *log_filename)
+	if (0 == CONFIG_LOG_FILE_SIZE || NULL == filename || '\0' == *filename)
 	{
 		/* redirect only once if log file wasn't specified or there is no log file size limit */
 		if (ZBX_MAX_UINT64 == old_size)
 		{
 			old_size = 0;
-			zbx_redirect_stdio(log_filename);
+			zbx_redirect_stdio(filename);
 		}
 
 		return;
 	}
 
-	if (0 != zbx_stat(log_filename, &buf))
+	if (0 != zbx_stat(filename, &buf))
 		return;
 
 	new_size = buf.st_size;
@@ -217,15 +217,15 @@ static void	rotate_log(const char *log_filename)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
-		strscpy(filename_old, log_filename);
+		strscpy(filename_old, filename);
 		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
 		remove(filename_old);
 
-		if (0 != rename(log_filename, filename_old))
+		if (0 != rename(filename, filename_old))
 		{
 			FILE	*log_file = NULL;
 
-			if (NULL != (log_file = fopen(log_filename, "w")))
+			if (NULL != (log_file = fopen(filename, "w")))
 			{
 				long		milliseconds;
 				struct tm	tm;
@@ -242,7 +242,7 @@ static void	rotate_log(const char *log_filename)
 						tm.tm_min,
 						tm.tm_sec,
 						milliseconds,
-						log_filename,
+						filename,
 						filename_old,
 						zbx_strerror(errno));
 
@@ -258,7 +258,7 @@ static void	rotate_log(const char *log_filename)
 						tm.tm_min,
 						tm.tm_sec,
 						milliseconds,
-						log_filename,
+						filename,
 						filename_old);
 
 				zbx_fclose(log_file);
@@ -271,7 +271,7 @@ static void	rotate_log(const char *log_filename)
 	}
 
 	if (old_size > new_size)
-		zbx_redirect_stdio(log_filename);
+		zbx_redirect_stdio(filename);
 
 	old_size = new_size;
 }

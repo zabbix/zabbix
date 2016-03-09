@@ -246,17 +246,17 @@ class C20ImportConverter extends CConverter {
 				unset($selement);
 			}
 
-				foreach ($map['links'] as &$link) {
-					if (array_key_exists('linktriggers', $link)) {
-						foreach ($link['linktriggers'] as &$linktrigger) {
-							$linktrigger['trigger']['expression'] = $this->triggerExpressionConverter->convert(
-								$linktrigger['trigger']['expression']
-							);
-						}
-						unset($linktrigger);
+			foreach ($map['links'] as &$link) {
+				if (array_key_exists('linktriggers', $link)) {
+					foreach ($link['linktriggers'] as &$linktrigger) {
+						$linktrigger['trigger']['expression'] = $this->triggerExpressionConverter->convert(
+							$linktrigger['trigger']['expression']
+						);
 					}
+					unset($linktrigger);
 				}
-				unset($link);
+			}
+			unset($link);
 		}
 		unset($map);
 
@@ -276,7 +276,7 @@ class C20ImportConverter extends CConverter {
 				$discovery_rule['status'] = ITEM_STATUS_ACTIVE;
 			}
 
-			if (!array_key_exists('st_prototypes', $discovery_rule)) {
+			if (!array_key_exists('host_prototypes', $discovery_rule)) {
 				$discovery_rule['host_prototypes'] = [];
 			}
 

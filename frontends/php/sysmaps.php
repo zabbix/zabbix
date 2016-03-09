@@ -82,6 +82,10 @@ $fields = [
 	// form
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
+	// filter
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,			null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"height","name","width"'),				null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -174,8 +178,12 @@ if (hasRequest('add') || hasRequest('update')) {
 		// TODO check permission by new value.
 		$map['sysmapid'] = getRequest('sysmapid');
 
+		// Only administrators can set map owner.
+		if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+			unset($map['userid']);
+		}
 		// Map update with inaccessible user.
-		if ($map['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $map['userid'] === '') {
 			$user_exist = API::User()->get([
 				'output' => ['userid'],
 				'userids' => [$sysmap['userid']]
@@ -360,17 +368,29 @@ if (hasRequest('form')) {
 	$mapView->show();
 }
 else {
+	CProfile::delete('web.maps.sysmapid');
+
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
 	$sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	CProfile::delete('web.maps.sysmapid');
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.sysmapconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		DBStart();
+		CProfile::delete('web.sysmapconf.filter_name');
+		DBend();
+	}
 
 	$config = select_config();
 
 	$data = [
+		'filter' => [
+			'name' => CProfile::get('web.sysmapconf.filter_name', '')
+		],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	];
@@ -380,23 +400,23 @@ else {
 		'output' => ['sysmapid', 'name', 'width', 'height'],
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1,
+		'search' => [
+			'name' => ($data['filter']['name'] === '') ? null : $data['filter']['name']
+		],
 		'preservekeys' => true
 	]);
 
 	$user_type = CWebUser::getType();
 	if ($user_type != USER_TYPE_SUPER_ADMIN && $user_type != USER_TYPE_ZABBIX_ADMIN) {
 		$editable_maps = API::Map()->get([
-			'output' => ['sysmapid', 'name', 'width', 'height'],
+			'output' => [],
+			'sysmapids' => array_keys($data['maps']),
 			'editable' => true,
-			'sortfield' => $sortField,
-			'limit' => $config['search_limit'] + 1,
 			'preservekeys' => true
 		]);
 
 		foreach ($data['maps'] as &$map) {
-			if (array_key_exists($map['sysmapid'], $editable_maps)) {
-				$map['editable'] = true;
-			}
+			$map['editable'] = array_key_exists($map['sysmapid'], $editable_maps);
 		}
 		unset($map);
 	}
