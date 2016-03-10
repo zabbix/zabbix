@@ -1306,6 +1306,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .disabled {
   cursor: default !important;
+  background-color: transparent !important;
   opacity: 0.35;
   filter: alpha(opacity=35); }
   .disabled .subfilter-enabled {
@@ -3341,5 +3342,3 @@ Widgets are used as containers to group any related information. Widget consists
 </div>
 ```
 */
-
-/*# sourceMappingURL=screen.css.map */
