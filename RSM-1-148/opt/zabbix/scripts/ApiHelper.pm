@@ -34,11 +34,12 @@ our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISA
 
 my $AH_BASE_DIR = '/opt/zabbix/sla';
 
-use constant AH_TLD_STATE_FILE => 'state.json';
-use constant AH_ALARMED_FILE => 'alarmed.json';
-use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability.json';
-use constant AH_INCIDENT_STATE_FILE => 'state.json';
-use constant AH_FALSE_POSITIVE_FILE => 'falsePositive.json';
+use constant AH_FILE_POSTFIX => '';	# e. g. ".json"
+use constant AH_TLD_STATE_FILE => 'state' . AH_FILE_POSTFIX;
+use constant AH_ALARMED_FILE => 'alarmed' . AH_FILE_POSTFIX;
+use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability' . AH_FILE_POSTFIX;
+use constant AH_INCIDENT_STATE_FILE => 'state' . AH_FILE_POSTFIX;
+use constant AH_FALSE_POSITIVE_FILE => 'falsePositive' . AH_FILE_POSTFIX;
 
 use constant AH_CONTINUE_FILE => 'last_update.txt';	# file with timestamp of last run with --continue
 use constant AH_AUDIT_FILE => 'last_audit.txt';		# file containing timestamp of last auditlog entry that was checked (false_positive change)
@@ -300,7 +301,7 @@ sub ah_save_incident_results
 
 	return AH_FAIL unless (__make_inc_path($tld, $service, $incidentid, \$inc_path) == AH_SUCCESS);
 
-	return __write_file("$inc_path/$clock.$incidentid.json", __encode_json($tr_ref));
+	return __write_file("$inc_path/$clock.$incidentid" . AH_FILE_POSTFIX, __encode_json($tr_ref));
 }
 
 sub ah_get_continue_file
