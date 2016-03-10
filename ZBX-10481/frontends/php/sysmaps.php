@@ -378,11 +378,14 @@ else {
 
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.sysmapconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
 		DBStart();
 		CProfile::delete('web.sysmapconf.filter_name');
 		DBend();
+
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 
 	$config = select_config();

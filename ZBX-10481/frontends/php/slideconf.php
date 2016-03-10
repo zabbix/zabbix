@@ -353,12 +353,15 @@ else {
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 	if (hasRequest('filter_set')) {
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 		CProfile::update('web.slideconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 	}
 	elseif (hasRequest('filter_rst')) {
 		DBStart();
 		CProfile::delete('web.slideconf.filter_name');
 		DBend();
+
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 
 	$config = select_config();

@@ -616,9 +616,13 @@ else {
 
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.httpconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
+		DBStart();
 		CProfile::delete('web.httpconf.filter_status');
+		DBEnd();
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 
 	$pageFilter = new CPageFilter([

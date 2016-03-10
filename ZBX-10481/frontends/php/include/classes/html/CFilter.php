@@ -138,6 +138,7 @@ class CFilter extends CTag {
 		$url = new CUrl();
 		$url->removeArgument('filter_set');
 		$url->removeArgument('ddreset');
+		$url->removeArgument('page');
 		$url->setArgument('filter_rst', 1);
 
 		return (new CDiv())

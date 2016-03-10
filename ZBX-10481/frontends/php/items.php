@@ -268,6 +268,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.items.filter_templated_items', getRequest('filter_templated_items', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_with_triggers', getRequest('filter_with_triggers', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.items.filter_ipmi_sensor', getRequest('filter_ipmi_sensor', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 
 	// subfilters
 	foreach ($subfiltersList as $name) {
@@ -297,6 +298,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.items.filter_with_triggers');
 	CProfile::delete('web.items.filter_ipmi_sensor');
 	DBend();
+
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 
 $_REQUEST['filter_groupid'] = CProfile::get('web.items.filter_groupid', 0);
@@ -325,6 +328,9 @@ foreach ($subfiltersList as $name) {
 	if (isset($_REQUEST['subfilter_set'])) {
 		$_REQUEST[$name] = getRequest($name, []);
 		CProfile::update('web.items.'.$name, implode(';', $_REQUEST[$name]), PROFILE_TYPE_STR);
+
+		// Reset to page one after using the subfilter.
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 	else {
 		$_REQUEST[$name] = [];

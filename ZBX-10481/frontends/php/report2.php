@@ -81,7 +81,10 @@ if (getRequest('triggerid') && !API::Trigger()->isReadable([$_REQUEST['triggerid
 /*
  * Filter
  */
-if (hasRequest('filter_rst')) {
+if (hasRequest('filter_set')) {
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
+}
+elseif (hasRequest('filter_rst')) {
 	$_REQUEST['filter_groupid'] = 0;
 	$_REQUEST['filter_hostid'] = 0;
 	$_REQUEST['filter_timesince'] = 0;
@@ -91,6 +94,8 @@ if (hasRequest('filter_rst')) {
 		$_REQUEST['tpl_triggerid'] = 0;
 		$_REQUEST['hostgroupid'] = 0;
 	}
+
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 
 if (!hasRequest('filter_rst')) {

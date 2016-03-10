@@ -402,11 +402,16 @@ else {
 		CProfile::update('web.triggers.filter_priority', getRequest('filter_priority', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 		CProfile::update('web.triggers.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
+		DBStart();
 		CProfile::delete('web.triggers.filter_priority');
 		CProfile::delete('web.triggers.filter_state');
 		CProfile::delete('web.triggers.filter_status');
+		DBend();
+
+		CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 	}
 
 	$config = select_config();

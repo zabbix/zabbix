@@ -69,6 +69,7 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.auditlogs.filter.alias', getRequest('alias', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.auditlogs.filter.action', getRequest('action', -1), PROFILE_TYPE_INT);
 	CProfile::update('web.auditlogs.filter.resourcetype', getRequest('resourcetype', -1), PROFILE_TYPE_INT);
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -76,6 +77,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.auditlogs.filter.action');
 	CProfile::delete('web.auditlogs.filter.resourcetype');
 	DBend();
+
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 
 /*

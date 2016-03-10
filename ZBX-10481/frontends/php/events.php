@@ -112,11 +112,14 @@ $source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_T
  */
 if (hasRequest('filter_set')) {
 	CProfile::update('web.events.filter.triggerid', getRequest('triggerid', 0), PROFILE_TYPE_ID);
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
 	CProfile::delete('web.events.filter.triggerid');
 	DBend();
+
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 
 $triggerId = CProfile::get('web.events.filter.triggerid', 0);

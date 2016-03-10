@@ -133,6 +133,7 @@ if (hasRequest('filter_set')) {
 	}
 	CProfile::updateArray('web.tr_status.filter.inventory.field', $inventoryFields, PROFILE_TYPE_STR);
 	CProfile::updateArray('web.tr_status.filter.inventory.value', $inventoryValues, PROFILE_TYPE_STR);
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -149,6 +150,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::deleteIdx('web.tr_status.filter.inventory.field');
 	CProfile::deleteIdx('web.tr_status.filter.inventory.value');
 	DBend();
+
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 
 if (hasRequest('filter_set') && getRequest('show_triggers') == TRIGGERS_OPTION_ALL) {

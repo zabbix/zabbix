@@ -157,6 +157,8 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.hosts.filter_dns', getRequest('filter_dns', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_host', getRequest('filter_host', ''), PROFILE_TYPE_STR);
 	CProfile::update('web.hosts.filter_port', getRequest('filter_port', ''), PROFILE_TYPE_STR);
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
+
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -165,6 +167,8 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete('web.hosts.filter_host');
 	CProfile::delete('web.hosts.filter_port');
 	DBend();
+
+	CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 }
 
 $filter['ip'] = CProfile::get('web.hosts.filter_ip', '');

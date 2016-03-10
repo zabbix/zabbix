@@ -392,11 +392,14 @@ else {
 	else {
 		if (hasRequest('filter_set')) {
 			CProfile::update('web.screenconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 		}
 		elseif (hasRequest('filter_rst')) {
 			DBStart();
 			CProfile::delete('web.screenconf.filter_name');
 			DBend();
+
+			CProfile::update('web.paging.page', 1, PROFILE_TYPE_INT);
 		}
 
 		$data['filter'] = [
