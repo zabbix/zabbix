@@ -1902,6 +1902,7 @@ $icon-widget-btn: (
 
 .disabled {
 	cursor: default !important;
+	background-color: transparent !important;
 	@include opacity(0.35);
 
 	.subfilter-enabled {
