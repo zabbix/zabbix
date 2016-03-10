@@ -60,59 +60,97 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$array = $this->xmlToArray($xml);
+		$data = $this->xml_to_array($xml);
 		$xml->close();
-		return $array;
+		return $data;
 	}
 
 	/**
 	 * Method for recursive processing of xml dom nodes.
 	 *
 	 * @param XMLReader $xml
+	 * @param array $nodes
 	 *
 	 * @return array|string
 	 */
-	protected function xmlToArray(XMLReader $xml) {
-		$array = '';
+	protected function xml_to_array(XMLReader $xml, array &$nodes = []) {
+		$data = '';
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
-					$nodeName = $xml->name;
-					if (isset($array[$nodeName])) {
-						$nodeName .= count($array);
+					$node_name = $xml->name;
+					if (array_key_exists($xml->depth, $nodes) && $nodes[$xml->depth]['name'] === $xml->name) {
+						$nodes[$xml->depth]['count']++;
+						$node_name .= count($xml->name);
+					}
+					else {
+						$nodes[$xml->depth] = [
+							'name' => $xml->name,
+							'count' => 1
+						];
 					}
 
-					// a special case for 1.8 import where attributes are still used
-					// attributes must be added to the array as if they where child elements
+					if ($xml->depth < max(array_keys($nodes))) {
+						foreach ($nodes as $key => $node) {
+							if ($xml->depth < $key) {
+								unset($nodes[$key]);
+							}
+						}
+					}
+
+					/*
+					 * A special case for 1.8 import where attributes are still used attributes must be added to the
+					 * array as if they where child elements.
+					 */
 					if ($xml->hasAttributes) {
 						while ($xml->moveToNextAttribute()) {
-							$array[$nodeName][$xml->name] = $xml->value;
+							$data[$node_name][$xml->name] = $xml->value;
 						}
 
-						// we assume that an element with attributes always contains child elements, not a text node
-						// works for 1.8 XML
-						$xmlToArray = $this->xmlToArray($xml);
+						/*
+						 * We assume that an element with attributes always contains child elements, not a text node
+						 * works for 1.8 XML.
+						 */
+						$xmlToArray = $this->xml_to_array($xml, $nodes);
 						if (is_array($xmlToArray)) {
 							foreach ($xmlToArray as $name => $value) {
-								$array[$nodeName][$name] = $value;
+								$data[$node_name][$name] = $value;
 							}
 						}
 					}
 					else {
-						$array[$nodeName] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml);
+						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $nodes);
 					}
-
 					break;
 
 				case XMLReader::TEXT:
-					$array = $xml->value;
+					if (is_array($data)) {
+						if (is_array($data)) {
+							array_pop($nodes);
+						}
+
+						$patch = '';
+
+						foreach ($nodes as $key => $node) {
+							$patch .= ($node['count'] > 1)
+								? '/'.$node['name'].'('.$node['count'].')'
+								: '/'.$node['name'];
+						}
+
+						throw new Exception(_s('Invalid XML text "%1$s": %2$s.', $patch,
+							_s('unexpected text "%1$s"', trim($xml->value))
+						));
+					}
+					else {
+						$data = $xml->value;
+					}
 					break;
 
 				case XMLReader::END_ELEMENT:
-					return $array;
+					return $data;
 			}
 		}
 
-		return $array;
+		return $data;
 	}
 }
