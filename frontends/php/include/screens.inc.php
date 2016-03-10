@@ -92,6 +92,7 @@ function addScreenRow($screen, $row_num) {
 	}
 	unset($screen_item);
 
+	DBstart();
 	$result = API::Screen()->update([
 		'screenid' => $screen['screenid'],
 		'vsize' => $screen['vsize'] + 1,
@@ -102,6 +103,7 @@ function addScreenRow($screen, $row_num) {
 			_('Row added')
 		);
 	}
+	DBend($result);
 }
 
 /**
@@ -118,6 +120,7 @@ function addScreenColumn($screen, $col_num) {
 	}
 	unset($screen_item);
 
+	DBstart();
 	$result = API::Screen()->update([
 		'screenid' => $screen['screenid'],
 		'hsize' => $screen['hsize'] + 1,
@@ -128,6 +131,7 @@ function addScreenColumn($screen, $col_num) {
 			_('Column added')
 		);
 	}
+	DBend($result);
 }
 
 /**
@@ -147,6 +151,7 @@ function delScreenRow($screen, $row_num) {
 	}
 	unset($screen_item);
 
+	DBstart();
 	$result = API::Screen()->update([
 		'screenid' => $screen['screenid'],
 		'vsize' => $screen['vsize'] - 1,
@@ -157,6 +162,7 @@ function delScreenRow($screen, $row_num) {
 			_('Row deleted')
 		);
 	}
+	DBend($result);
 }
 
 /**
@@ -176,6 +182,7 @@ function delScreenColumn($screen, $col_num) {
 	}
 	unset($screen_item);
 
+	DBstart();
 	$result = API::Screen()->update([
 		'screenid' => $screen['screenid'],
 		'hsize' => $screen['hsize'] - 1,
@@ -186,6 +193,7 @@ function delScreenColumn($screen, $col_num) {
 			_('Column deleted')
 		);
 	}
+	DBend($result);
 }
 
 function getSlideshowScreens($slideshowId, $step) {
