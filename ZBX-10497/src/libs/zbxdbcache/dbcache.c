@@ -90,13 +90,13 @@ static ZBX_DC_IDS	*ids = NULL;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	history_value_t	value_orig;	/* empty if flag ZBX_DC_FLAG_NOVALUE is set */
-	history_value_t	value;		/* used as source for log items */
+	history_value_t	value_orig;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	history_value_t	value;		/* uninitialized if ZBX_DC_FLAG_NOVALUE is set, source for log items */
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;
-	int		timestamp;
-	int		severity;
-	int		logeventid;
+	int		timestamp;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	int		severity;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	int		logeventid;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
 	int		mtime;
 	unsigned char	value_type;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
@@ -1905,6 +1905,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	int		i;
 	zbx_db_insert_t	db_insert;
 
+	/* see hc_copy_history_data() for fields that might be uninitialized and need special handling here */
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
 			"value", "logeventid", "lastlogsize", "mtime", "flags",  NULL);
 
@@ -1912,6 +1913,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	{
 		unsigned int		flags = PROXY_HISTORY_FLAG_META;
 		const char		*pvalue;
+		const char		*psource;
 		const ZBX_DC_HISTORY	*h = &history[i];
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -1922,15 +1924,31 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 
 		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
+			/* sent to server only if not 0, see proxy_get_history_data() */
+			static const int	unset_if_novalue = 0;
+
 			flags |= PROXY_HISTORY_FLAG_NOVALUE;
+
 			pvalue = "";
+			psource = "";
+
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue,
+					psource, unset_if_novalue, pvalue, unset_if_novalue,
+					h->lastlogsize, h->mtime, flags);
 		}
 		else
+		{
 			pvalue = h->value_orig.str;
 
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
-				NULL != h->value.str ? h->value.str : "", h->severity, pvalue, h->logeventid,
-				h->lastlogsize, h->mtime, flags);
+			if (NULL != h->value.str)
+				psource = h->value.str;
+			else
+				psource = "";
+
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
+					psource, h->severity, pvalue, h->logeventid,
+					h->lastlogsize, h->mtime, flags);
+		}
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -2931,6 +2949,8 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
  * Parameters: history - [OUT] the history value                              *
  *             itemid  - [IN] the item identifier                             *
  *             data    - [IN] the history data to copy                        *
+ *                                                                            *
+ * Comments: handling of uninitialized fields in dc_add_proxy_history_log()   *
  *                                                                            *
  ******************************************************************************/
 static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, zbx_hc_data_t *data)
