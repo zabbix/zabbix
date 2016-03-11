@@ -356,24 +356,38 @@ class CScreenBuilder {
 			$newColumns = [(new CCol())->addClass(ZBX_STYLE_CELL_WIDTH)];
 
 			for ($i = 0, $size = $this->screen['hsize']; $i < $size; $i++) {
-				$newColumns[] = (new CCol(
-					(new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
-						'&add_col='.$i
+				if ($this->screen['hsize'] >= 100) {
+					$link = (new CDiv('+'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addClass(ZBX_STYLE_DISABLED);
+				}
+				else {
+					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&add_col='.$i
 					))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->addSID()
-				))
+						->addSID();
+				}
+
+				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
 
-			$newColumns[] = (new CCol(
-				(new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+			if ($this->screen['hsize'] >= 100) {
+				$link = (new CDiv('+'))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->addClass(ZBX_STYLE_DISABLED);
+			}
+			else {
+				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
 					'&add_col='.$this->screen['hsize']
 				))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->addSID()
-			))
+					->addSID();
+			}
+
+			$newColumns[] = (new CCol($link))
 				->addClass(ZBX_STYLE_CENTER)
 				->addClass(ZBX_STYLE_MIDDLE)
 				->addClass(ZBX_STYLE_CELL_WIDTH);
@@ -387,13 +401,20 @@ class CScreenBuilder {
 
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$newColumns[] = (new CCol(
-					(new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
-						'&add_row='.$r
+				if ($this->screen['vsize'] >= 100) {
+					$link = (new CDiv('+'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addClass(ZBX_STYLE_DISABLED);
+				}
+				else {
+					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&add_row='.$r
 					))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->addSID()
-				))
+						->addSID();
+				}
+
+				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
@@ -542,13 +563,20 @@ class CScreenBuilder {
 
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
-					'&rmv_row='.$r
-				))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->addSID();
-				if (!$emptyScreenRow) {
-					$link->addConfirmation(CJs::encodeJson(_('This screen-row is not empty. Delete it?')));
+				if ($this->screen['vsize'] == 1) {
+					$link = (new CDiv('−'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addClass(ZBX_STYLE_DISABLED);
+				}
+				else {
+					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_row='.$r
+					))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addSID();
+					if (!$emptyScreenRow) {
+						$link->addConfirmation(CJs::encodeJson(_('This screen-row is not empty. Delete it?')));
+					}
 				}
 
 				$newColumns[] = (new CCol($link))
@@ -560,26 +588,40 @@ class CScreenBuilder {
 
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$newColumns = [
-				(new CCol(
-					(new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
-						'&add_row='.$this->screen['vsize']
-					))
-						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->addSID()
+			if ($this->screen['vsize'] >= 100) {
+				$link = (new CDiv('+'))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->addClass(ZBX_STYLE_DISABLED);
+			}
+			else {
+				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+					'&add_row='.$this->screen['vsize']
 				))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->addSID();
+			}
+
+			$newColumns = [
+				(new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE)
 			];
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
-				$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
-					'&rmv_col='.$i
-				))
-					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->addSID();
-				if (isset($emptyScreenColumns[$i])) {
-					$link->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')));
+				if ($this->screen['hsize'] == 1) {
+					$link = (new CDiv('−'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addClass(ZBX_STYLE_DISABLED);
+				}
+				else {
+					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_col='.$i
+					))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addSID();
+					if (isset($emptyScreenColumns[$i])) {
+						$link->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')));
+					}
 				}
 
 				$newColumns[] = (new CCol($link))
