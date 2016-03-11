@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -208,6 +208,42 @@ int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, cons
 	}													\
 														\
 	return FAIL;												\
+}														\
+														\
+														\
+void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_vector_ ## __id ## _t *right,\
+									zbx_compare_func_t compare_func)	\
+{														\
+	int	c, block_start, deleted = 0, left_index = 0, right_index = 0;					\
+														\
+	while (left_index < left->values_num && right_index < right->values_num)				\
+	{													\
+		c = compare_func(&left->values[left_index], &right->values[right_index]);			\
+														\
+		if (0 >= c)											\
+			left_index++;										\
+														\
+		if (0 <= c)											\
+			right_index++;										\
+														\
+		if (0 != c)											\
+			continue;										\
+														\
+		if (0 < deleted++)										\
+		{												\
+			memmove(&left->values[block_start - deleted + 1], &left->values[block_start],		\
+							(left_index - 1 - block_start) * sizeof(__type));	\
+		}												\
+														\
+		block_start = left_index;									\
+	}													\
+														\
+	if (0 < deleted)											\
+	{													\
+		memmove(&left->values[block_start - deleted], &left->values[block_start],			\
+							(left->values_num - block_start) * sizeof(__type));	\
+		left->values_num -= deleted;									\
+	}													\
 }														\
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size)				\

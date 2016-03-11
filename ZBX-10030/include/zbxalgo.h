@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,11 +39,13 @@ zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed);
 
 typedef zbx_hash_t (*zbx_hash_func_t)(const void *data);
 
+zbx_hash_t	zbx_default_ptr_hash_func(const void *data);
 zbx_hash_t	zbx_default_uint64_hash_func(const void *data);
 zbx_hash_t	zbx_default_string_hash_func(const void *data);
 
 #define ZBX_DEFAULT_HASH_SEED		0
 
+#define ZBX_DEFAULT_PTR_HASH_FUNC	zbx_default_ptr_hash_func
 #define ZBX_DEFAULT_UINT64_HASH_FUNC	zbx_default_uint64_hash_func
 #define ZBX_DEFAULT_STRING_HASH_FUNC	zbx_default_string_hash_func
 
@@ -293,6 +295,8 @@ int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, con
 int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, const __type value, int *index,\
 									zbx_compare_func_t compare_func);	\
 int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
+									zbx_compare_func_t compare_func);	\
+void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_vector_ ## __id ## _t *right,\
 									zbx_compare_func_t compare_func);	\
 														\
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,8 +147,6 @@ foreach ($hosts as $hnum => $host) {
 	$host['dns'] = $interface['dns'];
 	$host['port'] = $interface['port'];
 
-	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null;
-
 	$link = 'hostid='.$hostid;
 
 	// highlight visible name
@@ -156,7 +154,7 @@ foreach ($hosts as $hnum => $host) {
 
 	if ($admin && isset($rw_hosts[$hostid])) {
 		// host
-		$hostCell = [(new CLink($visibleName, 'hosts.php?form=update&'.$link))->addClass($style)];
+		$host_name = new CLink($visibleName, 'hosts.php?form=update&'.$link);
 
 		$applications_link = [
 			new CLink(_('Applications'), 'applications.php?'.$link),
@@ -185,7 +183,7 @@ foreach ($hosts as $hnum => $host) {
 	}
 	else {
 		// host
-		$hostCell = [(new CSpan($visibleName))->addClass($style)];
+		$host_name = new CSpan($visibleName);
 
 		$applications_link = [
 			_('Applications'),
@@ -213,19 +211,22 @@ foreach ($hosts as $hnum => $host) {
 		];
 	}
 
+	if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+		$host_name
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_RED);
+	}
+
 	// display the host name only if it matches the search string and is different from the visible name
 	if ($host['host'] !== $host['name'] && stripos($host['host'], $search) !== false) {
-		$hostCell[] = BR();
-		$hostCell[] = '(';
-		$hostCell[] = make_decoration($host['host'], $search);
-		$hostCell[] = ')';
+		$host_name = [$host_name, BR(), '(', make_decoration($host['host'], $search), ')'];
 	}
 
 	$hostip = make_decoration($host['ip'], $search);
 	$hostdns = make_decoration($host['dns'], $search);
 
 	$table->addRow([
-		$hostCell,
+		$host_name,
 		$hostip,
 		$hostdns,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
@@ -233,7 +234,7 @@ foreach ($hosts as $hnum => $host) {
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
-		new CLink(_('Web'), 'httpmon.php?'.$link),
+		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
 		$applications_link,
 		$items_link,
 		$triggers_link,
@@ -334,7 +335,7 @@ foreach ($hostGroups as $hnum => $group) {
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
-		new CLink(_('Web'), 'httpmon.php?'.$link),
+		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
 		$hostsLink,
 		$templatesLink
 	]);
@@ -421,31 +422,31 @@ if ($admin) {
 
 			$applications_link = [
 				new CLink(_('Applications'), 'applications.php?'.$link),
-				CViewHelper::showNum($host['applications'])
+				CViewHelper::showNum($template['applications'])
 			];
 			$items_link = [
 				new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-				CViewHelper::showNum($host['items'])
+				CViewHelper::showNum($template['items'])
 			];
 			$triggers_link = [
 				new CLink(_('Triggers'), 'triggers.php?'.$link),
-				CViewHelper::showNum($host['triggers'])
+				CViewHelper::showNum($template['triggers'])
 			];
 			$graphs_link = [
 				new CLink(_('Graphs'), 'graphs.php?'.$link),
-				CViewHelper::showNum($host['graphs'])
+				CViewHelper::showNum($template['graphs'])
 			];
 			$screensLink = [
 				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
-				CViewHelper::showNum($host['screens'])
+				CViewHelper::showNum($template['screens'])
 			];
 			$discoveryLink = [
 				new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-				CViewHelper::showNum($host['discoveries'])
+				CViewHelper::showNum($template['discoveries'])
 			];
 			$httpTestsLink = [
 				new CLink(_('Web'), 'httpconf.php?'.$link),
-				CViewHelper::showNum($host['httpTests'])
+				CViewHelper::showNum($template['httpTests'])
 			];
 		}
 		else {

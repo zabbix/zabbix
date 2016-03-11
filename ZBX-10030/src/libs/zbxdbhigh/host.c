@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1007,7 +1007,7 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
-	int			num, i;
+	int			i;
 	zbx_vector_uint64_t	profileids, selementids;
 	const char		*profile_idx = "web.events.filter.triggerid";
 
@@ -1019,24 +1019,10 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	zbx_vector_uint64_create(&profileids);
 	zbx_vector_uint64_create(&selementids);
 
-	/* add child triggers (auto-created) */
-	do
-	{
-		num = triggerids->values_num;
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct triggerid"
-				" from trigger_discovery"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid",
-				triggerids->values, triggerids->values_num);
-
-		DBselect_uint64(sql, triggerids);
-		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-	while (num != triggerids->values_num);
-
 	DBremove_triggers_from_itservices(triggerids->values, triggerids->values_num);
+
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
 	if (0 != selementids.values_num)
@@ -1049,9 +1035,6 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
-
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	DBget_profiles_by_source_idxs_values(&profileids, NULL, &profile_idx, 1, triggerids);
 	if (0 != profileids.values_num)
@@ -1074,6 +1057,43 @@ static void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	zbx_vector_uint64_destroy(&selementids);
 	zbx_vector_uint64_destroy(&profileids);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_trigger_hierarchy                                       *
+ *                                                                            *
+ * Purpose: delete parent triggers and auto-created children from database    *
+ *                                                                            *
+ * Parameters: triggerids - [IN] trigger identificators from database         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_trigger_hierarchy(zbx_vector_uint64_t *triggerids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	children_triggerids;
+
+	if (0 == triggerids->values_num)
+		return;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&children_triggerids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct triggerid from trigger_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_triggerid", triggerids->values,
+			triggerids->values_num);
+
+	DBselect_uint64(sql, &children_triggerids);
+	zbx_vector_uint64_setdiff(triggerids, &children_triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBdelete_triggers(&children_triggerids);
+	DBdelete_triggers(triggerids);
+
+	zbx_vector_uint64_destroy(&children_triggerids);
 
 	zbx_free(sql);
 }
@@ -1111,7 +1131,7 @@ static void	DBdelete_triggers_by_itemids(zbx_vector_uint64_t *itemids)
 
 	DBselect_uint64(sql, &triggerids);
 
-	DBdelete_triggers(&triggerids);
+	DBdelete_trigger_hierarchy(&triggerids);
 
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
@@ -1178,8 +1198,7 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	const char		*__function_name = "DBdelete_graphs";
 
 	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset;
-	int			num;
+	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	profileids, screen_itemids;
 	zbx_uint64_t		resource_type = SCREEN_RESOURCE_GRAPH;
 	const char		*profile_idx =  "web.favorite.graphids";
@@ -1194,23 +1213,6 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	zbx_vector_uint64_create(&profileids);
 	zbx_vector_uint64_create(&screen_itemids);
 
-	do	/* add child graphs (auto-created) */
-	{
-		num = graphids->values_num;
-		sql_offset = 0;
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct graphid"
-				" from graph_discovery"
-				" where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid",
-				graphids->values, graphids->values_num);
-
-		DBselect_uint64(sql, graphids);
-		zbx_vector_uint64_uniq(graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	}
-	while (num != graphids->values_num);
-
-	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* delete from screens_items */
@@ -1248,6 +1250,43 @@ void	DBdelete_graphs(zbx_vector_uint64_t *graphids)
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_graph_hierarchy                                         *
+ *                                                                            *
+ * Purpose: delete parent graphs and auto-created children from database      *
+ *                                                                            *
+ * Parameters: graphids - [IN] array of graph id's from database              *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_graph_hierarchy(zbx_vector_uint64_t *graphids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	children_graphids;
+
+	if (0 == graphids->values_num)
+		return;
+
+	sql = zbx_malloc(sql, sql_alloc);
+
+	zbx_vector_uint64_create(&children_graphids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct graphid from graph_discovery where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "parent_graphid", graphids->values,
+			graphids->values_num);
+
+	DBselect_uint64(sql, &children_graphids);
+	zbx_vector_uint64_setdiff(graphids, &children_graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	DBdelete_graphs(&children_graphids);
+	DBdelete_graphs(graphids);
+
+	zbx_vector_uint64_destroy(&children_graphids);
+
+	zbx_free(sql);
 }
 
 /******************************************************************************
@@ -1307,7 +1346,7 @@ static void	DBdelete_graphs_by_itemids(zbx_vector_uint64_t *itemids)
 	}
 	DBfree_result(result);
 
-	DBdelete_graphs(&graphids);
+	DBdelete_graph_hierarchy(&graphids);
 clean:
 	zbx_vector_uint64_destroy(&graphids);
 	zbx_free(sql);
@@ -1725,7 +1764,7 @@ static void	DBdelete_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint6
 
 	DBselect_uint64(sql, &graphids);
 
-	DBdelete_graphs(&graphids);
+	DBdelete_graph_hierarchy(&graphids);
 
 	zbx_vector_uint64_destroy(&graphids);
 	zbx_free(sql);
@@ -1771,7 +1810,7 @@ static void	DBdelete_template_triggers(zbx_uint64_t hostid, const zbx_vector_uin
 
 	DBselect_uint64(sql, &triggerids);
 
-	DBdelete_triggers(&triggerids);
+	DBdelete_trigger_hierarchy(&triggerids);
 
 	zbx_vector_uint64_destroy(&triggerids);
 	zbx_free(sql);
@@ -4666,6 +4705,47 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	zbx_vector_uint64_destroy(&selementids);
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_hosts_with_prototypes                                   *
+ *                                                                            *
+ * Purpose: delete hosts from database, check if there are any host           *
+ *          prototypes and delete them first                                  *
+ *                                                                            *
+ * Parameters: hostids - [IN] host identificators from database               *
+ *                                                                            *
+ ******************************************************************************/
+void	DBdelete_hosts_with_prototypes(zbx_vector_uint64_t *hostids)
+{
+	const char		*__function_name = "DBdelete_hosts_with_prototypes";
+
+	zbx_vector_uint64_t	host_prototypeids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&host_prototypeids);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hd.hostid"
+			" from items i,host_discovery hd"
+			" where i.itemid=hd.parent_itemid"
+				" and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", hostids->values, hostids->values_num);
+
+	DBselect_uint64(sql, &host_prototypeids);
+
+	DBdelete_host_prototypes(&host_prototypeids);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&host_prototypeids);
+
+	DBdelete_hosts(hostids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

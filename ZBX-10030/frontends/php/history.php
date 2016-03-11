@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ $items = API::Item()->get([
 	'itemids' => getRequest('itemids'),
 	'webitems' => true,
 	'selectHosts' => ['name'],
-	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'],
+	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid', 'history', 'trends'],
 	'preservekeys' => true
 ]);
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include "zbxjson.h"
 #include "log.h"
 
-static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_t *free,
+static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
 {
 #ifdef HAVE_SYS_STATVFS_H
@@ -34,37 +34,44 @@ static int	get_fs_size_stat(const char *fsname, zbx_uint64_t *total, zbx_uint64_
 #endif
 	struct ZBX_STATFS	s;
 
-	if (NULL == fsname || '\0' == *fsname)
+	if (NULL == fs || '\0' == *fs)
 	{
 		*error = zbx_strdup(NULL, "Filesystem name cannot be empty.");
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (0 != ZBX_STATFS(fsname, &s))
+	if (0 != ZBX_STATFS(fs, &s))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s", zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (total)
+	/* Available space could be negative (top bit set) if we hit disk space */
+	/* reserved for non-privileged users. Treat it as 0.                    */
+	if (0 != ZBX_IS_TOP_BIT_SET(s.f_bavail))
+		s.f_bavail = 0;
+
+	if (NULL != total)
 		*total = (zbx_uint64_t)s.f_blocks * s.ZBX_BSIZE;
-	if (free)
+
+	if (NULL != free)
 		*free = (zbx_uint64_t)s.f_bavail * s.ZBX_BSIZE;
-	if (used)
+
+	if (NULL != used)
 		*used = (zbx_uint64_t)(s.f_blocks - s.f_bfree) * s.ZBX_BSIZE;
-	if (pfree)
+
+	if (NULL != pfree)
 	{
 		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
-			*pfree = (double)(100.0 * s.f_bavail) /
-					(s.f_blocks - s.f_bfree + s.f_bavail);
+			*pfree = (double)(100.0 * s.f_bavail) / (s.f_blocks - s.f_bfree + s.f_bavail);
 		else
 			*pfree = 0;
 	}
-	if (pused)
+
+	if (NULL != pused)
 	{
 		if (0 != s.f_blocks - s.f_bfree + s.f_bavail)
-			*pused = 100.0 - (double)(100.0 * s.f_bavail) /
-					(s.f_blocks - s.f_bfree + s.f_bavail);
+			*pused = 100.0 - (double)(100.0 * s.f_bavail) / (s.f_blocks - s.f_bfree + s.f_bavail);
 		else
 			*pused = 0;
 	}

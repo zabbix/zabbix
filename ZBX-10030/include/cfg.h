@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,11 @@
 #define	ZBX_CFG_NOT_STRICT	0
 #define	ZBX_CFG_STRICT		1
 
+#define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
+
 extern char	*CONFIG_FILE;
+extern char	*CONFIG_LOG_TYPE_STR;
+extern int	CONFIG_LOG_TYPE;
 extern char	*CONFIG_LOG_FILE;
 extern int	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;

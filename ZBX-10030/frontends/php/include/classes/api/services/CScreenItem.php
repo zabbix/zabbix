@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -649,7 +649,6 @@ class CScreenItem extends CApiService {
 			$dbHostGroups = API::HostGroup()->get([
 				'output' => ['groupid'],
 				'groupids' => $hostGroupsIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -667,7 +666,6 @@ class CScreenItem extends CApiService {
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid'],
 				'hostids' => $hostIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -685,7 +683,6 @@ class CScreenItem extends CApiService {
 			$dbGraphs = API::Graph()->get([
 				'output' => ['graphid'],
 				'graphids' => $graphIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -703,7 +700,6 @@ class CScreenItem extends CApiService {
 			$dbGraphPrototypes = API::GraphPrototype()->get([
 				'output' => ['graphid'],
 				'graphids' => $graphPrototypeIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -721,7 +717,6 @@ class CScreenItem extends CApiService {
 			$dbItems = API::Item()->get([
 				'output' => ['itemid'],
 				'itemids' => $itemIds,
-				'editable' => true,
 				'preservekeys' => true,
 				'webitems' => true
 			]);
@@ -740,7 +735,6 @@ class CScreenItem extends CApiService {
 			$dbItemPrototypes = API::ItemPrototype()->get([
 				'output' => ['itemid'],
 				'itemids' => $itemPrototypeIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -758,7 +752,6 @@ class CScreenItem extends CApiService {
 			$dbMaps = API::Map()->get([
 				'output' => ['sysmapid'],
 				'sysmapids' => $mapIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -776,7 +769,6 @@ class CScreenItem extends CApiService {
 			$dbScreens = API::Screen()->get([
 				'output' => ['screenid'],
 				'screenids' => $screenIds,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -784,7 +776,6 @@ class CScreenItem extends CApiService {
 				$dbTemplateScreens = API::TemplateScreen()->get([
 					'output' => ['screenid'],
 					'screenids' => $screenIds,
-					'editable' => true,
 					'preservekeys' => true
 				]);
 

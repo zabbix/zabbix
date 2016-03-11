@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,16 +79,10 @@ class CUiWidget extends CDiv {
 	/**
 	 * Set widget header.
 	 *
-	 * @param string|array|CTag $caption
-	 * @param array             $icons
+	 * @param string	$caption
+	 * @param arrayi	$controls
 	 */
-	public function setHeader($caption = null, array $icons = [], $cursor_move = false) {
-		zbx_value2array($icons);
-
-		if ($caption === null && $icons !== null) {
-			$caption = SPACE;
-		}
-
+	public function setHeader($caption, array $controls = [], $cursor_move = false) {
 		$this->header = (new CDiv())
 			->addClass('dashbrd-widget-head')
 			->addItem(
@@ -99,9 +93,10 @@ class CUiWidget extends CDiv {
 			$this->header->addClass(ZBX_STYLE_CURSOR_MOVE);
 		}
 
-		if ($icons) {
-			$this->header->addItem(new CList($icons));
+		if ($controls) {
+			$this->header->addItem(new CList($controls));
 		}
+
 		return $this;
 	}
 
@@ -133,7 +128,7 @@ class CUiWidget extends CDiv {
 	 */
 	public function setFooter($list) {
 		$this->footer = $list;
-		$this->footer->addClass('dashbrd-widget-foot');
+		$this->footer->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
 		return $this;
 	}
 
@@ -142,7 +137,6 @@ class CUiWidget extends CDiv {
 	 */
 	protected function build() {
 		$body = (new CDiv($this->body))
-			->addClass('body')
 			->setId($this->id);
 
 		$this->cleanItems();

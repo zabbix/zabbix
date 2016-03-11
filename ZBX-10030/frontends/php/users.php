@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -280,16 +280,8 @@ elseif (isset($_REQUEST['del_user_group'])) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	$user = reset($users);
 
-	DBstart();
-
 	$result = API::User()->delete([$user['userid']]);
-
-	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
-		unset($_REQUEST['userid'], $_REQUEST['form']);
-	}
-
-	$result = DBend($result);
+	unset($_REQUEST['userid'], $_REQUEST['form']);
 
 	if ($result) {
 		uncheckTableRows();
@@ -323,33 +315,7 @@ elseif (hasRequest('action') && getRequest('action') == 'user.massunblock' && ha
 	show_messages($result, _('Users unblocked'), _('Cannot unblock users'));
 }
 elseif (hasRequest('action') && getRequest('action') == 'user.massdelete' && hasRequest('group_userid')) {
-	$result = false;
-
-	$groupUserId = getRequest('group_userid');
-
-	$dbUsers = API::User()->get([
-		'userids' => $groupUserId,
-		'output' => API_OUTPUT_EXTEND
-	]);
-	$dbUsers = zbx_toHash($dbUsers, 'userid');
-
-	DBstart();
-
-	foreach ($groupUserId as $userId) {
-		if (!isset($dbUsers[$userId])) {
-			continue;
-		}
-
-		$result |= (bool) API::User()->delete([$userId]);
-
-		if ($result) {
-			$userData = $dbUsers[$userId];
-
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$userData['alias'].'] name ['.$userData['name'].'] surname ['.$userData['surname'].']');
-		}
-	}
-
-	$result = DBend($result);
+	$result = API::User()->delete(getRequest('group_userid'));
 
 	if ($result) {
 		uncheckTableRows();

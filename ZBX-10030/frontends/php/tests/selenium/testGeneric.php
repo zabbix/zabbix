@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class testGeneric extends CWebTest {
 			['overview.php?form_refresh=1&groupid=0&type=1&view_style=0',	'Overview \[refreshed every 30 sec.\]'],
 			['overview.php?form_refresh=1&groupid=0&type=1&view_style=1',	'Overview \[refreshed every 30 sec.\]'],
 
-			['httpmon.php',					'Status of Web monitoring \[refreshed every 30 sec.\]'],
+			['zabbix.php?action=web.view',					'Status of Web monitoring \[refreshed every 30 sec.\]'],
 			['latest.php',						'Latest data \[refreshed every 30 sec.\]'],
 			['tr_status.php',					'Status of triggers \[refreshed every 30 sec.\]'],
 

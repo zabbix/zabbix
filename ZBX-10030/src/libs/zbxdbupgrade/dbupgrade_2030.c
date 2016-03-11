@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,8 @@
 
 #include "common.h"
 #include "db.h"
-#include "log.h"
-#include "sysinfo.h"
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 2.4 development database patches
@@ -906,6 +904,7 @@ static int	DBpatch_2030094(void)
 	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
 	{
 		expr_offset = 0;
+		zbx_strcpy_alloc(&expr, &expr_alloc, &expr_offset, "");
 
 		for (p = row[1]; '\0' != *p; p++)
 		{

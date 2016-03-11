@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -339,7 +339,8 @@ $widget = (new CWidget())
 	);
 
 // Filter
-$filterForm = new CFilter('web.latest.filter.state');
+$filterForm = (new CFilter('web.latest.filter.state'))
+	->addVar('fullscreen', getRequest('fullscreen'));
 
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(

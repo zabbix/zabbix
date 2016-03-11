@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -204,22 +204,5 @@ class CHistory extends CApiService {
 			$result = zbx_cleanHashes($result);
 		}
 		return $result;
-	}
-
-	protected function applyQuerySortOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$isIdFieldUsed = false;
-
-		if ($options['history'] == ITEM_VALUE_TYPE_LOG || $options['history'] == ITEM_VALUE_TYPE_TEXT) {
-			$this->sortColumns['id'] = 'id';
-			$isIdFieldUsed = true;
-		}
-
-		$sqlParts = parent::applyQuerySortOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($isIdFieldUsed) {
-			unset($this->sortColumns['id']);
-		}
-
-		return $sqlParts;
 	}
 }

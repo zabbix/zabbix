@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,35 +56,55 @@ $sizeX = 900;
 $sizeY = 300;
 
 $shiftX = 12;
-$shiftYup = 17;
+$shiftYup = 25;
 $shiftYdown = 25 + 15 * 3;
 
-$im = imagecreate($sizeX + $shiftX + 61, $sizeY + $shiftYup + $shiftYdown + 10);
+if (function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor') && @imagecreatetruecolor(1, 1)) {
+	$im = imagecreatetruecolor($sizeX + $shiftX + 61, $sizeY + $shiftYup + $shiftYdown + 10);
+}
+else {
+	$im = imagecreate($sizeX + $shiftX + 61, $sizeY + $shiftYup + $shiftYdown + 10);
+}
 
-$red = imagecolorallocate($im, 255, 0, 0);
-$darkred = imagecolorallocate($im, 150, 0, 0);
-$green = imagecolorallocate($im, 0, 255, 0);
-$darkgreen = imagecolorallocate($im, 0, 150, 0);
-$blue = imagecolorallocate($im, 0, 0, 255);
-$darkblue = imagecolorallocate($im, 0, 0, 150);
-$yellow = imagecolorallocate($im, 255, 255, 0);
-$darkyellow = imagecolorallocate($im, 150, 150, 0);
-$cyan = imagecolorallocate($im, 0, 255, 255);
-$black = imagecolorallocate($im, 0, 0, 0);
-$gray = imagecolorallocate($im, 150, 150, 150);
-$white = imagecolorallocate($im, 255, 255, 255);
-$bg = imagecolorallocate($im, 6 + 6 * 16, 7 + 7 * 16, 8 + 8 * 16);
+$graphtheme = [
+	'theme' => 'blue-theme',
+	'textcolor' => '1F2C33',
+	'highlightcolor' => 'E33734',
+	'backgroundcolor' => 'FFFFFF',
+	'graphcolor' => 'FFFFFF',
+	'gridcolor' => 'CCD5D9',
+	'maingridcolor' => 'ACBBC2',
+	'gridbordercolor' => 'ACBBC2',
+	'nonworktimecolor' => 'EBEBEB',
+	'leftpercentilecolor' => '429E47',
+	'righttpercentilecolor' => 'E33734'
+];
+
+$themes = DB::find('graph_theme', [
+	'theme' => getUserTheme(CWebUser::$data)
+]);
+if ($themes) {
+	$graphtheme = $themes[0];
+}
+
+$black = get_color($im, '000000');
+$green = get_color($im, '34AF67');
+$red = get_color($im, 'D64E4E');
+$grey = get_color($im, '969696', 50);
+$backgroundcolor = get_color($im, $graphtheme['backgroundcolor']);
+$gridcolor = get_color($im, $graphtheme['gridcolor']);
+$textcolor = get_color($im, $graphtheme['textcolor']);
+$highlightcolor = get_color($im, $graphtheme['highlightcolor']);
 
 $x = imagesx($im);
 $y = imagesy($im);
 
-imagefilledrectangle($im, 0, 0, $x, $y, $white);
-imagerectangle($im, 0, 0, $x-1, $y-1, $black);
+imagefilledrectangle($im, 0, 0, $x, $y, $backgroundcolor);
 
 $d = zbx_date2str(_x('Y', DATE_FORMAT_CONTEXT));
 $str = _s('%1$s (year %2$s)', $service['name'], $d);
 $x = imagesx($im) / 2 - imagefontwidth(4) * mb_strlen($str) / 2;
-imageText($im, 10, 0, $x, 14, $darkred, $str);
+imageText($im, 10, 0, $x, 14, $textcolor, $str);
 
 $now = time(null);
 $to_time = $now;
@@ -131,12 +151,12 @@ foreach ($sla['sla'] as $i => $intervalSla) {
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
-	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gray);
+	dashedLine($im, $shiftX, $i + $shiftYup, $sizeX + $shiftX, $i + $shiftYup, $gridcolor);
 }
 
 for ($i = 0, $period_start = $start; $i <= $sizeX; $i += $sizeX / 52) {
-	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gray);
-	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $black, zbx_date2str(_('d.M'), $period_start));
+	dashedLine($im, $i + $shiftX, $shiftYup, $i + $shiftX, $sizeY + $shiftYup, $gridcolor);
+	imageText($im, 6, 90, $i + $shiftX + 4, $sizeY + $shiftYup + 35, $textcolor, zbx_date2str(_('d.M'), $period_start));
 	$period_start += 7 * 24 * 3600;
 }
 
@@ -159,49 +179,47 @@ for ($i = 1; $i <= $weeks; $i++) {
 		$y2 = $maxSizeY * ($ok[$i - 1] - $minY) / ($maxY - $minY);
 	}
 
-	imagefilledrectangle(
-		$im,
-		$x2 + $shiftX, $shiftYup + $sizeY - $y2,
-		$x2 + $shiftX + 8, $shiftYup + $sizeY,
-		imagecolorallocate($im, 120, 235, 120)
-	);
-	imagerectangle(
-		$im,
-		$x2 + $shiftX, $shiftYup + $sizeY - $y2,
-		$x2 + $shiftX + 8, $shiftYup + $sizeY,
-		$black
-	);
-	imagefilledrectangle(
-		$im,
-		$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
-		$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2,
-		imagecolorallocate($im, 235, 120, 120)
-	);
-	imagerectangle(
-		$im,
-		$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
-		$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2,
-		$black
-	);
+	if ($y2 != 0) {
+		imagefilledrectangle(
+			$im,
+			$x2 + $shiftX, $shiftYup + $sizeY - $y2,
+			$x2 + $shiftX + 8, $shiftYup + $sizeY,
+			$green
+		);
+	}
+	if ($y2 != $maxSizeY) {
+		imagefilledrectangle(
+			$im,
+			$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
+			$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2,
+			$red
+		);
+	}
 }
 
 for ($i = 0; $i <= $sizeY; $i += $sizeY / 10) {
-	imageText($im, 7, 0, $sizeX + 5 + $shiftX, $sizeY - $i - 4 + $shiftYup + 8, $darkred, ($i * ($maxY - $minY) / $sizeY + $minY).'%');
+	imageText($im, 7, 0, $sizeX + 5 + $shiftX, $sizeY - $i - 4 + $shiftYup + 8, $highlightcolor,
+		($i * ($maxY - $minY) / $sizeY + $minY).'%'
+	);
 }
 
-imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 1, imagecolorallocate($im, 120, 235, 120));
-imagerectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 1, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 1, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 1 + 41, $black, _('OK').' (%)');
+$x = $shiftX;
+$y = $sizeY + $shiftYup + 31;
 
-imagefilledrectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 2, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 2, $darkred);
-imagerectangle($im, $shiftX, $sizeY + $shiftYup + 34 + 15 * 2, $shiftX + 5, $sizeY + $shiftYup + 30 + 9 + 15 * 2, $black);
-imageText($im, 8, 0, $shiftX + 9, $sizeY + $shiftYup + 15 * 2 + 41, $black, _('PROBLEM').' (%)');
-imagestringup($im, 1, imagesx($im) - 10, imagesy($im) - 50, ZABBIX_HOMEPAGE, $gray);
+imagefilledrectangle($im, $x, $y + 15 * 1, $x + 10, $y + 10 + 15 * 1, $green);
+imagerectangle($im, $x, $y + 15 * 1, $x + 10, $y + 10 + 15 * 1, $black);
+imageText($im, 8, 0, $x + 14, $y + 10 + 15 * 1, $textcolor, _('OK').' (%)');
+
+imagefilledrectangle($im, $x, $y + 15 * 2, $x + 10, $y + 10 + 15 * 2, $red);
+imagerectangle($im, $x, $y + 15 * 2, $x + 10, $y + 10 + 15 * 2, $black);
+imageText($im, 8, 0, $x + 14, $y + 10 + 15 * 2, $textcolor, _('PROBLEM').' (%)');
+
+imagestringup($im, 1, imagesx($im) - 10, imagesy($im) - 50, ZABBIX_HOMEPAGE, $grey);
 
 $str = sprintf('%0.2f', microtime(true) - $start_time);
 $str = _s('Generated in %s sec', $str);
 $strSize = imageTextSize(6, 0, $str);
-imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $gray, $str);
+imageText($im, 6, 0, imagesx($im) - $strSize['width'] - 5, imagesy($im) - 5, $grey, $str);
 imageOut($im);
 imagedestroy($im);
 

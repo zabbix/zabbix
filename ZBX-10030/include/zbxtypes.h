@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,10 @@
 
 #	ifndef __UINT64_C
 #		define __UINT64_C(x)	x
+#	endif
+
+#	ifndef __INT64_C
+#		define __INT64_C(x)	x
 #	endif
 
 #	define zbx_uint64_t	unsigned __int64
@@ -162,5 +166,8 @@ typedef struct
 zbx_uint128_t;
 
 #define ZBX_SIZE_T_ALIGN8(size)	(((size) + 7) & ~(size_t)7)
+
+/* macro to test if a signed value has been assigned to unsigned type (char, short, int, long long) */
+#define ZBX_IS_TOP_BIT_SET(x)	(0 != ((__UINT64_C(1) << ((sizeof(x) << 3) - 1)) & (x)))
 
 #endif

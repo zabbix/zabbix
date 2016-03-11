@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,6 +80,7 @@ class CRouter {
 		'proxy.hostenable'		=> ['CControllerProxyHostEnable',		null,					null],
 		'proxy.list'			=> ['CControllerProxyList',				'layout.htmlpage',		'administration.proxy.list'],
 		'proxy.update'			=> ['CControllerProxyUpdate',			null,					null],
+		'report.services'		=> ['CControllerReportServices',		'layout.htmlpage',		'report.services'],
 		'report.status'			=> ['CControllerReportStatus',			'layout.htmlpage',		'report.status'],
 		'script.create'			=> ['CControllerScriptCreate',			null,					null],
 		'script.delete'			=> ['CControllerScriptDelete',			null,					null],
@@ -87,6 +88,7 @@ class CRouter {
 		'script.list'			=> ['CControllerScriptList',			'layout.htmlpage',		'administration.script.list'],
 		'script.update'			=> ['CControllerScriptUpdate',			null,					null],
 		'system.warning'		=> ['CControllerSystemWarning',			'layout.warning',		'system.warning'],
+		'web.view'				=> ['CControllerWebView',				'layout.htmlpage',		'monitoring.web.view'],
 		'widget.discovery.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
 		'widget.hosts.view'		=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
 		'widget.issues.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],
@@ -106,8 +108,7 @@ class CRouter {
 	 * @return string
 	 */
 	public function calculateRoute() {
-		if (array_key_exists($this->action, $this->routes))
-		{
+		if (array_key_exists($this->action, $this->routes)) {
 			$this->controller = $this->routes[$this->action][0];
 			$this->layout = $this->routes[$this->action][1];
 			$this->view = $this->routes[$this->action][2];

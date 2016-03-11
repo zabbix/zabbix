@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,21 +47,10 @@ class CScreenPlainText extends CScreenBase {
 		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($this->screenitem['resourceid'])]);
 		$item = reset($items);
 
-		switch ($item['value_type']) {
-			case ITEM_VALUE_TYPE_TEXT:
-			case ITEM_VALUE_TYPE_LOG:
-				$orderField = 'id';
-				break;
-			case ITEM_VALUE_TYPE_FLOAT:
-			case ITEM_VALUE_TYPE_UINT64:
-			default:
-				$orderField = ['itemid', 'clock'];
-		}
-
 		$host = get_host_by_itemid($this->screenitem['resourceid']);
 
 		$table = (new CTableInfo())
-			->setHeader([_('Timestamp'), $host['name'].NAME_DELIMITER.$item['name_expanded']]);
+			->setHeader([_('Timestamp'), _('Value')]);
 
 		$stime = zbxDateToTime($this->timeline['stime']);
 
@@ -70,7 +59,7 @@ class CScreenPlainText extends CScreenBase {
 			'itemids' => $this->screenitem['resourceid'],
 			'output' => API_OUTPUT_EXTEND,
 			'sortorder' => ZBX_SORT_DOWN,
-			'sortfield' => $orderField,
+			'sortfield' => ['itemid', 'clock'],
 			'limit' => $this->screenitem['elements'],
 			'time_from' => $stime,
 			'time_till' => $stime + $this->timeline['period']
@@ -94,14 +83,20 @@ class CScreenPlainText extends CScreenBase {
 				$value = applyValueMap($value, $item['valuemapid']);
 			}
 
-			$class = $this->screenitem['style'] ? null : 'pre';
+			if ($this->screenitem['style'] == 0) {
+				$value = new CPre($value);
+			}
 
-			$table->addRow([
-				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']),
-				(new CCol($value))->addClass($class)
-			]);
+			$table->addRow([zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history['clock']), $value]);
 		}
 
-		return $this->getOutput($table);
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput(
+			(new CUiWidget(uniqid(), [$table, $footer]))
+				->setHeader($host['name'].NAME_DELIMITER.$item['name_expanded'])
+		);
 	}
 }

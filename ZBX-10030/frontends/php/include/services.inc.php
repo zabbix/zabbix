@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,18 +19,18 @@
 **/
 
 
-function serviceAlgorythm($algorythm = null) {
-	$algorythms = [
+function serviceAlgorithm($algorithm = null) {
+	$algorithms = [
 		SERVICE_ALGORITHM_MAX => _('Problem, if at least one child has a problem'),
 		SERVICE_ALGORITHM_MIN => _('Problem, if all children have problems'),
 		SERVICE_ALGORITHM_NONE => _('Do not calculate')
 	];
 
-	if ($algorythm === null) {
-		return $algorythms;
+	if ($algorithm === null) {
+		return $algorithms;
 	}
-	elseif (isset($algorythms[$algorythm])) {
-		return $algorythms[$algorythm];
+	elseif (isset($algorithms[$algorithm])) {
+		return $algorithms[$algorithm];
 	}
 	else {
 		return false;
@@ -66,14 +66,15 @@ function get_service_children($serviceid, $soft = 0) {
  */
 function createServiceConfigurationTree(array $services, &$tree, array $parentService = [], array $service = [], array $dependency = []) {
 	if (!$service) {
-		$caption = (new CLink(_('root'), '#'))
-			->setMenuPopup(CMenuPopupHelper::getServiceConfiguration(null, _('root'), false));
-
 		$serviceNode = [
 			'id' => 0,
 			'parentid' => 0,
-			'caption' => $caption,
+			'caption' => _('root'),
 			'trigger' => [],
+			'action' => new CHorList([
+				(new CLink(_('Add child'), 'services.php?form=1&parentname='._('root')))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+			]),
 			'algorithm' => SPACE,
 			'description' => SPACE
 		];
@@ -97,9 +98,6 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		$tree = [$serviceNode];
 	}
 	else {
-		// caption
-		$caption = new CLink($service['name'], '#');
-
 		// service is deletable only if it has no hard dependency
 		$deletable = true;
 		foreach ($service['dependencies'] as $dep) {
@@ -109,14 +107,23 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 			}
 		}
 
-		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration($service['serviceid'], $service['name'], $deletable));
-
 		$serviceNode = [
 			'id' => $service['serviceid'],
-			'caption' => $caption,
+			'caption' => new CLink($service['name'], 'services.php?form=1&serviceid='.$service['serviceid']),
+			'action' => new CHorList([
+				(new CLink(_('Add child'),
+					'services.php?form=1&parentid='.$service['serviceid'].'&parentname='.$service['name']
+				))->addClass(ZBX_STYLE_LINK_ACTION),
+				$deletable
+					? (new CLink(_('Delete'), 'services.php?delete=1&serviceid='.$service['serviceid']))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->addConfirmation(_s('Delete service "%1$s"?', $service['name']))
+						->addSID()
+					: null
+			]),
 			'description' => $service['trigger'] ? $service['trigger']['description'] : '',
 			'parentid' => $parentService ? $parentService['serviceid'] : 0,
-			'algorithm' => serviceAlgorythm($service['algorithm'])
+			'algorithm' => serviceAlgorithm($service['algorithm'])
 		];
 	}
 
@@ -153,14 +160,13 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	if (!$service) {
 		$serviceNode = [
 			'id' => 0,
-			'parentid' => 0,
 			'caption' => _('root'),
-			'status' => SPACE,
-			'sla' => SPACE,
-			'sla2' => SPACE,
-			'trigger' => [],
-			'reason' => SPACE,
-			'graph' => SPACE,
+			'reason' => '',
+			'sla' => '',
+			'sla2' => '',
+			'sla3' => '',
+			'parentid' => 0,
+			'status' => ''
 		];
 
 		$service = $serviceNode;
@@ -199,95 +205,82 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 			24 * DAY_IN_YEAR => 'yearly'
 		];
 
-		$caption = [new CLink(
-			$service['name'],
-			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
-		)];
+		$caption = new CLink($service['name'],
+			'zabbix.php?action=report.services'.'&serviceid='.$service['serviceid'].'&period='.$periods[$period]
+		);
+
 		$trigger = $service['trigger'];
 		if ($trigger) {
-			$url = new CLink($trigger['description'],
-				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
-			);
-			$caption[] = ' - ';
-			$caption[] = $url;
+			$caption = [
+				$caption,
+				' - ',
+				new CLink($trigger['description'],
+					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$trigger['triggerid']
+				)
+			];
 		}
 
 		// reason
-		$problemList = '';
-		if ($serviceSla['problems']) {
-			$problemList = (new CList())->addClass('service-problems');
-			foreach ($serviceSla['problems'] as $problemTrigger) {
-				$problemList->addItem(new CLink($problemTrigger['description'],
-					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
-				));
+		$reason = [];
+		foreach ($serviceSla['problems'] as $problemTrigger) {
+			if ($reason) {
+				$reason[] = ', ';
 			}
+			$reason[] = new CLink($problemTrigger['description'],
+				'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
+			);
 		}
 
 		// sla
-		$sla = '-';
-		$sla2 = '-';
+		$sla = '';
+		$sla2 = '';
+		$sla3 = '';
 		if ($service['showsla'] && $slaValues['sla'] !== null) {
-			$slaGood = $slaValues['sla'];
-			$slaBad = 100 - $slaValues['sla'];
-
-			$p = min($slaBad, 20);
+			$sla_good = $slaValues['sla'];
+			$sla_bad = 100 - $slaValues['sla'];
 
 			$width = 160;
-			$widthRed = $width * $p / 20;
-			$widthGreen = $width - $widthRed;
+			$width_red = $width * min($sla_bad, 20) / 20;
+			$width_green = $width - $width_red;
 
-			$chart1 = null;
-			if ($widthGreen > 0) {
-				$chart1 = (new CDiv())
-					->addClass('sla-bar-part')
-					->addClass('sla-green')
-					->setAttribute('style', 'width: '.$widthGreen.'px;');
-			}
-			$chart2 = null;
-			if ($widthRed > 0) {
-				$chart2 = (new CDiv())
-					->addClass('sla-bar-part')
-					->addClass('sla-red')
-					->setAttribute('style', 'width: '.$widthRed.'px;');
-			}
-			$bar = new CLink([
-				$chart1,
-				$chart2,
-				(new CDiv('80%'))
-					->addClass('sla-bar-legend')
-					->addClass('sla-bar-legend-start'),
-				(new CDiv('100%'))
-					->addClass('sla-bar-legend')
-					->addClass('sla-bar-legend-end')
-			], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
-			$bar = (new CDiv($bar))
-				->addClass('sla-bar')
+			$sla = (new CDiv(
+				new CLink([
+					(new CSpan([new CSpan('80%'), new CSpan('100%')]))->addClass(ZBX_STYLE_PROGRESS_BAR_LABEL),
+					$width_green > 0
+						? (new CSpan('&nbsp;'))
+							->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
+							->addClass(ZBX_STYLE_GREEN_BG)
+							->setAttribute('style', 'width: '.$width_green.'px;')
+						: null,
+					$width_red > 0
+						? (new CSpan('&nbsp;'))
+							->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
+							->addClass(ZBX_STYLE_RED_BG)
+							->setAttribute('style', 'width: '.$width_red.'px;')
+						: null
+				], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'))
+			))
+				->addClass(ZBX_STYLE_PROGRESS_BAR_CONTAINER)
 				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
 
-			$slaBar = [
-				$bar,
-				(new CSpan(sprintf('%.4f', $slaBad)))
-					->addClass('sla-value')
-					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
-			];
+			$sla2 = (new CSpan(sprintf('%.4f', $sla_bad)))
+				->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
-			$sla = (new CDiv($slaBar))->addClass('invisible');
-			$sla2 = [
-				(new CSpan(sprintf('%.4f', $slaGood)))
-					->addClass('sla-value')
-					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
-				'/',
-				(new CSpan(sprintf('%.4f', $service['goodsla'])))->addClass('sla-value')
+			$sla3 = [
+				(new CSpan(sprintf('%.4f', $sla_good)))
+					->addClass($service['goodsla'] > $sla_good ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
+				' / ',
+				sprintf('%.4f', $service['goodsla'])
 			];
 		}
 
 		$serviceNode = [
 			'id' => $service['serviceid'],
 			'caption' => $caption,
-			'description' => ($service['trigger']) ? $service['trigger']['description'] : _('None'),
-			'reason' => $problemList,
+			'reason' => $reason,
 			'sla' => $sla,
 			'sla2' => $sla2,
+			'sla3' => $sla3,
 			'parentid' => ($parentService) ? $parentService['serviceid'] : 0,
 			'status' => ($serviceSla['status'] !== null) ? $serviceSla['status'] : ''
 		];

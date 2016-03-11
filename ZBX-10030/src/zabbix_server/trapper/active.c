@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,10 +90,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
-			unsigned int		tls_accept;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			zbx_tls_conn_attr_t	attr;
-#endif
+			unsigned int	tls_accept;
+
 			tls_accept = (unsigned int)atoi(row[2]);
 
 			if (0 == (tls_accept & sock->connection_type))
@@ -104,19 +102,19 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			if ((ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
-					ZBX_TCP_SEC_TLS_PSK == sock->connection_type) &&
-					SUCCEED != zbx_tls_get_attr(sock, &attr))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
-						host);
-				goto done;
-			}
-
 			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 			{
+				zbx_tls_conn_attr_t	attr;
+
+				if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+
+					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
+							" \"%s\"", host);
+					goto done;
+				}
+
 				/* simplified match, not compliant with RFC 4517, 4518 */
 				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 				{
@@ -135,6 +133,17 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 			{
+				zbx_tls_conn_attr_t	attr;
+
+				if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+
+					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
+							" \"%s\"", host);
+					goto done;
+				}
+
 				if (strlen(row[5]) != attr.psk_identity_len ||
 						0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
 				{
@@ -158,9 +167,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		if (0 == strncmp("::ffff:", ip, 7) && SUCCEED == is_ip4(ip + 7))
 			ip += 7;
 
-		alarm(CONFIG_TIMEOUT);
+		zbx_alarm_on(CONFIG_TIMEOUT);
 		zbx_gethost_by_ip(ip, dns, sizeof(dns));
-		alarm(0);
+		zbx_alarm_off();
 
 		DBbegin();
 
@@ -223,7 +232,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 {
 	const char		*__function_name = "send_list_of_active_checks";
 
-	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX];
+	char			*host = NULL, *p, *buffer = NULL, error[MAX_STRING_LEN];
 	size_t			buffer_alloc = 8 * ZBX_KIBIBYTE, buffer_offset = 0;
 	int			ret = FAIL, i;
 	zbx_uint64_t		hostid;
@@ -243,10 +252,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 		goto out;
 	}
 
-	strscpy(ip, get_ip_by_socket(sock));
-
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(sock, host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, sock->peer, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
 	zbx_vector_uint64_create(&itemids);
@@ -311,20 +318,17 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, buffer);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
 		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
 		ret = SUCCEED;
-	alarm(0);
+	zbx_alarm_off();
 
 	zbx_free(buffer);
 out:
 	if (FAIL == ret)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to [%s]: %s",
-				get_ip_by_socket(sock), error);
-	}
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to \"%s\": %s", sock->peer, error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -421,8 +425,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 {
 	const char		*__function_name = "send_list_of_active_checks_json";
 
-#define ZBX_KEY_OTHER		0
-
 	char			host[HOST_HOST_LEN_MAX], tmp[MAX_STRING_LEN], ip[INTERFACE_IP_LEN_MAX],
 				error[MAX_STRING_LEN], *host_metadata = NULL;
 	struct zbx_json		json;
@@ -455,7 +457,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
-		strscpy(ip, get_ip_by_socket(sock));
+		strscpy(ip, sock->peer);
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_PORT, tmp, sizeof(tmp)))
 		*tmp = '\0';
@@ -579,18 +581,18 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __function_name, json.buffer);
 
-	alarm(CONFIG_TIMEOUT);
+	zbx_alarm_on(CONFIG_TIMEOUT);
 	if (SUCCEED != zbx_tcp_send(sock, json.buffer))
 		strscpy(error, zbx_socket_strerror());
 	else
 		ret = SUCCEED;
-	alarm(0);
+	zbx_alarm_off();
 
 	zbx_json_free(&json);
 
 	goto out;
 error:
-	zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to [%s]: %s", get_ip_by_socket(sock), error);
+	zabbix_log(LOG_LEVEL_WARNING, "cannot send list of active checks to \"%s\": %s", sock->peer, error);
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);

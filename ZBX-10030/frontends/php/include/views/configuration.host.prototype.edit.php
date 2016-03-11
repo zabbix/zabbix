@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -224,7 +224,6 @@ $tmplList = new CFormList();
 
 if ($hostPrototype['templateid']) {
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
@@ -246,7 +245,6 @@ else {
 	$ignoreTemplates = [];
 
 	$linkedTemplateTable = (new CTable())
-		->setNoDataMessage(_('No templates linked.'))
 		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
@@ -379,7 +377,7 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('disabled', 'disabled')
 	)
-	->addRow(_('Subject'),
+	->addRow(_x('Subject', 'encryption certificate'),
 		(new CTextBox('tls_subject', $parentHost['tls_subject'], false, 1024))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setAttribute('disabled', 'disabled')

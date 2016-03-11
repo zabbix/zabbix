@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,6 +51,8 @@ typedef struct zbx_scheduler_interval_t
 	struct zbx_scheduler_interval_t	*next;
 }
 zbx_scheduler_interval_t;
+
+ZBX_THREAD_LOCAL volatile sig_atomic_t	zbx_timed_out;	/* 0 - no timeout occurred, 1 - SIGALRM took place */
 
 #ifdef _WINDOWS
 
@@ -403,7 +405,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_setproctitle                                                 *
+ * Function: __zbx_zbx_setproctitle                                           *
  *                                                                            *
  * Purpose: set process title                                                 *
  *                                                                            *
@@ -413,14 +415,15 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
 #if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	char	title[MAX_STRING_LEN];
-	va_list	args;
+	const char	*__function_name = "__zbx_zbx_setproctitle";
+	char		title[MAX_STRING_LEN];
+	va_list		args;
 
 	va_start(args, fmt);
 	zbx_vsnprintf(title, sizeof(title), fmt, args);
 	va_end(args);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s", title);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __function_name, title);
 #endif
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
@@ -2382,73 +2385,6 @@ int	is_hex_string(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Function: uint64_in_list                                                   *
- *                                                                            *
- * Purpose: check if uin64 integer matches a list of integers                 *
- *                                                                            *
- * Parameters: list  - integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)         *
- *             value - value                                                  *
- *                                                                            *
- * Return value: FAIL - out of period, SUCCEED - within the list              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- ******************************************************************************/
-int	uint64_in_list(char *list, zbx_uint64_t value)
-{
-	const char	*__function_name = "uint64_in_list";
-	char		*start = NULL, *end = NULL;
-	zbx_uint64_t	i1, i2, tmp_uint64;
-	int		ret = FAIL;
-	char		c = '\0';
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() list:'%s' value:" ZBX_FS_UI64, __function_name, list, value);
-
-	for (start = list; start[0] != '\0';)
-	{
-		if (NULL != (end = strchr(start, ',')))
-		{
-			c=end[0];
-			end[0]='\0';
-		}
-
-		if (sscanf(start,ZBX_FS_UI64 "-" ZBX_FS_UI64,&i1,&i2) == 2)
-		{
-			if (i1 <= value && value <= i2)
-			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-		else
-		{
-			sscanf(start, ZBX_FS_UI64, &tmp_uint64);
-			if (tmp_uint64 == value)
-			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-
-		if (end != NULL)
-		{
-			*end = c;
-			start = end + 1;
-		}
-		else
-			break;
-	}
-
-	if (NULL != end)
-		*end = c;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: get_nearestindex                                                 *
  *                                                                            *
  * Purpose: get nearest index position of sorted elements in array            *
@@ -2533,23 +2469,6 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 
 /******************************************************************************
  *                                                                            *
- * Function: uint64_array_merge                                               *
- *                                                                            *
- * Purpose: merge two uint64 arrays                                           *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- ******************************************************************************/
-void	uint64_array_merge(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t *value, int value_num, int alloc_step)
-{
-	int	i;
-
-	for (i = 0; i < value_num; i++)
-		uint64_array_add(values, alloc, num, value[i], alloc_step);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: uint64_array_exists                                              *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
@@ -2587,38 +2506,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 
 		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
 		(*num)--;
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: uint64_array_remove_both                                         *
- *                                                                            *
- * Purpose: remove equal values from both arrays                              *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	uint64_array_remove_both(zbx_uint64_t *values, int *num, zbx_uint64_t *rm_values, int *rm_num)
-{
-	int	rindex, index;
-
-	for (rindex = 0; rindex < *rm_num; rindex++)
-	{
-		index = get_nearestindex(values, sizeof(zbx_uint64_t), *num, rm_values[rindex]);
-		if (index == *num || values[index] != rm_values[rindex])
-			continue;
-
-		memmove(&values[index], &values[index + 1], sizeof(zbx_uint64_t) * ((*num) - index - 1));
-		(*num)--;
-		memmove(&rm_values[rindex], &rm_values[rindex + 1], sizeof(zbx_uint64_t) * ((*rm_num) - rindex - 1));
-		(*rm_num)--; rindex--;
 	}
 }
 
@@ -3035,3 +2922,21 @@ fail:
 
 	return res;
 }
+
+#if !defined(_WINDOWS)
+unsigned int	zbx_alarm_on(unsigned int seconds)
+{
+	zbx_timed_out = 0;
+
+	return alarm(seconds);
+}
+
+unsigned int	zbx_alarm_off(void)
+{
+	unsigned int	ret;
+
+	ret = alarm(0);
+	zbx_timed_out = 0;
+	return ret;
+}
+#endif

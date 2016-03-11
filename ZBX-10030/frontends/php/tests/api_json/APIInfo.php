@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,14 +26,14 @@ class API_JSON_APIInfo extends CZabbixTest {
 		$result = $this->api_acall('apiinfo.version', [], $debug);
 
 		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '3.0.0');
+		$this->assertSame($result['result'], '3.1.0');
 	}
 
 	public function testAPIInfo_VersionWithoutAuth() {
 		$result = $this->api_call('apiinfo.version', [], $debug);
 
 		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '3.0.0');
+		$this->assertSame($result['result'], '3.1.0');
 	}
 
 }

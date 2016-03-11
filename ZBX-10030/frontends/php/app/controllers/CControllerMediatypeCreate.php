@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
+			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array media_type.exec_params',
 			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
@@ -111,10 +112,14 @@ class CControllerMediatypeCreate extends CController {
 				break;
 
 			case MEDIA_TYPE_EZ_TEXTING:
-				$this->getInputs($mediatype, ['passwd', 'exec_path']);
+				$this->getInputs($mediatype, ['passwd']);
 
 				if ($this->hasInput('eztext_username')) {
 					$mediatype['username'] = $this->getInput('eztext_username');
+				}
+
+				if ($this->hasInput('eztext_limit')) {
+					$mediatype['exec_path'] = $this->getInput('eztext_limit');
 				}
 				break;
 		}

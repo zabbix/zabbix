@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -629,8 +629,7 @@ class CImportReferencer {
 			$dbGroups = API::HostGroup()->get([
 				'filter' => ['name' => $this->groups],
 				'output' => ['groupid', 'name'],
-				'preservekeys' => true,
-				'editable' => true
+				'preservekeys' => true
 			]);
 			foreach ($dbGroups as $group) {
 				$this->groupsRefs[$group['name']] = $group['groupid'];
@@ -671,8 +670,7 @@ class CImportReferencer {
 				'filter' => ['host' => $this->hosts],
 				'output' => ['hostid', 'host'],
 				'preservekeys' => true,
-				'templated_hosts' => true,
-				'editable' => true
+				'templated_hosts' => true
 			]);
 			foreach ($dbHosts as $host) {
 				$this->hostsRefs[$host['host']] = $host['hostid'];
@@ -786,8 +784,7 @@ class CImportReferencer {
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
 						ZBX_FLAG_DISCOVERY_CREATED
 					]
-				],
-				'editable' => true
+				]
 			]);
 
 			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
@@ -821,8 +818,7 @@ class CImportReferencer {
 				'filter' => [
 					'name' => $graphNames,
 					'flags' => null
-				],
-				'editable' => true
+				]
 			]);
 
 			foreach ($dbGraphs as $dbGraph) {
@@ -892,11 +888,12 @@ class CImportReferencer {
 		if (!empty($this->screens)) {
 			$this->screensRefs = [];
 
-			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
-					' s.templateid IS NULL '.
-					' AND '.dbConditionString('s.name', $this->screens));
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$this->screensRefs[$dbScreen['name']] = $dbScreen['screenid'];
+			$db_screens = API::Screen()->get([
+				'filter' => ['name' => $this->screens],
+				'output' => ['screenid', 'name']
+			]);
+			foreach ($db_screens as $db_screen) {
+				$this->screensRefs[$db_screen['name']] = $db_screen['screenid'];
 			}
 
 			$this->screens = [];
@@ -910,15 +907,12 @@ class CImportReferencer {
 		if ($this->templateScreens) {
 			$this->templateScreensRefs = [];
 
-			$dbScreens = DBselect(
-				'SELECT s.screenid, s.name, s.templateid'.
-				' FROM screens s'.
-				' WHERE s.templateid IS NOT NULL '.
-					' AND '.dbConditionString('s.name', $this->templateScreens)
-			);
-
-			while ($dbScreen = DBfetch($dbScreens)) {
-				$this->templateScreensRefs[$dbScreen['templateid']][$dbScreen['name']] = $dbScreen['screenid'];
+			$db_template_screens = API::TemplateScreen()->get([
+				'filter' => ['name' => $this->templateScreens],
+				'output' => ['screenid', 'name', 'templateid']
+			]);
+			foreach ($db_template_screens as $screen) {
+				$this->templateScreensRefs[$screen['templateid']][$screen['name']] = $screen['screenid'];
 			}
 
 			$this->templateScreens = [];

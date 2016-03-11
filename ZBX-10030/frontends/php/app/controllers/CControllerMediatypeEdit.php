@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
+			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array media_type.exec_params',
 			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
@@ -106,6 +107,7 @@ class CControllerMediatypeEdit extends CController {
 			'gsm_modem' => '/dev/ttyS0',
 			'jabber_username' => 'user@server',
 			'eztext_username' => '',
+			'eztext_limit' => EZ_TEXTING_LIMIT_USA,
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE
@@ -150,6 +152,7 @@ class CControllerMediatypeEdit extends CController {
 
 				case MEDIA_TYPE_EZ_TEXTING:
 					$data['eztext_username'] = $this->mediatype['username'];
+					$data['eztext_limit'] = $this->mediatype['exec_path'];
 					break;
 			}
 		}
@@ -169,6 +172,7 @@ class CControllerMediatypeEdit extends CController {
 			'exec_params',
 			'exec_params_count',
 			'exec_path',
+			'eztext_limit',
 			'gsm_modem',
 			'jabber_username',
 			'eztext_username',

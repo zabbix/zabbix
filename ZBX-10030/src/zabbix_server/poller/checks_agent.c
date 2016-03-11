@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,11 @@
 #include "common.h"
 #include "comms.h"
 #include "log.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 #include "checks_agent.h"
+
+extern volatile sig_atomic_t	zbx_timed_out;
 
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
@@ -51,14 +54,15 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_socket_t	s;
-	char		buffer[MAX_STRING_LEN], *tls_arg1, *tls_arg2;
+	char		*buffer = NULL, *tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:%u", __function_name,
-			item->host.host, item->interface.addr, item->key, (unsigned int)item->host.tls_connect);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __function_name,
+				item->host.host, item->interface.addr, item->key,
+				zbx_tls_connection_type_name(item->host.tls_connect));
 	}
 
 	if (ZBX_TCP_SEC_UNENCRYPTED == item->host.tls_connect)
@@ -80,9 +84,8 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			tls_arg2 = item->host.tls_psk;
 		}
 #else
-		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support"
-				" for TLS was not compiled into %s.", get_program_type_string(program_type));
-		SET_MSG_RESULT(result, zbx_strdup(NULL, buffer));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent but"
+				" support for TLS was not compiled into %s.", get_program_type_string(program_type)));
 		ret = NETWORK_ERROR;
 		goto out;
 #endif
@@ -91,7 +94,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
 			item->host.tls_connect, tls_arg1, tls_arg2)))
 	{
-		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
+		buffer = zbx_dsprintf(buffer, "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
 
 		/* send requests using old protocol */
@@ -99,8 +102,12 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			ret = NETWORK_ERROR;
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
 			ret = SUCCEED;
-		else
+		else if (1 == zbx_timed_out)
 			ret = TIMEOUT_ERROR;
+		else
+			ret = NETWORK_ERROR;
+
+		zbx_free(buffer);
 	}
 	else
 		ret = NETWORK_ERROR;
@@ -116,36 +123,30 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			/* 'ZBX_NOTSUPPORTED\0<error message>' */
 			if (sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
-				zbx_snprintf(buffer, sizeof(buffer), "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED)));
 			else
-				zbx_snprintf(buffer, sizeof(buffer), "Not supported by Zabbix Agent");
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
 
-			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NOTSUPPORTED;
 		}
 		else if (0 == strcmp(s.buffer, ZBX_ERROR))
 		{
-			zbx_snprintf(buffer, sizeof(buffer), "Zabbix Agent non-critical error");
-			SET_MSG_RESULT(result, strdup(buffer));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
 			ret = AGENT_ERROR;
 		}
 		else if (0 == received_len)
 		{
-			zbx_snprintf(buffer, sizeof(buffer), "Received empty response from Zabbix Agent at [%s]."
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
 					" Assuming that agent dropped connection because of access permissions.",
-					item->interface.addr);
-			SET_MSG_RESULT(result, strdup(buffer));
+					item->interface.addr));
 			ret = NETWORK_ERROR;
 		}
 		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, s.buffer))
 			ret = NOTSUPPORTED;
 	}
 	else
-	{
-		zbx_snprintf(buffer, sizeof(buffer), "Get value from agent failed: %s",
-				zbx_socket_strerror());
-		SET_MSG_RESULT(result, strdup(buffer));
-	}
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
+
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 out:
 #endif

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,6 +138,7 @@ var timeControl = {
 				// url
 				if (isset('graphtype', obj.objDims) && obj.objDims.graphtype < 2) {
 					var graphUrl = new Curl(obj.src);
+					graphUrl.unsetArgument('sid');
 					graphUrl.setArgument('width', obj.objDims.width);
 
 					obj.src = graphUrl.getUrl();
@@ -1490,12 +1491,12 @@ var sbox = Class.create({
 
 		this.sbox_id = id;
 		this.containerId = '#flickerfreescreen_' + id;
-		this.shiftT = parseInt(tc.objDims.shiftYtop);
+		this.shiftT = parseInt(tc.objDims.shiftYtop) + 1;
 		this.shiftL = shiftL;
 		this.shiftR = shiftR;
 		this.additionShiftL = 0;
 		this.areaWidth = width;
-		this.areaHeight = parseInt(tc.objDims.graphHeight);
+		this.areaHeight = parseInt(tc.objDims.graphHeight) + 1;
 		this.box.width = width;
 	},
 
@@ -1663,7 +1664,7 @@ var sbox = Class.create({
 		this.dom_obj = document.createElement('div');
 		this.dom_obj.id = id;
 		this.dom_obj.className = 'box_on';
-		this.dom_obj.style.height = (this.areaHeight + 2) + 'px';
+		this.dom_obj.style.height = this.areaHeight + 'px';
 
 		jQuery(this.grphobj).parent().append(this.dom_obj);
 	},
@@ -1765,11 +1766,11 @@ var sbox = Class.create({
 
 	optimizeEvent: function(e) {
 		if (!empty(e.pageX) && !empty(e.pageY)) {
-			this.mouse_event.left = e.pageX - jQuery(this.containerId).position().left;
+			this.mouse_event.left = e.pageX;
 			this.mouse_event.top = e.pageY;
 		}
 		else if (!empty(e.clientX) && !empty(e.clientY)) {
-			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - jQuery(this.containerId).position().left;
+			this.mouse_event.left = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 			this.mouse_event.top = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 		}
 		else {

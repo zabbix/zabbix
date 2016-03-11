@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,9 @@ $this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())
 	->addRow(_('Message'),
-		(new CTextArea('message', '', ['maxlength' => 255]))
+		(new CTextArea('message'))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setMaxLength(255)
 			->setAttribute('autofocus', 'autofocus')
 	);
 
