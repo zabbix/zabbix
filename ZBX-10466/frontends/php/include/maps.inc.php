@@ -224,15 +224,7 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 						if ($host['status'] == HOST_STATUS_MONITORED) {
 							$gotos['showEvents'] = true;
 
-							// Pass a monitored 'hostid' and corresponding first 'groupid' to menu pop-up "Events" link.
-							$gotos['events']['hostid'] = $host['hostid'];
-							$gotos['events']['groupid'] = $monitored_hosts[$host['hostid']]['groups'][0]['groupid'];
 							break;
-						}
-						else {
-							// Unmonitored will have disabled "Events" link and there is no 'groupid' or 'hostid'.
-							$gotos['events']['hostid'] = 0;
-							$gotos['events']['groupid'] = 0;
 						}
 					}
 
