@@ -162,6 +162,24 @@ $till = $from + $period;
  * Display
  */
 if ($source == EVENT_SOURCE_TRIGGERS) {
+	if ($triggerId != 0 && hasRequest('filter_set')) {
+		$host = API::Host()->get([
+			'output' => ['hostid'],
+			'selectGroups' => ['groupid'],
+			'triggerids' => [$triggerId],
+			'limit' => 1
+		]);
+
+		$host = reset($host);
+		$hostid = $host['hostid'];
+		$group = reset($host['groups']);
+		$groupid = $group['groupid'];
+	}
+	else {
+		$groupid = getRequest('groupid');
+		$hostid = getRequest('hostid');
+	}
+
 	$pageFilter = new CPageFilter([
 		'groups' => [
 			'monitored_hosts' => true,
@@ -171,8 +189,8 @@ if ($source == EVENT_SOURCE_TRIGGERS) {
 			'monitored_hosts' => true,
 			'with_monitored_triggers' => true
 		],
-		'hostid' => getRequest('hostid', hasRequest('filter_set') ? 0 : null),
-		'groupid' => getRequest('groupid', hasRequest('filter_set') ? 0 : null)
+		'hostid' => $hostid,
+		'groupid' => $groupid
 	]);
 }
 
@@ -190,8 +208,6 @@ else {
 		// use the host ID from the page filter since it may not be present in the request
 		// if all hosts are selected, preserve the selected trigger
 		if ($triggerId != 0 && $pageFilter->hostid != 0) {
-			$hostid = $pageFilter->hostid;
-
 			$old_triggers = API::Trigger()->get([
 				'output' => ['description', 'expression'],
 				'selectHosts' => ['hostid', 'host'],
@@ -202,7 +218,7 @@ else {
 			$old_trigger['hosts'] = zbx_toHash($old_trigger['hosts'], 'hostid');
 
 			// if the trigger doesn't belong to the selected host - find a new one on that host
-			if (!array_key_exists($hostid, $old_trigger['hosts'])) {
+			if (!array_key_exists($pageFilter->hostid, $old_trigger['hosts'])) {
 				$triggerId = 0;
 
 				$old_expression = CMacrosResolverHelper::resolveTriggerExpression($old_trigger['expression']);
@@ -211,7 +227,7 @@ else {
 					'output' => ['triggerid', 'description', 'expression'],
 					'selectHosts' => ['hostid', 'host'],
 					'filter' => ['description' => $old_trigger['description']],
-					'hostids' => [$hostid]
+					'hostids' => [$pageFilter->hostid]
 				]);
 
 				$new_triggers = CMacrosResolverHelper::resolveTriggerExpressions($new_triggers);
@@ -221,7 +237,7 @@ else {
 
 					foreach ($old_trigger['hosts'] as $old_host) {
 						$new_expression = triggerExpressionReplaceHost($new_trigger['expression'],
-							$new_trigger['hosts'][$hostid]['host'], $old_host['host']
+							$new_trigger['hosts'][$pageFilter->hostid]['host'], $old_host['host']
 						);
 
 						if ($old_expression === $new_expression) {
