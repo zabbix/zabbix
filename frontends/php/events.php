@@ -105,8 +105,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit;
 }
 
-$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
-
 /*
  * Filter
  */
@@ -120,6 +118,10 @@ elseif (hasRequest('filter_rst')) {
 }
 
 $triggerId = CProfile::get('web.events.filter.triggerid', 0);
+
+$source = ($triggerId != 0 && hasRequest('filter_set'))
+	? EVENT_SOURCE_TRIGGERS
+	: getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
 
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
