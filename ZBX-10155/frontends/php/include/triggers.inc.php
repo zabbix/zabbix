@@ -1070,7 +1070,7 @@ function implode_exp($expression, $triggerId, &$hostnames = array()) {
 }
 
 /**
- * Get items from expression.
+ * Get normal items and item prototypes from expression.
  *
  * @param CTriggerExpression $triggerExpression
  *
