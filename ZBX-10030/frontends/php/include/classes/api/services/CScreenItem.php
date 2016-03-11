@@ -469,7 +469,7 @@ class CScreenItem extends CApiService {
 		$itemPrototypeIds = [];
 		$graphPrototypeIds = [];
 
-		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, ['resourcetype', 'resourceid']);
+		$screenItems = $this->extendFromObjects($screenItems, $dbScreenItems, ['resourcetype']);
 
 		$validStyles = [
 			SCREEN_RESOURCE_CLOCK => [TIME_TYPE_LOCAL, TIME_TYPE_SERVER, TIME_TYPE_HOST],
