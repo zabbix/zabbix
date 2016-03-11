@@ -425,10 +425,10 @@ class CScreen extends CApiService {
 				);
 			}
 
-			if ($screen[$field_name] < 1 || $screen[$field_name] > 100) {
+			if ($screen[$field_name] < SCREEN_MIN_SIZE || $screen[$field_name] > SCREEN_MAX_SIZE) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_s('Incorrect value for field "%1$s": %2$s.', $field_name,
-						_s('must be between "%1$s" and "%2$s"', 1, 100)
+						_s('must be between "%1$s" and "%2$s"', SCREEN_MIN_SIZE, SCREEN_MAX_SIZE)
 					)
 				);
 			}
