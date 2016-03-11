@@ -553,6 +553,11 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_SEVERITY_DISASTER	5
 #define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
 
+/* trigger recovery mode */
+#define TRIGGER_RECOVERY_MODE_EXPRESSION		0
+#define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
+#define TRIGGER_RECOVERY_MODE_NONE			2
+
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2
 #define ITEM_LOGTYPE_ERROR		4
