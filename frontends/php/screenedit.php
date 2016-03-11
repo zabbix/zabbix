@@ -259,6 +259,8 @@ elseif (hasRequest('rmv_col')) {
 	delScreenColumn($screen, getRequest('rmv_col'));
 }
 
+show_messages();
+
 /*
  * Display
  */
