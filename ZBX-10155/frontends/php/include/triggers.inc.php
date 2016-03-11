@@ -1092,7 +1092,7 @@ function getExpressionItems(CTriggerExpression $triggerExpression) {
 				' FROM items i,hosts h'.
 				' WHERE i.key_='.zbx_dbstr($expression['item']).
 					' AND '.dbConditionInt('i.flags', array(
-						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
+						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE
 					)).
 					' AND h.host='.zbx_dbstr($expression['host']).
 					' AND h.hostid=i.hostid'.

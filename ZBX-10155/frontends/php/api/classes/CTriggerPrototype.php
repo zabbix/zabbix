@@ -917,7 +917,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
 			));
 
-			$item_discoveryids = array_flip(zbx_objectValues($item_discoveries, 'parent_itemid'));
+			$item_discoveryids = array_unique(zbx_objectValues($item_discoveries, 'parent_itemid'));
 
 			if (count($item_discoveryids) > 1) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
