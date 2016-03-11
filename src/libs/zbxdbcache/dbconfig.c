@@ -63,6 +63,7 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	const char	*description;
 	const char	*expression;
+	const char	*recovery_expression;
 	const char	*error;
 	int		lastchange;
 	unsigned char	topoindex;
@@ -73,6 +74,7 @@ typedef struct
 	unsigned char	locked;
 	unsigned char	status;
 	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
+	unsigned char	recovery_mode;	/* TRIGGER_RECOVERY_MODE_* defines  */
 }
 ZBX_DC_TRIGGER;
 
@@ -2981,9 +2983,11 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		DCstrpool_replace(found, &trigger->description, row[1]);
 		DCstrpool_replace(found, &trigger->expression, row[2]);
+		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
+		ZBX_STR2UCHAR(trigger->recovery_mode, row[10]);
 
 		if (0 == found)
 		{
@@ -3708,8 +3712,8 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (trig_result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.error,"
-				"t.priority,t.type,t.value,t.state,t.lastchange,t.status"
+			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
+				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -5083,6 +5087,8 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->description = zbx_strdup(NULL, src_trigger->description);
 	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
 	dst_trigger->expression = NULL;
+	dst_trigger->recovery_expression_orig = zbx_strdup(NULL, src_trigger->recovery_expression);
+	dst_trigger->recovery_expression = NULL;
 	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
 	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
@@ -5095,6 +5101,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->lastchange = src_trigger->lastchange;
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
+	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -5102,6 +5109,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->new_error);
 	zbx_free(trigger->error);
 	zbx_free(trigger->expression_orig);
+	zbx_free(trigger->recovery_expression_orig);
 	zbx_free(trigger->description);
 }
 
