@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,9 +73,11 @@ foreach ($this->data['items'] as $item) {
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
-			)))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status']));
+			)
+	))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($item['status']))
+		->addSID();
 
 	if (!empty($item['applications'])) {
 		order_result($item['applications'], 'name');
@@ -95,8 +97,8 @@ foreach ($this->data['items'] as $item) {
 		$description,
 		$item['key_'],
 		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
-		convertUnitsS(SEC_PER_DAY * $item['history']),
-		($item['trends'] !== '') ? convertUnitsS(SEC_PER_DAY * $item['trends']) : '',
+		$item['history']._x('d', 'day short'),
+		($item['trends'] !== '') ? $item['trends']._x('d', 'day short') : '',
 		item_type2str($item['type']),
 		$applications,
 		$status

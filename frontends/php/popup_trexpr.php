@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -477,12 +477,12 @@ $functions = [
 		'allowed_types' => $allowedTypesAny
 	],
 	'fuzzytime[=]' => [
-		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise'),
+		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise'),
 		'params' => $param1Sec,
 		'allowed_types' => $allowedTypesAny
 	],
 	'fuzzytime[<>]' => [
-		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise'),
+		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise'),
 		'params' => $param1Sec,
 		'allowed_types' => $allowedTypesAny
 	],

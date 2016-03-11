@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,6 +107,7 @@ static int	find_tcp_port_by_state_nl(unsigned short port, int state, int *found)
 	request.nlhdr.nlmsg_seq = sequence;
 	request.nlhdr.nlmsg_type = TCPDIAG_GETSOCK;
 
+	memset(&request.r, 0, sizeof(request.r));
 	request.r.idiag_states = (1 << state);
 
 	if (-1 == (fd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)) ||

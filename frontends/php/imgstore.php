@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,12 +95,14 @@ elseif (isset($_REQUEST['iconid'])) {
 elseif (isset($_REQUEST['imageid'])) {
 	$imageid = getRequest('imageid', 0);
 
-	session_start();
-	if (isset($_SESSION['image_id'][$imageid])) {
-		echo $_SESSION['image_id'][$imageid];
-		unset($_SESSION['image_id'][$imageid]);
+	if (CSession::keyExists('image_id')) {
+		$image_data = CSession::getValue('image_id');
+		if (array_key_exists($imageid, $image_data)) {
+			echo $image_data[$imageid];
+			unset($image_data[$imageid]);
+			CSession::setValue('image_id', $image_data);
+		}
 	}
-	session_write_close();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

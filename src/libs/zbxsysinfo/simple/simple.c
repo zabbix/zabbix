@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,14 @@
 #include "ntp.h"
 #include "simple.h"
 
+#ifdef HAVE_LDAP
+#	include <ldap.h>
+#endif
+
+#ifdef HAVE_LBER_H
+#	include <lber.h>
+#endif
+
 ZBX_METRIC	parameters_simple[] =
 /*      KEY                     FLAG		FUNCTION        	TEST PARAMETERS */
 {
@@ -50,7 +58,7 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 	char	**valRes = NULL;
 	int	ldapErr = 0;
 
-	alarm(timeout);
+	zbx_alarm_on(timeout);
 
 	*value_int = 0;
 
@@ -82,7 +90,7 @@ static int    check_ldap(const char *host, unsigned short port, int timeout, int
 
 	*value_int = 1;
 lbl_ret:
-	alarm(0);
+	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);

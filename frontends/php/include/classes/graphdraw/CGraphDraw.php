@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,9 +63,7 @@ abstract class CGraphDraw {
 			'gridbordercolor' => 'ACBBC2',
 			'nonworktimecolor' => 'EBEBEB',
 			'leftpercentilecolor' => '429E47',
-			'righttpercentilecolor' => 'E33734',
-			'legendview' => '1',
-			'gridview' => '1'
+			'righttpercentilecolor' => 'E33734'
 		];
 		$this->applyGraphTheme();
 	}
@@ -249,18 +247,7 @@ abstract class CGraphDraw {
 			return $this->colors[$color];
 		}
 
-		$RGB = [
-			hexdec('0x'.substr($color, 0, 2)),
-			hexdec('0x'.substr($color, 2, 2)),
-			hexdec('0x'.substr($color, 4, 2))
-		];
-
-		if (isset($alfa) && function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
-				&& @imagecreatetruecolor(1, 1)) {
-			return imagecolorexactalpha($this->im, $RGB[0], $RGB[1], $RGB[2], $alfa);
-		}
-
-		return imagecolorallocate($this->im, $RGB[0], $RGB[1], $RGB[2]);
+		return get_color($this->im, $color, $alfa);
 	}
 
 	public function getShadow($color, $alfa = 0) {

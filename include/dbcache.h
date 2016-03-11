@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@
 #define ZBX_SYNC_PARTIAL	0
 #define	ZBX_SYNC_FULL		1
 
-#define ZBX_SYNC_MAX	1000
-
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
 #define	ZBX_POLLER_TYPE_UNREACHABLE	1
@@ -51,8 +49,8 @@ extern int	CONFIG_TIMEOUT;
 
 extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE;
+extern zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE;
 extern zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE;
-extern zbx_uint64_t	CONFIG_TEXT_CACHE_SIZE;
 
 extern int	CONFIG_POLLER_FORKS;
 extern int	CONFIG_UNREACHABLE_POLLER_FORKS;
@@ -115,6 +113,10 @@ typedef struct
 	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
+	char		error[HOST_ERROR_LEN_MAX];
+	char		snmp_error[HOST_ERROR_LEN_MAX];
+	char		ipmi_error[HOST_ERROR_LEN_MAX];
+	char		jmx_error[HOST_ERROR_LEN_MAX];
 }
 DC_HOST;
 
@@ -229,6 +231,16 @@ DC_PROXY;
 
 typedef struct
 {
+	zbx_uint64_t		actionid;
+	char			*formula;
+	unsigned char		eventsource;
+	unsigned char		evaltype;
+	zbx_vector_ptr_t	conditions;
+}
+zbx_action_eval_t;
+
+typedef struct
+{
 	const char	*host;
 	const char	*key;
 }
@@ -300,23 +312,13 @@ typedef struct
 }
 zbx_queue_item_t;
 
-typedef struct
-{
-	zbx_uint64_t	hostid;
-	int		errors_from;
-	int		disable_until;
-	unsigned char	type;
-	unsigned char	available;
-}
-zbx_host_availability_t;
-
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
-int	DCsync_history(int sync_type);
+int	DCsync_history(int sync_type, int *sync_num);
 void	init_database_cache();
 void	free_database_cache();
 
@@ -338,10 +340,10 @@ void	DCflush_nextchecks();
 #define ZBX_STATS_TREND_USED		12
 #define ZBX_STATS_TREND_FREE		13
 #define ZBX_STATS_TREND_PFREE		14
-#define ZBX_STATS_TEXT_TOTAL		15
-#define ZBX_STATS_TEXT_USED		16
-#define ZBX_STATS_TEXT_FREE		17
-#define ZBX_STATS_TEXT_PFREE		18
+#define ZBX_STATS_HISTORY_INDEX_TOTAL	15
+#define ZBX_STATS_HISTORY_INDEX_USED	16
+#define ZBX_STATS_HISTORY_INDEX_FREE	17
+#define ZBX_STATS_HISTORY_INDEX_PFREE	18
 void	*DCget_stats(int request);
 
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
@@ -362,8 +364,9 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
-void	DCconfig_lock_triggers_by_itemids(zbx_uint64_t *itemids, int itemids_num, zbx_vector_uint64_t *triggerids);
+int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
+void	DCconfig_unlock_all_triggers();
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
 		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num);
 void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_t *trigger_order, int max_triggers,
@@ -407,11 +410,11 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 
-int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out);
+int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out);
 
-int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx_host_availability_t *out);
-
-void	DChost_update_availability(const zbx_host_availability_t *availability, int availability_num);
+int	DChost_deactivate(zbx_uint64_t hostid, unsigned char agent, const zbx_timespec_t *ts,
+		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error);
 
 void	DCget_delta_items(zbx_hashset_t *items, const zbx_vector_uint64_t *ids);
 void	DCset_delta_items(zbx_hashset_t *items);
@@ -453,5 +456,46 @@ void	zbx_idset_free(zbx_idset_t *idset);
 /* global configuration support */
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
+
+/* flags to specify which host interfaces have enabled items */
+#define ZBX_FLAG_INTERFACE_NONE		0x00
+#define ZBX_FLAG_INTERFACE_ZABBIX	(0x01 << (INTERFACE_TYPE_AGENT - 1))
+#define ZBX_FLAG_INTERFACE_SNMP		(0x01 << (INTERFACE_TYPE_SNMP - 1))
+#define ZBX_FLAG_INTERFACE_IPMI		(0x01 << (INTERFACE_TYPE_IPMI - 1))
+#define ZBX_FLAG_INTERFACE_JMX		(0x01 << (INTERFACE_TYPE_JMX - 1))
+#define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
+
+int	DCset_hosts_availability(zbx_vector_ptr_t *availabilities);
+
+int	DCreset_hosts_availability(zbx_vector_ptr_t *hosts);
+void	DCupdate_hosts_availability();
+
+void	zbx_dc_get_actions_eval(zbx_vector_ptr_t *actions);
+void	zbx_action_eval_free(zbx_action_eval_t *action);
+
+int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts);
+
+void	zbx_host_availability_init(zbx_host_availability_t *availability, zbx_uint64_t hostid);
+void	zbx_host_availability_clean(zbx_host_availability_t *availability);
+void	zbx_host_availability_free(zbx_host_availability_t *availability);
+int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
+
+void	zbx_set_availability_diff_ts(int ts);
+
+#define ZBX_HC_ITEM_STATUS_NORMAL	0
+#define ZBX_HC_ITEM_STATUS_BUSY		1
+#define ZBX_HC_ITEM_STATUS_QUEUED	2
+
+struct zbx_hc_data_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	unsigned char		status;
+
+	struct zbx_hc_data_t	*tail;
+	struct zbx_hc_data_t	*head;
+}
+zbx_hc_item_t;
 
 #endif

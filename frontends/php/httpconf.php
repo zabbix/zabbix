@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,6 @@ $fields = [
 	'new_httpstep'		=> [T_ZBX_STR, O_OPT, null,	null,				null],
 	'sel_step'			=> [T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65534),	null],
 	'group_httptestid'	=> [T_ZBX_INT, O_OPT, null,	DB_ID,				null],
-	'showdisabled'		=> [T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),			null],
 	// form
 	'hostid'          => [T_ZBX_INT, O_OPT, P_SYS, DB_ID.NOT_ZERO,          'isset({form}) || isset({add}) || isset({update})'],
 	'applicationid'   => [T_ZBX_INT, O_OPT, null,  DB_ID,                   null, _('Application')],
@@ -68,6 +67,12 @@ $fields = [
 	'ssl_cert_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_file'		=> [T_ZBX_STR, O_OPT, null, null,					'isset({add}) || isset({update})'],
 	'ssl_key_password'	=> [T_ZBX_STR, O_OPT, P_NO_TRIM, null,				'isset({add}) || isset({update})'],
+	// filter
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_status' =>		[T_ZBX_INT, O_OPT, null,
+		IN([-1, HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED]), null
+	],
 	// actions
 	'action'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"httptest.massclearhistory","httptest.massdelete","httptest.massdisable",'.
@@ -87,12 +92,8 @@ $fields = [
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name","status"'),				null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-$_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.httpconf.showdisabled', 1));
 
 check_fields($fields);
-
-$showDisabled = getRequest('showdisabled', 1);
-CProfile::update('web.httpconf.showdisabled', $showDisabled, PROFILE_TYPE_INT);
 
 if (!empty($_REQUEST['steps'])) {
 	order_result($_REQUEST['steps'], 'no');
@@ -613,6 +614,13 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.httpconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.httpconf.filter_status');
+	}
+
 	$pageFilter = new CPageFilter([
 		'groups' => [
 			'editable' => true
@@ -628,7 +636,7 @@ else {
 	$data = [
 		'hostid' => $pageFilter->hostid,
 		'pageFilter' => $pageFilter,
-		'showDisabled' => $showDisabled,
+		'filter_status' => CProfile::get('web.httpconf.filter_status', -1),
 		'httpTests' => [],
 		'httpTestsLastData' => [],
 		'paging' => null,
@@ -655,8 +663,8 @@ else {
 			'output' => ['httptestid', $sortField],
 			'limit' => $config['search_limit'] + 1
 		];
-		if (empty($data['showDisabled'])) {
-			$options['filter']['status'] = HTTPTEST_STATUS_ACTIVE;
+		if ($data['filter_status'] != -1) {
+			$options['filter']['status'] = $data['filter_status'];
 		}
 		if ($data['pageFilter']->hostid > 0) {
 			$options['hostids'] = $data['pageFilter']->hostid;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,14 +34,7 @@ class CScreenEvents extends CScreenBase {
 			'eventLimit' => $this->screenitem['elements']
 		];
 
-		$item = (new CTableInfo())
-			->setHeader([
-				_('Time'),
-				_('Host'),
-				_('Description'),
-				_('Value'),
-				_('Severity')
-			]);
+		$table = (new CTableInfo())->setHeader([_('Time'), _('Host'), _('Description'), _('Value'), _('Severity')]);
 
 		$events = getLastEvents($options);
 
@@ -56,7 +49,7 @@ class CScreenEvents extends CScreenBase {
 			// add colors and blinking to span depending on configuration and trigger parameters
 			addTriggerValueStyle($statusSpan, $event['value'], $event['clock'], $event['acknowledged']);
 
-			$item->addRow([
+			$table->addRow([
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				$host['name'],
 				new CLink(
@@ -68,6 +61,10 @@ class CScreenEvents extends CScreenBase {
 			]);
 		}
 
-		return $this->getOutput($item);
+		$footer = (new CList())
+			->addItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)))
+			->addClass(ZBX_STYLE_DASHBRD_WIDGET_FOOT);
+
+		return $this->getOutput((new CUiWidget(uniqid(), [$table, $footer]))->setHeader(_('History of events')));
 	}
 }

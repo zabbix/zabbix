@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -267,6 +267,13 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* allocate a database connection handle */
 	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLAllocHandle(SQL_HANDLE_DBC, ibm_db2.henv,
 			&ibm_db2.hdbc)))
+	{
+		ret = ZBX_DB_FAIL;
+	}
+
+	/* set codepage to utf-8 */
+	if (ZBX_DB_OK == ret && SUCCEED != zbx_ibm_db2_success(SQLSetConnectAttr(ibm_db2.hdbc, SQL_ATTR_CLIENT_CODEPAGE,
+			(SQLPOINTER)(SQLUINTEGER)1208, SQL_IS_UINTEGER)))
 	{
 		ret = ZBX_DB_FAIL;
 	}
@@ -1096,12 +1103,15 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve result set");
 					break;
 				}
-				else
-					ret += (int)mysql_affected_rows(conn);
 
-				/* more results? -1 = no, >0 = error, 0 = yes (keep looping) */
+				ret += (int)mysql_affected_rows(conn);
+
+				/* more results? 0 = yes (keep looping), -1 = no, >0 = error */
 				if (0 < (status = mysql_next_result(conn)))
+				{
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
+					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+				}
 			}
 			while (0 == status);
 		}

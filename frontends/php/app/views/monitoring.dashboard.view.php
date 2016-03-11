@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -146,9 +146,7 @@ foreach ($widgets as $widgetid => $widget) {
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
 		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
-		->setFooter(new CList([
-			(new CListItem(''))->setId($widgetid.'_footer')
-		]));
+		->setFooter((new CList())->setId($widgetid.'_footer'));
 
 	$widgetRefreshParams[$widgetid] = [
 		'frequency' => $rate,

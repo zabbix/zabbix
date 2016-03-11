@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,10 +29,10 @@ abstract class CApiClient {
 	 *
 	 * @param string 	$api
 	 * @param string 	$method
-	 * @param array 	$params
+	 * @param mixed 	$params
 	 * @param string	$auth
 	 *
 	 * @return CApiClientResponse
 	 */
-	abstract public function callMethod($api, $method, array $params, $auth);
+	abstract public function callMethod($api, $method, $params, $auth);
 }

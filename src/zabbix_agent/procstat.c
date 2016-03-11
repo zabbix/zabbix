@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@
  * 6) saves the last cpu utilization snapshot
  *
  * Initialisation.
- * * procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
+ * * zbx_procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
  *   (zbx_dshm_create() called with size 0).
  * * the first call of procstat_add() allocates the shared memory for the header and the first query
  *   via call to zbx_dshm_realloc().
@@ -65,7 +65,7 @@
  * * Ensure that memory segment has enough free space with procstat_dshm_has_enough_space() before
  *   allocating space within segment with procstat_alloc() or functions that use it.
  * * Check how much of the allocated dshm is actually used by procstat by procstat_dshm_used_size().
- * * Change the dshm size with with zbx_dshm_realloc().
+ * * Change the dshm size with zbx_dshm_realloc().
  *
  * Synchronisation.
  * * agentd processes share a single instance of ZBX_COLLECTOR_DATA (*collector) containing reference
@@ -203,7 +203,7 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes);
  * Function: procstat_dshm_has_enough_space                                   *
  *                                                                            *
  * Purpose: check if the procstat shared memory segment has at least          *
- *          the specified amount of free bytes in the middle of the segment   *
+ *          the specified amount of free bytes in the segment                 *
  *                                                                            *
  * Parameters: base - [IN] the procstat shared memory segment                 *
  *             size - [IN] number of free bytes needed                        *
@@ -363,7 +363,7 @@ static size_t	procstat_strdup(void *base, const char *str)
  *           shared memory segement operation failure.                        *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_reattach()
+static void	procstat_reattach(void)
 {
 	char	*errmsg = NULL;
 
@@ -434,7 +434,7 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
  *          one process statistics query has been made).                      *
  *                                                                            *
  ******************************************************************************/
-static int	procstat_running()
+static int	procstat_running(void)
 {
 	if (ZBX_NONEXISTENT_SHMID == collector->procstat.shmid)
 		return FAIL;
@@ -970,7 +970,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
  *          collector has been initialized)                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_procstat_collector_started()
+int	zbx_procstat_collector_started(void)
 {
 	if (NULL == collector)
 		return FAIL;
@@ -984,13 +984,10 @@ int	zbx_procstat_collector_started()
  *                                                                            *
  * Purpose: initializes process statistics collector                          *
  *                                                                            *
- * Parameters: shm - [IN] the dynamic shared memory segment used by process   *
- *                        statistics collector                                *
- *                                                                            *
  * Return value: This function calls exit() on shared memory errors.          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_init()
+void	zbx_procstat_init(void)
 {
 	char	*errmsg = NULL;
 
@@ -1013,7 +1010,7 @@ void	zbx_procstat_init()
  * Purpose: destroys process statistics collector                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_destroy()
+void	zbx_procstat_destroy(void)
 {
 	char	*errmsg = NULL;
 
@@ -1122,7 +1119,7 @@ out:
  * Purpose: performs process statistics collection                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_procstat_collect()
+void	zbx_procstat_collect(void)
 {
 	/* identifies current collection iteration */
 	static int			runid = 1;

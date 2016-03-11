@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -264,7 +264,17 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			break;
 		}
 
-		f->value = zbx_realloc(f->value, strlen(f->value) + 1);
+		if (SUCCEED != is_double_suffix(f->value) || '-' == *f->value)
+		{
+			char	*wrapped;
+
+			wrapped = zbx_dsprintf(NULL, "(%s)", f->value);
+
+			zbx_free(f->value);
+			f->value = wrapped;
+		}
+		else
+			f->value = zbx_realloc(f->value, strlen(f->value) + 1);
 
 		zbx_snprintf(replace, sizeof(replace), "{%d}", f->functionid);
 		buf = string_replace(exp->exp, replace, f->value);

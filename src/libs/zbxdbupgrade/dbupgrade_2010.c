@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,10 +19,8 @@
 
 #include "common.h"
 #include "db.h"
-#include "log.h"
-#include "sysinfo.h"
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 2.2 development database patches

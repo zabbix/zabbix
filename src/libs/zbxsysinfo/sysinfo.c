@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -242,11 +242,9 @@ static void	zbx_log_init(zbx_log_t *log)
 {
 	log->value = NULL;
 	log->source = NULL;
-	log->lastlogsize = 0;
 	log->timestamp = 0;
 	log->severity = 0;
 	log->logeventid = 0;
-	log->mtime = 0;
 }
 
 void	init_result(AGENT_RESULT *result)
@@ -257,7 +255,7 @@ void	init_result(AGENT_RESULT *result)
 	result->dbl = 0;
 	result->str = NULL;
 	result->text = NULL;
-	result->logs = NULL;
+	result->log = NULL;
 	result->msg = NULL;
 }
 
@@ -267,16 +265,10 @@ static void	zbx_log_clean(zbx_log_t *log)
 	zbx_free(log->value);
 }
 
-void	zbx_logs_free(zbx_log_t **logs)
+void	zbx_log_free(zbx_log_t *log)
 {
-	size_t	i;
-
-	for (i = 0; NULL != logs[i]; i++)
-	{
-		zbx_log_clean(logs[i]);
-		zbx_free(logs[i]);
-	}
-	zbx_free(logs);
+	zbx_log_clean(log);
+	zbx_free(log);
 }
 
 void	free_result(AGENT_RESULT *result)
@@ -663,43 +655,21 @@ notsupported:
 	return ret;
 }
 
-void	set_log_result_empty(AGENT_RESULT *result)
+static void	add_log_result(AGENT_RESULT *result, const char *value)
 {
-	result->logs = zbx_malloc(result->logs, sizeof(zbx_log_t *));
+	result->log = zbx_malloc(result->log, sizeof(zbx_log_t));
 
-	result->logs[0] = NULL;
+	zbx_log_init(result->log);
+
+	result->log->value = zbx_strdup(result->log->value, value);
 	result->type |= AR_LOG;
-}
-
-zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value)
-{
-	zbx_log_t	*log;
-	size_t		i;
-
-	log = zbx_malloc(NULL, sizeof(zbx_log_t));
-
-	zbx_log_init(log);
-
-	if (NULL != value)
-		log->value = zbx_strdup(log->value, value);
-
-	for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
-		;
-
-	result->logs = zbx_realloc(result->logs, sizeof(zbx_log_t *) * (i + 2));
-
-	result->logs[i++] = log;
-	result->logs[i] = NULL;
-	result->type |= AR_LOG;
-
-	return log;
 }
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c)
 {
-	int		ret = FAIL;
 	zbx_uint64_t	value_uint64;
 	double		value_double;
+	int		ret = FAIL;
 
 	assert(result);
 
@@ -760,6 +730,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 
 			if (SUCCEED != is_double(c))
 				break;
+
 			value_double = atof(c);
 
 			SET_DBL_RESULT(result, value_double);
@@ -776,8 +747,7 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 			ret = SUCCEED;
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != c)
-				zbx_replace_invalid_utf8(c);
+			zbx_replace_invalid_utf8(c);
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
@@ -804,6 +774,13 @@ int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c
 	}
 
 	return ret;
+}
+
+void	set_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime)
+{
+	result->lastlogsize = lastlogsize;
+	result->mtime = mtime;
+	result->type |= AR_META;
 }
 
 static zbx_uint64_t	*get_result_ui64_value(AGENT_RESULT *result)
@@ -957,38 +934,29 @@ static char	**get_result_text_value(AGENT_RESULT *result)
 	return NULL;
 }
 
-static zbx_log_t	**get_result_log_value(AGENT_RESULT *result)
+static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
 {
 	if (0 != ISSET_LOG(result))
-		return result->logs;
+		return result->log;
 
-	if (0 != ISSET_STR(result) || 0 != ISSET_TEXT(result) || 0 != ISSET_UI64(result) || 0 != ISSET_DBL(result))
+	if (0 != ISSET_VALUE(result))
 	{
-		zbx_log_t	*log;
-		size_t		i;
+		result->log = zbx_malloc(result->log, sizeof(zbx_log_t));
 
-		log = zbx_malloc(NULL, sizeof(zbx_log_t));
+		zbx_log_init(result->log);
 
-		zbx_log_init(log);
 		if (0 != ISSET_STR(result))
-			log->value = zbx_strdup(log->value, result->str);
+			result->log->value = zbx_strdup(result->log->value, result->str);
 		else if (0 != ISSET_TEXT(result))
-			log->value = zbx_strdup(log->value, result->text);
+			result->log->value = zbx_strdup(result->log->value, result->text);
 		else if (0 != ISSET_UI64(result))
-			log->value = zbx_dsprintf(log->value, ZBX_FS_UI64, result->ui64);
+			result->log->value = zbx_dsprintf(result->log->value, ZBX_FS_UI64, result->ui64);
 		else if (0 != ISSET_DBL(result))
-			log->value = zbx_dsprintf(log->value, ZBX_FS_DBL, result->dbl);
+			result->log->value = zbx_dsprintf(result->log->value, ZBX_FS_DBL, result->dbl);
 
-		for (i = 0; NULL != result->logs && NULL != result->logs[i]; i++)
-			;
-
-		result->logs = zbx_realloc(result->logs, sizeof(zbx_log_t *) * (i + 2));
-
-		result->logs[i++] = log;
-		result->logs[i] = NULL;
 		result->type |= AR_LOG;
 
-		return result->logs;
+		return result->log;
 	}
 
 	return NULL;

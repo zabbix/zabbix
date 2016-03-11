@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,9 @@ extern char	*CONFIG_FPING6_LOCATION;
 #endif
 extern char	*CONFIG_TMPDIR;
 
-/* official fping does not support source IP address */
-/* patched versions provide either -I or -S options */
+/* old official fping (2.4b2_to_ipv6) did not support source IP address */
+/* old patched versions (2.4b2_to_ipv6) provided either -I or -S options */
+/* current official fping (3.x) provides -I option for binding to an interface and -S option for source IP address */
 
 static unsigned char	source_ip_checked = 0;
 static const char	*source_ip_option = NULL;
@@ -57,7 +58,7 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
 		if ('-' == p[0] && 'I' == p[1] && isspace(p[2]))
 		{
 			*option = "-I";
-			break;
+			continue;
 		}
 
 		if ('-' == p[0] && 'S' == p[1] && isspace(p[2]))

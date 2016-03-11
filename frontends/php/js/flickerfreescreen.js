@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2015 Zabbix SIA
+ ** Copyright (C) 2001-2016 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -69,16 +69,19 @@ jQuery(function($) {
 			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
 			ajaxUrl.setArgument('flickerfreeScreenId', id);
-			ajaxUrl.setArgument('pageFile', screen.pageFile);
-			ajaxUrl.setArgument('screenid', screen.screenid);
-			ajaxUrl.setArgument('screenitemid', screen.screenitemid);
-			ajaxUrl.setArgument('groupid', screen.groupid);
-			ajaxUrl.setArgument('hostid', screen.hostid);
-			ajaxUrl.setArgument('profileIdx', empty(screen.profileIdx) ? null : screen.profileIdx);
 			ajaxUrl.setArgument('profileIdx2', empty(screen.profileIdx2) ? null : screen.profileIdx2);
-			ajaxUrl.setArgument('updateProfile', empty(screen.updateProfile) ? null : +screen.updateProfile);
-			ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
-			ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+
+			if (screen.resourcetype != 21) {
+				ajaxUrl.setArgument('pageFile', screen.pageFile);
+				ajaxUrl.setArgument('screenid', screen.screenid);
+				ajaxUrl.setArgument('screenitemid', screen.screenitemid);
+				ajaxUrl.setArgument('groupid', screen.groupid);
+				ajaxUrl.setArgument('hostid', screen.hostid);
+				ajaxUrl.setArgument('profileIdx', empty(screen.profileIdx) ? null : screen.profileIdx);
+				ajaxUrl.setArgument('updateProfile', empty(screen.updateProfile) ? null : +screen.updateProfile);
+				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
+				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
+			}
 
 			// SCREEN_RESOURCE_GRAPH
 			// SCREEN_RESOURCE_SIMPLE_GRAPH
@@ -163,6 +166,12 @@ jQuery(function($) {
 				}
 			}
 
+			// SCREEN_RESOURCE_HTTPTEST_DETAILS
+			else if (screen.resourcetype == 21) {
+				ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
+				this.refreshHtml(id, ajaxUrl);
+			}
+
 			// others
 			else {
 				this.refreshHtml(id, ajaxUrl);
@@ -189,7 +198,7 @@ jQuery(function($) {
 			for (var id in this.screens) {
 				var screen = this.screens[id];
 
-				if (!empty(screen.id)) {
+				if (!empty(screen.id) && typeof screen.timeline !== 'undefined') {
 					screen.timeline.period = period;
 					screen.timeline.stime = stime;
 					screen.timeline.isNow = isNow;

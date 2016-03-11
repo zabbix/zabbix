@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2015 Zabbix SIA
+** Copyright (C) 2001-2016 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ class CProfile {
 	 */
 	protected static function deleteValues($idx, array $idx2) {
 		// remove from DB
-		DB::delete('profiles', ['idx' => $idx, 'idx2' => $idx2]);
+		DB::delete('profiles', ['idx' => $idx, 'idx2' => $idx2, 'userid' => self::$userDetails['userid']]);
 	}
 
 	/**
