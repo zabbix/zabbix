@@ -356,7 +356,7 @@ class CScreenBuilder {
 			$newColumns = [(new CCol())->addClass(ZBX_STYLE_CELL_WIDTH)];
 
 			for ($i = 0, $size = $this->screen['hsize']; $i < $size; $i++) {
-				if ($this->screen['hsize'] >= 100) {
+				if ($this->screen['hsize'] >= SCREEN_MAX_SIZE) {
 					$link = (new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addClass(ZBX_STYLE_DISABLED);
@@ -374,7 +374,7 @@ class CScreenBuilder {
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
 
-			if ($this->screen['hsize'] >= 100) {
+			if ($this->screen['hsize'] >= SCREEN_MAX_SIZE) {
 				$link = (new CDiv('+'))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 					->addClass(ZBX_STYLE_DISABLED);
@@ -401,7 +401,7 @@ class CScreenBuilder {
 
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				if ($this->screen['vsize'] >= 100) {
+				if ($this->screen['vsize'] >= SCREEN_MAX_SIZE) {
 					$link = (new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addClass(ZBX_STYLE_DISABLED);
@@ -563,7 +563,7 @@ class CScreenBuilder {
 
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				if ($this->screen['vsize'] == 1) {
+				if ($this->screen['vsize'] == SCREEN_MIN_SIZE) {
 					$link = (new CDiv('−'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addClass(ZBX_STYLE_DISABLED);
@@ -588,7 +588,7 @@ class CScreenBuilder {
 
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			if ($this->screen['vsize'] >= 100) {
+			if ($this->screen['vsize'] >= SCREEN_MAX_SIZE) {
 				$link = (new CDiv('+'))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 					->addClass(ZBX_STYLE_DISABLED);
@@ -608,7 +608,7 @@ class CScreenBuilder {
 			];
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
-				if ($this->screen['hsize'] == 1) {
+				if ($this->screen['hsize'] == SCREEN_MIN_SIZE) {
 					$link = (new CDiv('−'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addClass(ZBX_STYLE_DISABLED);
