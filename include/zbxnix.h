@@ -20,6 +20,6 @@
 #ifndef ZABBIX_ZBXNIX_H
 #define ZABBIX_ZBXNIX_H
 
-int    zbx_coredump_disable(void);
+int	zbx_coredump_disable(void);
 
 #endif	/* ZABBIX_ZBXNIX_H */
