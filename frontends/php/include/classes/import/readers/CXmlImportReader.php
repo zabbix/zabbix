@@ -125,9 +125,7 @@ class CXmlImportReader extends CImportReader {
 
 				case XMLReader::TEXT:
 					if (is_array($data)) {
-						if (is_array($data)) {
-							array_pop($nodes);
-						}
+						array_pop($nodes);
 
 						$patch = '';
 
