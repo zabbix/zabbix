@@ -254,7 +254,7 @@ function make_system_status($filter) {
 		'maintenance' => $filter['maintenance'],
 		'skipDependent' => true,
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid'),
+		'selectLastEvent' => array('eventid', 'acknowledged', 'objectid', 'clock', 'ns'),
 		'filter' => array(
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -303,6 +303,7 @@ function make_system_status($filter) {
 			$trigger['event'] = array(
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
+				'ns' => '999999999',
 				'value' => $trigger['value']
 			);
 		}
@@ -1531,9 +1532,12 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 
 	CArrayHelper::sort($triggers, array(array('field' => 'lastchange', 'order' => ZBX_SORT_DOWN)));
 
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
-
 	foreach ($triggers as $trigger) {
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+			'clock' => $trigger['event']['clock'],
+			'ns' => $trigger['event']['ns']
+		)));
+
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
@@ -1558,7 +1562,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 
 		$popupTable->addRow(array(
 			$trigger['hosts'][0]['name'],
-			getSeverityCell($trigger['priority'], $trigger['description']),
+			getSeverityCell($trigger['priority'], $description),
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
