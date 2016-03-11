@@ -464,6 +464,8 @@ function getMenuPopupMap(options) {
 			else {
 				var url = new Curl('events.php?filter_set=1');
 
+				url.unsetArgument('sid');
+
 				jQuery.each(options.gotos.events, function(name, value) {
 					url.setArgument(name, value);
 				});
