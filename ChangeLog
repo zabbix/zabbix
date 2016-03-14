@@ -3,6 +3,17 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
+A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
+...G...... [ZBX-10431] fixed net.tcp.listen on Linux when using netlink interface to obtain socket data; thanks to Andrey Melnikov for patch (wiper)
+A.F....... [ZBX-9700] fixed API receiving null and false instead of an array in method parameters (Ivo)
+..F....... [ZBX-10379] added context for text strings 'Filter' and 'Subject' (zalex_ua)
+..F....... [ZBX-10360] improved description for 'fuzzytime' trigger function in expression helper (zalex_ua)
+..F....... [ZBX-9659] changed setup condition for checking always_populate_raw_post_data (Cemeris)
+....I...S. [ZBX-10485] fixed database upgrade crash on attempt to substitute old-style comparison operators in empty trigger expressions (gleb, Sasha)
+..F....... [ZBX-10422] fixed layout of the history tables (Sasha)
+..F....... [ZBX-10386] fixed slideshow refresh rate (Ivo)
+A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 .......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
@@ -507,6 +518,10 @@ A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean,
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
+....I...S. [ZBX-10485] fixed database upgrade crash on attempt to substitute old-style comparison operators in empty trigger expressions (gleb, Sasha)
+..F....... [ZBX-10386] fixed slideshow refresh rate (Ivo)
+A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
 .......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
 .......PS. [ZBX-10429] fixed expression evaluation when a negated macro or function has a negative value itself (asaveljevs)
@@ -1265,6 +1280,10 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
+A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
+..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
+A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
 .......PS. [ZBX-4894] fixed fping 3.x source IP option detection (asaveljevs)
 .......PS. [ZBX-10320] fixed NFS based VMware datastore statistics (wiper)
