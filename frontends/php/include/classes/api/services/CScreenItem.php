@@ -894,11 +894,11 @@ class CScreenItem extends CApiService {
 	/**
 	 * Check duplicates screen items in one cell.
 	 *
-	 * @throws APIException
-	 *
 	 * @param array $screenItems
 	 * @param array $dbScreenItems
 	 * @param array $dbScreens
+	 *
+	 * @throws APIException if input is invalid.
 	 */
 	protected function checkDuplicateResourceInCell(array $screenItems, array $dbScreenItems, array $dbScreens) {
 		$pos = [];

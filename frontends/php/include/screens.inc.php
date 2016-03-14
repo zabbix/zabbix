@@ -79,15 +79,15 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 }
 
 /**
- * Add screen row
+ * Add screen row.
  *
  * @param array $screen
  * @param int   $row_num
  */
-function addScreenRow($screen, $row_num) {
+function addScreenRow(array $screen, $row_num) {
 	foreach ($screen['screenitems'] as &$screen_item) {
 		if ($screen_item['y'] >= $row_num) {
-			$screen_item['y'] ++;
+			$screen_item['y']++;
 		}
 	}
 	unset($screen_item);
@@ -107,15 +107,15 @@ function addScreenRow($screen, $row_num) {
 }
 
 /**
- * Add screen column
+ * Add screen column.
  *
  * @param array $screen
  * @param int   $col_num
  */
-function addScreenColumn($screen, $col_num) {
+function addScreenColumn(array $screen, $col_num) {
 	foreach ($screen['screenitems'] as &$screen_item) {
 		if ($screen_item['x'] >= $col_num) {
-			$screen_item['x'] ++;
+			$screen_item['x']++;
 		}
 	}
 	unset($screen_item);
@@ -135,18 +135,18 @@ function addScreenColumn($screen, $col_num) {
 }
 
 /**
- * Remove screen row
+ * Remove screen row.
  *
  * @param array $screen
  * @param int   $row_num
  */
-function delScreenRow($screen, $row_num) {
+function delScreenRow(array $screen, $row_num) {
 	foreach ($screen['screenitems'] as $key => &$screen_item) {
 		if ($screen_item['y'] == $row_num) {
 			unset($screen['screenitems'][$key]);
 		}
 		elseif ($screen_item['y'] > $row_num) {
-			$screen_item['y'] --;
+			$screen_item['y']--;
 		}
 	}
 	unset($screen_item);
@@ -166,18 +166,18 @@ function delScreenRow($screen, $row_num) {
 }
 
 /**
- * Remove screen column
+ * Remove screen column.
  *
  * @param array $screen
  * @param int   $col_num
  */
-function delScreenColumn($screen, $col_num) {
+function delScreenColumn(array $screen, $col_num) {
 	foreach ($screen['screenitems'] as $key => &$screen_item) {
 		if ($screen_item['x'] == $col_num) {
 			unset($screen['screenitems'][$key]);
 		}
 		elseif ($screen_item['x'] > $col_num) {
-			$screen_item['x'] --;
+			$screen_item['x']--;
 		}
 	}
 	unset($screen_item);
