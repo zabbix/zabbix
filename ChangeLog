@@ -15,6 +15,7 @@ Changes for 3.0.2rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-10086] restored old behaviour - do not disable core dump if compiled without encryption support (Andris)
 .......PS. [ZBX-10459] fixed compilation error with libxml2 versions before 2.7.0 (wiper)
 ...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
 A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
