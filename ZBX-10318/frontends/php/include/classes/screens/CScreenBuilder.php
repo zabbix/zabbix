@@ -456,7 +456,7 @@ class CScreenBuilder {
 
 				if (!empty($screenitem['screenitemid'])) {
 					$emptyScreenRow = false;
-					$emptyScreenColumns[$c] = 1;
+					$emptyScreenColumns[$c] = true;
 				}
 
 				// action
@@ -619,7 +619,8 @@ class CScreenBuilder {
 					))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
 						->addSID();
-					if (isset($emptyScreenColumns[$i])) {
+
+					if (array_key_exists($i, $emptyScreenColumns)) {
 						$link->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')));
 					}
 				}

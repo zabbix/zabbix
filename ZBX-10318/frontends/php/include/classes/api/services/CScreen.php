@@ -406,14 +406,13 @@ class CScreen extends CApiService {
 	}
 
 	/**
-	 * Validate vsize and hsize parameters
+	 * Validate vsize and hsize parameters.
 	 *
 	 * @param array $screen
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateScreenSize(array $screen)
-	{
+	protected function validateScreenSize(array $screen) {
 		foreach (['vsize', 'hsize'] as $field_name) {
 			if (!array_key_exists($field_name, $screen)) {
 				continue;
