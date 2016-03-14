@@ -7,7 +7,7 @@ A......... [ZBX-9859] improved performance of screen.get method for an unprivile
 
 Bug fixes:
 ...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
-A.F....... [ZBX-4842] improved auditing of maintenance API operations (Gunars)
+A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
 ..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
 A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
