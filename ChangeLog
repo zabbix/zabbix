@@ -13,8 +13,12 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.2rc1
 
 New features:
+..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+A......... [ZBX-10318,ZBX-10517] added validation of vsize and hsize parameters in screen.create() and screen.update() methods (Sasha)
+A......... [ZBX-10318,ZBX-10517] fixed validation of screen elements position in screen.create() and screen.update() methods (Sasha)
+..F....... [ZBX-10318] more secure removing of the screen columns and rows in GUI (Cemeris, Sasha)
 ...G...PS. [ZBX-10086] restored old behaviour - do not disable core dump if compiled without encryption support (Andris)
 .......PS. [ZBX-10459] fixed compilation error with libxml2 versions before 2.7.0 (wiper)
 ...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
