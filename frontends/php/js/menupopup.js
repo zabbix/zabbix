@@ -608,8 +608,10 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid
-	);
+	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid);
+
+	url.unsetArgument('sid');
+
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
