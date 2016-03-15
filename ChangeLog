@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
 ...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
 A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
 ..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
