@@ -23,6 +23,7 @@
 
 #include "comms.h"
 #include "log.h"
+#include "sysinfo.h"
 
 #define SSH_RUN_KEY	"ssh.run"
 
@@ -75,7 +76,7 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 }
 
 /* example ssh.run["ls /"] */
-static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
+static int	ssh_run(DC_ITEM *item, zbx_result_t *result, const char *encoding)
 {
 	const char	*__function_name = "ssh_run";
 	zbx_socket_t	s;
@@ -92,14 +93,14 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
 		goto close;
 	}
 
 	/* initializes an SSH session object */
 	if (NULL == (session = libssh2_session_init()))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize SSH session"));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize SSH session"));
 		goto tcp_close;
 	}
 
@@ -111,7 +112,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	if (0 != libssh2_session_startup(session, s.socket))
 	{
 		libssh2_session_last_error(session, &ssherr, NULL, 0);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssherr));
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot establish SSH session: %s", ssherr));
 		goto session_free;
 	}
 
@@ -128,7 +129,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	else
 	{
 		libssh2_session_last_error(session, &ssherr, NULL, 0);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain authentication methods: %s", ssherr));
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain authentication methods: %s", ssherr));
 		goto session_close;
 	}
 
@@ -143,7 +144,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				if (0 != libssh2_userauth_password(session, item->username, item->password))
 				{
 					libssh2_session_last_error(session, &ssherr, NULL, 0);
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Password authentication failed: %s",
+					ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Password authentication failed: %s",
 							ssherr));
 					goto session_close;
 				}
@@ -158,7 +159,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				if (0 != libssh2_userauth_keyboard_interactive(session, item->username, &kbd_callback))
 				{
 					libssh2_session_last_error(session, &ssherr, NULL, 0);
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Keyboard-interactive authentication"
+					ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Keyboard-interactive authentication"
 							" failed: %s", ssherr));
 					goto session_close;
 				}
@@ -168,7 +169,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			}
 			else
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
+				ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
 						" Supported methods: %s", userauthlist));
 				goto session_close;
 			}
@@ -178,7 +179,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			{
 				if (NULL == CONFIG_SSH_KEY_LOCATION)
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Authentication by public key failed."
+					ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Authentication by public key failed."
 							" SSHKeyLocation option is not set"));
 					goto session_close;
 				}
@@ -190,14 +191,14 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				if (SUCCEED != zbx_is_regular_file(publickey))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access public key file %s",
+					ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access public key file %s",
 							publickey));
 					goto session_close;
 				}
 
 				if (SUCCEED != zbx_is_regular_file(privatekey))
 				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access private key file %s",
+					ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot access private key file %s",
 							privatekey));
 					goto session_close;
 				}
@@ -208,7 +209,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				if (0 != rc)
 				{
 					libssh2_session_last_error(session, &ssherr, NULL, 0);
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Public key authentication failed:"
+					ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Public key authentication failed:"
 							" %s", ssherr));
 					goto session_close;
 				}
@@ -218,7 +219,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			}
 			else
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
+				ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Unsupported authentication method."
 						" Supported methods: %s", userauthlist));
 				goto session_close;
 			}
@@ -235,7 +236,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				waitsocket(s.socket, session);
 				continue;
 			default:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot establish generic session channel"));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot establish generic session channel"));
 				goto session_close;
 		}
 	}
@@ -250,7 +251,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 				waitsocket(s.socket, session);
 				continue;
 			default:
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot request a shell"));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot request a shell"));
 				goto channel_close;
 		}
 	}
@@ -281,7 +282,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 			waitsocket(s.socket, session);
 		else if (rc < 0)
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read data from SSH server"));
 			goto channel_close;
 		}
 		else
@@ -289,7 +290,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 	}
 
 	buffer[bytecount] = '\0';
-	SET_STR_RESULT(result, convert_to_utf8(buffer, bytecount, encoding));
+	ZBX_SET_STR_RESULT(result, convert_to_utf8(buffer, bytecount, encoding));
 
 	ret = SYSINFO_RET_OK;
 
@@ -329,7 +330,7 @@ close:
 	return ret;
 }
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_ssh(DC_ITEM *item, zbx_result_t *result)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED;
@@ -339,19 +340,19 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
 	}
 
 	if (0 != strcmp(SSH_RUN_KEY, get_rkey(&request)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 		goto out;
 	}
 
 	if (4 < get_rparams_num(&request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto out;
 	}
 
@@ -365,7 +366,7 @@ int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		if (FAIL == is_ushort(port, &item->interface.port))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 			goto out;
 		}
 	}

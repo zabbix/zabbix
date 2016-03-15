@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TELNET_H
 #define ZABBIX_TELNET_H
 
-#include "sysinfo.h"
+#include "zbxresult.h"
 #include "comms.h"
 
 #define WAIT_READ	0
@@ -34,7 +34,7 @@
 #define OPT_SGA		3
 
 int	telnet_test_login(ZBX_SOCKET socket_fd);
-int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result);
-int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding);
+int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, zbx_result_t *result);
+int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, zbx_result_t *result, const char *encoding);
 
 #endif

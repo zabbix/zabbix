@@ -36,7 +36,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 {
 	const char	*__function_name = "zbx_execute_script_on_agent";
 	int		ret;
-	AGENT_RESULT	agent_result;
+	zbx_result_t	agent_result;
 	char		*param, *port = NULL;
 	DC_ITEM		item;
 
@@ -67,22 +67,22 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	zbx_free(param);
 
-	init_result(&agent_result);
+	zbx_init_result(&agent_result);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	if (SUCCEED != (ret = get_value_agent(&item, &agent_result)))
 	{
-		if (ISSET_MSG(&agent_result))
+		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
 		ret = FAIL;
 	}
-	else if (NULL != result && ISSET_TEXT(&agent_result))
+	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
 
 	zbx_alarm_off();
 
-	free_result(&agent_result);
+	zbx_free_result(&agent_result);
 
 	zbx_free(item.key);
 fail:
@@ -142,7 +142,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
 	int		ret;
-	AGENT_RESULT	agent_result;
+	zbx_result_t	agent_result;
 	DC_ITEM		item;
 	int             (*function)();
 
@@ -203,22 +203,22 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
 
-	init_result(&agent_result);
+	zbx_init_result(&agent_result);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 
 	if (SUCCEED != (ret = function(&item, &agent_result)))
 	{
-		if (ISSET_MSG(&agent_result))
+		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
 		ret = FAIL;
 	}
-	else if (NULL != result && ISSET_TEXT(&agent_result))
+	else if (NULL != result && ZBX_ISSET_TEXT(&agent_result))
 		*result = zbx_strdup(*result, agent_result.text);
 
 	zbx_alarm_off();
 
-	free_result(&agent_result);
+	zbx_free_result(&agent_result);
 
 	zbx_free(item.params);
 	zbx_free(item.key);

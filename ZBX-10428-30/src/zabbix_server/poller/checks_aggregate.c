@@ -324,7 +324,7 @@ static void	aggregate_get_items(zbx_vector_uint64_t *itemids, const char *groups
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, const char *groups,
+static int	evaluate_aggregate(DC_ITEM *item, zbx_result_t *res, int grp_func, const char *groups,
 		const char *itemkey, int item_func, const char *param)
 {
 	const char			*__function_name = "evaluate_aggregate";
@@ -346,7 +346,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	if (0 == itemids.values_num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key \"%s\" in group(s) \"%s\".", itemkey, groups));
+		ZBX_SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No items for key \"%s\" in group(s) \"%s\".", itemkey, groups));
 		goto clean1;
 	}
 
@@ -367,7 +367,7 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 	{
 		if (FAIL == is_uint_suffix(param, &seconds))
 		{
-			SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
+			ZBX_SET_MSG_RESULT(res, zbx_strdup(NULL, "Invalid fourth parameter."));
 			goto clean2;
 		}
 		count = 0;
@@ -412,16 +412,16 @@ static int	evaluate_aggregate(DC_ITEM *item, AGENT_RESULT *res, int grp_func, co
 
 	if (0 == group_values.values_num)
 	{
-		SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) \"%s\"", itemkey, groups));
+		ZBX_SET_MSG_RESULT(res, zbx_dsprintf(NULL, "No values for key \"%s\" in group(s) \"%s\"", itemkey, groups));
 		goto clean2;
 	}
 
 	evaluate_history_func(&group_values, item->value_type, grp_func, &value);
 
 	if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-		SET_DBL_RESULT(res, value.dbl);
+		ZBX_SET_DBL_RESULT(res, value.dbl);
 	else
-		SET_UI64_RESULT(res, value.ui64);
+		ZBX_SET_UI64_RESULT(res, value.ui64);
 
 	ret = SUCCEED;
 clean2:
@@ -453,7 +453,7 @@ clean1:
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_aggregate(DC_ITEM *item, zbx_result_t *result)
 {
 	const char	*__function_name = "get_value_aggregate";
 
@@ -468,13 +468,13 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value type must be Numeric for aggregate items"));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Value type must be Numeric for aggregate items"));
 		goto out;
 	}
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
 	}
 
@@ -496,7 +496,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key."));
 		goto out;
 	}
 
@@ -504,7 +504,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (3 > params_num || params_num > 4)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
@@ -526,7 +526,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 		item_func = ZBX_VALUE_FUNC_LAST;
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 		goto out;
 	}
 
@@ -536,7 +536,7 @@ int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result)
 	}
 	else if (3 == params_num && ZBX_VALUE_FUNC_LAST != item_func)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 

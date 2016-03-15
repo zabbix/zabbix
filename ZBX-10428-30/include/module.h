@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+/* THIS FILE IS MEANT TO BE USED BY USER LOADABLE MODULES */
+/*       DO NOT MAKE CHANGES WITHOUT A GOOD REASON        */
+
 #ifndef ZABBIX_MODULE_H
 #define ZABBIX_MODULE_H
 
@@ -60,9 +63,11 @@ typedef struct
 {
 	char		*value;
 	char		*source;
+	zbx_uint64_t	lastlogsize;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
+	int		mtime;
 }
 zbx_log_t;
 
@@ -73,20 +78,19 @@ zbx_log_t;
 #define AR_TEXT		0x08
 #define AR_LOG		0x10
 #define AR_MESSAGE	0x20
-#define AR_META		0x40
 
 /* agent return structure */
 typedef struct
 {
-	zbx_uint64_t	lastlogsize;	/* meta information */
+	int	 	type;		/* see AR_* above */
 	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
 	char		*text;
-	char		*msg;		/* possible error message */
-	zbx_log_t	*log;
-	int	 	type;		/* flags: see AR_* above */
-	int		mtime;		/* meta information */
+	char		*msg;
+
+	/* null-terminated list of pointers */
+	zbx_log_t	**logs;
 }
 AGENT_RESULT;
 
@@ -122,7 +126,7 @@ AGENT_RESULT;
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
-	(res)->log = (zbx_log_t *)(val)		\
+	(res)->logs = (zbx_log_t **)(val)	\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */

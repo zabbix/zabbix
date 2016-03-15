@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "sysinfo.h"
 #include "zbxexec.h"
 
 #include "checks_external.h"
@@ -40,7 +41,7 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  * Author: Mike Nestor, rewritten by Alexander Vladishev                      *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_external(DC_ITEM *item, zbx_result_t *result)
 {
 	const char	*__function_name = "get_value_external";
 
@@ -55,7 +56,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED != parse_item_key(item->key, &request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto out;
 	}
 
@@ -64,7 +65,7 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (-1 == access(cmd, X_OK))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s: %s", cmd, zbx_strerror(errno)));
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s: %s", cmd, zbx_strerror(errno)));
 		goto out;
 	}
 
@@ -84,13 +85,13 @@ int	get_value_external(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		if (SUCCEED == set_result_type(result, item->value_type, item->data_type, buf))
+		if (SUCCEED == zbx_set_result_type(result, item->value_type, item->data_type, buf))
 			ret = SUCCEED;
 
 		zbx_free(buf);
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 out:
 	zbx_free(cmd);
 

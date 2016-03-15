@@ -20,7 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "sysinfo.h"
+#include "zbxresult.h"
 #include "zbxserver.h"
 
 #include "proxy.h"
@@ -2015,7 +2015,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		int *processed)
 {
 	const char		*__function_name = "process_mass_data";
-	AGENT_RESULT		result;
+	zbx_result_t		result;
 	DC_ITEM			*items = NULL;
 	zbx_host_key_t		*keys = NULL;
 	size_t			i;
@@ -2197,11 +2197,11 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		{
 			int	res = SUCCEED;
 
-			init_result(&result);
+			zbx_init_result(&result);
 
 			if (NULL != values[i].value)
 			{
-				res = set_result_type(&result, items[i].value_type,
+				res = zbx_set_result_type(&result, items[i].value_type,
 						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
 						values[i].value);
 			}
@@ -2223,7 +2223,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 				if (0 != values[i].meta)
-					set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
+					zbx_set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
@@ -2232,7 +2232,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				if (NULL != processed)
 					(*processed)++;
 			}
-			else if (ISSET_MSG(&result))
+			else if (ZBX_ISSET_MSG(&result))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "item [%s:%s] error: %s",
 						items[i].host.host, items[i].key_orig, result.msg);
@@ -2244,7 +2244,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			else
 				THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
 
-			free_result(&result);
+			zbx_free_result(&result);
 		}
 
 		itemids[num] = items[i].itemid;

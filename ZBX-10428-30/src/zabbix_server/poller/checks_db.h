@@ -25,6 +25,6 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-int	get_value_db(DC_ITEM *item, AGENT_RESULT *result);
+int	get_value_db(DC_ITEM *item, zbx_result_t *result);
 
 #endif

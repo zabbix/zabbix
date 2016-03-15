@@ -22,7 +22,7 @@
 #include "simple.h"
 #include "log.h"
 
-typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);
+typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, zbx_result_t *);
 
 #define ZBX_VMWARE_PREFIX	"vmware."
 
@@ -135,11 +135,12 @@ static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 	return FAIL;
 }
 
-int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+int	get_value_simple(DC_ITEM *item, zbx_result_t *result, zbx_vector_ptr_t *add_results)
 {
 	const char	*__function_name = "get_value_simple";
 
 	AGENT_REQUEST	request;
+	AGENT_RESULT	agent_result;
 	vmfunc_t	vmfunc;
 	int		ret = NOTSUPPORTED;
 
@@ -154,13 +155,23 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 0))
+		init_result(&agent_result);
+
+		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, &agent_result, 0))
 			ret = SUCCEED;
+
+		zbx_extract_results(&agent_result, add_results);
+		free_result(&agent_result);
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
+		init_result(&agent_result);
+
+		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, &agent_result, 1))
 			ret = SUCCEED;
+
+		zbx_extract_results(&agent_result, add_results);
+		free_result(&agent_result);
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
 	{
@@ -170,7 +181,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 				ret = SUCCEED;
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
 	}
 	else if (0 == strcmp(request.key, ZBX_VMWARE_PREFIX "eventlog"))
 	{
@@ -178,18 +189,23 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 		if (SYSINFO_RET_OK == check_vcenter_eventlog(&request, item, result, add_results))
 			ret = SUCCEED;
 #else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for VMware checks was not compiled in."));
 #endif
 	}
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result))
+		init_result(&agent_result);
+
+		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, &agent_result))
 			ret = SUCCEED;
+
+		zbx_extract_results(&agent_result, add_results);
+		free_result(&agent_result);
 	}
 
-	if (NOTSUPPORTED == ret && !ISSET_MSG(result))
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
+	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Simple check is not supported."));
 
 	free_request(&request);
 

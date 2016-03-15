@@ -23,6 +23,7 @@ DIST_SUBDIRS = \
 	zbxexec \
 	zbxself \
 	zbxmodules \
+	zbxresult \
 	zbxregexp
 
 if SERVER
@@ -36,7 +37,8 @@ SERVER_SUBDIRS = \
 	zbxserver \
 	zbxicmpping \
 	zbxmedia \
-	zbxself
+	zbxself \
+	zbxresult
 else
 if PROXY
 PROXY_SUBDIRS = \
@@ -48,7 +50,8 @@ PROXY_SUBDIRS = \
 	zbxmemory \
 	zbxserver \
 	zbxicmpping \
-	zbxself
+	zbxself \
+	zbxresult
 else
 if AGENT
 AGENT_SUBDIRS = \

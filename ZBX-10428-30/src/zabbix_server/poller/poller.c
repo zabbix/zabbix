@@ -407,13 +407,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void    free_result_ptr(AGENT_RESULT *result)
+static void    free_result_ptr(zbx_result_t *result)
 {
-	free_result(result);
+	zbx_free_result(result);
 	zbx_free(result);
 }
 
-static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
+static int	get_value(DC_ITEM *item, zbx_result_t *result, zbx_vector_ptr_t *add_results)
 {
 	const char	*__function_name = "get_value";
 	int		res = FAIL;
@@ -431,7 +431,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 #ifdef HAVE_OPENIPMI
 			res = get_value_ipmi(item, result);
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for IPMI checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
@@ -448,7 +448,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_db(item, result);
 			zbx_alarm_off();
 #else
-			SET_MSG_RESULT(result,
+			ZBX_SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
@@ -466,7 +466,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_ssh(item, result);
 			zbx_alarm_off();
 #else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
@@ -479,14 +479,14 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 			res = get_value_calculated(item, result);
 			break;
 		default:
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
+			ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
 			res = CONFIG_ERROR;
 	}
 
 	if (SUCCEED != res)
 	{
-		if (!ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
+		if (!ZBX_ISSET_MSG(result))
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
@@ -516,7 +516,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 {
 	const char		*__function_name = "get_values";
 	DC_ITEM			items[MAX_POLLER_ITEMS];
-	AGENT_RESULT		results[MAX_POLLER_ITEMS];
+	zbx_result_t		results[MAX_POLLER_ITEMS];
 	int			errcodes[MAX_POLLER_ITEMS];
 	zbx_timespec_t		timespec;
 	char			*port = NULL, error[ITEM_ERROR_LEN_MAX];
@@ -536,14 +536,14 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	/* prepare items */
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
@@ -561,7 +561,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
-					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
+					ZBX_SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
 					errcodes[i] = CONFIG_ERROR;
 					continue;
@@ -596,7 +596,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
@@ -644,7 +644,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
+			ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
 			errcodes[i] = CONFIG_ERROR;
 		}
 #endif
@@ -703,9 +703,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			/* remove formatting symbols from the end of the result */
 			/* so it could be checked by "is_uint64" and "is_double" functions */
 			/* when we try to get "int" or "float" values from "string" result */
-			if (0 != ISSET_STR(&results[i]))
+			if (0 != ZBX_ISSET_STR(&results[i]))
 				zbx_rtrim(results[i].str, ZBX_WHITESPACE);
-			if (0 != ISSET_TEXT(&results[i]))
+			if (0 != ZBX_ISSET_TEXT(&results[i]))
 				zbx_rtrim(results[i].text, ZBX_WHITESPACE);
 
 			if (0 == add_results.values_num)
@@ -716,16 +716,16 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			}
 			else
 			{
-				/* vmware.eventlog item returns vector of AGENT_RESULT representing events */
+				/* vmware.eventlog item returns vector of zbx_result_t representing events */
 
 				int		j;
 				zbx_timespec_t	ts_tmp = timespec;
 
 				for (j = 0; j < add_results.values_num; j++)
 				{
-					AGENT_RESULT	*add_result = add_results.values[j];
+					zbx_result_t	*add_result = add_results.values[j];
 
-					if (ISSET_MSG(add_result))
+					if (ZBX_ISSET_MSG(add_result))
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
@@ -737,7 +737,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 						dc_add_history(items[i].itemid, items[i].value_type, items[i].flags,
 								add_result, &ts_tmp, items[i].state, NULL);
 
-						if (0 != ISSET_META(add_result))
+						if (0 != add_result->meta)
 						{
 							plastlogsize = &lastlogsize;
 							lastlogsize = add_result->lastlogsize;
@@ -791,7 +791,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				break;
 		}
 
-		free_result(&results[i]);
+		zbx_free_result(&results[i]);
 	}
 
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);

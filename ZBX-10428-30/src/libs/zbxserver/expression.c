@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+#include "sysinfo.h"
 #include "zbxserver.h"
 #include "evalfunc.h"
 #include "db.h"

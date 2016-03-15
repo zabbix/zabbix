@@ -24,6 +24,7 @@
 #include "log.h"
 #include "proxy.h"
 #include "snmptrapper.h"
+#include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 
@@ -88,7 +89,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	int			ret = FAIL, fb = -1, *lastclocks = NULL, *errcodes = NULL;
 	zbx_uint64_t		*itemids = NULL;
 	unsigned char		*states = NULL;
-	AGENT_RESULT		*results = NULL;
+	zbx_result_t		*results = NULL;
 	AGENT_REQUEST		request;
 	zbx_vector_ptr_t	regexps;
 
@@ -100,18 +101,18 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 	states = zbx_malloc(states, sizeof(unsigned char) * num);
 	lastclocks = zbx_malloc(lastclocks, sizeof(int) * num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * num);
-	results = zbx_malloc(results, sizeof(AGENT_RESULT) * num);
+	results = zbx_malloc(results, sizeof(zbx_result_t) * num);
 
 	for (i = 0; i < num; i++)
 	{
-		init_result(&results[i]);
+		zbx_init_result(&results[i]);
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
 		if (SUCCEED != substitute_key_macros(&items[i].key, NULL, &items[i], NULL,
 				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = NOTSUPPORTED;
 			continue;
 		}
@@ -141,7 +142,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 				if (0 == regexps.values_num)
 				{
-					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
+					ZBX_SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL,
 							"Global regular expression \"%s\" does not exist.", regex + 1));
 					errcodes[i] = NOTSUPPORTED;
 					goto next;
@@ -152,7 +153,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 		}
 
-		if (SUCCEED == set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
+		if (SUCCEED == zbx_set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
 			errcodes[i] = SUCCEED;
 		else
 			errcodes[i] = NOTSUPPORTED;
@@ -163,7 +164,7 @@ next:
 
 	if (FAIL == ret && -1 != fb)
 	{
-		if (SUCCEED == set_result_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
+		if (SUCCEED == zbx_set_result_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
 			errcodes[fb] = SUCCEED;
 		else
 			errcodes[fb] = NOTSUPPORTED;
@@ -201,7 +202,7 @@ next:
 		}
 
 		zbx_free(items[i].key);
-		free_result(&results[i]);
+		zbx_free_result(&results[i]);
 	}
 
 	zbx_free(results);

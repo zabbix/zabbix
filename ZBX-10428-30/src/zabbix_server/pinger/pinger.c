@@ -20,6 +20,7 @@
 #include "common.h"
 
 #include "dbcache.h"
+#include "sysinfo.h"
 #include "log.h"
 #include "zbxserver.h"
 #include "zbxicmpping.h"
@@ -60,7 +61,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	const char	*__function_name = "process_value";
 	DC_ITEM		item;
 	int		errcode;
-	AGENT_RESULT	value;
+	zbx_result_t	value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -82,17 +83,17 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	}
 	else
 	{
-		init_result(&value);
+		zbx_init_result(&value);
 
 		if (NULL != value_ui64)
-			SET_UI64_RESULT(&value, *value_ui64);
+			ZBX_SET_UI64_RESULT(&value, *value_ui64);
 		else
-			SET_DBL_RESULT(&value, *value_dbl);
+			ZBX_SET_DBL_RESULT(&value, *value_dbl);
 
 		item.state = ITEM_STATE_NORMAL;
 		dc_add_history(item.itemid, item.value_type, item.flags, &value, ts, item.state, NULL);
 
-		free_result(&value);
+		zbx_free_result(&value);
 	}
 clean:
 	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);

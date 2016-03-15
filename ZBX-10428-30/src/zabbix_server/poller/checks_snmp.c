@@ -687,7 +687,7 @@ end:
 }
 
 static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char value_type, unsigned char data_type,
-		AGENT_RESULT *result)
+		zbx_result_t *result)
 {
 	const char	*__function_name = "zbx_snmp_set_result";
 	char		*strval_dyn;
@@ -700,12 +700,12 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	{
 		if (NULL == (strval_dyn = zbx_snmp_get_octet_string(var)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot receive string value: out of memory."));
 			ret = NOTSUPPORTED;
 		}
 		else
 		{
-			if (SUCCEED != set_result_type(result, value_type, data_type, strval_dyn))
+			if (SUCCEED != zbx_set_result_type(result, value_type, data_type, strval_dyn))
 				ret = NOTSUPPORTED;
 
 			zbx_free(strval_dyn);
@@ -719,7 +719,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
 #endif
 	{
-		SET_UI64_RESULT(result, (unsigned long)*var->val.integer);
+		ZBX_SET_UI64_RESULT(result, (unsigned long)*var->val.integer);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_COUNTER64 == var->type || ASN_OPAQUE_COUNTER64 == var->type)
@@ -727,7 +727,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	else if (ASN_COUNTER64 == var->type)
 #endif
 	{
-		SET_UI64_RESULT(result, (((zbx_uint64_t)var->val.counter64->high) << 32) +
+		ZBX_SET_UI64_RESULT(result, (((zbx_uint64_t)var->val.counter64->high) << 32) +
 				(zbx_uint64_t)var->val.counter64->low);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
@@ -740,22 +740,22 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 
 		zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
 
-		if (SUCCEED != set_result_type(result, value_type, data_type, buffer))
+		if (SUCCEED != zbx_set_result_type(result, value_type, data_type, buffer))
 			ret = NOTSUPPORTED;
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
 	else if (ASN_OPAQUE_FLOAT == var->type)
 	{
-		SET_DBL_RESULT(result, *var->val.floatVal);
+		ZBX_SET_DBL_RESULT(result, *var->val.floatVal);
 	}
 	else if (ASN_OPAQUE_DOUBLE == var->type)
 	{
-		SET_DBL_RESULT(result, *var->val.doubleVal);
+		ZBX_SET_DBL_RESULT(result, *var->val.doubleVal);
 	}
 #endif
 	else if (ASN_IPADDRESS == var->type)
 	{
-		SET_STR_RESULT(result, zbx_dsprintf(NULL, "%u.%u.%u.%u",
+		ZBX_SET_STR_RESULT(result, zbx_dsprintf(NULL, "%u.%u.%u.%u",
 				(unsigned int)var->val.string[0],
 				(unsigned int)var->val.string[1],
 				(unsigned int)var->val.string[2],
@@ -763,7 +763,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
+		ZBX_SET_MSG_RESULT(result, zbx_get_snmp_type_error(var->type));
 		ret = NOTSUPPORTED;
 	}
 
@@ -935,7 +935,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	char			snmp_oid[MAX_STRING_LEN];
 	struct variable_list	*var;
 	int			status, level, running, num_vars, ret = SUCCEED;
-	AGENT_RESULT		snmp_result;
+	zbx_result_t		snmp_result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' bulk:%d", __function_name, (int)item->type, OID, bulk);
 
@@ -1074,10 +1074,10 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					break;
 				}
 
-				init_result(&snmp_result);
+				zbx_init_result(&snmp_result);
 
 				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
-						NULL != GET_STR_RESULT(&snmp_result))
+						NULL != ZBX_GET_STR_RESULT(&snmp_result))
 				{
 					walk_cb_func(walk_cb_arg, OID, snmp_oid, snmp_result.str);
 				}
@@ -1085,13 +1085,13 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 				{
 					char	**msg;
 
-					msg = GET_MSG_RESULT(&snmp_result);
+					msg = ZBX_GET_MSG_RESULT(&snmp_result);
 
 					zabbix_log(LOG_LEVEL_DEBUG, "cannot get index '%s' string value: %s",
 							snmp_oid, NULL != msg && NULL != *msg ? *msg : "(null)");
 				}
 
-				free_result(&snmp_result);
+				zbx_free_result(&snmp_result);
 
 				/* go to next variable */
 				memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
@@ -1124,7 +1124,7 @@ out:
 }
 
 static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
-		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
+		zbx_result_t *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
 		char *error, size_t max_error_len, int *max_succeed, int *min_fail)
 {
 	const char		*__function_name = "zbx_snmp_get_values";
@@ -1157,7 +1157,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 		if (NULL == snmp_parse_oid(oids[i], parsed_oids[i], &parsed_oid_lens[i]))
 		{
-			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".",
+			ZBX_SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "snmp_parse_oid(): cannot parse OID \"%s\".",
 					oids[i]));
 			errcodes[i] = CONFIG_ERROR;
 			continue;
@@ -1165,7 +1165,7 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 
 		if (NULL == snmp_add_null_var(pdu, parsed_oids[i], parsed_oid_lens[i]))
 		{
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
+			ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "snmp_add_null_var(): cannot add null variable."));
 			errcodes[i] = CONFIG_ERROR;
 			continue;
 		}
@@ -1309,7 +1309,7 @@ retry:
 		{
 			errcodes[j] = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error,
 					max_error_len);
-			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, error));
+			ZBX_SET_MSG_RESULT(&results[j], zbx_strdup(NULL, error));
 			*error = '\0';
 		}
 
@@ -1636,7 +1636,7 @@ static void	zbx_snmp_walk_discovery_cb(void *arg, const char *OID, const char *i
 	obj->values[data->num] = zbx_strdup(NULL, value);
 }
 
-static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *item, AGENT_RESULT *result,
+static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *item, zbx_result_t *result,
 		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars,
 		int bulk)
 {
@@ -1686,14 +1686,14 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 
 	zbx_json_close(&js);
 
-	SET_TEXT_RESULT(result, zbx_strdup(NULL, js.buffer));
+	ZBX_SET_TEXT_RESULT(result, zbx_strdup(NULL, js.buffer));
 
 	zbx_json_free(&js);
 clean:
 	zbx_snmp_ddata_clean(&data);
 out:
 	if (SUCCEED != (*errcode = ret))
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1705,7 +1705,7 @@ static void	zbx_snmp_walk_cache_cb(void *arg, const char *oid, const char *index
 	cache_put_snmp_index((const DC_ITEM *)arg, oid, index, value);
 }
 
-static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, zbx_result_t *results,
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk)
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
@@ -1736,7 +1736,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 
 		if (3 != num_key_param(items[i].snmp_oid))
 		{
-			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
+			ZBX_SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));
 			errcodes[i] = CONFIG_ERROR;
 			continue;
@@ -1748,7 +1748,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 
 		if (0 != strcmp("index", method))
 		{
-			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Unsupported method \"%s\" in the OID \"%s\".",
+			ZBX_SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Unsupported method \"%s\" in the OID \"%s\".",
 					method, items[i].snmp_oid));
 			errcodes[i] = CONFIG_ERROR;
 			continue;
@@ -1787,7 +1787,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			if (SUCCEED != errcodes[j])
 				continue;
 
-			if (NULL == GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
+			if (NULL == ZBX_GET_STR_RESULT(&results[j]) || 0 != strcmp(results[j].str, index_values[j]))
 			{
 				to_walk[to_walk_num++] = j;
 			}
@@ -1808,7 +1808,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				zbx_strlcat(oids_translated[j], to_verify_oids[j] + len, sizeof(oids_translated[j]));
 			}
 
-			free_result(&results[j]);
+			zbx_free_result(&results[j]);
 		}
 	}
 
@@ -1858,7 +1858,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				{
 					if (0 == strcmp(oids_translated[to_walk[k]], oids_translated[j]))
 					{
-						SET_MSG_RESULT(&results[to_walk[k]], zbx_strdup(NULL, error));
+						ZBX_SET_MSG_RESULT(&results[to_walk[k]], zbx_strdup(NULL, error));
 						errcodes[to_walk[k]] = errcode;
 					}
 				}
@@ -1888,7 +1888,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			}
 			else
 			{
-				SET_MSG_RESULT(&results[j], zbx_dsprintf(NULL,
+				ZBX_SET_MSG_RESULT(&results[j], zbx_dsprintf(NULL,
 						"Cannot find index of \"%s\" in \"%s\".",
 						index_values[j], index_oids[j]));
 				errcodes[j] = NOTSUPPORTED;
@@ -1908,7 +1908,7 @@ exit:
 	return ret;
 }
 
-static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
+static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, zbx_result_t *results,
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail)
 {
 	const char	*__function_name = "zbx_snmp_process_standard";
@@ -1925,7 +1925,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 
 		if (0 != num_key_param(items[i].snmp_oid))
 		{
-			SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
+			ZBX_SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
 					items[i].snmp_oid));
 			errcodes[i] = CONFIG_ERROR;
 			continue;
@@ -1942,7 +1942,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 	return ret;
 }
 
-int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_snmp(const DC_ITEM *item, zbx_result_t *result)
 {
 	int	errcode = SUCCEED;
 
@@ -1951,7 +1951,7 @@ int	get_value_snmp(const DC_ITEM *item, AGENT_RESULT *result)
 	return errcode;
 }
 
-void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_snmp(const DC_ITEM *items, zbx_result_t *results, int *errcodes, int num)
 {
 	const char		*__function_name = "get_values_snmp";
 
@@ -2011,7 +2011,7 @@ exit:
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = err;
 		}
 	}

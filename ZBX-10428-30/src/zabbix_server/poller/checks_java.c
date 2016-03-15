@@ -25,7 +25,7 @@
 
 #include "checks_java.h"
 
-static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num, char *response,
+static int	parse_response(const DC_ITEM *items, zbx_result_t *results, int *errcodes, int num, char *response,
 		char *error, int max_error_len)
 {
 	const char		*p;
@@ -71,7 +71,7 @@ static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errc
 
 				if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_VALUE, &value, &value_alloc))
 				{
-					if (SUCCEED == set_result_type(&results[i], items[i].value_type,
+					if (SUCCEED == zbx_set_result_type(&results[i], items[i].value_type,
 							items[i].data_type, value))
 					{
 						errcodes[i] = SUCCEED;
@@ -81,12 +81,12 @@ static int	parse_response(const DC_ITEM *items, AGENT_RESULT *results, int *errc
 				}
 				else if (SUCCEED == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_ERROR, &value, &value_alloc))
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, value));
+					ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, value));
 					errcodes[i] = NOTSUPPORTED;
 				}
 				else
 				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot get item value or error message"));
+					ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Cannot get item value or error message"));
 					errcodes[i] = AGENT_ERROR;
 				}
 			}
@@ -120,7 +120,7 @@ exit:
 	return ret;
 }
 
-int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_java(unsigned char request, const DC_ITEM *item, zbx_result_t *result)
 {
 	int	errcode = SUCCEED;
 
@@ -129,7 +129,7 @@ int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *res
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num)
+void	get_values_java(unsigned char request, const DC_ITEM *items, zbx_result_t *results, int *errcodes, int num)
 {
 	const char	*__function_name = "get_values_java";
 
@@ -238,7 +238,7 @@ exit:
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			ZBX_SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = err;
 		}
 	}

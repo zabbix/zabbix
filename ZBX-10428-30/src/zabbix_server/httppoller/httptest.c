@@ -122,7 +122,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 	zbx_uint64_t	itemids[3];
 	int		lastclocks[3], errcodes[3];
 	size_t		i, num = 0;
-	AGENT_RESULT    value;
+	zbx_result_t    value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -174,18 +174,18 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			continue;
 		}
 
-		init_result(&value);
+		zbx_init_result(&value);
 
 		switch (types[i])
 		{
 			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_UI64_RESULT(&value, speed_download);
+				ZBX_SET_UI64_RESULT(&value, speed_download);
 				break;
 			case ZBX_HTTPITEM_TYPE_LASTSTEP:
-				SET_UI64_RESULT(&value, lastfailedstep);
+				ZBX_SET_UI64_RESULT(&value, lastfailedstep);
 				break;
 			case ZBX_HTTPITEM_TYPE_LASTERROR:
-				SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
+				ZBX_SET_STR_RESULT(&value, zbx_strdup(NULL, err_str));
 				break;
 		}
 
@@ -195,7 +195,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
 
-		free_result(&value);
+		zbx_free_result(&value);
 	}
 
 	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
@@ -216,7 +216,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	zbx_uint64_t	itemids[3];
 	int		lastclocks[3], errcodes[3];
 	size_t		i, num = 0;
-	AGENT_RESULT    value;
+	zbx_result_t    value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
 			__function_name, stat->rspcode, stat->total_time, stat->speed_download);
@@ -262,18 +262,18 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 			continue;
 		}
 
-		init_result(&value);
+		zbx_init_result(&value);
 
 		switch (types[i])
 		{
 			case ZBX_HTTPITEM_TYPE_RSPCODE:
-				SET_UI64_RESULT(&value, stat->rspcode);
+				ZBX_SET_UI64_RESULT(&value, stat->rspcode);
 				break;
 			case ZBX_HTTPITEM_TYPE_TIME:
-				SET_DBL_RESULT(&value, stat->total_time);
+				ZBX_SET_DBL_RESULT(&value, stat->total_time);
 				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
-				SET_DBL_RESULT(&value, stat->speed_download);
+				ZBX_SET_DBL_RESULT(&value, stat->speed_download);
 				break;
 		}
 
@@ -283,7 +283,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
 
-		free_result(&value);
+		zbx_free_result(&value);
 	}
 
 	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);

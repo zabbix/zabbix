@@ -21,7 +21,7 @@
 #define ZABBIX_DBCACHE_H
 
 #include "db.h"
-#include "sysinfo.h"
+#include "zbxresult.h"
 #include "zbxalgo.h"
 
 #define ZBX_SYNC_PARTIAL	0
@@ -315,7 +315,7 @@ zbx_queue_item_t;
 int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
-void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, AGENT_RESULT *result,
+void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags, zbx_result_t *result,
 		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
 int	DCsync_history(int sync_type, int *sync_num);

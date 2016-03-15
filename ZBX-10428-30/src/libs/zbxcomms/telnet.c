@@ -337,7 +337,7 @@ int	telnet_test_login(ZBX_SOCKET socket_fd)
 	return ret;
 }
 
-int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, AGENT_RESULT *result)
+int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *password, zbx_result_t *result)
 {
 	const char	*__function_name = "telnet_login";
 	char		buf[MAX_BUFFER_LEN], c;
@@ -359,7 +359,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No login prompt."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "No login prompt."));
 		goto fail;
 	}
 
@@ -379,7 +379,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "No password prompt."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "No password prompt."));
 		goto fail;
 	}
 
@@ -402,7 +402,7 @@ int	telnet_login(ZBX_SOCKET socket_fd, const char *username, const char *passwor
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Login failed."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Login failed."));
 		goto fail;
 	}
 
@@ -413,7 +413,7 @@ fail:
 	return ret;
 }
 
-int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *result, const char *encoding)
+int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, zbx_result_t *result, const char *encoding)
 {
 	const char	*__function_name = "telnet_execute";
 	char		buf[MAX_BUFFER_LEN];
@@ -451,7 +451,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
 				strerror_from_system(zbx_socket_last_error())));
 		goto fail;
 	}
@@ -486,7 +486,7 @@ int	telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *resu
 		offset--;
 	buf[offset] = '\0';
 
-	SET_STR_RESULT(result, convert_to_utf8(buf, offset, encoding));
+	ZBX_SET_STR_RESULT(result, convert_to_utf8(buf, offset, encoding));
 	ret = SUCCEED;
 fail:
 	zbx_free(command_lf);

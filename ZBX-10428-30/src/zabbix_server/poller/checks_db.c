@@ -49,7 +49,7 @@ static int	get_result_columns(ZBX_ODBC_DBH *dbh, char **buffer)
 	return ret;
 }
 
-static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, zbx_result_t *result)
 {
 	const char	*__function_name = "db_odbc_discovery";
 
@@ -63,13 +63,13 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 
 	if (2 != request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
 	if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 		goto out;
 	}
 
@@ -91,7 +91,7 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 
 					if (SUCCEED != is_macro_char(*p))
 					{
-						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
+						ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 								"Cannot convert column #%d name to macro.", i + 1));
 						goto clean;
 					}
@@ -101,7 +101,7 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 				{
 					if (0 == strcmp(columns[i], columns[j]))
 					{
-						SET_MSG_RESULT(result, zbx_dsprintf(NULL,
+						ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 								"Duplicate macro name: {#%s}.", columns[i]));
 						goto clean;
 					}
@@ -126,7 +126,7 @@ static int	db_odbc_discovery(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT
 
 			zbx_json_close(&json);
 
-			SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
+			ZBX_SET_STR_RESULT(result, zbx_strdup(NULL, json.buffer));
 
 			zbx_json_free(&json);
 
@@ -136,12 +136,12 @@ clean:
 				zbx_free(columns[i]);
 		}
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain column names."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain column names."));
 
 		zbx_free(columns);
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 
 	odbc_DBclose(&dbh);
 out:
@@ -150,7 +150,7 @@ out:
 	return ret;
 }
 
-static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *result)
+static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, zbx_result_t *result)
 {
 	const char	*__function_name = "db_odbc_select";
 
@@ -162,13 +162,13 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 
 	if (2 != request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
 	}
 
 	if (SUCCEED != odbc_DBconnect(&dbh, request->params[1], item->username, item->password, CONFIG_TIMEOUT))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 		goto out;
 	}
 
@@ -178,9 +178,9 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 		{
 			if (NULL == row[0])
 			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
 			}
-			else if (SUCCEED == set_result_type(result, item->value_type, item->data_type, row[0]))
+			else if (SUCCEED == zbx_set_result_type(result, item->value_type, item->data_type, row[0]))
 			{
 				ret = SUCCEED;
 			}
@@ -190,13 +190,13 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, AGENT_RESULT *r
 			const char	*last_error = get_last_odbc_strerror();
 
 			if ('\0' != *last_error)
-				SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, last_error));
 			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty result."));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned empty result."));
 		}
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, get_last_odbc_strerror()));
 
 	odbc_DBclose(&dbh);
 out:
@@ -219,7 +219,7 @@ out:
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_db(DC_ITEM *item, zbx_result_t *result)
 {
 	const char	*__function_name = "get_value_db";
 
@@ -237,10 +237,10 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 		else if (0 == strcmp(request.key, "db.odbc.discovery"))
 			ret = db_odbc_discovery(item, &request, result);
 		else
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key for this item type."));
 	}
 	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item parameter format."));
 
 	free_request(&request);
 

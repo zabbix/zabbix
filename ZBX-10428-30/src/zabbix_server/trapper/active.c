@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbcache.h"
 #include "log.h"
+#include "sysinfo.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 

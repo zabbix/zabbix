@@ -25,11 +25,10 @@
 #ifdef HAVE_OPENIPMI
 
 #include "dbcache.h"
-#include "sysinfo.h"
 
 int	init_ipmi_handler(void);
 void	free_ipmi_handler(void);
-int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value);
+int	get_value_ipmi(DC_ITEM *item, zbx_result_t *value);
 int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error, size_t max_error_len);
 int	set_ipmi_control_value(DC_ITEM *item, int value, char *error, size_t max_error_len);
 void	delete_inactive_ipmi_hosts(time_t last_check);

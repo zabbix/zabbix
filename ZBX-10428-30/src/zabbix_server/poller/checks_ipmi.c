@@ -1255,7 +1255,7 @@ void	delete_inactive_ipmi_hosts(time_t last_check)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
+int	get_value_ipmi(DC_ITEM *item, zbx_result_t *value)
 {
 	const char		*__function_name = "get_value_ipmi";
 	zbx_ipmi_host_t		*h;
@@ -1266,7 +1266,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 
 	if (NULL == os_hnd)
 	{
-		SET_MSG_RESULT(value, strdup("IPMI handler is not initialised"));
+		ZBX_SET_MSG_RESULT(value, strdup("IPMI handler is not initialised"));
 		return CONFIG_ERROR;
 	}
 
@@ -1279,7 +1279,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	{
 		if (NULL != h->err)
 		{
-			SET_MSG_RESULT(value, strdup(h->err));
+			ZBX_SET_MSG_RESULT(value, strdup(h->err));
 		}
 		return h->ret;
 	}
@@ -1290,7 +1290,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 
 	if (NULL == s && NULL == c)
 	{
-		SET_MSG_RESULT(value, zbx_dsprintf(NULL, "sensor or control %s@[%s]:%d does not exist",
+		ZBX_SET_MSG_RESULT(value, zbx_dsprintf(NULL, "sensor or control %s@[%s]:%d does not exist",
 				item->ipmi_sensor, h->ip, h->port));
 		return NOTSUPPORTED;
 	}
@@ -1304,7 +1304,7 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	{
 		if (NULL != h->err)
 		{
-			SET_MSG_RESULT(value, strdup(h->err));
+			ZBX_SET_MSG_RESULT(value, strdup(h->err));
 		}
 		return h->ret;
 	}
@@ -1312,12 +1312,12 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 	if (NULL != s)
 	{
 		if (IPMI_EVENT_READING_TYPE_THRESHOLD == s->reading_type)
-			SET_DBL_RESULT(value, s->value.threshold);
+			ZBX_SET_DBL_RESULT(value, s->value.threshold);
 		else
-			SET_UI64_RESULT(value, s->value.discrete);
+			ZBX_SET_UI64_RESULT(value, s->value.discrete);
 	}
 	if (NULL != c)
-		SET_DBL_RESULT(value, c->val[0]);
+		ZBX_SET_DBL_RESULT(value, c->val[0]);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(h->ret));
 

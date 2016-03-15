@@ -50,7 +50,7 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
+int	get_value_agent(DC_ITEM *item, zbx_result_t *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_socket_t	s;
@@ -84,7 +84,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			tls_arg2 = item->host.tls_psk;
 		}
 #else
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent but"
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent but"
 				" support for TLS was not compiled into %s.", get_program_type_string(program_type)));
 		ret = NETWORK_ERROR;
 		goto out;
@@ -123,29 +123,29 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		{
 			/* 'ZBX_NOTSUPPORTED\0<error message>' */
 			if (sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED)));
+				ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED)));
 			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
 
 			ret = NOTSUPPORTED;
 		}
 		else if (0 == strcmp(s.buffer, ZBX_ERROR))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
+			ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
 			ret = AGENT_ERROR;
 		}
 		else if (0 == received_len)
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
-					" Assuming that agent dropped connection because of access permissions.",
+			ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at"
+					" [%s]. Assuming that agent dropped connection because of access permissions.",
 					item->interface.addr));
 			ret = NETWORK_ERROR;
 		}
-		else if (SUCCEED != set_result_type(result, item->value_type, item->data_type, s.buffer))
+		else if (SUCCEED != zbx_set_result_type(result, item->value_type, item->data_type, s.buffer))
 			ret = NOTSUPPORTED;
 	}
 	else
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 out:

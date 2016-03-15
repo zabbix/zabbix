@@ -21,7 +21,6 @@
 #define ZABBIX_CHECKS_JAVA_H
 
 #include "dbcache.h"
-#include "sysinfo.h"
 
 #define ZBX_JAVA_GATEWAY_REQUEST_INTERNAL	0
 #define ZBX_JAVA_GATEWAY_REQUEST_JMX		1
@@ -30,7 +29,7 @@ extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_JAVA_GATEWAY;
 extern int	CONFIG_JAVA_GATEWAY_PORT;
 
-int	get_value_java(unsigned char request, const DC_ITEM *item, AGENT_RESULT *result);
-void	get_values_java(unsigned char request, const DC_ITEM *items, AGENT_RESULT *results, int *errcodes, int num);
+int	get_value_java(unsigned char request, const DC_ITEM *item, zbx_result_t *result);
+void	get_values_java(unsigned char request, const DC_ITEM *items, zbx_result_t *results, int *errcodes, int num);
 
 #endif

@@ -24,12 +24,11 @@
 
 #ifdef HAVE_SSH2
 #include "dbcache.h"
-#include "sysinfo.h"
 
 extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SSH_KEY_LOCATION;
 
-int	get_value_ssh(DC_ITEM *item, AGENT_RESULT *result);
+int	get_value_ssh(DC_ITEM *item, zbx_result_t *result);
 #endif	/* HAVE_SSH2 */
 
 #endif

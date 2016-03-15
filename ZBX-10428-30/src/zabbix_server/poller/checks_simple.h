@@ -22,8 +22,7 @@
 
 #include "common.h"
 #include "dbcache.h"
-#include "sysinfo.h"
 
-int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
+int	get_value_simple(DC_ITEM *item, zbx_result_t *result, zbx_vector_ptr_t *add_results);
 
 #endif

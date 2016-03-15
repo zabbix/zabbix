@@ -23,6 +23,6 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
-extern	int	get_value_aggregate(DC_ITEM *item, AGENT_RESULT *result);
+extern	int	get_value_aggregate(DC_ITEM *item, zbx_result_t *result);
 
 #endif

@@ -108,14 +108,16 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 	int		ret = SUCCEED;
 	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	const char	*service = NULL;
-	AGENT_RESULT 	result;
+	AGENT_RESULT 	agent_result;
+	zbx_result_t	result;
 	DC_ITEM		item;
 	ZBX_FPING_HOST	host;
 	size_t		value_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	init_result(&result);
+	init_result(&agent_result);
+	zbx_init_result(&result);
 
 	**value = '\0';
 
@@ -185,8 +187,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != process(key, 0, &result) || NULL == GET_UI64_RESULT(&result) ||
-						0 == result.ui64)
+				if (SUCCEED != process(key, 0, &agent_result) || NULL == GET_UI64_RESULT(&agent_result) ||
+						0 == agent_result.ui64)
 				{
 					ret = FAIL;
 				}
@@ -225,7 +227,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 				if (SVC_AGENT == dcheck->type)
 				{
-					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
+					if (SUCCEED == get_value_agent(&item, &result) &&
+							NULL != ZBX_GET_STR_RESULT(&result))
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
 					else
 						ret = FAIL;
@@ -268,7 +271,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 								NULL, 0);
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
+					if (SUCCEED == get_value_snmp(&item, &result) &&
+							NULL != ZBX_GET_STR_RESULT(&result))
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
 					else
 						ret = FAIL;
@@ -288,7 +292,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 					ret = FAIL;
 #endif	/* HAVE_NETSNMP */
 
-				if (FAIL == ret && ISSET_MSG(&result))
+				if (FAIL == ret && ZBX_ISSET_MSG(&result))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
 							item.key, result.msg);
@@ -309,7 +313,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 		zbx_alarm_off();
 	}
-	free_result(&result);
+	free_result(&agent_result);
+	zbx_free_result(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

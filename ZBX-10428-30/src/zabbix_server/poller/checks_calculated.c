@@ -291,7 +291,7 @@ out:
 	return ret;
 }
 
-int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
+int	get_value_calculated(DC_ITEM *dc_item, zbx_result_t *result)
 {
 	const char	*__function_name = "get_value_calculated";
 	expression_t	exp;
@@ -306,19 +306,19 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (SUCCEED != (ret = calcitem_parse_expression(dc_item, &exp, error, sizeof(error))))
 	{
-		SET_MSG_RESULT(result, strdup(error));
+		ZBX_SET_MSG_RESULT(result, strdup(error));
 		goto clean;
 	}
 
 	if (SUCCEED != (ret = calcitem_evaluate_expression(dc_item, &exp, error, sizeof(error))))
 	{
-		SET_MSG_RESULT(result, strdup(error));
+		ZBX_SET_MSG_RESULT(result, strdup(error));
 		goto clean;
 	}
 
 	if (SUCCEED != evaluate(&value, exp.exp, error, sizeof(error)))
 	{
-		SET_MSG_RESULT(result, strdup(error));
+		ZBX_SET_MSG_RESULT(result, strdup(error));
 		ret = NOTSUPPORTED;
 		goto clean;
 	}
@@ -327,14 +327,14 @@ int	get_value_calculated(DC_ITEM *dc_item, AGENT_RESULT *result)
 
 	if (ITEM_VALUE_TYPE_UINT64 == dc_item->value_type && 0 > value)
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [" ZBX_FS_DBL "]"
+		ZBX_SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received value [" ZBX_FS_DBL "]"
 				" is not suitable for value type [%s].",
 				value, zbx_item_value_type_string(dc_item->value_type)));
 		ret = NOTSUPPORTED;
 		goto clean;
 	}
 
-	SET_DBL_RESULT(result, value);
+	ZBX_SET_DBL_RESULT(result, value);
 clean:
 	free_expression(&exp);
 
