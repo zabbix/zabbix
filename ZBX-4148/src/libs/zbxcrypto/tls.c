@@ -3591,7 +3591,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 	/* set up TLS context */
 
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(struct zbx_tls_context));
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = zbx_malloc(NULL, sizeof(ssl_context));
 
 	if (0 != (res = ssl_init(s->tls_ctx->ctx)))
@@ -3822,7 +3822,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 
 	/* set up TLS context */
 
-	s->tls_ctx = zbx_alloc(s->tls_ctx, sizeof(struct zbx_tls_context));
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
 	s->tls_ctx->psk_client_creds = NULL;
 	s->tls_ctx->psk_server_creds = NULL;
@@ -4108,7 +4108,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 #endif
 	char		psk_buf[HOST_TLS_PSK_LEN / 2];
 
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(struct zbx_tls_context));
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -4385,7 +4385,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	/* set up TLS context */
 
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(struct zbx_tls_context));
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = zbx_malloc(NULL, sizeof(ssl_context));
 
 	if (0 != (res = ssl_init(s->tls_ctx->ctx)))
@@ -4610,7 +4610,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	/* set up TLS context */
 
-	s->tls_ctx = zbx_alloc(s->tls_ctx, sizeof(struct zbx_tls_context));
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
 	s->tls_ctx->psk_client_creds = NULL;
 	s->tls_ctx->psk_server_creds = NULL;
@@ -4906,7 +4906,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(struct zbx_tls_context));
+	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 
 	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 	{
