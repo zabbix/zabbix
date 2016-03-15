@@ -582,7 +582,7 @@ else {
 
 	// source not discovery i.e. trigger
 	else {
-		if ($csvExport || $pageFilter->hostsSelected || $triggerId) {
+		if ($csvExport || $pageFilter->hostsSelected || $triggerId != 0) {
 			$knownTriggerIds = [];
 			$validTriggerIds = [];
 
@@ -609,7 +609,7 @@ else {
 				$knownTriggerIds = [$triggerId => $triggerId];
 				$validTriggerIds = $knownTriggerIds;
 
-				$eventOptions['objectids'] = [$triggerId];;
+				$eventOptions['objectids'] = [$triggerId];
 			}
 			elseif ($pageFilter->hostid > 0) {
 				$hostTriggers = API::Trigger()->get([
