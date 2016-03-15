@@ -197,7 +197,6 @@ elseif (isset($_REQUEST['save'])) {
 	}
 
 	if ($result) {
-		add_audit(!isset($_REQUEST['maintenanceid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
 		unset($_REQUEST['form']);
 	}
 
@@ -212,22 +211,10 @@ elseif (isset($_REQUEST['delete']) || $_REQUEST['go'] == 'delete') {
 
 	zbx_value2array($maintenanceids);
 
-	DBstart();
-
-	$maintenances = array();
-	foreach ($maintenanceids as $id => $maintenanceid) {
-		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
-	}
-
 	$goResult = API::Maintenance()->delete($maintenanceids);
 	if ($goResult) {
-		foreach ($maintenances as $maintenanceid => $maintenance) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE, 'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']');
-		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
 	}
-
-	$goResult = DBend($goResult);
 
 	show_messages($goResult, _('Maintenance deleted'), _('Cannot delete maintenance'));
 	clearCookies($goResult);

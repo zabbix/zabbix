@@ -27,8 +27,9 @@ if (!isset($_REQUEST['form_refresh'])) {
 }
 
 $host_groups = get_request('groups', array());
-if (isset($_REQUEST['groupid']) && ($_REQUEST['groupid'] > 0) && empty($host_groups)) {
-	array_push($host_groups, $_REQUEST['groupid']);
+$groupid = getRequest('groupid');
+if (!hasRequest('form_refresh') && $groupid != 0) {
+	$host_groups[] = $groupid;
 }
 
 $newgroup = get_request('newgroup', '');
@@ -89,9 +90,12 @@ else {
 	$original_templates = array();
 }
 
-// load data from the DB when opening the full clone form for the first time
-$cloneFormOpened = (in_array(getRequest('form'), array('clone', 'full_clone')) && getRequest('form_refresh') == 1);
-if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
+if (getRequest('hostid') != 0
+		&& (($dbHost['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+				&& (!hasRequest('form_refresh') || getRequest('form_refresh') == 1))
+			|| (!hasRequest('form_refresh') && getRequest('form') === 'update'))) {
+	// Load data from DB for host update and for discovered host clone.
+
 	$proxy_hostid = $dbHost['proxy_hostid'];
 	$host = $dbHost['host'];
 	$visiblename = $dbHost['name'];
@@ -101,7 +105,9 @@ if (getRequest('hostid') && (!hasRequest('form_refresh') || $cloneFormOpened)) {
 		$visiblename = '';
 	}
 
-	$status = $dbHost['status'];
+	if (!hasRequest('form_refresh')) {
+		$status = $dbHost['status'];
+	}
 
 	$ipmi_authtype = $dbHost['ipmi_authtype'];
 	$ipmi_privilege = $dbHost['ipmi_privilege'];
