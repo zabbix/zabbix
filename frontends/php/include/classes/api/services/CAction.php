@@ -617,10 +617,6 @@ class CAction extends CApiService {
 			$actionDb = $actionsDb[$actionId];
 
 			$actionUpdateValues = array_intersect_key($action, $update_fields);
-			if (!count($actionUpdateValues) && !isset($action['filter'])
-					&& !isset($action['operations'])) {
-				continue;
-			}
 
 			if (isset($action['filter'])) {
 				$actionFilter = $action['filter'];
@@ -654,10 +650,12 @@ class CAction extends CApiService {
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+			if ($actionUpdateValues) {
+				$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+			}
 		}
 
-		if ($actionsUpdateData != []) {
+		if ($actionsUpdateData) {
 			DB::update('actions', $actionsUpdateData);
 		}
 
