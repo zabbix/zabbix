@@ -422,7 +422,7 @@ static void	extract_log_entries(AGENT_RESULT *agent_result, zbx_vector_ptr_t *ad
 	zbx_result_t	*add_result;
 	int		i;
 
-	if (0 == ISSET_LOG(agent_result))
+	if (0 == (agent_result->type & AR_LOG))
 		return;
 
 	for (i = 0; NULL != agent_result->logs[i]; i++)
@@ -436,12 +436,12 @@ static void	extract_log_entries(AGENT_RESULT *agent_result, zbx_vector_ptr_t *ad
 
 static void	extract_result_by_type(AGENT_RESULT *agent_result, int type, zbx_vector_ptr_t *add_results)
 {
-	zbx_result_t	*add_result = NULL;
+	zbx_result_t	*add_result;
 
 	if (0 == (agent_result->type & type))
 		return;
 
-	add_result = zbx_malloc(add_result, sizeof(zbx_result_t));
+	add_result = zbx_malloc(NULL, sizeof(zbx_result_t));
 	zbx_init_result(add_result);
 
 	switch (type)
@@ -464,7 +464,6 @@ static void	extract_result_by_type(AGENT_RESULT *agent_result, int type, zbx_vec
 	}
 
 	zbx_vector_ptr_append(add_results, add_result);
-	zbx_free(add_result);
 }
 
 void	zbx_extract_results(AGENT_RESULT *agent_result, zbx_vector_ptr_t *add_results)

@@ -22,7 +22,6 @@
 
 #include "zbxalgo.h"
 #include "module.h"
-#include "sysinfo.h"
 
 typedef struct zbx_log_entry
 {
@@ -79,7 +78,7 @@ zbx_result_t;
 #define ZBX_SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
-	(res)->log = (zbx_log_t *)(val)	\
+	(res)->log = (zbx_log_t *)(val)		\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
