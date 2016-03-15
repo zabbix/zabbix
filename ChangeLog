@@ -16,6 +16,7 @@ New features:
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-10257] changed VMware items to become not supported if no VMware collector processes are started (viktors)
 A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
 A......... [ZBX-10318,ZBX-10517] added validation of vsize and hsize parameters in screen.create() and screen.update() methods (Sasha)
 A......... [ZBX-10318,ZBX-10517] fixed validation of screen elements position in screen.create() and screen.update() methods (Sasha)
@@ -1299,6 +1300,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-10257] changed VMware items to become not supported if no VMware collector processes are started (viktors)
 A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
 ...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
 A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
