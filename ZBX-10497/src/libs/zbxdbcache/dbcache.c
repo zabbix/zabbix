@@ -1925,16 +1925,15 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
 			/* sent to server only if not 0, see proxy_get_history_data() */
-			static const int	unset_if_novalue = 0;
+			const int	unset_if_novalue = 0;
 
 			flags |= PROXY_HISTORY_FLAG_NOVALUE;
 
 			pvalue = "";
 			psource = "";
 
-			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue,
-					psource, unset_if_novalue, pvalue, unset_if_novalue,
-					h->lastlogsize, h->mtime, flags);
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue, psource,
+					unset_if_novalue, pvalue, unset_if_novalue, h->lastlogsize, h->mtime, flags);
 		}
 		else
 		{
@@ -1945,9 +1944,8 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 			else
 				psource = "";
 
-			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
-					psource, h->severity, pvalue, h->logeventid,
-					h->lastlogsize, h->mtime, flags);
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp, psource,
+					h->severity, pvalue, h->logeventid, h->lastlogsize, h->mtime, flags);
 		}
 	}
 
@@ -3082,7 +3080,7 @@ static void	hc_push_busy_items(zbx_vector_ptr_t *history_items)
 		hc_queue_item(item);
 
 		/* After pushing back to queue current syncer has released ownership of this item. */
-		/* To avoid of using it further reset the item reference in vector to NULL.        */
+		/* To avoid using it further reset the item reference in vector to NULL.           */
 		history_items->values[i] = NULL;
 	}
 }
