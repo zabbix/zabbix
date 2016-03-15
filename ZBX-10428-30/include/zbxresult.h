@@ -78,7 +78,7 @@ zbx_result_t;
 #define ZBX_SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
-	(res)->log = (zbx_log_t *)(val)		\
+	(res)->log = (zbx_log_entry_t *)(val)	\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
@@ -165,7 +165,7 @@ while (0)
 #define ZBX_GET_DBL_RESULT(res)		((double *)zbx_get_result_value_by_type(res, AR_DOUBLE))
 #define ZBX_GET_STR_RESULT(res)		((char **)zbx_get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)zbx_get_result_value_by_type(res, AR_TEXT))
-#define ZBX_GET_LOG_RESULT(res)		((zbx_log_t **)zbx_get_result_value_by_type(res, AR_LOG))
+#define ZBX_GET_LOG_RESULT(res)		((zbx_log_entry_t *)zbx_get_result_value_by_type(res, AR_LOG))
 #define ZBX_GET_MSG_RESULT(res)		((char **)zbx_get_result_value_by_type(res, AR_MESSAGE))
 
 void	zbx_init_result(zbx_result_t *result);

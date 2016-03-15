@@ -417,6 +417,25 @@ void    *zbx_get_result_value_by_type(zbx_result_t *result, int require_type)
 	return NULL;
 }
 
+static zbx_log_entry_t	*zbx_get_log_entry(zbx_log_t *log)
+{
+	zbx_log_entry_t	*log_entry;
+
+	log_entry = zbx_malloc(NULL, sizeof(zbx_log_entry_t));
+	zbx_log_entry_init(log_entry);
+
+	if (NULL != log->value)
+		log_entry->value = zbx_strdup(log_entry->value, log->value);
+
+	if (NULL != log->source)
+		log_entry->source = zbx_strdup(log_entry->source, log->source);
+
+	log_entry->timestamp = log->timestamp;
+	log_entry->severity = log->severity;
+	log_entry->logeventid = log->logeventid;
+	return log_entry;
+}
+
 static void	extract_log_entries(AGENT_RESULT *agent_result, zbx_vector_ptr_t *add_results)
 {
 	zbx_result_t	*add_result;
@@ -429,7 +448,9 @@ static void	extract_log_entries(AGENT_RESULT *agent_result, zbx_vector_ptr_t *ad
 	{
 		add_result = zbx_malloc(NULL, sizeof(zbx_result_t));
 		zbx_init_result(add_result);
-		zbx_add_log_result(add_result, agent_result->logs[i]->value);
+		ZBX_SET_LOG_RESULT(add_result, zbx_get_log_entry(agent_result->logs[i]));
+		add_result->lastlogsize = agent_result->logs[i]->lastlogsize;
+		add_result->mtime = agent_result->logs[i]->mtime;
 		zbx_vector_ptr_append(add_results, add_result);
 	}
 }
