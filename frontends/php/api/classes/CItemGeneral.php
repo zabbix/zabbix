@@ -64,7 +64,7 @@ abstract class CItemGeneral extends CZBXAPI {
 			'trapper_hosts'			=> array(),
 			'units'					=> array('template' => 1),
 			'multiplier'			=> array('template' => 1),
-			'delta'					=> array(),
+			'delta'					=> array('template' => 1),
 			'snmpv3_contextname'	=> array(),
 			'snmpv3_securityname'	=> array(),
 			'snmpv3_securitylevel'	=> array(),
