@@ -48,8 +48,12 @@ $fields = [
 	'screenid' =>		[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,			'isset({form}) && {form} == "update"'],
 	'templateid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
-	'hsize' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({add}) || isset({update})', _('Columns')],
-	'vsize' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), 'isset({add}) || isset({update})', _('Rows')],
+	'hsize' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_MIN_SIZE, SCREEN_MAX_SIZE),
+		'isset({add}) || isset({update})', _('Columns')
+	],
+	'vsize' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_MIN_SIZE, SCREEN_MAX_SIZE),
+		'isset({add}) || isset({update})', _('Rows')
+	],
 	'userid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
 	'private' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 1),	null],
 	'users' =>			[T_ZBX_INT, O_OPT, null,	null,			null],
