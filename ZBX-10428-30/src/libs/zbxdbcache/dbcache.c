@@ -2343,7 +2343,7 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t 
 		item_value->value.value_str.len = 0;
 }
 
-static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *ts, const zbx_log_entry_t *log,
+static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *ts, const zbx_result_log_t *log,
 		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
 	dc_item_value_t	*item_value;

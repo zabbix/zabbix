@@ -21,7 +21,7 @@
 #include "zbxalgo.h"
 #include "zbxresult.h"
 
-static void	zbx_log_entry_init(zbx_log_entry_t *log)
+static void	zbx_result_log_init(zbx_result_log_t *log)
 {
 	log->value = NULL;
 	log->source = NULL;
@@ -43,7 +43,7 @@ void	zbx_init_result(zbx_result_t *result)
 	result->msg = NULL;
 }
 
-void	zbx_log_entry_free(zbx_log_entry_t *log)
+void	zbx_result_log_free(zbx_result_log_t *log)
 {
 	zbx_free(log->source);
 	zbx_free(log->value);
@@ -62,9 +62,9 @@ void	zbx_free_result(zbx_result_t *result)
 
 static void	zbx_add_log_result(zbx_result_t *result, char *value)
 {
-	result->log = zbx_malloc(result->log, sizeof(zbx_log_entry_t));
+	result->log = zbx_malloc(result->log, sizeof(zbx_result_log_t));
 
-	zbx_log_entry_init(result->log);
+	zbx_result_log_init(result->log);
 
 	result->log->value = zbx_strdup(result->log->value, value);
 	result->type |= AR_LOG;
@@ -339,16 +339,16 @@ static char	**zbx_get_result_text_value(zbx_result_t *result)
 	return NULL;
 }
 
-static zbx_log_entry_t	*zbx_get_result_log_value(zbx_result_t *result)
+static zbx_result_log_t	*zbx_get_result_log_value(zbx_result_t *result)
 {
 	if (0 != ZBX_ISSET_LOG(result))
 		return result->log;
 
 	if (0 != result->type)
 	{
-		result->log = zbx_malloc(result->log, sizeof(zbx_log_entry_t));
+		result->log = zbx_malloc(result->log, sizeof(zbx_result_log_t));
 
-		zbx_log_entry_init(result->log);
+		zbx_result_log_init(result->log);
 
 		if (0 != ZBX_ISSET_STR(result))
 			result->log->value = zbx_strdup(result->log->value, result->str);
@@ -417,26 +417,26 @@ void    *zbx_get_result_value_by_type(zbx_result_t *result, int require_type)
 	return NULL;
 }
 
-static zbx_log_entry_t	*zbx_get_log_entry(zbx_log_t *log)
+static zbx_result_log_t	*zbx_get_result_log(zbx_log_t *log)
 {
-	zbx_log_entry_t	*log_entry;
+	zbx_result_log_t	*result_log;
 
-	log_entry = zbx_malloc(NULL, sizeof(zbx_log_entry_t));
-	zbx_log_entry_init(log_entry);
+	result_log = zbx_malloc(NULL, sizeof(zbx_result_log_t));
+	zbx_result_log_init(result_log);
 
 	if (NULL != log->value)
-		log_entry->value = zbx_strdup(log_entry->value, log->value);
+		result_log->value = zbx_strdup(result_log->value, log->value);
 
 	if (NULL != log->source)
-		log_entry->source = zbx_strdup(log_entry->source, log->source);
+		result_log->source = zbx_strdup(result_log->source, log->source);
 
-	log_entry->timestamp = log->timestamp;
-	log_entry->severity = log->severity;
-	log_entry->logeventid = log->logeventid;
-	return log_entry;
+	result_log->timestamp = log->timestamp;
+	result_log->severity = log->severity;
+	result_log->logeventid = log->logeventid;
+	return result_log;
 }
 
-static void	extract_log_entries(AGENT_RESULT *agent_result, zbx_vector_ptr_t *add_results)
+static void	extract_result_logs(AGENT_RESULT *agent_result, zbx_vector_ptr_t *add_results)
 {
 	zbx_result_t	*add_result;
 	int		i;
@@ -448,7 +448,7 @@ static void	extract_log_entries(AGENT_RESULT *agent_result, zbx_vector_ptr_t *ad
 	{
 		add_result = zbx_malloc(NULL, sizeof(zbx_result_t));
 		zbx_init_result(add_result);
-		ZBX_SET_LOG_RESULT(add_result, zbx_get_log_entry(agent_result->logs[i]));
+		ZBX_SET_LOG_RESULT(add_result, zbx_get_result_log(agent_result->logs[i]));
 		add_result->lastlogsize = agent_result->logs[i]->lastlogsize;
 		add_result->mtime = agent_result->logs[i]->mtime;
 		zbx_vector_ptr_append(add_results, add_result);
@@ -494,5 +494,5 @@ void	zbx_extract_results(AGENT_RESULT *agent_result, zbx_vector_ptr_t *add_resul
 	extract_result_by_type(agent_result, AR_STRING, add_results);
 	extract_result_by_type(agent_result, AR_TEXT, add_results);
 	extract_result_by_type(agent_result, AR_MESSAGE, add_results);
-	extract_log_entries(agent_result, add_results);
+	extract_result_logs(agent_result, add_results);
 }

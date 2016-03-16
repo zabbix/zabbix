@@ -23,7 +23,7 @@
 #include "zbxalgo.h"
 #include "module.h"
 
-typedef struct zbx_log_entry
+typedef struct zbx_result_log
 {
 	char		*value;
 	char		*source;
@@ -31,20 +31,20 @@ typedef struct zbx_log_entry
 	int		severity;
 	int		logeventid;
 }
-zbx_log_entry_t;
+zbx_result_log_t;
 
 typedef struct zbx_result
 {
-	zbx_uint64_t	lastlogsize;	/* meta information */
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
-	char		*text;
-	char		*msg;		/* possible error message */
-	zbx_log_entry_t	*log;
-	int	 	type;		/* flags: see AR_* of AGENT_RESULT */
-	int		mtime;		/* meta information */
-	int		meta;		/* != 0 if meta information is set */
+	zbx_uint64_t		lastlogsize;	/* meta information */
+	zbx_uint64_t		ui64;
+	double			dbl;
+	char			*str;
+	char			*text;
+	char			*msg;		/* possible error message */
+	zbx_result_log_t	*log;
+	int	 		type;		/* flags: see AR_* of AGENT_RESULT */
+	int			mtime;		/* meta information */
+	int			meta;		/* != 0 if meta information is set */
 }
 zbx_result_t;
 
@@ -78,7 +78,7 @@ zbx_result_t;
 #define ZBX_SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
-	(res)->log = (zbx_log_entry_t *)(val)	\
+	(res)->log = (zbx_result_log_t *)(val)	\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
@@ -136,7 +136,7 @@ do									\
 {									\
 	if ((res)->type & AR_LOG)					\
 	{								\
-		zbx_log_entry_free((res)->log);				\
+		zbx_result_log_free((res)->log);			\
 		(res)->type &= ~AR_LOG;					\
 	}								\
 }									\
@@ -165,11 +165,11 @@ while (0)
 #define ZBX_GET_DBL_RESULT(res)		((double *)zbx_get_result_value_by_type(res, AR_DOUBLE))
 #define ZBX_GET_STR_RESULT(res)		((char **)zbx_get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)zbx_get_result_value_by_type(res, AR_TEXT))
-#define ZBX_GET_LOG_RESULT(res)		((zbx_log_entry_t *)zbx_get_result_value_by_type(res, AR_LOG))
+#define ZBX_GET_LOG_RESULT(res)		((zbx_result_log_t *)zbx_get_result_value_by_type(res, AR_LOG))
 #define ZBX_GET_MSG_RESULT(res)		((char **)zbx_get_result_value_by_type(res, AR_MESSAGE))
 
 void	zbx_init_result(zbx_result_t *result);
-void	zbx_log_entry_free(zbx_log_entry_t *log);
+void	zbx_result_log_free(zbx_result_log_t *log);
 void	zbx_free_result(zbx_result_t *result);
 
 int	zbx_set_result_type(zbx_result_t *result, int value_type, int data_type, char *c);
