@@ -39,10 +39,6 @@ function HEX($var = null) {
 	return 'preg_match("/^([a-zA-Z0-9]+)$/",{'.$var.'})&&';
 }
 
-function KEY_PARAM($var = null) {
-	return 'preg_match("/'.ZBX_PREG_PARAMS.'/",{'.$var.'})&&';
-}
-
 function validate_port_list($str) {
 	foreach (explode(',', $str) as $port_range) {
 		$port_range = explode('-', $port_range);
