@@ -753,7 +753,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		$header = [_('Hosts')];
 		foreach ($items as $item_name => $item_data) {
 			foreach ($item_data as $ithosts) {
-				$header[] = (new CCol($item_name))->addClass('vertical_rotation');
+				$header[] = (new CColHeader($item_name))->addClass('vertical_rotation');
 			}
 		}
 		$table->setHeader($header);
