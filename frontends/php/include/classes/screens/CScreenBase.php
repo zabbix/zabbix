@@ -233,7 +233,7 @@ class CScreenBase {
 				];
 		}
 
-		// get screenitem if its required or resource type is null
+		// Get screenitem if its required or resource type is null.
 		$this->screenitem = [];
 		if (array_key_exists('screenitem', $options) && is_array($options['screenitem'])) {
 			$this->screenitem = $options['screenitem'];
@@ -263,7 +263,7 @@ class CScreenBase {
 			}
 		}
 
-		// get resourcetype
+		// Get resourcetype.
 		if ($this->resourcetype === null && array_key_exists('resourcetype',$this->screenitem)) {
 			$this->resourcetype = $this->screenitem['resourcetype'];
 		}
@@ -274,13 +274,13 @@ class CScreenBase {
 			}
 		}
 
-		// get page file
+		// Get page file.
 		if ($this->required_parameters['pageFile'] && $this->pageFile === null) {
 			global $page;
 			$this->pageFile = $page['file'];
 		}
 
-		// calculate timeline
+		// Calculate timeline.
 		if ($this->required_parameters['timeline'] && $this->timeline === null) {
 			$this->timeline = $this->calculateTime([
 				'profileIdx' => $this->profileIdx,
@@ -291,12 +291,12 @@ class CScreenBase {
 			]);
 		}
 
-		// get screenid
+		// Get screenid.
 		if ($this->required_parameters['screenid'] && $this->screenid === null && $this->screenitem) {
 			$this->screenid = $this->screenitem['screenid'];
 		}
 
-		// create action url
+		// Create action URL.
 		if ($this->required_parameters['action'] && $this->action === null && $this->screenitem) {
 			$this->action = 'screenedit.php?form=update&screenid='.$this->screenid.'&screenitemid='.
 				$this->screenitem['screenitemid'];
@@ -430,7 +430,7 @@ class CScreenBase {
 			$options['profileIdx2'] = 0;
 		}
 
-		// show only latest data without update is set only period
+		// Show only latest data without update is set only period.
 		if (!empty($options['period']) && empty($options['stime'])) {
 			$options['updateProfile'] = false;
 			$options['profileIdx'] = '';

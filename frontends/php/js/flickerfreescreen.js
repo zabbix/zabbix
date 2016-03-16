@@ -95,8 +95,7 @@ jQuery(function($) {
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}
 
-			// SCREEN_RESOURCE_GRAPH
-			// SCREEN_RESOURCE_SIMPLE_GRAPH
+			// SCREEN_RESOURCE_GRAPH or SCREEN_RESOURCE_SIMPLE_GRAPH
 			if (screen.resourcetype == 0 || screen.resourcetype == 1) {
 				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshImg(id, function() {
