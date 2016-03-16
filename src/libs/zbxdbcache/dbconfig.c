@@ -31,7 +31,6 @@
 #include "zbxregexp.h"
 #include "macrocache.h"
 #include "cfg.h"
-#include "comms.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 static int	sync_in_progress = 0;
