@@ -124,17 +124,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		$messageSuccess = _('Maintenance updated');
 		$messageFailed = _('Cannot update maintenance');
-		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
 		$messageSuccess = _('Maintenance added');
 		$messageFailed = _('Cannot add maintenance');
-		$auditAction = AUDIT_ACTION_ADD;
 	}
 
 	$result = true;
-
-	DBstart();
 
 	if (!validateDateTime($_REQUEST['active_since_year'],
 			$_REQUEST['active_since_month'],
@@ -206,15 +202,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		add_audit($auditAction, AUDIT_RESOURCE_MAINTENANCE, _('Name').NAME_DELIMITER.$_REQUEST['mname']);
 		unset($_REQUEST['form']);
-	}
-
-	$result = DBend($result);
-
-	if ($result) {
 		uncheckTableRows();
 	}
+
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('delete') || (hasRequest('action') && getRequest('action') == 'maintenance.massdelete')) {
@@ -225,29 +216,12 @@ elseif (hasRequest('delete') || (hasRequest('action') && getRequest('action') ==
 
 	zbx_value2array($maintenanceids);
 
-	$maintenances = [];
-
-	DBstart();
-
-	foreach ($maintenanceids as $id => $maintenanceid) {
-		$maintenances[$maintenanceid] = get_maintenance_by_maintenanceid($maintenanceid);
-	}
-
 	$result = API::Maintenance()->delete($maintenanceids);
 	if ($result) {
-		foreach ($maintenances as $maintenanceid => $maintenance) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_MAINTENANCE,
-				'Id ['.$maintenanceid.'] '._('Name').' ['.$maintenance['name'].']'
-			);
-		}
 		unset($_REQUEST['form'], $_REQUEST['maintenanceid']);
-	}
-
-	$result = DBend($result);
-
-	if ($result) {
 		uncheckTableRows();
 	}
+
 	show_messages($result, _('Maintenance deleted'), _('Cannot delete maintenance'));
 }
 elseif (isset($_REQUEST['add_timeperiod']) && isset($_REQUEST['new_timeperiod'])) {

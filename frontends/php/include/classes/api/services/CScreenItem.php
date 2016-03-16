@@ -894,76 +894,46 @@ class CScreenItem extends CApiService {
 	/**
 	 * Check duplicates screen items in one cell.
 	 *
-	 * @throws APIException
-	 *
 	 * @param array $screenItems
 	 * @param array $dbScreenItems
 	 * @param array $dbScreens
+	 *
+	 * @throws APIException if input is invalid.
 	 */
 	protected function checkDuplicateResourceInCell(array $screenItems, array $dbScreenItems, array $dbScreens) {
-		foreach ($screenItems as &$screenItem) {
-			if (!isset($screenItem['x'])) {
-				$screenItem['x'] = isset($screenItem['screenitemid'])
-					? $dbScreenItems[$screenItem['screenitemid']]['x']
-					: 0;
+		$pos = [];
+
+		foreach ($screenItems as $screenItem) {
+			foreach (['x', 'y'] as $field_name) {
+				if (!array_key_exists($field_name, $screenItem)) {
+					$screenItem[$field_name] = array_key_exists('screenitemid', $screenItem)
+						? $dbScreenItems[$screenItem['screenitemid']][$field_name]
+						: 0;
+				}
 			}
-			if (!isset($screenItem['y'])) {
-				$screenItem['y'] = isset($screenItem['screenitemid'])
-					? $dbScreenItems[$screenItem['screenitemid']]['y']
-					: 0;
+
+			if (array_key_exists($screenItem['screenid'], $pos)
+					&& array_key_exists($screenItem['x'], $pos[$screenItem['screenid']])
+					&& array_key_exists($screenItem['y'], $pos[$screenItem['screenid']][$screenItem['x']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
+					$dbScreens[$screenItem['screenid']]['name'], $screenItem['x'], $screenItem['y']
+				));
+			}
+
+			$pos[$screenItem['screenid']][$screenItem['x']][$screenItem['y']] = true;
+
+			if (array_key_exists('screenitemid', $screenItem)) {
+				unset($dbScreenItems[$screenItem['screenitemid']]);
 			}
 		}
-		unset($screenItem);
 
-		foreach ($screenItems as $key => $screenItem) {
-			// check between input and input
-			foreach ($screenItems as $key2 => $screenItem2) {
-				if ($key == $key2) {
-					continue;
-				}
-
-				if ($screenItem['x'] == $screenItem2['x'] &&
-					$screenItem['y'] == $screenItem2['y'] &&
-					$screenItem['screenid'] == $screenItem2['screenid']
-				) {
-					$screenId = isset($screenItem['screenitemid'])
-						? $dbScreenItems[$screenItem['screenitemid']]['screenid']
-						: $screenItem['screenid'];
-
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s(
-							'Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
-							$dbScreens[$screenId]['name'],
-							$screenItem['x'],
-							$screenItem['y']
-						)
-					);
-				}
-			}
-
-			// check between input and db
-			foreach ($dbScreenItems as $dbScreenItem) {
-				if (isset($screenItem['screenitemid'])
-						&& bccomp($screenItem['screenitemid'], $dbScreenItem['screenitemid']) == 0) {
-					continue;
-				}
-
-				if ($screenItem['x'] == $dbScreenItem['x'] && $screenItem['y'] == $dbScreenItem['y']) {
-					$screenId = isset($screenItem['screenitemid'])
-						? $dbScreenItems[$screenItem['screenitemid']]['screenid']
-						: $screenItem['screenid'];
-
-					self::exception(
-						ZBX_API_ERROR_PARAMETERS,
-						_s(
-							'Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
-							$dbScreens[$screenId]['name'],
-							$screenItem['x'],
-							$screenItem['y']
-						)
-					);
-				}
+		foreach ($dbScreenItems as $dbScreenItem) {
+			if (array_key_exists($dbScreenItem['screenid'], $pos)
+					&& array_key_exists($dbScreenItem['x'], $pos[$dbScreenItem['screenid']])
+					&& array_key_exists($dbScreenItem['y'], $pos[$dbScreenItem['screenid']][$dbScreenItem['x']])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Screen "%1$s" cell X - %2$s Y - %3$s is already taken.',
+					$dbScreens[$dbScreenItem['screenid']]['name'], $dbScreenItem['x'], $dbScreenItem['y']
+				));
 			}
 		}
 	}
