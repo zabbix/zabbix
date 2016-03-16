@@ -143,26 +143,6 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 		'nopermissions' => true
 	]);
 
-	// Find monitored hosts and get groups that those hosts belong to.
-	$monitored_hostids = [];
-
-	foreach ($triggers as $trigger) {
-		foreach ($trigger['hosts'] as $host) {
-			if ($host['status'] == HOST_STATUS_MONITORED) {
-				$monitored_hostids[$host['hostid']] = true;
-			}
-		}
-	}
-
-	if ($monitored_hostids) {
-		$monitored_hosts = API::Host()->get([
-			'output' => ['hostid'],
-			'selectGroups' => ['groupid'],
-			'hostids' => array_keys($monitored_hostids),
-			'preservekeys' => true
-		]);
-	}
-
 	foreach ($sysmap['selements'] as $elem) {
 		$back = get_png_by_selement($mapInfo[$elem['selementid']]);
 		$area = new CArea(
