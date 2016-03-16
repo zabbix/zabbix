@@ -78,6 +78,124 @@ function check_screen_recursion($mother_screenid, $child_screenid) {
 	return false;
 }
 
+/**
+ * Add screen row.
+ *
+ * @param array $screen
+ * @param int   $row_num
+ */
+function addScreenRow(array $screen, $row_num) {
+	foreach ($screen['screenitems'] as &$screen_item) {
+		if ($screen_item['y'] >= $row_num) {
+			$screen_item['y']++;
+		}
+	}
+	unset($screen_item);
+
+	DBstart();
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		'vsize' => $screen['vsize'] + 1,
+		'screenitems' => $screen['screenitems']
+	]);
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			_('Row added')
+		);
+	}
+	DBend($result);
+}
+
+/**
+ * Add screen column.
+ *
+ * @param array $screen
+ * @param int   $col_num
+ */
+function addScreenColumn(array $screen, $col_num) {
+	foreach ($screen['screenitems'] as &$screen_item) {
+		if ($screen_item['x'] >= $col_num) {
+			$screen_item['x']++;
+		}
+	}
+	unset($screen_item);
+
+	DBstart();
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		'hsize' => $screen['hsize'] + 1,
+		'screenitems' => $screen['screenitems']
+	]);
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			_('Column added')
+		);
+	}
+	DBend($result);
+}
+
+/**
+ * Remove screen row.
+ *
+ * @param array $screen
+ * @param int   $row_num
+ */
+function delScreenRow(array $screen, $row_num) {
+	foreach ($screen['screenitems'] as $key => &$screen_item) {
+		if ($screen_item['y'] == $row_num) {
+			unset($screen['screenitems'][$key]);
+		}
+		elseif ($screen_item['y'] > $row_num) {
+			$screen_item['y']--;
+		}
+	}
+	unset($screen_item);
+
+	DBstart();
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		'vsize' => $screen['vsize'] - 1,
+		'screenitems' => $screen['screenitems']
+	]);
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			_('Row deleted')
+		);
+	}
+	DBend($result);
+}
+
+/**
+ * Remove screen column.
+ *
+ * @param array $screen
+ * @param int   $col_num
+ */
+function delScreenColumn(array $screen, $col_num) {
+	foreach ($screen['screenitems'] as $key => &$screen_item) {
+		if ($screen_item['x'] == $col_num) {
+			unset($screen['screenitems'][$key]);
+		}
+		elseif ($screen_item['x'] > $col_num) {
+			$screen_item['x']--;
+		}
+	}
+	unset($screen_item);
+
+	DBstart();
+	$result = API::Screen()->update([
+		'screenid' => $screen['screenid'],
+		'hsize' => $screen['hsize'] - 1,
+		'screenitems' => $screen['screenitems']
+	]);
+	if ($result) {
+		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
+			_('Column deleted')
+		);
+	}
+	DBend($result);
+}
+
 function getSlideshowScreens($slideshowId, $step) {
 	$dbSlides = DBfetch(DBselect(
 		'SELECT MIN(s.step) AS min_step,MAX(s.step) AS max_step'.
