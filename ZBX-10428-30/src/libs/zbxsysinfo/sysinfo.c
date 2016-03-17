@@ -17,9 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* THIS FILE IS MEANT TO BE USED BY USER LOADABLE MODULES */
-/*       DO NOT MAKE CHANGES WITHOUT A GOOD REASON        */
-
 #include "common.h"
 #include "module.h"
 #include "sysinfo.h"
@@ -404,7 +401,7 @@ void	test_parameter(const char *key)
 {
 #define	ZBX_COL_WIDTH	45
 
-	AGENT_RESULT	result;
+	zbx_result_t	result;
 	int		n;
 
 	n = printf("%s", key);
@@ -412,9 +409,9 @@ void	test_parameter(const char *key)
 	if (0 < n && ZBX_COL_WIDTH > n)
 		printf("%-*s", ZBX_COL_WIDTH - n, " ");
 
-	init_result(&result);
+	zbx_result_init(&result);
 
-	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result, NULL))
 	{
 		if (0 != ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
@@ -439,7 +436,7 @@ void	test_parameter(const char *key)
 			printf(" [m|" ZBX_NOTSUPPORTED "]");
 	}
 
-	free_result(&result);
+	zbx_result_free(&result);
 
 	printf("\n");
 
@@ -575,19 +572,19 @@ static int	replace_param(const char *cmd, AGENT_REQUEST *request, char **out, ch
  *               result - contains item value or error message                *
  *                                                                            *
  ******************************************************************************/
-int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
+int	process(const char *in_command, unsigned flags, zbx_result_t *result, zbx_vector_ptr_t *add_results)
 {
 	int		ret = NOTSUPPORTED;
 	ZBX_METRIC	*command = NULL;
 	AGENT_REQUEST	request;
 
-	init_result(result);
+	zbx_result_init(result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key((0 == (flags & PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
 			&request))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;
 	}
 
@@ -595,7 +592,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & PROCESS_LOCAL_COMMAND) &&
 			0 == strcmp(request.key, "system.run"))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not enabled."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not enabled."));
 		goto notsupported;
 	}
 
@@ -608,21 +605,21 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	/* item key not found */
 	if (NULL == command->key)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
 		goto notsupported;
 	}
 
 	/* expected item from a module */
 	if (0 != (flags & PROCESS_MODULE_COMMAND) && 0 == (command->flags & CF_MODULE))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
 		goto notsupported;
 	}
 
 	/* command does not accept parameters but was called with parameters */
 	if (0 == (command->flags & CF_HAVEPARAMS) && 0 != request.nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Item does not allow parameters."));
+		ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "Item does not allow parameters."));
 		goto notsupported;
 	}
 
@@ -634,7 +631,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 			if (FAIL == replace_param(command->test_param, &request, &parameters, error, sizeof(error)))
 			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 				goto notsupported;
 			}
 
@@ -648,17 +645,32 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
-	if (SYSINFO_RET_OK != command->function(&request, result))
+	if (0 != (command->flags & CF_MODULE))
 	{
-		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-		if (0 != (command->flags & CF_MODULE) && 0 == ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
+		AGENT_RESULT	agent_result;
+		char	**value;
 
-		goto notsupported;
+		init_result(&agent_result);
+
+		if (SYSINFO_RET_OK != command->function(&request, &agent_result))
+		{
+			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+			/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
+			if (0 == ISSET_MSG(&agent_result))
+				SET_MSG_RESULT(&agent_result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
+		}
+		else
+			ret = SUCCEED;
+
+		if (NULL != add_results)
+			zbx_extract_results(&agent_result, add_results);
+		else if (NULL != (value = GET_TEXT_RESULT(&agent_result)))
+			ZBX_SET_TEXT_RESULT(result, zbx_strdup(NULL, *value));
+
+		free_result(&agent_result);
 	}
-
-	ret = SUCCEED;
+	else if (SYSINFO_RET_OK == command->function(&request, result))
+		ret = SUCCEED;
 
 notsupported:
 	free_request(&request);

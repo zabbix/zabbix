@@ -140,7 +140,6 @@ int	get_value_simple(DC_ITEM *item, zbx_result_t *result, zbx_vector_ptr_t *add_
 	const char	*__function_name = "get_value_simple";
 
 	AGENT_REQUEST	request;
-	AGENT_RESULT	agent_result;
 	vmfunc_t	vmfunc;
 	int		ret = NOTSUPPORTED;
 
@@ -155,23 +154,13 @@ int	get_value_simple(DC_ITEM *item, zbx_result_t *result, zbx_vector_ptr_t *add_
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
-		init_result(&agent_result);
-
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, &agent_result, 0))
+		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 0))
 			ret = SUCCEED;
-
-		zbx_extract_results(&agent_result, add_results);
-		free_result(&agent_result);
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
-		init_result(&agent_result);
-
-		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, &agent_result, 1))
+		if (SYSINFO_RET_OK == check_service(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
-
-		zbx_extract_results(&agent_result, add_results);
-		free_result(&agent_result);
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
 	{
@@ -195,13 +184,8 @@ int	get_value_simple(DC_ITEM *item, zbx_result_t *result, zbx_vector_ptr_t *add_
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		init_result(&agent_result);
-
-		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, &agent_result))
+		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result, add_results))
 			ret = SUCCEED;
-
-		zbx_extract_results(&agent_result, add_results);
-		free_result(&agent_result);
 	}
 
 	if (NOTSUPPORTED == ret && !ZBX_ISSET_MSG(result))

@@ -510,12 +510,12 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	else if (NULL != CONFIG_HOST_METADATA_ITEM)
 	{
 		char		**value;
-		AGENT_RESULT	result;
+		zbx_result_t	result;
 
-		init_result(&result);
+		zbx_result_init(&result);
 
-		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
+		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result, NULL) &&
+				NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 		{
 			if (SUCCEED != zbx_is_utf8(*value))
 			{
@@ -544,7 +544,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get host metadata using \"%s\" item specified by"
 					" \"HostMetadataItem\" configuration parameter", CONFIG_HOST_METADATA_ITEM);
 
-		free_result(&result);
+		zbx_result_free(&result);
 	}
 
 	if (NULL != CONFIG_LISTEN_IP)
@@ -1444,19 +1444,19 @@ out:
 static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric, char **error)
 {
 	int		ret;
-	AGENT_RESULT	result;
+	zbx_result_t	result;
 	char		**pvalue;
 
-	init_result(&result);
+	zbx_result_init(&result);
 
-	if (SUCCEED != (ret = process(metric->key, 0, &result)))
+	if (SUCCEED != (ret = process(metric->key, 0, &result, NULL)))
 	{
-		if (NULL != (pvalue = GET_MSG_RESULT(&result)))
+		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
 		goto out;
 	}
 
-	if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
+	if (NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
@@ -1464,7 +1464,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 				NULL, NULL, NULL, NULL, metric->flags);
 	}
 out:
-	free_result(&result);
+	zbx_result_free(&result);
 
 	return ret;
 }

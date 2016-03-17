@@ -43,7 +43,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 
 static void	process_listener(zbx_socket_t *s)
 {
-	AGENT_RESULT	result;
+	zbx_result_t	result;
 	char		**value = NULL;
 	int		ret;
 
@@ -53,11 +53,11 @@ static void	process_listener(zbx_socket_t *s)
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		init_result(&result);
+		zbx_result_init(&result);
 
-		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result, NULL))
 		{
-			if (NULL != (value = GET_TEXT_RESULT(&result)))
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 				ret = zbx_tcp_send_to(s, *value, CONFIG_TIMEOUT);
@@ -65,7 +65,7 @@ static void	process_listener(zbx_socket_t *s)
 		}
 		else
 		{
-			value = GET_MSG_RESULT(&result);
+			value = ZBX_GET_MSG_RESULT(&result);
 
 			if (NULL != value)
 			{
@@ -93,7 +93,7 @@ static void	process_listener(zbx_socket_t *s)
 			}
 		}
 
-		free_result(&result);
+		zbx_result_free(&result);
 	}
 
 	if (FAIL == ret)

@@ -397,15 +397,15 @@ void    *zbx_result_get_value_by_type(zbx_result_t *result, int require_type)
 	switch (require_type)
 	{
 		case AR_UINT64:
-			return (void *)zbx_get_result_ui64_value(result);
+			return (void *)zbx_result_get_ui64_value(result);
 		case AR_DOUBLE:
-			return (void *)zbx_get_result_dbl_value(result);
+			return (void *)zbx_result_get_dbl_value(result);
 		case AR_STRING:
-			return (void *)zbx_get_result_str_value(result);
+			return (void *)zbx_result_get_str_value(result);
 		case AR_TEXT:
-			return (void *)zbx_get_result_text_value(result);
+			return (void *)zbx_result_get_text_value(result);
 		case AR_LOG:
-			return (void *)zbx_get_result_log_value(result);
+			return (void *)zbx_result_get_log_value(result);
 		case AR_MESSAGE:
 			if (0 != ZBX_ISSET_MSG(result))
 				return (void *)(&result->msg);

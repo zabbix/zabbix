@@ -17,14 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-/* THIS FILE IS MEANT TO BE USED BY USER LOADABLE MODULES */
-/*       DO NOT MAKE CHANGES WITHOUT A GOOD REASON        */
-
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
 #include "common.h"
-#include "module.h"
+#include "zbxresult.h"
 
 /* CHECK RESULT */
 
@@ -191,7 +188,7 @@ void	init_metrics();
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics();
 
-int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	process(const char *in_command, unsigned flags, zbx_result_t *result, zbx_vector_ptr_t *add_results);
 
 int	add_user_parameter(const char *key, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)());

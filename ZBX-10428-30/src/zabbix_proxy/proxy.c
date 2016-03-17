@@ -347,7 +347,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
  ******************************************************************************/
 static void	zbx_set_defaults(void)
 {
-	AGENT_RESULT	result;
+	zbx_result_t	result;
 	char		**value = NULL;
 
 	CONFIG_SERVER_STARTUP_TIME = time(NULL);
@@ -357,10 +357,10 @@ static void	zbx_set_defaults(void)
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
 
-		init_result(&result);
+		zbx_result_init(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = GET_STR_RESULT(&result)))
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result, NULL) &&
+				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 
@@ -375,7 +375,7 @@ static void	zbx_set_defaults(void)
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get proxy name from [%s])", CONFIG_HOSTNAME_ITEM);
 
-		free_result(&result);
+		zbx_result_free(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 	{

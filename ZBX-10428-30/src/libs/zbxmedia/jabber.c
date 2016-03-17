@@ -210,16 +210,16 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 {
 	const char	*__function_name = "lookup_jabber";
 	char		buffer[MAX_STRING_LEN], command[MAX_STRING_LEN];
-	AGENT_RESULT	result;
+	zbx_result_t	result;
 	int		ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s: In %s() server:'%s' port:%d", __module_name, __function_name, server, port);
 
-	init_result(&result);
+	zbx_result_init(&result);
 
 	zbx_snprintf(command, sizeof(command), "net.dns.record[,_xmpp-client._tcp.%s,SRV]", server);
 
-	if (SUCCEED == process(command, 0, &result))
+	if (SUCCEED == process(command, 0, &result, NULL))
 	{
 		int		max_priority = 65536, max_weight = -1;
 		int		cur_priority, cur_weight, cur_port;
@@ -253,7 +253,7 @@ static void	lookup_jabber(const char *server, int port, char *real_server, size_
 		}
 	}
 
-	free_result(&result);
+	zbx_result_free(&result);
 
 	if (SYSINFO_RET_OK != ret)
 	{
