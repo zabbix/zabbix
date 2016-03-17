@@ -51,7 +51,7 @@ int	get_value_internal(DC_ITEM *item, zbx_result_t *result)
 	const char	*tmp, *tmp1;
 	char		*error = NULL;
 
-	zbx_init_result(result);
+	zbx_result_init(result);
 	init_request(&request);
 
 	if (SUCCEED != parse_item_key(item->key, &request))

@@ -174,7 +174,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 			continue;
 		}
 
-		zbx_init_result(&value);
+		zbx_result_init(&value);
 
 		switch (types[i])
 		{
@@ -195,7 +195,7 @@ static void	process_test_data(zbx_uint64_t httptestid, int lastfailedstep, doubl
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
 
-		zbx_free_result(&value);
+		zbx_result_free(&value);
 	}
 
 	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);
@@ -262,7 +262,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 			continue;
 		}
 
-		zbx_init_result(&value);
+		zbx_result_init(&value);
 
 		switch (types[i])
 		{
@@ -283,7 +283,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 		states[i] = items[i].state;
 		lastclocks[i] = ts->sec;
 
-		zbx_free_result(&value);
+		zbx_result_free(&value);
 	}
 
 	DCrequeue_items(itemids, states, lastclocks, NULL, NULL, errcodes, num);

@@ -705,7 +705,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		}
 		else
 		{
-			if (SUCCEED != zbx_set_result_type(result, value_type, data_type, strval_dyn))
+			if (SUCCEED != zbx_result_set_type(result, value_type, data_type, strval_dyn))
 				ret = NOTSUPPORTED;
 
 			zbx_free(strval_dyn);
@@ -740,7 +740,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 
 		zbx_snprintf(buffer, sizeof(buffer), "%d", *var->val.integer);
 
-		if (SUCCEED != zbx_set_result_type(result, value_type, data_type, buffer))
+		if (SUCCEED != zbx_result_set_type(result, value_type, data_type, buffer))
 			ret = NOTSUPPORTED;
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
@@ -1074,7 +1074,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					break;
 				}
 
-				zbx_init_result(&snmp_result);
+				zbx_result_init(&snmp_result);
 
 				if (SUCCEED == zbx_snmp_set_result(var, ITEM_VALUE_TYPE_STR, 0, &snmp_result) &&
 						NULL != ZBX_GET_STR_RESULT(&snmp_result))
@@ -1091,7 +1091,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 							snmp_oid, NULL != msg && NULL != *msg ? *msg : "(null)");
 				}
 
-				zbx_free_result(&snmp_result);
+				zbx_result_free(&snmp_result);
 
 				/* go to next variable */
 				memcpy((char *)anOID, (char *)var->name, var->name_length * sizeof(oid));
@@ -1808,7 +1808,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 				zbx_strlcat(oids_translated[j], to_verify_oids[j] + len, sizeof(oids_translated[j]));
 			}
 
-			zbx_free_result(&results[j]);
+			zbx_result_free(&results[j]);
 		}
 	}
 

@@ -141,7 +141,7 @@ int	get_value_agent(DC_ITEM *item, zbx_result_t *result)
 					item->interface.addr));
 			ret = NETWORK_ERROR;
 		}
-		else if (SUCCEED != zbx_set_result_type(result, item->value_type, item->data_type, s.buffer))
+		else if (SUCCEED != zbx_result_set_type(result, item->value_type, item->data_type, s.buffer))
 			ret = NOTSUPPORTED;
 	}
 	else

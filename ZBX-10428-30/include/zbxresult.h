@@ -161,21 +161,21 @@ while (0)
 #define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
 #define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
 
-#define ZBX_GET_UI64_RESULT(res)	((zbx_uint64_t *)zbx_get_result_value_by_type(res, AR_UINT64))
-#define ZBX_GET_DBL_RESULT(res)		((double *)zbx_get_result_value_by_type(res, AR_DOUBLE))
-#define ZBX_GET_STR_RESULT(res)		((char **)zbx_get_result_value_by_type(res, AR_STRING))
-#define ZBX_GET_TEXT_RESULT(res)	((char **)zbx_get_result_value_by_type(res, AR_TEXT))
-#define ZBX_GET_LOG_RESULT(res)		((zbx_result_log_t *)zbx_get_result_value_by_type(res, AR_LOG))
-#define ZBX_GET_MSG_RESULT(res)		((char **)zbx_get_result_value_by_type(res, AR_MESSAGE))
+#define ZBX_GET_UI64_RESULT(res)	((zbx_uint64_t *)zbx_result_get_value_by_type(res, AR_UINT64))
+#define ZBX_GET_DBL_RESULT(res)		((double *)zbx_result_get_value_by_type(res, AR_DOUBLE))
+#define ZBX_GET_STR_RESULT(res)		((char **)zbx_result_get_value_by_type(res, AR_STRING))
+#define ZBX_GET_TEXT_RESULT(res)	((char **)zbx_result_get_value_by_type(res, AR_TEXT))
+#define ZBX_GET_LOG_RESULT(res)		((zbx_result_log_t *)zbx_result_get_value_by_type(res, AR_LOG))
+#define ZBX_GET_MSG_RESULT(res)		((char **)zbx_result_get_value_by_type(res, AR_MESSAGE))
 
-void	zbx_init_result(zbx_result_t *result);
+void	zbx_result_init(zbx_result_t *result);
 void	zbx_result_log_free(zbx_result_log_t *log);
-void	zbx_free_result(zbx_result_t *result);
+void	zbx_result_free(zbx_result_t *result);
 
-int	zbx_set_result_type(zbx_result_t *result, int value_type, int data_type, char *c);
-void	zbx_set_result_meta(zbx_result_t *result, zbx_uint64_t lastlogsize, int mtime);
+int	zbx_result_set_type(zbx_result_t *result, int value_type, int data_type, char *c);
+void	zbx_result_set_meta(zbx_result_t *result, zbx_uint64_t lastlogsize, int mtime);
 
-void    *zbx_get_result_value_by_type(zbx_result_t *result, int require_type);
+void    *zbx_result_get_value_by_type(zbx_result_t *result, int require_type);
 void	zbx_extract_results(AGENT_RESULT *agent_result, zbx_vector_ptr_t *add_results);
 
 #endif	/* ZABBIX_RESULT_H */

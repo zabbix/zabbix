@@ -409,7 +409,7 @@ out:
 
 static void    free_result_ptr(zbx_result_t *result)
 {
-	zbx_free_result(result);
+	zbx_result_free(result);
 	zbx_free(result);
 }
 
@@ -536,7 +536,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	/* prepare items */
 	for (i = 0; i < num; i++)
 	{
-		zbx_init_result(&results[i]);
+		zbx_result_init(&results[i]);
 		errcodes[i] = SUCCEED;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
@@ -717,6 +717,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			else
 			{
 				/* vmware.eventlog item returns vector of zbx_result_t representing events */
+				/* loadable module commands return vector of zbx_result_t extracted from AGENT_RESULT */
 
 				int		j;
 				zbx_timespec_t	ts_tmp = timespec;
@@ -791,7 +792,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				break;
 		}
 
-		zbx_free_result(&results[i]);
+		zbx_result_free(&results[i]);
 	}
 
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)free_result_ptr);

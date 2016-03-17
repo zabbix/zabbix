@@ -83,7 +83,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 	}
 	else
 	{
-		zbx_init_result(&value);
+		zbx_result_init(&value);
 
 		if (NULL != value_ui64)
 			ZBX_SET_UI64_RESULT(&value, *value_ui64);
@@ -93,7 +93,7 @@ static void	process_value(zbx_uint64_t itemid, zbx_uint64_t *value_ui64, double 
 		item.state = ITEM_STATE_NORMAL;
 		dc_add_history(item.itemid, item.value_type, item.flags, &value, ts, item.state, NULL);
 
-		zbx_free_result(&value);
+		zbx_result_free(&value);
 	}
 clean:
 	DCrequeue_items(&item.itemid, &item.state, &ts->sec, NULL, NULL, &errcode, 1);

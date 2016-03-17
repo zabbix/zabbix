@@ -30,7 +30,7 @@ static void	zbx_result_log_init(zbx_result_log_t *log)
 	log->logeventid = 0;
 }
 
-void	zbx_init_result(zbx_result_t *result)
+void	zbx_result_init(zbx_result_t *result)
 {
 	result->type = 0;
 	result->meta = 0;
@@ -50,7 +50,7 @@ void	zbx_result_log_free(zbx_result_log_t *log)
 	zbx_free(log);
 }
 
-void	zbx_free_result(zbx_result_t *result)
+void	zbx_result_free(zbx_result_t *result)
 {
 	ZBX_UNSET_UI64_RESULT(result);
 	ZBX_UNSET_DBL_RESULT(result);
@@ -60,7 +60,7 @@ void	zbx_free_result(zbx_result_t *result)
 	ZBX_UNSET_MSG_RESULT(result);
 }
 
-static void	zbx_add_log_result(zbx_result_t *result, char *value)
+static void	zbx_result_add_log(zbx_result_t *result, char *value)
 {
 	result->log = zbx_malloc(result->log, sizeof(zbx_result_log_t));
 
@@ -70,7 +70,7 @@ static void	zbx_add_log_result(zbx_result_t *result, char *value)
 	result->type |= AR_LOG;
 }
 
-int	zbx_set_result_type(zbx_result_t *result, int value_type, int data_type, char *c)
+int	zbx_result_set_type(zbx_result_t *result, int value_type, int data_type, char *c)
 {
 	zbx_uint64_t	value_uint64;
 	double		value_double;
@@ -153,7 +153,7 @@ int	zbx_set_result_type(zbx_result_t *result, int value_type, int data_type, cha
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_replace_invalid_utf8(c);
-			zbx_add_log_result(result, c);
+			zbx_result_add_log(result, c);
 			ret = SUCCEED;
 			break;
 	}
@@ -181,14 +181,14 @@ int	zbx_set_result_type(zbx_result_t *result, int value_type, int data_type, cha
 	return ret;
 }
 
-void	zbx_set_result_meta(zbx_result_t *result, zbx_uint64_t lastlogsize, int mtime)
+void	zbx_result_set_meta(zbx_result_t *result, zbx_uint64_t lastlogsize, int mtime)
 {
 	result->lastlogsize = lastlogsize;
 	result->mtime = mtime;
 	result->meta = 1;
 }
 
-static zbx_uint64_t	*zbx_get_result_ui64_value(zbx_result_t *result)
+static zbx_uint64_t	*zbx_result_get_ui64_value(zbx_result_t *result)
 {
 	zbx_uint64_t	value;
 
@@ -232,7 +232,7 @@ static zbx_uint64_t	*zbx_get_result_ui64_value(zbx_result_t *result)
 	return NULL;
 }
 
-static double	*zbx_get_result_dbl_value(zbx_result_t *result)
+static double	*zbx_result_get_dbl_value(zbx_result_t *result)
 {
 	double	value;
 
@@ -276,7 +276,7 @@ static double	*zbx_get_result_dbl_value(zbx_result_t *result)
 	return NULL;
 }
 
-static char	**zbx_get_result_str_value(zbx_result_t *result)
+static char	**zbx_result_get_str_value(zbx_result_t *result)
 {
 	char	*p, tmp;
 
@@ -311,7 +311,7 @@ static char	**zbx_get_result_str_value(zbx_result_t *result)
 	return NULL;
 }
 
-static char	**zbx_get_result_text_value(zbx_result_t *result)
+static char	**zbx_result_get_text_value(zbx_result_t *result)
 {
 	assert(result);
 
@@ -339,7 +339,7 @@ static char	**zbx_get_result_text_value(zbx_result_t *result)
 	return NULL;
 }
 
-static zbx_result_log_t	*zbx_get_result_log_value(zbx_result_t *result)
+static zbx_result_log_t	*zbx_result_get_log_value(zbx_result_t *result)
 {
 	if (0 != ZBX_ISSET_LOG(result))
 		return result->log;
@@ -369,7 +369,7 @@ static zbx_result_log_t	*zbx_get_result_log_value(zbx_result_t *result)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_get_result_value_by_type                                     *
+ * Function: zbx_result_get_value_by_type                                     *
  *                                                                            *
  * Purpose: return value of result in special type                            *
  *          if value missing, convert existing value to requested type        *
@@ -390,7 +390,7 @@ static zbx_result_log_t	*zbx_get_result_log_value(zbx_result_t *result)
  *    AR_MESSAGE - skipped in conversion                                      *
  *                                                                            *
  ******************************************************************************/
-void    *zbx_get_result_value_by_type(zbx_result_t *result, int require_type)
+void    *zbx_result_get_value_by_type(zbx_result_t *result, int require_type)
 {
 	assert(result);
 
@@ -417,7 +417,7 @@ void    *zbx_get_result_value_by_type(zbx_result_t *result, int require_type)
 	return NULL;
 }
 
-static zbx_result_log_t	*zbx_get_result_log(zbx_log_t *log)
+static zbx_result_log_t	*extract_result_log(zbx_log_t *log)
 {
 	zbx_result_log_t	*result_log;
 
@@ -447,8 +447,8 @@ static void	extract_result_logs(AGENT_RESULT *agent_result, zbx_vector_ptr_t *ad
 	for (i = 0; NULL != agent_result->logs[i]; i++)
 	{
 		add_result = zbx_malloc(NULL, sizeof(zbx_result_t));
-		zbx_init_result(add_result);
-		ZBX_SET_LOG_RESULT(add_result, zbx_get_result_log(agent_result->logs[i]));
+		zbx_result_init(add_result);
+		ZBX_SET_LOG_RESULT(add_result, extract_result_log(agent_result->logs[i]));
 		add_result->lastlogsize = agent_result->logs[i]->lastlogsize;
 		add_result->mtime = agent_result->logs[i]->mtime;
 		zbx_vector_ptr_append(add_results, add_result);
@@ -463,7 +463,7 @@ static void	extract_result_by_type(AGENT_RESULT *agent_result, int type, zbx_vec
 		return;
 
 	add_result = zbx_malloc(NULL, sizeof(zbx_result_t));
-	zbx_init_result(add_result);
+	zbx_result_init(add_result);
 
 	switch (type)
 	{

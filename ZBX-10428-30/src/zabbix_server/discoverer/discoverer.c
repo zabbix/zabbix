@@ -108,7 +108,6 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 	int		ret = SUCCEED;
 	char		key[MAX_STRING_LEN], error[ITEM_ERROR_LEN_MAX];
 	const char	*service = NULL;
-	AGENT_RESULT 	agent_result;
 	zbx_result_t	result;
 	DC_ITEM		item;
 	ZBX_FPING_HOST	host;
@@ -116,8 +115,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	init_result(&agent_result);
-	zbx_init_result(&result);
+	zbx_result_init(&result);
 
 	**value = '\0';
 
@@ -187,8 +185,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != process(key, 0, &agent_result) || NULL == GET_UI64_RESULT(&agent_result) ||
-						0 == agent_result.ui64)
+				if (SUCCEED != process(key, 0, &result, NULL) || NULL == ZBX_GET_UI64_RESULT(&result) ||
+						0 == result.ui64)
 				{
 					ret = FAIL;
 				}
@@ -313,8 +311,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 		zbx_alarm_off();
 	}
-	free_result(&agent_result);
-	zbx_free_result(&result);
+	zbx_result_free(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 

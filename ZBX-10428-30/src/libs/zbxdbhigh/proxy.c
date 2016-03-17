@@ -2197,11 +2197,11 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		{
 			int	res = SUCCEED;
 
-			zbx_init_result(&result);
+			zbx_result_init(&result);
 
 			if (NULL != values[i].value)
 			{
-				res = zbx_set_result_type(&result, items[i].value_type,
+				res = zbx_result_set_type(&result, items[i].value_type,
 						(0 != proxy_hostid ? ITEM_DATA_TYPE_DECIMAL : items[i].data_type),
 						values[i].value);
 			}
@@ -2223,7 +2223,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 				if (0 != values[i].meta)
-					zbx_set_result_meta(&result, values[i].lastlogsize, values[i].mtime);
+					zbx_result_set_meta(&result, values[i].lastlogsize, values[i].mtime);
 
 				items[i].state = ITEM_STATE_NORMAL;
 				dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &result,
@@ -2242,9 +2242,9 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 						&values[i].ts, items[i].state, result.msg);
 			}
 			else
-				THIS_SHOULD_NEVER_HAPPEN;	/* set_result_type() always sets MSG result if not SUCCEED */
+				THIS_SHOULD_NEVER_HAPPEN;	/* zbx_result_set_type() always sets MSG result if not SUCCEED */
 
-			zbx_free_result(&result);
+			zbx_result_free(&result);
 		}
 
 		itemids[num] = items[i].itemid;

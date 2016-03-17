@@ -105,7 +105,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 	for (i = 0; i < num; i++)
 	{
-		zbx_init_result(&results[i]);
+		zbx_result_init(&results[i]);
 		errcodes[i] = FAIL;
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
@@ -153,7 +153,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				goto next;
 		}
 
-		if (SUCCEED == zbx_set_result_type(&results[i], items[i].value_type, items[i].data_type, trap))
+		if (SUCCEED == zbx_result_set_type(&results[i], items[i].value_type, items[i].data_type, trap))
 			errcodes[i] = SUCCEED;
 		else
 			errcodes[i] = NOTSUPPORTED;
@@ -164,7 +164,7 @@ next:
 
 	if (FAIL == ret && -1 != fb)
 	{
-		if (SUCCEED == zbx_set_result_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
+		if (SUCCEED == zbx_result_set_type(&results[fb], items[fb].value_type, items[fb].data_type, trap))
 			errcodes[fb] = SUCCEED;
 		else
 			errcodes[fb] = NOTSUPPORTED;
@@ -202,7 +202,7 @@ next:
 		}
 
 		zbx_free(items[i].key);
-		zbx_free_result(&results[i]);
+		zbx_result_free(&results[i]);
 	}
 
 	zbx_free(results);

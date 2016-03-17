@@ -180,7 +180,7 @@ static int	db_odbc_select(DC_ITEM *item, AGENT_REQUEST *request, zbx_result_t *r
 			{
 				ZBX_SET_MSG_RESULT(result, zbx_strdup(NULL, "SQL query returned NULL value."));
 			}
-			else if (SUCCEED == zbx_set_result_type(result, item->value_type, item->data_type, row[0]))
+			else if (SUCCEED == zbx_result_set_type(result, item->value_type, item->data_type, row[0]))
 			{
 				ret = SUCCEED;
 			}

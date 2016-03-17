@@ -67,7 +67,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	zbx_free(param);
 
-	zbx_init_result(&agent_result);
+	zbx_result_init(&agent_result);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -82,7 +82,7 @@ static int	zbx_execute_script_on_agent(DC_HOST *host, const char *command, char 
 
 	zbx_alarm_off();
 
-	zbx_free_result(&agent_result);
+	zbx_result_free(&agent_result);
 
 	zbx_free(item.key);
 fail:
@@ -203,7 +203,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 	item.value_type = ITEM_VALUE_TYPE_TEXT;
 	item.params = zbx_strdup(item.params, script->command);
 
-	zbx_init_result(&agent_result);
+	zbx_result_init(&agent_result);
 
 	zbx_alarm_on(CONFIG_TIMEOUT);
 
@@ -218,7 +218,7 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 
 	zbx_alarm_off();
 
-	zbx_free_result(&agent_result);
+	zbx_result_free(&agent_result);
 
 	zbx_free(item.params);
 	zbx_free(item.key);

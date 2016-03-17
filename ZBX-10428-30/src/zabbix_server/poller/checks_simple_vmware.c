@@ -243,7 +243,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (SUCCEED == zbx_set_result_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, perfvalue->second))
+	if (SUCCEED == zbx_result_set_type(result, ITEM_VALUE_TYPE_UINT64, ITEM_DATA_TYPE_DECIMAL, perfvalue->second))
 	{
 		result->ui64 *= coeff;
 		ret = SYSINFO_RET_OK;
@@ -709,11 +709,11 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 			add_result = zbx_malloc(NULL, sizeof(zbx_result_t));
 
-			zbx_init_result(add_result);
+			zbx_result_init(add_result);
 
-			if (SUCCEED == (ret = zbx_set_result_type(add_result, item->value_type, item->flags, value)))
+			if (SUCCEED == (ret = zbx_result_set_type(add_result, item->value_type, item->flags, value)))
 			{
-				zbx_set_result_meta(add_result, ids.values[i], 0);
+				zbx_result_set_meta(add_result, ids.values[i], 0);
 
 				if (ITEM_VALUE_TYPE_LOG == item->value_type)
 				{

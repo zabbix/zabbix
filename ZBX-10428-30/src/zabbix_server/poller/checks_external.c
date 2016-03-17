@@ -85,7 +85,7 @@ int	get_value_external(DC_ITEM *item, zbx_result_t *result)
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
 
-		if (SUCCEED == zbx_set_result_type(result, item->value_type, item->data_type, buf))
+		if (SUCCEED == zbx_result_set_type(result, item->value_type, item->data_type, buf))
 			ret = SUCCEED;
 
 		zbx_free(buf);
