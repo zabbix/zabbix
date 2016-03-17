@@ -124,7 +124,7 @@ class CScreenBuilder {
 		if (!empty($options['screen'])) {
 			$this->screen = $options['screen'];
 		}
-		elseif (!empty($options['screenid'])) {
+		elseif (array_key_exists('screenid', $options) && $options['screenid'] > 0) {
 			$this->screen = API::Screen()->get([
 				'screenids' => $options['screenid'],
 				'output' => API_OUTPUT_EXTEND,
@@ -169,31 +169,33 @@ class CScreenBuilder {
 	 * @return CScreenBase
 	 */
 	public static function getScreen(array $options = []) {
-		// get resourcetype from screenitem
-		if (empty($options['screenitem']) && !empty($options['screenitemid'])) {
-			if (!empty($options['hostid'])) {
-				$options['screenitem'] = API::TemplateScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'hostids' => $options['hostid'],
-					'output' => API_OUTPUT_EXTEND
-				]);
+		if (!array_key_exists('resourcetype', $options)) {
+			$options['resourcetype'] = null;
+
+			// get resourcetype from screenitem
+			if (!array_key_exists('screenitem', $options) && array_key_exists('screenitemid', $options)) {
+				if (array_key_exists('hostid', $options) && $options['hostid'] > 0) {
+					$options['screenitem'] = API::TemplateScreenItem()->get([
+						'screenitemids' => $options['screenitemid'],
+						'hostids' => $options['hostid'],
+						'output' => API_OUTPUT_EXTEND
+					]);
+				}
+				else {
+					$options['screenitem'] = API::ScreenItem()->get([
+						'screenitemids' => $options['screenitemid'],
+						'output' => API_OUTPUT_EXTEND
+					]);
+				}
+				$options['screenitem'] = reset($options['screenitem']);
 			}
-			else {
-				$options['screenitem'] = API::ScreenItem()->get([
-					'screenitemids' => $options['screenitemid'],
-					'output' => API_OUTPUT_EXTEND
-				]);
+
+			if (array_key_exists('screenitem', $options) && array_key_exists('resourcetype', $options['screenitem'])) {
+				$options['resourcetype'] = $options['screenitem']['resourcetype'];
 			}
-			$options['screenitem'] = reset($options['screenitem']);
 		}
 
-		if (zbx_empty($options['resourcetype'])
-				&& array_key_exists('screenitem', $options)
-				&& !zbx_empty($options['screenitem']['resourcetype'])) {
-			$options['resourcetype'] = $options['screenitem']['resourcetype'];
-		}
-
-		if (zbx_empty($options['resourcetype'])) {
+		if ($options['resourcetype'] === null) {
 			return null;
 		}
 
@@ -252,22 +254,6 @@ class CScreenBuilder {
 				return new CScreenHostTriggers($options);
 
 			case SCREEN_RESOURCE_HISTORY:
-				// TODO: pass the items from the outside instead of retrieving them by ids
-				if (isset($options['itemids'])) {
-					$items = API::Item()->get([
-						'itemids' => $options['itemids'],
-						'webitems' => true,
-						'selectHosts' => ['name'],
-						'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
-						'preservekeys' => true
-					]);
-
-					$items = CMacrosResolverHelper::resolveItemNames($items);
-
-					$options['items'] = $items;
-					unset($options['itemids']);
-				}
-
 				return new CScreenHistory($options);
 
 			case SCREEN_RESOURCE_CHART:
@@ -284,6 +270,9 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_HTTPTEST_DETAILS:
 				return new CScreenHttpTestDetails($options);
 
+			case SCREEN_RESOURCE_DISCOVERY:
+				return new CScreenDiscovery($options);
+
 			default:
 				return null;
 		}
@@ -297,10 +286,10 @@ class CScreenBuilder {
 	 * @return array
 	 */
 	protected static function appendTemplatedScreenOption(array $options) {
-		if (isset($options['screen'])) {
+		if (array_key_exists('screen', $options)) {
 			$options['isTemplatedScreen'] = (bool) $options['screen']['templateid'];
 		}
-		elseif (isset($options['screenid'])) {
+		elseif (array_key_exists('screenid', $options) && $options['screenid'] > 0) {
 			$options['isTemplatedScreen'] = (bool) API::TemplateScreen()->get([
 				'screenids' => [$options['screenid']],
 				'output' => []

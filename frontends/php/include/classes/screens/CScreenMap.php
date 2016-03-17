@@ -34,8 +34,8 @@ class CScreenMap extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$image = (new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
-			.'&height='.$this->screenitem['height'].'&curtime='.time()))
+		$image = (new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].
+			'&width='.$this->screenitem['width'].'&height='.$this->screenitem['height'].'&curtime='.time()))
 			->setId('map_'.$this->screenitem['screenitemid']);
 
 		if ($this->mode == SCREEN_MODE_PREVIEW) {
@@ -52,10 +52,10 @@ class CScreenMap extends CScreenBase {
 
 			$image->setSrc($image->getAttribute('src').'&severity_min='.$sysmap['severity_min']);
 
-			$actionMap = getActionMapBySysmap($sysmap, ['severity_min' => $sysmap['severity_min']]);
-			$image->setMap($actionMap->getName());
+			$action_map = getActionMapBySysmap($sysmap, ['severity_min' => $sysmap['severity_min']]);
+			$image->setMap($action_map->getName());
 
-			$output = [$actionMap, $image];
+			$output = [$action_map, $image];
 		}
 		elseif ($this->mode == SCREEN_MODE_EDIT) {
 			$output = [$image, BR(), new CLink(_('Change'), $this->action)];
