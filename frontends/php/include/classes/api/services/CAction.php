@@ -599,9 +599,8 @@ class CAction extends CApiService {
 			'selectFilter'     => ['formula', 'conditions']
 		]);
 
-		$update_fields = ['name' => true, 'eventsource' => true, 'status' => true, 'esc_period' => true,
-			'def_shortdata' => true, 'def_longdata' => true, 'recovery_msg' => true, 'r_shortdata' => true,
-			'r_longdata' => true
+		$update_fields = ['name', 'eventsource', 'status', 'esc_period', 'def_shortdata', 'def_longdata',
+			'recovery_msg', 'r_shortdata','r_longdata'
 		];
 
 		$this->validateUpdate($actions, $actionsDb);
@@ -616,7 +615,7 @@ class CAction extends CApiService {
 		foreach ($actions as $actionId => $action) {
 			$actionDb = $actionsDb[$actionId];
 
-			$actionUpdateValues = array_intersect_key($action, $update_fields);
+			$actionUpdateValues = array_intersect_key($action, array_flip($update_fields));
 
 			if (isset($action['filter'])) {
 				$actionFilter = $action['filter'];
