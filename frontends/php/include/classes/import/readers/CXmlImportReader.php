@@ -60,7 +60,9 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$data = $this->xml_to_array($xml);
+		$data = [];
+		$nodes = [];
+		$this->xml_to_array($xml, $nodes, $data);
 		$xml->close();
 		return $data;
 	}
@@ -70,18 +72,18 @@ class CXmlImportReader extends CImportReader {
 	 *
 	 * @param XMLReader $xml
 	 * @param array $nodes
+	 * @param array $data
 	 *
 	 * @return array|string
 	 */
-	protected function xml_to_array(XMLReader $xml, array &$nodes = []) {
-		$data = '';
+	protected function xml_to_array(XMLReader $xml, array &$nodes, array &$data = []) {
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
 					$node_name = $xml->name;
 					if (array_key_exists($xml->depth, $nodes) && $nodes[$xml->depth]['name'] === $xml->name) {
 						$nodes[$xml->depth]['count']++;
-						$node_name .= count($xml->name);
+						$node_name .= count($data);
 					}
 					else {
 						$nodes[$xml->depth] = [
@@ -119,36 +121,42 @@ class CXmlImportReader extends CImportReader {
 						}
 					}
 					else {
-						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $nodes);
+						if (is_array($data)) {
+							$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $nodes);
+						}
+						else {
+							$patch = '';
+
+							foreach ($nodes as $key => $node) {
+								$patch .= ($node['count'] > 1)
+									? '/'.$node['name'].'('.$node['count'].')'
+									: '/'.$node['name'];
+							}
+
+							$xml->next();
+							throw new Exception(_s('Invalid XML text "%1$s": %2$s.', $patch,
+								_s('unexpected text "%1$s"', trim($data))
+							));
+						}
+
 					}
 					break;
 
 				case XMLReader::TEXT:
-					if (is_array($data)) {
-						array_pop($nodes);
-
-						$patch = '';
-
-						foreach ($nodes as $key => $node) {
-							$patch .= ($node['count'] > 1)
-								? '/'.$node['name'].'('.$node['count'].')'
-								: '/'.$node['name'];
-						}
-
-						throw new Exception(_s('Invalid XML text "%1$s": %2$s.', $patch,
-							_s('unexpected text "%1$s"', trim($xml->value))
-						));
-					}
-					else {
-						$data = $xml->value;
-					}
+					$data = $xml->value;
 					break;
 
 				case XMLReader::END_ELEMENT:
+					/*
+					 * For tags without any value, this issue firstly exists in 1.8 XML files.
+					 * Example: <dns></dns>
+					 */
+					if (is_array($data) && !$data) {
+						$data = '';
+					}
+
 					return $data;
 			}
 		}
-
-		return $data;
 	}
 }
