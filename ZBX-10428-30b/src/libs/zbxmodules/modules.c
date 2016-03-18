@@ -18,7 +18,11 @@
 **/
 
 #include "common.h"
+
+#define ZABBIX_CORE
 #include "module.h"
+#undef ZABBIX_CORE
+
 #include "zbxmodules.h"
 
 #include "log.h"

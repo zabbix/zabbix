@@ -185,7 +185,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != process(key, 0, &result) || NULL == GET_UI64_RESULT(&result) ||
+				if (SUCCEED != process(key, 0, &result, NULL) || NULL == GET_UI64_RESULT(&result) ||
 						0 == result.ui64)
 				{
 					ret = FAIL;

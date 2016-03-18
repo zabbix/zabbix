@@ -21,7 +21,78 @@
 #define ZABBIX_SYSINFO_H
 
 #include "common.h"
+#include "zbxalgo.h"
+
+#define ZABBIX_CORE
 #include "module.h"
+#undef ZABBIX_CORE
+
+typedef struct
+{
+	char		*value;
+	char		*source;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+}
+zbx_log_t;
+
+/* agent return structure */
+typedef struct
+{
+	zbx_uint64_t	lastlogsize;	/* meta information */
+	zbx_uint64_t	ui64;
+	double		dbl;
+	char		*str;
+	char		*text;
+	char		*msg;		/* possible error message */
+	zbx_log_t	*log;
+	int	 	type;		/* flags: see AR_* in module.h */
+	int		mtime;		/* meta information */
+}
+AGENT_RESULT;
+
+/* SET RESULT */
+
+#define SET_UI64_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_UINT64,		\
+	(res)->ui64 = (zbx_uint64_t)(val)	\
+)
+
+#define SET_DBL_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_DOUBLE,		\
+	(res)->dbl = (double)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_STR_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_STRING,		\
+	(res)->str = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_TEXT_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_TEXT,			\
+	(res)->text = (char *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_LOG_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_LOG,			\
+	(res)->log = (zbx_log_t *)(val)		\
+)
+
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
+#define SET_MSG_RESULT(res, val)		\
+(						\
+	(res)->type |= AR_MESSAGE,		\
+	(res)->msg = (char *)(val)		\
+)
 
 /* CHECK RESULT */
 
@@ -191,7 +262,7 @@ void	init_metrics();
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics();
 
-int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	process(const char *in_command, unsigned flags, AGENT_RESULT *result, zbx_vector_ptr_t *add_results);
 
 int	add_user_parameter(const char *key, char *command, char *error, size_t max_error_len);
 int	add_user_module(const char *key, int (*function)());

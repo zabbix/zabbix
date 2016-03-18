@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "module.h"
 #include "sysinfo.h"
 #include "log.h"
 #include "cfg.h"
@@ -403,7 +402,7 @@ void	test_parameter(const char *key)
 
 	init_result(&result);
 
-	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result, NULL))
 	{
 		if (0 != ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
@@ -548,6 +547,59 @@ static int	replace_param(const char *cmd, AGENT_REQUEST *request, char **out, ch
 	return ret;
 }
 
+static void	module_result_init(zbx_module_result_t *module_result)
+{
+	module_result->type = 0;
+
+	module_result->ui64 = 0;
+	module_result->dbl = 0;
+	module_result->str = NULL;
+	module_result->text = NULL;
+	module_result->logs = NULL;
+	module_result->msg = NULL;
+}
+
+static void	module_result_free(zbx_module_result_t *module_result)
+{
+	zbx_free(module_result->str);
+	zbx_free(module_result->text);
+	zbx_free(module_result->msg);
+
+	if (NULL != module_result->logs)
+	{
+		size_t	i;
+
+		for (i = 0; NULL != module_result->logs[i]; i++)
+		{
+			zbx_free(module_result->logs[i]->source);
+			zbx_free(module_result->logs[i]->value);
+			zbx_free(module_result->logs[i]);
+		}
+
+		zbx_free(module_result->logs);
+	}
+}
+
+static zbx_log_t	*extract_log(zbx_module_log_t *module_log)
+{
+	zbx_log_t	*log;
+
+	log = zbx_malloc(NULL, sizeof(zbx_log_t));
+	zbx_log_init(log);
+
+	if (NULL != module_log->value)
+		log->value = zbx_strdup(log->value, module_log->value);
+
+	if (NULL != module_log->source)
+		log->source = zbx_strdup(log->source, module_log->source);
+
+	log->timestamp = module_log->timestamp;
+	log->severity = module_log->severity;
+	log->logeventid = module_log->logeventid;
+
+	return log;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: process                                                          *
@@ -564,7 +616,7 @@ static int	replace_param(const char *cmd, AGENT_REQUEST *request, char **out, ch
  *               result - contains item value or error message                *
  *                                                                            *
  ******************************************************************************/
-int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
+int	process(const char *in_command, unsigned flags, AGENT_RESULT *result, zbx_vector_ptr_t *add_results)
 {
 	int		ret = NOTSUPPORTED;
 	ZBX_METRIC	*command = NULL;
@@ -637,17 +689,58 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
-	if (SYSINFO_RET_OK != command->function(&request, result))
+	if (0 != (command->flags & CF_MODULE))
 	{
-		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
-		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
-		if (0 != (command->flags & CF_MODULE) && 0 == ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
+		zbx_module_result_t	module_result;
 
-		goto notsupported;
+		module_result_init(&module_result);
+
+		if (SYSINFO_RET_OK != command->function(&request, &module_result))
+		{
+			/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
+			/* message in "module_result" but would break things relying on ZBX_NOTSUPPORTED message. */
+			if (0 != (module_result.type & AR_MESSAGE))
+				SET_MSG_RESULT(result, zbx_strdup(NULL, module_result.msg));
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
+		}
+		else
+		{
+			if (0 != (module_result.type & AR_UINT64))
+				SET_UI64_RESULT(result, module_result.ui64);
+
+			if (0 != (module_result.type & AR_DOUBLE))
+				SET_DBL_RESULT(result, module_result.dbl);
+
+			if (0 != (module_result.type & AR_STRING))
+				SET_STR_RESULT(result, zbx_strdup(NULL, module_result.str));
+
+			if (0 != (module_result.type & AR_TEXT))
+				SET_TEXT_RESULT(result, zbx_strdup(NULL, module_result.text));
+
+			if (0 != (module_result.type & AR_LOG) && NULL != add_results)
+			{
+				AGENT_RESULT	*add_result;
+				size_t		i;
+
+				for (i = 0; NULL != module_result.logs[i]; i++)
+				{
+					add_result = zbx_malloc(NULL, sizeof(AGENT_RESULT));
+					init_result(add_result);
+					SET_LOG_RESULT(add_result, extract_log(module_result.logs[i]));
+					add_result->lastlogsize = module_result.logs[i]->lastlogsize;
+					add_result->mtime = module_result.logs[i]->mtime;
+					zbx_vector_ptr_append(add_results, add_result);
+				}
+			}
+
+			ret = SUCCEED;
+		}
+
+		module_result_free(&module_result);
 	}
-
-	ret = SUCCEED;
+	else if (SYSINFO_RET_OK == command->function(&request, result))
+		ret = SUCCEED;
 
 notsupported:
 	free_request(&request);

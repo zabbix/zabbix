@@ -514,7 +514,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
+		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result, NULL) &&
 				NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
 		{
 			if (SUCCEED != zbx_is_utf8(*value))
@@ -1449,7 +1449,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 
 	init_result(&result);
 
-	if (SUCCEED != (ret = process(metric->key, 0, &result)))
+	if (SUCCEED != (ret = process(metric->key, 0, &result, NULL)))
 	{
 		if (NULL != (pvalue = GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);

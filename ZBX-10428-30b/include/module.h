@@ -45,7 +45,7 @@ typedef struct
 }
 ZBX_METRIC;
 
-/* agent request structure */
+/* agent and module request structure */
 typedef struct
 {
 	char		*key;
@@ -60,37 +60,56 @@ typedef struct
 {
 	char		*value;
 	char		*source;
+	zbx_uint64_t	lastlogsize;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
+	int		mtime;
 }
-zbx_log_t;
+#ifndef ZABBIX_CORE
+zbx_log_t;	/* zbx_log_t for internal use is defined in sysinfo.h */
+#else
+zbx_module_log_t;
+#endif
 
-/* agent result types */
+/* module return structure */
+typedef struct
+{
+	int	 		type;
+	zbx_uint64_t		ui64;
+	double			dbl;
+	char			*str;
+	char			*text;
+	char			*msg;
+
+	/* null-terminated list of pointers */
+#ifndef ZABBIX_CORE
+	zbx_log_t		**logs;
+#else
+	zbx_module_log_t	**logs;
+#endif
+}
+#ifndef ZABBIX_CORE
+AGENT_RESULT;	/* AGENT_RESULT for internal use is defined in sysinfo.h */
+#else
+zbx_module_result_t;
+#endif
+
+/* agent and module result types */
 #define AR_UINT64	0x01
 #define AR_DOUBLE	0x02
 #define AR_STRING	0x04
 #define AR_TEXT		0x08
 #define AR_LOG		0x10
 #define AR_MESSAGE	0x20
-#define AR_META		0x40
 
-/* agent return structure */
-typedef struct
-{
-	zbx_uint64_t	lastlogsize;	/* meta information */
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
-	char		*text;
-	char		*msg;		/* possible error message */
-	zbx_log_t	*log;
-	int	 	type;		/* flags: see AR_* above */
-	int		mtime;		/* meta information */
-}
-AGENT_RESULT;
+#ifdef ZABBIX_CORE
+#define AR_META		0x40
+#endif
 
 /* SET RESULT */
+
+#ifndef ZABBIX_CORE	/* macros for internal use are defined in sysinfo.h */
 
 #define SET_UI64_RESULT(res, val)		\
 (						\
@@ -122,7 +141,7 @@ AGENT_RESULT;
 #define SET_LOG_RESULT(res, val)		\
 (						\
 	(res)->type |= AR_LOG,			\
-	(res)->log = (zbx_log_t *)(val)		\
+	(res)->logs = (zbx_log_t **)(val)	\
 )
 
 /* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
@@ -131,6 +150,8 @@ AGENT_RESULT;
 	(res)->type |= AR_MESSAGE,		\
 	(res)->msg = (char *)(val)		\
 )
+
+#endif	/* ZABBIX_CORE */
 
 #define SYSINFO_RET_OK		0
 #define SYSINFO_RET_FAIL	1

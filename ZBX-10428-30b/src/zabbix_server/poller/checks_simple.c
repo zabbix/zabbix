@@ -192,7 +192,7 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == process(item->key, PROCESS_MODULE_COMMAND, result, add_results))
 			ret = SUCCEED;
 	}
 
