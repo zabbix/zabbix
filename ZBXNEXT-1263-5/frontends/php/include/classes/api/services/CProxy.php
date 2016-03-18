@@ -644,14 +644,14 @@ class CProxy extends CApiService {
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('tls_connect', $proxy)
 					&& !in_array($proxy['tls_connect'], $available_connect_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_connect',
-					_s('unexpected value "%1$s"', $host['tls_connect'])
+					_s('unexpected value "%1$s"', $proxy['tls_connect'])
 				));
 			}
 
 			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && array_key_exists('tls_accept', $proxy)
 					&& !in_array($proxy['tls_accept'], $available_accept_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_accept',
-					_s('unexpected value "%1$s"', $host['tls_connect'])
+					_s('unexpected value "%1$s"', $proxy['tls_accept'])
 				));
 			}
 

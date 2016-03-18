@@ -1542,7 +1542,7 @@ class CHost extends CHostGeneral {
 
 			if (array_key_exists('tls_accept', $host) && !in_array($host['tls_accept'], $available_accept_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_accept',
-					_s('unexpected value "%1$s"', $host['tls_connect'])
+					_s('unexpected value "%1$s"', $host['tls_accept'])
 				));
 			}
 
