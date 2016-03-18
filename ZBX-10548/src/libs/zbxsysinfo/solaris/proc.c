@@ -672,7 +672,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	zoneflag;
 	zbx_timespec_t	ts_timeout, ts;
 
-	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15)] */
+	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15),(current|all)] */
 	if (6 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
@@ -680,9 +680,12 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 #ifndef HAVE_ZONE_H
-	if (5 == request->nparam && GLOBAL_ZONEID != getzoneid())
+	/* Case of Solaris 9 and earlier. Zones are supported in Solaris 10 and later.*/
+
+	if (6 == request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported sixth parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported sixth parameter, agent compiled on a Solaris"
+				" version without zones support."));
 		return SYSINFO_RET_FAIL;
 	}
 #endif
