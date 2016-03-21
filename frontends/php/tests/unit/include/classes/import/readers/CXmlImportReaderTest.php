@@ -100,6 +100,19 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'</hosts>'."\n".
 				'</zabbix_export>',
 				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "abc".'
+			],
+			[
+				'<'.'?xml version="1.0"?'.'>'."\n".
+				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
+				'<hosts>'."\n".
+				'    <host>'."\n".
+				'        <status>0</status>p'."\n".
+				'        <item type="3" key="icmpping" value_type="3">'."\n".
+				'        </item>'."\n".
+				'    </host>'."\n".
+				'</hosts>'."\n".
+				'</zabbix_export>',
+				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "p".'
 			]
 		];
 	}
