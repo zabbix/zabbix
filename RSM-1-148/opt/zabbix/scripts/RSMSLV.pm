@@ -74,10 +74,11 @@ use constant SEC_PER_WEEK	=> 604800;
 
 our ($result, $dbh, $tld);
 
-my $total_sec;
+my $start_time;
 my $sql_time = 0.0;
 my $sql_count = 0;
 my $lock_time = 0.0;
+my $lock_wait_time = 0.0;
 my $lock_count = 0;
 my $lock_tmp;
 
@@ -101,12 +102,12 @@ our @EXPORT = qw($result $dbh $tld
 		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
 		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
-		get_epp_str_itemids get_dns_test_values get_dns_test_values2 get_rdds_test_values get_rdds_test_values2 get_epp_test_values no_cycle_result
+		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
 		get_service_status_itemids get_probe_results
 		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
 		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
-		get_real_services_period dbg info wrn fail format_stats_time slv_exit slv_lock slv_unlock exit_if_running trim parse_opts
+		get_real_services_period dbg info wrn fail format_stats_time slv_exit slv_stats_reset slv_lock slv_unlock exit_if_running trim parse_opts
 		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
 		cycle_start cycle_end rsm_slv_error get_readable_tld usage);
 
@@ -2224,19 +2225,59 @@ sub get_epp_str_itemids
 	return __get_itemids_by_complete_key($tld, $probe, $key_ip);
 }
 
+sub __best_rtt
+{
+	my $cur_rtt = shift;
+	my $cur_description = shift;
+	my $new_rtt = shift;
+	my $new_description = shift;
+
+	if (!defined($cur_rtt) && !defined($cur_description))
+	{
+		return ($new_rtt, $new_description);
+	}
+
+	if (defined($new_rtt))
+	{
+		if (!defined($cur_rtt) || $cur_rtt > $new_rtt)
+		{
+			return ($new_rtt, $new_description);
+		}
+	}
+
+	return ($cur_rtt, $cur_description);
+}
+
 # values are organized like this:
+#
 # {
-#           'WashingtonDC' => {
-#                               'ns1,192.0.34.201' => {
-#                                                       '1418994681' => '-204.0000',
-#                                                       '1418994621' => '-204.0000'
-#                                                     },
-#                               'ns2,2620:0:2d0:270::1:201' => {
-#                                                                '1418994681' => '-204.0000',
-#                                                                '1418994621' => '-204.0000'
-#                                                              }
-#                             },
-# ...
+#     1418994681 =>
+#     {
+#         'DNS' =>
+#         {
+#             'WashingtonDC' =>
+#             {
+#                 'ns1' =>
+#                 [
+#                     {
+#                         'targetIP' => 192.0.34.201,
+#                         'rtt' => 103,
+#                         'clock' => 1418994681,
+#                         'description' => null
+#                     },
+#                     {
+#                         'targetIP' => 2620:0:2d0:270::1:201,
+#                         'rtt' => null,
+#                         'clock' => 1418994681
+#                         'description' => -204
+#                     }
+#                 ]
+#             }
+#         }
+#     }
+# }
+#
+# {$cycleclock}->{$interface}->{$probe}->{$ns}
 sub get_dns_test_values
 {
 	my $dns_items_ref = shift;
@@ -2302,89 +2343,66 @@ sub get_dns_test_values
 				next;
 			}
 
-			my ($ns, $ip) = split(',', $nsip);
+			my ($target, $ip) = split(',', $nsip);
 
-			my ($description, $real_value);
+			my ($new_value, $new_description, $set_idx);
 
-			$real_value = $value;
+			my $value_tag = JSON_TAG_RTT();
 
-			if ($real_value < 0)
+			$new_value = $value;
+
+			if ($new_value < 0)
 			{
-				$description = $real_value;
-				undef($real_value);
+				$new_description = $new_value;
+				undef($new_value);
 			}
 
 			my $cycleclock = cycle_start($clock, $delay);
 
-			push(@{$result->{$cycleclock}->{$interface}->{$probe}->{$ns}},
+			my $tests_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target};
+
+			my $idx = 0;
+			foreach my $test_ref (@$tests_ref)
+			{
+				if ($test_ref->{JSON_TAG_TARGET_IP()} eq $ip)
+				{
+					$set_idx = $idx;
+					last;
+				}
+
+				$idx++;
+			}
+
+			if (!defined($set_idx))
+			{
+				$set_idx = 0;
+			}
+			else
+			{
+				my $test_ref = $tests_ref->[$set_idx];
+
+				($new_value, $new_description) = __best_rtt($test_ref->{$value_tag}, $test_ref->{JSON_TAG_DESCRIPTION()}, $new_value, $new_description);
+
+				if (!defined($new_value) || (defined($test_ref->{$value_tag}) && $new_value == $test_ref->{$value_tag}))
+				{
+					undef($set_idx);
+				}
+			}
+
+			if (defined($set_idx))
+			{
+				$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[$set_idx] =
 				{
 					JSON_TAG_TARGET_IP() => $ip,
-					JSON_TAG_RTT() => $real_value,
+					$value_tag => $new_value,
 					JSON_TAG_CLOCK() => $clock,
-					JSON_TAG_DESCRIPTION() => get_detailed_result($valuemaps, $description)
-				});
+					JSON_TAG_DESCRIPTION() => get_detailed_result($valuemaps, $new_description)
+				};
+			}
 		}
 	}
 
 	return $result;
-}
-
-sub get_dns_test_values2
-{
-	my $dns_items_ref = shift;
-	my $start = shift;
-	my $end = shift;
-
-	my %result;
-
-	# generate list if itemids
-	my @itemids;
-	foreach my $probe (keys(%$dns_items_ref))
-	{
-		push(@itemids, keys(%{$dns_items_ref->{$probe}}));
-	}
-
-	if (scalar(@itemids) != 0)
-	{
-		my $rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@itemids);
-
-		foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$rows_ref)
-		{
-			my $itemid = $row_ref->[0];
-			my $value = $row_ref->[1];
-			my $clock = $row_ref->[2];
-
-			my ($nsip, $probe);
-			my $last = 0;
-
-			foreach my $pr (keys(%$dns_items_ref))
-			{
-				my $itemids_ref = $dns_items_ref->{$pr};
-
-				foreach my $i (keys(%$itemids_ref))
-				{
-					if ($i == $itemid)
-					{
-						$nsip = $dns_items_ref->{$pr}->{$i};
-						$probe = $pr;
-						$last = 1;
-						last;
-					}
-				}
-				last if ($last == 1);
-			}
-
-			unless (defined($nsip))
-			{
-				wrn("internal error: Name Server,IP pair of item $itemid not found");
-				next;
-			}
-
-			$result{$probe}->{$nsip}->{$clock} = $value;
-		}
-	}
-
-	return \%result;
 }
 
 sub __find_probe_key_by_itemid
@@ -2454,27 +2472,56 @@ sub __get_epp_str_type
 }
 
 # values are organized like this:
+#
 # {
-#           'WashingtonDC' => {
-#                               '80' => {
-#                                         '1418994206' => {
-#                                                           'ip' => '192.0.34.201',
-#                                                           'rtt' => '127.0000'
-#                                                         },
-#                                         '1418994086' => {
-#                                                           'ip' => '192.0.34.201',
-#                                                           'rtt' => '127.0000'
-#                                                         },
-#                               '43' => {
-#                                         '1418994206' => {
-#                                                           'ip' => '192.0.34.201',
-#                                                           'rtt' => '127.0000'
-#                                                         },
-#                                         '1418994086' => {
-#                                                           'ip' => '192.0.34.201',
-#                                                           'rtt' => '127.0000'
-#                                                         },
-# ...
+#     1418994681 =>
+#     {
+#         'RDDS43' =>
+#         {
+#             'WashingtonDC' =>
+#             {
+#                 'ns1' =>
+#                 [
+#                     {
+#                         'targetIP' => 192.0.34.201,
+#                         'rtt' => 103,
+#                         'upd' => 23,
+#                         'clock' => 1418994681,
+#                         'description' => null
+#                     },
+#                     {
+#                         'targetIP' => 2620:0:2d0:270::1:201,
+#                         'rtt' => null,
+#                         'upd' => null,
+#                         'clock' => 1418994681,
+#                         'description' => -204
+#                     }
+#                 ]
+#             }
+#         }
+#         'RDDS80' =>
+#         {
+#             'WashingtonDC' =>
+#             {
+#                 'ns1' =>
+#                 [
+#                     {
+#                         'targetIP' => 192.0.34.201,
+#                         'rtt' => 103,
+#                         'clock' => 1418994681,
+#                         'description' => null
+#                     },
+#                     {
+#                         'targetIP' => 2620:0:2d0:270::1:201,
+#                         'rtt' => null,
+#                         'clock' => 1418994681,
+#                         'description' => -204
+#                     }
+#                 ]
+#             }
+#         }
+#     }
+# }
 sub get_rdds_test_values
 {
 	my $rdds_dbl_items_ref = shift;
@@ -2538,45 +2585,36 @@ sub get_rdds_test_values
 			fail("unknown RDDS port in item (id:$itemid)");
 		}
 
-		my ($real_value, $description, $real_value_tag);
+		my ($new_value, $new_description, $value_tag, $set_idx);
 
 		if ($type eq 'rtt')
 		{
-			$real_value_tag = JSON_TAG_RTT;
-			$real_value = $value;
+			$value_tag = JSON_TAG_RTT;
+			$new_value = $value;
 		}
 		elsif ($type eq 'upd')
 		{
-			$real_value_tag = JSON_TAG_UPD;
-			$real_value = int($value);
+			$value_tag = JSON_TAG_UPD;
+			$new_value = int($value);
 		}
 		else
 		{
 			fail("unknown $interface item key (itemid:$itemid), expected 'rtt' or 'upd' value");
 		}
 
-		if ($real_value < 0)
+		if ($new_value < 0)
 		{
-			$description = get_detailed_result($valuemaps, $real_value);
-			undef($real_value);
+			$new_description = get_detailed_result($valuemaps, $new_value);
+			undef($new_value);
 		}
 
 		my $cycleclock = cycle_start($clock, $delay);
 
-		my $cur_desc = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()};
+		my $test_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0];
 
-		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{$real_value_tag} = $real_value;
-		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_CLOCK()} = $clock;
-
-		if ($description)
-		{
-			if ($cur_desc && ($cur_desc ne $description))
-			{
-				$description = "$cur_desc; $description";
-			}
-
-			$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_DESCRIPTION()} = $description;
-		}
+		$test_ref->{$value_tag} = $new_value;
+		$test_ref->{JSON_TAG_CLOCK()} = $clock;
+		$test_ref->{JSON_TAG_DESCRIPTION()} = $new_description;
 	}
 
 	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
@@ -2615,151 +2653,9 @@ sub get_rdds_test_values
 
 		my $cycleclock = cycle_start($clock, $delay);
 
-		$result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0]->{JSON_TAG_TARGET_IP()} = $ip;
-	}
+		my $test_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0];
 
-	return $result;
-}
-
-sub get_rdds_test_values2
-{
-	my $rdds_dbl_items_ref = shift;
-	my $rdds_str_items_ref = shift;
-	my $start = shift;
-	my $end = shift;
-	my $delay = shift;
-
-	# generate list if itemids
-	my @dbl_itemids;
-	foreach my $probe (keys(%$rdds_dbl_items_ref))
-	{
-		foreach my $itemid (keys(%{$rdds_dbl_items_ref->{$probe}}))
-		{
-			push(@dbl_itemids, $itemid);
-		}
-	}
-
-	my @str_itemids;
-	foreach my $probe (keys(%$rdds_str_items_ref))
-	{
-		foreach my $itemid (keys(%{$rdds_str_items_ref->{$probe}}))
-		{
-			push(@str_itemids, $itemid);
-		}
-	}
-
-	return undef if (scalar(@dbl_itemids) == 0 || scalar(@str_itemids) == 0);
-
-	# we need pre_result to combine IP and RTT to single test result
-	my $pre_result;
-
-	my $dbl_rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
-
-	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
-	{
-		my $itemid = $row_ref->[0];
-		my $value = $row_ref->[1];
-		my $clock = $row_ref->[2];
-
-		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_dbl_items_ref);
-
-		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
-
-		my $port = __get_rdds_port($key);
-		my $type = __get_rdds_dbl_type($key);
-
-		my $interface;
-		if ($port eq '43')
-		{
-			$interface = JSON_INTERFACE_RDDS43;
-		}
-		elsif ($port eq '80')
-		{
-			$interface = JSON_INTERFACE_RDDS80;
-		}
-		else
-		{
-			fail("unknown RDDS port in item (id:$itemid)");
-		}
-
-		$pre_result->{$probe}->{$interface}->{$clock}->{$type} = ($type eq 'rtt') ? $value : int($value);
-	}
-
-	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
-
-	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
-	{
-		my $itemid = $row_ref->[0];
-		my $ip = $row_ref->[1];
-		my $clock = $row_ref->[2];
-
-		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
-
-		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
-
-		my $port = __get_rdds_port($key);
-		my $type = __get_rdds_str_type($key);
-
-		my $interface;
-                if ($port eq '43')
-                {
-                        $interface = JSON_INTERFACE_RDDS43;
-                }
-                elsif ($port eq '80')
-                {
-                        $interface = JSON_INTERFACE_RDDS80;
-                }
-                else
-                {
-                        fail("unknown RDDS port in item (id:$itemid)");
-                }
-
-		if (!$pre_result->{$probe}->{$interface}->{$clock})
-		{
-			# Sometimes there is small difference (1 second) in the clocked of saved rtt
-			# (or upd) and ip values, the values must be still grouped together. In such
-			# cases find the clock of rtt (or upd) and use that as the timestamp of IP.
-
-			my $search_from = cycle_start($clock, $delay);
-			my $search_till = $search_from + $delay - 1;
-
-			foreach my $dbl_clock (keys(%{$pre_result->{$probe}->{$interface}}))
-			{
-				if ($dbl_clock > $search_from && $search_till > $clock)
-				{
-					wrn("$interface: resulting IP clock adjusted (from ", ts_full($clock), " to ", ts_full($dbl_clock), ")");
-					$clock = $dbl_clock;
-					last;
-				}
-			}
-		}
-
-		fail("internal error: cannot find result (rtt or upd) of the $interface test against IP $ip (clock:", ts_full($clock), ", itemid:$itemid)")
-			unless ($pre_result->{$probe}->{$interface}->{$clock});
-
-		$pre_result->{$probe}->{$interface}->{$clock}->{$type} = $ip;
-	}
-
-	my $result;
-
-	foreach my $probe (keys(%$pre_result))
-	{
-		foreach my $interface (keys(%{$pre_result->{$probe}}))
-		{
-			foreach my $clock (sort(keys(%{$pre_result->{$probe}->{$interface}})))	# must be sorted by clock
-			{
-				my $h;
-
-				foreach my $key (keys(%{$pre_result->{$probe}->{$interface}->{$clock}}))
-				{
-					$h->{$key} = $pre_result->{$probe}->{$interface}->{$key};
-				}
-
-				$h->{'clock'} = $clock;
-
-				push(@{$result->{$probe}->{$interface}}, $h);
-			}
-		}
+		$test_ref->{JSON_TAG_TARGET_IP()} = $ip;
 	}
 
 	return $result;
@@ -3980,30 +3876,49 @@ sub slv_exit
 
 	if (SUCCESS == $rv && opt('stats'))
 	{
+		my $prefix = $tld ? "$tld " : '';
+
 		my $sql_str = format_stats_time($sql_time);
+
 		$sql_str .= " ($sql_count queries)";
 
-		my $total_str = format_stats_time(time() - $total_sec);
+		my $total_str = format_stats_time(time() - $start_time);
 
-		printf("%7d stats:\n", $$);
-		print("total : $total_str\n");
-		print("  sql : $sql_str\n");
+		print($prefix, "total     : $total_str\n");
+		print($prefix, "sql       : $sql_str\n");
 
 		if ($lock_count > 0)
 		{
-			my $lock_str = format_stats_time($lock_time);
-			$lock_str .= " ($lock_count)";
+			my $l_time = format_stats_time($lock_time);
+			my $l_w_time = format_stats_time($lock_wait_time);
 
-		print("locks : $lock_str\n");
+			print($prefix, "locks     : $l_time ($lock_count)\n");
+			print($prefix, "lock wait : $l_w_time\n");
 		}
 	}
 
 	exit($rv);
 }
 
+sub slv_stats_reset
+{
+	$start_time = time();
+	$sql_time = 0.0;
+	$sql_count = 0;
+	$lock_time = 0.0;
+	$lock_wait_time = 0.0;
+	$lock_count = 0;
+}
+
 sub slv_lock
 {
-	printf("%7d: %s\n", $$, 'TRY');
+	#printf("%7d: %s\n", $$, 'TRY');
+
+	my $tmp;
+	if (opt('stats'))
+	{
+		$tmp = time();
+	}
 
         open($_lock_fh, ">", _LOCK_FILE) or fail("cannot open lock file " . _LOCK_FILE . ": $!");
 
@@ -4011,11 +3926,13 @@ sub slv_lock
 
 	if (opt('stats'))
 	{
+		$lock_wait_time += time() - $tmp;
+
 		$lock_tmp = time();
 		$lock_count++;
 	}
 
-	printf("%7d: %s\n", $$, 'LOCK');
+	#printf("%7d: %s\n", $$, 'LOCK');
 }
 
 sub slv_unlock
@@ -4027,7 +3944,7 @@ sub slv_unlock
 		$lock_time += time() - $lock_tmp;
 	}
 
-	printf("%7d: %s\n", $$, 'UNLOCK');
+	#printf("%7d: %s\n", $$, 'UNLOCK');
 }
 
 sub exit_if_running
@@ -4099,7 +4016,7 @@ sub parse_opts
 
 	setopt('nolog') if (opt('dry-run') || opt('debug'));
 
-	$total_sec = time() if (opt('stats'));
+	$start_time = time() if (opt('stats'));
 
 	if (opt('debug'))
 	{

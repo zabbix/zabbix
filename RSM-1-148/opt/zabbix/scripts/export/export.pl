@@ -202,6 +202,8 @@ while ($tld_index < $tld_count)
 		# child
 		$tld = $tlds_ref->[$tld_index];
 
+		slv_stats_reset();
+
 		db_disconnect();
 		db_connect();
 
@@ -1366,9 +1368,9 @@ sub __format_rtt
 {
 	my $rtt = shift;
 
-	return "UNDEF" unless (defined($rtt));	# it should never be undefined
+	return "UNDEF" unless (defined($rtt));		# it should never be undefined
 
-	return $rtt unless ($rtt);		# allow empty string (in case of error)
+	return $rtt unless ($rtt);			# allow empty string (in case of error)
 
 	return int($rtt);
 }

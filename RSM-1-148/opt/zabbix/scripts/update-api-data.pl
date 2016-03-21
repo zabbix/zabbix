@@ -144,7 +144,7 @@ my $now = opt('now') ? getopt('now') : time();
 dbg("now:", ts_full($now));
 
 # rolling week incidents
-my ($rollweek_from, $rollweek_till) = get_rollweek_bounds(getopt('now'));
+my ($rollweek_from, $rollweek_till) = get_rollweek_bounds($now);
 
 my $tlds_ref;
 if (opt('tld'))
@@ -405,7 +405,7 @@ foreach (keys(%$servicedata))
 		# we must have a special calculation key for that ($downtime_key)
 		#my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		if (__get_downtime($hostid, $service, $downtime_key, getopt('now'), \$downtime) != SUCCESS)
+		if (__get_downtime($hostid, $service, $downtime_key, $now, \$downtime) != SUCCESS)
 		{
 			wrn("configuration error: ", rsm_slv_error());
 			$downtime = 0.0;
