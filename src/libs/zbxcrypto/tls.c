@@ -3597,9 +3597,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	if (0 != (res = ssl_init(s->tls_ctx->ctx)))
 	{
 		zbx_tls_error_msg(res, "ssl_init(): ", error);
-		ssl_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx);
 		goto out;
 	}
 
@@ -3612,9 +3609,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 	if (0 != (res = ssl_set_session_tickets(s->tls_ctx->ctx, SSL_SESSION_TICKETS_DISABLED)))
 	{
 		zbx_tls_error_msg(res, "ssl_set_session_tickets(): ", error);
-		ssl_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx);
 		goto out;
 	}
 
@@ -3648,9 +3642,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		if (0 != (res = ssl_set_own_cert(s->tls_ctx->ctx, my_cert, my_priv_key)))
 		{
 			zbx_tls_error_msg(res, "ssl_set_own_cert(): ", error);
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 	}
@@ -3667,9 +3658,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 					(const unsigned char *)my_psk_identity, my_psk_identity_len)))
 			{
 				zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
-				ssl_free(s->tls_ctx->ctx);
-				zbx_free(s->tls_ctx->ctx);
-				zbx_free(s->tls_ctx);
 				goto out;
 			}
 		}
@@ -3685,9 +3673,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 					sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
-				ssl_free(s->tls_ctx->ctx);
-				zbx_free(s->tls_ctx->ctx);
-				zbx_free(s->tls_ctx);
 				goto out;
 			}
 
@@ -3695,9 +3680,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 					(const unsigned char *)tls_arg1, strlen(tls_arg1))))
 			{
 				zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
-				ssl_free(s->tls_ctx->ctx);
-				zbx_free(s->tls_ctx->ctx);
-				zbx_free(s->tls_ctx);
 				goto out;
 			}
 		}
@@ -3716,9 +3698,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		if (1 == zbx_timed_out)
 		{
 			*error = zbx_strdup(*error, "ssl_handshake() timed out");
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 
@@ -3735,13 +3714,10 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 				zbx_tls_cert_error_msg((unsigned int)s->tls_ctx->ctx->session_negotiate->verify_result,
 						error);
 				zbx_tls_close(s);
-				goto out;
+				goto out1;
 			}
 
 			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 	}
@@ -3754,7 +3730,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		{
 			*error = zbx_strdup(*error, "no peer certificate");
 			zbx_tls_close(s);
-			goto out;
+			goto out1;
 		}
 
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
@@ -3764,7 +3740,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			if (SUCCEED != zbx_log_peer_cert(__function_name, peer_cert, error))
 			{
 				zbx_tls_close(s);
-				goto out;
+				goto out1;
 			}
 		}
 
@@ -3774,7 +3750,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 		if (SUCCEED != zbx_verify_issuer_subject(peer_cert, tls_arg1, tls_arg2, error))
 		{
 			zbx_tls_close(s);
-			goto out;
+			goto out1;
 		}
 
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
@@ -3795,7 +3771,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, char *tls_arg1, c
 			ssl_get_version(s->tls_ctx->ctx), ssl_get_ciphersuite(s->tls_ctx->ctx));
 
 	return SUCCEED;
-out:
+
+out:	/* an error occurred */
+	ssl_free(s->tls_ctx->ctx);
+	zbx_free(s->tls_ctx->ctx);
+	zbx_free(s->tls_ctx);
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
@@ -4391,9 +4372,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	if (0 != (res = ssl_init(s->tls_ctx->ctx)))
 	{
 		zbx_tls_error_msg(res, "ssl_init(): ", error);
-		ssl_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx);
 		goto out;
 	}
 
@@ -4406,9 +4384,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	if (0 != (res = ssl_set_session_tickets(s->tls_ctx->ctx, SSL_SESSION_TICKETS_DISABLED)))
 	{
 		zbx_tls_error_msg(res, "ssl_set_session_tickets(): ", error);
-		ssl_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx->ctx);
-		zbx_free(s->tls_ctx);
 		goto out;
 	}
 
@@ -4444,9 +4419,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		if (NULL != my_cert && 0 != (res = ssl_set_own_cert(s->tls_ctx->ctx, my_cert, my_priv_key)))
 		{
 			zbx_tls_error_msg(res, "ssl_set_own_cert(): ", error);
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 	}
@@ -4461,9 +4433,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
 		{
 			zbx_tls_error_msg(res, "ssl_set_psk(): ", error);
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
@@ -4511,9 +4480,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		if (1 == zbx_timed_out)
 		{
 			*error = zbx_strdup(*error, "ssl_handshake() timed out");
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 
@@ -4534,9 +4500,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			}
 
 			zbx_tls_error_msg(res, "ssl_handshake(): ", error);
-			ssl_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx->ctx);
-			zbx_free(s->tls_ctx);
 			goto out;
 		}
 	}
@@ -4571,13 +4534,13 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			{
 				*error = zbx_strdup(*error, "no peer certificate");
 				zbx_tls_close(s);
-				goto out;
+				goto out1;
 			}
 
 			if (SUCCEED != zbx_log_peer_cert(__function_name, peer_cert, error))
 			{
 				zbx_tls_close(s);
-				goto out;
+				goto out1;
 			}
 		}
 
@@ -4592,7 +4555,12 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	}
 
 	return SUCCEED;
-out:
+
+out:	/* an error occurred */
+	ssl_free(s->tls_ctx->ctx);
+	zbx_free(s->tls_ctx->ctx);
+	zbx_free(s->tls_ctx);
+out1:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
@@ -5118,7 +5086,8 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	}
 
 	return SUCCEED;
-out:
+
+out:	/* an error occurred */
 	if (NULL != s->tls_ctx->ctx)
 		SSL_free(s->tls_ctx->ctx);
 
