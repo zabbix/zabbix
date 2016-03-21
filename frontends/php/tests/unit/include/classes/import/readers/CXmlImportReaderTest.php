@@ -21,31 +21,110 @@
 
 class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 
-	public function testReadAttributes() {
-		$xml = '<hosts>
-				<host host="Zabbix server">
-					<status>0</status>
-				</host>
-				<host host="Linux server">
-					<status>0</status>
-				</host>
-			</hosts>';
-
-		$reader = new CXmlImportReader();
-		$data = $reader->read($xml);
-
-		$this->assertEquals($data, [
-			'hosts' => [
-				'host' => [
-					'host' => 'Zabbix server',
-					'status' => '0',
-				],
-				'host1' => [
-					'host' => 'Linux server',
-					'status' => '0',
-				],
+	public function dataProvider() {
+		return [
+			[
+				'<'.'?xml version="1.0"?'.'>'."\n".
+				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
+				'</zabbix_export>',
+				[
+					'zabbix_export' => [
+						'version' => '1.0',
+						'date' => '09.01.10',
+						'time' => '14.23'
+					]
+				]
+			],
+			[
+				'<'.'?xml version="1.0"?'.'>'."\n".
+				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
+				'<hosts>'."\n".
+				'    <host host="Zabbix server">'."\n".
+				'        <status>0</status>'."\n".
+				'    </host>'."\n".
+				'    <host host="Linux server">'."\n".
+				'        <status>0</status>'."\n".
+				'    </host>'."\n".
+				'</hosts>'."\n".
+				'<screens/>'."\n".
+				'<images/>'."\n".
+				'</zabbix_export>',
+				[
+					'zabbix_export' => [
+						'version' => '1.0',
+						'date' => '09.01.10',
+						'time' => '14.23',
+						'hosts' => [
+							'host' => [
+								'host' => 'Zabbix server',
+								'status' => '0'
+							],
+							'host1' => [
+								'host' => 'Linux server',
+								'status' => '0'
+							]
+						],
+						'screens' => '',
+						'images' => ''
+					]
+				]
+			],
+			[
+				'<'.'?xml version="1.0"?'.'>'."\n".
+				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
+				'<hosts></hosts>'."\n".
+				'<screens></screens>text'."\n".
+				'<images></images>'."\n".
+				'</zabbix_export>',
+				'Invalid XML tag "/zabbix_export": unexpected text "text".'
+			],
+			[
+				'<'.'?xml version="1.0"?'.'>'."\n".
+				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
+				'<hosts>'."\n".
+				'    <host host="Zabbix server">'."\n".
+				'        abc'."\n".
+				'    </host>'."\n".
+				'</hosts>'."\n".
+				'</zabbix_export>',
+				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "abc".'
+			],
+			[
+				'<'.'?xml version="1.0"?'.'>'."\n".
+				'<zabbix_export version="1.0" date="09.01.10" time="14.23">'."\n".
+				'<hosts>'."\n".
+				'    <host>'."\n".
+				'        abc'."\n".
+				'        <status>0</status>'."\n".
+				'    </host>'."\n".
+				'</hosts>'."\n".
+				'</zabbix_export>',
+				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "abc".'
 			]
-		]);
+		];
+	}
+
+	/**
+	 * @dataProvider dataProvider
+	 *
+	 * @param string $xml
+	 * @param mixed  $expected
+	 */
+	public function testReadXML($xml, $expected) {
+		$reader = new CXmlImportReader();
+
+		if (is_array($expected)) {
+			$data = $reader->read($xml);
+			$this->assertEquals($expected, $data);
+		}
+		else {
+			try {
+				$data = $reader->read($xml);
+				$this->assertEquals($expected, $data);
+			} catch (Exception $e) {
+				$this->assertEquals($expected, $e->getMessage());
+			}
+		}
 	}
 
 }
