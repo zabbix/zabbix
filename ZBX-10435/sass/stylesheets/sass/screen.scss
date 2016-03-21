@@ -1369,14 +1369,6 @@ footer {
 		vertical-align: top;
 	}
 
-	.radio-segmented {
-		margin: 4px 0 0 0;
-
-		label {
-			display: inline;
-		}
-	}
-
 	input[type="radio"] {
 		min-height: 24px;
 	}
@@ -1461,6 +1453,7 @@ footer {
 
 	label {
 		padding: 4px 11px;
+		line-height: 24px;
 		border: 1px solid $form-border-color;
 		@include transition(background-color .2s ease-out);
 	}
