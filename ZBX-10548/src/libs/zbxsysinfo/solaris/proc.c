@@ -685,7 +685,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (6 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported sixth parameter, agent compiled on a Solaris"
-				" version without zones support."));
+				" version without zone support."));
 		return SYSINFO_RET_FAIL;
 	}
 #endif
