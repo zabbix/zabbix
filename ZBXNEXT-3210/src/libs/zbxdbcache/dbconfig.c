@@ -57,11 +57,32 @@ static int	sync_in_progress = 0;
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
 
+/* validator function optionally used to validate macro values when expanding user macros */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_value_validator_func_t                                       *
+ *                                                                            *
+ * Purpose: validate macro value when expanding user macros                   *
+ *                                                                            *
+ * Parameters: macro   - [IN] the macro name                                  *
+ *             context - [IN] the macro context                               *
+ *             value   - [IN] the macro value                                 *
+ *             error   - [OUT] the error message                              *
+ *                                                                            *
+ * Return value: SUCCEED - the value is valid                                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+typedef int (*zbx_value_validator_func_t)(const char *macro, const char *context, const char *value, char **error);
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
 	const char	*description;
 	const char	*expression;
+	/* cached expression with expanded user macros, can be NULL */
+	const char	*expression_ex;
 	const char	*error;
 	int		lastchange;
 	unsigned char	topoindex;
@@ -524,6 +545,11 @@ extern unsigned char	program_type;
 extern int		CONFIG_TIMER_FORKS;
 
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
+
+static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
+static char	*dc_expression_expand_user_macros(const char *expression, char **error);
+static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, unsigned char expand,
+		char **error);
 
 /******************************************************************************
  *                                                                            *
@@ -2992,6 +3018,15 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 			trigger->lastchange = atoi(row[8]);
 			trigger->locked = 0;
 		}
+		else
+		{
+			if (NULL != trigger->expression_ex)
+				zbx_strpool_release(trigger->expression_ex);
+		}
+
+		/* reset the cached expression to ensure the expression are expanded */
+		/* with updated user macro values                                    */
+		trigger->expression_ex = NULL;
 
 		trigger->topoindex = 1;
 
@@ -3013,6 +3048,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		zbx_strpool_release(trigger->description);
 		zbx_strpool_release(trigger->expression);
 		zbx_strpool_release(trigger->error);
+
+		if (NULL != trigger->expression_ex)
+			zbx_strpool_release(trigger->expression_ex);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -5076,12 +5114,11 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 	memcpy(dst_function->parameter, src_function->parameter, sz_parameter);
 }
 
-static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_trigger)
+static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, unsigned char expand)
 {
 	dst_trigger->triggerid = src_trigger->triggerid;
 	dst_trigger->description = zbx_strdup(NULL, src_trigger->description);
 	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
-	dst_trigger->expression = NULL;
 	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
 	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
@@ -5094,6 +5131,9 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, const ZBX_DC_TRIGGER *src_tri
 	dst_trigger->lastchange = src_trigger->lastchange;
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
+
+	dst_trigger->expression = dc_cache_expanded_expression(src_trigger->expression,
+			&src_trigger->expression_ex, expand, &dst_trigger->new_error);
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -5198,7 +5238,7 @@ void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_
 			continue;
 		}
 
-		DCget_trigger(&triggers[i], dc_trigger);
+		DCget_trigger(&triggers[i], dc_trigger, 0);
 		errcode[i] = SUCCEED;
 	}
 
@@ -5441,11 +5481,12 @@ void	DCconfig_unlock_all_triggers()
  *                                                                            *
  ******************************************************************************/
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
-		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num)
+		const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs, char **errors, int itemids_num,
+		unsigned char expand)
 {
 	int			i, j, found;
 	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_TRIGGER	*dc_trigger;
+	ZBX_DC_TRIGGER		*dc_trigger;
 	DC_TRIGGER		*trigger;
 
 	LOCK_CACHE;
@@ -5464,7 +5505,7 @@ void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_pt
 
 			if (0 == found)
 			{
-				DCget_trigger(trigger, dc_trigger);
+				DCget_trigger(trigger, dc_trigger, expand);
 				zbx_vector_ptr_append(trigger_order, trigger);
 			}
 
@@ -5618,7 +5659,7 @@ void	DCconfig_get_time_based_triggers(DC_TRIGGER **trigger_info, zbx_vector_ptr_
 
 			trigger = &(*trigger_info)[trigger_order->values_num];
 
-			DCget_trigger(trigger, dc_trigger);
+			DCget_trigger(trigger, dc_trigger, ZBX_EXPAND_MACROS);
 			zbx_timespec(&trigger->timespec);
 
 			zbx_vector_ptr_append(trigger_order, trigger);
@@ -7392,17 +7433,10 @@ static void	DCget_global_macro(const char *macro, const char *context, char **va
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
+static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
+		char **replace_to)
 {
-	const char	*__function_name = "DCget_user_macro";
-	char		*name = NULL, *context = NULL, *value = NULL, *value_default = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
-
-	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
-		goto out;
-
-	LOCK_CACHE;
+	char		*value = NULL, *value_default = NULL;
 
 	/* User macros should be expanded according to the following priority: */
 	/*                                                                     */
@@ -7415,10 +7449,11 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 	/* the host level, we try to expand global macros, passing the default */
 	/* macro value found on the host level, if any.                        */
 
-	DCget_host_macro(hostids, host_num, name, context, &value, &value_default);
+	if (0 < hostids_num)
+		DCget_host_macro(hostids, hostids_num, macro, context, &value, &value_default);
 
 	if (NULL == value)
-		DCget_global_macro(name, context, &value, &value_default);
+		DCget_global_macro(macro, context, &value, &value_default);
 
 	UNLOCK_CACHE;
 
@@ -7434,11 +7469,242 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 		zbx_free(*replace_to);
 		*replace_to = value_default;
 	}
+}
+
+void	DCget_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
+{
+	const char	*__function_name = "DCget_user_macro";
+	char		*name = NULL, *context = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
+
+	if (SUCCEED != zbx_user_macro_parse_dyn(macro, &name, &context, NULL))
+		goto out;
+
+	LOCK_CACHE;
+
+	dc_get_user_macro(hostids, hostids_num, name, context, replace_to);
+
+	UNLOCK_CACHE;
 
 	zbx_free(context);
 	zbx_free(name);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_expression_user_macro_validator                               *
+ *                                                                            *
+ * Purpose: validate user macro values in trigger expressions                 *
+ *                                                                            *
+ * Parameters: macro   - [IN] the macro name                                  *
+ *             context - [IN] the macro context                               *
+ *             value   - [IN] the macro value                                 *
+ *             error   - [OUT] the error message (optional)                   *
+ *                                                                            *
+ * Return value: SUCCEED - the macro value can be used in expression          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_expression_user_macro_validator(const char *macro, const char *context, const char *value,
+		char **error)
+{
+	size_t	error_alloc = 0, error_offset = 0;
+
+	if (SUCCEED == is_double_suffix(value))
+		return SUCCEED;
+
+	if (NULL != error)
+	{
+		zbx_free(*error);
+
+		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "Macro '%s'", macro);
+
+		if (NULL != context)
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, " with context '%'", context);
+
+		zbx_strcpy_alloc(error, &error_alloc, &error_offset, " value is not numeric.");
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_expand_user_macros                                            *
+ *                                                                            *
+ * Purpose: expand user macros in the specified text value                    *
+ *                                                                            *
+ * Parameters: hostids        - [IN] an array of related hostids              *
+ *             hostids_num    - [IN] the number of hostids                    *
+ *             text           - [IN] the text value to expand                 *
+ *             validator_func - [IN] an optional validator function           *
+ *             error          - [OUT] the error message if expanding macros   *
+ *                                    failed                                  *
+ *                                                                            *
+ * Return value: The text value with expanded user macros.                    *
+ *                                                                            *
+ * Comments: The returned value must be freed by the caller.                  *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
+		zbx_value_validator_func_t validator_func, char **error)
+{
+	const char	*__function_name = "dc_expand_user_macros";
+	char		*exp = NULL, *macro = NULL, *context = NULL, *value = NULL;
+	const char	*ptr, *start;
+	size_t		exp_alloc = 0, exp_offset = 0;
+	int		len, ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, text);
+
+	for (start = text, ptr = strchr(start, '{'); NULL != ptr; ptr = strchr(ptr, '{'))
+	{
+		if ('$' != ptr[1] || SUCCEED != zbx_user_macro_parse_dyn(ptr, &macro, &context, &len))
+		{
+			ptr++;
+			continue;
+		}
+
+		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, start, ptr - start);
+		start = ptr + len;
+		ptr = start;
+
+		dc_get_user_macro(hostids, hostids_num, macro, context, &value);
+
+		if (NULL != value)
+		{
+			if (NULL == validator_func || SUCCEED == (ret = validator_func(macro, context, value, error)))
+				zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, value);
+
+			zbx_free(value);
+
+			if (SUCCEED != ret)
+			{
+				zbx_free(macro);
+				zbx_free(context);
+				zbx_free(exp);
+				goto out;
+			}
+		}
+
+		zbx_free(macro);
+		zbx_free(context);
+	}
+
+	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, start);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, exp);
+
+	return exp;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_expression_expand_user_macros                                 *
+ *                                                                            *
+ * Purpose: expand user macros in trigger expression                          *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to expand                     *
+ *             error      - [OUT] the error message                           *
+ *                                                                            *
+ * Return value: The expanded expression or NULL in the case of error.        *
+ *               If NULL is returned the error message is set.                *
+ *                                                                            *
+ * Comments: The returned expression must be freed by the caller.             *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dc_expression_expand_user_macros(const char *expression, char **error)
+{
+	zbx_vector_uint64_t	functionids, hostids;
+	char			*out;
+
+	zbx_vector_uint64_create(&functionids);
+	zbx_vector_uint64_create(&hostids);
+
+	get_functionids(&functionids, expression);
+	dc_get_hostids_by_functionids(&functionids, &hostids);
+
+	out = dc_expand_user_macros(expression, hostids.values, hostids.values_num, dc_expression_user_macro_validator,
+			error);
+
+	zbx_vector_uint64_destroy(&hostids);
+	zbx_vector_uint64_destroy(&functionids);
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: dc_cache_expanded_expression                                     *
+ *                                                                            *
+ * Purpose: return expanded trigger expression, caching it if necessary       *
+ *                                                                            *
+ * Parameters: expression    - [IN] the expression to expand                  *
+ *             expression_ex - [IN/OUT] the cached expression                 *
+ *             expand          [IN] 0 - expression should not be expanded     *
+ *                                  ZBX_EXPAND_MACROS - expand the expression *
+ *             error         - [OUT] the error message                        *
+ *                                                                            *
+ * Return value: The expanded expression, NULL in the case of error or if     *
+ *               expand flag was not set.                                     *
+ *                                                                            *
+ * Comments: If expand flag is set this function will first try to return     *
+ *           a copy of cached expression. If the expression has not been      *
+ *           expanded, it will expand the expression, cache it and return the *
+ *           copy of it.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, unsigned char expand,
+		char **error)
+{
+	char	*out;
+
+	/* nothing to do, return NULL */
+	if (ZBX_EXPAND_MACROS != expand)
+		return NULL;
+
+	/* expression has already been cached, a copy */
+	if (NULL != *expression_ex)
+		return zbx_strdup(NULL, *expression_ex);
+
+	/* expand expression and cache it if successful */
+	if (NULL != (out = dc_expression_expand_user_macros(expression, error)))
+		DCstrpool_replace(0, expression_ex, out);
+
+	return out;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dc_expression_expand_user_macros                             *
+ *                                                                            *
+ * Purpose: expand user macros in trigger expression                          *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to expand                     *
+ *             error      - [OUT] the error message                           *
+ *                                                                            *
+ * Return value: The expanded expression or NULL in the case of error.        *
+ *               If NULL is returned the error message is set.                *
+ *                                                                            *
+ * Comments: The returned expression must be freed by the caller.             *
+ *           This function is a locking wrapper of                            *
+ *           dc_expression_expand_user_macros() function for external usage.  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dc_expression_expand_user_macros(const char *expression, char **error)
+{
+	char	*expression_ex;
+
+	LOCK_CACHE;
+
+	expression_ex = dc_expression_expand_user_macros(expression, error);
+
+	UNLOCK_CACHE;
+
+	return expression_ex;
 }
 
 /******************************************************************************
@@ -7976,7 +8242,7 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: DCget_bulk_hostids_by_functionids                                *
+ * Function: dc_get_hostids_by_functionids                                    *
  *                                                                            *
  * Purpose: get function host ids grouped by an object (trigger) id           *
  *                                                                            *
@@ -7984,16 +8250,11 @@ unlock:
  *             hostids     - [OUT] the host ids                               *
  *                                                                            *
  ******************************************************************************/
-void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
+static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
 {
-	const char	*__function_name = "DCget_hostids_by_functionids";
 	ZBX_DC_FUNCTION	*function;
 	ZBX_DC_ITEM	*item;
 	int		i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	LOCK_CACHE;
 
 	for (i = 0; i < functionids->values_num; i++)
 	{
@@ -8006,6 +8267,27 @@ void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_u
 
 	zbx_vector_uint64_sort(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_uniq(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCget_hostids_by_functionids                                     *
+ *                                                                            *
+ * Purpose: get function host ids grouped by an object (trigger) id           *
+ *                                                                            *
+ * Parameters: functionids - [IN] the function ids                            *
+ *             hostids     - [OUT] the host ids                               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
+{
+	const char	*__function_name = "DCget_hostids_by_functionids";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	dc_get_hostids_by_functionids(functionids, hostids);
 
 	UNLOCK_CACHE;
 

@@ -2387,12 +2387,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	{
 		char	*expression;
 
-		expression = zbx_strdup(NULL, event->trigger.expression);
-
-		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, NULL,
-				&expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-
-		expand_trigger_description_constants(data, expression);
+		if (NULL != (expression = zbx_dc_expression_expand_user_macros(event->trigger.expression, NULL)))
+			expand_trigger_description_constants(data, expression);
 
 		zbx_free(expression);
 	}
@@ -3345,19 +3341,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strcmp(m, MVAR_TRIGGER_VALUE))
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
-				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
-				{
-					char	*value = NULL;
 
-					cache_trigger_hostids(&hostids, event->trigger.expression);
-					DCget_user_macro(hostids.values, hostids.values_num, m, &value);
-
-					if (NULL != value)
-					{
-						require_numeric = 1;
-						replace_to = value;
-					}
-				}
+				/* when processing trigger expressions the user macros are already expanded */
 			}
 		}
 		else if (0 != (macro_type & MACRO_TYPE_TRIGGER_URL))
@@ -4064,8 +4049,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 	{
 		tr = (DC_TRIGGER *)triggers->values[i];
 
-		tr->expression = zbx_strdup(NULL, tr->expression_orig);
-
 		event.objectid = tr->triggerid;
 		event.value = tr->value;
 
@@ -4073,14 +4056,17 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		/* when evaluating trigger expression                                                 */
 		event.trigger.expression = tr->expression_orig;
 
-		zbx_remove_whitespace(tr->expression);
-
-		if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
-				&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
+		if (NULL != tr->expression)
 		{
-			tr->new_error = zbx_strdup(tr->new_error, err);
-			tr->new_value = TRIGGER_VALUE_UNKNOWN;
+			if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
+					&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
+			{
+				tr->new_error = zbx_strdup(tr->new_error, err);
+			}
 		}
+
+		if (NULL != tr->new_error)
+			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 	}
 
 	substitute_functions(triggers);
