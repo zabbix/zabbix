@@ -1343,10 +1343,12 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
+
+	ret = SUCCEED;
 out:
 	zbx_socket_timeout_cleanup(s);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
