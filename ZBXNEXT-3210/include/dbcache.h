@@ -433,14 +433,6 @@ void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
 
 int	DCget_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
-/* a set of identifiers assigned to another identifier */
-typedef struct
-{
-	zbx_uint64_t		id;
-	zbx_vector_uint64_t	ids;
-}
-zbx_idset_t;
-
 /* local user macro cache support */
 void	zbx_umc_init(zbx_hashset_t *cache);
 void	zbx_umc_destroy(zbx_hashset_t *cache);
@@ -449,9 +441,7 @@ void	zbx_umc_add_hostids(zbx_hashset_t *cache, zbx_uint64_t objectid, const zbx_
 void	zbx_umc_resolve(zbx_hashset_t *cache);
 const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid, const char *macro);
 
-void	DCget_bulk_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
-void	zbx_idset_free(zbx_idset_t *idset);
 
 /* global configuration support */
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);

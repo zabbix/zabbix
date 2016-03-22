@@ -29,7 +29,6 @@
 #include "zbxalgo.h"
 #include "dbcache.h"
 #include "zbxregexp.h"
-#include "macrocache.h"
 #include "cfg.h"
 #include "comms.h"
 #include "../zbxcrypto/tls_tcp_active.h"
@@ -2223,7 +2222,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x01))
 				{
 					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
 							&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->ip, addr);
 					zbx_free(addr);
@@ -2232,7 +2231,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x02))
 				{
 					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
 							&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->dns, addr);
 					zbx_free(addr);
@@ -7977,77 +7976,6 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_umc_resolve                                                  *
- *                                                                            *
- * Purpose: resolve user macros in user macro cache                           *
- *                                                                            *
- * Parameters: cache  - [IN] the user macro cache                             *
- *                                                                            *
- * Comments: assumes macros have not been expanded yet (macro->value is NULL) *
- *                                                                            *
- ******************************************************************************/
-void	zbx_umc_resolve(zbx_hashset_t *cache)
-{
-	const char		*__function_name = "zbx_umc_resolve";
-	zbx_hashset_iter_t	iter;
-	zbx_umc_object_t	*object;
-	int			i, resolved = 0, total = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zbx_hashset_iter_reset(cache, &iter);
-
-	LOCK_CACHE;
-
-	while (NULL != (object = zbx_hashset_iter_next(&iter)))
-	{
-		for (i = 0; i < object->macros.values_num; i++)
-		{
-			zbx_umc_macro_t	*macro = (zbx_umc_macro_t *)object->macros.values[i];
-			char		*value = NULL, *value_default = NULL;
-
-			/* User macros should be expanded according to the following priority: */
-			/*                                                                     */
-			/*  1) host context macro                                              */
-			/*  2) global context macro                                            */
-			/*  3) host base (default) macro                                       */
-			/*  4) global base (default) macro                                     */
-			/*                                                                     */
-			/* We try to expand host macros first. If there is no perfect match on */
-			/* the host level, we try to expand global macros, passing the default */
-			/* macro value found on the host level, if any.                        */
-
-			DCget_host_macro(object->hostids.values, object->hostids.values_num, macro->name,
-					macro->context, &value, &value_default);
-
-			if (NULL == value)
-				DCget_global_macro(macro->name, macro->context, &value, &value_default);
-
-			if (NULL != value)
-			{
-				macro->value = value;
-				zbx_free(value_default);
-			}
-			else if (NULL != value_default)
-			{
-				macro->value = value_default;
-			}
-
-			total++;
-			if (NULL != macro->value)
-				resolved++;
-		}
-
-		zbx_vector_ptr_sort(&object->macros, zbx_umc_compare_macro);
-	}
-
-	UNLOCK_CACHE;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): resolved %d/%d user macro(s)", __function_name, resolved, total);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DCget_bulk_hostids_by_functionids                                *
  *                                                                            *
  * Purpose: get function host ids grouped by an object (trigger) id           *
@@ -8056,97 +7984,32 @@ void	zbx_umc_resolve(zbx_hashset_t *cache)
  *             hostids     - [OUT] the host ids                               *
  *                                                                            *
  ******************************************************************************/
-void	DCget_bulk_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids)
+void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
 {
-	const char	*__function_name = "DCget_bulk_hostids_by_functionids";
-	zbx_idset_t	*fset, *hset;
+	const char	*__function_name = "DCget_hostids_by_functionids";
 	ZBX_DC_FUNCTION	*function;
 	ZBX_DC_ITEM	*item;
-	int		i, j, hosts = 0;
+	int		i;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:%d", __function_name, functionids->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	LOCK_CACHE;
 
 	for (i = 0; i < functionids->values_num; i++)
 	{
-		fset = (zbx_idset_t *)functionids->values[i];
-		hset = (zbx_idset_t *)zbx_malloc(NULL, sizeof(zbx_idset_t));
-
-		hset->id = fset->id;
-		zbx_vector_uint64_create(&hset->ids);
-		zbx_vector_ptr_append(hostids, hset);
-
-		for (j = 0; j < fset->ids.values_num; j++)
-		{
-			if (NULL == (function = zbx_hashset_search(&config->functions, &fset->ids.values[j])))
+		if (NULL == (function = zbx_hashset_search(&config->functions, &functionids->values[i])))
 				continue;
 
-			if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
-				zbx_vector_uint64_append(&hset->ids, item->hostid);
-		}
-
-		zbx_vector_uint64_sort(&hset->ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&hset->ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		hosts += hset->ids.values_num;
+		if (NULL != (item = zbx_hashset_search(&config->items, &function->itemid)))
+			zbx_vector_uint64_append(hostids, item->hostid);
 	}
+
+	zbx_vector_uint64_sort(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hosts);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_hostids_by_functionids                                     *
- *                                                                            *
- * Purpose: get function host ids g                                           *
- *                                                                            *
- * Parameters: functionids - [IN] the function ids                            *
- *             hostids     - [OUT] the host ids                               *
- *                                                                            *
- ******************************************************************************/
-void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids)
-{
-	zbx_vector_ptr_t	fset, hset;
-	zbx_idset_t		*idset;
-
-	zbx_vector_ptr_create(&fset);
-	zbx_vector_ptr_create(&hset);
-
-	/* prepare function idset vector */
-	idset = (zbx_idset_t *)zbx_malloc(NULL, sizeof(zbx_idset_t));
-	idset->id = 0;
-	idset->ids = *functionids;
-	zbx_vector_ptr_append(&fset, idset);
-
-	DCget_bulk_hostids_by_functionids(&fset, &hset);
-
-	/* copy the result to output vector */
-	idset = (zbx_idset_t *)hset.values[0];
-	*hostids = idset->ids;
-
-	/* don't perform idset cleanup as idset->ids vector ownership was transferred to hostids vector */
-	zbx_vector_ptr_clear_ext(&hset, (zbx_mem_free_func_t)zbx_ptr_free);
-	zbx_vector_ptr_destroy(&hset);
-
-	/* don't perform idset cleanup as functionids vector sill has ownership over idset->ids vector */
-	zbx_vector_ptr_clear_ext(&fset, (zbx_mem_free_func_t)zbx_ptr_free);
-	zbx_vector_ptr_destroy(&fset);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_idset_free                                                   *
- *                                                                            *
- * Purpose: free idset data structure                                         *
- *                                                                            *
- ******************************************************************************/
-void	zbx_idset_free(zbx_idset_t *idset)
-{
-	zbx_vector_uint64_destroy(&idset->ids);
-	zbx_free(idset);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): found %d hosts", __function_name, hostids->values_num);
 }
 
 /******************************************************************************

@@ -109,7 +109,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 				zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, alert, NULL, &param,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, alert, &param,
 						MACRO_TYPE_ALERT, NULL, 0);
 
 				param_esc = zbx_dyn_escape_shell_single_quote(param);
