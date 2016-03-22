@@ -1584,6 +1584,7 @@ textarea {
 		size: $font-form-size;
 	}
 	padding: 4px 5px;
+	margin: 0;
 	overflow: auto;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
