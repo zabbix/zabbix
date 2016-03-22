@@ -4,6 +4,7 @@ New features:
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+...GI..PS. [ZBX-4148] separated third-party library CFLAGS to avoid header file name conflicts (gleb)
 ..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 ..F....... [ZBX-10466] fixed event selection by trigger ID (Gunars)
