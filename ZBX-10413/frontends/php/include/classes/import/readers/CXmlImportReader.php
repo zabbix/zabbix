@@ -31,6 +31,10 @@ class CXmlImportReader extends CImportReader {
 	 * @return array
 	 */
 	public function read($string) {
+		if ($string === '') {
+			throw new Exception(_s('Cannot read XML: %1$s.', _('XML is empty')));
+		}
+
 		libxml_use_internal_errors(true);
 		libxml_disable_entity_loader(true);
 		$result = simplexml_load_string($string, null, LIBXML_IMPORT_FLAGS);
@@ -39,22 +43,9 @@ class CXmlImportReader extends CImportReader {
 			libxml_clear_errors();
 
 			foreach ($errors as $error) {
-				$text = '';
-
-				switch ($error->level) {
-					case LIBXML_ERR_WARNING:
-						$text .= _s('XML file contains warning %1$s:', $error->code);
-						break;
-					case LIBXML_ERR_ERROR:
-						$text .= _s('XML file contains error %1$s:', $error->code);
-						break;
-					case LIBXML_ERR_FATAL:
-						$text .= _s('XML file contains fatal error %1$s:', $error->code);
-						break;
-				}
-
-				$text .= trim($error->message).' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
-				throw new Exception($text);
+				throw new Exception(_s('Cannot read XML: %1$s.', _s('%1$s [Line: %2$s | Column: %3$s]',
+					'('.$error->code.') '.trim($error->message), $error->line, $error->column
+				)));
 			}
 		}
 
