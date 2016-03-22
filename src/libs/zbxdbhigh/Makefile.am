@@ -2,15 +2,9 @@
 
 noinst_LIBRARIES = libzbxdbhigh.a
 
-if WITH_ODBC
-ODBC_SRC = odbc.c
-else
-ODBC_SRC =
-endif
-
 libzbxdbhigh_a_SOURCES = \
 	host.c \
-	${ODBC_SRC} \
+	odbc.c \
 	db.c \
 	dbschema.c \
 	proxy.c \
@@ -25,4 +19,4 @@ libzbxdbhigh_a_SOURCES = \
 	template_item.c \
 	template.h
 
-libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/
+libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/ @UNIXODBC_CFLAGS@

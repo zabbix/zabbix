@@ -70,7 +70,7 @@ typedef struct
 }
 zbx_ipmi_control_t;
 
-typedef struct zbx_ipmi_host_s
+typedef struct zbx_ipmi_host
 {
 	char			*ip;
 	int			port;
@@ -89,7 +89,7 @@ typedef struct zbx_ipmi_host_s
 	time_t			lastaccess;
 	unsigned int		domain_id;
 	char			*err;
-	struct zbx_ipmi_host_s	*next;
+	struct zbx_ipmi_host	*next;
 }
 zbx_ipmi_host_t;
 
