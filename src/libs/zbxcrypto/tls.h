@@ -29,6 +29,9 @@
 /* 'main' thread and use this structure for passing minimum TLS variables into 'send_value' thread. */
 
 #if defined(HAVE_POLARSSL)
+#	if defined(_WINDOWS) && defined(uint32_t)
+#		undef uint32_t
+#	endif
 #	include <polarssl/entropy.h>
 #	include <polarssl/ctr_drbg.h>
 #	include <polarssl/ssl.h>

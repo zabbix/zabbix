@@ -23,6 +23,8 @@
 
 #include "zbxmedia.h"
 
+#ifdef HAVE_JABBER
+
 #include <iksemel.h>
 
 static void	zbx_io_close(void *socket)
@@ -605,3 +607,5 @@ lbl_fail:
 
 	return ret;
 }
+
+#endif	/* HAVE_JABBER */

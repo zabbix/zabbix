@@ -486,15 +486,15 @@ void	zbx_set_availability_diff_ts(int ts);
 #define ZBX_HC_ITEM_STATUS_BUSY		1
 #define ZBX_HC_ITEM_STATUS_QUEUED	2
 
-struct zbx_hc_data_t;
+typedef struct zbx_hc_data	zbx_hc_data_t;
 
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	unsigned char		status;
+	zbx_uint64_t	itemid;
+	unsigned char	status;
 
-	struct zbx_hc_data_t	*tail;
-	struct zbx_hc_data_t	*head;
+	zbx_hc_data_t	*tail;
+	zbx_hc_data_t	*head;
 }
 zbx_hc_item_t;
 
