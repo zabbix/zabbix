@@ -60,6 +60,7 @@ class CApplicationManager {
 				}
 			}
 		}
+		unset($application);
 
 		// link inherited apps
 		DB::insertBatch('application_template', $applicationTemplates);

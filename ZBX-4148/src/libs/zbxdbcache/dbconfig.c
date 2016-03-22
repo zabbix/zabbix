@@ -540,6 +540,8 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
  *           ,------------------+--------------------------------------,      *
  *           | type             | key                                  |      *
  *           +------------------+--------------------------------------+      *
+ *           | Zabbix internal  | zabbix[host,,items]                  |      *
+ *           | Zabbix internal  | zabbix[host,,items_unsupported]      |      *
  *           | Zabbix internal  | zabbix[host,,maintenance]            |      *
  *           | Zabbix internal  | zabbix[proxy,<proxyname>,lastaccess] |      *
  *           | Zabbix aggregate | *                                    |      *
@@ -576,8 +578,11 @@ int	is_item_processed_by_server(unsigned char type, const char *key)
 					arg2 = get_rparam(&request, 1);
 					arg3 = get_rparam(&request, 2);
 
-					if (0 != strcmp(arg3, "maintenance") || '\0' != *arg2)
+					if ((0 != strcmp(arg3, "maintenance") && 0 != strcmp(arg3, "items") &&
+							0 != strcmp(arg3, "items_unsupported")) || '\0' != *arg2)
+					{
 						goto clean;
+					}
 				}
 				else if (0 == strcmp(arg1, "proxy"))
 				{

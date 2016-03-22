@@ -352,6 +352,7 @@ else {
 					}
 				}
 			}
+			unset($application);
 		}
 
 		/*
@@ -383,6 +384,7 @@ else {
 				}
 			}
 		}
+		unset($application);
 
 		// Info column is show when all hosts are selected or current host is not a template.
 		if ($pageFilter->hostid > 0) {

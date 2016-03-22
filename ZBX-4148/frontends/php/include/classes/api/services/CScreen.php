@@ -406,6 +406,35 @@ class CScreen extends CApiService {
 	}
 
 	/**
+	 * Validate vsize and hsize parameters.
+	 *
+	 * @param array $screen
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function validateScreenSize(array $screen) {
+		foreach (['vsize', 'hsize'] as $field_name) {
+			if (!array_key_exists($field_name, $screen)) {
+				continue;
+			}
+
+			if (!zbx_is_int($screen[$field_name])) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('a numeric value is expected'))
+				);
+			}
+
+			if ($screen[$field_name] < SCREEN_MIN_SIZE || $screen[$field_name] > SCREEN_MAX_SIZE) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_s('Incorrect value for field "%1$s": %2$s.', $field_name,
+						_s('must be between "%1$s" and "%2$s"', SCREEN_MIN_SIZE, SCREEN_MAX_SIZE)
+					)
+				);
+			}
+		}
+	}
+
+	/**
 	 * Validates the input parameters for the create() method.
 	 *
 	 * @param array $screens
@@ -425,6 +454,8 @@ class CScreen extends CApiService {
 			if (!check_db_fields($screen_db_fields, $screen)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
+
+			$this->validateScreenSize($screen);
 
 			// "templateid", is not allowed
 			if (array_key_exists('templateid', $screen)) {
@@ -731,6 +762,8 @@ class CScreen extends CApiService {
 		$check_names = [];
 
 		foreach ($screens as $screen) {
+			$this->validateScreenSize($screen);
+
 			if (!array_key_exists($screen['screenid'], $db_screens)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
@@ -1125,6 +1158,10 @@ class CScreen extends CApiService {
 		$deleteScreenItemIds = [];
 		$updateScreenItems = [];
 		foreach ($screens as $screen) {
+			if (array_key_exists('screenitems', $screen)) {
+				continue;
+			}
+
 			$dbScreen = $dbScreens[$screen['screenid']];
 			$dbScreenItems = $dbScreen['screenitems'];
 

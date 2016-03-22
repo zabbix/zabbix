@@ -2458,7 +2458,7 @@ static void	zbx_trigger_cache_clean(zbx_hashset_t *cache)
  *                                                                            *
  * Purpose: removes trigger dependency                                        *
  *                                                                            *
- * Parameters: from  - [IN] the reference to dependent triger                 *
+ * Parameters: from  - [IN] the reference to dependent trigger                *
  *             to    - [IN] the reference to trigger the from depends on      *
  *             error - [OUT] the error message                                *
  *                                                                            *
