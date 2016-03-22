@@ -9,3 +9,5 @@ libzbxcrypto_a_SOURCES = \
 	tls.h \
 	tls_tcp.h \
 	tls_tcp_active.h
+
+libzbxcrypto_a_CFLAGS = @TLS_CFLAGS@

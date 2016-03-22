@@ -4,6 +4,7 @@ New features:
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
+...GI..PS. [ZBX-4148] separated third-party library CFLAGS to avoid header file name conflicts (gleb)
 ..F....... [ZBX-9972] changed SERVICE_SLA constant to match database default goodsla value (Cemeris)
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
