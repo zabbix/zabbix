@@ -52,9 +52,9 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
-<tr>
-	<td></td>
-	<td>
+<li>
+	<div class="<?= ZBX_STYLE_TABLE_FORMS_TD_LEFT ?>"></div>
+	<div class="<?= ZBX_STYLE_TABLE_FORMS_TD_RIGHT ?>">
 		<div id="opcmdEditForm" class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
 			<table style="width: 100%;">
 				<tbody>
@@ -86,8 +86,8 @@
 				</tbody>
 			</table>
 		</div>
-	</td>
-</tr>
+	</div>
+</li>
 </script>
 
 <script type="text/javascript">
@@ -236,7 +236,7 @@
 		}
 
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
-		jQuery('#opCmdList').closest('tr').after(tpl.evaluate(objectTPL));
+		jQuery('#opCmdList').closest('li').after(tpl.evaluate(objectTPL));
 
 		// actions
 		jQuery('#opcmdEditForm')
@@ -374,7 +374,7 @@
 	}
 
 	function closeOpCmdForm() {
-		jQuery('#opcmdEditForm').closest('tr').remove();
+		jQuery('#opcmdEditForm').closest('li').remove();
 	}
 
 	function showOpTypeForm() {
@@ -409,7 +409,7 @@
 			}
 
 			jQuery(fieldId)
-				.closest('tr')
+				.closest('li')
 				.toggle(show)
 				.find(':input')
 				.prop('disabled', !show);
@@ -434,12 +434,12 @@
 		}
 
 		jQuery('#new_operation_opcommand_password')
-			.closest('tr')
+			.closest('li')
 			.toggle(show_password)
 			.find(':input')
 			.prop('disabled', !show_password);
 		jQuery('#new_operation_opcommand_publickey,#new_operation_opcommand_privatekey,#new_operation_opcommand_passphrase')
-			.closest('tr')
+			.closest('li')
 			.toggle(show_publickey)
 			.find(':input')
 			.prop('disabled', !show_publickey);
@@ -472,7 +472,7 @@
 	function processOperationTypeOfCalculation() {
 		var labels = jQuery('#operationConditionTable .label');
 
-		jQuery('#operationEvaltype').closest('tr').toggle(labels.length > 1);
+		jQuery('#operationEvaltype').closest('li').toggle(labels.length > 1);
 
 		if (labels.length > 1) {
 			var conditions = [];
@@ -494,8 +494,8 @@
 		jQuery('#new_operation_opmessage_default_msg').on('change', function() {
 			var default_message = jQuery(this).is(':checked');
 
-			jQuery('#new_operation_opmessage_subject').closest('tr').toggle(!default_message);
-			jQuery('#new_operation_opmessage_message').closest('tr').toggle(!default_message);
+			jQuery('#new_operation_opmessage_subject').closest('li').toggle(!default_message);
+			jQuery('#new_operation_opmessage_message').closest('li').toggle(!default_message);
 		});
 
 		jQuery('#new_operation_opmessage_default_msg').trigger('change');
