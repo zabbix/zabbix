@@ -1249,8 +1249,9 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	fd_set		sock_set;
 	ZBX_SOCKET	accepted_socket;
 	ZBX_SOCKLEN_T	nlen;
-	int		i, n = 0;
-	unsigned char	buf;		/* 1 byte buffer */
+	int		i, n = 0, ret = FAIL;
+	ssize_t		res;
+	unsigned char	buf;	/* 1 byte buffer */
 
 	zbx_tcp_unaccept(s);
 
@@ -1268,7 +1269,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	if (ZBX_PROTO_ERROR == select(n + 1, &sock_set, NULL, NULL, NULL))
 	{
 		zbx_set_socket_strerror("select() failed: %s", strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
+		return ret;
 	}
 
 	for (i = 0; i < s->num_socks; i++)
@@ -1284,7 +1285,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 			&nlen)))
 	{
 		zbx_set_socket_strerror("accept() failed: %s", strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
+		return ret;
 	}
 
 	s->socket_orig = s->socket;	/* remember main socket */
@@ -1293,39 +1294,42 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 
 	zbx_strlcpy(s->peer, zbx_get_ip_by_socket(s), sizeof(s->peer));	/* save peer IP address */
 
+	zbx_socket_timeout_set(s, CONFIG_TIMEOUT);
+
+	if (ZBX_SOCKET_ERROR == (res = recv(s->socket, &buf, 1, MSG_PEEK)))
+	{
+		zbx_set_socket_strerror("from %s: recv() peek failed: %s", s->peer,
+				strerror_from_system(zbx_socket_last_error()));
+		zbx_tcp_unaccept(s);
+		goto out;
+	}
+
 	/* if the 1st byte is 0x16 then assume it's a TLS connection */
-	if (1 == recv(s->socket, &buf, 1, MSG_PEEK) && '\x16' == buf)
+	if (1 == res && '\x16' == buf)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (0 != (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 		{
 			char	*error = NULL;
-			int	res;
 
-			zbx_socket_timeout_set(s, CONFIG_TIMEOUT);
-
-			res = zbx_tls_accept(s, &error, tls_accept);
-#if !defined(_WINDOWS)
-			zbx_alarm_off();
-#endif
-			if (SUCCEED != res)
+			if (SUCCEED != zbx_tls_accept(s, &error, tls_accept))
 			{
 				zbx_set_socket_strerror("from %s: %s", s->peer, error);
 				zbx_tcp_unaccept(s);
 				zbx_free(error);
-				return FAIL;
+				goto out;
 			}
 		}
 		else
 		{
 			zbx_set_socket_strerror("from %s: TLS connections are not allowed", s->peer);
 			zbx_tcp_unaccept(s);
-			return FAIL;
+			goto out;
 		}
 #else
 		zbx_set_socket_strerror("from %s: support for TLS was not compiled in", s->peer);
 		zbx_tcp_unaccept(s);
-		return FAIL;
+		goto out;
 #endif
 	}
 	else
@@ -1334,12 +1338,15 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		{
 			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed", s->peer);
 			zbx_tcp_unaccept(s);
-			return FAIL;
+			goto out;
 		}
 
 		s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 	}
-
+out:
+#if !defined(_WINDOWS)
+	zbx_alarm_off();
+#endif
 	return SUCCEED;
 }
 
