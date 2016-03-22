@@ -4672,10 +4672,8 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
 		}
-
 	}
 #endif
-
 	LOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(host)))
