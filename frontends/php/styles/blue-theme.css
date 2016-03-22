@@ -546,13 +546,22 @@ footer, .footer {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
+  .treeview-plus:link {
+    color: #1f2c33; }
+  .treeview-plus:visited {
+    color: #1f2c33; }
   .treeview-plus:hover {
-    background-color: #eef7ff; }
+    color: #1f2c33;
+    background-color: #eef7ff;
+    border-bottom-color: #acbbc2; }
   .treeview-plus:focus {
+    color: #1f2c33;
     background-color: #eef7ff;
     border-color: #02659f; }
   .treeview-plus:active {
-    background-color: #eef7ff; }
+    color: #1f2c33;
+    background-color: #eef7ff;
+    border-color: #acbbc2; }
 
 .treeview {
   display: inline-block;
@@ -1297,6 +1306,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .disabled {
   cursor: default !important;
+  background-color: transparent !important;
   opacity: 0.35;
   filter: alpha(opacity=35); }
   .disabled .subfilter-enabled {

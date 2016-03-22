@@ -293,7 +293,7 @@ int	main(int argc, char **argv)
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 	unsigned short	opt_count[256] = {0}, port = ZBX_DEFAULT_AGENT_PORT;
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zbx_error("cannot disable core dump, exiting...");

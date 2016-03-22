@@ -666,6 +666,7 @@ class CHost extends CHostGeneral {
 				$inventories[] = $inventory;
 			}
 		}
+		unset($host);
 
 		$inventories = $this->extendObjects('host_inventory', $inventories, ['inventory_mode']);
 		$inventories = zbx_toHash($inventories, 'hostid');

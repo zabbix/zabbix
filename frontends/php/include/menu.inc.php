@@ -161,12 +161,12 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'auditlogs.php',
 					'label' => _('Audit'),
-					'user_type' => USER_TYPE_ZABBIX_ADMIN
+					'user_type' => USER_TYPE_SUPER_ADMIN
 				],
 				[
 					'url' => 'auditacts.php',
 					'label' => _('Action log'),
-					'user_type' => USER_TYPE_ZABBIX_ADMIN
+					'user_type' => USER_TYPE_SUPER_ADMIN
 				],
 				[
 					'url' => 'report4.php',
@@ -276,7 +276,10 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'users.php',
 					'label' => _('Users'),
-					'sub_pages' => ['popup_usrgrp.php']
+					'sub_pages' => [
+						'popup_usrgrp.php',
+						'popup_media.php'
+					],
 				],
 				[
 					'url' => 'zabbix.php',

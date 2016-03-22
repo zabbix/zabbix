@@ -31,10 +31,6 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
-	access_deny();
-}
-
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'dstfrm'=>		[T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null],
@@ -117,6 +113,7 @@ CArrayHelper::sort($mediatypes, ['description']);
 foreach ($mediatypes as &$mediatype) {
 	$mediatype = $mediatype['description'];
 }
+unset($mediatype);
 
 $frm_row = [];
 
@@ -131,8 +128,8 @@ array_pop($frm_row);
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
-	->addRow(_('Send to'), (new CTextBox('sendto', $sendto))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('When active'), (new CTextBox('period', $period))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Send to'), (new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('When active'), (new CTextBox('period', $period, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Use if severity'), $frm_row)
 	->addRow(_('Enabled'), (new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($active == MEDIA_STATUS_ACTIVE));
 

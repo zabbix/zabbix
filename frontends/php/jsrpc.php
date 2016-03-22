@@ -178,40 +178,12 @@ switch ($data['method']) {
 		break;
 
 	case 'screen.get':
-		$options = [
-			'pageFile' => !empty($data['pageFile']) ? $data['pageFile'] : null,
-			'mode' => !empty($data['mode']) ? $data['mode'] : null,
-			'timestamp' => !empty($data['timestamp']) ? $data['timestamp'] : time(),
-			'resourcetype' => !empty($data['resourcetype']) ? $data['resourcetype'] : null,
-			'screenid' => (isset($data['screenid']) && $data['screenid'] != 0) ? $data['screenid'] : null,
-			'screenitemid' => !empty($data['screenitemid']) ? $data['screenitemid'] : null,
-			'groupid' => !empty($data['groupid']) ? $data['groupid'] : null,
-			'hostid' => !empty($data['hostid']) ? $data['hostid'] : null,
-			'period' => !empty($data['period']) ? $data['period'] : null,
-			'stime' => !empty($data['stime']) ? $data['stime'] : null,
-			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null,
-			'profileIdx2' => !empty($data['profileIdx2']) ? $data['profileIdx2'] : null,
-			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null
-		];
-		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
-			$options['itemids'] = !empty($data['itemids']) ? $data['itemids'] : null;
-			$options['action'] = !empty($data['action']) ? $data['action'] : null;
-			$options['filter'] = !empty($data['filter']) ? $data['filter'] : null;
-			$options['filter_task'] = !empty($data['filter_task']) ? $data['filter_task'] : null;
-			$options['mark_color'] = !empty($data['mark_color']) ? $data['mark_color'] : null;
-		}
-		elseif ($options['resourcetype'] == SCREEN_RESOURCE_CHART) {
-			$options['graphid'] = !empty($data['graphid']) ? $data['graphid'] : null;
-			$options['profileIdx2'] = $options['graphid'];
-		}
-
-		$screenBase = CScreenBuilder::getScreen($options);
-		if (!empty($screenBase)) {
+		$result = '';
+		$screenBase = CScreenBuilder::getScreen($data);
+		if ($screenBase !== null) {
 			$screen = $screenBase->get();
-		}
 
-		if (!empty($screen)) {
-			if ($options['mode'] == SCREEN_MODE_JS) {
+			if ($data['mode'] == SCREEN_MODE_JS) {
 				$result = $screen;
 			}
 			else {
@@ -219,9 +191,6 @@ switch ($data['method']) {
 					$result = $screen->toString();
 				}
 			}
-		}
-		else {
-			$result = '';
 		}
 		break;
 
