@@ -113,6 +113,18 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'</hosts>'."\n".
 				'</zabbix_export>',
 				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "p".'
+			],
+			[
+				'',
+				'Cannot read XML: XML is empty.'
+			],
+			[
+				'abc',
+				'Cannot read XML: (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
+			],
+			[
+				'<a></b>',
+				'Cannot read XML: (76) Opening and ending tag mismatch: a line 1 and b [Line: 1 | Column: 8].'
 			]
 		];
 	}
@@ -126,17 +138,12 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 	public function testReadXML($xml, $expected) {
 		$reader = new CXmlImportReader();
 
-		if (is_array($expected)) {
+		try {
 			$data = $reader->read($xml);
+			$this->assertEquals(is_array($expected), is_array($data));
 			$this->assertEquals($expected, $data);
-		}
-		else {
-			try {
-				$data = $reader->read($xml);
-				$this->assertEquals($expected, $data);
-			} catch (Exception $e) {
-				$this->assertEquals($expected, $e->getMessage());
-			}
+		} catch (Exception $e) {
+			$this->assertEquals($expected, $e->getMessage());
 		}
 	}
 
