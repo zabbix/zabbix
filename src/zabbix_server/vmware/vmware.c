@@ -18,6 +18,14 @@
 **/
 
 #include "common.h"
+
+/* LIBXML2 is used */
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
+
 #include "ipc.h"
 #include "memalloc.h"
 #include "log.h"
@@ -173,6 +181,8 @@ typedef struct
 ZBX_HTTPPAGE;
 
 static ZBX_HTTPPAGE	page;
+
+static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -3846,7 +3856,7 @@ out:
  *         contain the value specified by xpath.                              *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
+static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
