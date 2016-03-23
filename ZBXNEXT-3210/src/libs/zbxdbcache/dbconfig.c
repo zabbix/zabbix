@@ -7557,8 +7557,6 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 		}
 
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, start, ptr - start);
-		start = ptr + len;
-		ptr = start;
 
 		dc_get_user_macro(hostids, hostids_num, macro, context, &value);
 
@@ -7577,9 +7575,14 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 				goto out;
 			}
 		}
+		else
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, ptr, len);
 
 		zbx_free(macro);
 		zbx_free(context);
+
+		start = ptr + len;
+		ptr = start;
 	}
 
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, start);
