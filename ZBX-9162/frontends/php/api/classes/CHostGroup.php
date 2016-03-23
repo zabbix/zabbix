@@ -181,7 +181,7 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
-		// monitored_hosts, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
+		// monitored_hosts, with_graphs, real_hosts, templated_hosts, not_proxy_hosts, with_hosts_and_templates
 		if (!is_null($options['monitored_hosts'])) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
@@ -190,6 +190,23 @@ class CHostGroup extends CZBXAPI {
 					' FROM hosts h'.
 					' WHERE hg.hostid=h.hostid'.
 						' AND h.status='.HOST_STATUS_MONITORED.
+					')';
+		}
+		/*
+		 * Execute this statement when both "with_graphs" and "real_hosts" options are passed.
+		 * This significantly improves performance.
+		 */
+		elseif ($options['with_graphs'] !== null && $options['real_hosts'] !== null) {
+			$sqlParts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM items i,graphs_items gi,graphs g,hosts h,hosts_groups hg'.
+					' WHERE g.groupid=hg.groupid'.
+						' AND h.hostid=i.hostid'.
+						' AND i.itemid=gi.itemid'.
+						' AND gi.graphid=g.graphid'.
+						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+						' AND h.hostid=hg.hostid'.
+						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 					')';
 		}
 		elseif (!is_null($options['real_hosts'])) {
@@ -310,7 +327,7 @@ class CHostGroup extends CZBXAPI {
 		}
 
 		// with_graphs
-		if (!is_null($options['with_graphs'])) {
+		if ($options['with_graphs'] !== null && $options['real_hosts'] === null) {
 			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
