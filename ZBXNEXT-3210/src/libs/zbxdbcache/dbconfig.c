@@ -7543,13 +7543,10 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *con
 static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
 		zbx_value_validator_func_t validator_func, char **error)
 {
-	const char	*__function_name = "dc_expand_user_macros";
 	char		*exp = NULL, *macro = NULL, *context = NULL, *value = NULL;
 	const char	*ptr, *start;
 	size_t		exp_alloc = 0, exp_offset = 0;
 	int		len, ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, text);
 
 	for (start = text, ptr = strchr(start, '{'); NULL != ptr; ptr = strchr(ptr, '{'))
 	{
@@ -7587,8 +7584,6 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, start);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, exp);
-
 	return exp;
 }
 
