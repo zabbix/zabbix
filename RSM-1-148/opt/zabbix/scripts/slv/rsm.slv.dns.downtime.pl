@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# DNS downtime of current month in minutes
+# DNS unavailability
 
 BEGIN
 {
@@ -25,7 +25,6 @@ db_connect();
 
 my $interval = get_macro_dns_udp_delay();
 
-# second one is unused
 my ($from, $till, $value_ts) = get_interval_bounds($interval);
 
 my ($curmon_from) = get_curmon_bounds();
