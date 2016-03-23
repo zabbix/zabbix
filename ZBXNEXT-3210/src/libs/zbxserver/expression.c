@@ -2388,9 +2388,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		char	*expression;
 
 		if (NULL != (expression = zbx_dc_expression_expand_user_macros(event->trigger.expression, NULL)))
+		{
 			expand_trigger_description_constants(data, expression);
-
-		zbx_free(expression);
+			zbx_free(expression);
+		}
 	}
 
 	p = *data;
