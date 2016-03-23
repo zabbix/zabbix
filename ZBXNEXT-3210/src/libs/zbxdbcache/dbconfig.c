@@ -7679,7 +7679,7 @@ static char	*dc_cache_expanded_expression(const char *expression, const char **e
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_expression_expand_user_macros                             *
+ * Function: DCexpression_expand_user_macros                                  *
  *                                                                            *
  * Purpose: expand user macros in trigger expression                          *
  *                                                                            *
@@ -7694,7 +7694,7 @@ static char	*dc_cache_expanded_expression(const char *expression, const char **e
  *           dc_expression_expand_user_macros() function for external usage.  *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_dc_expression_expand_user_macros(const char *expression, char **error)
+char	*DCexpression_expand_user_macros(const char *expression, char **error)
 {
 	char	*expression_ex;
 

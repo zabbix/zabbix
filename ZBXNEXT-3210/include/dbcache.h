@@ -412,7 +412,7 @@ void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
-char	*zbx_dc_expression_expand_user_macros(const char *expression, char **error);
+char	*DCexpression_expand_user_macros(const char *expression, char **error);
 
 int	DChost_activate(zbx_uint64_t hostid, unsigned char agent_type, const zbx_timespec_t *ts,
 		zbx_agent_availability_t *in, zbx_agent_availability_t *out);
