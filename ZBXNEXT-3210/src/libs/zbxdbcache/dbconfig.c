@@ -7332,20 +7332,16 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 	UNLOCK_CACHE;
 }
 
-static void	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
+static void	dc_get_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
 		char **value, char **value_default)
 {
-	const char	*__function_name = "DCget_host_macro";
-
 	int			i, j;
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 	ZBX_DC_HTMPL		*htmpl;
 	zbx_vector_uint64_t	templateids;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro, ZBX_NULL2STR(context));
-
 	if (0 == host_num)
-		goto out;
+		return;
 
 	hmacro_hm_local.macro = macro;
 
@@ -7364,7 +7360,7 @@ static void	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *ma
 					if (0 == zbx_strcmp_null(hmacro->context, context))
 					{
 						*value = zbx_strdup(*value, hmacro->value);
-						goto out;
+						return;
 					}
 
 					/* check for the default (without parameters) macro value */
@@ -7390,22 +7386,16 @@ static void	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *ma
 	if (0 != templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		DCget_host_macro(templateids.values, templateids.values_num, macro, context, value, value_default);
+		dc_get_host_macro(templateids.values, templateids.values_num, macro, context, value, value_default);
 	}
 
 	zbx_vector_uint64_destroy(&templateids);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCget_global_macro(const char *macro, const char *context, char **value, char **value_default)
+static void	dc_get_global_macro(const char *macro, const char *context, char **value, char **value_default)
 {
-	const char	*__function_name = "DCget_global_macro";
 	int		i;
-
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s' context:'%s'", __function_name, macro, ZBX_NULL2STR(context));
 
 	gmacro_m_local.macro = macro;
 
@@ -7429,8 +7419,6 @@ static void	DCget_global_macro(const char *macro, const char *context, char **va
 			}
 		}
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
@@ -7449,11 +7437,10 @@ static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char
 	/* the host level, we try to expand global macros, passing the default */
 	/* macro value found on the host level, if any.                        */
 
-	if (0 < hostids_num)
-		DCget_host_macro(hostids, hostids_num, macro, context, &value, &value_default);
+	dc_get_host_macro(hostids, hostids_num, macro, context, &value, &value_default);
 
 	if (NULL == value)
-		DCget_global_macro(macro, context, &value, &value_default);
+		dc_get_global_macro(macro, context, &value, &value_default);
 
 	UNLOCK_CACHE;
 
