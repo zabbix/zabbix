@@ -304,27 +304,28 @@ foreach (@$tlds_ref)
 			next;
 		}
 
-		my $lastclock_key = "rsm.slv.$service.rollweek";
+		my $rollweek_key = "rsm.slv.$service.rollweek";
+		my $result;
 
-		my $lastclock = get_lastclock($tld, $lastclock_key);
-
-		if ($lastclock == E_FAIL)
+		if (get_lastclock($tld, $rollweek_key, \$result) != SUCCESS)
 		{
-			wrn(uc($service), ": configuration error, item $lastclock_key not found");
+			wrn(uc($service), ": configuration error, item $rollweek_key not found");
 			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
 			next;
 		}
 
-		if ($lastclock == 0)
+		if (!$result->{'lastclock'})
 		{
 			wrn(uc($service), ": no rolling week data in the database yet");
 			$servicedata->{$tld}->{'services'}->{$service}->{'alarmed'} = AH_ALARMED_DISABLED;
 			next;
 		}
 
-		dbg("lastclock:$lastclock");
+		dbg("lastclock:", $result->{'lastclock'}, " lastvalue:", $result->{'lastvalue'});
 
-		$servicedata->{$tld}->{'services'}->{$service}->{'lastclock'} = $lastclock;
+		$servicedata->{$tld}->{'services'}->{$service}->{'rw_lastclock'} = $result->{'lastclock'};
+		$servicedata->{$tld}->{'services'}->{$service}->{'rw_lastvalue'} = $result->{'lastvalue'};
+		$servicedata->{$tld}->{'services'}->{$service}->{'rw_itemid'} = $result->{'itemid'};
 	}
 }
 
@@ -356,7 +357,9 @@ foreach (keys(%$servicedata))
 
 	foreach my $service (keys(%{$servicedata->{$tld}->{'services'}}))
 	{
-		my $lastclock = $servicedata->{$tld}->{'services'}->{$service}->{'lastclock'};
+		my $rw_lastclock = $servicedata->{$tld}->{'services'}->{$service}->{'rw_lastclock'};
+		my $rw_lastvalue = $servicedata->{$tld}->{'services'}->{$service}->{'rw_lastvalue'};
+		my $rw_itemid = $servicedata->{$tld}->{'services'}->{$service}->{'rw_itemid'};
 		my $alarmed = $servicedata->{$tld}->{'services'}->{$service}->{'alarmed'};
 
 		my $delay = $services->{$service}->{'delay'};
@@ -399,27 +402,34 @@ foreach (keys(%$servicedata))
 			next;
 		}
 
-		my $downtime_key = "rsm.slv.$service.downtime";
-		my $downtime;
+		my $rollweek;
 
-		# we must have a special calculation key for that ($downtime_key)
+		# we must have a special calculation key for that ($rollweek_key)
 		#my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		if (__get_downtime($hostid, $service, $downtime_key, $now, \$downtime) != SUCCESS)
+		if ($rw_lastclock)
 		{
-			wrn("configuration error: ", rsm_slv_error());
-			$downtime = 0.0;
+			$rollweek = $rw_lastvalue;
+		}
+		else
+		{
+			# try go get it from history
+			if (__get_rollweek($rw_itemid, $now, $delay, \$rollweek) != SUCCESS)
+			{
+				wrn("no $service rolling week value in the database, using 0");
+				$rollweek = 0.0;
+			}
 		}
 
 		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') || opt('debug'));
 
 		if (opt('dry-run'))
 		{
-			__prnt(uc($service), " service availability $downtime (", ts_str($lastclock), ")");
+			__prnt(uc($service), " service availability $rollweek (", ts_str($rw_lastclock), ")");
 		}
 		else
 		{
-			if (ah_save_service_availability($readable_tld, $service, $downtime) != AH_SUCCESS)
+			if (ah_save_service_availability($readable_tld, $service, $rollweek) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -798,7 +808,7 @@ foreach (keys(%$servicedata))
 			$tld_status->{'status'} = AH_STATUS_DOWN;
 		}
 
-		$tld_status->{'services'}->{$service}->{'emergencyThreshold'} = $downtime;
+		$tld_status->{'services'}->{$service}->{'emergencyThreshold'} = $rollweek;
 
 		# rolling week incidents
 		my $rw_incidents = get_incidents2($avail_itemid, $delay, $rollweek_from, $rollweek_till);
@@ -1046,39 +1056,27 @@ sub __get_config_minclock
 	return $minclock;
 }
 
-sub __get_downtime
+sub __get_rollweek
 {
-	my $hostid = shift;
-	my $service = shift;
-	my $key = shift;
+	my $rw_itemid = shift;
 	my $clock = shift;
-	my $downtime_ref = shift;
-
-	my $itemid = get_itemid_by_hostid($hostid, $key);
-
-	return E_FAIL unless ($itemid);
+	my $delay = shift;
+	my $result_ref = shift;
 
 	$clock = time() unless($clock);
 
-	my $from = truncate_from($clock);
-	my $till = $from + 59;
+	my ($from, $till) = get_interval_bounds($delay, $clock);
 
 	my $rows_ref = db_select(
 		"select value".
 		" from history".
-		" where itemid=$itemid".
+		" where itemid=$rw_itemid".
 			" and ".sql_time_condition($from, $till).
 		" order by itemid,clock");
 
-	if (scalar(@$rows_ref) == 0)
-	{
-		wrn(uc($service), ": no downtime value in the database between ", ts_full($from), " and ", ts_full($till), ", using 0.0 ($key)");
-		$$downtime_ref = 0.0;
-	}
-	else
-	{
-		$$downtime_ref = $rows_ref->[0]->[0];
-	}
+	return E_FAIL if (scalar(@$rows_ref) == 0);
+
+	$$result_ref = $rows_ref->[0]->[0];
 
 	return SUCCESS;
 }

@@ -199,13 +199,13 @@ sub ah_save_service_availability
 {
 	my $tld = shift;
 	my $service = shift;
-	my $downtime = shift;
+	my $rollweek = shift;
 
 	my $service_path;
 
 	return AH_FAIL unless (__make_service_path($tld, $service, \$service_path) == AH_SUCCESS);
 
-	my $json_ref = {'serviceAvailability' => $downtime};
+	my $json_ref = {'serviceAvailability' => $rollweek};
 
 	return __write_file($service_path . '/' . AH_SERVICE_AVAILABILITY_FILE, __encode_json($json_ref));
 }

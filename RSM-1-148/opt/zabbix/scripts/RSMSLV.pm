@@ -434,41 +434,49 @@ sub get_itemids_by_host_and_keypart
 }
 
 # returns:
-# E_FAIL - if item was not found
-#      0 - if lastclock is NULL
-#      * - lastclock
+# E_FAIL  - if item was not found
+# SUCCESS - otherwise
 sub get_lastclock
 {
 	my $host = shift;
 	my $key = shift;
+	my $result_ptr = shift;
 
 	my $sql;
 
 	if ("[" eq substr($key, -1))
 	{
 		$sql =
-			"select i.lastclock".
+			"select i.itemid,i.lastclock,i.lastvalue".
 			" from items i,hosts h".
 			" where i.hostid=h.hostid".
-			" and h.host='$host'".
-			" and i.key_ like '$key%'".
+				" and h.host='$host'".
+				" and i.key_ like '$key%'".
 			" limit 1";
 	}
 	else
 	{
 		$sql =
-			"select i.lastclock".
+			"select i.itemid,i.lastclock,i.lastvalue".
 			" from items i,hosts h".
 			" where i.hostid=h.hostid".
-			" and h.host='$host'".
-			" and i.key_='$key'";
+				" and h.host='$host'".
+				" and i.key_='$key'";
 	}
 
 	my $rows_ref = db_select($sql);
 
 	return E_FAIL if (scalar(@$rows_ref) == 0);
 
-	return (defined($rows_ref->[0]->[0]) && $rows_ref->[0]->[0] > 0) ? $rows_ref->[0]->[0] : 0;
+	$$result_ptr->{'itemid'} = $rows_ref->[0]->[0];
+
+	if (defined($rows_ref->[0]->[0]) && $rows_ref->[0]->[0] > 0)
+	{
+		$$result_ptr->{'lastclock'} = $rows_ref->[0]->[1];
+		$$result_ptr->{'lastvalue'} = $rows_ref->[0]->[2];
+	}
+
+	return SUCCESS;
 }
 
 sub get_tlds
