@@ -65,8 +65,7 @@ static int	sync_in_progress = 0;
  *                                                                            *
  * Purpose: validate macro value when expanding user macros                   *
  *                                                                            *
- * Parameters: macro   - [IN] the macro name                                  *
- *             context - [IN] the macro context                               *
+ * Parameters: macro   - [IN] the user macro                                  *
  *             value   - [IN] the macro value                                 *
  *             error   - [OUT] the error message                              *
  *                                                                            *
@@ -74,7 +73,7 @@ static int	sync_in_progress = 0;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-typedef int (*zbx_value_validator_func_t)(const char *macro, const char *context, const char *value, char **error);
+typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, char **error);
 
 typedef struct
 {
@@ -7490,8 +7489,7 @@ out:
  *                                                                            *
  * Purpose: validate user macro values in trigger expressions                 *
  *                                                                            *
- * Parameters: macro   - [IN] the macro name                                  *
- *             context - [IN] the macro context                               *
+ * Parameters: macro   - [IN] the user macro                                  *
  *             value   - [IN] the macro value                                 *
  *             error   - [OUT] the error message (optional)                   *
  *                                                                            *
@@ -7499,8 +7497,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	dc_expression_user_macro_validator(const char *macro, const char *context, const char *value,
-		char **error)
+static int	dc_expression_user_macro_validator(const char *macro, const char *value, char **error)
 {
 	size_t	error_alloc = 0, error_offset = 0;
 
@@ -7508,16 +7505,7 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *con
 		return SUCCEED;
 
 	if (NULL != error)
-	{
-		zbx_free(*error);
-
-		zbx_snprintf_alloc(error, &error_alloc, &error_offset, "Macro '%s'", macro);
-
-		if (NULL != context)
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, " with context '%'", context);
-
-		zbx_strcpy_alloc(error, &error_alloc, &error_offset, " value is not numeric.");
-	}
+		*error = zbx_dsprintf(*error, "Macro '%s' value is not numeric.", macro);
 
 	return FAIL;
 }
@@ -7543,14 +7531,14 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *con
 static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
 		zbx_value_validator_func_t validator_func, char **error)
 {
-	char		*exp = NULL, *macro = NULL, *context = NULL, *value = NULL;
+	char		*exp = NULL, *macro = NULL, *name = NULL, *context = NULL, *value = NULL;
 	const char	*ptr, *start;
-	size_t		exp_alloc = 0, exp_offset = 0;
+	size_t		exp_alloc = 0, exp_offset = 0, macro_alloc = 0, macro_offset;
 	int		len, ret = SUCCEED;
 
 	for (start = text, ptr = strchr(start, '{'); NULL != ptr; ptr = strchr(ptr, '{'))
 	{
-		if ('$' != ptr[1] || SUCCEED != zbx_user_macro_parse_dyn(ptr, &macro, &context, &len))
+		if ('$' != ptr[1] || SUCCEED != zbx_user_macro_parse_dyn(ptr, &name, &context, &len))
 		{
 			ptr++;
 			continue;
@@ -7558,28 +7546,34 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, start, ptr - start);
 
-		dc_get_user_macro(hostids, hostids_num, macro, context, &value);
+		dc_get_user_macro(hostids, hostids_num, name, context, &value);
 
 		if (NULL != value)
 		{
-			if (NULL == validator_func || SUCCEED == (ret = validator_func(macro, context, value, error)))
+			if (NULL != validator_func)
+			{
+				macro_offset = 0;
+				zbx_strncpy_alloc(&macro, &macro_alloc, &macro_offset, ptr, len);
+
+				ret = validator_func(macro, value, error);
+			}
+
+			if (SUCCEED == ret)
 				zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, value);
 
 			zbx_free(value);
-
-			if (SUCCEED != ret)
-			{
-				zbx_free(macro);
-				zbx_free(context);
-				zbx_free(exp);
-				goto out;
-			}
 		}
 		else
 			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, ptr, len);
 
-		zbx_free(macro);
+		zbx_free(name);
 		zbx_free(context);
+
+		if (SUCCEED != ret)
+		{
+			zbx_free(exp);
+			goto out;
+		}
 
 		start = ptr + len;
 		ptr = start;
@@ -7587,6 +7581,8 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 
 	zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, start);
 out:
+	zbx_free(macro);
+
 	return exp;
 }
 
