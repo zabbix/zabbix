@@ -2256,9 +2256,8 @@ fail:
  *             expression - [IN] the trigger expression                       *
  *                                                                            *
  ******************************************************************************/
-static void    cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression)
+static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression)
 {
-
 	if (0 == hostids->values_num)
 	{
 		zbx_vector_uint64_t	functionids;
@@ -2268,7 +2267,6 @@ static void    cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *e
 		DCget_hostids_by_functionids(&functionids, hostids);
 		zbx_vector_uint64_destroy(&functionids);
 	}
-
 }
 
 /******************************************************************************
