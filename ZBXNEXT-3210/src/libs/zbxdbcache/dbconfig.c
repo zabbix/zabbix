@@ -548,8 +548,7 @@ ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 static char	*dc_expression_expand_user_macros(const char *expression, char **error);
-static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, unsigned char expand,
-		char **error);
+static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, char **error);
 
 /******************************************************************************
  *                                                                            *
@@ -5132,8 +5131,13 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
 
-	dst_trigger->expression = dc_cache_expanded_expression(src_trigger->expression,
-			&src_trigger->expression_ex, expand, &dst_trigger->new_error);
+	if (ZBX_EXPAND_MACROS == expand)
+	{
+		dst_trigger->expression = dc_cache_expanded_expression(src_trigger->expression,
+				&src_trigger->expression_ex, &dst_trigger->new_error);
+	}
+	else
+		dst_trigger->expression = NULL;
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -7631,27 +7635,18 @@ static char	*dc_expression_expand_user_macros(const char *expression, char **err
  *                                                                            *
  * Parameters: expression    - [IN] the expression to expand                  *
  *             expression_ex - [IN/OUT] the cached expression                 *
- *             expand          [IN] 0 - expression should not be expanded     *
- *                                  ZBX_EXPAND_MACROS - expand the expression *
  *             error         - [OUT] the error message                        *
  *                                                                            *
- * Return value: The expanded expression, NULL in the case of error or if     *
- *               expand flag was not set.                                     *
+ * Return value: The expanded expression, NULL in the case of error           *
  *                                                                            *
- * Comments: If expand flag is set this function will first try to return     *
- *           a copy of cached expression. If the expression has not been      *
- *           expanded, it will expand the expression, cache it and return the *
- *           copy of it.                                                      *
+ * Comments: This function will first try to return a copy of cached          *
+ *           expression. If the expression has not been expanded, it will     *
+ *           expand the expression, cache it and return the copy of it.       *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, unsigned char expand,
-		char **error)
+static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, char **error)
 {
 	char	*out;
-
-	/* nothing to do, return NULL */
-	if (ZBX_EXPAND_MACROS != expand)
-		return NULL;
 
 	/* expression has already been cached, a copy */
 	if (NULL != *expression_ex)
