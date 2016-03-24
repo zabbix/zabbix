@@ -1103,6 +1103,8 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
+void	get_time(struct tm *tm, long *milliseconds);
+
 int	zbx_strcmp_null(const char *s1, const char *s2);
 
 int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r);
