@@ -7428,7 +7428,7 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
 		char **replace_to)
 {
-	char		*value = NULL, *value_default = NULL;
+	char	*value = NULL, *value_default = NULL;
 
 	/* User macros should be expanded according to the following priority: */
 	/*                                                                     */
@@ -7445,8 +7445,6 @@ static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char
 
 	if (NULL == value)
 		dc_get_global_macro(macro, context, &value, &value_default);
-
-	UNLOCK_CACHE;
 
 	if (NULL != value)
 	{
