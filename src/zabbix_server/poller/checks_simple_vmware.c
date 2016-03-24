@@ -734,15 +734,18 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 								&tm.tm_sec))
 						{
 							int		tz_offset;
-#if defined(HAVE_TM_TM_GMTOFF)
-							struct tm	*ptm;
-							time_t		now;
+							struct tm	ptm;
 
-							now = time(NULL);
-							ptm = localtime(&now);
-							tz_offset = ptm->tm_gmtoff;
+							get_time(&ptm, NULL);
+#if defined(HAVE_TM_TM_GMTOFF)
+							tz_offset = ptm.tm_gmtoff;
 #else
 							tz_offset = -timezone;
+
+							/* daylight saving time */
+							if (0 < ptm.tm_isdst)
+								/* assume DST is one hour */
+								tz_offset += SEC_PER_HOUR;
 #endif
 							tm.tm_year -= 1900;
 							tm.tm_mon--;
