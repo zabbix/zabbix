@@ -4099,8 +4099,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 			zabbix_log(LOG_LEVEL_DEBUG, "%s():expression [%s] cannot be evaluated: %s",
 					__function_name, tr->expression, tr->new_error);
 		}
-
-		zbx_free(tr->expression);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
