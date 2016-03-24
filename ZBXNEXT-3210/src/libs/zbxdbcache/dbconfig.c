@@ -7506,7 +7506,7 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *val
 		return SUCCEED;
 
 	if (NULL != error)
-		*error = zbx_dsprintf(*error, "Macro '%s' value is not numeric.", macro);
+		*error = zbx_dsprintf(*error, "macro '%s' value is not numeric", macro);
 
 	return FAIL;
 }
@@ -7534,7 +7534,7 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 {
 	char		*exp = NULL, *macro = NULL, *name = NULL, *context = NULL, *value = NULL;
 	const char	*ptr, *start;
-	size_t		exp_alloc = 0, exp_offset = 0, macro_alloc = 0, macro_offset;
+	size_t		exp_alloc = 0, exp_offset = 0;
 	int		len, ret = SUCCEED;
 
 	for (start = text, ptr = strchr(start, '{'); NULL != ptr; ptr = strchr(ptr, '{'))
@@ -7553,9 +7553,7 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 		{
 			if (NULL != validator_func)
 			{
-				macro_offset = 0;
-				zbx_strncpy_alloc(&macro, &macro_alloc, &macro_offset, ptr, len);
-
+				macro = zbx_dsprintf(macro, "%.*s", len, ptr);
 				ret = validator_func(macro, value, error);
 			}
 
@@ -7565,7 +7563,10 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 			zbx_free(value);
 		}
 		else
-			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, ptr, len);
+		{
+			*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+			ret = FAIL;
+		}
 
 		zbx_free(name);
 		zbx_free(context);

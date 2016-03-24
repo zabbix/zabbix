@@ -4057,15 +4057,15 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		if (NULL != tr->expression)
 		{
-			if (SUCCEED != substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
-					&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, err, sizeof(err)))
-			{
-				tr->new_error = zbx_strdup(tr->new_error, err);
-			}
+			substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
+					&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
 		}
 
-		if (NULL != tr->new_error)
+		if (NULL != tr->new_error) {
+			zbx_snprintf(err, sizeof(err), "Cannot evaluate expression: %s.", tr->new_error);
+			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
+		}
 	}
 
 	substitute_functions(triggers);
