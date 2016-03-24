@@ -78,7 +78,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			tls_arg1 = item->host.tls_issuer;
 			tls_arg2 = item->host.tls_subject;
 		}
-		else if(ZBX_TCP_SEC_TLS_PSK == item->host.tls_connect)
+		else if (ZBX_TCP_SEC_TLS_PSK == item->host.tls_connect)
 		{
 			tls_arg1 = item->host.tls_psk_identity;
 			tls_arg2 = item->host.tls_psk;
