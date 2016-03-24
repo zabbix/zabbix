@@ -31,9 +31,7 @@ $actionForm = (new CForm())
 if ($this->data['actionid']) {
 	$actionForm->addVar('actionid', $this->data['actionid']);
 }
-else {
-	$actionForm->addVar('eventsource', $this->data['eventsource']);
-}
+$actionForm->addVar('eventsource', $this->data['eventsource']);
 
 /*
  * Action tab

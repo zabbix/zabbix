@@ -22,7 +22,6 @@ $widget = (new CWidget())
 	->setTitle(_('Actions'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('eventsource', $data['eventsource'])
 		->addItem((new CList())
 			->addItem([_('Event source'), SPACE,
 				new CComboBox('eventsource', $data['eventsource'], 'submit()', [
