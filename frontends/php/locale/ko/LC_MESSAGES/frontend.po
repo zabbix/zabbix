@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-02-10 20:16+0300\n"
+"PO-Revision-Date: 2016-03-23 11:23+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455128208.0\n"
+"X-POOTLE-MTIME: 1458725000.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -4252,11 +4252,11 @@ msgstr "기간T 동안의 최대값과 최소값의 차 NOT N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "아이템의 타임스탬프와 Zabbix서버의 타임스탬프의 차이가 T초 이상인 경우 N=0, 그 외의 경우 N=1"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "아이템의 타임스탬프와 Zabbix서버의 타임스탬프의 차이가 T초 이상인 경우 N NOT 0, 그 외의 경우 N=1"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5538,7 +5538,7 @@ msgstr "필터"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "필터"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -6751,7 +6751,7 @@ msgstr "IT서비스 의존관계"
 
 #: include/views/configuration.services.parent.list.php:24
 msgid "IT service parent"
-msgstr "IT서비스 부모"
+msgstr "상위 IT 서비스"
 
 #: include/menu.inc.php:109 include/menu.inc.php:237
 #: include/views/administration.general.housekeeper.edit.php:62
@@ -7626,11 +7626,11 @@ msgstr "유저 그룹의 파라미터가 올바르지 않습니다."
 #: include/classes/api/services/CService.php:1009
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr "서비스 \"%1$s\"의 부모가 올바르지 않습니다."
+msgstr "서비스 \"%1$s\"의 상위가 올바르지 않습니다."
 
 #: include/classes/api/services/CService.php:1012
 msgid "Incorrect parent service."
-msgstr "부모 서비스가 올바르지 않습니다."
+msgstr "상위 서비스가 올바르지 않습니다."
 
 #: discoveryconf.php:97 include/classes/api/services/CDRule.php:240
 msgid "Incorrect port range."
@@ -8516,7 +8516,7 @@ msgstr "아이템을 갱신하였습니다"
 
 #: include/classes/api/services/CItemGeneral.php:285
 msgid "Item uses host interface from non-parent host."
-msgstr "아이템이 부모호스트의 것이 아닌 호스트인터페이스를 이용하고 있습니다."
+msgstr "아이템이 상위 호스트의 것이 아닌 호스트 인터페이스를 이용하고 있습니다."
 
 #: include/classes/api/services/CItemGeneral.php:288
 msgid "Item uses incorrect interface type."
@@ -11392,25 +11392,25 @@ msgstr "파라미터"
 #: include/views/configuration.host.discovery.edit.php:43
 #: include/views/configuration.host.prototype.edit.php:55
 msgid "Parent discovery rules"
-msgstr "부모 디스커버리 규칙"
+msgstr "상위 디스커버리 규칙"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graphs"
-msgstr "부모 그래프"
+msgstr "상위 그래프"
 
 #: include/views/configuration.item.edit.php:43
 #: include/views/configuration.item.prototype.edit.php:42
 msgid "Parent items"
-msgstr "부모 아이템"
+msgstr "상위 아이템"
 
 #: include/views/configuration.services.edit.php:48
 msgid "Parent service"
-msgstr "부모 서비스"
+msgstr "상위 서비스"
 
 #: include/views/configuration.trigger.prototype.edit.php:44
 #: include/views/configuration.triggers.edit.php:47
 msgid "Parent triggers"
-msgstr "부모 트리거"
+msgstr "상위 트리거"
 
 #: include/views/configuration.httpconf.edit.php:48
 msgid "Parent web scenarios"
@@ -13559,7 +13559,7 @@ msgstr "제목"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "서브젝트"
 
 #: jsLoader.php:213
 msgid "Submap"

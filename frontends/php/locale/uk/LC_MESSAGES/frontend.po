@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-02-14 16:26+0300\n"
+"PO-Revision-Date: 2016-03-08 10:39+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455459960.0\n"
+"X-POOTLE-MTIME: 1457426350.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -4352,11 +4352,11 @@ msgstr "Різниця між МАКС і МІН значеннями за пе�
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "Різниця між значенням штампу часу та штампом часу на Zabbix сервері більше T секунд, тоді N = 0, 1 - в іншому випадку"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Різниця між значенням штампу часу та штампом часу на Zabbix сервері більше T секунд, тоді N НЕ 0, 1 - в іншому випадку"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5643,7 +5643,7 @@ msgstr "Фільтр"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "Фільтрувати"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -13708,7 +13708,7 @@ msgstr "Тема"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "Суб'єкт"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -16682,7 +16682,7 @@ msgstr "макрос(и)"
 
 #: include/actions.inc.php:154 include/views/configuration.action.edit.php:258
 msgid "maintenance"
-msgstr "сервіс"
+msgstr "сервісі"
 
 #: include/classes/api/services/CMap.php:626
 #: include/classes/api/services/CMap.php:1046

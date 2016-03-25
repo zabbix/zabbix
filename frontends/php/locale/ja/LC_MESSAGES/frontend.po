@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-02-15 03:43+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"PO-Revision-Date: 2016-03-16 11:54+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455500630.0\n"
+"X-POOTLE-MTIME: 1458122099.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -4252,11 +4252,11 @@ msgstr "期間Tの間の最大値と最小値の差 NOT N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "アイテムのタイムスタンプとZabbixサーバーのタイムスタンプの差がT秒以上の場合 N=0、その他の場合 N=1"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "アイテムのタイムスタンプとZabbixサーバーのタイムスタンプの差がT秒以上の場合 N NOT 0、その他の場合 N=1"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5537,7 +5537,7 @@ msgstr "フィルター"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "フィルタリング"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -13558,7 +13558,7 @@ msgstr "件名"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "サブジェクト"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -13745,7 +13745,7 @@ msgstr "テンプレート"
 #: include/classes/api/services/CTemplate.php:420
 #, c-format
 msgid "Template \"%1$s\" already exists."
-msgstr "テンプレート\"%1$s\"はそでに存在します。"
+msgstr "テンプレート\"%1$s\"はすでに存在します。"
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format

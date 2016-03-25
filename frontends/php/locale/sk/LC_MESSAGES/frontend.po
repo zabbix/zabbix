@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-02-03 20:40+0300\n"
+"PO-Revision-Date: 2016-03-08 18:45+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454524839.0\n"
+"X-POOTLE-MTIME: 1457455502.0\n"
 
 # "%1$s" je očakávanáX
 #: include/classes/import/validators/C10XmlValidator.php:346
@@ -881,8 +881,8 @@ msgstr[2] "O %1$s:%2$s každý %3$s každý %4$s týždeň"
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] "O %1$s:%2$s každý deň"
-msgstr[1] "O %1$s:%2$s každý %3$s deň"
-msgstr[2] "O %1$s:%2$s každý %3$s deň"
+msgstr[1] "O %1$s:%2$s každé %3$s dni"
+msgstr[2] "O %1$s:%2$s každých %3$s dní"
 
 #: include/forms.inc.php:1921
 msgid "At (hour:minute)"
@@ -4354,11 +4354,11 @@ msgstr "Rozdiel medzi MAX a MIN hodnotou v perióde T NIE JE N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "Rozdiel medzi timestampom položky a aktuálnym timestampom Zabbix servera je viac ako T sekúnd, potom N = 0, 1 - inak"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Rozdiel medzi timestampom položky a aktuálnym timestampom Zabbix servera je viac ako T sekúnd, potom N NOT 0, 1 - inak"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5645,7 +5645,7 @@ msgstr "Filtrovať"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -13710,7 +13710,7 @@ msgstr "Predmet"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "Subjekt"
 
 #: jsLoader.php:213
 msgid "Submap"

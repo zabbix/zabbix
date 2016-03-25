@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-02-05 14:57+0300\n"
+"PO-Revision-Date: 2016-03-23 11:27+0300\n"
 "Last-Translator: Sébastien <sebastien@maccagnoni.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454677051.0\n"
+"X-POOTLE-MTIME: 1458725279.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -4303,11 +4303,11 @@ msgstr "La différence entre les valeurs MAX et MIN de la période T n'est PAS N
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "Si la différence entre la date de l'élément et la date du serveur Zabbix est supérieure à T secondes, alors N = 0, sinon 1"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Si la différence entre la date de l'élément et la date du serveur Zabbix est supérieure à T secondes, alors N n'est pas 0, sinon 1"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5591,7 +5591,7 @@ msgstr "Filtre"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "Filtrer"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -5833,7 +5833,7 @@ msgstr "Google Chrome"
 
 #: include/graphs.inc.php:65
 msgid "Gradient line"
-msgstr "Ligne en gradiant"
+msgstr "Ligne et dégradé"
 
 #: include/audit.inc.php:29 include/screens.inc.php:30
 #: include/views/configuration.graph.edit.php:336
@@ -13634,7 +13634,7 @@ msgstr "Sujet"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "Sujet"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -13681,7 +13681,7 @@ msgstr "Support"
 #: include/views/administration.users.edit.php:53
 #: include/views/administration.users.list.php:49 popup.php:631 users.php:45
 msgid "Surname"
-msgstr "Prénom"
+msgstr "Nom de famille"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:523
