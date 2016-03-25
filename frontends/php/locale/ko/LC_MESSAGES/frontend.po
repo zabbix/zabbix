@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:39+0200\n"
-"PO-Revision-Date: 2016-02-10 20:16+0300\n"
+"PO-Revision-Date: 2016-03-11 07:59+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455128208.0\n"
+"X-POOTLE-MTIME: 1457675970.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -110,7 +110,7 @@ msgstr[0] "%1$s 초"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "%4$s 의 로그인 시도 실패가 있었습니다. 마지막 시도 실패는 %3$s %2$s %1$s 에 있었습니다."
+msgstr[0] "%4$s번의 로그인 시도 실패가 있었습니다. 마지막 로그인 시도 실패는 %3$s %2$s %1$s 입니다."
 
 #: include/classes/screens/CScreenDiscovery.php:218
 #, c-format
@@ -3517,7 +3517,7 @@ msgstr "Dark"
 #: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:46
 #: include/views/monitoring.dashconf.php:22
 msgid "Dashboard"
-msgstr "대쉬보드"
+msgstr "대시보드"
 
 #: dashconf.php:27
 msgid "Dashboard configuration"
@@ -3525,7 +3525,7 @@ msgstr "대시보드 설정"
 
 #: include/views/monitoring.dashconf.php:48
 msgid "Dashboard filter"
-msgstr "대쉬보드 필터"
+msgstr "대시보드 필터"
 
 #: include/graphs.inc.php:63 include/views/js/monitoring.sysmaps.js.php:345
 #: include/views/js/monitoring.sysmaps.js.php:425
@@ -4253,11 +4253,11 @@ msgstr "기간T 동안의 최대값과 최소값의 차 NOT N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "아이템의 타임스탬프와 Zabbix서버의 타임스탬프의 차이가 T초 이상인 경우 N=0, 그 외의 경우 N=1"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "아이템의 타임스탬프와 Zabbix서버의 타임스탬프의 차이가 T초 이상인 경우 N NOT 0, 그 외의 경우 N=1"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5533,7 +5533,7 @@ msgstr "필터"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "필터링"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -5767,7 +5767,7 @@ msgstr "다음 페이지로 이동"
 
 #: app/views/system.warning.php:26 include/func.inc.php:1691
 msgid "Go to dashboard"
-msgstr "대쉬보드로 이동"
+msgstr "대시보드로 이동"
 
 #: include/httptest.inc.php:288
 msgid "Google Chrome"
@@ -6742,7 +6742,7 @@ msgstr "IT서비스 의존관계"
 
 #: include/views/configuration.services.parent.list.php:24
 msgid "IT service parent"
-msgstr "IT서비스 부모"
+msgstr "상위 IT 서비스"
 
 #: include/menu.inc.php:109 include/menu.inc.php:237
 #: include/views/administration.general.housekeeper.edit.php:62
@@ -7610,7 +7610,7 @@ msgstr "유저 그룹의 파라미터가 올바르지 않습니다."
 #: include/classes/api/services/CService.php:1009
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr "서비스 \"%1$s\"의 부모가 올바르지 않습니다."
+msgstr "서비스 \"%1$s\"의 상위가 올바르지 않습니다."
 
 #: include/classes/api/services/CService.php:1012
 msgid "Incorrect parent service."
@@ -7673,7 +7673,7 @@ msgstr "서비스 시간의 종류가 올바르지 않습니다."
 #: include/classes/api/services/CService.php:978
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
-msgstr ""
+msgstr "서비스 \"%1$s\" 의 정렬이 올바르지 않습니다."
 
 #: include/classes/api/services/CEvent.php:363
 msgid "Incorrect source value."
@@ -8505,7 +8505,7 @@ msgstr "아이템을 갱신하였습니다"
 
 #: include/classes/api/services/CItemGeneral.php:285
 msgid "Item uses host interface from non-parent host."
-msgstr "아이템이 부모호스트의 것이 아닌 호스트인터페이스를 이용하고 있습니다."
+msgstr "아이템이 상위 호스트의 것이 아닌 호스트 인터페이스를 이용하고 있습니다."
 
 #: include/classes/api/services/CItemGeneral.php:288
 msgid "Item uses incorrect interface type."
@@ -9314,7 +9314,7 @@ msgstr "맵의 요소"
 
 #: sysmap.php:83
 msgid "Map is updated! Return?"
-msgstr "맵이 갱신되었습니다! 되돌리시겠습니까?"
+msgstr "맵이 갱신되었습니다! 전 화면으로 돌아가시겠습니까?"
 
 #: include/views/monitoring.sysmap.edit.php:171
 msgid "Map label type"
@@ -10601,7 +10601,7 @@ msgstr "호스트상의 유효 아이템 수."
 
 #: include/blocks.inc.php:478 include/blocks.inc.php:479
 msgid "Number of hosts (enabled/disabled/templates)"
-msgstr "호스트수 (활성/비활성/템플릿)"
+msgstr "호스트 수 (활성/비활성/템플릿)"
 
 #: include/blocks.inc.php:486
 msgid "Number of items (enabled/disabled/not supported)"
@@ -10621,7 +10621,7 @@ msgstr "from에서 to까지의 시간이 늦는 큐의 아이템수."
 
 #: include/classes/items/CHelpItems.php:903
 msgid "Number of monitored hosts"
-msgstr "감시호스트수"
+msgstr "감시호스트 수"
 
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:375
@@ -11382,25 +11382,25 @@ msgstr "파라미터"
 #: include/views/configuration.host.discovery.edit.php:43
 #: include/views/configuration.host.prototype.edit.php:55
 msgid "Parent discovery rules"
-msgstr "부모 디스커버리 규칙"
+msgstr "상위 디스커버리 규칙"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graphs"
-msgstr "부모 그래프"
+msgstr "상위 그래프"
 
 #: include/views/configuration.item.edit.php:43
 #: include/views/configuration.item.prototype.edit.php:42
 msgid "Parent items"
-msgstr "부모 아이템"
+msgstr "상위 아이템"
 
 #: include/views/configuration.services.edit.php:48
 msgid "Parent service"
-msgstr "부모 서비스"
+msgstr "상위 서비스"
 
 #: include/views/configuration.trigger.prototype.edit.php:44
 #: include/views/configuration.triggers.edit.php:47
 msgid "Parent triggers"
-msgstr "부모 트리거"
+msgstr "상위 트리거"
 
 #: include/views/configuration.httpconf.edit.php:48
 msgid "Parent web scenarios"
@@ -12167,7 +12167,7 @@ msgstr "Zabbix서버의 요구 퍼포먼스를 1초간격으로 기대되는 값
 
 #: include/blocks.inc.php:506
 msgid "Required server performance, new values per second"
-msgstr "1초간의 감시항목수(Zabbix서버의 요구 퍼포먼스)"
+msgstr "1초간의 감시항목 수 (Zabbix 서버 요구 성능)"
 
 #: include/views/configuration.httpconf.popup.php:108
 msgid "Required status codes"
@@ -13549,7 +13549,7 @@ msgstr "제목"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "서브젝트"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -13647,7 +13647,7 @@ msgstr "시스템 통계값. integer 혹은 float로 리턴"
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
 msgid "System status"
-msgstr "시스템상태"
+msgstr "시스템 상태"
 
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:499
@@ -15223,7 +15223,7 @@ msgstr "사용자는 그룹\"%s\"의 멤버가 됨에 따라 자기자신의 Web
 #: include/classes/api/services/CUser.php:305
 #, c-format
 msgid "User may not modify system status for himself by becoming a member of user group \"%s\"."
-msgstr "사용자는 그룹\"%s\"의 멤버가 되었으므로 자기자신의 시스템상태를 변경할 수 없습니다."
+msgstr "사용자는 그룹\"%s\"의 멤버가 되었으므로 자기자신의 시스템 상태를 변경할 수 없습니다."
 
 #: disc_prototypes.php:76 host_discovery.php:63
 #: include/views/configuration.action.edit.php:827
@@ -16235,7 +16235,7 @@ msgstr "문자열로 지정해 주십시오"
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "숫자로 지정해주세요"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
