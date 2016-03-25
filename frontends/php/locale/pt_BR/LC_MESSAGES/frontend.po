@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-02-03 13:49+0300\n"
+"PO-Revision-Date: 2016-03-21 19:53+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454500148.0\n"
+"X-POOTLE-MTIME: 1458582821.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -1663,7 +1663,7 @@ msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na opera
 #: include/classes/api/services/CScript.php:475
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr "Falha ao excluir scripts. Não existe script com o scriptid \"%1$s\"."
+msgstr "Falha ao excluir scripts. Não existe script com o \"scriptid\" \"%1$s\"."
 
 #: actionconf.php:434
 msgid "Cannot delete selected actions"
@@ -3133,7 +3133,8 @@ msgstr ""
 "A conexão com o servidor Zabbix \"%s\" foi recusada. Possíveis causas:\n"
 "1. IP/DNS incorreto no arquivo \"zabbix.conf.php\";\n"
 "2. Definição de segurança (por exemplo SELinux) está bloqueando a conexão;\n"
-"3. Firewall bloqueando conexão TCP.\n"
+"3. O Zabbix Server não está em execução.\n"
+"4. Firewall bloqueando conexão TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:278
 #, c-format
@@ -3318,7 +3319,7 @@ msgstr "Criar script"
 
 #: include/views/monitoring.slideconf.list.php:29
 msgid "Create slide show"
-msgstr "Criar apresentação de telas"
+msgstr "Criar apresentação"
 
 #: templates.php:574
 msgid "Create template"
@@ -4303,11 +4304,11 @@ msgstr "Diferença entre o valor MÁXIMO e MÍNIMO em um período T é NÃO É N
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "A diferença entre o carimbo de hora da coleta do item e o do servidor Zabbix é maior que T segundos, então N = 0, caso contrário - 1"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "A diferença entre o carimbo de hora da coleta do item e o do servidor Zabbix é maior que T segundos, então N NÃO É 0, caso contrário - 1"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -4336,7 +4337,7 @@ msgstr "Diferença entre o último valor e seu predecessor é NÃO É N"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:439
 msgid "Different information about specific process(es). Returns float"
-msgstr "Informações diversas sobre um processo específico. Retorna: ponto flutuante"
+msgstr "Informações diversas sobre um processo específico. Retorna: ponto flutuante (número)"
 
 #: include/views/monitoring.screen.list.php:71
 msgid "Dimension (cols x rows)"
@@ -5592,7 +5593,7 @@ msgstr "Filtrar"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "Filtro"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -7583,7 +7584,7 @@ msgstr "Lista de itens inválida."
 
 #: maintenance.php:303
 msgid "Incorrect maintenance - date must be between 1970.01.01 and 2038.01.18"
-msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038."
+msgstr "Manutenção inválida - a data deve estar entre 01/01/1970 e 18/01/2038"
 
 #: maintenance.php:331
 msgid "Incorrect maintenance date"
@@ -8035,11 +8036,11 @@ msgstr "Informação"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:447
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr "Informação sobre um serviço. Retorna inteiro - (state, startup); Caractere - (displayname, path, user); Texto - (description); Especificamente para estado: 0 - em execução, 1 - pausado, 2 - iniciação pendente, 3 - pausa pendente, 4 - retorno pendente, 5 - finalização pendente, 6 - finalizado, 7 - desconhecido, 255 - serviço desconhecido; Especificamente para inicialização: 0 - automático, 1 - Automático com atraso, 2 - Manual, 3 - Desabilitado, 4 - desconhecido."
+msgstr "Informação sobre um serviço. Retorna inteiro - (state, startup); Caractere - (displayname, path, user); Texto - (description); Especificamente para estado: 0 - em execução, 1 - pausado, 2 - iniciação pendente, 3 - pausa pendente, 4 - retorno pendente, 5 - finalização pendente, 6 - finalizado, 7 - desconhecido, 255 - serviço desconhecido; Especificamente para inicialização: 0 - automático, 1 - Automático com atraso, 2 - Manual, 3 - Desabilitado, 4 - desconhecido"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and host macros"
-msgstr "Herdado e macros de host"
+msgstr "Macros herdadas e do host"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and template macros"
@@ -8096,7 +8097,7 @@ msgstr "A interface com o IP \"%1$s\" não pode possuir nome de DNS nulo enquant
 #: include/classes/api/services/CHostInterface.php:294
 #, c-format
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
-msgstr "A interface com IP \"%s$s\" não pode possuir nome de DNS nulo."
+msgstr "A interface com IP \"%1$s\" não pode possuir nome de DNS nulo."
 
 #: include/views/administration.authentication.edit.php:33
 msgctxt "authentication"
@@ -9610,7 +9611,7 @@ msgstr "Limite de memória: %1$s"
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:595
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "Tamanho da memória em bytes ou em percentual relativo ao total. Retorna: inteiro para bytes; ponto flutuante para percentual"
+msgstr "Tamanho da memória em bytes ou em percentual relativo ao total. Retorna: inteiro para bytes; número fracionário para percentual"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:431
@@ -9939,7 +9940,7 @@ msgstr "O nome do protótipo de grupo \"%1$s\" deve conter macros."
 #: include/views/monitoring.slideconf.list.php:39
 #: include/views/monitoring.sysmap.list.php:32
 msgid "Name like"
-msgstr "Nome como"
+msgstr "Nome contendo"
 
 #: include/views/administration.general.housekeeper.edit.php:50
 msgid "Network discovery data storage period (in days)"
@@ -10838,7 +10839,7 @@ msgstr "Número de máquinas virtuais no hypervisor VMware, <url> - URL de servi
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:587
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr "Quantidade ou percentual de inodes. Retorna: inteiro para quantidade; ponto flutuante para percentual"
+msgstr "Quantidade ou percentual de inodes. Retorna: inteiro para quantidade; número fracionário para percentual"
 
 #: include/forms.inc.php:452 include/items.inc.php:127
 #: include/triggers.inc.php:1817 include/views/configuration.item.edit.php:216
@@ -11569,7 +11570,7 @@ msgstr "Percentual"
 
 #: popup_trexpr.php:346
 msgid "Percentile P of a period T is < N"
-msgstr "O percentual P de um período T é < N."
+msgstr "O percentual P de um período T é < N"
 
 #: popup_trexpr.php:356
 msgid "Percentile P of a period T is = N"
@@ -11859,7 +11860,7 @@ msgstr "Incidentes"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr "Utilização percentual, pelo processo, de CPU. Retorna número com ponto flutuante"
+msgstr "Utilização percentual, pelo processo, de CPU. Retorna número fracionário"
 
 #: include/views/monitoring.screen.list.php:81
 #: include/views/monitoring.slideconf.list.php:64
@@ -12843,7 +12844,7 @@ msgstr "Script atualizado"
 #: include/classes/api/services/CScript.php:432
 #, c-format
 msgid "Script with scriptid \"%1$s\" does not exist."
-msgstr "Não existe script com o scriptid \"%1$s\"."
+msgstr "Não existe script com o \"scriptid\" \"%1$s\"."
 
 #: app/views/administration.script.edit.php:25
 #: app/views/administration.script.list.php:27 include/menu.inc.php:294
@@ -12922,7 +12923,7 @@ msgstr "Nome de segurança"
 
 #: include/forms.inc.php:537
 msgid "Security name like"
-msgstr "Nome de segurança como"
+msgstr "Nome de segurança contendo"
 
 #: events.php:344 include/classes/html/CMultiSelect.php:54
 #: include/forms.inc.php:523
@@ -13650,7 +13651,7 @@ msgstr "Assunto"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "Segurado"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -13712,7 +13713,7 @@ msgstr "Estatísticas de envio de dados da memória para o swap. Retorna: númer
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:531
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr "Tamanho do espaço do swap em bytes ou percentual relativo ao total. Retorna: inteiro para bytes; ponto flutuante para percentual"
+msgstr "Tamanho do espaço do swap em bytes ou percentual relativo ao total. Retorna: inteiro para bytes; número fracionário para percentual"
 
 #: include/locales.inc.php:79
 msgid "Swedish (sv_SE)"
@@ -13743,7 +13744,7 @@ msgstr "Nome do host. Retorna: texto"
 #: include/classes/items/CHelpItems.php:225
 #: include/classes/items/CHelpItems.php:507
 msgid "System statistics. Returns integer or float"
-msgstr "Estatísticas do sistema. Retorna: número inteiro ou ponto flutuante"
+msgstr "Estatísticas do sistema. Retorna: número inteiro ou número fracionário"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
@@ -14413,7 +14414,7 @@ msgstr "Nome da trigger"
 
 #: include/views/monitoring.dashconf.php:107
 msgid "Trigger name like"
-msgstr "Nome de trigger como"
+msgstr "Nome de trigger contendo"
 
 #: include/audit.inc.php:34
 #: include/views/configuration.trigger.prototype.edit.php:266
@@ -15741,7 +15742,7 @@ msgstr "Os mapeamentos de valor dos mapas serão atualizados!"
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr "Valor de um contador de performance do Windows. Retorna: inteiro, ponto flutuante ou texto (dependendo da requisição)"
+msgstr "Valor de um contador de performance do Windows. Retorna: inteiro, número fracionário ou texto (dependendo da requisição)"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -16259,7 +16260,7 @@ msgstr "Agente Zabbix"
 
 #: include/items.inc.php:86
 msgid "Zabbix agent (active)"
-msgstr "agente Zabbix (ativo)"
+msgstr "Agente Zabbix (ativo)"
 
 #: include/items.inc.php:94
 msgid "Zabbix aggregate"
@@ -16267,7 +16268,7 @@ msgstr "Zabbix agregado"
 
 #: include/validate.inc.php:335
 msgid "Zabbix has received an incorrect request."
-msgstr "Zabbix recebeu uma uma solicitação incorreta."
+msgstr "Zabbix recebeu uma solicitação incorreta."
 
 #: include/items.inc.php:92
 msgid "Zabbix internal"

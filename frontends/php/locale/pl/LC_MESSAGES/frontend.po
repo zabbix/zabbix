@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-01-28 12:48+0300\n"
+"PO-Revision-Date: 2016-03-10 12:52+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1453978102.0\n"
+"X-POOTLE-MTIME: 1457607153.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -36,7 +36,7 @@ msgstr "\"%s\" musi zawierać się w przedziale pomiędzy 1970-01-01 a 2038-01-1
 #: include/classes/import/validators/C10XmlValidator.php:403
 #: include/classes/import/validators/C10XmlValidator.php:424
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "oczekiwano pary \"host:klucz\""
 
 #: include/func.inc.php:453
 #, c-format
@@ -4352,11 +4352,11 @@ msgstr "Różnica pomiędzy wartościami MAX i MIN w okresie T NIE jest = N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "Różnica pomiędzy znacznikami czasu pozycji i serwera Zabbix przekracza T sekund, wtedy N = 0, 1 - w przeciwnym przypadku"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Różnica pomiędzy znacznikami czasu pozycji i serwera Zabbix przekracza T sekund, wtedy N NIE 0, 1 - w przeciwnym przypadku"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -4874,15 +4874,15 @@ msgstr "Edycja"
 
 #: app/views/monitoring.map.view.php:37
 msgid "Edit map"
-msgstr ""
+msgstr "Edycja mapy"
 
 #: include/views/monitoring.screen.php:76
 msgid "Edit screen"
-msgstr ""
+msgstr "Edycja ekranu"
 
 #: include/views/monitoring.slides.php:78
 msgid "Edit slide show"
-msgstr ""
+msgstr "Edycja pokazu slajdów"
 
 #: jsLoader.php:187
 msgid "Edit trigger"
@@ -5643,7 +5643,7 @@ msgstr "Filtr"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "Filtr"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -11514,7 +11514,7 @@ msgstr "Tożsamość PSK nie może być pusta"
 #: include/classes/api/services/CProxy.php:676
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
-msgstr ""
+msgstr "PSK jest zbyt krótkie. Minimalnie to %1$s znaków heksadecymalnych."
 
 #: include/validate.inc.php:385
 msgid "Page received incorrect data"
@@ -13708,7 +13708,7 @@ msgstr "Temat"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "Temat"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -16459,7 +16459,7 @@ msgstr "oczekiwano tablicy"
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
 msgid "an empty string is expected"
-msgstr ""
+msgstr "oczekiwano pustego ciągu znaków"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
