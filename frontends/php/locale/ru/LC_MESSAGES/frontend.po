@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:39+0200\n"
-"PO-Revision-Date: 2016-02-08 14:18+0300\n"
-"Last-Translator: Aleksandrs <Aleksandrs.Saveljevs@zabbix.com>\n"
+"PO-Revision-Date: 2016-03-25 14:28+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454933922.0\n"
+"X-POOTLE-MTIME: 1458908915.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -652,7 +652,7 @@ msgstr "Агрегативные проверки не требуют налич
 #: app/controllers/CControllerAcknowledgeEdit.php:146
 #: app/views/monitoring.acknowledge.edit.php:84
 msgid "Alarm acknowledgements"
-msgstr "Подтверждение сигнала тревоги"
+msgstr "Подтверждения событий"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:629 users.php:43
@@ -4353,11 +4353,11 @@ msgstr "Разница между МАКС и МИН значениями за �
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "Разница между значением штампа времени и штампа времени на Zabbix сервере больше T секунд, тогда N = 0, 1 - в противном случае"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Разница между значением штампа времени и штампа времени на Zabbix сервере больше T секунд, тогда N NOT 0, 1 - в противном случае"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5638,7 +5638,7 @@ msgstr "Фильтр"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "Фильтровать"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -7790,7 +7790,7 @@ msgstr "Некорректный тип времени услуги."
 #: include/classes/api/services/CService.php:978
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
-msgstr ""
+msgstr "Некорректный порядок сортировки для услуги \"%1$s\"."
 
 #: include/classes/api/services/CEvent.php:363
 msgid "Incorrect source value."
@@ -13699,7 +13699,7 @@ msgstr "Тема"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "Субъект"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -16409,7 +16409,7 @@ msgstr "ожидается строка символов"
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "ожидается числовое значение"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
