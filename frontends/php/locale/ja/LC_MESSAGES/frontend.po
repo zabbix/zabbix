@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:39+0200\n"
-"PO-Revision-Date: 2016-02-15 03:43+0300\n"
-"Last-Translator: Kodai <kodai74@gmail.com>\n"
+"PO-Revision-Date: 2016-03-16 11:56+0300\n"
+"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1455500630.0\n"
+"X-POOTLE-MTIME: 1458122210.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -4253,11 +4253,11 @@ msgstr "期間Tの間の最大値と最小値の差 NOT N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "アイテムのタイムスタンプとZabbixサーバーのタイムスタンプの差がT秒以上の場合 N=0、その他の場合 N=1"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "アイテムのタイムスタンプとZabbixサーバーのタイムスタンプの差がT秒以上の場合 N NOT 0、その他の場合 N=1"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5532,7 +5532,7 @@ msgstr "フィルター"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "フィルタリング"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -7672,7 +7672,7 @@ msgstr "サービスタイムの種別が正しくありません。"
 #: include/classes/api/services/CService.php:978
 #, c-format
 msgid "Incorrect sort order for service \"%1$s\"."
-msgstr ""
+msgstr "サービス\"%1$s\"のソート順が正しくありません。"
 
 #: include/classes/api/services/CEvent.php:363
 msgid "Incorrect source value."
@@ -13548,7 +13548,7 @@ msgstr "件名"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "サブジェクト"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -13735,7 +13735,7 @@ msgstr "テンプレート"
 #: include/classes/api/services/CTemplate.php:420
 #, c-format
 msgid "Template \"%1$s\" already exists."
-msgstr "テンプレート\"%1$s\"はそでに存在します。"
+msgstr "テンプレート\"%1$s\"はすでに存在します。"
 
 #: include/classes/import/importers/CHostImporter.php:46
 #, c-format
@@ -13861,7 +13861,7 @@ msgstr "テストデータ"
 
 #: include/views/administration.general.regularexpressions.edit.php:111
 msgid "Test expressions"
-msgstr "テスト条件式"
+msgstr "条件式のテスト"
 
 #: adm.regexps.php:37
 #: include/views/administration.general.regularexpressions.edit.php:108
@@ -16234,7 +16234,7 @@ msgstr "文字列で指定してください"
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "数字で指定してください"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
