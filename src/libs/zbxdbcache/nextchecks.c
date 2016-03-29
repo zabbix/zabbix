@@ -133,7 +133,7 @@ void	DCflush_nextchecks()
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, nextcheck_num);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, errors, nextcheck_num);
+	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, errors, nextcheck_num, 0);
 
 	zbx_free(errors);
 	zbx_free(timespecs);
