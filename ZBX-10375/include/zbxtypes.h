@@ -31,8 +31,6 @@
 
 #define ZBX_PTR_SIZE		sizeof(void *)
 
-typedef uint32_t zbx_uint32_t;
-
 #if defined(_WINDOWS)
 #	include <strsafe.h>
 
@@ -61,7 +59,11 @@ typedef uint32_t zbx_uint32_t;
 
 #	define alloca		_alloca
 
-#	define zbx_uint32_t	__int32
+#	ifndef uint32_t
+typedef unsigned __int32	zbx_uint32_t;
+#	else
+typedef uint32_t		zbx_uint32_t;
+#	endif
 
 #	ifndef PATH_SEPARATOR
 #		define PATH_SEPARATOR	'\\'
@@ -126,6 +128,8 @@ typedef __int64	zbx_offset_t;
 #			define ZBX_FS_X64	"%llx"
 #		endif
 #	endif
+
+typedef uint32_t	zbx_uint32_t;
 
 #	ifndef PATH_SEPARATOR
 #		define PATH_SEPARATOR	'/'
