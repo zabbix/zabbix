@@ -904,55 +904,49 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param array  $trigger_expression            instance of CTriggerExpression
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, CTriggerExpression $trigger_expression) {
-		$items = array();
-		$item_discoveryids = array();
+		$parents = array();
 		$processed_items = array();
+		$hosts = array();
 
 		foreach ($trigger_expression->expressions as $value) {
-			if (!array_key_exists($value['host'], $processed_items)
-					|| !array_key_exists('item', $processed_items[$value['host']])) {
-				$host = API::Host()->get(array(
-					'nodeids' => get_current_nodeid(true),
-					'filter' => array(
-						'host' => $value['host']
-					)
-				));
-				$host = reset($host);
-				$db_item = API::ItemPrototype()->get(array(
-					'hostids' => $host['hostid'],
-					'output' => array('itemid'),
-					'filter' => array(
-						'key_' => $value['item']
-					)
-				));
-				$db_item = reset($db_item);
-				if ($db_item) {
-					$items[] = $db_item;
-				}
+			if (array_key_exists($value['host'], $processed_items)
+					&& array_key_exists('item', $processed_items[$value['host']])) {
+				continue;
 			}
+
+			$host = API::Host()->get(array(
+				'nodeids' => get_current_nodeid(true),
+				'filter' => array(
+					'host' => $value['host']
+				)
+			));
+			$host = reset($host);
+			$db_item = API::Item()->get(array(
+				'hostids' => $host['hostid'],
+				'output' => array('itemid'),
+				'filter' => array(
+					'key_' => $value['item'],
+					'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+				),
+				'selectItemDiscovery' => ['parent_itemid']
+			));
+			$db_item = reset($db_item);
+			if ($db_item) {
+				$parents[$db_item['itemDiscovery']['parent_itemid']] = null;
+			}
+
 			$processed_items[$value['host']][$value['item']] = null;
 		}
 
-		if ($items) {
-			$item_discoveries = API::getApi()->select('item_discovery', array(
-				'nodeids' => get_current_nodeid(true),
-				'output' => array('parent_itemid'),
-				'filter' => array('itemid' => zbx_objectValues($items, 'itemid')),
-			));
-
-			$item_discoveryids = array_unique(zbx_objectValues($item_discoveries, 'parent_itemid'));
-
-			if (count($item_discoveryids) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
-					$trigger['description']
-				));
-			}
-		}
-
-		if (!$item_discoveryids) {
+		if (!$parents) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Trigger prototype "%1$s" must contain at least one item prototype.',
+				$trigger['description']
+			));
+		}
+		elseif (count($parents) > 1) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
 				$trigger['description']
 			));
 		}
