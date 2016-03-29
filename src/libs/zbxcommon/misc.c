@@ -762,7 +762,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		if (pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &start, 4, min, max))
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &start, sizeof(start), min, max))
 			return FAIL;
 
 		if ('-' == *pend)
@@ -780,7 +780,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 			if (pend == pstart || pend - pstart > var_len)
 				return FAIL;
 
-			if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &end, 4, min, max))
+			if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &end, sizeof(end), min, max))
 				return FAIL;
 
 			if (end < start)
@@ -816,7 +816,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		if (pend == pstart || pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, 4, 1, end - start))
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, sizeof(step), 1, end - start))
 			return FAIL;
 	}
 	else

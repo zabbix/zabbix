@@ -49,10 +49,10 @@ static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *para
 		else if ('#' == *parameter)
 		{
 			*flag = ZBX_FLAG_VALUES;
-			if (SUCCEED == is_uint31(parameter + 1, (zbx_uint32_t *)value) && 0 < *value)
+			if (SUCCEED == is_uint31(parameter + 1, value) && 0 < *value)
 				ret = SUCCEED;
 		}
-		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
+		else if (SUCCEED == is_uint_suffix(parameter, value) && 0 <= *value)
 		{
 			*flag = ZBX_FLAG_SEC;
 			ret = SUCCEED;
