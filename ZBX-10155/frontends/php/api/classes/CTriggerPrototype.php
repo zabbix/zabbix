@@ -515,8 +515,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$this->checkIfExistsOnHost($trigger);
 
 			// check item prototypes
-			$items = getExpressionItems($triggerExpression);
-			$this->checkDiscoveryRuleCount($trigger, $items);
+			$this->checkDiscoveryRuleCount($trigger, $triggerExpression);
 		}
 
 		$this->createReal($triggers);
@@ -576,10 +575,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if (!$triggerExpression->parse($trigger['expression'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 				}
-
-				// check item prototypes
-				$items = getExpressionItems($triggerExpression);
-				$this->checkDiscoveryRuleCount($trigger, $items);
+				$this->checkDiscoveryRuleCount($trigger, $triggerExpression);
 			}
 
 			if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['comments']) == 0) {
@@ -905,10 +901,37 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @param array  $trigger						array of trigger data
 	 * @param string $trigger['description']		trigger description
-	 * @param array  $items							array of trigger items
+	 * @param array  $trigger_expression            instance of CTriggerExpression
 	 */
-	protected function checkDiscoveryRuleCount(array $trigger, array $items) {
+	protected function checkDiscoveryRuleCount(array $trigger, CTriggerExpression $trigger_expression) {
+		$items = array();
 		$item_discoveryids = array();
+		$processed_items = array();
+
+		foreach ($trigger_expression->expressions as $value) {
+			if (!array_key_exists($value['host'], $processed_items)
+					|| !array_key_exists('item', $processed_items[$value['host']])) {
+				$host = API::Host()->get(array(
+					'nodeids' => get_current_nodeid(true),
+					'filter' => array(
+						'host' => $value['host']
+					)
+				));
+				$host = reset($host);
+				$db_item = API::ItemPrototype()->get(array(
+					'hostids' => $host['hostid'],
+					'output' => array('itemid'),
+					'filter' => array(
+						'key_' => $value['item']
+					)
+				));
+				$db_item = reset($db_item);
+				if ($db_item) {
+					$items[] = $db_item;
+				}
+			}
+			$processed_items[$value['host']][$value['item']] = null;
+		}
 
 		if ($items) {
 			$item_discoveries = API::getApi()->select('item_discovery', array(
