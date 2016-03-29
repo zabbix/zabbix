@@ -1065,6 +1065,7 @@ textarea {
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
+  height: 24px;
   padding: 3px 3px 3px 0;
   background-color: #fff; }
   select option {
