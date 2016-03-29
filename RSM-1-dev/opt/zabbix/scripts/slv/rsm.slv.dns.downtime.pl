@@ -2,7 +2,11 @@
 #
 # DNS unavailability
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*/.*,$1,; $MYDIR = '..' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use warnings;
@@ -35,8 +39,12 @@ foreach (@$tlds_ref)
 {
 	$tld = $_; # set global variable here
 
+	my $itemid = get_itemid_by_host($tld, $cfg_key_in);
+
+	next unless ($itemid);
+
 	# for future calculation of downtime
-	$tld_items{$tld} = get_itemid_by_host($tld, $cfg_key_in);
+	$tld_items{$tld} = $itemid;
 }
 
 init_values();
