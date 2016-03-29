@@ -1,6 +1,7 @@
 Changes for 3.0.2rc1
 
 New features:
+........S. [ZBXNEXT-3210] replaced user macro cache with expanded trigger expression caching (wiper)
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Greek, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
