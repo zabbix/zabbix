@@ -338,14 +338,14 @@ sub get_itemid_by_host
 
 	my $errbuf;
 
-	my $itemid = __get_itemid_by_sql("select i.itemid from items i,hosts h where i.hostid=h.hostid and h.host='$host' and i.key_='$key'", \$errbuf);
+	my $sql =
+		"select i.itemid".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+	    		" and h.host='$host'".
+			" and i.key_='$key'";
 
-	if (!$itemid)
-	{
-		$__rsm_slv_error = "cannot get itemid of \"$key\" at host \"$host\": $errbuf";
-	}
-
-	return $itemid;
+	return __get_itemid_by_sql($sql);
 }
 
 sub get_itemid_by_hostid

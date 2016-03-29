@@ -64,9 +64,14 @@ while ($period > 0)
 	foreach (@$tlds_ref)
 	{
 		$tld = $_;
+
 		my $itemid = get_itemid_by_host($tld, $cfg_key_out);
 
-		next unless ($itemid);
+		if ($itemid < 0)
+		{
+			dbg("item \"$cfg_key_out\" does not exist at host \"$tld\"");
+			next;
+		}
 
 		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
 		{
