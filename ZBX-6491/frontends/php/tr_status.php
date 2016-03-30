@@ -437,7 +437,7 @@ $triggers = API::Trigger()->get(array(
 	'selectHosts' => array('hostid', 'name', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'description'),
 	'selectItems' => array('itemid', 'hostid', 'key_', 'name', 'value_type'),
 	'selectDependencies' => API_OUTPUT_EXTEND,
-	'selectLastEvent' => array('clock', 'ns'),
+	'selectLastEvent' => array('eventid', 'objectid', 'clock', 'ns'),
 	'preservekeys' => true
 ));
 
