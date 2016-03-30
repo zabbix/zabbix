@@ -1298,7 +1298,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 
 	if (ZBX_SOCKET_ERROR == (res = recv(s->socket, &buf, 1, MSG_PEEK)))
 	{
-		zbx_set_socket_strerror("from %s: recv() peek failed: %s", s->peer,
+		zbx_set_socket_strerror("from %s: reading first byte from connection failed: %s", s->peer,
 				strerror_from_system(zbx_socket_last_error()));
 		zbx_tcp_unaccept(s);
 		goto out;
