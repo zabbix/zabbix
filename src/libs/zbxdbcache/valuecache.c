@@ -87,13 +87,13 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 #define ZBX_VC_RANGE_SYNC_PERIOD	24
 
 /* the data chunk used to store data fragment */
-typedef struct _zbx_vc_chunk_t
+typedef struct zbx_vc_chunk
 {
 	/* a pointer to the previous chunk or NULL if this is the tail chunk */
-	struct _zbx_vc_chunk_t	*prev;
+	struct zbx_vc_chunk	*prev;
 
 	/* a pointer to the next chunk or NULL if this is the head chunk */
-	struct _zbx_vc_chunk_t	*next;
+	struct zbx_vc_chunk	*next;
 
 	/* the index of first (oldest) value in chunk */
 	int			first_value;
