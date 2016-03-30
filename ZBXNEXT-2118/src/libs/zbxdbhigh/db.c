@@ -520,7 +520,8 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_value, trigger->description,
-						trigger->expression_orig, trigger->priority, trigger->type);
+						trigger->expression_orig, trigger->recovery_expression_orig,
+						trigger->priority, trigger->type);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
@@ -537,7 +538,8 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 			{
 				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_state, trigger->description,
-						trigger->expression_orig, trigger->priority, trigger->type);
+						trigger->expression_orig, trigger->recovery_expression_orig,
+						trigger->priority, trigger->type);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
 			}
@@ -1293,7 +1295,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		zbx_free(ip_esc);
 
 		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
-				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0);
 		process_events();
 	}
 

@@ -259,10 +259,12 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	char		*description;
 	char		*expression;
+	char		*recovery_expression;
 	char		*url;
 	char		*comments;
 	unsigned char	priority;
 	unsigned char	type;
+	unsigned char	recovery_mode;
 }
 DB_TRIGGER;
 
