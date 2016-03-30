@@ -47,6 +47,7 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #endif
 
 #include "../libs/zbxcrypto/tls.h"
+#include "../libs/zbxcommon/stopwatch.h"
 
 ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
 ZBX_THREAD_LOCAL static zbx_vector_ptr_t	active_metrics;
@@ -842,6 +843,7 @@ ret:
  *                           the event; used for monitoring of Windows        *
  *                           event logs                                       *
  *             flags       - metric flags                                     *
+ *             stopwatch   - pointer for stopwatch control                    *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
@@ -859,7 +861,8 @@ ret:
  ******************************************************************************/
 static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime, unsigned long *timestamp,
-		const char *source, unsigned short *severity, unsigned long *logeventid, unsigned char flags)
+		const char *source, unsigned short *severity, unsigned long *logeventid, unsigned char flags,
+		zbx_stopwatch_t *stopwatch)
 {
 	const char			*__function_name = "process_value";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
@@ -868,7 +871,15 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, ZBX_NULL2STR(value));
 
+	/* do not count time spent on sending data to server */
+
+	if (NULL != stopwatch)
+		zbx_stopwatch_stop(stopwatch);
+
 	send_buffer(server, port);
+
+	if (NULL != stopwatch)
+		zbx_stopwatch_start(stopwatch);
 
 	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
@@ -1461,7 +1472,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
 		process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
-				NULL, NULL, NULL, NULL, metric->flags);
+				NULL, NULL, NULL, NULL, metric->flags, NULL);
 	}
 out:
 	free_result(&result);
@@ -1520,7 +1531,8 @@ static void	process_active_checks(char *server, unsigned short port)
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
 
 			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
-					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags);
+					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags,
+					NULL);
 
 			zbx_free(error);
 		}
@@ -1545,7 +1557,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					/* meta information update */
 					process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
-							NULL, NULL, metric->flags);
+							NULL, NULL, metric->flags, NULL);
 				}
 
 				/* remove "new metric" flag */

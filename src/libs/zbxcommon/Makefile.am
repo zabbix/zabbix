@@ -11,5 +11,6 @@ libzbxcommon_a_SOURCES = \
 	alias.c \
 	file.c \
 	setproctitle.c \
-	iprange.c
+	iprange.c \
+	stopwatch.c
 

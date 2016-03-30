@@ -22,6 +22,7 @@
 
 #include "zbxregexp.h"
 #include "md5.h"
+#include "../libs/zbxcommon/stopwatch.h"
 
 struct	st_logfile
 {
@@ -40,11 +41,14 @@ struct	st_logfile
 	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
+typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
+		unsigned char, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
+		unsigned char, zbx_stopwatch_t *);
+
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
 		unsigned short port, const char *hostname, const char *key);
-
 #endif
