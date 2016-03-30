@@ -906,7 +906,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	protected function checkDiscoveryRuleCount(array $trigger, CTriggerExpression $trigger_expression) {
 		$parents = array();
 		$processed_items = array();
-		$hosts = array();
 
 		foreach ($trigger_expression->expressions as $value) {
 			if (array_key_exists($value['host'], $processed_items)
@@ -920,19 +919,21 @@ class CTriggerPrototype extends CTriggerGeneral {
 					'host' => $value['host']
 				)
 			));
-			$host = reset($host);
-			$db_item = API::Item()->get(array(
-				'hostids' => $host['hostid'],
-				'output' => array('itemid'),
-				'filter' => array(
-					'key_' => $value['item'],
-					'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
-				),
-				'selectItemDiscovery' => ['parent_itemid']
-			));
-			$db_item = reset($db_item);
-			if ($db_item) {
-				$parents[$db_item['itemDiscovery']['parent_itemid']] = null;
+			if ($host) {
+				$db_item = API::Item()->get(array(
+					'hostids' => reset($host)['hostid'],
+					'output' => array('itemid'),
+					'filter' => array(
+						'key_' => $value['item'],
+						'flags' => ZBX_FLAG_DISCOVERY_PROTOTYPE
+					),
+					'selectItemDiscovery' => ['parent_itemid']
+				));
+
+				$db_item = reset($db_item);
+				if ($db_item) {
+					$parents[$db_item['itemDiscovery']['parent_itemid']] = null;
+				}
 			}
 
 			$processed_items[$value['host']][$value['item']] = null;
