@@ -23,6 +23,8 @@
 #include "zbxjson.h"
 #include "log.h"
 
+#ifdef HAVE_UNIXODBC
+
 static int	get_result_columns(ZBX_ODBC_DBH *dbh, char **buffer)
 {
 	int		ret = SUCCEED, i, j;
@@ -248,3 +250,5 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 	return ret;
 }
+
+#endif	/* HAVE_UNIXODBC */

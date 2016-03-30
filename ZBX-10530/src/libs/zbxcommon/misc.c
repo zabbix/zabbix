@@ -28,17 +28,17 @@
 #define ZBX_SCHEDULER_FILTER_MINUTE	3
 #define ZBX_SCHEDULER_FILTER_SECOND	4
 
-typedef struct zbx_scheduler_filter_t
+typedef struct zbx_scheduler_filter
 {
 	int				start;
 	int				end;
 	int				step;
 
-	struct zbx_scheduler_filter_t	*next;
+	struct zbx_scheduler_filter	*next;
 }
 zbx_scheduler_filter_t;
 
-typedef struct zbx_scheduler_interval_t
+typedef struct zbx_scheduler_interval
 {
 	zbx_scheduler_filter_t		*mdays;
 	zbx_scheduler_filter_t		*wdays;
@@ -48,7 +48,7 @@ typedef struct zbx_scheduler_interval_t
 
 	int				filter_level;
 
-	struct zbx_scheduler_interval_t	*next;
+	struct zbx_scheduler_interval	*next;
 }
 zbx_scheduler_interval_t;
 

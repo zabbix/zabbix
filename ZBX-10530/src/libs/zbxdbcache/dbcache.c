@@ -884,7 +884,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, item_num);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
+	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num,
+			ZBX_EXPAND_MACROS);
 
 	if (0 == trigger_order.values_num)
 		goto clean_triggers;
@@ -2577,7 +2578,7 @@ void	dc_flush_history()
 ZBX_MEM_FUNC_IMPL(__hc_index, hc_index_mem)
 ZBX_MEM_FUNC_IMPL(__hc, hc_mem)
 
-typedef struct zbx_hc_data_t
+struct zbx_hc_data
 {
 	history_value_t	value;
 	zbx_uint64_t	lastlogsize;
@@ -2587,9 +2588,8 @@ typedef struct zbx_hc_data_t
 	unsigned char	flags;
 	unsigned char	state;
 
-	struct zbx_hc_data_t	*next;
-}
-zbx_hc_data_t;
+	struct zbx_hc_data	*next;
+};
 
 /******************************************************************************
  *                                                                            *
