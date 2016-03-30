@@ -18,6 +18,7 @@
 **/
 
 #include "checks_snmp.h"
+
 #include "comms.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
