@@ -915,7 +915,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$hosts[$expression['host']] = array('hostid' => null, 'items' => array());
 			}
 
-			$hosts[$expression['host']]['items'][$expression['item']] = null;
+			$hosts[$expression['host']]['items'][$expression['item']] = true;
 		}
 
 		$db_hosts = API::Host()->get(array(
@@ -938,7 +938,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$db_item_prorotypes = API::ItemPrototype()->get(array(
-				'output' => array('itemid'),
+				'output' => array(),
 				'selectDiscoveryRule' => array('itemid'),
 				'hostids' => array($data['hostid']),
 				'filter' => array(
