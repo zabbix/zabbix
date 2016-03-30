@@ -1162,7 +1162,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 
 	if (SUCCEED == res && EVENT_OBJECT_TRIGGER == event->object)
 	{
-		result = DBselect("select description,expression,priority,comments,url"
+		result = DBselect("select description,expression,priority,comments,url,recovery_expression,recovery_mode"
 				" from triggers"
 				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
@@ -1175,6 +1175,8 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 			event->trigger.priority = (unsigned char)atoi(row[2]);
 			event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
 			event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
+			event->trigger.expression = zbx_strdup(event->trigger.recovery_expression, row[5]);
+			ZBX_STR2UCHAR(event->trigger.recovery_mode, row[6]);
 		}
 		else
 			res = FAIL;

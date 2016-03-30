@@ -81,8 +81,11 @@ typedef struct
 	const char	*description;
 	const char	*expression;
 	const char	*recovery_expression;
-	/* cached expression with expanded user macros, can be NULL */
+
+	/* cached expressions with expanded user macros, can be NULL */
 	const char	*expression_ex;
+	const char	*recovery_expression_ex;
+
 	const char	*error;
 	int		lastchange;
 	unsigned char	topoindex;
@@ -3024,11 +3027,15 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		{
 			if (NULL != trigger->expression_ex)
 				zbx_strpool_release(trigger->expression_ex);
+
+			if (NULL != trigger->recovery_expression_ex)
+				zbx_strpool_release(trigger->recovery_expression_ex);
 		}
 
-		/* reset the cached expression to ensure the expression are expanded */
-		/* with updated user macro values                                    */
+		/* reset the cached expressions to ensure the expressions are expanded */
+		/* with updated user macro values                                      */
 		trigger->expression_ex = NULL;
+		trigger->recovery_expression_ex = NULL;
 
 		trigger->topoindex = 1;
 
@@ -3053,6 +3060,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		if (NULL != trigger->expression_ex)
 			zbx_strpool_release(trigger->expression_ex);
+
+		if (NULL != trigger->recovery_expression_ex)
+			zbx_strpool_release(trigger->recovery_expression_ex);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -5122,7 +5132,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->description = zbx_strdup(NULL, src_trigger->description);
 	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
 	dst_trigger->recovery_expression_orig = zbx_strdup(NULL, src_trigger->recovery_expression);
-	dst_trigger->recovery_expression = NULL;
 	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
 	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
@@ -5137,13 +5146,21 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->status = src_trigger->status;
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 
+	dst_trigger->expression = NULL;
+	dst_trigger->recovery_expression = NULL;
+
 	if (ZBX_EXPAND_MACROS == expand)
 	{
 		dst_trigger->expression = dc_cache_expanded_expression(src_trigger->expression,
 				&src_trigger->expression_ex, &dst_trigger->new_error);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == dst_trigger->recovery_mode &&
+				NULL == dst_trigger->new_error)
+		{
+			dst_trigger->recovery_expression = dc_cache_expanded_expression(src_trigger->recovery_expression,
+					&src_trigger->recovery_expression_ex, &dst_trigger->new_error);
+		}
 	}
-	else
-		dst_trigger->expression = NULL;
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)

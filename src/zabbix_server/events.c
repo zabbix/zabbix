@@ -50,7 +50,8 @@ static size_t	events_alloc = 0, events_num = 0;
  ******************************************************************************/
 void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, unsigned char trigger_priority, unsigned char trigger_type)
+		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
+		unsigned char trigger_type)
 {
 	if (events_num == events_alloc)
 	{
@@ -72,6 +73,7 @@ void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 		events[events_num].trigger.triggerid = objectid;
 		events[events_num].trigger.description = zbx_strdup(NULL, trigger_description);
 		events[events_num].trigger.expression = zbx_strdup(NULL, trigger_expression);
+		events[events_num].trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
 		events[events_num].trigger.priority = trigger_priority;
 		events[events_num].trigger.type = trigger_type;
 	}
