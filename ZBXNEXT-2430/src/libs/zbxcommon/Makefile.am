@@ -14,3 +14,4 @@ libzbxcommon_a_SOURCES = \
 	iprange.c \
 	stopwatch.c
 
+libzbxcommon_a_CFLAGS = @ICONV_CFLAGS@

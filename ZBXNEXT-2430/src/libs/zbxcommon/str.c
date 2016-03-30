@@ -20,6 +20,10 @@
 #include "common.h"
 #include "threads.h"
 
+#ifdef HAVE_ICONV
+#	include <iconv.h>
+#endif
+
 static const char	copyright_message[] =
 	"Copyright (C) 2016 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"

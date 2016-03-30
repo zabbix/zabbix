@@ -64,7 +64,7 @@ abstract class CItemGeneral extends CApiService {
 			'trapper_hosts'			=> [],
 			'units'					=> ['template' => 1],
 			'multiplier'			=> ['template' => 1],
-			'delta'					=> [],
+			'delta'					=> ['template' => 1],
 			'snmpv3_contextname'	=> [],
 			'snmpv3_securityname'	=> [],
 			'snmpv3_securitylevel'	=> [],
