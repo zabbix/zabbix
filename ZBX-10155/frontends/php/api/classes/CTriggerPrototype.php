@@ -935,7 +935,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 			foreach ($hosts as $host => $data) {
 				if ($data['hostid'] === null) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.', $host
+						'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.',
+						$host
 					));
 				}
 
