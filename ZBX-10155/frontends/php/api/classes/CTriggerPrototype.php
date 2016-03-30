@@ -907,61 +907,64 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param array  $triggerExpression             instance of CTriggerExpression
 	 */
 	protected function checkDiscoveryRuleCount(array $trigger, CTriggerExpression $triggerExpression) {
-		$hosts = array();
 		$lld_rules = array();
 
-		foreach ($triggerExpression->expressions as $expression) {
-			if (!array_key_exists($expression['host'], $hosts)) {
-				$hosts[$expression['host']] = array('hostid' => null, 'items' => array());
+		if ($triggerExpression->expressions) {
+			$hosts = array();
+
+			foreach ($triggerExpression->expressions as $expression) {
+				if (!array_key_exists($expression['host'], $hosts)) {
+					$hosts[$expression['host']] = array('hostid' => null, 'items' => array());
+				}
+
+				$hosts[$expression['host']]['items'][$expression['item']] = true;
 			}
 
-			$hosts[$expression['host']]['items'][$expression['item']] = true;
-		}
-
-		$db_hosts = API::Host()->get(array(
-			'output' => array('hostid', 'host'),
-			'nodeids' => get_current_nodeid(true),
-			'filter' => array(
-				'host' => array_keys($hosts)
-			)
-		));
-
-		foreach ($db_hosts as $db_host) {
-			$hosts[$db_host['host']]['hostid'] = $db_host['hostid'];
-		}
-
-		foreach ($hosts as $host => $data) {
-			if ($data['hostid'] === null) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.', $host
-				));
-			}
-
-			$db_item_prorotypes = API::ItemPrototype()->get(array(
-				'output' => array(),
-				'selectDiscoveryRule' => array('itemid'),
-				'hostids' => array($data['hostid']),
+			$db_hosts = API::Host()->get(array(
+				'output' => array('hostid', 'host'),
+				'nodeids' => get_current_nodeid(true),
 				'filter' => array(
-					'key_' => array_keys($data['items'])
-				),
-				'nopermissions' => true
+					'host' => array_keys($hosts)
+				)
 			));
 
-			foreach ($db_item_prorotypes as $db_item_prorotype) {
-				$lld_rules[$db_item_prorotype['discoveryRule']['itemid']] = true;
+			foreach ($db_hosts as $db_host) {
+				$hosts[$db_host['host']]['hostid'] = $db_host['hostid'];
+			}
+
+			foreach ($hosts as $host => $data) {
+				if ($data['hostid'] === null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.', $host
+					));
+				}
+
+				$db_item_prorotypes = API::ItemPrototype()->get(array(
+					'output' => array(),
+					'selectDiscoveryRule' => array('itemid'),
+					'hostids' => array($data['hostid']),
+					'filter' => array(
+						'key_' => array_keys($data['items'])
+					),
+					'nopermissions' => true
+				));
+
+				foreach ($db_item_prorotypes as $db_item_prorotype) {
+					$lld_rules[$db_item_prorotype['discoveryRule']['itemid']] = true;
+				}
+			}
+
+			if (count($lld_rules) > 1) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
+					$trigger['description']
+				));
 			}
 		}
 
 		if (!$lld_rules) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Trigger prototype "%1$s" must contain at least one item prototype.', $trigger['description']
-			));
-		}
-
-		if (count($lld_rules) > 1) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
-				$trigger['description']
 			));
 		}
 	}
