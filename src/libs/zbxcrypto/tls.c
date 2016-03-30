@@ -3560,7 +3560,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			goto out;
 		}
 	}
-	else	/* pre-shared key */
+	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1));
@@ -3570,6 +3570,12 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
 			goto out;
 		}
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid connection parameters");
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
 	}
 
 	/* set up TLS context */
@@ -3788,10 +3794,16 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
 	}
-	else	/* pre-shared key */
+	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1));
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid connection parameters");
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
 	}
 
 	/* set up TLS context */
@@ -4101,7 +4113,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			goto out;
 		}
 	}
-	else	/* connect with pre-shared key */
+	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __function_name,
 				ZBX_NULL2EMPTY_STR(tls_arg1));
@@ -4154,6 +4166,12 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			psk_for_cb = psk_buf;				/* buffer is on stack */
 			psk_len_for_cb = (size_t)psk_len;
 		}
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid connection parameters");
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
 	}
 
 	/* set our connected TCP socket to TLS context */
