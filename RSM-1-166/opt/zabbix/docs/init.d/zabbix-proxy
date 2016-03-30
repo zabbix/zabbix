@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+# chkconfig: - 85 15
+# description: Zabbix proxy daemon
+# config: /opt/zabbix/etc/zabbix_proxy.conf
+#
+
+### BEGIN INIT INFO
+# Provides: zabbix-proxy
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Default-Start:
+# Default-Stop: 0 1 2 3 4 5 6
+# Short-Description: Start and stop Zabbix proxy
+# Description: Zabbix proxy
+### END INIT INFO
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+if [ -x /opt/zabbix/sbin/zabbix_proxy ]; then
+    exec=/opt/zabbix/sbin/zabbix_proxy
+else
+    exit 5
+fi
+
+prog=${exec##*/}
+conf=/opt/zabbix/etc/zabbix_proxy.conf
+lockfile=/var/lock/subsys/zabbix-proxy
+
+opts="-c $conf"
+[ "$2" = "--rsm" ] && opts="$opts --rsm"
+
+start()
+{
+    echo -n $"Starting Zabbix proxy: "
+    daemon $exec $opts
+    rv=$?
+    echo
+    [ $rv -eq 0 ] && touch $lockfile
+    return $rv
+}
+
+stop()
+{
+    echo -n $"Shutting down Zabbix proxy: "
+    killproc $prog
+    rv=$?
+    echo
+    [ $rv -eq 0 ] && rm -f $lockfile
+    return $rv
+}
+
+restart()
+{
+    stop
+    start
+}
+
+case "$1" in
+    start|stop|restart)
+        $1
+        ;;
+    force-reload)
+        restart
+        ;;
+    status)
+        status $prog
+        ;;
+    try-restart|condrestart)
+        if status $prog >/dev/null ; then
+            restart
+        fi
+        ;;
+    reload)
+        action $"Service ${0##*/} does not support the reload action: " /bin/false
+        exit 3
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|try-restart|force-reload}"
+        exit 2
+        ;;
+esac
