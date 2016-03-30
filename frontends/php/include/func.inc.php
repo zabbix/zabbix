@@ -1397,11 +1397,21 @@ function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 
 /*************** PAGE SORTING ******************/
 
-// creates header col for sorting in table header
-function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
+/**
+ * Returns header with sorting options.
+ *
+ * @param string obj			Header item.
+ * @param string $tabfield		Table field.
+ * @param string $sortField		Sorting field.
+ * @param string $sortOrder		Sorting order.
+ * @param string $link			Sorting link.
+ *
+ * @return CColHeader
+ */
+function make_sorting_header($obj, $tabfield, $sortField, $sortOrder, $link = null) {
 	$sortorder = ($sortField == $tabfield && $sortOrder == ZBX_SORT_UP) ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-	$link = CUrlFactory::getContextUrl();
+	$link = CUrlFactory::getContextUrl($link);
 
 	$link->setArgument('sort', $tabfield);
 	$link->setArgument('sortorder', $sortorder);
