@@ -199,12 +199,12 @@ class CHostGroup extends CZBXAPI {
 		elseif ($options['with_graphs'] !== null && $options['real_hosts'] !== null) {
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM items i,graphs_items gi,graphs g,hosts h,hosts_groups hg'.
+					' FROM items i,graphs_items gi,graphs gr,hosts h,hosts_groups hg'.
 					' WHERE g.groupid=hg.groupid'.
 						' AND h.hostid=i.hostid'.
 						' AND i.itemid=gi.itemid'.
-						' AND gi.graphid=g.graphid'.
-						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+						' AND gi.graphid=gr.graphid'.
+						' AND gr.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 						' AND h.hostid=hg.hostid'.
 						' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
 					')';
@@ -332,11 +332,11 @@ class CHostGroup extends CZBXAPI {
 			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
 			$sqlParts['where'][] = 'EXISTS ('.
 					'SELECT NULL'.
-					' FROM items i,graphs_items gi,graphs g'.
+					' FROM items i,graphs_items gi,graphs gr'.
 					' WHERE hg.hostid=i.hostid'.
 						' AND i.itemid=gi.itemid'.
-						' AND gi.graphid=g.graphid'.
-						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+						' AND gi.graphid=gr.graphid'.
+						' AND gr.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
 					')';
 		}
 
