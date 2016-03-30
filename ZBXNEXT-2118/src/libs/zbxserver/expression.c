@@ -4156,7 +4156,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		if (NULL != tr->new_error)
 			continue;
 
-		if (SUCCEED == evaluate(&expr_result, tr->expression, err, sizeof(err)))
+		if (SUCCEED != evaluate(&expr_result, tr->expression, err, sizeof(err)))
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
