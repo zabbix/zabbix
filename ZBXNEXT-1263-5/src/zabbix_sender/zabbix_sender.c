@@ -480,10 +480,15 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
 	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
 		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+	}
+	else
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
 	}
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
@@ -514,7 +519,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (FAIL == tcp_ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
-
+out:
 	zbx_thread_exit(ret);
 }
 

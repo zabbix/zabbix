@@ -573,6 +573,12 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	{
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
 	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
 
 	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
@@ -600,7 +606,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 		zbx_tcp_close(&s);
 	}
-
+out:
 	if (SUCCEED != ret && SUCCEED == last_ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,
@@ -746,6 +752,12 @@ static int	send_buffer(const char *host, unsigned short port)
 	{
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
 	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		ret = FAIL;
+		goto out;
+	}
 
 	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
@@ -779,7 +791,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	}
 	else
 		err_send_step = "[connect] ";
-
+out:
 	zbx_json_free(&json);
 
 	if (SUCCEED == ret)

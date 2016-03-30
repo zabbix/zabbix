@@ -53,6 +53,11 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 	{
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
 	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
 
 	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
