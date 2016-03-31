@@ -825,6 +825,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 					exit(EXIT_FAILURE);
 				}
 			}
+
 			DBfree_result(result);
 
 			dbres = DBexecute("insert into ids (table_name,field_name,nextid)"
@@ -861,12 +862,14 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			{
 				ZBX_STR2UINT64(ret2, row[0]);
-				DBfree_result(result);
+
 				if (ret1 + num == ret2)
 					found = SUCCEED;
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
+
+			DBfree_result(result);
 		}
 	}
 
