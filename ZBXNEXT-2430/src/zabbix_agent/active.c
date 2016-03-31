@@ -669,6 +669,7 @@ static int	check_response(char *response)
  *                                                                            *
  * Parameters: host - IP or Hostname of Zabbix server                         *
  *             port - port number                                             *
+ *             stopwatch - pointer for stopwatch control, can be NULL         *
  *                                                                            *
  * Return value: returns SUCCEED on successful sending,                       *
  *               FAIL on other cases                                          *
@@ -676,7 +677,7 @@ static int	check_response(char *response)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	send_buffer(const char *host, unsigned short port)
+static int	send_buffer(const char *host, unsigned short port, zbx_stopwatch_t *stopwatch)
 {
 	const char			*__function_name = "send_buffer";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
@@ -750,6 +751,10 @@ static int	send_buffer(const char *host, unsigned short port)
 
 	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
+	/* do not count time spent on sending data to server */
+	if (NULL != stopwatch)
+		zbx_stopwatch_stop(stopwatch);
+
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
@@ -780,6 +785,9 @@ static int	send_buffer(const char *host, unsigned short port)
 	}
 	else
 		err_send_step = "[connect] ";
+
+	if (NULL != stopwatch)
+		zbx_stopwatch_start(stopwatch);
 
 	zbx_json_free(&json);
 
@@ -871,15 +879,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, ZBX_NULL2STR(value));
 
-	/* do not count time spent on sending data to server */
-
-	if (NULL != stopwatch)
-		zbx_stopwatch_stop(stopwatch);
-
-	send_buffer(server, port);
-
-	if (NULL != stopwatch)
-		zbx_stopwatch_start(stopwatch);
+	send_buffer(server, port, stopwatch);
 
 	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
@@ -1316,7 +1316,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
 							&severity, &logeventid,
-							metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
+							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL);
 
 					if (SUCCEED == send_err)
 					{
@@ -1410,7 +1410,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
-						&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
+						&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL);
 
 				if (SUCCEED == send_err)
 				{
@@ -1603,7 +1603,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextsend)
 		{
-			send_buffer(activechk_args.host, activechk_args.port);
+			send_buffer(activechk_args.host, activechk_args.port, NULL);
 			nextsend = (int)time(NULL) + 1;
 		}
 
