@@ -1,9 +1,14 @@
 Changes for 3.0.2rc1
 
 New features:
+........S. [ZBXNEXT-3210] replaced user macro cache with expanded trigger expression caching (wiper)
+A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Greek, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
+...G...PS. [ZBX-10530] fixed trappers and agent listeners accepting connections without a timeout (asaveljevs)
+..F....... [ZBX-10570] fixed incorrect select input height in FF (Pavel)
 ..F....... [ZBX-10413] improved XML import validation (Oleg, Sasha)
 ...GI..PS. [ZBX-4148] separated third-party library CFLAGS to avoid header file name conflicts (gleb)
 ..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
@@ -1296,6 +1301,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
 A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
 .......PS. [ZBX-10257] changed VMware items to become not supported if no VMware collector processes are started (viktors)
 A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
@@ -2672,6 +2678,7 @@ New features:
 A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
 A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
