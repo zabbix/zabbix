@@ -2183,9 +2183,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed_bytes:" ZBX_FS_UI64 " processing_time:%e",
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", time:%e s, speed:%e B/s",
 				__function_name, zbx_result_string(ret), processed_bytes,
-				zbx_stopwatch_elapsed(&stopwatch));
+				zbx_stopwatch_elapsed(&stopwatch),
+				(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch));
 	}
 
 	return ret;
