@@ -495,10 +495,11 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	new_lastchange = trigger->timespec.sec;
 
 	value_changed = (trigger->value != new_value ||
-			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state));
+			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state)) &&
+			TRIGGER_VALUE_NONE != new_value;
 	state_changed = (trigger->state != new_state);
 	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type && TRIGGER_VALUE_PROBLEM == new_value &&
-			TRIGGER_STATE_NORMAL == new_state);
+			TRIGGER_STATE_NORMAL == new_state && TRIGGER_VALUE_NONE != new_value);
 	error_changed = (0 != strcmp(trigger->error, new_error_local));
 
 	if (0 != value_changed || 0 != state_changed || 0 != multiple_problem || 0 != error_changed)

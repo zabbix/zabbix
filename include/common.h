@@ -537,6 +537,7 @@ zbx_maintenance_type_t;
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+#define TRIGGER_VALUE_NONE		3	/* only in server code, never in DB */
 const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
