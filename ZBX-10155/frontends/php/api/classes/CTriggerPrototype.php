@@ -961,7 +961,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 					));
 				}
 
-				$db_item_prorotypes = API::ItemPrototype()->get(array(
+				$db_item_prototypes = API::ItemPrototype()->get(array(
 					'output' => array(),
 					'selectDiscoveryRule' => array('itemid'),
 					'hostids' => array($expression['hostid']),
@@ -971,8 +971,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 					'nopermissions' => true
 				));
 
-				foreach ($db_item_prorotypes as $db_item_prorotype) {
-					$lld_rules[$db_item_prorotype['discoveryRule']['itemid']] = true;
+				foreach ($db_item_prototypes as $db_item_prototype) {
+					$lld_rules[$db_item_prototype['discoveryRule']['itemid']] = true;
 				}
 			}
 
