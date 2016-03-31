@@ -4149,6 +4149,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	substitute_functions(triggers);
 
+	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		tr = (DC_TRIGGER *)triggers->values[i];
@@ -4166,6 +4167,12 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		if (SUCCEED != zbx_double_compare(expr_result, 0))
 		{
 			tr->new_value = TRIGGER_VALUE_PROBLEM;
+			continue;
+		}
+
+		if (TRIGGER_RECOVERY_MODE_NONE == tr->recovery_mode)
+		{
+			tr->new_value = TRIGGER_VALUE_NONE;
 			continue;
 		}
 
