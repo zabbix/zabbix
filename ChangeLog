@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
 ...G...PS. [ZBX-10530] fixed trappers and agent listeners accepting connections without a timeout (asaveljevs)
 ..F....... [ZBX-10570] fixed incorrect select input height in FF (Pavel)
 ..F....... [ZBX-10413] improved XML import validation (Oleg, Sasha)
