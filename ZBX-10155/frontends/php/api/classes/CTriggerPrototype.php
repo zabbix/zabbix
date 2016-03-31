@@ -507,14 +507,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 					_s('Cannot set "templateid" for trigger prototype "%1$s".', $trigger['description']));
 			}
 
-			$triggerExpression = new CTriggerExpression();
-			if (!$triggerExpression->parse($trigger['expression'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
-			}
-
-			// check item prototypes
-			$this->checkDiscoveryRuleCount($trigger, $triggerExpression);
-
+			$this->checkExpression($trigger);
 			$this->checkIfExistsOnHost($trigger);
 		}
 
@@ -571,13 +564,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 					unset($triggers[$key]['expression']);
 				}
 				else {
-					$triggerExpression = new CTriggerExpression();
-					if (!$triggerExpression->parse($trigger['expression'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
-					}
-
-					// check item prototypes
-					$this->checkDiscoveryRuleCount($trigger, $triggerExpression);
+					$this->checkExpression($trigger);
 				}
 			}
 
@@ -898,26 +885,37 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Check if trigger prototype has at least one item prototype and belongs to one discovery rule.
+	 * Check if trigger prototype has a correct trigger expression and has at least one item prototype and belongs to
+	 * one discovery rule, does not belong to a host and a template simultaneously and has permissions to all hosts and
+	 * templates in the expression.
 	 *
-	 * @throws APIException if trigger prototype has no item prototype or items belong to multiple discovery rules.
+	 * @param array  $trigger
+	 * @param string $trigger['description']
+	 * @param string $trigger['expression']
 	 *
-	 * @param array  $trigger						array of trigger data
-	 * @param string $trigger['description']		trigger description
-	 * @param array  $triggerExpression             instance of CTriggerExpression
+	 * @throws APIException
 	 */
-	protected function checkDiscoveryRuleCount(array $trigger, CTriggerExpression $triggerExpression) {
+	protected function checkExpression(array $trigger) {
+		$triggerExpression = new CTriggerExpression();
+		if (!$triggerExpression->parse($trigger['expression'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
+		}
+
 		$lld_rules = array();
 
 		if ($triggerExpression->expressions) {
+			$expressions = array();
 			$hosts = array();
+			$has_host = false;
+			$has_template = false;
 
 			foreach ($triggerExpression->expressions as $expression) {
-				if (!array_key_exists($expression['host'], $hosts)) {
-					$hosts[$expression['host']] = array('hostid' => null, 'items' => array());
+				if (!array_key_exists($expression['host'], $expressions)) {
+					$expressions[$expression['host']] = array('hostid' => null, 'items' => array());
 				}
 
-				$hosts[$expression['host']]['items'][$expression['item']] = true;
+				$expressions[$expression['host']]['items'][$expression['item']] = true;
+				$hosts[$expression['host']] = true;
 			}
 
 			$db_hosts = API::Host()->get(array(
@@ -929,11 +927,34 @@ class CTriggerPrototype extends CTriggerGeneral {
 			));
 
 			foreach ($db_hosts as $db_host) {
-				$hosts[$db_host['host']]['hostid'] = $db_host['hostid'];
+				$expressions[$db_host['host']]['hostid'] = $db_host['hostid'];
+				$has_host = true;
+				unset($hosts[$db_host['host']]);
 			}
 
-			foreach ($hosts as $host => $data) {
-				if ($data['hostid'] === null) {
+			if ($hosts) {
+				$db_templates = API::Template()->get(array(
+					'output' => array('templateid', 'host'),
+					'nodeids' => get_current_nodeid(true),
+					'filter' => array(
+						'host' => array_keys($hosts)
+					)
+				));
+
+				foreach ($db_templates as $db_template) {
+					$expressions[$db_template['host']]['hostid'] = $db_template['templateid'];
+					$has_template = true;
+				}
+			}
+
+			if ($has_host && $has_template) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _(
+					'Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'
+				));
+			}
+
+			foreach ($expressions as $host => $expression) {
+				if ($expression['hostid'] === null) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.',
 						$host
@@ -943,9 +964,9 @@ class CTriggerPrototype extends CTriggerGeneral {
 				$db_item_prorotypes = API::ItemPrototype()->get(array(
 					'output' => array(),
 					'selectDiscoveryRule' => array('itemid'),
-					'hostids' => array($data['hostid']),
+					'hostids' => array($expression['hostid']),
 					'filter' => array(
-						'key_' => array_keys($data['items'])
+						'key_' => array_keys($expression['items'])
 					),
 					'nopermissions' => true
 				));
