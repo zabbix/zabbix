@@ -39,19 +39,12 @@ $widget = (new CWidget())
 $header = (new CForm('get'))
 	->setName('slideHeaderForm');
 
-$controls = new CList();
-$controls
-	->addItem(
-		new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
-			'screens.php' => _('Screens'),
-			'slides.php' => _('Slide shows')
-		])
-	)
-	->addItem($data['screen']['editable']
-		? (new CButton('edit', _('Edit slide show')))
-			->onClick('redirect("slideconf.php?form=update&slideshowid='.$data['screen']['slideshowid'].'")')
-		: null
-	);
+$controls = (new CList())->addItem(
+	new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);', [
+		'screens.php' => _('Screens'),
+		'slides.php' => _('Slide shows')
+	])
+);
 
 $favourite_icon = $this->data['screen']
 	? get_icon('favourite', [
@@ -81,6 +74,11 @@ if (isset($this->data['isDynamicItems'])) {
 	$controls->addItem([SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
 }
 $controls
+	->addItem($data['screen']['editable']
+		? (new CButton('edit', _('Edit slide show')))
+			->onClick('redirect("slideconf.php?form=update&slideshowid='.$data['screen']['slideshowid'].'")')
+		: null
+	)
 	->addItem($favourite_icon)
 	->addItem($refresh_icon)
 	->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));

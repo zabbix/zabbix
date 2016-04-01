@@ -38,6 +38,7 @@ class CScreenChart extends CScreenBase {
 		parent::__construct($options);
 
 		$this->graphid = isset($options['graphid']) ? $options['graphid'] : null;
+		$this->profileIdx2 = $this->graphid;
 	}
 
 	/**

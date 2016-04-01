@@ -13,3 +13,4 @@ libzbxcommon_a_SOURCES = \
 	setproctitle.c \
 	iprange.c
 
+libzbxcommon_a_CFLAGS = @ICONV_CFLAGS@

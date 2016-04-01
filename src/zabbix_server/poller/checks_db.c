@@ -19,9 +19,12 @@
 
 #include "checks_db.h"
 
-#include "zbxodbc.h"
 #include "zbxjson.h"
 #include "log.h"
+
+#ifdef HAVE_UNIXODBC
+
+#include "zbxodbc.h"
 
 static int	get_result_columns(ZBX_ODBC_DBH *dbh, char **buffer)
 {
@@ -248,3 +251,5 @@ int	get_value_db(DC_ITEM *item, AGENT_RESULT *result)
 
 	return ret;
 }
+
+#endif	/* HAVE_UNIXODBC */

@@ -672,28 +672,53 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	]);
 
 	$items = [];
+	$item_counter = [];
+	$host_items = [];
 	foreach ($dbItems as $dbItem) {
-		$name = $dbItem['name_expanded'];
+		$item_name = $dbItem['name_expanded'];
+		$host_name = $dbItem['hostname'];
+		$hostNames[$dbItem['hostid']] = $host_name;
 
-		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
+		if (!array_key_exists($host_name, $item_counter)) {
+			$item_counter[$host_name] = [];
+		}
+
+		if (!array_key_exists($item_name, $item_counter[$host_name])) {
+			$item_counter[$host_name][$item_name] = 0;
+		}
+
+		if (!array_key_exists($item_name, $host_items) || !array_key_exists($host_name, $host_items[$item_name])) {
+			$host_items[$item_name][$host_name] = [];
+		}
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($items[$name][$dbItem['hostname']])
-				|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-					|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-						&& $dbItem['priority'] > $items[$name][$dbItem['hostname']]['severity']))) {
-			$items[$name][$dbItem['hostname']] = [
+		if (!array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])
+			|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+				|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+					&& $dbItem['priority'] > $host_items[$item_name][$host_name][$dbItem['itemid']]['severity']))) {
+
+			if (array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])) {
+				$item_place = $host_items[$item_name][$host_name][$dbItem['itemid']]['item_place'];
+			}
+			else {
+				$item_place = $item_counter[$host_name][$item_name];
+				$item_counter[$host_name][$item_name]++;
+			}
+
+			$items[$item_name][$item_place][$host_name] = [
 				'itemid' => $dbItem['itemid'],
 				'value_type' => $dbItem['value_type'],
 				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
 				'units' => $dbItem['units'],
-				'name' => $name,
 				'valuemapid' => $dbItem['valuemapid'],
 				'severity' => $dbItem['priority'],
 				'tr_value' => $dbItem['tr_value'],
-				'triggerid' => $dbItem['triggerid']
+				'triggerid' => $dbItem['triggerid'],
+				'item_place' => $item_place
 			];
+
+			$host_items[$item_name][$host_name][$dbItem['itemid']] = $items[$item_name][$item_place][$host_name];
 		}
 	}
 
@@ -712,20 +737,24 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		}
 		$table->setHeader($header);
 
-		foreach ($items as $descr => $ithosts) {
-			$tableRow = [nbsp($descr)];
-			foreach ($hostNames as $hostName) {
-				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+		foreach ($items as $item_name => $item_data) {
+			foreach ($item_data as $ithosts) {
+				$tableRow = [nbsp($item_name)];
+				foreach ($hostNames as $hostName) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				}
+				$table->addRow($tableRow);
 			}
-			$table->addRow($tableRow);
 		}
 	}
 	else {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		$header = [_('Hosts')];
-		foreach ($items as $descr => $ithosts) {
-			$header[] = (new CColHeader($descr))->addClass('vertical_rotation');
+		foreach ($items as $item_name => $item_data) {
+			foreach ($item_data as $ithosts) {
+				$header[] = (new CColHeader($item_name))->addClass('vertical_rotation');
+			}
 		}
 		$table->setHeader($header);
 
@@ -737,8 +766,10 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
-			foreach ($items as $ithosts) {
-				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+			foreach ($items as $item_data) {
+				foreach ($item_data as $ithosts) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				}
 			}
 			$table->addRow($tableRow);
 		}
