@@ -72,16 +72,13 @@ class CTableInfo extends CTable {
 								"transform-origin": transform,
 								"-webkit-transform-origin": transform,
 								"-moz-transform-origin": transform,
-								"-o-transform-origin": transform
+								"-o-transform-origin": transform,
+								"-ms-transform-origin": transform
 							};
 
+							// For regular fonts IE leaves extra spaces that are impossible to remove and are hard to read.
 							if (IE) {
 								css["font-family"] = "monospace";
-								css["-ms-transform-origin"] = "50% 50%";
-							}
-
-							if (IE9) {
-								css["-ms-transform-origin"] = transform;
 							}
 
 							var divInner = $("<div>", {
@@ -121,16 +118,8 @@ class CTableInfo extends CTable {
 				jQuery(document).ready(function() {
 					jQuery(".'.$this->getAttribute('class').'").makeVerticalRotation();
 
-					if (IE8 || IE10 || IE11) {
-						jQuery(".vertical_rotation_inner").css({
-							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)",
-							"writing-mode": "tb-rl"
-						});
-					}
-					else if (IE9) {
-						jQuery(".vertical_rotation_inner").css({
-							"-ms-transform": "rotate(270deg)"
-						});
+					if (IE8) {
+						jQuery(".vertical_rotation_inner").addClass("ie8_vertical_rotation");
 					}
 				});'
 			, true);
