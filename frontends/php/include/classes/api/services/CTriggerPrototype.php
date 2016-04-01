@@ -1483,29 +1483,29 @@ class CTriggerPrototype extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
 		}
 
-		$lld_rules = array();
+		$lld_rules = [];
 
 		if ($triggerExpression->expressions) {
-			$expressions = array();
-			$hosts = array();
+			$expressions = [];
+			$hosts = [];
 			$has_host = false;
 			$has_template = false;
 
 			foreach ($triggerExpression->expressions as $expression) {
 				if (!array_key_exists($expression['host'], $expressions)) {
-					$expressions[$expression['host']] = array('hostid' => null, 'items' => array());
+					$expressions[$expression['host']] = ['hostid' => null, 'items' => []];
 				}
 
 				$expressions[$expression['host']]['items'][$expression['item']] = true;
 				$hosts[$expression['host']] = true;
 			}
 
-			$db_hosts = API::Host()->get(array(
-				'output' => array('hostid', 'host'),
-				'filter' => array(
+			$db_hosts = API::Host()->get([
+				'output' => ['hostid', 'host'],
+				'filter' => [
 					'host' => array_keys($hosts)
-				)
-			));
+				]
+			]);
 
 			foreach ($db_hosts as $db_host) {
 				$expressions[$db_host['host']]['hostid'] = $db_host['hostid'];
@@ -1514,12 +1514,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			if ($hosts) {
-				$db_templates = API::Template()->get(array(
-					'output' => array('templateid', 'host'),
-					'filter' => array(
+				$db_templates = API::Template()->get([
+					'output' => ['templateid', 'host'],
+					'filter' => [
 						'host' => array_keys($hosts)
-					)
-				));
+					]
+				]);
 
 				foreach ($db_templates as $db_template) {
 					$expressions[$db_template['host']]['hostid'] = $db_template['templateid'];
@@ -1541,15 +1541,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 					));
 				}
 
-				$db_item_prototypes = API::ItemPrototype()->get(array(
-					'output' => array(),
-					'selectDiscoveryRule' => array('itemid'),
-					'hostids' => array($expression['hostid']),
-					'filter' => array(
+				$db_item_prototypes = API::ItemPrototype()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['itemid'],
+					'hostids' => [$expression['hostid']],
+					'filter' => [
 						'key_' => array_keys($expression['items'])
-					),
+					],
 					'nopermissions' => true
-				));
+				]);
 
 				foreach ($db_item_prototypes as $db_item_prototype) {
 					$lld_rules[$db_item_prototype['discoveryRule']['itemid']] = true;
