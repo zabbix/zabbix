@@ -116,14 +116,14 @@ zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed)
 
 	zbx_hash_t	hash;
 
-	const uint32_t	m = 0x5bd1e995u;
-	const uint32_t	r = 24;
+	const zbx_hash_t	m = 0x5bd1e995u;
+	const zbx_hash_t	r = 24;
 
 	hash = seed ^ len;
 
 	while (len >= 4)
 	{
-		uint32_t	k;
+		zbx_hash_t	k;
 
 		k = p[0];
 		k |= p[1] << 8;
