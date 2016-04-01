@@ -17,33 +17,45 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MACROCACHE_H
-#define ZABBIX_MACROCACHE_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#include "zbxtypes.h"
-#include "zbxalgo.h"
+/*
+ * 3.2 development database patches
+ */
 
-/* user macro structure used to store user macros in user macro cache */
-typedef struct
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_3010000(void)
 {
-	char	*name;
-	char	*context;
-	char	*value;
+	return DBdrop_index("history_log", "history_log_2");
 }
-zbx_umc_macro_t;
 
-/* user macro cache object */
-typedef struct
+static int	DBpatch_3010001(void)
 {
-	/* the object id, for example trigger id */
-	zbx_uint64_t		objectid;
-	/* the macro source hosts */
-	zbx_vector_uint64_t	hostids;
-	/* the macro:value pairs */
-	zbx_vector_ptr_t	macros;
+	return DBdrop_field("history_log", "id");
 }
-zbx_umc_object_t;
 
-int	zbx_umc_compare_macro(const void *d1, const void *d2);
+static int	DBpatch_3010002(void)
+{
+	return DBdrop_index("history_text", "history_text_2");
+}
+
+static int	DBpatch_3010003(void)
+{
+	return DBdrop_field("history_text", "id");
+}
 
 #endif
+
+DBPATCH_START(3010)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(3010000, 0, 1)
+DBPATCH_ADD(3010001, 0, 1)
+DBPATCH_ADD(3010002, 0, 1)
+DBPATCH_ADD(3010003, 0, 1)
+
+DBPATCH_END()

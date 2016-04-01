@@ -377,8 +377,8 @@ class CHttpTest extends CApiService {
 			'preservekeys' => true,
 			'selectHosts' => API_OUTPUT_EXTEND
 		];
-		$delHttpTestChilds = $this->get($options);
-		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChilds);
+		$delHttpTestChildren = $this->get($options);
+		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChildren);
 		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
 
 		$itemidsDel = [];
@@ -648,11 +648,6 @@ class CHttpTest extends CApiService {
 		if (array_key_exists('steps', $httpTest)
 				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
-		}
-
-		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
-		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
 		$followRedirectsValidator = new CLimitedSetValidator([

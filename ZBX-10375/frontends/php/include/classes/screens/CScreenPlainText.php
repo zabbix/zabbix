@@ -47,17 +47,6 @@ class CScreenPlainText extends CScreenBase {
 		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($this->screenitem['resourceid'])]);
 		$item = reset($items);
 
-		switch ($item['value_type']) {
-			case ITEM_VALUE_TYPE_TEXT:
-			case ITEM_VALUE_TYPE_LOG:
-				$orderField = 'id';
-				break;
-			case ITEM_VALUE_TYPE_FLOAT:
-			case ITEM_VALUE_TYPE_UINT64:
-			default:
-				$orderField = ['itemid', 'clock'];
-		}
-
 		$host = get_host_by_itemid($this->screenitem['resourceid']);
 
 		$table = (new CTableInfo())
@@ -70,7 +59,7 @@ class CScreenPlainText extends CScreenBase {
 			'itemids' => $this->screenitem['resourceid'],
 			'output' => API_OUTPUT_EXTEND,
 			'sortorder' => ZBX_SORT_DOWN,
-			'sortfield' => $orderField,
+			'sortfield' => ['itemid', 'clock'],
 			'limit' => $this->screenitem['elements'],
 			'time_from' => $stime,
 			'time_till' => $stime + $this->timeline['period']

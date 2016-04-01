@@ -19,7 +19,9 @@
 
 #include "common.h"
 #include "log.h"
+#include "zbxnix.h"
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_coredump_disable                                             *
@@ -45,3 +47,4 @@ int	zbx_coredump_disable(void)
 
 	return SUCCEED;
 }
+#endif
