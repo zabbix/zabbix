@@ -2,7 +2,7 @@ package ApiHelper;
 
 use strict;
 use warnings;
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use DateTime::Format::RFC3339;
 use JSON::XS;
 use base 'Exporter';
@@ -27,12 +27,13 @@ use constant AH_INCIDENT_ENDED => 'Resolved';
 our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED AH_STATUS_UP AH_STATUS_DOWN
 		AH_ENABLED_YES AH_ENABLED_NO AH_FALSE_POSITIVE_TRUE AH_FALSE_POSITIVE_FALSE AH_INCIDENT_ACTIVE
 		AH_INCIDENT_ENDED
-		ah_get_error
+		ah_get_error ah_begin ah_end
 		ah_save_alarmed ah_save_service_availability ah_save_incident_state ah_save_false_positive
 		ah_save_incident_results ah_get_continue_file ah_get_last_audit ah_save_audit
-		ah_encode_pretty_json ah_save_tld_status ah_set_base_dir);
+		ah_encode_pretty_json ah_save_tld_status ah_set_base_dir ah_set_tmp_dir);
 
 my $AH_BASE_DIR = '/opt/zabbix/sla';
+my $AH_TMP_DIR = '/opt/zabbix/tmp';
 
 use constant AH_FILE_POSTFIX => '';	# e. g. ".json"
 use constant AH_TLD_STATE_FILE => 'state' . AH_FILE_POSTFIX;
@@ -51,6 +52,70 @@ my $error_string = "";
 sub ah_get_error
 {
 	return $error_string;
+}
+
+sub ah_begin
+{
+	my $err;
+
+	if (-d __target_dir())
+	{
+		remove_tree(__target_dir(), {keep_root => 1, error => \$err});
+
+		if (@$err)
+		{
+			__set_file_error($err);
+			$error_string = "cannot empty temporary directory $error_string";
+			return AH_FAIL;
+		}
+	}
+	else
+	{
+		remove_tree(__target_dir(), {error => \$err});
+
+		if (@$err)
+		{
+			__set_file_error($err);
+			$error_string = "cannot delete temporary directory $error_string";
+			return AH_FAIL;
+		}
+
+		make_path(__target_dir(), {error => \$err});
+
+		if (@$err)
+		{
+			__set_file_error($err);
+			$error_string = "cannot create temporary directory $error_string";
+			return AH_FAIL;
+		}
+	}
+
+	if (-f __source_dir())
+	{
+		if (!unlink(__source_dir()))
+		{
+			__set_file_error($!);
+			return AH_FAIL;
+		}
+	}
+
+	make_path(__source_dir(), {error => \$err});
+
+	if (@$err)
+	{
+		__set_file_error($err);
+		$error_string = "cannot create base directory $error_string";
+		return AH_FAIL;
+	}
+
+	return AH_SUCCESS;
+}
+
+sub ah_end
+{
+	my $strip_components = () = __target_dir() =~ /\//g;
+
+	return __system('tar -cf - ', __target_dir(), ' 2>/dev/null | tar --ignore-command-error -C ', __source_dir(), ' --strip-components=', $strip_components, ' -xf -');
 }
 
 sub __make_path
@@ -76,7 +141,7 @@ sub __make_tld_path
 
 	$tld = lc($tld);
 
-	my $path = $AH_BASE_DIR . "/$tld/data";
+	my $path = __target_dir() . "/$tld/data";
 	$path .= "/$add_path" if ($add_path);
 
 	return AH_FAIL unless (__make_path($path) == AH_SUCCESS);
@@ -306,13 +371,13 @@ sub ah_save_incident_results
 
 sub ah_get_continue_file
 {
-	return $AH_BASE_DIR . '/' . AH_CONTINUE_FILE;
+	return __source_dir() . '/' . AH_CONTINUE_FILE;
 }
 
 # get the time of last audit log entry that was checked
 sub ah_get_last_audit
 {
-	my $audit_file = $AH_BASE_DIR . '/' . AH_AUDIT_FILE;
+	my $audit_file = __source_dir() . '/' . AH_AUDIT_FILE;
 	my $handle;
 
 	if (-e $audit_file)
@@ -333,7 +398,7 @@ sub ah_save_audit
 {
 	my $clock = shift;
 
-	return __write_file($AH_BASE_DIR . '/' . AH_AUDIT_FILE, $clock);
+	return __write_file(__target_dir() . '/' . AH_AUDIT_FILE, $clock);
 }
 
 sub __encode_json
@@ -414,8 +479,21 @@ sub ah_save_tld_status
 sub ah_set_base_dir
 {
 	$AH_BASE_DIR = shift;
+}
 
-	return __make_path($AH_BASE_DIR);
+sub ah_set_tmp_dir
+{
+	$AH_TMP_DIR = shift;
+}
+
+sub __source_dir
+{
+	return $AH_BASE_DIR;
+}
+
+sub __target_dir
+{
+	return $AH_TMP_DIR;
 }
 
 sub __read_file
@@ -453,6 +531,27 @@ sub __parse_json_file
 	return AH_FAIL unless (__read_file($file, \$buf) == AH_SUCCESS);
 
 	$$json_ref_ref = decode_json($buf);
+
+	return AH_SUCCESS;
+}
+
+sub __system
+{
+	my $cmd = join('', @_);
+
+	system($cmd);
+
+	if ($? == -1)
+	{
+		__set_error("failed to execute: $!");
+		return AH_FAIL;
+	}
+
+	if ($? & 127)
+	{
+		__set_error("child died with signal %d, %s coredump", ($? & 127),  ($? & 128) ? 'with' : 'without');
+		return AH_FAIL;
+	}
 
 	return AH_SUCCESS;
 }
