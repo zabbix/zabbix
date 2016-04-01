@@ -1528,15 +1528,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			if ($has_host && $has_template) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _(
-					'Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously.'
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger prototype expression.'.
+					' Trigger prototype expression elements should not belong to a template and a host simultaneously.'
 				));
 			}
 
 			foreach ($expressions as $host => $expression) {
 				if ($expression['hostid'] === null) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Incorrect trigger expression. Host "%s" does not exist or you have no access to this host.',
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect trigger prototype expression.'.
+						' Host "%1$s" does not exist or you have no access to this host.',
 						$host
 					));
 				}
