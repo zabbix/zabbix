@@ -142,7 +142,7 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(int), 0, 30))
+		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(bits), 0, 30))
 			return FAIL;
 
 		iprange->mask = 1;
@@ -173,15 +173,21 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 		len = (NULL == dash ? ptr : dash) - address;
 
 		/* extract the range start value */
-		if (FAIL == is_uint_n_range(address, len, &iprange->range[index].from, 4, 0, 255))
+		if (FAIL == is_uint_n_range(address, len, &iprange->range[index].from,
+				sizeof(iprange->range[index].from), 0, 255))
+		{
 			return FAIL;
+		}
 
 		/* if range is specified, extract the end value, otherwise set end value equal to the start value */
 		if (NULL != dash)
 		{
 			dash++;
-			if (FAIL == is_uint_n_range(dash, ptr - dash, &iprange->range[index].to, 4, 0, 255))
+			if (FAIL == is_uint_n_range(dash, ptr - dash, &iprange->range[index].to,
+					sizeof(iprange->range[index].to), 0, 255))
+			{
 				return FAIL;
+			}
 
 			if (iprange->range[index].to < iprange->range[index].from)
 				return FAIL;
@@ -227,7 +233,7 @@ static int	iprangev6_parse(zbx_iprange_t *iprange, const char *address)
 
 	if (NULL != (end = strchr(address, '/')))
 	{
-		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(int), 0, 128))
+		if (FAIL == is_uint_n_range(end + 1, len - (end + 1 - address), &bits, sizeof(bits), 0, 128))
 			return FAIL;
 
 		iprange->mask = 1;
