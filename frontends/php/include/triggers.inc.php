@@ -682,46 +682,6 @@ function implode_exp($expression, $triggerId, &$hostnames = []) {
 	return $expression;
 }
 
-/**
- * Get items from expression.
- *
- * @param CTriggerExpression $triggerExpression
- *
- * @return array
- */
-function getExpressionItems(CTriggerExpression $triggerExpression) {
-	$items = [];
-	$processedFunctions = [];
-	$processedItems = [];
-
-	foreach ($triggerExpression->expressions as $expression) {
-		if (isset($processedFunctions[$expression['expression']])) {
-			continue;
-		}
-
-		if (!isset($processedItems[$expression['host']][$expression['item']])) {
-			$dbItems = DBselect(
-				'SELECT i.itemid,i.flags'.
-				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($expression['item']).
-					' AND '.dbConditionInt('i.flags', [
-						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
-					]).
-					' AND h.host='.zbx_dbstr($expression['host']).
-					' AND h.hostid=i.hostid'
-			);
-			if ($dbItem = DBfetch($dbItems)) {
-				$items[] = $dbItem;
-				$processedItems[$expression['host']][$expression['item']] = true;
-			}
-		}
-
-		$processedFunctions[$expression['expression']] = true;
-	}
-
-	return $items;
-}
-
 function check_right_on_trigger_by_expression($permission, $expression) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
