@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
 A......... [ZBX-10155] prohibited creation of a trigger prototype without item prototypes in the expression (Cemeris, Sasha)
 .......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
 ...G...PS. [ZBX-10530] fixed trappers and agent listeners accepting connections without a timeout (asaveljevs)
@@ -540,6 +541,7 @@ A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean,
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
 ..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
 ....I...S. [ZBX-10485] fixed database upgrade crash on attempt to substitute old-style comparison operators in empty trigger expressions (gleb, Sasha)
 ..F....... [ZBX-10386] fixed slideshow refresh rate (Ivo)
@@ -1302,6 +1304,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
 A......... [ZBX-10155] prohibited creation of a trigger prototype which belongs to a host and a template simultaneously (Sasha)
 A......... [ZBX-10155] prohibited creation of a trigger prototype without item prototypes in the expression (Cemeris, Sasha)
 A......... [ZBX-10155] prohibited creation of a trigger prototype without permissions to a host or template in the expression (Sasha)
