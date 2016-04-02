@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-02-22 21:19+0200\n"
-"PO-Revision-Date: 2016-02-08 13:00+0300\n"
+"PO-Revision-Date: 2016-03-23 11:28+0300\n"
 "Last-Translator: Sébastien <sebastien@maccagnoni.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454929225.0\n"
+"X-POOTLE-MTIME: 1458725283.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -13488,7 +13488,7 @@ msgstr "Support"
 #: include/views/administration.users.edit.php:53
 #: include/views/administration.users.list.php:56 popup.php:595 users.php:46
 msgid "Surname"
-msgstr "Prénom"
+msgstr "Nom de famille"
 
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:483
