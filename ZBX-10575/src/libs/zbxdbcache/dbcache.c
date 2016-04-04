@@ -2873,8 +2873,12 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 	}
 
 	(*data)->value_type = item_value->value_type;
-	(*data)->lastlogsize = item_value->lastlogsize;
-	(*data)->mtime = item_value->mtime;
+
+	if (0 != (ZBX_DC_FLAG_META & item_value->flags))
+	{
+		(*data)->lastlogsize = item_value->lastlogsize;
+		(*data)->mtime = item_value->mtime;
+	}
 
 	return SUCCEED;
 }
