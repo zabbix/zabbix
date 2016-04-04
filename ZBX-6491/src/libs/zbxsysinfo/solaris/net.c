@@ -22,171 +22,185 @@
 #include "zbxjson.h"
 #include "../common/common.h"
 
-static int	get_kstat_named_field(const char *name, const char *field, kstat_named_t *returned_data)
+static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value)
 {
 	int		ret = FAIL;
 	kstat_ctl_t	*kc;
 	kstat_t		*kp;
 	kstat_named_t	*kn;
 
-	if (NULL != (kc = kstat_open()))
+	if (NULL == (kc = kstat_open()))
+		return FAIL;
+
+	for (kp = kc->kc_chain; NULL != kp; kp = kp->ks_next)	/* traverse all kstat chain */
 	{
-		if (NULL != (kp = kstat_lookup(kc, NULL, -1, (char *)name)) && -1 != kstat_read(kc, kp, 0))
-		{
-			if (NULL != (kn = (kstat_named_t *)kstat_data_lookup(kp, (char *)field)))
-			{
-				*returned_data = *kn;
-				ret = SUCCEED;
-			}
-		}
-		kstat_close(kc);
+		if (0 != strcmp(name, kp->ks_name))		/* network interface name */
+			continue;
+
+		/* Assume that interfaces in our zone have instance 0. If instance > 0 then it belongs to other zone */
+		/* and should be monitored by Zabbix agent running in that zone where it will have instance number 0. */
+		if (0 != kp->ks_instance)
+			continue;
+
+		if (0 == strcmp("net", kp->ks_class))
+			break;
 	}
+
+	if (NULL == kp || -1 == kstat_read(kc, kp, 0) ||
+			NULL == (kn = (kstat_named_t *)kstat_data_lookup(kp, (char *)field)))
+	{
+		goto clean;
+	}
+
+	*field_value = get_kstat_numeric_value(kn);
+
+	ret = SUCCEED;
+clean:
+	kstat_close(kc);
 
 	return ret;
 }
 
 static int	NET_IF_IN_BYTES(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "rbytes64", &kn) ||
-			SUCCEED == get_kstat_named_field(if_name, "rbytes", &kn))
+	if (SUCCEED == get_kstat_named_field(if_name, "rbytes64", &value) ||
+			SUCCEED == get_kstat_named_field(if_name, "rbytes", &value))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_IN_PACKETS(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ipackets64", &kn) ||
-			SUCCEED == get_kstat_named_field(if_name, "ipackets", &kn))
+	if (SUCCEED == get_kstat_named_field(if_name, "ipackets64", &value) ||
+			SUCCEED == get_kstat_named_field(if_name, "ipackets", &value))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_IN_ERRORS(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ierrors", &kn))
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	else
-		return SYSINFO_RET_FAIL;
+	if (SUCCEED == get_kstat_named_field(if_name, "ierrors", &value))
+	{
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_OUT_BYTES(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "obytes64", &kn) ||
-			SUCCEED == get_kstat_named_field(if_name, "obytes", &kn))
+	if (SUCCEED == get_kstat_named_field(if_name, "obytes64", &value) ||
+			SUCCEED == get_kstat_named_field(if_name, "obytes", &value))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_OUT_PACKETS(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "opackets64", &kn) ||
-			SUCCEED == get_kstat_named_field(if_name, "opackets", &kn))
+	if (SUCCEED == get_kstat_named_field(if_name, "opackets64", &value) ||
+			SUCCEED == get_kstat_named_field(if_name, "opackets", &value))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_OUT_ERRORS(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "oerrors", &kn))
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	else
-		return SYSINFO_RET_FAIL;
+	if (SUCCEED == get_kstat_named_field(if_name, "oerrors", &value))
+	{
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_TOTAL_BYTES(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	ikn, okn;
+	zbx_uint64_t	value_in, value_out;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "rbytes64", &ikn) &&
-			SUCCEED == get_kstat_named_field(if_name, "obytes64", &okn))
+	if ((SUCCEED == get_kstat_named_field(if_name, "rbytes64", &value_in) &&
+			SUCCEED == get_kstat_named_field(if_name, "obytes64", &value_out)) ||
+			(SUCCEED == get_kstat_named_field(if_name, "rbytes", &value_in) &&
+			SUCCEED == get_kstat_named_field(if_name, "obytes", &value_out)))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
-	}
-	else if (SUCCEED == get_kstat_named_field(if_name, "rbytes", &ikn) &&
-			SUCCEED == get_kstat_named_field(if_name, "obytes", &okn))
-	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value_in + value_out);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_TOTAL_PACKETS(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	ikn, okn;
+	zbx_uint64_t	value_in, value_out;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ipackets64", &ikn) &&
-			SUCCEED == get_kstat_named_field(if_name, "opackets64", &okn))
+	if ((SUCCEED == get_kstat_named_field(if_name, "ipackets64", &value_in) &&
+			SUCCEED == get_kstat_named_field(if_name, "opackets64", &value_out)) ||
+			(SUCCEED == get_kstat_named_field(if_name, "ipackets", &value_in) &&
+			SUCCEED == get_kstat_named_field(if_name, "opackets", &value_out)))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
-	}
-	else if (SUCCEED == get_kstat_named_field(if_name, "ipackets", &ikn) &&
-			SUCCEED == get_kstat_named_field(if_name, "opackets", &okn))
-	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value_in + value_out);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 static int	NET_IF_TOTAL_ERRORS(const char *if_name, AGENT_RESULT *result)
 {
-	kstat_named_t	ikn, okn;
+	zbx_uint64_t	value_in, value_out;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "ierrors", &ikn) &&
-			SUCCEED == get_kstat_named_field(if_name, "oerrors", &okn))
+	if (SUCCEED == get_kstat_named_field(if_name, "ierrors", &value_in) &&
+			SUCCEED == get_kstat_named_field(if_name, "oerrors", &value_out))
 	{
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&ikn) + get_kstat_numeric_value(&okn));
-	}
-	else
-		return SYSINFO_RET_FAIL;
+		SET_UI64_RESULT(result, value_in + value_out);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	kstat_named_t	kn;
+	zbx_uint64_t	value;
 	char		*if_name;
 
 	if (1 < request->nparam)
@@ -197,12 +211,14 @@ int	NET_IF_COLLISIONS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == if_name || '\0' == *if_name)
 		return SYSINFO_RET_FAIL;
 
-	if (SUCCEED == get_kstat_named_field(if_name, "collisions", &kn))
-		SET_UI64_RESULT(result, get_kstat_numeric_value(&kn));
-	else
-		return SYSINFO_RET_FAIL;
+	if (SUCCEED == get_kstat_named_field(if_name, "collisions", &value))
+	{
+		SET_UI64_RESULT(result, value);
 
-	return SYSINFO_RET_OK;
+		return SYSINFO_RET_OK;
+	}
+
+	return SYSINFO_RET_FAIL;
 }
 
 int	NET_TCP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -258,7 +274,7 @@ int	NET_UDP_LISTEN(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -271,9 +287,9 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "bytes"))
 		ret = NET_IF_IN_BYTES(if_name, result);
-	else if (0 ==strcmp(mode, "packets"))
+	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_IN_PACKETS(if_name, result);
-	else if (0 ==strcmp(mode, "errors"))
+	else if (0 == strcmp(mode, "errors"))
 		ret = NET_IF_IN_ERRORS(if_name, result);
 	else
 		ret = SYSINFO_RET_FAIL;
@@ -284,7 +300,7 @@ int	NET_IF_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -297,9 +313,9 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
 		ret = NET_IF_OUT_BYTES(if_name, result);
-	else if (0 ==strcmp(mode, "packets"))
+	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_OUT_PACKETS(if_name, result);
-	else if (0 ==strcmp(mode, "errors"))
+	else if (0 == strcmp(mode, "errors"))
 		ret = NET_IF_OUT_ERRORS(if_name, result);
 	else
 		ret = SYSINFO_RET_FAIL;
@@ -310,7 +326,7 @@ int	NET_IF_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *mode;
-	int	ret = SYSINFO_RET_FAIL;
+	int	ret;
 
 	if (2 < request->nparam)
 		return SYSINFO_RET_FAIL;
@@ -323,9 +339,9 @@ int	NET_IF_TOTAL(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == mode || '\0' == *mode || 0 ==strcmp(mode, "bytes"))
 		ret = NET_IF_TOTAL_BYTES(if_name, result);
-	else if (0 ==strcmp(mode, "packets"))
+	else if (0 == strcmp(mode, "packets"))
 		ret = NET_IF_TOTAL_PACKETS(if_name, result);
-	else if (0 ==strcmp(mode, "errors"))
+	else if (0 == strcmp(mode, "errors"))
 		ret = NET_IF_TOTAL_ERRORS(if_name, result);
 	else
 		ret = SYSINFO_RET_FAIL;
@@ -339,11 +355,14 @@ int	NET_IF_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct zbx_json		j;
 	int			i;
 
+	if (NULL == (ni = if_nameindex()))
+		return SYSINFO_RET_FAIL;
+
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
 
-	for (ni = if_nameindex(), i = 0; 0 != ni[i].if_index; i++)
+	for (i = 0; 0 != ni[i].if_index; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", ni[i].if_name, ZBX_JSON_TYPE_STRING);

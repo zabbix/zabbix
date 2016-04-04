@@ -595,11 +595,6 @@ class CHttpTest extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
 		}
 
-		$stepNames = zbx_objectValues($httpTest['steps'], 'name');
-		if (!empty($stepNames) && !preg_grep('/'.ZBX_PREG_PARAMS.'/i', $stepNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
-		}
-
 		if ($dbHttpTest) {
 			$httpTestStepIds = zbx_objectValues($httpTest['steps'], 'httpstepid');
 
