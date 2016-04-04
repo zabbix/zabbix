@@ -3501,6 +3501,25 @@ static void	DCsync_actions(DB_RESULT result)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_compare_action_conditions_by_type                             *
+ *                                                                            *
+ * Purpose: compare two action conditions by their type                       *
+ *                                                                            *
+ * Comments: This function is used to sort action conditions by type.         *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_compare_action_conditions_by_type(const void *d1, const void *d2)
+{
+	zbx_dc_action_condition_t	*c1 = *(zbx_dc_action_condition_t **)d1;
+	zbx_dc_action_condition_t	*c2 = *(zbx_dc_action_condition_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(c1->conditiontype, c2->conditiontype);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_action_conditions                                         *
  *                                                                            *
  * Purpose: Updates action conditions configuration cache                     *
@@ -3568,6 +3587,16 @@ static void	DCsync_action_conditions(DB_RESULT result)
 		zbx_strpool_release(condition->value);
 
 		zbx_hashset_iter_remove(&iter);
+	}
+
+	/* sort conditions by type */
+
+	zbx_hashset_iter_reset(&config->actions, &iter);
+
+	while (NULL != (action = zbx_hashset_iter_next(&iter)))
+	{
+		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
+			zbx_vector_ptr_sort(&action->conditions, dc_compare_action_conditions_by_type);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
