@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+..F....... [ZBX-6491] fixed resolving of {ITEM.VALUE} macro in "System status" widget and Monitoring -> Triggers (Gunars)
 A......... [ZBX-10563] fixed validation of timeperiods in maintenance create and maintenance update API methods (Cemeris)
 ...GI..PS. [ZBX-10375] defined zbx_uint32_t to avoid conflicting uint32_t definitions (gleb, viktors)
 ........S. [ZBX-10510] fixed action condition time period checking (viktors)
