@@ -1314,7 +1314,7 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 		switch (action->evaltype)
 		{
 			case CONDITION_EVAL_TYPE_AND_OR:
-				if (old_type == condition->conditiontype)
+				if (old_type == condition->conditiontype)	/* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
 						ret = SUCCEED;
