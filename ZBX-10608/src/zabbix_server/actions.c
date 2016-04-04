@@ -1309,6 +1309,12 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 	{
 		condition = (DB_CONDITION *)action->conditions.values[i];
 
+		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
+				SUCCEED == ret)
+		{
+			continue;	/* short-circuit true OR condition block to the next AND condition */
+		}
+
 		condition_result = check_action_condition(event, condition);
 
 		switch (action->evaltype)
