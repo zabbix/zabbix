@@ -449,13 +449,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			memset(&page, 0, sizeof(page));
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
-			{
 				break;
-			}
-			else
-			{
-				zbx_free(page.data);
-			}
+
+			zbx_free(page.data);
 		}
 		while (0 != --httptest->httptest.retries);
 
