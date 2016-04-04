@@ -16,7 +16,7 @@ use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n', 'base=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n', 'base=s', 'tmp=s');
 
 # do not write any logs
 setopt('nolog');
@@ -35,13 +35,8 @@ db_connect();
 
 __validate_input();
 
-if (opt('base'))
-{
-	if (ah_set_base_dir(getopt('base')) != AH_SUCCESS)
-	{
-		fail("cannot set base directory: ", ah_get_error());
-	}
-}
+ah_set_base_dir(getopt('base')) if (opt('base'));
+ah_set_tmp_dir(getopt('tmp')) if (opt('tmp'));
 
 my $opt_from = getopt('from');
 
@@ -175,6 +170,8 @@ dbg("config_minclock:$config_minclock");
 my $last_time_till = max_avail_time($now) - 60;
 
 my ($check_from, $check_till, $continue_file);
+
+fail(ah_get_error()) unless (ah_begin() == AH_SUCCESS);
 
 if (opt('continue'))
 {
@@ -859,6 +856,8 @@ unless (opt('dry-run') || opt('tld'))
 	__update_false_positives();
 }
 
+fail(ah_get_error()) unless (ah_end() == AH_SUCCESS);
+
 slv_exit(SUCCESS);
 
 sub __prnt
@@ -1328,6 +1327,10 @@ Run script as if current time would be as specified.
 =item B<--base> directory
 
 Specify different base directory (default /opt/zabbix/sla).
+
+=item B<--tmp> directory
+
+Specify different temporary directory (default /opt/zabbix/tmp).
 
 =item B<--dry-run>
 
