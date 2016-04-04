@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-03-08 18:45+0300\n"
+"PO-Revision-Date: 2016-03-26 08:09+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1457455502.0\n"
+"X-POOTLE-MTIME: 1458972564.0\n"
 
 # "%1$s" je očakávanáX
 #: include/classes/import/validators/C10XmlValidator.php:346
@@ -71,7 +71,7 @@ msgstr[2] "%1$s Položiek"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Riadok: %2$s | Stĺpec: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -1410,7 +1410,7 @@ msgstr "Nie je možné pridať scenár"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "Nie je možné volať metódu \"%1$s.%2$s\" bez parameterov."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -2197,7 +2197,7 @@ msgstr "Nie je možné spracovať aplikácie z rôznych hostov alebo šablón."
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "Nie je možné čítať XML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -16150,7 +16150,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr ""
+msgstr "XML je prázdne"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -16419,7 +16419,7 @@ msgstr "reťazec znakov je očakávaný"
 
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "číselná hodnota je očakávaná"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
@@ -16734,7 +16734,7 @@ msgstr "musí byť platný LDAP používateľ"
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "musí byť medzi \"%1$s\" a \"%2$s\""
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:177
 msgid "new"
@@ -16925,7 +16925,7 @@ msgstr "neočakávaný tag \"%1$s\""
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr ""
+msgstr "neočakávaný text \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407

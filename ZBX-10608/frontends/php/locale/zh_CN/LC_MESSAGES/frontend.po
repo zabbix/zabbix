@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-03-14 09:03+0300\n"
+"PO-Revision-Date: 2016-04-01 11:43+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1457939003.0\n"
+"X-POOTLE-MTIME: 1459503780.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -6737,7 +6737,7 @@ msgstr "IPMI用户名"
 
 #: include/audit.inc.php:39
 msgid "IT service"
-msgstr "IT 服务"
+msgstr "IT 服务(业务监控)"
 
 #: adm.housekeeper.php:45
 msgid "IT service data storage period"
@@ -6762,7 +6762,7 @@ msgstr "IT服务上层"
 #: include/views/configuration.services.list.php:23 srv_status.php:26
 #: srv_status.php:168
 msgid "IT services"
-msgstr "IT服务"
+msgstr "IT服务(业务监控)"
 
 #: app/controllers/CControllerReportServices.php:146
 #: app/views/report.services.php:21

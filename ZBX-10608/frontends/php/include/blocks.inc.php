@@ -316,7 +316,7 @@ function make_system_status($filter, $backurl) {
 		'output' => ['triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange', 'expression'],
 		'selectGroups' => ['groupid'],
 		'selectHosts' => ['name'],
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid'],
+		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
 		'skipDependent' => true,
 		'groupids' => $groupIds,
@@ -369,6 +369,7 @@ function make_system_status($filter, $backurl) {
 			$trigger['event'] = [
 				'acknowledged' => false,
 				'clock' => $trigger['lastchange'],
+				'ns' => '999999999',
 				'value' => $trigger['value']
 			];
 		}
@@ -797,9 +798,12 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 
-	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
-
 	foreach ($triggers as $trigger) {
+		$description = CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, array(
+			'clock' => $trigger['event']['clock'],
+			'ns' => $trigger['event']['ns']
+		)));
+
 		// unknown triggers
 		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
@@ -823,7 +827,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 		$popupTable->addRow([
 			$trigger['hosts'][0]['name'],
-			getSeverityCell($trigger['priority'], $config, $trigger['description']),
+			getSeverityCell($trigger['priority'], $config, $description),
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
