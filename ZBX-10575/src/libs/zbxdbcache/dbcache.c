@@ -219,6 +219,7 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
 static void	hc_push_busy_items(zbx_vector_ptr_t *history_items);
 static int	hc_push_processed_items(zbx_vector_ptr_t *history_items);
+static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
 static void	hc_update_history_queue();
 
 /******************************************************************************
@@ -2177,6 +2178,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		}
 
 		zbx_vector_ptr_clear(&history_items);
+		hc_free_item_values(history, history_num);
 
 		if (ZBX_HC_SYNC_MIN_PCNT > history_num * 100 / candidate_num)
 		{
@@ -2956,7 +2958,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		history->value_orig.err = data->value.str;
+		history->value_orig.err = zbx_strdup(NULL, data->value.str);
 		history->flags |= ZBX_DC_FLAG_UNDEF;
 		return;
 	}
@@ -2979,11 +2981,14 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
-				history->value_orig.str = data->value.str;
+				history->value_orig.str = zbx_strdup(NULL, data->value.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				history->value_orig.str = data->value.log->value;
-				history->value.str = data->value.log->source;
+				history->value_orig.str = zbx_strdup(NULL, data->value.log->value);
+				if (NULL != data->value.log->source)
+					history->value.str = zbx_strdup(NULL, data->value.log->source);
+				else
+					history->value.str = NULL;
 
 				history->timestamp = data->value.log->timestamp;
 				history->severity = data->value.log->severity;
@@ -3134,6 +3139,44 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 		next_sync = 0;
 
 	return next_sync;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: hc_free_item_values                                              *
+ *                                                                            *
+ * Purpose: frees resources allocated to store str/text/log values            *
+ *                                                                            *
+ * Parameters: history     - [IN] the history data                            (
+ *             history_num - [IN] the number of values in history data        *
+ *                                                                            *
+ ******************************************************************************/
+static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num)
+{
+	int	i;
+
+	for (i = 0; i < history_num; i++)
+	{
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
+		{
+			zbx_free(history[i].value_orig.err);
+			continue;
+		}
+
+		if (0 != (ZBX_DC_FLAG_NOVALUE & history[i].flags))
+			continue;
+
+		switch (history[i].value_type)
+		{
+			case ITEM_VALUE_TYPE_LOG:
+				zbx_free(history[i].value.str);
+				/* break; is not missing here */
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				zbx_free(history[i].value_orig.str);
+				break;
+		}
+	}
 }
 
 /******************************************************************************
