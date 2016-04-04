@@ -553,9 +553,7 @@ sub __get_test_data
 
 			$last_avail_clock = $clock;
 
-			dbg("$service availability at ", ts_full($clock), ": $value");
-
-			dbg("inc_idx:$inc_idx value:$value clock:", ts_full($clock));
+			dbg("$service availability at ", ts_full($clock), ": $value (inc_idx:$inc_idx)");
 
 			# we need to count failed tests within resolved incidents
 			if ($inc_idx < $incidents_count && $incidents->[$inc_idx]->{'end'})
@@ -573,7 +571,8 @@ sub __get_test_data
 				}
 			}
 
-			wrn("unknown status: $value (expected UP (0) or DOWN (1))") if ($value != UP && $value != DOWN);
+			wrn("unknown availability result: $value (expected ", DOWN, " (Down), ", UP, " (Up) or ", UP_INCONCLUSIVE, " (Up (inconclusive))")
+				if ($value != UP && $value != DOWN && $value != UP_INCONCLUSIVE);
 
 			# We have the test resulting value (Up or Down) at "clock". Now we need to select the
 			# time bounds (start/end) of all data points from all proxies.
