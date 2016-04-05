@@ -469,11 +469,11 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*              |                                                                                 */
 	/*  ------------+---------------------------------------------------------------------            */
 	/*              |                                                                                 */
-	/*  OK          |   no           T+I          T+E         I              -                        */
+	/*  OK          |   no           T+I          T+E         I              no                       */
 	/*              |                                                                                 */
 	/*  OK(?)       |   T+I          T(e)         T+E+I       -              T+I                      */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I            -                        */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I            no                       */
 	/*              |                                                                                 */
 	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)           T+I                      */
 	/*              |                                                                                 */
