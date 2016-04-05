@@ -3615,9 +3615,6 @@ static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, cons
 	char		*bl, *br;
 	zbx_uint64_t	functionid;
 
-	if (NULL == expression)
-		return SUCCEED;
-
 	for (bl = strchr(expression, '{'); NULL != bl; bl = strchr(bl, '{'))
 	{
 		if (NULL == (br = strchr(bl, '}')))
