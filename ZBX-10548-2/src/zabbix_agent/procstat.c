@@ -477,7 +477,6 @@ static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname
 		{
 			return query;
 		}
-
 	}
 
 	return NULL;

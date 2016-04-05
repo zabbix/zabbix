@@ -448,7 +448,7 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
 static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *minor_version)
 {
 	const char	*__function_name = "zbx_solaris_version_get";
-	int		res;
+	long		res;
 	char		buf[8];
 
 	if (-1 == (res = sysinfo(SI_RELEASE, buf, sizeof(buf))))
@@ -792,11 +792,11 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		period = SEC_PER_MIN;
 	}
-	else if ( 0 == strcmp(tmp, "avg5"))
+	else if (0 == strcmp(tmp, "avg5"))
 	{
 		period = SEC_PER_MIN * 5;
 	}
-	else if ( 0 == strcmp(tmp, "avg15"))
+	else if (0 == strcmp(tmp, "avg15"))
 	{
 		period = SEC_PER_MIN * 15;
 	}
@@ -825,7 +825,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 #endif
 		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_CURRENT;
 	}
-	else if(0 == strcmp(flags, "all"))
+	else if (0 == strcmp(flags, "all"))
 	{
 		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_ALL;
 	}
