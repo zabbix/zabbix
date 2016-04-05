@@ -20,15 +20,16 @@ use Fcntl qw(:flock);
 use constant SUCCESS	=> 0;
 use constant E_FAIL	=> -1;
 
-use constant UP		=> 1;
-use constant DOWN	=> 0;
+use constant DOWN		=> 0;
+use constant UP			=> 1;
+use constant UP_INCONCLUSIVE	=> 2;
+
 use constant ONLINE	=> 1;
 use constant OFFLINE	=> 0;
 
 use constant SLV_UNAVAILABILITY_LIMIT	=> 49; # NB! must be in sync with frontend
 
 use constant MAX_SERVICE_ERROR	=> -200; # -200, -201 ...
-use constant RDDS_UP		=> 2; # results of input items: 0 - RDDS down, 1 - only RDDS43 up, 2 - both RDDS43 and RDDS80 up
 use constant MIN_LOGIN_ERROR	=> -205;
 use constant MAX_LOGIN_ERROR	=> -203;
 use constant MIN_INFO_ERROR	=> -211;
@@ -51,9 +52,9 @@ use constant PROBE_KEY_AUTOMATIC		=> 'rsm.probe.status[automatic,%]'; # match al
 # in case of "availability" and 3 minutes in case of "rolling week"
 # calculations.
 # NB! These numbers must be in sync with Frontend (details page)!
-use constant AVAIL_SHIFT_BACK		=> 120; # seconds (must be divisible by 60 without remainder)
-use constant ROLLWEEK_SHIFT_BACK	=> 180; # seconds (must be divisible by 60 without remainder)
-use constant RESULT_TIMESTAMP_SHIFT	=> 29; # seconds (shift back from upper time bound of the period for the value timestamp)
+use constant AVAIL_SHIFT_BACK		=> 120;	# seconds (must be divisible by 60 without remainder)
+use constant ROLLWEEK_SHIFT_BACK	=> 180;	# seconds (must be divisible by 60 without remainder)
+use constant RESULT_TIMESTAMP_SHIFT	=> 29;	# seconds (shift back from upper time bound of the period for the value timestamp)
 
 use constant PROBE_ONLINE_STR	=> 'Online';
 use constant PROBE_OFFLINE_STR	=> 'Offline';
@@ -85,7 +86,7 @@ my $lock_tmp;
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
-		SUCCESS E_FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
+		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
 		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR
 		AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43 JSON_INTERFACE_RDDS80
 		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION
@@ -106,7 +107,7 @@ our @EXPORT = qw($result $dbh $tld
 		get_service_status_itemids get_probe_results
 		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
-		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
+		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time avail_up_down
 		get_real_services_period dbg info wrn fail format_stats_time slv_exit slv_stats_reset slv_lock slv_unlock exit_if_running trim parse_opts
 		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
 		cycle_start cycle_end rsm_slv_error get_readable_tld usage);
@@ -1778,7 +1779,7 @@ sub process_slv_avail
 
 	if ($probes_count < $cfg_minonline)
 	{
-		push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
+		push_value($tld, $cfg_key_out, $value_ts, UP_INCONCLUSIVE, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
 		add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes online, $probes_count while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		return;
 	}
@@ -1802,7 +1803,7 @@ sub process_slv_avail
 	my $probes_with_results = scalar(keys(%$values_ref));
 	if ($probes_with_results < $cfg_minonline)
 	{
-		push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+		push_value($tld, $cfg_key_out, $value_ts, UP_INCONCLUSIVE, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
 		add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		return;
 	}
@@ -1827,9 +1828,8 @@ sub process_slv_avail
 		dbg("i:$itemid (h:$hostid): ", (SUCCESS == $result ? "up" : "down"), " (values: ", join(', ', @{$values_ref->{$itemid}}), ")");
 	}
 
-	my $result = DOWN;
 	my $perc = $probes_with_positive * 100 / $probes_with_results;
-	$result = UP if ($perc > SLV_UNAVAILABILITY_LIMIT);
+	my $result = $perc > SLV_UNAVAILABILITY_LIMIT ? UP : DOWN;
 
 	push_value($tld, $cfg_key_out, $value_ts, $result, avail_result_msg($result, $probes_with_positive, $probes_with_results, $perc, $value_ts));
 }
@@ -1895,12 +1895,12 @@ sub process_slv_ns_avail
 
 		if ($online_probes_count < $cfg_minonline)
 		{
-			push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes online, $online_probes_count while $cfg_minonline required)");
+			push_value($tld, $out_key, $value_ts, UP_INCONCLUSIVE, "Up (not enough probes online, $online_probes_count while $cfg_minonline required)");
 			add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes online, $online_probes_count while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		}
 		elsif ($probes_with_results < $cfg_minonline)
 		{
-			push_value($tld, $out_key, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+			push_value($tld, $out_key, $value_ts, UP_INCONCLUSIVE, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
 			add_alert(ts_str($value_ts) . "#system#zabbix#$out_key#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 		}
 		else
@@ -3292,7 +3292,7 @@ sub get_downtime
 	my $itemid = shift;
 	my $from = shift;
 	my $till = shift;
-	my $ignore_incidents = shift; # if set check the whole period
+	my $ignore_incidents = shift;	# if set check the whole period
 
 	my $incidents;
 	if ($ignore_incidents)
@@ -3344,7 +3344,7 @@ sub get_downtime
 		{
 			$fetches++;
 
-			my $value = $row_ref->[0];
+			my $value = avail_up_down($row_ref->[0]);
 			my $clock = $row_ref->[1];
 
 			# In case of multiple values per second treat them as one. Up value prioritized.
@@ -3471,6 +3471,8 @@ sub get_downtime_execute
 
 		while ($sth->fetch)
 		{
+			$value = avail_up_down($value);
+
 			$fetches++;
 
 			# In case of multiple values per second treat them as one. Up value prioritized.
@@ -3515,7 +3517,7 @@ sub avail_result_msg
 	my $perc = shift;
 	my $value_ts = shift;
 
-	my $result_str = ($test_result == UP ? "Up" : "Down");
+	my $result_str = (avail_up_down($test_result) == UP ? "Up" : "Down");
 
 	return sprintf("$result_str (%d/%d positive, %.3f%%, %s)", $success_values, $total_results, $perc, ts_str($value_ts));
 }
@@ -3795,6 +3797,19 @@ sub get_test_start_time
 	return 0 if ($remainder != 0);
 
 	return $till - $delay;
+}
+
+# returns UP or DOWN
+sub avail_up_down
+{
+	my $avail_value = shift;
+
+	if ($avail_value == UP_INCONCLUSIVE)
+	{
+		$avail_value = UP;
+	}
+
+	return $avail_value;
 }
 
 # $services is a hash reference of services that need to be checked.

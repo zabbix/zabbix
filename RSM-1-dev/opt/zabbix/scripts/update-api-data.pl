@@ -598,18 +598,19 @@ foreach (keys(%$servicedata))
 
 				if (opt('dry-run'))
 				{
-					if ($value == UP)
+					my $up_down = avail_up_down($value);
+
+					if ($up_down == UP)
 					{
 						$status_up++;
 					}
-					elsif ($value == DOWN)
+					elsif ($up_down == DOWN)
 					{
 						$status_down++;
 					}
-					else
-					{
-						wrn("unknown status: $value (expected UP (" . UP . ") or DOWN (" . DOWN . "))");
-					}
+
+					wrn("unknown availability result: $value (expected ", DOWN, " (Down), ", UP, " (Up) or ", UP_INCONCLUSIVE, " (Up (inconclusive))")
+						if ($value != UP && $value != DOWN && $value != UP_INCONCLUSIVE);
 				}
 
 				$cycles->{$cycleclock}->{'tld'} = $tld;
