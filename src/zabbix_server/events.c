@@ -42,11 +42,11 @@ static size_t	events_alloc = 0, events_num = 0;
  *             value    - [IN] event value (TRIGGER_VALUE_*,                  *
  *                             TRIGGER_STATE_*, ITEM_STATE_* ... depends on   *
  *                             source and object)                             *
- *             trigger_description - [IN] trigger description                 *
- *             trigger_expression  - [IN] trigger short expression            *
+ *             trigger_description         - [IN] trigger description         *
+ *             trigger_expression          - [IN] trigger short expression    *
  *             trigger_recovery_expression - [IN] trigger recovery expression *
- *             trigger_priority    - [IN] trigger priority                    *
- *             trigger_type        - [IN] trigger type (TRIGGER_TYPE_*)       *
+ *             trigger_priority            - [IN] trigger priority            *
+ *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
  *                                                                            *
  ******************************************************************************/
 void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
