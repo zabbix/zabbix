@@ -464,18 +464,18 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*                                                                                                */
 	/*   _          |                                                                                 */
 	/*    \__ to    |                                                                                 */
-	/*       \_____ |   OK           OK(?)        PROBLEM     PROBLEM(?)                              */
+	/*       \_____ |   OK           OK(?)        PROBLEM     PROBLEM(?)     NONE                     */
 	/*   from      \|                                                                                 */
 	/*              |                                                                                 */
-	/*  ------------+------------------------------------------------------                           */
+	/*  ------------+---------------------------------------------------------------------            */
 	/*              |                                                                                 */
-	/*  OK          |   no           T+I          T+E         I                                       */
+	/*  OK          |   no           T+I          T+E         I              -                        */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
+	/*  OK(?)       |   T+I          T(e)         T+E+I       -              T+I                      */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I            -                        */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
+	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)           T+I                      */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
@@ -488,6 +488,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*  (m) - if it is a "multiple PROBLEM events" trigger                                            */
 	/*  (e) - if an error message has changed                                                         */
 	/*  I   - generate an internal event                                                              */
+	/*                                                                                                */
+	/*  NONE is a trigger value used internally to indicate that trigger value was calculated         */
+	/*  successfully, but should not affect trigger event generation (internal events still can       */
+	/*  be generated if the trigger was in unknown state.                                             */
 	/*                                                                                                */
 	/**************************************************************************************************/
 
