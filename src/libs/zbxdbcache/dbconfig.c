@@ -5133,7 +5133,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
 	dst_trigger->recovery_expression_orig = zbx_strdup(NULL, src_trigger->recovery_expression);
 	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
-	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
 	dst_trigger->timespec.ns = 0;
 	dst_trigger->priority = src_trigger->priority;
@@ -5148,6 +5147,7 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 
 	dst_trigger->expression = NULL;
 	dst_trigger->recovery_expression = NULL;
+	dst_trigger->new_error = NULL;
 
 	if (ZBX_EXPAND_MACROS == expand)
 	{

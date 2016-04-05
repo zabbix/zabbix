@@ -71,14 +71,9 @@
  ******************************************************************************/
 static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end)
 {
-	const char			*__function_name = "get_N_functionid";
-
 	enum state_t {NORMAL, ID}	state = NORMAL;
 	int				num = 0, ret = FAIL;
 	const char			*c, *p_functionid = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
-			__function_name, expression, N_functionid);
 
 	for (c = expression; '\0' != *c; c++)
 	{
@@ -106,9 +101,6 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 			{
 				if (++num == N_functionid)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64,
-							__function_name, *functionid);
-
 					if (NULL != end)
 						*end = c + 1;
 
@@ -121,8 +113,6 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
 	return ret;
 }
 
@@ -132,10 +122,9 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
  *                                                                            *
  * Purpose: get identifiers of the functions used in expression               *
  *                                                                            *
- * Parameters: expression   - [IN] null terminated trigger expression         *
- *                            '{11}=1 & {2346734}>5'                          *
- *             count        - [IN] the maximum number of functions to parse   *
- *             functionids  - [OUT] the resulting vector of function ids      *
+ * Parameters: functionids - [OUT] the resulting vector of function ids       *
+ *             expression  - [IN] null terminated trigger expression          *
+ *                           '{11}=1 & {2346734}>5'                           *
  *                                                                            *
  ******************************************************************************/
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
@@ -2260,7 +2249,7 @@ fail:
  * Parameters: hostids             - [OUT] the host identifier cache          *
  *             expression          - [IN] the trigger expression              *
  *             recovery_expression - [IN] the trigger recovery expression     *
- *                                        (can be NULL)                       *
+ *                                        (can be empty)                      *
  *                                                                            *
  ******************************************************************************/
 static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression,
@@ -2663,7 +2652,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
-						replace_to = zbx_strdup(replace_to, c_event->trigger.recovery_expression);
+						replace_to = zbx_strdup(replace_to,
+								c_event->trigger.recovery_expression);
 						DCexpand_trigger_expression(&replace_to);
 					}
 					else
@@ -2853,7 +2843,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
 					{
-						replace_to = zbx_strdup(replace_to, c_event->trigger.recovery_expression);
+						replace_to = zbx_strdup(replace_to,
+								c_event->trigger.recovery_expression);
 						DCexpand_trigger_expression(&replace_to);
 					}
 					else
@@ -3871,7 +3862,6 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 typedef struct
 {
 	zbx_uint64_t	functionid;
@@ -3946,7 +3936,7 @@ static int	substitute_expression_functions_results(zbx_hashset_t *func_index, ch
 
 static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_ptr_t *triggers)
 {
-	const char	*__function_name = "zbx_substitute_functions_results";
+	const char		*__function_name = "zbx_substitute_functions_results";
 
 	DC_TRIGGER		*tr;
 	char			*out = NULL;
