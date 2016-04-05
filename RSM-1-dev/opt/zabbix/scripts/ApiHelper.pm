@@ -7,45 +7,52 @@ use DateTime::Format::RFC3339;
 use JSON::XS;
 use base 'Exporter';
 
-use constant AH_SUCCESS => 0;
-use constant AH_FAIL => 1;
-use constant AH_ALARMED_YES => 'Yes';
-use constant AH_ALARMED_NO => 'No';
-use constant AH_ALARMED_DISABLED => 'Disabled';
+use constant AH_SUCCESS	=> 0;
+use constant AH_FAIL	=> 1;
 
-use constant AH_STATUS_UP => 'Up';
-use constant AH_STATUS_DOWN => 'Down';
-use constant AH_ENABLED_YES => 'Yes';
-use constant AH_ENABLED_NO => 'No';
+use constant AH_ALARMED_YES		=> 'Yes';
+use constant AH_ALARMED_NO		=> 'No';
+use constant AH_ALARMED_DISABLED	=> 'Disabled';
+use constant AH_ALARMED_MAINTENANCE	=> 'No (maintenance)';
 
-use constant AH_FALSE_POSITIVE_TRUE => 'True';
-use constant AH_FALSE_POSITIVE_FALSE => 'False';
+use constant AH_STATUS_UP		=> 'Up';
+use constant AH_STATUS_DOWN		=> 'Down';
+use constant AH_STATUS_MAINTENANCE	=> 'Up (maintenance)';
 
-use constant AH_INCIDENT_ACTIVE => 'Active';
-use constant AH_INCIDENT_ENDED => 'Resolved';
+use constant AH_ENABLED_YES	=> 'Yes';
+use constant AH_ENABLED_NO	=> 'No';
 
-our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED AH_STATUS_UP AH_STATUS_DOWN
-		AH_ENABLED_YES AH_ENABLED_NO AH_FALSE_POSITIVE_TRUE AH_FALSE_POSITIVE_FALSE AH_INCIDENT_ACTIVE
-		AH_INCIDENT_ENDED
+use constant AH_FALSE_POSITIVE_TRUE	=> 'True';
+use constant AH_FALSE_POSITIVE_FALSE	=> 'False';
+
+use constant AH_INCIDENT_ACTIVE	=> 'Active';
+use constant AH_INCIDENT_ENDED	=> 'Resolved';
+
+our @EXPORT = qw(AH_SUCCESS AH_FAIL AH_ALARMED_YES AH_ALARMED_NO AH_ALARMED_DISABLED AH_ALARMED_MAINTENANCE AH_STATUS_UP
+		AH_STATUS_DOWN AH_STATUS_MAINTENANCE AH_ENABLED_YES AH_ENABLED_NO AH_FALSE_POSITIVE_TRUE
+		AH_FALSE_POSITIVE_FALSE AH_INCIDENT_ACTIVE AH_INCIDENT_ENDED
 		ah_get_error ah_begin ah_end
 		ah_save_alarmed ah_save_service_availability ah_save_incident_state ah_save_false_positive
 		ah_save_incident_results ah_get_continue_file ah_get_last_audit ah_save_audit
 		ah_encode_pretty_json ah_save_tld_status ah_set_base_dir ah_set_tmp_dir);
 
+use constant AH_FILE_POSTFIX			=> '';	# e. g. ".json"
+use constant AH_TLD_STATE_FILE			=> 'state' . AH_FILE_POSTFIX;
+use constant AH_ALARMED_FILE			=> 'alarmed' . AH_FILE_POSTFIX;
+use constant AH_SERVICE_AVAILABILITY_FILE	=> 'serviceAvailability' . AH_FILE_POSTFIX;
+use constant AH_INCIDENT_STATE_FILE		=> 'state' . AH_FILE_POSTFIX;
+use constant AH_FALSE_POSITIVE_FILE		=> 'falsePositive' . AH_FILE_POSTFIX;
+
+use constant AH_CONTINUE_FILE	=> 'last_update.txt';	# file with timestamp of last run with --continue
+use constant AH_AUDIT_FILE	=> 'last_audit.txt';	# file containing timestamp of last auditlog entry that was checked (false_positive change)
+
+use constant AH_JSON_FILE_VERSION	=> 1;
+
+# When files are generated they are first saved to $AH_TMP_DIR . When the script is finished, they are copied over
+# to $AH_BASE_DIR . This allows atomic process of generating files. These variables can be overriden using functions
+# ah_set_base_dir() and ah_set_tmp_dir() .
 my $AH_BASE_DIR = '/opt/zabbix/sla';
 my $AH_TMP_DIR = '/opt/zabbix/tmp';
-
-use constant AH_FILE_POSTFIX => '';	# e. g. ".json"
-use constant AH_TLD_STATE_FILE => 'state' . AH_FILE_POSTFIX;
-use constant AH_ALARMED_FILE => 'alarmed' . AH_FILE_POSTFIX;
-use constant AH_SERVICE_AVAILABILITY_FILE => 'serviceAvailability' . AH_FILE_POSTFIX;
-use constant AH_INCIDENT_STATE_FILE => 'state' . AH_FILE_POSTFIX;
-use constant AH_FALSE_POSITIVE_FILE => 'falsePositive' . AH_FILE_POSTFIX;
-
-use constant AH_CONTINUE_FILE => 'last_update.txt';	# file with timestamp of last run with --continue
-use constant AH_AUDIT_FILE => 'last_audit.txt';		# file containing timestamp of last auditlog entry that was checked (false_positive change)
-
-use constant AH_JSON_FILE_VERSION => 1;
 
 my $error_string = "";
 
@@ -133,7 +140,25 @@ sub __make_path
 	return AH_SUCCESS;
 }
 
-sub __make_tld_path
+sub __make_source_tld_path
+{
+	my $tld = shift;
+	my $result_path_ptr = shift;	# pointer
+	my $add_path = shift;
+
+	$tld = lc($tld);
+
+	my $path = __source_dir() . "/$tld/data";
+	$path .= "/$add_path" if ($add_path);
+
+	return AH_FAIL unless (__make_path($path) == AH_SUCCESS);
+
+	$$result_path_ptr = $path;
+
+	return AH_SUCCESS;
+}
+
+sub __make_target_tld_path
 {
 	my $tld = shift;
 	my $result_path_ptr = shift;	# pointer
@@ -151,7 +176,7 @@ sub __make_tld_path
 	return AH_SUCCESS;
 }
 
-sub __make_service_path
+sub __make_source_service_path
 {
 	my $tld = shift;
 	my $service = shift;
@@ -164,7 +189,23 @@ sub __make_service_path
 
 	$path .= "/$add_path" if ($add_path);
 
-	return __make_tld_path($tld, $service_path_ptr, $path);
+	return __make_source_tld_path($tld, $service_path_ptr, $path);
+}
+
+sub __make_taret_service_path
+{
+	my $tld = shift;
+	my $service = shift;
+	my $service_path_ptr = shift;	# pointer
+	my $add_path = shift;
+
+	$service = lc($service);
+
+	my $path = $service;
+
+	$path .= "/$add_path" if ($add_path);
+
+	return __make_target_tld_path($tld, $service_path_ptr, $path);
 }
 
 sub __make_inc_path
@@ -174,7 +215,7 @@ sub __make_inc_path
 	my $incidentid = shift;
 	my $inc_path_ptr = shift;	# pointer
 
-	return __make_service_path($tld, $service, $inc_path_ptr, "incidents/$incidentid");
+	return __make_taret_service_path($tld, $service, $inc_path_ptr, "incidents/$incidentid");
 }
 
 sub __set_error
@@ -235,18 +276,19 @@ sub __write_file
 
 sub ah_save_alarmed
 {
+	my $now = shift;
 	my $tld = shift;
 	my $service = shift;
 	my $status = shift;
 
-	my $service_path;
+	my $target_path;
 
-	return AH_FAIL unless (__make_service_path($tld, $service, \$service_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_taret_service_path($tld, $service, \$target_path) == AH_SUCCESS);
 
 	# if service is disabled there should be no availability file
 	if ($status eq AH_ALARMED_DISABLED)
 	{
-		my $avail_path = $service_path . '/' . AH_SERVICE_AVAILABILITY_FILE;
+		my $avail_path = $target_path . '/' . AH_SERVICE_AVAILABILITY_FILE;
 
 		if ((-e $avail_path) and not unlink($avail_path))
 		{
@@ -255,22 +297,49 @@ sub ah_save_alarmed
 		}
 	}
 
-	my $json_ref = {'alarmed' => $status};
+	my $json_ref;
 
-	return __write_file($service_path . '/' . AH_ALARMED_FILE, __encode_json($json_ref));
+	if ($now)
+	{
+		$json_ref->{'lastUpdateApiDatabase'} = $now;
+	}
+	else
+	{
+		my ($source_path, $buf);
+
+		return AH_FAIL unless (__make_source_service_path($tld, $service, \$source_path) == AH_SUCCESS);
+
+		if (__read_file($source_path . '/' . AH_ALARMED_FILE, \$buf) == AH_SUCCESS)
+		{
+			$json_ref = decode_json($buf);
+
+			$json_ref->{'lastUpdateApiDatabase'} = $json_ref->{'lastUpdateApiDatabase'} + 1;
+		}
+		else
+		{
+			$json_ref->{'lastUpdateApiDatabase'} = time();
+		}
+	}
+
+	$json_ref->{'alarmed'} = $status;
+
+	return __write_file($target_path . '/' . AH_ALARMED_FILE, __encode_json($json_ref));
 }
 
 sub ah_save_service_availability
 {
+	my $now = shift;
 	my $tld = shift;
 	my $service = shift;
 	my $rollweek = shift;
 
 	my $service_path;
 
-	return AH_FAIL unless (__make_service_path($tld, $service, \$service_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_taret_service_path($tld, $service, \$service_path) == AH_SUCCESS);
 
 	my $json_ref = {'serviceAvailability' => $rollweek};
+
+	$json_ref->{'lastUpdateApiDatabase'} = $now;
 
 	return __write_file($service_path . '/' . AH_SERVICE_AVAILABILITY_FILE, __encode_json($json_ref));
 }
@@ -285,6 +354,7 @@ sub __incident_id
 
 sub ah_save_incident_state
 {
+	my $now = shift;
 	my $tld = shift;
 	my $service = shift;
 	my $eventid = shift;	# incident is identified by event ID
@@ -299,6 +369,8 @@ sub ah_save_incident_state
 	return AH_FAIL unless (__make_inc_path($tld, $service, $incidentid, \$inc_path) == AH_SUCCESS);
 
 	my $json_ref = {'falsePositive' => AH_FALSE_POSITIVE_FALSE, 'updateTime' => undef};
+
+	$json_ref->{'lastUpdateApiDatabase'} = $now;
 
 	return AH_FAIL unless (__write_file($inc_path . '/' . AH_FALSE_POSITIVE_FILE, __encode_json($json_ref)) == AH_SUCCESS);
 
@@ -316,11 +388,14 @@ sub ah_save_incident_state
 			]
 		};
 
+	$json_ref->{'lastUpdateApiDatabase'} = $now;
+
 	return __write_file($inc_path . '/'. AH_INCIDENT_STATE_FILE, __encode_json($json_ref));
 }
 
 sub ah_save_false_positive
 {
+	my $now = shift;
 	my $tld = shift;
 	my $service = shift;
 	my $start = shift;		# incident start time
@@ -340,6 +415,8 @@ sub ah_save_false_positive
 			'updateTime' => $clock
 		};
 
+	$json_ref->{'lastUpdateApiDatabase'} = $now;
+
 	return AH_FAIL unless (__write_file($inc_path . '/' . AH_FALSE_POSITIVE_FILE, __encode_json($json_ref)) == AH_SUCCESS);
 
 	$json_ref = undef;
@@ -348,11 +425,14 @@ sub ah_save_false_positive
 
 	$json_ref->{'incident'}->{'falsePositive'} = ($false_positive == 0 ? AH_FALSE_POSITIVE_FALSE : AH_FALSE_POSITIVE_TRUE);
 
+	$json_ref->{'lastUpdateApiDatabase'} = $now;
+
 	return __write_file($inc_state_file, __encode_json($json_ref));
 }
 
 sub ah_save_incident_results
 {
+	my $now = shift;
 	my $tld = shift;
 	my $service = shift;
 	my $eventid = shift;	# incident is identified by event ID
@@ -365,6 +445,8 @@ sub ah_save_incident_results
 	my $incidentid = __incident_id($start, $eventid);
 
 	return AH_FAIL unless (__make_inc_path($tld, $service, $incidentid, \$inc_path) == AH_SUCCESS);
+
+	$tr_ref->{'lastUpdateApiDatabase'} = $now;
 
 	return __write_file("$inc_path/$clock.$incidentid" . AH_FILE_POSTFIX, __encode_json($tr_ref));
 }
@@ -406,7 +488,6 @@ sub __encode_json
 	my $json_ref = shift;
 
 	$json_ref->{'version'} = AH_JSON_FILE_VERSION;
-	$json_ref->{'lastUpdateApiDatabase'} = time();
 
 	return encode_json($json_ref);
 }
@@ -418,12 +499,13 @@ sub ah_encode_pretty_json
 
 sub ah_save_tld_status
 {
+	my $now = shift;
 	my $tld = shift;
 	my $tld_ref = shift;
 
 	my $base_path;
 
-	return AH_FAIL unless (__make_tld_path($tld, \$base_path) == AH_SUCCESS);
+	return AH_FAIL unless (__make_source_tld_path($tld, \$base_path) == AH_SUCCESS);
 
 	my $buf;
 	my $json_ref;
@@ -437,6 +519,23 @@ sub ah_save_tld_status
 	{
 		$json_ref = {'tld' => $tld};
 	}
+
+	if ($now)
+	{
+		$json_ref->{'lastUpdateApiDatabase'} = $now;
+	}
+	elsif ($json_ref->{'lastUpdateApiDatabase'})
+	{
+		$json_ref->{'lastUpdateApiDatabase'} = $json_ref->{'lastUpdateApiDatabase'} + 1;
+	}
+	else
+	{
+		$json_ref->{'lastUpdateApiDatabase'} = time();
+	}
+
+	return AH_FAIL unless (__make_target_tld_path($tld, \$base_path) == AH_SUCCESS);
+
+	$file = $base_path . '/' . AH_TLD_STATE_FILE;
 
 	$json_ref->{'status'} = $tld_ref->{'status'};
 
