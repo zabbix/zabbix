@@ -3976,22 +3976,19 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 		if (NULL != tr->new_error)
 			continue;
 
-		if (NULL != tr->expression)
+		if( SUCCEED != substitute_expression_functions_results(&func_index, tr->expression, &out,
+				&out_alloc, &tr->new_error))
 		{
-			if( SUCCEED != substitute_expression_functions_results(&func_index, tr->expression, &out,
-					&out_alloc, &tr->new_error))
-			{
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
-				continue;
-			}
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'", __function_name, i,
-					tr->expression, out);
-
-			tr->expression = zbx_strdup(tr->expression, out);
+			tr->new_value = TRIGGER_VALUE_UNKNOWN;
+			continue;
 		}
 
-		if (NULL != tr->recovery_expression)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'", __function_name, i,
+				tr->expression, out);
+
+		tr->expression = zbx_strdup(tr->expression, out);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
 		{
 			if (SUCCEED != substitute_expression_functions_results(&func_index,
 				tr->recovery_expression, &out, &out_alloc, &tr->new_error))
@@ -4119,13 +4116,10 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		if (NULL == tr->new_error)
 		{
-			if (NULL != tr->expression)
-			{
-				substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
-						&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-			}
+			substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, &tr->expression,
+					MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
 
-			if (NULL != tr->recovery_expression)
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
 			{
 				substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
 						&tr->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
