@@ -4104,8 +4104,6 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
 
-	memset(&event, 0, sizeof(DB_EVENT));
-	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
 
 	for (i = 0; i < triggers->values_num; i++)
@@ -4170,20 +4168,18 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 				continue;
 			}
 
-			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
+			/* processing recovery expression mode */
+			if (SUCCEED != evaluate(&expr_result, tr->recovery_expression, err, sizeof(err)))
 			{
-				if (SUCCEED != evaluate(&expr_result, tr->recovery_expression, err, sizeof(err)))
-				{
-					tr->new_error = zbx_strdup(tr->new_error, err);
-					tr->new_value = TRIGGER_VALUE_UNKNOWN;
-					continue;
-				}
+				tr->new_error = zbx_strdup(tr->new_error, err);
+				tr->new_value = TRIGGER_VALUE_UNKNOWN;
+				continue;
+			}
 
-				if (SUCCEED != zbx_double_compare(expr_result, 0))
-				{
-					tr->new_value = TRIGGER_VALUE_OK;
-					continue;
-				}
+			if (SUCCEED != zbx_double_compare(expr_result, 0))
+			{
+				tr->new_value = TRIGGER_VALUE_OK;
+				continue;
 			}
 		}
 
