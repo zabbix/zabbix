@@ -3612,7 +3612,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
-	char		*bl, *br;
+	const char	*bl, *br;
 	zbx_uint64_t	functionid;
 
 	for (bl = strchr(expression, '{'); NULL != bl; bl = strchr(bl, '{'))
@@ -3628,10 +3628,7 @@ static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, cons
 		bl = br + 1;
 	}
 
-	if (NULL != bl)
-		return FAIL;
-
-	return SUCCEED;
+	return (NULL == bl ? SUCCEED : FAIL);
 }
 
 static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *triggers)
