@@ -519,11 +519,11 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 
 			zbx_free(var_err_str);
+			zbx_free(page.data);
 		}
 		else
 			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 
-		zbx_free(page.data);
 httpstep_error:
 		zbx_free(httpstep.status_codes);
 		zbx_free(httpstep.required);
