@@ -3610,7 +3610,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	return res;
 }
 
-static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, char *expression)
+static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
 	char		*bl, *br;
 	zbx_uint64_t	functionid;
@@ -3623,18 +3623,12 @@ static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, char
 		if (NULL == (br = strchr(bl, '}')))
 			break;
 
-		*br = '\0';
-
-		if (SUCCEED != is_uint64(bl + 1, &functionid))
-		{
-			*br = '}';
+		if (SUCCEED != is_uint64_n(bl + 1, br - bl - 1, &functionid))
 			break;
-		}
 
 		zbx_vector_uint64_append(functionids, functionid);
 
 		bl = br + 1;
-		*br = '}';
 	}
 
 	if (NULL != bl)
