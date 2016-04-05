@@ -2,7 +2,11 @@
 #
 # RDDS availability
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*/.*,$1,; $MYDIR = '..' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
 use strict;
 use warnings;
@@ -61,7 +65,14 @@ while ($period > 0)
 	{
 		$tld = $_;
 
-		if (avail_value_exists($value_ts, get_itemid_by_host($tld, $cfg_key_out)) == SUCCESS)
+		my $itemid = get_itemid_by_host($tld, $cfg_key_out);
+		if (!$itemid)
+		{
+			wrn("configuration error: ", rsm_slv_error());
+			next;
+		}
+
+		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
 		{
 			# value already exists
 			next unless (opt('dry-run'));
