@@ -219,7 +219,9 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
 static void	hc_push_busy_items(zbx_vector_ptr_t *history_items);
 static int	hc_push_processed_items(zbx_vector_ptr_t *history_items);
-static void	hc_update_history_queue();
+static void	hc_queue_item(zbx_hc_item_t *item);
+static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
+
 
 /******************************************************************************
  *                                                                            *
@@ -2053,6 +2055,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	time_t			sync_start, now;
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_ptr_t	history_items;
+	zbx_binary_heap_t	tmp_history_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -2060,15 +2063,34 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
+		zbx_hashset_iter_t	iter;
+		zbx_hc_item_t		*item;
+
+		/* History index cache might be full without any space left for queueing items from history index to  */
+		/* history queue. The solution: replace the shared-memory history queue with heap-allocated one. Add  */
+		/* all items from history index to the new history queue.                                             */
+		/*                                                                                                    */
+		/* Assertions that must be true.                                                                      */
+		/*   * This is the main server or proxy process,                                                      */
+		/*   * There are no other users of history index cache stored in shared memory. Other processes       */
+		/*     should have quit by this point.                                                                */
+		/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
+		/*     stored in the shared memory.                                                                   */
+
 		/* unlock all triggers before full sync so no items are locked by triggers */
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			DCconfig_unlock_all_triggers();
 
 		LOCK_CACHE;
 
-		/* A history syncer exited before pushing taken items back to history cache. */
-		/* Such items must be returned to queue before doing full sync.              */
-		hc_update_history_queue();
+		tmp_history_queue = cache->history_queue;
+
+		zbx_binary_heap_create(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY);
+		zbx_hashset_iter_reset(&cache->history_items, &iter);
+
+		/* add all items from history index to the new history queue */
+		while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
+			hc_queue_item(item);
 
 		UNLOCK_CACHE;
 
@@ -2189,7 +2211,16 @@ int	DCsync_history(int sync_type, int *total_num)
 		zbx_vector_uint64_destroy(&triggerids);
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
+	{
+		LOCK_CACHE;
+
+		zbx_binary_heap_destroy(&cache->history_queue);
+		cache->history_queue = tmp_history_queue;
+
+		UNLOCK_CACHE;
+
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
+	}
 
 	return next_sync;
 }
@@ -3128,45 +3159,6 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 		next_sync = 0;
 
 	return next_sync;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: hc_update_history_queue                                          *
- *                                                                            *
- * Purpose: updates history queue by queuing missing history items            *
- *                                                                            *
- * Comments: This function is called before full history sync to ensure that  *
- *           all history items are queued and will be synced.                 *
- *                                                                            *
- ******************************************************************************/
-static void	hc_update_history_queue()
-{
-	zbx_hashset_iter_t	iter;
-	zbx_hc_item_t		*item;
-	int			i;
-
-	/* if all items have been queued - nothing to update */
-	if (cache->history_items.num_data == cache->history_queue.elems_num)
-		return;
-
-	/* mark queued items */
-	for (i = 0; i < cache->history_queue.elems_num; i++)
-	{
-		item = (zbx_hc_item_t *)cache->history_queue.elems[i].data;
-		item->status = ZBX_HC_ITEM_STATUS_QUEUED;
-	}
-
-	zbx_hashset_iter_reset(&cache->history_items, &iter);
-
-	/* queue unmarked items, reset item status */
-	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (ZBX_HC_ITEM_STATUS_QUEUED != item->status && NULL != item->tail)
-			hc_queue_item(item);
-
-		item->status = ZBX_HC_ITEM_STATUS_NORMAL;
-	}
 }
 
 /******************************************************************************

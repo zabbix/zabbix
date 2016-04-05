@@ -484,7 +484,6 @@ void	zbx_set_availability_diff_ts(int ts);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
-#define ZBX_HC_ITEM_STATUS_QUEUED	2
 
 struct zbx_hc_data_t;
 

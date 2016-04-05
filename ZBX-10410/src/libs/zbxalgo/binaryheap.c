@@ -58,7 +58,7 @@ static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap)
 
 	/* In order to prevent memory corruption heap->elems_alloc is set only after successful allocation. */
 	/* Otherwise, in case of shared memory, other processes might read or write past the actually       */
-	/* allocated memory.                                                                        */
+	/* allocated memory.                                                                                */
 
 	if (NULL == heap->elems)
 	{
