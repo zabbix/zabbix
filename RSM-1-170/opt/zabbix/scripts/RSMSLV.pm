@@ -3292,7 +3292,7 @@ sub get_downtime
 	my $itemid = shift;
 	my $from = shift;
 	my $till = shift;
-	my $ignore_incidents = shift; # if set check the whole period
+	my $ignore_incidents = shift;	# if set check the whole period, otherwise only consider failed tests within incidents
 
 	my $incidents;
 	if ($ignore_incidents)
@@ -3412,18 +3412,12 @@ sub get_downtime_execute
 	my $itemid = shift;
 	my $from = shift;
 	my $till = shift;
-	my $ignore_incidents = shift; # if set check the whole period
+	my $ignore_incidents = shift;	# if set check the whole period, otherwise only consider failed tests within incidents
 
 	my $incidents;
 	if ($ignore_incidents)
 	{
-		my %h;
-
-		$h{'start'} = $from;
-		$h{'end'} = $till;
-		$h{'false_positive'} = 0;
-
-		push(@$incidents, \%h);
+		push(@$incidents, __make_incident(0, 0, $from, $till));
 	}
 	else
 	{
