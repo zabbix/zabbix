@@ -138,6 +138,7 @@ static void	clean_events()
 
 		zbx_free(events[i].trigger.description);
 		zbx_free(events[i].trigger.expression);
+		zbx_free(events[i].trigger.recovery_expression);
 	}
 
 	events_num = 0;

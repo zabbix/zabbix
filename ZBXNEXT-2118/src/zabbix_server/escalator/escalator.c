@@ -1204,6 +1204,7 @@ static void	free_event_info(DB_EVENT *event)
 	{
 		zbx_free(event->trigger.description);
 		zbx_free(event->trigger.expression);
+		zbx_free(event->trigger.recovery_expression);
 		zbx_free(event->trigger.comments);
 		zbx_free(event->trigger.url);
 	}
