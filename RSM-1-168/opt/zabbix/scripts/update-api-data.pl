@@ -16,7 +16,8 @@ use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n', 'base=s', 'tmp=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n',
+	'base=s', 'tmp=s', 'start-maintenance!');
 
 # do not write any logs
 setopt('nolog');
@@ -38,12 +39,26 @@ __validate_input();
 ah_set_base_dir(getopt('base')) if (opt('base'));
 ah_set_tmp_dir(getopt('tmp')) if (opt('tmp'));
 
-my $opt_from = getopt('from');
-
-if (defined($opt_from))
+if (!opt('dry-run') && ah_begin() != AH_SUCCESS)
 {
-	$opt_from = truncate_from($opt_from);	# use the whole minute
-	dbg("option \"from\" truncated to the start of a minute: $opt_from") if ($opt_from != getopt('from'));
+	fail(ah_get_error());
+}
+
+my $tlds_ref;
+if (opt('tld'))
+{
+	my @tlds = split(',', getopt('tld'));
+
+	foreach my $t (@tlds)
+	{
+		fail("TLD $t does not exist.") if (tld_exists($t) == 0);
+	}
+
+	$tlds_ref = \@tlds;
+}
+else
+{
+	$tlds_ref = get_tlds();
 }
 
 my $services;
@@ -57,6 +72,65 @@ else
 	{
 		$services->{$service} = undef;
 	}
+}
+
+if (opt('start-maintenance'))
+{
+	foreach (@$tlds_ref)
+	{
+		$tld = $_;
+
+		my $tld_status;
+
+		$tld_status->{'status'} = AH_STATUS_MAINTENANCE;
+
+		my $readable_tld = get_readable_tld($tld);
+
+		if (opt('dry-run'))
+		{
+			__prnt("status: ", $tld_status->{'status'});
+		}
+
+		foreach my $service (keys(%{$services}))
+		{
+			$tld_status->{'services'}->{$service}->{'status'} = AH_STATUS_MAINTENANCE;
+
+			if (opt('dry-run'))
+			{
+				__prnt_notld("  ", uc($service), ' alarmed: ', AH_ALARMED_MAINTENANCE);
+			}
+			else
+			{
+				if (ah_save_alarmed(undef, $readable_tld, $service, AH_ALARMED_MAINTENANCE) != AH_SUCCESS)
+				{
+					fail("cannot save alarmed: ", ah_get_error());
+				}
+			}
+		}
+
+		if (!opt('dry-run'))
+		{
+			if (ah_save_tld_status(undef, $readable_tld, $tld_status) != AH_SUCCESS)
+			{
+				fail("cannot save TLD status: ", ah_get_error());
+			}
+		}
+	}
+
+	if (!opt('dry-run') && ah_end() != AH_SUCCESS)
+	{
+		fail(ah_get_error());
+	}
+
+	slv_exit(SUCCESS);
+}
+
+my $opt_from = getopt('from');
+
+if (defined($opt_from))
+{
+	$opt_from = truncate_from($opt_from);	# use the whole minute
+	dbg("option \"from\" truncated to the start of a minute: $opt_from") if ($opt_from != getopt('from'));
 }
 
 my %ignore_hash;
@@ -141,23 +215,6 @@ dbg("now:", ts_full($now));
 # rolling week incidents
 my ($rollweek_from, $rollweek_till) = get_rollweek_bounds($now);
 
-my $tlds_ref;
-if (opt('tld'))
-{
-	my @tlds = split(',', getopt('tld'));
-
-	foreach my $t (@tlds)
-	{
-		fail("TLD $t does not exist.") if (tld_exists($t) == 0);
-	}
-
-	$tlds_ref = \@tlds;
-}
-else
-{
-	$tlds_ref = get_tlds();
-}
-
 my $servicedata;	# hash with various data of TLD service
 
 my $probe_avail_limit = get_macro_probe_avail_limit();
@@ -170,8 +227,6 @@ dbg("config_minclock:$config_minclock");
 my $last_time_till = max_avail_time($now) - 60;
 
 my ($check_from, $check_till, $continue_file);
-
-fail(ah_get_error()) unless (ah_begin() == AH_SUCCESS);
 
 if (opt('continue'))
 {
@@ -370,11 +425,11 @@ foreach (keys(%$servicedata))
 
 			if (opt('dry-run'))
 			{
-				__prnt(uc($service), ' alarmed:', AH_ALARMED_DISABLED);
+				__prnt(uc($service), ' alarmed: ', AH_ALARMED_DISABLED);
 			}
 			else
 			{
-				if (ah_save_alarmed($readable_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				if (ah_save_alarmed($now, $readable_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
 				{
 					fail("cannot save alarmed: ", ah_get_error());
 				}
@@ -426,7 +481,7 @@ foreach (keys(%$servicedata))
 		}
 		else
 		{
-			if (ah_save_service_availability($readable_tld, $service, $rollweek) != AH_SUCCESS)
+			if (ah_save_service_availability($now, $readable_tld, $service, $rollweek) != AH_SUCCESS)
 			{
 				fail("cannot save service availability: ", ah_get_error());
 			}
@@ -448,11 +503,11 @@ foreach (keys(%$servicedata))
 
 		if (opt('dry-run'))
 		{
-			__prnt(uc($service), " alarmed:$alarmed");
+			__prnt(uc($service), " alarmed: $alarmed");
 		}
 		else
 		{
-			if (ah_save_alarmed($readable_tld, $service, $alarmed) != AH_SUCCESS)
+			if (ah_save_alarmed($now, $readable_tld, $service, $alarmed) != AH_SUCCESS)
 			{
 				fail("cannot save alarmed: ", ah_get_error());
 			}
@@ -574,7 +629,7 @@ foreach (keys(%$servicedata))
 			}
 			else
 			{
-				if (ah_save_incident_state($readable_tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
+				if (ah_save_incident_state($now, $readable_tld, $service, $eventid, $event_start, $event_end, $false_positive) != AH_SUCCESS)
 				{
 					fail("cannot save incident state: ", ah_get_error());
 				}
@@ -680,7 +735,7 @@ foreach (keys(%$servicedata))
 				}
 				else
 				{
-					if (ah_save_incident_results($readable_tld, $service, $eventid, $event_start, $cycle_hash, $cycleclock) != AH_SUCCESS)
+					if (ah_save_incident_results($now, $readable_tld, $service, $eventid, $event_start, $cycle_hash, $cycleclock) != AH_SUCCESS)
 					{
 						fail("cannot save incident results: ", ah_get_error());
 					}
@@ -786,7 +841,7 @@ foreach (keys(%$servicedata))
 			# 		}
 			# 		else
 			# 		{
-			# 			if (ah_save_incident_results($readable_tld, $service, $eventid, $event_start, $cycle_ref, $cycle_ref->{'clock'}) != AH_SUCCESS)
+			# 			if (ah_save_incident_results($now, $readable_tld, $service, $eventid, $event_start, $cycle_ref, $cycle_ref->{'clock'}) != AH_SUCCESS)
 			# 			{
 			# 				fail("cannot save incident results: ", ah_get_error());
 			# 			}
@@ -831,7 +886,7 @@ foreach (keys(%$servicedata))
 	}
 	else
 	{
-		if (ah_save_tld_status($readable_tld, $tld_status) != AH_SUCCESS)
+		if (ah_save_tld_status($now, $readable_tld, $tld_status) != AH_SUCCESS)
 		{
 			fail("cannot save TLD status: ", ah_get_error());
 		}
@@ -856,13 +911,21 @@ unless (opt('dry-run') || opt('tld'))
 	__update_false_positives();
 }
 
-fail(ah_get_error()) unless (ah_end() == AH_SUCCESS);
+if (!opt('dry-run') && ah_end() != AH_SUCCESS)
+{
+	fail(ah_get_error());
+}
 
 slv_exit(SUCCESS);
 
 sub __prnt
 {
 	print((defined($tld) ? "$tld: " : ''), join('', @_), "\n");
+}
+
+sub __prnt_notld
+{
+	print(join('', @_), "\n");
 }
 
 sub __prnt_json
@@ -926,7 +989,7 @@ sub __update_false_positives
 
 		dbg("auditlog message: $eventid\t$service\t".ts_str($event_clock)."\t".ts_str($clock)."\tfp:$false_positive\t$tld\n");
 
-		if (ah_save_false_positive($tld, $service, $event_clock, $eventid, $false_positive, $clock) != AH_SUCCESS)
+		if (ah_save_false_positive($now, $tld, $service, $event_clock, $eventid, $false_positive, $clock) != AH_SUCCESS)
 		{
 			wrn("cannot update false_positive value of event (eventid:$eventid start:[", ts_full($event_clock), "] service:$service false_positive:$false_positive clock:[", ts_full($clock), "): ",
 				ah_get_error());
@@ -1331,6 +1394,10 @@ Specify different base directory (default /opt/zabbix/sla).
 =item B<--tmp> directory
 
 Specify different temporary directory (default /opt/zabbix/tmp).
+
+=item B<--start-maintenance>
+
+Start maintenance period.
 
 =item B<--dry-run>
 
