@@ -3658,9 +3658,17 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 		values_num_save = functionids->values_num;
 
 		if (SUCCEED != extract_expression_functionids(functionids, tr->expression))
+		{
 			error_expression = tr->expression;
-		else if (SUCCEED != extract_expression_functionids(functionids, tr->recovery_expression))
-			error_expression = tr->recovery_expression;
+		}
+		else
+		{
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode &&
+					SUCCEED != extract_expression_functionids(functionids, tr->recovery_expression))
+			{
+				error_expression = tr->recovery_expression;
+			}
+		}
 
 		if (NULL != error_expression)
 		{
