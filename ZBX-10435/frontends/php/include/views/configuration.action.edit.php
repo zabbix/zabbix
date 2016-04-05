@@ -26,12 +26,12 @@ $widget = (new CWidget())->setTitle(_('Actions'));
 // create form
 $actionForm = (new CForm())
 	->setName('action.edit')
-	->addVar('form', $this->data['form']);
+	->addVar('form', $this->data['form'])
+	->addVar('eventsource', $this->data['eventsource']);
 
 if ($this->data['actionid']) {
 	$actionForm->addVar('actionid', $this->data['actionid']);
 }
-$actionForm->addVar('eventsource', $this->data['eventsource']);
 
 /*
  * Action tab
