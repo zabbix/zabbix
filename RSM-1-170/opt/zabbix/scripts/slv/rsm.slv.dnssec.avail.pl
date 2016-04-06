@@ -81,7 +81,7 @@ while ($period > 0)
 
 		if ($probes_count < $cfg_minonline)
 		{
-			push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
+			push_value($tld, $cfg_key_out, $value_ts, UP_INCONCLUSIVE, "Up (not enough probes online, $probes_count while $cfg_minonline required)");
 			add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes online, $probes_count while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 			next;
 		}
@@ -112,7 +112,7 @@ while ($period > 0)
 		my $probes_with_results = get_probes_count($items_ref, $values_ref);
 		if ($probes_with_results < $cfg_minonline)
 		{
-			push_value($tld, $cfg_key_out, $value_ts, UP, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
+			push_value($tld, $cfg_key_out, $value_ts, UP_INCONCLUSIVE, "Up (not enough probes with reults, $probes_with_results while $cfg_minonline required)");
 			add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld (not enough probes with reults, $probes_with_results while $cfg_minonline required)") if (alerts_enabled() == SUCCESS);
 			next;
 		}
@@ -123,18 +123,10 @@ while ($period > 0)
 			$success_values-- if (ZBX_EC_DNS_NS_ERRSIG == $_->[1]);
 		}
 
-		my $test_result;
 		my $total_values = scalar(@$values_ref);
-		my $perc = $success_values * 100 / $total_values;
 
-		if ($perc > SLV_UNAVAILABILITY_LIMIT)
-		{
-			$test_result = UP;
-		}
-		else
-		{
-			$test_result = DOWN;
-		}
+		my $perc = $success_values * 100 / $total_values;
+		my $test_result = $perc > SLV_UNAVAILABILITY_LIMIT ? UP : DOWN;
 
 		push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
 	}
