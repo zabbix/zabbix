@@ -812,8 +812,9 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 			/* But now this agent is running on a system with zone support. This agent cannot limit */
 			/* results to only current zone. */
 
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported sixth parameter, agent compiled on a"
-					" Solaris version without zone support."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "The sixth parameter value \"current\" cannot be used"
+					" with agent compiled on a Solaris version without zone support. Consider using"
+					" \"all\" or install agent with Solaris zone support."));
 			return SYSINFO_RET_FAIL;
 		}
 
