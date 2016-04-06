@@ -1472,14 +1472,17 @@ static int	lld_triggers_equal(zbx_lld_trigger_t *trigger, zbx_lld_trigger_t *tri
 		zbx_free(expression);
 		zbx_free(expression_b);
 
-		expression = lld_expression_expand(trigger->recovery_expression, &trigger->functions);
-		expression_b = lld_expression_expand(trigger_b->recovery_expression, &trigger_b->functions);
+		if (SUCCEED == ret)
+		{
+			expression = lld_expression_expand(trigger->recovery_expression, &trigger->functions);
+			expression_b = lld_expression_expand(trigger_b->recovery_expression, &trigger_b->functions);
 
-		if (0 == strcmp(expression, expression_b))
-			ret = SUCCEED;
+			if (0 != strcmp(expression, expression_b))
+				ret = FAIL;
 
-		zbx_free(expression);
-		zbx_free(expression_b);
+			zbx_free(expression);
+			zbx_free(expression_b);
+		}
 
 	}
 
