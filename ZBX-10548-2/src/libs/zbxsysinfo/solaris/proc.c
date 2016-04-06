@@ -19,7 +19,7 @@
 
 #include <procfs.h>
 #ifndef HAVE_ZONE_H
-#	include <sys/systeminfo.h>
+#	include <sys/utsname.h>
 #endif
 #include "common.h"
 #include "sysinfo.h"
@@ -448,29 +448,25 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
 static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *minor_version)
 {
 	const char	*__function_name = "zbx_solaris_version_get";
-	long		res;
-	char		buf[8];
+	int		res;
+	struct utsname	uts;
 
-	if (-1 == (res = sysinfo(SI_RELEASE, buf, sizeof(buf))))
+	/* Initially sysinfo(SI_RELEASE, ...) was considered for getting Solaris release. Its result type */
+	/* depends from version: on Solaris 8,9,10 sysinfo() returns 'long', on Solaris 11 it returns 'int'. */
+	/* Therefore uname() was chosen for getting Solaris release. */
+
+	if (-1 == (res = uname(&uts)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): sysinfo() failed: %s", __function_name,
-				zbx_strerror(errno));
-		return FAIL;
-	}
-
-	/* expected result in buf: "5.9" - Solaris 9, "5.10" - Solaris 10, "5.11" - Solaris 11 */
-
-	if (sizeof(buf) < res)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): sysinfo() returned: \"%s\"", __function_name, buf);
-		THIS_SHOULD_NEVER_HAPPEN;
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __function_name, zbx_strerror(errno));
 
 		return FAIL;
 	}
 
-	if (2 != sscanf(buf, "%u.%u", major_version, minor_version))
+	/* expected result in uts.release: "5.9" - Solaris 9, "5.10" - Solaris 10, "5.11" - Solaris 11 */
+
+	if (2 != sscanf(uts.release, "%u.%u", major_version, minor_version))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): sscanf() failed on: \"%s\"", __function_name, buf);
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): sscanf() failed on: \"%s\"", __function_name, uts.release);
 		THIS_SHOULD_NEVER_HAPPEN;
 
 		return FAIL;
