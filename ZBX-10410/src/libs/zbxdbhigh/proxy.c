@@ -1534,7 +1534,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
@@ -2094,7 +2096,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			char	*allowed_hosts;
 
 			allowed_hosts = zbx_strdup(NULL, items[i].trapper_hosts);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL,
 					&allowed_hosts, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 			security_check = zbx_tcp_check_security(sock, allowed_hosts, 1);
 			zbx_free(allowed_hosts);

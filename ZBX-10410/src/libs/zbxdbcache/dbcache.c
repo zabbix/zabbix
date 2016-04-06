@@ -90,13 +90,13 @@ static ZBX_DC_IDS	*ids = NULL;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	history_value_t	value_orig;	/* empty if flag ZBX_DC_FLAG_NOVALUE is set */
-	history_value_t	value;		/* used as source for log items */
+	history_value_t	value_orig;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	history_value_t	value;		/* uninitialized if ZBX_DC_FLAG_NOVALUE is set, source for log items */
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;
-	int		timestamp;
-	int		severity;
-	int		logeventid;
+	int		timestamp;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	int		severity;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	int		logeventid;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
 	int		mtime;
 	unsigned char	value_type;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
@@ -886,7 +886,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, item_num);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
+	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num,
+			ZBX_EXPAND_MACROS);
 
 	if (0 == trigger_order.values_num)
 		goto clean_triggers;
@@ -1907,6 +1908,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	int		i;
 	zbx_db_insert_t	db_insert;
 
+	/* see hc_copy_history_data() for fields that might be uninitialized and need special handling here */
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
 			"value", "logeventid", "lastlogsize", "mtime", "flags",  NULL);
 
@@ -1914,6 +1916,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	{
 		unsigned int		flags = PROXY_HISTORY_FLAG_META;
 		const char		*pvalue;
+		const char		*psource;
 		const ZBX_DC_HISTORY	*h = &history[i];
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -1924,15 +1927,29 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 
 		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
+			/* sent to server only if not 0, see proxy_get_history_data() */
+			const int	unset_if_novalue = 0;
+
 			flags |= PROXY_HISTORY_FLAG_NOVALUE;
+
 			pvalue = "";
+			psource = "";
+
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue, psource,
+					unset_if_novalue, pvalue, unset_if_novalue, h->lastlogsize, h->mtime, flags);
 		}
 		else
+		{
 			pvalue = h->value_orig.str;
 
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
-				NULL != h->value.str ? h->value.str : "", h->severity, pvalue, h->logeventid,
-				h->lastlogsize, h->mtime, flags);
+			if (NULL != h->value.str)
+				psource = h->value.str;
+			else
+				psource = "";
+
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp, psource,
+					h->severity, pvalue, h->logeventid, h->lastlogsize, h->mtime, flags);
+		}
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -2592,7 +2609,7 @@ void	dc_flush_history()
 ZBX_MEM_FUNC_IMPL(__hc_index, hc_index_mem)
 ZBX_MEM_FUNC_IMPL(__hc, hc_mem)
 
-typedef struct zbx_hc_data_t
+struct zbx_hc_data
 {
 	history_value_t	value;
 	zbx_uint64_t	lastlogsize;
@@ -2602,9 +2619,8 @@ typedef struct zbx_hc_data_t
 	unsigned char	flags;
 	unsigned char	state;
 
-	struct zbx_hc_data_t	*next;
-}
-zbx_hc_data_t;
+	struct zbx_hc_data	*next;
+};
 
 /******************************************************************************
  *                                                                            *
@@ -2969,6 +2985,8 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
  *             itemid  - [IN] the item identifier                             *
  *             data    - [IN] the history data to copy                        *
  *                                                                            *
+ * Comments: handling of uninitialized fields in dc_add_proxy_history_log()   *
+ *                                                                            *
  ******************************************************************************/
 static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
@@ -3099,7 +3117,7 @@ static void	hc_push_busy_items(zbx_vector_ptr_t *history_items)
 		hc_queue_item(item);
 
 		/* After pushing back to queue current syncer has released ownership of this item. */
-		/* To avoid of using it further reset the item reference in vector to NULL.        */
+		/* To avoid using it further reset the item reference in vector to NULL.           */
 		history_items->values[i] = NULL;
 	}
 }
@@ -3443,7 +3461,9 @@ void	DCupdate_hosts_availability()
 
 	for (i = 0; i < hosts.values_num; i++)
 	{
-		zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+		if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 

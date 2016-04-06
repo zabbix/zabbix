@@ -18,6 +18,14 @@
 **/
 
 #include "common.h"
+
+/* LIBXML2 is used */
+#ifdef HAVE_LIBXML2
+#	include <libxml/parser.h>
+#	include <libxml/tree.h>
+#	include <libxml/xpath.h>
+#endif
+
 #include "ipc.h"
 #include "memalloc.h"
 #include "log.h"
@@ -87,6 +95,13 @@ static zbx_vmware_t	*vmware = NULL;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
+/* according to libxml2 changelog XML_PARSE_HUGE option was introduced in version 2.7.0 */
+#if 20700 <= LIBXML_VERSION	/* version 2.7.0 */
+#	define ZBX_XML_PARSE_OPTS	XML_PARSE_HUGE
+#else
+#	define ZBX_XML_PARSE_OPTS	0
+#endif
+
 #define ZBX_VMWARE_COUNTERS_INIT_SIZE	500
 
 /* VMware service object name mapping for vcenter and vsphere installations */
@@ -135,16 +150,24 @@ zbx_vmware_counter_t;
 
 #define ZBX_XPATH_FAULTSTRING()										\
 	"/*/*/*[local-name()='Fault']/*[local-name()='faultstring']"
+
 #define ZBX_XPATH_REFRESHRATE()										\
 	"/*/*/*/*/*[local-name()='refreshRate']"
+
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
+
 #define ZBX_XPATH_DATASTORE(property)									\
-	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']"					\
-	"/*[local-name()='" property "']"
+	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='" property "']"
+
+#define ZBX_XPATH_DATASTORE_MOUNT()									\
+	"/*/*/*/*/*[local-name()='propSet']/*/*[local-name()='DatastoreHostMount']"			\
+	"/*[local-name()='mountInfo']/*[local-name()='path']"
+
 #define ZBX_XPATH_HV_DATASTORES()									\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
 	"/*[local-name()='val']/*[@type='Datastore']"
+
 #define ZBX_XPATH_HV_VMS()										\
 	"/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
 	"/*[local-name()='val']/*[@type='VirtualMachine']"
@@ -158,6 +181,8 @@ typedef struct
 ZBX_HTTPPAGE;
 
 static ZBX_HTTPPAGE	page;
+
+static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -1223,7 +1248,7 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 		goto out;
 
 
-	if (NULL == (doc = xmlReadMemory(page.data, page.offset, ZBX_VM_NONAME_XML, NULL, XML_PARSE_HUGE)))
+	if (NULL == (doc = xmlReadMemory(page.data, page.offset, ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 	{
 		*error = zbx_strdup(*error, "Cannot parse performance counter list.");
 		goto out;
@@ -1319,7 +1344,7 @@ static void	wmware_vm_get_nic_devices(zbx_vmware_vm_t *vm)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, XML_PARSE_HUGE)))
+	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -1386,7 +1411,7 @@ static void	wmware_vm_get_disk_devices(zbx_vmware_vm_t *vm)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, XML_PARSE_HUGE)))
+	if (NULL == (doc = xmlReadMemory(vm->details, strlen(vm->details), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -1639,24 +1664,23 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 {
 #	define ZBX_POST_DATASTORE_GET								\
 		ZBX_POST_VSPHERE_HEADER								\
-		"<ns0:RetrievePropertiesEx>"							\
+		"<ns0:RetrieveProperties>"							\
 			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"			\
 			"<ns0:specSet>"								\
 				"<ns0:propSet>"							\
 					"<ns0:type>Datastore</ns0:type>"			\
 					"<ns0:pathSet>summary</ns0:pathSet>"			\
+					"<ns0:pathSet>host</ns0:pathSet>"			\
 				"</ns0:propSet>"						\
 				"<ns0:objectSet>"						\
 					"<ns0:obj type=\"Datastore\">%s</ns0:obj>"		\
 				"</ns0:objectSet>"						\
 			"</ns0:specSet>"							\
-			"<ns0:options/>"							\
-		"</ns0:RetrievePropertiesEx>"							\
+		"</ns0:RetrieveProperties>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
 	const char		*__function_name = "vmware_service_create_datastore";
-
-	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *url;
+	char			tmp[MAX_STRING_LEN], *uuid = NULL, *name = NULL, *path;
 	zbx_vmware_datastore_t	*datastore = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() datastore:'%s'", __function_name, id);
@@ -1676,25 +1700,26 @@ static zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_
 
 	name = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE("name"));
 
-	if (NULL != (url = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE("url"))))
+	if (NULL != (path = zbx_xml_read_value(page.data, ZBX_XPATH_DATASTORE_MOUNT())))
 	{
-		if ('\0' != *url)
+		if ('\0' != *path)
 		{
 			size_t	len;
 			char	*ptr;
 
-			len = strlen(url);
+			len = strlen(path);
 
-			if ('/' == url[len - 1])
-				url[len - 1] = '\0';
+			if ('/' == path[len - 1])
+				path[len - 1] = '\0';
 
-			for (ptr = url + len - 2; ptr > url && *ptr != '/'; ptr--)
+			for (ptr = path + len - 2; ptr > path && *ptr != '/'; ptr--)
 				;
 
 			uuid = zbx_strdup(NULL, ptr + 1);
 		}
-		zbx_free(url);
+		zbx_free(path);
 	}
+
 out:
 	datastore = zbx_malloc(NULL, sizeof(zbx_vmware_datastore_t));
 	datastore->name = (NULL != name) ? name : zbx_strdup(NULL, id);
@@ -3042,7 +3067,7 @@ static void	vmware_service_parse_perf_data(zbx_vmware_service_t *service, const 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, XML_PARSE_HUGE)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -3751,7 +3776,7 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
 	zbx_vmware_lock();
 
 	stats->memory_total = vmware_mem->total_size;
-	stats->memory_used = vmware_mem->used_size;
+	stats->memory_used = vmware_mem->total_size - vmware_mem->free_size;
 
 	zbx_vmware_unlock();
 
@@ -3789,7 +3814,7 @@ char	*zbx_xml_read_value(const char *data, const char *xpath)
 	if (NULL == data)
 		goto out;
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, XML_PARSE_HUGE)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);
@@ -3831,7 +3856,7 @@ out:
  *         contain the value specified by xpath.                              *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
+static char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath)
 {
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -3891,7 +3916,7 @@ int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *v
 	if (NULL == data)
 		goto out;
 
-	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, XML_PARSE_HUGE)))
+	if (NULL == (doc = xmlReadMemory(data, strlen(data), ZBX_VM_NONAME_XML, NULL, ZBX_XML_PARSE_OPTS)))
 		goto out;
 
 	xpathCtx = xmlXPathNewContext(doc);

@@ -19,8 +19,8 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.1rc1');
-define('ZABBIX_API_VERSION',	'3.0.1');
+define('ZABBIX_VERSION',		'3.0.2rc1');
+define('ZABBIX_API_VERSION',	'3.0.2');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
 define('ZABBIX_DB_VERSION',		3000000);
 
@@ -559,7 +559,9 @@ define('SCREEN_RESOURCE_CHART',				18);
 define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
 define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 // used in Monitoring > Web > Details (httpdetails.php)
-define('SCREEN_RESOURCE_HTTPTEST_DETAILS',		21);
+define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
+// used in Monitoring > Discovery
+define('SCREEN_RESOURCE_DISCOVERY',			22);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -587,6 +589,9 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
 define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
 define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
+
+define('SCREEN_MIN_SIZE', 1);
+define('SCREEN_MAX_SIZE', 100);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
@@ -829,11 +834,10 @@ define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
 
 // preg
-define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
+define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
