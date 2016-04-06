@@ -16,6 +16,7 @@ use Parallel;
 
 my $cfg_key_in = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 my $cfg_key_out = 'rsm.slv.dns.ns.avail[';
+my $cfg_key_out_md = 'rsm.slv.dns.ns.downtime[';	# monthly downtime in minutes
 
 parse_opts('now=i');
 exit_if_running();
@@ -48,7 +49,7 @@ foreach (@$tlds_ref)
 
 	if (get_lastclock($tld, $cfg_key_out, \$result) != SUCCESS)
 	{
-		wrn("configuration error: no output item matching \"$cfg_key_out*\" found");
+		wrn("configuration error: DNS NS availability items not found (\"$cfg_key_out*\")");
 		next;
 	}
 
@@ -90,7 +91,7 @@ while ($tld_index < $tld_count)
 
 		my $cycleclock = cycle_start($value_ts, $interval);
 
-		my $values = process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts,
+		my $values = process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $cfg_key_out_md, $from, $till, $value_ts,
 			$cfg_minonline, $probe_avail_limit, \&check_item_value);
 
 		if ($values == 0)

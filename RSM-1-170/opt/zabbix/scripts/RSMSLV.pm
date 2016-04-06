@@ -1896,6 +1896,7 @@ sub process_slv_ns_avail
 	my $tld = shift;
 	my $cfg_key_in = shift;
 	my $cfg_key_out = shift;
+	my $cfg_key_out_md = shift;	# monthly downtime
 	my $from = shift;
 	my $till = shift;
 	my $value_ts = shift;
@@ -1933,7 +1934,7 @@ sub process_slv_ns_avail
 		# get current month downtime
 		my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till, 1); # ignore incidents
 
-		push_value($tld, "rsm.slv.dns.ns.downtime[$nsip]", $value_ts, $downtime,
+		push_value($tld, $cfg_key_out_md . "$nsip]", $value_ts, $downtime,
 			"$downtime minutes of downtime from ", ts_str($curmon_from), " ($curmon_from) till ",
 			ts_str($curmon_till), " ($curmon_till)");
 
