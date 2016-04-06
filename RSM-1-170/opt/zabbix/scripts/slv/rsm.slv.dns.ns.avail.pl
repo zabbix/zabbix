@@ -18,25 +18,32 @@ my $cfg_key_in = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 my $cfg_key_out = 'rsm.slv.dns.ns.avail[';
 my $cfg_key_out_md = 'rsm.slv.dns.ns.downtime[';	# monthly downtime in minutes
 
-parse_opts('now=i');
+parse_avail_opts('now=i');
 exit_if_running();
 
+my $now;
 if (opt('now'))
 {
+	$now = getopt('now');
+
 	setopt('nolog');
 	setopt('dry-run');
+}
+else
+{
+	$now = time();
 }
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $interval = get_macro_dns_udp_delay();
+my $interval = get_macro_dns_udp_delay($now);
 my $cfg_minonline = get_macro_dns_probe_online();
 my $cfg_max_value = get_macro_dns_udp_rtt_high();
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
-my ($from, $till, $value_ts) = get_interval_bounds($interval, getopt('now'));
+my ($from, $till, $value_ts) = get_interval_bounds($interval, $now);
 
 my $tlds_ref = get_tlds();
 my @tlds;
@@ -67,6 +74,8 @@ $tld = undef;
 my $tld_index = 0;
 my $tld_count = scalar(@tlds);
 
+my $cycleclock = cycle_start($value_ts, $interval);
+
 while ($tld_index < $tld_count)
 {
 	my $pid = fork_without_pipe();
@@ -88,8 +97,6 @@ while ($tld_index < $tld_count)
 		init_values();
 
 		db_connect();
-
-		my $cycleclock = cycle_start($value_ts, $interval);
 
 		my $values = process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $cfg_key_out_md, $from, $till, $value_ts,
 			$cfg_minonline, $probe_avail_limit, \&check_item_value);

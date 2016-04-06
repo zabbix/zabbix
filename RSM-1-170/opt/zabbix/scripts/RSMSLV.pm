@@ -1107,7 +1107,19 @@ sub get_curmon_bounds
 {
 	require DateTime;
 
-	my $dt = DateTime->now;
+	my $now = shift;
+
+	my $dt;
+
+	if ($now)
+	{
+		$dt = DateTime->from_epoch(epoch => $now);
+	}
+	else
+	{
+		$dt = DateTime->now;
+	}
+
 	my $till = $dt->epoch;
 
 	$dt->truncate(to => 'month');
