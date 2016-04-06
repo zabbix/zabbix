@@ -1930,7 +1930,7 @@ sub process_slv_ns_avail
 	my $values_ref = get_nsip_values($itemids_ref, [$from, $till], $nsip_items_ref);
 
 	# for current month downtime
-	my ($curmon_from) = get_curmon_bounds();
+	my ($curmon_from) = get_curmon_bounds($value_ts);
 	my $curmon_till = $from;
 
 	# use binds for faster execution of the same SQL query
@@ -4129,7 +4129,7 @@ sub parse_avail_opts
 {
 	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.avail.usage';
 
-	parse_opts('tld=s', 'from=n', 'period=n');
+	parse_opts('tld=s', 'from=n', 'period=n', @_);
 }
 
 sub parse_rollweek_opts
