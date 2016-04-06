@@ -45,7 +45,18 @@ my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my ($from, $till, $value_ts) = get_interval_bounds($interval, $now);
 
-my $tlds_ref = get_tlds();
+my $tlds_ref;
+if (opt('tld'))
+{
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+
+	$tlds_ref = [ getopt('tld') ];
+}
+else
+{
+	$tlds_ref = get_tlds();
+}
+
 my @tlds;
 
 foreach (@$tlds_ref)
