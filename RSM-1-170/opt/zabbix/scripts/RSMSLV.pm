@@ -16,6 +16,7 @@ use Sys::Syslog;
 use Data::Dumper;
 use Time::HiRes qw(time);
 use Fcntl qw(:flock);
+use TLD_constants qw(:api);
 
 use constant SUCCESS	=> 0;
 use constant E_FAIL	=> -1;
@@ -34,17 +35,16 @@ use constant MAX_LOGIN_ERROR	=> -203;
 use constant MIN_INFO_ERROR	=> -211;
 use constant MAX_INFO_ERROR	=> -209;
 
-use constant TRIGGER_SEVERITY_NOT_CLASSIFIED	=> 0;
-use constant EVENT_OBJECT_TRIGGER		=> 0;
-use constant EVENT_SOURCE_TRIGGERS		=> 0;
-use constant TRIGGER_VALUE_FALSE		=> 0;
-use constant TRIGGER_VALUE_TRUE			=> 1;
-use constant INCIDENT_FALSE_POSITIVE		=> 1; # NB! must be in sync with frontend
-use constant SENDER_BATCH_COUNT			=> 250;
-use constant PROBE_LASTACCESS_ITEM		=> 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
-use constant PROBE_GROUP_NAME			=> 'Probes';
-use constant PROBE_KEY_MANUAL			=> 'rsm.probe.status[manual]';
-use constant PROBE_KEY_AUTOMATIC		=> 'rsm.probe.status[automatic,%]'; # match all in SQL
+use constant EVENT_OBJECT_TRIGGER	=> 0;
+use constant EVENT_SOURCE_TRIGGERS	=> 0;
+use constant TRIGGER_VALUE_FALSE	=> 0;
+use constant TRIGGER_VALUE_TRUE		=> 1;
+use constant INCIDENT_FALSE_POSITIVE	=> 1; # NB! must be in sync with frontend
+use constant SENDER_BATCH_COUNT		=> 250;
+use constant PROBE_LASTACCESS_ITEM	=> 'zabbix[proxy,{$RSM.PROXY_NAME},lastaccess]';
+use constant PROBE_GROUP_NAME		=> 'Probes';
+use constant PROBE_KEY_MANUAL		=> 'rsm.probe.status[manual]';
+use constant PROBE_KEY_AUTOMATIC	=> 'rsm.probe.status[automatic,%]'; # match all in SQL
 
 # In order to do the calculation we should wait till all the results
 # are available on the server (from proxies). We shift back 2 minutes
@@ -269,6 +269,7 @@ sub get_item_data
 			"select i.key_,i.itemid,i.lastclock".
 			" from items i,hosts h".
 			" where i.hostid=h.hostid".
+				" and i.status<>".ITEM_STATUS_DISABLED.
 				" and h.host='$host'".
 				" and (i.key_='$cfg_key_in' or i.key_ like '$cfg_key_out%')";
 	}
@@ -278,6 +279,7 @@ sub get_item_data
 			"select i.key_,i.itemid,i.lastclock".
 			" from items i,hosts h".
 			" where i.hostid=h.hostid".
+				" and i.status<>".ITEM_STATUS_DISABLED.
 				" and h.host='$host'".
 				" and i.key_ in ('$cfg_key_in','$cfg_key_out')";
 	}
@@ -321,7 +323,11 @@ sub get_itemid_by_key
 
 	my $errbuf;
 
-	my $itemid = __get_itemid_by_sql("select itemid from items where key_='$key'", \$errbuf);
+	my $itemid = __get_itemid_by_sql(
+		"select itemid".
+		" from items".
+		" where status<>".ITEM_STATUS_DISABLED.
+			" and key_='$key'", \$errbuf);
 
 	if (!$itemid)
 	{
@@ -342,6 +348,7 @@ sub get_itemid_by_host
 		"select i.itemid".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 	    		" and h.host='$host'".
 			" and i.key_='$key'";
 
@@ -355,7 +362,12 @@ sub get_itemid_by_hostid
 
 	my $errbuf;
 
-	my $itemid = __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_='$key'", \$errbuf);
+	my $itemid = __get_itemid_by_sql(
+		"select itemid".
+		" from items".
+		" where hostid=$hostid".
+			" and status<>".ITEM_STATUS_DISABLED.
+			" and key_='$key'", \$errbuf);
 
 	if (!$itemid)
 	{
@@ -372,7 +384,12 @@ sub get_itemid_like_by_hostid
 
 	my $errbuf;
 
-	my $itemid = __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_ like '$key'", \$errbuf);
+	my $itemid = __get_itemid_by_sql(
+		"select itemid".
+		" from items".
+		" where hostid=$hostid".
+			" and status<>".ITEM_STATUS_DISABLED.
+			" and key_ like '$key'", \$errbuf);
 
 	if (!$itemid)
 	{
@@ -413,6 +430,7 @@ sub get_itemids_by_host_and_keypart
 		"select i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 	    		" and h.host='$host'".
 			" and i.key_ like '$key_part%'");
 
@@ -450,6 +468,7 @@ sub get_lastclock
 			"select i.itemid,i.lastclock,i.lastvalue".
 			" from items i,hosts h".
 			" where i.hostid=h.hostid".
+				" and i.status<>".ITEM_STATUS_DISABLED.
 				" and h.host='$host'".
 				" and i.key_ like '$key%'".
 			" limit 1";
@@ -460,6 +479,7 @@ sub get_lastclock
 			"select i.itemid,i.lastclock,i.lastvalue".
 			" from items i,hosts h".
 			" where i.hostid=h.hostid".
+				" and i.status<>".ITEM_STATUS_DISABLED.
 				" and h.host='$host'".
 				" and i.key_='$key'";
 	}
@@ -579,11 +599,23 @@ sub get_nsips
 	my $sql;
 	if (defined($templated))
 	{
-		$sql = "select key_ from items i,hosts h where i.hostid=h.hostid and h.host='Template $host' and i.key_ like '$key%'";
+		$sql =
+			"select key_".
+			" from items i,hosts h".
+			" where i.hostid=h.hostid".
+				" and i.status<>".ITEM_STATUS_DISABLED.
+				" and h.host='Template $host'".
+				" and i.key_ like '$key%'";
 	}
 	else
 	{
-		$sql = "select key_ from items i,hosts h where i.hostid=h.hostid and h.host='$host' and i.key_ like '$key%'";
+		$sql =
+			"select key_".
+			" from items i,hosts h".
+			" where i.hostid=h.hostid".
+				" and i.status<>".ITEM_STATUS_DISABLED.
+				" and h.host='$host'".
+				" and i.key_ like '$key%'";
 	}
 
 	my $rows_ref = db_select($sql);
@@ -617,6 +649,7 @@ sub get_all_items
 		"select h.hostid,i.itemid".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and i.templateid is not null".
 			" and i.key_='$key'";
 	$sql .=		" and h.host like '$tld %'" if (defined($tld));
@@ -672,6 +705,7 @@ sub get_nsip_items
 		"select h.hostid,i.itemid,i.key_ ".
 		"from items i,hosts h ".
 		"where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and h.host like '$tld %'".
 			" and i.templateid is not null".
 			" and i.key_ in ($keys_str)");
@@ -696,13 +730,20 @@ sub get_items_by_hostids
 	my $hostids = join(',', @$hostids_ref);
 
 	my $rows_ref;
+
+	my $pre_sql =
+		"select itemid,hostid".
+		" from items".
+		" where hostid in ($hostids)".
+			" and status<>".ITEM_STATUS_DISABLED;
+
 	if ($complete)
 	{
-		$rows_ref = db_select("select itemid,hostid from items where hostid in ($hostids) and key_='$cfg_key'");
+		$rows_ref = db_select($pre_sql . " and key_='$cfg_key'");
 	}
 	else
 	{
-		$rows_ref = db_select("select itemid,hostid from items where hostid in ($hostids) and key_ like '$cfg_key%'");
+		$rows_ref = db_select($pre_sql . " and key_ like '$cfg_key%'");
 	}
 
 	my @items;
@@ -728,6 +769,7 @@ sub get_tld_items
 		"select i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and h.host='$tld'".
 			" and i.key_ like '$cfg_key%'");
 
@@ -1176,7 +1218,12 @@ sub get_online_probes
 
 	my $hostids_str = join(',', @hostids);
 
-	$rows_ref = db_select("select itemid,hostid from items where key_='" . PROBE_LASTACCESS_ITEM . "' and hostid in ($hostids_str)");
+	$rows_ref = db_select(
+		"select itemid,hostid".
+		" from items".
+		" where status<>".ITEM_STATUS_DISABLED.
+			" and key_='" . PROBE_LASTACCESS_ITEM . "'".
+			" and hostid in ($hostids_str)");
 
 	my @itemids;
 	foreach my $row_ref (@$rows_ref)
@@ -1240,7 +1287,12 @@ sub get_online_probes
 			next;
 		}
 
-		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
+		$rows_ref = db_select(
+			"select value".
+			" from history_uint".
+			" where itemid=$itemid".
+				" and clock between $from and $till".
+			" order by clock");
 
 		$probe_down = 0;
 		$no_values = 1;
@@ -1286,7 +1338,12 @@ sub get_online_probes
 			next;
 		}
 
-		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
+		$rows_ref = db_select(
+			"select value".
+			" from history_uint".
+			" where itemid=$itemid".
+				" and clock between $from and $till".
+			" order by clock");
 
 		$probe_down = 0;
 		$no_values = 1;
@@ -1843,7 +1900,7 @@ sub process_slv_ns_avail
 	my $till = shift;
 	my $value_ts = shift;
 	my $cfg_minonline = shift;
-	my $probe_avail_limit = shift; # max "last seen" of proxy
+	my $probe_avail_limit = shift;	# max "last seen" of proxy
 	my $check_value_ref = shift;
 
 	my $nsips_ref = get_nsips($tld, $cfg_key_out);
@@ -1858,8 +1915,6 @@ sub process_slv_ns_avail
 	my $hostids_ref = probes2tldhostids($tld, $online_probes_ref);
 	my $itemids_ref = get_itemids_by_hostids($hostids_ref, $nsip_items_ref);
 	my $values_ref = get_nsip_values($itemids_ref, [$from, $till], $nsip_items_ref);
-
-	wrn("no values of items ($cfg_key_in) at host $tld found in the database") if (scalar(keys(%$values_ref)) == 0);
 
 	# for current month downtime
 	my ($curmon_from) = get_curmon_bounds();
@@ -1911,10 +1966,12 @@ sub process_slv_ns_avail
 			push_value($tld, $out_key, $value_ts, $test_result, avail_result_msg($test_result, $probes_with_positive, $probes_with_results, $perc, $value_ts));
 		}
 
-		push_value($tld, "rsm.slv.dns.ns.results[$nsip]", $value_ts, $probes_with_results, "probes with results");
-		push_value($tld, "rsm.slv.dns.ns.positive[$nsip]", $value_ts, $probes_with_positive, "probes with positive results");
-		push_value($tld, "rsm.slv.dns.ns.sla[$nsip]", $value_ts, $positive_sla, "positive results according to SLA");
+		#push_value($tld, "rsm.slv.dns.ns.results[$nsip]", $value_ts, $probes_with_results, "probes with results");
+		#push_value($tld, "rsm.slv.dns.ns.positive[$nsip]", $value_ts, $probes_with_positive, "probes with positive results");
+		#push_value($tld, "rsm.slv.dns.ns.sla[$nsip]", $value_ts, $positive_sla, "SLA required positive results");
 	}
+
+	return scalar(keys(%$values_ref));
 }
 
 #
@@ -1992,7 +2049,12 @@ sub get_item_values
 			$itemids_str .= $_->{'itemid'};
 		}
 
-		my $rows_ref = db_select("select itemid,value from history_uint where itemid in ($itemids_str) and clock between $from and $till order by clock");
+		my $rows_ref = db_select(
+			"select itemid,value".
+			" from history_uint".
+			" where itemid in ($itemids_str)".
+				" and clock between $from and $till".
+			" order by clock");
 
 		foreach my $row_ref (@$rows_ref)
 		{
@@ -2067,6 +2129,7 @@ sub get_dns_itemids
 		"select h.host,i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and h.host like '$host_value'".
 			" and i.templateid is not null".
 			" and i.key_ in ($keys_str)");
@@ -2105,6 +2168,7 @@ sub __get_itemids_by_complete_key
 		"select h.host,i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and h.host like '$host_value'".
 			" and i.key_ in ($keys_str)".
 			" and i.templateid is not null");
@@ -2191,6 +2255,7 @@ sub __get_itemids_by_incomplete_key
 		"select h.host,i.itemid,i.key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and h.host like '$host_value'".
 			" and i.templateid is not null".
 			" and $keys_cond");
@@ -2790,6 +2855,7 @@ sub get_service_status_itemids
 		"select h.host,i.itemid".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
+			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and i.templateid is not null".
 			" and $key_condition".
 			" and h.host like '$tld %'".
@@ -2970,6 +3036,7 @@ sub get_incidents
 		"select distinct t.triggerid".
 		" from triggers t,functions f".
 		" where t.triggerid=f.triggerid".
+			" and t.status<>".TRIGGER_STATUS_DISABLED.
 			" and f.itemid=$itemid".
 			" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
@@ -3120,6 +3187,7 @@ sub get_incidents2
 		"select distinct t.triggerid".
 		" from triggers t,functions f".
 		" where t.triggerid=f.triggerid".
+			" and t.status<>".TRIGGER_STATUS_DISABLED.
 			" and f.itemid=$itemid".
 			" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
