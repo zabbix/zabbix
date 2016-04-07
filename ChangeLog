@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+A......... [ZBX-9162] fixed performance of the hostgroup.get method under MySQL (Gunars, Sasha)
 .......PS. [ZBX-10575] fixed history cache memory leak when floating value calculations resulted in out of bounds value (wiper)
 .......PS. [ZBX-10410] fixed possible crashes during history cache synchronisation during shutdown/crash (Sandis, wiper)
 .......PS. [ZBX-10493] fixed memory leak when trying to reconnect to URL (viktors)
