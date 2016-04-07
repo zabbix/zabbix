@@ -1466,7 +1466,8 @@ static int	lld_triggers_equal(zbx_lld_trigger_t *trigger, zbx_lld_trigger_t *tri
 		expression = lld_expression_expand(trigger->expression, &trigger->functions);
 		expression_b = lld_expression_expand(trigger_b->expression, &trigger_b->functions);
 
-		if (0 == strcmp(expression, expression_b)) {
+		if (0 == strcmp(expression, expression_b))
+		{
 			zbx_free(expression);
 			zbx_free(expression_b);
 
