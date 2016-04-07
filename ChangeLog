@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+..F....... [ZBX-10564] fixed trigger acknowledging in slide shows (Cemeris)
 .......PS. [ZBX-10571] fixed network discovery based on agent checks (gleb)
 A......... [ZBX-9162] fixed performance of the hostgroup.get method under MySQL (Gunars, Sasha)
 .......PS. [ZBX-10575] fixed history cache memory leak when floating value calculations resulted in out of bounds value (wiper)
