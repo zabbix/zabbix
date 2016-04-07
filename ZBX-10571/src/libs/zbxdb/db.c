@@ -1629,68 +1629,6 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 #ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Function: zbx_db_bytea_escape                                              *
- *                                                                            *
- * Purpose: converts from binary string to the null terminated escaped string *
- *                                                                            *
- * Transformations:                                                           *
- *      <= 0x1f || '\'' || '\\' || >= 0x7f -> \\ooo (ooo is an octal number)  *
- *                                                                            *
- * Parameters:                                                                *
- *      input - null terminated hexadecimal string                            *
- *      output - pointer to buffer                                            *
- *      olen - size of returned buffer                                        *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen)
-{
-	const u_char	*i = input;
-	char		*o;
-	size_t		len = 1;	/* '\0' */
-
-	while (i - input < ilen)
-	{
-		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
-		{
-			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
-				len++;
-			len += 4;
-		}
-		else
-			len++;
-		i++;
-	}
-
-	if (*olen < len)
-	{
-		*olen = len;
-		*output = zbx_realloc(*output, *olen);
-	}
-	o = *output;
-	i = input;
-
-	while (i - input < ilen)
-	{
-		if (0x1f >= *i || '\'' == *i || '\\' == *i || 0x7f <= *i)
-		{
-			if (1 == ZBX_PG_ESCAPE_BACKSLASH)
-				*o++ = '\\';
-			*o++ = '\\';
-			*o++ = ((*i >> 6) & 0x7) + 0x30;
-			*o++ = ((*i >> 3) & 0x7) + 0x30;
-			*o++ = (*i & 0x7) + 0x30;
-		}
-		else
-			*o++ = *i;
-		i++;
-	}
-	*o = '\0';
-
-	return len - 1;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: zbx_db_bytea_unescape                                            *
  *                                                                            *
  * Purpose: converts the null terminated string into binary buffer            *

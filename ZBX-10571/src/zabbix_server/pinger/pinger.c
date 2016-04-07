@@ -239,7 +239,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*count = 3;
 	}
-	else if (FAIL == is_uint31(tmp, (uint32_t*)count) || MIN_COUNT > *count || *count > MAX_COUNT)
+	else if (FAIL == is_uint31(tmp, count) || MIN_COUNT > *count || *count > MAX_COUNT)
 	{
 		zbx_snprintf(error, max_error_len, "Number of packets \"%s\" is not between %d and %d.",
 				tmp, MIN_COUNT, MAX_COUNT);
@@ -250,7 +250,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*interval = 0;
 	}
-	else if (FAIL == is_uint31(tmp, (uint32_t*)interval) || MIN_INTERVAL > *interval)
+	else if (FAIL == is_uint31(tmp, interval) || MIN_INTERVAL > *interval)
 	{
 		zbx_snprintf(error, max_error_len, "Interval \"%s\" should be at least %d.", tmp, MIN_INTERVAL);
 		goto out;
@@ -260,7 +260,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*size = 0;
 	}
-	else if (FAIL == is_uint31(tmp, (uint32_t*)size) || MIN_SIZE > *size || *size > MAX_SIZE)
+	else if (FAIL == is_uint31(tmp, size) || MIN_SIZE > *size || *size > MAX_SIZE)
 	{
 		zbx_snprintf(error, max_error_len, "Packet size \"%s\" is not between %d and %d.",
 				tmp, MIN_SIZE, MAX_SIZE);
@@ -271,7 +271,7 @@ static int	parse_key_params(const char *key, const char *host_addr, icmpping_t *
 	{
 		*timeout = 0;
 	}
-	else if (FAIL == is_uint31(tmp, (uint32_t*)timeout) || MIN_TIMEOUT > *timeout)
+	else if (FAIL == is_uint31(tmp, timeout) || MIN_TIMEOUT > *timeout)
 	{
 		zbx_snprintf(error, max_error_len, "Timeout \"%s\" should be at least %d.", tmp, MIN_TIMEOUT);
 		goto out;
