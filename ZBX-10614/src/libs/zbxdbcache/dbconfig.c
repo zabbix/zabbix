@@ -1931,7 +1931,12 @@ static void	DCsync_gmacros(DB_RESULT result)
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
 		if (NULL == context)
+		{
+			if (1 == found && NULL != gmacro->context)
+				zbx_strpool_release(gmacro->context);
+
 			gmacro->context = NULL;
+		}
 		else
 			DCstrpool_replace((NULL == gmacro->context ? 0 : found), &gmacro->context, context);
 
@@ -2023,7 +2028,12 @@ static void	DCsync_hmacros(DB_RESULT result)
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
 		if (NULL == context)
+		{
+			if (1 == found && NULL != hmacro->context)
+				zbx_strpool_release(hmacro->context);
+
 			hmacro->context = NULL;
+		}
 		else
 			DCstrpool_replace((NULL == hmacro->context ? 0 : found), &hmacro->context, context);
 
