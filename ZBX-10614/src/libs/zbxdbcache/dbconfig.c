@@ -1889,7 +1889,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 
 	ZBX_DC_GMACRO		*gmacro;
 
-	int			found, update_index;
+	int			macro_found, context_found, update_index;
 	zbx_uint64_t		globalmacroid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1913,32 +1913,41 @@ static void	DCsync_gmacros(DB_RESULT result)
 		/* array of selected globalmacros */
 		zbx_vector_uint64_append(&ids, globalmacroid);
 
-		gmacro = DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &found);
+		gmacro = DCfind_id(&config->gmacros, globalmacroid, sizeof(ZBX_DC_GMACRO), &macro_found);
+
+		if (1 == macro_found && NULL != gmacro->context)
+			context_found = 1;
+		else
+			context_found = 0;
 
 		/* see whether we should and can update gmacros_m index at this point */
 		update_index = 0;
 
-		if (0 == found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context))
+		if (0 == macro_found || 0 != strcmp(gmacro->macro, macro) || 0 != zbx_strcmp_null(gmacro->context, context))
 		{
-			if (1 == found)
+			if (1 == macro_found)
 				config_gmacro_remove_index(&config->gmacros_m, gmacro);
 
 			update_index = 1;
 		}
 
 		/* store new information in macro structure */
-		DCstrpool_replace(found, &gmacro->macro, macro);
-		DCstrpool_replace(found, &gmacro->value, row[2]);
+		DCstrpool_replace(macro_found, &gmacro->macro, macro);
+		DCstrpool_replace(macro_found, &gmacro->value, row[2]);
 
 		if (NULL == context)
 		{
-			if (1 == found && NULL != gmacro->context)
+			/* release the context if it was removed from the macro */
+			if (1 == context_found)
 				zbx_strpool_release(gmacro->context);
 
 			gmacro->context = NULL;
 		}
 		else
-			DCstrpool_replace(1 == found && NULL != gmacro->context, &gmacro->context, context);
+		{
+			/* replace the existing context (1) or add context to macro (0) */
+			DCstrpool_replace(context_found, &gmacro->context, context);
+		}
 
 		/* update gmacros_m index using new data */
 		if (1 == update_index)
@@ -1983,7 +1992,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 
 	ZBX_DC_HMACRO		*hmacro;
 
-	int			found, update_index;
+	int			macro_found, context_found, update_index;
 	zbx_uint64_t		hostmacroid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -2008,15 +2017,20 @@ static void	DCsync_hmacros(DB_RESULT result)
 		/* array of selected hostmacros */
 		zbx_vector_uint64_append(&ids, hostmacroid);
 
-		hmacro = DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &found);
+		hmacro = DCfind_id(&config->hmacros, hostmacroid, sizeof(ZBX_DC_HMACRO), &macro_found);
+
+		if (1 == macro_found && NULL != hmacro->context)
+			context_found = 1;
+		else
+			context_found = 0;
 
 		/* see whether we should and can update hmacros_hm index at this point */
 		update_index = 0;
 
-		if (0 == found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, macro) ||
+		if (0 == macro_found || hmacro->hostid != hostid || 0 != strcmp(hmacro->macro, macro) ||
 				0 != zbx_strcmp_null(hmacro->context, context))
 		{
-			if (1 == found)
+			if (1 == macro_found)
 				config_hmacro_remove_index(&config->hmacros_hm, hmacro);
 
 			update_index = 1;
@@ -2024,18 +2038,22 @@ static void	DCsync_hmacros(DB_RESULT result)
 
 		/* store new information in macro structure */
 		hmacro->hostid = hostid;
-		DCstrpool_replace(found, &hmacro->macro, macro);
-		DCstrpool_replace(found, &hmacro->value, row[3]);
+		DCstrpool_replace(macro_found, &hmacro->macro, macro);
+		DCstrpool_replace(macro_found, &hmacro->value, row[3]);
 
 		if (NULL == context)
 		{
-			if (1 == found && NULL != hmacro->context)
+			/* release the context if it was removed from the macro */
+			if (1 == context_found)
 				zbx_strpool_release(hmacro->context);
 
 			hmacro->context = NULL;
 		}
 		else
-			DCstrpool_replace(1 == found && NULL != hmacro->context, &hmacro->context, context);
+		{
+			/* replace the existing context (1) or add context to macro (0) */
+			DCstrpool_replace(context_found, &hmacro->context, context);
+		}
 
 		/* update hmacros_hm index using new data */
 		if (1 == update_index)
