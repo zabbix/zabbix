@@ -1938,7 +1938,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 			gmacro->context = NULL;
 		}
 		else
-			DCstrpool_replace((NULL == gmacro->context ? 0 : found), &gmacro->context, context);
+			DCstrpool_replace(1 == found && NULL != gmacro->context, &gmacro->context, context);
 
 		/* update gmacros_m index using new data */
 		if (1 == update_index)
@@ -2035,7 +2035,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 			hmacro->context = NULL;
 		}
 		else
-			DCstrpool_replace((NULL == hmacro->context ? 0 : found), &hmacro->context, context);
+			DCstrpool_replace(1 == found && NULL != hmacro->context, &hmacro->context, context);
 
 		/* update hmacros_hm index using new data */
 		if (1 == update_index)
