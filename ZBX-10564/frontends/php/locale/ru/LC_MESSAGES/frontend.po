@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-03-25 14:27+0300\n"
+"PO-Revision-Date: 2016-03-30 08:40+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1458908875.0\n"
+"X-POOTLE-MTIME: 1459320047.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -70,7 +70,7 @@ msgstr[2] "%1$s элементов данных"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Строка: %2$s | Колонка: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -1409,7 +1409,7 @@ msgstr "Не удалось добавить веб-сценарий"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "Не удалось вызвать метод \"%1$s.%2$s\" без параметров."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -2195,7 +2195,7 @@ msgstr "Не удалось обработать группы элементов
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "Не удалось прочитать XML: %1$s."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -16149,7 +16149,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr ""
+msgstr "XML пустой"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -16418,7 +16418,7 @@ msgstr "ожидается строка символов"
 
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "ожидается цифровое значение"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
@@ -16733,7 +16733,7 @@ msgstr "должен быть действительным пользовате�
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "должно быть между \"%1$s\" и \"%2$s\""
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:177
 msgid "new"
@@ -16924,7 +16924,7 @@ msgstr "неожиданный тэг \"%1$s\""
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr ""
+msgstr "неожиданный текст \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
