@@ -3879,9 +3879,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 
 			if (NULL == (br = strchr(bl, '}')))
 			{
-				tr[i].new_error = zbx_strdup(tr[i].new_error, "Invalid trigger expression");
-				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
-				THIS_SHOULD_NEVER_HAPPEN;
+				tr->new_error = zbx_strdup(tr->new_error, "Invalid trigger expression");
+				tr->new_value = TRIGGER_VALUE_UNKNOWN;
 				break;
 			}
 
