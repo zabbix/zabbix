@@ -378,10 +378,6 @@ out:
  *                                                                            *
  * Return value: SUCCEED - if triggers coincide                               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
 static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1, const char *recovery_expression1,
 		zbx_uint64_t triggerid2, const char *expression2, const char *recovery_expression2)
@@ -419,7 +415,6 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1, cons
 		rexpr = string_replace(rexpr, search, replace);
 		zbx_free(old_expr);
 	}
-
 	DBfree_result(result);
 
 	if (0 != strcmp(expression1, expr) || 0 != strcmp(recovery_expression1, rexpr))
@@ -2115,10 +2110,6 @@ out:
  *             url - trigger url                                              *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
 static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t hostid, zbx_uint64_t triggerid,
