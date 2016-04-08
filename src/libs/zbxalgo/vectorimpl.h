@@ -165,7 +165,7 @@ int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, con
 {														\
 	__type	*ptr;												\
 														\
-	ptr = (__type *)bsearch(&value, vector->values, vector->values_num, sizeof(__type), compare_func);	\
+	ptr = (__type *)zbx_bsearch(&value, vector->values, vector->values_num, sizeof(__type), compare_func);	\
 														\
 	if (NULL != ptr)											\
 		return (int)(ptr - vector->values);								\
