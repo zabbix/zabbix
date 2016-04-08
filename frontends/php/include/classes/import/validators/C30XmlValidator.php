@@ -244,7 +244,9 @@ class C30XmlValidator {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED]
 										]]
-									]]
+									]],
+									'recovery_mode' =>			['type' => XML_STRING],
+									'recovery_expression' =>	['type' => XML_STRING]
 								]]
 							]],
 							'graph_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_prototype', 'rules' => [
@@ -680,7 +682,9 @@ class C30XmlValidator {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'expression' =>				['type' => XML_STRING | XML_REQUIRED]
 						]]
-					]]
+					]],
+					'recovery_mode' =>			['type' => XML_STRING],
+					'recovery_expression' =>	['type' => XML_STRING]
 				]]
 			]],
 			'graphs' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'graph', 'rules' => [

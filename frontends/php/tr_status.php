@@ -574,13 +574,26 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
+	$description = [];
+
 	$description[] = (new CSpan($trigger['description']))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description[] = BR();
-		$description[] = $trigger['expression'];
+		if ($trigger['recovery_expression']) {
+			$description[] = _('Problem').':';
+			$description[] = $trigger['expression'];
+			$description[] = BR();
+			$description[] = _('Recovery').':';
+			$description[] = CMacrosResolverHelper::resolveTriggerExpression($trigger['recovery_expression'], [
+				'html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true
+			]);
+		}
+		else {
+			$description[] = $trigger['expression'];
+		}
 	}
 
 	// host js menu

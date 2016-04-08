@@ -537,13 +537,51 @@ class CTrigger extends CTriggerGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect fields for trigger.'));
 			}
 
-			$expressionChanged = true;
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
-				if (array_key_exists('expression', $trigger) && $trigger['expression'] === $dbTrigger['expression']) {
-					$expressionChanged = false;
+				if (!array_key_exists('recovery_expression', $trigger) && array_key_exists('recovery_mode', $trigger)
+						&& $trigger['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
+					$trigger['recovery_expression'] = '';
 				}
+				elseif (array_key_exists('recovery_expression', $trigger)
+						&& !array_key_exists('recovery_mode', $trigger)
+						&& $dbTrigger['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
+					);
+				}
+			}
+			else {
+				if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== ''
+						&& $trigger['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
+					);
+				}
+			}
+
+			if (array_key_exists('recovery_mode', $trigger)
+					&& $trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION
+					&& !array_key_exists('recovery_expression', $trigger)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('cannot be empty'))
+				);
+			}
+
+			$expression_changed = true;
+			$recovery_expression = true;
+
+			if ($update) {
+				if (array_key_exists('expression', $trigger) && $trigger['expression'] === $dbTrigger['expression']) {
+					$expression_changed = false;
+				}
+
+				if (array_key_exists('recovery_expression', $trigger)
+						&& $trigger['recovery_expression'] === $dbTrigger['recovery_expression']) {
+					$recovery_expression = false;
+				}
+
 				if (array_key_exists('description', $trigger)
 						&& strcmp($trigger['description'], $dbTrigger['description']) == 0) {
 					unset($trigger['description']);
@@ -552,7 +590,7 @@ class CTrigger extends CTriggerGeneral {
 
 			// if some of the properties are unchanged, no need to update them in DB
 			// validating trigger expression
-			if (isset($trigger['expression']) && $expressionChanged) {
+			if (isset($trigger['expression']) && $expression_changed) {
 				// expression permissions
 				$expressionData = new CTriggerExpression(['lldmacros' => false]);
 				if (!$expressionData->parse($trigger['expression'])) {
@@ -561,7 +599,7 @@ class CTrigger extends CTriggerGeneral {
 
 				if (!isset($expressionData->expressions[0])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Trigger expression must contain at least one host:key reference.'));
+						_('Trigger expression must contain at least one host:key reference.'));
 				}
 
 				$expressionHosts = $expressionData->getHosts();
@@ -602,7 +640,7 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
-			// check existing
+			// Check for existing, uniqueness criteria: name + expression + recovery_expression
 			$this->checkIfExistsOnHost($currentTrigger);
 		}
 		unset($trigger);
@@ -981,7 +1019,9 @@ class CTrigger extends CTriggerGeneral {
 		$allHosts = [];
 		$allowedHosts = [];
 		$triggersAndHosts = [];
-		$triggerExpression = [];
+		$trigger_expression = [];
+		$trigger_recovery_expression = [];
+
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 			$hosts = [];
@@ -994,6 +1034,20 @@ class CTrigger extends CTriggerGeneral {
 						_s('Cannot implode expression "%s".', $trigger['expression']).' '.$e->getMessage());
 			}
 
+			$trigger_expression[$triggerId] = $expression;
+
+			if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== '') {
+				try {
+					$recovery_expression = implode_exp($trigger['recovery_expression'], $triggerId, $hosts);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot implode expression "%s".', $trigger['recovery_expression']).' '.$e->getMessage());
+				}
+
+				$trigger_recovery_expression[$triggerId] = $recovery_expression;
+			}
+
 			$this->validateItems($trigger);
 
 			foreach ($hosts as $host) {
@@ -1001,7 +1055,6 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			$triggersAndHosts[$triggerId] = $hosts;
-			$triggerExpression[$triggerId] = $expression;
 		}
 
 		$allHosts = array_unique($allHosts);
@@ -1020,8 +1073,14 @@ class CTrigger extends CTriggerGeneral {
 		foreach ($triggers as $tnum => $trigger) {
 			$triggerId = $triggers[$tnum]['triggerid'] = $triggerIds[$tnum];
 
+			$update['expression'] = $trigger_expression[$triggerId];
+
+			if (array_key_exists($triggerId, $trigger_recovery_expression)) {
+				$update['recovery_expression'] = $trigger_recovery_expression[$triggerId];
+			}
+
 			DB::update('triggers', [
-				'values' => ['expression' => $triggerExpression[$triggerId]],
+				'values' => $update,
 				'where' => ['triggerid' => $triggerId]
 			]);
 
@@ -1056,14 +1115,15 @@ class CTrigger extends CTriggerGeneral {
 		$changedPriorityTriggerIds = [];
 
 		foreach ($triggers as &$trigger) {
-			$descriptionChanged = false;
-			$expressionChanged = false;
+			$description_changed = false;
+			$expression_changed = false;
+			$recovery_expression_changed = false;
 
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
 			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
-				$descriptionChanged = true;
+				$description_changed = true;
 			}
 			else {
 				$trigger['description'] = $dbTrigger['description'];
@@ -1072,15 +1132,15 @@ class CTrigger extends CTriggerGeneral {
 			if (isset($trigger['expression']) && $dbTrigger['expression'] !== $trigger['expression']) {
 				$this->validateItems($trigger);
 
-				$expressionChanged = true;
-				$expressionFull = $trigger['expression'];
+				$expression_changed = true;
+				$expression_full = $trigger['expression'];
 			}
 
-			if ($expressionChanged) {
-				// check the expression
-				$expressionData = new CTriggerExpression();
-				if (!$expressionData->parse($expressionFull)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+			if ($expression_changed) {
+				// Check the expression.
+				$expression_data = new CTriggerExpression();
+				if (!$expression_data->parse($expression_full)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $expression_data->error);
 				}
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
@@ -1088,7 +1148,7 @@ class CTrigger extends CTriggerGeneral {
 				$oldExpressionData->parse($dbTrigger['expression']);
 				// check if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
-				$newTemplates = zbx_toHash($expressionData->getHosts());
+				$newTemplates = zbx_toHash($expression_data->getHosts());
 				$proceed = true;
 				foreach ($oldTemplates as $oldTemplate) {
 					if (isset($newTemplates[$oldTemplate])) {
@@ -1112,7 +1172,7 @@ class CTrigger extends CTriggerGeneral {
 
 						// if we have at least one template linked to trigger host inside trigger expression,
 						// then we don't delete this trigger
-						$expressionHosts = $expressionData->getHosts();
+						$expressionHosts = $expression_data->getHosts();
 						foreach ($expressionHosts as $templateName) {
 							if (isset($templateNames[$templateName])) {
 								continue 2;
@@ -1123,14 +1183,14 @@ class CTrigger extends CTriggerGeneral {
 					$this->deleteByIds($cTrigIds);
 				}
 
-				DB::delete('functions', ['triggerid' => $trigger['triggerid']]);
+//				DB::delete('functions', ['triggerid' => $trigger['triggerid']]);
 
 				try {
-					$trigger['expression'] = implode_exp($expressionFull, $trigger['triggerid'], $hosts);
+					$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid'], $hosts);
 				}
 				catch (Exception $e) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
+							_s('Cannot implode expression "%s".', $expression_full).' '.$e->getMessage());
 				}
 
 				// if the expression has changed, we must revalidate the existing dependencies
@@ -1139,12 +1199,84 @@ class CTrigger extends CTriggerGeneral {
 				}
 			}
 
+			if (array_key_exists('recovery_expression', $trigger)
+					&& $dbTrigger['recovery_expression'] !== $trigger['recovery_expression']) {
+				// !!!!
+				//$this->validateItems($trigger);
+
+				$recovery_expression_changed = true;
+				$recovery_expression_full = $trigger['recovery_expression'];
+			}
+
+			if ($recovery_expression_changed && $recovery_expression_full !== '') {
+				// Check the expression.
+				$recovery_expression_data = new CTriggerExpression();
+				if (!$recovery_expression_data->parse($recovery_expression_full)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $recovery_expression_data->error);
+				}
+
+				// remove triggers if expression is changed in a way that trigger will not appear in current host
+				$oldExpressionData = new CTriggerExpression();
+				$oldExpressionData->parse($dbTrigger['recovery_expression']);
+				// check if at least one template has stayed in expression, this means that child trigger will stay in host
+				$oldTemplates = $oldExpressionData->getHosts();
+				$newTemplates = zbx_toHash($recovery_expression_data->getHosts());
+				$proceed = true;
+				foreach ($oldTemplates as $oldTemplate) {
+					if (isset($newTemplates[$oldTemplate])) {
+						$proceed = false;
+						break;
+					}
+				}
+				// proceed if there is possibility that child triggers should be deleted
+				if ($proceed) {
+					$sql = 'SELECT t.triggerid'.
+							' FROM triggers t'.
+							' WHERE t.templateid='.zbx_dbstr($trigger['triggerid']);
+					$cTrigCursor = DBselect($sql);
+					$cTrigIds = [];
+					while ($cTrig = DBfetch($cTrigCursor)) {
+						// get templates linked to templated trigger host
+						$templateNames = DBfetchArrayAssoc(DBselect('SELECT h.name'.
+							' FROM hosts h, hosts_templates ht, items i, functions f'.
+							' WHERE h.hostid = ht.templateid AND ht.hostid = i.hostid AND i.itemid = f.itemid AND'.
+							' f.triggerid='.zbx_dbstr($cTrig['triggerid'])), 'name');
+
+						// if we have at least one template linked to trigger host inside trigger expression,
+						// then we don't delete this trigger
+						$recovery_expression_hosts = $recovery_expression_data->getHosts();
+						foreach ($recovery_expression_hosts as $templateName) {
+							if (isset($templateNames[$templateName])) {
+								continue 2;
+							}
+						}
+						$cTrigIds[] = $cTrig['triggerid'];
+					}
+					$this->deleteByIds($cTrigIds);
+				}
+
+//				DB::delete('functions', ['triggerid' => $trigger['triggerid']]);
+
+				try {
+					$trigger['recovery_expression'] = implode_exp($recovery_expression_full, $trigger['triggerid'],
+						$hosts
+					);
+				}
+				catch (Exception $e) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Cannot implode expression "%s".', $recovery_expression_full).' '.$e->getMessage());
+				}
+			}
+
 			$triggerUpdate = $trigger;
-			if (!$descriptionChanged) {
+			if (!$description_changed) {
 				unset($triggerUpdate['description']);
 			}
-			if (!$expressionChanged) {
+			if (!$expression_changed) {
 				unset($triggerUpdate['expression']);
+			}
+			if (!$recovery_expression_changed) {
+				unset($triggerUpdate['recovery_expression']);
 			}
 
 			// skip updating read only values
@@ -1166,7 +1298,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			// restore the full expression to properly validate dependencies
-			$trigger['expression'] = $expressionChanged ? $expressionFull : $dbTrigger['expression'];
+			$trigger['expression'] = $expression_changed ? $expression_full : $dbTrigger['expression'];
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
 			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'],

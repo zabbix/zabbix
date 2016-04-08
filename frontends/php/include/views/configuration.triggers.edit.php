@@ -18,138 +18,160 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Triggers'));
 
 // append host summary to widget header
-if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));
+if (!empty($data['hostid'])) {
+	$widget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
 // create form
 $triggersForm = (new CForm())
 	->setName('triggersForm')
-	->addVar('form', $this->data['form'])
-	->addVar('hostid', $this->data['hostid'])
-	->addVar('input_method', $this->data['input_method'])
+	->addVar('form', $data['form'])
+	->addVar('hostid', $data['hostid'])
+	->addVar('input_method', $data['input_method'])
 	->addVar('toggle_input_method', '')
 	->addVar('remove_expression', '');
 
 if ($data['triggerid'] !== null) {
-	$triggersForm->addVar('triggerid', $this->data['triggerid']);
+	$triggersForm->addVar('triggerid', $data['triggerid']);
 }
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
-if (!empty($this->data['templates'])) {
-	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
+if (!empty($data['templates'])) {
+	$triggersFormList->addRow(_('Parent triggers'), $data['templates']);
 }
 $triggersFormList->addRow(_('Name'),
-	(new CTextBox('description', $this->data['description'], $this->data['limited']))
+	(new CTextBox('description', $data['description'], $data['limited']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
 );
 
 // append expression to form list
-if ($this->data['expression_field_readonly']) {
-	$triggersForm->addVar('expression', $this->data['expression']);
+if ($data['expression_field_readonly']) {
+	$triggersForm->addVar('expression', $data['expression']);
+	$triggersForm->addVar('recovery_expression', $data['recovery_expression']);
 }
 
-$addExpressionButton = (new CButton('insert', ($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add')))
+$add_expression_button = (new CButton('insert', ($data['input_method'] == IM_TREE) ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-			'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression&srcfld1=expression'.
-			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));'
+			'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
+			'&srcfld1='.$data['expression_field_name'].
+			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
 	);
-if ($this->data['limited']) {
-	$addExpressionButton->setAttribute('disabled', 'disabled');
+if ($data['limited']) {
+	$add_expression_button->setAttribute('disabled', 'disabled');
 }
-$expressionRow = [
+$expression_row = [
 	(new CTextArea(
-		$this->data['expression_field_name'],
-		$this->data['expression_field_value'],
+		$data['expression_field_name'],
+		$data['expression_field_value'],
 		[
-			'readonly' => $this->data['expression_field_readonly']
+			'readonly' => $data['expression_field_readonly']
 		]
 	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	$addExpressionButton
+	$add_expression_button
 ];
 
-if ($this->data['input_method'] == IM_TREE) {
+$add_expression_button = (new CButton('insert', ($data['input_method'] == IM_TREE) ? _('Edit') : _('Add')))
+	->addClass(ZBX_STYLE_BTN_GREY)
+	->onClick(
+		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
+			'&dstfld1='.$data['recovery_expression_field_name'].
+			'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
+			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
+	);
+
+$recovery_expression_row = [
+	(new CTextArea(
+		$data['recovery_expression_field_name'],
+		$data['recovery_expression_field_value'],
+		[
+			'readonly' => $data['expression_field_readonly']
+		]
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$add_expression_button
+];
+
+if ($data['input_method'] == IM_TREE) {
 	// insert macro button
 	$insertMacroButton = (new CButton('insert_macro', _('Insert expression')))
 		->addClass(ZBX_STYLE_BTN_GREY)
 		->setMenuPopup(CMenuPopupHelper::getTriggerMacro());
-	if ($this->data['limited']) {
+	if ($data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
 	}
-	$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-	$expressionRow[] = $insertMacroButton;
+	$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$expression_row[] = $insertMacroButton;
 
-	array_push($expressionRow, BR());
-	if (empty($this->data['outline'])) {
+	array_push($expression_row, BR());
+	if (empty($data['outline'])) {
 		// add button
-		$addExpressionButton = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
-			$addExpressionButton->setAttribute('disabled', 'disabled');
+		$add_expression_button = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
+		if ($data['limited']) {
+			$add_expression_button->setAttribute('disabled', 'disabled');
 		}
-		$expressionRow[] = $addExpressionButton;
+		$expression_row[] = $add_expression_button;
 	}
 	else {
 		// add button
-		$addExpressionButton = (new CSubmit('and_expression', _('And')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
-			$addExpressionButton->setAttribute('disabled', 'disabled');
+		$add_expression_button = (new CSubmit('and_expression', _('And')))->addClass(ZBX_STYLE_BTN_GREY);
+		if ($data['limited']) {
+			$add_expression_button->setAttribute('disabled', 'disabled');
 		}
-		$expressionRow[] = $addExpressionButton;
+		$expression_row[] = $add_expression_button;
 
 		// or button
 		$orExpressionButton = (new CSubmit('or_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
+		if ($data['limited']) {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
-		$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expressionRow[] = $orExpressionButton;
+		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$expression_row[] = $orExpressionButton;
 
 		// replace button
 		$replaceExpressionButton = (new CSubmit('replace_expression', _('Replace')))->addClass(ZBX_STYLE_BTN_GREY);
-		if ($this->data['limited']) {
+		if ($data['limited']) {
 			$replaceExpressionButton->setAttribute('disabled', 'disabled');
 		}
-		$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$expressionRow[] = $replaceExpressionButton;
+		$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$expression_row[] = $replaceExpressionButton;
 	}
 }
-elseif ($this->data['input_method'] != IM_FORCED) {
+elseif ($data['input_method'] != IM_FORCED) {
 	$inputMethodToggle = (new CButton(null, _('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_input_method").value=1;'.
-			'document.getElementById("input_method").value='.(($this->data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+			'document.getElementById("input_method").value='.(($data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
 			'document.forms["'.$triggersForm->getName().'"].submit();');
-	$expressionRow[] = [BR(), $inputMethodToggle];
+	$expression_row[] = [BR(), $inputMethodToggle];
 }
-$triggersFormList->addRow(_('Expression'), $expressionRow);
+$triggersFormList->addRow(_('Expression'), $expression_row);
 
 // append expression table to form list
-if ($this->data['input_method'] == IM_TREE) {
+if ($data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setId('exp_list')
 		->setHeader([
-			$this->data['limited'] ? null : _('Target'),
+			$data['limited'] ? null : _('Target'),
 			_('Expression'),
-			$this->data['limited'] ? null : _('Action'),
+			$data['limited'] ? null : _('Action'),
 			_('Info')
 		]);
 
 	$allowedTesting = true;
-	if (!empty($this->data['eHTMLTree'])) {
-		foreach ($this->data['eHTMLTree'] as $i => $e) {
+	if (!empty($data['eHTMLTree'])) {
+		foreach ($data['eHTMLTree'] as $i => $e) {
 			if (!isset($e['expression']['levelErrors'])) {
 				$errorImg = '';
 			}
@@ -170,7 +192,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			// templated trigger
-			if ($this->data['limited']) {
+			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
 					if (gettype($obj) == 'object' && get_class($obj) == 'CSpan'
@@ -184,13 +206,13 @@ if ($this->data['input_method'] == IM_TREE) {
 
 			$expressionTable->addRow(
 				new CRow([
-					!$this->data['limited']
+					!$data['limited']
 						? (new CCheckBox('expr_target_single', $e['id']))
 							->setChecked($i == 0)
 							->onClick('check_target(this);')
 						: null,
 					$e['list'],
-					!$this->data['limited']
+					!$data['limited']
 						? (new CCol(
 							(new CButton(null, _('Remove')))
 								->addClass(ZBX_STYLE_BTN_LINK)
@@ -209,7 +231,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 	else {
 		$allowedTesting = false;
-		$this->data['outline'] = '';
+		$data['outline'] = '';
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
@@ -219,11 +241,11 @@ if ($this->data['input_method'] == IM_TREE) {
 	if (!$allowedTesting) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
-	if (empty($this->data['outline'])) {
+	if (empty($data['outline'])) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 
-	$wrapOutline = new CSpan([$this->data['outline']]);
+	$wrapOutline = new CSpan([$data['outline']]);
 	$triggersFormList->addRow(null, [
 		$wrapOutline,
 		BR(),
@@ -243,27 +265,38 @@ if ($this->data['input_method'] == IM_TREE) {
 }
 
 $triggersFormList
-	->addRow(_('Multiple PROBLEM events generation'),
-		(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
+	->addRow(_('OK event generation'),
+		(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
+			->addValue(_('Expression'), TRIGGER_REC_MODE_EXPRESSION)
+			->addValue(_('Recovery expression'), TRIGGER_REC_MODE_REC_EXPRESSION)
+			->addValue(_('None'), TRIGGER_REC_MODE_NONE)
+			->setModern(true)
+	)
+	->addRow(_('Recovery expression'), $recovery_expression_row)
+	->addRow(_('Multiple events generation mode'),
+		(new CRadioButtonList('type', (int) $data['type']))
+			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
+			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
+			->setModern(true)
 	)
 	->addRow(_('Description'),
-		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('comments', $data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $this->data['priority']]));
+	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
 
 // append status to form list
-if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
+if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 	$status = true;
 }
 else {
-	$status = ($this->data['status'] == 0);
+	$status = ($data['status'] == 0);
 }
 $triggersFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // append tabs to form
 $triggersTab = new CTabView();
-if (!$this->data['form_refresh']) {
+if (!$data['form_refresh']) {
 	$triggersTab->setSelected(0);
 }
 $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
@@ -276,7 +309,7 @@ $dependenciesTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
-foreach ($this->data['db_dependencies'] as $dependency) {
+foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
 	$depTriggerDescription = CHtml::encode(
@@ -317,9 +350,9 @@ $dependenciesFormList->addRow(_('Dependencies'),
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 
 // append buttons to form
-if (!empty($this->data['triggerid'])) {
+if (!empty($data['triggerid'])) {
 	$deleteButton = new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid']));
-	if ($this->data['limited']) {
+	if ($data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
