@@ -29,33 +29,35 @@ $page['file'] = 'triggers.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
+// VAR							TYPE	OPTIONAL	FLAGS	VALIDATION		EXCEPTION
 $fields = [
-	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
-	'triggerid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
-	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN([COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_HOST_GROUP]), 'isset({copy})'],
-	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
-	'type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'description' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
-	'expression' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
-	'priority' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
-	'comments' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'url' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'status' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'input_method' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'],
-	'expr_temp' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
-	'expr_target_single' => [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
-	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_dependency' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'],
-	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_targetid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'copy_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
-	'visible' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'groupid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'hostid' =>					[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'triggerid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'(isset({form}) && ({form} == "update"))'],
+	'copy_type' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN([COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_HOST_GROUP]), 'isset({copy})'],
+	'copy_mode' =>				[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),		null],
+	'type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
+	'description' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
+	'expression' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Expression')],
+	'recovery_expression' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
+	'recovery_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),	null],
+	'priority' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
+	'comments' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'url' =>					[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'status' =>					[T_ZBX_STR, O_OPT, null,	null,			null],
+	'input_method' =>			[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_input_method})'],
+	'expr_temp' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
+	'expr_target_single' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'dependencies' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'new_dependency' =>			[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0',	'isset({add_dependency})'],
+	'g_triggerid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'copy_targetid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'copy_groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
+	'visible' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
 	// filter
-	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_priority' =>	[T_ZBX_INT, O_OPT, null,
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_priority' =>		[T_ZBX_INT, O_OPT, null,
 		IN([
 			-1, TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING,
 			TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH, TRIGGER_SEVERITY_DISASTER
@@ -172,14 +174,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'priority' => getRequest('priority'),
 		'comments' => getRequest('comments'),
 		'type' => getRequest('type'),
-		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid')
+		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid'),
+		'recovery_mode' => getRequest('recovery_mode'),
+		'recovery_expression' => getRequest('recovery_expression')
 	];
 
 	if (hasRequest('update')) {
 		// update only changed fields
-
 		$old_triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
+				'recovery_expression'
+			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
 		]);
@@ -190,6 +195,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$old_triggers = CMacrosResolverHelper::resolveTriggerExpressions($old_triggers);
 
 		$old_trigger = reset($old_triggers);
+		$old_trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
+			$old_trigger['recovery_expression']
+		);
+
 		$old_trigger['dependencies'] = zbx_toHash(zbx_objectValues($old_trigger['dependencies'], 'triggerid'));
 
 		$newDependencies = $trigger['dependencies'];
@@ -197,8 +206,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		unset($trigger['dependencies'], $old_trigger['dependencies']);
 
-		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger);
-		$triggerToUpdate['triggerid'] = getRequest('triggerid');
+		$trigger_to_update = array_diff_assoc($trigger, $old_trigger);
+		$trigger_to_update['triggerid'] = getRequest('triggerid');
 
 		// dependencies
 		$updateDepencencies = false;
@@ -213,10 +222,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 		if ($updateDepencencies) {
-			$triggerToUpdate['dependencies'] = $newDependencies;
+			$trigger_to_update['dependencies'] = $newDependencies;
 		}
 
-		$result = API::Trigger()->update($triggerToUpdate);
+		$result = API::Trigger()->update($trigger_to_update);
 
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
@@ -490,7 +499,9 @@ else {
 	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
 	$data['triggers'] = API::Trigger()->get([
-		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state'],
+		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error',
+			'templateid', 'state', 'recovery_expression'
+		],
 		'selectHosts' => ['hostid', 'host', 'name'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'selectDiscoveryRule' => ['itemid', 'name'],

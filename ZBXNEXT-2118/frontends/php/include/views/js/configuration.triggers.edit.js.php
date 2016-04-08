@@ -1,4 +1,22 @@
 <script type="text/javascript">
+	jQuery(document).ready(function($) {
+		// Refresh field visibility on document load.
+		changeRecoveryMode();
+
+		$('input[name=recovery_mode]').change(function() {
+			changeRecoveryMode();
+		});
+
+		function changeRecoveryMode() {
+			if ($('input[name=recovery_mode]:checked').val() == <?= TRIGGER_REC_MODE_REC_EXPRESSION ?>) {
+				$('#recovery_expression').closest('li').show();
+			}
+			else {
+				$('#recovery_expression').closest('li').hide();
+			}
+		}
+	});
+
 	/**
 	 * @see init.js add.popup event
 	 */

@@ -188,8 +188,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		unset($trigger['dependencies'], $old_trigger_prototype['dependencies']);
 
-		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger_prototype);
-		$triggerToUpdate['triggerid'] = getRequest('triggerid');
+		$trigger_to_update = array_diff_assoc($trigger, $old_trigger_prototype);
+		$trigger_to_update['triggerid'] = getRequest('triggerid');
 
 		// dependencies
 		$updateDepencencies = false;
@@ -204,10 +204,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 		if ($updateDepencencies) {
-			$triggerToUpdate['dependencies'] = $newDependencies;
+			$trigger_to_update['dependencies'] = $newDependencies;
 		}
 
-		$result = API::TriggerPrototype()->update($triggerToUpdate);
+		$result = API::TriggerPrototype()->update($trigger_to_update);
 
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}

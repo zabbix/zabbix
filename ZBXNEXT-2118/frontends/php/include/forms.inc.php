@@ -1401,7 +1401,10 @@ function getTriggerFormData($exprAction) {
 		'db_dependencies' => [],
 		'triggerid' => getRequest('triggerid'),
 		'expression' => getRequest('expression', ''),
+		'recovery_expression' => getRequest('recovery_expression', ''),
 		'expr_temp' => getRequest('expr_temp', ''),
+		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
+		'recovery_mode' => getRequest('recovery_mode', 0),
 		'description' => getRequest('description', ''),
 		'type' => getRequest('type', 0),
 		'priority' => getRequest('priority', 0),
@@ -1424,8 +1427,11 @@ function getTriggerFormData($exprAction) {
 		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
 		$data['trigger'] = reset($triggers);
+		$data['trigger']['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
+			$data['trigger']['recovery_expression']
+		);
 
-		// get templates
+		// Get templates.
 		$tmp_triggerid = $data['triggerid'];
 		do {
 			$db_triggers = DBfetch(DBselect(
@@ -1467,10 +1473,12 @@ function getTriggerFormData($exprAction) {
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
 		$data['expression'] = $data['trigger']['expression'];
+		$data['recovery_expression'] = $data['trigger']['recovery_expression'];
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $data['trigger']['description'];
 			$data['type'] = $data['trigger']['type'];
+			$data['recovery_mode'] = $data['trigger']['recovery_mode'];
 			$data['priority'] = $data['trigger']['priority'];
 			$data['status'] = $data['trigger']['status'];
 			$data['comments'] = $data['trigger']['comments'];
@@ -1517,6 +1525,9 @@ function getTriggerFormData($exprAction) {
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = true;
+
+			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
+			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
 		}
 		else {
 			show_messages(false, '', _('Expression Syntax Error.'));
@@ -1527,6 +1538,9 @@ function getTriggerFormData($exprAction) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
 		$data['expression_field_readonly'] = $data['limited'];
+
+		$data['recovery_expression_field_name'] = 'recovery_expression';
+		$data['recovery_expression_field_value'] = $data['recovery_expression'];
 	}
 
 	if ($data['dependencies']) {

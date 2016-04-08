@@ -201,6 +201,21 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
+	$expression = [];
+
+	if ($trigger['recovery_expression']) {
+		$expression[] = _('Problem').':';
+		$expression[] = $trigger['expression'];
+		$expression[] = BR();
+		$expression[] = _('Recovery').':';
+		$expression[] = CMacrosResolverHelper::resolveTriggerExpression($trigger['recovery_expression'], [
+			'html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true
+		]);
+	}
+	else {
+		$expression[] = $trigger['expression'];
+	}
+
 	// checkbox
 	$checkBox = (new CCheckBox('g_triggerid['.$triggerid.']', $triggerid))
 		->setEnabled(empty($trigger['discoveryRule']));
@@ -210,7 +225,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		$trigger['expression'],
+		$expression,
 		$status,
 		$info
 	]);

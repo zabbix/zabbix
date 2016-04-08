@@ -512,7 +512,9 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies'])
+				'dependencies' => $this->formatDependencies($trigger['dependencies']),
+				'recovery_mode' => $trigger['recovery_mode'],
+				'recovery_expression' => $trigger['recovery_expression']
 			];
 		}
 

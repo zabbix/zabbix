@@ -227,8 +227,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @return void
 	 */
 	protected function checkIfExistsOnHost(array $trigger, $hostId = null) {
-		// skip the check if the description and expression haven't been changed
-		if (!isset($trigger['description']) && !isset($trigger['expression'])) {
+		// Skip the check if the description, expression and recovery_expression haven't been changed.
+		if (!array_key_exists('description', $trigger) && !array_key_exists('expression', $trigger)
+				&& !array_key_exists('recovery_expression', $trigger)) {
 			return;
 		}
 
@@ -239,6 +240,12 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if ($explodeExpression) {
 				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression']);
+			}
+
+			if (array_key_exists('recovery_expression', $trigger)) {
+				$trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
+					$trigger['recovery_expression']
+				);
 			}
 		}
 
