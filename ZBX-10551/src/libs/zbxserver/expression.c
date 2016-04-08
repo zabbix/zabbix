@@ -220,10 +220,10 @@ static char 	**extract_numbers(const char *str, int *count)
 		if (!isdigit(*s))
 			continue;
 
-		if (s != str && '{' == *(s - 1))
+		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
 		{
 			/* skip functions '{65432}' */
-			s = strchr(s, '}');
+			s = e;
 			continue;
 		}
 
