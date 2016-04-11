@@ -104,6 +104,7 @@ class CUrl {
 		$url = $this->url;
 		$url .= $this->query ? '?'.$this->query : '';
 		$url .= $this->reference ? '#'.urlencode($this->reference) : '';
+
 		return $url;
 	}
 
@@ -113,32 +114,11 @@ class CUrl {
 
 	public function setArgument($key, $value = '') {
 		$this->arguments[$key] = $value;
-	}
 
-	public function getArgument($key) {
-		return isset($this->arguments[$key]) ? $this->arguments[$key] : null;
-	}
-
-	public function setReference($reference) {
-		$this->reference = $reference;
-	}
-
-	// returns the reference of $this url, i.e. 'bookmark' in the url 'http://server/file.html#bookmark'
-	public function getReference() {
-		return $this->reference;
+		return $this;
 	}
 
 	public function toString() {
 		return $this->getUrl();
-	}
-
-	public function getArguments()
-	{
-		return $this->arguments;
-	}
-
-	public function setArguments($arguments)
-	{
-		$this->arguments = $arguments;
 	}
 }

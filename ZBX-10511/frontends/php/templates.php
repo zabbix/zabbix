@@ -616,7 +616,11 @@ else {
 
 	// sorting && paging
 	order_result($templates, $sortField, $sortOrder);
-	$paging = getPagingLine($templates, $sortOrder);
+
+	$url = (new CUrl('templates.php'))
+		->setArgument('groupid', getRequest('groupid', 0));
+
+	$paging = getPagingLine($templates, $sortOrder, $url);
 
 	$templates = API::Template()->get([
 		'templateids' => zbx_objectValues($templates, 'templateid'),

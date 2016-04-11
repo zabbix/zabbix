@@ -329,7 +329,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['drules'], $sortOrder);
+	$data['paging'] = getPagingLine($data['drules'], $sortOrder, new CUrl('discoveryconf.php'));
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

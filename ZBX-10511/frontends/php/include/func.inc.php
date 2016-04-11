@@ -1465,10 +1465,11 @@ function getPageNumber() {
  *
  * @param array  $items				list of items
  * @param string $sortorder			the order in which items are sorted ASC or DESC
+ * @param CUrl $url					URL object containing arguments and query
  *
  * @return CDiv
  */
-function getPagingLine(&$items, $sortorder) {
+function getPagingLine(&$items, $sortorder, CUrl $url) {
 	global $page;
 
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
@@ -1510,7 +1511,6 @@ function getPagingLine(&$items, $sortorder) {
 
 		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-		$url = CUrlFactory::getContextUrl();
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
 			$tags[] = new CLink(_('First'), $url->getUrl());
