@@ -27,11 +27,11 @@
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*type, buf[32];
-	size_t			offset;
-	long			milliseconds;
-	struct tm		tm;
-	zbx_tz_offset		tz_offset;
+	char		*type, buf[32];
+	size_t		offset;
+	long		milliseconds;
+	struct tm	tm;
+	zbx_tz_offset	tz_offset;
 
 	if (1 < request->nparam)
 	{
