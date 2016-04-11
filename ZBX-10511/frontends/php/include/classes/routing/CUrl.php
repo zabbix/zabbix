@@ -110,6 +110,8 @@ class CUrl {
 
 	public function removeArgument($key) {
 		unset($this->arguments[$key]);
+
+		return $this;
 	}
 
 	public function setArgument($key, $value = '') {

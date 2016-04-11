@@ -38,8 +38,7 @@ function zbx_is_callable(array $names) {
 
 /************ REQUEST ************/
 function redirect($url) {
-	$curl = new CUrl($url);
-	$curl->removeArgument('sid');
+	$curl = (new CUrl($url))->removeArgument('sid');
 	header('Location: '.$curl->getUrl());
 	exit;
 }
@@ -1668,8 +1667,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to a page
 	else {
 		// url to redirect the user to after he loggs in
-		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-		$url->removeArgument('sid');
+		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message
