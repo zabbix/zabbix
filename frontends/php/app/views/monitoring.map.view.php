@@ -19,8 +19,9 @@
 **/
 
 
-$this->addJsFile('js/gtlc.js');
-$this->addJsFile('js/flickerfreescreen.js');
+$actionMap = getActionMapBySysmap($data['map'], ['severity_min' => $data['severity_min']]);
+$imgMap = (new CImg('map.php?sysmapid='.$data['map']['sysmapid'].'&severity_min='.$data['severity_min']))
+	->setMap($actionMap->getName());
 
 (new CWidget())
 	->setTitle(_('Maps'))
@@ -55,18 +56,9 @@ $this->addJsFile('js/flickerfreescreen.js');
 		(new CDiv())
 			->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
 			->addItem(
-				CScreenBuilder::getScreen([
-					'resourcetype' => SCREEN_RESOURCE_MAP,
-					'mode' => SCREEN_MODE_PREVIEW,
-					'dataId' => 'mapimg',
-					'screenitem' => [
-						'screenitemid' => $data['map']['sysmapid'],
-						'screenid' => null,
-						'resourceid' => $data['map']['sysmapid'],
-						'width' => null,
-						'height' => null
-					]
-				])->get()
+				(new CTable())
+					->addRow($actionMap)
+					->addRow($imgMap)
 			)
 	)
 	->show();

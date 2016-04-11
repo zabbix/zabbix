@@ -64,11 +64,11 @@ class CControllerDiscoveryView extends CController {
 	}
 
 	protected function doAction() {
-		$sort = $this->getInput('sort', CProfile::get('web.discovery.php.sort', 'ip'));
-		$sortorder = $this->getInput('sortorder', CProfile::get('web.discovery.php.sortorder', ZBX_SORT_UP));
+		$sortField = $this->getInput('sort', CProfile::get('web.discovery.php.sort', 'ip'));
+		$sortOrder = $this->getInput('sortorder', CProfile::get('web.discovery.php.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.discovery.php.sort', $sort, PROFILE_TYPE_STR);
-		CProfile::update('web.discovery.php.sortorder', $sortorder, PROFILE_TYPE_STR);
+		CProfile::update('web.discovery.php.sort', $sortField, PROFILE_TYPE_STR);
+		CProfile::update('web.discovery.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
 		/*
 		 * Display
@@ -76,14 +76,85 @@ class CControllerDiscoveryView extends CController {
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'druleid' => $this->getInput('druleid', 0),
-			'sort' => $sort,
-			'sortorder' => $sortorder
+			'sort' => $sortField,
+			'sortorder' => $sortOrder,
+			'services' => [],
+			'drules' => []
 		];
 
 		$data['pageFilter'] = new CPageFilter([
 			'drules' => ['filter' => ['status' => DRULE_STATUS_ACTIVE]],
 			'druleid' => $data['druleid']
 		]);
+
+		if ($data['pageFilter']->drulesSelected) {
+
+			// discovery rules
+			$options = [
+				'output' => API_OUTPUT_EXTEND,
+				'selectDHosts' => API_OUTPUT_EXTEND,
+				'filter' => ['status' => DRULE_STATUS_ACTIVE]
+			];
+
+			if ($data['pageFilter']->druleid > 0) {
+				$options['druleids'] = $data['pageFilter']->druleid; // set selected discovery rule id
+			}
+
+			$data['drules'] = API::DRule()->get($options);
+			if (!empty($data['drules'])) {
+				order_result($data['drules'], 'name');
+			}
+
+			// discovery services
+			$options = [
+				'selectHosts' => ['hostid', 'name', 'status'],
+				'output' => API_OUTPUT_EXTEND,
+				'sortfield' => $sortField,
+				'sortorder' => $sortOrder,
+				'limitSelects' => 1
+			];
+			if (!empty($data['druleid'])) {
+				$options['druleids'] = $data['druleid'];
+			}
+			else {
+				$options['druleids'] = zbx_objectValues($data['drules'], 'druleid');
+			}
+			$dservices = API::DService()->get($options);
+
+			// user macros
+			$data['macros'] = API::UserMacro()->get([
+				'output' => API_OUTPUT_EXTEND,
+				'globalmacro' => true
+			]);
+			$data['macros'] = zbx_toHash($data['macros'], 'macro');
+
+			// services
+			$data['services'] = [];
+			foreach ($dservices as $dservice) {
+				$key_ = $dservice['key_'];
+				if (!zbx_empty($key_)) {
+					if (isset($data['macros'][$key_])) {
+						$key_ = $data['macros'][$key_]['value'];
+					}
+					$key_ = ': '.$key_;
+				}
+				$serviceName = discovery_check_type2str($dservice['type']).
+					discovery_port2str($dservice['type'], $dservice['port']).$key_;
+				$data['services'][$serviceName] = 1;
+			}
+			ksort($data['services']);
+
+			// discovery services to hash
+			$data['dservices'] = zbx_toHash($dservices, 'dserviceid');
+
+			// discovery hosts
+			$data['dhosts'] = API::DHost()->get([
+				'druleids' => zbx_objectValues($data['drules'], 'druleid'),
+				'selectDServices' => ['dserviceid', 'ip', 'dns', 'type', 'status', 'key_'],
+				'output' => ['dhostid', 'lastdown', 'lastup', 'druleid']
+			]);
+			$data['dhosts'] = zbx_toHash($data['dhosts'], 'dhostid');
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Status of discovery'));
