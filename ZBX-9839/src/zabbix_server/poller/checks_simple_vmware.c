@@ -733,26 +733,20 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 								&tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
 								&tm.tm_sec))
 						{
-							int		tz_offset;
-							struct tm	ptm;
+							zbx_tz_offset	tz_offset;
+							int		tz_offset_sec;
 
-							get_time(&ptm, NULL);
-#if defined(HAVE_TM_TM_GMTOFF)
-							tz_offset = ptm.tm_gmtoff;
-#else
-							tz_offset = -timezone;
+							get_time(NULL, NULL, &tz_offset);
 
-							/* daylight saving time */
-							if (0 < ptm.tm_isdst)
-								/* assume DST is one hour */
-								tz_offset += SEC_PER_HOUR;
-#endif
+							tz_offset_sec = (int)tz_offset.hours * SEC_PER_HOUR +
+									(int)tz_offset.minutes * SEC_PER_MIN;
+
 							tm.tm_year -= 1900;
 							tm.tm_mon--;
 							tm.tm_isdst = -1;
 
 							if (0 < (t = mktime(&tm)))
-								add_result->log->timestamp = (int)t + tz_offset;
+								add_result->log->timestamp = (int)t + tz_offset_sec;
 						}
 
 						zbx_free(timestamp);
