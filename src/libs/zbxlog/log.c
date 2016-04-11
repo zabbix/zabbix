@@ -174,7 +174,7 @@ static void	rotate_log(const char *log_filename)
 				long		milliseconds;
 				struct tm	tm;
 
-				get_time(&tm, &milliseconds);
+				get_time(&tm, &milliseconds, NULL);
 
 				fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
 						" cannot rename log file \"%s\" to \"%s\": %s\n",
@@ -429,7 +429,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			long		milliseconds;
 			struct tm	tm;
 
-			get_time(&tm, &milliseconds);
+			get_time(&tm, &milliseconds, NULL);
 
 			fprintf(log_file,
 					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
@@ -464,7 +464,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 
 		lock_log();
 
-		get_time(&tm, &milliseconds);
+		get_time(&tm, &milliseconds, NULL);
 
 		fprintf(stdout,
 				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",

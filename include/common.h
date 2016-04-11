@@ -108,6 +108,14 @@ typedef struct
 }
 zbx_timespec_t;
 
+/* time zone offset */
+typedef struct zbx_tz_offset
+{
+	short	hours;
+	short	minutes;
+}
+zbx_tz_offset;
+
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
 
@@ -902,6 +910,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
+#define HOURS_PER_DAY		24
+
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
@@ -1103,7 +1113,7 @@ void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
-void	get_time(struct tm *tm, long *milliseconds);
+void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset);
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 

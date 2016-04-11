@@ -27,12 +27,11 @@
 
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*type, buf[32];
-	size_t		offset;
-	int		gmtoff;
-	unsigned short	h, m;
-	long		milliseconds;
-	struct tm	tm;
+	char			*type, buf[32];
+	size_t			offset;
+	long			milliseconds;
+	struct tm		tm;
+	zbx_tz_offset		tz_offset;
 
 	if (1 < request->nparam)
 	{
@@ -48,34 +47,23 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(type, "local"))
 	{
-		get_time(&tm, &milliseconds);
+		get_time(&tm, &milliseconds, &tz_offset);
 
 		offset = zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03ld,",
 				1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
 
 		/* timezone offset */
-#if defined(HAVE_TM_TM_GMTOFF)
-		gmtoff = tm.tm_gmtoff;
-#else
-#ifdef _WINDOWS
-		gmtoff = -_timezone;
-#else
-		gmtoff = -timezone;
-#endif
-		if (0 < tm.tm_isdst)		/* daylight saving time */
-			gmtoff += SEC_PER_HOUR;	/* assume DST is one hour */
-#endif
 
-		h = (unsigned short)(abs(gmtoff) / SEC_PER_HOUR);
-		m = (unsigned short)((abs(gmtoff) - h * SEC_PER_HOUR) / SEC_PER_MIN);
-
-		if (0 <= gmtoff)
+		if (0 <= tz_offset.hours)
+		{
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "+");
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%02d:%02d",
+					(int)tz_offset.hours, (int)tz_offset.minutes);
+		}
 		else
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "-");
-
-		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%02d:%02d", (int)h, (int)m);
+			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%03d:%02d",
+					(int)tz_offset.hours, (int)tz_offset.minutes);
 
 		SET_STR_RESULT(result, strdup(buf));
 	}
