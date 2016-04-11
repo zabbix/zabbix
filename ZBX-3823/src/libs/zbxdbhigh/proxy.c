@@ -2463,8 +2463,6 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 		}
 	}
 
-	zbx_free(tmp);
-
 	if (0 < values_num)
 		process_mass_data(sock, proxy_hostid, values, values_num, &processed);
 
@@ -2476,6 +2474,8 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
 out:
+	zbx_free(tmp);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
