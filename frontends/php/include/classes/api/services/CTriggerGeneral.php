@@ -233,16 +233,21 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
-		// make sure we have all the required data
-		if (!isset($trigger['description']) || !isset($trigger['expression'])) {
-			$explodeExpression = !isset($trigger['expression']);
-			$trigger = $this->extendObject($this->tableName(), $trigger, ['description', 'expression']);
+		// Make sure we have all the required data.
+		if (!array_key_exists('description', $trigger) || !array_key_exists('expression', $trigger)
+				|| !array_key_exists('recovery_expression', $trigger)) {
+			$explode_expression = !array_key_exists('expression', $trigger);
+			$explode_recovery_expression = !array_key_exists('recovery_expression', $trigger);
 
-			if ($explodeExpression) {
+			$trigger = $this->extendObject($this->tableName(), $trigger, ['description', 'expression',
+				'recovery_expression'
+			]);
+
+			if ($explode_expression) {
 				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression']);
 			}
 
-			if (array_key_exists('recovery_expression', $trigger)) {
+			if ($explode_recovery_expression) {
 				$trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
 					$trigger['recovery_expression']
 				);
@@ -261,19 +266,23 @@ abstract class CTriggerGeneral extends CApiService {
 			$filter['host'] = reset($expressionHosts);
 		}
 
-		$triggers = $this->get([
+		$db_triggers = $this->get([
 			'filter' => $filter,
-			'output' => ['expression', 'triggerid'],
+			'output' => ['expression', 'triggerid', 'recovery_expression'],
 			'nopermissions' => true
 		]);
 
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
 
-		foreach ($triggers as $dbTrigger) {
-			// check if the expressions are also equal and that this is a different trigger
-			$differentTrigger = (!isset($trigger['triggerid']) || !idcmp($trigger['triggerid'], $dbTrigger['triggerid']));
+		foreach ($db_triggers as $db_trigger) {
+			// Check if the expressions are also equal and that this is a different trigger.
+			$db_trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
+				$db_trigger['recovery_expression']
+			);
 
-			if ($dbTrigger['expression'] === $trigger['expression'] && $differentTrigger) {
+			if ((!array_key_exists('triggerid', $trigger) || !idcmp($trigger['triggerid'], $db_trigger['triggerid']))
+					&& $db_trigger['expression'] === $trigger['expression']
+					&& $db_trigger['recovery_expression'] === $trigger['recovery_expression']) {
 				$options = [
 					'output' => ['name'],
 					'templated_hosts' => true,
