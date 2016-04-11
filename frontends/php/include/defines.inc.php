@@ -559,9 +559,7 @@ define('SCREEN_RESOURCE_CHART',				18);
 define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
 define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 // used in Monitoring > Web > Details (httpdetails.php)
-define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
-// used in Monitoring > Discovery
-define('SCREEN_RESOURCE_DISCOVERY',			22);
+define('SCREEN_RESOURCE_HTTPTEST_DETAILS',		21);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);

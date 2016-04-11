@@ -25,7 +25,6 @@ A......... [ZBX-10155] prohibited creation of a trigger prototype without item p
 ..F....... [ZBX-10570] fixed incorrect select input height in FF (Pavel)
 ..F....... [ZBX-10413] improved XML import validation (Oleg, Sasha)
 ...GI..PS. [ZBX-4148] separated third-party library CFLAGS to avoid header file name conflicts (gleb)
-..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 ..F....... [ZBX-10466] fixed event selection by trigger ID (Gunars)
 ..F....... [ZBX-7422] fixed LLD discovery rule list showing 0 instead of blank space in interval column for trapper and SNMP trap items (Ivo)
