@@ -113,7 +113,6 @@ typedef struct zbx_tz_offset
 {
 	short	hours;
 	short	minutes;
-	short	negative_minutes;	/* flag for when minutes have negative value */
 }
 zbx_tz_offset;
 
@@ -1115,6 +1114,8 @@ void	zbx_trim_str_list(char *list, char delimiter);
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
 
 void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset);
+
+time_t zbx_mkgmtime(struct tm *tm);
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 

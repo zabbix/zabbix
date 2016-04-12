@@ -733,23 +733,12 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 								&tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
 								&tm.tm_sec))
 						{
-							zbx_tz_offset	tz_offset;
-							int		tz_offset_sec;
-
-							get_time(NULL, NULL, &tz_offset);
-
-							if (1 == tz_offset.negative_minutes)
-								tz_offset.minutes = -tz_offset.minutes;
-
-							tz_offset_sec = (int)tz_offset.hours * SEC_PER_HOUR +
-									(int)tz_offset.minutes * SEC_PER_MIN;
-
 							tm.tm_year -= 1900;
 							tm.tm_mon--;
 							tm.tm_isdst = -1;
 
-							if (0 < (t = mktime(&tm)))
-								add_result->log->timestamp = (int)t + tz_offset_sec;
+							if (FAIL != (t = zbx_mkgmtime(&tm)))
+								add_result->log->timestamp = (int)t;
 						}
 
 						zbx_free(timestamp);
