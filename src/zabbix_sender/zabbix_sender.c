@@ -457,7 +457,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode || ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* take TLS data passed from 'main' thread */
 		zbx_tls_take_vars(&sendval_args->tls_vars);
@@ -1012,8 +1012,7 @@ int	main(int argc, char **argv)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();
 
-		if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode ||
-				ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+		if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 		{
 #if defined(_WINDOWS)
 			zbx_tls_init_parent();
@@ -1028,7 +1027,7 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode || ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
 		zbx_tls_pass_vars(&sendval_args.tls_vars);
@@ -1244,7 +1243,7 @@ exit:
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode || ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		zbx_tls_free();
 #if defined(_WINDOWS)

@@ -188,7 +188,7 @@ static void	get_signal_handler(int sig)
 		zbx_error("Timeout while executing operation");
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode || ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 		zbx_tls_free_on_signal();
 #endif
 	exit(EXIT_FAILURE);
@@ -437,8 +437,7 @@ int	main(int argc, char **argv)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();
 
-		if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode ||
-				ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+		if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 		{
 #if defined(_WINDOWS)
 			zbx_tls_init_parent();
@@ -460,7 +459,7 @@ out:
 	zbx_free(key);
 	zbx_free(source_ip);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode || ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
 	{
 		zbx_tls_free();
 #if defined(_WINDOWS)
