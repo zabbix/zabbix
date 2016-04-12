@@ -3803,7 +3803,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	{
 		*error = zbx_strdup(*error, "invalid connection parameters");
 		THIS_SHOULD_NEVER_HAPPEN;
-		goto out;
+		goto out2;
 	}
 
 	/* set up TLS context */
@@ -4078,7 +4078,7 @@ out:	/* an error occurred */
 out1:
 	if (NULL != peer_cert)
 		gnutls_x509_crt_deinit(peer_cert);
-
+out2:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
@@ -4171,7 +4171,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	{
 		*error = zbx_strdup(*error, "invalid connection parameters");
 		THIS_SHOULD_NEVER_HAPPEN;
-		goto out;
+		goto out1;
 	}
 
 	/* set our connected TCP socket to TLS context */

@@ -606,7 +606,9 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 		zbx_tcp_close(&s);
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 out:
+#endif
 	if (SUCCEED != ret && SUCCEED == last_ret)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,
@@ -791,7 +793,9 @@ static int	send_buffer(const char *host, unsigned short port)
 	}
 	else
 		err_send_step = "[connect] ";
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 out:
+#endif
 	zbx_json_free(&json);
 
 	if (SUCCEED == ret)
