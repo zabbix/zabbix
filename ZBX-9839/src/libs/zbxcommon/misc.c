@@ -2951,7 +2951,7 @@ unsigned int	zbx_alarm_off(void)
  * Parameters:                                                                *
  *     tm           - [OUT] broken-down representation of the current time    *
  *     milliseconds - [OUT] milliseconds since the previous second            *
- *     tz_offset    - [OUT] time zone offset form UTC                         *
+ *     tz_offset    - [OUT] time zone offset from UTC                         *
  *                                                                            *
  * Comments:                                                                  *
  *     On Windows localtime() returns pointer to static, thread-local storage *
@@ -3002,7 +3002,7 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
 		gmtime_r(&current_time.tv_sec, &tm_utc);
 #endif
 #endif
-		/* calculate if UTC and local time has the same date and adjust hours if needed */
+		/* calculate if UTC and local time has the same date or not and adjust the offset if needed */
 		day_diff = tm_local.tm_yday - tm_utc.tm_yday;
 		year_diff = tm_local.tm_year - tm_utc.tm_year;
 
@@ -3019,9 +3019,6 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
 		tz_offset->hours = (short)(tm_local.tm_hour - tm_utc.tm_hour);
 		tz_offset->minutes = (short)(tm_local.tm_min - tm_utc.tm_min);
 
-		/* setting a flag for negative minute values */
-		tz_offset->negative_minutes = (0 > tz_offset->minutes ? 1 : 0);
-
 		if ((0 <= tz_offset->hours && 0 <= tz_offset->minutes) ||
 				(0 >= tz_offset->hours && 0 >= tz_offset->minutes) || tz_offset->minutes == 0)
 		{
@@ -3037,4 +3034,50 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
 			tz_offset->minutes = 60 - abs(tz_offset->minutes);
 		}
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mkgmtime                                                     *
+ *                                                                            *
+ * Purpose: get UTC time from time which is broken down into a struct tm      *
+ *          provided by caller                                                *
+ *                                                                            *
+ * Parameters: tm - broken-down representation of the UTC time                *
+ *                                                                            *
+ * Return value:  Epoch timestamp - given the value is positive               *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+time_t zbx_mkgmtime(struct tm *tm)
+{
+	int month, year, year_for_leap;
+	time_t	ret;
+
+	/* Month-to-day offset for non-leap-years */
+	static const int month_day[12] =
+	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+
+	month = tm->tm_mon % 12;
+	year = tm->tm_year + tm->tm_mon / 12;
+
+	if (month < 0)
+	{
+		month += 12;
+		--year;
+	}
+
+	/* This is the number of Februaries since 1900 */
+	year_for_leap = (month > 1) ? year + 1 : year;
+
+	ret = tm->tm_sec					/* Seconds */
+		+ 60 * (tm->tm_min				/* Minute = 60 seconds */
+		+ 60 * (tm->tm_hour				/* Hour = 60 minutes */
+		+ 24 * (month_day[month] + tm->tm_mday - 1	/* Day = 24 hours */
+		+ 365 * (year - 70)				/* Year = 365 days */
+		+ (year_for_leap - 69) / 4			/* Every 4 years is leap... */
+		- (year_for_leap - 1) / 100			/* Except centuries... */
+		+ (year_for_leap + 299) / 400)));		/* Except 400s. */
+
+	return ret < 0 ? FAIL : ret;
 }
