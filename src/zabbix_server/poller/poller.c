@@ -300,7 +300,7 @@ static unsigned char	host_availability_agent_by_item_type(unsigned char type)
 	}
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 {
 	const char		*__function_name = "activate_host";
 	zbx_host_availability_t	in, out;
@@ -334,8 +334,6 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
 				zbx_agent_type_string(item->type), item->host.host);
 	}
-
-	*available = HOST_AVAILABLE_TRUE;
 out:
 	zbx_host_availability_clean(&out);
 	zbx_host_availability_clean(&in);
@@ -343,7 +341,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, const char *error)
+static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
 {
 	const char		*__function_name = "deactivate_host";
 	zbx_host_availability_t	in, out;
@@ -359,11 +357,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 		goto out;
 
 	if (FAIL == host_get_availability(&item->host, agent_type, &in))
-		goto out;
-
-	/* if the item is still flagged as unreachable while the host is reachable, */
-	/* it means that this is item rather than network failure                   */
-	if (0 == in.agents[agent_type].errors_from && 0 != item->unreachable)
 		goto out;
 
 	if (FAIL == DChost_deactivate(item->host.hostid, agent_type, ts, &in.agents[agent_type],
@@ -407,8 +400,6 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, c
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name,
 			out.agents[agent_type].errors_from, out.agents[agent_type].available);
-
-	*available = HOST_AVAILABLE_FALSE;
 out:
 	zbx_host_availability_clean(&out);
 	zbx_host_availability_clean(&in);
@@ -566,7 +557,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case ITEM_TYPE_IPMI:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
@@ -586,13 +577,13 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				ZBX_STRDUP(items[i].snmpv3_privpassphrase, items[i].snmpv3_privpassphrase_orig);
 				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
@@ -600,7 +591,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				ZBX_STRDUP(items[i].snmp_community, items[i].snmp_community_orig);
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
@@ -614,24 +605,24 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				ZBX_STRDUP(items[i].publickey, items[i].publickey_orig);
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
 				items[i].username = zbx_strdup(items[i].username, items[i].username_orig);
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
-				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL,
 						NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}
@@ -684,14 +675,20 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
-			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
-					activate_host(&items[i], &timespec, &last_available);
+				{
+					activate_host(&items[i], &timespec);
+					last_available = HOST_AVAILABLE_TRUE;
+				}
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
-					deactivate_host(&items[i], &timespec, &last_available, results[i].msg);
+				{
+					deactivate_host(&items[i], &timespec, results[i].msg);
+					last_available = HOST_AVAILABLE_FALSE;
+				}
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
@@ -756,7 +753,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 				}
 			}
 		}
-		else if (HOST_AVAILABLE_FALSE != last_available)
+		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,

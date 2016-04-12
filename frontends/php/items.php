@@ -138,8 +138,8 @@ $fields = [
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	// filter
-	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_hostid' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'filter_application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -164,7 +164,7 @@ $fields = [
 	'filter_with_triggers' =>	[T_ZBX_INT, O_OPT, null,	IN('-1,0,1'), null],
 	'filter_ipmi_sensor' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// subfilters
-	'subfilter_set' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'subfilter_set' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_apps' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'subfilter_types' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_value_types' =>	[T_ZBX_INT, O_OPT, null,	null,		null],

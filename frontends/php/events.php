@@ -105,8 +105,6 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 	exit;
 }
 
-$source = getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
-
 /*
  * Filter
  */
@@ -121,6 +119,10 @@ elseif (hasRequest('filter_rst')) {
 
 $triggerId = CProfile::get('web.events.filter.triggerid', 0);
 
+$source = ($triggerId != 0 && hasRequest('filter_set'))
+	? EVENT_SOURCE_TRIGGERS
+	: getRequest('source', CProfile::get('web.events.source', EVENT_SOURCE_TRIGGERS));
+
 CProfile::update('web.events.source', $source, PROFILE_TYPE_INT);
 
 // calculate stime and period
@@ -130,7 +132,7 @@ if ($csvExport) {
 	if (hasRequest('stime')) {
 		$stime = getRequest('stime');
 
-		if ($stime + $period > time()) {
+		if (bccomp($stime + $period, date(TIMESTAMP_FORMAT, time())) == 1) {
 			$stime = date(TIMESTAMP_FORMAT, time() - $period);
 		}
 	}
@@ -159,6 +161,39 @@ $till = $from + $period;
 /*
  * Display
  */
+if ($source == EVENT_SOURCE_TRIGGERS) {
+	if ($triggerId != 0 && hasRequest('filter_set')) {
+		$host = API::Host()->get([
+			'output' => ['hostid'],
+			'selectGroups' => ['groupid'],
+			'triggerids' => [$triggerId],
+			'limit' => 1
+		]);
+
+		$host = reset($host);
+		$hostid = $host['hostid'];
+		$group = reset($host['groups']);
+		$groupid = $group['groupid'];
+	}
+	else {
+		$groupid = getRequest('groupid');
+		$hostid = getRequest('hostid');
+	}
+
+	$pageFilter = new CPageFilter([
+		'groups' => [
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true
+		],
+		'hosts' => [
+			'monitored_hosts' => true,
+			'with_monitored_triggers' => true
+		],
+		'hostid' => $hostid,
+		'groupid' => $groupid
+	]);
+}
+
 if ($csvExport) {
 	if (!hasRequest('hostid')) {
 		$_REQUEST['hostid'] = 0;
@@ -169,25 +204,10 @@ if ($csvExport) {
 }
 else {
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$pageFilter = new CPageFilter([
-			'groups' => [
-				'monitored_hosts' => true,
-				'with_monitored_triggers' => true
-			],
-			'hosts' => [
-				'monitored_hosts' => true,
-				'with_monitored_triggers' => true
-			],
-			'hostid' => getRequest('hostid'),
-			'groupid' => getRequest('groupid')
-		]);
-
 		// try to find matching trigger when host is changed
 		// use the host ID from the page filter since it may not be present in the request
 		// if all hosts are selected, preserve the selected trigger
 		if ($triggerId != 0 && $pageFilter->hostid != 0) {
-			$hostid = $pageFilter->hostid;
-
 			$old_triggers = API::Trigger()->get([
 				'output' => ['description', 'expression'],
 				'selectHosts' => ['hostid', 'host'],
@@ -198,7 +218,7 @@ else {
 			$old_trigger['hosts'] = zbx_toHash($old_trigger['hosts'], 'hostid');
 
 			// if the trigger doesn't belong to the selected host - find a new one on that host
-			if (!array_key_exists($hostid, $old_trigger['hosts'])) {
+			if (!array_key_exists($pageFilter->hostid, $old_trigger['hosts'])) {
 				$triggerId = 0;
 
 				$old_expression = CMacrosResolverHelper::resolveTriggerExpression($old_trigger['expression']);
@@ -207,7 +227,7 @@ else {
 					'output' => ['triggerid', 'description', 'expression'],
 					'selectHosts' => ['hostid', 'host'],
 					'filter' => ['description' => $old_trigger['description']],
-					'hostids' => [$hostid]
+					'hostids' => [$pageFilter->hostid]
 				]);
 
 				$new_triggers = CMacrosResolverHelper::resolveTriggerExpressions($new_triggers);
@@ -217,7 +237,7 @@ else {
 
 					foreach ($old_trigger['hosts'] as $old_host) {
 						$new_expression = triggerExpressionReplaceHost($new_trigger['expression'],
-							$new_trigger['hosts'][$hostid]['host'], $old_host['host']
+							$new_trigger['hosts'][$pageFilter->hostid]['host'], $old_host['host']
 						);
 
 						if ($old_expression === $new_expression) {
@@ -245,12 +265,11 @@ else {
 	}
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
+		$frmForm->addVar('groupid', $pageFilter->groupid, 'groupid_csv');
+		$frmForm->addVar('hostid', $pageFilter->hostid, 'hostid_csv');
+
 		if ($triggerId) {
 			$frmForm->addVar('triggerid', $triggerId, 'triggerid_csv');
-		}
-		else {
-			$frmForm->addVar('groupid', getRequest('groupid'), 'groupid_csv');
-			$frmForm->addVar('hostid', getRequest('hostid'), 'hostid_csv');
 		}
 	}
 
@@ -290,6 +309,8 @@ else {
 		$filterForm->addVar('triggerid', $triggerId)
 			->addVar('stime', $stime)
 			->addVar('period', $period);
+		$filterForm->addVar('groupid', $pageFilter->groupid);
+		$filterForm->addVar('hostid', $pageFilter->hostid);
 
 		if ($triggerId > 0) {
 			$dbTrigger = API::Trigger()->get([
@@ -411,7 +432,7 @@ if ($source == EVENT_SOURCE_DISCOVERY) {
 else {
 	$header = [
 		_('Time'),
-		(getRequest('hostid', 0) == 0) ? _('Host') : null,
+		($pageFilter->hostid == 0) ? _('Host') : null,
 		_('Description'),
 		_('Status'),
 		_('Severity'),
@@ -561,7 +582,7 @@ else {
 
 	// source not discovery i.e. trigger
 	else {
-		if ($csvExport || $pageFilter->hostsSelected) {
+		if ($csvExport || $pageFilter->hostsSelected || $triggerId != 0) {
 			$knownTriggerIds = [];
 			$validTriggerIds = [];
 
@@ -588,7 +609,7 @@ else {
 				$knownTriggerIds = [$triggerId => $triggerId];
 				$validTriggerIds = $knownTriggerIds;
 
-				$eventOptions['objectids'] = [$triggerId];;
+				$eventOptions['objectids'] = [$triggerId];
 			}
 			elseif ($pageFilter->hostid > 0) {
 				$hostTriggers = API::Trigger()->get([
@@ -709,7 +730,7 @@ else {
 			]);
 
 			// fetch scripts for the host JS menu
-			if (!$csvExport && getRequest('hostid', 0) == 0) {
+			if (!$csvExport && $pageFilter->hostid == 0) {
 				$scripts = API::Script()->getScriptsByHosts($hostids);
 			}
 
@@ -739,7 +760,7 @@ else {
 				if ($csvExport) {
 					$csvRows[] = [
 						zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-						(getRequest('hostid', 0) == 0) ? $host['name'] : null,
+						($pageFilter->hostid == 0) ? $host['name'] : null,
 						$description,
 						trigger_value2str($event['value']),
 						getSeverityName($trigger['priority'], $config),
@@ -768,7 +789,7 @@ else {
 					// host JS menu link
 					$hostName = null;
 
-					if (getRequest('hostid', 0) == 0) {
+					if ($pageFilter->hostid == 0) {
 						$hostName = (new CSpan($host['name']))
 							->addClass(ZBX_STYLE_LINK_ACTION)
 							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));

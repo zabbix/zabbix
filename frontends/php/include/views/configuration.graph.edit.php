@@ -92,6 +92,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$percentLeftTextBox = (new CTextBox('percent_left', $this->data['percent_left'], $is_templated, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
+			->setChecked(true)
 			->onClick('javascript: showHideVisible("percent_left");')
 			->setEnabled(!$is_templated);
 
@@ -109,6 +110,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		$percentRightTextBox = (new CTextBox('percent_right', $this->data['percent_right'], $is_templated, 7))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
+			->setChecked(true)
 			->onClick('javascript: showHideVisible("percent_right");')
 			->setEnabled(!$is_templated);
 
@@ -160,7 +162,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1'.
-					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");');
+					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");')
+			->setEnabled(!$is_templated);
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
@@ -221,7 +224,8 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1'.
-					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");');
+					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");')
+			->setEnabled(!$is_templated);
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {

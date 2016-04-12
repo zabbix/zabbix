@@ -134,6 +134,11 @@ elseif (!$screens) {
 }
 else {
 	$data['screen'] = reset($screens);
+	$data['screen']['editable'] = (bool) API::Screen()->get([
+		'output' => [],
+		'screenids' => [$data['screen']['screenid']],
+		'editable' => true
+	]);
 }
 ob_end_flush();
 

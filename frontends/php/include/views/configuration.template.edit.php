@@ -136,7 +136,13 @@ foreach ($data['groupsAllowed'] as $group) {
 $hostsTB = new CTweenBox($frmHost, 'hosts', $data['hostIdsLinkedTo'], 20);
 
 foreach ($data['hostsAllowedToAdd'] as $host) {
+	if (bccomp($host['hostid'], $data['templateId']) == 0) {
+		continue;
+	}
 	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
+		continue;
+	}
+	if (array_key_exists($host['hostid'], $data['linkedTemplates'])) {
 		continue;
 	}
 	$hostsTB->addItem($host['hostid'], $host['name']);
@@ -388,6 +394,10 @@ $tmplList = new CFormList();
 
 $ignoredTemplates = [];
 
+if ($data['templateId'] != 0) {
+	$ignoredTemplates[$data['templateId']] = $data['dbTemplate']['host'];
+}
+
 $linkedTemplateTable = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
@@ -413,6 +423,10 @@ foreach ($data['linkedTemplates'] as $template) {
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
+foreach ($data['hostIdsLinkedTo'] as $templateid) {
+	$ignoredTemplates[$templateid] = '';
+}
+
 $tmplList->addRow(_('Linked templates'),
 	(new CDiv($linkedTemplateTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -428,7 +442,7 @@ $newTemplateTable = (new CTable())
 			'ignored' => $ignoredTemplates,
 			'popup' => [
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1&templateid='.$data['templateId']
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])

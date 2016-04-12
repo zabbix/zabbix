@@ -374,7 +374,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		} while (!empty($parentItemids));
 
-		$delRulesChilds = $this->get([
+		$delRulesChildren = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childTuleids,
 			'nopermissions' => true,
@@ -382,7 +382,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectHosts' => ['name']
 		]);
 
-		$delRules = array_merge($delRules, $delRulesChilds);
+		$delRules = array_merge($delRules, $delRulesChildren);
 		$ruleids = array_merge($ruleids, $childTuleids);
 
 		$iprototypeids = [];
@@ -1174,6 +1174,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 				unset($gitem['gitemid'], $gitem['graphid']);
 			}
+			unset($gitem);
 
 			// replace the old axis items with the new one with the same key
 			if ($graph['ymin_itemid']) {
@@ -1185,6 +1186,7 @@ class CDiscoveryRule extends CItemGeneral {
 				$graph['ymax_itemid'] = $dstItems[$yMaxSrcItem['key_']]['itemid'];
 			}
 		}
+		unset($graph);
 
 		// save graphs
 		$rs = API::GraphPrototype()->create($dstGraphs);

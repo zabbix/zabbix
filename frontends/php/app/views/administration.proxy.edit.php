@@ -117,7 +117,7 @@ $encryption_form_list = (new CFormList('encryption'))
 	->addRow(_('Issuer'),
 		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	)
-	->addRow(_('Subject'),
+	->addRow(_x('Subject', 'encryption certificate'),
 		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
 

@@ -11,7 +11,7 @@
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
 		<input name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
 		<div class="interface-bulk">
-			<input type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
+			<input type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{attrs.checked_bulk}>
 			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
@@ -35,7 +35,7 @@
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?> interface-control">
-		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" #{*attrs.disabled}><?= _('Remove') ?></button>
+		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" #{attrs.disabled}><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>

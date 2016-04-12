@@ -856,7 +856,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 			util_local.pid = qdata->pids.values[i];
 
 			/* find the process utilization data in current snapshot */
-			putil = (zbx_procstat_util_t *)bsearch(&util_local, stats, pids->values_num,
+			putil = (zbx_procstat_util_t *)zbx_bsearch(&util_local, stats, pids->values_num,
 					sizeof(zbx_procstat_util_t), procstat_util_compare);
 
 			if (NULL == putil || SUCCEED != putil->error)
@@ -868,7 +868,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 			starttime = putil->starttime;
 
 			/* find the process utilization data in last snapshot */
-			putil = (zbx_procstat_util_t *)bsearch(&util_local, procstat_snapshot, procstat_snapshot_num,
+			putil = (zbx_procstat_util_t *)zbx_bsearch(&util_local, procstat_snapshot, procstat_snapshot_num,
 					sizeof(zbx_procstat_util_t), procstat_util_compare);
 
 			if (NULL == putil || SUCCEED != putil->error || putil->starttime != starttime)

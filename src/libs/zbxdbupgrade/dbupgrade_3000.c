@@ -17,33 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MACROCACHE_H
-#define ZABBIX_MACROCACHE_H
+#include "common.h"
+#include "db.h"
+#include "dbupgrade.h"
 
-#include "zbxtypes.h"
-#include "zbxalgo.h"
+/*
+ * 3.0 maintenance database patches
+ */
 
-/* user macro structure used to store user macros in user macro cache */
-typedef struct
+#ifndef HAVE_SQLITE3
+
+static int	DBpatch_3000000(void)
 {
-	char	*name;
-	char	*context;
-	char	*value;
+	return SUCCEED;
 }
-zbx_umc_macro_t;
-
-/* user macro cache object */
-typedef struct
-{
-	/* the object id, for example trigger id */
-	zbx_uint64_t		objectid;
-	/* the macro source hosts */
-	zbx_vector_uint64_t	hostids;
-	/* the macro:value pairs */
-	zbx_vector_ptr_t	macros;
-}
-zbx_umc_object_t;
-
-int	zbx_umc_compare_macro(const void *d1, const void *d2);
 
 #endif
+
+DBPATCH_START(3000)
+
+/* version, duplicates flag, mandatory flag */
+
+DBPATCH_ADD(3000000, 0, 1)
+
+DBPATCH_END()

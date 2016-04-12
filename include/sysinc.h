@@ -165,10 +165,6 @@
 #	include <kstat.h>
 #endif
 
-#ifdef HAVE_LDAP
-#	include <ldap.h>
-#endif
-
 #ifdef HAVE_WINLDAP_H
 #	undef SEC_I_INCOMPLETE_CREDENTIALS
 #	undef SEC_E_INCOMPLETE_CREDENTIALS
@@ -332,10 +328,6 @@
 #	include <unistd.h>
 #endif
 
-#ifdef HAVE_LBER_H
-#	include <lber.h>
-#endif
-
 #ifdef HAVE_SYS_IPC_H
 #	include <sys/ipc.h>
 #endif
@@ -395,31 +387,9 @@
 #	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
-/* Net-SNMP is used */
-#ifdef HAVE_NETSNMP
-#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
-#	include <net-snmp/net-snmp-config.h>
-#	include <net-snmp/net-snmp-includes.h>
-#endif
-
-/* LIBXML2 is used */
-#ifdef HAVE_LIBXML2
-#	include <libxml/parser.h>
-#	include <libxml/tree.h>
-#	include <libxml/xpath.h>
-#endif
-
 /* Required for advanced sigaction */
 #ifdef HAVE_SYS_UCONTEXT_H
 #	include <sys/ucontext.h>
-#endif
-
-#ifdef HAVE_ICONV
-#	include <iconv.h>
-#endif
-
-#ifdef HAVE_SSH2
-#	include <libssh2.h>
 #endif
 
 #ifdef HAVE_IO_H

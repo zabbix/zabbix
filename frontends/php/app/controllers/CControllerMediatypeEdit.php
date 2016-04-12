@@ -107,6 +107,7 @@ class CControllerMediatypeEdit extends CController {
 			'gsm_modem' => '/dev/ttyS0',
 			'jabber_username' => 'user@server',
 			'eztext_username' => '',
+			'eztext_limit' => EZ_TEXTING_LIMIT_USA,
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE

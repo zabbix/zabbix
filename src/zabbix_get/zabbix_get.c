@@ -133,6 +133,9 @@ char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
 
+int	CONFIG_PASSIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
+int	CONFIG_ACTIVE_FORKS		= 0;	/* not used in zabbix_get, just for linking with tls.c */
+
 /* COMMAND LINE OPTIONS */
 
 /* long options */
@@ -290,7 +293,7 @@ int	main(int argc, char **argv)
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 	unsigned short	opt_count[256] = {0}, port = ZBX_DEFAULT_AGENT_PORT;
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zbx_error("cannot disable core dump, exiting...");

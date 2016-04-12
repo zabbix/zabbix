@@ -49,6 +49,10 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,	null],
+	// filter
+	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'filter_name' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
 	// sort and sortorder
 	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"cnt","delay","name"'),					null],
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -115,9 +119,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'userGroups' => getRequest('userGroups', [])
 		];
 
+		// Only administrators can set slide show owner.
+		if (CWebUser::getType() == USER_TYPE_ZABBIX_USER) {
+			unset($data['userid']);
+		}
 		// Slide show update with inaccessible user.
-		if ($data['userid'] === '' && CWebUser::getType() != USER_TYPE_SUPER_ADMIN
-				&& CWebUser::getType() != USER_TYPE_ZABBIX_ADMIN) {
+		elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN && $data['userid'] === '') {
 			$user_exist = API::User()->get([
 				'output' => ['userid'],
 				'userids' => [$data['userid']]
@@ -345,18 +352,43 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.slideconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		DBStart();
+		CProfile::delete('web.slideconf.filter_name');
+		DBend();
+	}
+
 	$config = select_config();
 	$limit = $config['search_limit'] + 1;
 
 	$data = [
+		'filter' => [
+			'name' => CProfile::get('web.slideconf.filter_name', '')
+		],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	];
+
+	if ($data['filter']['name'] !== '') {
+		// escaping parameter that is about to be used in LIKE statement
+		$pattern = str_replace("!", "!!", $data['filter']['name']);
+		$pattern = str_replace("%", "!%", $pattern);
+		$pattern = str_replace("_", "!_", $pattern);
+
+		$sql_where = ' WHERE UPPER(s.name) LIKE '.zbx_dbstr('%'.mb_strtoupper($pattern).'%')." ESCAPE '!'";
+	}
+	else {
+		$sql_where = '';
+	}
 
 	$data['slides'] = DBfetchArray(DBselect(
 			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 			' FROM slideshows s'.
 				' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
+			$sql_where.
 			' GROUP BY s.slideshowid,s.name,s.delay'.
 			' ORDER BY '.(($sortField === 'cnt') ? 'cnt' : 's.'.$sortField)
 	));
@@ -365,9 +397,8 @@ else {
 		if (!slideshow_accessible($slide['slideshowid'], PERM_READ)) {
 			unset($data['slides'][$key]);
 		}
-
-		if (get_slideshow_by_slideshowid($slide['slideshowid'], PERM_READ_WRITE)) {
-			$slide['editable'] = true;
+		else {
+			$slide['editable'] = (bool) get_slideshow_by_slideshowid($slide['slideshowid'], PERM_READ_WRITE);
 		}
 	}
 	unset($slide);

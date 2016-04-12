@@ -26,6 +26,12 @@ $widget = (new CWidget())
 			->addItem(new CSubmit('form', _('Create map')))
 			->addItem((new CButton('form', _('Import')))->onClick('redirect("map.import.php?rules_preset=map")'))
 		)
+	)
+	->addItem(
+		(new CFilter('web.sysmapconf.filter.state'))
+			->addColumn((new CFormList())->addRow(_('Name like'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			))
 	);
 
 // create form
@@ -45,8 +51,7 @@ $sysmapTable = (new CTableInfo())
 
 foreach ($this->data['maps'] as $map) {
 	$user_type = CWebUser::getType();
-	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
-			|| array_key_exists('editable', $map)) {
+	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN || $map['editable']) {
 		$checkbox = new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']);
 		$action = new CLink(_('Properties'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid']);
 		$constructor = new CLink(_('Constructor'), 'sysmap.php?sysmapid='.$map['sysmapid']);

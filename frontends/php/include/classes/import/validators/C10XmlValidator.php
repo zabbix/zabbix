@@ -115,10 +115,12 @@ class C10XmlValidator {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'width' =>					['type' => XML_STRING | XML_REQUIRED],
 							'height' =>					['type' => XML_STRING | XML_REQUIRED],
+							// The tag 'ymin_type' should be validated before the 'ymin_item_key' because it is used in 'ex_validate' method.
 							'ymin_type' =>				['type' => XML_STRING | XML_REQUIRED],
+							'ymin_item_key' =>			['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateYMinItem']],
+							// The tag 'ymax_type' should be validated before the 'ymax_item_key' because it is used in 'ex_validate' method.
 							'ymax_type' =>				['type' => XML_STRING | XML_REQUIRED],
-							'ymin_item_key' =>			['type' => XML_STRING | XML_REQUIRED],
-							'ymax_item_key' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ymax_item_key' =>			['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateYMaxItem']],
 							'show_work_period' =>		['type' => XML_STRING | XML_REQUIRED],
 							'show_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
 							'graphtype' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -130,7 +132,7 @@ class C10XmlValidator {
 							'percent_right' =>			['type' => XML_STRING | XML_REQUIRED],
 							'graph_elements' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'graph_element', 'rules' => [
 								'graph_element' =>			['type' => XML_ARRAY, 'rules' => [
-									'item' =>					['type' => XML_STRING | XML_REQUIRED],
+									'item' =>					['type' => XML_STRING | XML_REQUIRED, 'ex_validate' => [$this, 'validateGraphItem']],
 									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
 									'sortorder' =>				['type' => XML_STRING | XML_REQUIRED],
 									'color' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -359,6 +361,67 @@ class C10XmlValidator {
 	public function validateTime($data, array $parent_data = null, $path) {
 		if (!preg_match('/^(2[0-3]|[01][0-9])\.[0-5][0-9]$/', $data)) {
 			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('hh.mm', 'XML time format'))));
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate Y Axis value.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if tag is invalid
+	 */
+	public function validateYMinItem($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['ymin_type']) && $parent_data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			if (strpos($data, ':') === false) {
+				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
+			}
+		}
+		elseif ($data !== '') {
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an empty string is expected')));
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate Y Axis value.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if tag is invalid
+	 */
+	public function validateYMaxItem($data, array $parent_data = null, $path) {
+		if (zbx_is_int($parent_data['ymax_type']) && $parent_data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
+			if (strpos($data, ':') === false) {
+				throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
+			}
+		}
+		elseif ($data !== '') {
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('an empty string is expected')));
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Validate graph item.
+	 *
+	 * @param string $data			import data
+	 * @param array  $parent_data	data's parent array
+	 * @param string $path			XML path
+	 *
+	 * @throws Exception			if tag is invalid
+	 */
+	public function validateGraphItem($data, array $parent_data = null, $path) {
+		if (strpos($data, ':') === false) {
+			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _('"host:key" pair is expected')));
 		}
 
 		return $data;

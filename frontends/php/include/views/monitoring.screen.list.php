@@ -20,13 +20,18 @@
 
 $widget = (new CWidget())->setTitle(_('Screens'));
 
-$controls = (new CList())->addItem(
-	new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
-		'screens.php' => _('Screens'),
-		'slides.php' => _('Slide shows')
-	])
-)
-	->addItem(new CSubmit('form', _('Create screen')));
+$controls = new CList();
+
+if (!$data['templateid']) {
+	$controls->addItem(
+		new CComboBox('config', 'screens.php', 'redirect(this.options[this.selectedIndex].value);', [
+			'screens.php' => _('Screens'),
+			'slides.php' => _('Slide shows')
+		])
+	);
+}
+
+$controls->addItem(new CSubmit('form', _('Create screen')));
 
 $createForm = (new CForm('get'))->cleanItems();
 
@@ -40,6 +45,16 @@ else {
 
 $createForm->addItem($controls);
 $widget->setControls($createForm);
+
+// filter
+if (!$data['templateid']) {
+	$widget->addItem(
+		(new CFilter('web.screenconf.filter.state'))
+			->addColumn((new CFormList())->addRow(_('Name like'),
+				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			))
+	);
+}
 
 // create form
 $screenForm = (new CForm())
@@ -61,7 +76,7 @@ foreach ($data['screens'] as $screen) {
 	$user_type = CWebUser::getType();
 
 	if ($data['templateid'] || $user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
-			|| array_key_exists('editable', $screen)) {
+			|| $screen['editable']) {
 		$checkbox = new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']);
 		$action = new CLink(_('Properties'), '?form=update&screenid='.$screen['screenid'].url_param('templateid'));
 		$constructor = new CLink(_('Constructor'),

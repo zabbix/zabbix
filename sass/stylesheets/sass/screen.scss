@@ -170,7 +170,6 @@ pre {
 		family: $font-stack-mono;
 		size: $font-mono-size;
 	}
-	//display: block;
 	@extend %space-pre-wrap;
 
 	a {
@@ -234,7 +233,7 @@ nav {
 .top-nav-container {
 	height: 49px;
 	line-height: 49px;
-	overflow: hidden;
+	position: relative;
 	background-color: $main-nav-bg-color;
 }
 
@@ -579,8 +578,7 @@ footer {
 	width: 95px;
 	height: 25px;
 	margin: 12px 9px 0 13px;
-	background: $white url(../img/icon-sprite.svg) no-repeat 0 -720px;
-	background-size: 95px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
 }
 
 // Tables
@@ -794,17 +792,30 @@ footer {
 	text-align: center;
 	@include border-radius(2px);
 
+	&:link {
+		color: $font-color;
+	}
+
+	&:visited {
+		color: $font-color;
+	}
+
 	&:hover {
+		color: $font-color;
 		background-color: $ui-hover-color;
+		border-bottom-color: $form-border-color;
 	}
 
 	&:focus {
+		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 	}
 
 	&:active {
+		color: $font-color;
 		background-color: $ui-hover-color;
+		border-color: $form-border-color;
 	}
 }
 
@@ -1076,7 +1087,8 @@ footer {
 }
 
 .suggest-found {
-	@extend %found-bg;
+	font-weight: bold;
+	color: $dark-yellow;
 }
 
 // Timeline
@@ -1487,9 +1499,11 @@ footer {
 
 		&:checked[disabled] + label {
 			background-color: lighten($ui-bg-selected-color, 33%) !important;
+			@include transition(none);
 		}
 
 		&[disabled] + label {
+			@include transition(none);
 			@extend %form-disabled;
 		}
 	}
@@ -1570,6 +1584,7 @@ textarea {
 		size: $font-form-size;
 	}
 	padding: 4px 5px;
+	margin: 0;
 	overflow: auto;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
@@ -1589,6 +1604,7 @@ select {
 		family: $font-stack;
 		size: $font-form-size;
 	}
+	height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
@@ -1888,6 +1904,7 @@ $icon-widget-btn: (
 
 .disabled {
 	cursor: default !important;
+	background-color: transparent !important;
 	@include opacity(0.35);
 
 	.subfilter-enabled {
@@ -2717,6 +2734,7 @@ $form-icon-btn: (
 }
 
 .screen-table {
+	background-color: $ui-bg-color;
 	width: 100%;
 
 	td {
@@ -2799,15 +2817,17 @@ $form-icon-btn: (
 	position: absolute;
 	z-index: 98;
 	overflow: hidden;
-	background-color: rgba($yellow,0.5);
-	border: 1px solid rgba($yellow,0.5);
+	background-color: rgba($yellow,0.35);
+	border: 1px solid rgba($dark-yellow,0.6);
+	border-top: none;
+	border-bottom: none;
 }
 
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;
-	background-color: rgba($yellow,0.5);
-	border: 1px solid rgba($yellow,0.5);
+	background-color: rgba($yellow,0.35);
+	border: 1px solid rgba($dark-yellow,0.6);
 }
 
 #map-area {

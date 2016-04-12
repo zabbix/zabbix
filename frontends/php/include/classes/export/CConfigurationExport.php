@@ -550,6 +550,7 @@ class CConfigurationExport {
 			foreach ($item['filter']['conditions'] as &$condition) {
 				unset($condition['item_conditionid'], $condition['itemid']);
 			}
+			unset($condition);
 		}
 		unset($item);
 

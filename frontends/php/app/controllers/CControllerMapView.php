@@ -104,6 +104,8 @@ class CControllerMapView extends CController {
 		]);
 		$data['map'] = $maps[0];
 
+		$data['map']['editable'] = API::Map()->isWritable([$this->sysmapid]);
+
 		$data['pageFilter'] = new CPageFilter([
 			'severitiesMin' => [
 				'default' => $data['map']['severity_min'],

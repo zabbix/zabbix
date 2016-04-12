@@ -70,14 +70,12 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 
 				$('#expression').toggle(!show_formula);
 				$('#formula').toggle(show_formula);
-				if (show_formula) {
+				if (!show_formula) {
 					updateExpression();
 				}
 			});
 
 			$('#evaltype').trigger('change');
-
-			updateExpression();
 		});
 	})(jQuery);
 </script>

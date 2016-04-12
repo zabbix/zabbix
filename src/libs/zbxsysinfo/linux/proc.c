@@ -867,8 +867,9 @@ static int	proc_get_process_name(pid_t pid, char **procname)
  *                                                                            *
  * Purpose: returns process command line                                      *
  *                                                                            *
- * Parameters: pid     - [IN] the process identifier                          *
- *             cmdline - [OUT] the process command line                       *
+ * Parameters: pid            - [IN] the process identifier                   *
+ *             cmdline        - [OUT] the process command line                *
+ *             cmdline_nbytes - [OUT] the number of bytes in the command line *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
