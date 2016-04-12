@@ -18,7 +18,7 @@
 **/
 
 #include <procfs.h>
-#ifndef HAVE_ZONE_H
+#if !defined(HAVE_ZONE_H) && defined(HAVE_SYS_UTSNAME_H)
 #	include <sys/utsname.h>
 #endif
 #include "common.h"
@@ -449,24 +449,24 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
 {
 	const char	*__function_name = "zbx_solaris_version_get";
 	int		res;
-	struct utsname	uts;
+	struct utsname	name;
 
 	/* Initially sysinfo(SI_RELEASE, ...) was considered for getting Solaris release. Its result type */
 	/* depends from version: on Solaris 8,9,10 sysinfo() returns 'long', on Solaris 11 it returns 'int'. */
 	/* Therefore uname() was chosen for getting Solaris release. */
 
-	if (-1 == (res = uname(&uts)))
+	if (-1 == (res = uname(&name)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __function_name, zbx_strerror(errno));
 
 		return FAIL;
 	}
 
-	/* expected result in uts.release: "5.9" - Solaris 9, "5.10" - Solaris 10, "5.11" - Solaris 11 */
+	/* expected result in name.release: "5.9" - Solaris 9, "5.10" - Solaris 10, "5.11" - Solaris 11 */
 
-	if (2 != sscanf(uts.release, "%u.%u", major_version, minor_version))
+	if (2 != sscanf(name.release, "%u.%u", major_version, minor_version))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s(): sscanf() failed on: \"%s\"", __function_name, uts.release);
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): sscanf() failed on: \"%s\"", __function_name, name.release);
 		THIS_SHOULD_NEVER_HAPPEN;
 
 		return FAIL;
@@ -813,8 +813,9 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 			/* results to only current zone. */
 
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "The sixth parameter value \"current\" cannot be used"
-					" with agent compiled on a Solaris version without zone support. Consider using"
-					" \"all\" or install agent with Solaris zone support."));
+					" with agent running on a Solaris version with zone support, but compiled on"
+					" a Solaris version without zone support. Consider using \"all\" or install"
+					" agent with Solaris zone support."));
 			return SYSINFO_RET_FAIL;
 		}
 
