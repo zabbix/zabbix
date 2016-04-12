@@ -1101,7 +1101,7 @@ class CTrigger extends CTriggerGeneral {
 
 		$triggerIds = zbx_objectValues($triggers, 'triggerid');
 
-		$dbTriggers = $this->get([
+		$db_triggers = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'triggerids' => $triggerIds,
 			'selectHosts' => ['name'],
@@ -1110,7 +1110,7 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		]);
 
-		$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
 
 		$changedPriorityTriggerIds = [];
 
@@ -1119,24 +1119,46 @@ class CTrigger extends CTriggerGeneral {
 			$expression_changed = false;
 			$recovery_expression_changed = false;
 
-			$dbTrigger = $dbTriggers[$trigger['triggerid']];
-			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
+			$db_trigger = $db_triggers[$trigger['triggerid']];
+			$hosts = zbx_objectValues($db_trigger['hosts'], 'name');
 
-			if (isset($trigger['description']) && strcmp($dbTrigger['description'], $trigger['description']) != 0) {
+			if (isset($trigger['description']) && strcmp($db_trigger['description'], $trigger['description']) != 0) {
 				$description_changed = true;
 			}
 			else {
-				$trigger['description'] = $dbTrigger['description'];
+				$trigger['description'] = $db_trigger['description'];
 			}
 
-			if (isset($trigger['expression']) && $dbTrigger['expression'] !== $trigger['expression']) {
+			if (isset($trigger['expression']) && $db_trigger['expression'] !== $trigger['expression']) {
 				$this->validateItems($trigger);
 
 				$expression_changed = true;
-				$expression_full = $trigger['expression'];
 			}
 
-			if ($expression_changed) {
+			$db_trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
+				$db_trigger['recovery_expression']
+			);
+
+			if (array_key_exists('recovery_expression', $trigger)
+					&& $db_trigger['recovery_expression'] !== $trigger['recovery_expression']) {
+				//$this->validateItems($trigger);
+
+				$recovery_expression_changed = true;
+			}
+
+			if ($expression_changed || $recovery_expression_changed) {
+				DB::delete('functions', ['triggerid' => $trigger['triggerid']]);
+
+				if (!$expression_changed) {
+					$trigger['expression'] = $db_trigger['expression'];
+				}
+				elseif (!$recovery_expression_changed) {
+					$trigger['recovery_expression'] = $db_trigger['recovery_expression'];
+				}
+
+				$expression_full = $trigger['expression'];
+				$recovery_expression_full = $trigger['recovery_expression'];
+
 				// Check the expression.
 				$expression_data = new CTriggerExpression();
 				if (!$expression_data->parse($expression_full)) {
@@ -1145,7 +1167,7 @@ class CTrigger extends CTriggerGeneral {
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression();
-				$oldExpressionData->parse($dbTrigger['expression']);
+				$oldExpressionData->parse($db_trigger['expression']);
 				// check if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
 				$newTemplates = zbx_toHash($expression_data->getHosts());
@@ -1183,8 +1205,6 @@ class CTrigger extends CTriggerGeneral {
 					$this->deleteByIds($cTrigIds);
 				}
 
-//				DB::delete('functions', ['triggerid' => $trigger['triggerid']]);
-
 				try {
 					$trigger['expression'] = implode_exp($expression_full, $trigger['triggerid'], $hosts);
 				}
@@ -1195,20 +1215,9 @@ class CTrigger extends CTriggerGeneral {
 
 				// if the expression has changed, we must revalidate the existing dependencies
 				if (!isset($trigger['dependencies'])) {
-					$trigger['dependencies'] = zbx_objectValues($dbTrigger['dependencies'], 'triggerid');
+					$trigger['dependencies'] = zbx_objectValues($db_trigger['dependencies'], 'triggerid');
 				}
-			}
 
-			if (array_key_exists('recovery_expression', $trigger)
-					&& $dbTrigger['recovery_expression'] !== $trigger['recovery_expression']) {
-				// !!!!
-				//$this->validateItems($trigger);
-
-				$recovery_expression_changed = true;
-				$recovery_expression_full = $trigger['recovery_expression'];
-			}
-
-			if ($recovery_expression_changed && $recovery_expression_full !== '') {
 				// Check the expression.
 				$recovery_expression_data = new CTriggerExpression();
 				if (!$recovery_expression_data->parse($recovery_expression_full)) {
@@ -1217,7 +1226,7 @@ class CTrigger extends CTriggerGeneral {
 
 				// remove triggers if expression is changed in a way that trigger will not appear in current host
 				$oldExpressionData = new CTriggerExpression();
-				$oldExpressionData->parse($dbTrigger['recovery_expression']);
+				$oldExpressionData->parse($db_trigger['recovery_expression']);
 				// check if at least one template has stayed in expression, this means that child trigger will stay in host
 				$oldTemplates = $oldExpressionData->getHosts();
 				$newTemplates = zbx_toHash($recovery_expression_data->getHosts());
@@ -1255,8 +1264,6 @@ class CTrigger extends CTriggerGeneral {
 					$this->deleteByIds($cTrigIds);
 				}
 
-//				DB::delete('functions', ['triggerid' => $trigger['triggerid']]);
-
 				try {
 					$trigger['recovery_expression'] = implode_exp($recovery_expression_full, $trigger['triggerid'],
 						$hosts
@@ -1272,11 +1279,8 @@ class CTrigger extends CTriggerGeneral {
 			if (!$description_changed) {
 				unset($triggerUpdate['description']);
 			}
-			if (!$expression_changed) {
-				unset($triggerUpdate['expression']);
-			}
-			if (!$recovery_expression_changed) {
-				unset($triggerUpdate['recovery_expression']);
+			if (!$expression_changed && !$recovery_expression_changed) {
+				unset($triggerUpdate['expression'], $triggerUpdate['recovery_expression']);
 			}
 
 			// skip updating read only values
@@ -1293,16 +1297,16 @@ class CTrigger extends CTriggerGeneral {
 			]);
 
 			// update service status
-			if (isset($trigger['priority']) && $trigger['priority'] != $dbTrigger['priority']) {
+			if (isset($trigger['priority']) && $trigger['priority'] != $db_trigger['priority']) {
 				$changedPriorityTriggerIds[] = $trigger['triggerid'];
 			}
 
 			// restore the full expression to properly validate dependencies
-			$trigger['expression'] = $expression_changed ? $expression_full : $dbTrigger['expression'];
+			$trigger['expression'] = $expression_changed ? $expression_full : $db_trigger['expression'];
 
 			$infos[] = _s('Updated: Trigger "%1$s" on "%2$s".', $trigger['description'], implode(', ', $hosts));
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $dbTrigger['triggerid'],
-					$dbTrigger['description'], null, $dbTrigger, $triggerUpdate);
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER, $db_trigger['triggerid'],
+				$db_trigger['description'], null, $db_trigger, $triggerUpdate);
 		}
 		unset($trigger);
 
