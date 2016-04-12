@@ -113,6 +113,7 @@ typedef struct zbx_tz_offset
 {
 	short	hours;
 	short	minutes;
+	bool	negative_minutes;	/* flag for when minutes have negative value */
 }
 zbx_tz_offset;
 
