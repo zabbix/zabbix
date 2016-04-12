@@ -120,7 +120,7 @@ static void	disconnect_proxy(zbx_socket_t *sock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data)
+static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data, zbx_timespec_t *ts)
 {
 	const char	*__function_name = "get_data_from_proxy";
 	zbx_socket_t	s;
@@ -135,6 +135,10 @@ static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data
 
 	if (SUCCEED == (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
 	{
+		/* get connection timestamp if required */
+		if (NULL != ts)
+			zbx_timespec(ts);
+
 		if (SUCCEED == (ret = send_data_to_proxy(proxy, &s, j.buffer)))
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 				if (SUCCEED == (ret = zbx_send_response(&s, SUCCEED, NULL, 0)))
@@ -176,6 +180,7 @@ static int	process_proxy(void)
 	char			*answer = NULL, *port = NULL, *error = NULL;
 	time_t			now;
 	unsigned char		update_nextcheck;
+	zbx_timespec_t		ts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -198,7 +203,7 @@ static int	process_proxy(void)
 		proxy.addr = proxy.addr_orig;
 
 		port = zbx_strdup(port, proxy.port_orig);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 				&port, MACRO_TYPE_COMMON, NULL, 0);
 		if (FAIL == is_ushort(port, &proxy.port))
 		{
@@ -247,7 +252,7 @@ static int	process_proxy(void)
 		if (proxy.proxy_data_nextcheck <= now)
 		{
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer))
+					ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer, NULL))
 			{
 				if ('\0' == *answer)
 				{
@@ -275,7 +280,8 @@ static int	process_proxy(void)
 			else
 				goto network_error;
 retry_history:
-			if (SUCCEED == get_data_from_proxy(&proxy, ZBX_PROTO_VALUE_HISTORY_DATA, &answer))
+			if (SUCCEED == get_data_from_proxy(&proxy,
+					ZBX_PROTO_VALUE_HISTORY_DATA, &answer, &ts))
 			{
 				if ('\0' == *answer)
 				{
@@ -292,7 +298,7 @@ retry_history:
 					goto network_error;
 				}
 
-				if (SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, &error))
+				if (SUCCEED != process_hist_data(NULL, &jp, proxy.hostid, &ts, &error))
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid"
 							" history data: %s", proxy.host, proxy.addr, error);
@@ -309,7 +315,7 @@ retry_history:
 				goto network_error;
 retry_dhistory:
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer))
+					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer, NULL))
 			{
 				if ('\0' == *answer)
 				{
@@ -344,7 +350,7 @@ retry_dhistory:
 				goto network_error;
 retry_autoreg_host:
 			if (SUCCEED == get_data_from_proxy(&proxy,
-					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer))
+					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer, NULL))
 			{
 				if ('\0' == *answer)
 				{

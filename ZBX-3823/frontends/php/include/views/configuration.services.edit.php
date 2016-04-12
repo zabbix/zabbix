@@ -61,7 +61,7 @@ $servicesFormList->addRow(_('Status calculation algorithm'),
 );
 
 // append SLA to form list
-$showslaCheckbox = (new CCheckBox('showsla'))->setChecked($this->data['showsla'] == 1);
+$showslaCheckbox = (new CCheckBox('showsla'))->setChecked($this->data['showsla'] == SERVICE_SHOW_SLA_ON);
 $goodslaTextBox = (new CTextBox('goodsla', $this->data['goodsla'], false, 8))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
@@ -104,7 +104,8 @@ foreach ($this->data['children'] as $child) {
 			[
 				$childrenLink,
 				new CVar('children['.$child['serviceid'].'][name]', $child['name']),
-				new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
+				new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid']),
+				new CVar('children['.$child['serviceid'].'][trigger]', $child['trigger'])
 			],
 			(new CCheckBox('children['.$child['serviceid'].'][soft]'))
 				->setChecked(isset($child['soft']) && !empty($child['soft'])),

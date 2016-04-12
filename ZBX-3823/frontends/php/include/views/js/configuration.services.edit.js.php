@@ -42,6 +42,12 @@
 			inputName.setAttribute('name', 'children[' + serviceid + '][name]');
 			inputName.setAttribute('id', 'children_' + serviceid + '_name');
 
+			var inputTrigger = document.createElement('input');
+			inputTrigger.setAttribute('type', 'hidden');
+			inputTrigger.setAttribute('value', trigger);
+			inputTrigger.setAttribute('name', 'children[' + serviceid + '][trigger]');
+			inputTrigger.setAttribute('id', 'children_' + serviceid + '_trigger');
+
 			var url = document.createElement('a');
 			url.setAttribute('href', 'services.php?form=1&serviceid=' + serviceid);
 			url.setAttribute('target', '_blank');
@@ -49,6 +55,7 @@
 
 			td.appendChild(inputServiceId);
 			td.appendChild(inputName);
+			td.appendChild(inputTrigger);
 			td.appendChild(url);
 			tr.appendChild(td);
 
@@ -86,6 +93,7 @@
 		removeObjectById('children_' + serviceid);
 		removeObjectById('children_' + serviceid + '_name');
 		removeObjectById('children_' + serviceid + '_serviceid');
+		removeObjectById('children_' + serviceid + '_trigger');
 	}
 
 	function removeTime(id) {

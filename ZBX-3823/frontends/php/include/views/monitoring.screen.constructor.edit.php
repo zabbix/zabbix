@@ -27,6 +27,10 @@ if (isset($_REQUEST['screenitemid'])) {
 // create screen form
 $screenForm = (new CForm('post', $action))->setName('screen_item_form');
 
+if ($data['screen']['templateid'] != 0) {
+	$screenForm->addVar('templateid', $data['screen']['templateid']);
+}
+
 // create screen form list
 $screenFormList = (new CFormList())->addVar('screenid', $_REQUEST['screenid']);
 
@@ -749,15 +753,15 @@ if (isset($_REQUEST['screenitemid'])) {
 	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete(null, url_param('form').url_param('screenid').url_param('screenitemid')),
-			new CButtonCancel(url_param('screenid'))
+			new CButtonDelete(null, url_params(['form', 'screenid', 'templateid', 'screenitemid'])),
+			new CButtonCancel(url_params(['screenid', 'templateid']))
 		]
 	));
 }
 else {
 	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('screenid'))]
+		[new CButtonCancel(url_params(['screenid', 'templateid']))]
 	));
 }
 

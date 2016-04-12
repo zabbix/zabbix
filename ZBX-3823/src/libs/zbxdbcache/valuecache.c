@@ -87,13 +87,13 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 #define ZBX_VC_RANGE_SYNC_PERIOD	24
 
 /* the data chunk used to store data fragment */
-typedef struct _zbx_vc_chunk_t
+typedef struct zbx_vc_chunk
 {
 	/* a pointer to the previous chunk or NULL if this is the tail chunk */
-	struct _zbx_vc_chunk_t	*prev;
+	struct zbx_vc_chunk	*prev;
 
 	/* a pointer to the next chunk or NULL if this is the head chunk */
-	struct _zbx_vc_chunk_t	*next;
+	struct zbx_vc_chunk	*next;
 
 	/* the index of first (oldest) value in chunk */
 	int			first_value;
@@ -676,7 +676,7 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
  *                                                                            *
  ******************************************************************************/
 
-#define REFCOUNT_FIELD_SIZE	sizeof(uint32_t)
+#define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
@@ -1106,10 +1106,10 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 				return NULL;
 		}
 
-		*(uint32_t *)ptr = 0;
+		*(zbx_uint32_t *)ptr = 0;
 	}
 
-	(*(uint32_t *)ptr)++;
+	(*(zbx_uint32_t *)ptr)++;
 
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
@@ -1139,7 +1139,7 @@ static size_t	vc_item_strfree(char *str)
 	{
 		void	*ptr = str - REFCOUNT_FIELD_SIZE;
 
-		if (0 == --(*(uint32_t *)ptr))
+		if (0 == --(*(zbx_uint32_t *)ptr))
 		{
 			freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
 			zbx_hashset_remove(&vc_cache->strpool, ptr);
@@ -1839,6 +1839,59 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
+ * Function: vch_item_remove_values                                           *
+ *                                                                            *
+ * Purpose: removes item history data that are older than the specified       *
+ *          timestamp                                                         *
+ *                                                                            *
+ * Parameters:  item      - [IN] the target item                              *
+ *              timestamp - [IN] the timestamp (number of seconds since the   *
+ *                               Epoch)                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	vch_item_remove_values(zbx_vc_item_t *item, int timestamp)
+{
+	zbx_vc_chunk_t	*chunk = item->tail;
+
+	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
+		item->status = 0;
+
+	/* try to remove chunks with all history values older than the timestamp */
+	while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
+	{
+		zbx_vc_chunk_t	*next;
+
+		/* If chunk contains values with timestamp greater or equal - remove */
+		/* only the values with less timestamp. Otherwise remove the while   */
+		/* chunk and check next one.                                         */
+		if (chunk->slots[chunk->last_value].timestamp.sec >= timestamp)
+		{
+			while (chunk->slots[chunk->first_value].timestamp.sec < timestamp)
+			{
+				vc_item_free_values(item, chunk->slots, chunk->first_value, chunk->first_value);
+				chunk->first_value++;
+			}
+
+			break;
+		}
+
+		next = chunk->next;
+		vch_item_remove_chunk(item, chunk);
+
+		/* empty items must be removed to avoid situation when a new value is added to cache */
+		/* while other values with matching timestamp seconds are not cached                 */
+		if (NULL == next)
+		{
+			item->state |= ZBX_ITEM_STATE_REMOVE_PENDING;
+			break;
+		}
+
+		chunk = next;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vch_item_add_value_at_head                                       *
  *                                                                            *
  * Purpose: adds one item history value at the end of current item's history  *
@@ -1865,10 +1918,9 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 		if (0 < vc_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
 		{
 			/* If the added value has the same or older timestamp as the first value in cache */
-			/* we can't add it to keep cache consistency. In this case reset the cached all   */
-			/* flag and return success.                                                       */
-			if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
-				item->status = 0;
+			/* we can't add it to keep cache consistency. Additionally we must make sure no   */
+			/* values with matching timestamp seconds are kept in cache.                      */
+			vch_item_remove_values(item, value->timestamp.sec + 1);
 
 			/* if the value is newer than the database cached from timestamp we must */
 			/* adjust the cached from timestamp to exclude this value                */

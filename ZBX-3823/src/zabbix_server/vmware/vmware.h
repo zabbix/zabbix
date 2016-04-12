@@ -31,6 +31,10 @@
 
 #define ZBX_VMWARE_STATE_UPDATING	0x100
 #define ZBX_VMWARE_STATE_UPDATING_PERF	0x200
+#define ZBX_VMWARE_STATE_REMOVING	0x400
+
+#define ZBX_VMWARE_STATE_BUSY		(ZBX_VMWARE_STATE_UPDATING | ZBX_VMWARE_STATE_UPDATING_PERF \
+							| ZBX_VMWARE_STATE_REMOVING)
 
 /* the vmware performance counter state */
 #define ZBX_VMWARE_COUNTER_NEW		0x00
@@ -264,7 +268,6 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
 
 char	*zbx_xml_read_value(const char *data, const char *xpath);
-char	*zbx_xml_read_node_value(xmlDoc *doc, xmlNode *node, const char *xpath);
 int	zbx_xml_read_values(const char *data, const char *xpath, zbx_vector_str_t *values);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

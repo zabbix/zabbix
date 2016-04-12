@@ -334,6 +334,8 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifdef _WINDOWS
 	switch (t->task)
 	{
+		case ZBX_TASK_START:
+			break;
 		case ZBX_TASK_INSTALL_SERVICE:
 		case ZBX_TASK_UNINSTALL_SERVICE:
 		case ZBX_TASK_START_SERVICE:
@@ -345,7 +347,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				goto out;
 			}
 			break;
-
 		default:
 			if (0 != (t->flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS))
 			{
@@ -889,12 +890,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
 #ifndef _WINDOWS
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
 		exit(EXIT_FAILURE);
 	}
-
+#endif
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");

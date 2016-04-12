@@ -677,6 +677,7 @@ class CApiService {
 					check_db_fields($dbObjects[$pk], $object);
 				}
 			}
+			unset($object);
 		}
 
 		return $objects;

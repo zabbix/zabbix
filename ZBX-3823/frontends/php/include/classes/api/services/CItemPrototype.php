@@ -747,9 +747,9 @@ class CItemPrototype extends CItemGeneral {
 			'preservekeys' => true,
 			'selectHosts' => ['name']
 		];
-		$delItemPrototypesChilds = $this->get($options);
+		$delItemPrototypesChildren = $this->get($options);
 
-		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
+		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChildren);
 		$prototypeids = array_merge($prototypeids, $childPrototypeids);
 
 		// delete graphs with this item prototype

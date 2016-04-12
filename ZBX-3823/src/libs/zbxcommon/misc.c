@@ -28,17 +28,17 @@
 #define ZBX_SCHEDULER_FILTER_MINUTE	3
 #define ZBX_SCHEDULER_FILTER_SECOND	4
 
-typedef struct zbx_scheduler_filter_t
+typedef struct zbx_scheduler_filter
 {
 	int				start;
 	int				end;
 	int				step;
 
-	struct zbx_scheduler_filter_t	*next;
+	struct zbx_scheduler_filter	*next;
 }
 zbx_scheduler_filter_t;
 
-typedef struct zbx_scheduler_interval_t
+typedef struct zbx_scheduler_interval
 {
 	zbx_scheduler_filter_t		*mdays;
 	zbx_scheduler_filter_t		*wdays;
@@ -48,7 +48,7 @@ typedef struct zbx_scheduler_interval_t
 
 	int				filter_level;
 
-	struct zbx_scheduler_interval_t	*next;
+	struct zbx_scheduler_interval	*next;
 }
 zbx_scheduler_interval_t;
 
@@ -762,7 +762,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		if (pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &start, 4, min, max))
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &start, sizeof(start), min, max))
 			return FAIL;
 
 		if ('-' == *pend)
@@ -780,7 +780,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 			if (pend == pstart || pend - pstart > var_len)
 				return FAIL;
 
-			if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &end, 4, min, max))
+			if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &end, sizeof(end), min, max))
 				return FAIL;
 
 			if (end < start)
@@ -816,7 +816,7 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
 		if (pend == pstart || pend - pstart > var_len)
 			return FAIL;
 
-		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, 4, 1, end - start))
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, sizeof(step), 1, end - start))
 			return FAIL;
 	}
 	else

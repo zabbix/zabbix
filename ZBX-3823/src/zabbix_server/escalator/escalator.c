@@ -319,9 +319,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
 				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
 				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
@@ -587,7 +587,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
@@ -1080,9 +1080,9 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 			subject_dyn = zbx_strdup(NULL, action->r_shortdata);
 			message_dyn = zbx_strdup(NULL, action->r_longdata);
 
-			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
 					NULL, &subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
 					NULL, &message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
 
 			escalation->esc_step = 0;
@@ -1313,11 +1313,11 @@ out:
  *          hosts, and actions are still present and were not disabled)       *
  *                                                                            *
  * Parameters: escalation - [IN] escalation data                              *
- *             action     - [OUT] action data (optional)                      *
+ *             action     - [OUT] action data                                 *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
- * Comments: If 'action' is not NULL, it gathers information about it. If     *
- *           information could not be gathered, its 'actionid' is set to 0.   *
+ * Comments: 'action' is filled with information about action. If information *
+ *           could not be gathered, 'action->actionid' is set to 0.           *
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, char **error)
@@ -1373,11 +1373,10 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	}
 
 	result = DBselect(
-			"select actionid,name,status%s"
+			"select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
+				"r_longdata,recovery_msg"
 			" from actions"
 			" where actionid=" ZBX_FS_UI64,
-			NULL == action ? "" : ",eventsource,esc_period"
-				",def_shortdata,def_longdata,r_shortdata,r_longdata,recovery_msg",
 			escalation->actionid);
 
 	if (NULL != (row = DBfetch(result)))
@@ -1385,26 +1384,22 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 		if (ACTION_STATUS_ACTIVE != atoi(row[2]))
 			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
 
-		if (NULL != action)
-		{
-			memset(action, 0, sizeof(*action));
-			ZBX_STR2UINT64(action->actionid, row[0]);
-			action->eventsource = atoi(row[3]);
-			action->esc_period = atoi(row[4]);
-			action->shortdata = zbx_strdup(NULL, row[5]);
-			action->longdata = zbx_strdup(NULL, row[6]);
-			action->r_shortdata = zbx_strdup(NULL, row[7]);
-			action->r_longdata = zbx_strdup(NULL, row[8]);
-			action->recovery_msg = atoi(row[9]);
-		}
+		ZBX_STR2UINT64(action->actionid, row[0]);
+		action->eventsource = atoi(row[3]);
+		action->esc_period = atoi(row[4]);
+		action->shortdata = zbx_strdup(NULL, row[5]);
+		action->longdata = zbx_strdup(NULL, row[6]);
+		action->r_shortdata = zbx_strdup(NULL, row[7]);
+		action->r_longdata = zbx_strdup(NULL, row[8]);
+		action->recovery_msg = atoi(row[9]);
 	}
 	else
 	{
-		if (NULL != action)
-			action->actionid = 0;
+		action->actionid = 0;
 
 		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", escalation->actionid);
 	}
+
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error: '%s'", __function_name, zbx_result_string(ret),
@@ -1473,10 +1468,13 @@ static void	execute_escalation(DB_ESCALATION *escalation, DB_ACTION *action, con
 
 static void	free_db_action(DB_ACTION *action)
 {
-	zbx_free(action->shortdata);
-	zbx_free(action->longdata);
-	zbx_free(action->r_shortdata);
-	zbx_free(action->r_longdata);
+	if (0 != action->actionid)
+	{
+		zbx_free(action->shortdata);
+		zbx_free(action->longdata);
+		zbx_free(action->r_shortdata);
+		zbx_free(action->r_longdata);
+	}
 }
 
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)

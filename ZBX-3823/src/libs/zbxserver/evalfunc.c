@@ -37,7 +37,7 @@ static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *para
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (1 == defaults_on_empty && '\0' == *parameter)
@@ -49,7 +49,7 @@ static int	__get_function_parameter_uint31(zbx_uint64_t hostid, const char *para
 		else if ('#' == *parameter)
 		{
 			*flag = ZBX_FLAG_VALUES;
-			if (SUCCEED == is_uint31(parameter + 1, (uint32_t *)value) && 0 < *value)
+			if (SUCCEED == is_uint31(parameter + 1, value) && 0 < *value)
 				ret = SUCCEED;
 		}
 		else if (SUCCEED == is_uint_suffix(parameter, (unsigned int *)value) && 0 <= *value)
@@ -93,7 +93,7 @@ static int	get_function_parameter_uint64(zbx_uint64_t hostid, const char *parame
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		if (SUCCEED == is_uint64(parameter, value))
@@ -124,7 +124,7 @@ static int	get_function_parameter_float(zbx_uint64_t hostid, const char *paramet
 	if (NULL == (parameter = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+	if (SUCCEED == substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 			&parameter, MACRO_TYPE_COMMON, NULL, 0))
 	{
 		int		digits;
@@ -176,7 +176,7 @@ static int	get_function_parameter_str(zbx_uint64_t hostid, const char *parameter
 	if (NULL == (*value = get_param_dyn(parameters, Nparam)))
 		goto out;
 
-	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+	ret = substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 			value, MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED == ret)

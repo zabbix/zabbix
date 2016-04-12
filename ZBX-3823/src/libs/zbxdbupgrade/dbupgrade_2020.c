@@ -19,9 +19,6 @@
 
 #include "common.h"
 #include "db.h"
-#include "log.h"
-#include "sysinfo.h"
-#include "zbxdbupgrade.h"
 #include "dbupgrade.h"
 
 /*

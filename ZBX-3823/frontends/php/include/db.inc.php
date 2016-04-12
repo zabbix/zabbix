@@ -134,19 +134,31 @@ function DBconnect(&$error) {
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
 
-				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database: '.db2_conn_errormsg();
-					$result = false;
+				$unicodeprefixes = ['C', 'en_US', 'en_GB'];
+				foreach ($unicodeprefixes as $prefix) {
+					$result = setlocale(LC_ALL, [$prefix.'.utf8', $prefix.'.UTF-8']);
+					if ($result) {
+						break;
+					}
+				}
+				if ($result) {
+					$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
+					if (!$DB['DB']) {
+						$error = 'Error connecting to database: '.db2_conn_errormsg();
+						$result = false;
+					}
+					else {
+						$options = [
+							'db2_attr_case' => DB2_CASE_LOWER
+						];
+						db2_set_option($DB['DB'], $options, 1);
+						if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
+							DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
+						}
+					}
 				}
 				else {
-					$options = [
-						'db2_attr_case' => DB2_CASE_LOWER,
-					];
-					db2_set_option($DB['DB'], $options, 1);
-					if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
-						DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
-					}
+					$error = 'Cannot set UTF-8 locale for web server.';
 				}
 
 				if ($result) {

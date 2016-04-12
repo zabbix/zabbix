@@ -33,6 +33,14 @@ $createForm = (new CForm('get'))->cleanItems()
 
 $widget->setControls($createForm);
 
+// filter
+$widget->addItem(
+	(new CFilter('web.slideconf.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Name like'),
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		))
+);
+
 // Create form.
 $form = (new CForm())->setName('slideForm');
 
@@ -51,8 +59,7 @@ $slidesTable = (new CTableInfo())
 foreach ($this->data['slides'] as $slide) {
 	$user_type = CWebUser::getType();
 
-	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN
-			|| array_key_exists('editable', $slide)) {
+	if ($user_type == USER_TYPE_SUPER_ADMIN || $user_type == USER_TYPE_ZABBIX_ADMIN || $slide['editable']) {
 		$checkbox = new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']);
 		$properties = (new CLink(_('Properties'), '?form=update&slideshowid='.$slide['slideshowid']))
 			->addClass('action');

@@ -554,7 +554,7 @@ function hide_color_picker() {
 	}
 
 	color_picker.style.zIndex = 1000;
-	color_picker.style.visibility = 'hidden';
+	color_picker.style.display = 'none';
 	color_picker.style.left = '-' + ((color_picker.style.width) ? color_picker.style.width : 100) + 'px';
 	curr_lbl = null;
 	curr_txt = null;
@@ -572,7 +572,7 @@ function show_color_picker(id) {
 	color_picker.y = pos.top;
 	color_picker.style.left = (color_picker.x + 20) + 'px';
 	color_picker.style.top = color_picker.y + 'px';
-	color_picker.style.visibility = 'visible';
+	color_picker.style.display = null;
 }
 
 function create_color_picker() {

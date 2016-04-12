@@ -72,6 +72,11 @@ if (check_dynamic_items($data['screen']['screenid'], 0)) {
 
 // page header
 $controls
+	->addItem($data['screen']['editable']
+		? (new CButton('edit', _('Edit screen')))
+			->onClick('redirect("screenedit.php?screenid='.$data['screen']['screenid'].'")')
+		: null
+	)
 	->addItem(get_icon('favourite',
 		[
 			'fav' => 'web.favorite.screenids',

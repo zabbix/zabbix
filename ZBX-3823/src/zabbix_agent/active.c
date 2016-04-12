@@ -736,10 +736,6 @@ static int	send_buffer(const char *host, unsigned short port)
 
 	zbx_json_close(&json);
 
-	zbx_timespec(&ts);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
@@ -756,6 +752,10 @@ static int	send_buffer(const char *host, unsigned short port)
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
+		zbx_timespec(&ts);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, json.buffer)))

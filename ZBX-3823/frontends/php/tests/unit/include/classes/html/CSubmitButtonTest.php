@@ -39,10 +39,6 @@ class CSubmitButtonTest extends CTagTest {
 				['caption', 'button', 'value'],
 				'<button type="submit" name="button" value="value">caption</button>'
 			],
-			[
-				['caption', 'button', 'value', 'my-class'],
-				'<button class="my-class" type="submit" name="button" value="value">caption</button>'
-			],
 			// caption encoding
 			[
 				['</button>'],
@@ -59,11 +55,10 @@ class CSubmitButtonTest extends CTagTest {
 	 * @param $name
 	 * @param $value
 	 * @param $caption
-	 * @param $class
 	 *
 	 * @return CSubmitButton
 	 */
-	protected function createTag($name = null, $value = null, $caption = null) {
-		return new CSubmitButton($name, $value, $caption);
+	protected function createTag($caption = null, $name = null, $value = null) {
+		return new CSubmitButton($caption, $name, $value);
 	}
 }
