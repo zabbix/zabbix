@@ -738,6 +738,9 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 							get_time(NULL, NULL, &tz_offset);
 
+							if (1 == tz_offset.negative_minutes)
+								tz_offset.minutes = tz_offset.minutes * -1;
+
 							tz_offset_sec = (int)tz_offset.hours * SEC_PER_HOUR +
 									(int)tz_offset.minutes * SEC_PER_MIN;
 
