@@ -2950,8 +2950,8 @@ unsigned int	zbx_alarm_off(void)
  *                                                                            *
  * Parameters:                                                                *
  *     tm           - [OUT] broken-down representation of the current time    *
- *     milliseconds - [OUT] milliseconds since the previous second	      *
- *     tz_offset    - [OUT] time zone offset form UTC		              *
+ *     milliseconds - [OUT] milliseconds since the previous second            *
+ *     tz_offset    - [OUT] time zone offset form UTC                         *
  *                                                                            *
  * Comments:                                                                  *
  *     On Windows localtime() returns pointer to static, thread-local storage *
