@@ -1073,6 +1073,7 @@ textarea {
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
   padding: 4px 5px;
+  margin: 0;
   overflow: auto; }
   textarea[readonly] {
     color: #f2f2f2 !important; }
@@ -1080,6 +1081,7 @@ textarea {
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
+  height: 24px;
   padding: 3px 3px 3px 0;
   background-color: #383838; }
   select option {
