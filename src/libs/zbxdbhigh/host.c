@@ -2164,9 +2164,9 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update triggers"
 				" set templateid=" ZBX_FS_UI64 ","
-					"flags=%d"
+					"flags=%d,recovery_mode=%d"
 				" where triggerid=" ZBX_FS_UI64 ";\n",
-				triggerid, (int)flags, h_triggerid);
+				triggerid, (int)flags, (int)recovery_mode, h_triggerid);
 
 		res = SUCCEED;
 		break;
