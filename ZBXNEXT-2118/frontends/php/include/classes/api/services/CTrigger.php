@@ -1048,7 +1048,11 @@ class CTrigger extends CTriggerGeneral {
 				$trigger_recovery_expression[$triggerId] = $recovery_expression;
 			}
 
-			$this->validateItems($trigger);
+			// Validate trigger expression items.
+			$this->validateItems($trigger['expression'], $trigger['description']);
+
+			// Validate trigger recovery expression items.
+			$this->validateItems($trigger['recovery_expression'], $trigger['description']);
 
 			foreach ($hosts as $host) {
 				$allHosts[] = $host;
@@ -1130,7 +1134,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 
 			if (isset($trigger['expression']) && $db_trigger['expression'] !== $trigger['expression']) {
-				$this->validateItems($trigger);
+				$this->validateItems($trigger['expression'], $trigger['description']);
 
 				$expression_changed = true;
 			}
@@ -1141,7 +1145,7 @@ class CTrigger extends CTriggerGeneral {
 
 			if (array_key_exists('recovery_expression', $trigger)
 					&& $db_trigger['recovery_expression'] !== $trigger['recovery_expression']) {
-				//$this->validateItems($trigger);
+				$this->validateItems($trigger['recovery_expression'], $trigger['description']);
 
 				$recovery_expression_changed = true;
 			}
@@ -1623,13 +1627,14 @@ class CTrigger extends CTriggerGeneral {
 	 *
 	 * @throws APIException
 	 *
-	 * @param $trigger
+	 * @param string $expression
+	 * @param string $description
 	 *
 	 * @return bool
 	 */
-	protected function validateItems(array $trigger) {
+	protected function validateItems($expression, $description) {
 		$expressionData = new CTriggerExpression();
-		$expressionData->parse($trigger['expression']);
+		$expressionData->parse($expression);
 
 		$templatesData = API::Template()->get([
 			'output' => ['templateid'],
@@ -1655,7 +1660,7 @@ class CTrigger extends CTriggerGeneral {
 				if (array_diff($compareLinks, $linkedTo) || array_diff($linkedTo, $compareLinks)) {
 					self::exception(
 						ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%s" belongs to templates with different linkages.', $trigger['description'])
+						_s('Trigger "%s" belongs to templates with different linkages.', $description)
 					);
 				}
 			}
