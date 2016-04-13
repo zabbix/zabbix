@@ -358,18 +358,20 @@ out:
 	return ret;
 }
 
-#define OP_EQ	0
-#define OP_NE	1
-#define OP_GT	2
-#define OP_GE	3
-#define OP_LT	4
-#define OP_LE	5
-#define OP_LIKE	6
-#define OP_BAND	7
-#define OP_MAX	8
+#define OP_EQ		0
+#define OP_NE		1
+#define OP_GT		2
+#define OP_GE		3
+#define OP_LT		4
+#define OP_LE		5
+#define OP_LIKE		6
+#define OP_REGEXP	7
+#define OP_IREGEXP	8
+#define OP_BAND		9
+#define OP_MAX		10
 
 static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t *value, const char *arg2,
-		const char *arg2_2)
+		const char *arg2_2, zbx_vector_ptr_t *regexps)
 {
 	zbx_uint64_t	 arg2_uint64, arg2_2_uint64;
 	double		 arg2_double;
@@ -476,6 +478,10 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
 					if (NULL != strstr(value->log->value, arg2))
 						return SUCCEED;
 					break;
+				case OP_REGEXP:
+					return regexp_match_ex(regexps, value->log->value, arg2, ZBX_CASE_SENSITIVE);
+				case OP_IREGEXP:
+					return regexp_match_ex(regexps, value->log->value, arg2, ZBX_IGNORE_CASE);
 			}
 
 			break;
@@ -494,6 +500,10 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
 					if (NULL != strstr(value->str, arg2))
 						return SUCCEED;
 					break;
+				case OP_REGEXP:
+					return regexp_match_ex(regexps, value->str, arg2, ZBX_CASE_SENSITIVE);
+				case OP_IREGEXP:
+					return regexp_match_ex(regexps, value->str, arg2, ZBX_IGNORE_CASE);
 			}
 	}
 
@@ -522,16 +532,19 @@ static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t 
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now)
+static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+		char **error)
 {
 	const char			*__function_name = "evaluate_COUNT";
 	int				arg1, flag, op, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0;
 	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
+	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	zbx_vector_ptr_create(&regexps);
 	zbx_history_record_vector_create(&values);
 
 	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
@@ -568,6 +581,10 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 			op = OP_LE;
 		else if (0 == strcmp(arg3, "like"))
 			op = OP_LIKE;
+		else if (0 == strcmp(arg3, "regexp"))
+			op = OP_REGEXP;
+		else if (0 == strcmp(arg3, "iregexp"))
+			op = OP_IREGEXP;
 		else if (0 == strcmp(arg3, "band"))
 		{
 			op = OP_BAND;
@@ -582,11 +599,20 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 			fail = 1;
 
 		if (1 == fail)
+		{
 			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for function COUNT", arg3);
-		else if (0 != numeric_search && OP_LIKE == op)
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"like\" is not supported for counting numeric values");
-		else if (0 == numeric_search && OP_LIKE != op && OP_EQ != op && OP_NE != op)
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
+		}
+		else if (0 != numeric_search && (OP_LIKE == op || OP_REGEXP == op || OP_IREGEXP == op))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting numeric values",
+					arg3);
+		}
+		else if (0 == numeric_search && (OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op &&
+				OP_EQ != op && OP_NE != op))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values",
+					arg3);
+		}
 		else
 			fail = 0;
 
@@ -611,8 +637,22 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		now -= time_shift;
 	}
 
-	if (NULL != arg2 && '\0' == *arg2 && (0 != numeric_search || OP_LIKE == op))
-		zbx_free(arg2);
+	if (NULL != arg2 && '@' == *arg2 && (OP_REGEXP == op || OP_IREGEXP == op))
+	{
+		DCget_expressions_by_name(&regexps, arg2 + 1);
+
+		if (0 == regexps.values_num)
+		{
+			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", arg2 + 1);
+			goto out;
+		}
+	}
+
+	if (NULL != arg2 && '\0' == *arg2)
+	{
+		if (0 != numeric_search || OP_LIKE == op || OP_REGEXP == op || OP_IREGEXP == op)
+			zbx_free(arg2);
+	}
 
 	if (ZBX_FLAG_SEC == flag)
 		seconds = arg1;
@@ -625,7 +665,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	for (i = 0; i < values.values_num; i++)
 	{
 		if (NULL == arg2 || SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2,
-				arg2_2))
+				arg2_2, &regexps))
 		{
 			count++;
 		}
@@ -636,6 +676,9 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	ret = SUCCEED;
 out:
 	zbx_free(arg2);
+
+	zbx_regexp_clean_expressions(&regexps);
+	zbx_vector_ptr_destroy(&regexps);
 
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -651,6 +694,8 @@ out:
 #undef OP_LT
 #undef OP_LE
 #undef OP_LIKE
+#undef OP_REGEXP
+#undef OP_IREGEXP
 #undef OP_BAND
 #undef OP_MAX
 
@@ -2185,7 +2230,7 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "count"))
 	{
-		ret = evaluate_COUNT(value, item, function, parameter, now);
+		ret = evaluate_COUNT(value, item, function, parameter, now, error);
 	}
 	else if (0 == strcmp(function, "delta"))
 	{
