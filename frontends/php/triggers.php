@@ -39,8 +39,8 @@ $fields = [
 	'type' =>					[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'expression' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Expression')],
-	'recovery_expression' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
-	'recovery_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),	null],
+	'recovery_expression' =>	[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'recovery_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),	'isset({add}) || isset({update})'],
 	'priority' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>				[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'url' =>					[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -192,13 +192,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			access_deny();
 		}
 
-		$old_triggers = CMacrosResolverHelper::resolveTriggerExpressions($old_triggers);
-
-		$old_trigger = reset($old_triggers);
-		$old_trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
-			$old_trigger['recovery_expression']
+		$old_triggers = CMacrosResolverHelper::resolveTriggerExpressions($old_triggers,
+			['sources' => ['expression', 'recovery_expression']]
 		);
 
+		$old_trigger = reset($old_triggers);
 		$old_trigger['dependencies'] = zbx_toHash(zbx_objectValues($old_trigger['dependencies'], 'triggerid'));
 
 		$newDependencies = $trigger['dependencies'];
@@ -500,7 +498,7 @@ else {
 
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error',
-			'templateid', 'state', 'recovery_expression'
+			'templateid', 'state', 'recovery_mode', 'recovery_expression'
 		],
 		'selectHosts' => ['hostid', 'host', 'name'],
 		'selectDependencies' => ['triggerid', 'description'],

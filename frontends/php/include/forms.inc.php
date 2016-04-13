@@ -1425,11 +1425,10 @@ function getTriggerFormData($exprAction) {
 			'triggerids' => $data['triggerid']
 		];
 		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
-		$data['trigger'] = reset($triggers);
-		$data['trigger']['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
-			$data['trigger']['recovery_expression']
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+			['sources' => ['expression', 'recovery_expression']]
 		);
+		$data['trigger'] = reset($triggers);
 
 		// Get templates.
 		$tmp_triggerid = $data['triggerid'];
