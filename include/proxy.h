@@ -55,7 +55,7 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 void	process_proxyconfig(struct zbx_json_parse *jp_data);
 
 int	get_host_availability_data(struct zbx_json *j, int *ts);
-void	process_host_availability(struct zbx_json_parse *jp_data);
+int	process_host_availability(struct zbx_json_parse *jp_data, char **error);
 
 int	proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid);
 int	proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid);
@@ -70,8 +70,8 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t value_num, int *processed);
 int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_uint64_t proxy_hostid,
 		zbx_timespec_t *ts, char **info);
-void	process_dhis_data(struct zbx_json_parse *jp);
-void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);
+int	process_dhis_data(struct zbx_json_parse *jp, char **error);
+int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char **error);
 
 void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts);
 

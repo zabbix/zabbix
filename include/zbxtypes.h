@@ -60,7 +60,9 @@
 #	define alloca		_alloca
 
 #	ifndef uint32_t
-#		define uint32_t	__int32
+typedef unsigned __int32	zbx_uint32_t;
+#	else
+typedef uint32_t		zbx_uint32_t;
 #	endif
 
 #	ifndef PATH_SEPARATOR
@@ -126,6 +128,8 @@ typedef __int64	zbx_offset_t;
 #			define ZBX_FS_X64	"%llx"
 #		endif
 #	endif
+
+typedef uint32_t	zbx_uint32_t;
 
 #	ifndef PATH_SEPARATOR
 #		define PATH_SEPARATOR	'/'
