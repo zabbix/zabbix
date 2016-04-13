@@ -209,6 +209,8 @@ class CFunctionValidatorTest extends PHPUnit_Framework_TestCase {
 			$params[$no] = 'le';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
 			$params[$no] = 'like';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
 			$params[$no] = 'band';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'regexp';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
+			$params[$no] = 'iregexp';	$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
 			$params[$no] = '{$M}';		$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
 			$params[$no] = '';			$tests[] = [$func, $params, $valueType, isset($valueTypes[$valueType])];
 			$params[$no] = '0';			$tests[] = [$func, $params, $valueType, false];
