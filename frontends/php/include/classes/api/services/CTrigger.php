@@ -554,6 +554,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 			else {
 				if (array_key_exists('recovery_expression', $trigger) && $trigger['recovery_expression'] !== ''
+						&& array_key_exists('recovery_mode', $trigger)
 						&& $trigger['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
@@ -590,7 +591,7 @@ class CTrigger extends CTriggerGeneral {
 
 			// if some of the properties are unchanged, no need to update them in DB
 			// validating trigger expression
-			if (isset($trigger['expression']) && $expression_changed) {
+			if (array_key_exists('expression', $trigger) && $expression_changed) {
 				// expression permissions
 				$expressionData = new CTriggerExpression(['lldmacros' => false]);
 				if (!$expressionData->parse($trigger['expression'])) {
