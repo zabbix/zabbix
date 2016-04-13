@@ -1894,7 +1894,7 @@ $icon-widget-btn: (
 	background-color: $btn-disabled-bg-color;
 	border-color: $btn-disabled-border-color;
 	cursor: default;
-	@include transition(0s);
+	@include transition(none);
 }
 
 %form-disabled {
