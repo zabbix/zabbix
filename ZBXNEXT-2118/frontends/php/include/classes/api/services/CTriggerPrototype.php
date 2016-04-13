@@ -477,6 +477,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 				));
 			}
 
+			if (array_key_exists('recovery_expression', $triggerPrototype)
+					&& $triggerPrototype['recovery_expression'] !== ''
+					&& array_key_exists('recovery_mode', $triggerPrototype)
+					&& $triggerPrototype['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
+				);
+			}
+
 			$this->checkIfExistsOnHost($triggerPrototype);
 
 			$this->validateTriggerPrototypeExpression($triggerPrototype);
