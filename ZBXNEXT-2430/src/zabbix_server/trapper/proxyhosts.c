@@ -51,7 +51,11 @@ void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		goto out;
 	}
 
-	process_host_availability(jp);
+	if (SUCCEED != (ret = process_host_availability(jp, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid host availability data from proxy \"%s\" at \"%s\": %s",
+				host, sock->peer, error);
+	}
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 
