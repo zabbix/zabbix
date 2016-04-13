@@ -1098,7 +1098,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
-			server, port, CONFIG_HOSTNAME, metric->key_orig);
+			server, port, CONFIG_HOSTNAME, metric->key_orig, metric->refresh);
 
 	if (SUCCEED == ret)
 	{
