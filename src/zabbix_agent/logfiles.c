@@ -1912,6 +1912,43 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: calculate_delay                                                  *
+ *                                                                            *
+ * Purpose: calculate delay based on number of processed and remaining bytes, *
+ *          update interval and processing time                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     processed_bytes - [IN] number of processed bytes in logfile            *
+ *     remaining_bytes - [IN] number of remaining bytes in all logfiles       *
+ *     t_upd           - [IN] update interval, s                              *
+ *     t_proc          - [IN] processing time, s                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *     delay in seconds                                                       *
+ *                                                                            *
+ ******************************************************************************/
+static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaining_bytes, int t_upd, double t_proc)
+{
+	zbx_uint64_t	remaining_full_checks, remaining_bytes_last;
+
+	if (0 != processed_bytes)
+	{
+		/* integer division to get quotient */
+		remaining_full_checks = remaining_bytes / processed_bytes;
+
+		/* remainder bytes in last check */
+		remaining_bytes_last = remaining_bytes % processed_bytes;
+
+		/* 't_proc' is expected to be much smaller than 't_upd'. Therefore multiplications first then adding. */
+		return (double)remaining_full_checks * t_proc + (double)remaining_full_checks * t_upd +
+				(double)remaining_bytes_last * t_proc / (double)processed_bytes;
+	}
+	else
+		return 0.0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_logrt                                                    *
  *                                                                            *
  * Purpose: Find new records in logfiles                                      *
@@ -1956,6 +1993,7 @@ out:
  *     port             - [IN] port to send data to                           *
  *     hostname         - [IN] hostname the data comes from                   *
  *     key              - [IN] item key the data belongs to                   *
+ *     refresh          - [IN] item update interval                           *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -1968,7 +2006,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key)
+		unsigned short port, const char *hostname, const char *key, int refresh)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -1977,7 +2015,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
 	zbx_stopwatch_t		stopwatch;
-	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp;
+	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags, filename, *lastlogsize, *mtime);
@@ -2155,6 +2193,12 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 			if (0 >= *p_count || 0 >= *s_count)
 			{
+				/* calculate number of remaining bytes, not processed due to 'p_count' or 's_count' */
+				/* limit */
+
+				for (j = 0; j < logfiles_num; j++)
+					remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
+
 				ret = SUCCEED;
 				break;
 			}
@@ -2183,10 +2227,13 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", time:%e s, speed:%e B/s",
-				__function_name, zbx_result_string(ret), processed_bytes,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
+				ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s", __function_name,
+				zbx_result_string(ret), processed_bytes, remaining_bytes,
 				zbx_stopwatch_elapsed(&stopwatch),
-				(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch));
+				(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch),
+				calculate_delay(processed_bytes, remaining_bytes, refresh,
+				zbx_stopwatch_elapsed(&stopwatch)));
 	}
 
 	return ret;
