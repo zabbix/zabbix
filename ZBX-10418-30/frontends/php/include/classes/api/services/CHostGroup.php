@@ -175,146 +175,133 @@ class CHostGroup extends CApiService {
 			$sqlParts['where']['hmh'] = 'g.groupid=mg.groupid';
 		}
 
+		$sub_sql_parts = array();
+
 		// monitored_hosts, real_hosts, templated_hosts, with_hosts_and_templates
-		if (!is_null($options['monitored_hosts'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM hosts h'.
-					' WHERE hg.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_MONITORED.
-					')';
+		if ($options['monitored_hosts'] !== null) {
+			$sub_sql_parts['from']['h'] = 'hosts h';
+			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_MONITORED));
 		}
-		elseif (!is_null($options['real_hosts'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
+		elseif ($options['real_hosts'] !== null) {
+			$sub_sql_parts['from']['h'] = 'hosts h';
+			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('h.status',
+				array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED)
+			);
 		}
-		elseif (!is_null($options['templated_hosts'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'h.status='.HOST_STATUS_TEMPLATE;
+		elseif ($options['templated_hosts'] !== null) {
+			$sub_sql_parts['from']['h'] = 'hosts h';
+			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_TEMPLATE));
 		}
-		elseif (!is_null($options['with_hosts_and_templates'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where'][] = 'h.hostid=hg.hostid';
-			$sqlParts['where'][] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
+		elseif ($options['with_hosts_and_templates'] !== null) {
+			$sub_sql_parts['from']['h'] = 'hosts h';
+			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('h.status',
+				array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE)
+			);
 		}
 
 		// with_items, with_monitored_items, with_simple_graph_items
-		if (!is_null($options['with_items'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+		if ($options['with_items'] !== null) {
+			$sub_sql_parts['from']['i'] = 'items i';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
+				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+			);
 		}
-		elseif (!is_null($options['with_monitored_items'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i,hosts h'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.hostid=h.hostid'.
-						' AND h.status='.HOST_STATUS_MONITORED.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+		elseif ($options['with_monitored_items'] !== null) {
+			$sub_sql_parts['from']['i'] = 'items i';
+			$sub_sql_parts['from']['h'] = 'hosts h';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_MONITORED));
+			$sub_sql_parts['where'][] = dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE));
+			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
+				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+			);
 		}
-		elseif (!is_null($options['with_simple_graph_items'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.value_type IN ('.ITEM_VALUE_TYPE_FLOAT.','.ITEM_VALUE_TYPE_UINT64.')'.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND i.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+		elseif ($options['with_simple_graph_items'] !== null) {
+			$sub_sql_parts['from']['i'] = 'items i';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('i.value_type',
+				array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64)
+			);
+			$sub_sql_parts['where'][] = dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE));
+			$sub_sql_parts['where'][] = dbConditionInt('i.flags',
+				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+			);
 		}
 
 		// with_triggers, with_monitored_triggers
-		if (!is_null($options['with_triggers'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i,functions f,triggers t'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'.
-						' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+		if ($options['with_triggers'] !== null) {
+			$sub_sql_parts['from']['i'] = 'items i';
+			$sub_sql_parts['from']['f'] = 'functions f';
+			$sub_sql_parts['from']['t'] = 'triggers t';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
+			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
+			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
+			$sub_sql_parts['where'][] = dbConditionInt('t.flags',
+				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+			);
 		}
-		elseif (!is_null($options['with_monitored_triggers'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i,hosts h,functions f,triggers t'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.hostid=h.hostid'.
-						' AND i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'.
-						' AND h.status='.HOST_STATUS_MONITORED.
-						' AND i.status='.ITEM_STATUS_ACTIVE.
-						' AND t.status='.TRIGGER_STATUS_ENABLED.
-						' AND t.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+		elseif ($options['with_monitored_triggers'] !== null) {
+			$sub_sql_parts['from']['i'] = 'items i';
+			$sub_sql_parts['from']['h'] = 'hosts h';
+			$sub_sql_parts['from']['f'] = 'functions f';
+			$sub_sql_parts['from']['t'] = 'triggers t';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
+			$sub_sql_parts['where']['hg-h'] = 'hg.hostid=h.hostid';
+			$sub_sql_parts['where']['i-f'] = 'i.itemid=f.itemid';
+			$sub_sql_parts['where']['f-t'] = 'f.triggerid=t.triggerid';
+			$sub_sql_parts['where'][] = dbConditionInt('h.status', array(HOST_STATUS_MONITORED));
+			$sub_sql_parts['where'][] = dbConditionInt('i.status', array(ITEM_STATUS_ACTIVE));
+			$sub_sql_parts['where'][] = dbConditionInt('t.status', array(TRIGGER_STATUS_ENABLED));
+			$sub_sql_parts['where'][] = dbConditionInt('t.flags',
+				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+			);
 		}
 
 		// with_httptests, with_monitored_httptests
-		if (!is_null($options['with_httptests'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM httptest ht'.
-					' WHERE hg.hostid=ht.hostid'.
-					')';
+		if ($options['with_httptests'] !== null) {
+			$sub_sql_parts['from']['ht'] = 'httptest ht';
+			$sub_sql_parts['where']['hg-ht'] = 'hg.hostid=ht.hostid';
 		}
-		elseif (!is_null($options['with_monitored_httptests'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM httptest ht'.
-					' WHERE hg.hostid=ht.hostid'.
-						' AND ht.status='.HTTPTEST_STATUS_ACTIVE.
-					')';
+		elseif ($options['with_monitored_httptests'] !== null) {
+			$sub_sql_parts['from']['ht'] = 'httptest ht';
+			$sub_sql_parts['where']['hg-ht'] = 'hg.hostid=ht.hostid';
+			$sub_sql_parts['where'][] = dbConditionInt('ht.status', array(HTTPTEST_STATUS_ACTIVE));
 		}
 
 		// with_graphs
-		if (!is_null($options['with_graphs'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM items i,graphs_items gi,graphs g'.
-					' WHERE hg.hostid=i.hostid'.
-						' AND i.itemid=gi.itemid'.
-						' AND gi.graphid=g.graphid'.
-						' AND g.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-					')';
+		if ($options['with_graphs'] !== null) {
+			$sub_sql_parts['from']['i'] = 'items i';
+			$sub_sql_parts['from']['gi'] = 'graphs_items gi';
+			$sub_sql_parts['from']['gr'] = 'graphs gr';
+			$sub_sql_parts['where']['hg-i'] = 'hg.hostid=i.hostid';
+			$sub_sql_parts['where']['i-gi'] = 'i.itemid=gi.itemid';
+			$sub_sql_parts['where']['gi-gr'] = 'gi.graphid=gr.graphid';
+			$sub_sql_parts['where'][] = dbConditionInt('gr.flags',
+				array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+			);
 		}
 
-		if (!is_null($options['with_applications'])) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['applications'] = 'applications a';
-			$sqlParts['where']['hgg'] = 'g.groupid=hg.groupid';
-			$sqlParts['where'][] = 'hg.hostid=a.hostid';
+		// with_applications
+		if ($options['with_applications'] !== null) {
+			$sub_sql_parts['from']['a'] = 'applications a';
+			$sub_sql_parts['where']['hg-a'] = 'hg.hostid=a.hostid';
+		}
+
+		if ($sub_sql_parts) {
+			$sub_sql_parts['from']['hg'] = 'hosts_groups hg';
+			$sub_sql_parts['where']['g-hg'] = 'g.groupid=hg.groupid';
+
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM '.implode(',', $sub_sql_parts['from']).
+				' WHERE '.implode(' AND ', array_unique($sub_sql_parts['where'])).
+			')';
 		}
 
 		// filter

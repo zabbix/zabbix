@@ -223,7 +223,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
@@ -286,11 +286,11 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		switch (condition->operator)
 		{
 			case CONDITION_OPERATOR_IN:
-				if (SUCCEED == check_time_period(condition->value, (time_t)0))
+				if (SUCCEED == check_time_period(condition->value, (time_t)event->clock))
 					ret = SUCCEED;
 				break;
 			case CONDITION_OPERATOR_NOT_IN:
-				if (FAIL == check_time_period(condition->value, (time_t)0))
+				if (FAIL == check_time_period(condition->value, (time_t)event->clock))
 					ret = SUCCEED;
 				break;
 			default:
@@ -1309,12 +1309,18 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 	{
 		condition = (DB_CONDITION *)action->conditions.values[i];
 
+		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
+				SUCCEED == ret)
+		{
+			continue;	/* short-circuit true OR condition block to the next AND condition */
+		}
+
 		condition_result = check_action_condition(event, condition);
 
 		switch (action->evaltype)
 		{
 			case CONDITION_EVAL_TYPE_AND_OR:
-				if (old_type == condition->conditiontype)
+				if (old_type == condition->conditiontype)	/* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
 						ret = SUCCEED;

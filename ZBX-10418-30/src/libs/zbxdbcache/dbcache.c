@@ -90,13 +90,13 @@ static ZBX_DC_IDS	*ids = NULL;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	history_value_t	value_orig;	/* empty if flag ZBX_DC_FLAG_NOVALUE is set */
-	history_value_t	value;		/* used as source for log items */
+	history_value_t	value_orig;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	history_value_t	value;		/* uninitialized if ZBX_DC_FLAG_NOVALUE is set, source for log items */
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;
-	int		timestamp;
-	int		severity;
-	int		logeventid;
+	int		timestamp;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	int		severity;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
+	int		logeventid;	/* uninitialized if ZBX_DC_FLAG_NOVALUE is set */
 	int		mtime;
 	unsigned char	value_type;
 	unsigned char	flags;		/* see ZBX_DC_FLAG_* above */
@@ -219,7 +219,9 @@ static void	hc_pop_items(zbx_vector_ptr_t *history_items);
 static void	hc_get_item_values(ZBX_DC_HISTORY *history, zbx_vector_ptr_t *history_items);
 static void	hc_push_busy_items(zbx_vector_ptr_t *history_items);
 static int	hc_push_processed_items(zbx_vector_ptr_t *history_items);
-static void	hc_update_history_queue();
+static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num);
+static void	hc_queue_item(zbx_hc_item_t *item);
+static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 
 /******************************************************************************
  *                                                                            *
@@ -884,7 +886,8 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 	zbx_vector_ptr_create(&trigger_order);
 	zbx_vector_ptr_reserve(&trigger_order, item_num);
 
-	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num);
+	DCconfig_get_triggers_by_itemids(&trigger_info, &trigger_order, itemids, timespecs, NULL, item_num,
+			ZBX_EXPAND_MACROS);
 
 	if (0 == trigger_order.values_num)
 		goto clean_triggers;
@@ -1905,6 +1908,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	int		i;
 	zbx_db_insert_t	db_insert;
 
+	/* see hc_copy_history_data() for fields that might be uninitialized and need special handling here */
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
 			"value", "logeventid", "lastlogsize", "mtime", "flags",  NULL);
 
@@ -1912,6 +1916,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 	{
 		unsigned int		flags = PROXY_HISTORY_FLAG_META;
 		const char		*pvalue;
+		const char		*psource;
 		const ZBX_DC_HISTORY	*h = &history[i];
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
@@ -1922,15 +1927,29 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 
 		if (0 != (h->flags & ZBX_DC_FLAG_NOVALUE))
 		{
+			/* sent to server only if not 0, see proxy_get_history_data() */
+			const int	unset_if_novalue = 0;
+
 			flags |= PROXY_HISTORY_FLAG_NOVALUE;
+
 			pvalue = "";
+			psource = "";
+
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue, psource,
+					unset_if_novalue, pvalue, unset_if_novalue, h->lastlogsize, h->mtime, flags);
 		}
 		else
+		{
 			pvalue = h->value_orig.str;
 
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp,
-				NULL != h->value.str ? h->value.str : "", h->severity, pvalue, h->logeventid,
-				h->lastlogsize, h->mtime, flags);
+			if (NULL != h->value.str)
+				psource = h->value.str;
+			else
+				psource = "";
+
+			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, h->timestamp, psource,
+					h->severity, pvalue, h->logeventid, h->lastlogsize, h->mtime, flags);
+		}
 	}
 
 	zbx_db_insert_execute(&db_insert);
@@ -2053,6 +2072,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	time_t			sync_start, now;
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_ptr_t	history_items;
+	zbx_binary_heap_t	tmp_history_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
 
@@ -2060,15 +2080,34 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	if (ZBX_SYNC_FULL == sync_type)
 	{
+		zbx_hashset_iter_t	iter;
+		zbx_hc_item_t		*item;
+
+		/* History index cache might be full without any space left for queueing items from history index to  */
+		/* history queue. The solution: replace the shared-memory history queue with heap-allocated one. Add  */
+		/* all items from history index to the new history queue.                                             */
+		/*                                                                                                    */
+		/* Assertions that must be true.                                                                      */
+		/*   * This is the main server or proxy process,                                                      */
+		/*   * There are no other users of history index cache stored in shared memory. Other processes       */
+		/*     should have quit by this point.                                                                */
+		/*   * other parts of the program do not hold pointers to the elements of history queue that is       */
+		/*     stored in the shared memory.                                                                   */
+
 		/* unlock all triggers before full sync so no items are locked by triggers */
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			DCconfig_unlock_all_triggers();
 
 		LOCK_CACHE;
 
-		/* A history syncer exited before pushing taken items back to history cache. */
-		/* Such items must be returned to queue before doing full sync.              */
-		hc_update_history_queue();
+		tmp_history_queue = cache->history_queue;
+
+		zbx_binary_heap_create(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY);
+		zbx_hashset_iter_reset(&cache->history_items, &iter);
+
+		/* add all items from history index to the new history queue */
+		while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
+			hc_queue_item(item);
 
 		UNLOCK_CACHE;
 
@@ -2166,6 +2205,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		}
 
 		zbx_vector_ptr_clear(&history_items);
+		hc_free_item_values(history, history_num);
 
 		if (ZBX_HC_SYNC_MIN_PCNT > history_num * 100 / candidate_num)
 		{
@@ -2189,7 +2229,16 @@ int	DCsync_history(int sync_type, int *total_num)
 		zbx_vector_uint64_destroy(&triggerids);
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
+	{
+		LOCK_CACHE;
+
+		zbx_binary_heap_destroy(&cache->history_queue);
+		cache->history_queue = tmp_history_queue;
+
+		UNLOCK_CACHE;
+
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
+	}
 
 	return next_sync;
 }
@@ -2561,7 +2610,7 @@ void	dc_flush_history()
 ZBX_MEM_FUNC_IMPL(__hc_index, hc_index_mem)
 ZBX_MEM_FUNC_IMPL(__hc, hc_mem)
 
-typedef struct zbx_hc_data_t
+struct zbx_hc_data
 {
 	history_value_t	value;
 	zbx_uint64_t	lastlogsize;
@@ -2571,9 +2620,8 @@ typedef struct zbx_hc_data_t
 	unsigned char	flags;
 	unsigned char	state;
 
-	struct zbx_hc_data_t	*next;
-}
-zbx_hc_data_t;
+	struct zbx_hc_data	*next;
+};
 
 /******************************************************************************
  *                                                                            *
@@ -2654,25 +2702,36 @@ static void	hc_queue_item(zbx_hc_item_t *item)
  *                                                                            *
  * Function: hc_get_item                                                      *
  *                                                                            *
- * Purpose: returns history item by itemid, creating new one if necessary     *
+ * Purpose: returns history item by itemid                                    *
  *                                                                            *
  * Parameters: itemid - [IN] the item id                                      *
  *                                                                            *
- * Return value: the history item                                             *
+ * Return value: the history item or NULL if the requested item is not in     *
+ *               history cache                                                *
  *                                                                            *
  ******************************************************************************/
 static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
 {
-	zbx_hc_item_t	*item;
+	return (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid);
+}
 
-	if (NULL == (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)))
-	{
-		zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL};
+/******************************************************************************
+ *                                                                            *
+ * Function: hc_add_item                                                      *
+ *                                                                            *
+ * Purpose: adds a new item to history cache                                  *
+ *                                                                            *
+ * Parameters: itemid - [IN] the item id                                      *
+ *                      [IN] the item data                                    *
+ *                                                                            *
+ * Return value: the added history item                                       *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
+{
+	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, data, data};
 
-		item = (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
-	}
-
-	return item;
+	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
 
 /******************************************************************************
@@ -2861,8 +2920,12 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 	}
 
 	(*data)->value_type = item_value->value_type;
-	(*data)->lastlogsize = item_value->lastlogsize;
-	(*data)->mtime = item_value->mtime;
+
+	if (0 != (ZBX_DC_FLAG_META & item_value->flags))
+	{
+		(*data)->lastlogsize = item_value->lastlogsize;
+		(*data)->mtime = item_value->mtime;
+	}
 
 	return SUCCEED;
 }
@@ -2889,7 +2952,6 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
 
 	for (i = 0; i < item_values_num; i++)
 	{
-		int		update_queue;
 		zbx_hc_data_t	*data = NULL;
 
 		item_value = &item_values[i];
@@ -2904,20 +2966,16 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
 			LOCK_CACHE;
 		}
 
-		item = hc_get_item(item_value->itemid);
-
-		/* new items must be inserted in queue */
-		update_queue = (NULL == item->tail);
-
-		if (NULL == item->head)
-			item->tail = data;
-		else
-			item->head->next = data;
-
-		item->head = data;
-
-		if (0 != update_queue)
+		if (NULL == (item = hc_get_item(item_value->itemid)))
+		{
+			item = hc_add_item(item_value->itemid, data);
 			hc_queue_item(item);
+		}
+		else
+		{
+			item->head->next = data;
+			item->head = data;
+		}
 	}
 }
 
@@ -2932,6 +2990,8 @@ static void	hc_add_item_values(dc_item_value_t *item_values, int item_values_num
  *             itemid  - [IN] the item identifier                             *
  *             data    - [IN] the history data to copy                        *
  *                                                                            *
+ * Comments: handling of uninitialized fields in dc_add_proxy_history_log()   *
+ *                                                                            *
  ******************************************************************************/
 static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
@@ -2944,7 +3004,7 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		history->value_orig.err = data->value.str;
+		history->value_orig.err = zbx_strdup(NULL, data->value.str);
 		history->flags |= ZBX_DC_FLAG_UNDEF;
 		return;
 	}
@@ -2967,11 +3027,14 @@ static void	hc_copy_history_data(ZBX_DC_HISTORY *history, zbx_uint64_t itemid, z
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
-				history->value_orig.str = data->value.str;
+				history->value_orig.str = zbx_strdup(NULL, data->value.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				history->value_orig.str = data->value.log->value;
-				history->value.str = data->value.log->source;
+				history->value_orig.str = zbx_strdup(NULL, data->value.log->value);
+				if (NULL != data->value.log->source)
+					history->value.str = zbx_strdup(NULL, data->value.log->source);
+				else
+					history->value.str = NULL;
 
 				history->timestamp = data->value.log->timestamp;
 				history->severity = data->value.log->severity;
@@ -3062,7 +3125,7 @@ static void	hc_push_busy_items(zbx_vector_ptr_t *history_items)
 		hc_queue_item(item);
 
 		/* After pushing back to queue current syncer has released ownership of this item. */
-		/* To avoid of using it further reset the item reference in vector to NULL.        */
+		/* To avoid using it further reset the item reference in vector to NULL.           */
 		history_items->values[i] = NULL;
 	}
 }
@@ -3087,7 +3150,7 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 {
 	int		i;
 	zbx_hc_item_t	*item;
-	zbx_hc_data_t	*data_next;
+	zbx_hc_data_t	*data_free;
 	int		next_sync;
 
 	for (i = 0; i < history_items->values_num; i++)
@@ -3096,11 +3159,11 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 		if (NULL == (item = (zbx_hc_item_t *)history_items->values[i]))
 			continue;
 
-		data_next = item->tail->next;
+		data_free = item->tail;
+		item->tail = item->tail->next;
+		hc_free_data(data_free);
 
-		hc_free_data(item->tail);
-
-		if (NULL == (item->tail = data_next))
+		if (NULL == item->tail)
 		{
 			zbx_hashset_remove(&cache->history_items, item);
 			continue;
@@ -3126,40 +3189,39 @@ static int	hc_push_processed_items(zbx_vector_ptr_t *history_items)
 
 /******************************************************************************
  *                                                                            *
- * Function: hc_update_history_queue                                          *
+ * Function: hc_free_item_values                                              *
  *                                                                            *
- * Purpose: updates history queue by queuing missing history items            *
+ * Purpose: frees resources allocated to store str/text/log values            *
  *                                                                            *
- * Comments: This function is called before full history sync to ensure that  *
- *           all history items are queued and will be synced.                 *
+ * Parameters: history     - [IN] the history data                            (
+ *             history_num - [IN] the number of values in history data        *
  *                                                                            *
  ******************************************************************************/
-static void	hc_update_history_queue()
+static void	hc_free_item_values(ZBX_DC_HISTORY *history, int history_num)
 {
-	zbx_hashset_iter_t	iter;
-	zbx_hc_item_t		*item;
-	int			i;
+	int	i;
 
-	/* if all items have been queued - nothing to update */
-	if (cache->history_items.num_data == cache->history_queue.elems_num)
-		return;
-
-	/* mark queued items */
-	for (i = 0; i < cache->history_queue.elems_num; i++)
+	for (i = 0; i < history_num; i++)
 	{
-		item = (zbx_hc_item_t *)cache->history_queue.elems[i].data;
-		item->status = ZBX_HC_ITEM_STATUS_QUEUED;
-	}
+		if (ITEM_STATE_NOTSUPPORTED == history[i].state)
+		{
+			zbx_free(history[i].value_orig.err);
+			continue;
+		}
 
-	zbx_hashset_iter_reset(&cache->history_items, &iter);
+		if (0 != (ZBX_DC_FLAG_NOVALUE & history[i].flags))
+			continue;
 
-	/* queue unmarked items, reset item status */
-	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (ZBX_HC_ITEM_STATUS_QUEUED != item->status)
-			hc_queue_item(item);
-
-		item->status = ZBX_HC_ITEM_STATUS_NORMAL;
+		switch (history[i].value_type)
+		{
+			case ITEM_VALUE_TYPE_LOG:
+				zbx_free(history[i].value.str);
+				/* break; is not missing here */
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				zbx_free(history[i].value_orig.str);
+				break;
+		}
 	}
 }
 

@@ -653,7 +653,9 @@ class CAction extends CApiService {
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+			if ($actionUpdateValues) {
+				$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+			}
 		}
 
 		if ($actionsUpdateData) {

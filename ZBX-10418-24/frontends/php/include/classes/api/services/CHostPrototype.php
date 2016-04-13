@@ -1022,11 +1022,11 @@ class CHostPrototype extends CHostBase {
 		$links = parent::link($templateids, $targetids);
 
 		foreach ($targetids as $targetid) {
-			$linked_templates = API::Template()->get([
+			$linked_templates = API::Template()->get(array(
 				'output' => array(),
 				'hostids' => array($targetid),
 				'nopermissions' => true
-			]);
+			));
 
 			$result = DBselect(
 				'SELECT i.key_,count(*)'.

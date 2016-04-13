@@ -24,7 +24,7 @@
 
 /* generic */
 
-typedef uint32_t zbx_hash_t;
+typedef zbx_uint32_t zbx_hash_t;
 
 zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed);
@@ -236,6 +236,12 @@ typedef struct
 	int			options;
 	zbx_compare_func_t	compare_func;
 	zbx_hashmap_t		*key_index;
+
+	/* The binary heap is designed to work correctly only with memory allocation functions */
+	/* that return pointer to the allocated memory or quit. Functions that can return NULL */
+	/* are not supported (process will exit() if NULL return value is encountered). If     */
+	/* using zbx_mem_info_t and the associated memory functions then ensure that allow_oom */
+	/* is always set to 0.                                                                 */
 	zbx_mem_malloc_func_t	mem_malloc_func;
 	zbx_mem_realloc_func_t	mem_realloc_func;
 	zbx_mem_free_func_t	mem_free_func;

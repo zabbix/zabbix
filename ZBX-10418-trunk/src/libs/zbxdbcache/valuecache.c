@@ -87,13 +87,13 @@ ZBX_MEM_FUNC_IMPL(__vc, vc_mem)
 #define ZBX_VC_RANGE_SYNC_PERIOD	24
 
 /* the data chunk used to store data fragment */
-typedef struct _zbx_vc_chunk_t
+typedef struct zbx_vc_chunk
 {
 	/* a pointer to the previous chunk or NULL if this is the tail chunk */
-	struct _zbx_vc_chunk_t	*prev;
+	struct zbx_vc_chunk	*prev;
 
 	/* a pointer to the next chunk or NULL if this is the head chunk */
-	struct _zbx_vc_chunk_t	*next;
+	struct zbx_vc_chunk	*next;
 
 	/* the index of first (oldest) value in chunk */
 	int			first_value;
@@ -676,7 +676,7 @@ static int	vc_db_read_value(zbx_uint64_t itemid, int value_type, const zbx_times
  *                                                                            *
  ******************************************************************************/
 
-#define REFCOUNT_FIELD_SIZE	sizeof(uint32_t)
+#define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
 static zbx_hash_t	vc_strpool_hash_func(const void *data)
 {
@@ -1106,10 +1106,10 @@ static char	*vc_item_strdup(zbx_vc_item_t *item, const char *str)
 				return NULL;
 		}
 
-		*(uint32_t *)ptr = 0;
+		*(zbx_uint32_t *)ptr = 0;
 	}
 
-	(*(uint32_t *)ptr)++;
+	(*(zbx_uint32_t *)ptr)++;
 
 	return (char *)ptr + REFCOUNT_FIELD_SIZE;
 }
@@ -1139,7 +1139,7 @@ static size_t	vc_item_strfree(char *str)
 	{
 		void	*ptr = str - REFCOUNT_FIELD_SIZE;
 
-		if (0 == --(*(uint32_t *)ptr))
+		if (0 == --(*(zbx_uint32_t *)ptr))
 		{
 			freed = strlen(str) + REFCOUNT_FIELD_SIZE + 1;
 			zbx_hashset_remove(&vc_cache->strpool, ptr);

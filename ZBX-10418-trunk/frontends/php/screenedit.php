@@ -91,10 +91,10 @@ $fields = [
 	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
-	'add_row' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
-	'add_col' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
-	'rmv_row' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
-	'rmv_col' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'add_row' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
+	'add_col' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
+	'rmv_row' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
+	'rmv_col' =>		[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 100), null],
 	'sw_pos' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
 	'ajaxAction' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,			null]
 ];
@@ -246,132 +246,20 @@ elseif (hasRequest('delete')) {
 	$result = DBend($screenitemid);
 	show_messages($result, _('Screen updated'), _('Cannot update screen'));
 }
-elseif (isset($_REQUEST['add_row'])) {
-	DBstart();
-
-	$result = DBexecute('UPDATE screens SET vsize=(vsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
-
-	$add_row = getRequest('add_row', 0);
-	if ($screen['vsize'] > $add_row) {
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET y=(y+1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y>='.zbx_dbstr($add_row)
-		);
-	}
-
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Row added')
-		);
-	}
-
-	DBend($result);
+elseif (hasRequest('add_row')) {
+	addScreenRow($screen, getRequest('add_row'));
 }
-elseif (isset($_REQUEST['add_col'])) {
-	DBstart();
-
-	$result = DBexecute('UPDATE screens SET hsize=(hsize+1) WHERE screenid='.zbx_dbstr($screen['screenid']));
-
-	$add_col = getRequest('add_col', 0);
-	if ($screen['hsize'] > $add_col) {
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET x=(x+1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x>='.zbx_dbstr($add_col)
-		);
-	}
-
-	if ($result) {
-		add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-			_('Column added')
-		);
-	}
-
-	DBend($result);
+elseif (hasRequest('add_col')) {
+	addScreenColumn($screen, getRequest('add_col'));
 }
-elseif (isset($_REQUEST['rmv_row'])) {
-	if ($screen['vsize'] > 1) {
-		$rmv_row = getRequest('rmv_row', 0);
-
-		DBstart();
-		// reduce the rowspan of the items that are displayed in the removed row
-		DBexecute(
-			'UPDATE screens_items'.
-				' SET rowspan=(rowspan-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y+rowspan>'.zbx_dbstr($rmv_row).
-				' AND y<'.zbx_dbstr($rmv_row)
-		);
-
-		$result = DBexecute('UPDATE screens SET vsize=(vsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
-		$result &= DBexecute(
-			'DELETE FROM screens_items'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y='.zbx_dbstr($rmv_row)
-		);
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET y=(y-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND y>'.zbx_dbstr($rmv_row)
-		);
-
-		if ($result) {
-			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-				_('Row deleted')
-			);
-		}
-
-		DBend($result);
-	}
-	else {
-		error(_('Screen should contain at least one row and column.'));
-		show_error_message(_('Impossible to remove last row and column.'));
-	}
+elseif (hasRequest('rmv_row')) {
+	delScreenRow($screen, getRequest('rmv_row'));
 }
-elseif (isset($_REQUEST['rmv_col'])) {
-	if ($screen['hsize'] > 1) {
-		$rmv_col = getRequest('rmv_col', 0);
-
-		DBstart();
-		// reduce the colspan of the items that are displayed in the removed column
-		DBexecute(
-			'UPDATE screens_items'.
-				' SET colspan=(colspan-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x+colspan>'.zbx_dbstr($rmv_col).
-				' AND x<'.zbx_dbstr($rmv_col)
-		);
-
-		$result = DBexecute('UPDATE screens SET hsize=(hsize-1) WHERE screenid='.zbx_dbstr($screen['screenid']));
-		$result &= DBexecute(
-			'DELETE FROM screens_items'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x='.zbx_dbstr($rmv_col)
-		);
-		$result &= DBexecute(
-			'UPDATE screens_items'.
-			' SET x=(x-1)'.
-			' WHERE screenid='.zbx_dbstr($screen['screenid']).
-				' AND x>'.zbx_dbstr($rmv_col)
-		);
-
-		if ($result) {
-			add_audit_details(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_SCREEN, $screen['screenid'], $screen['name'],
-				_('Column deleted')
-			);
-		}
-
-		DBend($result);
-	}
-	else {
-		error(_('Screen should contain at least one row and column.'));
-		show_error_message(_('Impossible to remove last row and column.'));
-	}
+elseif (hasRequest('rmv_col')) {
+	delScreenColumn($screen, getRequest('rmv_col'));
 }
+
+show_messages();
 
 /*
  * Display

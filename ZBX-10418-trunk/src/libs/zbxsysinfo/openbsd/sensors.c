@@ -84,7 +84,7 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 		if (i == SENSOR_MAX_TYPES)
 			return FAIL;
 
-		if (SUCCEED != is_uint31(name + len, (uint32_t*)&mib[4]))
+		if (SUCCEED != is_uint31(name + len, &mib[4]))
 			return FAIL;
 
 		mib[3] = i;

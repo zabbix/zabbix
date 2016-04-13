@@ -354,25 +354,38 @@ class CScreenBuilder {
 			$newColumns = [(new CCol())->addClass(ZBX_STYLE_CELL_WIDTH)];
 
 			for ($i = 0, $size = $this->screen['hsize']; $i < $size; $i++) {
-				$newColumns[] = (new CCol(
-					(new CDiv('+'))
+				if ($this->screen['hsize'] >= SCREEN_MAX_SIZE) {
+					$link = (new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->onClick('javascript: location.href = "screenedit.php?config=1'.
-							'&screenid='.$this->screen['screenid'].url_param('templateid').'&add_col='.$i.'";'
-						)
-				))
+						->addClass(ZBX_STYLE_DISABLED);
+				}
+				else {
+					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&add_col='.$i
+					))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addSID();
+				}
+
+				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
 
-			$newColumns[] = (new CCol(
-				(new CDiv('+'))
+			if ($this->screen['hsize'] >= SCREEN_MAX_SIZE) {
+				$link = (new CDiv('+'))
 					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-					->onClick('javascript: location.href = "screenedit.php?config=1'.
-						'&screenid='.$this->screen['screenid'].url_param('templateid').
-						'&add_col='.$this->screen['hsize'].'";'
-					)
-			))
+					->addClass(ZBX_STYLE_DISABLED);
+			}
+			else {
+				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+					'&add_col='.$this->screen['hsize']
+				))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->addSID();
+			}
+
+			$newColumns[] = (new CCol($link))
 				->addClass(ZBX_STYLE_CENTER)
 				->addClass(ZBX_STYLE_MIDDLE)
 				->addClass(ZBX_STYLE_CELL_WIDTH);
@@ -386,13 +399,20 @@ class CScreenBuilder {
 
 			// action left cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$newColumns[] = (new CCol(
-					(new CDiv('+'))
+				if ($this->screen['vsize'] >= SCREEN_MAX_SIZE) {
+					$link = (new CDiv('+'))
 						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->onClick('javascript: location.href = "screenedit.php?config=1'.
-							'&screenid='.$this->screen['screenid'].url_param('templateid').'&add_row='.$r.'";'
-						)
-				))
+						->addClass(ZBX_STYLE_DISABLED);
+				}
+				else {
+					$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&add_row='.$r
+					))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addSID();
+				}
+
+				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
@@ -434,7 +454,7 @@ class CScreenBuilder {
 
 				if (!empty($screenitem['screenitemid'])) {
 					$emptyScreenRow = false;
-					$emptyScreenColumns[$c] = 1;
+					$emptyScreenColumns[$c] = true;
 				}
 
 				// action
@@ -541,23 +561,23 @@ class CScreenBuilder {
 
 			// action right cell
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				if ($emptyScreenRow) {
-					$removeRowLink = 'javascript: location.href = "screenedit.php?screenid='.$this->screen['screenid'].
-						url_param('templateid').'&rmv_row='.$r.'";';
+				if ($this->screen['vsize'] == SCREEN_MIN_SIZE) {
+					$link = (new CDiv('−'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addClass(ZBX_STYLE_DISABLED);
 				}
 				else {
-					$removeRowLink = 'javascript:'.
-						' if (confirm('.CJs::encodeJson(_('This screen-row is not empty. Delete it?')).')) {'.
-							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
-							url_param('templateid').'&rmv_row='.$r.'";'.
-						' }';
+					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_row='.$r
+					))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addSID();
+					if (!$emptyScreenRow) {
+						$link->addConfirmation(CJs::encodeJson(_('This screen-row is not empty. Delete it?')));
+					}
 				}
 
-				$newColumns[] = (new CCol(
-					(new CDiv('−'))
-						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->onClick($removeRowLink)
-				))
+				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}
@@ -566,37 +586,44 @@ class CScreenBuilder {
 
 		// action bottom row
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$newColumns = [
-				(new CCol(
-					(new CDiv('+'))
-						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->onClick('javascript: location.href = "screenedit.php'.
-							'?screenid='.$this->screen['screenid'].url_param('templateid').
-							'&add_row='.$this->screen['vsize'].'";'
-						)
+			if ($this->screen['vsize'] >= SCREEN_MAX_SIZE) {
+				$link = (new CDiv('+'))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->addClass(ZBX_STYLE_DISABLED);
+			}
+			else {
+				$link = (new CLink('+', 'screenedit.php?screenid='.$this->screen['screenid'].url_param('templateid').
+					'&add_row='.$this->screen['vsize']
 				))
+					->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+					->addSID();
+			}
+
+			$newColumns = [
+				(new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE)
 			];
 
 			for ($i = 0; $i < $this->screen['hsize']; $i++) {
-				if (isset($emptyScreenColumns[$i])) {
-					$removeColumnLink = 'javascript:'.
-						' if (confirm('.CJs::encodeJson(_('This screen-column is not empty. Delete it?')).')) {'.
-							' location.href = "screenedit.php?screenid='.$this->screen['screenid'].
-								url_param('templateid').'&rmv_col='.$i.'";'.
-						' }';
+				if ($this->screen['hsize'] == SCREEN_MIN_SIZE) {
+					$link = (new CDiv('−'))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addClass(ZBX_STYLE_DISABLED);
 				}
 				else {
-					$removeColumnLink = 'javascript: location.href = "screenedit.php?config=1'.
-						'&screenid='.$this->screen['screenid'].url_param('templateid').'&rmv_col='.$i.'";';
+					$link = (new CLink('−', 'screenedit.php?screenid='.$this->screen['screenid'].
+						url_param('templateid').'&rmv_col='.$i
+					))
+						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
+						->addSID();
+
+					if (array_key_exists($i, $emptyScreenColumns)) {
+						$link->addConfirmation(CJs::encodeJson(_('This screen-column is not empty. Delete it?')));
+					}
 				}
 
-				$newColumns[] = (new CCol(
-					(new CDiv('−'))
-						->addClass(ZBX_STYLE_TREEVIEW_PLUS)
-						->onClick($removeColumnLink)
-				))
+				$newColumns[] = (new CCol($link))
 					->addClass(ZBX_STYLE_CENTER)
 					->addClass(ZBX_STYLE_MIDDLE);
 			}

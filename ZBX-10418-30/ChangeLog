@@ -1,8 +1,46 @@
 Changes for 3.0.2rc1
 
 New features:
+........S. [ZBXNEXT-3210] replaced user macro cache with expanded trigger expression caching (wiper)
+A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Greek, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-10626] fixed crash in agent's collector process on Solaris 8 (gleb)
+..F....... [ZBX-10564] fixed trigger acknowledging in slide shows (Cemeris)
+.......PS. [ZBX-10571] fixed network discovery based on agent checks (gleb)
+A......... [ZBX-9162] fixed performance of the hostgroup.get method under MySQL (Gunars, Sasha)
+.......PS. [ZBX-10575] fixed history cache memory leak when floating value calculations resulted in out of bounds value (wiper)
+.......PS. [ZBX-10410] fixed possible crashes during history cache synchronisation during shutdown/crash (Sandis, wiper)
+.......PS. [ZBX-10493] fixed memory leak when trying to reconnect to URL (viktors)
+..F....... [ZBX-10435] fixed position of labels in the action operation form (Pavel, Sasha)
+........S. [ZBX-10608] fixed evaluation of action conditions with and/or evaluation type (wiper)
+..F....... [ZBX-6491] fixed resolving of {ITEM.VALUE} macro in "System status" widget and Monitoring -> Triggers (Gunars)
+A......... [ZBX-10563] fixed validation of timeperiods in maintenance create and maintenance update API methods (Cemeris)
+...GI..PS. [ZBX-10375] defined zbx_uint32_t to avoid conflicting uint32_t definitions (gleb, viktors)
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
+A......... [ZBX-10155] prohibited creation of a trigger prototype without item prototypes in the expression (Cemeris, Sasha)
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
+...G...PS. [ZBX-10530] fixed trappers and agent listeners accepting connections without a timeout (asaveljevs)
+..F....... [ZBX-10570] fixed incorrect select input height in FF (Pavel)
+..F....... [ZBX-10413] improved XML import validation (Oleg, Sasha)
+...GI..PS. [ZBX-4148] separated third-party library CFLAGS to avoid header file name conflicts (gleb)
+..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
+..F....... [ZBX-10466] fixed event selection by trigger ID (Gunars)
+..F....... [ZBX-7422] fixed LLD discovery rule list showing 0 instead of blank space in interval column for trapper and SNMP trap items (Ivo)
+A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
+.......P.. [ZBX-10497] fixed proxy crash when processing metadata updates of log[] or logrt[] items (Sandis)
+.......PS. [ZBX-10257] changed VMware items to become not supported if no VMware collector processes are started (viktors)
+A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
+A......... [ZBX-10318,ZBX-10517] added validation of vsize and hsize parameters in screen.create() and screen.update() methods (Sasha)
+A......... [ZBX-10318,ZBX-10517] fixed validation of screen elements position in screen.create() and screen.update() methods (Sasha)
+..F....... [ZBX-10318] more secure removing of the screen columns and rows in GUI (Cemeris, Sasha)
+...G...PS. [ZBX-10086] restored old behaviour - do not disable core dump if compiled without encryption support (Andris)
+.......PS. [ZBX-10459] fixed compilation error with libxml2 versions before 2.7.0 (wiper)
+...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
+A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
+...G...... [ZBX-10431] fixed net.tcp.listen on Linux when using netlink interface to obtain socket data; thanks to Andrey Melnikov for patch (wiper)
+A.F....... [ZBX-9700] fixed API receiving null and false instead of an array in method parameters (Ivo)
 ..F....... [ZBX-10379] added context for text strings 'Filter' and 'Subject' (zalex_ua)
 ..F....... [ZBX-10360] improved description for 'fuzzytime' trigger function in expression helper (zalex_ua)
 ..F....... [ZBX-9659] changed setup condition for checking always_populate_raw_post_data (Cemeris)
@@ -514,6 +552,7 @@ A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean,
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
 ..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
 ....I...S. [ZBX-10485] fixed database upgrade crash on attempt to substitute old-style comparison operators in empty trigger expressions (gleb, Sasha)
 ..F....... [ZBX-10386] fixed slideshow refresh rate (Ivo)
@@ -1276,6 +1315,19 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), English (United
 A......... [ZBX-9859] improved performance of screen.get method for an unprivileged user (Sasha)
 
 Bug fixes:
+A......... [ZBX-9162] fixed performance of the hostgroup.get method under MySQL (Gunars, Sasha)
+.......PS. [ZBX-10493] fixed memory leak when trying to reconnect to URL (viktors)
+..F....... [ZBX-6491] fixed resolving of {ITEM.VALUE} macro in "System status" widget and Monitoring -> Triggers (Gunars)
+........S. [ZBX-10510] fixed action condition time period checking (viktors)
+A......... [ZBX-10155] prohibited creation of a trigger prototype which belongs to a host and a template simultaneously (Sasha)
+A......... [ZBX-10155] prohibited creation of a trigger prototype without item prototypes in the expression (Cemeris, Sasha)
+A......... [ZBX-10155] prohibited creation of a trigger prototype without permissions to a host or template in the expression (Sasha)
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
+A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
+.......PS. [ZBX-10257] changed VMware items to become not supported if no VMware collector processes are started (viktors)
+A......... [ZBX-10262] fixed item.update modifying "delta" field for a templated item (Ivo)
+...G...... [ZBX-10372] fixed searching of network interface statistics in Solaris kstat (Andris, wiper)
+A.F....... [ZBX-4842,ZBX-10532] improved auditing of maintenance API operations (Gunars)
 ..F....... [ZBX-10387] fixed overview vertical column rotation for IE in Japanese language (Ivo)
 A......... [ZBX-10369] fixed unexpected deleting of screen items in screen.update API method (Gunars)
 ........S. [ZBX-10342] fixed item value not being cached by value cache if its timestamp seconds matches the oldest cached value timestamp, but the nanoseconds value is less (wiper)
@@ -2647,6 +2699,8 @@ New features:
 A.F....... [ZBX-1357] updated English (United States), French, Japanese, Korean, Polish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......P.. [ZBX-6744] fixed "expression tree is too large (maximum depth 1000)" error when using SQLite3 in a large environment (Sasha)
+A.F....... [ZBX-10316] fixed the regular expression preventing from adding web scenario steps (Ivo)
 .......PS. [ZBX-10221] fixed MySQL transaction handling when execute query fails (dimir)
 A......... [ZBX-10358] fixed error message in template screen cloning (Oleg)
 ....I..... [ZBX-10365] fixed inconsistences in schema.inc.php with schema.tmpl (Sasha)
@@ -4338,6 +4392,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+A.F....... [ZBX-10650] fixed php code to correspond to the syntax of PHP 5.0 (Sasha)
 ....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22

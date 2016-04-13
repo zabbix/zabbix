@@ -690,10 +690,6 @@ class CWebCheck extends CZBXAPI {
 	protected function createStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
 
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
-		}
-
 		$sql = 'SELECT h.httpstepid,h.name'.
 				' FROM httpstep h'.
 				' WHERE h.httptestid='.zbx_dbstr($httpTest['httptestid']).
@@ -789,10 +785,6 @@ class CWebCheck extends CZBXAPI {
 	 */
 	protected function updateStepsReal($httpTest, $websteps) {
 		$webstepsNames = zbx_objectValues($websteps, 'name');
-
-		if (!preg_grep('/'.ZBX_PREG_PARAMS.'/i', $webstepsNames)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Scenario step name should contain only printable characters.'));
-		}
 
 		// get all used keys
 		$webstepids = zbx_objectValues($websteps, 'webstepid');
