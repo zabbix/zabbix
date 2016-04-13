@@ -89,7 +89,9 @@ $triggersTable = (new CTableInfo())
 		$this->data['showInfoColumn'] ? _('Info') : null
 	]);
 
-$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], ['html' => true]);
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'],
+	['html' => true, 'sources' => ['expression', 'recovery_expression']]
+);
 
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -201,19 +203,14 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
-	$expression = [];
-
-	if ($trigger['recovery_expression']) {
-		$expression[] = _('Problem').':';
-		$expression[] = $trigger['expression'];
-		$expression[] = BR();
-		$expression[] = _('Recovery').':';
-		$expression[] = CMacrosResolverHelper::resolveTriggerExpression($trigger['recovery_expression'], [
-			'html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true
-		]);
+	if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+		$expression = [
+			_('Problem'), ': ', $trigger['expression'], BR(),
+			_('Recovery'), ': ', $trigger['recovery_expression']
+		];
 	}
 	else {
-		$expression[] = $trigger['expression'];
+		$expression = $trigger['expression'];
 	}
 
 	// checkbox

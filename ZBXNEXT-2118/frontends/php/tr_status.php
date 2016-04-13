@@ -378,9 +378,12 @@ $triggers = API::Trigger()->get([
 
 $triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 if ($showDetails) {
-	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
-	);
+	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers, [
+		'html' => true,
+		'resolve_usermacros' => true,
+		'resolve_macros' => true,
+		'sources' => ['expression', 'recovery_expression']
+	]);
 }
 
 order_result($triggers, $sortField, $sortOrder);
@@ -574,22 +577,15 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$description = [];
-
 	$description[] = (new CSpan($trigger['description']))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description[] = BR();
-		if ($trigger['recovery_expression']) {
-			$description[] = _('Problem').':';
-			$description[] = $trigger['expression'];
-			$description[] = BR();
-			$description[] = _('Recovery').':';
-			$description[] = CMacrosResolverHelper::resolveTriggerExpression($trigger['recovery_expression'], [
-				'html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true
-			]);
+		if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+			array_push($description, _('Problem'), ': ', $trigger['expression'], BR());
+			array_push($description, _('Recovery'), ': ', $trigger['recovery_expression']);
 		}
 		else {
 			$description[] = $trigger['expression'];

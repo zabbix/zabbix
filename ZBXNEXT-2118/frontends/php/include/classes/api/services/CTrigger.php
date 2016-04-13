@@ -1115,7 +1115,9 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		]);
 
-		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 
 		$changedPriorityTriggerIds = [];
 
@@ -1134,15 +1136,11 @@ class CTrigger extends CTriggerGeneral {
 				$trigger['description'] = $db_trigger['description'];
 			}
 
-			if (isset($trigger['expression']) && $db_trigger['expression'] !== $trigger['expression']) {
+			if (array_key_exists('expression', $trigger) && $db_trigger['expression'] !== $trigger['expression']) {
 				$this->validateItems($trigger['expression'], $trigger['description']);
 
 				$expression_changed = true;
 			}
-
-			$db_trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
-				$db_trigger['recovery_expression']
-			);
 
 			if (array_key_exists('recovery_expression', $trigger)
 					&& $db_trigger['recovery_expression'] !== $trigger['recovery_expression']) {

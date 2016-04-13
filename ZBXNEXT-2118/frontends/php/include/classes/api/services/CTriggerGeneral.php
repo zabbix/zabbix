@@ -236,21 +236,20 @@ abstract class CTriggerGeneral extends CApiService {
 		// Make sure we have all the required data.
 		if (!array_key_exists('description', $trigger) || !array_key_exists('expression', $trigger)
 				|| !array_key_exists('recovery_expression', $trigger)) {
-			$explode_expression = !array_key_exists('expression', $trigger);
-			$explode_recovery_expression = !array_key_exists('recovery_expression', $trigger);
+			$sources = [];
+			if (!array_key_exists('expression', $trigger)) {
+				$sources[] = 'expression';
+			}
+			if (!array_key_exists('recovery_expression', $trigger)) {
+				$sources[] = 'recovery_expression';
+			}
 
 			$trigger = $this->extendObject($this->tableName(), $trigger, ['description', 'expression',
 				'recovery_expression'
 			]);
 
-			if ($explode_expression) {
-				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression']);
-			}
-
-			if ($explode_recovery_expression) {
-				$trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
-					$trigger['recovery_expression']
-				);
+			if ($sources) {
+				$trigger = CMacrosResolverHelper::resolveTriggerExpressions([$trigger], ['sources' => $sources])[0];
 			}
 		}
 
@@ -267,19 +266,17 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$db_triggers = $this->get([
+			'output' => ['triggerid', 'expression', 'recovery_expression'],
 			'filter' => $filter,
-			'output' => ['expression', 'triggerid', 'recovery_expression'],
 			'nopermissions' => true
 		]);
 
-		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 
 		foreach ($db_triggers as $db_trigger) {
 			// Check if the expressions are also equal and that this is a different trigger.
-			$db_trigger['recovery_expression'] = CMacrosResolverHelper::resolveTriggerExpression(
-				$db_trigger['recovery_expression']
-			);
-
 			if ((!array_key_exists('triggerid', $trigger) || !idcmp($trigger['triggerid'], $db_trigger['triggerid']))
 					&& $db_trigger['expression'] === $trigger['expression']
 					&& $db_trigger['recovery_expression'] === $trigger['recovery_expression']) {
@@ -299,7 +296,8 @@ abstract class CTriggerGeneral extends CApiService {
 				$host = reset($host);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name']));
+					_s('Trigger "%1$s" already exists on "%2$s".', $trigger['description'], $host['name'])
+				);
 			}
 		}
 	}
