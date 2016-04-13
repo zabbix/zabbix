@@ -899,7 +899,7 @@ COpt::memoryPick();
 	 * @param array $items	    An array of items to validate
 	 * @param array $dbItems	An array of items $dbItems should be matched against
 	 */
-	protected static function checkInput(array $items, array $dbItems = array()) {
+	protected static function checkInput($items, $dbItems = array()) {
 		// fetch hosts
 		if ($dbItems) {
 			$options = array('itemids' => zbx_objectValues($items, 'itemid'));
@@ -947,7 +947,7 @@ COpt::memoryPick();
 	 *
 	 * @param array $itemIds   An array of item IDs
 	 */
-	protected static function checkGraphReference(array $itemIds) {
+	protected static function checkGraphReference($itemIds) {
 		self::checkUseInGraphAxis($itemIds, true);
 		self::checkUseInGraphAxis($itemIds);
 	}
@@ -968,7 +968,7 @@ COpt::memoryPick();
 	 * @param array $itemIds   An array of items IDs
 	 * @param type $checkMax
 	 */
-	protected static function checkUseInGraphAxis(array $itemIds, $checkMax = false) {
+	protected static function checkUseInGraphAxis($itemIds, $checkMax = false) {
 		if ($checkMax) {
 			$filter = array(
 				'ymax_itemid' => $itemIds,

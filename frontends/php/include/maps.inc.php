@@ -550,7 +550,7 @@
 	 * @param array $selement
 	 * @return string
 	 */
-	function resolveMapLabelMacrosAll(array $selement){
+	function resolveMapLabelMacrosAll($selement){
 		$label = $selement['label'];
 
 		$resolveHostMacros = false;

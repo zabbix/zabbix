@@ -599,7 +599,7 @@ return preg_match("/^\-?[0-9]+$/", $var);
  * @param array $array
  * @return array
  */
-function zbx_arrayFindDuplicates(array $array){
+function zbx_arrayFindDuplicates($array){
 	$countValues = array_count_values($array); // counting occurrences of every value in array
 	foreach($countValues as $value => $count){
 		if($count <= 1){
@@ -870,7 +870,7 @@ class ArraySorter {
 	 * @param array $array array to sort passed by reference
 	 * @param array $fields fields to sort, can be either string with field name or array with 'field' and 'order' keys
 	 */
-	public static function sort(array &$array, array $fields) {
+	public static function sort(&$array, $fields) {
 		foreach ($fields as $fid => $field) {
 			if (!is_array($field)) {
 				$fields[$fid] = array('field' => $field, 'order' => ZBX_SORT_UP);

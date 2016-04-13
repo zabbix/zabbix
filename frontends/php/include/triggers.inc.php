@@ -2720,7 +2720,7 @@ function analyzeExpression($expression) {
  *
  * @return bool                 returns true if element is found, false - otherwise
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operand = null) {
+function buildExpressionHtmlTree($expressionTree, &$next, &$letterNum, $level = 0, $operand = null) {
 	$treeList = array();
 	$outline = '';
 
@@ -2855,7 +2855,7 @@ function expressionHighLevelErrors($expression) {
  *
  * @return array
  */
-function expressionLevelDraw(array $next, $level) {
+function expressionLevelDraw($next, $level) {
 	$expr = array();
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
@@ -3132,7 +3132,7 @@ function remakeExpression($expression, $expressionId, $action, $newExpression) {
  *
  * @return bool                 returns true if element is found, false - otherwise
  */
-function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $newExpression, $operand = null)
+function rebuildExpressionTree(&$expressionTree, $expressionId, $action, $newExpression, $operand = null)
 {
 	foreach ($expressionTree as $key => $expression) {
 		if ($expressionId == $expressionTree[$key]['id']) {
@@ -3243,7 +3243,7 @@ function rebuildExpressionTree(array &$expressionTree, $expressionId, $action, $
  *
  * @return string
  */
-function makeExpression(array $expressionTree, $level = 0, $operand = null)
+function makeExpression($expressionTree, $level = 0, $operand = null)
 {
 	$expression = '';
 

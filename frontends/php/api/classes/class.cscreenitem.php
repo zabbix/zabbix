@@ -77,7 +77,7 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
-	public static function get(array $options = array()) {
+	public static function get($options = array()) {
 		$defOptions = array(
 			'nodeids'					=> null,
 			'screenitemids'				=> null,
@@ -145,7 +145,7 @@ class CScreenItem extends CZBXAPI {
 	 * @return array				An array, that contains the IDs of the new items
 	 *								under the 'screenitemids' key
 	 */
-	public static function create(array $screenItems) {
+	public static function create($screenItems) {
 
 		try {
 			self::BeginTransaction(__METHOD__);
@@ -177,7 +177,7 @@ class CScreenItem extends CZBXAPI {
 	 * @return array				An array, that contains the IDs of the updated items
 	 *								under the 'screenitemids' key
 	 */
-	public static function update(array $screenItems) {
+	public static function update($screenItems) {
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -227,7 +227,7 @@ class CScreenItem extends CZBXAPI {
 	 * @return array				An array, that contains the IDs of the updated items
 	 *								under the 'screenitemids' key
 	 */
-	public static function updateByPosition(array $screenItems) {
+	public static function updateByPosition($screenItems) {
 
 		try{
 			self::BeginTransaction(__METHOD__);
@@ -334,7 +334,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $screenItemIds  An array if screen item IDs
 	 * @return boolean
 	 */
-	public static function isReadable(array $screenItemIds) {
+	public static function isReadable($screenItemIds) {
 		if (!is_array($screenItemIds)) {
 			return false;
 		}
@@ -359,7 +359,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $screenItemIds  An array if screen item IDs
 	 * @return boolean
 	 */
-	public static function isWritable(array $screenItemIds) {
+	public static function isWritable($screenItemIds) {
 		if (!is_array($screenItemIds)) {
 			return false;
 		}
@@ -392,7 +392,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $dbScreenItems	An array of screen items $screenItems should
 	 *								be matched against
 	 */
-	protected static function checkInput(array $screenItems, array $dbScreenItems = array()) {
+	protected static function checkInput($screenItems, $dbScreenItems = array()) {
 
 		$hostgroups = array();
 		$hosts = array();
@@ -573,7 +573,7 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @return array         The resulting SQL parts array
 	 */
-	protected static function buildSqlParts(array $options) {
+	protected static function buildSqlParts($options) {
 		$sqlParts = array(
 			'select' => array('si.screenitemid'),
 			'from' => array('screens_items si'),
@@ -604,7 +604,7 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @return string         The resulting SQL query
 	 */
-	protected static function buildSql(array $options, array $sqlParts) {
+	protected static function buildSql($options, $sqlParts) {
 		// build query
 		$sqlSelect = implode(',', array_unique($sqlParts['select']));
 		$sqlFrom = implode(',', array_unique($sqlParts['from']));
@@ -629,7 +629,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $schema
 	 * @return array
 	 */
-	protected static function buildSqlOutput(array $options, array $sqlParts, array $schema) {
+	protected static function buildSqlOutput($options, $sqlParts, $schema) {
 
 		// count
 		if ($options['countOutput'] !== null) {
@@ -676,7 +676,7 @@ class CScreenItem extends CZBXAPI {
 	 * @param array $sqlParts
 	 * @return type
 	 */
-	protected static function buildSqlFilters(array $options, array $sqlParts) {
+	protected static function buildSqlFilters($options, $sqlParts) {
 
 		// screen item ids
 		if ($options['screenitemids'] !== null) {
@@ -720,7 +720,7 @@ class CScreenItem extends CZBXAPI {
 	 *
 	 * @return array           The resulting object
 	 */
-	protected static function unsetExtraFields(array $object, array $options, array $sqlParts) {
+	protected static function unsetExtraFields($object, $options, $sqlParts) {
 
 		// unset the pk forced by the 'preservedkeys' option
 		if ($options['preservekeys'] !== null && in_array('si.screenitemid', $sqlParts['select'])

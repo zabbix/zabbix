@@ -1757,7 +1757,7 @@ Copt::memoryPick();
 	 *
 	 * @return boolean
 	 */
-	private static function validate(array &$host, array $fields = array()) {
+	private static function validate(&$host, $fields = array()) {
 		// don't perform field checks if we're udpating only selected fields
 		if (!$fields) {
 			$host_db_fields = array(

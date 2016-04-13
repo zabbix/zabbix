@@ -835,7 +835,7 @@ Copt::memoryPick();
 		}
 	}
 
-	protected static function removeSecondsFromTimes(array &$maintenances) {
+	protected static function removeSecondsFromTimes(&$maintenances) {
 		foreach ($maintenances as &$maintenance) {
 			if (isset($maintenance['active_since'])) {
 				$maintenance['active_since'] -= $maintenance['active_since'] % SEC_PER_MIN;

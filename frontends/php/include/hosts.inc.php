@@ -103,7 +103,7 @@
 	 *
 	 * @return bool
 	 */
-	function copyTemplateElements($targetHostId, array $templatedIds, $copyMode = false) {
+	function copyTemplateElements($targetHostId, $templatedIds, $copyMode = false) {
 
 		$newTriggerIds = array();
 		foreach ($templatedIds as $templateId) {
@@ -146,7 +146,7 @@
 	 *
 	 * @return bool
 	 */
-	function syncHostWithTemplates($hostid, array $templateIds) {
+	function syncHostWithTemplates($hostid, $templateIds) {
 		delete_template_elements($hostid, $templateIds);
 		return copyTemplateElements($hostid, $templateIds);
 	}

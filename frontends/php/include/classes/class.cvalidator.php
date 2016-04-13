@@ -29,7 +29,7 @@ abstract class CValidator {
 	private $error;
 	protected $options = array();
 
-	public function __construct(array $options = array()) {
+	public function __construct($options = array()) {
 		$this->initOptions();
 		$this->options = zbx_array_merge($this->options, $options);
 	}
