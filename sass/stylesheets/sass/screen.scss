@@ -792,17 +792,30 @@ footer {
 	text-align: center;
 	@include border-radius(2px);
 
+	&:link {
+		color: $font-color;
+	}
+
+	&:visited {
+		color: $font-color;
+	}
+
 	&:hover {
+		color: $font-color;
 		background-color: $ui-hover-color;
+		border-bottom-color: $form-border-color;
 	}
 
 	&:focus {
+		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 	}
 
 	&:active {
+		color: $font-color;
 		background-color: $ui-hover-color;
+		border-color: $form-border-color;
 	}
 }
 
@@ -1571,6 +1584,7 @@ textarea {
 		size: $font-form-size;
 	}
 	padding: 4px 5px;
+	margin: 0;
 	overflow: auto;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
@@ -1590,6 +1604,7 @@ select {
 		family: $font-stack;
 		size: $font-form-size;
 	}
+	height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
@@ -1889,6 +1904,7 @@ $icon-widget-btn: (
 
 .disabled {
 	cursor: default !important;
+	background-color: transparent !important;
 	@include opacity(0.35);
 
 	.subfilter-enabled {

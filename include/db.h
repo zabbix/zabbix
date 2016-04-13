@@ -557,11 +557,6 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
 void	DBselect_uint64(const char *sql, zbx_vector_uint64_t *ids);
 
-#ifdef HAVE_POSTGRESQL
-#	define DBbytea_escape	zbx_db_bytea_escape
-size_t	zbx_db_bytea_escape(const u_char *input, size_t ilen, char **output, size_t *olen);
-#endif
-
 /* bulk insert support */
 
 /* database field value */

@@ -19,6 +19,9 @@
 
 #include "common.h"
 #include "log.h"
+
+#ifdef HAVE_UNIXODBC
+
 #include "zbxodbc.h"
 
 #define CALLODBC(fun, rc, h_type, h, msg)	(SQL_SUCCESS != (rc = (fun)) && 0 == odbc_Diag((h_type), (h), rc, (msg)))
@@ -321,3 +324,5 @@ end:
 
 	return result;
 }
+
+#endif	/* HAVE_UNIXODBC */
