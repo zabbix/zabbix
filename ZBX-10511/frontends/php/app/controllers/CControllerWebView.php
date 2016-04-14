@@ -134,6 +134,7 @@ class CControllerWebView extends CController {
 			order_result($httptests, $sortField, $sortOrder);
 
 			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
 				->setArgument('groupid', $data['groupid'])
 				->setArgument('hostid', $data['hostid'])
 				->setArgument('fullscreen', $data['fullscreen']);
