@@ -1016,8 +1016,9 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 {
 	AGENT_REQUEST	request;
 	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
-	char		*encoding_uc = NULL;
+	char		*encoding_uc = NULL, *max_delay_str;
 	int		rate, ret = FAIL, s_count, p_count;
+	float		max_delay;
 
 	init_request(&request);
 
@@ -1033,7 +1034,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	if (6 < get_rparams_num(&request))
+	if (7 < get_rparams_num(&request))
 	{
 		*error = zbx_strdup(*error, "Too many parameters.");
 		goto out;
@@ -1089,6 +1090,16 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	if (NULL == (template = get_rparam(&request, 5)))
 		template = "";
 
+	if (NULL == (max_delay_str = get_rparam(&request, 6)) || '\0' == *max_delay_str)
+	{
+		max_delay = 0.0f;
+	}
+	else if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay = atof(max_delay_str)))
+	{
+		*error = zbx_strdup(*error, "Invalid seventh parameter.");
+		goto out;
+	}
+
 	/* do not flood Zabbix server if file grows too fast */
 	s_count = rate * metric->refresh;
 
@@ -1098,7 +1109,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
-			server, port, CONFIG_HOSTNAME, metric->key_orig, metric->refresh);
+			server, port, CONFIG_HOSTNAME, metric->key_orig, max_delay, metric->refresh);
 
 	if (SUCCEED == ret)
 	{

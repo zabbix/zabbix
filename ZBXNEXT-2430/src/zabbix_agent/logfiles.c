@@ -1993,6 +1993,7 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  *     port             - [IN] port to send data to                           *
  *     hostname         - [IN] hostname the data comes from                   *
  *     key              - [IN] item key the data belongs to                   *
+ *     max_delay        - [IN] maximum allowed delay, s                       *
  *     refresh          - [IN] item update interval                           *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
@@ -2006,7 +2007,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
 		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key, int refresh)
+		unsigned short port, const char *hostname, const char *key, float max_delay, int refresh)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -2159,8 +2160,11 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	/* from now assume success - it could be that there is nothing to do */
 	ret = SUCCEED;
 
-	zbx_stopwatch_reset(&stopwatch);
-	zbx_stopwatch_start(&stopwatch);
+	if (0.0f != max_delay)
+	{
+		zbx_stopwatch_reset(&stopwatch);
+		zbx_stopwatch_start(&stopwatch);
+	}
 
 	while (i < logfiles_num)
 	{
@@ -2175,7 +2179,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 					(0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags) ? mtime_sent : NULL), skip_old_data,
 					big_rec, &logfiles[i].incomplete, err_msg, encoding, regexps, pattern,
 					output_template, p_count, s_count, process_value, server, port, hostname, key,
-					&processed_bytes_tmp, &stopwatch);
+					&processed_bytes_tmp, 0.0f == max_delay ? NULL : &stopwatch);
 
 			/* process_log() advances 'lastlogsize' only on success therefore */
 			/* we do not check for errors here */
@@ -2189,18 +2193,21 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			if (SUCCEED != ret)
 				break;
 
-			processed_bytes += processed_bytes_tmp;
-
-			if (0 >= *p_count || 0 >= *s_count)
+			if (0.0f != max_delay)
 			{
-				/* calculate number of remaining bytes, not processed due to 'p_count' or 's_count' */
-				/* limit */
+				processed_bytes += processed_bytes_tmp;
 
-				for (j = 0; j < logfiles_num; j++)
-					remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
+				if (0 >= *p_count || 0 >= *s_count)
+				{
+					/* calculate number of remaining bytes, not processed due to 'p_count' or */
+					/* 's_count' limit */
 
-				ret = SUCCEED;
-				break;
+					for (j = 0; j < logfiles_num; j++)
+						remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
+
+					ret = SUCCEED;
+					break;
+				}
 			}
 		}
 
@@ -2217,7 +2224,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		i++;
 	}
 
-	zbx_stopwatch_stop(&stopwatch);
+	if (0.0f != max_delay)
+		zbx_stopwatch_stop(&stopwatch);
 
 	/* remember the current logfile list */
 	*logfiles_num_old = logfiles_num;
@@ -2227,13 +2235,20 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
-				ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s", __function_name,
-				zbx_result_string(ret), processed_bytes, remaining_bytes,
-				zbx_stopwatch_elapsed(&stopwatch),
-				(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch),
-				calculate_delay(processed_bytes, remaining_bytes, refresh,
-				zbx_stopwatch_elapsed(&stopwatch)));
+		if (0.0f == max_delay)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
+					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s", __function_name,
+					zbx_result_string(ret), processed_bytes, remaining_bytes,
+					zbx_stopwatch_elapsed(&stopwatch),
+					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch),
+					calculate_delay(processed_bytes, remaining_bytes, refresh,
+					zbx_stopwatch_elapsed(&stopwatch)));
+		}
 	}
 
 	return ret;
