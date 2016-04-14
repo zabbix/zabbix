@@ -2963,18 +2963,23 @@ unsigned int	zbx_alarm_off(void)
  ******************************************************************************/
 void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
 {
-	struct timeval	current_time;
 	struct tm	tm_local;
-	int		day_diff, year_diff;
-#if !defined(HAVE_TM_TM_GMTOFF)
-	struct tm	tm_utc;
-#endif
 
 #ifdef _WINDOWS
-	time(&current_time);
-	if (0 == localtime_s(&tm_local, (const time_t*)&current_time.tv_sec))
+	struct timeb	current_time;
+
+	_ftime_s(&current_time);
+
+	*milliseconds = current_time.millitm / 1000;
+
+	if (0 == localtime_s(&tm_local, &current_time.time))
 #else
+	struct timeval	current_time;
+
 	gettimeofday(&current_time, NULL);
+
+	*milliseconds = current_time.tv_usec / 1000;
+
 	if (NULL != localtime_r(&current_time.tv_sec, &tm_local))
 #endif
 	{
@@ -2986,53 +2991,36 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
 		memset(tm, 0, sizeof(struct tm));
 	}
 
-	*milliseconds = current_time.tv_usec / 1000;
-
 	/* timezone offset */
 	if (NULL != tz_offset)
 	{
+
 #if defined(HAVE_TM_TM_GMTOFF)
 		tz_offset->hours = (short)(tm_local.tm_gmtoff / SEC_PER_HOUR);
 		tz_offset->minutes = (short)((abs(tm_local.tm_gmtoff) - abs(tz_offset->hours) * SEC_PER_HOUR) /
 				SEC_PER_MIN);
 #else
+		int		day_diff, min_diff;
+		struct tm	tm_utc;
 #ifdef _WINDOWS
-		gmtime_s(&tm_utc, (const time_t*)&current_time.tv_sec);
+		gmtime_s(&tm_utc, &current_time.time);
 #else
 		gmtime_r(&current_time.tv_sec, &tm_utc);
 #endif
-#endif
-		/* calculate if UTC and local time has the same date or not and adjust the offset if needed */
+
+		min_diff = (tm_local.tm_hour - tm_utc.tm_hour) * MIN_PER_HOUR + (tm_local.tm_min - tm_utc.tm_min);
+
 		day_diff = tm_local.tm_yday - tm_utc.tm_yday;
-		year_diff = tm_local.tm_year - tm_utc.tm_year;
 
-		if (0 > year_diff)
-			day_diff = 1;
-		else if (0 < year_diff)
-			day_diff = -1;
+		/* the date difference can be only 0, 1 or -1 otherwise it is a year change */
+		if ((day_diff == 1) || (day_diff < -1))
+			min_diff += HOURS_PER_DAY * MIN_PER_HOUR;
+		else if ((day_diff == -1) || (day_diff > 1))
+			min_diff -= HOURS_PER_DAY * MIN_PER_HOUR;
 
-		if (0 > day_diff)
-			tm_utc.tm_hour = tm_utc.tm_hour + HOURS_PER_DAY;
-		else if (0 < day_diff)
-			tm_local.tm_hour = tm_local.tm_hour + HOURS_PER_DAY;
-
-		tz_offset->hours = (short)(tm_local.tm_hour - tm_utc.tm_hour);
-		tz_offset->minutes = (short)(tm_local.tm_min - tm_utc.tm_min);
-
-		if ((0 <= tz_offset->hours && 0 <= tz_offset->minutes) ||
-				(0 >= tz_offset->hours && 0 >= tz_offset->minutes) || tz_offset->minutes == 0)
-		{
-			tz_offset->minutes = abs(tz_offset->minutes);
-		}
-		else
-		{
-			if (0 < tz_offset->hours)
-				tz_offset->hours--;
-			else
-				tz_offset->hours++;
-
-			tz_offset->minutes = 60 - abs(tz_offset->minutes);
-		}
+		tz_offset->hours = (short)(min_diff / MIN_PER_HOUR);
+		tz_offset->minutes = (short)(abs(min_diff % MIN_PER_HOUR));
+#endif
 	}
 }
 
