@@ -912,6 +912,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define MIN_PER_HOUR		60
 #define HOURS_PER_DAY		24
+#define DAYS_PER_YEAR		365
 
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
