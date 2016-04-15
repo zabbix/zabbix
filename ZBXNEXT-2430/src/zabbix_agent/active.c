@@ -239,7 +239,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->refresh_unsupported = 0;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
-	/* existing log[] and eventlog[] data can be skipped */
+	/* existing log[], log.count[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
 	metric->use_ino = 0;
@@ -248,10 +248,17 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->logfiles = NULL;
 	metric->flags = ZBX_METRIC_FLAG_NEW;
 
-	if (0 == strncmp(metric->key, "log[", 4))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_LOG;
-	else if (0 == strncmp(metric->key, "logrt[", 6))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
+	if ('l' == metric->key[0] && 'o' == metric->key[1] && 'g' == metric->key[2])
+	{
+		if ('[' == metric->key[3])					/* log[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOG;
+		else if (0 == strncmp(metric->key + 3, "rt[", 3))		/* logrt[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
+		else if (0 == strncmp(metric->key + 3, ".count[", 7))		/* log.count[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_COUNT;
+		else if (0 == strncmp(metric->key + 3, "rt.count[", 9))		/* logrt.count[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_COUNT;
+	}
 	else if (0 == strncmp(metric->key, "eventlog[", 9))
 		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
 

@@ -99,7 +99,8 @@ out:
  *                                                                            *
  * Purpose: separates filename to directory and to file name pattern (regexp) *
  *                                                                            *
- * Parameters: filename  - [IN] first parameter of logrt[] item               *
+ * Parameters: filename  - [IN] first parameter of logrt[] or logrt.count[]   *
+ *                         item                                               *
  *             directory - [IN/OUT] directory part of the 'filename'          *
  *             format    - [IN/OUT] file name pattern part                    *
  *             err_msg   - [IN/OUT] error message why an item became          *
@@ -1304,7 +1305,8 @@ clean:
  *          parameter                                                         *
  *                                                                            *
  * Parameters:                                                                *
- *     flags          - [IN] metric flags to check item type: log or logrt    *
+ *     flags          - [IN] metric flags to check item type: log, logrt,     *
+ *                      log.count or logrt.count                              *
  *     filename       - [IN] logfile name (regular expression with a path)    *
  *     mtime          - [IN] last modification time of the file               *
  *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
@@ -1323,7 +1325,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 	int		ret = SUCCEED, i;
 	zbx_stat_t	file_buf;
 
-	if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags))	/* log[] item */
+	if (0 != (ZBX_METRIC_FLAG_LOG_LOG & flags))	/* log[] or log.count[] item */
 	{
 		if (0 != zbx_stat(filename, &file_buf))
 		{
@@ -1352,7 +1354,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 		*use_ino = 1;
 #endif
 	}
-	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))	/* logrt[] item */
+	else if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & flags))	/* logrt[] or logrt.count[] item */
 	{
 		char	*directory = NULL, *format = NULL;
 		int	reg_error;
@@ -1390,8 +1392,8 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 
 		if (0 == *logfiles_num)
 		{
-			/* Do not make a logrt[] item NOTSUPPORTED if there are no matching log files or they are not */
-			/* accessible (can happen during a rotation), just log the problem. */
+			/* Do not make logrt[] and /logrt.count[] items NOTSUPPORTED if there are no matching log */
+			/* files or they are not accessible (can happen during a rotation), just log the problem. */
 #ifdef _WINDOWS
 			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
 					"access rights", format, directory);
@@ -1774,7 +1776,8 @@ out:
  *          records to Zabbix server                                          *
  *                                                                            *
  * Parameters:                                                                *
- *     flags           - [IN] metric flags to check item type: log or logrt   *
+ *     flags           - [IN] metric flags to check item type: log, logrt,    *
+ *                       log.count or logrt.count                             *
  *     filename        - [IN] logfile name                                    *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN] file modification time for reporting to server  *
@@ -1954,7 +1957,8 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  * Purpose: Find new records in logfiles                                      *
  *                                                                            *
  * Parameters:                                                                *
- *     flags            - [IN] metric flags to check item type: log or logrt  *
+ *     flags            - [IN] metric flags to check item type: log, logrt,   *
+ *                        log.count or logrt.count                            *
  *     filename         - [IN] logfile name (regular expression with a path)  *
  *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
  *     mtime            - [IN/OUT] last modification time of the file         *
@@ -2018,8 +2022,9 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	zbx_stopwatch_t		stopwatch;
 	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d filename:'%s' lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags, filename, *lastlogsize, *mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d is_count:%d filename:'%s' lastlogsize:" ZBX_FS_UI64
+			" mtime:%d", __function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags,
+			ZBX_METRIC_FLAG_LOG_COUNT & flags, filename, *lastlogsize, *mtime);
 
 	/* Minimize data loss if the system clock has been set back in time. */
 	/* Setting the clock ahead of time is harmless in our case. */
