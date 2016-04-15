@@ -2042,13 +2042,13 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (SUCCEED != make_logfile_list(flags, filename, mtime, &logfiles, &logfiles_alloc, &logfiles_num, use_ino,
 			err_msg))
 	{
-		/* an error occurred or a file was not accessible for a log[] item */
+		/* an error occurred or a file was not accessible for a log[] or log.count[] item */
 		goto out;
 	}
 
 	if (0 == logfiles_num)
 	{
-		/* there were no files for a logrt[] item to analyze */
+		/* there were no files for a logrt[] or logt.count[] item to analyze */
 		ret = SUCCEED;
 		goto out;
 	}
@@ -2210,7 +2210,6 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 					for (j = 0; j < logfiles_num; j++)
 						remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
 
-					ret = SUCCEED;
 					break;
 				}
 			}
