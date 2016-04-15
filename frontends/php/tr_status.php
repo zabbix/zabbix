@@ -371,18 +371,23 @@ $triggers = API::Trigger()->get([
 	],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 	'selectDependencies' => API_OUTPUT_EXTEND,
-	'selectLastEvent' => true,
-	'expandDescription' => true,
+	'selectLastEvent' => ['eventid', 'objectid', 'clock', 'ns'],
 	'preservekeys' => true
 ]);
 
 $triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 if ($showDetails) {
+	foreach ($triggers as &$trigger) {
+		$trigger['expression_html'] = $trigger['expression'];
+		$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
+	}
+	unset($trigger);
+
 	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers, [
 		'html' => true,
 		'resolve_usermacros' => true,
 		'resolve_macros' => true,
-		'sources' => ['expression', 'recovery_expression']
+		'sources' => ['expression_html', 'recovery_expression_html']
 	]);
 }
 
@@ -577,18 +582,33 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$description[] = (new CSpan($trigger['description']))
+	// Trigger has events.
+	if ($trigger['lastEvent']) {
+		$event = [
+			'clock' => $trigger['lastEvent']['clock'],
+			'ns' => $trigger['lastEvent']['ns']
+		];
+	}
+	// Trigger has no events.
+	else {
+		$event = [
+			'clock' => $trigger['lastchange'],
+			'ns' => '999999999'
+		];
+	}
+
+	$description[] = (new CSpan(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description[] = BR();
 		if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
-			array_push($description, _('Problem'), ': ', $trigger['expression'], BR());
-			array_push($description, _('Recovery'), ': ', $trigger['recovery_expression']);
+			array_push($description, _('Problem'), ': ', $trigger['expression_html'], BR());
+			array_push($description, _('Recovery'), ': ', $trigger['recovery_expression_html']);
 		}
 		else {
-			$description[] = $trigger['expression'];
+			$description[] = $trigger['expression_html'];
 		}
 	}
 
