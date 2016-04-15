@@ -3049,25 +3049,29 @@ time_t zbx_mkgmtime(struct tm *tm)
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 	/* minimal sanity checking not to access outside of the array */
-	if ((unsigned) tm->tm_min >= 59)
+	if ((unsigned) tm->tm_min >= 59)	/* minutes	[0-59] */
 			return FAIL;
-	if ((unsigned) tm->tm_hour >= 23)
+	if ((unsigned) tm->tm_hour >= 23)	/* hours	[0-23] */
 			return FAIL;
-	if ((unsigned) tm->tm_mday >= 31)
+	if ((unsigned) tm->tm_mday >= 31)	/* day		[0-31] */
 			return FAIL;
-	if ((unsigned) tm->tm_mon >= 12)
+	if ((unsigned) tm->tm_mon >= 11)	/* months	[0-11] */
 		return FAIL;
 	if (tm->tm_year < EPOCH_YEAR - TM_YEAR_BASE)
 		return FAIL;
 
+	/* this is the number of Februaries since 1900 */
 	year = tm->tm_year + TM_YEAR_BASE - (tm->tm_mon < 2);
 
+	/* If a year is divisible by 4 then it IS a leap year.		*/
+	/* If a year is divisible by 100 then it IS NOT a leap year.	*/
+	/* Except if a year is divisible by 400 then it IS a leap year.	*/
 	nleapdays = year / 4 - year / 100 + year / 400 -
 			((EPOCH_YEAR-1) / 4 - (EPOCH_YEAR-1) / 100 + (EPOCH_YEAR-1) / 400);
 
-	t = ((((time_t) (tm->tm_year - (EPOCH_YEAR - TM_YEAR_BASE)) * 365 +
-			month_day[tm->tm_mon] + tm->tm_mday - 1 + nleapdays) * 24 +
-			tm->tm_hour) * 60 + tm->tm_min) * 60 + tm->tm_sec;
+	t = ((((time_t) (tm->tm_year - (EPOCH_YEAR - TM_YEAR_BASE)) * DAYS_PER_YEAR +
+			month_day[tm->tm_mon] + tm->tm_mday - 1 + nleapdays) * HOURS_PER_DAY +
+			tm->tm_hour) * MIN_PER_HOUR + tm->tm_min) * SEC_PER_MIN + tm->tm_sec;
 
 	return (t < 0 ? FAIL : t);
 }
