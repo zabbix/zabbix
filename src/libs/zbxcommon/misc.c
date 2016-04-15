@@ -2991,7 +2991,7 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
 		memset(tm, 0, sizeof(struct tm));
 	}
 
-	/* timezone offset */
+	/* time zone offset */
 	if (NULL != tz_offset)
 	{
 
@@ -3039,33 +3039,35 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
  ******************************************************************************/
 time_t zbx_mkgmtime(struct tm *tm)
 {
-	int month, year, year_for_leap;
-	time_t	ret;
+	const int	EPOCH_YEAR = 1970;
+	const int	TM_YEAR_BASE = 1900;
+	int		year, nleapdays;
+	time_t		t;
 
-	/* Month-to-day offset for non-leap-years */
-	static const int month_day[12] =
+	/* days before the month */
+	static const unsigned short month_day[12] =
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
-	month = tm->tm_mon % 12;
-	year = tm->tm_year + tm->tm_mon / 12;
+	/* minimal sanity checking not to access outside of the array */
+	if ((unsigned) tm->tm_min >= 59)
+			return FAIL;
+	if ((unsigned) tm->tm_hour >= 23)
+			return FAIL;
+	if ((unsigned) tm->tm_mday >= 31)
+			return FAIL;
+	if ((unsigned) tm->tm_mon >= 12)
+		return FAIL;
+	if (tm->tm_year < EPOCH_YEAR - TM_YEAR_BASE)
+		return FAIL;
 
-	if (month < 0)
-	{
-		month += 12;
-		--year;
-	}
+	year = tm->tm_year + TM_YEAR_BASE - (tm->tm_mon < 2);
 
-	/* This is the number of Februaries since 1900 */
-	year_for_leap = (month > 1) ? year + 1 : year;
+	nleapdays = year / 4 - year / 100 + year / 400 -
+			((EPOCH_YEAR-1) / 4 - (EPOCH_YEAR-1) / 100 + (EPOCH_YEAR-1) / 400);
 
-	ret = tm->tm_sec					/* Seconds */
-		+ 60 * (tm->tm_min				/* Minute = 60 seconds */
-		+ 60 * (tm->tm_hour				/* Hour = 60 minutes */
-		+ 24 * (month_day[month] + tm->tm_mday - 1	/* Day = 24 hours */
-		+ 365 * (year - 70)				/* Year = 365 days */
-		+ (year_for_leap - 69) / 4			/* Every 4 years is leap... */
-		- (year_for_leap - 1) / 100			/* Except centuries... */
-		+ (year_for_leap + 299) / 400)));		/* Except 400s. */
+	t = ((((time_t) (tm->tm_year - (EPOCH_YEAR - TM_YEAR_BASE)) * 365 +
+			month_day[tm->tm_mon] + tm->tm_mday - 1 + nleapdays) * 24 +
+			tm->tm_hour) * 60 + tm->tm_min) * 60 + tm->tm_sec;
 
-	return ret < 0 ? FAIL : ret;
+	return (t < 0 ? FAIL : t);
 }

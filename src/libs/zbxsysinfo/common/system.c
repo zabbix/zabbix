@@ -53,8 +53,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 				1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
 
-		/* timezone offset */
-
+		/* time zone offset */
 		if (0 <= tz_offset.hours)
 		{
 			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "+");
