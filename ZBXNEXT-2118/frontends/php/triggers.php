@@ -88,6 +88,7 @@ $fields = [
 	'replace_expression' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'replace_recovery_expression' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'remove_expression' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'remove_recovery_expression' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'test_expression' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'add_dependency' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	'group_enable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
@@ -186,7 +187,7 @@ elseif (hasRequest('replace_recovery_expression')) {
 }
 elseif (hasRequest('remove_recovery_expression')) {
 	$recovery_expression_action = 'R';
-	$_REQUEST['recovery_expr_target_single'] = $_REQUEST['recovery_remove_expression'];
+	$_REQUEST['recovery_expr_target_single'] = $_REQUEST['remove_recovery_expression'];
 }
 
 if (hasRequest('clone') && hasRequest('triggerid')) {

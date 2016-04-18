@@ -36,8 +36,21 @@ function check_target(e) {
 	}
 }
 
-function delete_expression(expr_id) {
-	document.getElementsByName('remove_expression')[0].value = expr_id;
+/**
+ * Remove part of expression.
+ *
+ * @param string expr_id	Expression temporary ID.
+ * @param number type		Expression (type = 0) or recovery expression (type = 1).
+ */
+function delete_expression(expr_id, type) {
+	// If type is expression.
+	if (type == 0) {
+		jQuery('#remove_expression').val(expr_id);
+	}
+	// Type is recovery expression.
+	else {
+		jQuery('#remove_recovery_expression').val(expr_id);
+	}
 }
 
 function copy_expression(id) {

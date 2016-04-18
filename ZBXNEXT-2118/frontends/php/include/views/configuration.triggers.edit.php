@@ -36,7 +36,8 @@ $triggersForm = (new CForm())
 	->addVar('recovery_expression_constructor', $data['recovery_expression_constructor'])
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
-	->addVar('remove_expression', '');
+	->addVar('remove_expression', '')
+	->addVar('remove_recovery_expression', '');
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $data['triggerid']);
@@ -204,7 +205,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-										' delete_expression("'.$e['id'] .'");'.
+										' delete_expression("'.$e['id'] .'", '.TRIGGER_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
 								)
@@ -396,7 +397,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-										' delete_expression("'.$e['id'] .'");'.
+										' delete_expression("'.$e['id'] .'", '.TRIGGER_RECOVERY_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
 								)
