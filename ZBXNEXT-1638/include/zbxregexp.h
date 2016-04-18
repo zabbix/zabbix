@@ -36,6 +36,7 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
 char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
+char	*zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template);
 
 void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions);
 
