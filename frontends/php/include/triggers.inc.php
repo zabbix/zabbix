@@ -1118,7 +1118,7 @@ function make_trigger_details($trigger) {
  *
  * @return array
  */
-function analyzeExpression($expression) {
+function analyzeExpression($expression, $type) {
 	if (empty($expression)) {
 		return ['', null];
 	}
@@ -1133,7 +1133,7 @@ function analyzeExpression($expression) {
 
 	$next = [];
 	$letterNum = 0;
-	return buildExpressionHtmlTree($expressionTree, $next, $letterNum);
+	return buildExpressionHtmlTree($expressionTree, $next, $letterNum, 0, null, $type);
 }
 
 /**
@@ -1148,7 +1148,7 @@ function analyzeExpression($expression) {
  * @return array	array containing the trigger expression formula as the first element and an array describing the
  *					expression tree as the second
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null) {
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null, $type) {
 	$treeList = [];
 	$outline = '';
 
@@ -1177,7 +1177,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				$treeList[] = $levelDetails;
 
 				list($subOutline, $subTreeList) = buildExpressionHtmlTree($element['elements'], $next, $letterNum,
-						$level + 1, $element['operator']);
+						$level + 1, $element['operator'], $type);
 				$treeList = array_merge($treeList, $subTreeList);
 
 				$outline .= ($level == 0) ? $subOutline : '('.$subOutline.')';
@@ -1198,12 +1198,17 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$url = $element['expression'];
 				}
 				else {
-					$expressionId = 'expr_'.$element['id'];
+					if ($type == TRIGGER_EXPRESSION) {
+						$expressionId = 'expr_'.$element['id'];
+					}
+					else {
+						$expressionId = 'recovery_expr_'.$element['id'];
+					}
 
 					$url = (new CSpan($element['expression']))
 						->addClass(ZBX_STYLE_LINK_ACTION)
 						->setId($expressionId)
-						->onClick('javascript: copy_expression("'.$expressionId.'");');
+						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;

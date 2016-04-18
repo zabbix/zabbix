@@ -1500,7 +1500,7 @@ function getTriggerFormData(array $data) {
 
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['expression']);
+		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 		if ($analyze !== false) {
 			list($data['outline'], $data['expression_tree']) = $analyze;
 			if ($data['expression_action'] !== '' && $data['expression_tree'] != null) {
@@ -1509,7 +1509,7 @@ function getTriggerFormData(array $data) {
 				);
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
-					$analyze = analyzeExpression($data['expression']);
+					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 					if ($analyze !== false) {
 						list($data['outline'], $data['expression_tree']) = $analyze;
 					}
@@ -1539,7 +1539,7 @@ function getTriggerFormData(array $data) {
 
 	// Trigger recovery expression constructor.
 	if ($data['recovery_expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['recovery_expression']);
+		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
 		if ($analyze !== false) {
 			list($data['outline'], $data['recovery_expression_tree']) = $analyze;
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] != null) {
@@ -1549,7 +1549,7 @@ function getTriggerFormData(array $data) {
 
 				if ($new_expr !== false) {
 					$data['recovery_expression'] = $new_expr;
-					$analyze = analyzeExpression($data['recovery_expression']);
+					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
 					if ($analyze !== false) {
 						list($data['outline'], $data['recovery_expression_tree']) = $analyze;
 					}
