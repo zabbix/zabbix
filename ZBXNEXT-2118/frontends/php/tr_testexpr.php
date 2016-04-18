@@ -42,7 +42,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $expression = getRequest('expression', '');
 
 define('NO_LINK_IN_TESTING', true);
-list($outline, $eHTMLTree) = analyzeExpression($expression);
+list($outline, $eHTMLTree) = analyzeExpression($expression, TRIGGER_EXPRESSION);
 
 // test data (create table, create check fields)
 $dataTable = (new CTable())
