@@ -210,7 +210,9 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 			}
 
-			$trigger = $this->createReal([$trigger])[0];
+			$triggers = [$trigger];
+			$this->createReal($triggers);
+			$trigger = $triggers[0];
 		}
 
 		return $trigger;
@@ -227,8 +229,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $trigger['recovery_expression']
 	 *
 	 * @throws APIException if at least one trigger exists
-	 *
-	 * @return void
 	 */
 	protected function checkIfExistsOnHost($trigger) {
 		switch (get_class($this)) {
@@ -856,6 +856,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int        $triggers[<tnum>]['recovery_mode']          [IN]
 	 * @param string     $triggers[<tnum>]['recovery_expression']    [IN/OUT]
 	 * @param array|null $db_triggers                                [IN]
+	 * @param string     $db_triggers[<tnum>]['triggerid']           [IN]
 	 * @param string     $db_triggers[<tnum>]['expression']          [IN]
 	 * @param string     $db_triggers[<tnum>]['recovery_expression'] [IN]
 	 * @param array      $triggers_functions                         [OUT] array of the new functions which must be
@@ -1022,7 +1023,19 @@ abstract class CTriggerGeneral extends CApiService {
 		 */
 		$mt_triggers = [];
 
-		foreach ($triggers as &$trigger) {
+		/*
+		 * The list of triggers which are moved from one host or template to another.
+		 *
+		 * [
+		 *     <triggerid> => [
+		 *         'description' => <description>
+		 *     ],
+		 *     ...
+		 * ]
+		 */
+		$moved_triggers = [];
+
+		foreach ($triggers as $tnum => &$trigger) {
 			$expressions_changed = $db_triggers === null
 				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
 				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']);
@@ -1050,7 +1063,9 @@ abstract class CTriggerGeneral extends CApiService {
 			 * 0x02 - with hosts
 			 */
 			$status_mask = 0x00;
-			$templateids = [];
+			// The lists of hostids and hosts which are used in the current trigger.
+			$hostids = [];
+			$hosts = [];
 
 			// Common checks.
 			foreach (array_merge($expressions1, $expressions2) as $exprPart) {
@@ -1092,19 +1107,44 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 
 				$status_mask |= ($host_keys['status'] == HOST_STATUS_TEMPLATE ? 0x01 : 0x02);
-				$templateids[$host_keys['hostid']] = true;
+				$hostids[$host_keys['hostid']] = true;
+				$hosts[$exprPart['host']] = true;
 			}
 
-			// if both templates and hosts are referenced in expressions
+			// When both templates and hosts are referenced in expressions.
 			if ($status_mask == 0x03) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error_host_and_template);
 			}
 
-			// the trigger with multiple templates
-			if ($status_mask == 0x01 && count($templateids) > 1) {
+			// Triggers with children cannot be moved from one template to another host or template.
+			if ($db_triggers !== null && $expressions_changed) {
+				$expressionData->parse($db_triggers[$tnum]['expression']);
+				$old_hosts1 = $expressionData->getHosts();
+				$old_hosts2 = [];
+
+				if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+					$expressionData->parse($db_triggers[$tnum]['recovery_expression']);
+					$old_hosts2 = $expressionData->getHosts();
+				}
+
+				$is_moved = true;
+				foreach (array_merge($old_hosts1, $old_hosts2) as $old_host) {
+					if (array_key_exists($old_host, $hosts)) {
+						$is_moved = false;
+						break;
+					}
+				}
+
+				if ($is_moved) {
+					$moved_triggers[$db_triggers[$tnum]['triggerid']] = ['description' => $trigger['description']];
+				}
+			}
+
+			// The trigger with multiple templates.
+			if ($status_mask == 0x01 && count($hostids) > 1) {
 				$mt_triggers[] = [
 					'description' => $trigger['description'],
-					'templateids' => array_keys($templateids)
+					'templateids' => array_keys($hostids)
 				];
 			}
 
@@ -1124,7 +1164,13 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		unset($trigger);
 
-		$this->validateTriggersWithMultipleTemplates($mt_triggers);
+		if ($mt_triggers) {
+			$this->validateTriggersWithMultipleTemplates($mt_triggers);
+		}
+
+		if ($moved_triggers) {
+			$this->validateMovedTriggers($moved_triggers);
+		}
 
 		$functionid = DB::reserveIds('functions', $functions_num);
 
@@ -1176,8 +1222,6 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array  $mt_triggers[]['templateids']
 	 *
 	 * @throws APIException
-	 *
-	 * @return bool
 	 */
 	protected function validateTriggersWithMultipleTemplates($mt_triggers) {
 		$templateids = [];
@@ -1218,10 +1262,34 @@ abstract class CTriggerGeneral extends CApiService {
 
 				if (array_diff($compare_links, $linked_to) || array_diff($linked_to, $compare_links)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%s" belongs to templates with different linkages.', $mt_trigger['description'])
+						_s('Trigger "%1$s" belongs to templates with different linkages.', $mt_trigger['description'])
 					);
 				}
 			}
+		}
+	}
+
+	/**
+	 * Check if moved triggers does not have children.
+	 *
+	 * @param array  $moved_triggers
+	 * @param string $moved_triggers[<triggerid>]['description']
+	 *
+	 * @throws APIException
+	 */
+	protected function validateMovedTriggers($moved_triggers) {
+		$_db_triggers = DBselect(
+			'SELECT t.templateid'.
+			' FROM triggers t'.
+			' WHERE '.dbConditionInt('t.templateid', array_keys($moved_triggers)),
+			1
+		);
+
+		if ($_db_trigger = DBfetch($_db_triggers)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update trigger "%1$s": %2$s.',
+				$moved_triggers[$_db_trigger['templateid']]['description'],
+				_('trigger with linkages cannot be moved to another template or host')
+			));
 		}
 	}
 
