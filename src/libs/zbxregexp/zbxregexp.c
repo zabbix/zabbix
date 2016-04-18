@@ -283,6 +283,19 @@ char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *outpu
 	return regexp_sub(string, pattern, output_template, REG_EXTENDED);
 }
 
+/*********************************************************************************
+ *                                                                               *
+ * Function: zbx_iregexp_sub                                                     *
+ *                                                                               *
+ * Purpose: This function is similar to zbx_regexp_sub() with exception that     *
+ *          case insensitive matches are accepted.                               *
+ *                                                                               *
+ *********************************************************************************/
+char	*zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template)
+{
+	return regexp_sub(string, pattern, output_template, REG_EXTENDED | REG_ICASE);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_regexp_clean_expressions                                     *

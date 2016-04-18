@@ -24,6 +24,7 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "valuecache.h"
+#include "macrofunc.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -2368,7 +2369,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0;
+	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, calc_macro;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2400,9 +2401,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	data_alloc = data_len = strlen(*data) + 1;
 
-	while (SUCCEED == res)
+	for (; SUCCEED == res; res = zbx_token_find(*data, pos, &token))
 	{
 		indexed_macro = 0;
+		calc_macro = 0;
 		require_numeric = 0;
 		N_functionid = 0;
 
@@ -2424,6 +2426,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				if ('1' <= *p && *p <= '9')
 					N_functionid = *p - '0';
 				break;
+			default:
+				m = *data + token.token.l;
 		}
 
 		bl = *data + token.token.l;
@@ -2450,11 +2454,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				N_functionid = 1;
 		}
 		else
-		{
-			/* set macro and functionid to default values */
-			m = bl;
 			N_functionid = 1;
-		}
 
 		c = *++br;
 		*br = '\0';
@@ -2556,8 +2556,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_KEY_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
+					calc_macro = 1;
 					ret = DBitem_lastvalue(c_event->trigger.expression, &replace_to, N_functionid);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
@@ -2612,8 +2613,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(c_event->trigger.expression, &replace_to,
 							N_functionid, ZBX_REQUEST_ITEM_NAME_ORIG);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
 				{
+					calc_macro = 1;
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
 							c_event->clock, c_event->ns);
 				}
@@ -3329,12 +3331,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = DBget_trigger_value(event->trigger.expression, &replace_to, N_functionid,
 							ZBX_REQUEST_HOST_PORT);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
+					calc_macro = 1;
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid);
 				}
-				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
 				{
+					calc_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns);
 				}
@@ -3549,18 +3553,32 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			else if (NULL != error)
 				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
-		else if (FAIL == ret)
+
+		if (ZBX_TOKEN_CALC_MACRO == token.type && NULL != replace_to)
+		{
+			if (0 != calc_macro)
+			{
+				ret = zbx_calculate_macro_function(*data + token.data.calc_macro.func.l,
+						token.data.calc_macro.func.r - token.data.calc_macro.func.l + 1,
+						&replace_to);
+			}
+			else
+				ret = FAIL;
+		}
+
+		if (FAIL == ret)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%s'", bl);
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
 		*br = c;
-		pos = token.token.r + 1;
 
 		if (NULL != replace_to)
 		{
 			size_t	sz_m, sz_r;
+
+			pos = token.token.r + 1;
 
 			sz_m = br - bl;
 			sz_r = strlen(replace_to);
@@ -3586,9 +3604,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			memcpy(bl, replace_to, sz_r);
 			zbx_free(replace_to);
 		}
-
-		if (SUCCEED != zbx_token_find(*data, pos, &token))
-			break;
+		else
+			pos++;
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
