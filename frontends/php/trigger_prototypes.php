@@ -212,8 +212,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
 	else {
-		$trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 		$result = API::TriggerPrototype()->create($trigger);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));

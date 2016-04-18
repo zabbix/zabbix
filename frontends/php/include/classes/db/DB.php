@@ -95,7 +95,7 @@ class DB {
 	 *
 	 * @return string
 	 */
-	protected static function reserveIds($table, $count) {
+	public static function reserveIds($table, $count) {
 		global $DB;
 
 		$tableSchema = self::getSchema($table);
@@ -519,9 +519,11 @@ class DB {
 			// set creation
 			$sqlSet = '';
 			foreach ($row['values'] as $field => $value) {
-				$sqlSet .= ' '.$field.'='.$value.',';
+				if ($sqlSet !== '') {
+					$sqlSet .= ',';
+				}
+				$sqlSet .= $field.'='.$value;
 			}
-			$sqlSet = rtrim($sqlSet, ',');
 
 			if (!isset($row['where']) || empty($row['where']) || !is_array($row['where'])) {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without where condition.', $table));
