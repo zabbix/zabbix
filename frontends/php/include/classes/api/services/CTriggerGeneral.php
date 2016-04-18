@@ -1023,17 +1023,19 @@ abstract class CTriggerGeneral extends CApiService {
 		 */
 		$mt_triggers = [];
 
-		/*
-		 * The list of triggers which are moved from one host or template to another.
-		 *
-		 * [
-		 *     <triggerid> => [
-		 *         'description' => <description>
-		 *     ],
-		 *     ...
-		 * ]
-		 */
-		$moved_triggers = [];
+		if ($class === 'CTrigger') {
+			/*
+			 * The list of triggers which are moved from one host or template to another.
+			 *
+			 * [
+			 *     <triggerid> => [
+			 *         'description' => <description>
+			 *     ],
+			 *     ...
+			 * ]
+			 */
+			$moved_triggers = [];
+		}
 
 		foreach ($triggers as $tnum => &$trigger) {
 			$expressions_changed = $db_triggers === null
@@ -1117,7 +1119,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			// Triggers with children cannot be moved from one template to another host or template.
-			if ($db_triggers !== null && $expressions_changed) {
+			if ($class === 'CTrigger' && $db_triggers !== null && $expressions_changed) {
 				$expressionData->parse($db_triggers[$tnum]['expression']);
 				$old_hosts1 = $expressionData->getHosts();
 				$old_hosts2 = [];
@@ -1168,7 +1170,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->validateTriggersWithMultipleTemplates($mt_triggers);
 		}
 
-		if ($moved_triggers) {
+		if ($class === 'CTrigger' && $moved_triggers) {
 			$this->validateMovedTriggers($moved_triggers);
 		}
 
@@ -1224,6 +1226,21 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected function validateTriggersWithMultipleTemplates($mt_triggers) {
+		switch (get_class($this)) {
+			case 'CTrigger':
+				$expressionData = new CTriggerExpression(['lldmacros' => false]);
+				$error_different_linkages = _('Trigger "%1$s" belongs to templates with different linkages.');
+				break;
+
+			case 'CTriggerPrototype':
+				$expressionData = new CTriggerExpression();
+				$error_different_linkages = _('Trigger prototype "%1$s" belongs to templates with different linkages.');
+				break;
+
+			default:
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
+		}
+
 		$templateids = [];
 
 		foreach ($mt_triggers as $mt_trigger) {
@@ -1262,7 +1279,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				if (array_diff($compare_links, $linked_to) || array_diff($linked_to, $compare_links)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Trigger "%1$s" belongs to templates with different linkages.', $mt_trigger['description'])
+						_params($error_different_linkages, [$mt_trigger['description']])
 					);
 				}
 			}
