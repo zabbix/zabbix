@@ -1,0 +1,53 @@
+=head1 NAME
+
+rsm.slv.*.avail.pl - scripts to calculate different service status results and save to the database
+
+=head1 SYNOPSIS
+
+rsm.slv.*.avail.pl [--from <timestamp>] [--period minutes] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--from> timestamp
+
+Specify Unix timestamp within the oldest test cycle to handle in this run. You don't need to specify the
+first second of the test cycle, any timestamp within it will work. Number of minutes to handle within
+this run can be specified using option --period otherwise all completed test cycles available in the
+database up till now will be handled.
+
+=item B<--period> minutes
+
+Specify number minutes of the period to handle during this run. The first cycle to handle can be specified
+using options --from or --continue (continue from the last time when --continue was used) (see below).
+
+=item B<--dry-run>
+
+Print data to the screen, do not write anything to the filesystem.
+
+=item B<--warnslow> seconds
+
+Issue a warning in case an SQL query takes more than specified number of seconds. A floating-point number
+is supported as seconds (i. e. 0.5, 1, 1.5 are valid).
+
+=item B<--debug>
+
+Run the script in debug mode. This means printing more information.
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+B<These scripts> are meant to be run by cron but can be run manually in order to cover the data in
+time periods when cron was not running.
+
+=head1 EXAMPLES
+
+./rsm.slv.*.avail.pl --from 1420063200 --period 10
+
+=cut
