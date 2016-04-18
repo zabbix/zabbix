@@ -420,7 +420,7 @@ elseif (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
-		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'parent_discoveryid' => null,
 		'dependencies' => getRequest('dependencies', []),
 		'db_dependencies' => [],
 		'triggerid' => getRequest('triggerid'),
