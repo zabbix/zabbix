@@ -2368,10 +2368,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED;
+	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
+	zbx_token_t		token;
 
 	if (NULL == data || NULL == *data || '\0' == **data)
 	{
@@ -2392,57 +2393,67 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		}
 	}
 
-	p = *data;
-	if (NULL == (m = bl = strchr(p, '{')))
+	if (SUCCEED != zbx_token_find(*data, pos, &token))
 		return res;
 
 	zbx_vector_uint64_create(&hostids);
 
 	data_alloc = data_len = strlen(*data) + 1;
 
-	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
+	while (SUCCEED == res)
 	{
 		indexed_macro = 0;
 		require_numeric = 0;
+		N_functionid = 0;
 
-		/* User macros can have macro closing symbol } in quoted context. */
-		/* We must use user macro parsing function to find macro end.     */
-		if ('$' == m[1])
+		switch (token.type)
 		{
-			int	macro_r, context_l, context_r;
-
-			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
-			{
-				p = bl + 1;
+			case ZBX_TOKEN_OBJECTID:
+			case ZBX_TOKEN_LLD_MACRO:
+				pos = token.token.r + 1;
 				continue;
+			case ZBX_TOKEN_SIMPLE_MACRO:
+				p = *data + token.token.r - 1;
+				m = *data + token.token.l;
+				if ('1' <= *p && *p <= '9')
+					N_functionid = *p - '0';
+				break;
+			case ZBX_TOKEN_CALC_MACRO:
+				p = *data + token.data.calc_macro.macro.r - 1;
+				m = *data + token.data.calc_macro.macro.l;
+				if ('1' <= *p && *p <= '9')
+					N_functionid = *p - '0';
+				break;
+		}
+
+		bl = *data + token.token.l;
+		br = *data + token.token.r;
+
+		if (0 != N_functionid)
+		{
+			int	i, diff;
+
+			for (i = 0; NULL != ex_macros[i]; i++)
+			{
+				diff = zbx_mismatch(ex_macros[i], m);
+
+				if ('}' == ex_macros[i][diff] && '}' == m[diff + 1])
+				{
+					indexed_macro = 1;
+					m = ex_macros[i];
+					break;
+				}
 			}
 
-			br = bl + macro_r;
+			/* reset functionid if the macro was not found */
+			if (0 == indexed_macro)
+				N_functionid = 1;
 		}
 		else
 		{
-			if (NULL == (br = strchr(bl, '}')))
-				break;
-
+			/* set macro and functionid to default values */
+			m = bl;
 			N_functionid = 1;
-
-			if ('1' <= *(br - 1) && *(br - 1) <= '9')
-			{
-				int	i, diff;
-
-				for (i = 0; NULL != ex_macros[i]; i++)
-				{
-					diff = zbx_mismatch(ex_macros[i], bl);
-
-					if ('}' == ex_macros[i][diff] && bl + diff == br - 1)
-					{
-						N_functionid = *(br - 1) - '0';
-						indexed_macro = 1;
-						m = ex_macros[i];
-						break;
-					}
-				}
-			}
 		}
 
 		c = *++br;
@@ -3545,6 +3556,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		}
 
 		*br = c;
+		pos = token.token.r + 1;
 
 		if (NULL != replace_to)
 		{
@@ -3555,6 +3567,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 			if (sz_m != sz_r)
 			{
+				pos += sz_r - sz_m;
 				data_len += sz_r - sz_m;
 
 				if (data_len > data_alloc)
@@ -3571,12 +3584,11 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 
 			memcpy(bl, replace_to, sz_r);
-			p = bl + sz_r;
-
 			zbx_free(replace_to);
 		}
-		else
-			p = bl + 1;
+
+		if (SUCCEED != zbx_token_find(*data, pos, &token))
+			break;
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
