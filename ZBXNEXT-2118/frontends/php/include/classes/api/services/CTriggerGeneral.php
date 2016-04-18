@@ -575,6 +575,11 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			$_db_trigger = $_db_triggers[$trigger['triggerid']];
 
+			if ($class === 'CTrigger') {
+				$updateDiscoveredValidator->setObjectName($_db_trigger['description']);
+				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $_db_trigger);
+			}
+
 			if (array_key_exists('recovery_mode', $trigger) && !array_key_exists('recovery_expression', $trigger)) {
 				switch ($trigger['recovery_mode']) {
 					case TRIGGER_REC_MODE_EXPRESSION:
@@ -591,11 +596,6 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_update, $trigger['description']);
-
-			if ($class === 'CTrigger') {
-				$updateDiscoveredValidator->setObjectName($_db_trigger['description']);
-				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $_db_trigger);
-			}
 
 			switch ($trigger['recovery_mode']) {
 				case TRIGGER_REC_MODE_EXPRESSION:
