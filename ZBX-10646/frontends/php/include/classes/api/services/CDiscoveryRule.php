@@ -623,7 +623,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Process dependencies, if at least one trigger prototype has a dependency.
 		if ($add_dependencies) {
-			$trigger_prototypeids = array_values(array_keys($trigger_prototypes));
+			$trigger_prototypeids = array_keys($trigger_prototypes);
 
 			foreach ($result['triggerids'] as $i => $triggerid) {
 				$new_trigger_prototypes[$trigger_prototypeids[$i]] = [
