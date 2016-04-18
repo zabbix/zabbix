@@ -420,75 +420,35 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 *
 	 * @see https://www.zabbix.com/documentation/3.0/manual/api/reference/triggerprototype/create
 	 *
-	 * @param array $triggerPrototypes
+	 * @param array $trigger_prototypes
 	 *
 	 * @return array
 	 */
-	public function create(array $triggerPrototypes) {
-		$triggerPrototypes = zbx_toArray($triggerPrototypes);
+	public function create(array $trigger_prototypes) {
+		$trigger_prototypes = zbx_toArray($trigger_prototypes);
 
-		$this->validateCreate($triggerPrototypes);
+		$this->validateCreate($trigger_prototypes);
+		$this->createReal($trigger_prototypes);
 
-		$this->createReal($triggerPrototypes);
-
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			$this->inherit($triggerPrototype);
+		foreach ($trigger_prototypes as $trigger_prototype) {
+			$this->inherit($trigger_prototype);
 		}
 
 		$addDependencies = false;
 
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			if (isset($triggerPrototype['dependencies']) && is_array($triggerPrototype['dependencies'])
-					&& $triggerPrototype['dependencies']) {
+		foreach ($trigger_prototypes as $trigger_prototype) {
+			if (isset($trigger_prototype['dependencies']) && is_array($trigger_prototype['dependencies'])
+					&& $trigger_prototype['dependencies']) {
 				$addDependencies = true;
 				break;
 			}
 		}
 
 		if ($addDependencies) {
-			$this->addDependencies($triggerPrototypes);
+			$this->addDependencies($trigger_prototypes);
 		}
 
-		return ['triggerids' => zbx_objectValues($triggerPrototypes, 'triggerid')];
-	}
-
-	/**
-	 * Validate trigger prototypes to be created.
-	 *
-	 * @param array $triggerPrototypes
-	 *
-	 * @throws APIException	if validation failed.
-	 */
-	protected function validateCreate(array $triggerPrototypes) {
-		$triggerDbFields = [
-			'description' => null,
-			'expression' => null,
-			'error' => _('Trigger just added. No status update so far.')
-		];
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			if (!check_db_fields($triggerDbFields, $triggerPrototype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));
-			}
-
-			if (array_key_exists('templateid', $triggerPrototype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot set "templateid" for trigger prototype "%1$s".',
-					$triggerPrototype['description']
-				));
-			}
-
-			if (array_key_exists('recovery_expression', $triggerPrototype)
-					&& $triggerPrototype['recovery_expression'] !== ''
-					&& array_key_exists('recovery_mode', $triggerPrototype)
-					&& $triggerPrototype['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
-				);
-			}
-
-			$this->checkExpression($triggerPrototype);
-			$this->checkIfExistsOnHost($triggerPrototype);
-		}
+		return ['triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid')];
 	}
 
 	/**
@@ -502,61 +462,12 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 */
 	public function update(array $triggerPrototypes) {
 		$triggerPrototypes = zbx_toArray($triggerPrototypes);
-		$triggerPrototypeIds = zbx_objectValues($triggerPrototypes, 'triggerid');
+		$db_triggers = [];
 
-		$dbTriggerPrototypes = $this->get([
-			'triggerids' => $triggerPrototypeIds,
-			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-
-		$dbTriggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggerPrototypes);
-
-		$this->validateUpdate($triggerPrototypes, $dbTriggerPrototypes);
-
-		foreach ($triggerPrototypes as &$triggerPrototype) {
-			$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototype['triggerid']];
-
-			if (isset($triggerPrototype['expression'])) {
-				if ($triggerPrototype['expression'] === $dbTriggerPrototype['expression']) {
-					unset($triggerPrototype['expression']);
-				}
-			}
-
-			if (isset($triggerPrototype['description'])
-					&& strcmp($triggerPrototype['description'], $dbTriggerPrototype['comments']) == 0) {
-				unset($triggerPrototype['description']);
-			}
-
-			if (isset($triggerPrototype['priority'])
-					&& $triggerPrototype['priority'] == $dbTriggerPrototype['priority']) {
-				unset($triggerPrototype['priority']);
-			}
-
-			if (isset($triggerPrototype['type']) && $triggerPrototype['type'] == $dbTriggerPrototype['type']) {
-				unset($triggerPrototype['type']);
-			}
-
-			if (isset($triggerPrototype['comments'])
-					&& strcmp($triggerPrototype['comments'], $dbTriggerPrototype['comments']) == 0) {
-				unset($triggerPrototype['comments']);
-			}
-
-			if (isset($triggerPrototype['url']) && strcmp($triggerPrototype['url'], $dbTriggerPrototype['url']) == 0) {
-				unset($triggerPrototype['url']);
-			}
-
-			if (isset($triggerPrototype['status']) && $triggerPrototype['status'] == $dbTriggerPrototype['status']) {
-				unset($triggerPrototype['status']);
-			}
-		}
-		unset($triggerPrototype);
-
-		$triggerPrototypes = $this->updateReal($triggerPrototypes);
+		$this->validateUpdate($triggerPrototypes, $db_triggers);
+		$this->updateReal($triggerPrototypes, $db_triggers);
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
-			$triggerPrototype['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			$this->inherit($triggerPrototype);
 		}
 
@@ -573,7 +484,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			$this->updateDependencies($triggerPrototypes);
 		}
 
-		return ['triggerids' => $triggerPrototypeIds];
+		return ['triggerids' => zbx_objectValues($triggerPrototypes, 'triggerid')];
 	}
 
 	/**
@@ -665,158 +576,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 		DB::delete('triggers', ['triggerid' => $triggerPrototypeIds]);
 
 		return ['triggerids' => $triggerPrototypeIds];
-	}
-
-	/**
-	 * Inserts trigger prototype records into database.
-	 *
-	 * @param array $triggerPrototypes
-	 *
-	 * @throws APIException
-	 *
-	 * @return void
-	 */
-	protected function createReal(array &$triggerPrototypes) {
-		$triggerPrototypes = zbx_toArray($triggerPrototypes);
-
-		foreach ($triggerPrototypes as $key => $triggerPrototype) {
-			$triggerPrototypes[$key]['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-
-		// insert trigger prototypes without expression
-		$triggerPrototypesCopy = $triggerPrototypes;
-		for ($i = 0, $size = count($triggerPrototypesCopy); $i < $size; $i++) {
-			unset($triggerPrototypesCopy[$i]['expression']);
-		}
-
-		$triggerPrototypeIds = DB::insert('triggers', $triggerPrototypesCopy);
-		unset($triggerPrototypesCopy);
-
-		foreach ($triggerPrototypes as $key => $triggerPrototype) {
-			$triggerPrototypeId = $triggerPrototypes[$key]['triggerid'] = $triggerPrototypeIds[$key];
-			$hosts = [];
-
-			try {
-				$expression = implode_exp($triggerPrototype['expression'], $triggerPrototypeId, $hosts);
-
-				DB::update('triggers', [
-					'values' => ['expression' => $expression],
-					'where' => ['triggerid' => $triggerPrototypeId]
-				]);
-
-				info(_s('Created: Trigger prototype "%1$s" on "%2$s".', $triggerPrototype['description'], implode(', ', $hosts)));
-			}
-			catch (Exception $e) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Cannot implode expression "%s".', $triggerPrototype['expression']).' '.$e->getMessage()
-				);
-			}
-		}
-	}
-
-	/**
-	 * Updates trigger prototype records in database.
-	 *
-	 * @param array $triggerPrototypes
-	 *
-	 * @throws APIException
-	 *
-	 * @return array
-	 */
-	protected function updateReal(array $triggerPrototypes) {
-		$triggerPrototypes = zbx_toArray($triggerPrototypes);
-
-		$dbTriggerPrototypes = $this->get([
-			'triggerids' => zbx_objectValues($triggerPrototypes, 'triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['name'],
-			'selectDependencies' => ['triggerid'],
-			'preservekeys' => true,
-			'nopermissions' => true
-		]);
-
-		$dbTriggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggerPrototypes);
-
-		foreach ($triggerPrototypes as &$triggerPrototype) {
-			$descriptionChanged = false;
-			$expressionChanged = false;
-
-			$dbTriggerPrototype = $dbTriggerPrototypes[$triggerPrototype['triggerid']];
-			$hosts = zbx_objectValues($dbTriggerPrototype['hosts'], 'name');
-
-			if (isset($triggerPrototype['description'])
-					&& strcmp($dbTriggerPrototype['description'], $triggerPrototype['description']) != 0) {
-				$descriptionChanged = true;
-			}
-
-			if (isset($triggerPrototype['expression'])
-					&& $dbTriggerPrototype['expression'] !== $triggerPrototype['expression']) {
-				$expressionChanged = true;
-				$expressionFull = $triggerPrototype['expression'];
-			}
-
-			if ($expressionChanged) {
-				$expressionData = new CTriggerExpression();
-				if (!$expressionData->parse($expressionFull)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
-				}
-
-				if (!isset($expressionData->expressions[0])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _(
-						'Trigger expression must contain at least one host:key reference.'
-					));
-				}
-
-				DB::delete('functions', ['triggerid' => $triggerPrototype['triggerid']]);
-
-				try {
-					// Don't change the original expression for inheritance.
-					$expression = implode_exp($expressionFull, $triggerPrototype['triggerid'], $hosts);
-				}
-				catch (Exception $e) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Cannot implode expression "%s".', $expressionFull).' '.$e->getMessage());
-				}
-
-				// if the expression has changed, revalidate the existing dependencies
-				if (!isset($triggerPrototype['dependencies'])) {
-					$triggerPrototype['dependencies'] = $dbTriggerPrototype['dependencies'];
-				}
-			}
-
-			$triggerPrototypeUpdate = $triggerPrototype;
-
-			if (!$descriptionChanged) {
-				unset($triggerPrototypeUpdate['description']);
-			}
-
-			if ($expressionChanged) {
-				$triggerPrototypeUpdate['expression'] = $expression;
-			}
-			else {
-				unset($triggerPrototypeUpdate['expression']);
-			}
-
-			// skip updating read only values
-			unset(
-				$triggerPrototypeUpdate['state'],
-				$triggerPrototypeUpdate['value'],
-				$triggerPrototypeUpdate['lastchange'],
-				$triggerPrototypeUpdate['error']
-			);
-
-			DB::update('triggers', [
-				'values' => $triggerPrototypeUpdate,
-				'where' => ['triggerid' => $triggerPrototype['triggerid']]
-			]);
-
-			$description = isset($triggerPrototype['description']) ? $triggerPrototype['description'] : $dbTriggerPrototype['description'];
-
-			info(_s('Updated: Trigger prototype "%1$s" on "%2$s".', $description, implode(', ', $hosts)));
-		}
-		unset($triggerPrototype);
-
-		return $triggerPrototypes;
 	}
 
 	/**
@@ -1348,12 +1107,17 @@ class CTriggerPrototype extends CTriggerGeneral {
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
 		$triggerPrototypes = $this->get([
-			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+			'output' => [
+				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
+				'priority', 'comments', 'type'
+			],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
 
-		$triggerPrototypes = CMacrosResolverHelper::resolveTriggerExpressions($triggerPrototypes);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggerPrototypes,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 
 		foreach ($triggerPrototypes as $triggerPrototype) {
 			$this->inherit($triggerPrototype, $data['hostids']);
@@ -1438,145 +1202,4 @@ class CTriggerPrototype extends CTriggerGeneral {
 		return $result;
 	}
 
-	/**
-	 * Validates trigger prototype update data.
-	 *
-	 * @param array		$triggerPrototypes
-	 * @param array		$dbTriggerPrototypes
-	 *
-	 * @throws APIException
-	 *
-	 * @return void
-	 */
-	protected function validateUpdate(array $triggerPrototypes, array $dbTriggerPrototypes) {
-		$triggerPrototypes = $this->extendObjects($this->tableName(), $triggerPrototypes, ['description']);
-
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			if (!isset($triggerPrototype['triggerid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for trigger.'));
-			}
-
-			if (!isset($dbTriggerPrototypes[$triggerPrototype['triggerid']])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-
-			if (array_key_exists('templateid', $triggerPrototype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot set "templateid" for trigger prototype "%1$s".',
-					$triggerPrototype['description']
-				));
-			}
-
-			if (isset($triggerPrototype['expression'])) {
-				$this->checkExpression($triggerPrototype);
-			}
-			$this->checkIfExistsOnHost($triggerPrototype);
-		}
-	}
-
-	/**
-	 * Check if trigger prototype has a correct trigger expression and has at least one item prototype and belongs to
-	 * one discovery rule, does not belong to a host and a template simultaneously and has permissions to all hosts and
-	 * templates in the expression.
-	 *
-	 * @param array  $triggerPrototype
-	 * @param string $triggerPrototype['description']
-	 * @param string $triggerPrototype['expression']
-	 *
-	 * @throws APIException
-	 *
-	 * @return void
-	 */
-	protected function checkExpression(array $triggerPrototype) {
-		$triggerExpression = new CTriggerExpression();
-		if (!$triggerExpression->parse($triggerPrototype['expression'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $triggerExpression->error);
-		}
-
-		$lld_rules = [];
-
-		if ($triggerExpression->expressions) {
-			$expressions = [];
-			$hosts = [];
-			$has_host = false;
-			$has_template = false;
-
-			foreach ($triggerExpression->expressions as $expression) {
-				if (!array_key_exists($expression['host'], $expressions)) {
-					$expressions[$expression['host']] = ['hostid' => null, 'items' => []];
-				}
-
-				$expressions[$expression['host']]['items'][$expression['item']] = true;
-				$hosts[$expression['host']] = true;
-			}
-
-			$db_hosts = API::Host()->get([
-				'output' => ['hostid', 'host'],
-				'filter' => [
-					'host' => array_keys($hosts)
-				]
-			]);
-
-			foreach ($db_hosts as $db_host) {
-				$expressions[$db_host['host']]['hostid'] = $db_host['hostid'];
-				$has_host = true;
-				unset($hosts[$db_host['host']]);
-			}
-
-			if ($hosts) {
-				$db_templates = API::Template()->get([
-					'output' => ['templateid', 'host'],
-					'filter' => [
-						'host' => array_keys($hosts)
-					]
-				]);
-
-				foreach ($db_templates as $db_template) {
-					$expressions[$db_template['host']]['hostid'] = $db_template['templateid'];
-					$has_template = true;
-				}
-			}
-
-			if ($has_host && $has_template) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect trigger prototype expression.'.
-					' Trigger prototype expression elements should not belong to a template and a host simultaneously.'
-				));
-			}
-
-			foreach ($expressions as $host => $expression) {
-				if ($expression['hostid'] === null) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect trigger prototype expression.'.
-						' Host "%1$s" does not exist or you have no access to this host.',
-						$host
-					));
-				}
-
-				$db_item_prototypes = API::ItemPrototype()->get([
-					'output' => [],
-					'selectDiscoveryRule' => ['itemid'],
-					'hostids' => [$expression['hostid']],
-					'filter' => [
-						'key_' => array_keys($expression['items'])
-					],
-					'nopermissions' => true
-				]);
-
-				foreach ($db_item_prototypes as $db_item_prototype) {
-					$lld_rules[$db_item_prototype['discoveryRule']['itemid']] = true;
-				}
-			}
-
-			if (count($lld_rules) > 1) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
-					$triggerPrototype['description']
-				));
-			}
-		}
-
-		if (!$lld_rules) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Trigger prototype "%1$s" must contain at least one item prototype.', $triggerPrototype['description']
-			));
-		}
-	}
 }
