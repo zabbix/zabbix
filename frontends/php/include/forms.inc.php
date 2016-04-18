@@ -1391,7 +1391,7 @@ function getTriggerMassupdateFormData() {
  * @param array $data											Trigger data array.
  * @param string $data['form']									Form action.
  * @param string $data['form_refresh']							Form refresh.
- * @param string $data['parent_discoveryid']					Parent discovery.
+ * @param null|string $data['parent_discoveryid']					Parent discovery.
  * @param array $data['dependencies']							Trigger dependencies.
  * @param array $data['db_dependencies']						DB trigger dependencies.
  * @param string $data['triggerid']								Trigger ID.
