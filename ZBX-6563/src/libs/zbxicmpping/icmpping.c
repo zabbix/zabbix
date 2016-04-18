@@ -330,7 +330,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				if (1 == host->status[index])
 				{
-					sec = atof(c);
+					sec = atof(c) / 1000; /* convert ms to seconds */
 
 					if (0 == host->rcv || host->min > sec)
 						host->min = sec;
