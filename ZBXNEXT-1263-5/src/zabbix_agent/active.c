@@ -581,6 +581,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 #endif
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
+			ret = FAIL;
 			goto out;
 	}
 
@@ -762,6 +763,7 @@ static int	send_buffer(const char *host, unsigned short port)
 #endif
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
+			ret = FAIL;
 			goto out;
 	}
 
