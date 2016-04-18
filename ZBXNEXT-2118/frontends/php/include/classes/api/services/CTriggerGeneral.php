@@ -101,6 +101,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @return array|mixed  the updated child trigger
 	 */
 	protected function inheritOnHost(array $trigger, array $host) {
+		$class = get_class($this);
+
 		$triggerid = $trigger['triggerid'];
 		$trigger['templateid'] = $trigger['triggerid'];
 		unset($trigger['triggerid']);
@@ -142,18 +144,22 @@ abstract class CTriggerGeneral extends CApiService {
 			while ($exprPart = prev($expressionData->expressions));
 		}
 
-		// check if a child trigger already exists on the host
-		$_db_triggers = $this->get([
+		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
 				'status', 'priority', 'comments', 'type', 'templateid'
 			],
-			'filter' => [
-				'templateid' => $trigger['templateid']
-			],
 			'hostids' => $host['hostid'],
 			'nopermissions' => true
-		]);
+		];
 
+		if ($class === 'CTriggerPrototype') {
+			$options['selectDiscoveryRule'] = ['itemid'];
+		}
+
+		$options['filter'] = ['templateid' => $trigger['templateid']];
+
+		// check if a child trigger already exists on the host
+		$_db_triggers = $this->get($options);
 		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
@@ -167,18 +173,10 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		// no child trigger found
 		else {
-			// look for a trigger with the same description and expression
-			$_db_triggers = $this->get([
-				'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
-					'status', 'priority', 'comments', 'type', 'templateid'
-				],
-				'filter' => [
-					'description' => $trigger['description']
-				],
-				'hostids' => $host['hostid'],
-				'nopermissions' => true
-			]);
+			$options['filter'] = ['description' => $trigger['description']];
 
+			// look for a trigger with the same description and expression
+			$_db_triggers = $this->get($options);
 			$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
 				['sources' => ['expression', 'recovery_expression']]
 			);
@@ -538,21 +536,25 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 		}
 
-		$output = ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-			'priority', 'comments', 'type', 'templateid'
-		];
-
-		if ($class === 'CTrigger') {
-			$output[] = 'flags';
-		}
-
-		$_db_triggers = $this->get([
-			'output' => $output,
+		$options = [
+			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
+				'status', 'priority', 'comments', 'type', 'templateid'
+			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'editable' => true,
 			'preservekeys' => true
-		]);
+		];
+
+		if ($class === 'CTrigger') {
+			$options['output'][] = 'flags';
+		}
+
+		if ($class === 'CTriggerPrototype') {
+			$options['selectDiscoveryRule'] = ['itemid'];
+		}
+
+		$_db_triggers = $this->get($options);
 
 		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
 			['sources' => ['expression', 'recovery_expression']]
@@ -710,30 +712,32 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * Update trigger or trigger prototypes records in the database.
 	 *
-	 * @param array  $triggers                                   [IN] list of triggers to be updated
-	 * @param array  $triggers[<tnum>]['triggerid']              [IN]
-	 * @param array  $triggers[<tnum>]['description']            [IN]
-	 * @param string $triggers[<tnum>]['expression']             [IN]
-	 * @param int    $triggers[<tnum>]['recovery_mode']          [IN]
-	 * @param string $triggers[<tnum>]['recovery_expression']    [IN]
-	 * @param string $triggers[<tnum>]['url']                    [IN] (optional)
-	 * @param int    $triggers[<tnum>]['status']                 [IN] (optional)
-	 * @param int    $triggers[<tnum>]['priority']               [IN] (optional)
-	 * @param string $triggers[<tnum>]['comments']               [IN] (optional)
-	 * @param int    $triggers[<tnum>]['type']                   [IN] (optional)
-	 * @param string $triggers[<tnum>]['templateid']             [IN] (optional)
-	 * @param array  $db_triggers                                [IN]
-	 * @param array  $db_triggers[<tnum>]['triggerid']           [IN]
-	 * @param array  $db_triggers[<tnum>]['description']         [IN]
-	 * @param string $db_triggers[<tnum>]['expression']          [IN]
-	 * @param int    $db_triggers[<tnum>]['recovery_mode']       [IN]
-	 * @param string $db_triggers[<tnum>]['recovery_expression'] [IN]
-	 * @param string $db_triggers[<tnum>]['url']                 [IN]
-	 * @param int    $db_triggers[<tnum>]['status']              [IN]
-	 * @param int    $db_triggers[<tnum>]['priority']            [IN]
-	 * @param string $db_triggers[<tnum>]['comments']            [IN]
-	 * @param int    $db_triggers[<tnum>]['type']                [IN]
-	 * @param string $db_triggers[<tnum>]['templateid']          [IN]
+	 * @param array  $triggers                                       [IN] list of triggers to be updated
+	 * @param array  $triggers[<tnum>]['triggerid']                  [IN]
+	 * @param array  $triggers[<tnum>]['description']                [IN]
+	 * @param string $triggers[<tnum>]['expression']                 [IN]
+	 * @param int    $triggers[<tnum>]['recovery_mode']              [IN]
+	 * @param string $triggers[<tnum>]['recovery_expression']        [IN]
+	 * @param string $triggers[<tnum>]['url']                        [IN] (optional)
+	 * @param int    $triggers[<tnum>]['status']                     [IN] (optional)
+	 * @param int    $triggers[<tnum>]['priority']                   [IN] (optional)
+	 * @param string $triggers[<tnum>]['comments']                   [IN] (optional)
+	 * @param int    $triggers[<tnum>]['type']                       [IN] (optional)
+	 * @param string $triggers[<tnum>]['templateid']                 [IN] (optional)
+	 * @param array  $db_triggers                                    [IN]
+	 * @param array  $db_triggers[<tnum>]['triggerid']               [IN]
+	 * @param array  $db_triggers[<tnum>]['description']             [IN]
+	 * @param string $db_triggers[<tnum>]['expression']              [IN]
+	 * @param int    $db_triggers[<tnum>]['recovery_mode']           [IN]
+	 * @param string $db_triggers[<tnum>]['recovery_expression']     [IN]
+	 * @param string $db_triggers[<tnum>]['url']                     [IN]
+	 * @param int    $db_triggers[<tnum>]['status']                  [IN]
+	 * @param int    $db_triggers[<tnum>]['priority']                [IN]
+	 * @param string $db_triggers[<tnum>]['comments']                [IN]
+	 * @param int    $db_triggers[<tnum>]['type']                    [IN]
+	 * @param string $db_triggers[<tnum>]['templateid']              [IN]
+	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prorotypes only.
+	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
 	 *
 	 * @throws APIException
 	 */
@@ -1151,6 +1155,8 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			if ($class === 'CTriggerPrototype') {
+				$lld_ruleids = array_keys($lld_ruleids);
+
 				if (!$lld_ruleids) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Trigger prototype "%1$s" must contain at least one item prototype.', $trigger['description']
@@ -1160,6 +1166,12 @@ abstract class CTriggerGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 						'Trigger prototype "%1$s" contains item prototypes from multiple discovery rules.',
 						$trigger['description']
+					));
+				}
+				elseif ($db_triggers !== null
+						&& !idcmp($lld_ruleids[0], $db_triggers[$tnum]['discoveryRule']['itemid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update trigger prototype "%1$s": %2$s.',
+						$trigger['description'], _('trigger prototype cannot be moved to another template or host')
 					));
 				}
 			}
