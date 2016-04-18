@@ -1388,35 +1388,35 @@ function getTriggerMassupdateFormData() {
 /**
  * Generate data for the trigger configuration form.
  *
- * @param string $exprAction	expression constructor action, see remakeExpression() for a list of supported values
+ * @param array $data											Trigger data array.
+ * @param string $data['form']									Form action.
+ * @param string $data['form_refresh']							Form refresh.
+ * @param string $data['parent_discoveryid']					Parent discovery.
+ * @param array $data['dependencies']							Trigger dependencies.
+ * @param array $data['db_dependencies']						DB trigger dependencies.
+ * @param string $data['triggerid']								Trigger ID.
+ * @param string $data['expression']							Trigger expression.
+ * @param string $data['recovery_expression']					Trigger recovery expression.
+ * @param string $data['expr_temp']								Trigger temporary expression.
+ * @param string $data['recovery_expr_temp']					Trigger temporary recovery expression.
+ * @param string $data['recovery_mode']							Trigger recovery mode.
+ * @param string $data['description']							Trigger description.
+ * @param int $data['type']										Trigger problem event generation mode.
+ * @param string $data['priority']								Trigger severity.
+ * @param int $data['status']									Trigger status.
+ * @param string $data['comments']								Trigger description.
+ * @param string $data['url']									Trigger URL.
+ * @param string $data['expression_constructor']				Trigger expression constructor mode.
+ * @param string $data['recovery_expression_constructor']		Trigger recovery expression constructor mode.
+ * @param bool $data['limited']									Templated trigger.
+ * @param array $data['templates']								Trigger templates.
+ * @param string $data['hostid']								Host ID.
+ * @param string $data['expression_action']						Trigger expression action.
+ * @param string $data['recovery_expression_action']			Trigger recovery expression action.
  *
  * @return array
  */
-function getTriggerFormData($exprAction) {
-	$data = [
-		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
-		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'dependencies' => getRequest('dependencies', []),
-		'db_dependencies' => [],
-		'triggerid' => getRequest('triggerid'),
-		'expression' => getRequest('expression', ''),
-		'recovery_expression' => getRequest('recovery_expression', ''),
-		'expr_temp' => getRequest('expr_temp', ''),
-		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
-		'recovery_mode' => getRequest('recovery_mode', 0),
-		'description' => getRequest('description', ''),
-		'type' => getRequest('type', 0),
-		'priority' => getRequest('priority', 0),
-		'status' => getRequest('status', 0),
-		'comments' => getRequest('comments', ''),
-		'url' => getRequest('url', ''),
-		'input_method' => getRequest('input_method', IM_ESTABLISHED),
-		'limited' => false,
-		'templates' => [],
-		'hostid' => getRequest('hostid', 0)
-	];
-
+function getTriggerFormData(array $data) {
 	if (!empty($data['triggerid'])) {
 		// get trigger
 		$options = [
@@ -1498,48 +1498,83 @@ function getTriggerFormData($exprAction) {
 		}
 	}
 
-	if ($data['input_method'] == IM_TREE) {
+	// Trigger expression constructor.
+	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression']);
 		if ($analyze !== false) {
-			list($data['outline'], $data['eHTMLTree']) = $analyze;
-			if ($exprAction !== null && $data['eHTMLTree'] != null) {
+			list($data['outline'], $data['expression_tree']) = $analyze;
+			if ($data['expression_action'] !== '' && $data['expression_tree'] != null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
-					$exprAction, $data['expr_temp']
+					$data['expression_action'], $data['expr_temp']
 				);
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
 					$analyze = analyzeExpression($data['expression']);
 					if ($analyze !== false) {
-						list($data['outline'], $data['eHTMLTree']) = $analyze;
+						list($data['outline'], $data['expression_tree']) = $analyze;
 					}
 					else {
-						show_messages(false, '', _('Expression Syntax Error.'));
+						show_messages(false, '', _('Expression syntax error.'));
 					}
 					$data['expr_temp'] = '';
 				}
 				else {
-					show_messages(false, '', _('Expression Syntax Error.'));
+					show_messages(false, '', _('Expression syntax error.'));
 				}
 			}
 			$data['expression_field_name'] = 'expr_temp';
 			$data['expression_field_value'] = $data['expr_temp'];
 			$data['expression_field_readonly'] = true;
-
-			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
-			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
 		}
 		else {
-			show_messages(false, '', _('Expression Syntax Error.'));
-			$data['input_method'] = IM_ESTABLISHED;
+			show_messages(false, '', _('Expression syntax error.'));
+			$data['expression_constructor'] = IM_ESTABLISHED;
 		}
 	}
-	if ($data['input_method'] != IM_TREE) {
+	elseif ($data['expression_constructor'] != IM_TREE) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
 		$data['expression_field_readonly'] = $data['limited'];
+	}
 
+	// Trigger recovery expression constructor.
+	if ($data['recovery_expression_constructor'] == IM_TREE) {
+		$analyze = analyzeExpression($data['recovery_expression']);
+		if ($analyze !== false) {
+			list($data['outline'], $data['recovery_expression_tree']) = $analyze;
+			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] != null) {
+				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
+					$data['recovery_expression_action'], $data['recovery_expr_temp']
+				);
+
+				if ($new_expr !== false) {
+					$data['recovery_expression'] = $new_expr;
+					$analyze = analyzeExpression($data['recovery_expression']);
+					if ($analyze !== false) {
+						list($data['outline'], $data['recovery_expression_tree']) = $analyze;
+					}
+					else {
+						show_messages(false, '', _('Recovery expression syntax error.'));
+					}
+					$data['recovery_expr_temp'] = '';
+				}
+				else {
+					show_messages(false, '', _('Recovery expression syntax error.'));
+				}
+			}
+			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
+			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
+			$data['recovery_expression_field_readonly'] = true;
+		}
+		else {
+			show_messages(false, '', _('Recovery expression syntax error.'));
+			$data['recovery_expression_constructor'] = IM_ESTABLISHED;
+		}
+	}
+	elseif ($data['recovery_expression_constructor'] != IM_TREE) {
 		$data['recovery_expression_field_name'] = 'recovery_expression';
 		$data['recovery_expression_field_value'] = $data['recovery_expression'];
+		$data['recovery_expression_field_readonly'] = $data['limited'];
 	}
 
 	if ($data['dependencies']) {

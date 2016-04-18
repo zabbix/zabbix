@@ -32,8 +32,10 @@ $triggersForm = (new CForm())
 	->setName('triggersForm')
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
-	->addVar('input_method', $data['input_method'])
-	->addVar('toggle_input_method', '')
+	->addVar('expression_constructor', $data['expression_constructor'])
+	->addVar('recovery_expression_constructor', $data['recovery_expression_constructor'])
+	->addVar('toggle_expression_constructor', '')
+	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '');
 
 if ($data['triggerid'] !== null) {
@@ -54,16 +56,19 @@ $triggersFormList->addRow(_('Name'),
 // append expression to form list
 if ($data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $data['expression']);
+}
+
+if ($data['recovery_expression_field_readonly']) {
 	$triggersForm->addVar('recovery_expression', $data['recovery_expression']);
 }
 
-$add_expression_button = (new CButton('insert', ($data['input_method'] == IM_TREE) ? _('Edit') : _('Add')))
+$add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 			'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
 			'&srcfld1='.$data['expression_field_name'].
-			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
+			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
 	);
 if ($data['limited']) {
 	$add_expression_button->setAttribute('disabled', 'disabled');
@@ -80,28 +85,7 @@ $expression_row = [
 	$add_expression_button
 ];
 
-$add_expression_button = (new CButton('insert', ($data['input_method'] == IM_TREE) ? _('Edit') : _('Add')))
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->onClick(
-		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-			'&dstfld1='.$data['recovery_expression_field_name'].
-			'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
-			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
-	);
-
-$recovery_expression_row = [
-	(new CTextArea(
-		$data['recovery_expression_field_name'],
-		$data['recovery_expression_field_value'],
-		[
-			'readonly' => $data['expression_field_readonly']
-		]
-	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	$add_expression_button
-];
-
-if ($data['input_method'] == IM_TREE) {
+if ($data['expression_constructor'] == IM_TREE) {
 	// insert macro button
 	$insertMacroButton = (new CButton('insert_macro', _('Insert expression')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -146,19 +130,21 @@ if ($data['input_method'] == IM_TREE) {
 		$expression_row[] = $replaceExpressionButton;
 	}
 }
-elseif ($data['input_method'] != IM_FORCED) {
-	$inputMethodToggle = (new CButton(null, _('Expression constructor')))
+elseif ($data['expression_constructor'] != IM_FORCED) {
+	$input_method_toggle = (new CButton(null, _('Expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
-			'document.getElementById("toggle_input_method").value=1;'.
-			'document.getElementById("input_method").value='.(($data['input_method'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+			'document.getElementById("toggle_expression_constructor").value=1;'.
+			'document.getElementById("expression_constructor").value='.
+				(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
 			'document.forms["'.$triggersForm->getName().'"].submit();');
-	$expression_row[] = [BR(), $inputMethodToggle];
+	$expression_row[] = [BR(), $input_method_toggle];
 }
+
 $triggersFormList->addRow(_('Expression'), $expression_row);
 
-// append expression table to form list
-if ($data['input_method'] == IM_TREE) {
+// Append expression table to form list.
+if ($data['expression_constructor'] == IM_TREE) {
 	$expressionTable = (new CTable())
 		->setAttribute('style', 'width: 100%;')
 		->setId('exp_list')
@@ -169,14 +155,14 @@ if ($data['input_method'] == IM_TREE) {
 			_('Info')
 		]);
 
-	$allowedTesting = true;
-	if (!empty($data['eHTMLTree'])) {
-		foreach ($data['eHTMLTree'] as $i => $e) {
+	$allowed_testing = true;
+	if (!empty($data['expression_tree'])) {
+		foreach ($data['expression_tree'] as $i => $e) {
 			if (!isset($e['expression']['levelErrors'])) {
 				$errorImg = '';
 			}
 			else {
-				$allowedTesting = false;
+				$allowed_testing = false;
 				$errors = [];
 
 				if (is_array($e['expression']['levelErrors'])) {
@@ -230,15 +216,15 @@ if ($data['input_method'] == IM_TREE) {
 		}
 	}
 	else {
-		$allowedTesting = false;
+		$allowed_testing = false;
 		$data['outline'] = '';
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('openWinCentered("tr_testexpr.php?expression=" + encodeURIComponent(this.form.elements["expression"].value),'.
+		->onClick('openWinCentered("tr_testexpr.php?expression="+encodeURIComponent(this.form.elements["expression"].value),'.
 		'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
 		->addClass(ZBX_STYLE_BTN_LINK);
-	if (!$allowedTesting) {
+	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 	if (empty($data['outline'])) {
@@ -255,13 +241,13 @@ if ($data['input_method'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
-	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
+	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
-			'document.getElementById("toggle_input_method").value=1;'.
-			'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
+			'document.getElementById("toggle_expression_constructor").value=1;'.
+			'document.getElementById("expression_constructor").value='.IM_ESTABLISHED.';'.
 			'document.forms["'.$triggersForm->getName().'"].submit();');
-	$triggersFormList->addRow(null, [$inputMethodToggle, BR()]);
+	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
 
 $triggersFormList
@@ -271,9 +257,194 @@ $triggersFormList
 			->addValue(_('Recovery expression'), TRIGGER_REC_MODE_REC_EXPRESSION)
 			->addValue(_('None'), TRIGGER_REC_MODE_NONE)
 			->setModern(true)
+	);
+
+$add_recovery_expression_button = (new CButton('insert',
+		($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add'))
 	)
-	->addRow(_('Recovery expression'), $recovery_expression_row)
-	->addRow(_('Multiple events generation mode'),
+	->addClass(ZBX_STYLE_BTN_GREY)
+	->onClick(
+		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
+			'&dstfld1='.$data['recovery_expression_field_name'].
+			'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
+			'&recovery_expression="'.
+				'+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
+	);
+
+$recovery_expression_row = [
+	(new CTextArea(
+		$data['recovery_expression_field_name'],
+		$data['recovery_expression_field_value'],
+		[
+			'readonly' => $data['recovery_expression_field_readonly']
+		]
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$add_recovery_expression_button
+];
+
+if ($data['recovery_expression_constructor'] == IM_TREE) {
+	array_push($recovery_expression_row, BR());
+	if (empty($data['outline'])) {
+		// add button
+		$add_recovery_expression_button = (new CSubmit('add_recovery_expression', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY);
+		if ($data['limited']) {
+			$add_recovery_expression_button->setAttribute('disabled', 'disabled');
+		}
+		$recovery_expression_row[] = $add_recovery_expression_button;
+	}
+	else {
+		// add button
+		$add_recovery_expression_button = (new CSubmit('and_recovery_expression', _('And')))
+			->addClass(ZBX_STYLE_BTN_GREY);
+		if ($data['limited']) {
+			$add_recovery_expression_button->setAttribute('disabled', 'disabled');
+		}
+		$recovery_expression_row[] = $add_recovery_expression_button;
+
+		// or button
+		$or_recovery_expression_button = (new CSubmit('or_recovery_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
+		if ($data['limited']) {
+			$or_recovery_expression_button->setAttribute('disabled', 'disabled');
+		}
+		$recovery_expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$recovery_expression_row[] = $or_recovery_expression_button;
+
+		// replace button
+		$replace_recovery_expression_button = (new CSubmit('replace_recovery_expression', _('Replace')))
+			->addClass(ZBX_STYLE_BTN_GREY);
+		if ($data['limited']) {
+			$replace_recovery_expression_button->setAttribute('disabled', 'disabled');
+		}
+		$recovery_expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$recovery_expression_row[] = $replace_recovery_expression_button;
+	}
+}
+elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
+	$input_method_toggle = (new CButton(null, _('Expression constructor')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->onClick('javascript: '.
+			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
+			'document.getElementById("recovery_expression_constructor").value='.
+				(($data['recovery_expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$recovery_expression_row[] = [BR(), $input_method_toggle];
+}
+
+$triggersFormList->addRow(_('Recovery expression'), $recovery_expression_row);
+
+// Append expression table to form list.
+if ($data['recovery_expression_constructor'] == IM_TREE) {
+	$recovery_expression_table = (new CTable())
+		->setAttribute('style', 'width: 100%;')
+		->setId('exp_list')
+		->setHeader([
+			$data['limited'] ? null : _('Target'),
+			_('Expression'),
+			$data['limited'] ? null : _('Action'),
+			_('Info')
+		]);
+
+	$allowed_testing = true;
+
+	if (!empty($data['recovery_expression_tree'])) {
+		foreach ($data['recovery_expression_tree'] as $i => $e) {
+			if (!isset($e['recovery_expression']['levelErrors'])) {
+				$errorImg = '';
+			}
+			else {
+				$allowed_testing = false;
+				$errors = [];
+
+				if (is_array($e['recovery_expression']['levelErrors'])) {
+					foreach ($e['recovery_expression']['levelErrors'] as $expVal => $errTxt) {
+						if ($errors) {
+							$errors[] = BR();
+						}
+						$errors[] = $expVal.':'.$errTxt;
+					}
+				}
+
+				$errorImg = makeErrorIcon($errors);
+			}
+
+			// templated trigger
+			if ($data['limited']) {
+				// make all links inside inactive
+				foreach ($e['list'] as &$obj) {
+					if (gettype($obj) == 'object' && get_class($obj) == 'CSpan'
+							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+						$obj->removeAttribute('class');
+						$obj->onClick(null);
+					}
+				}
+				unset($obj);
+			}
+
+			$recovery_expression_table->addRow(
+				new CRow([
+					!$data['limited']
+						? (new CCheckBox('recovery_expr_target_single', $e['id']))
+							->setChecked($i == 0)
+							->onClick('check_target(this);')
+						: null,
+					$e['list'],
+					!$data['limited']
+						? (new CCol(
+							(new CButton(null, _('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->onClick('javascript:'.
+									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+										' delete_expression("'.$e['id'] .'");'.
+										' document.forms["'.$triggersForm->getName().'"].submit();'.
+									' }'
+								)
+						))->addClass(ZBX_STYLE_NOWRAP)
+						: null,
+					$errorImg
+				])
+			);
+		}
+	}
+	else {
+		$allowed_testing = false;
+		$data['outline'] = '';
+	}
+
+	$testButton = (new CButton('test_expression', _('Test')))
+		->onClick('openWinCentered("tr_testexpr.php?expression="'.
+			'+encodeURIComponent(this.form.elements["recovery_expression"].value),'.
+		'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
+		->addClass(ZBX_STYLE_BTN_LINK);
+	if (!$allowed_testing) {
+		$testButton->setAttribute('disabled', 'disabled');
+	}
+	if (empty($data['outline'])) {
+		$testButton->setAttribute('disabled', 'disabled');
+	}
+
+	$wrapOutline = new CSpan([$data['outline']]);
+	$triggersFormList->addRow(null, [
+		$wrapOutline,
+		BR(),
+		BR(),
+		(new CDiv([$recovery_expression_table, $testButton]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	]);
+
+	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->onClick('javascript: '.
+			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
+			'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
+			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
+}
+
+$triggersFormList
+	->addRow(_('PROBLEM event generation mode'),
 		(new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
