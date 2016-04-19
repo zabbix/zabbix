@@ -272,6 +272,10 @@ $add_recovery_expression_button = (new CButton('insert',
 				'+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
 	);
 
+if ($data['limited']) {
+	$add_recovery_expression_button->setAttribute('disabled', 'disabled');
+}
+
 $recovery_expression_row = [
 	(new CTextArea(
 		$data['recovery_expression_field_name'],
