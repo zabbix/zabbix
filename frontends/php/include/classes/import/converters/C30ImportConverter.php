@@ -125,11 +125,30 @@ class C30ImportConverter extends CConverter {
 	 */
 	protected function convertMaps(array $maps) {
 		foreach ($maps as &$map) {
-			$map['links'] = convertMapLinks($map['links']);
+			$map['selements'] = $this->convertMapElements($map['selements']);
+			$map['links'] = $this->convertMapLinks($map['links']);
 		}
-		unset($maps);
+		unset($map);
 
 		return $maps;
+	}
+
+	/**
+	 * Convert map elements.
+	 *
+	 * @param array $selements
+	 *
+	 * @return array
+	 */
+	protected function convertMapElements(array $selements) {
+		foreach ($selements as &$selement) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
+				$selement['element']['recovery_expression'] = '';
+			}
+		}
+		unset($selement);
+
+		return $selements;
 	}
 
 	/**
@@ -141,9 +160,9 @@ class C30ImportConverter extends CConverter {
 	 */
 	protected function convertMapLinks(array $links) {
 		foreach ($links as &$link) {
-			$link['linktriggers'] = convertMapLinkTriggers($link['linktriggers']);
+			$link['linktriggers'] = $this->convertMapLinkTriggers($link['linktriggers']);
 		}
-		unset($links);
+		unset($link);
 
 		return $links;
 	}
@@ -159,7 +178,7 @@ class C30ImportConverter extends CConverter {
 		foreach ($linktriggers as &$linktrigger) {
 			$linktrigger['trigger']['recovery_expression'] = '';
 		}
-		unset($linktriggers);
+		unset($linktrigger);
 
 		return $linktriggers;
 	}
