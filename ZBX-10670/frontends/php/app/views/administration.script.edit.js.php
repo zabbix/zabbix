@@ -8,9 +8,13 @@
 				jQuery('#execute_on, #command').closest('li').hide();
 
 				jQuery('#commandipmi')
-					.val(jQuery('#command').val())
 					.closest('li')
 					.show();
+
+				if (jQuery('#command').val() != '') {
+					jQuery('#commandipmi').val(jQuery('#command').val());
+					jQuery('#command').val('');
+				}
 			}
 			else {
 				jQuery('#execute_on')
@@ -18,13 +22,17 @@
 					.show();
 
 				jQuery('#command')
-					.val(jQuery('#commandipmi').val())
 					.closest('li')
 					.show();
 
+				if (jQuery('#commandipmi').val() != '') {
+					jQuery('#command').val(jQuery('#commandipmi').val());
+					jQuery('#commandipmi').val('');
+				}
 				jQuery('#commandipmi').closest('li').hide();
 			}
-		});
+		})
+			.trigger('change');
 
 		// clone button
 		jQuery('#clone').click(function() {
