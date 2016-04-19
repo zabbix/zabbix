@@ -22,7 +22,7 @@
 
 static int	macrofunc_regsub(zbx_function_t *func, char **out)
 {
-	char	*value;
+	char	*value = NULL;
 
 	if (2 != func->nparam)
 		return FAIL;
@@ -41,7 +41,7 @@ static int	macrofunc_regsub(zbx_function_t *func, char **out)
 
 static int	macrofunc_iregsub(zbx_function_t *func, char **out)
 {
-	char	*value;
+	char	*value = NULL;
 
 	if (2 != func->nparam)
 		return FAIL;
