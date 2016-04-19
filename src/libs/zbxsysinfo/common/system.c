@@ -47,7 +47,7 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(type, "local"))
 	{
-		get_time(&tm, &milliseconds, &tz_offset);
+		zbx_get_time(&tm, &milliseconds, &tz_offset);
 
 		offset = zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03ld,",
 				1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
