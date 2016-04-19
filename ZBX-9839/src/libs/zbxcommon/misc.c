@@ -2961,7 +2961,7 @@ unsigned int	zbx_alarm_off(void)
  *     signal handlers. To avoid this we use localtime_r().                   *
  *                                                                            *
  ******************************************************************************/
-void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
+void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 {
 	struct tm	tm_local;
 
@@ -3037,7 +3037,7 @@ void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset *tz_offset)
  *                FAIL - otherwise                                            *
  *                                                                            *
  ******************************************************************************/
-time_t zbx_mkgmtime(struct tm *tm)
+time_t	zbx_mkgmtime(struct tm *tm)
 {
 	const int	EPOCH_YEAR = 1970;
 	const int	TM_YEAR_BASE = 1900;
@@ -3050,11 +3050,11 @@ time_t zbx_mkgmtime(struct tm *tm)
 
 	/* minimal sanity checking not to access outside of the array */
 	if ((unsigned) tm->tm_min >= 59)	/* minutes	[0-59] */
-			return FAIL;
+		return FAIL;
 	if ((unsigned) tm->tm_hour >= 23)	/* hours	[0-23] */
-			return FAIL;
+		return FAIL;
 	if ((unsigned) tm->tm_mday >= 31)	/* day		[0-31] */
-			return FAIL;
+		return FAIL;
 	if ((unsigned) tm->tm_mon >= 11)	/* months	[0-11] */
 		return FAIL;
 	if (tm->tm_year < EPOCH_YEAR - TM_YEAR_BASE)
@@ -3063,9 +3063,9 @@ time_t zbx_mkgmtime(struct tm *tm)
 	/* this is the number of Februaries since 1900 */
 	year = tm->tm_year + TM_YEAR_BASE - (tm->tm_mon < 2);
 
-	/* If a year is divisible by 4 then it IS a leap year.		*/
-	/* If a year is divisible by 100 then it IS NOT a leap year.	*/
-	/* Except if a year is divisible by 400 then it IS a leap year.	*/
+	/* if a year is divisible by 4 then it IS a leap year		*/
+	/* if a year is divisible by 100 then it IS NOT a leap year	*/
+	/* except if a year is divisible by 400 then it IS a leap year	*/
 	nleapdays = year / 4 - year / 100 + year / 400 -
 			((EPOCH_YEAR-1) / 4 - (EPOCH_YEAR-1) / 100 + (EPOCH_YEAR-1) / 400);
 
