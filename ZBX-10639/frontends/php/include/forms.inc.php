@@ -576,7 +576,7 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Key like'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn2->addRow(_('Port like'),
+	$filterColumn2->addRow(_('Port'),
 		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		'filter_port_row'
 	);
