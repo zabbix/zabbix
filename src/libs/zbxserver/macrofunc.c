@@ -20,6 +20,19 @@
 #include "common.h"
 #include "zbxregexp.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Function: macrofunc_regsub                                                 *
+ *                                                                            *
+ * Purpose: calculates regular expression substitution                        *
+ *                                                                            *
+ * Parameters: func - [IN] the function data                                  *
+ *             out  - [IN/OUT] the input/output value                         *
+ *                                                                            *
+ * Return value: SUCCEED - the function was calculated successfully.          *
+ *               FAIL    - the function calculation failed.                   *
+ *                                                                            *
+ ******************************************************************************/
 static int	macrofunc_regsub(zbx_function_t *func, char **out)
 {
 	char	*value = NULL;
@@ -39,6 +52,19 @@ static int	macrofunc_regsub(zbx_function_t *func, char **out)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: macrofunc_regsub                                                 *
+ *                                                                            *
+ * Purpose: calculates case insensitive regular expression substitution       *
+ *                                                                            *
+ * Parameters: func - [IN] the function data                                  *
+ *             out  - [IN/OUT] the input/output value                         *
+ *                                                                            *
+ * Return value: SUCCEED - the function was calculated successfully.          *
+ *               FAIL    - the function calculation failed.                   *
+ *                                                                            *
+ ******************************************************************************/
 static int	macrofunc_iregsub(zbx_function_t *func, char **out)
 {
 	char	*value = NULL;
@@ -58,6 +84,20 @@ static int	macrofunc_iregsub(zbx_function_t *func, char **out)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_calculate_macro_function                                     *
+ *                                                                            *
+ * Purpose: calculates macro function value                                   *
+ *                                                                            *
+ * Parameters: expression - [IN] the macro function                           *
+ *             len        - [IN] the macro function length                    *
+ *             out        - [IN/OUT] the input/output value                   *
+ *                                                                            *
+ * Return value: SUCCEED - the function was calculated successfully.          *
+ *               FAIL    - the function calculation failed.                   *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_calculate_macro_function(const char *expression, size_t len, char **out)
 {
 	zbx_function_t	func;
