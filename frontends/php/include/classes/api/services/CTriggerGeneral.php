@@ -159,8 +159,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$options['filter'] = ['templateid' => $trigger['templateid']];
 
 		// check if a child trigger already exists on the host
-		$_db_triggers = $this->get($options);
-		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
+		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
@@ -176,8 +175,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$options['filter'] = ['description' => $trigger['description']];
 
 			// look for a trigger with the same description and expression
-			$_db_triggers = $this->get($options);
-			$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
+			$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
 				['sources' => ['expression', 'recovery_expression']]
 			);
 
@@ -479,17 +477,17 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * Validate trigger to be updated.
 	 *
-	 * @param array  $triggers                          [IN/OUT]
-	 * @param array  $triggers[]['triggerid']           [IN]
-	 * @param array  $triggers[]['description']         [IN/OUT] (optional)
-	 * @param string $triggers[]['expression']          [IN/OUT] (optional)
-	 * @param int    $triggers[]['recovery_mode']       [IN/OUT] (optional)
-	 * @param string $triggers[]['recovery_expression'] [IN/OUT] (optional)
-	 * @param string $triggers[]['url']                 [IN] (optional)
-	 * @param int    $triggers[]['status']              [IN] (optional)
-	 * @param int    $triggers[]['priority']            [IN] (optional)
-	 * @param string $triggers[]['comments']            [IN] (optional)
-	 * @param int    $triggers[]['type']                [IN] (optional)
+	 * @param array  $triggers                                   [IN/OUT]
+	 * @param array  $triggers[]['triggerid']                    [IN]
+	 * @param array  $triggers[]['description']                  [IN/OUT] (optional)
+	 * @param string $triggers[]['expression']                   [IN/OUT] (optional)
+	 * @param int    $triggers[]['recovery_mode']                [IN/OUT] (optional)
+	 * @param string $triggers[]['recovery_expression']          [IN/OUT] (optional)
+	 * @param string $triggers[]['url']                          [IN] (optional)
+	 * @param int    $triggers[]['status']                       [IN] (optional)
+	 * @param int    $triggers[]['priority']                     [IN] (optional)
+	 * @param string $triggers[]['comments']                     [IN] (optional)
+	 * @param int    $triggers[]['type']                         [IN] (optional)
 	 * @param array  $db_triggers                                [OUT]
 	 * @param array  $db_triggers[<tnum>]['triggerid']           [OUT]
 	 * @param array  $db_triggers[<tnum>]['description']         [OUT]
@@ -554,9 +552,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$options['selectDiscoveryRule'] = ['itemid'];
 		}
 
-		$_db_triggers = $this->get($options);
-
-		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($_db_triggers,
+		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
