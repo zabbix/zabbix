@@ -27,7 +27,10 @@ static int	macrofunc_regsub(zbx_function_t *func, char **out)
 	if (2 != func->nparam)
 		return FAIL;
 
-	if (NULL == (value = zbx_regexp_sub(*out, func->params[0], func->params[1])))
+	if (FAIL == zbx_regexp_sub(*out, func->params[0], func->params[1], &value))
+		return FAIL;
+
+	if (NULL == value)
 		value = zbx_strdup(NULL, "");
 
 	zbx_free(*out);
@@ -43,7 +46,10 @@ static int	macrofunc_iregsub(zbx_function_t *func, char **out)
 	if (2 != func->nparam)
 		return FAIL;
 
-	if (NULL == (value = zbx_iregexp_sub(*out, func->params[0], func->params[1])))
+	if (FAIL == zbx_iregexp_sub(*out, func->params[0], func->params[1], &value))
+		return FAIL;
+
+	if (NULL == value)
 		value = zbx_strdup(NULL, "");
 
 	zbx_free(*out);

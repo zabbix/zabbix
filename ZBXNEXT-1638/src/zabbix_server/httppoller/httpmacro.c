@@ -89,6 +89,15 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
 			__function_name, (int)nkey, pkey, (int)nvalue, pvalue);
 
+	if (NULL == data)
+	{
+		/* Ignore regex variables when no input data is specified. For example,   */
+		/* scenario level regex variables don't have input data before the first  */
+		/* web scenario step is processed.                                        */
+		ret = SUCCEED;
+		goto out;
+	}
+
 	if (0 == nkey || 0 == nvalue)
 	{
 		if (0 == nkey && 0 != nvalue)
@@ -131,24 +140,15 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_strncpy_alloc(&value_str, &value_size, &value_offset, pvalue, nvalue);
 	if (0 == strncmp(REGEXP_PREFIX, value_str, REGEXP_PREFIX_SIZE))
 	{
+		int	rc;
 		/* The value contains regexp pattern, retrieve the first captured group or fail.  */
 		/* The \@ sequence is a special construct to fail if the pattern matches but does */
 		/* not contain groups to capture.                                                 */
-		if (NULL != data)
-			pair.second = (void *)zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@");
 
+		rc = zbx_mregexp_sub(data, value_str + REGEXP_PREFIX_SIZE, "\\@", (char **)&pair.second);
 		zbx_free(value_str);
 
-		if (NULL == data)
-		{
-			/* Ignore regex variables when no input data is specified. For example,   */
-			/* scenario level regex variables don't have input data before the first  */
-			/* web scenario step is processed.                                        */
-			ret = SUCCEED;
-			goto out;
-		}
-
-		if (NULL == pair.second)
+		if (SUCCEED != rc || NULL == pair.second)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot extract the value of \"%.*s\" from response",
 					__function_name, (int)nkey, pkey);
