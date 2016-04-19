@@ -1328,4 +1328,31 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 	}
 
+	/**
+	 * Adds triggers and trigger prorotypes from template to hosts.
+	 *
+	 * @param array $data
+	 */
+	public function syncTemplates(array $data) {
+		$data['templateids'] = zbx_toArray($data['templateids']);
+		$data['hostids'] = zbx_toArray($data['hostids']);
+
+		$triggers = $this->get([
+			'output' => [
+				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
+				'priority', 'comments', 'type'
+			],
+			'hostids' => $data['templateids'],
+			'preservekeys' => true
+		]);
+
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		foreach ($triggers as $trigger) {
+			$this->inherit($trigger, $data['hostids']);
+		}
+	}
+
 }
