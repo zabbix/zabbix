@@ -58,7 +58,8 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter('web.overview.filter.state'))
-	->addVar('fullscreen', $this->data['fullscreen']);
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addVar('groupid', $data['groupid']);
 
 $column = new CFormList();
 

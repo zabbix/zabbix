@@ -26,7 +26,8 @@ $hostInventoryWidget->setControls(
 );
 
 // filter
-$filterForm = new CFilter('web.hostinventories.filter.state');
+$filterForm = (new CFilter('web.hostinventories.filter.state'))
+	->addVar('groupid', $data['pageFilter']->groupid);
 
 $filterColumn = new CFormList();
 

@@ -39,7 +39,10 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
-$form = (new CForm())->setName('application_form');
+$form = (new CForm())
+	->setName('application_form')
+	->addVar('groupid', $data['groupid'])
+	->addVar('hostid', $data['hostid']);
 
 // create table
 $applicationTable = (new CTableInfo())

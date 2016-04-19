@@ -582,7 +582,9 @@ else {
 
 	$templateWidget->setControls($frmForm);
 
-	$form = (new CForm())->setName('templates');
+	$form = (new CForm())
+		->setName('templates')
+		->addVar('groupid', $pageFilter->groupid);
 
 	$table = (new CTableInfo())
 		->setHeader([

@@ -32,6 +32,7 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter('web.hosts.filter.state'))
+	->addVar('groupid', $data['groupId'])
 	->addColumn((new CFormList())->addRow(_('Name like'),
 		(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	))
@@ -48,7 +49,9 @@ $filter = (new CFilter('web.hosts.filter.state'))
 $widget->addItem($filter);
 
 // table hosts
-$form = (new CForm())->setName('hosts');
+$form = (new CForm())
+	->setName('hosts')
+	->addVar('groupid', $data['groupId']);
 
 $table = (new CTableInfo())
 	->setHeader([

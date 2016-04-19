@@ -28,7 +28,9 @@ $widget = (new CWidget())
 		));
 
 // create form
-$maintenanceForm = (new CForm())->setName('maintenanceForm');
+$maintenanceForm = (new CForm())
+	->setName('maintenanceForm')
+	->addVar('groupid', $data['pageFilter']->groupid);
 
 // create table
 $maintenanceTable = (new CTableInfo())

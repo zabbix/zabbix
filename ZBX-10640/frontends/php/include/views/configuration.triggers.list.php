@@ -29,6 +29,8 @@ else {
 }
 
 $filter = (new CFilter('web.triggers.filter.state'))
+	->addVar('groupid', $data['groupid'])
+	->addVar('hostid', $data['hostid'])
 	->addColumn(
 		(new CFormList())
 			->addRow(_('Severity'),
@@ -73,6 +75,7 @@ $widget->addItem($filter);
 // create form
 $triggersForm = (new CForm())
 	->setName('triggersForm')
+	->addVar('groupid', $data['groupid'])
 	->addVar('hostid', $this->data['hostid']);
 
 // create table

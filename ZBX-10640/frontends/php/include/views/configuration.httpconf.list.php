@@ -26,6 +26,8 @@ else {
 }
 
 $filter = (new CFilter('web.httpconf.filter.state'))
+	->addVar('groupid', $data['pageFilter']->groupid)
+	->addVar('hostid', $data['hostid'])
 	->addColumn(
 		(new CFormList())
 			->addRow(_('Status'),
@@ -59,6 +61,7 @@ $widget->addItem($filter);
 // create form
 $httpForm = (new CForm())
 	->setName('scenarios')
+	->addVar('groupid', $data['pageFilter']->groupid)
 	->addVar('hostid', $this->data['hostid']);
 
 $httpTable = (new CTableInfo())
