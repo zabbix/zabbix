@@ -2369,7 +2369,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, calc_macro;
+	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, calc_macro,
+				found = SUCCEED;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2401,7 +2402,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	data_alloc = data_len = strlen(*data) + 1;
 
-	for (; SUCCEED == res; res = zbx_token_find(*data, pos, &token))
+	for (; SUCCEED == res && SUCCEED == found; found = zbx_token_find(*data, pos, &token))
 	{
 		indexed_macro = 0;
 		calc_macro = 0;
@@ -3606,6 +3607,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		}
 		else
 			pos++;
+
+		if (SUCCEED != zbx_token_find(*data, pos, &token))
+			break;
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
