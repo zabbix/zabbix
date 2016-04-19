@@ -2961,7 +2961,7 @@ unsigned int	zbx_alarm_off(void)
  *     signal handlers. To avoid this we use localtime_r().                   *
  *                                                                            *
  ******************************************************************************/
-void	get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 {
 	struct tm	tm_local;
 
