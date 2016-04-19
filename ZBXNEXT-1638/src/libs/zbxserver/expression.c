@@ -2370,7 +2370,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, calc_macro,
-				found = SUCCEED;
+				found;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2402,17 +2402,19 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	data_alloc = data_len = strlen(*data) + 1;
 
-	for (; SUCCEED == res && SUCCEED == found; found = zbx_token_find(*data, pos, &token))
+	for (found = SUCCEED; SUCCEED == res && SUCCEED == found; found = zbx_token_find(*data, pos, &token))
 	{
 		indexed_macro = 0;
 		calc_macro = 0;
 		require_numeric = 0;
+		/* temporarily reset function id to 0 before parsing possible indexed macros */
 		N_functionid = 0;
 
 		switch (token.type)
 		{
 			case ZBX_TOKEN_OBJECTID:
 			case ZBX_TOKEN_LLD_MACRO:
+				/* neither lld or {123123} macros are processed by this function, skip them */
 				pos = token.token.r + 1;
 				continue;
 			case ZBX_TOKEN_SIMPLE_MACRO:
@@ -2449,12 +2451,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					break;
 				}
 			}
-
-			/* reset functionid if the macro was not found */
-			if (0 == indexed_macro)
-				N_functionid = 1;
 		}
-		else
+
+		/* reset functionid to its default value (first function) if this is not indexed macro */
+		if (0 == indexed_macro)
 			N_functionid = 1;
 
 		c = *++br;
