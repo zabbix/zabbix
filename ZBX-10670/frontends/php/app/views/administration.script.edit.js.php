@@ -45,10 +45,11 @@
 		// enable confirmation checkbox
 		jQuery('#enable_confirmation').change(function() {
 			if (this.checked) {
-				jQuery('#confirmation').removeAttr('disabled').keyup();
+				jQuery('#confirmation').prop('readonly', false).keyup();
 			}
 			else {
-				jQuery('#confirmation, #testConfirmation').prop('disabled', true);
+				jQuery('#testConfirmation').prop('disabled', true);
+				jQuery('#confirmation').prop('readonly', true);
 			}
 		}).change();
 
