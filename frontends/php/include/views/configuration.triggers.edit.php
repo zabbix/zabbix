@@ -142,7 +142,7 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 	$expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Expression'), $expression_row);
+$triggersFormList->addRow(_('Problem expression'), $expression_row);
 
 // Append expression table to form list.
 if ($data['expression_constructor'] == IM_TREE) {
