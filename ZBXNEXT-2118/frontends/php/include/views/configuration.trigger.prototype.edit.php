@@ -132,7 +132,7 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 		->addClass(ZBX_STYLE_BTN_LINK);
 	$expression_row[] = [BR(), $input_method_toggle];
 }
-$triggersFormList->addRow(_('Expression'), $expression_row);
+$triggersFormList->addRow(_('Problem expression'), $expression_row);
 
 // append expression table to form list
 if ($data['expression_constructor'] == IM_TREE) {
