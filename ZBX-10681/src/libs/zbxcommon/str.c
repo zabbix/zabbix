@@ -3367,10 +3367,6 @@ static int	function_parse_unquoted_param(const char *expr, size_t *length, size_
 		}
 	}
 out:
-	/* trim the trailing whitespace */
-	while (ptr > expr && ' ' == *(ptr - 1) )
-		ptr--;
-
 	*length = ptr - expr;
 
 	return SUCCEED;
