@@ -573,7 +573,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 
 	ret = SUCCEED;
 
-	if (0 == numeric_search && (NULL == arg2 || '\0' == *arg2))
+	if ((NULL == arg2 || '\0' == *arg2) && (NULL == arg3 || '\0' == *arg3) ||
+			(0 == numeric_search) && (OP_LIKE == op))
 	{
 		count = values.values_num;
 		goto out;
