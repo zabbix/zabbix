@@ -514,11 +514,13 @@ abstract class CTriggerGeneral extends CApiService {
 			case 'CTrigger':
 				$error_wrong_fields = _('Wrong fields for trigger.');
 				$error_cannot_update = _('Cannot update "%1$s" for trigger "%2$s".');
+				$error_cannot_update_tmpl = _('Cannot update "%1$s" for templated trigger "%2$s".');
 				break;
 
 			case 'CTriggerPrototype':
 				$error_wrong_fields = _('Wrong fields for trigger prototype.');
 				$error_cannot_update = _('Cannot update "%1$s" for trigger prototype "%2$s".');
+				$error_cannot_update_tmpl = _('Cannot update "%1$s" for templated trigger prototype "%2$s".');
 				break;
 
 			default:
@@ -527,6 +529,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$triggerDbFields = ['triggerid' => null];
 		$read_only_fields = ['value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
+		$read_only_fields_tmpl = ['description', 'expression', 'recovery_mode', 'recovery_expression'];
 
 		foreach ($triggers as $trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
@@ -571,8 +574,17 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			$_db_trigger = $_db_triggers[$trigger['triggerid']];
 
+			$description = array_key_exists('description', $trigger)
+				? $trigger['description']
+				: $_db_trigger['description'];
+
+			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_update, $description);
+			if ($_db_trigger['templateid'] != 0) {
+				$this->checkNoParameters($trigger, $read_only_fields_tmpl, $error_cannot_update_tmpl, $description);
+			}
+
 			if ($class === 'CTrigger') {
-				$updateDiscoveredValidator->setObjectName($_db_trigger['description']);
+				$updateDiscoveredValidator->setObjectName($description);
 				$this->checkPartialValidator($trigger, $updateDiscoveredValidator, $_db_trigger);
 			}
 
@@ -590,8 +602,6 @@ abstract class CTriggerGeneral extends CApiService {
 					$trigger[$field_name] = $_db_trigger[$field_name];
 				}
 			}
-
-			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_update, $trigger['description']);
 
 			switch ($trigger['recovery_mode']) {
 				case TRIGGER_REC_MODE_EXPRESSION:
