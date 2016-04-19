@@ -3026,52 +3026,56 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mkgmtime                                                     *
+ * Function: zbx_utc_time                                                     *
  *                                                                            *
- * Purpose: get UTC time from time which is broken down into a struct tm      *
- *          provided by caller                                                *
+ * Purpose: get UTC time from time from broken down time elements             *
  *                                                                            *
- * Parameters: tm - broken-down representation of the UTC time                *
+ * Parameters:                                                                *
+ *     year  - [IN] year                                                      *
+ *     month - [IN] month                                                     *
+ *     mday  - [IN] date                                                      *
+ *     hour  - [IN] hours                                                     *
+ *     min   - [IN] minutes                                                   *
+ *     sec   - [IN] seconds                                                   *
  *                                                                            *
  * Return value:  Epoch timestamp - given the value is positive               *
  *                FAIL - otherwise                                            *
  *                                                                            *
  ******************************************************************************/
-time_t	zbx_mkgmtime(struct tm *tm)
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec)
 {
-	const int	EPOCH_YEAR = 1970;
-	const int	TM_YEAR_BASE = 1900;
-	int		year, nleapdays;
-	time_t		t;
+	const int	epoch_year = 1970;
+	int		feb_year, nleapdays, t;
 
 	/* days before the month */
 	static const unsigned short month_day[12] =
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 	/* minimal sanity checking not to access outside of the array */
-	if ((unsigned) tm->tm_min >= 59)	/* minutes	[0-59] */
+	if ((unsigned) sec >= 61)	/* minutes	[0-61] where 60, 61 being leap seconds	*/
 		return FAIL;
-	if ((unsigned) tm->tm_hour >= 23)	/* hours	[0-23] */
+	if ((unsigned) min >= 59)	/* minutes	[0-59]					*/
 		return FAIL;
-	if ((unsigned) tm->tm_mday >= 31)	/* day		[0-31] */
+	if ((unsigned) hour >= 23)	/* hours	[0-23]					*/
 		return FAIL;
-	if ((unsigned) tm->tm_mon >= 11)	/* months	[0-11] */
+	if ((unsigned) mday >= 31)	/* day		[0-31]					*/
 		return FAIL;
-	if (tm->tm_year < EPOCH_YEAR - TM_YEAR_BASE)
+	if ((unsigned) mon >= 11)	/* months	[0-11]					*/
+		return FAIL;
+	if (year < epoch_year)
 		return FAIL;
 
-	/* this is the number of Februaries since 1900 */
-	year = tm->tm_year + TM_YEAR_BASE - (tm->tm_mon < 2);
+	/* checking if the date is past February */
+	feb_year = year - (mon < 2);
 
 	/* if a year is divisible by 4 then it IS a leap year		*/
 	/* if a year is divisible by 100 then it IS NOT a leap year	*/
 	/* except if a year is divisible by 400 then it IS a leap year	*/
-	nleapdays = year / 4 - year / 100 + year / 400 -
-			((EPOCH_YEAR-1) / 4 - (EPOCH_YEAR-1) / 100 + (EPOCH_YEAR-1) / 400);
+	nleapdays = feb_year / 4 - feb_year / 100 + feb_year / 400 -
+			((epoch_year - 1) / 4 - (epoch_year - 1) / 100 + (epoch_year - 1) / 400);
 
-	t = ((((time_t) (tm->tm_year - (EPOCH_YEAR - TM_YEAR_BASE)) * DAYS_PER_YEAR +
-			month_day[tm->tm_mon] + tm->tm_mday - 1 + nleapdays) * HOURS_PER_DAY +
-			tm->tm_hour) * MIN_PER_HOUR + tm->tm_min) * SEC_PER_MIN + tm->tm_sec;
+	t = ((((year - epoch_year) * DAYS_PER_YEAR + month_day[mon] + mday - 1 + nleapdays) *
+			HOURS_PER_DAY + hour) * MIN_PER_HOUR + min) * SEC_PER_MIN + sec;
 
 	return (t < 0 ? FAIL : t);
 }
