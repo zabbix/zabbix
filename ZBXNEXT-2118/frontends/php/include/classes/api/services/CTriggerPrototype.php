@@ -1096,37 +1096,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Adds items from template to hosts.
-	 *
-	 * @param array		$data
-	 *
-	 * @return bool
-	 */
-	public function syncTemplates(array $data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$triggerPrototypes = $this->get([
-			'output' => [
-				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type'
-			],
-			'hostids' => $data['templateids'],
-			'preservekeys' => true
-		]);
-
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggerPrototypes,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			$this->inherit($triggerPrototype, $data['hostids']);
-		}
-
-		return true;
-	}
-
-	/**
 	 * Retrieves and adds additional requested data (options 'selectHosts', 'selectGroups', etc.) to result set.
 	 *
 	 * @param array		$options

@@ -829,35 +829,6 @@ class CTrigger extends CTriggerGeneral {
 	}
 
 	/**
-	 * @param $data
-	 *
-	 * @return bool
-	 */
-	public function syncTemplates(array $data) {
-		$data['templateids'] = zbx_toArray($data['templateids']);
-		$data['hostids'] = zbx_toArray($data['hostids']);
-
-		$triggers = $this->get([
-			'output' => [
-				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type'
-			],
-			'hostids' => $data['templateids'],
-			'preservekeys' => true
-		]);
-
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		foreach ($triggers as $trigger) {
-			$this->inherit($trigger, $data['hostids']);
-		}
-
-		return true;
-	}
-
-	/**
 	 * Synchronizes the templated trigger dependencies on the given hosts inherited from the given
 	 * templates.
 	 * Update dependencies, do it after all triggers that can be dependent were created/updated on
