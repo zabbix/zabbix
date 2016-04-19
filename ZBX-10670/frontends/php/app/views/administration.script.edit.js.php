@@ -2,34 +2,29 @@
 	jQuery(document).ready(function() {
 		// type change
 		jQuery('#type').change(function() {
-			var ipmi = (jQuery(this).val() == 1);
+			var type = jQuery(this).val(),
+				commandIpmi = jQuery('#commandipmi'),
+				command = jQuery('#command');
 
-			if (ipmi) {
-				jQuery('#execute_on, #command').closest('li').hide();
+			if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
+				commandIpmi.closest('li').show();
 
-				jQuery('#commandipmi')
-					.closest('li')
-					.show();
-
-				if (jQuery('#command').val() != '') {
-					jQuery('#commandipmi').val(jQuery('#command').val());
-					jQuery('#command').val('');
+				if (command.val() != '') {
+					commandIpmi.val(command.val());
+					command.val('');
 				}
+
+				jQuery('#execute_on').add(command).closest('li').hide();
 			}
 			else {
-				jQuery('#execute_on')
-					.closest('li')
-					.show();
+				jQuery('#execute_on').add(command).closest('li').show();
 
-				jQuery('#command')
-					.closest('li')
-					.show();
-
-				if (jQuery('#commandipmi').val() != '') {
-					jQuery('#command').val(jQuery('#commandipmi').val());
-					jQuery('#commandipmi').val('');
+				if (commandIpmi.val() != '') {
+					command.val(commandIpmi.val());
+					commandIpmi.val('');
 				}
-				jQuery('#commandipmi').closest('li').hide();
+
+				commandIpmi.closest('li').hide();
 			}
 		})
 			.trigger('change');
