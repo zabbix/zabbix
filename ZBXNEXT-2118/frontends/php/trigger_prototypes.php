@@ -196,6 +196,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'recovery_expression' => getRequest('recovery_expression')
 	];
 
+	if ($trigger['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
+		$trigger['recovery_expression'] = '';
+	}
+
 	if (hasRequest('update')) {
 		// Update only changed fields.
 
