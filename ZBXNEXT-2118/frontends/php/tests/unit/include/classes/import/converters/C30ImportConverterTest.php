@@ -32,11 +32,11 @@ class C30ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => [
 										[
 											'description' => 'trigger1',
-											'expression' => '{host:item1.last()}',
+											'expression' => '{Template:item1.last()}',
 											'dependencies' => [
 												[
 													'description' => 'trigger2',
-													'expression' => '{host:item2.last()}'
+													'expression' => '{Template:item2.last()}'
 												]
 											]
 										]
@@ -58,6 +58,34 @@ class C30ImportConverterTest extends CImportConverterTest {
 													'description' => 'trigger2',
 													'expression' => '{host:item2.last()}'
 												]
+											]
+										]
+									]
+								]
+							]
+						]
+					],
+					'maps' => [
+						[
+							'selements' => [
+								[
+									'elementtype' => 0
+								],
+								[
+									'elementtype' => 2,
+									'element' => [
+										'description' => 'trigger1',
+										'expression' => 'trigger1:item.last()'
+									]
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger2',
+												'expression' => 'trigger2:item.last()'
 											]
 										]
 									]
@@ -74,13 +102,13 @@ class C30ImportConverterTest extends CImportConverterTest {
 									'trigger_prototypes' => [
 										[
 											'description' => 'trigger1',
-											'expression' => '{host:item1.last()}',
+											'expression' => '{Template:item1.last()}',
 											'recovery_mode' => '0',
 											'recovery_expression' => '',
 											'dependencies' => [
 												[
 													'description' => 'trigger2',
-													'expression' => '{host:item2.last()}',
+													'expression' => '{Template:item2.last()}',
 													'recovery_expression' => ''
 												]
 											]
@@ -106,6 +134,36 @@ class C30ImportConverterTest extends CImportConverterTest {
 													'expression' => '{host:item2.last()}',
 													'recovery_expression' => ''
 												]
+											]
+										]
+									]
+								]
+							]
+						]
+					],
+					'maps' => [
+						[
+							'selements' => [
+								[
+									'elementtype' => 0
+								],
+								[
+									'elementtype' => 2,
+									'element' => [
+										'description' => 'trigger1',
+										'expression' => 'trigger1:item.last()',
+										'recovery_expression' => ''
+									]
+								]
+							],
+							'links' => [
+								[
+									'linktriggers' => [
+										[
+											'trigger' => [
+												'description' => 'trigger2',
+												'expression' => 'trigger2:item.last()',
+												'recovery_expression' => ''
 											]
 										]
 									]
