@@ -506,19 +506,19 @@ class CConfigurationExportBuilder {
 		foreach ($triggers as $trigger) {
 			$result[] = [
 				'expression' => $trigger['expression'],
+				'recovery_mode' => $trigger['recovery_mode'],
+				'recovery_expression' => $trigger['recovery_expression'],
 				'name' => $trigger['description'],
 				'url' => $trigger['url'],
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies']),
-				'recovery_mode' => $trigger['recovery_mode'],
-				'recovery_expression' => $trigger['recovery_expression']
+				'dependencies' => $this->formatDependencies($trigger['dependencies'])
 			];
 		}
 
-		CArrayHelper::sort($result, ['name', 'expression']);
+		CArrayHelper::sort($result, ['name', 'expression', 'recovery_expression']);
 
 		return $result;
 	}
@@ -719,11 +719,12 @@ class CConfigurationExportBuilder {
 		foreach ($dependencies as $dependency) {
 			$result[] = [
 				'name' => $dependency['description'],
-				'expression' => $dependency['expression']
+				'expression' => $dependency['expression'],
+				'recovery_expression' => $dependency['recovery_expression']
 			];
 		}
 
-		CArrayHelper::sort($result, ['name', 'expression']);
+		CArrayHelper::sort($result, ['name', 'expression', 'recovery_expression']);
 
 		return $result;
 	}
@@ -898,10 +899,11 @@ class CConfigurationExportBuilder {
 		foreach ($linktriggers as &$linktrigger) {
 			$linktrigger['description'] = $linktrigger['triggerid']['description'];
 			$linktrigger['expression'] = $linktrigger['triggerid']['expression'];
+			$linktrigger['recovery_expression'] = $linktrigger['triggerid']['recovery_expression'];
 		}
 		unset($linktrigger);
 
-		CArrayHelper::sort($linktriggers, ['description', 'expression']);
+		CArrayHelper::sort($linktriggers, ['description', 'expression', 'recovery_expression']);
 
 		foreach ($linktriggers as $linktrigger) {
 			$result[] = [
