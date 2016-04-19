@@ -663,9 +663,8 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 	zbx_vector_uint64_t	ids;
 	zbx_uint64_t		key;
 	char			*value, xpath[MAX_STRING_LEN];
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			i, t, ret = SYSINFO_RET_FAIL;
 	struct tm		tm;
-	time_t			t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, lastlogsize);
 
@@ -733,12 +732,9 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 								&tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
 								&tm.tm_sec))
 						{
-							tm.tm_year -= 1900;
-							tm.tm_mon--;
-							tm.tm_isdst = -1;
-
-							if (FAIL != (t = zbx_mkgmtime(&tm)))
-								add_result->log->timestamp = (int)t;
+							if (FAIL != (t = zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday,
+									tm.tm_hour, tm.tm_min, tm.tm_sec)))
+								add_result->log->timestamp = t;
 						}
 
 						zbx_free(timestamp);
