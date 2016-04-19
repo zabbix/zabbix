@@ -571,22 +571,21 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
-	ret = SUCCEED;
-
-	if ((NULL == arg2 || '\0' == *arg2) && (NULL == arg3 || '\0' == *arg3) ||
-			(0 == numeric_search) && (OP_LIKE == op))
+	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
+	if ((NULL != arg2 && '\0' != *arg2) || (NULL != arg3 && '\0' != *arg3) && OP_LIKE != op)
 	{
+		for (i = 0; i < values.values_num; i++)
+		{
+			if (SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2, arg2_2))
+				count++;
+		}
+	}
+	else
 		count = values.values_num;
-		goto out;
-	}
-
-	for (i = 0; i < values.values_num; i++)
-	{
-		if (SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2, arg2_2))
-			count++;
-	}
 
 	zbx_snprintf(value, MAX_BUFFER_LEN, "%d", count);
+
+	ret = SUCCEED;
 out:
 	zbx_free(arg2);
 	zbx_free(arg3);
