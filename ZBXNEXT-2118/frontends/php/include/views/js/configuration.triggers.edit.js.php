@@ -8,16 +8,16 @@
 		});
 
 		function changeRecoveryMode() {
-			/* Used textarea[id="recovery_expression"] selector, because #recovery_expression doesn't correctly work for
-			 * disabled fields.
+			/*
+			 * Used textarea selector by ID because there are ID duplicates on page.
 			 */
 			if ($('input[name=recovery_mode]:checked').val() == <?= TRIGGER_REC_MODE_REC_EXPRESSION ?>) {
 				$('textarea[id="recovery_expression"]').closest('li').show();
-				$('#expression').closest('li').find('label').html('<?= _('Problem expression') ?>');
+				$('textarea[id="expression"]').closest('li').find('label').html('<?= _('Problem expression') ?>');
 			}
 			else {
 				$('textarea[id="recovery_expression"]').closest('li').hide();
-				$('#expression').closest('li').find('label').html('<?= _('Expression') ?>');
+				$('textarea[id="expression"]').closest('li').find('label').html('<?= _('Expression') ?>');
 			}
 		}
 	});
