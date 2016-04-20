@@ -467,7 +467,7 @@ class CTrigger extends CTriggerGeneral {
 
 			if ($sources) {
 				$result = CMacrosResolverHelper::resolveTriggerExpressions($result,
-					['resolve_usermacros' => true, 'resolve_macros' => true, 'sources' => $source]
+					['resolve_usermacros' => true, 'resolve_macros' => true, 'sources' => $sources]
 				);
 			}
 		}
