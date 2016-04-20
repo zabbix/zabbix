@@ -1161,9 +1161,9 @@ unsigned int	zbx_alarm_off(void);
 typedef struct
 {
 	/* left position */
-	int	l;
+	size_t	l;
 	/* right position */
-	int	r;
+	size_t	r;
 }
 zbx_strloc_t;
 
