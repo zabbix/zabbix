@@ -8,11 +8,14 @@
 		});
 
 		function changeRecoveryMode() {
+			/* Used textarea[id="recovery_expression"] selector, because #recovery_expression doesn't correctly work for
+			 * disabled fields.
+			 */
 			if ($('input[name=recovery_mode]:checked').val() == <?= TRIGGER_REC_MODE_REC_EXPRESSION ?>) {
-				$('#recovery_expression').closest('li').show();
+				$('textarea[id="recovery_expression"]').closest('li').show();
 			}
 			else {
-				$('#recovery_expression').closest('li').hide();
+				$('textarea[id="recovery_expression"]').closest('li').hide();
 			}
 		}
 	});
