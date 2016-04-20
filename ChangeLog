@@ -3,6 +3,7 @@ Changes for 2.2.13rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.12
