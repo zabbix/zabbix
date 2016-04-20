@@ -8,24 +8,22 @@
 					command = jQuery('#command');
 
 				if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
-					command_ipmi.closest('li').show();
-
-					if (command.val() != '') {
+					if (command.val() !== '') {
 						command_ipmi.val(command.val());
 						command.val('');
 					}
 
 					jQuery('#execute_on').add(command).closest('li').hide();
+					command_ipmi.closest('li').show();
 				}
 				else {
-					jQuery('#execute_on').add(command).closest('li').show();
-
-					if (command_ipmi.val() != '') {
+					if (command_ipmi.val() !== '') {
 						command.val(command_ipmi.val());
 						command_ipmi.val('');
 					}
 
 					command_ipmi.closest('li').hide();
+					jQuery('#execute_on').add(command).closest('li').show();
 				}
 			})
 			.change();
