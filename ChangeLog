@@ -3,6 +3,7 @@ Changes for 3.0.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10639] changed incorrect labels in item filters and host filters (Cemeris)
 ..F....... [ZBX-10668] added hint for action operation steps on how to proceed infinitely (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
