@@ -76,10 +76,6 @@ class CControllerScriptUpdate extends CController {
 			'groupid', 'host_access', 'confirmation'
 		]);
 
-		if (!$this->getInput('enable_confirmation', false)) {
-			$script['confirmation'] = '';
-		}
-
 		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI
 				&& $this->hasInput('commandipmi')) {
 			$script['command'] = $this->getInput('commandipmi');
