@@ -533,7 +533,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 
 	if (0 != numeric_search)
 	{
-		if ((NULL == arg2 || '\0' == *arg2) && (NULL != arg3 && '\0' != *arg3))
+		if (NULL != arg3 && '\0' != *arg3 && '\0' == *arg2)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "pattern must be provided along with operator for numeric values");
 			goto out;
@@ -572,7 +572,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		goto out;
 
 	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
-	if ((NULL != arg2 && '\0' != *arg2) || (NULL != arg3 && '\0' != *arg3) && OP_LIKE != op)
+	if ((NULL != arg2 && '\0' != *arg2) || (NULL != arg3 && '\0' != *arg3 && OP_LIKE != op))
 	{
 		for (i = 0; i < values.values_num; i++)
 		{
