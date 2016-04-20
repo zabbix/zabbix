@@ -142,7 +142,7 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 	$expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Problem expression'), $expression_row);
+$triggersFormList->addRow(_('Expression'), $expression_row);
 
 // Append expression table to form list.
 if ($data['expression_constructor'] == IM_TREE) {
@@ -250,15 +250,17 @@ if ($data['expression_constructor'] == IM_TREE) {
 			'document.forms["'.$triggersForm->getName().'"].submit();');
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
-
-$triggersFormList
-	->addRow(_('OK event generation'),
-		(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
+$event_generation = (new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
 			->addValue(_('Expression'), TRIGGER_REC_MODE_EXPRESSION)
 			->addValue(_('Recovery expression'), TRIGGER_REC_MODE_REC_EXPRESSION)
 			->addValue(_('None'), TRIGGER_REC_MODE_NONE)
-			->setModern(true)
-	);
+			->setModern(true);
+
+if ($data['limited']) {
+	$event_generation->setEnabled(false);
+}
+
+$triggersFormList->addRow(_('OK event generation'), $event_generation);
 
 $add_recovery_expression_button = (new CButton('insert',
 		($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add'))

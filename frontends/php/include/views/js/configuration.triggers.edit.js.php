@@ -13,9 +13,11 @@
 			 */
 			if ($('input[name=recovery_mode]:checked').val() == <?= TRIGGER_REC_MODE_REC_EXPRESSION ?>) {
 				$('textarea[id="recovery_expression"]').closest('li').show();
+				$('#expression').closest('li').find('label').html('<?= _('Problem expression') ?>');
 			}
 			else {
 				$('textarea[id="recovery_expression"]').closest('li').hide();
+				$('#expression').closest('li').find('label').html('<?= _('Expression') ?>');
 			}
 		}
 	});
