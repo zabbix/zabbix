@@ -4214,7 +4214,6 @@ static int	zbx_token_parse_user_macro(const char *expression, const char *macro,
 		data->context.r = 0;
 	}
 
-
 	return SUCCEED;
 }
 
