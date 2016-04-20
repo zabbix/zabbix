@@ -4144,15 +4144,16 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  * Purpose: trying to resolve the discovery macros in item key parameters     *
  *          in simple macros like {host:key[].func()}                         *
  *                                                                            *
+ * Comments: This function could be improved by using zbx_token_func_macro_t  *
+ *           structure host, key, func fields.                                *
+ *                                                                            *
  ******************************************************************************/
-static int	substitute_discovery_macros_simple(char *data, char **replace_to, size_t *replace_to_alloc,
-		size_t *pos, struct zbx_json_parse *jp_row)
+static int	substitute_discovery_macros_simple(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
 {
-	char	*pl, *pr;
-	char	*key = NULL;
-	size_t	sz, replace_to_offset = 0;
+	char	*pl, *pr, *key = NULL, *replace_to = NULL;
+	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0;
 
-	pl = pr = data + *pos;
+	pl = pr = *data + token->token.l;
 	if ('{' != *pr++)
 		return FAIL;
 
@@ -4169,20 +4170,17 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 	if (':' != *pr++)
 		return FAIL;
 
-	if (0 == *replace_to_alloc)
-	{
-		*replace_to_alloc = 128;
-		*replace_to = zbx_malloc(*replace_to, *replace_to_alloc);
-	}
+	replace_to_alloc = 128;
+	replace_to = zbx_malloc(NULL, replace_to_alloc);
 
-	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
+	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
 	/* an item key */
 	if (SUCCEED != get_item_key(&pr, &key))
 		return FAIL;
 
 	substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-	zbx_strcpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, key);
+	zbx_strcpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, key);
 
 	zbx_free(key);
 
@@ -4192,11 +4190,122 @@ static int	substitute_discovery_macros_simple(char *data, char **replace_to, siz
 	if ('.' != *pr++ || SUCCEED != parse_function(&pr, NULL, NULL) || '}' != *pr++)
 		return FAIL;
 
-	zbx_strncpy_alloc(replace_to, replace_to_alloc, &replace_to_offset, pl, pr - pl);
+	zbx_strncpy_alloc(&replace_to, &replace_to_alloc, &replace_to_offset, pl, pr - pl);
 
-	*pos = pr - data - 1;
+	token->token.r = pr - *data - 1;
+	zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
+
+	zbx_free(replace_to);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_discovery_macros_lld                                  *
+ *                                                                            *
+ * Purpose: expand discovery macro in expression                              *
+ *                                                                            *
+ * Parameters: data      - [IN/OUT] the expression containing lld macro       *
+ *             token     - [IN/OUT] the token with lld macro location data    *
+ *             flags     - [IN] the flags passed to                           *
+ *                                  subtitute_discovery_macros() function     *
+ *             jp_row    - [IN] discovery data                                *
+ *             error     - [OUT] should be not NULL if                        *
+ *                               ZBX_MACRO_NUMERIC flag is set                *
+ *             error_len - [IN] the size of error buffer                      *
+ *                                                                            *
+ * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
+ *               if all discovery macros resolved to numeric values,          *
+ *               otherwise FAIL with an error message.                        *
+ *                                                                            *
+ ******************************************************************************/
+static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int flags,
+		struct zbx_json_parse *jp_row, char *error, size_t error_len)
+{
+	char	c, *replace_to = NULL;
+	int	ret = SUCCEED, replace = 0;
+	size_t	replace_to_alloc = 0;
+
+	c = (*data)[token->token.r + 1];
+	(*data)[token->token.r + 1] = '\0';
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp_row, *data + token->token.l, &replace_to, &replace_to_alloc))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set",
+				*data + token->token.l);
+
+		if (0 != (flags & ZBX_MACRO_NUMERIC))
+		{
+			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + token->token.l);
+			ret = FAIL;
+		}
+	}
+	else if (0 != (flags & ZBX_MACRO_NUMERIC))
+	{
+		if (SUCCEED == (ret = is_double_suffix(replace_to)))
+		{
+			replace_to = wrap_negative_double_suffix(replace_to);
+			replace = 1;
+		}
+		else
+		{
+			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + token->token.l);
+			ret = FAIL;
+		}
+	}
+
+	(*data)[token->token.r + 1] = c;
+
+	if (0 != replace)
+		zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
+
+	zbx_free(replace_to);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_discovery_macros_user                                 *
+ *                                                                            *
+ * Purpose: expand discovery macro in user macro context                      *
+ *                                                                            *
+ * Parameters: data      - [IN/OUT] the expression containing lld macro       *
+ *             token     - [IN/OUT] the token with user macro location data   *
+ *             flags     - [IN] the flags passed to                           *
+ *                                  subtitute_discovery_macros() function     *
+ *             jp_row    - [IN] discovery data                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, int flags,
+		struct zbx_json_parse *jp_row)
+{
+	int			force_quote = 0;
+	size_t			context_r;
+	char			*context, *context_esc;
+	zbx_token_user_macro_t	*macro = &token->data.user_macro;
+
+	/* user macro without context, nothing to replace */
+	if (0 == token->data.user_macro.context.l)
+		return;
+
+	force_quote = ('"' == (*data)[macro->context.l]);
+
+	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
+
+	/* substitute_discovery_macros() can't fail with ZBX_MACRO_CONTEXT flag set */
+	substitute_discovery_macros(&context, jp_row, ZBX_MACRO_CONTEXT, NULL, 0);
+
+	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
+
+	context_r = macro->context.r;
+	zbx_replace_string(data, macro->context.l, &context_r, context_esc);
+
+	token->token.r += context_r - macro->context.r;
+
+	zbx_free(context_esc);
+	zbx_free(context);
 }
 
 /******************************************************************************
@@ -4229,120 +4338,34 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 {
 	const char	*__function_name = "substitute_discovery_macros";
 
-	char		*replace_to = NULL, c;
-	size_t		l, r, replace_to_alloc = 0;
-	int		rc, ret = SUCCEED;
+	int		ret = SUCCEED, pos = 0;
+	zbx_token_t	token;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
-	for (l = 0; '\0' != (*data)[l]; l++)
+	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token))
 	{
-		if ('{' != (*data)[l])
-			continue;
-
-		r = l;
-
-		/* substitute discovery macros, e.g. {#FSNAME} */
-		if ('#' == (*data)[l + 1])
+		switch (token.type)
 		{
-			for (r += 2; SUCCEED == is_macro_char((*data)[r]); r++)
-				;
+			case ZBX_TOKEN_LLD_MACRO:
+				ret = substitute_discovery_macros_lld(data, &token, flags, jp_row, error,
+						max_error_len);
 
-			if ('}' != (*data)[r])
-				continue;
-
-			c = (*data)[r + 1];
-			(*data)[r + 1] = '\0';
-
-			if (SUCCEED != (rc = zbx_json_value_by_name_dyn(jp_row, &(*data)[l], &replace_to, &replace_to_alloc)))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot substitute macro \"%s\": not found in value set",
-						__function_name, *data + l);
-
-				if (0 != (flags & ZBX_MACRO_NUMERIC))
-				{
-					zbx_snprintf(error, max_error_len, "no value for macro \"%s\"", *data + l);
-					ret = FAIL;
-				}
-			}
-			else if (0 != (flags & ZBX_MACRO_NUMERIC))
-			{
-				if (SUCCEED == is_double_suffix(replace_to))
-				{
-					replace_to = wrap_negative_double_suffix(replace_to);
-				}
-				else
-				{
-					zbx_snprintf(error, max_error_len, "macro \"%s\" value is not numeric", *data + l);
-					ret = FAIL;
-				}
-			}
-
-			(*data)[r + 1] = c;
-
-			if (SUCCEED != ret)
 				break;
+			case ZBX_TOKEN_USER_MACRO:
+				if (0 == (flags & ZBX_MACRO_CONTEXT))
+					substitute_discovery_macros_user(data, &token, flags, jp_row);
 
-			if (SUCCEED == rc)
-				zbx_replace_string(data, l, &r, replace_to);
-		}
-		/* substitute user macro context */
-		else if (0 == (flags & ZBX_MACRO_CONTEXT) && '$' == (*data)[l + 1])
-		{
-			int	macro_r, context_l, context_r, force_quote = 0;
-			char	*context, *context_esc;
-
-			if (FAIL == zbx_user_macro_parse(*data + l, &macro_r, &context_l, &context_r))
-				continue;
-
-			if (0 == context_l)
-			{
-				/* user macro without context, skip it */
-				l += macro_r;
-				continue;
-			}
-
-			force_quote = ('"' == (*data)[l + context_l]);
-
-			context = zbx_user_macro_unquote_context_dyn(*data + l + context_l, context_r - context_l + 1);
-
-			if (FAIL == substitute_discovery_macros(&context, jp_row, ZBX_MACRO_CONTEXT, error,
-					max_error_len))
-			{
-				zbx_free(context);
-				ret = FAIL;
 				break;
-			}
+			case ZBX_TOKEN_FUNC_MACRO:
+				if (0 != (flags & ZBX_MACRO_SIMPLE))
+					substitute_discovery_macros_simple(data, &token, jp_row);
 
-			context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
-
-			r = l + context_r;
-			zbx_replace_string(data, l + context_l, &r, context_esc);
-
-			zbx_free(context_esc);
-			zbx_free(context);
-
-			/* move cursor to the end of user macro */
-			while ('}' != (*data)[r++])
-				;
-		}
-		/* substitute LLD macros, located in the item key parameters in simple macros */
-		/* e.g. {Zabbix server:ifAlias[{#SNMPINDEX}].last(0)}                         */
-		else if (0 != (flags & ZBX_MACRO_SIMPLE))
-		{
-			if (SUCCEED != substitute_discovery_macros_simple(*data, &replace_to, &replace_to_alloc,
-					&r, jp_row))
-			{
-				continue;
-			}
-
-			zbx_replace_string(data, l, &r, replace_to);
+				break;
 		}
 
-		l = r;
+		pos = token.token.r + 1;
 	}
-
-	zbx_free(replace_to);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
 
