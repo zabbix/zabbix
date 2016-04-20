@@ -455,11 +455,21 @@ class CTrigger extends CTriggerGeneral {
 			$result = CMacrosResolverHelper::resolveTriggerDescriptions($result);
 		}
 
-		// expand expression
-		if ($options['expandExpression'] !== null && $result && array_key_exists('expression', reset($result))) {
-			$result = CMacrosResolverHelper::resolveTriggerExpressions($result,
-				['resolve_usermacros' => true, 'resolve_macros' => true]
-			);
+		// expand expressions
+		if ($options['expandExpression'] !== null && $result) {
+			$sources = [];
+			if (array_key_exists('expression', reset($result))) {
+				$sources[] = 'expression';
+			}
+			if (array_key_exists('recovery_expression', reset($result))) {
+				$sources[] = 'recovery_expression';
+			}
+
+			if ($sources) {
+				$result = CMacrosResolverHelper::resolveTriggerExpressions($result,
+					['resolve_usermacros' => true, 'resolve_macros' => true, 'sources' => $source]
+				);
+			}
 		}
 
 		// removing keys (hash -> array)
