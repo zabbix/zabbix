@@ -208,6 +208,10 @@ foreach ($this->data['items'] as $item) {
 		$triggers = [];
 
 		foreach ($item['triggers'] as $trigger) {
+			if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+				continue;
+			}
+
 			foreach ($trigger['functions'] as $function) {
 				if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
 					continue 2;
