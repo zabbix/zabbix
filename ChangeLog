@@ -3,6 +3,7 @@ Changes for 3.0.3rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10551] fixed possible crash when constants are extracted from invalid trigger expression containing '{' without matching '}' (gleb)
 ..F....... [ZBX-10646] fixed adding trigger prototype dependencies when cloning a host or template (Ivo)
 ..F....... [ZBX-10511] fixed pagination throwing an error after performing enable or disable via link on an object (Ivo)
 ........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
