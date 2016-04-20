@@ -15,7 +15,7 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 --------------------------------------------------------------------------------
 Changes for 3.0.2
 
-3.0.2rc2 was released as 3.0.2 without any changes
+3.0.2rc1 was released as 3.0.2 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.2rc1
