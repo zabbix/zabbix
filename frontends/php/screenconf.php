@@ -436,7 +436,7 @@ else {
 	order_result($data['screens'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['screens'], $sortOrder);
+	$data['paging'] = getPagingLine($data['screens'], $sortOrder, new CUrl('screenconf.php'));
 
 	// render view
 	$screenView = new CView('monitoring.screen.list', $data);
