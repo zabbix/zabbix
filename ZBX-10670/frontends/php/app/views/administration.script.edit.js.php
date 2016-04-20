@@ -1,39 +1,42 @@
 <script type="text/javascript">
 	jQuery(document).ready(function() {
 		// type change
-		jQuery('#type').change(function() {
-			var type = jQuery(this).val(),
-				commandIpmi = jQuery('#commandipmi'),
-				command = jQuery('#command');
+		jQuery('#type')
+			.change(function() {
+				var type = jQuery(this).val(),
+					command_ipmi = jQuery('#commandipmi'),
+					command = jQuery('#command');
 
-			if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
-				commandIpmi.closest('li').show();
+				if (type == <?= ZBX_SCRIPT_TYPE_IPMI ?>) {
+					command_ipmi.closest('li').show();
 
-				if (command.val() != '') {
-					commandIpmi.val(command.val());
-					command.val('');
+					if (command.val() != '') {
+						command_ipmi.val(command.val());
+						command.val('');
+					}
+
+					jQuery('#execute_on').add(command).closest('li').hide();
 				}
+				else {
+					jQuery('#execute_on').add(command).closest('li').show();
 
-				jQuery('#execute_on').add(command).closest('li').hide();
-			}
-			else {
-				jQuery('#execute_on').add(command).closest('li').show();
+					if (command_ipmi.val() != '') {
+						command.val(command_ipmi.val());
+						command_ipmi.val('');
+					}
 
-				if (commandIpmi.val() != '') {
-					command.val(commandIpmi.val());
-					commandIpmi.val('');
+					command_ipmi.closest('li').hide();
 				}
-
-				commandIpmi.closest('li').hide();
-			}
-		})
-			.trigger('change');
+			})
+			.change();
 
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#scriptid, #delete, #clone').remove();
 			jQuery('#update').text(<?= CJs::encodeJson(_('Add')) ?>);
-			jQuery('#update').val('script.create').attr({id: 'add'});
+			jQuery('#update')
+				.val('script.create')
+				.attr({id: 'add'});
 			jQuery('#name').focus();
 		});
 
@@ -43,14 +46,18 @@
 		}).keyup();
 
 		// enable confirmation checkbox
-		jQuery('#enable_confirmation').change(function() {
-			if (this.checked) {
-				jQuery('#confirmation').removeAttr('disabled').keyup();
-			}
-			else {
-				jQuery('#confirmation, #testConfirmation').prop('disabled', true);
-			}
-		}).change();
+		jQuery('#enable_confirmation')
+			.change(function() {
+				if (this.checked) {
+					jQuery('#confirmation')
+						.removeAttr('disabled')
+						.keyup();
+				}
+				else {
+					jQuery('#confirmation, #testConfirmation').prop('disabled', true);
+				}
+			})
+			.change();
 
 		// test confirmation button
 		jQuery('#testConfirmation').click(function() {
@@ -67,7 +74,7 @@
 					jQuery('#hostGroupSelection').hide();
 				}
 			})
-			.trigger('change');
+			.change();
 
 		// trim spaces on sumbit
 		jQuery('#scriptForm').submit(function() {
