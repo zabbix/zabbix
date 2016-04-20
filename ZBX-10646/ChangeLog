@@ -1,3 +1,17 @@
+Changes for 3.0.3rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-10511] fixed pagination throwing an error after performing enable or disable via link on an object (Ivo)
+........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.2
+
+3.0.2rc1 was released as 3.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.2rc1
 
 New features:
@@ -542,6 +556,11 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.8
+
+2.4.8rc1 was released as 2.4.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.4.8rc1
@@ -1305,6 +1324,19 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.12
+
+2.2.12rc1 was released as 2.2.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.12rc1
@@ -2691,6 +2723,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17
+
+2.0.17rc1 was released as 2.0.17 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.17rc1
@@ -4392,6 +4436,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+A.F....... [ZBX-10650] fixed php code to correspond to the syntax of PHP 5.0 (Sasha)
 ....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
