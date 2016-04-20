@@ -1,3 +1,16 @@
+Changes for 3.0.3rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.2
+
+3.0.2rc1 was released as 3.0.2 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.2rc1
 
 New features:
@@ -6,6 +19,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 ..F....... [ZBX-10318] added disabling of [-] or [+] buttons when screen column or row cannot be removed or added (Sasha)
 
 Bug fixes:
+...G...PS. [ZBX-10626] fixed crash in agent's collector process on Solaris 8 (gleb)
 ..F....... [ZBX-10564] fixed trigger acknowledging in slide shows (Cemeris)
 .......PS. [ZBX-10571] fixed network discovery based on agent checks (gleb)
 A......... [ZBX-9162] fixed performance of the hostgroup.get method under MySQL (Gunars, Sasha)
@@ -24,7 +38,6 @@ A......... [ZBX-10155] prohibited creation of a trigger prototype without item p
 ..F....... [ZBX-10570] fixed incorrect select input height in FF (Pavel)
 ..F....... [ZBX-10413] improved XML import validation (Oleg, Sasha)
 ...GI..PS. [ZBX-4148] separated third-party library CFLAGS to avoid header file name conflicts (gleb)
-..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
 ..F....... [ZBX-9820] fixed overview of items and triggers with same name and multiple hosts (Gunars, Sasha)
 ..F....... [ZBX-10466] fixed event selection by trigger ID (Gunars)
 ..F....... [ZBX-7422] fixed LLD discovery rule list showing 0 instead of blank space in interval column for trapper and SNMP trap items (Ivo)
@@ -542,6 +555,11 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.8
+
+2.4.8rc1 was released as 2.4.8 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.4.8rc1
@@ -1305,6 +1323,19 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.12
+
+2.2.12rc1 was released as 2.2.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.12rc1
@@ -2691,6 +2722,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17
+
+2.0.17rc1 was released as 2.0.17 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.17rc1
@@ -4392,6 +4435,7 @@ New features:
 --------------------------------------------------------------------------------
 Changes for 1.8.23rc1
 
+A.F....... [ZBX-10650] fixed php code to correspond to the syntax of PHP 5.0 (Sasha)
 ....I..... [ZBX-10364] fixed inconsistences in schema.inc.php with schema.sql (Sasha)
 
 Changes for 1.8.22
