@@ -132,7 +132,14 @@ class CControllerWebView extends CController {
 			unset($httptest);
 
 			order_result($httptests, $sortField, $sortOrder);
-			$data['paging'] = getPagingLine($httptests, $sortOrder);
+
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'web.view')
+				->setArgument('groupid', $data['groupid'])
+				->setArgument('hostid', $data['hostid'])
+				->setArgument('fullscreen', $data['fullscreen']);
+
+			$data['paging'] = getPagingLine($httptests, $sortOrder, $url);
 			$httptests = resolveHttpTestMacros($httptests, true, false);
 			order_result($httptests, $sortField, $sortOrder);
 
