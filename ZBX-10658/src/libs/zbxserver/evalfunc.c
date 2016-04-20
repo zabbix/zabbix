@@ -626,6 +626,7 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const 
 	const char			*__function_name = "evaluate_SUM";
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_vector_history_record_t	values;
+	history_value_t			result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -661,26 +662,23 @@ static int	evaluate_SUM(char *value, DC_ITEM *item, const char *function, const 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
-	if (0 < values.values_num)
+	if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 	{
-		history_value_t	result = {0};
+		result.dbl = 0;
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-		{
-			for (i = 0; i < values.values_num; i++)
-				result.dbl += values.values[i].value.dbl;
-		}
-		else
-		{
-			for (i = 0; i < values.values_num; i++)
-				result.ui64 += values.values[i].value.ui64;
-		}
-		zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
-
-		ret = SUCCEED;
+		for (i = 0; i < values.values_num; i++)
+			result.dbl += values.values[i].value.dbl;
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "result for SUM is empty");
+	{
+		result.ui64 = 0;
+
+		for (i = 0; i < values.values_num; i++)
+			result.ui64 += values.values[i].value.ui64;
+	}
+
+	zbx_vc_history_value2str(value, MAX_BUFFER_LEN, &result, item->value_type);
+	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -1471,32 +1469,29 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 		goto out;
 
-	if (0 == values.values_num)
+	if (0 != values.values_num)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "result for STR is empty");
-		goto out;
-	}
-
-	/* at this point the value type can be only str, text or log */
-	if (ITEM_VALUE_TYPE_LOG == item->value_type)
-	{
-		for (i = 0; i < values.values_num; i++)
+		/* at this point the value type can be only str, text or log */
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 		{
-			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
+			for (i = 0; i < values.values_num; i++)
 			{
-				found = 1;
-				break;
+				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.log->value, arg1))
+				{
+					found = 1;
+					break;
+				}
 			}
 		}
-	}
-	else
-	{
-		for (i = 0; i < values.values_num; i++)
+		else
 		{
-			if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
+			for (i = 0; i < values.values_num; i++)
 			{
-				found = 1;
-				break;
+				if (SUCCEED == evaluate_STR_one(func, &regexps, values.values[i].value.str, arg1))
+				{
+					found = 1;
+					break;
+				}
 			}
 		}
 	}
