@@ -495,7 +495,7 @@ else {
 
 	// sorting & paging
 	order_result($data['usergroups'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder);
+	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder, new CUrl('usergrps.php'));
 
 	// render view
 	$view = new CView('administration.usergroups.list', $data);

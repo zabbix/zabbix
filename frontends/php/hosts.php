@@ -1060,7 +1060,10 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
-	$pagingLine = getPagingLine($hosts, $sortOrder);
+	$url = (new CUrl('hosts.php'))
+		->setArgument('groupid', $pageFilter->groupid);
+
+	$pagingLine = getPagingLine($hosts, $sortOrder, $url);
 
 	$hosts = API::Host()->get([
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
