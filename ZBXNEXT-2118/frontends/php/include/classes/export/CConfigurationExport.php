@@ -881,7 +881,9 @@ class CConfigurationExport {
 				}
 			}
 
-			$trigger['dependencies'] = CMacrosResolverHelper::resolveTriggerExpressions($trigger['dependencies']);
+			$trigger['dependencies'] = CMacrosResolverHelper::resolveTriggerExpressions($trigger['dependencies'],
+				['sources' => ['expression', 'recovery_expression']]
+			);
 		}
 		unset($trigger);
 
