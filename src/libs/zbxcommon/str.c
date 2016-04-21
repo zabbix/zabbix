@@ -4236,7 +4236,7 @@ static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, 
 {
 	const char		*ptr;
 	int			offset;
-	zbx_token_simple_t	*data;
+	zbx_token_macro_t	*data;
 
 	/* find the end of lld macro by validating its name until the closing bracket } */
 	for (ptr = macro + 2; '}' != *ptr; ptr++)
@@ -4289,7 +4289,7 @@ static int	zbx_token_parse_objectid(const char *expression, const char *macro, z
 {
 	const char		*ptr;
 	int			offset;
-	zbx_token_simple_t	*data;
+	zbx_token_macro_t	*data;
 
 	/* find the end of object id by checking if it contains digits until the closing bracket } */
 	for (ptr = macro + 1; '}' != *ptr; ptr++)
@@ -4343,7 +4343,7 @@ static int	zbx_token_parse_simple_macro(const char *expression, const char *macr
 {
 	const char		*ptr;
 	int			offset;
-	zbx_token_simple_t	*data;
+	zbx_token_macro_t	*data;
 
 	/* find the end of simple macro by validating its name until the closing bracket } */
 	for (ptr = macro + 1; '}' != *ptr; ptr++)
@@ -4362,12 +4362,12 @@ static int	zbx_token_parse_simple_macro(const char *expression, const char *macr
 	offset = macro - expression;
 
 	/* initialize token */
-	token->type = ZBX_TOKEN_SIMPLE_MACRO;
+	token->type = ZBX_TOKEN_MACRO;
 	token->token.l = offset;
 	token->token.r = offset + (ptr - macro);
 
 	/* initialize token data */
-	data = &token->data.simple_macro;
+	data = &token->data.macro;
 	data->name.l = offset + 1;
 	data->name.r = token->token.r - 1;
 
@@ -4445,7 +4445,7 @@ static int	zbx_token_parse_calc_macro(const char *expression, const char *macro,
 		zbx_token_t *token)
 {
 	zbx_strloc_t		func_loc;
-	zbx_token_calc_macro_t	*data;
+	zbx_token_func_macro_t	*data;
 	const char		*ptr;
 	int			offset;
 
@@ -4468,12 +4468,12 @@ static int	zbx_token_parse_calc_macro(const char *expression, const char *macro,
 	offset = macro - expression;
 
 	/* initialize token */
-	token->type = ZBX_TOKEN_CALC_MACRO;
+	token->type = ZBX_TOKEN_FUNC_MACRO;
 	token->token.l = offset;
 	token->token.r = ptr - expression;
 
 	/* initialize token data */
-	data = &token->data.calc_macro;
+	data = &token->data.func_macro;
 	data->macro.l = offset + 1;
 	data->macro.r = func_loc.l - 2;
 
@@ -4509,10 +4509,10 @@ static int	zbx_token_parse_calc_macro(const char *expression, const char *macro,
 static int	zbx_token_parse_func_macro_key(const char *expression, const char *macro, const char *key,
 		zbx_token_t *token)
 {
-	int			offset;
-	zbx_token_func_macro_t	*data;
-	const char		*ptr;
-	zbx_strloc_t		key_loc, func_loc;
+	int				offset;
+	zbx_token_simple_macro_t	*data;
+	const char			*ptr;
+	zbx_strloc_t			key_loc, func_loc;
 
 	ptr = key;
 
@@ -4557,12 +4557,12 @@ static int	zbx_token_parse_func_macro_key(const char *expression, const char *ma
 	offset = macro - expression;
 
 	/* initialize token */
-	token->type = ZBX_TOKEN_FUNC_MACRO;
+	token->type = ZBX_TOKEN_SIMPLE_MACRO;
 	token->token.l = offset;
 	token->token.r = ptr - expression;
 
 	/* initialize token data */
-	data = &token->data.func_macro;
+	data = &token->data.simple_macro;
 	data->host.l = offset + 1;
 	data->host.r = offset + (key - macro) - 2;
 

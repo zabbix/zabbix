@@ -984,7 +984,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 	if (NULL != trigger)
 	{
 		buffer = zbx_strdup(buffer, trigger_prototype->description);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(trigger->description, buffer))
 		{
@@ -1003,7 +1003,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 		}
 
 		buffer = zbx_strdup(buffer, trigger_prototype->comments);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(trigger->comments, buffer))
 		{
@@ -1033,7 +1033,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 		trigger->description = zbx_strdup(NULL, trigger_prototype->description);
 		trigger->description_orig = NULL;
-		substitute_discovery_macros(&trigger->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(&trigger->description, jp_row, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(trigger->description, ZBX_WHITESPACE);
 
 		trigger->expression = expression;
@@ -1042,7 +1042,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 		trigger->comments = zbx_strdup(NULL, trigger_prototype->comments);
 		trigger->comments_orig = NULL;
-		substitute_discovery_macros(&trigger->comments, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(&trigger->comments, jp_row, ZBX_MACRO_FUNC, NULL, 0);
 		zbx_lrtrim(trigger->comments, ZBX_WHITESPACE);
 
 		trigger->url = zbx_strdup(NULL, trigger_prototype->url);
