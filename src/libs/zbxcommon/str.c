@@ -3579,10 +3579,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	const char	*ptr_context = context;
 
 	if ('"' == *ptr_context || ' ' == *ptr_context)
-	{
 		force_quote = 1;
-		ptr_context++;
-	}
 
 	for (; '\0' != *ptr_context; ptr_context++)
 	{

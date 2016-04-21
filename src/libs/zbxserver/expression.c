@@ -4355,13 +4355,23 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 
 				break;
 			case ZBX_TOKEN_USER_MACRO:
-				if (0 == (flags & ZBX_MACRO_CONTEXT))
-					substitute_discovery_macros_user(data, &token, flags, jp_row);
+				if (0 != (flags & ZBX_MACRO_CONTEXT))
+				{
+					pos++;
+					continue;
+				}
+
+				substitute_discovery_macros_user(data, &token, flags, jp_row);
 
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
-				if (0 != (flags & ZBX_MACRO_SIMPLE))
-					substitute_discovery_macros_simple(data, &token, jp_row);
+				if (0 == (flags & ZBX_MACRO_SIMPLE))
+				{
+					pos++;
+					continue;
+				}
+
+				substitute_discovery_macros_simple(data, &token, jp_row);
 
 				break;
 		}
