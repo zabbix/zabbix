@@ -3,6 +3,7 @@ Changes for 3.0.3rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
 ...G...... [ZBX-10548] fixed agent compilation on Solaris without zone support (e.g. Solaris 9), added awareness of running on a newer Solaris with zones (Andris)
 ..F....... [ZBX-10639] changed incorrect labels in item filters and host filters (Cemeris)
 ..F....... [ZBX-10668] added hint for action operation steps on how to proceed infinitely (Cemeris)
