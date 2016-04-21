@@ -1,3 +1,8 @@
+Changes for 2.4.8
+
+2.4.8rc1 was released as 2.4.8 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.8rc1
 
 New features:
@@ -759,6 +764,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.12
+
+2.2.12rc1 was released as 2.2.12 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.12rc1
@@ -2145,6 +2155,11 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17
+
+2.0.17rc1 was released as 2.0.17 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.17rc1

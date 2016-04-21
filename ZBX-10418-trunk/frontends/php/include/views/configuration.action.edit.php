@@ -527,7 +527,9 @@ if (!empty($this->data['new_operation'])) {
 			'-',
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5))
-				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			_('(0 - infinitely)')
 		]);
 
 		$new_operation_formlist->addRow(_('Step duration'), [

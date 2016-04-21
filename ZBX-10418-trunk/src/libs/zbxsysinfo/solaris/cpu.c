@@ -111,7 +111,7 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return get_cpustat(result, cpu_num, state, mode);
 }
 
-#ifdef HAVE_KSTAT_H
+#if defined(HAVE_KSTAT_H) && !defined(HAVE_GETLOADAVG)
 static int	get_kstat_system_misc(char *key, int *value, char **error)
 {
 	kstat_ctl_t	*kc;
