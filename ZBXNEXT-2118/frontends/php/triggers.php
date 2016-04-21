@@ -554,7 +554,11 @@ else {
 	}
 
 	// paging
-	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
+	$url = (new CUrl('triggers.php'))
+		->setArgument('groupid', $data['groupid'])
+		->setArgument('hostid', $data['hostid']);
+
+	$data['paging'] = getPagingLine($data['triggers'], $sortOrder, $url);
 
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error',

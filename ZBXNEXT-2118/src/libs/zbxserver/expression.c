@@ -212,10 +212,10 @@ static char 	**extract_numbers(const char *str, int *count)
 		if (!isdigit(*s))
 			continue;
 
-		if (s != str && '{' == *(s - 1))
+		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
 		{
 			/* skip functions '{65432}' */
-			s = strchr(s, '}');
+			s = e;
 			continue;
 		}
 
@@ -3880,7 +3880,6 @@ static int	substitute_expression_functions_results(zbx_hashset_t *func_index, ch
 		if (NULL == (br = strchr(bl, '}')))
 		{
 			*error = zbx_strdup(*error, "Invalid trigger expression");
-			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;
 		}
 

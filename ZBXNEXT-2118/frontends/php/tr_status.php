@@ -361,7 +361,15 @@ if (!$showMaintenance) {
 $triggers = API::Trigger()->get($options);
 
 order_result($triggers, $sortField, $sortOrder);
-$paging = getPagingLine($triggers, $sortOrder);
+
+$url = (new CUrl('tr_status.php'))
+	->setArgument('fullscreen', getRequest('fullscreen'))
+	->setArgument('groupid', $pageFilter->groupid)
+	->setArgument('hostid', $pageFilter->hostid)
+	->setArgument('show_triggers', getRequest('show_triggers'))
+	->setArgument('filter_set', getRequest('filter_set'));
+
+$paging = getPagingLine($triggers, $sortOrder, $url);
 
 $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),

@@ -1359,7 +1359,7 @@ else {
 		order_result($data['items'], $sortField, $sortOrder);
 	}
 
-	$data['paging'] = getPagingLine($data['items'], $sortOrder);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder, new CUrl('items.php'));
 
 	$itemTriggerIds = [];
 	foreach ($data['items'] as $item) {
