@@ -50,7 +50,7 @@ jQuery(function($) {
 		},
 
 		refresh: function(id, isSelfRefresh) {
-			var screen = this.screens[id];
+			var screen = this.screens[id], ajaxParams;
 
 			switch (screen.resourcetype) {
 				case 21:
@@ -83,10 +83,7 @@ jQuery(function($) {
 			var ajaxUrl = new Curl('jsrpc.php');
 			ajaxUrl.setArgument('type', 9); // PAGE_TYPE_TEXT
 			ajaxUrl.setArgument('method', 'screen.get');
-			ajaxUrl.setArgument('mode', screen.mode);
 			ajaxUrl.setArgument('timestamp', screen.timestampActual);
-			ajaxUrl.setArgument('flickerfreeScreenId', id);
-			ajaxUrl.setArgument('profileIdx2', empty(screen.profileIdx2) ? null : screen.profileIdx2);
 
 			for (var i = 0; i < ajaxParams.length; i++) {
 				ajaxUrl.setArgument(ajaxParams[i], empty(screen[ajaxParams[i]]) ? null : screen[ajaxParams[i]]);
@@ -98,8 +95,7 @@ jQuery(function($) {
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}
 
-			// SCREEN_RESOURCE_GRAPH
-			// SCREEN_RESOURCE_SIMPLE_GRAPH
+			// SCREEN_RESOURCE_GRAPH or SCREEN_RESOURCE_SIMPLE_GRAPH
 			if (screen.resourcetype == 0 || screen.resourcetype == 1) {
 				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshImg(id, function() {
@@ -179,12 +175,6 @@ jQuery(function($) {
 				if (isSelfRefresh || this.isRefreshAllowed(screen)) {
 					this.refreshHtml(id, ajaxUrl);
 				}
-			}
-
-			// SCREEN_RESOURCE_HTTPTEST_DETAILS
-			else if (screen.resourcetype == 21) {
-				ajaxUrl.setArgument('resourcetype', empty(screen.resourcetype) ? null : screen.resourcetype);
-				this.refreshHtml(id, ajaxUrl);
 			}
 
 			// others

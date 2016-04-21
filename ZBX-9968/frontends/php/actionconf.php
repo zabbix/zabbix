@@ -701,7 +701,7 @@ else {
 
 	// sorting && paging
 	order_result($data['actions'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['actions'], $sortOrder, new CUrl('actionconf.php'));
+	$data['paging'] = getPagingLine($data['actions'], $sortOrder);
 
 	// render view
 	$actionView = new CView('configuration.action.list', $data);

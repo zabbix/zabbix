@@ -71,11 +71,7 @@ class CControllerScriptList extends CController {
 
 		// sorting & paging
 		order_result($data['scripts'], $sortField, $sortOrder);
-
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'script.list');
-
-		$data['paging'] = getPagingLine($data['scripts'], $sortOrder, $url);
+		$data['paging'] = getPagingLine($data['scripts'], $sortOrder);
 
 		// find script host group name and user group name. set to '' if all host/user groups used.
 

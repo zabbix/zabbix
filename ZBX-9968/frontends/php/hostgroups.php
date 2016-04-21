@@ -416,7 +416,7 @@ else {
 	]);
 	order_result($groups, $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($groups, $sortOrder, new CUrl('hostgroups.php'));
+	$data['paging'] = getPagingLine($groups, $sortOrder);
 	$groupIds = zbx_objectValues($groups, 'groupid');
 
 	// get hosts and templates count

@@ -220,10 +220,10 @@ static char 	**extract_numbers(const char *str, int *count)
 		if (!isdigit(*s))
 			continue;
 
-		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
+		if (s != str && '{' == *(s - 1))
 		{
 			/* skip functions '{65432}' */
-			s = e;
+			s = strchr(s, '}');
 			continue;
 		}
 
@@ -3879,8 +3879,9 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 
 			if (NULL == (br = strchr(bl, '}')))
 			{
-				tr->new_error = zbx_strdup(tr->new_error, "Invalid trigger expression");
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
+				tr[i].new_error = zbx_strdup(tr[i].new_error, "Invalid trigger expression");
+				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
+				THIS_SHOULD_NEVER_HAPPEN;
 				break;
 			}
 

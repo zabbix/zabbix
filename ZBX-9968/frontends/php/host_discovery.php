@@ -443,10 +443,7 @@ else {
 	}
 
 	// paging
-	$url = (new CUrl('host_discovery.php'))
-		->setArgument('hostid', $data['hostid']);
-
-	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder, $url);
+	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

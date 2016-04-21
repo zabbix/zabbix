@@ -861,7 +861,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	 * @param array  $triggerPrototypes[]['dependencies']
 	 * @param string $triggerPrototypes[]['dependencies'][]['triggerid']
 	 */
-	public function addDependencies(array $triggerPrototypes) {
+	protected function addDependencies(array $triggerPrototypes) {
 		$this->validateAddDependencies($triggerPrototypes);
 
 		$insert = [];

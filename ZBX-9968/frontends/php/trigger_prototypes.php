@@ -376,10 +376,7 @@ else {
 	order_result($data['triggers'], $sortField, $sortOrder);
 
 	// paging
-	$url = (new CUrl('trigger_prototypes.php'))
-		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
-
-	$data['paging'] = getPagingLine($data['triggers'], $sortOrder, $url);
+	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
 
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid'],

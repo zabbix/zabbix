@@ -646,11 +646,7 @@ else {
 
 	order_result($data['graphs'], $sortField, $sortOrder);
 
-	$url = (new CUrl('graphs.php'))
-		->setArgument('groupid', $pageFilter->groupid)
-		->setArgument('hostid', $data['hostid']);
-
-	$data['paging'] = getPagingLine($data['graphs'], $sortOrder, $url);
+	$data['paging'] = getPagingLine($data['graphs'], $sortOrder);
 
 	// get graphs after paging
 	$options = [

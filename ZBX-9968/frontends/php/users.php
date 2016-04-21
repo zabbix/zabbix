@@ -374,7 +374,7 @@ else {
 
 	// sorting & paging
 	order_result($data['users'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['users'], $sortOrder, new CUrl('users.php'));
+	$data['paging'] = getPagingLine($data['users'], $sortOrder);
 
 	// set default lastaccess time to 0
 	foreach ($data['users'] as $user) {

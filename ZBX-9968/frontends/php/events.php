@@ -452,12 +452,9 @@ else {
 if (!$firstEvent) {
 	$starttime = null;
 
-	$url = (new CUrl('events.php'))
-		->setArgument('fullscreen', getRequest('fullscreen'));
-
 	if (!$csvExport) {
 		$events = [];
-		$paging = getPagingLine($events, ZBX_SORT_UP, $url);
+		$paging = getPagingLine($events, ZBX_SORT_UP);
 	}
 }
 else {
@@ -492,10 +489,7 @@ else {
 		]);
 		$dsc_events = array_slice($dsc_events, 0, $config['search_limit'] + 1);
 
-		$url = (new CUrl('events.php'))
-			->setArgument('fullscreen', getRequest('fullscreen'));
-
-		$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN, $url);
+		$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN);
 
 		if (!$csvExport) {
 			$csvDisabled = zbx_empty($dsc_events);
@@ -686,12 +680,7 @@ else {
 			$events = array_slice($events, 0, $config['search_limit'] + 1);
 
 			// get paging
-			$url = (new CUrl('events.php'))
-				->setArgument('fullscreen', getRequest('fullscreen'))
-				->setArgument('groupid', $pageFilter->groupid)
-				->setArgument('hostid', $pageFilter->hostid);
-
-			$paging = getPagingLine($events, ZBX_SORT_DOWN, $url);
+			$paging = getPagingLine($events, ZBX_SORT_DOWN);
 
 			// query event with extend data
 			$events = API::Event()->get([
@@ -824,13 +813,7 @@ else {
 		else {
 			if (!$csvExport) {
 				$events = [];
-
-				$url = (new CUrl('events.php'))
-					->setArgument('fullscreen', getRequest('fullscreen'))
-					->setArgument('groupid', $pageFilter->groupid)
-					->setArgument('hostid', $pageFilter->hostid);
-
-				$paging = getPagingLine($events, ZBX_SORT_UP, $url);
+				$paging = getPagingLine($events, ZBX_SORT_UP);
 			}
 		}
 	}

@@ -73,11 +73,7 @@ class CControllerProxyList extends CController {
 		]);
 		// sorting & paging
 		order_result($data['proxies'], $sortField, $sortOrder);
-
-		$url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'proxy.list');
-
-		$data['paging'] = getPagingLine($data['proxies'], $sortOrder, $url);
+		$data['paging'] = getPagingLine($data['proxies'], $sortOrder);
 
 		foreach ($data['proxies'] as &$proxy) {
 			order_result($proxy['hosts'], 'name');

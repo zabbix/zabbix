@@ -505,10 +505,7 @@ else {
 
 	order_result($data['items'], $sortField, $sortOrder);
 
-	$url = (new CUrl('disc_prototypes.php'))
-		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
-
-	$data['paging'] = getPagingLine($data['items'], $sortOrder, $url);
+	$data['paging'] = getPagingLine($data['items'], $sortOrder);
 
 	// render view
 	$itemView = new CView('configuration.item.prototype.list', $data);
