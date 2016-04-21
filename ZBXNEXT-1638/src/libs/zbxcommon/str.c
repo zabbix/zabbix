@@ -3578,10 +3578,7 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	char		*buffer, *ptr_buffer;
 	const char	*ptr_context;
 
-	for (ptr_context = context; ' ' == *ptr_context; ptr_context++)
-		;
-
-	if ('"' == *ptr_context)
+	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
 
 	for (; '\0' != *ptr_context; ptr_context++)
