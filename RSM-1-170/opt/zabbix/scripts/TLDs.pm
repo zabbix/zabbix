@@ -885,7 +885,7 @@ sub create_cron_jobs($) {
 	    $avail_cur += $avail_step;
 	    $avail_cur = $avail_shift if ($avail_cur >= $avail_limit);
 	}
-	else ($slv_file =~ /\.slv\..*\.rollweek\.pl$/)
+	elsif ($slv_file =~ /\.slv\..*\.rollweek\.pl$/)
 	{
 	    # rolling week
 	    system("echo '* * * * * root sleep $rollweek_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
