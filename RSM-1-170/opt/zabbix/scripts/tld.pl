@@ -135,7 +135,7 @@ pfail("SLV scripts path is not specified. Please check configuration file") unle
 
 #### Creating cron objects ####
 if (defined($OPTS{'setup-cron'})) {
-    create_cron_jobs((-d "$MYDIR/slv" ? "$MYDIR/slv" : $config->{'slv'}->{'path'}));
+    create_cron_jobs($config->{'slv'}->{'path'});
     print("cron jobs created successfully\n");
     exit;
 }
