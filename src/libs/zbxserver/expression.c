@@ -4224,7 +4224,7 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 		struct zbx_json_parse *jp_row, char *error, size_t error_len)
 {
 	char	c, *replace_to = NULL;
-	int	ret = SUCCEED, replace = 0;
+	int	ret = SUCCEED;
 	size_t	replace_to_alloc = 0;
 
 	c = (*data)[token->token.r + 1];
@@ -4240,16 +4240,18 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + token->token.l);
 			ret = FAIL;
 		}
+
+		zbx_free(replace_to);
 	}
 	else if (0 != (flags & ZBX_MACRO_NUMERIC))
 	{
 		if (SUCCEED == (ret = is_double_suffix(replace_to)))
 		{
 			replace_to = wrap_negative_double_suffix(replace_to);
-			replace = 1;
 		}
 		else
 		{
+			zbx_free(replace_to);
 			zbx_snprintf(error, error_len, "macro \"%s\" value is not numeric", *data + token->token.l);
 			ret = FAIL;
 		}
@@ -4257,10 +4259,11 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 
 	(*data)[token->token.r + 1] = c;
 
-	if (0 != replace)
+	if (NULL != replace_to)
+	{
 		zbx_replace_string(data, token->token.l, &token->token.r, replace_to);
-
-	zbx_free(replace_to);
+		zbx_free(replace_to);
+	}
 
 	return ret;
 }
@@ -4281,7 +4284,7 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, int flags,
 		struct zbx_json_parse *jp_row)
 {
-	int			force_quote = 0;
+	int			force_quote;
 	size_t			context_r;
 	char			*context, *context_esc;
 	zbx_token_user_macro_t	*macro = &token->data.user_macro;
@@ -4291,7 +4294,6 @@ static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, in
 		return;
 
 	force_quote = ('"' == (*data)[macro->context.l]);
-
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
 	/* substitute_discovery_macros() can't fail with ZBX_MACRO_CONTEXT flag set */
