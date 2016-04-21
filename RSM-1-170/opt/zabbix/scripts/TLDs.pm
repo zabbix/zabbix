@@ -839,21 +839,22 @@ sub create_cron_jobs($) {
     my $avail_shift = 0;
     my $avail_step = 1;
     my $avail_limit = 5;
-
-    my $rollweek_shift = 5;
-    my $rollweek_step = 1;
-    my $rollweek_limit = 10;
-
-    my $downtime_shift = 10;
-    my $downtime_step = 1;
-    my $downtime_limit = 15;
-
-    my $month_shift = 15;
-    my $month_step = 2;
-    my $month_limit = 25;
-
     my $avail_cur = $avail_shift;
+
+    my $rollweek_shift = 3;
+    my $rollweek_step = 1;
+    my $rollweek_limit = 8;
     my $rollweek_cur = $rollweek_shift;
+
+    my $downtime_shift = 6;
+    my $downtime_step = 1;
+    my $downtime_limit = 11;
+    my $downtime_cur = $downtime_shift;
+
+    my $month_shift = 10;
+    my $month_step = 1;
+    my $month_limit = 20;
+    my $month_cur = $month_shift;
 
     $rv = opendir DIR, $slv_path;
 
