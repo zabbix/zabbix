@@ -1082,9 +1082,6 @@ function make_trigger_details($trigger) {
 	}
 	array_pop($hostNames);
 
-	$expression = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression'],
-		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]);
-
 	$table = (new CTableInfo())
 		->addRow([
 			new CCol(_n('Host', 'Hosts', count($hosts))),
@@ -1097,10 +1094,25 @@ function make_trigger_details($trigger) {
 		->addRow([
 			_('Severity'),
 			getSeverityCell($trigger['priority'], $config)
+		]);
+
+	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [
+		'html' => true,
+		'resolve_usermacros' => true,
+		'resolve_macros' => true,
+		'sources' => ['expression', 'recovery_expression']
+	]);
+
+	$trigger = reset($trigger);
+
+	$table
+		->addRow([
+			new CCol(_('Problem expression')),
+			new CCol($trigger['expression'])
 		])
 		->addRow([
-			new CCol(_('Expression')),
-			new CCol($expression)
+			new CCol(_('Recovery expression')),
+			new CCol($trigger['recovery_expression'])
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])

@@ -45,9 +45,10 @@ $triggersTable = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
-$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'],
-	['html' => true, 'sources' => ['expression', 'recovery_expression']]
-);
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
+	'html' => true,
+	'sources' => ['expression', 'recovery_expression']
+]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
