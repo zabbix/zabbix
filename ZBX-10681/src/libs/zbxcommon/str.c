@@ -3382,7 +3382,7 @@ out:
  *                             parameter separator: (p1,p2 ... or ,p2,p3 ...  *
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
- *             length    - [OUT] the parameter length excluding trailing      *
+ *             length    - [OUT] the parameter length including trailing      *
  *                               whitespace                                   *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
