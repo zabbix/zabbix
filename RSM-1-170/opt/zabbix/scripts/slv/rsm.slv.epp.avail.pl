@@ -12,25 +12,27 @@ use strict;
 use warnings;
 use RSM;
 use RSMSLV;
+use Alerts;
+use Parallel;
 
 my $cfg_key_in = 'rsm.epp[{$RSM.TLD}';
 my $cfg_key_out = 'rsm.slv.epp.avail';
 
-parse_avail_opts();
+parse_avail_opts('now=i');
 exit_if_running();
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $interval = get_macro_epp_delay();
+my $delay = get_macro_epp_delay();
 my $cfg_minonline = get_macro_epp_probe_online();
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
-my $clock = (opt('from') ? getopt('from') : $now - $interval - AVAIL_SHIFT_BACK);
-my $period = (opt('period') ? getopt('period') : 1);
+my $now = (opt('now') ? getopt('now') : time());
+my $cycles = (opt('cycles') ? getopt('cycles') : 1);
 
-my $max_avail_time = max_avail_time($now);
+my $max_avail_time = max_avail_time($delay);
 
 my $tlds_ref;
 if (opt('tld'))
@@ -41,47 +43,88 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds();
+        $tlds_ref = get_tlds('EPP');
 }
 
-while ($period > 0)
-{
-	my ($from, $till, $value_ts) = get_interval_bounds($interval, $clock);
+my $times_from = get_cycle_bounds($now - $delay, $delay);
+my $times_till = ($times_from + $delay + $delay * $cycles - 1);
+my $probe_times_ref = get_probe_times($times_from, $times_till);
 
-	$period -= $interval / 60;
-	$clock += $interval;
+while ($cycles > 0)
+{
+	my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
+
+	$cycles--;
+	$now += $delay;
 
 	next if ($till > $max_avail_time);
 
-	my $probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
+	my $tld_index = 0;
+	my $tld_count = scalar(@{$tlds_ref});
 
-	init_values();
-
-	foreach (@$tlds_ref)
+	while ($tld_index < $tld_count)
 	{
-		$tld = $_;	# set global variable here
+		my $pid = fork_without_pipe();
 
-		my $itemid = get_itemid_by_host($tld, $cfg_key_out);
-		if (!$itemid)
+		if (!defined($pid))
 		{
-			wrn("configuration error: ", rsm_slv_error());
-			next;
+			# max children reached, make sure to handle_children()
+		}
+		elsif ($pid)
+		{
+			# parent
+			$tld_index++;
+		}
+		else
+		{
+			# child
+			$tld = $tlds_ref->[$tld_index];
+
+			db_connect();
+
+			if (!opt('dry-run'))
+			{
+				my $itemid = get_itemid_by_host($tld, $cfg_key_out);
+				if (!$itemid)
+				{
+					wrn("configuration error: ", rsm_slv_error());
+					exit(0);
+				}
+
+				exit(0) if (avail_value_exists($value_ts, $itemid) == SUCCESS);
+			}
+
+			my $result = process_slv_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline, $probe_times_ref,
+				\&check_item_values);
+
+			exit(0) unless ($result);
+
+			my $value = $result->{'value'};
+			my $message = $result->{'message'};
+			my $alert = $result->{'alert'};
+
+			init_values();
+
+			push_value($tld, $cfg_key_out, $value_ts, $value, $message);
+
+			add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld ($message)") if ($alert);
+
+			send_values();
+
+			exit(0);
 		}
 
-		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
-		{
-			# value already exists
-			next unless (opt('dry-run'));
-		}
-
-		process_slv_avail($tld, $cfg_key_in, $cfg_key_out, $from, $till, $value_ts, $cfg_minonline,
-			$probe_avail_limit, $probes_ref, \&check_item_values);
+		handle_children();
 	}
 
 	# unset TLD (for the logs)
 	$tld = undef;
+}
 
-	send_values();
+# wait till children finish
+while (children_running() > 0)
+{
+	handle_children();
 }
 
 slv_exit(SUCCESS);
@@ -90,14 +133,11 @@ slv_exit(SUCCESS);
 # E_FAIL  - all values unsuccessful
 sub check_item_values
 {
-	my $values_ref = shift;
+	my $value = shift;
 
-	return SUCCESS if (scalar(@$values_ref) == 0);
+	return SUCCESS if (!defined($value));
 
-	foreach (@$values_ref)
-	{
-		return SUCCESS if ($_ == UP);
-	}
+	return SUCCESS if ($value == UP);
 
 	return E_FAIL;
 }

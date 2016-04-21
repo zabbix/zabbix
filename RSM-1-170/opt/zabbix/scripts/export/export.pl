@@ -136,8 +136,7 @@ if (opt('probe'))
 	$all_probes_ref->{getopt('probe')} = $temp->{getopt('probe')};
 }
 
-my $probe_avail_limit = get_macro_probe_avail_limit();
-my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $all_probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $all_probes_ref);
 
 if (opt('debug'))
 {
@@ -651,7 +650,7 @@ sub __get_test_data
 					# the status is set later
 					$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = undef;
 
-					if (probe_offline_at($probe_times_ref, $probe, $cycleclock) != 0)
+					if (probe_offline_at($probe_times_ref, $probe, $cycleclock) == SUCCESS)
 					{
 						$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
 					}

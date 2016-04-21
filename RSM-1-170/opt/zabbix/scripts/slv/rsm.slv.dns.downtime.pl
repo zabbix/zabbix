@@ -23,13 +23,11 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $interval = get_macro_dns_udp_delay();
+my $delay = get_macro_dns_udp_delay();
+my $now = time();
 
-# second one is unused
-my ($from, $till, $value_ts) = get_interval_bounds($interval);
-
-my ($curmon_from) = get_curmon_bounds();
-my $curmon_till = $from;
+my ($month_from, undef, $value_ts) = get_month_bounds($now, $delay);
+my $month_till = cycle_end($value_ts, $delay);
 
 my %tld_items;
 
@@ -55,14 +53,14 @@ my $sth = get_downtime_prepare();
 
 foreach (keys(%tld_items))
 {
-	$tld = $_; # set global variable here
+	$tld = $_;	# set global variable here
 
 	my $itemid = $tld_items{$tld};
 
-	my $downtime = get_downtime_execute($sth, $itemid, $curmon_from, $curmon_till);
+	my $downtime = get_downtime_execute($sth, $itemid, $month_from, $month_till);
 
 	push_value($tld, $cfg_key_out, $value_ts, $downtime, "$downtime minutes of downtime from ",
-		ts_str($curmon_from), " ($curmon_from) till ", ts_str($curmon_till), " ($curmon_till)");
+		ts_full($month_from), " till ", ts_full($month_till));
 }
 
 # unset TLD (for the logs)

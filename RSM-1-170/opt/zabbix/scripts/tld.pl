@@ -1207,8 +1207,17 @@ sub create_all_slv_ns_items {
     my $ip = shift;
     my $hostid = shift;
 
-    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'rsm.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'rsm.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    # Monthly DNS NS (TCP and UDP)
+    foreach my $p ('tcp', 'udp')
+    {
+        my $p_uc = uc($p);
+
+        create_slv_item('% of failed DNS NS ($p_uc): $1 ($2)', 'rsm.slv.dns.ns.rtt.$p.pfailed['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+        create_slv_item('Failed DNS NS ($p_uc): $1 ($2)',      'rsm.slv.dns.ns.rtt.$p.failed[' .$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM,  [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+        create_slv_item('Maximum DNS NS ($p_uc): $1 ($2)',     'rsm.slv.dns.ns.rtt.$p.max['    .$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM,  [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+        create_slv_item('Average DNS NS ($p_uc): $1 ($2)',     'rsm.slv.dns.ns.rtt.$p.avg['    .$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM,  [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+    }
+
     create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]) if (defined($OPTS{'epp-servers'}));
     create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
     create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_CURMON, $hostid)]);

@@ -217,8 +217,6 @@ my ($rollweek_from, $rollweek_till) = get_rollweek_bounds($now);
 
 my $servicedata;	# hash with various data of TLD service
 
-my $probe_avail_limit = get_macro_probe_avail_limit();
-
 my $config_minclock = __get_config_minclock();
 
 dbg("config_minclock:$config_minclock");
@@ -394,7 +392,7 @@ if (opt('probe'))
 	$all_probes_ref->{getopt('probe')} = $temp->{getopt('probe')};
 }
 
-my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $all_probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $all_probes_ref);
 
 foreach (keys(%$servicedata))
 {
@@ -670,7 +668,7 @@ foreach (keys(%$servicedata))
 						# the status is set later
 						$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = undef;
 
-						if (probe_offline_at($probe_times_ref, $probe, $cycleclock) != 0)
+						if (probe_offline_at($probe_times_ref, $probe, $cycleclock) == SUCCESS)
 						{
 							$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
 						}
@@ -771,7 +769,7 @@ foreach (keys(%$servicedata))
 
 			# 			$cycle_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
 
-			# 			if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
+			# 			if (probe_offline_at($probe_times_ref, $probe, $clock) == SUCCESS)
 			# 			{
 			# 				$cycle_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
 			# 			}
@@ -1128,7 +1126,7 @@ sub __get_rollweek
 
 	$clock = time() unless($clock);
 
-	my ($from, $till) = get_interval_bounds($delay, $clock);
+	my ($from, $till) = get_cycle_bounds($clock, $delay);
 
 	my $rows_ref = db_select(
 		"select value".

@@ -1,9 +1,13 @@
 #!/usr/bin/perl -w
 
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
+
 use strict;
 use warnings;
-
-use lib '/opt/zabbix/scripts';
 use RSM;
 use RSMSLV;
 
@@ -28,65 +32,59 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my ($key, $cfg_max_value, $service_type, $delay, $eomonth);
+my ($key, $cfg_max_value, $service_type, $delay);
 
-my $from = getopt('from');
-my $till = getopt('till');
-my $value_ts = $till;
+my ($from, $till);
 
-# calculate estimated total number of tests this month unless at least one time bound specified
-my $calculate_month_total = ((defined($from) or defined($till)) ? 0 : 1);
-
-unless (defined($from) and defined($till))
+if (opt('from'))
 {
-	my @bounds = get_curmon_bounds();
-
-	$from = $bounds[0] unless (defined($from));
-	$till = $bounds[1] unless (defined($till));
-	$value_ts = $till;
-	$eomonth = $bounds[2];
+	$from = truncate_from(getopt('from'));
+}
+if (opt('till'))
+{
+	$till = truncate_till(getopt('till'));
 }
 
 if (getopt('service') eq 'tcp-dns-rtt')
 {
 	$key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
 	$cfg_max_value = get_macro_dns_tcp_rtt_low();
-	$delay = get_macro_dns_tcp_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_dns_tcp_delay();
 	$service_type = 'DNS';
 }
 elsif (getopt('service') eq 'udp-dns-rtt')
 {
 	$key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	$cfg_max_value = get_macro_dns_udp_rtt_low();
-	$delay = get_macro_dns_udp_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_dns_udp_delay();
 	$service_type = 'DNS';
 }
 elsif (getopt('service') eq 'dns-upd')
 {
 	$key = 'rsm.dns.udp.upd[{$RSM.TLD},';
 	$cfg_max_value = get_macro_dns_update_time();
-	$delay = get_macro_dns_udp_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_dns_udp_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'rdds43-rtt')
 {
 	$key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 	$cfg_max_value = get_macro_rdds_rtt_low();
-	$delay = get_macro_rdds_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_rdds_delay();
 	$service_type = 'RDDS';
 }
 elsif (getopt('service') eq 'rdds80-rtt')
 {
 	$key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 	$cfg_max_value = get_macro_rdds_rtt_low();
-	$delay = get_macro_rdds_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_rdds_delay();
 	$service_type = 'RDDS';
 }
 elsif (getopt('service') eq 'rdds-upd')
 {
 	$key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
 	$cfg_max_value = get_macro_rdds_rtt_low();
-	$delay = get_macro_rdds_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_rdds_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'epp-login-rtt')
@@ -94,7 +92,7 @@ elsif (getopt('service') eq 'epp-login-rtt')
 	my $command = 'login';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
 	$cfg_max_value = get_macro_epp_rtt_low($command);
-	$delay = get_macro_epp_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_epp_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'epp-info-rtt')
@@ -102,7 +100,7 @@ elsif (getopt('service') eq 'epp-info-rtt')
 	my $command = 'info';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
 	$cfg_max_value = get_macro_epp_rtt_low($command);
-	$delay = get_macro_epp_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_epp_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'epp-update-rtt')
@@ -110,7 +108,7 @@ elsif (getopt('service') eq 'epp-update-rtt')
 	my $command = 'update';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
 	$cfg_max_value = get_macro_epp_rtt_low($command);
-	$delay = get_macro_epp_delay() if ($calculate_month_total != 0);
+	$delay = get_macro_epp_delay();
 	$service_type = 'EPP';
 }
 else
@@ -119,9 +117,12 @@ else
 	usage(2);
 }
 
-my $probe_avail_limit = get_macro_probe_avail_limit();
+($from, $till) = get_default_period(time() - $delay - AVAIL_SHIFT_BACK, $delay, getopt('from'), getopt('till'));
+
+info('selected period: ', selected_period($from, $till));
+
 my $probes_ref = get_probes($service_type);
-my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $probes_ref);
 my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
 foreach (@$tlds_ref)
@@ -132,7 +133,7 @@ foreach (@$tlds_ref)
 
 	if ("," eq substr($key, -1))
 	{
-		my $nsips_ref = get_nsips($tld, $key, 1); # templated
+		my $nsips_ref = get_nsips($tld, $key);
 		$items_ref = __get_all_ns_items($nsips_ref, $key, $tld);
 	}
 	else
@@ -140,13 +141,14 @@ foreach (@$tlds_ref)
 		$items_ref = get_all_items($key, $tld);
 	}
 
-	my $result = get_results($tld, $value_ts, $probe_times_ref, $items_ref, \&__check_test);
+	my $result = get_results($tld, $probe_times_ref, $items_ref, \&__check_test);
 
 	foreach my $nsip (keys(%$result))
 	{
 		my $total = $result->{$nsip}->{'total'};
 		my $successful = $result->{$nsip}->{'successful'};
 		my $nsip_label = '';
+
 		$nsip_label = "$nsip: " unless ($nsip eq '');
 
 		if ($total == 0)
@@ -156,12 +158,6 @@ foreach (@$tlds_ref)
 		}
 
 		info($nsip_label, "$successful/$total successful results from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");
-
-		if ($calculate_month_total != 0)
-		{
-			my $month_total = $total + int(($eomonth - $value_ts) / $delay);
-			info($nsip_label, "month total $month_total tests");
-		}
 	}
 }
 

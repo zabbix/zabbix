@@ -13,37 +13,25 @@ use warnings;
 use RSM;
 use RSMSLV;
 use Parallel;
+use Alerts;
 
 my $cfg_key_in = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 my $cfg_key_out = 'rsm.slv.dns.ns.avail[';
-my $cfg_key_out_md = 'rsm.slv.dns.ns.downtime[';	# monthly downtime in minutes
 
-parse_avail_opts('now=i');
+parse_avail_opts();
 exit_if_running();
 
-my $now;
-if (opt('now'))
-{
-	$now = getopt('now');
-
-	setopt('nolog');
-	setopt('dry-run');
-}
-else
-{
-	$now = time();
-}
+my $now = (opt('now') ? getopt('now') : time());
+my $cycles = (opt('cycles') ? getopt('cycles') : 1);
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $interval = get_macro_dns_udp_delay($now);
+my $delay = get_macro_dns_udp_delay($now);
 my $cfg_minonline = get_macro_dns_probe_online();
 my $cfg_max_value = get_macro_dns_udp_rtt_high();
-my $probe_avail_limit = get_macro_probe_avail_limit();
-
-my ($from, $till, $value_ts) = get_interval_bounds($interval, $now);
+my $max_avail_time = max_avail_time($delay);
 
 my $tlds_ref;
 if (opt('tld'))
@@ -57,76 +45,90 @@ else
 	$tlds_ref = get_tlds();
 }
 
-my @tlds;
+my $times_from = get_cycle_bounds($now - $delay, $delay);
+my $times_till = ($times_from + $delay + $delay * $cycles - 1);
+my $probe_times_ref = get_probe_times($times_from, $times_till);
 
-foreach (@$tlds_ref)
+while ($cycles > 0)
 {
-	$tld = $_; # set global variable here
+	my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
 
-	my $result;
+	$cycles--;
+	$now += $delay;
 
-	if (get_lastclock($tld, $cfg_key_out, \$result) != SUCCESS)
+	next if ($till > $max_avail_time);
+
+	my $tld_index = 0;
+	my $tld_count = scalar(@{$tlds_ref});
+
+	while ($tld_index < $tld_count)
 	{
-		wrn("configuration error: DNS NS availability items not found (\"$cfg_key_out*\")");
-		next;
-	}
+		my $pid = fork_without_pipe();
 
-	if (avail_value_exists($value_ts, $result->{'itemid'}) == SUCCESS)
-	{
-		# value already exists
-		next unless (opt('dry-run'));
-	}
-
-	push(@tlds, $tld);
-}
-
-$tld = undef;
-
-my $tld_index = 0;
-my $tld_count = scalar(@tlds);
-
-my $cycleclock = cycle_start($value_ts, $interval);
-
-while ($tld_index < $tld_count)
-{
-	my $pid = fork_without_pipe();
-
-	if (!defined($pid))
-	{
-		# max children reached, make sure to handle_children()
-	}
-	elsif ($pid)
-	{
-		# parent
-		$tld_index++;
-	}
-	else
-	{
-		# child
-		$tld = $tlds[$tld_index];
-
-		init_values();
-
-		db_connect();
-
-		my $values = process_slv_ns_avail($tld, $cfg_key_in, $cfg_key_out, $cfg_key_out_md, $from, $till, $value_ts,
-			$cfg_minonline, $probe_avail_limit, \&check_item_value);
-
-		if ($values == 0)
+		if (!defined($pid))
 		{
-			wrn("no DNS UDP test results found in the database (cycle: ", ts_full(cycle_start($value_ts, $interval)), ")");
+			# max children reached, make sure to handle_children()
+		}
+		elsif ($pid)
+		{
+			# parent
+			$tld_index++;
+		}
+		else
+		{
+			# child
+			$tld = $tlds_ref->[$tld_index];
+
+			db_connect();
+
+			if (!opt('dry-run'))
+			{
+				my $result;
+
+				if (get_lastclock($tld, $cfg_key_out, \$result) != SUCCESS)
+				{
+					wrn("configuration error: DNS NS availability items not found (\"$cfg_key_out*\")");
+					exit(0);
+				}
+
+				exit(0) if (avail_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
+			}
+
+			my $result = process_slv_ns_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline,
+				$probe_times_ref, \&check_item_value);
+
+			if (scalar(keys(%{$result})) == 0)
+			{
+				wrn("no DNS NS UDP test results found in the database (cycle: ", ts_full(cycle_start($value_ts, $delay)), ")");
+			}
+			else
+			{
+				init_values();
+
+				foreach my $nsip (keys(%$result))
+				{
+					my $key = $cfg_key_out . $nsip . ']';
+					my $value = $result->{$nsip}->{'value'};
+					my $message = $result->{$nsip}->{'message'};
+					my $alert = $result->{$nsip}->{'alert'};
+
+					push_value($tld, $key, $value_ts, $value, $message);
+
+					add_alert(ts_str($value_ts) . "#system#zabbix#$key#PROBLEM#$tld ($message)") if ($alert);
+				}
+
+				send_values();
+			}
+
+			exit(0);
 		}
 
-		send_values();
-
-		exit(0);
+		handle_children();
 	}
 
-	handle_children();
+	# unset TLD (for the logs)
+	$tld = undef;
 }
-
-# unset TLD (for the logs)
-$tld = undef;
 
 # wait till children finish
 while (children_running() > 0)
