@@ -867,16 +867,16 @@ sub create_cron_jobs($) {
 	if ($slv_file =~ /\.slv\..*\.month\.pl$/)
 	{
 	    # monthly data
+	    system("echo '* * * * * root sleep $month_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
 	    $month_cur += $month_step;
 	    $month_cur = $month_shift if ($month_cur >= $month_limit);
-	    system("echo '* * * * * root $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
 	}
 	elsif ($slv_file =~ /\.slv\..*\.downtime\.pl$/)
 	{
 	    # downtime
+	    system("echo '* * * * * root sleep $downtime_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
 	    $downtime_cur += $downtime_step;
 	    $downtime_cur = $downtime_shift if ($downtime_cur >= $downtime_limit);
-	    system("echo '* * * * * root $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
 	}
 	elsif ($slv_file =~ /\.slv\..*\.avail\.pl$/)
 	{
