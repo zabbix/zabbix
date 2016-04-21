@@ -388,8 +388,10 @@ else {
 
 	order_result($data['hostPrototypes'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['hostPrototypes'], $sortOrder);
+	$url = (new CUrl('host_prototypes.php'))
+		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 
+	$data['paging'] = getPagingLine($data['hostPrototypes'], $sortOrder, $url);
 	// fetch templates linked to the prototypes
 	$templateIds = [];
 	foreach ($data['hostPrototypes'] as $hostPrototype) {
