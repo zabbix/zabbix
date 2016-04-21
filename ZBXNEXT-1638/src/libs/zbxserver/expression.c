@@ -2369,7 +2369,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, calc_macro,
+	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, func_macro,
 				found;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
@@ -2405,7 +2405,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	for (found = SUCCEED; SUCCEED == res && SUCCEED == found; found = zbx_token_find(*data, pos, &token))
 	{
 		indexed_macro = 0;
-		calc_macro = 0;
+		func_macro = 0;
 		require_numeric = 0;
 		/* temporarily reset function id to 0 before parsing possible indexed macros */
 		N_functionid = 0;
@@ -2417,15 +2417,15 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				/* neither lld or {123123} macros are processed by this function, skip them */
 				pos = token.token.r + 1;
 				continue;
-			case ZBX_TOKEN_SIMPLE_MACRO:
+			case ZBX_TOKEN_MACRO:
 				p = *data + token.token.r - 1;
 				m = *data + token.token.l;
 				if ('1' <= *p && *p <= '9')
 					N_functionid = *p - '0';
 				break;
-			case ZBX_TOKEN_CALC_MACRO:
-				p = *data + token.data.calc_macro.macro.r - 1;
-				m = *data + token.data.calc_macro.macro.l;
+			case ZBX_TOKEN_FUNC_MACRO:
+				p = *data + token.data.func_macro.macro.r - 1;
+				m = *data + token.data.func_macro.macro.l;
 				if ('1' <= *p && *p <= '9')
 					N_functionid = *p - '0';
 				break;
@@ -2559,7 +2559,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
-					calc_macro = 1;
+					func_macro = 1;
 					ret = DBitem_lastvalue(c_event->trigger.expression, &replace_to, N_functionid);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
@@ -2616,7 +2616,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
 				{
-					calc_macro = 1;
+					func_macro = 1;
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
 							c_event->clock, c_event->ns);
 				}
@@ -3334,12 +3334,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
-					calc_macro = 1;
+					func_macro = 1;
 					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid);
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
 				{
-					calc_macro = 1;
+					func_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
 							event->clock, event->ns);
 				}
@@ -3555,12 +3555,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
 
-		if (ZBX_TOKEN_CALC_MACRO == token.type && NULL != replace_to)
+		if (ZBX_TOKEN_FUNC_MACRO == token.type && NULL != replace_to)
 		{
-			if (0 != calc_macro)
+			if (0 != func_macro)
 			{
-				ret = zbx_calculate_macro_function(*data + token.data.calc_macro.func.l,
-						token.data.calc_macro.func.r - token.data.calc_macro.func.l + 1,
+				ret = zbx_calculate_macro_function(*data + token.data.func_macro.func.l,
+						token.data.func_macro.func.r - token.data.func_macro.func.l + 1,
 						&replace_to);
 			}
 			else
@@ -4144,7 +4144,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  * Purpose: trying to resolve the discovery macros in item key parameters     *
  *          in simple macros like {host:key[].func()}                         *
  *                                                                            *
- * Comments: This function could be improved by using zbx_token_func_macro_t  *
+ * Comments: This function could be improved by using zbx_token_simple_macro_t*
  *           structure host, key, func fields.                                *
  *                                                                            *
  ******************************************************************************/
@@ -4235,7 +4235,7 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot substitute macro \"%s\": not found in value set",
 				*data + token->token.l);
 
-		if (0 != (flags & ZBX_MACRO_NUMERIC))
+		if (0 != (flags & ZBX_TOKEN_NUMERIC))
 		{
 			zbx_snprintf(error, error_len, "no value for macro \"%s\"", *data + token->token.l);
 			ret = FAIL;
@@ -4243,7 +4243,7 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 
 		zbx_free(replace_to);
 	}
-	else if (0 != (flags & ZBX_MACRO_NUMERIC))
+	else if (0 != (flags & ZBX_TOKEN_NUMERIC))
 	{
 		if (SUCCEED == (ret = is_double_suffix(replace_to)))
 		{
@@ -4297,7 +4297,7 @@ static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, in
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
 	/* substitute_discovery_macros() can't fail with ZBX_MACRO_CONTEXT flag set */
-	substitute_discovery_macros(&context, jp_row, ZBX_MACRO_CONTEXT, NULL, 0);
+	substitute_discovery_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
@@ -4350,33 +4350,34 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 		switch (token.type)
 		{
 			case ZBX_TOKEN_LLD_MACRO:
-				ret = substitute_discovery_macros_lld(data, &token, flags, jp_row, error,
-						max_error_len);
-
+				if (0 != (flags & ZBX_TOKEN_LLD_MACRO))
+				{
+					ret = substitute_discovery_macros_lld(data, &token, flags, jp_row, error,
+							max_error_len);
+					pos = token.token.r;
+				}
 				break;
 			case ZBX_TOKEN_USER_MACRO:
-				if (0 != (flags & ZBX_MACRO_CONTEXT))
+				if (0 != (flags & ZBX_TOKEN_USER_MACRO))
 				{
-					pos++;
-					continue;
+					substitute_discovery_macros_user(data, &token, flags, jp_row);
+					pos = token.token.r;
 				}
-
-				substitute_discovery_macros_user(data, &token, flags, jp_row);
-
+				break;
+			case ZBX_TOKEN_SIMPLE_MACRO:
+				if (0 != (flags & ZBX_TOKEN_SIMPLE_MACRO))
+				{
+					substitute_discovery_macros_simple(data, &token, jp_row);
+					pos = token.token.r;
+				}
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
-				if (0 == (flags & ZBX_MACRO_SIMPLE))
-				{
-					pos++;
-					continue;
-				}
-
-				substitute_discovery_macros_simple(data, &token, jp_row);
-
+				if (0 != (flags & ZBX_TOKEN_FUNC_MACRO))
+					pos = token.token.r;
 				break;
 		}
 
-		pos = token.token.r + 1;
+		pos++;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
