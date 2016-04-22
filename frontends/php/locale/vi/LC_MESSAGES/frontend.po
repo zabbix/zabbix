@@ -3,17 +3,17 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:25+0300\n"
-"PO-Revision-Date: 2016-02-22 02:38+0300\n"
-"Last-Translator: Trung <tvtrung@monre.gov.vn>\n"
+"PO-Revision-Date: 2016-03-24 09:34+0300\n"
+"Last-Translator: Đào <nadao@monre.gov.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1456101528.0\n"
+"X-POOTLE-MTIME: 1458804869.000000\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:508 api/classes/CMaintenance.php:513
@@ -66,7 +66,7 @@ msgstr[0] "%1$s ngày"
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] "%4$s lần đăng nhập thất bại được ghi nhận. Đăng nhập thất bại cuối từ %1$s vào %2$s lúc %3$s."
+msgstr[0] "%4$s lần đăng nhập thất bại được ghi nhận. Đăng nhập thất bại lần cuối từ %1$s vào %2$s lúc %3$s."
 
 #: include/views/monitoring.discovery.php:131
 #, c-format
@@ -100,7 +100,7 @@ msgstr "(giây)"
 
 #: include/views/configuration.action.edit.php:485
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr "(tối thiểu 60 giây, 0 - sử dụng hành động mặc định)"
+msgstr "(tối thiểu 60 giây, 0 - sử dụng hoạt động mặc định)"
 
 #: include/views/configuration.host.edit.php:426
 #: include/views/configuration.host.edit.php:447
@@ -189,11 +189,11 @@ msgstr "VÀ / HOẶC"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "AUDIT ACTIONS"
-msgstr "CÁC HÀNH ĐỘNG KIỂM SOÁT"
+msgstr "KIỂM SOÁT HOẠT ĐỘNG "
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOGS"
-msgstr "NHẬT KÝ KIỂM SOÁT"
+msgstr "KIỂM SOÁT ĐĂNG NHẬP"
 
 #: report2.php:153
 msgid "AVAILABILITY REPORT"
@@ -201,19 +201,19 @@ msgstr "Thông báo tính sẵn sàng"
 
 #: popup_trexpr.php:139
 msgid "Absolute difference between last and previous value is < N"
-msgstr "Khoảng cách giữa giá trị mới nhất và trước đó < N"
+msgstr "Chênh lệch tuyệt đối giữa giá trị cuối cùng và giá trị trước đó < N"
 
 #: popup_trexpr.php:147
 msgid "Absolute difference between last and previous value is = N"
-msgstr "Khoảng cách giữa giá trị mới nhất và trước đó = N"
+msgstr "Chênh lệch tuyệt đối giữa giá trị cuối cùng và giá trị trước đó = N"
 
 #: popup_trexpr.php:143
 msgid "Absolute difference between last and previous value is > N"
-msgstr "Khoảng cách giữa giá trị mới nhất và trước đó > N"
+msgstr "Chênh lệch tuyệt đối giữa giá trị cuối cùng và giá trị trước đó > N"
 
 #: popup_trexpr.php:151
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr "Khoảng cách giữa giá trị mới nhất và trước đó khác N"
+msgstr "Chênh lệch tuyệt đối giữa giá trị cuối cùng và giá trị trước đó khác N"
 
 #: report3.php:83 srv_status.php:142
 msgid "Acceptable SLA"
@@ -269,7 +269,7 @@ msgstr "Sự kiện được ghi nhận OK"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Sự cố được ghi nhận"
+msgstr "Sự kiện PROBLEM được ghi nhận"
 
 #: acknow.php:27 tr_events.php:121
 msgid "Acknowledges"
@@ -304,49 +304,49 @@ msgstr "Ghi nhận bị vô hiệu hóa"
 #: include/views/configuration.triggers.massupdate.php:89 tr_logform.php:303
 #: tr_logform.php:307
 msgid "Action"
-msgstr "Hành động"
+msgstr "Hoạt động"
 
 #: api/classes/CAction.php:544 api/classes/CAction.php:558
 #: api/classes/CAction.php:675 api/classes/CAction.php:697
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr "Hành động \"%1$s\" đã tồn tại."
+msgstr "Hoạt động\"%1$s\" đã tồn tại."
 
 #: api/classes/CAction.php:541 api/classes/CAction.php:660
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "Hành động \"%1$s\" chứa giá trị không chính xác cho \"esc_period\" (tối thiểu %2$s giây)."
+msgstr "Hoạt động \"%1$s\" chứa giá trị không chính xác cho \"esc_period\" (tối thiểu %2$s giây)."
 
 #: api/classes/CAction.php:742
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr "Hành động \"%1$s\" không có thao tác được định nghĩa."
+msgstr "Hoạt động \"%1$s\" không có thao tác được định nghĩa."
 
 #: actionconf.php:158
 msgid "Action added"
-msgstr "Action được thêm vào"
+msgstr "Hoạt động được thêm vào"
 
 #: actionconf.php:177
 msgid "Action deleted"
-msgstr "Hành động đã được xóa"
+msgstr "Hoạt động đã được xóa"
 
 #: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] "Hành động đã vô hiệu hóa"
+msgstr[0] "Hoạt động đã vô hiệu hóa"
 
 #: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] "Hành động đã bật"
+msgstr[0] "Hoạt động đã kích hoạt"
 
 #: include/views/configuration.action.edit.php:444
 msgid "Action operations"
-msgstr "Các hoạt động"
+msgstr "Thao tác hoạt động"
 
 #: actionconf.php:150
 msgid "Action updated"
-msgstr "Hành động đã cập nhật"
+msgstr "Hoạt động đã cập nhật"
 
 #: events.php:591 events.php:604 include/blocks.inc.php:954
 #: include/blocks.inc.php:1530 include/events.inc.php:205
@@ -355,7 +355,7 @@ msgstr "Hành động đã cập nhật"
 #: include/views/administration.auditlogs.list.php:29
 #: include/views/configuration.action.list.php:40
 msgid "Actions"
-msgstr "Hành động"
+msgstr "Hoạt động"
 
 #: include/views/administration.proxy.edit.php:42
 #: include/views/administration.proxy.list.php:93
@@ -444,7 +444,7 @@ msgstr "Thêm phần tử"
 
 #: include/actions.inc.php:403 include/actions.inc.php:637
 msgid "Add host"
-msgstr "Thêm host"
+msgstr "Thêm máy chủ"
 
 #: include/views/configuration.sysmap.constructor.php:33
 msgid "Add link"
@@ -460,7 +460,7 @@ msgstr "Thêm mới hoặc thoát khỏi ứng dụng"
 
 #: include/views/configuration.host.massupdate.php:119
 msgid "Add new or existing host groups"
-msgstr "thêm mới hoặc thoát khỏi nhóm host"
+msgstr "Thêm nhóm máy chủ mới hoặc đã tồn tại"
 
 #: include/views/configuration.graph.edit.php:241
 msgid "Add prototype"
@@ -481,11 +481,11 @@ msgstr "Thêm vào ưa thích"
 
 #: include/actions.inc.php:641
 msgid "Add to host group"
-msgstr "Thêm vào nhóm host"
+msgstr "Thêm vào nhóm máy chủ"
 
 #: include/actions.inc.php:429 include/views/configuration.action.edit.php:865
 msgid "Add to host groups"
-msgstr "Thêm vào nhóm host"
+msgstr "Thêm vào nhóm máy chủ"
 
 #: auditlogs.php:134
 msgid "Added"
@@ -526,7 +526,7 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:315
 msgid "Agent host name defined in the configuration file. String value."
-msgstr "Xác định agent host name trong file cấu hình. Chuỗi giá trị."
+msgstr "Xác định tên máy chủ agent trong file cấu hình. Chuỗi giá trị."
 
 #: include/views/configuration.host.edit.php:297
 #: include/views/configuration.host.edit.php:381
@@ -541,7 +541,7 @@ msgstr "Agent hoặc SNMP hoặc JMX hoặc IPMI interface"
 
 #: include/classes/items/CHelpItems.php:577
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
-msgstr "Tập hợp các kiểm tra yêu cầu không được bất kỳ agent nào đang chạy trên host thì được theo dõi. Zabbix server thu thập các tập hợp thông tin bằng cách trực tiếp. Xem hướng dẫn Zabbix."
+msgstr "Tập hợp các kiểm tra yêu cầu không được bất kỳ agent nào đang chạy trên máy chủ thì được theo dõi. Zabbix server thu thập các tập hợp thông tin bằng cách trực tiếp. Xem hướng dẫn Zabbix."
 
 #: include/hosts.inc.php:120 include/views/administration.users.edit.php:52
 #: include/views/administration.users.list.php:55 popup.php:631 users.php:44
@@ -591,7 +591,7 @@ msgstr "Tất cả các node"
 #: include/views/configuration.item.edit.php:438
 #: include/views/configuration.item.massupdate.php:457
 msgid "Allowed hosts"
-msgstr "Những host được phép"
+msgstr "Máy chủ được phép"
 
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:555
@@ -680,7 +680,7 @@ msgstr "Tháng tư"
 
 #: include/classes/class.cbuttonqmessage.php:49
 msgid "Are you sure you want perform this action?"
-msgstr "Bạn có chắc muốn thực hiện hành động này?"
+msgstr "Bạn có chắc muốn thực hiện hoạt động này?"
 
 #: include/views/js/common.macros.js.php:53
 msgid "Are you sure you want to delete"
@@ -743,7 +743,7 @@ msgstr "Tại (giờ: phút)"
 
 #: api/classes/CMaintenance.php:332 api/classes/CMaintenance.php:538
 msgid "At least one host or group should be selected."
-msgstr "Ít nhất một host hoặc nhóm nên được chọn."
+msgstr "Ít nhất một máy chủ hoặc nhóm nên được chọn."
 
 #: api/classes/CMaintenance.php:402 api/classes/CMaintenance.php:409
 #: api/classes/CMaintenance.php:523 api/classes/CMaintenance.php:528
@@ -757,24 +757,24 @@ msgstr "Ít nhất một trong các MySQL, PostgreSQL, Oracle, SQLite3 hoă�
 #: include/menu.inc.php:264
 #: include/views/administration.general.housekeeper.edit.php:99
 msgid "Audit"
-msgstr "Kiểm tra"
+msgstr "Kiểm soát"
 
 #: auditacts.php:27
 msgid "Audit actions"
-msgstr "Các hành động kiểm tra"
+msgstr "Kiểm soát hoạt động"
 
 #: adm.housekeeper.php:51
 msgid "Audit data storage period"
-msgstr "Chu kỳ kiểm tra dữ liệu lưu trữ"
+msgstr "Chu kỳ kiểm soát dữ liệu lưu trữ"
 
 #: adm.housekeeper.php:110
 #, c-format
 msgid "Audit data storage period (in days) \"%1$s\"."
-msgstr "Chu kỳ kiểm tra dữ liệu lưu trữ (trong ngày) \"%1$s\"."
+msgstr "Chu kỳ kiểm soát dữ liệu lưu trữ (trong ngày) \"%1$s\"."
 
 #: auditlogs.php:27
 msgid "Audit logs"
-msgstr "Audit logs"
+msgstr "Kiểm soát đăng nhập"
 
 #: include/func.inc.php:256
 msgid "Aug"
@@ -994,16 +994,16 @@ msgstr "Vùng ghi nhận"
 
 #: report2.php:177
 msgid "By host"
-msgstr "By host"
+msgstr "Máy chủ"
 
 #: report2.php:178
 msgid "By trigger template"
-msgstr "By trigger template"
+msgstr "Mẫu trigger"
 
 #: include/views/configuration.action.edit.php:25
 #: include/views/configuration.action.list.php:29
 msgid "CONFIGURATION OF ACTIONS"
-msgstr "Cấu hình các action"
+msgstr "CẤU HÌNH HOẠT ĐỘNG"
 
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:40
@@ -1037,16 +1037,16 @@ msgstr "Cấu hình GUI"
 #: include/views/configuration.hostgroups.edit.php:23
 #: include/views/configuration.hostgroups.list.php:36
 msgid "CONFIGURATION OF HOST GROUPS"
-msgstr "Cấu hình các nhóm host"
+msgstr "CẤU HÌNH NHÓM MÁY CHỦ"
 
 #: include/views/configuration.host.prototype.edit.php:29
 #: include/views/configuration.host.prototype.list.php:31
 msgid "CONFIGURATION OF HOST PROTOTYPES"
-msgstr "Cấu hình các kiểu host"
+msgstr "Cấu hình các kiểu máy chủ"
 
 #: hosts.php:653 hosts.php:718 hosts.php:767
 msgid "CONFIGURATION OF HOSTS"
-msgstr "Cấu hình các host"
+msgstr "Cấu hình các máy chủ"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
@@ -1088,7 +1088,7 @@ msgstr "Cấu hình các chu kỳ bảo trì"
 #: include/views/administration.mediatypes.edit.php:23
 #: include/views/administration.mediatypes.list.php:27
 msgid "CONFIGURATION OF MEDIA TYPES"
-msgstr "Cấu hình các kiểu media"
+msgstr "Cấu hình loại phương tiện"
 
 #: include/views/configuration.sysmap.constructor.php:25
 #: include/views/configuration.sysmap.edit.php:25
@@ -1119,7 +1119,7 @@ msgstr "Cấu hình Screen"
 #: include/views/administration.script.edit.php:25
 #: include/views/administration.script.list.php:27
 msgid "CONFIGURATION OF SCRIPTS"
-msgstr "Cấu hình các tiến trình"
+msgstr "CẤU HÌNH SCRIPTS"
 
 #: include/views/configuration.slideconf.edit.php:25
 #: include/views/configuration.slideconf.list.php:28
@@ -1128,7 +1128,7 @@ msgstr "Cấu hình các slide show"
 
 #: templates.php:427 templates.php:477
 msgid "CONFIGURATION OF TEMPLATES"
-msgstr "Cấu hình các template"
+msgstr "CẤU HÌNH MẪU"
 
 #: include/views/configuration.triggers.edit.php:37
 #: include/views/configuration.triggers.list.php:42
@@ -1149,12 +1149,12 @@ msgstr "Cấu hình các trigger"
 #: include/views/administration.usergroups.edit.php:23
 #: include/views/administration.usergroups.list.php:31
 msgid "CONFIGURATION OF USER GROUPS"
-msgstr "Cấu hình các nhóm người dùng"
+msgstr "Cấu hình nhóm người dùng"
 
 #: include/views/administration.users.edit.php:30
 #: include/views/administration.users.list.php:31
 msgid "CONFIGURATION OF USERS"
-msgstr "Cấu hình các người dùng"
+msgstr "Cấu hình người dùng"
 
 #: adm.valuemapping.php:147
 msgid "CONFIGURATION OF VALUE MAPPING"
@@ -1163,7 +1163,7 @@ msgstr "Cấu hình các giá trị trên bản đồ"
 #: include/views/configuration.httpconf.edit.php:25
 #: include/views/configuration.httpconf.list.php:39
 msgid "CONFIGURATION OF WEB MONITORING"
-msgstr "Cấu hình web theo dõi"
+msgstr "Cấu hình web giám sát"
 
 #: adm.workingtime.php:76
 msgid "CONFIGURATION OF WORKING TIME"
@@ -1186,7 +1186,7 @@ msgstr "CPU(s) load. Processor load. cpu và chế độ là tùy chọn. N
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:435
 msgid "CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used."
-msgstr "Tải của CPU. Đơn vị là phần trăm. Loại CPU và chế độ tùy chọn. Nếu cpu is missing all được sử dụng. Nếu type is missing được sử dụng. Nếu mode is missing avg 1 được sử dụng."
+msgstr "Tải của CPU. Đơn vị là phần trăm. Loại CPU và chế độ tùy chọn. Nếu cpu is missing all được sử dụng. Nếu type is missing user được sử dụng. Nếu mode is missing avg 1 được sử dụng."
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:527
@@ -1222,11 +1222,11 @@ msgstr "Gọi lại"
 
 #: api/classes/CTemplate.php:1037 api/classes/CTemplate.php:1047
 msgid "Can't link template"
-msgstr "Không thể kết nối template"
+msgstr "Không thể kết nối mẫu"
 
 #: api/classes/CTemplate.php:1008 api/classes/CTemplate.php:1026
 msgid "Can't unlink template"
-msgstr "Không thể không kết nối template"
+msgstr "Không thể không kết nối mẫu"
 
 #: include/views/administration.mediatypes.edit.php:90
 msgid "Canada (136 characters)"
@@ -1270,11 +1270,11 @@ msgstr "Không thể thêm một item phi số \"%1$s\"."
 
 #: actionconf.php:158
 msgid "Cannot add action"
-msgstr "Không thể thêm hành động"
+msgstr "Không thể thêm hoạt động"
 
 #: actionconf.php:233
 msgid "Cannot add action condition"
-msgstr "Không thể thêm điều kiện hành động"
+msgstr "Không thể thêm điều kiện hoạt động"
 
 #: applications.php:108
 msgid "Cannot add application"
@@ -1282,7 +1282,7 @@ msgstr "Không thể thêm ứng dụng"
 
 #: api/classes/CTrigger.php:1412
 msgid "Cannot add dependency from a host to a template."
-msgstr "Không thể thêm quan hệ phụ thuộc từ host đến template"
+msgstr "Không thể thêm quan hệ phụ thuộc từ máy chủ đến mẫu."
 
 #: include/triggers.inc.php:493
 #, c-format
@@ -1307,11 +1307,11 @@ msgstr "Không thể thêm nhóm"
 
 #: hosts.php:378
 msgid "Cannot add host"
-msgstr "Không thể thêm host"
+msgstr "Không thể thêm máy chủ"
 
 #: host_prototypes.php:202
 msgid "Cannot add host prototype"
-msgstr "Không thể thêm kiểu host"
+msgstr "Không thể thêm kiểu máy chủ"
 
 #: adm.images.php:62
 msgid "Cannot add image"
@@ -1348,7 +1348,7 @@ msgstr "Không thể thêm bảo trì"
 
 #: media_types.php:127
 msgid "Cannot add media type"
-msgstr "Không thể thêm kiểu phương tiện"
+msgstr "Không thể thêm loại phương tiện"
 
 #: api/classes/CGraph.php:43
 #, c-format
@@ -1387,7 +1387,7 @@ msgstr "Không thể thêm screen"
 
 #: scripts.php:96 scripts.php:100 scripts.php:126
 msgid "Cannot add script"
-msgstr "Không thể thêm tập lệnh"
+msgstr "Không thể thêm script"
 
 #: services.php:154
 msgid "Cannot add service"
@@ -1399,7 +1399,7 @@ msgstr "Không thể thêm slide show"
 
 #: templates.php:166
 msgid "Cannot add template"
-msgstr "Không thể thêm template"
+msgstr "Không thể thêm mẫu"
 
 #: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Cannot add trigger"
@@ -1419,7 +1419,7 @@ msgstr "Không thể thêm người dùng. Tất cả mật khẩu phải 
 
 #: api/classes/CUserGroup.php:270
 msgid "Cannot add users."
-msgstr "Không thể thêm các người dùng."
+msgstr "Không thể thêm người dùng."
 
 #: adm.valuemapping.php:74
 msgid "Cannot add value map"
@@ -1455,7 +1455,7 @@ msgstr "Không thể sao chép kiểu đồ thị."
 
 #: api/classes/CDiscoveryRule.php:1001
 msgid "Cannot clone host prototypes."
-msgstr "Không thể sao chép kiểu host."
+msgstr "Không thể sao chép kiểu máy chủ."
 
 #: api/classes/CDiscoveryRule.php:837
 msgid "Cannot clone item prototypes."
@@ -1480,12 +1480,12 @@ msgstr "Không thể sao chép các item"
 #: include/triggers.inc.php:400
 #, c-format
 msgid "Cannot copy trigger \"%1$s:%2$s\", because it has multiple hosts in the expression."
-msgstr "Không thể sao chép trigger \"%1$s:%2$s\", bởi vì nó có nhiều host trong biểu thức."
+msgstr "Không thể sao chép trigger \"%1$s:%2$s\", bởi vì nó có nhiều máy chủ trong biểu thức."
 
 #: api/classes/CHostPrototype.php:151
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr "Không thể tạo một kiểu host trên một discovered host \"%1$s\"."
+msgstr "Không thể tạo một kiểu máy chủ trên một máy chủ được phát hiện \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -1536,7 +1536,7 @@ msgstr "Không thể xóa người dùng zabbix nội bộ \"%1$s\", thư�
 
 #: actionconf.php:177
 msgid "Cannot delete action"
-msgstr "Không thể xóa hành động"
+msgstr "Không thể xóa hoạt động"
 
 #: applications.php:142 applications.php:181
 msgid "Cannot delete application"
@@ -1585,15 +1585,15 @@ msgstr "Không thể xóa nhóm"
 
 #: hosts.php:583 hosts.php:600
 msgid "Cannot delete host"
-msgstr "Không thể xóa host"
+msgstr "Không thể xóa máy chủ"
 
 #: api/classes/CDiscoveryRule.php:413
 msgid "Cannot delete host prototype."
-msgstr "Không thể xóa kiểu host."
+msgstr "Không thể xóa kiểu máy chủ."
 
 #: host_prototypes.php:119 host_prototypes.php:244
 msgid "Cannot delete host prototypes"
-msgstr "Không thể xóa các kiểu host"
+msgstr "Không thể xóa các kiểu máy chủ"
 
 #: adm.iconmapping.php:97
 msgid "Cannot delete icon map"
@@ -1658,25 +1658,25 @@ msgstr "Không thể xóa screen"
 
 #: scripts.php:149 scripts.php:171
 msgid "Cannot delete script"
-msgstr "Không thể xóa tập lệnh"
+msgstr "Không thể xóa script"
 
 #: api/classes/CScript.php:504
 msgid "Cannot delete scripts. Empty input parameter \"scriptids\"."
-msgstr "Không thể xóa các tập lệnh. Tham số đầu vào \"scriptids\" trống."
+msgstr "Không thể xóa scripts. Tham số đầu vào \"scriptids\" trống."
 
 #: api/classes/CScript.php:536
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr "Không thể xóa các tập lệnh. Tập lệnh \"%1$s\" được sử dụng trong hành động thao tác \"%2$s\"."
+msgstr "Không thể xóa scripts. Script \"%1$s\" được sử dụng trong thao tác hoạt động \"%2$s\"."
 
 #: api/classes/CScript.php:519
 #, c-format
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
-msgstr "Không thể xóa các tập lệnh. Tập lệnh với scriptid \"%1$s\" không tồn tại."
+msgstr "Không thể xóa scripts. Script với scriptid \"%1$s\" không tồn tại."
 
 #: actionconf.php:361
 msgid "Cannot delete selected actions"
-msgstr "Không thể xóa các hành động được lựa chọn"
+msgstr "Không thể xóa hoạt động được lựa chọn"
 
 #: services.php:107
 msgid "Cannot delete service"
@@ -1688,7 +1688,7 @@ msgstr "Không thể xóa slide show"
 
 #: templates.php:361 templates.php:377 templates.php:405
 msgid "Cannot delete template"
-msgstr "Không thể xóa template"
+msgstr "Không thể xóa mẫu"
 
 #: api/classes/CApplication.php:444
 msgid "Cannot delete templated application."
@@ -1700,11 +1700,11 @@ msgstr "Không thể xóa các biểu đồ mẫu."
 
 #: api/classes/CHostPrototype.php:1076
 msgid "Cannot delete templated host prototype."
-msgstr "Không thể xóa kiểu host mẫu."
+msgstr "Không thể xóa kiểu máy chủ mẫu."
 
 #: api/classes/CItem.php:693
 msgid "Cannot delete templated item."
-msgstr "Không thể  xóa item mẫu."
+msgstr "Không thể xóa item mẫu."
 
 #: api/classes/CItemPrototype.php:512
 msgid "Cannot delete templated items"
@@ -1754,7 +1754,7 @@ msgstr "Không thể xóa người dùng"
 
 #: api/classes/CUser.php:949
 msgid "Cannot delete user media."
-msgstr "Không thể xóa người dùng đa phương tiện."
+msgstr "Không thể xóa phương tiện người dùng."
 
 #: adm.valuemapping.php:90
 msgid "Cannot delete value map"
@@ -1767,7 +1767,7 @@ msgstr "Không thể xóa web scenario"
 #: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
-msgstr[0] "Không thể vô hiệu hóa hành độngKhông thể vô hiệu hóa các hành động"
+msgstr[0] "Không thể vô hiệu hóa hoạt độngKhông thể vô hiệu hóa các hoạt động"
 
 #: discoveryconf.php:194
 msgid "Cannot disable discovery rule"
@@ -1782,12 +1782,16 @@ msgstr[0] "Không thể vô hiệu hóa các quy tắc phát hiệnKhông
 #: hostgroups.php:289 hosts.php:629 proxies.php:183
 msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
-msgstr[0] "Không thể vô hiệu hóa hostKhông thể vô hiệu hóa các host"
+msgstr[0] ""
+"Không thể vô hiệu hóa máy chủ\n"
+"Không thể vô hiệu hóa các máy chủ"
 
 #: host_prototypes.php:236
 msgid "Cannot disable host prototype"
 msgid_plural "Cannot disable host prototypes"
-msgstr[0] "Không thể vô hiệu hóa kiểu hostKhông thể vô hiệu hóa các kiểu host"
+msgstr[0] ""
+"Không thể vô hiệu hóa kiểu máy chủ\n"
+"Không thể vô hiệu hóa các kiểu máy chủ"
 
 #: applications.php:213 items.php:682
 msgid "Cannot disable item"
@@ -1802,7 +1806,7 @@ msgstr[0] "Không thể vô hiệu hóa kiểu itemKhông thể vô hiệu
 #: media_types.php:166
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
-msgstr[0] "Không thể vô hiệu hóa kiểu phương tiệnKhông thể vô hiệu hóa các loại phương tiện"
+msgstr[0] "Không thể vô hiệu hóa loại phương tiệnKhông thể vô hiệu hóa các loại phương tiện"
 
 #: triggers.php:288
 msgid "Cannot disable trigger"
@@ -1835,7 +1839,7 @@ msgstr "Không thể hiển thị nhiều hơn một item với kiểu \"G
 #: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
-msgstr[0] "Không thể kích hoạt hành độngKhông thể kích hoạt các hành động"
+msgstr[0] "Không thể kích hoạt hoạt độngKhông thể kích hoạt các hoạt động"
 
 #: discoveryconf.php:193
 msgid "Cannot enable discovery rule"
@@ -1850,12 +1854,16 @@ msgstr[0] "Không thể kích hoạt các quy tắc phát hiệnKhông th�
 #: hostgroups.php:288 hosts.php:628 proxies.php:182
 msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
-msgstr[0] "Không thể kích hoạt hostKhông thể kích hoạt các host"
+msgstr[0] ""
+"Không thể kích hoạt máy chủ\n"
+"Không thể kích hoạt các máy chủ"
 
 #: host_prototypes.php:235
 msgid "Cannot enable host prototype"
 msgid_plural "Cannot enable host prototypes"
-msgstr[0] "Không thể kích hoạt kiểu hostKhông thể kích hoạt các kiểu host"
+msgstr[0] ""
+"Không thể kích hoạt kiểu máy chủ\n"
+"Không thể kích hoạt các kiểu máy chủ"
 
 #: applications.php:212 items.php:681
 msgid "Cannot enable item"
@@ -1870,7 +1878,9 @@ msgstr[0] "Không thể kích hoạt kiểu itemKhông thể kích hoạt c
 #: media_types.php:165
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
-msgstr[0] "Không thể kích hoạt kiểu mediaKhông thể kích hoạt các kiểu media"
+msgstr[0] ""
+"Không thể kích hoạt loại phương tiện\n"
+"Không thể kích hoạt các loại phương tiện"
 
 #: triggers.php:287
 msgid "Cannot enable trigger"
@@ -1921,31 +1931,31 @@ msgstr "Không thể tìm thấy nhóm \"%1$s\" được sử dụng trong
 #: include/classes/import/importers/CMapImporter.php:217
 #, c-format
 msgid "Cannot find host \"%1$s\" used in map \"%2$s\"."
-msgstr "Không thể tìm thấy host \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
+msgstr "Không thể tìm thấy máy chủ \"%1$s\" được sử dụng trong sơ đồ \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:498
 #: include/classes/import/importers/CAbstractScreenImporter.php:61
 #, c-format
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
-msgstr "Không thể tìm thấy host \"%1$s\" được sử dụng trong màn hình screen \"%2$s\"."
+msgstr "Không thể tìm thấy máy chủ \"%1$s\" được sử dụng trong screen \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:766
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "Không thể tìm thấy nhóm host \"%1$s\" cho kiểu host \"%2$s\" của quy tắc phát hiện \"%3$s\" trên \"%4$s\"."
+msgstr "Không thể tìm thấy nhóm máy chủ \"%1$s\" cho kiểu máy chủ \"%2$s\" của quy tắc phát hiện \"%3$s\" trên \"%4$s\"."
 
 #: api/classes/CDiscoveryRule.php:749 api/classes/CDiscoveryRule.php:825
 #: api/classes/CItemGeneral.php:100 include/items.inc.php:380
 #: include/items.inc.php:431
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
-msgstr "Không thể tìm thất host interface trên \"%1$s\" cho item key \"%2$s\"."
+msgstr "Không thể tìm thấy host interface trên \"%1$s\" đối với item key \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:929
 #: include/classes/import/CConfigurationImport.php:1041
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
-msgstr "Không thể tìm thấy host hoặc template \"%1$s\" được sử dụng trong biểu đồ  \"%2$s\"."
+msgstr "Không thể tìm thấy máy chủ hay mẫu \"%1$s\" được sử dụng trong biểu đồ  \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:767
 #: include/classes/import/importers/CMapImporter.php:250
@@ -2014,7 +2024,7 @@ msgstr "Không thể tìm thấy screen \"%1$s\" được sử dụng trong
 #: include/classes/import/CConfigurationImport.php:785
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "Không thể tìm thấy template \"%1$s\" cho kiểu host \"%2$s\" của quy tắc phát hiện \"%3$s\" trên \"%4$s\"."
+msgstr "Không thể tìm thấy mẫu \"%1$s\" cho kiểu máy chủ \"%2$s\" của quy tắc phát hiện \"%3$s\" trên \"%4$s\"."
 
 #: include/classes/import/CXmlImport18.php:745
 #: include/classes/import/CXmlImport18.php:788
@@ -2044,7 +2054,7 @@ msgstr "Không thể tìm thấy dạng thức cây."
 
 #: api/classes/CTemplate.php:933
 msgid "Cannot have empty visible template name"
-msgstr "Không thể để tên template trống"
+msgstr "Không thể để tên mẫu trống"
 
 #: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
@@ -2062,7 +2072,7 @@ msgstr[0] "Không thể nhập screen \"%1$s\": subscreen \"%2$s\" không tồ
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "Không thể nhập template \"%1$s\", template được liên kết \"%2$s\" không tồn tại."
+msgstr[0] "Không thể nhập mẫu \"%1$s\", mẫu được liên kết \"%2$s\" không tồn tại."
 
 #: include/classes/class.cview.php:113
 #, c-format
@@ -2075,11 +2085,11 @@ msgstr "Không thể chèn biểu thức trigger"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
-msgstr "Không thể chèn media người dùng."
+msgstr "Không thể chèn phương tiện người dùng."
 
 #: api/classes/CHost.php:1251
 msgid "Cannot link template"
-msgstr "Không thể liên kết template"
+msgstr "Không thể liên kết mẫu"
 
 #: api/classes/CUser.php:1099
 msgid "Cannot login."
@@ -2091,24 +2101,24 @@ msgstr "Không thể đăng xuất."
 
 #: api/classes/CHost.php:1111
 msgid "Cannot mass update host name."
-msgstr "Không thể cập nhật cùng một lúc tên host."
+msgstr "Không thể cập nhật cùng một lúc tên máy chủ."
 
 #: api/classes/CTemplate.php:883
 msgid "Cannot mass update template name"
-msgstr "Không thể cập nhật cùng một lúc tên template"
+msgstr "Không thể cập nhật cùng một lúc tên mẫu"
 
 #: api/classes/CHost.php:1101
 msgid "Cannot mass update visible host name."
-msgstr "Không thể cập nhật cùng một lúc visible host name."
+msgstr "Không thể cập nhật cùng một lúc tên máy chủ ."
 
 #: api/classes/CTemplate.php:850
 msgid "Cannot mass update visible template name"
-msgstr "Không thể cập nhật cùng một lúc visible template name"
+msgstr "Không thể cập nhật cùng một lúc tên mẫu hiển thị"
 
 #: api/classes/CHostBase.php:57
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %s."
-msgstr "Không thể tạo cùng một mật khẩu template IDs cho liên kết: %s. "
+msgstr "Không thể tạo cùng một mật khẩu ID mẫu cho liên kết: %s. "
 
 #: include/classes/db/DB.php:708
 #, c-format
@@ -2127,7 +2137,7 @@ msgstr "Không thể cập nhật trạng thái trong bảng \"%1$s\" với
 
 #: api/classes/CApplication.php:536
 msgid "Cannot process applications from different hosts or templates."
-msgstr "Không thể xử lý các ứng dụng từ các host khác nhau hoặc các template."
+msgstr "Không thể xử lý các ứng dụng từ các máy chủ hoặc các mẫu khác nhau."
 
 #: include/classes/server/CZabbixServer.php:222
 #, c-format
@@ -2158,7 +2168,7 @@ msgstr "Không thể gửi lệnh, kiểm tra kết nối đến zabbix s
 #: api/classes/CHostGroup.php:473
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr "Không thể đặt lại \"%1$s\" cho nhóm host  \"%2$s\"."
+msgstr "Không thể đặt lại \"%1$s\" cho nhóm máy chủ \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:248
 #, c-format
@@ -2191,11 +2201,11 @@ msgstr "Không thể đặt lại các trường inventory khi vô hiệu h
 
 #: api/classes/CHostInterface.php:324
 msgid "Cannot switch host for interface."
-msgstr "Không thể chuyển đổi host cho interface."
+msgstr "Không thể chuyển đổi máy chủ cho interface."
 
 #: users.php:354
 msgid "Cannot unblock users"
-msgstr "Không thể không ngăn chặn các người dùng"
+msgstr "Không thể mở khóa người dùng"
 
 #: api/classes/CHostGeneral.php:519
 msgid "Cannot unlink and clear Web scenarios."
@@ -2231,17 +2241,17 @@ msgstr "Không thể ngắt kết nối hoặc xóa các trigger"
 
 #: api/classes/CHost.php:1242
 msgid "Cannot unlink template"
-msgstr "Không thể ngắt kết nối tempate"
+msgstr "Không thể ngắt kết nối mẫu"
 
 #: api/classes/CHostGeneral.php:241
 #, c-format
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
-msgstr "Không thể ngắt kết nối trigger \"%s\", nó có các item từ template đó là liên kết đến host."
+msgstr "Không thể ngắt kết nối trigger \"%s\", nó có các item từ mẫu đó là liên kết đến máy chủ."
 
 #: api/classes/CHost.php:716
 #, c-format
 msgid "Cannot update \"%1$s\" for a discovered host."
-msgstr "Không thể cập nhật \"%1$s\" cho một host được phát hiện. "
+msgstr "Không thể cập nhật \"%1$s\" cho một máy chủ được phát hiện. "
 
 #: api/classes/CItemGeneral.php:175
 #, c-format
@@ -2256,12 +2266,12 @@ msgstr "Không thể cập nhật \"%1$s\" cho một trigger được phá
 #: api/classes/CAction.php:666
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
-msgstr "Không thể cập nhật \"%1$s\" cho hành động \"%2$s\"."
+msgstr "Không thể cập nhật \"%1$s\" cho hoạt động \"%2$s\"."
 
 #: api/classes/CHostGroup.php:515
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr "Không thể cập nhật \"%1$s\" cho nhóm host \"%2$s\"."
+msgstr "Không thể cập nhật \"%1$s\" cho nhóm máy chủ \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
@@ -2309,11 +2319,11 @@ msgstr "Không thể cập nhật một biểu đồ được phát hiê
 
 #: api/classes/CHostGroup.php:530
 msgid "Cannot update a discovered host group."
-msgstr "Không thể cập nhật một nhóm host được phát hiện."
+msgstr "Không thể cập nhật một nhóm máy chủ được phát hiện."
 
 #: actionconf.php:150
 msgid "Cannot update action"
-msgstr "Không thể cập nhật hành động"
+msgstr "Không thể cập nhật hoạt động"
 
 #: applications.php:101
 msgid "Cannot update application"
@@ -2361,19 +2371,19 @@ msgstr "Không thể cập nhật nhóm."
 #: api/classes/CHostGroup.php:1186
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
-msgstr "Không thể cập nhật các nhóm cho host được phát hiện \"%1$s\"."
+msgstr "Không thể cập nhật nhóm cho máy chủ được phát hiện \"%1$s\"."
 
 #: hosts.php:366
 msgid "Cannot update host"
-msgstr "Không thể cập nhật host"
+msgstr "Không thể cập nhật máy chủ"
 
 #: host_prototypes.php:188
 msgid "Cannot update host prototype"
-msgstr "Không thể cập nhật kiểu host"
+msgstr "Không thể cập nhật kiểu máy chủ"
 
 #: hosts.php:355
 msgid "Cannot update hosts"
-msgstr "Không thể cập nhật các host"
+msgstr "Không thể cập nhật các máy chủ"
 
 #: adm.iconmapping.php:76
 msgid "Cannot update icon map"
@@ -2390,7 +2400,7 @@ msgstr "Không thể cập nhật hình ảnh."
 #: api/classes/CHostInterface.php:395
 #, c-format
 msgid "Cannot update interface for discovered host \"%1$s\"."
-msgstr "Không thể cập nhật interface cho host được phát hiện \"%1$s\"."
+msgstr "Không thể cập nhật interface cho máy chủ được phát hiện \"%1$s\"."
 
 #: items.php:475 screenedit.php:176
 msgid "Cannot update item"
@@ -2423,7 +2433,7 @@ msgstr "Không thể cập nhật sơ đồ \"%s\"."
 
 #: media_types.php:121
 msgid "Cannot update media type"
-msgstr "Không thể cập nhật kiểu media"
+msgstr "Không thể cập nhật loại phương tiện"
 
 #: sysmaps.php:165
 msgid "Cannot update network map"
@@ -2440,7 +2450,7 @@ msgstr "Không thể cập nhật proxy"
 #: api/classes/CProxy.php:299
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr "Không thể cập nhật proxy cho host được phát hiện \"%1$s\"."
+msgstr "Không thể cập nhật proxy cho máy chủ được phát hiện \"%1$s\"."
 
 #: adm.regexps.php:127
 msgid "Cannot update regular expression"
@@ -2468,16 +2478,16 @@ msgstr "Không thể cập nhật slide show"
 
 #: templates.php:162
 msgid "Cannot update template"
-msgstr "Không thể cập nhật template"
+msgstr "Không thể cập nhật mẫu"
 
 #: api/classes/CApplication.php:353
 msgid "Cannot update templated applications."
-msgstr "Không thể cập nhật các template ứng dụng."
+msgstr "Không thể cập nhật các mẫu ứng dụng."
 
 #: api/classes/CTemplate.php:806 api/classes/CTemplate.php:1127
 #, c-format
 msgid "Cannot update templates on discovered host \"%1$s\"."
-msgstr "Không thể cập nhật các template trên host được phát hiện \"%1$s\"."
+msgstr "Không thể cập nhật các mẫu trên máy chủ được phát hiện \"%1$s\"."
 
 #: triggers.php:191 triggers.php:249 tr_logform.php:113
 msgid "Cannot update trigger"
@@ -2497,7 +2507,7 @@ msgstr "Không thể cập nhật người dùng"
 
 #: api/classes/CUser.php:818
 msgid "Cannot update user media."
-msgstr "Không thể cập nhật media người dùng"
+msgstr "Không thể cập nhật phương tiện người dùng."
 
 #: profile.php:113 users.php:185
 msgid "Cannot update user. Both passwords must be equal."
@@ -2593,7 +2603,7 @@ msgstr "Kiểm tra nếu tập tin tồn tại. 0 - tập tin không tồn
 
 #: include/classes/items/CHelpItems.php:595
 msgid "Check if service is available. 0 - service is down, 1 - service is running. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr "Kiểm tra nếu dịch vụ sẵn sàng. 0 - dịch vụ không chạy, 1 - dịch vụ đang chạy. Nếu <ip> đang lỗi, IP hoặc tên DNS được lấy từ host. Nếu <port> đang lỗi, cổng dịch vụ mặc định được sử dụng."
+msgstr "Kiểm tra nếu dịch vụ sẵn sàng. 0 - dịch vụ không chạy, 1 - dịch vụ đang chạy. Nếu <ip> đang lỗi, IP hoặc tên DNS được lấy từ máy chủ. Nếu <port> đang lỗi, cổng dịch vụ mặc định được sử dụng."
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:383
@@ -2607,7 +2617,7 @@ msgstr "Kiểm tra tính năng của dịch vụ \"service\". 0 - dịch vụ 
 
 #: include/classes/items/CHelpItems.php:599
 msgid "Check performance of service. 0 - service is down, sec - number of seconds spent on connection to the service. If <ip> is missing, IP or DNS name is taken from host definition. If <port> is missing, default service port is used."
-msgstr "Kiểm tra tính năng của dịch vụ. 0 - Dịch vụ không hoạt động, sec - số giây dành cho kết nối đến dịch vụ. Nếu <ip> đang lỗi, IP hoặc tên DNS được lấy từ host. Nếu <port> đang lỗi, cổng dịch vụ mặc định được sử dụng."
+msgstr "Kiểm tra tính năng của dịch vụ. 0 - Dịch vụ không hoạt động, sec - số giây dành cho kết nối đến dịch vụ. Nếu <ip> đang lỗi, IP hoặc tên DNS được lấy từ máy chủ. Nếu <port> đang lỗi, cổng dịch vụ mặc định được sử dụng."
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:319
@@ -2672,7 +2682,7 @@ msgstr "Thông tư liên kết không thể được tạo ra cho các yế
 #: include/classes/import/importers/CMapImporter.php:89
 #, c-format
 msgid "Circular reference in maps: %1$s."
-msgstr "Thông tư tham khảo cho các bản đồ: %1$s."
+msgstr "Thông tin tham khảo cho các sơ đồ: %1$s."
 
 #: include/classes/import/importers/CScreenImporter.php:104
 #, c-format
@@ -2682,11 +2692,11 @@ msgstr "Thông tin tham khảo cho screen: %1$s."
 #: include/classes/import/importers/CTemplateImporter.php:139
 #, c-format
 msgid "Circular reference in templates: %1$s."
-msgstr "Thông tư tham khảo cho các template: %1$s."
+msgstr "Thông tư tham khảo cho mẫu: %1$s."
 
 #: api/classes/CHostBase.php:234 api/classes/CHostBase.php:291
 msgid "Circular template linkage is not allowed."
-msgstr "Liên kết thông tư template không được cho phép."
+msgstr "Liên kết thông tư mẫu không được cho phép."
 
 #: include/classes/core/ZBase.php:233
 msgid "Classic"
@@ -2789,7 +2799,7 @@ msgstr "Câu lệnh"
 
 #: tr_events.php:132
 msgid "Command actions"
-msgstr "Thực thi lệnh"
+msgstr "Thực thi lệnh hoạt động"
 
 #: scripts.php:99
 msgid "Command cannot be empty."
@@ -2867,7 +2877,7 @@ msgstr "Cấu hình của Zabbix"
 
 #: actionconf.php:27
 msgid "Configuration of actions"
-msgstr "Cấu hình của các hành động"
+msgstr "Cấu hình của các hoạt động"
 
 #: applications.php:26
 msgid "Configuration of applications"
@@ -2891,15 +2901,15 @@ msgstr "Cấu hình của các đồ thị"
 
 #: hostgroups.php:25
 msgid "Configuration of host groups"
-msgstr "Cấu hình của các nhóm host"
+msgstr "Cấu hình của nhóm máy chủ"
 
 #: host_prototypes.php:27
 msgid "Configuration of host prototypes"
-msgstr "Cấu hình của các kiểu host"
+msgstr "Cấu hình của các kiểu máy chủ"
 
 #: hosts.php:32
 msgid "Configuration of hosts"
-msgstr "Cấu hình của các host"
+msgstr "Cấu hình của các máy chủ"
 
 #: adm.housekeeper.php:24
 msgid "Configuration of housekeeping"
@@ -2931,7 +2941,7 @@ msgstr "Cấu hình của chu kỳ bảo trì"
 
 #: media_types.php:26
 msgid "Configuration of media types"
-msgstr "Cấu hình của kiểu media"
+msgstr "Cấu hình của loại phương tiện"
 
 #: sysmap.php:26 sysmaps.php:34
 msgid "Configuration of network maps"
@@ -2955,7 +2965,7 @@ msgstr "Cấu hình của screen"
 
 #: scripts.php:24
 msgid "Configuration of scripts"
-msgstr "Cấu hình của các câu lệnh"
+msgstr "Cấu hình của scripts"
 
 #: slideconf.php:25
 msgid "Configuration of slide shows"
@@ -2963,7 +2973,7 @@ msgstr "Cấu hình của các slide show"
 
 #: templates.php:38
 msgid "Configuration of templates"
-msgstr "Cấu hình của các template"
+msgstr "Cấu hình của mẫu"
 
 #: adm.triggerdisplayoptions.php:24
 msgid "Configuration of trigger displaying options"
@@ -2983,11 +2993,11 @@ msgstr "Cấu hình của các trigger"
 
 #: usergrps.php:29
 msgid "Configuration of user groups"
-msgstr "Cấu hình của các nhóm người dùng"
+msgstr "Cấu hình của nhóm người dùng"
 
 #: users.php:29
 msgid "Configuration of users"
-msgstr "Cấu hình của các người dùng "
+msgstr "Cấu hình người dùng "
 
 #: adm.valuemapping.php:24
 msgid "Configuration of value mapping"
@@ -2995,7 +3005,7 @@ msgstr "Cấu hình của giá trị bản đồ"
 
 #: httpconf.php:27
 msgid "Configuration of web monitoring"
-msgstr "Cấu hình của web monitoring"
+msgstr "Cấu hình của web giám sát"
 
 #: adm.workingtime.php:24
 msgid "Configuration of working time"
@@ -3133,7 +3143,7 @@ msgstr "Đếm số slide"
 
 #: include/views/configuration.action.list.php:28
 msgid "Create action"
-msgstr "Tạo action"
+msgstr "Tạo hoạt động"
 
 #: include/views/configuration.application.list.php:35
 msgid "Create application"
@@ -3141,7 +3151,7 @@ msgstr "Tạo ứng dụng"
 
 #: include/views/configuration.application.list.php:30
 msgid "Create application (select host first)"
-msgstr "Tạo ứng dụng (chọn host trước tiên)"
+msgstr "Tạo ứng dụng (chọn máy chủ trước tiên)"
 
 #: include/views/configuration.discovery.list.php:27
 #: include/views/configuration.host.discovery.list.php:28
@@ -3154,7 +3164,7 @@ msgstr "Tạo đồ thị"
 
 #: include/views/configuration.graph.list.php:45
 msgid "Create graph (select host first)"
-msgstr "Tạo đồ thị (chọn host đầu tiên)"
+msgstr "Tạo đồ thị (chọn máy chủ đầu tiên)"
 
 #: include/views/configuration.graph.list.php:29
 msgid "Create graph prototype"
@@ -3162,16 +3172,16 @@ msgstr "Tạo kiểu đồ thị"
 
 #: hosts.php:762
 msgid "Create host"
-msgstr "Tạo host"
+msgstr "Tạo máy chủ"
 
 #: include/views/configuration.hostgroups.list.php:28
 #: include/views/configuration.hostgroups.list.php:31
 msgid "Create host group"
-msgstr "Tạo nhóm host"
+msgstr "Tạo nhóm máy chủ"
 
 #: include/views/configuration.host.prototype.list.php:30
 msgid "Create host prototype"
-msgstr "Tạo kiểu host"
+msgstr "Tạo kiểu máy chủ"
 
 #: adm.iconmapping.php:126
 msgid "Create icon map"
@@ -3187,7 +3197,7 @@ msgstr "Tạo item"
 
 #: include/views/configuration.item.list.php:31
 msgid "Create item (select host first)"
-msgstr "Tạo item (chọn host đầu tiên)"
+msgstr "Tạo item (chọn máy chủ đầu tiên)"
 
 #: include/views/configuration.item.prototype.list.php:28
 msgid "Create item prototype"
@@ -3203,7 +3213,7 @@ msgstr "Tạo bản đồ"
 
 #: include/views/administration.mediatypes.list.php:26
 msgid "Create media type"
-msgstr "Tạo media type"
+msgstr "Tạo loại phương tiện"
 
 #: include/views/administration.node.list.php:36
 msgid "Create node"
@@ -3219,7 +3229,7 @@ msgstr "Tạo scenario"
 
 #: include/views/configuration.httpconf.list.php:29
 msgid "Create scenario (select host first)"
-msgstr "Tạo scenario (chọn host đầu tiên)"
+msgstr "Tạo scenario (chọn máy chủ đầu tiên)"
 
 #: include/views/configuration.screen.list.php:27
 msgid "Create screen"
@@ -3235,7 +3245,7 @@ msgstr "Tạo slide show"
 
 #: templates.php:472
 msgid "Create template"
-msgstr "Tạo template"
+msgstr "Tạo mẫu"
 
 #: include/views/configuration.triggers.list.php:51 jsLoader.php:110
 msgid "Create trigger"
@@ -3243,7 +3253,7 @@ msgstr "Tạo trigger"
 
 #: include/views/configuration.triggers.list.php:46
 msgid "Create trigger (select host first)"
-msgstr "Tạo trigger (chọn host đầu tiên)"
+msgstr "Tạo trigger (chọn máy chủ đầu tiên)"
 
 #: include/views/configuration.triggers.list.php:40
 msgid "Create trigger prototype"
@@ -3274,7 +3284,7 @@ msgstr "Đã tạo: quy tắc phát hiện \"%1$s\" trên \"%2$s\"."
 #: api/classes/CHostPrototype.php:364
 #, c-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr "Đã tạo: Kiểu host \"%1$s\" trên \"%2$s\"."
+msgstr "Đã tạo: Kiểu máy chủ \"%1$s\" trên \"%2$s\"."
 
 #: api/classes/CItem.php:592
 #, c-format
@@ -3329,7 +3339,7 @@ msgstr "Cập nhật hiện tại là khác N"
 #: include/views/js/configuration.action.edit.js.php:87
 #: include/views/js/configuration.action.edit.js.php:212
 msgid "Current host"
-msgstr "Host hiện tại"
+msgstr "Máy chủ hiện tại"
 
 #: include/page_header.php:333
 msgid "Current node"
@@ -3529,7 +3539,7 @@ msgstr "Tập tin cơ sở dữ liệu"
 
 #: include/setup.inc.php:283
 msgid "Database host"
-msgstr "Cơ sở dữ liệu host"
+msgstr "Cơ sở dữ liệu máy chủ"
 
 #: include/items.inc.php:92
 msgid "Database monitor"
@@ -3731,11 +3741,11 @@ msgstr "Xóa và xóa sạch"
 
 #: templates.php:656
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
-msgstr "Xóa và xóa hoàn toàn các template được chọn hay không? (Cảnh báo: tất cả các liên kết đến host sẽ bị xóa bỏ hoàn toàn!)"
+msgstr "Xóa và xóa hoàn toàn các mẫu được chọn? (Cảnh báo: tất cả các liên kết đến máy chủ sẽ bị xóa bỏ hoàn toàn!)"
 
 #: include/views/configuration.template.edit.php:534
 msgid "Delete and clear template? (Warning: all linked hosts will be cleared!)"
-msgstr "Xóa và xóa bỏ hoàn toàn template hay không? (Cảnh báo: tất cả các liên kết đến các host sẽ bị xóa bỏ hoàn toàn!)"
+msgstr "Xóa và xóa bỏ hoàn toàn mẫu? (Cảnh báo: tất cả các liên kết đến các máy chủ sẽ bị xóa bỏ hoàn toàn!)"
 
 #: include/views/configuration.application.edit.php:55
 msgid "Delete application?"
@@ -3743,7 +3753,7 @@ msgstr "Xóa ứng dụng?"
 
 #: include/views/configuration.action.edit.php:1091
 msgid "Delete current action?"
-msgstr "Xóa hành động hiện tại?"
+msgstr "Xóa hoạt động hiện tại?"
 
 #: include/views/configuration.discovery.edit.php:85
 #: include/views/configuration.item.edit.php:506
@@ -3817,7 +3827,7 @@ msgstr "Xóa screen?"
 
 #: include/views/administration.script.edit.php:121
 msgid "Delete script?"
-msgstr "Xoas script?"
+msgstr "Xóa script?"
 
 #: hosts.php:1024 include/reports.inc.php:114 include/reports.inc.php:211
 #: include/reports.inc.php:257
@@ -3856,7 +3866,7 @@ msgstr "Xóa WEB scenario được chọn?"
 
 #: include/views/configuration.action.list.php:106
 msgid "Delete selected actions?"
-msgstr "Xóa các action được chọn?"
+msgstr "Xóa hoạt động được chọn?"
 
 #: include/views/configuration.application.list.php:121
 msgid "Delete selected applications?"
@@ -3890,23 +3900,23 @@ msgstr "Xóa các nhóm được chọn?"
 
 #: include/views/configuration.hostgroups.list.php:168
 msgid "Delete selected host groups?"
-msgstr "Xóa các nhóm host được chọn?"
+msgstr "Xóa nhóm máy chủ được chọn?"
 
 #: include/views/configuration.host.prototype.edit.php:333
 msgid "Delete selected host prototype?"
-msgstr "Xóa kiểu host được chọn?"
+msgstr "Xóa kiểu máy chủ được chọn?"
 
 #: include/views/configuration.host.prototype.list.php:128
 msgid "Delete selected host prototypes?"
-msgstr "Xóa các kiểu host được chọn?"
+msgstr "Xóa các kiểu máy chủ được chọn?"
 
 #: include/views/configuration.host.edit.php:916
 msgid "Delete selected host?"
-msgstr "Xóa host được chọn?"
+msgstr "Xóa máy chủ được chọn?"
 
 #: hosts.php:1025
 msgid "Delete selected hosts?"
-msgstr "Xóa các host được chọn ?"
+msgstr "Xóa máy chủ được chọn ?"
 
 #: include/views/administration.general.image.edit.php:61
 msgid "Delete selected image?"
@@ -3930,11 +3940,11 @@ msgstr "Xóa các sơ đồ được chọn?"
 
 #: include/views/administration.mediatypes.edit.php:110
 msgid "Delete selected media type?"
-msgstr "Xóa media type được chọn?"
+msgstr "Xóa loại phương tiện được chọn?"
 
 #: include/views/administration.mediatypes.list.php:122
 msgid "Delete selected media types?"
-msgstr "Xóa các media type được chọn?"
+msgstr "Xóa các loại phương tiện được chọn?"
 
 #: include/views/administration.node.edit.php:89
 msgid "Delete selected node?"
@@ -3954,7 +3964,7 @@ msgstr "Xóa screen được chọn?"
 
 #: include/views/administration.script.list.php:91
 msgid "Delete selected scripts?"
-msgstr "Xóa các script được chọn?"
+msgstr "Xóa script được chọn?"
 
 #: include/views/configuration.slideconf.list.php:59
 msgid "Delete selected slide shows?"
@@ -3962,7 +3972,7 @@ msgstr "Xóa các slide show được chọn?"
 
 #: templates.php:653
 msgid "Delete selected templates?"
-msgstr "Xóa các template được chọn?"
+msgstr "Xóa mẫu được chọn?"
 
 #: include/views/configuration.triggers.list.php:288
 msgid "Delete selected trigger prototypes?"
@@ -3978,7 +3988,7 @@ msgstr "Xóa người dùng được chọn?"
 
 #: include/views/administration.users.list.php:139
 msgid "Delete selected users?"
-msgstr "Xóa các người dùng được chọn?"
+msgstr "Xóa người dùng được chọn?"
 
 #: adm.valuemapping.php:181
 msgid "Delete selected value mapping?"
@@ -4004,7 +4014,7 @@ msgstr "Xóa slide show?"
 
 #: include/views/configuration.template.edit.php:533
 msgid "Delete template?"
-msgstr "Xóa template?"
+msgstr "Xóa mẫu?"
 
 #: jsLoader.php:189
 msgid "Delete the selected service?"
@@ -4040,12 +4050,12 @@ msgstr "Đã xoá: đồ thị \"%1$s\" trên \"%2$s\"."
 #: api/classes/CHost.php:1601
 #, c-format
 msgid "Deleted: Host \"%1$s\"."
-msgstr "Đã xóa: Host \"%1$s\"."
+msgstr "Đã xóa: máy chủ \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:971
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr "Đã xóa: Kiểu host \"%1$s\" trên \"%2$s\"."
+msgstr "Đã xóa: Kiểu máy chủ \"%1$s\" trên \"%2$s\"."
 
 #: api/classes/CItem.php:784
 #, c-format
@@ -4065,7 +4075,7 @@ msgstr "Đã xóa: Proxy \"%1$s\"."
 #: api/classes/CTemplate.php:766
 #, c-format
 msgid "Deleted: Template \"%1$s\"."
-msgstr "Đã xóa: Template \"%1$s\"."
+msgstr "Đã xóa: mẫu \"%1$s\"."
 
 #: api/classes/CTrigger.php:850
 #, c-format
@@ -4240,19 +4250,19 @@ msgstr "Tắt chế độ debug trong nhóm được lựa chọn?"
 
 #: include/actions.inc.php:412 include/actions.inc.php:640
 msgid "Disable host"
-msgstr "Vô hiệu hóa host"
+msgstr "Vô hiệu hóa máy chủ"
 
 #: hosts.php:945 hosts.php:958
 msgid "Disable host?"
-msgstr "Vô hiệu hóa host?"
+msgstr "Vô hiệu hóa máy chủ?"
 
 #: include/views/configuration.hostgroups.list.php:165
 msgid "Disable hosts in the selected host groups?"
-msgstr "Vô hiệu hóa host trong nhóm được lựa chọn?"
+msgstr "Vô hiệu hóa máy chủ trong nhóm máy chủ được chọn?"
 
 #: include/views/administration.proxy.list.php:109
 msgid "Disable hosts monitored by selected proxies?"
-msgstr "Vô hiệu hóa host được giám sát bởi các proxy đã chọn?"
+msgstr "Vô hiệu hóa máy chủ được giám sát bởi các proxy đã chọn?"
 
 #: hosts.php:1021 include/views/administration.mediatypes.list.php:117
 #: include/views/administration.proxy.list.php:108
@@ -4276,7 +4286,7 @@ msgstr "Vô hiệu hóa WEB scenario được lựa chọn?"
 
 #: include/views/configuration.action.list.php:102
 msgid "Disable selected actions?"
-msgstr "Vô hiệu hóa các action được lựa chọn?"
+msgstr "Vô hiệu hóa hoạt động được lựa chọn?"
 
 #: include/views/configuration.application.list.php:117
 msgid "Disable selected applications?"
@@ -4293,11 +4303,11 @@ msgstr "Vô hiệu hóa các nhóm đã chọn?"
 
 #: include/views/configuration.host.prototype.list.php:124
 msgid "Disable selected host prototypes?"
-msgstr "Vô hiệu hóa các kiểu host đã chọn?"
+msgstr "Vô hiệu hóa các kiểu máy chủ đã chọn?"
 
 #: hosts.php:1022
 msgid "Disable selected hosts?"
-msgstr "Vô hiệu hóa các host đã chọn?"
+msgstr "Vô hiệu hóa máy chủ đã chọn?"
 
 #: include/views/configuration.item.prototype.list.php:117
 msgid "Disable selected item prototypes?"
@@ -4309,7 +4319,7 @@ msgstr "Vô hiệu hóa các item đã chọn?"
 
 #: include/views/administration.mediatypes.list.php:118
 msgid "Disable selected media types?"
-msgstr "Vô hiệu hóa các media type đã chọn?"
+msgstr "Vô hiệu hóa loại phương tiện đã chọn?"
 
 #: include/views/configuration.triggers.list.php:274
 msgid "Disable selected trigger prototypes?"
@@ -4404,7 +4414,7 @@ msgstr "Quy tắc phát hiện"
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Quy tắc phát hiện \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ template khác."
+msgstr "Quy tắc phát hiện \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ mẫu khác."
 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
@@ -4538,12 +4548,12 @@ msgstr "Kiểu dáng thiết kế"
 
 #: include/views/administration.general.gui.edit.php:32
 msgid "Dropdown first entry"
-msgstr "Dropdown nhập đầu tiên"
+msgstr "Mục Dropdown đầu tiên"
 
 #: adm.gui.php:77
 #, c-format
 msgid "Dropdown first entry \"%1$s\"."
-msgstr "Dropdown \"%1$s\" nhập đầu tiên."
+msgstr "Mục Dropdown \"%1$s\" đầu tiên."
 
 #: adm.gui.php:78
 #, c-format
@@ -4558,22 +4568,22 @@ msgstr "Bản sao quan hệ phụ thuộc trong trigger \"%1$s\"."
 #: api/classes/CHostPrototype.php:197
 #, c-format
 msgid "Duplicate group prototype name \"%2$s\" for host prototype \"%1$s\"."
-msgstr "Tạo bản sao tên kiểu nhóm \"%2$s\" cho kiểu host \"%1$s\"."
+msgstr "Tạo bản sao tên kiểu nhóm \"%2$s\" cho kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:191
 #, c-format
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
-msgstr "Tạo bản sao nhóm ID host \"%2$s\" cho kiểu host \"%1$s\"."
+msgstr "Tạo bản sao ID nhóm máy chủ \"%2$s\" cho kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CHost.php:760
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
-msgstr "Bản sao host. Host với tên host cùng là \"%s\" đã tồn tại trong dữ liệu."
+msgstr "Bản sao máy chủ. Máy chủ với máy chủ cùng tên là \"%s\" đã tồn tại trong dữ liệu."
 
 #: api/classes/CHost.php:792
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
-msgstr "Bản sao host. Host với tên hiển thị cùng là \"%s\" đã tồn tại trong dữ liệu."
+msgstr "Bản sao máy chủ. Máy chủ với tên hiển thị cùng là \"%s\" đã tồn tại trong dữ liệu."
 
 #: api/classes/CMap.php:405
 #, c-format
@@ -4583,7 +4593,7 @@ msgstr "Bản sao tên bản đồ cho bản đồ \"%s\"."
 #: api/classes/CScript.php:411 api/classes/CScript.php:467
 #, c-format
 msgid "Duplicate script name \"%1$s\"."
-msgstr "Bản sao tên tập lệnh \"%1$s\"."
+msgstr "Bản sao tên script \"%1$s\"."
 
 #: include/profiles.inc.php:345
 #, c-format
@@ -4623,7 +4633,7 @@ msgstr "LỖI"
 
 #: tr_events.php:99
 msgid "EVENTS"
-msgstr "Các sự kiện"
+msgstr "Sự kiện"
 
 #: jsLoader.php:159
 msgid "Each URL should have a unique name. Please make sure there is only one URL named"
@@ -4683,7 +4693,7 @@ msgstr "Trống"
 #: api/classes/CAction.php:1644 api/classes/CAction.php:1654
 #: api/classes/CAction.php:1663 api/classes/CAction.php:1678
 msgid "Empty action condition."
-msgstr "Điều kiện action trống."
+msgstr "Điều kiện hoạt động để trống."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
@@ -4691,11 +4701,11 @@ msgstr "Không có màu sắc."
 
 #: api/classes/CHostPrototype.php:458
 msgid "Empty host ID for host prototype."
-msgstr "Không có host ID cho kiểu host."
+msgstr "Không có ID cho kiểu máy chủ."
 
 #: api/classes/CHostPrototype.php:173
 msgid "Empty host."
-msgstr "Không có host."
+msgstr "Không có máy chủ."
 
 #: api/classes/CAction.php:1275 api/classes/CApplication.php:288
 #: api/classes/CDiscoveryRule.php:340 api/classes/CDRule.php:617
@@ -4733,16 +4743,16 @@ msgstr "Không có tên cho kiểu nhóm."
 #: api/classes/CHostPrototype.php:181
 #, c-format
 msgid "Empty name for host prototype \"%1$s\"."
-msgstr "Không có tên cho kiểu nhóm \"%1$s\"."
+msgstr "Không có tên cho kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CScript.php:569
 #, c-format
 msgid "Empty name for script \"%1$s\"."
-msgstr "Không có tên cho tập lệnh \"%1$s\"."
+msgstr "Không có tên cho script \"%1$s\"."
 
 #: api/classes/CScript.php:408 api/classes/CScript.php:464
 msgid "Empty name for script."
-msgstr "Không có tên cho tập lệnh."
+msgstr "Không có tên cho script."
 
 #: api/classes/CService.php:1113
 msgid "Empty name."
@@ -4763,7 +4773,7 @@ msgstr "Không có screen ID cho screen."
 
 #: api/classes/CTemplateScreen.php:604
 msgid "Empty screen ID for template screen."
-msgstr "Không có screen ID cho template screen."
+msgstr "Không có screen ID cho mẫu screen."
 
 #: include/classes/validators/CTimePeriodValidator.php:46
 msgid "Empty time period."
@@ -4791,15 +4801,15 @@ msgstr "Kích hoạt sự tiếp nhận sự kiện"
 
 #: include/actions.inc.php:409 include/actions.inc.php:639
 msgid "Enable host"
-msgstr "Kích hoạt host"
+msgstr "Kích hoạt máy chủ"
 
 #: hosts.php:952
 msgid "Enable host?"
-msgstr "Kích hoạt host?"
+msgstr "Kích hoạt máy chủ?"
 
 #: include/views/administration.proxy.list.php:105
 msgid "Enable hosts monitored by selected proxies?"
-msgstr "Kích hoạt tính năng theo dõi các host bằng cách chọn các proxy?"
+msgstr "Kích hoạt tính năng theo dõi các máy chủ bằng cách chọn các proxy?"
 
 #: include/views/administration.general.housekeeper.edit.php:29
 #: include/views/administration.general.housekeeper.edit.php:67
@@ -4832,7 +4842,7 @@ msgstr "Kích hoạt WEB scenario được chọn?"
 
 #: include/views/configuration.action.list.php:98
 msgid "Enable selected actions?"
-msgstr "Kích hoạt các action được chọn?"
+msgstr "Kích hoạt các hoạt động được chọn?"
 
 #: include/views/configuration.application.list.php:113
 msgid "Enable selected applications?"
@@ -4849,11 +4859,11 @@ msgstr "Kích hoạt các nhóm được chọn?"
 
 #: include/views/configuration.host.prototype.list.php:120
 msgid "Enable selected host prototypes?"
-msgstr "Kích hoạt các kiểu host được chọn?"
+msgstr "Kích hoạt các kiểu máy chủ được chọn?"
 
 #: hosts.php:1019 include/views/configuration.hostgroups.list.php:162
 msgid "Enable selected hosts?"
-msgstr "Kích hoạt các host được chọn?"
+msgstr "Kích hoạt máy chủ được chọn?"
 
 #: include/views/configuration.item.prototype.list.php:113
 msgid "Enable selected item prototypes?"
@@ -4865,7 +4875,7 @@ msgstr "Kích hoạt các item được chọn?"
 
 #: include/views/administration.mediatypes.list.php:114
 msgid "Enable selected media types?"
-msgstr "Kích hoạt các media type đã chọn?"
+msgstr "Kích hoạt loại phương tiện đã chọn?"
 
 #: include/views/configuration.triggers.list.php:267
 msgid "Enable selected trigger prototypes?"
@@ -4984,11 +4994,11 @@ msgstr "Kiểu sự kiện"
 #: search.php:135 search.php:208 search.php:267 search.php:321
 #: tr_status.php:299
 msgid "Events"
-msgstr "Các sự kiện"
+msgstr "Sự kiện"
 
 #: include/views/administration.general.housekeeper.edit.php:60
 msgid "Events and alerts"
-msgstr "Các sự kiện và các thông báo"
+msgstr "Sự kiện và thông báo"
 
 #: include/forms.inc.php:1672
 msgid "Every day(s)"
@@ -5030,7 +5040,7 @@ msgstr "Thực hiện trên"
 
 #: include/items.inc.php:1363 include/views/configuration.item.edit.php:195
 msgid "Executed script"
-msgstr "Câu lệnh đã thực hiện"
+msgstr "Script đã thực hiện"
 
 #: jsLoader.php:106
 msgid "Execution confirmation"
@@ -5145,19 +5155,19 @@ msgstr "Đã thất bại"
 
 #: api/classes/CTemplate.php:611
 msgid "Failed to update template"
-msgstr "Cập nhật template bị thất bại"
+msgstr "Cập nhật mẫu bị thất bại"
 
 #: include/items.inc.php:37
 msgid "Failure Audit"
-msgstr "Thử nghiệm thất bại"
+msgstr "Kiểm soát thất bại"
 
 #: dashboard.php:311 include/blocks.inc.php:1243
 msgid "Favourite graphs"
-msgstr "Các đồ thị ưa thích"
+msgstr "Đồ thị ưa thích"
 
 #: dashboard.php:339 include/blocks.inc.php:1372
 msgid "Favourite maps"
-msgstr "Các bản đồ ưathích"
+msgstr "Sơ đồ ưa thích"
 
 #: dashboard.php:325 include/blocks.inc.php:1417
 msgid "Favourite screens"
@@ -5269,7 +5279,7 @@ msgstr "Lọc"
 
 #: report2.php:321
 msgid "Filter by host group"
-msgstr "Lọc bởi các nhóm host"
+msgstr "Lọc bởi các nhóm máy chủ"
 
 #: tr_status.php:325
 msgid "Filter by name"
@@ -5472,11 +5482,11 @@ msgstr "Biểu thức toàn cục không tồn tại."
 
 #: include/views/configuration.action.edit.php:726
 msgid "Global script"
-msgstr "Tập lệnh toàn cục"
+msgstr "Global script"
 
 #: popup.php:116
 msgid "Global scripts"
-msgstr "Các tập lệnh toàn cục"
+msgstr "Global scripts"
 
 #: hosts.php:1027
 #: include/views/administration.general.regularexpressions.list.php:70
@@ -5531,7 +5541,7 @@ msgstr "Đồ thị"
 #: api/classes/CGraph.php:448 api/classes/CGraphPrototype.php:463
 #, c-format
 msgid "Graph \"%1$s\" already exists on \"%2$s\" (inherited from another template)."
-msgstr "Đồ thị \"%1$s\"  đã tồn tại trên \"%2$s\" (Kế thừa từ template khác)"
+msgstr "Đồ thị \"%1$s\"  đã tồn tại trên \"%2$s\" (Kế thừa từ mẫu khác)"
 
 #: api/classes/CGraph.php:469 api/classes/CGraph.php:476
 #: api/classes/CGraphPrototype.php:485 api/classes/CGraphPrototype.php:492
@@ -5563,7 +5573,7 @@ msgstr "Đồ thị \"%1$s\" không thể kế thừa. Không có các ite
 #: api/classes/CTemplateScreen.php:506
 #, c-format
 msgid "Graph \"%1$s\" does not exist on template \"%2$s\"."
-msgstr "Đồ thị \"%1$s\" đã tồn tại trên template \"%2$s\"."
+msgstr "Đồ thị \"%1$s\" đã tồn tại trên mẫu \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1554
 #: include/classes/import/CXmlImport18.php:1558
@@ -5574,7 +5584,7 @@ msgstr "Đồ thị \"%1$s\" bị bỏ qua - quy tắc người dùng."
 #: api/classes/CGraph.php:38
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Đồ thị \"%1$s\" với các template item không thể chứa các item từ các host khác."
+msgstr "Đồ thị \"%1$s\" với các item mẫu không thể chứa các item từ máy chủ khác."
 
 #: graphs.php:246
 msgid "Graph added"
@@ -5613,7 +5623,7 @@ msgstr "Kiểu đồ thị \"%1$s\" phải có ít nhất một kiểu it
 #: api/classes/CGraphPrototype.php:38
 #, c-format
 msgid "Graph prototype \"%1$s\" with templated items cannot contain items from other hosts."
-msgstr "Kiểu đồ thị \"%1$s\" với các template item không thể chứa các item từ các host khác."
+msgstr "Kiểu đồ thị \"%1$s\" với các mẫu item không thể chứa các item từ các máy chủ khác."
 
 #: api/classes/CGraphPrototype.php:609
 #, c-format
@@ -5733,7 +5743,7 @@ msgstr "Nhóm"
 #: api/classes/CHostGroup.php:606
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
-msgstr "Nhóm \"%1$s\" không thể bị xóa, bởi vì nó được sử dụng bởi các kiểu host."
+msgstr "Nhóm \"%1$s\" không thể bị xóa,vì nó được sử dụng bởi các kiểu máy chủ."
 
 #: include/classes/import/importers/CTemplateImporter.php:233
 #, c-format
@@ -5743,7 +5753,7 @@ msgstr "Nhóm \"%1$s\" không tồn tại."
 #: include/classes/import/importers/CHostImporter.php:131
 #, c-format
 msgid "Group \"%1$s\" for host \"%2$s\" does not exist."
-msgstr "Nhóm \"%1$s\" cho host \"%2$s\" không tồn tại."
+msgstr "Nhóm \"%1$s\" cho máy chủ \"%2$s\" không tồn tại."
 
 #: hostgroups.php:211 usergrps.php:186
 msgid "Group added"
@@ -5755,12 +5765,12 @@ msgstr "Nhóm đã xóa"
 
 #: include/views/administration.general.other.edit.php:36
 msgid "Group for discovered hosts"
-msgstr "Nhóm cho các host được phát hiện"
+msgstr "Nhóm máy chủ được phát hiện"
 
 #: adm.other.php:74
 #, c-format
 msgid "Group for discovered hosts \"%1$s\"."
-msgstr "Nhóm cho các host được phát hiện \"%1$s\"."
+msgstr "Nhóm máy chủ được phát hiện \"%1$s\"."
 
 #: include/views/administration.usergroups.edit.php:41
 #: include/views/configuration.hostgroups.edit.php:40
@@ -5774,7 +5784,7 @@ msgstr "ID kiểu nhóm không thể để trống."
 #: api/classes/CHostPrototype.php:156 api/classes/CHostPrototype.php:434
 #, c-format
 msgid "Group prototype cannot be based on a discovered host group \"%1$s\"."
-msgstr "Kiểu nhóm không thể dựa trên một nhóm host được phát hiện \"%1$s\"."
+msgstr "Kiểu nhóm không thể dựa trên một nhóm máy chủ được phát hiện \"%1$s\"."
 
 #: include/views/configuration.host.prototype.edit.php:209
 msgid "Group prototypes"
@@ -5824,24 +5834,24 @@ msgstr "H:i:s"
 
 #: events.php:269
 msgid "HISTORY OF EVENTS"
-msgstr "Lịch sử của các sự kiện"
+msgstr "Lịch sử các sự kiện"
 
 #: include/classes/screens/CScreenHostgroupTriggers.php:132
 msgid "HOST GROUP ISSUES"
-msgstr "Sản phẩm của nhóm host"
+msgstr "Sản phẩm của nhóm máy chủ"
 
 #: include/views/inventory.host.list.php:26
 #: include/views/inventory.host.view.php:24
 msgid "HOST INVENTORY"
-msgstr "Kho lưu trữ host"
+msgstr "Kho lưu trữ máy chủ"
 
 #: hostinventoriesoverview.php:65
 msgid "HOST INVENTORY OVERVIEW"
-msgstr "Tổng quan kho lưu trữ host"
+msgstr "Tổng quan kho lưu trữ máy chủ"
 
 #: include/classes/screens/CScreenHostTriggers.php:131
 msgid "HOST ISSUES"
-msgstr "Sản phẩm host"
+msgstr "Sản phẩm máy chủ"
 
 #: include/discovery.inc.php:60
 #: include/views/administration.authentication.edit.php:48
@@ -5963,11 +5973,11 @@ msgstr "Lịch sử chu kỳ lưu trữ dữ liệu (trong ngày) \"%1$s\".
 
 #: include/screens.inc.php:31
 msgid "History of actions"
-msgstr "Lịch sử của các action"
+msgstr "Lịch sử của hoạt động"
 
 #: include/screens.inc.php:32
 msgid "History of events"
-msgstr "Lịch sử của các sự kiện"
+msgstr "Lịch sử các sự kiện"
 
 #: disc_prototypes.php:115 items.php:54
 msgid "History storage period"
@@ -6025,61 +6035,65 @@ msgstr "Sắp xếp theo chiều ngang"
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
-msgstr "Host"
+msgstr "Máy chủ"
 
 #: api/classes/CHost.php:1124 api/classes/CTemplate.php:512
 #, c-format
 msgid "Host \"%1$s\" already exists."
-msgstr "Host \"%1$s\" đã tồn tại."
+msgstr "Máy chủ \"%1$s\" đã tồn tại."
 
 #: api/classes/CProxy.php:591
 #, c-format
 msgid "Host \"%1$s\" is monitored with proxy \"%2$s\"."
-msgstr "Host \"%1$s\" được theo dõi với proxy \"%2$s\"."
+msgstr "Máy chủ \"%1$s\" được theo dõi với proxy \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:927
 #, c-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "Host \"%s\" có tham số \"useipmi\" được kiểm tra, nhưng không có tham số \"ipmi_ip\"! Sử dụng địa chỉ host IP như là một địa chỉ cho interface IPMI. "
+msgstr "Máy chủ \"%s\" có tham số \"useipmi\" được kiểm tra, nhưng không có tham số \"ipmi_ip\"! Sử dụng địa chỉ IP máy chủ như là một địa chỉ cho interface IPMI. "
 
 #: include/views/configuration.screen.constructor.edit.php:358
 msgid "Host (ascending)"
-msgstr "Host (tăng dần)"
+msgstr "Máy chủ (tăng dần)"
 
 #: include/actions.inc.php:76
 msgid "Host IP"
-msgstr "Host IP"
+msgstr "IP máy chủ"
 
 #: include/views/administration.script.list.php:45
 msgid "Host access"
-msgstr "Kết nối host"
+msgstr "Kết nối máy chủ"
 
 #: hosts.php:377
 msgid "Host added"
-msgstr "Host được thêm vào"
+msgstr "Máy chủ được thêm vào"
 
 #: api/classes/CHostInterface.php:844
 msgid "Host cannot have more than one default interface of the same type."
-msgstr "Host không thể có nhiều hơn một interface mặc định của kiểu tương tự."
+msgstr "Máy chủ không thể có nhiều hơn một interface mặc định của kiểu tương tự."
 
 #: hostinventoriesoverview.php:92
 #: include/views/administration.proxy.list.php:49
 msgid "Host count"
-msgstr "Đếm host"
+msgstr "Số lượng máy chủ"
 
 #: hosts.php:583 hosts.php:600
 msgid "Host deleted"
-msgstr "Host đã xóa"
+msgstr "Máy chủ đã xóa"
 
 #: hostgroups.php:286 hosts.php:626 proxies.php:180
 msgid "Host disabled"
 msgid_plural "Hosts disabled"
-msgstr[0] "Host đã vô hiệu hóaCác host đã vô hiệu hóa"
+msgstr[0] ""
+"Máy chủ đã vô hiệu hóa\n"
+"Các máy chủ đã vô hiệu hóa"
 
 #: hostgroups.php:285 hosts.php:625 proxies.php:179
 msgid "Host enabled"
 msgid_plural "Hosts enabled"
-msgstr[0] "Host được kích hoạtCác host được kích hoạt"
+msgstr[0] ""
+"Máy chủ được kích hoạt\n"
+"Các máy chủ được kích hoạt"
 
 #: include/actions.inc.php:60 include/audit.inc.php:35
 #: include/blocks.inc.php:198 include/blocks.inc.php:401
@@ -6094,43 +6108,43 @@ msgstr[0] "Host được kích hoạtCác host được kích hoạt"
 #: include/views/js/configuration.sysmaps.js.php:91 jsLoader.php:149
 #: report2.php:343 search.php:264
 msgid "Host group"
-msgstr "Nhóm host"
+msgstr "Nhóm máy chủ"
 
 #: api/classes/CHostGroup.php:467 api/classes/CHostGroup.php:545
 #, c-format
 msgid "Host group \"%1$s\" already exists."
-msgstr "Nhóm host \"%1$s\" đã tồn tại."
+msgstr "Nhóm máy chủ \"%1$s\" đã tồn tại."
 
 #: api/classes/CHostGroup.php:638
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
-msgstr "`Nhóm host \"%1$s\" không thể bị xóa, bởi bị nó được sử dụng trong một tập lệnh toàn cục."
+msgstr "`Nhóm máy chủ \"%1$s\" không thể bị xóa, bởi bị nó được sử dụng trong một global script."
 
 #: api/classes/CHostGroup.php:619
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
-msgstr "Nhóm host \"%1$s\"  không thể bị xóa, bởi vì một số host phụ thuộc vào nó."
+msgstr "Nhóm máy chủ \"%1$s\" không thể bị xóa, bởi vì một số máy chủ phụ thuộc vào nó."
 
 #: api/classes/CHostGroup.php:593
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
-msgstr "Nhóm host \"%1$s\" là nội bộ và không thể bị xóa."
+msgstr "Nhóm máy chủ \"%1$s\" là nội bộ và không thể bị xóa."
 
 #: include/views/js/configuration.sysmaps.js.php:33
 msgid "Host group elements"
-msgstr "Các phần tử nhóm host"
+msgstr "Các phần tử nhóm máy chủ"
 
 #: include/screens.inc.php:39
 msgid "Host group issues"
-msgstr "Sản phẩm nhóm host"
+msgstr "Sản phẩm nhóm máy chủ"
 
 #: include/views/configuration.sysmap.edit.php:75
 msgid "Host group label type"
-msgstr "Kiểu nhãn nhóm host"
+msgstr "Kiểu nhãn nhóm máy chủ"
 
 #: api/classes/CHostGroup.php:464 api/classes/CHostGroup.php:537
 msgid "Host group name cannot be empty."
-msgstr "Tên nhóm host không thể để trống."
+msgstr "Tên nhóm máy chủ không thể để trống."
 
 #: include/forms.inc.php:202 include/menu.inc.php:160
 #: include/views/configuration.copy.elements.php:47
@@ -6138,145 +6152,149 @@ msgstr "Tên nhóm host không thể để trống."
 #: include/views/configuration.item.copy.php:43
 #: include/views/monitoring.dashconf.php:53 popup.php:48 search.php:330
 msgid "Host groups"
-msgstr "Các nhóm host"
+msgstr "Nhóm máy chủ"
 
 #: include/views/configuration.item.edit.php:116
 #: include/views/configuration.item.massupdate.php:84
 msgid "Host interface"
-msgstr "Giao diện host"
+msgstr "Giao diện máy chủ"
 
 #: jsLoader.php:185
 msgid "Host inventories"
-msgstr "Host lưu trữ"
+msgstr "Máy chủ lưu trữ"
 
 #: hostinventories.php:26 include/views/configuration.host.edit.php:905
 #: include/views/configuration.host.prototype.edit.php:324 jsLoader.php:204
 msgid "Host inventory"
-msgstr "Host lưu trữ"
+msgstr "Máy chủ lưu trữ"
 
 #: hostinventoriesoverview.php:26
 msgid "Host inventory overview"
-msgstr "Tổng quan về host lưu trữ"
+msgstr "Tổng quan về máy chủ lưu trữ"
 
 #: include/screens.inc.php:40
 msgid "Host issues"
-msgstr "Sản phẩm host"
+msgstr "Sản phẩm máy chủ"
 
 #: include/views/configuration.sysmap.edit.php:83
 msgid "Host label type"
-msgstr "Kiểu nhãn host"
+msgstr "Kiểu nhãn máy chủ"
 
 #: include/html.inc.php:347
 msgid "Host list"
-msgstr "Danh sách host"
+msgstr "Danh sách máy chủ"
 
 #: include/actions.inc.php:96
 msgid "Host metadata"
-msgstr "Dữ liệu đặc tả host"
+msgstr "Dữ liệu đặc tả máy chủ"
 
 #: host_prototypes.php:40 hosts.php:53 include/actions.inc.php:58
 #: include/views/configuration.host.edit.php:182
 #: include/views/configuration.host.prototype.edit.php:65
 #: include/views/inventory.host.view.php:45
 msgid "Host name"
-msgstr "Tên host"
+msgstr "Tên máy chủ"
 
 #: api/classes/CHostPrototype.php:174
 #, c-format
 msgid "Host name \"%1$s\" is too long, it must not be longer than %2$d characters."
-msgstr "Tên host \"%1$s\" quá dài, nó phải không được dài hơn %2$d ký tự."
+msgstr "Tên máy chủ \"%1$s\" quá dài, nó phải không được dài hơn %2$d ký tự."
 
 #: api/classes/CHostPrototype.php:176
 #, c-format
 msgid "Host name for host prototype \"%1$s\" must contain macros."
-msgstr "Tên host cho kiểu host \"%1$s\" phải chứa các macro."
+msgstr "Tên máy chủ cho kiểu máy chủ \"%1$s\" phải chứa các macro."
 
 #: include/hosts.inc.php:290
 msgid "Host networks"
-msgstr "Các mạng host"
+msgstr "Các mạng máy chủ"
 
 #: api/classes/CHostPrototype.php:785
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ các template khác."
+msgstr "Kiểu máy chủ \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ các mẫu khác."
 
 #: api/classes/CHostPrototype.php:773
 #, c-format
 msgid "Host prototype \"%1$s\" already exists on \"%2$s\"."
-msgstr "Kiểu host \"%1$s\" đã tồn tại trên \"%2$s\"."
+msgstr "Kiểu máy chủ \"%1$s\" đã tồn tại trên \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:189
 #, c-format
 msgid "Host prototype \"%1$s\" must have at least one host group."
-msgstr "Kiểu host \"%1$s\" phải có ít nhất một nhóm host."
+msgstr "Kiểu máy chủ \"%1$s\" phải có ít nhất một nhóm máy chủ."
 
 #: host_prototypes.php:202
 msgid "Host prototype added"
-msgstr "Kiểu host được thêm vào"
+msgstr "Kiểu máy chủ được thêm vào"
 
 #: host_prototypes.php:119
 msgid "Host prototype deleted"
-msgstr "Kiểu host bị xóa"
+msgstr "Kiểu máy chủ bị xóa"
 
 #: host_prototypes.php:233
 msgid "Host prototype disabled"
 msgid_plural "Host prototypes disabled"
-msgstr[0] "Kiểu host đã vô hiệu hóaCác kiểu host đã vô hiệu hóa"
+msgstr[0] ""
+"Kiểu máy chủ đã vô hiệu hóa\n"
+"Các kiểu máy chủ đã vô hiệu hóa"
 
 #: host_prototypes.php:232
 msgid "Host prototype enabled"
 msgid_plural "Host prototypes enabled"
-msgstr[0] "Kiểu host được kích hoạtCác kiểu host được kích hoạt"
+msgstr[0] ""
+"Kiểu máy chủ được kích hoạt\n"
+"Các kiểu máy chủ được kích hoạt"
 
 #: host_prototypes.php:188
 msgid "Host prototype updated"
-msgstr "Kiểu host được cập nhật"
+msgstr "Kiểu máy chủ được cập nhật"
 
 #: api/classes/CHostPrototype.php:1100
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Kiểu host với tên host \"%1$s\" đã tồn tại trong quy tắc phát hiện \"%2$s\"."
+msgstr "Kiểu máy chủ với tên máy chủ \"%1$s\" đã tồn tại trong quy tắc phát hiện \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1096
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
-msgstr "Kiểu host với tên host \"%1$s\" đã tồn tại."
+msgstr "Kiểu máy chủ với tên máy chủ \"%1$s\" đã tồn tại."
 
 #: api/classes/CHostPrototype.php:1108
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
-msgstr "Kiểu host với tên hiển thị \"%1$s\" đã tồn tại trong quy tắc phát hiện \"%2$s\"."
+msgstr "Kiểu máy chủ với tên hiển thị \"%1$s\" đã tồn tại trong quy tắc phát hiện \"%2$s\"."
 
 #: api/classes/CHostPrototype.php:1105
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
-msgstr "Kiểu host với tên hiển thị \"%1$s\" đã tồn tại."
+msgstr "Kiểu máy chủ với tên hiển thị \"%1$s\" đã tồn tại."
 
 #: include/html.inc.php:488 include/html.inc.php:492
 #: include/views/configuration.host.discovery.list.php:96
 #: include/views/configuration.host.edit.php:677
 msgid "Host prototypes"
-msgstr "Các kiểu host"
+msgstr "Các kiểu máy chủ"
 
 #: host_prototypes.php:244
 msgid "Host prototypes deleted"
-msgstr "Các kiểu host đã xóa"
+msgstr "Các kiểu máy chủ đã xóa"
 
 #: include/views/configuration.host.prototype.list.php:34
 msgid "Host prototypes of"
-msgstr "Các kiểu host của"
+msgstr "Các kiểu máy chủ của"
 
 #: include/hosts.inc.php:300
 msgid "Host router"
-msgstr "Định tuyến host"
+msgstr "Định tuyến máy chủ"
 
 #: host_screen.php:27 jsLoader.php:181 jsLoader.php:205
 msgid "Host screens"
-msgstr "Màn hình host"
+msgstr "Host screens"
 
 #: dashboard.php:383
 msgid "Host status"
-msgstr "Trạng thái host"
+msgstr "Trạng thái máy chủ"
 
 #: include/hosts.inc.php:295
 msgid "Host subnet mask"
@@ -6284,35 +6302,35 @@ msgstr "Host subnet mask"
 
 #: include/views/configuration.screen.constructor.edit.php:538
 msgid "Host time"
-msgstr "Thời gian của host"
+msgstr "Thời gian của máy chủ"
 
 #: api/classes/CHost.php:1003
 msgid "Host update failed."
-msgstr "Host cập nhật thất bại."
+msgstr "Máy chủ cập nhật thất bại."
 
 #: hosts.php:365
 msgid "Host updated"
-msgstr "Host đã cập nhật"
+msgstr "Máy chủ đã cập nhật"
 
 #: api/classes/CTemplate.php:908
 #, c-format
 msgid "Host with the same name \"%1$s\" already exists."
-msgstr "Host với cùng một tên \"%1$s\" đã tồn tại."
+msgstr "Máy chủ với cùng một tên \"%1$s\" đã tồn tại."
 
 #: api/classes/CHost.php:822
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
-msgstr "Host với cùng một tên \"%s\" đã tồn tại."
+msgstr "Máy chủ với cùng một tên \"%s\" đã tồn tại."
 
 #: api/classes/CTemplate.php:526 api/classes/CTemplate.php:875
 #, c-format
 msgid "Host with the same visible name \"%1$s\" already exists."
-msgstr "Host với cùng một tên hiển thị \"%1$s\" đã tồn tại."
+msgstr "Máy chủ với cùng một tên hiển thị \"%1$s\" đã tồn tại."
 
 #: api/classes/CHost.php:828
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
-msgstr "Host với cùng một tên hiển thị \"%s\" đã tồn tại."
+msgstr "Máy chủ với cùng một tên hiển thị \"%s\" đã tồn tại."
 
 #: hostinventoriesoverview.php:85 hosts.php:772 include/forms.inc.php:225
 #: include/forms.inc.php:916 include/items.inc.php:754
@@ -6330,40 +6348,40 @@ msgstr "Host với cùng một tên hiển thị \"%s\" đã tồn tại."
 #: search.php:130 search.php:224 search.php:270 search.php:290 search.php:295
 #: search.php:311
 msgid "Hosts"
-msgstr "Các host"
+msgstr "Máy chủ"
 
 #: include/views/configuration.maintenance.edit.php:187
 msgid "Hosts & Groups"
-msgstr "Các host  & các nhóm"
+msgstr "Máy chủ  & Nhóm"
 
 #: include/classes/class.cserverinfo.php:46
 msgid "Hosts (m/n/t)"
-msgstr "Các host (m/n/t)"
+msgstr "Máy chủ (m/n/t)"
 
 #: include/views/configuration.template.edit.php:225
 msgid "Hosts / templates"
-msgstr "Các host / các template"
+msgstr "Máy chủ / Mẫu"
 
 #: include/views/configuration.hostgroups.edit.php:63
 msgid "Hosts in"
-msgstr "Các host trong"
+msgstr "Máy chủ trong"
 
 #: include/views/configuration.maintenance.edit.php:169
 msgid "Hosts in maintenance"
-msgstr "Host trong bảo trì"
+msgstr "Máy chủ trong bảo trì"
 
 #: include/classes/class.chostsinfo.php:104 include/screens.inc.php:33
 msgid "Hosts info"
-msgstr "Thông tin các host"
+msgstr "Thông tin máy chủ"
 
 #: include/views/configuration.screen.constructor.edit.php:587
 #: include/views/monitoring.overview.php:90
 msgid "Hosts location"
-msgstr "Vị trí các host"
+msgstr "Vị trí máy chủ"
 
 #: hosts.php:348
 msgid "Hosts updated"
-msgstr "Các host đã cập nhật"
+msgstr "Máy chủ đã cập nhật"
 
 #: include/reports.inc.php:60 include/reports.inc.php:402
 #: include/reports.inc.php:410
@@ -6707,7 +6725,7 @@ msgstr "Các hình ảnh"
 
 #: include/views/conf.import.php:51
 msgid "Images for all maps will be updated!"
-msgstr "Các hình ảnh cho tất cả bản đồ sẽ được cập nhật!"
+msgstr "Các hình ảnh cho tất cả sơ đồ sẽ được cập nhật!"
 
 #: include/views/configuration.action.edit.php:401
 msgid "Immediately"
@@ -6806,57 +6824,57 @@ msgstr "Sự chấp nhận SLA không chính xác đối với dịch vu�
 
 #: api/classes/CAction.php:1612
 msgid "Incorrect action condition discovery check."
-msgstr "Điều kiện kiểm tra phát hiện action không chính xác."
+msgstr "Điều kiện kiểm tra phát hiện hoạt động không chính xác."
 
 #: api/classes/CAction.php:1705
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
-msgstr "Điều kiện kiểm tra phát hiện action không chính xác. Kiểm tra phát hiện không tồn tại hoặc bạn không có quyền truy cập vào nó."
+msgstr "Điều kiện kiểm tra phát hiện hoạt động không chính xác. Kiểm tra phát hiện không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
 #: api/classes/CAction.php:1587
 msgid "Incorrect action condition discovery object."
-msgstr "Điều kiện đối tượng phát hiện action không chính xác."
+msgstr "Điều kiện đối tượng phát hiện hoạt động không chính xác."
 
 #: api/classes/CAction.php:1702
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
-msgstr "Điều kiện quy tắc phát hiện action không chính xác. Quy tắc phát hiện không tồn tại hoặc bạn không có quyền truy cập vào nó."
+msgstr "Điều kiện quy tắc phát hiện hoạt động không chính xác. Quy tắc phát hiện không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
 #: api/classes/CAction.php:1632
 msgid "Incorrect action condition discovery status."
-msgstr "Điều kiện trạng thái phát hiện action không chính xác."
+msgstr "Điều kiện trạng thái phát hiện hoạt động không chính xác."
 
 #: api/classes/CAction.php:1666
 msgid "Incorrect action condition event type."
-msgstr "Điều kiện kiểu sự kiện action không chính xác."
+msgstr "Điều kiện kiểu sự kiện hoạt động không chính xác."
 
 #: api/classes/CAction.php:1690
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
-msgstr "Điều kiện nhóm host action không chính xác. Nhóm host không tồn tại hoặc bạn không có quyền truy cập vào nó."
+msgstr "Điều kiện nhóm máy chủ action không chính xác. Nhóm máy chủ không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
 #: api/classes/CAction.php:1693
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
-msgstr "Điều kiện host action không chính xác. Host không tồn tại hoặc bạn không có quyền truy cập vào nó."
+msgstr "Điều kiện máy chủ action không chính xác. Máy chủ không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
 #: api/classes/CAction.php:1603
 #, c-format
 msgid "Incorrect action condition ip \"%1$s\"."
-msgstr "Điều kiện ip action \"%1$s\" không chính xác."
+msgstr "Điều kiện ip hoạt động \"%1$s\" không chính xác."
 
 #: api/classes/CAction.php:1525
 msgid "Incorrect action condition operator."
-msgstr "Điều kiện thao tác action không chính xác."
+msgstr "Điều kiện thao tác hoạt động không chính xác."
 
 #: api/classes/CAction.php:1622
 #, c-format
 msgid "Incorrect action condition port \"%1$s\"."
-msgstr "Điều kiện cổng action \"%1$s\" không chính xác."
+msgstr "Điều kiện cổng hoạt động \"%1$s\" không chính xác."
 
 #: api/classes/CAction.php:1708
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
-msgstr "Điều kiện proxy action không chính xác. Proxy không tồn tại hoặc bạn không có quyền truy cập vào nó."
+msgstr "Điều kiện hoạt động proxy không chính xác. Proxy không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
 #: api/classes/CAction.php:1696
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
-msgstr "Điều kiện template action không chính xác. Template không tồn tại hoặc bạn không có quyền truy cập vào nó."
+msgstr "Điều kiện mẫu hoạt động không chính xác. Mẫu không tồn tại hoặc bạn không có quyền truy cập vào nó."
 
 #: api/classes/CAction.php:1648
 msgid "Incorrect action condition trigger severity."
@@ -6872,40 +6890,40 @@ msgstr "Điều kiện trigger action không chính xác. Trigger không tô
 
 #: api/classes/CAction.php:1683
 msgid "Incorrect action condition type."
-msgstr "Kiểu điều kiện action không chính xác."
+msgstr "Kiểu điều kiện hoạt động không chính xác."
 
 #: api/classes/CAction.php:734
 msgid "Incorrect action conditionid."
-msgstr "Điều kiện id action không chính xác."
+msgstr "Điều kiện id hoạt động không chính xác."
 
 #: api/classes/CAction.php:569 api/classes/CAction.php:707
 #, c-format
 msgid "Incorrect action conditions for action \"%1$s\"."
-msgstr "Các điều kiện action không chính xác đối với action \"%1$s\"."
+msgstr "Các điều kiện hoạt động không chính xác đối với hoạt động \"%1$s\"."
 
 #: api/classes/CAction.php:1389
 msgid "Incorrect action operation command type."
-msgstr "Thao tác kiểu câu lệnh action không chính xác."
+msgstr "Thao tác kiểu câu lệnh hoạt động không chính xác."
 
 #: api/classes/CAction.php:1732
 msgid "Incorrect action operation condition acknowledge type."
-msgstr "Thao tác kiểu điều kiện tiếp nhận action không chính xác."
+msgstr "Thao tác kiểu điều kiện tiếp nhận hoạt động không chính xác."
 
 #: api/classes/CAction.php:1737
 msgid "Incorrect action operation condition type."
-msgstr "Thao tác kiểu điều kiện action không chính xác."
+msgstr "Thao tác kiểu điều kiện hoạt động không chính xác."
 
 #: api/classes/CAction.php:1307 api/classes/CAction.php:1311
 msgid "Incorrect action operation escalation step values."
-msgstr "Bước thao tác các giá trị tiếp theo không chính xác."
+msgstr "Bước thao tác các giá trị hoạt động tiếp theo không chính xác."
 
 #: api/classes/CAction.php:1460
 msgid "Incorrect action operation host group. Host group does not exist or you have no access to this host group."
-msgstr "Thao tác nhóm host action không chính xác. Nhóm host không tồn tại hoặc bạn không có quyền truy cập vào nhóm host đó."
+msgstr "Thao tác nhóm máy chủ action không chính xác. Nhóm máy chủ không tồn tại hoặc bạn không có quyền truy cập vào nhóm host đó."
 
 #: api/classes/CAction.php:1463
 msgid "Incorrect action operation host. Host does not exist or you have no access to this host."
-msgstr "Thao tác host action không chính xác. Host không tồn tại hoặc bạn không có quyền truy cập vào host này."
+msgstr "Thao tác máy chủ action không chính xác. Máy chủ không tồn tại hoặc bạn không có quyền truy cập vào máy chủ này."
 
 #: api/classes/CAction.php:1395 api/classes/CAction.php:1399
 #, c-format
@@ -6914,11 +6932,11 @@ msgstr "Thao tác cổng action \"%s\" không chính xác."
 
 #: api/classes/CAction.php:1317
 msgid "Incorrect action operation step duration."
-msgstr "Thao tác thời gian các bước action không chính xác."
+msgstr "Thao tác thời gian các bước hoạt động không chính xác."
 
 #: api/classes/CAction.php:1455
 msgid "Incorrect action operation type."
-msgstr "Thao tác kiểu action không chính xác."
+msgstr "Thao tác kiểu hoạt động không chính xác."
 
 #: api/classes/CAction.php:1469
 msgid "Incorrect action operation user group. User group does not exist or you have no access to this user group."
@@ -6974,17 +6992,17 @@ msgstr "Các ký tự được sử dụng cho tên Node không chính xa�
 #: api/classes/CTemplate.php:501
 #, c-format
 msgid "Incorrect characters used for Template name \"%1$s\""
-msgstr "Các ký tự được sử dụng cho tên Template \"%1$s\" không chính xác."
+msgstr "Các ký tự được sử dụng cho tên mẫu \"%1$s\" không chính xác."
 
 #: api/classes/CHostPrototype.php:175
 #, c-format
 msgid "Incorrect characters used for host \"%1$s\"."
-msgstr "Các ký tự được sử dụng cho host \"%1$s\" không chính xác."
+msgstr "Các ký tự được sử dụng cho máy chủ \"%1$s\" không chính xác."
 
 #: api/classes/CHost.php:756 api/classes/CHost.php:1107
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
-msgstr "Các ký tự được sử dụng cho tên host \"%s\" không chính xác."
+msgstr "Các ký tự được sử dụng cho tên máy chủ \"%s\" không chính xác."
 
 #: api/classes/CProxy.php:241
 #, c-format
@@ -6994,7 +7012,7 @@ msgstr "Các ký tự được sử dụng cho tên proxy \"%1$s\" không c
 #: api/classes/CTemplate.php:916
 #, c-format
 msgid "Incorrect characters used for template name \"%1$s\"."
-msgstr "Các ký tự được sử dụng cho tên template \"%1$s\" không chính xác."
+msgstr "Các ký tự được sử dụng cho tên mẫu \"%1$s\" không chính xác."
 
 #: api/classes/CDRule.php:261
 msgid "Incorrect delay."
@@ -7003,7 +7021,7 @@ msgstr "Trễ không chính xác."
 #: api/classes/CHostPrototype.php:113
 #, c-format
 msgid "Incorrect discovery rule ID for host prototype \"%1$s\"."
-msgstr "ID quy tắc phát hiện cho kiểu host \"%1$s\" không chính xác."
+msgstr "ID quy tắc phát hiện cho kiểu máy chủ \"%1$s\" không chính xác."
 
 #: include/classes/validators/event/CEventSourceObjectValidator.php:66
 #, c-format
@@ -7062,34 +7080,34 @@ msgstr "Kiểu nhóm ID không chính xác."
 #: api/classes/CHostPrototype.php:196
 #, c-format
 msgid "Incorrect group prototypes for host prototype \"%1$s\"."
-msgstr "Các kiểu nhóm không chính xác đối với kiểu host \"%1$s\"."
+msgstr "Các kiểu nhóm không chính xác đối với kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CScreenItem.php:588
 #, c-format
 msgid "Incorrect host ID \"%1$s\" provided for screen element."
-msgstr "Host ID \"%1$s\" không chính xác đã cung cấp cho Phần tử screen."
+msgstr "ID máy chủ \"%1$s\" không chính xác đã cung cấp cho Phần tử screen."
 
 #: api/classes/CScreenItem.php:569
 #, c-format
 msgid "Incorrect host group ID \"%1$s\" provided for screen element."
-msgstr "ID nhóm host \"%1$s\" không chính xác đã cung cấp cho phần tử screen."
+msgstr "ID nhóm máy chủ \"%1$s\" không chính xác đã cung cấp cho phần tử screen."
 
 #: api/classes/CHostPrototype.php:241
 msgid "Incorrect host group ID for group prototype."
-msgstr "ID nhóm host không chính xác đối với kiểu nhóm."
+msgstr "ID nhóm máy chủ không chính xác đối với kiểu nhóm."
 
 #: include/profiles.inc.php:291
 msgid "Incorrect host group."
-msgstr "Nhóm host không chính xác."
+msgstr "Nhóm máy chủ không chính xác."
 
 #: api/classes/CHostPrototype.php:190
 #, c-format
 msgid "Incorrect host groups for host prototype \"%1$s\"."
-msgstr "Các nhóm host không chính xác đối với kiểu host \"%1$s\"."
+msgstr "Nhóm máy chủ không chính xác đối với kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:459
 msgid "Incorrect host prototype ID."
-msgstr "ID kiểu host không chính xác."
+msgstr "ID kiểu máy chủ không chính xác."
 
 #: image.php:46
 msgid "Incorrect image index."
@@ -7196,7 +7214,7 @@ msgstr "Giá trị độ rộng bản đồ \"%s\" không chính xác."
 #: api/classes/CScript.php:576
 #, c-format
 msgid "Incorrect menu path for script \"%1$s\"."
-msgstr "Danh sách đường dẫn cho tập lệnh \"%1$s\" không chính xác."
+msgstr "Danh sách đường dẫn cho script \"%1$s\" không chính xác."
 
 #: include/nodes.inc.php:335
 msgid "Incorrect node type."
@@ -7209,7 +7227,7 @@ msgstr "Giá trị đối tượng không chính xác."
 #: api/classes/CAction.php:538 api/classes/CAction.php:589
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
-msgstr "Tham số cho action \"%1$s\" không chính xác."
+msgstr "Tham số cho hoạt động \"%1$s\" không chính xác."
 
 #: api/classes/CAction.php:834
 msgid "Incorrect parameter for operations."
@@ -7223,7 +7241,7 @@ msgstr "Tham số được sử dụng cho biểu tượng bản đồ \"%
 #: api/classes/CAction.php:650
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
-msgstr "Các tham số cho phương pháp  cập nhật action \"%1$s\" không chính xác."
+msgstr "Các tham số cho phương pháp cập nhật hoạt động \"%1$s\" không chính xác."
 
 #: api/classes/CAction.php:804
 msgid "Incorrect parameters for condition."
@@ -7315,7 +7333,7 @@ msgstr "Giá trị nguồn không chính xác."
 #: api/classes/CHostPrototype.php:185
 #, c-format
 msgid "Incorrect status for host prototype \"%1$s\"."
-msgstr "Trạng thái cho kiểu host \"%1$s\" không chính xác."
+msgstr "Trạng thái cho kiểu máy chủ \"%1$s\" không chính xác."
 
 #: api/classes/CService.php:1236
 #, c-format
@@ -7328,12 +7346,12 @@ msgstr "Trạng thái không chính xác."
 
 #: api/classes/CTemplateScreen.php:605
 msgid "Incorrect template screen ID."
-msgstr "Template screen ID không chính xác."
+msgstr "ID mẫu screen không chính xác."
 
 #: api/classes/CUser.php:362
 #, c-format
 msgid "Incorrect theme for user \"%1$s\"."
-msgstr "Sắc thái cho người dùng \"%1$s\" không chính xác."
+msgstr "Theme cho người dùng \"%1$s\" không chính xác."
 
 #: include/classes/validators/CTimePeriodValidator.php:99
 #, c-format
@@ -7368,16 +7386,16 @@ msgstr "Biểu thức trigger không chính xác."
 #: include/triggers.inc.php:1091
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
-msgstr "Biểu thức trigger không chính xác. Host \"%1$s\" không tồn tại hoặc bạn không có quyền truy cập vào host này."
+msgstr "Biểu thức trigger không chính xác. Máy chủ \"%1$s\" không tồn tại hoặc bạn không có quyền truy cập vào máy chủ này."
 
 #: api/classes/CTrigger.php:705 api/classes/CTriggerPrototype.php:959
 #, c-format
 msgid "Incorrect trigger expression. Host \"%s\" does not exist or you have no access to this host."
-msgstr "Biểu thức trigger không chính xác. Host \"%s\" không tồn tại hoặc bạn không có quyền truy cập vào host này."
+msgstr "Biểu thức trigger không chính xác. Máy chủ \"%s\" không tồn tại hoặc bạn không có quyền truy cập vào máy chủ này."
 
 #: api/classes/CTrigger.php:711 api/classes/CTriggerPrototype.php:952
 msgid "Incorrect trigger expression. Trigger expression elements should not belong to a template and a host simultaneously."
-msgstr "Biểu thức trigger không chính xác. Các phần tử biểu thức trigger không phải thuộc về một template và một host cùng một lúc."
+msgstr "Biểu thức trigger không chính xác. Các phần tử biểu thức trigger không phải thuộc về một mẫu và một máy chủ cùng một lúc."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:248
 #: include/classes/validators/CTriggerFunctionValidator.php:260
@@ -7681,7 +7699,7 @@ msgstr "Kiểm kê"
 #: api/classes/CHost.php:1292
 #, c-format
 msgid "Inventory disabled for host \"%1$s\"."
-msgstr "Kiểm kê bị vô hiệu hóa cho host \"%1$s\"."
+msgstr "Kiểm kê bị vô hiệu hóa cho máy chủ \"%1$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:41
 msgid "Inventory field"
@@ -7728,7 +7746,7 @@ msgstr "Item"
 #: api/classes/CItem.php:37
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ template khác."
+msgstr "Item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ mẫu khác."
 
 #: api/classes/CItem.php:38
 #, c-format
@@ -7743,7 +7761,7 @@ msgstr "Item \"%1$s\" không thể gắn vào một quá trình kiểm k�
 #: api/classes/CTemplateScreen.php:520
 #, c-format
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
-msgstr "Item \"%1$s\" không tồn tại trên template \"%2$s\"."
+msgstr "Item \"%1$s\" không tồn tại trên mẫu \"%2$s\"."
 
 #: include/classes/import/CXmlImport18.php:1521
 #, c-format
@@ -7807,7 +7825,7 @@ msgstr "Kiểu item"
 #: api/classes/CItemPrototype.php:37
 #, c-format
 msgid "Item prototype \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "Kiểu item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ template khác."
+msgstr "Kiểu item \"%1$s\" đã tồn tại trên \"%2$s\", kế thừa từ mẫu khác."
 
 #: api/classes/CItemPrototype.php:38
 #, c-format
@@ -7857,7 +7875,7 @@ msgstr "Item đã được cập nhật"
 
 #: api/classes/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
-msgstr "Item sử dụng host interface không phải từ host gốc."
+msgstr "Item sử dụng host interface không phải từ máy chủ gốc."
 
 #: api/classes/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
@@ -8075,7 +8093,7 @@ msgstr "Xác thực LDAP đã bị thay đổi"
 #: authentication.php:38
 #: include/views/administration.authentication.edit.php:67
 msgid "LDAP host"
-msgstr "LDAP host"
+msgstr "Máy chủ LDAP"
 
 #: authentication.php:159
 msgid "LDAP login successful"
@@ -8112,18 +8130,18 @@ msgstr "Ngôn ngữ"
 
 #: include/forms.inc.php:1743 include/maintenances.inc.php:122
 msgid "Last"
-msgstr "Cuối cùng"
+msgstr "Giá trị cuối cùng"
 
 #: include/func.inc.php:1883
 msgctxt "page navigation"
 msgid "Last"
-msgstr "Cuối cùng"
+msgstr "Giá trị cuối cùng"
 
 #: dashboard.php:397
 #, c-format
 msgid "Last %1$d issue"
 msgid_plural "Last %1$d issues"
-msgstr[0] "%1$d vấn đề còn lại"
+msgstr[0] "%1$d vấn đề cuối cùng"
 
 #: popup_trexpr.php:239
 msgid "Last (most recent) T value is < N"
@@ -8268,7 +8286,7 @@ msgstr "Tên liên kết nên là duy nhất cho bản đồ \"%s\"."
 #: include/views/configuration.host.prototype.edit.php:262
 #: include/views/configuration.template.edit.php:512
 msgid "Link new templates"
-msgstr "Liên kết các template mới"
+msgstr "Liên kết các mẫu mới"
 
 #: api/classes/CMap.php:507
 #, c-format
@@ -8287,7 +8305,7 @@ msgstr "Liên kết phải có cả trường \"tên\" và \"url\" cho bản
 
 #: include/views/configuration.host.massupdate.php:209
 msgid "Link templates"
-msgstr "Liên kết các template"
+msgstr "Liên kết các mẫu"
 
 #: include/actions.inc.php:643
 msgid "Link to template"
@@ -8295,11 +8313,11 @@ msgstr "Liên kết đến template"
 
 #: include/actions.inc.php:453
 msgid "Link to templates"
-msgstr "Liên kết đến các template"
+msgstr "Liên kết đến các mẫu"
 
 #: include/views/configuration.action.edit.php:919
 msgid "Link with templates"
-msgstr "Liên kết với các template"
+msgstr "Liên kết với các mẫu"
 
 #: include/views/configuration.host.edit.php:742
 #: include/views/configuration.host.edit.php:772
@@ -8307,7 +8325,7 @@ msgstr "Liên kết với các template"
 #: include/views/configuration.template.edit.php:487
 #: include/views/configuration.template.edit.php:514 templates.php:500
 msgid "Linked templates"
-msgstr "Các template đã liên kết"
+msgstr "Các mẫu đã liên kết"
 
 #: templates.php:501
 msgid "Linked to"
@@ -8575,7 +8593,7 @@ msgstr "Giá trị bảo trì \"Active since\" không thể được lớn 
 
 #: api/classes/CAction.php:1638
 msgid "Maintenance action condition value must be empty."
-msgstr "Điều kiện giá trị bảo trì action  phải rỗng."
+msgstr "Điều kiện giá trị bảo trì hoạt động phải rỗng."
 
 #: maintenance.php:124
 msgid "Maintenance added"
@@ -8643,7 +8661,7 @@ msgstr "Bản đồ"
 #: include/classes/import/CXmlImport18.php:667
 #, c-format
 msgid "Map \"%1$s\" skipped - user rule."
-msgstr "Bản đồ \"%1$s\" được bỏ qua - quy tắc người dùng."
+msgstr "Sơ đồ \"%1$s\" được bỏ qua - quy tắc người dùng."
 
 #: include/views/configuration.sysmap.constructor.php:67
 #, c-format
@@ -8696,7 +8714,7 @@ msgstr "Vẽ bản đồ"
 #: include/views/conf.import.php:36 include/views/monitoring.maps.php:36
 #: popup.php:96
 msgid "Maps"
-msgstr "Các bản đồ"
+msgstr "Sơ đồ"
 
 #: include/func.inc.php:251
 msgid "Mar"
@@ -8752,16 +8770,16 @@ msgstr "Nốt chính đã tồn tại."
 
 #: adm.gui.php:41 include/views/administration.general.gui.edit.php:39
 msgid "Max count of elements to show inside table cell"
-msgstr "Đếm tối đã các phần tử hiển thị bên trong ô của bảng"
+msgstr "Đếm tối đa các phần tử hiển thị bên trong ô của bảng"
 
 #: adm.gui.php:79
 #, c-format
 msgid "Max count of elements to show inside table cell \"%1$s\"."
-msgstr "Đếm tối đã các phần tử hiển thị bên trong ô của bảng \"%1$s\"."
+msgstr "Đếm tối đa các phần tử hiển thị bên trong ô của bảng \"%1$s\"."
 
 #: adm.gui.php:38 include/views/administration.general.gui.edit.php:45
 msgid "Max count of events per trigger to show"
-msgstr "Đếm tối đa các sự kiện trên trigger để hiển thị"
+msgstr "Đếm tối đa các sự kiện trên mỗi trigger để hiển thị"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
 #: include/func.inc.php:2212
@@ -8784,7 +8802,7 @@ msgstr[0] "Độ dài bí danh DNS tối đa là %1$d ký tự, \"%2$s\" 
 #, c-format
 msgid "Maximum host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Độ dài tên host tối đa là %1$d ký tự, \"%2$s\" là %3$d ký tự."
+msgstr[0] "Độ dài tên máy chủ tối đa là %1$d ký tự, \"%2$s\" là %3$d ký tự."
 
 #: include/views/configuration.item.edit.php:319
 #: include/views/configuration.item.massupdate.php:372
@@ -8827,7 +8845,7 @@ msgstr "Giá trị lớn nhất của chu kỳ T khác N"
 #, c-format
 msgid "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d character."
 msgid_plural "Maximum visible host name length is %1$d characters, \"%2$s\" is %3$d characters."
-msgstr[0] "Độ dài tên host có thể nhìn thấy tối đa là %1$d ký tự, \"%2$s\" là %3$d ký tự."
+msgstr[0] "Độ dài tên máy chủ có thể nhìn thấy tối đa là %1$d ký tự, \"%2$s\" là %3$d ký tự."
 
 #: include/forms.inc.php:1716 include/func.inc.php:133
 #: include/func.inc.php:270 jsLoader.php:122
@@ -8842,7 +8860,7 @@ msgstr "Tháng 5"
 #: include/views/administration.users.edit.php:211
 #: include/views/administration.users.edit.php:339 popup_media.php:27
 msgid "Media"
-msgstr "Media"
+msgstr "Phương tiện"
 
 #: include/audit.inc.php:26
 #: include/views/administration.mediatypes.edit.php:100 report4.php:92
@@ -8879,12 +8897,12 @@ msgstr "Loại phương tiện đã được cập nhật"
 #: include/menu.inc.php:256
 #: include/views/administration.mediatypes.list.php:28
 msgid "Media types"
-msgstr "Các loại phương tiện"
+msgstr "Loại phương tiện"
 
 #: api/classes/CMediatype.php:346
 #, c-format
 msgid "Media types used by action \"%s\"."
-msgstr "Các loại phương tiện được sử dụng bởi action \"%s\"."
+msgstr "Loại phương tiện được sử dụng bởi hoạt động \"%s\"."
 
 #: include/func.inc.php:677
 msgid "Mega"
@@ -8922,7 +8940,7 @@ msgstr "Tin nhắn"
 
 #: tr_events.php:127
 msgid "Message actions"
-msgstr "Hành động nhắn tin"
+msgstr "Hoạt động nhắn tin"
 
 #: include/views/administration.mediatypes.edit.php:92
 msgid "Message text limit"
@@ -8976,12 +8994,12 @@ msgstr "Phiên bản PHP được yêu cầu tối thiểu là %s."
 #: include/classes/class.frontendsetup.php:168
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
-msgstr "Giới hạn được yêu cầu tối thiểu về thời gian thực hiện các tập lệnh PHP là %s (tùy chọn cấu hình \"max_execution_time\")."
+msgstr "Giới hạn được yêu cầu tối thiểu về thời gian thực hiện scripts PHP là %s (tùy chọn cấu hình \"max_execution_time\")."
 
 #: include/classes/class.frontendsetup.php:185
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
-msgstr "Giới hạn được yêu cầu tối thiểu về thời gian phân tích đầu vào cho các tập lệnh PHP là %s (tùy chọn cấu hình \"max_input_time\")."
+msgstr "Giới hạn được yêu cầu tối thiểu về thời gian phân tích đầu vào cho scripts PHP là %s (tùy chọn cấu hình \"max_input_time\")."
 
 #: include/classes/class.frontendsetup.php:134
 #, c-format
@@ -9025,7 +9043,7 @@ msgstr "Phút"
 #: api/classes/CAction.php:575
 #, c-format
 msgid "Missing \"%1$s\" field for action condition."
-msgstr "Thiếu trường \"%1$s\" cho điều kiện action."
+msgstr "Thiếu trường \"%1$s\" cho điều kiện hoạt động."
 
 #: include/reports.inc.php:489
 #, c-format
@@ -9057,7 +9075,7 @@ msgstr "Thiếu trường \"tên\" cho đồ thị."
 #: include/classes/import/CXmlImport18.php:1590
 #, c-format
 msgid "Missing item \"%1$s\" for host \"%2$s\"."
-msgstr "Thiếu item \"%1$s\" cho host \"%2$s\" ."
+msgstr "Thiếu item \"%1$s\" cho máy chủ \"%2$s\" ."
 
 #: api/classes/CGraph.php:40
 #, c-format
@@ -9072,7 +9090,7 @@ msgstr "Thiếu các item cho kiểu đồ thị \"%1$s\"."
 #: include/graphs.inc.php:332
 #, c-format
 msgid "Missing key \"%1$s\" for host \"%2$s\"."
-msgstr "Thiếu key \"%1$s\" cho host \"%2$s\"."
+msgstr "Thiếu key \"%1$s\" cho máy chủ \"%2$s\"."
 
 #: api/classes/CUserGroup.php:413
 msgid "Missing parameter: usrgrpids."
@@ -9110,11 +9128,11 @@ msgstr "Giám sát bằng proxy"
 
 #: include/views/monitoring.discovery.php:42
 msgid "Monitored host"
-msgstr "Host được giám sát"
+msgstr "Máy chủ được giám sát"
 
 #: include/menu.inc.php:26
 msgid "Monitoring"
-msgstr "Đang theo dõi"
+msgstr "Giám sát"
 
 #: include/classes/items/CHelpItems.php:327
 msgid "Monitoring of Windows event logs. pattern, severity, eventid - regular expressions"
@@ -9126,7 +9144,7 @@ msgstr "Giám sát các bản ghi tập tin theo vòng. fileformat - [path]
 
 #: include/classes/items/CHelpItems.php:339
 msgid "Monitoring of log file. pattern - regular expression"
-msgstr "giám sát các bản ghi tập tin. pattern - regular expression"
+msgstr "Giám sát các bản ghi tập tin. pattern - regular expression"
 
 #: include/forms.inc.php:1725 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
@@ -9149,7 +9167,7 @@ msgstr "Nhiều hơn 10 phút"
 #: api/classes/CGraphGeneral.php:790
 #, c-format
 msgid "More than one graph with name \"%1$s\" within host."
-msgstr "Nhiều hơn một đồ thị với tên \"%1$s\" trong host."
+msgstr "Nhiều hơn một đồ thị với tên \"%1$s\" trong máy chủ."
 
 #: report5.php:24
 msgid "Most busy triggers top 100"
@@ -9165,11 +9183,11 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1602
 msgid "Multiple PROBLEM events"
-msgstr "Nhiều sự kiện có vấn đề"
+msgstr "Nhiều sự kiện PROBLEM"
 
 #: include/views/configuration.triggers.edit.php:244
 msgid "Multiple PROBLEM events generation"
-msgstr "Nhiều lớp sự kiện hiển thị trạng thái PROBLEM"
+msgstr "Nhiều lớp sự kiện có trạng thái PROBLEM"
 
 #: jsLoader.php:166
 msgid "Mute"
@@ -9355,7 +9373,7 @@ msgstr "Nhóm mới"
 
 #: include/views/configuration.host.massupdate.php:142
 msgid "New host group"
-msgstr "Nhóm host mới"
+msgstr "Nhóm máy chủ mới"
 
 #: popup_bitem.php:96
 msgid "New item for the graph"
@@ -9363,7 +9381,7 @@ msgstr "Item mới cho đồ thị"
 
 #: popup_media.php:105
 msgid "New media"
-msgstr "Media mới"
+msgstr "Phương tiện mới"
 
 #: adm.regexps.php:210
 msgid "New regular expression"
@@ -9403,7 +9421,7 @@ msgstr "\"%1$s\" không được đưa ra cho đồ thị."
 #: api/classes/CHostPrototype.php:457
 #, c-format
 msgid "No \"%1$s\" given for host prototype."
-msgstr "\"%1$s\" không được đưa ra cho kiểu host."
+msgstr "\"%1$s\" không được đưa ra cho kiểu máy chủ."
 
 #: api/classes/CScreen.php:540
 #, c-format
@@ -9413,12 +9431,12 @@ msgstr "\"%1$s\" không được đưa ra cho screen."
 #: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr "\"%1$s\" không được đưa ra cho template screen."
+msgstr "\"%1$s\" không được đưa ra cho mẫu screen."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
-msgstr "\"%2$s\" không được đưa ra cho kiểu host \"%1$s\"."
+msgstr "\"%2$s\" không được đưa ra cho kiểu máy chủ \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1567
 #, c-format
@@ -9477,7 +9495,7 @@ msgstr "Không tìm thấy sự tiếp nhận."
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
 #: include/views/configuration.action.list.php:48
 msgid "No actions found."
-msgstr "Không tìm thấy hành động."
+msgstr "Không tìm thấy hoạt động."
 
 #: include/views/configuration.host.edit.php:377
 #: include/views/configuration.host.prototype.edit.php:103
@@ -9497,17 +9515,17 @@ msgstr "Không tìm thấy ứng dụng."
 #: include/views/administration.auditacts.list.php:67
 #: include/views/administration.auditlogs.list.php:83
 msgid "No audit entries found."
-msgstr "Không tìm thấy đề mục nào."
+msgstr "Không tìm thấy đề mục kiểm soát nào."
 
 #: api/classes/CAction.php:1354
 #, c-format
 msgid "No authentication type specified for action operation command \"%s\"."
-msgstr "Không quy định loại xác thực cho thao tác lệnh action \"%s\"."
+msgstr "Không quy định loại xác thực cho thao tác lệnh hoạt động \"%s\"."
 
 #: api/classes/CAction.php:1358 api/classes/CAction.php:1372
 #, c-format
 msgid "No authentication user name specified for action operation command \"%s\"."
-msgstr "Không quy định xác thực tên người dùng cho thao tác lệnh action \"%s\"."
+msgstr "Không quy định xác thực tên người dùng cho thao tác lệnh hoạt động \"%s\"."
 
 #: api/classes/CItemGeneral.php:349
 msgid "No authentication user name specified."
@@ -9515,11 +9533,11 @@ msgstr "Không quy định xác thực tên người dùng."
 
 #: api/classes/CAction.php:1341
 msgid "No command specified for action operation."
-msgstr "Không quy định lệnh cho thao tác action."
+msgstr "Không quy định lệnh cho thao tác hoạt động."
 
 #: api/classes/CAction.php:1336
 msgid "No command type specified for action operation."
-msgstr "Không quy định kiểu lệnh cho thao tác action."
+msgstr "Không quy định kiểu lệnh cho thao tác hoạt động."
 
 #: include/views/configuration.action.edit.php:69
 #: include/views/configuration.action.edit.php:938
@@ -9562,7 +9580,7 @@ msgstr "Không tìm thấy thiết bị phát hiện."
 #: api/classes/CHostPrototype.php:112
 #, c-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr "Không có quy tắc phát hiện ID cho kiểu host \"%1$s\"."
+msgstr "Không có quy tắc phát hiện ID cho kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:444
 msgid "No discovery rule IDs given."
@@ -9598,7 +9616,7 @@ msgstr "Không có sự kiện nào để tiếp nhận"
 #: api/classes/CAction.php:1349
 #, c-format
 msgid "No execution target specified for action operation command \"%s\"."
-msgstr "Không có mục tiêu thực hiện theo quy định đối với thao tác lệnh action \"%s\"."
+msgstr "Không có mục tiêu thực hiện theo quy định đối với thao tác lệnh hoạt động \"%s\"."
 
 #: include/classes/helpers/CUploadFile.php:156
 msgid "No file was uploaded."
@@ -9634,67 +9652,67 @@ msgstr "Không tìm thấy đồ thị."
 #: api/classes/CHost.php:676 api/classes/CHost.php:683
 #, c-format
 msgid "No groups for host \"%s\"."
-msgstr "Không có nhóm cho host \"%s\"."
+msgstr "Không có nhóm cho máy chủ \"%s\"."
 
 #: api/classes/CHost.php:1093
 msgid "No groups for hosts."
-msgstr "Không có nhóm nào cho các host."
+msgstr "Không có nhóm nào cho máy chủ."
 
 #: api/classes/CTemplate.php:842
 msgid "No groups for template"
-msgstr "Không có nhóm nào cho template"
+msgstr "Không có nhóm nào cho mẫu"
 
 #: api/classes/CTemplate.php:460
 #, c-format
 msgid "No groups for template \"%1$s\"."
-msgstr "Không có nhóm nào cho template \"%1$s\"."
+msgstr "Không có nhóm nào cho mẫu \"%1$s\"."
 
 #: api/classes/CHost.php:1461
 msgid "No host ID given."
-msgstr "Không có host ID nhất định."
+msgstr "Không có ID máy chủ nhất định."
 
 #: api/classes/CDiscoveryRule.php:447
 msgid "No host IDs given."
-msgstr "Không có các host ID nhất định."
+msgstr "Không có các ID máy chủ nhất định."
 
 #: api/classes/CUserMacro.php:682
 #, c-format
 msgid "No host given for macro \"%1$s\"."
-msgstr "Không có host nhất định nào cho macro \"%1$s\"."
+msgstr "Không có máy chủ nhất định nào cho macro \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:240
 msgid "No host group ID for group prototype."
-msgstr "Không có ID nhóm host nào cho kiểu host."
+msgstr "Không có ID nhóm máy chủ nào cho kiểu nhóm."
 
 #: api/classes/CScreenItem.php:465
 msgid "No host group ID provided for screen element."
-msgstr "ID nhóm host không được cung cấp cho phần tử screen."
+msgstr "ID nhóm máy chủ không được cung cấp cho phần tử screen."
 
 #: include/blocks.inc.php:195 include/blocks.inc.php:398
 #: include/views/configuration.hostgroups.list.php:56 popup.php:930
 #: popup_right.php:89 search.php:274
 msgid "No host groups found."
-msgstr "Không tìm thấy nhóm host nào."
+msgstr "Không tìm thấy nhóm máy chủ nào."
 
 #: include/hosts.inc.php:493
 #, c-format
 msgid "No host groups with groupid \"%s\"."
-msgstr "Không tìm thấy nhóm host nào với ID nhóm \"%s\"."
+msgstr "Không tìm thấy nhóm máy chủ nào với ID nhóm \"%s\"."
 
 #: include/views/configuration.host.prototype.list.php:44
 msgid "No host prototypes found."
-msgstr "Không tìm thấy kiểu host nào."
+msgstr "Không tìm thấy kiểu máy chủ nào."
 
 #: include/hosts.inc.php:536
 #, c-format
 msgid "No host with hostid \"%s\"."
-msgstr "Không có host với hostid \"%s\"."
+msgstr "Không có máy chủ với hostid \"%s\"."
 
 #: hostinventoriesoverview.php:88 hosts.php:809
 #: include/views/inventory.host.list.php:74 popup.php:775 popup.php:852
 #: search.php:127
 msgid "No hosts found."
-msgstr "Không tìm thấy host nào."
+msgstr "Không tìm thấy máy chủ nào."
 
 #: api/classes/CMapElement.php:70
 #, c-format
@@ -9703,7 +9721,7 @@ msgstr "Không có biểu tượng cho phần tử bản đồ \"%s\"."
 
 #: include/views/administration.general.iconmap.list.php:22
 msgid "No icon maps found."
-msgstr "Không tìm thấy biểu tượng bản đồ nào."
+msgstr "Không tìm thấy biểu tượng sơ đồ nào."
 
 #: include/views/configuration.sysmap.edit.php:47
 msgid "No image"
@@ -9731,7 +9749,7 @@ msgstr "Interface không được cung cấp cho proxy \"%s\"."
 #: api/classes/CHost.php:730 api/classes/CHost.php:736
 #, c-format
 msgid "No interfaces for host \"%s\"."
-msgstr "Không có interface nào cho host \"%s\"."
+msgstr "Không có interface nào cho máy chủ \"%s\"."
 
 #: api/classes/CScreenItem.php:491 api/classes/CScreenItem.php:500
 msgid "No item ID provided for screen element."
@@ -9782,12 +9800,12 @@ msgstr "Map ID không được cung cấp cho phần tử screen."
 
 #: include/blocks.inc.php:160
 msgid "No maps added."
-msgstr "Bản đồ không được thêm vào."
+msgstr "Sơ đồ không được thêm vào."
 
 #: include/views/configuration.sysmap.list.php:40
 #: include/views/monitoring.maps.php:23 popup.php:1538
 msgid "No maps found."
-msgstr "Không tìm thấy bản đồ nào."
+msgstr "Không tìm thấy sơ đồ nào."
 
 #: include/classes/class.cmultiselect.php:51 jsLoader.php:192
 msgid "No matches found"
@@ -9795,11 +9813,11 @@ msgstr "Không khớp với kết quả nào "
 
 #: include/views/administration.users.edit.php:173
 msgid "No media found."
-msgstr "Không tìm thấy media."
+msgstr "Không tìm thấy phương tiện."
 
 #: include/views/administration.mediatypes.list.php:36
 msgid "No media types found."
-msgstr "Không tìm thấy kiểu media nào."
+msgstr "Không tìm thấy loại phương tiện nào."
 
 #: report4.php:73
 msgid "No notifications found."
@@ -9819,7 +9837,7 @@ msgstr "Không có quyền truy cập cho đồ thị \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:962
 #, c-format
 msgid "No permission for host \"%1$s\"."
-msgstr "Không có quyền truy cập cho host \"%1$s\"."
+msgstr "Không có quyền truy cập cho máy chủ \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1512
 #, c-format
@@ -9829,7 +9847,7 @@ msgstr "Không có quyền truy cập cho item \"%1$s\"."
 #: include/classes/import/CXmlImport18.php:1143
 #, c-format
 msgid "No permission for template \"%1$s\"."
-msgstr "Không có quyền truy cập cho template \"%1$s\"."
+msgstr "Không có quyền truy cập cho mẫu \"%1$s\"."
 
 #: include/classes/import/CXmlImport18.php:1423
 #, c-format
@@ -9910,7 +9928,7 @@ msgstr "Không có quyền truy cập vào đối tượng được gọi
 #: api/classes/CAction.php:1366
 #, c-format
 msgid "No private key file specified for action operation command \"%s\"."
-msgstr "Không quy định khóa tập tin riêng cho lệnh thao tác action \"%s\"."
+msgstr "Không quy định khóa tập tin riêng cho lệnh thao tác hoạt động \"%s\"."
 
 #: api/classes/CItemGeneral.php:357
 msgid "No private key file specified."
@@ -9931,7 +9949,7 @@ msgstr "Không có proxy ID nhất định."
 #: api/classes/CAction.php:1363
 #, c-format
 msgid "No public key file specified for action operation command \"%s\"."
-msgstr "Không quy định được khóa tập tin công khai cho thao tác lệnh action \"%s\"."
+msgstr "Không quy định được khóa tập tin công khai cho thao tác lệnh hoạt động \"%s\"."
 
 #: api/classes/CItemGeneral.php:354
 msgid "No public key file specified."
@@ -9962,7 +9980,7 @@ msgstr "Không tìm thấy screen."
 
 #: api/classes/CAction.php:1377
 msgid "No script specified for action operation command."
-msgstr "Không quy được script cho thao tác lệnh action."
+msgstr "Không quy được script cho thao tác lệnh hoạt động."
 
 #: include/views/administration.script.list.php:35 popup.php:1831
 msgid "No scripts found."
@@ -9995,14 +10013,14 @@ msgstr "Không có mục tiêu nào được chọn."
 
 #: popup.php:698 search.php:389 templates.php:488
 msgid "No templates found."
-msgstr "Không tìm thấy template nào."
+msgstr "Không tìm thấy mẫu nào."
 
 #: include/views/configuration.host.edit.php:708
 #: include/views/configuration.host.prototype.edit.php:217
 #: include/views/configuration.host.prototype.edit.php:239
 #: include/views/configuration.template.edit.php:460
 msgid "No templates linked."
-msgstr "Không có template nào được liên kết."
+msgstr "Không có mẫu nào được liên kết."
 
 #: include/views/configuration.services.edit.php:126
 msgid "No times defined. Work 24x7."
@@ -10042,7 +10060,7 @@ msgstr "Không tìm thấy người dùng nào."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value maps found."
-msgstr "Không tìm thấy giá trị bản đồ nào."
+msgstr "Không tìm thấy giá trị sơ đồ nào."
 
 #: include/classes/screens/CScreenHistory.php:161
 #: include/classes/screens/CScreenHistory.php:259
@@ -10142,12 +10160,12 @@ msgstr "Không báo nhận"
 
 #: include/forms.inc.php:631 include/forms.inc.php:814
 msgid "Not Templated items"
-msgstr "Không có Templated items"
+msgstr "Không có mẫu item"
 
 #: api/classes/CTrigger.php:1491
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
-msgstr "Không phải tất cả template đều được kết nối đến \"%s\"."
+msgstr "Không phải tất cả mẫu đều được kết nối đến \"%s\"."
 
 #: api/classes/CUser.php:384
 msgid "Not allowed to set password for user \"guest\"."
@@ -10227,7 +10245,7 @@ msgstr "Số lượng bộ xử lý sẵn sàng."
 
 #: include/blocks.inc.php:770 include/blocks.inc.php:772
 msgid "Number of hosts (monitored/not monitored/templates)"
-msgstr "Số lượng host (Đã theo dõi/Không được theo dõi/templates)"
+msgstr "Số lượng máy chủ (Đã theo dõi/Không được theo dõi/mẫu)"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:547
@@ -10252,7 +10270,7 @@ msgstr "Số lượng item trong hàng đợi mà đang bị trễ từ g
 
 #: include/classes/items/CHelpItems.php:839
 msgid "Number of monitored hosts"
-msgstr "Số lượng host được giám sát"
+msgstr "Số lượng máy chủ được giám sát"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:403
@@ -10261,15 +10279,15 @@ msgstr "Số lượng tiến trình. <name> và <user> tương tự như t
 
 #: include/classes/items/CHelpItems.php:643
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Số lượng lõi bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Số lượng lõi bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Số lượng nhánh bộ xử lý trên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:711
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Số lượng bộ xử lý trên máy ảo VMware, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: popup_trexpr.php:479
 msgid "Number of seconds since the Epoch is < N"
@@ -10362,7 +10380,7 @@ msgstr "Số lượng giá trị được lưu trữ trong bảng TRENDS_UN
 
 #: include/classes/items/CHelpItems.php:699
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Số lượng máy ảo trên VMware hypervisor, <url> - dịch vụ VMware URl, <uuid> - tên host VMware hypervisor"
+msgstr "Số lượng máy ảo trên VMware hypervisor, <url> - dịch vụ VMware URl, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/forms.inc.php:430 include/items.inc.php:123
 #: include/triggers.inc.php:2195 include/views/configuration.item.edit.php:223
@@ -10480,7 +10498,7 @@ msgstr "Một lần"
 #: api/classes/CHostGroup.php:1142 api/classes/CHostGroup.php:1151
 #: api/classes/CHostGroup.php:1244
 msgid "One of the objects is left without a host group."
-msgstr "Một trong các đối tượng rời khỏi một nhóm host."
+msgstr "Một trong các đối tượng rời khỏi một nhóm máy chủ."
 
 #: include/forms.inc.php:1659 include/maintenances.inc.php:34
 msgid "One time only"
@@ -10497,15 +10515,15 @@ msgstr "Chỉ các Super Admin mới có thể tạo các global macro."
 
 #: api/classes/CHostGroup.php:459
 msgid "Only Super Admins can create host groups."
-msgstr "Chỉ các Super Admin mới có thể tạo các nhóm host."
+msgstr "Chỉ các Super Admin mới có thể tạo các nhóm máy chủ."
 
 #: api/classes/CIconMap.php:166
 msgid "Only Super Admins can create icon maps."
-msgstr "Chỉ các Super Admin mới có thể tạo các biểu tượng bản đồ."
+msgstr "Chỉ các Super Admin mới có thể tạo các biểu tượng sơ đồ."
 
 #: api/classes/CMediatype.php:221
 msgid "Only Super Admins can create media types."
-msgstr "Chỉ các Super Admin mới có thể tạo các media type."
+msgstr "Chỉ các Super Admin mới có thể tạo loại phương tiện."
 
 #: api/classes/CUserMacro.php:397
 msgid "Only Super Admins can delete global macros."
@@ -10513,17 +10531,17 @@ msgstr "Chỉ các Super Admin mới có thể xóa các global macro."
 
 #: api/classes/CMediatype.php:334
 msgid "Only Super Admins can delete media types."
-msgstr "Chỉ các Super Admin mới có thể xóa các media type."
+msgstr "Chỉ Super Admin mới có thể xóa các media type."
 
 #: api/classes/CUserGroup.php:237 api/classes/CUserGroup.php:288
 #: api/classes/CUserGroup.php:312 api/classes/CUserGroup.php:407
 #: api/classes/CUserGroup.php:631
 msgid "Only Super Admins can delete user groups."
-msgstr "Chỉ các Super Admin mới có thể xóa các nhóm người dùng."
+msgstr "Chỉ các Super Admin mới có thể xóa nhóm người dùng."
 
 #: api/classes/CMediatype.php:272
 msgid "Only Super Admins can edit media types."
-msgstr "Chỉ các Super Admin mới có thể chỉnh sửa các media type."
+msgstr "Chỉ Super Admin mới có thể chỉnh sửa loại phương tiện."
 
 #: api/classes/CUserMacro.php:335
 msgid "Only Super Admins can update global macros."
@@ -10531,19 +10549,19 @@ msgstr "Chỉ các Super Admin mới có thể cập nhật các global m
 
 #: api/classes/CIconMap.php:222
 msgid "Only Super Admins can update icon maps."
-msgstr "Chỉ các Super Admin mới có thể cập nhật các biểu tượng bản đồ."
+msgstr "Chỉ các Super Admin mới có thể cập nhật các biểu tượng sơ đồ."
 
 #: api/classes/CUser.php:669
 msgid "Only Zabbix Admins can add user media."
-msgstr "Chỉ các Zabbix Admin mới có thể thêm media người dùng."
+msgstr "Chỉ Zabbix Admin mới có thể thêm phương tiện người dùng."
 
 #: api/classes/CUser.php:847
 msgid "Only Zabbix Admins can change user media."
-msgstr "Chỉ các Zabbix Admin mới có thể thay đổi media người dùng."
+msgstr "Chỉ Zabbix Admin mới có thể thay đổi phương tiện người dùng."
 
 #: api/classes/CUser.php:928
 msgid "Only Zabbix Admins can remove user media."
-msgstr "Chỉ các Zabbix Admin mới có thể gỡ bỏ media người dùng."
+msgstr "Chỉ Zabbix Admin mới có thể gỡ bỏ phương tiện người dùng."
 
 #: api/classes/CHttpTest.php:690
 msgid "Only characters are allowed."
@@ -10551,7 +10569,7 @@ msgstr "Chỉ các ký tự được cho phép."
 
 #: include/blocks.inc.php:780
 msgid "Only items assigned to enabled hosts are counted"
-msgstr "Chỉ các item được gán đến host đã kích hoạt mới được tính"
+msgstr "Chỉ các item được gán đến máy chủ đã kích hoạt mới được tính"
 
 #: api/classes/CDRule.php:371
 msgid "Only one check can be unique."
@@ -10559,7 +10577,7 @@ msgstr "Chỉ một kiểm tra có thể là duy nhất."
 
 #: api/classes/CUserGroup.php:420
 msgid "Only one user group name can be changed at a time."
-msgstr "Chỉ mộ tên nhóm người dùng có thể thay đổi ở một thời điểm."
+msgstr "Chỉ một tên nhóm người dùng có thể thay đổi ở một thời điểm."
 
 #: include/services.inc.php:265
 #, c-format
@@ -10572,7 +10590,7 @@ msgstr "Chỉ các sự kiện trigger mới có thể được tiếp n
 
 #: include/blocks.inc.php:789
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
-msgstr "Chỉ các trigger được gán đến các host đã kích hoạt và tùy thuộc vào các item đã kích hoạt mới được tính"
+msgstr "Chỉ các trigger được gán đến máy chủ đã kích hoạt và tùy thuộc vào các item đã kích hoạt mới được tính"
 
 #: include/views/configuration.httpconf.edit.php:110
 msgid "Opera"
@@ -10601,7 +10619,7 @@ msgstr "Thao tác không có nhóm để hoạt động."
 
 #: api/classes/CAction.php:1445
 msgid "Operation has no template to operate."
-msgstr "Thao tác không có template để hoạt động."
+msgstr "Thao tác không có mẫu để hoạt động."
 
 #: include/views/configuration.action.edit.php:503
 #: include/views/configuration.action.edit.php:509
@@ -10693,13 +10711,13 @@ msgstr "Các nhóm khác"
 
 #: include/views/administration.proxy.edit.php:88
 msgid "Other hosts"
-msgstr "Các host khác"
+msgstr "Máy chủ khác"
 
 #: include/reports.inc.php:386
 #: include/views/configuration.hostgroups.edit.php:63
 #: include/views/configuration.maintenance.edit.php:168
 msgid "Other hosts | Group"
-msgstr "Các host | nhóm khác"
+msgstr "Máy chủ | nhóm khác"
 
 #: include/views/administration.general.other.edit.php:41
 msgid "Other parameters"
@@ -10953,7 +10971,7 @@ msgstr "Dịch vụ gốc"
 
 #: include/views/configuration.triggers.edit.php:59
 msgid "Parent triggers"
-msgstr "Các trigger gốc"
+msgstr "Trigger gốc"
 
 #: include/views/configuration.httpconf.edit.php:51
 msgid "Parent web scenarios"
@@ -11000,11 +11018,11 @@ msgstr "Mật khẩu (nhập lại một lần nữa)"
 #: users.php:163
 #, c-format
 msgid "Password is unavailable for users with %1$s."
-msgstr "Mật khẩu không có sẵn cho các người dùng với %1$s."
+msgstr "Mật khẩu không có sẵn cho người dùng với %1$s."
 
 #: api/classes/CMediatype.php:237 api/classes/CMediatype.php:301
 msgid "Password required for media type."
-msgstr "Mật khẩu được yêu cầu cho media type."
+msgstr "Mật khẩu được yêu cầu cho loại phương tiện."
 
 #: profile.php:119 users.php:199
 msgid "Password should not be empty"
@@ -11109,7 +11127,7 @@ msgstr "Polish (pl_PL)"
 
 #: include/views/configuration.item.edit.php:476
 msgid "Populates host inventory field"
-msgstr "Gắn linh kiện vào trường host còn lại"
+msgstr "Gắn linh kiện vào trường máy chủ còn lại"
 
 #: authentication.php:40 disc_prototypes.php:82 host_discovery.php:79
 #: hosts.php:782 include/forms.inc.php:498 include/setup.inc.php:379
@@ -11299,7 +11317,7 @@ msgstr "Proxy"
 #: include/classes/import/importers/CHostImporter.php:143
 #, c-format
 msgid "Proxy \"%1$s\" for host \"%2$s\" does not exist."
-msgstr "Proxy \"%1$s\" cho host \"%2$s\" không tồn tại."
+msgstr "Proxy \"%1$s\" cho máy chủ \"%2$s\" không tồn tại."
 
 #: api/classes/CProxy.php:571
 #, c-format
@@ -11321,7 +11339,7 @@ msgstr "Proxy đã bị xóa"
 
 #: include/views/administration.proxy.edit.php:88
 msgid "Proxy hosts"
-msgstr "Proxy hosts"
+msgstr "Máy chủ Proxy"
 
 #: api/classes/CProxy.php:326
 msgid "Proxy interface creation failed."
@@ -11565,15 +11583,15 @@ msgstr "Gỡ bỏ từ mục ưa thích"
 
 #: include/actions.inc.php:642
 msgid "Remove from host group"
-msgstr "Gỡ bỏ từ nhóm host"
+msgstr "Gỡ bỏ từ nhóm máy chủ"
 
 #: include/actions.inc.php:432 include/views/configuration.action.edit.php:866
 msgid "Remove from host groups"
-msgstr "Gỡ bỏ từ các nhóm host"
+msgstr "Gỡ bỏ từ nhóm máy chủ"
 
 #: include/actions.inc.php:406 include/actions.inc.php:638
 msgid "Remove host"
-msgstr "Gỡ bỏ host"
+msgstr "Gỡ bỏ máy chủ"
 
 #: include/views/configuration.sysmap.constructor.php:35
 msgid "Remove link"
@@ -11598,7 +11616,7 @@ msgstr "Thay thế quan hệ phụ thuộc"
 
 #: include/views/configuration.host.massupdate.php:66
 msgid "Replace host groups"
-msgstr "Thay thế các nhóm host"
+msgstr "Thay thế nhóm máy chủ"
 
 #: chart_bar.php:66 report2.php:183 report5.php:53 report6.php:210
 msgid "Report"
@@ -11638,7 +11656,7 @@ msgstr "Trường được yêu cầu \"inventory_link\" bị lỗi khi vẽ
 
 #: include/views/administration.script.edit.php:101
 msgid "Required host permissions"
-msgstr "Quyền truy cập host được yêu cầu"
+msgstr "Quyền truy cập máy chủ được yêu cầu"
 
 #: include/views/administration.proxy.list.php:51
 msgid "Required performance (vps)"
@@ -11766,17 +11784,17 @@ msgstr "Trả về thời gian đáp ứng ICMP ping trong vài giây. Ví
 
 #: include/classes/items/CHelpItems.php:835
 msgid "Returns availability of a particular type of checks on the host. Value of this item corresponds to availability icons in the host list. Valid types are: agent, snmp, ipmi, jmx."
-msgstr "Trả về tính sẵn sàng của một loại hình cụ thể của kiểm tra trên máy chủ. Giá trị của item này tương ứng với các biểu tượng có sẵn trên danh sách host. Các loại hợp lệ là: agent, snmp, ipmi, jmx."
+msgstr "Trả về tính sẵn sàng của một loại hình cụ thể của kiểm tra trên máy chủ. Giá trị của item này tương ứng với các biểu tượng có sẵn trên danh sách máy chủ. Các loại hợp lệ là: agent, snmp, ipmi, jmx."
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:495
 msgid "Returns detailed host information. String value"
-msgstr "Trả về chi tiết thông tin host. Chuỗi giá trị "
+msgstr "Trả về chi tiết thông tin máy chủ. Chuỗi giá trị "
 
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:439
 msgid "Returns hostname (or NetBIOS name (by default) on Windows). String value. Example of returned value: www.zabbix.com"
-msgstr "Trả về tên host (hoặc tên NetBIOS (mặc định) trên windows). Chuỗi giá trị. Ví dụ giá trị được trả về: www.zabbix.com"
+msgstr "Trả về tên máy chủ (hoặc tên NetBIOS (mặc định) trên windows). Chuỗi giá trị. Ví dụ giá trị được trả về: www.zabbix.com"
 
 #: include/classes/items/CHelpItems.php:851
 msgid "Returns information associated with Zabbix Java gateway. Valid params are: ping, version."
@@ -11846,20 +11864,20 @@ msgstr "Chạy global script"
 
 #: include/actions.inc.php:379
 msgid "Run remote commands on current host"
-msgstr "Thực hiện lệnh từ xa trên host hiện tại"
+msgstr "Thực hiện lệnh từ xa trên máy chủ hiện tại"
 
 #: include/actions.inc.php:398
 msgid "Run remote commands on host groups"
-msgstr "Thực hiện lệnh từ xa trên các nhóm host"
+msgstr "Thực hiện lệnh từ xa trên nhóm máy chủ"
 
 #: include/actions.inc.php:386
 msgid "Run remote commands on hosts"
-msgstr "Thực hiện lệnh từ xa trên các host"
+msgstr "Thực hiện lệnh từ xa trên máy chủ"
 
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:463
 msgid "Run specified command on the host."
-msgstr "Thực hiện lệnh được ghi rõ trên host."
+msgstr "Thực hiện lệnh được ghi rõ trên máy chủ."
 
 #: include/locales.inc.php:78
 msgid "Russian (ru_RU)"
@@ -12017,11 +12035,11 @@ msgstr "TRẠNG THÁI CỦA DISCOVERY"
 
 #: tr_status.php:264
 msgid "STATUS OF TRIGGERS"
-msgstr "TRẠNG THÁI CỦA CÁC TRIGGER"
+msgstr "TRẠNG THÁI CỦA TRIGGER"
 
 #: httpmon.php:77
 msgid "STATUS OF WEB MONITORING"
-msgstr "TRẠNG THÁI CỦA WEB MONITORING"
+msgstr "TRẠNG THÁI CỦA WEB GIÁM SÁT"
 
 #: report1.php:32
 msgid "STATUS OF ZABBIX"
@@ -12144,7 +12162,7 @@ msgstr "Screen \"%1$s\" đã được thêm vào."
 #: api/classes/CTemplateScreen.php:702
 #, c-format
 msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
-msgstr "Screen \"%1$s\" đã tồn tại trên template \"%2$s\"."
+msgstr "Screen \"%1$s\" đã tồn tại trên mẫu\"%2$s\"."
 
 #: api/classes/CScreen.php:449 api/classes/CScreen.php:522
 #, c-format
@@ -12181,7 +12199,7 @@ msgstr "Screen \"%1$s\" khoảng cách hàng trong ô X - %2$s Y - %3$s là q
 #: include/classes/import/CXmlImport18.php:1643
 #, c-format
 msgid "Screen \"%1$s\" skipped - user rule."
-msgstr "Screen \"%1$s\" đac được bỏ qua - quy tắc người dùng."
+msgstr "Screen \"%1$s\" đã được bỏ qua - quy tắc người dùng."
 
 #: include/classes/import/CXmlImport18.php:575
 #: include/classes/import/CXmlImport18.php:1700
@@ -12276,7 +12294,7 @@ msgstr "Script với scriptid \"%1$s\" không tồn tại."
 #: include/menu.inc.php:260 include/views/administration.script.list.php:28
 #: jsLoader.php:184 jsLoader.php:212 scripts_exec.php:24
 msgid "Scripts"
-msgstr "Các Script"
+msgstr "Scripts"
 
 #: include/views/general.search.php:29 search.php:26
 msgid "Search"
@@ -12400,7 +12418,7 @@ msgstr "Đã chọn"
 
 #: actionconf.php:361
 msgid "Selected actions deleted"
-msgstr "Các action đã chọn bị xóa"
+msgstr "Hoạt động đã chọn bị xóa"
 
 #: include/views/js/configuration.sysmaps.js.php:216
 msgid "Selected elements"
@@ -12412,7 +12430,7 @@ msgstr "Các nhóm đã chọn"
 
 #: include/reports.inc.php:385
 msgid "Selected hosts"
-msgstr "Các host đã chọn"
+msgstr "Máy chủ đã chọn"
 
 #: include/actions.inc.php:635
 msgid "Send message"
@@ -12420,11 +12438,11 @@ msgstr "Gửi tin nhắn"
 
 #: include/actions.inc.php:356
 msgid "Send message to user groups"
-msgstr "Gửi tin nhắc đến các nhóm người dùng"
+msgstr "Gửi tin nhắc đến nhóm người dùng"
 
 #: include/actions.inc.php:344
 msgid "Send message to users"
-msgstr "Gửi tin nhắn đến các người dùng"
+msgstr "Gửi tin nhắn đến người dùng"
 
 #: include/views/configuration.action.edit.php:607
 msgid "Send only to"
@@ -12436,11 +12454,11 @@ msgstr "Gửi tới"
 
 #: include/views/configuration.action.edit.php:590
 msgid "Send to User groups"
-msgstr "Gửi tới các nhóm người dùng"
+msgstr "Gửi tới nhóm người dùng"
 
 #: include/views/configuration.action.edit.php:591
 msgid "Send to Users"
-msgstr "Gửi tới các người dùng"
+msgstr "Gửi tới người dùng"
 
 #: include/actions.inc.php:984
 msgid "Sent"
@@ -12617,7 +12635,7 @@ msgstr "Hiển thị các sự kiện mới hơn (trong ngày ) \"%1$s\"."
 
 #: include/views/monitoring.dashconf.php:87 tr_status.php:326
 msgid "Show hosts in maintenance"
-msgstr "Hiển thị các host trong bảo trì"
+msgstr "Hiển thị máy chủ trong bảo trì"
 
 #: latest.php:305
 msgid "Show items with name like"
@@ -12746,7 +12764,7 @@ msgstr "Kích thước của các đáp ứng nhận được từ máy
 #: include/graphs.inc.php:380
 #, c-format
 msgid "Skipped copying of graph \"%1$s\" to host \"%2$s\"."
-msgstr "Sao chép đồ thị \"%1$s\" đến host \"%2$s\" được bỏ qua."
+msgstr "Sao chép đồ thị \"%1$s\" đến máy chủ \"%2$s\" được bỏ qua."
 
 #: include/views/configuration.slideconf.edit.php:102
 msgid "Slide"
@@ -12872,7 +12890,7 @@ msgstr "Spanish (es_ES)"
 
 #: api/classes/CAction.php:1385
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
-msgstr "Tập lệnh được chỉ định không tồn tại hoặc bạn không có quyền truy cập vào nó cho thao tác lệnh hoạt động."
+msgstr "Script được chỉ định không tồn tại hoặc bạn không có quyền truy cập vào nó cho thao tác lệnh hoạt động."
 
 #: httpdetails.php:133 httpdetails.php:298
 msgid "Speed"
@@ -12958,7 +12976,7 @@ msgstr "Mã trạng thái"
 
 #: httpmon.php:24
 msgid "Status of Web monitoring"
-msgstr "Trạng thái Web monitoring"
+msgstr "Trạng thái Web giám sát"
 
 #: dashboard.php:354 include/classes/screens/CScreenSystemStatus.php:46
 #: include/menu.inc.php:124 report1.php:25
@@ -13042,7 +13060,7 @@ msgstr "Submap"
 
 #: include/items.inc.php:39
 msgid "Success Audit"
-msgstr "Kiểm nghiệm thành công"
+msgstr "Kiểm soát thành công"
 
 #: include/classes/items/CHelpItems.php:109
 #: include/classes/items/CHelpItems.php:371
@@ -13208,96 +13226,96 @@ msgstr "Telnet"
 #: include/views/configuration.template.edit.php:451
 #: include/views/configuration.triggers.list.php:126 report2.php:259
 msgid "Template"
-msgstr "Template"
+msgstr "Mẫu"
 
 #: api/classes/CHost.php:1129 api/classes/CTemplate.php:508
 #, c-format
 msgid "Template \"%1$s\" already exists."
-msgstr "template \"%1$s\" đã tồn tại."
+msgstr "Mẫu \"%1$s\" đã tồn tại."
 
 #: include/classes/import/importers/CHostImporter.php:33
 #, c-format
 msgid "Template \"%1$s\" for host \"%2$s\" does not exist."
-msgstr "Template \"%1$s\" cho host \"%2$s\" không tồn tại."
+msgstr "Mẫu \"%1$s\" cho máy chủ \"%2$s\" không tồn tại."
 
 #: api/classes/CHostBase.php:94
 #, c-format
 msgid "Template \"%1$s\" with item key \"%2$s\" already linked to host."
-msgstr "template \"%1$s\" với item key \"%2$s\" đã liên kết đến host."
+msgstr "Mẫu \"%1$s\" với item key \"%2$s\" đã liên kết đến máy chủ."
 
 #: templates.php:165
 msgid "Template added"
-msgstr "Template đã được thêm vào"
+msgstr "Mẫu đã được thêm vào"
 
 #: api/classes/CHostBase.php:294
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "Template không thể liên kết được đến template khác nhiều hơn một lần thậm chí thông qua các template khác."
+msgstr "Mẫu không thể liên kết được đến mẫu khác nhiều hơn một lần thậm chí thông qua các mẫu khác."
 
 #: templates.php:361 templates.php:377 templates.php:405
 msgid "Template deleted"
-msgstr "Template đã bị xóa"
+msgstr "Mẫu đã bị xóa"
 
 #: report2.php:237
 msgid "Template group"
-msgstr "Nhóm template"
+msgstr "Nhóm mẫu"
 
 #: include/views/conf.import.php:30
 msgid "Template linkage"
-msgstr "Liên kết template"
+msgstr "Liên kết mẫu"
 
 #: include/html.inc.php:336
 msgid "Template list"
-msgstr "Danh sách template"
+msgstr "Danh sách mẫu"
 
 #: include/views/configuration.template.edit.php:99 templates.php:55
 msgid "Template name"
-msgstr "Tên template"
+msgstr "Tên mẫu"
 
 #: api/classes/CTemplateScreen.php:584 api/classes/CTemplateScreen.php:653
 #, c-format
 msgid "Template screen \"%1$s\" already exists."
-msgstr "Template screen \"%1$s\" đã tồn tại."
+msgstr "Mẫu screen \"%1$s\" đã tồn tại."
 
 #: include/views/conf.import.php:29
 msgid "Template screens"
-msgstr "Template screens"
+msgstr "Mẫu screens"
 
 #: report2.php:296
 msgid "Template trigger"
-msgstr "Template trigger"
+msgstr "Mẫu trigger"
 
 #: templates.php:161
 msgid "Template updated"
-msgstr "Template đã được cập nhật"
+msgstr "Mẫu đã được cập nhật"
 
 #: include/hosts.inc.php:724
 #, c-format
 msgid "Template with item key \"%1$s\" already linked to host."
-msgstr "Template với item key \"%1$s\" đã liên kết đến host."
+msgstr "Mẫu với item key \"%1$s\" đã liên kết đến máy chủ."
 
 #: api/classes/CTemplate.php:900
 #, c-format
 msgid "Template with the same name \"%1$s\" already exists."
-msgstr "Template với cùng một tên \"%1$s\" đã tồn tại."
+msgstr "Mẫu với cùng một tên \"%1$s\" đã tồn tại."
 
 #: api/classes/CHost.php:838
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
-msgstr "Template với cùng một tên \"%s\" đã tồn tại."
+msgstr "Mẫu với cùng một tên \"%s\" đã tồn tại."
 
 #: api/classes/CTemplate.php:519 api/classes/CTemplate.php:867
 #, c-format
 msgid "Template with the same visible name \"%1$s\" already exists."
-msgstr "Template với cùng tên hiển thị \"%1$s\" đã tồn tại. "
+msgstr "Mẫu với cùng tên hiển thị \"%1$s\" đã tồn tại. "
 
 #: api/classes/CHost.php:844
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
-msgstr "Template với cùng một tên hiển thị \"%s\" đã tồn tại."
+msgstr "Mẫu với cùng một tên hiển thị \"%s\" đã tồn tại."
 
 #: include/forms.inc.php:630 include/forms.inc.php:817
 msgid "Templated items"
-msgstr "Templated items"
+msgstr "Mẫu item"
 
 #: hosts.php:821 include/menu.inc.php:164
 #: include/views/configuration.host.edit.php:775
@@ -13309,12 +13327,12 @@ msgstr "Templated items"
 #: search.php:305 search.php:312 search.php:379 search.php:456
 #: templates.php:482 templates.php:492
 msgid "Templates"
-msgstr "Templates"
+msgstr "Mẫu"
 
 #: api/classes/CHostBase.php:272
 #, c-format
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
-msgstr "Template \"%1$s\" không liên kết từ các host \"%2$s\"."
+msgstr "Mẫu \"%1$s\" không liên kết từ máy chủ \"%2$s\"."
 
 #: include/func.inc.php:679
 msgid "Tera"
@@ -13380,24 +13398,24 @@ msgstr "Giao diện không khớp với cơ sở dữ liệu Zabbix. Phiê
 #: include/views/configuration.hostgroups.list.php:137
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Nhóm host không được phát hiện nữa và sẽ bị xóa trong %1$s (trên %2$s tại %3$s)."
+msgstr "Nhóm máy chủ không được phát hiện nữa và sẽ bị xóa trong %1$s (trên %2$s tại %3$s)."
 
 #: include/html.inc.php:596
 #, c-format
 msgid "The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr "Host không được phát hiện nữa và sẽ bị xóa trong %1$s (trên %2$s tại %3$s)."
+msgstr "Máy chủ không được phát hiện nữa và sẽ bị xóa trong %1$s (trên %2$s tại %3$s)."
 
 #: api/classes/CImage.php:492
 #, c-format
 msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
-msgstr[0] "Hình ảnh được sử dụng trong biểu tượng bản đồ %1$s."
+msgstr[0] "Hình ảnh được sử dụng trong biểu tượng sơ đồ %1$s."
 
 #: api/classes/CImage.php:518
 #, c-format
 msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
-msgstr[0] "Hình ảnh được sử dụng trong bản đồ %1$s."
+msgstr[0] "Hình ảnh được sử dụng trong sơ đồ %1$s."
 
 #: include/views/configuration.item.list.php:127
 #, c-format
@@ -13418,7 +13436,7 @@ msgstr "Các yêu cầu thủ tục từ xa không tồn tại / không să�
 
 #: api/classes/CHttpTest.php:573
 msgid "The web scenario application belongs to a different host than the web scenario host."
-msgstr "Ứng dụng web scenario thuộc về một host khác hơn so với host web scenario."
+msgstr "Ứng dụng web scenario thuộc về một máy chủ khác hơn so với máy chủ web scenario."
 
 #: include/views/administration.users.edit.php:152
 msgid "Theme"
@@ -13666,7 +13684,7 @@ msgstr "Trigger \"%1$s\" được bỏ qua - quy tắc người dùng."
 #: api/classes/CTrigger.php:1630
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
-msgstr "Trigger \"%s\" thuộc về các template với các liên kết khác nhau."
+msgstr "Trigger \"%s\" thuộc về các mẫu với các liên kết khác nhau."
 
 #: triggers.php:195 triggers.php:318 tr_logform.php:148
 msgid "Trigger added"
@@ -13721,7 +13739,7 @@ msgstr "Điều kiện biểu thức trigger"
 
 #: api/classes/CTrigger.php:685
 msgid "Trigger expression must contain at least one host:key reference."
-msgstr "Biểu thức trigger phải chứa ít nhất một host: key reference."
+msgstr "Biểu thức trigger phải chứa ít nhất một máy chủ: key reference."
 
 #: tr_logform.php:27
 msgid "Trigger form"
@@ -13730,7 +13748,7 @@ msgstr "Mẫu trigger"
 #: api/classes/CHostBase.php:187
 #, c-format
 msgid "Trigger has items from template \"%1$s\" that is not linked to host."
-msgstr "Trigger có các item từ template \"%1$s\" đó không phải là liên kết đến host."
+msgstr "Trigger có các item từ mẫu \"%1$s\" đó không phải là liên kết đến máy chủ."
 
 #: include/actions.inc.php:1157
 msgid "Trigger in \"normal\" state"
@@ -13743,7 +13761,7 @@ msgstr "Trigger ở trạng thái \"unknown\""
 #: api/classes/CHostBase.php:143
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
-msgstr "Trigger trong template \"%1$s\" phụ thuộc vào trigger trong template \"%2$s\"."
+msgstr "Trigger trong mẫu \"%1$s\" phụ thuộc vào trigger trong mẫu \"%2$s\"."
 
 #: api/classes/CTriggerPrototype.php:498
 msgid "Trigger just added. No status update so far."
@@ -13851,27 +13869,27 @@ msgstr "Giá trị trigger"
 #: search.php:266 search.php:320 search.php:382 search.php:411 search.php:435
 #: templates.php:495 templates.php:558 tr_status.php:267
 msgid "Triggers"
-msgstr "Các trigger"
+msgstr "Triggers"
 
 #: include/classes/class.cserverinfo.php:64
 msgid "Triggers (e/d)[p/o]"
-msgstr "Các trigger (e/d)[p/o]"
+msgstr "Triggers (e/d)[p/o]"
 
 #: triggers.php:330
 msgid "Triggers deleted"
-msgstr "Các trigger đã bị xóa"
+msgstr "Trigger đã bị xóa"
 
 #: include/classes/class.ctriggersinfo.php:107 include/screens.inc.php:42
 msgid "Triggers info"
-msgstr "Thông tin các trigger"
+msgstr "Thông tin trigger"
 
 #: include/screens.inc.php:43
 msgid "Triggers overview"
-msgstr "Tổng quan các trigger"
+msgstr "Tổng quan về trigger"
 
 #: tr_status.php:283
 msgid "Triggers status"
-msgstr "Trạng thái các trigger"
+msgstr "Trạng thái của trigger"
 
 #: include/menu.inc.php:133
 msgid "Triggers top 100"
@@ -13910,7 +13928,7 @@ msgstr "Hai phần tử nên được lựa chọn"
 #: api/classes/CItem.php:1021
 #, c-format
 msgid "Two items (\"%1$s\" and \"%2$s\") cannot populate one host inventory field \"%3$s\", this would lead to a conflict."
-msgstr "Hai item (\"%1$s\" và \"%2$s\") không thể gắn vào một trường host còn lại \"%3$s\", điều này sẽ dẫn đến một cuộc xung đột."
+msgstr "Hai item (\"%1$s\" và \"%2$s\") không thể gắn vào một trường máy chủ còn lại \"%3$s\", điều này sẽ dẫn đến một cuộc xung đột."
 
 #: include/actions.inc.php:829 include/classes/screens/CScreenActions.php:48
 #: include/classes/screens/CScreenActions.php:53
@@ -14087,7 +14105,7 @@ msgstr "Bỏ chặn lựa chọn"
 
 #: include/views/administration.users.list.php:136
 msgid "Unblock selected users?"
-msgstr "Bỏ chặn các người dùng được lựa chọn?"
+msgstr "Bỏ chặn người dùng được lựa chọn?"
 
 #: include/views/configuration.item.edit.php:240
 #: include/views/configuration.item.massupdate.php:237
@@ -14125,7 +14143,7 @@ msgstr "Không rõ"
 
 #: auditlogs.php:155
 msgid "Unknown action"
-msgstr "Hành động không rõ"
+msgstr "Hoạt động không rõ"
 
 #: httpdetails.php:163 httpdetails.php:235 httpmon.php:145
 msgid "Unknown error"
@@ -14137,11 +14155,11 @@ msgstr "Hàm không rõ"
 
 #: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
-msgstr "Host item không rõ, không có item trong host được lựa chọn"
+msgstr "item máy chủ không rõ, không có item trong máy chủ được lựa chọn"
 
 #: include/triggers.inc.php:1731 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
-msgstr "Host không rõ, không có như vậy trong hệ thống"
+msgstr "Máy chủ không rõ, không có máy chủ như vậy trong hệ thống"
 
 #: include/hosts.inc.php:480
 msgid "Unknown interface type."
@@ -14173,11 +14191,11 @@ msgstr "Hủy liên kết và xóa"
 
 #: include/actions.inc.php:644
 msgid "Unlink from template"
-msgstr "Hủy liên kết từ template"
+msgstr "Hủy liên kết từ mẫu"
 
 #: include/actions.inc.php:456 include/views/configuration.action.edit.php:920
 msgid "Unlink from templates"
-msgstr "Hủy liên kết từ các template"
+msgstr "Hủy liên kết từ các mẫu"
 
 #: api/classes/CHostGeneral.php:577
 #, c-format
@@ -14202,7 +14220,7 @@ msgstr "Hủy liên kết: kiểu đồ thị \"%1$s\" trên \"%2$s\"."
 #: api/classes/CHostGeneral.php:420
 #, c-format
 msgid "Unlinked: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr "Hủy liên kết: Kiểu host \"%1$s\" trên \"%2$s\"."
+msgstr "Hủy liên kết: Kiểu máy chủ \"%1$s\" trên \"%2$s\"."
 
 #: api/classes/CHostGeneral.php:372
 #, c-format
@@ -14251,12 +14269,12 @@ msgstr "Không hỗ trợ tham số \"%1$s\" cho kiểu nhóm."
 #: api/classes/CHostPrototype.php:209
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for host prototype \"%1$s\"."
-msgstr "Không hỗ trợ tham sô \"%2$s\" cho kiểu host \"%1$s\"."
+msgstr "Không hỗ trợ tham số \"%2$s\" cho kiểu máy chủ \"%1$s\"."
 
 #: api/classes/CHostPrototype.php:203
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
-msgstr "Không hỗ trợ tham số \"%2$s\"  cho kiểu host \"%1$s\" host còn lại."
+msgstr "Không hỗ trợ tham số \"%2$s\"  cho kiểu máy chủ \"%1$s\" máy chủ còn lại."
 
 #: include/blocks.inc.php:1222
 msgctxt "discovery results in dashboard"
@@ -14301,7 +14319,7 @@ msgstr "Đã cập nhật"
 
 #: include/hosts.inc.php:571
 msgid "Updated status of host"
-msgstr "Trạng thái đã cập nhật của host"
+msgstr "Trạng thái đã cập nhật của máy chủ"
 
 #: include/blocks.inc.php:392 include/blocks.inc.php:747
 #: include/blocks.inc.php:816 include/blocks.inc.php:1071
@@ -14324,7 +14342,7 @@ msgstr "Đã cập nhật: Quy tắc phát hiện \"%1$s\" trên \"%2$s\".
 #: api/classes/CHostPrototype.php:615
 #, c-format
 msgid "Updated: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr "Đã cập nhật: Kiểu host \"%1$s\" trên \"%2$s\"."
+msgstr "Đã cập nhật: Kiểu máy chủ \"%1$s\" trên \"%2$s\"."
 
 #: api/classes/CItem.php:644
 #, c-format
@@ -14357,7 +14375,7 @@ msgstr "Tải lên"
 
 #: include/views/monitoring.maps.php:54
 msgid "Upper level maps"
-msgstr "Các bản đồ ở mức cao hơn"
+msgstr "Sơ đồ ở mức cao hơn"
 
 #: include/views/configuration.services.edit.php:134
 #: include/views/configuration.services.edit.php:257
@@ -14389,7 +14407,7 @@ msgstr "Sử dụng nếu mức độ quan trọng"
 
 #: include/views/administration.mediatypes.list.php:43
 msgid "Used in actions"
-msgstr "Sử dùng trong các action"
+msgstr "Sử dụng trong các hoạt động"
 
 #: httpconf.php:53 include/acknow.inc.php:49 include/actions.inc.php:965
 #: include/audit.inc.php:24 include/hosts.inc.php:67 include/setup.inc.php:319
@@ -14457,7 +14475,7 @@ msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong cấu hi�
 #: api/classes/CUserGroup.php:657
 #, c-format
 msgid "User group \"%1$s\" is used in script \"%2$s\"."
-msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong tập lệnh \"%2$s\"."
+msgstr "Nhóm người dùng \"%1$s\" được sử dụng trong script \"%2$s\"."
 
 #: api/classes/CUserGroup.php:431
 #, c-format
@@ -14488,7 +14506,7 @@ msgstr "Nhóm người dùng cho cơ sở dữ liệu tin nhắn không h
 #: include/views/administration.users.list.php:28 popup.php:64
 #: popup_usrgrp.php:25 popup_usrgrp.php:49
 msgid "User groups"
-msgstr "Các nhóm người dùng"
+msgstr "Nhóm người dùng"
 
 #: api/classes/CUser.php:1376
 msgid "User is not allowed to delete himself."
@@ -14567,15 +14585,15 @@ msgstr "Tên người dùng"
 #: include/views/administration.users.list.php:29
 #: include/views/administration.users.list.php:43 popup.php:68
 msgid "Users"
-msgstr "Các người dùng"
+msgstr "Người dùng"
 
 #: include/classes/class.cserverinfo.php:42
 msgid "Users (online)"
-msgstr "Các người dùng (trực tuyến)"
+msgstr "Người dùng (trực tuyến)"
 
 #: users.php:354
 msgid "Users unblocked"
-msgstr "Các người dùng không bị khóa"
+msgstr "Người dùng được mở khóa"
 
 #: include/classes/items/CHelpItems.php:903
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
@@ -14591,79 +14609,79 @@ msgstr "VMware event log, <url> - Dịch vụ VMware URL"
 
 #: include/classes/items/CHelpItems.php:659
 msgid "VMware hypervisor BIOS uuid, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "VMware hypervisor BIOS uuid, <url> - Dịch vụ VMwareURL, <uuid> - Tên host VMware hypervisor"
+msgstr "VMware hypervisor BIOS uuid, <url> - Dịch vụ VMwareURL, <uuid> - Tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:667
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Kích thước bộ nhớ VMware hypervisor thừa ra, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Kích thước bộ nhớ VMware hypervisor thừa ra, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:615
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Tên VMware hypervisor cluster, <url> - Dịch vụ VMware hypervisor cluster VMware URL, <uuid> - Tên host VMware hypervisor"
+msgstr "Tên VMware hypervisor cluster, <url> - Dịch vụ VMware hypervisor cluster VMware URL, <uuid> - Tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:623
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
-msgstr "Kho dữ liệu đọc số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
+msgstr "Kho dữ liệu đọc số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên máy chủ VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
 #: include/classes/items/CHelpItems.php:627
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
-msgstr "Kho dữ liệu ghi số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên host VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
+msgstr "Kho dữ liệu ghi số liệu thống kê VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - Tên máy chủ VMware hypervisor, <datastore> - tên kho dữ liệu, <mode> - độ trễ"
 
 #: include/classes/items/CHelpItems.php:655
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Mô hình VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Mô hình VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:631
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Tên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Tên VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:675
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
-msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
+msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:679
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
-msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor, <mode> - bps"
+msgstr "Thống kê mạng đầu vào VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor, <mode> - bps"
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr "Theo dõi hiệu suất VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor , <path> - đường dẫn theo dõi hiệu suất, <instance> - đếm số lần hiệu suất"
+msgstr "Theo dõi hiệu suất VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor , <path> - đường dẫn theo dõi hiệu suất, <instance> - đếm số lần hiệu suất"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Tần số bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Tần số bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:639
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Mô hình bộ xử lý VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:619
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Cách sử dụng bộ xử lý VMware hypervisor đơn vị là Hz, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:687
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Trạng thái VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Trạng thái VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:651
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Kích thước bộ nhớ tổng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Kích thước bộ nhớ tổng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:691
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Thời gian chạy VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Thời gian chạy VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:671
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Kích thước bộ nhớ đã sử dụng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Kích thước bộ nhớ đã sử dụng VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:663
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Tên nhà sản xuất VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Tên nhà sản xuất VMware hypervisor, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:695
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host VMware hypervisor"
+msgstr "Phiên bản VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ VMware hypervisor"
 
 #: include/classes/items/CHelpItems.php:611
 msgid "VMware service full name, <url> - VMware service URL"
@@ -14675,91 +14693,91 @@ msgstr "Phiên bản dịch vụ VMware, <url> - dịch vụ VMware URL"
 
 #: include/classes/items/CHelpItems.php:723
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Kích thước bộ nhớ máy ảo VMware bị thừa ra, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Kích thước bộ nhớ máy ảo VMware bị thừa ra, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Không gian lưu trữ máy ảo VMware được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Không gian lưu trữ máy ảo VMware được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Kích thước bộ nhớ máy ảo VMware được nén lại, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Kích thước bộ nhớ máy ảo VMware được nén lại, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
-msgstr "Thiết bị đĩa máy ảo VMware đọc số liệu thống kê, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
+msgstr "Thiết bị đĩa máy ảo VMware đọc số liệu thống kê, <url> - Dịch vụ VMware URL, <uuid> - tên host máy chủ ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/số lần thao tác trên giây"
 
 #: include/classes/items/CHelpItems.php:791
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
-msgstr "Thiết bị đĩa máy ảo VMware ghi số liệu thống kê, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/ số lần thao tác trên giây "
+msgstr "Thiết bị đĩa máy ảo VMware ghi số liệu thống kê, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware, <instance> - Số thiết bị đĩa, <mode> - bps/ops - bytes/ số lần thao tác trên giây "
 
 #: include/classes/items/CHelpItems.php:795
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
-msgstr "Hệ thống tập tin máy ảo thống kê VMware, <url> - dịch vụ VMware URL, <uuid> -  tên host máy ảo VMware, <fsname> - tên hệ thống tập tin, <mode> -  total/free/used/pfree/pused"
+msgstr "Hệ thống tập tin máy ảo thống kê VMware, <url> - dịch vụ VMware URL, <uuid> -  tên máy chủ ảo VMware, <fsname> - tên hệ thống tập tin, <mode> -  total/free/used/pfree/pused"
 
 #: include/classes/items/CHelpItems.php:743
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Cách sử dụng bộ nhớ máy ảo VMware của khách, <url> - dịch vụ VMware URL, <uuid> - Tên host máy ảo VMware"
+msgstr "Cách sử dụng bộ nhớ máy ảo VMware của khách, <url> - dịch vụ VMware URL, <uuid> - Tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:747
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Cách sử dụng bộ nhớ máy ảo VMware của host, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Cách sử dụng bộ nhớ máy ảo VMware của host, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:719
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Tên máy ảo VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Tên máy ảo VMware hypervisor, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:707
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Tên máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Tên máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:755
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
-msgstr "Thống kê interface mạng đầu vào máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
+msgstr "Thống kê interface mạng đầu vào máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
 #: include/classes/items/CHelpItems.php:759
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
-msgstr "Thống kê interface mạng đầu ra máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy áo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
+msgstr "Thống kê interface mạng đầu ra máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ áo VMware, <instance> - số lượng interface, <mode> - bps/pps - bytes/số lượng gói tin trên giây"
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr "Hiệu suất truy cập máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware, <path> - đường dẫn hiệu suất truy cập, <instance> - Số lượng hiệu suất truy cập"
+msgstr "Hiệu suất truy cập máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware, <path> - đường dẫn hiệu suất truy cập, <instance> - Số lượng hiệu suất truy cập"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Tình trạng nguồn của máy ảo VMware, <url> - dich vụ VMware URL, <uuid> - Tên host máy ảo VMware"
+msgstr "Tình trạng nguồn của máy ảo VMware, <url> - dich vụ VMware URL, <uuid> - Tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:731
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Kích thước bộ nhớ riêng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Kích thước bộ nhớ riêng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:715
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Cách sử dụng bộ xử lý máy ảo VMware đơn vị Hz, <url> - Dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Kích thước bộ nhớ chia sẻ của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Kích thước bộ nhớ chia sẻ của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Kích thước bộ nhớ máy ảo VMware được trao đổi, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Kích thước bộ nhớ máy ảo VMware được trao đổi, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:751
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Kích thước bộ nhớ tổng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Kích thước bộ nhớ tổng của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:775
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Không gian lưu trữ máy ảo VMware không được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Không gian lưu trữ máy ảo VMware không được thống nhất, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:779
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Không gian lưu trữ máy ảo VMware không được chia sẻ, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Không gian lưu trữ máy ảo VMware không được chia sẻ, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/classes/items/CHelpItems.php:783
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Thời gian hoạt động của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên host máy ảo VMware"
+msgstr "Thời gian hoạt động của máy ảo VMware, <url> - dịch vụ VMware URL, <uuid> - tên máy chủ ảo VMware"
 
 #: include/blocks.inc.php:758 include/classes/graphdraw/CPieGraphDraw.php:327
 #: include/classes/screens/CScreenEvents.php:43
@@ -14908,7 +14926,7 @@ msgstr "Chi tiết"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:323
 msgid "Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1"
-msgstr "Phiên bản của zabbix_agent(d) đang chạy trên host được giám sát. chuối giá trị. Ví dụ của giá trị được trả về: 1.1"
+msgstr "Phiên bản của zabbix_agent(d) đang chạy trên máy chủ được giám sát. chuối giá trị. Ví dụ của giá trị được trả về: 1.1"
 
 #: include/views/configuration.screen.constructor.edit.php:576
 msgid "Vertical"
@@ -14940,7 +14958,7 @@ msgstr "Tên hiển thị"
 
 #: api/classes/CHost.php:771
 msgid "Visible name cannot be empty if host name is missing."
-msgstr "Tên hiển thị không thể bị trống nếu tên host bị lỗi."
+msgstr "Tên hiển thị không thể bị trống nếu tên máy chủ bị lỗi."
 
 #: jsLoader.php:132
 msgctxt "Wednesday short"
@@ -14974,13 +14992,13 @@ msgstr "Web"
 
 #: dashboard.php:411 include/items.inc.php:98
 msgid "Web monitoring"
-msgstr "Web monitoring"
+msgstr "Web giám sát"
 
 #: api/classes/managers/CHttpTestManager.php:383
 #: api/classes/managers/CHttpTestManager.php:391
 #, c-format
 msgid "Web scenario \"%1$s\" already exists on host \"%2$s\"."
-msgstr "Web scenario \"%1$s\" đã tồn tại trên host \"%2$s\"."
+msgstr "Web scenario \"%1$s\" đã tồn tại trên máy chủ \"%2$s\"."
 
 #: api/classes/CHttpTest.php:480 api/classes/CHttpTest.php:529
 #, c-format
@@ -15082,7 +15100,7 @@ msgstr "Các vấn đề"
 #: include/forms.inc.php:615 include/forms.inc.php:842
 #: include/forms.inc.php:951
 msgid "With triggers"
-msgstr "Các trigger"
+msgstr "Trong số các trigger"
 
 #: tr_status.php:288
 msgid "With unacknowledged events"
@@ -15131,7 +15149,7 @@ msgstr "Những trường không đúng đối với phần tử."
 #: api/classes/CHost.php:661
 #, c-format
 msgid "Wrong fields for host \"%s\"."
-msgstr "Những trường không đúng đối với host \"%s\"."
+msgstr "Những trường không đúng đối với máy chủ \"%s\"."
 
 #: api/classes/CImage.php:253
 #, c-format
@@ -15166,7 +15184,7 @@ msgstr "Những trường không đúng đối với liên kết bản đ�
 
 #: api/classes/CMediatype.php:232 api/classes/CMediatype.php:283
 msgid "Wrong fields for media type."
-msgstr "Những trường không đúng đối với media type."
+msgstr "Những trường không đúng đối với loại phương tiện."
 
 #: api/classes/CProxy.php:207
 #, c-format
@@ -15328,25 +15346,25 @@ msgstr "Bạn không được đăng nhập."
 
 #: popup.php:519
 msgid "You can not switch hosts for current selection."
-msgstr "Bạn không thể chuyển đổi các host cho lựa chọn hiện tại."
+msgstr "Bạn không thể chuyển đổi máy chủ cho lựa chọn hiện tại."
 
 #: include/views/js/configuration.action.edit.js.php:349
 msgid "You did not specify host for operation."
-msgstr "Bạn không ghi rõ host cho thao tác."
+msgstr "Bạn không ghi rõ máy chủ cho thao tác."
 
 #: include/views/js/configuration.action.edit.js.php:315
 msgid "You did not specify host group for operation."
-msgstr "Bạn không ghi rõ nhóm host cho thao tác."
+msgstr "Bạn không ghi rõ nhóm máy chủ cho thao tác."
 
 #: api/classes/CAction.php:1426
 #, c-format
 msgid "You did not specify targets for action operation command \"%s\"."
-msgstr "Bạn không ghi rõ mục tiêu cho lệnh thao tác action \"%s\"."
+msgstr "Bạn không ghi rõ mục tiêu cho lệnh thao tác hoạt động \"%s\"."
 
 #: api/classes/CAction.php:1423
 #, c-format
 msgid "You did not specify targets for action operation global script \"%s\"."
-msgstr "Bạn không ghi rõ mục tiêu cho thao tác tập lệnh action \"%s\"."
+msgstr "Bạn không ghi rõ mục tiêu cho thao tác global script hoạt động \"%s\"."
 
 #: api/classes/CGraph.php:557 api/classes/CGraphPrototype.php:574
 #: api/classes/CHost.php:1030 api/classes/CHost.php:1087
@@ -15363,11 +15381,11 @@ msgstr "Bạn không có quyền để thực hiện các thao tác này
 
 #: api/classes/CUser.php:289
 msgid "You do not have permissions to create users."
-msgstr "Bạn không có quyền để tạo các người dùng."
+msgstr "Bạn không có quyền để tạo người dùng."
 
 #: api/classes/CUser.php:300
 msgid "You do not have permissions to update other users."
-msgstr "Bạn không có quyền để cập nhật các người dùng khác."
+msgstr "Bạn không có quyền để cập nhật người dùng khác."
 
 #: api/classes/CUser.php:296
 msgid "You do not have permissions to update user or user does not exist."
@@ -15387,7 +15405,7 @@ msgstr "Bạn đã đăng nhập"
 
 #: include/views/administration.node.list.php:28
 msgid "Your setup is not configured for distributed monitoring."
-msgstr "Thiết lập của bạn không được cấu hình để phân phối theo dõi."
+msgstr "Thiết lập của bạn không được cấu hình để phân phối giám sát."
 
 #: include/func.inc.php:682
 msgctxt "Zetta short"
@@ -15418,7 +15436,7 @@ msgstr "Zabbix Super Admin"
 
 #: include/users.inc.php:54
 msgid "Zabbix User"
-msgstr "Zabbix User"
+msgstr "Người dùng Zabbix"
 
 #: include/discovery.inc.php:65 include/items.inc.php:81
 #: include/views/administration.script.edit.php:53
@@ -15549,7 +15567,7 @@ msgstr "Tất cả"
 
 #: include/actions.inc.php:325
 msgid "all media"
-msgstr "Tất cả media"
+msgstr "Tất cả phương tiện"
 
 #: api/classes/CUserGroup.php:252
 msgid "already exists"
@@ -15581,7 +15599,7 @@ msgstr "Đăng ký tự động"
 
 #: include/events.inc.php:66
 msgid "auto-registered host"
-msgstr "Host được đăng ký tự động"
+msgstr "Máy chủ được đăng ký tự động"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1831
 #: include/classes/graphdraw/CLineGraphDraw.php:1853
@@ -15664,7 +15682,7 @@ msgstr "Dấu phân cách"
 
 #: include/events.inc.php:64
 msgid "discovered host"
-msgstr "discovered host"
+msgstr "máy chủ được phát hiện"
 
 #: include/events.inc.php:65
 msgid "discovered service"
@@ -15726,11 +15744,11 @@ msgstr "hh"
 
 #: api/classes/CMap.php:425
 msgid "host"
-msgstr "host"
+msgstr "Máy chủ"
 
 #: api/classes/CMap.php:424
 msgid "host group"
-msgstr "Nhóm host"
+msgstr "Nhóm máy chủ"
 
 #: api/classes/CMap.php:421
 msgid "icon"
@@ -15770,7 +15788,7 @@ msgstr "Không có key"
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 msgid "last"
-msgstr "Cuối cùng"
+msgstr "Giá trị cuối cùng"
 
 #: hosts.php:779 hosts.php:780 hosts.php:781 include/actions.inc.php:29
 #: include/forms.inc.php:477 include/forms.inc.php:484
@@ -15990,7 +16008,7 @@ msgstr "Thiết lập giá trị bản đồ hiển thị"
 #: api/classes/CHostBase.php:53
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
-msgstr "ID template \"%1$s\" được thông qua %2$s lần"
+msgstr "ID mẫu \"%1$s\" được thông qua %2$s lần"
 
 #: include/func.inc.php:1901
 msgid "to"
