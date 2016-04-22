@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:25+0300\n"
-"PO-Revision-Date: 2016-03-30 06:19+0300\n"
+"PO-Revision-Date: 2016-04-22 12:35+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1459311595.0\n"
+"X-POOTLE-MTIME: 1461321326.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -148,7 +148,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:532
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - нескінченно)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -7748,7 +7748,7 @@ msgstr "Некоректні параметри для групи користу
 #: include/classes/api/services/CService.php:1009
 #, c-format
 msgid "Incorrect parent for service \"%1$s\"."
-msgstr "Некоректна батьківська для послуги \"%s\"."
+msgstr "Некоректна батьківська для послуги \"%1$s\"."
 
 #: include/classes/api/services/CService.php:1012
 msgid "Incorrect parent service."

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:25+0300\n"
-"PO-Revision-Date: 2016-03-23 11:23+0300\n"
+"PO-Revision-Date: 2016-04-12 02:57+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1458725000.0\n"
+"X-POOTLE-MTIME: 1460422652.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -64,7 +64,7 @@ msgstr[0] "항목 %1$s개"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [행: %2$s | 열: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -1380,7 +1380,7 @@ msgstr "Web시나리오를 추가할 수 없습니다"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "파라미터 없이는 메소드 \"%1$s.%2$s\"를 불러올 수 없습니다."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -2017,13 +2017,13 @@ msgstr "조건식\"%s\"를 전개할 수 없습니다"
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] "스크린 \"%1$s\"를 임포트 할 수 없습니다 : 서브 스크린 \"%2$s\"이 없습니다."
+msgstr[0] "스크린 \"%1$s\"를 가져올 수 없습니다 : 서브 스크린 \"%2$s\"이 없습니다."
 
 #: include/classes/import/importers/CTemplateImporter.php:119
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "템플릿 \"%1$s\"를 임포트 할 수 없습니다. 링크되어 있는 템플릿 \"%2$s\"가 존재하지 않습니다."
+msgstr[0] "템플릿 \"%1$s\"를 가져올 수 없습니다. 링크되어 있는 템플릿 \"%2$s\"가 존재하지 않습니다."
 
 #: include/classes/mvc/CView.php:219
 #, c-format
@@ -2104,7 +2104,7 @@ msgstr "다른 호스트 혹은 템플릿의 어플리케이션을 처리할 수
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "XML: %1$s 을 읽을 수 없습니다."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -2876,7 +2876,7 @@ msgstr "설정 파일 \"%1$s\"를 작성하였습니다."
 
 #: conf.import.php:25 map.import.php:25 screen.import.php:25
 msgid "Configuration import"
-msgstr "설정의 임포트"
+msgstr "가져오기 설정"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
@@ -5305,11 +5305,11 @@ msgstr "분해도 그래프"
 #: include/views/monitoring.screen.list.php:107
 #: include/views/monitoring.sysmap.list.php:79 templates.php:756
 msgid "Export"
-msgstr "익스포트"
+msgstr "내보내기"
 
 #: events.php:299
 msgid "Export to CSV"
-msgstr "CSV 익스포트"
+msgstr "CSV 내보내기"
 
 #: include/triggers.inc.php:1191
 #: include/views/administration.general.iconmap.edit.php:48
@@ -6965,7 +6965,7 @@ msgstr "가져오기"
 
 #: conf.import.php:179 map.import.php:179 screen.import.php:179
 msgid "Import failed"
-msgstr "임포트에 실패하였습니다"
+msgstr "가져오기에 실패하였습니다"
 
 #: include/views/conf.import.php:105
 msgid "Import file"
@@ -6973,7 +6973,7 @@ msgstr "파일 가져오기"
 
 #: conf.import.php:179 map.import.php:179 screen.import.php:179
 msgid "Imported successfully"
-msgstr "임포트에 성공하였습니다."
+msgstr "가져오기에 성공하였습니다."
 
 #: hostinventories.php:187
 #, c-format
@@ -14829,12 +14829,12 @@ msgstr "음소거 해제"
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, c-format
 msgid "Unsupported import file extension \"%1$s\"."
-msgstr "임포트 파일의 확장자 \"%1$s\"는 지원하지 않습니다."
+msgstr "가져오기 파일의 확장자 \"%1$s\"는 지원하지 않습니다."
 
 #: include/classes/import/readers/CImportReaderFactory.php:44
 #, c-format
 msgid "Unsupported import format \"%1$s\"."
-msgstr "임포트 포맷 \"%1$s\"는 지원하지 않습니다."
+msgstr "가져오기 포맷 \"%1$s\"는 지원하지 않습니다."
 
 #: include/classes/api/services/CHostPrototype.php:227
 #: include/classes/api/services/CHostPrototype.php:245
@@ -15966,7 +15966,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr ""
+msgstr "XML이 비어있습니다."
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -16235,7 +16235,7 @@ msgstr "문자열로 지정해 주십시오"
 
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "숫자로 지정해주세요"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
@@ -16551,7 +16551,7 @@ msgstr "유효한 LDAP서버가 필요합니다."
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\"에서 \"%2$s\"의 수치로 설정해주세요"
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:177
 msgid "new"
@@ -16742,7 +16742,7 @@ msgstr "태그 \"%1$s\"가 잘못되어 있습니다"
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr ""
+msgstr "텍스트 \"%1$s\"가 잘못되었습니다."
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407

@@ -1,6 +1,7 @@
 Changes for 3.0.3rc1
 
 New features:
+A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ..F....... [ZBX-10670] fixed disabling of script confirmation in Administration -> Script -> Edit form (Cemeris)
