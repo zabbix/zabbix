@@ -4165,7 +4165,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_discovery_macros_simple                               *
+ * Function: process_simple_macro_token                                       *
  *                                                                            *
  * Purpose: trying to resolve the discovery macros in item key parameters     *
  *          in simple macros like {host:key[].func()}                         *
@@ -4174,7 +4174,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
  *           structure host, key, func fields.                                *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_discovery_macros_simple(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
+static int	process_simple_macro_token(char **data, zbx_token_t *token, struct zbx_json_parse *jp_row)
 {
 	char	*pl, *pr, *key = NULL, *replace_to = NULL;
 	size_t	sz, replace_to_offset = 0, replace_to_alloc = 0;
@@ -4228,7 +4228,7 @@ static int	substitute_discovery_macros_simple(char **data, zbx_token_t *token, s
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_discovery_macros_lld                                  *
+ * Function: process_lld_macro_token                                          *
  *                                                                            *
  * Purpose: expand discovery macro in expression                              *
  *                                                                            *
@@ -4246,7 +4246,7 @@ static int	substitute_discovery_macros_simple(char **data, zbx_token_t *token, s
  *               otherwise FAIL with an error message.                        *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int flags,
+static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 		struct zbx_json_parse *jp_row, char *error, size_t error_len)
 {
 	char	c, *replace_to = NULL;
@@ -4296,7 +4296,7 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_discovery_macros_user                                 *
+ * Function: process_user_macro_token                                         *
  *                                                                            *
  * Purpose: expand discovery macro in user macro context                      *
  *                                                                            *
@@ -4307,7 +4307,7 @@ static int	substitute_discovery_macros_lld(char **data, zbx_token_t *token, int 
  *             jp_row    - [IN] discovery data                                *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, int flags,
+static void	process_user_macro_token(char **data, zbx_token_t *token, int flags,
 		struct zbx_json_parse *jp_row)
 {
 	int			force_quote;
@@ -4322,8 +4322,8 @@ static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, in
 	force_quote = ('"' == (*data)[macro->context.l]);
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
-	/* substitute_discovery_macros() can't fail with ZBX_MACRO_CONTEXT flag set */
-	substitute_discovery_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
+	/* substitute_lld_macros() can't fail with only ZBX_TOKEN_LLD_MACRO flag set */
+	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
@@ -4338,7 +4338,7 @@ static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, in
 
 /******************************************************************************
  *                                                                            *
- * Function: substitute_discovery_macros                                      *
+ * Function: substitute_lld_macros                                            *
  *                                                                            *
  * Parameters: data   - [IN/OUT] pointer to a buffer                          *
  *             jp_row - [IN] discovery data                                   *
@@ -4361,10 +4361,10 @@ static void	substitute_discovery_macros_user(char **data, zbx_token_t *token, in
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int flags,
+int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 		char *error, size_t max_error_len)
 {
-	const char	*__function_name = "substitute_discovery_macros";
+	const char	*__function_name = "substitute_lld_macros";
 
 	int		ret = SUCCEED, pos = 0;
 	zbx_token_t	token;
@@ -4378,19 +4378,20 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
-					ret = substitute_discovery_macros_lld(data, &token, flags, jp_row, error,
+					ret = process_lld_macro_token(data, &token, flags, jp_row, error,
 							max_error_len);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_USER_MACRO:
-					substitute_discovery_macros_user(data, &token, flags, jp_row);
+					process_user_macro_token(data, &token, flags, jp_row);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_SIMPLE_MACRO:
-					substitute_discovery_macros_simple(data, &token, jp_row);
+					process_simple_macro_token(data, &token, jp_row);
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
+					/* lld macros are not supported inside macro functions */
 					pos = token.token.r;
 					break;
 			}
@@ -4444,7 +4445,7 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
 		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL,
 				&param, macro_type, NULL, 0);
 	else
-		substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	if (0 != level)
 		quote_key_param(&param, quoted);

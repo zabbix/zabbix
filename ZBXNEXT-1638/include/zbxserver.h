@@ -65,7 +65,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 #define ZBX_MACRO_SIMPLE	(ZBX_MACRO_ANY | ZBX_TOKEN_SIMPLE_MACRO)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
-int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int flags,
+int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 		char *error, size_t max_error_len);
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t mexerrlen);
