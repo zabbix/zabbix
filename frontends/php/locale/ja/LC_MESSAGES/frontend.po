@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:26+0300\n"
-"PO-Revision-Date: 2016-03-16 11:56+0300\n"
+"PO-Revision-Date: 2016-03-26 04:18+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1458122210.0\n"
+"X-POOTLE-MTIME: 1458958730.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -64,7 +64,7 @@ msgstr[0] "%1$sアイテム"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [行: %2$s | 列: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -1380,7 +1380,7 @@ msgstr "Webシナリオを追加できません"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "パラメータなしでメソッド\"%1$s.%2$s\"を呼び出すことはできません。"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -2104,7 +2104,7 @@ msgstr "異なるホストまたはテンプレートのアプリケーション
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "XML: %1$sが読み込めません。"
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -15955,7 +15955,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr ""
+msgstr "XMLが空です"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -16225,7 +16225,7 @@ msgstr "文字列で指定してください"
 #: include/classes/api/services/CDRule.php:309
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr "数字で指定してください"
+msgstr "数値で指定してください"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
@@ -16546,7 +16546,7 @@ msgstr "有効なLDAPユーザーが必要です"
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\"から\"%2$s\"の値で設定してください"
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:177
 msgid "new"
@@ -16737,7 +16737,7 @@ msgstr "タグ\"%1$s\"が間違っています"
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr ""
+msgstr "テキスト\"%1$s\"が間違っています"
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
