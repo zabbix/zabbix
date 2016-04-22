@@ -23,8 +23,6 @@ if (!opt('from') || !opt('till'))
 	fail("usage: --from <timestamp> --till <timestamp> [OPTIONS]");
 }
 
-my @probes;
-
 set_slv_config(get_rsm_config());
 
 db_connect();
