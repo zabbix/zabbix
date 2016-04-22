@@ -1403,6 +1403,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.18rc1
 
 New features:
+A.F....... [ZBX-1357] updated French translation; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 
