@@ -2963,15 +2963,14 @@ unsigned int	zbx_alarm_off(void)
  ******************************************************************************/
 void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 {
-
 #ifdef _WINDOWS
 	struct _timeb	current_time;
 
-	_ftime_s(&current_time);
+	_ftime(&current_time);
 
-	*milliseconds = current_time.millitm / 1000;
+	*milliseconds = current_time.millitm;
 
-	localtime(tm);
+	*tm = *localtime(current_time.time);
 #else
 	struct timeval	current_time;
 
@@ -2980,7 +2979,6 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 	*milliseconds = current_time.tv_usec / 1000;
 
 	localtime_r(&current_time.tv_sec, tm);
-
 #endif
 	/* time zone offset */
 	if (NULL != tz_offset)
