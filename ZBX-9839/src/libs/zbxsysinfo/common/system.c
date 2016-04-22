@@ -53,16 +53,8 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 				1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
 				tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
 
-		/* time zone offset */
-		if (0 <= tz_offset.hours)
-		{
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "+");
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%02d:%02d",
-					(int)tz_offset.hours, (int)tz_offset.minutes);
-		}
-		else
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%03d:%02d",
-					(int)tz_offset.hours, (int)tz_offset.minutes);
+		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%c%02d:%02d",
+				tz_offset.sign, tz_offset.hours, tz_offset.minutes);
 
 		SET_STR_RESULT(result, strdup(buf));
 	}

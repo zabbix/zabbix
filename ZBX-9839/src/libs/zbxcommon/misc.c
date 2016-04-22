@@ -2963,16 +2963,15 @@ unsigned int	zbx_alarm_off(void)
  ******************************************************************************/
 void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 {
-	struct tm	tm_local;
 
 #ifdef _WINDOWS
-	struct timeb	current_time;
+	struct _timeb	current_time;
 
 	_ftime_s(&current_time);
 
 	*milliseconds = current_time.millitm / 1000;
 
-	if (0 == localtime_s(&tm_local, &current_time.time))
+	localtime(tm);
 #else
 	struct timeval	current_time;
 
@@ -2980,26 +2979,13 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 
 	*milliseconds = current_time.tv_usec / 1000;
 
-	if (NULL != localtime_r(&current_time.tv_sec, &tm_local))
-#endif
-	{
-		*tm = tm_local;
-	}
-	else
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		memset(tm, 0, sizeof(struct tm));
-	}
+	localtime_r(&current_time.tv_sec, tm);
 
+#endif
 	/* time zone offset */
 	if (NULL != tz_offset)
 	{
-
-#if defined(HAVE_TM_TM_GMTOFF)
-		tz_offset->hours = (short)(tm_local.tm_gmtoff / SEC_PER_HOUR);
-		tz_offset->minutes = (short)((abs(tm_local.tm_gmtoff) - abs(tz_offset->hours) * SEC_PER_HOUR) /
-				SEC_PER_MIN);
-#else
+#if !defined(HAVE_TM_TM_GMTOFF)
 		int		day_diff, min_diff;
 		struct tm	tm_utc;
 #ifdef _WINDOWS
@@ -3008,9 +2994,14 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 		gmtime_r(&current_time.tv_sec, &tm_utc);
 #endif
 
-		min_diff = (tm_local.tm_hour - tm_utc.tm_hour) * MIN_PER_HOUR + (tm_local.tm_min - tm_utc.tm_min);
+		min_diff = (tm->tm_hour - tm_utc.tm_hour) * MIN_PER_HOUR + (tm->tm_min - tm_utc.tm_min);
 
-		day_diff = tm_local.tm_yday - tm_utc.tm_yday;
+		day_diff = tm->tm_yday - tm_utc.tm_yday;
+
+		if (0 <= min_diff)
+			tz_offset->sign = '+';
+		else
+			tz_offset->sign = '-';
 
 		/* the date difference can be only 0, 1 or -1 otherwise it is a year change */
 		if ((day_diff == 1) || (day_diff < -1))
@@ -3018,8 +3009,11 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 		else if ((day_diff == -1) || (day_diff > 1))
 			min_diff -= HOURS_PER_DAY * MIN_PER_HOUR;
 
-		tz_offset->hours = (short)(min_diff / MIN_PER_HOUR);
-		tz_offset->minutes = (short)(abs(min_diff % MIN_PER_HOUR));
+		tz_offset->hours = abs(min_diff / MIN_PER_HOUR);
+		tz_offset->minutes = abs(min_diff % MIN_PER_HOUR);
+#else
+		tz_offset->hours = tm->tm_gmtoff / SEC_PER_HOUR;
+		tz_offset->minutes = (abs(tm->tm_gmtoff) - abs(tz_offset->hours) * SEC_PER_HOUR) / SEC_PER_MIN;
 #endif
 	}
 }
@@ -3034,9 +3028,9 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
  *     year  - [IN] year                                                      *
  *     month - [IN] month                                                     *
  *     mday  - [IN] date                                                      *
- *     hour  - [IN] hours                                                     *
- *     min   - [IN] minutes                                                   *
- *     sec   - [IN] seconds                                                   *
+ *     hour  - [IN] hour                                                      *
+ *     min   - [IN] minute                                                    *
+ *     sec   - [IN] second                                                    *
  *                                                                            *
  * Return value:  Epoch timestamp - given the value is positive               *
  *                FAIL - otherwise                                            *
@@ -3052,21 +3046,21 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec)
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 	/* minimal sanity checking not to access outside of the array */
-	if ((unsigned) sec >= 61)	/* minutes	[0-61] where 60, 61 being leap seconds	*/
+	if (0 > sec && sec < 61)	/* minutes	[0-61] where 60, 61 being leap seconds	*/
 		return FAIL;
-	if ((unsigned) min >= 59)	/* minutes	[0-59]					*/
+	if (0 > min && min < 59)	/* minutes	[0-59]					*/
 		return FAIL;
-	if ((unsigned) hour >= 23)	/* hours	[0-23]					*/
+	if (0 > hour && hour < 23)	/* hours	[0-23]					*/
 		return FAIL;
-	if ((unsigned) mday >= 31)	/* day		[0-31]					*/
+	if (0 >= mday && mday < 31)	/* day		[1-31]					*/
 		return FAIL;
-	if ((unsigned) mon >= 11)	/* months	[0-11]					*/
+	if (0 >= mon && mon < 12)	/* months	[1-12]					*/
 		return FAIL;
 	if (year < epoch_year)
 		return FAIL;
 
 	/* checking if the date is past February */
-	feb_year = year - (mon < 2);
+	feb_year = mon < 3 ? year - 1 : year;
 
 	/* if a year is divisible by 4 then it IS a leap year		*/
 	/* if a year is divisible by 100 then it IS NOT a leap year	*/
