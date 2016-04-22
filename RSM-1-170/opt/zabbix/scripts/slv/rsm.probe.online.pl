@@ -41,7 +41,7 @@ init_values();
 
 foreach my $probe (keys(%$all_probes_ref))
 {
-	my @result = grep(/^$probe$/, @$probe_times_ref);
+	my @result = grep(/^$probe$/, keys(%{$probe_times_ref}));
 	my $status = (@result ? UP : DOWN);
 	my $status_str = ($status == UP ? "Up" : "Down");
 
