@@ -34,14 +34,14 @@ dbg("selected period: ", selected_period($from, $till), ", with value timestamp:
 
 my $all_probes_ref = get_probes();
 
-my $online_probes_ref = get_online_probes($from, $till, $probe_avail_limit, $all_probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $all_probes_ref);
 
 print(ts_full($value_ts), "\n");
 init_values();
 
 foreach my $probe (keys(%$all_probes_ref))
 {
-	my @result = grep(/^$probe$/, @$online_probes_ref);
+	my @result = grep(/^$probe$/, @$probe_times_ref);
 	my $status = (@result ? UP : DOWN);
 	my $status_str = ($status == UP ? "Up" : "Down");
 
