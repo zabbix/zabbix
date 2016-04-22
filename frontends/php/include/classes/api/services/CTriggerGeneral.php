@@ -691,7 +691,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
 
 		foreach ($new_triggers as $tnum => &$new_trigger) {
-			$new_trigger['triggerid'] = $triggerid++;
+			$new_trigger['triggerid'] = bcadd($triggerid, 1, 0);
 			$triggers[$tnum]['triggerid'] = $new_trigger['triggerid'];
 
 			foreach ($triggers_functions[$tnum] as $trigger_function) {
@@ -910,7 +910,10 @@ abstract class CTriggerGeneral extends CApiService {
 		 *         'keys' => [
 		 *             <key> => [
 		 *                 'itemid' => <itemid>,
-		 *                 'value_type' => <value_type>
+		 *                 'key' => <key>,
+		 *                 'value_type' => <value_type>,
+		 *                 'flags' => <flags>,
+		 *                 'lld_ruleid' => <itemid> (CTriggerProrotype only)
 		 *             ]
 		 *         ]
 		 *     ]
@@ -1205,7 +1208,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			foreach ($triggers_functions[$tnum] as &$trigger_function) {
-				$trigger_function['functionid'] = $functionid++;
+				$trigger_function['functionid'] = bcadd($functionid, 1, 0);
 			}
 			unset($function);
 
