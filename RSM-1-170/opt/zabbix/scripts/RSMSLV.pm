@@ -102,10 +102,10 @@ our @EXPORT = qw($result $dbh $tld
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds get_probe_macros get_ipv_probes
 		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_disconnect db_select db_select_binds
 		db_exec set_slv_config get_cycle_bounds get_rollweek_bounds get_prev_month_bounds get_month_bounds
-		get_month_from get_num_cycles minutes_last_month max_avail_time get_probe_times get_probe_availabilities
-		probe_offline_at probes2tldhostids
+		get_month_from get_num_cycles minutes_last_month max_avail_time get_probe_times get_probe_times2 get_probe_availabilities
+		probe_offline_at probes2tldhostids get_probe_online_key_itemid
 		init_values push_value send_values get_nsip_from_key get_ip_from_nsip is_service_error process_slv_ns_monthly
-		process_slv_avail process_slv_ns_avail process_slv_monthly get_results avail_value_exists
+		process_slv_avail process_slv_ns_avail process_slv_monthly get_results probe_online_value_exists avail_value_exists
 		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
 		get_service_status_itemids get_probe_results get_ip_version
@@ -1258,6 +1258,8 @@ sub get_probe_times
 	my $till = shift;
 	my $probes_ref = shift;	# 'probe' => hostid
 
+	$probes_ref = get_probes() unless ($probes_ref);
+
 	my $hostids = join(',', values(%$probes_ref));
 
 	my $items_ref = db_select(
@@ -1268,7 +1270,7 @@ sub get_probe_times
 
 	if (scalar(@{$items_ref}) == 0)
 	{
-		return __get_probe_times_old($from, $till, $probes_ref);
+		return get_probe_times2($from, $till, $probes_ref);
 	}
 
 	my $result;
@@ -1322,9 +1324,17 @@ sub get_probe_times
 		}
 
 	}
+
+	return $result;
 }
 
-sub __get_probe_times_old
+# Old way of getting online probe statuses. Uses 3 methods
+# - proxy lastaccess
+# - automatic status (calculated by simple check on the probe, self-check)
+# - manual status (manually turn off probe)
+#
+# Must return results the same way get_probe_times() does.
+sub get_probe_times2
 {
 	my $from = shift;
 	my $till = shift;
@@ -1468,6 +1478,13 @@ sub __probe2tldhostid
 		" where host='$tld $probe'");
 
 	return $rows_ref->[0]->[0] || fail("internal error: cannot get TLD-probe host ID ('$tld-$probe')");
+}
+
+sub get_probe_online_key_itemid
+{
+	my $probe = shift;
+
+	return get_itemid_by_host($probe, PROBE_KEY_ONLINE);
 }
 
 sub init_values
@@ -2021,6 +2038,18 @@ sub __get_item_values
 	}
 
 	return $result;
+}
+
+sub probe_online_value_exists
+{
+        my $clock = shift;
+        my $itemid = shift;
+
+        my $rows_ref = db_select("select 1 from history_uint where itemid=$itemid and clock=$clock");
+
+        return SUCCESS if ($rows_ref->[0]->[0]);
+
+        return E_FAIL;
 }
 
 sub avail_value_exists
