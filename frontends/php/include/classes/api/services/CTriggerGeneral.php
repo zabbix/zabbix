@@ -167,7 +167,7 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($_db_triggers) {
 			$trigger['triggerid'] = $_db_triggers[0]['triggerid'];
 
-			$this->checkIfExistsOnHost($trigger, $host['hostid']);
+			$this->checkIfExistsOnHost($trigger);
 			$db_trigger = $_db_triggers[0];
 		}
 		// no child trigger found
