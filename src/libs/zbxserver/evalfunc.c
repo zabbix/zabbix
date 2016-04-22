@@ -371,144 +371,91 @@ out:
 #define OP_BAND		9
 #define OP_MAX		10
 
-static int	evaluate_COUNT_one(unsigned char value_type, int op, history_value_t *value, const char *arg2,
-		const char *arg2_2, zbx_vector_ptr_t *regexps)
+static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t pattern, zbx_uint64_t mask)
 {
-	zbx_uint64_t	 arg2_uint64, arg2_2_uint64;
-	double		 arg2_double;
-
-	switch (value_type)
+	switch (op)
 	{
-		case ITEM_VALUE_TYPE_UINT64:
-			if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_uint64))
-				return FAIL;
-
-			switch (op)
-			{
-				case OP_EQ:
-					if (value->ui64 == arg2_uint64)
-						return SUCCEED;
-					break;
-				case OP_NE:
-					if (value->ui64 != arg2_uint64)
-						return SUCCEED;
-					break;
-				case OP_GT:
-					if (value->ui64 > arg2_uint64)
-						return SUCCEED;
-					break;
-				case OP_GE:
-					if (value->ui64 >= arg2_uint64)
-						return SUCCEED;
-					break;
-				case OP_LT:
-					if (value->ui64 < arg2_uint64)
-						return SUCCEED;
-					break;
-				case OP_LE:
-					if (value->ui64 <= arg2_uint64)
-						return SUCCEED;
-					break;
-				case OP_BAND:
-					if (NULL != arg2_2)
-					{
-						if (SUCCEED != is_uint64(arg2_2, &arg2_2_uint64))
-							return FAIL;
-					}
-					else
-						arg2_2_uint64 = arg2_uint64;
-
-					if (arg2_uint64 == (value->ui64 & arg2_2_uint64))
-						return SUCCEED;
-					break;
-			}
-
-			break;
-		case ITEM_VALUE_TYPE_FLOAT:
-			if (SUCCEED != is_double_suffix(arg2))
-				return FAIL;
-			arg2_double = str2double(arg2);
-
-			switch (op)
-			{
-				case OP_EQ:
-					if (value->dbl > arg2_double - ZBX_DOUBLE_EPSILON &&
-							value->dbl < arg2_double + ZBX_DOUBLE_EPSILON)
-					{
-						return SUCCEED;
-					}
-					break;
-				case OP_NE:
-					if (!(value->dbl > arg2_double - ZBX_DOUBLE_EPSILON &&
-							value->dbl < arg2_double + ZBX_DOUBLE_EPSILON))
-					{
-						return SUCCEED;
-					}
-					break;
-				case OP_GT:
-					if (value->dbl >= arg2_double + ZBX_DOUBLE_EPSILON)
-						return SUCCEED;
-					break;
-				case OP_GE:
-					if (value->dbl > arg2_double - ZBX_DOUBLE_EPSILON)
-						return SUCCEED;
-					break;
-				case OP_LT:
-					if (value->dbl <= arg2_double - ZBX_DOUBLE_EPSILON)
-						return SUCCEED;
-					break;
-				case OP_LE:
-					if (value->dbl < arg2_double + ZBX_DOUBLE_EPSILON)
-						return SUCCEED;
-					break;
-			}
-
-			break;
-		case ITEM_VALUE_TYPE_LOG:
-			switch (op)
-			{
-				case OP_EQ:
-					if (0 == strcmp(value->log->value, arg2))
-						return SUCCEED;
-					break;
-				case OP_NE:
-					if (0 != strcmp(value->log->value, arg2))
-						return SUCCEED;
-					break;
-				case OP_LIKE:
-					if (NULL != strstr(value->log->value, arg2))
-						return SUCCEED;
-					break;
-				case OP_REGEXP:
-					return regexp_match_ex(regexps, value->log->value, arg2, ZBX_CASE_SENSITIVE);
-				case OP_IREGEXP:
-					return regexp_match_ex(regexps, value->log->value, arg2, ZBX_IGNORE_CASE);
-			}
-
-			break;
+		case OP_EQ:
+			if (value == pattern)
+				break;
+		case OP_NE:
+			if (value != pattern)
+				break;
+		case OP_GT:
+			if (value > pattern)
+				break;
+		case OP_GE:
+			if (value >= pattern)
+				break;
+		case OP_LT:
+			if (value < pattern)
+				break;
+		case OP_LE:
+			if (value <= pattern)
+				break;
+		case OP_BAND:
+			if ((value & mask) == pattern)
+				break;
 		default:
-			switch (op)
-			{
-				case OP_EQ:
-					if (0 == strcmp(value->str, arg2))
-						return SUCCEED;
-					break;
-				case OP_NE:
-					if (0 != strcmp(value->str, arg2))
-						return SUCCEED;
-					break;
-				case OP_LIKE:
-					if (NULL != strstr(value->str, arg2))
-						return SUCCEED;
-					break;
-				case OP_REGEXP:
-					return regexp_match_ex(regexps, value->str, arg2, ZBX_CASE_SENSITIVE);
-				case OP_IREGEXP:
-					return regexp_match_ex(regexps, value->str, arg2, ZBX_IGNORE_CASE);
-			}
+			return;
 	}
 
-	return FAIL;
+	(*count)++;
+}
+
+static void	count_one_dbl(int *count, int op, double value, double pattern)
+{
+	switch (op)
+	{
+		case OP_EQ:
+			if (value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON)
+				break;
+		case OP_NE:
+			if (!(value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON))
+				break;
+		case OP_GT:
+			if (value >= pattern + ZBX_DOUBLE_EPSILON)
+				break;
+		case OP_GE:
+			if (value > pattern - ZBX_DOUBLE_EPSILON)
+				break;
+		case OP_LT:
+			if (value <= pattern - ZBX_DOUBLE_EPSILON)
+				break;
+		case OP_LE:
+			if (value < pattern + ZBX_DOUBLE_EPSILON)
+				break;
+		default:
+			return;
+	}
+
+	(*count)++;
+}
+
+static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_ptr_t *regexps)
+{
+	switch (op)
+	{
+		case OP_EQ:
+			if (0 == strcmp(value, pattern))
+				break;
+		case OP_NE:
+			if (0 != strcmp(value, pattern))
+				break;
+		case OP_LIKE:
+			if (NULL != strstr(value, pattern))
+				break;
+		case OP_REGEXP:
+			if (SUCCEED == regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE))
+				break;
+		case OP_IREGEXP:
+			if (SUCCEED == regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE))
+				break;
+		default:
+			return;
+	}
+
+	(*count)++;
 }
 
 /******************************************************************************
@@ -540,6 +487,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	int				arg1, flag, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0;
 	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
+	double				arg2_dbl;
+	zbx_uint64_t			arg2_ui64, arg2_2_ui64;
 	zbx_vector_ptr_t		regexps;
 	zbx_vector_history_record_t	values;
 
@@ -600,7 +549,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 
 	if (OP_UNKNOWN == op)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for function COUNT", arg3);
+		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for function COUNT", arg3);
 		goto out;
 	}
 
@@ -608,20 +557,20 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	{
 		if (NULL != arg3 && '\0' != *arg3 && '\0' == *arg2)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "pattern must be provided along with operator for numeric values");
+			*error = zbx_dsprintf(*error, "pattern must be provided along with operator for numeric values");
 			goto out;
 		}
 
 		if (OP_LIKE == op || OP_REGEXP == op || OP_IREGEXP == op)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting numeric values",
+			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting numeric values",
 					arg3);
 			goto out;
 		}
 
 		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "operator \"band\" is not supported for counting float values");
+			*error = zbx_dsprintf(*error, "operator \"band\" is not supported for counting float values");
 			goto out;
 		}
 
@@ -630,10 +579,45 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 			*arg2_2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
 			arg2_2++;	/* start of the 2nd part of the 2nd parameter (mask) */
 		}
+
+		if (NULL != arg2 && '\0' != *arg2)
+		{
+			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
+			{
+				if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_ui64))
+				{
+					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned value",
+							arg2);
+					goto out;
+				}
+
+				if (NULL != arg2_2)
+				{
+					if (SUCCEED != is_uint64(arg2_2, &arg2_2_ui64))
+					{
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned "
+								"value", arg2_2);
+						goto out;
+					}
+				}
+				else
+					arg2_2_ui64 = arg2_ui64;
+			}
+			else
+			{
+				if (SUCCEED != is_double_suffix(arg2))
+				{
+					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value", arg2);
+					goto out;
+				}
+
+				arg2_dbl = str2double(arg2);
+			}
+		}
 	}
 	else if (OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op && OP_EQ != op && OP_NE != op)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "operator \"%s\" is not supported for counting textual values", arg3);
+		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", arg3);
 		goto out;
 	}
 
@@ -654,20 +638,34 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		nvalues = arg1;
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+	{
+		*error = zbx_strdup(*error, "unable to get values from value cache");
 		goto out;
+	}
 
 	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
 	if ((NULL != arg2 && '\0' != *arg2) || (NULL != arg3 && '\0' != *arg3 &&
 			OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op))
 	{
-		for (i = 0; i < values.values_num; i++)
+		switch (item->value_type)
 		{
-			if (SUCCEED == evaluate_COUNT_one(item->value_type, op, &values.values[i].value, arg2, arg2_2,
-					&regexps))
-			{
-				count++;
-			}
+			case ITEM_VALUE_TYPE_UINT64:
+				for (i = 0; i < values.values_num; i++)
+					count_one_ui64(&count, op, values.values[i].value.ui64, arg2_ui64, arg2_2_ui64);
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+				for (i = 0; i < values.values_num; i++)
+					count_one_dbl(&count, op, values.values[i].value.dbl, arg2_dbl);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				for (i = 0; i < values.values_num; i++)
+					count_one_str(&count, op, values.values[i].value.log->value, arg2, &regexps);
+				break;
+			default:
+				for (i = 0; i < values.values_num; i++)
+					count_one_str(&count, op, values.values[i].value.str, arg2, &regexps);
 		}
+
 	}
 	else
 		count = values.values_num;
