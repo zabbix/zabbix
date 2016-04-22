@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 18:05+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -2708,67 +2708,67 @@ msgstr "Δημιουργήθηκε: Έναυσμα \"%1$s\" σε \"%2$s\"."
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Δημιουργήθηκε: Πρωτότυπο έναυσμα \"%1$s\" σε \"%2$s\"."
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "Κρίσιμο σφάλμα. Το πεδίο \"%1$s\" περιέχει πολυδυφιοσυλλαβικούς χαρακτήρες."
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" είναι υποχρεωτικό."
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι περιοχή IP."
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι IP."
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι ένα χρώμα."
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι δεκαδικός αριθμός."
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι ακέραιος καταλόγου ή περιοχής."
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι ακέραιος."
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" δεν είναι στοιχειοσειρά."
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "Κρίσιμο σφάλμα. Το Πεδίο \"%1$s\" πρέπει να απουσιάζει."
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Κρίσιμο σφάλμα. Λάθος τιμή \"%1$s\" για \"%2$s\" πεδίο."
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Κρίσιμο σφάλμα. Λάθος τιμή \"%1$s\" για \"%2$s\" πεδίο: πρέπει να είναι μεταξύ %3$s και %4$s."
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Κρίσιμο σφάλμα. Λάθος τιμή για πεδίο \"%1$s\": δεν μπορεί να είναι κενό."
@@ -3888,7 +3888,7 @@ msgstr "Down"
 msgid "Download speed for scenario \"%s\"."
 msgstr "Ταχύτητα κατεβάσματος για σενάριο \"%s\"."
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Ταχύτητα κατεβάσματος για βήμα \"%1$s\" του σεναρίου \"%2$s\"."
@@ -9026,7 +9026,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Η λειτουργία \"%s\" υπάρχει ήδη."
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Η λειτουργία δεν εκτελείται λόγω μη εξουσιοδοτημένης αίτησης."
 
@@ -9323,7 +9323,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ΠΡΟΒΛΗΜΑ"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "Η σελίδα έλαβε λάθος δεδομένα"
 
@@ -10096,7 +10096,7 @@ msgstr "Πόρος"
 msgid "Response code"
 msgstr "Κωδικός απόκρισης"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Κωδικός απόκρισης για βήμα \"%1$s\" του σεναρίου \"%2$s\"."
@@ -10105,7 +10105,7 @@ msgstr "Κωδικός απόκρισης για βήμα \"%1$s\" του σεν
 msgid "Response time"
 msgstr "Χρόνος απόκρισης"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Χρόνος απόκρισης για βήμα \"%1$s\" του σεναρίου \"%2$s\"."
@@ -10511,11 +10511,7 @@ msgstr "Το Σενάριο διεγράφη"
 msgid "Scenario disabled"
 msgstr "Το Σενάριο απενεργοποιήθηκε"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "Τό όνομα βήματος σεναρίου θα πρέπει να περιέχει μόνο εκτυπώσιμους χαρακτήρες."
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "Ο αριθμός βήματος σεναρίου δεν μπορεί να είναι μικρότερος απο 1."
 
@@ -11358,7 +11354,7 @@ msgstr "Βήμα"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Βήμα \"%1$s\" [%2$s of %3$s] απέτυχε: %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "Το βήμα \"%s\" υπάρχει ήδη."
@@ -12848,67 +12844,67 @@ msgstr "Προειδοποίηση"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Προειδοποίηση. Δεν μπορούν να εμφανισθούν πλέον του ενός συλλέκτες τύπου \"Graph sum\"."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" είναι υποχρεωτικό."
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι περιοχή IP."
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι IP."
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι χρώμα."
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι δεκαδικός αριθμός."
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι κατάλογος ή περιοχή ακεραίου."
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι ακέραιος."
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" δεν είναι στοιχειοσειρά."
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" είναι περιωρισμένων πολυδυφιοσυλλαβικών χαρακτήρων."
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr "Προειδοποίηση. Το πεδίο \"%1$s\" πρέπει να απουσιάζει."
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδίο \"%1$s\"."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδίο \"%1$s\": δεν μπορεί να είναι κενό."
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Προειδοποίηση. Λανθασμένη τιμή για πεδίο \"%1$s\": πρέπει να είναι μεταξύ %2$s και %3$s."
@@ -12939,12 +12935,12 @@ msgstr "Ιστός"
 msgid "Web checks"
 msgstr "Έλεγχοι ιστού"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Συλλέκτης Ιστού \"%s\" δημιουργήθηκε."
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "Συλλέκτης Ιστού με κλειδί \"%s\" υπάρχει ήδη."
@@ -13362,7 +13358,7 @@ msgstr "Αντιπρόσωπος Zabbix (ενεργός)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix συνολικά"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix έλαβε λανθασμένο αίτημα."
 

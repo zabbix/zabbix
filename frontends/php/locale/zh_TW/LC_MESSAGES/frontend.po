@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 18:05+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
 "PO-Revision-Date: 2012-11-06 09:29+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2698,67 +2698,67 @@ msgstr "已創建: 觸發器 \"%1$s\" 於 \"%2$s\"."
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "已創建: 觸發器原型 \"%1$s\" 於 \"%2$s\"."
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 含有多位元字元."
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 是必要的."
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是IP範圍."
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是IP"
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是顏色."
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 十進位數字."
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "關鍵錯誤. 欄位\"%1$s\"不是整數列表或範圍."
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是整數."
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 不是字串."
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "關鍵錯誤. 欄位 \"%1$s\" 應該未填入."
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "關鍵錯誤. 欄位 \"%2$s\"的值\"%1$s\"錯誤."
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "關鍵錯誤. 欄位 \"%2$s\"的值\"%1$s\"錯誤: 必須在%3$s 和%4$s之間."
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "關鍵錯誤. 欄位 \"%1$s\"的值錯誤: 不能是空白."
@@ -3876,7 +3876,7 @@ msgstr "下"
 msgid "Download speed for scenario \"%s\"."
 msgstr "方案\"%s\"的下載速度."
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "方案\"%2$s\"之步驟\"%1$s\"的下載速度."
@@ -9009,7 +9009,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "由於未認證的請求, 操作無法完成."
 
@@ -9306,7 +9306,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "問題"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "頁面接收到不正確的資料"
 
@@ -10077,7 +10077,7 @@ msgstr "資源"
 msgid "Response code"
 msgstr "資源編碼"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "方案 \"%2$s\" 之步驟 \"%1$s\" 的回應碼."
@@ -10086,7 +10086,7 @@ msgstr "方案 \"%2$s\" 之步驟 \"%1$s\" 的回應碼."
 msgid "Response time"
 msgstr "回應時間"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "方案 \"%2$s\" 之步驟 \"%1$s\" 的回應時間."
@@ -10492,11 +10492,7 @@ msgstr "方案已刪除"
 msgid "Scenario disabled"
 msgstr "方案已失效"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "方案步驟名稱應只含可列印字元"
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "方案步驟號碼不能小於1."
 
@@ -11339,7 +11335,7 @@ msgstr "階段"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "步驟\"%1$s\" [%2$s之於%3$s] 失敗: %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "步驟\"%s\"已存在."
@@ -12825,67 +12821,67 @@ msgstr "警告"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "警告. 無法顯示超過一個類型為\"Graph sum\"的項目."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "警告. 欄位\"%1$s\"是必要的."
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "警告. 欄位\"%1$s\"不是IP範圍."
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "警告. 欄位\"%1$s\"不是IP."
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "警告. 欄位\"%1$s\"不是顏色."
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "警告. 欄位\"%1$s\"不是十進位數字"
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "警告. 欄位\"%1$s\"不是整數列表或範圍."
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "警告. 欄位\"%1$s\"不是整數."
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "警告. 欄位\"%1$s\"不是字串."
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr " 警告. 欄位\"%1$s\"的多位元字元是受限的."
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr " 警告. 缺少了欄位\"%1$s\""
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "警告: 不正確的值予欄位\"%1$s\"."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "警告: 不正確的值予欄位\"%1$s\": 不能是空白."
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "警告: 不正確的值予欄位\"%1$s\": 必需介於 %2$s 和 %3$s."
@@ -12914,12 +12910,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Web檢查"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Web項目\"%s\"已創建."
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "鍵值為\"%s\"的Web項目已創建."
@@ -13337,7 +13333,7 @@ msgstr "Zabbix端點代理程式(主動式)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix整合"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix已接收到一個不正確的請求."
 
