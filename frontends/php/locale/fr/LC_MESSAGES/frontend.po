@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:25+0300\n"
-"PO-Revision-Date: 2016-02-08 13:46+0300\n"
+"PO-Revision-Date: 2016-04-20 07:16+0300\n"
 "Last-Translator: Sébastien <sebastien@maccagnoni.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454931992.0\n"
+"X-POOTLE-MTIME: 1461129396.000000\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:508 api/classes/CMaintenance.php:513
@@ -5164,7 +5164,7 @@ msgstr "Ez Texting"
 #: jsLoader.php:134
 msgctxt "Friday short"
 msgid "F"
-msgstr "F"
+msgstr "V"
 
 #: include/views/js/adm.regexprs.edit.js.php:360
 #: include/views/js/adm.regexprs.edit.js.php:369
@@ -13141,7 +13141,7 @@ msgstr "Support"
 #: include/views/administration.users.edit.php:54
 #: include/views/administration.users.list.php:57 popup.php:633 users.php:46
 msgid "Surname"
-msgstr "Prénom"
+msgstr "Nom de famille"
 
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:483

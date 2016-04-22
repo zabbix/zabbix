@@ -1,6 +1,7 @@
 Changes for 2.2.13rc1
 
 New features:
+A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
