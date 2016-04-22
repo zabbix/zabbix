@@ -4373,34 +4373,27 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 
 	while (SUCCEED == ret && SUCCEED == zbx_token_find(*data, pos, &token))
 	{
-		switch (token.type)
+		if (0 != (token.type & flags))
 		{
-			case ZBX_TOKEN_LLD_MACRO:
-				if (0 != (flags & ZBX_TOKEN_LLD_MACRO))
-				{
+			switch (token.type)
+			{
+				case ZBX_TOKEN_LLD_MACRO:
 					ret = substitute_discovery_macros_lld(data, &token, flags, jp_row, error,
 							max_error_len);
 					pos = token.token.r;
-				}
-				break;
-			case ZBX_TOKEN_USER_MACRO:
-				if (0 != (flags & ZBX_TOKEN_USER_MACRO))
-				{
+					break;
+				case ZBX_TOKEN_USER_MACRO:
 					substitute_discovery_macros_user(data, &token, flags, jp_row);
 					pos = token.token.r;
-				}
-				break;
-			case ZBX_TOKEN_SIMPLE_MACRO:
-				if (0 != (flags & ZBX_TOKEN_SIMPLE_MACRO))
-				{
+					break;
+				case ZBX_TOKEN_SIMPLE_MACRO:
 					substitute_discovery_macros_simple(data, &token, jp_row);
 					pos = token.token.r;
-				}
-				break;
-			case ZBX_TOKEN_FUNC_MACRO:
-				if (0 != (flags & ZBX_TOKEN_FUNC_MACRO))
+					break;
+				case ZBX_TOKEN_FUNC_MACRO:
 					pos = token.token.r;
-				break;
+					break;
+			}
 		}
 
 		pos++;
