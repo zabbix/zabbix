@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:25+0300\n"
-"PO-Revision-Date: 2016-04-01 11:43+0300\n"
+"PO-Revision-Date: 2016-04-22 09:51+0300\n"
 "Last-Translator: 岂几 <tom3000@126.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -14,9 +14,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1459503780.0\n"
+"X-POOTLE-MTIME: 1461311495.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -45,13 +45,13 @@ msgstr "“主机：key值” 关键的预计"
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] "%1$d 天%1$d 每天"
+msgstr[0] "%1$d 天"
 
 #: include/blocks.inc.php:771
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "%1$d of %2$d 问题显示%1$d of %2$d 有问题显示"
+msgstr[0] "%2$d 的问题展示 %1$d "
 
 #: chart4.php:91 chart5.php:105
 #, c-format
@@ -67,7 +67,7 @@ msgstr[0] "%1$s 监控项"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [线: %2$s | 列: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -82,19 +82,19 @@ msgstr[0] "%1$s 天"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] "%1$s 事件%1$s events"
+msgstr[0] "%1$s 事件"
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] "%1$s 项目%1$s 条款"
+msgstr[0] "%1$s 项目"
 
 #: jsLoader.php:220 jsLoader.php:221 jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] "%1$s 分%1$s 分钟"
+msgstr[0] "%1$s 分"
 
 #: include/classes/screens/CScreenActions.php:149
 #: include/views/administration.auditacts.list.php:66
@@ -107,7 +107,7 @@ msgstr[0] "剩余%1$s 重试次数"
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] "%1$s 秒%1$s 每秒"
+msgstr[0] "%1$s 秒"
 
 #: app/views/layout.htmlpage.php:80 include/page_header.php:246
 #, c-format
@@ -129,7 +129,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:532
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - 无穷大)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -420,7 +420,7 @@ msgstr "启用中"
 #: include/views/configuration.maintenance.list.php:41 maintenance.php:140
 #: maintenance.php:146
 msgid "Active since"
-msgstr "作用中自从"
+msgstr "启用自从"
 
 #: include/classes/api/services/CMaintenance.php:357
 #: include/classes/api/services/CMaintenance.php:503
@@ -428,7 +428,7 @@ msgstr "作用中自从"
 #: include/views/configuration.maintenance.list.php:42 maintenance.php:154
 #: maintenance.php:158
 msgid "Active till"
-msgstr "作用中直到"
+msgstr "启用直到"
 
 #: app/views/administration.mediatype.edit.js.php:65
 #: app/views/administration.mediatype.edit.php:101
@@ -709,7 +709,7 @@ msgstr "和"
 #: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:268
 msgid "And/Or"
-msgstr "和/或者"
+msgstr "与/或"
 
 #: include/views/common.filter.trigger.php:35
 #: include/views/common.filter.trigger.php:45
@@ -850,13 +850,13 @@ msgstr "在 %1$s:%2$s 的天 %3$s 的每个 %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "在每%4$s个星期%3$s的%1$s:%2$s"
+msgstr[0] "每隔 %4$s 周的 %3$s %1$s ： %2$s"
 
 #: include/maintenances.inc.php:56
 #, c-format
 msgid "At %1$s:%2$s on every day"
 msgid_plural "At %1$s:%2$s on every %3$s days"
-msgstr[0] "在每隔%3$s天的%1$s:%2$s"
+msgstr[0] "在每隔 %3$s 天的 %1$s ： %2$s"
 
 #: include/forms.inc.php:1921
 msgid "At (hour:minute)"
@@ -877,7 +877,7 @@ msgstr "必须创建至少一个维护期间."
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "拓扑图 \"%1$s\" 需要至少一个或者多个值。"
 
 #: include/classes/setup/CFrontendSetup.php:251
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1383,7 +1383,7 @@ msgstr "不能添加web场景"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "不能调用方法 \"%1$s.%2$s\"  未带参数。"
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -2107,7 +2107,7 @@ msgstr "无法在不同的主机或模板上执行分类"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "无法读取XML： %1$s 。"
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -2160,7 +2160,7 @@ msgstr "无法设置 \"%1$s\" 为触发器 \"%2$s\"."
 #: include/classes/api/services/CItemPrototype.php:306
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "不能设置 \"templateid\" 设置到项目原形 \"%1$s\" 。"
 
 #: include/classes/api/services/CScreen.php:464
 #, c-format
@@ -2516,11 +2516,11 @@ msgstr "区分大小写"
 
 #: include/classes/items/CHelpItems.php:857
 msgid "Catches all SNMP traps that match regex. If regexp is unspecified, catches any trap."
-msgstr ""
+msgstr "采集所有符合规则的SNMP信息，如果没有规则则会采集所有信息。"
 
 #: include/classes/items/CHelpItems.php:853
 msgid "Catches all SNMP traps that were not caught by any of snmptrap[] items."
-msgstr ""
+msgstr "采集所有SNMP traps规则以外的snmptrap[]"
 
 #: include/views/monitoring.screen.constructor.edit.php:710
 msgid "Center"
@@ -4260,11 +4260,11 @@ msgstr "期间T的最大与最小值的差不是 N"
 
 #: popup_trexpr.php:480
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
-msgstr ""
+msgstr "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise"
 
 #: popup_trexpr.php:485
 msgid "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
-msgstr ""
+msgstr "Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -4582,7 +4582,7 @@ msgstr "显示 已自动发现的 %2$s中的%1$s"
 #: include/func.inc.php:1569
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
-msgstr ""
+msgstr "在 %3$s 中打印 %1$s 到 %2$s "
 
 #: include/services.inc.php:26
 msgid "Do not calculate"
@@ -4646,18 +4646,18 @@ msgstr "下拉记住所选的 \"%1$s\"."
 #: include/classes/api/services/CMediatype.php:451
 #, c-format
 msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr ""
+msgstr "%1$s 媒体类型说明值重复。"
 
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
-msgstr ""
+msgstr " \"%2$s\"与\"%1$s\"的名字有冲突。"
 
 #: include/classes/api/services/CMap.php:401
 #: include/classes/api/services/CMap.php:815
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for map."
-msgstr ""
+msgstr "拓扑图 %1$s 名字重复。"
 
 #: include/classes/api/services/CScreen.php:476
 #: include/classes/api/services/CScreen.php:807
@@ -4706,7 +4706,7 @@ msgstr "重复的主机. 有相同主机可视名称\"%s\"的主机已存于数�
 #: include/classes/api/services/CValueMap.php:524
 #, c-format
 msgid "Duplicate mapping value \"%1$s\" for value map \"%2$s\"."
-msgstr ""
+msgstr "\"%2$s\" 与 \"%1$s\" 的mapping 值冲突"
 
 #: include/profiles.inc.php:91
 #, c-format
@@ -4722,25 +4722,25 @@ msgstr "重复的用户别名\"%s\"."
 #: include/classes/api/services/CMap.php:929
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "用户ID \"%1$s\" 与 \"%2$s\" 冲突"
 
 #: include/classes/api/services/CScreen.php:570
 #: include/classes/api/services/CScreen.php:908
 #, c-format
 msgid "Duplicate userid \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "用户ID \"%1$s\" 聚合图形的用户 \"%2$s\" 冲突"
 
 #: include/classes/api/services/CMap.php:583
 #: include/classes/api/services/CMap.php:1002
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "用户组ID \"%1$s\" 与 \"%2$s\" 冲突"
 
 #: include/classes/api/services/CScreen.php:644
 #: include/classes/api/services/CScreen.php:981
 #, c-format
 msgid "Duplicate usrgrpid \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "用户组ID  \"%1$s\" 与 \"%2$s\" 聚合图形用户组冲突"
 
 #: events.php:439 include/events.inc.php:196 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:284
@@ -4786,7 +4786,7 @@ msgstr "编辑聚合图形"
 
 #: include/views/monitoring.slides.php:78
 msgid "Edit slide show"
-msgstr ""
+msgstr "编辑幻灯片"
 
 #: jsLoader.php:187
 msgid "Edit trigger"
@@ -4794,7 +4794,7 @@ msgstr "编辑触发器"
 
 #: include/views/hostmacros.php:46
 msgid "Effective value"
-msgstr ""
+msgstr "可用值"
 
 #: include/views/monitoring.sysmap.edit.php:219
 msgid "Element"
@@ -4844,7 +4844,7 @@ msgstr "空的动作条件。"
 #: include/classes/api/services/CItemPrototype.php:300
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
-msgstr ""
+msgstr "该项目的原型应用名称为 \"%1$s\" 里面是空的。"
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
@@ -4954,7 +4954,7 @@ msgstr "空名字"
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
 msgid "Empty new value in value map \"%1$s\"."
-msgstr ""
+msgstr "新拓扑图 \"%1$s\" 值为空"
 
 #: include/classes/api/services/CImage.php:369
 msgid "Empty parameters"
@@ -4983,7 +4983,7 @@ msgstr "空白时间期间."
 
 #: include/classes/api/services/CValueMap.php:396
 msgid "Empty value map ID."
-msgstr ""
+msgstr "空的拓扑图ID值。"
 
 #: include/classes/api/services/CHttpTest.php:298
 msgid "Empty web scenario ID."
@@ -5252,7 +5252,7 @@ msgstr "执行SQL错误[%1$s]于[%2$s]."
 #: include/classes/items/CHelpItems.php:329
 #: include/classes/items/CHelpItems.php:611
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "执行 WMI 查询返回第一个对象。返回整形、浮点、字符串或者文本内容"
 
 #: app/views/administration.script.edit.php:50
 #: app/views/administration.script.list.php:44
@@ -5453,24 +5453,24 @@ msgstr "字段\"%1$s\"需要手工填写"
 #: include/classes/api/services/CMap.php:558
 #, c-format
 msgid "Field \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "字段  \"%1$s\" 缺少拓扑图 \"%2$s\" 的值。"
 
 #: include/classes/api/services/CMediatype.php:197
 #: include/classes/api/services/CMediatype.php:475
 #: include/classes/api/services/CMediatype.php:808
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
-msgstr ""
+msgstr "字段 \"%1$s\" 缺少媒体类型  \"%2$s\" 的值。"
 
 #: include/classes/api/services/CScreen.php:619
 #, c-format
 msgid "Field \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "字段  \"%1$s\"  缺少聚合图形 \"%2$s\" 的值。"
 
 #: include/validate.inc.php:216
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr ""
+msgstr "字段 \"%1$s\"  设置错误: %2$s"
 
 #: include/validate.inc.php:142
 #, c-format
@@ -5485,7 +5485,7 @@ msgstr "字段 \"%1$s\"不是字符串"
 #: include/classes/api/services/CMediatype.php:802
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
-msgstr ""
+msgstr "字段 \"%1$s\" 需要媒体类型 \"%2$s\"."
 
 #: include/validate.inc.php:285
 #, c-format
@@ -5507,7 +5507,7 @@ msgstr "栏位\"name\"是必需的."
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:555
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
-msgstr ""
+msgstr "文件效验，unix标准算法。返回整数"
 
 #: include/classes/api/services/CImage.php:562
 msgid "File format is unsupported."
@@ -5545,7 +5545,7 @@ msgstr "过滤器"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr ""
+msgstr "过滤"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -5585,12 +5585,12 @@ msgstr "查找文件中的字符串，如果有则返回1，没有则返回0。"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:571
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "查找文件中的字符串，返回内容是被匹配内容的整行字符串，或者其他可选参数"
 
 #: include/classes/items/CHelpItems.php:325
 #: include/classes/items/CHelpItems.php:607
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "查找网页中的字符串，返回内容是被匹配内容的整行字符串，或者其他可选参数"
 
 #: include/classes/setup/CSetupWizard.php:118
 msgid "Finish"
@@ -5637,19 +5637,19 @@ msgstr "访客的密码必须为空"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "Forecast for next t seconds based on period T is < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "Forecast for next t seconds based on period T is = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "Forecast for next t seconds based on period T is > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "Forecast for next t seconds based on period T is NOT N"
 
 #: include/items.inc.php:1345 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -5742,7 +5742,7 @@ msgstr "产生于%s秒"
 
 #: include/locales.inc.php:61
 msgid "Georgian (ka_GE)"
-msgstr ""
+msgstr "Georgian (ka_GE)"
 
 #: include/locales.inc.php:62
 msgid "German (de_DE)"
@@ -5751,7 +5751,7 @@ msgstr "德语 (de_DE)"
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:599
 msgid "Get content of web page. Returns web page source as text"
-msgstr ""
+msgstr "获取网页。返回信息为网页源码或者TXT"
 
 #: include/triggers.inc.php:1329 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -6124,7 +6124,7 @@ msgstr "硬件(全细节)"
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:443
 msgid "Hardware sensor reading. Returns float"
-msgstr ""
+msgstr "硬件传感器读数。返回浮点型"
 
 #: include/views/configuration.httpconf.edit.php:110
 #: include/views/configuration.httpconf.popup.php:97
@@ -6681,7 +6681,7 @@ msgstr "主机接口的IP和DNS不能为空."
 
 #: include/views/configuration.host.list.php:41
 msgid "IP like"
-msgstr ""
+msgstr "IP 地址"
 
 #: include/views/configuration.discovery.edit.php:51
 #: include/views/configuration.discovery.list.php:38
@@ -6742,7 +6742,7 @@ msgstr "IPMI用户名"
 
 #: include/audit.inc.php:39
 msgid "IT service"
-msgstr "IT 服务(业务监控)"
+msgstr "IT 服务"
 
 #: adm.housekeeper.php:45
 msgid "IT service data storage period"
@@ -6767,7 +6767,7 @@ msgstr "IT服务上层"
 #: include/views/configuration.services.list.php:23 srv_status.php:26
 #: srv_status.php:168
 msgid "IT services"
-msgstr "IT服务(业务监控)"
+msgstr "IT服务"
 
 #: app/controllers/CControllerReportServices.php:146
 #: app/views/report.services.php:21
@@ -7032,43 +7032,43 @@ msgstr "网络接口上传流量统计。返回 整数"
 #: include/classes/api/services/CMap.php:871
 #, c-format
 msgid "Incorrect \"height\" value for map \"%1$s\"."
-msgstr ""
+msgstr "拓扑图 \"%1$s\" 高度值错误。"
 
 #: include/classes/api/services/CMap.php:568
 #: include/classes/api/services/CMap.php:988
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for map \"%2$s\"."
-msgstr ""
+msgstr "拓扑图 \"%2$s\" 用户组 \"permission\" 的值 \"%1$s\" 冲突"
 
 #: include/classes/api/services/CScreen.php:629
 #: include/classes/api/services/CScreen.php:967
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in user groups for screen \"%2$s\"."
-msgstr ""
+msgstr "聚合图形 \"%2$s\" 用户组 \"permission\" 的值 \"%1$s\" 冲突"
 
 #: include/classes/api/services/CMap.php:494
 #: include/classes/api/services/CMap.php:915
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for map \"%2$s\"."
-msgstr ""
+msgstr "拓扑图 \"%2$s\" 用户 \"permission\" 的值 \"%1$s\" 冲突"
 
 #: include/classes/api/services/CScreen.php:555
 #: include/classes/api/services/CScreen.php:894
 #, c-format
 msgid "Incorrect \"permission\" value \"%1$s\" in users for screen \"%2$s\"."
-msgstr ""
+msgstr "聚合图形  \"%2$s\" 权限值  \"%1$s\"  异常。"
 
 #: include/classes/api/services/CMap.php:455
 #: include/classes/api/services/CMap.php:877
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "拓扑图 \"%2$s\" 的\"private\" “%1$s\" 值错误。"
 
 #: include/classes/api/services/CScreen.php:516
 #: include/classes/api/services/CScreen.php:856
 #, c-format
 msgid "Incorrect \"private\" value \"%1$s\" for screen \"%2$s\"."
-msgstr ""
+msgstr "聚合图形 \"%2$s\" 的\"private\" 值 \"%1$s\" 异常。"
 
 #: include/classes/api/services/CService.php:1131
 #, c-format
@@ -7079,7 +7079,7 @@ msgstr "在服务 \"%1$s\" 依赖了\"soft\"栏位的错误数据."
 #: include/classes/api/services/CMap.php:865
 #, c-format
 msgid "Incorrect \"width\" value for map \"%1$s\"."
-msgstr ""
+msgstr "拓扑图的宽度值 \"%1$s\" 错误。"
 
 #: include/classes/api/services/CMap.php:641
 #: include/classes/api/services/CMap.php:648
@@ -7495,7 +7495,7 @@ msgstr "错误的资产纪录栏位\"%s\"."
 
 #: include/classes/api/services/CAction.php:1462
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "要执行的动作库存方式是不正确的。"
 
 #: include/classes/api/services/CScreenItem.php:727
 #, c-format
@@ -7824,25 +7824,25 @@ msgstr "自动发现规则 \"%1$s\"的计算类型不正确."
 #: include/classes/api/services/CMap.php:950
 #, c-format
 msgid "Incorrect user ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "拓扑图 \"%1$s\" 用户ID错误。"
 
 #: include/classes/api/services/CScreen.php:591
 #: include/classes/api/services/CScreen.php:929
 #, c-format
 msgid "Incorrect user ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "聚合图形 \"%1$s\" 用户ID错误。"
 
 #: include/classes/api/services/CMap.php:600
 #: include/classes/api/services/CMap.php:1019
 #, c-format
 msgid "Incorrect user group ID specified for map \"%1$s\"."
-msgstr ""
+msgstr "拓扑图 \"%1$s\" 用户组ID错误。"
 
 #: include/classes/api/services/CScreen.php:661
 #: include/classes/api/services/CScreen.php:998
 #, c-format
 msgid "Incorrect user group ID specified for screen \"%1$s\"."
-msgstr ""
+msgstr "聚合图形 \"%1$s\" 用户组ID错误。"
 
 #: include/profiles.inc.php:68
 msgid "Incorrect user group."
@@ -7899,7 +7899,7 @@ msgstr "错误的值\"%1$s\"于无正负的整数栏位\"%2$s\"中."
 #: include/classes/api/services/CMediatype.php:783
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "\"%2$s\" 中 媒体值 \"%3$s\" 的 \"%1$s\" 值错误。"
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:418
@@ -7909,7 +7909,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "字段 \"%1$s\": %2$s 值错误。"
 
 #: include/validate.inc.php:315
 #, c-format
@@ -7918,28 +7918,28 @@ msgstr "字段\"%1$s\"的值不正确:不能为空."
 
 #: include/classes/api/services/CValueMap.php:397
 msgid "Incorrect value map ID."
-msgstr ""
+msgstr "拓扑图ID值错误。"
 
 #: include/classes/api/services/CHost.php:1559
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr ""
+msgstr "在PSK字段使用的值是不正确的。未配置为十六进制字符串。"
 
 #: include/classes/api/services/CHost.php:1542
 msgid "Incorrect value used for connections from host field."
-msgstr ""
+msgstr "用于从主机的连接指定的值是不正确的。"
 
 #: include/classes/api/services/CProxy.php:651
 msgid "Incorrect value used for connections from proxy field."
-msgstr ""
+msgstr "从代理连接指定的值是不正确的。"
 
 #: include/classes/api/services/CHost.php:1538
 msgid "Incorrect value used for connections to host field."
-msgstr ""
+msgstr "用于连接到主机指定的值不正确。"
 
 #: include/classes/api/services/CProxy.php:646
 msgid "Incorrect value used for connections to proxy field."
-msgstr ""
+msgstr "在连接到代理指定的值是不正确的。"
 
 #: include/classes/api/services/CProxy.php:726
 #: include/classes/api/services/CProxy.php:824
@@ -7982,7 +7982,7 @@ msgstr "信息"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:447
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr ""
+msgstr "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and host macros"
@@ -8146,7 +8146,7 @@ msgstr "无效的请求."
 #: include/classes/import/validators/CXmlValidator.php:62
 #, c-format
 msgid "Invalid XML tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "无效的XML标签 \"%1$s\": %2$s."
 
 #: maintenance.php:140 maintenance.php:154 services.php:187 services.php:201
 #, c-format
@@ -8160,7 +8160,7 @@ msgstr "第一个参数无效."
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr ""
+msgstr "更新间隔时间的特别设置是错误的: \"%1$s\" 超出 \"%2$s\" 的最大刷新间隔。"
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8177,97 +8177,97 @@ msgstr "宏 \"%1$s\" 存在无效的 hostid."
 #: items.php:601
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "无效的间隔 \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:395
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
-msgstr ""
+msgstr "无效的间隔 \"%1$s\": %2$s."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:306
 #: include/classes/validators/CItemDelayFlexValidator.php:321
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hour step \"%2$s\"."
-msgstr ""
+msgstr "无效的间隔\"%1$s\" ：无效的小时 \"%2$s\" 。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:269
 #: include/classes/validators/CItemDelayFlexValidator.php:282
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hours \"%2$s\"."
-msgstr ""
+msgstr "错误的间隔 \"%1$s\": 无效的小时 \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:375
 #: include/classes/validators/CItemDelayFlexValidator.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minute step \"%2$s\"."
-msgstr ""
+msgstr "错误的间隔 \"%1$s\": 分钟间隔 \"%2$s\" 错误。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:338
 #: include/classes/validators/CItemDelayFlexValidator.php:351
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minutes \"%2$s\"."
-msgstr ""
+msgstr "错误的间隔 \"%1$s\": 分钟间隔 \"%2$s\" 错误。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:127
 #: include/classes/validators/CItemDelayFlexValidator.php:140
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day \"%2$s\"."
-msgstr ""
+msgstr "错误的间隔 \"%1$s\": 间隔日期 \"%2$s\" 有误。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:165
 #: include/classes/validators/CItemDelayFlexValidator.php:180
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day step \"%2$s\"."
-msgstr ""
+msgstr "更新间隔 \"%1$s\" 是不正确：间隔天数 \"%2$s\" 是不正确的。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:446
 #: include/classes/validators/CItemDelayFlexValidator.php:461
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid second step \"%2$s\"."
-msgstr ""
+msgstr "更新间隔 \"%1$s\" 是不正确：间隔秒 \"%2$s\" 是不正确的。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:408
 #: include/classes/validators/CItemDelayFlexValidator.php:421
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid seconds \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" 与 \"%2$s\" 无效。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:198
 #: include/classes/validators/CItemDelayFlexValidator.php:211
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day \"%2$s\"."
-msgstr ""
+msgstr "更新间隔 \"%1$s\" 是不正确：间隔一周 \"%2$s\" 是不正确的。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:236
 #: include/classes/validators/CItemDelayFlexValidator.php:251
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day step \"%2$s\"."
-msgstr ""
+msgstr "更新间隔 \"%1$s\" 是不正确：间隔工作日 \"%2$s\" 是不正确的。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
-msgstr ""
+msgstr " \"%1$s\" 间隔时间不正确，开始时间必须小于间隔时间。（小时）"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
 msgid "Invalid interval \"%1$s\": starting minute must be less or equal to ending minute."
-msgstr ""
+msgstr "\"%1$s\" 无效的间隔时间，开始分钟必须小于结束的分钟。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:151
 #, c-format
 msgid "Invalid interval \"%1$s\": starting month day must be less or equal to ending month day."
-msgstr ""
+msgstr "\"%1$s\" 无效的间隔时间，开始时间必须小于结束的天数"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:432
 #, c-format
 msgid "Invalid interval \"%1$s\": starting second must be less or equal to ending second."
-msgstr ""
+msgstr "\"%1$s\" 错误的间隔时间 开始的秒数必须小于监控时间的秒数。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:222
 #, c-format
 msgid "Invalid interval \"%1$s\": starting week day must be less or equal to ending week day."
-msgstr ""
+msgstr "\"%1$s\" 无效的间隔时间，开始的星期必须小于结束的星期时间"
 
 #: include/classes/api/services/CDiscoveryRule.php:42
 #, c-format
@@ -8709,7 +8709,7 @@ msgstr "键值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"
 
 #: include/forms.inc.php:576
 msgid "Key like"
-msgstr ""
+msgstr "key"
 
 #: include/views/configuration.action.edit.php:849
 #: include/views/js/common.item.edit.js.php:237
@@ -9009,7 +9009,7 @@ msgstr "安装包列表。返回文本"
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:451
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
-msgstr ""
+msgstr "列表服务。返回0表示空，如果是列表则是每行一个内容"
 
 #: include/locales.inc.php:70
 msgid "Lithuanian (lt_LT)"
@@ -9018,7 +9018,7 @@ msgstr "立陶宛 (lt_LT)"
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:603
 msgid "Loading time of full web page (in seconds). Returns float"
-msgstr ""
+msgstr "全网页加载时间（秒）。返回浮点型"
 
 #: include/classes/screens/CScreenClock.php:92
 msgid "Local"
@@ -9317,7 +9317,7 @@ msgstr "拓扑图"
 #: include/classes/api/services/CMap.php:831
 #, c-format
 msgid "Map \"%1$s\" already exists."
-msgstr ""
+msgstr "拓扑图\"%1$s\"已经存在。"
 
 #: include/classes/api/services/CMap.php:503
 #: include/classes/api/services/CMap.php:577
@@ -9325,7 +9325,7 @@ msgstr ""
 #: include/classes/api/services/CMap.php:996
 #, c-format
 msgid "Map \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "拓扑图 \"%1$s\" 为公开只读不允许共享。"
 
 #: include/views/js/monitoring.sysmaps.js.php:2
 msgid "Map element"
@@ -9359,7 +9359,7 @@ msgstr "映射到"
 #: include/classes/api/services/CValueMap.php:501
 #, c-format
 msgid "Mapping is missing parameters: %1$s for value map \"%2$s\"."
-msgstr ""
+msgstr "拓扑图\"%2$s\"的 %1$s 值无效"
 
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/administration.general.valuemapping.edit.php:71
@@ -9487,7 +9487,7 @@ msgstr "报警媒介类型"
 #: include/classes/api/services/CMediatype.php:439
 #, c-format
 msgid "Media type \"%1$s\" already exists."
-msgstr ""
+msgstr "媒体类型 \"%1$s\" 已经存在。"
 
 #: app/controllers/CControllerMediatypeCreate.php:139
 msgid "Media type added"
@@ -9511,7 +9511,7 @@ msgstr[0] "消息介质类型已启用"
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
 msgid "Media type is missing parameters: %1$s"
-msgstr ""
+msgstr "%1$s 媒体类型缺少参数。"
 
 #: app/controllers/CControllerMediatypeUpdate.php:153
 msgid "Media type updated"
@@ -9540,7 +9540,7 @@ msgstr "内存限制：%1$s"
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:595
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "从字节或总百分比的内存大小。它返回一个整数值，如果字节，只要百分比返回浮点值。"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:431
@@ -9626,7 +9626,7 @@ msgstr "最小的严重级别"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
+msgstr[0] "可显示最短的时间为 %1$s 分。"
 
 #: include/views/common.filter.trigger.php:71
 #: include/views/monitoring.sysmap.edit.php:212
@@ -9665,7 +9665,7 @@ msgstr "缺少\"itemid\" 的监控项栏位"
 #: include/classes/api/services/CItemPrototype.php:294
 #, c-format
 msgid "Missing \"name\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "找不到应用项目原型 \"name\" 字段 \"%1$s\"。"
 
 #: include/classes/api/services/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
@@ -9992,12 +9992,12 @@ msgstr "主机模板的\"%1$s\"未配置"
 #: include/classes/api/services/CMap.php:780
 #, c-format
 msgid "No \"%1$s\" given for map."
-msgstr ""
+msgstr "\"%1$s\" 在拓扑图中未定义。"
 
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
 msgid "No \"%1$s\" given for media type."
-msgstr ""
+msgstr "无\"%1$s\" 给与媒体值"
 
 #: include/classes/api/services/CScreen.php:757
 #: include/classes/api/services/CScreen.php:1020
@@ -10013,7 +10013,7 @@ msgstr "聚合图形的 \"%1$s\"未配置"
 #: include/classes/api/services/CValueMap.php:395
 #, c-format
 msgid "No \"%1$s\" given for value map."
-msgstr ""
+msgstr "值 \"%1$s\" 在拓扑图中未定义"
 
 #: include/classes/api/services/CHttpTest.php:297
 #, c-format
@@ -10280,7 +10280,7 @@ msgstr "主机\"%s\" 没有提供接口."
 
 #: include/classes/api/services/CAction.php:1457
 msgid "No inventory mode specified for action operation."
-msgstr ""
+msgstr "要执行的动作的库存模式没有被设定。"
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
@@ -10644,7 +10644,7 @@ msgstr "已监控主机的数量"
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:375
 msgid "Number of out-of-window collisions. Returns integer"
-msgstr ""
+msgstr "网络冲突数量。返回整型"
 
 #: include/classes/items/CHelpItems.php:691
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -10763,7 +10763,7 @@ msgstr "VMware hypervisor管理的虚拟机数量，<url>-VMware服务URL，<uui
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:587
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr ""
+msgstr "数或inode的百分比。返回数字，如果是浮点则是百分比"
 
 #: include/forms.inc.php:452 include/items.inc.php:127
 #: include/triggers.inc.php:1777 include/views/configuration.item.edit.php:216
@@ -11584,7 +11584,7 @@ msgstr "播放声音"
 #: include/classes/setup/CSetupWizard.php:342
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
-msgstr ""
+msgstr "请检查配置参数。如果无误请按%1$s\" ，如果需要修改请按 \"%2$s\" "
 
 #: include/classes/setup/CSetupWizard.php:272
 #, c-format
@@ -11780,13 +11780,13 @@ msgstr "问题"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "CPU进程百分比。返回浮点值"
 
 #: include/views/monitoring.screen.list.php:81
 #: include/views/monitoring.slideconf.list.php:64
 #: include/views/monitoring.sysmap.list.php:56
 msgid "Properties"
-msgstr ""
+msgstr "属性"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:266
@@ -11853,7 +11853,7 @@ msgstr "agent代理程序已添加"
 #: include/views/monitoring.slideconf.edit.php:241
 #: include/views/monitoring.sysmap.edit.php:344
 msgid "Public"
-msgstr ""
+msgstr "公开"
 
 #: include/views/configuration.action.edit.php:823
 #: include/views/configuration.host.discovery.edit.php:162
@@ -11877,7 +11877,7 @@ msgstr "队列"
 
 #: queue.php:66
 msgid "Queue of items to be updated"
-msgstr ""
+msgstr "项目队列已被更新"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -11900,7 +11900,7 @@ msgstr "只读"
 #: include/views/js/monitoring.sysmap.edit.js.php:12
 #: include/views/js/monitoring.sysmap.edit.js.php:45
 msgid "Read-only"
-msgstr ""
+msgstr "只读"
 
 #: include/forms.inc.php:256 include/perm.inc.php:31
 #: include/views/administration.usergroups.edit.php:93
@@ -12374,7 +12374,7 @@ msgstr "于主机上执行远程命令"
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
-msgstr ""
+msgstr "即在主机上指定的命令的执行。返回命令执行结果的文本值。如果指定NOWAIT的模式，这将返回执行命令的结果1。"
 
 #: include/locales.inc.php:76
 msgid "Russian (ru_RU)"
@@ -12490,7 +12490,7 @@ msgstr "SNMPv3 客户端"
 #: include/classes/debug/CProfiler.php:132
 #, c-format
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
-msgstr ""
+msgstr "SQL count: %1$s (selects: %2$s | executes: %3$s)"
 
 #: include/items.inc.php:1343
 #: include/views/configuration.host.discovery.edit.php:185
@@ -12629,7 +12629,7 @@ msgstr "图表 \"%1$s\"单元格X - %2$s Y - %3$s太大."
 #: include/classes/api/services/CScreen.php:975
 #, c-format
 msgid "Screen \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "聚合图形 \"%1$s\" 只读，不能共享。"
 
 #: include/classes/api/services/CScreenItem.php:822
 #, c-format
@@ -12740,7 +12740,7 @@ msgstr "脚本参数"
 #: include/classes/api/services/CMediatype.php:632
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "脚本参数 \"%1$s\"  没有在上一个换行中找到对应 \"%2$s\" 的媒体类型。"
 
 #: include/classes/debug/CProfiler.php:124
 msgid "Script profiler"
@@ -13080,14 +13080,14 @@ msgstr "分享"
 #: include/classes/api/services/CMap.php:978
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for map \"%2$s\"."
-msgstr ""
+msgstr "共享选项 \"%1$s\" 没有在拓补图中指定值 \"%2$s\" 。"
 
 #: include/classes/api/services/CScreen.php:545
 #: include/classes/api/services/CScreen.php:884
 #: include/classes/api/services/CScreen.php:957
 #, c-format
 msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
-msgstr ""
+msgstr "共享选项 \"%1$s\" 没有在聚合图形中指定值 \"%2$s\" 。"
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:391
 #: tr_status.php:729 tr_status.php:734
@@ -13184,7 +13184,7 @@ msgstr "注册"
 
 #: app/views/layout.htmlpage.menu.php:56
 msgid "Sign out"
-msgstr ""
+msgstr "退出"
 
 #: include/views/js/configuration.graph.edit.js.php:39
 msgid "Simple"
@@ -13265,7 +13265,7 @@ msgstr "幻灯片播放\"%1$s\"已经存在."
 #: include/screens.inc.php:484 include/screens.inc.php:492
 #, c-format
 msgid "Slide show \"%1$s\" is public and read-only sharing is disallowed."
-msgstr ""
+msgstr "幻灯片 \"%1$s\" 是公共只读，不能共享。"
 
 #: include/screens.inc.php:330
 #, c-format
@@ -13505,7 +13505,7 @@ msgstr "步骤持续时间"
 
 #: include/views/configuration.httpconf.popup.php:114 popup_httpstep.php:24
 msgid "Step of web scenario"
-msgstr ""
+msgstr "web 方案步骤"
 
 #: include/views/configuration.httpconf.popup.php:33
 #, c-format
@@ -13553,7 +13553,7 @@ msgstr "主题"
 #: include/views/configuration.host.prototype.edit.php:380
 msgctxt "encryption certificate"
 msgid "Subject"
-msgstr ""
+msgstr "主体"
 
 #: jsLoader.php:213
 msgid "Submap"
@@ -13878,7 +13878,7 @@ msgstr "测试字符串"
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:217
 msgid "Text"
-msgstr "文字"
+msgstr "文本"
 
 #: include/classes/api/clients/CLocalApiClient.php:99
 #, c-format
@@ -13898,11 +13898,11 @@ msgstr "图表\"%3$s\"上的位于X坐标为%1$s坐标为%2$s的图表元素的Y
 #: include/views/configuration.application.list.php:99
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "该应用程序不再被发现，并且会被删除 %1$s (在 %2$s 和 %3$s)."
 
 #: include/views/configuration.application.list.php:94
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "该应用程序不再被发现，并在下一次发现规则处理时删除。"
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
@@ -14061,7 +14061,7 @@ msgstr "时间(降序)"
 
 #: include/classes/items/CHelpItems.php:919
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <num>) spent in <state> in percentage."
-msgstr "处在<state>状态下的某个或一组zabbix进程（由<type>和<num>指定)的百分比时间."
+msgstr "处在 <state> 状态下的某个或一组zabbix进程（由 <type> 和 <num> 指定）的百分比时间。"
 
 #: include/classes/items/CHelpItems.php:923
 msgid "Time of proxy last access. Name - proxy name. Param - lastaccess. Unix timestamp."
@@ -14078,19 +14078,19 @@ msgstr "排班"
 
 #: popup_trexpr.php:618
 msgid "Time to reach threshold estimated based on period T is < N"
-msgstr ""
+msgstr "在周期T里，阀值预计<N"
 
 #: popup_trexpr.php:628
 msgid "Time to reach threshold estimated based on period T is = N"
-msgstr ""
+msgstr "在周期T里，阀值预计=N"
 
 #: popup_trexpr.php:623
 msgid "Time to reach threshold estimated based on period T is > N"
-msgstr ""
+msgstr "在周期T里，阀值预计>N"
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
+msgstr "在周期T里，阀值预计不等于N"
 
 #: include/views/monitoring.screen.constructor.edit.php:613
 msgid "Time type"
@@ -14155,7 +14155,7 @@ msgstr "交易尚未被关闭. 放弃中..."
 
 #: include/classes/items/CHelpItems.php:981
 msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr ""
+msgstr "将转换后的SQL查询到低级别的发现JSON对象的执行结果。"
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
@@ -14190,7 +14190,7 @@ msgstr "趋势"
 
 #: include/forms.inc.php:563
 msgid "Trends (in days)"
-msgstr ""
+msgstr "趋势（日）"
 
 #: events.php:294 events.php:340 include/actions.inc.php:43
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:488
@@ -14325,7 +14325,7 @@ msgstr "触发器模板\"%1$s\"中包含了来自多个自动发现规则的项�
 #: include/classes/import/CConfigurationImport.php:1157
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "触发器模板 \"%1$s\" 依赖于触发器 \"%2$s\" ,但它不存在。"
 
 #: include/classes/api/services/CTriggerPrototype.php:1569
 #, c-format
@@ -14338,7 +14338,7 @@ msgstr "触发器模板已添加"
 
 #: include/classes/api/services/CTriggerPrototype.php:1191
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
-msgstr ""
+msgstr "原型的触发将不能够依靠从自己继承了触发。"
 
 #: trigger_prototypes.php:234
 msgid "Trigger prototype deleted"
@@ -14560,7 +14560,7 @@ msgstr "信息类型"
 
 #: include/classes/api/services/CItemGeneral.php:346
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "信息的类型必须是“数字（符号）”或“数字（浮点）”为总项目。"
 
 #: include/forms.inc.php:863
 msgid "Types"
@@ -14607,7 +14607,7 @@ msgstr "URL C"
 #: include/classes/api/services/CMap.php:1153
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
-msgstr ""
+msgstr "URL名称应该是拓扑图 \"%1$s\" 中唯一的。"
 
 #: include/html.inc.php:108
 msgid "URL parameter cannot be array."
@@ -14621,7 +14621,7 @@ msgstr "URL 参数名为空."
 #: include/classes/api/services/CMap.php:1147
 #, c-format
 msgid "URL should have both \"name\" and \"url\" fields for map \"%1$s\"."
-msgstr ""
+msgstr "拓扑图 \"%1$s\" URL、名称为必填项。"
 
 #: include/views/js/monitoring.sysmaps.js.php:162
 #: include/views/monitoring.sysmap.edit.php:270 jsLoader.php:217
@@ -15190,13 +15190,13 @@ msgstr "用户组被用于接收数据库宕机信息\"%1$s\"."
 #: include/classes/api/services/CMap.php:969
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "拓扑图 \"%2$s\" 用户组共享找不到参数 %1$s"
 
 #: include/classes/api/services/CScreen.php:610
 #: include/classes/api/services/CScreen.php:948
 #, c-format
 msgid "User group sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "聚合图形 \"%2$s\" 用户组共享找不到参数 %1$s"
 
 #: include/menu.inc.php:274
 #: include/views/administration.usergroups.edit.php:22
@@ -15217,7 +15217,7 @@ msgstr "用户是不允许删除自己"
 #: include/classes/api/services/CUserMacro.php:642
 #, c-format
 msgid "User macro missing parameters: %1$s"
-msgstr ""
+msgstr "用户宏缺少参数： %1$s"
 
 #: include/classes/api/services/CUser.php:301
 #, c-format
@@ -15268,13 +15268,13 @@ msgstr "用户会话"
 #: include/classes/api/services/CMap.php:896
 #, c-format
 msgid "User sharing is missing parameters: %1$s for map \"%2$s\"."
-msgstr ""
+msgstr "拓扑图 \"%2$s\" 用户共享缺少参数 %1$s "
 
 #: include/classes/api/services/CScreen.php:536
 #: include/classes/api/services/CScreen.php:875
 #, c-format
 msgid "User sharing is missing parameters: %1$s for screen \"%2$s\"."
-msgstr ""
+msgstr "聚合图形 \"%2$s\" 用户共享缺少参数 %1$s 。"
 
 #: include/views/administration.users.edit.php:388
 #: include/views/administration.users.edit.php:392
@@ -15477,7 +15477,7 @@ msgstr "VMware 虚拟机私有内存大小, <url> - VMware 服务 URL, <uuid> - 
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware virtual 处理器准备时间 %, <url> -  VMware 服务URL，<uuid> - VMware virtual 主机名"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15599,7 +15599,7 @@ msgstr[0] "值对应已删除"
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
 msgid "Value map is missing parameters: %1$s"
-msgstr ""
+msgstr "拓扑图缺少参数值  %1$s "
 
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/api/services/CValueMap.php:423
@@ -15623,12 +15623,12 @@ msgstr "映射值"
 
 #: include/views/conf.import.php:69
 msgid "Value mappings for value maps will be updated!"
-msgstr ""
+msgstr "拓扑图映射值已更新！"
 
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "所有Windows计数器值。返回 整形、浮点、字符串、文本"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -15825,7 +15825,7 @@ msgstr "欢迎来到"
 
 #: include/views/administration.users.edit.php:200 popup_media.php:132
 msgid "When active"
-msgstr "当作用中时"
+msgstr "当启用时"
 
 #: graphs.php:41 include/views/configuration.graph.edit.php:60
 #: include/views/configuration.graph.list.php:73
@@ -15969,7 +15969,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr ""
+msgstr "XML空"
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -15994,11 +15994,11 @@ msgstr "纵轴Y侧"
 
 #: include/translateDefines.inc.php:33
 msgid "Y-m-d"
-msgstr "Y-m-d"
+msgstr "Y/m/d"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i"
-msgstr "Y-m-d H:i"
+msgstr "Y/m/d H:i:s"
 
 #: include/translateDefines.inc.php:30
 msgid "Y-m-d H:i:s"
@@ -16234,15 +16234,15 @@ msgstr "[错误的月计数: \"%s\" ]"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
 #: include/classes/validators/CNewValidator.php:231
 msgid "a character string is expected"
-msgstr ""
+msgstr "请在字符串中指定"
 
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "一个数值预计"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
-msgstr ""
+msgstr "只影响过滤后的数据"
 
 #: include/hosts.inc.php:462
 msgid "agent"
@@ -16274,12 +16274,12 @@ msgstr "所有介质"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:186
 msgid "an array is expected"
-msgstr ""
+msgstr "请在阵列中指定"
 
 #: include/classes/import/validators/C10XmlValidator.php:385
 #: include/classes/import/validators/C10XmlValidator.php:407
 msgid "an empty string is expected"
-msgstr ""
+msgstr "请指定一个空字符串"
 
 #: include/views/monitoring.history.php:165
 msgid "as Blue"
@@ -16553,7 +16553,7 @@ msgstr "必需为一个正确的LDAP用户"
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "必须在 \"%1$s\" 和 \"%2$s\" 之间"
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:177
 msgid "new"
@@ -16709,7 +16709,7 @@ msgstr "模板ID\"%1$s\"已传送%2$s次"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:115
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr ""
+msgstr "标签 \"%1$s\" 丢失"
 
 #: include/classes/api/services/CMap.php:622
 #: include/classes/api/services/CMap.php:1042 include/events.inc.php:34
@@ -16723,7 +16723,7 @@ msgstr "在此输入搜索"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"
-msgstr ""
+msgstr "更新间隔的结束是不正确"
 
 #: include/classes/parsers/CItemKey.php:178
 msgid "unexpected end of key"
@@ -16731,20 +16731,20 @@ msgstr "非期望的关键字结束"
 
 #: include/classes/parsers/CUserMacroParser.php:45
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "宏的结束是不正确"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:81
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr ""
+msgstr "标签 \"%1$s\" 异常"
 
 #: include/classes/import/readers/CXmlImportReader.php:78
 #: include/classes/import/readers/CXmlImportReader.php:113
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr ""
+msgstr "异常的文本 \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407

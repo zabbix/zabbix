@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-22 16:25+0300\n"
-"PO-Revision-Date: 2016-03-26 01:21+0300\n"
+"PO-Revision-Date: 2016-04-20 11:25+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1458948110.0\n"
+"X-POOTLE-MTIME: 1461144311.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363
@@ -9215,7 +9215,7 @@ msgstr "M"
 #: jsLoader.php:125
 msgctxt "Monday short"
 msgid "M"
-msgstr "M"
+msgstr "S"
 
 #: include/hosts.inc.php:154 include/views/inventory.host.list.php:66
 msgid "MAC address A"
@@ -12472,7 +12472,7 @@ msgstr "S"
 #: jsLoader.php:131
 msgctxt "Sunday short"
 msgid "S"
-msgstr "S"
+msgstr "D"
 
 #: include/views/configuration.host.discovery.edit.php:129
 #: include/views/configuration.item.edit.php:138
@@ -13755,7 +13755,7 @@ msgstr "Tempo desde a carga do sistema. Retorna: número inteiro"
 #: jsLoader.php:128
 msgctxt "Thursday short"
 msgid "T"
-msgstr "T"
+msgstr "Q"
 
 #: jsLoader.php:126
 msgctxt "Tuesday short"
@@ -14142,7 +14142,7 @@ msgstr "Até"
 #: include/views/configuration.triggers.expression.php:93 jsLoader.php:134
 #: popup_trexpr.php:33 popup_trexpr.php:130
 msgid "Time"
-msgstr "Data"
+msgstr "Hora"
 
 #: include/views/monitoring.screen.constructor.edit.php:460
 msgid "Time (ascending)"
@@ -15791,7 +15791,7 @@ msgstr "O nome visível não pode ser vazio se o nome do host não for informado
 #: jsLoader.php:127
 msgctxt "Wednesday short"
 msgid "W"
-msgstr "W"
+msgstr "Q"
 
 #: adm.triggerseverities.php:34 adm.triggerseverities.php:35
 #: include/items.inc.php:33
@@ -16881,7 +16881,7 @@ msgstr "via"
 #: include/func.inc.php:561 jsLoader.php:97
 msgctxt "year short"
 msgid "y"
-msgstr "y"
+msgstr "a"
 
 #: include/html.inc.php:726
 msgid "yyyy"
