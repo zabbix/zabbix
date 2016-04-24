@@ -16,16 +16,17 @@ use strict;
 use warnings;
 use RSM;
 use RSMSLV;
+use Parallel;
 
 use constant VALUE_INVALID	=> -1;	# used internally
 
 my $cfg_key_in = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
 my $cfg_keys_out =
 {
-	'failed'	=> 'rsm.slv.dns.ns.rtt.tcp.failed',
-	'max'		=> 'rsm.slv.dns.ns.rtt.tcp.max',
-	'avg'		=> 'rsm.slv.dns.ns.rtt.tcp.avg',
-	'pfailed'	=> 'rsm.slv.dns.ns.rtt.tcp.pfailed'
+	'failed'	=> 'rsm.slv.dns.tcp.rtt.failed',
+	'max'		=> 'rsm.slv.dns.tcp.rtt.max',
+	'avg'		=> 'rsm.slv.dns.tcp.rtt.avg',
+	'pfailed'	=> 'rsm.slv.dns.tcp.rtt.pfailed'
 };
 
 parse_opts('tld=s', 'now=i');
