@@ -1630,35 +1630,49 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
 
-					send_err = SUCCEED;
-
-					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
+					if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log[] or logrt[] */
 					{
-						send_err = process_value(server, port, hostname, key, item_value,
-								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
-								NULL, NULL, flags | ZBX_METRIC_FLAG_PERSISTENT,
-								stopwatch);
+						send_err = SUCCEED;
 
-						zbx_free(item_value);
+						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+								ZBX_CASE_SENSITIVE, output_template, &item_value))
+						{
+							send_err = process_value(server, port, hostname, key,
+									item_value, ITEM_STATE_NORMAL, &lastlogsize1,
+									mtime, NULL, NULL, NULL, NULL,
+									flags | ZBX_METRIC_FLAG_PERSISTENT, stopwatch);
+
+							zbx_free(item_value);
+
+							if (SUCCEED == send_err)
+							{
+								*lastlogsize_sent = lastlogsize1;
+								if (NULL != mtime_sent)
+									*mtime_sent = *mtime;
+
+								(*s_count)--;
+							}
+						}
 
 						if (SUCCEED == send_err)
 						{
-							*lastlogsize_sent = lastlogsize1;
-							if (NULL != mtime_sent)
-								*mtime_sent = *mtime;
-
-							(*s_count)--;
+							*lastlogsize = lastlogsize1;
+							*big_rec = 1;	/* ignore the rest of this record */
 						}
 					}
-
-					(*p_count)--;
-
-					if (SUCCEED == send_err)
+					else	/* log.count[] or logrt.count[] */
 					{
+						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+								ZBX_CASE_SENSITIVE, NULL, NULL))
+						{
+							(*s_count)--;
+						}
+
 						*lastlogsize = lastlogsize1;
 						*big_rec = 1;	/* ignore the rest of this record */
 					}
+
+					(*p_count)--;
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -1699,32 +1713,45 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
 
-					send_err = SUCCEED;
-
-					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
-							output_template, &item_value))
+					if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))   /* log[] or logrt[] */
 					{
-						send_err = process_value(server, port, hostname, key, item_value,
-								ITEM_STATE_NORMAL, &lastlogsize1, mtime, NULL, NULL,
-								NULL, NULL, flags | ZBX_METRIC_FLAG_PERSISTENT,
-								stopwatch);
+						send_err = SUCCEED;
 
-						zbx_free(item_value);
+						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+								ZBX_CASE_SENSITIVE, output_template, &item_value))
+						{
+							send_err = process_value(server, port, hostname, key,
+									item_value, ITEM_STATE_NORMAL, &lastlogsize1,
+									mtime, NULL, NULL, NULL, NULL,
+									flags | ZBX_METRIC_FLAG_PERSISTENT, stopwatch);
+
+							zbx_free(item_value);
+
+							if (SUCCEED == send_err)
+							{
+								*lastlogsize_sent = lastlogsize1;
+								if (NULL != mtime_sent)
+									*mtime_sent = *mtime;
+
+								(*s_count)--;
+							}
+						}
 
 						if (SUCCEED == send_err)
+							*lastlogsize = lastlogsize1;
+					}
+					else	/* log.count[] or logrt.count[] */
+					{
+						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+								ZBX_CASE_SENSITIVE, NULL, NULL))
 						{
-							*lastlogsize_sent = lastlogsize1;
-							if (NULL != mtime_sent)
-								*mtime_sent = *mtime;
-
 							(*s_count)--;
 						}
+
+						*lastlogsize = lastlogsize1;
 					}
 
 					(*p_count)--;
-
-					if (SUCCEED == send_err)
-						*lastlogsize = lastlogsize1;
 
 					if ('\0' != *encoding)
 						zbx_free(value);
@@ -1781,6 +1808,8 @@ out:
  *     filename        - [IN] logfile name                                    *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN] file modification time for reporting to server  *
+ *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
+ *     mtime_sent      - [OUT] mtime value that was last sent                 *
  *     skip_old_data   - [IN/OUT] start from the beginning of the file or     *
  *                       jump to the end                                      *
  *     big_rec         - [IN/OUT] state variable to remember whether a long   *

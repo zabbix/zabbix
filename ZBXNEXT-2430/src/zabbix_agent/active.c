@@ -1024,7 +1024,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	AGENT_REQUEST	request;
 	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
 	char		*encoding_uc = NULL, *max_delay_str;
-	int		rate, ret = FAIL, s_count, p_count, is_count_item, max_delay_par_nr;
+	int		rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr, mtime_orig;
+	zbx_uint64_t	lastlogsize_orig;
 	float		max_delay;
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
@@ -1136,9 +1137,21 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 	/* do not flood local system if file grows too fast */
 	if (0 == is_count_item)
+	{
 		p_count = 4 * s_count;				/* log[], logrt[] */
+	}
 	else
-		p_count = s_count;				/* log.count[], logrt.count[] */
+	{
+		/* In log.count[] and logrt.count[] items the variable 's_count' (max number of lines allowed to be */
+		/* sent to server) is used for counting matching lines in logfile(s). 's_count' is counted from max */
+		/* value down towards 0. */
+
+		p_count = s_count_orig = s_count;
+
+		/* remember current position */
+		lastlogsize_orig = metric->lastlogsize;
+		mtime_orig = metric->mtime;
+	}
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
@@ -1148,6 +1161,32 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	if (SUCCEED == ret)
 	{
 		metric->error_count = 0;
+
+		/* send log.count[] or logrt.count[] item value to server */
+
+		if (1 == is_count_item)
+		{
+			int	match_count;			/* number of matching lines */
+			char	buf[ZBX_MAX_UINT64_LEN];
+
+			match_count = s_count_orig - s_count;
+
+			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
+
+			if (SUCCEED == process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, buf,
+					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL))
+			{
+				*lastlogsize_sent = metric->lastlogsize;
+				*mtime_sent = metric->mtime;
+			}
+			else
+			{
+				/* unable to send data, restore original position to try again in next check */
+				metric->lastlogsize = lastlogsize_orig;
+				metric->mtime =  mtime_orig;
+			}
+		}
 	}
 	else
 	{
