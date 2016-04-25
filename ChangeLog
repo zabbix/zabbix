@@ -123,7 +123,7 @@ New features:
 A.F....... [ZBX-1357] updated English (United States), Italian, Japanese, Korean, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-10385] fixed "Case sensistive" checkbox on regular expression test function (Sasha)
+..F....... [ZBX-10385] fixed "Case sensitive" checkbox on regular expression test function (Sasha)
 ..F....... [ZBX-10381] fixed validation of length of a command in the Administration->Scripts form (Sasha)
 ....I..... [ZBX-10384] fixed upgrade of screens, maps and slide shows to make public them for simple users (Sasha)
 ..F....... [ZBX-10382] fixed "Too few arguments" error in the user profile form (Sasha)
