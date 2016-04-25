@@ -86,7 +86,7 @@
 						expression : $('#expressions_' + index + '_expression').val(),
 						expression_type : $('#expressions_' + index + '_expression_type').val(),
 						exp_delimiter : $('#expressions_' + index + '_exp_delimiter').val(),
-						case_sensitive : $('#expressions_' + index + '_case_sensitive').val()
+						case_sensitive : $('#expressions_' + index + '_case_sensitive').is(':checked') ? '1' : '0'
 					}
 				});
 
@@ -147,8 +147,6 @@
 						default:
 							expression_type_str = '';
 					}
-
-					console.log($('#expressions_' + index + '_expression_type').val());
 
 					$('#testResultTable').append(obj.testTableRowTpl.evaluate({
 						expression: $('#expressions_' + index + '_expression').val(),

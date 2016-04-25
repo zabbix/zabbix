@@ -553,9 +553,9 @@ class CApplication extends CApiService {
 
 		// mass add applications for children
 		foreach ($itemIds as $itemId) {
-			$dbChilds = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.zbx_dbstr($itemId));
+			$dbChildren = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE i.templateid='.zbx_dbstr($itemId));
 
-			while ($child = DBfetch($dbChilds)) {
+			while ($child = DBfetch($dbChildren)) {
 				$dbApplications = DBselect(
 					'SELECT a1.applicationid'.
 					' FROM applications a1,applications a2'.

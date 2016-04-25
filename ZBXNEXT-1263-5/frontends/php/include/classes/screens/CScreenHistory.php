@@ -142,12 +142,18 @@ class CScreenHistory extends CScreenBase {
 				if (empty($this->plaintext)) {
 					$historyTable = (new CTableInfo())
 						->setHeader([
-							_('Timestamp'),
+							(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
 							$isManyItems ? _('Item') : null,
-							$useLogItem ? _('Local time') : null,
-							($useEventLogItem && $useLogItem) ? _('Source') : null,
-							($useEventLogItem && $useLogItem) ? _('Severity') : null,
-							($useEventLogItem && $useLogItem) ? _('Event ID') : null,
+							$useLogItem ? (new CColHeader(_('Local time')))->addClass(ZBX_STYLE_CELL_WIDTH) : null,
+							($useEventLogItem && $useLogItem)
+								? (new CColHeader(_('Source')))->addClass(ZBX_STYLE_CELL_WIDTH)
+								: null,
+							($useEventLogItem && $useLogItem)
+								? (new CColHeader(_('Severity')))->addClass(ZBX_STYLE_CELL_WIDTH)
+								: null,
+							($useEventLogItem && $useLogItem)
+								? (new CColHeader(_('Event ID')))->addClass(ZBX_STYLE_CELL_WIDTH)
+								: null,
 							_('Value')
 						]);
 				}
@@ -158,7 +164,7 @@ class CScreenHistory extends CScreenBase {
 						$options['excludeSearch'] = 1;
 					}
 				}
-				$options['sortfield'] = 'id';
+				$options['sortfield'] = ['itemid', 'clock'];
 
 				$historyData = API::History()->get($options);
 
@@ -198,6 +204,7 @@ class CScreenHistory extends CScreenBase {
 						$row = [];
 
 						$row[] = (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock'])))
+							->addClass(ZBX_STYLE_NOWRAP)
 							->addClass($color);
 
 						if ($isManyItems) {
@@ -206,22 +213,27 @@ class CScreenHistory extends CScreenBase {
 						}
 
 						if ($useLogItem) {
-							$row[] = (new CCol(
-								($data['timestamp'] != 0)
-									? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp'])
-									: ''
-							))->addClass($color);
+							$row[] = ($data['timestamp'] != 0)
+								? (new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp'])))
+									->addClass(ZBX_STYLE_NOWRAP)
+									->addClass($color)
+								: '';
 
 							// if this is a eventLog item, showing additional info
 							if ($useEventLogItem) {
-								$row[] = (new CCol($data['source']))->addClass($color);
+								$row[] = (new CCol($data['source']))
+									->addClass(ZBX_STYLE_NOWRAP)
+									->addClass($color);
 								$row[] = ($data['severity'] != 0)
 									? (new CCol(get_item_logtype_description($data['severity'])))
+										->addClass(ZBX_STYLE_NOWRAP)
 										->addClass(get_item_logtype_style($data['severity']))
 									: '';
-								$row[] = (new CCol(
-									($data['logeventid'] != 0) ? $data['logeventid'] : ''
-								))->addClass($color);
+								$row[] = ($data['logeventid'] != 0)
+									? (new CCol($data['logeventid']))
+										->addClass(ZBX_STYLE_NOWRAP)
+										->addClass($color)
+									: '';
 							}
 						}
 
@@ -243,7 +255,10 @@ class CScreenHistory extends CScreenBase {
 			// numeric, float
 			else {
 				if (empty($this->plaintext)) {
-					$historyTable = (new CTableInfo())->setHeader([_('Timestamp'), _('Value')]);
+					$historyTable = (new CTableInfo())->setHeader([
+						(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH),
+						_('Value')
+					]);
 				}
 
 				$options['sortfield'] = ['itemid', 'clock'];
@@ -265,7 +280,8 @@ class CScreenHistory extends CScreenBase {
 						}
 
 						$historyTable->addRow([
-							zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']),
+							(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock'])))
+								->addClass(ZBX_STYLE_NOWRAP),
 							new CPre(zbx_nl2br($value))
 						]);
 					}
@@ -286,7 +302,7 @@ class CScreenHistory extends CScreenBase {
 		if (!$this->plaintext && str_in_array($this->action, [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
 			$graphDims = getGraphDims();
 
-			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($firstItem['itemid']));
+			$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid([$firstItem]));
 
 			$this->dataId = 'historyGraph';
 
