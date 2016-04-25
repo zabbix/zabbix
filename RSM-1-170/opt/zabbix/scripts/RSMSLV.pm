@@ -1480,7 +1480,7 @@ sub get_probe_online_key_itemid
 {
 	my $probe = shift;
 
-	return get_itemid_by_host($probe, PROBE_KEY_ONLINE);
+	return get_itemid_by_host("$probe - mon", PROBE_KEY_ONLINE);
 }
 
 sub init_values
