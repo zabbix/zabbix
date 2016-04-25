@@ -363,11 +363,10 @@ class CMaintenance extends CApiService {
 			}
 
 			// validate timeperiods
-			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])) {
+			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])
+					|| !$maintenance['timeperiods']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
-
-			$insert[$mnum] = $maintenance;
 
 			foreach ($maintenance['timeperiods'] as $timeperiod) {
 				if (!is_array($timeperiod)) {
@@ -385,6 +384,8 @@ class CMaintenance extends CApiService {
 				$insertTimeperiods[$tid] = $timeperiod;
 				$timeperiods[$tid] = $mnum;
 			}
+
+			$insert[$mnum] = $maintenance;
 		}
 		$maintenanceids = DB::insert('maintenances', $insert);
 		$timeperiodids = DB::insert('timeperiods', $insertTimeperiods);
@@ -508,7 +509,8 @@ class CMaintenance extends CApiService {
 			}
 
 			// validate timeperiods
-			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])) {
+			if (!array_key_exists('timeperiods', $maintenance) || !is_array($maintenance['timeperiods'])
+					|| !$maintenance['timeperiods']) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('At least one maintenance period must be created.'));
 			}
 

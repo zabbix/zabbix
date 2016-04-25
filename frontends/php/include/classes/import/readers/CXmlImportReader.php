@@ -31,6 +31,10 @@ class CXmlImportReader extends CImportReader {
 	 * @return array
 	 */
 	public function read($string) {
+		if ($string === '') {
+			throw new Exception(_s('Cannot read XML: %1$s.', _('XML is empty')));
+		}
+
 		libxml_use_internal_errors(true);
 		libxml_disable_entity_loader(true);
 		$result = simplexml_load_string($string, null, LIBXML_IMPORT_FLAGS);
@@ -39,80 +43,106 @@ class CXmlImportReader extends CImportReader {
 			libxml_clear_errors();
 
 			foreach ($errors as $error) {
-				$text = '';
-
-				switch ($error->level) {
-					case LIBXML_ERR_WARNING:
-						$text .= _s('XML file contains warning %1$s:', $error->code);
-						break;
-					case LIBXML_ERR_ERROR:
-						$text .= _s('XML file contains error %1$s:', $error->code);
-						break;
-					case LIBXML_ERR_FATAL:
-						$text .= _s('XML file contains fatal error %1$s:', $error->code);
-						break;
-				}
-
-				$text .= trim($error->message).' [ Line: '.$error->line.' | Column: '.$error->column.' ]';
-				throw new Exception($text);
+				throw new Exception(_s('Cannot read XML: %1$s.', _s('%1$s [Line: %2$s | Column: %3$s]',
+					'('.$error->code.') '.trim($error->message), $error->line, $error->column
+				)));
 			}
 		}
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-		$array = $this->xmlToArray($xml);
+		$data = $this->xml_to_array($xml);
 		$xml->close();
-		return $array;
+		return $data;
 	}
 
 	/**
 	 * Method for recursive processing of xml dom nodes.
 	 *
 	 * @param XMLReader $xml
+	 * @param string    $path
 	 *
 	 * @return array|string
 	 */
-	protected function xmlToArray(XMLReader $xml) {
-		$array = '';
+	protected function xml_to_array(XMLReader $xml, $path = '') {
+		$data = null;
+
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
-					$nodeName = $xml->name;
-					if (isset($array[$nodeName])) {
-						$nodeName .= count($array);
+					if ($data === null) {
+						$data = [];
+					}
+					elseif (!is_array($data)) {
+						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
+							_s('unexpected text "%1$s"', trim($data))
+						));
 					}
 
-					// a special case for 1.8 import where attributes are still used
-					// attributes must be added to the array as if they where child elements
+					$node_name = $xml->name;
+					$sub_path = $path.'/'.$node_name;
+					if (array_key_exists($node_name, $data)) {
+						$node_name .= count($data);
+						$sub_path .= '('.count($data).')';
+					}
+
+					/*
+					 * A special case for 1.8 import where attributes are still used attributes must be added to the
+					 * array as if they where child elements.
+					 */
 					if ($xml->hasAttributes) {
 						while ($xml->moveToNextAttribute()) {
-							$array[$nodeName][$xml->name] = $xml->value;
+							$data[$node_name][$xml->name] = $xml->value;
 						}
 
-						// we assume that an element with attributes always contains child elements, not a text node
-						// works for 1.8 XML
-						$xmlToArray = $this->xmlToArray($xml);
-						if (is_array($xmlToArray)) {
-							foreach ($xmlToArray as $name => $value) {
-								$array[$nodeName][$name] = $value;
+						/*
+						 * We assume that an element with attributes always contains child elements, not a text node
+						 * works for 1.8 XML.
+						 */
+						$child_data = $this->xml_to_array($xml, $sub_path);
+						if (is_array($child_data)) {
+							foreach ($child_data as $child_node_name => $child_node_value) {
+								if (array_key_exists($child_node_name, $data[$node_name])) {
+									$child_node_name .= count($data[$node_name]);
+								}
+								$data[$node_name][$child_node_name] = $child_node_value;
 							}
+						}
+						elseif ($child_data !== '') {
+							throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $sub_path,
+								_s('unexpected text "%1$s"', trim($child_data))
+							));
 						}
 					}
 					else {
-						$array[$nodeName] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml);
+						$data[$node_name] = $xml->isEmptyElement ? '' : $this->xml_to_array($xml, $sub_path);
+					}
+					break;
+
+				case XMLReader::TEXT:
+					if ($data === null) {
+						$data = $xml->value;
+					}
+					elseif (is_array($data)) {
+						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
+							_s('unexpected text "%1$s"', trim($xml->value))
+						));
 					}
 
 					break;
 
-				case XMLReader::TEXT:
-					$array = $xml->value;
-					break;
-
 				case XMLReader::END_ELEMENT:
-					return $array;
+					/*
+					 * For tags with empty value: <dns></dns>.
+					 */
+					if ($data === null) {
+						$data = '';
+					}
+
+					return $data;
 			}
 		}
 
-		return $array;
+		return $data;
 	}
 }

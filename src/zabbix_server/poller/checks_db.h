@@ -25,6 +25,8 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
+#ifdef HAVE_UNIXODBC
 int	get_value_db(DC_ITEM *item, AGENT_RESULT *result);
+#endif
 
 #endif
