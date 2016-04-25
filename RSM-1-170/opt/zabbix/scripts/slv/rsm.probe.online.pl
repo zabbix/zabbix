@@ -37,7 +37,6 @@ my $all_probes_ref = get_probes();
 my $probe_times_ref = get_probe_times2($from, $till, $all_probes_ref);
 my @online_probes = keys(%{$probe_times_ref});
 
-print(ts_full($value_ts), "\n");
 init_values();
 
 foreach my $probe (keys(%$all_probes_ref))
