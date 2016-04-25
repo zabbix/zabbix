@@ -50,7 +50,7 @@ foreach my $probe (keys(%$all_probes_ref))
 
 	my $status_str = ($status == UP ? "Up" : "Down");
 
-	push_value($probe, $cfg_key_out, $value_ts, $status, $status_str);
+	push_value("$probe - mon", $cfg_key_out, $value_ts, $status, $status_str);
 }
 
 send_values();
