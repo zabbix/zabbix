@@ -621,6 +621,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
+	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
+			ZBX_TCP_SEC_TLS_PSK != tls_connect)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
