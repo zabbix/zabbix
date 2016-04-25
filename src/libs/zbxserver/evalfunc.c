@@ -242,7 +242,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 		char	logeventid[16];
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
-		if (SUCCEED == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
+		if (MATCH == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -377,30 +377,32 @@ static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t 
 	{
 		case OP_EQ:
 			if (value == pattern)
-				break;
+				(*count)++;
+			break;
 		case OP_NE:
 			if (value != pattern)
-				break;
+				(*count)++;
+			break;
 		case OP_GT:
 			if (value > pattern)
-				break;
+				(*count)++;
+			break;
 		case OP_GE:
 			if (value >= pattern)
-				break;
+				(*count)++;
+			break;
 		case OP_LT:
 			if (value < pattern)
-				break;
+				(*count)++;
+			break;
 		case OP_LE:
 			if (value <= pattern)
-				break;
+				(*count)++;
+			break;
 		case OP_BAND:
 			if ((value & mask) == pattern)
-				break;
-		default:
-			return;
+				(*count)++;
 	}
-
-	(*count)++;
 }
 
 static void	count_one_dbl(int *count, int op, double value, double pattern)
@@ -409,53 +411,60 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	{
 		case OP_EQ:
 			if (value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON)
-				break;
+				(*count)++;
+			break;
 		case OP_NE:
 			if (!(value > pattern - ZBX_DOUBLE_EPSILON && value < pattern + ZBX_DOUBLE_EPSILON))
-				break;
+				(*count)++;
+			break;
 		case OP_GT:
 			if (value >= pattern + ZBX_DOUBLE_EPSILON)
-				break;
+				(*count)++;
+			break;
 		case OP_GE:
 			if (value > pattern - ZBX_DOUBLE_EPSILON)
-				break;
+				(*count)++;
+			break;
 		case OP_LT:
 			if (value <= pattern - ZBX_DOUBLE_EPSILON)
-				break;
+				(*count)++;
+			break;
 		case OP_LE:
 			if (value < pattern + ZBX_DOUBLE_EPSILON)
-				break;
-		default:
-			return;
+				(*count)++;
 	}
-
-	(*count)++;
 }
 
 static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_ptr_t *regexps)
 {
+	int res;
+
 	switch (op)
 	{
 		case OP_EQ:
 			if (0 == strcmp(value, pattern))
-				break;
+				(*count)++;
+			break;
 		case OP_NE:
 			if (0 != strcmp(value, pattern))
-				break;
+				(*count)++;
+			break;
 		case OP_LIKE:
 			if (NULL != strstr(value, pattern))
-				break;
+				(*count)++;
+			break;
 		case OP_REGEXP:
-			if (SUCCEED == regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE))
-				break;
+			if (MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+				(*count)++;
+			else if (FAIL == res)
+				(*count) = FAIL;
+			break;
 		case OP_IREGEXP:
-			if (SUCCEED == regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE))
-				break;
-		default:
-			return;
+			if (MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
+				(*count)++;
+			else if (FAIL == res)
+				(*count) = FAIL;
 	}
-
-	(*count)++;
 }
 
 /******************************************************************************
@@ -658,14 +667,19 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 					count_one_dbl(&count, op, values.values[i].value.dbl, arg2_dbl);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				for (i = 0; i < values.values_num; i++)
+				for (i = 0; i < values.values_num && FAIL != count; i++)
 					count_one_str(&count, op, values.values[i].value.log->value, arg2, &regexps);
 				break;
 			default:
-				for (i = 0; i < values.values_num; i++)
+				for (i = 0; i < values.values_num && FAIL != count; i++)
 					count_one_str(&count, op, values.values[i].value.str, arg2, &regexps);
 		}
 
+		if (FAIL == count)
+		{
+			*error = zbx_strdup(*error, "invalid regular expression");
+			goto out;
+		}
 	}
 	else
 		count = values.values_num;
@@ -1623,9 +1637,9 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-			return regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE);
+			return (MATCH == regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
 		case ZBX_FUNC_IREGEXP:
-			return regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE);
+			return (MATCH == regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE) ? SUCCEED : FAIL);
 	}
 
 	return FAIL;

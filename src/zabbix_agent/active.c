@@ -1294,12 +1294,12 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-				if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-						SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+				if (MATCH == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+						MATCH == regexp_match_ex(&regexps, str_severity, key_severity,
 								ZBX_IGNORE_CASE) &&
-						SUCCEED == regexp_match_ex(&regexps, provider, key_source,
+						MATCH == regexp_match_ex(&regexps, provider, key_source,
 								ZBX_IGNORE_CASE) &&
-						SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+						MATCH == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 								ZBX_CASE_SENSITIVE))
 				{
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
@@ -1390,11 +1390,11 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 			zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-			if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+			if (MATCH == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+					MATCH == regexp_match_ex(&regexps, str_severity, key_severity,
 							ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+					MATCH == regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) &&
+					MATCH == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 							ZBX_CASE_SENSITIVE))
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,

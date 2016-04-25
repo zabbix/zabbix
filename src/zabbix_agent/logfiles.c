@@ -1630,7 +1630,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					send_err = SUCCEED;
 
-					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
+					if (MATCH == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							output_template, &item_value))
 					{
 						send_err = process_value(server, port, hostname, key, item_value,
@@ -1698,7 +1698,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 
 					send_err = SUCCEED;
 
-					if (SUCCEED == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
+					if (MATCH == regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							output_template, &item_value))
 					{
 						send_err = process_value(server, port, hostname, key, item_value,
