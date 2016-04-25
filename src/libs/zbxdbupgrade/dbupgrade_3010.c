@@ -47,6 +47,13 @@ static int	DBpatch_3010003(void)
 	return DBdrop_field("history_text", "id");
 }
 
+static int	DBpatch_3010004(void)
+{
+	const ZBX_FIELD	field = {"maintenance_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -57,5 +64,6 @@ DBPATCH_ADD(3010000, 0, 1)
 DBPATCH_ADD(3010001, 0, 1)
 DBPATCH_ADD(3010002, 0, 1)
 DBPATCH_ADD(3010003, 0, 1)
+DBPATCH_ADD(3010004, 0, 1)
 
 DBPATCH_END()
