@@ -35,7 +35,8 @@ $triggersForm = (new CForm())
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '')
-	->addVar('remove_recovery_expression', '');
+	->addVar('remove_recovery_expression', '')
+	->addVar('recovery_mode', $data['recovery_mode']);
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $data['triggerid']);
