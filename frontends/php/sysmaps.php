@@ -424,7 +424,7 @@ else {
 	order_result($data['maps'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['maps'], $sortOrder);
+	$data['paging'] = getPagingLine($data['maps'], $sortOrder, new CUrl('sysmaps.php'));
 
 	// render view
 	$mapView = new CView('monitoring.sysmap.list', $data);

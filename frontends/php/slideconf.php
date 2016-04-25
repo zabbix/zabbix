@@ -414,7 +414,7 @@ else {
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['slides'], $sortOrder);
+	$data['paging'] = getPagingLine($data['slides'], $sortOrder, new CUrl('slideconf.php'));
 
 	// render view
 	$slideshowView = new CView('monitoring.slideconf.list', $data);

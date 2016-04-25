@@ -83,6 +83,7 @@ class CScreenHistory extends CScreenBase {
 	 * @param int		$options['markColor']
 	 * @param boolean	$options['plaintext']
 	 * @param array		$options['items']
+	 * @param array		$options['itemids']
 	 */
 	public function __construct(array $options = []) {
 		parent::__construct($options);
@@ -90,13 +91,13 @@ class CScreenHistory extends CScreenBase {
 		$this->resourcetype = SCREEN_RESOURCE_HISTORY;
 
 		// mandatory
-		$this->filter = isset($options['filter']) ? $options['filter'] : null;
+		$this->filter = isset($options['filter']) ? $options['filter'] : '';
 		$this->filterTask = isset($options['filter_task']) ? $options['filter_task'] : null;
-		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : null;
+		$this->markColor = isset($options['mark_color']) ? $options['mark_color'] : MARK_COLOR_RED;
 		$this->graphType = isset($options['graphtype']) ? $options['graphtype'] : GRAPH_TYPE_NORMAL;
 
 		// optional
-		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : null;
+		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->items = array_key_exists('items', $options) ?  $options['items'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
 	}
@@ -109,7 +110,7 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = [];
 
-		if ($this->itemids !== null && !$this->items) {
+		if ($this->itemids && !$this->items) {
 			$this->items = API::Item()->get([
 				'itemids' => $this->itemids,
 				'webitems' => true,
