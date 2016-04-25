@@ -1502,7 +1502,7 @@ function getTriggerFormData(array $data) {
 	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 		if ($analyze !== false) {
-			list($data['outline'], $data['expression_tree']) = $analyze;
+			list($data['expression_formula'], $data['expression_tree']) = $analyze;
 			if ($data['expression_action'] !== '' && $data['expression_tree'] != null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
 					$data['expression_action'], $data['expr_temp']
@@ -1511,7 +1511,7 @@ function getTriggerFormData(array $data) {
 					$data['expression'] = $new_expr;
 					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 					if ($analyze !== false) {
-						list($data['outline'], $data['expression_tree']) = $analyze;
+						list($data['expression_formula'], $data['expression_tree']) = $analyze;
 					}
 					else {
 						show_messages(false, '', _('Expression syntax error.'));
@@ -1541,7 +1541,7 @@ function getTriggerFormData(array $data) {
 	if ($data['recovery_expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
 		if ($analyze !== false) {
-			list($data['outline'], $data['recovery_expression_tree']) = $analyze;
+			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] != null) {
 				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
 					$data['recovery_expression_action'], $data['recovery_expr_temp']
@@ -1551,7 +1551,7 @@ function getTriggerFormData(array $data) {
 					$data['recovery_expression'] = $new_expr;
 					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
 					if ($analyze !== false) {
-						list($data['outline'], $data['recovery_expression_tree']) = $analyze;
+						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 					}
 					else {
 						show_messages(false, '', _('Recovery expression syntax error.'));

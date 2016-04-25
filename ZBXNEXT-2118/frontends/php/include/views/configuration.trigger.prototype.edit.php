@@ -90,7 +90,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$expression_row[] = $insertMacroButton;
 
 	array_push($expression_row, BR());
-	if (empty($data['outline'])) {
+	if (empty($data['expression_formula'])) {
 		// add button
 		$add_expression_button = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($data['limited']) {
@@ -209,7 +209,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 	else {
 		$allowed_testing = false;
-		$data['outline'] = '';
+		$data['expression_formula'] = '';
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
@@ -219,11 +219,11 @@ if ($data['expression_constructor'] == IM_TREE) {
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
-	if (empty($data['outline'])) {
+	if (empty($data['expression_formula'])) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 
-	$wrapOutline = new CSpan([$data['outline']]);
+	$wrapOutline = new CSpan([$data['expression_formula']]);
 	$triggersFormList->addRow(SPACE, [
 		$wrapOutline,
 		BR(),
@@ -284,7 +284,7 @@ $recovery_expression_row = [
 
 if ($data['recovery_expression_constructor'] == IM_TREE) {
 	array_push($recovery_expression_row, BR());
-	if (empty($data['outline'])) {
+	if (empty($data['recovery_expression_formula'])) {
 		// add button
 		$add_recovery_expression_button = (new CSubmit('add_recovery_expression', _('Add')))
 			->addClass(ZBX_STYLE_BTN_GREY);
@@ -408,7 +408,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 	else {
 		$allowed_testing = false;
-		$data['outline'] = '';
+		$data['recovery_expression_formula'] = '';
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
@@ -419,11 +419,11 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
-	if (empty($data['outline'])) {
+	if (empty($data['recovery_expression_formula'])) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 
-	$wrapOutline = new CSpan([$data['outline']]);
+	$wrapOutline = new CSpan([$data['recovery_expression_formula']]);
 	$triggersFormList->addRow(null, [
 		$wrapOutline,
 		BR(),
