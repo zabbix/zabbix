@@ -975,7 +975,7 @@ class CService extends CApiService {
 		if (!isset($service['sortorder']) || !zbx_is_int($service['sortorder'])
 			|| $service['sortorder'] < 0 || $service['sortorder'] > 999) {
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect sorder order for service "%1$s".', $service['name']));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect sort order for service "%1$s".', $service['name']));
 		}
 	}
 

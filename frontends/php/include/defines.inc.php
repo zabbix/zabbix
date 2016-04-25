@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0rc3');
-define('ZABBIX_API_VERSION',	'3.0.0');
+define('ZABBIX_VERSION',		'3.1.0');
+define('ZABBIX_API_VERSION',	'3.1.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		3000000);
+define('ZABBIX_DB_VERSION',		3010003);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -438,7 +438,7 @@ define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
 define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
 define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
-define('SERVICE_SLA', 99.05);
+define('SERVICE_SLA', '99.9000');
 
 define('SERVICE_SHOW_SLA_OFF',	0);
 define('SERVICE_SHOW_SLA_ON',	1);
@@ -587,6 +587,9 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
 define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
 define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
+
+define('SCREEN_MIN_SIZE', 1);
+define('SCREEN_MAX_SIZE', 100);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 

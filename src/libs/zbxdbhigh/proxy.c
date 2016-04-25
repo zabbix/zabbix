@@ -1534,7 +1534,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 

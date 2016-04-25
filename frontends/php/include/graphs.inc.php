@@ -163,33 +163,29 @@ function get_hosts_by_graphid($graphid) {
  *	sql is split to many sql's to optimize search on history tables
  */
 function get_min_itemclock_by_graphid($graphid) {
-	$itemids = [];
-	$dbItems = DBselect(
-		'SELECT DISTINCT gi.itemid'.
-		' FROM graphs_items gi'.
-		' WHERE gi.graphid='.zbx_dbstr($graphid)
-	);
-	while ($item = DBfetch($dbItems)) {
-		$itemids[$item['itemid']] = $item['itemid'];
-	}
+	$items = DBfetchArray(DBselect(
+		'SELECT DISTINCT i.itemid,i.value_type,i.history,i.trends'.
+		' FROM items i,graphs_items gi'.
+		' WHERE i.itemid=gi.itemid'.
+			' AND gi.graphid='.zbx_dbstr($graphid)
+	));
 
-	return get_min_itemclock_by_itemid($itemids);
+	return get_min_itemclock_by_itemid($items);
 }
 
 /**
- * Return the time of the 1st appearance of item in trends.
+ * Return the time of the 1st appearance of items in history or trends.
  *
- * @param array $itemIds
+ * @param array $items
+ * @param array $items[]['itemid']
+ * @param array $items[]['value_type']
+ * @param array $items[]['history']
+ * @param array $items[]['trends']
  *
  * @return int (unixtime)
  */
-function get_min_itemclock_by_itemid($itemIds) {
-	zbx_value2array($itemIds);
-
-	$min = null;
-	$result = time() - SEC_PER_YEAR;
-
-	$itemTypes = [
+function get_min_itemclock_by_itemid($items) {
+	$item_types = [
 		ITEM_VALUE_TYPE_FLOAT => [],
 		ITEM_VALUE_TYPE_STR => [],
 		ITEM_VALUE_TYPE_LOG => [],
@@ -197,82 +193,74 @@ function get_min_itemclock_by_itemid($itemIds) {
 		ITEM_VALUE_TYPE_TEXT => []
 	];
 
-	$dbItems = DBselect(
-		'SELECT i.itemid,i.value_type'.
-		' FROM items i'.
-		' WHERE '.dbConditionInt('i.itemid', $itemIds)
-	);
+	$max = ['history' => 0, 'trends' => 0];
 
-	while ($item = DBfetch($dbItems)) {
-		$itemTypes[$item['value_type']][$item['itemid']] = $item['itemid'];
+	foreach ($items as $item) {
+		$item_types[$item['value_type']][] = $item['itemid'];
+
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			$max['history'] = max($max['history'], (int) $item['history']);
+			$max['trends'] = max($max['trends'], (int) $item['trends']);
+		}
 	}
 
-	// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
-	// get max trends and history values for such type items to find out in what tables to look for data
-	$sqlFrom = 'history';
-	$sqlFromNum = '';
+	$sql_unions = [];
+	foreach ($item_types as $type => $itemids) {
+		if ($itemids) {
+			switch ($type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					$sql_from = ($max['history'] > $max['trends']) ? 'history' : 'trends';
+					break;
+				case ITEM_VALUE_TYPE_STR:
+					$sql_from = 'history_str';
+					break;
+				case ITEM_VALUE_TYPE_LOG:
+					$sql_from = 'history_log';
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					$sql_from = ($max['history'] > $max['trends']) ? 'history_uint' : 'trends_uint';
+					break;
+				case ITEM_VALUE_TYPE_TEXT:
+					$sql_from = 'history_text';
+					break;
+				default:
+					$sql_from = 'history';
+			}
 
-	if (!empty($itemTypes[ITEM_VALUE_TYPE_FLOAT]) || !empty($itemTypes[ITEM_VALUE_TYPE_UINT64])) {
-		$itemIdsNumeric = zbx_array_merge($itemTypes[ITEM_VALUE_TYPE_FLOAT], $itemTypes[ITEM_VALUE_TYPE_UINT64]);
+			foreach ($itemids as $itemid) {
+				$sql_unions[] =
+					'SELECT MIN(h.clock) AS clock'.
+					' FROM '.$sql_from.' h'.
+					' WHERE h.itemid='.zbx_dbstr($itemid);
+			}
+		}
+	}
 
-		$sql = 'SELECT MAX(i.history) AS history,MAX(i.trends) AS trends'.
-				' FROM items i'.
-				' WHERE '.dbConditionInt('i.itemid', $itemIdsNumeric);
-		if ($tableForNumeric = DBfetch(DBselect($sql))) {
-			// look for data in one of the tables
-			$sqlFromNum = ($tableForNumeric['history'] > $tableForNumeric['trends']) ? 'history' : 'trends';
+	$row = DBfetch(DBselect(
+		'SELECT MIN(h.clock) AS min_clock'.
+		' FROM ('.implode(' UNION ALL ', $sql_unions).') h'
+	));
+	$min_clock = $row['min_clock'];
 
-			$result = time() - (SEC_PER_DAY * max($tableForNumeric['history'], $tableForNumeric['trends']));
+	// in case DB clock column is corrupted having negative numbers, return min clock from max possible history storage
+	if ($min_clock == 0) {
+		if ($item_types[ITEM_VALUE_TYPE_FLOAT] || $item_types[ITEM_VALUE_TYPE_UINT64]) {
+			$min_clock = time() - SEC_PER_DAY * max($max['history'], $max['trends']);
 
 			/*
 			 * In case history storage exceeds the maximum time difference between current year and minimum 1970
 			 * (for example year 2014 - 200 years < year 1970), correct year to 1970 (unix time timestamp 0).
 			 */
-			if ($result < 0) {
-				$result = 0;
+			if ($min_clock < 0) {
+				$min_clock = 0;
 			}
 		}
+		else {
+			$min_clock = time() - SEC_PER_YEAR;
+		}
 	}
 
-	foreach ($itemTypes as $type => $items) {
-		if (empty($items)) {
-			continue;
-		}
-
-		switch ($type) {
-			case ITEM_VALUE_TYPE_FLOAT:
-				$sqlFrom = $sqlFromNum;
-				break;
-			case ITEM_VALUE_TYPE_STR:
-				$sqlFrom = 'history_str';
-				break;
-			case ITEM_VALUE_TYPE_LOG:
-				$sqlFrom = 'history_log';
-				break;
-			case ITEM_VALUE_TYPE_UINT64:
-				$sqlFrom = $sqlFromNum.'_uint';
-				break;
-			case ITEM_VALUE_TYPE_TEXT:
-				$sqlFrom = 'history_text';
-				break;
-			default:
-				$sqlFrom = 'history';
-		}
-
-		foreach ($itemIds as $itemId) {
-			$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE ht.itemid='.zbx_dbstr($itemId);
-		}
-
-		$dbMin = DBfetch(DBselect(
-			'SELECT MIN(ht.c) AS min_clock'.
-			' FROM ('.implode(' UNION ALL ', $sqlUnions).') ht'
-		));
-
-		$min = $min ? min($min, $dbMin['min_clock']) : $dbMin['min_clock'];
-	}
-
-	// in case DB clock column is corrupted having negative numbers, return min clock from max possible history storage
-	return ($min > 0) ? $min : $result;
+	return $min_clock;
 }
 
 function getGraphByGraphId($graphId) {
