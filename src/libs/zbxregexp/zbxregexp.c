@@ -208,7 +208,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
 
 	if (NULL == string)
 	{
-		zbx_free(out);
+		zbx_free(*out);
 		return SUCCEED;
 	}
 
