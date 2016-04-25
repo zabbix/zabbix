@@ -607,14 +607,21 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// Save new trigger prototypes and without dependencies for now.
 		$dstTriggers = $srcTriggers;
-		$dstTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dstTriggers);
+		$dstTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dstTriggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 		foreach ($dstTriggers as $id => &$trigger) {
 			unset($dstTriggers[$id]['triggerid'], $dstTriggers[$id]['templateid']);
 
-			// Update the destination expression.
+			// Update the destination expressions.
 			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
 				$dstHost['host']
 			);
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				$trigger['recovery_expression'] = triggerExpressionReplaceHost($trigger['recovery_expression'],
+					$srcHost['host'], $dstHost['host']
+				);
+			}
 		}
 		unset($trigger);
 
