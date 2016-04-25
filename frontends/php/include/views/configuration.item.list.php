@@ -180,7 +180,7 @@ foreach ($this->data['items'] as $item) {
 
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
-		if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 			$expression = [
 				_('Problem'), ': ', $trigger['expression'], BR(),
 				_('Recovery'), ': ', $trigger['recovery_expression']
@@ -220,7 +220,7 @@ foreach ($this->data['items'] as $item) {
 		$triggers = [];
 
 		foreach ($item['triggers'] as $trigger) {
-			if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				continue;
 			}
 

@@ -129,7 +129,7 @@ abstract class CTriggerGeneral extends CApiService {
 		while ($exprPart = prev($expressionData->expressions));
 
 		// recovery_expression: {template:item.func()} => {host:item.func()}
-		if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 			if (!$expressionData->parse($trigger['recovery_expression'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 			}
@@ -379,7 +379,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		// recovery_expression
-		if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 			if (!$expressionData->parse($trigger['recovery_expression'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
 			}
@@ -442,12 +442,12 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
 
 			if (!array_key_exists('recovery_mode', $trigger)) {
-				$trigger['recovery_mode'] = TRIGGER_REC_MODE_EXPRESSION;
+				$trigger['recovery_mode'] = ZBX_RECOVERY_MODE_EXPRESSION;
 			}
 
 			switch ($trigger['recovery_mode']) {
-				case TRIGGER_REC_MODE_EXPRESSION:
-				case TRIGGER_REC_MODE_NONE:
+				case ZBX_RECOVERY_MODE_EXPRESSION:
+				case ZBX_RECOVERY_MODE_NONE:
 					if (!array_key_exists('recovery_expression', $trigger)) {
 						$trigger['recovery_expression'] = '';
 					}
@@ -459,7 +459,7 @@ abstract class CTriggerGeneral extends CApiService {
 					}
 					break;
 
-				case TRIGGER_REC_MODE_REC_EXPRESSION:
+				case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
 					if (!array_key_exists('recovery_expression', $trigger) || $trigger['recovery_expression'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('cannot be empty'))
@@ -590,8 +590,8 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if (array_key_exists('recovery_mode', $trigger) && !array_key_exists('recovery_expression', $trigger)) {
 				switch ($trigger['recovery_mode']) {
-					case TRIGGER_REC_MODE_EXPRESSION:
-					case TRIGGER_REC_MODE_NONE:
+					case ZBX_RECOVERY_MODE_EXPRESSION:
+					case ZBX_RECOVERY_MODE_NONE:
 						$trigger['recovery_expression'] = '';
 						break;
 				}
@@ -604,8 +604,8 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			switch ($trigger['recovery_mode']) {
-				case TRIGGER_REC_MODE_EXPRESSION:
-				case TRIGGER_REC_MODE_NONE:
+				case ZBX_RECOVERY_MODE_EXPRESSION:
+				case ZBX_RECOVERY_MODE_NONE:
 					if ($trigger['recovery_expression'] !== '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('should be empty'))
@@ -613,7 +613,7 @@ abstract class CTriggerGeneral extends CApiService {
 					}
 					break;
 
-				case TRIGGER_REC_MODE_REC_EXPRESSION:
+				case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
 					if ($trigger['recovery_expression'] === '') {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'recovery_expression', _('cannot be empty'))
@@ -936,7 +936,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$expressionData->parse($trigger['expression']);
 			$expressions = $expressionData->expressions;
 
-			if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expressionData->parse($trigger['recovery_expression']);
 				$expressions = array_merge($expressions, $expressionData->expressions);
 			}
@@ -1065,7 +1065,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$expressions1 = $expressionData->expressions;
 			$expressions2 = [];
 
-			if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expressionData->parse($trigger['recovery_expression']);
 				$expressions2 = $expressionData->expressions;
 			}
@@ -1139,7 +1139,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$old_hosts1 = $expressionData->getHosts();
 				$old_hosts2 = [];
 
-				if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 					$expressionData->parse($db_triggers[$tnum]['recovery_expression']);
 					$old_hosts2 = $expressionData->getHosts();
 				}
@@ -1225,7 +1225,7 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			while ($exprPart = prev($expressionData->expressions));
 
-			if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 				$expressionData->parse($trigger['recovery_expression']);
 				$exprPart = end($expressionData->expressions);
 				do {

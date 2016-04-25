@@ -204,7 +204,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
-	if ($trigger['recovery_mode'] == TRIGGER_REC_MODE_REC_EXPRESSION) {
+	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$expression = [
 			_('Problem'), ': ', $trigger['expression'], BR(),
 			_('Recovery'), ': ', $trigger['recovery_expression']
