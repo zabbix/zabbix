@@ -21,6 +21,8 @@
 
 #ifdef HAVE_SSH2
 
+#include <libssh2.h>
+
 #include "comms.h"
 #include "log.h"
 

@@ -371,16 +371,27 @@ $triggers = API::Trigger()->get([
 	],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 	'selectDependencies' => API_OUTPUT_EXTEND,
-	'selectLastEvent' => true,
-	'expandDescription' => true,
+	'selectLastEvent' => ['eventid', 'objectid', 'clock', 'ns'],
 	'preservekeys' => true
 ]);
 
 $triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 if ($showDetails) {
+	foreach ($triggers as &$trigger) {
+		$trigger['expression_orig'] = $trigger['expression'];
+	}
+	unset($trigger);
+
 	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
 	);
+
+	foreach ($triggers as &$trigger) {
+		$trigger['expression_html'] = $trigger['expression'];
+		$trigger['expression'] = $trigger['expression_orig'];
+		unset($trigger['expression_orig']);
+	}
+	unset($trigger);
 }
 
 order_result($triggers, $sortField, $sortOrder);
@@ -574,13 +585,28 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$description[] = (new CSpan($trigger['description']))
+	// Trigger has events.
+	if ($trigger['lastEvent']) {
+		$event = [
+			'clock' => $trigger['lastEvent']['clock'],
+			'ns' => $trigger['lastEvent']['ns']
+		];
+	}
+	// Trigger has no events.
+	else {
+		$event = [
+			'clock' => $trigger['lastchange'],
+			'ns' => '999999999'
+		];
+	}
+
+	$description[] = (new CSpan(CMacrosResolverHelper::resolveEventDescription(zbx_array_merge($trigger, $event))))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description[] = BR();
-		$description[] = $trigger['expression'];
+		$description[] = $trigger['expression_html'];
 	}
 
 	// host js menu

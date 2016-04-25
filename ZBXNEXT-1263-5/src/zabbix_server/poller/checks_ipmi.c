@@ -70,7 +70,7 @@ typedef struct
 }
 zbx_ipmi_control_t;
 
-typedef struct zbx_ipmi_host_s
+typedef struct zbx_ipmi_host
 {
 	char			*ip;
 	int			port;
@@ -89,7 +89,7 @@ typedef struct zbx_ipmi_host_s
 	time_t			lastaccess;
 	unsigned int		domain_id;
 	char			*err;
-	struct zbx_ipmi_host_s	*next;
+	struct zbx_ipmi_host	*next;
 }
 zbx_ipmi_host_t;
 
@@ -1363,7 +1363,7 @@ int	parse_ipmi_command(const char *command, char *c_name, int *val, char *error,
 		*val = 1;
 	else if (0 == strcasecmp(p, "off"))
 		*val = 0;
-	else if (SUCCEED != is_uint31(p, (uint32_t *)val))
+	else if (SUCCEED != is_uint31(p, val))
 	{
 		zbx_snprintf(error, max_error_len, "IPMI command value is not supported [%s]", p);
 		goto fail;
