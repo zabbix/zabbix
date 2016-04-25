@@ -65,37 +65,35 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 				zbx_tls_connection_type_name(item->host.tls_connect));
 	}
 
-	if (ZBX_TCP_SEC_UNENCRYPTED == item->host.tls_connect)
+	switch (item->host.tls_connect)
 	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
-	else
-	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (ZBX_TCP_SEC_TLS_CERT == item->host.tls_connect)
-		{
+		case ZBX_TCP_SEC_TLS_CERT:
 			tls_arg1 = item->host.tls_issuer;
 			tls_arg2 = item->host.tls_subject;
-		}
-		else if (ZBX_TCP_SEC_TLS_PSK == item->host.tls_connect)
-		{
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
 			tls_arg1 = item->host.tls_psk_identity;
 			tls_arg2 = item->host.tls_psk;
-		}
-		else
-		{
+			break;
+#else
+		case ZBX_TCP_SEC_TLS_CERT:
+		case ZBX_TCP_SEC_TLS_PSK:
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent"
+					" but support for TLS was not compiled into %s.",
+					get_program_type_string(program_type)));
+			ret = CONFIG_ERROR;
+			goto out;
+#endif
+		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid TLS connection parameters."));
 			ret = CONFIG_ERROR;
 			goto out;
-		}
-#else
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent but"
-				" support for TLS was not compiled into %s.", get_program_type_string(program_type)));
-		ret = CONFIG_ERROR;
-		goto out;
-#endif
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
