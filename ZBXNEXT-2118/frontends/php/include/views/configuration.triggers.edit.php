@@ -425,7 +425,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('openWinCentered("tr_testexpr.php?expression="'.
 			'+encodeURIComponent(this.form.elements["recovery_expression"].value),'.
-		'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
+			'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
@@ -449,7 +450,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 		->onClick('javascript: '.
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
 			'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+			'document.forms["'.$triggersForm->getName().'"].submit();'
+		);
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 

@@ -54,28 +54,34 @@ $triggersFormList->addRow(_('Name'),
 );
 
 // append expression to form list
-$expressionTextBox = (new CTextArea(
-	$data['expression_field_name'],
-	$data['expression_field_value'],
-	['readonly' => $data['expression_field_readonly']]
-))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
 if ($data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $data['expression']);
+}
+
+if ($data['recovery_expression_field_readonly']) {
+	$triggersForm->addVar('recovery_expression', $data['recovery_expression']);
 }
 
 $add_expression_button = (new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-			'&dstfld1='.$data['expression_field_name'].'&srctbl=expression'.url_param('parent_discoveryid').
-			'&srcfld1=expression'.
+			'&dstfld1='.$data['expression_field_name'].'&srctbl='.$data['expression_field_name'].
+			url_param('parent_discoveryid').'&srcfld1='.$data['expression_field_name'].
 			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['expression_field_name'].'"]\').val()));'
 	);
 if ($data['limited']) {
 	$add_expression_button->setAttribute('disabled', 'disabled');
 }
-$expression_row = [$expressionTextBox, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), $add_expression_button];
+$expression_row = [
+	(new CTextArea(
+		$data['expression_field_name'],
+		$data['expression_field_value'],
+		['readonly' => $data['expression_field_readonly']]
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$add_expression_button
+];
 
 if ($data['expression_constructor'] == IM_TREE) {
 	// insert macro button
@@ -124,14 +130,15 @@ if ($data['expression_constructor'] == IM_TREE) {
 }
 elseif ($data['expression_constructor'] != IM_FORCED) {
 	$input_method_toggle = (new CButton(null, _('Expression constructor')))
+		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_expression_constructor").value=1;'.
 			'document.getElementById("expression_constructor").value='.
 				(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();')
-		->addClass(ZBX_STYLE_BTN_LINK);
+			'document.forms["'.$triggersForm->getName().'"].submit();');
 	$expression_row[] = [BR(), $input_method_toggle];
 }
+
 $triggersFormList->addRow(_('Expression'), $expression_row, 'expression_row');
 
 // Append expression table to form list.
@@ -184,9 +191,9 @@ if ($data['expression_constructor'] == IM_TREE) {
 			$expressionTable->addRow(
 				new CRow([
 					!$data['limited']
-						? (new CCheckBox('expr_target_single',$e['id']))
+						? (new CCheckBox('expr_target_single', $e['id']))
 							->setChecked($i == 0)
-							->onClick('check_target(this);')
+							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 						: null,
 					$e['list'],
 					!$data['limited']
@@ -195,7 +202,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 								->addClass(ZBX_STYLE_BTN_LINK)
 								->onClick('javascript:'.
 									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-										' delete_expression("'.$e['id'] .'");'.
+										' delete_expression("'.$e['id'] .'", '.TRIGGER_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
 									' }'
 								)
@@ -225,7 +232,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$wrapOutline = new CSpan([$data['expression_formula']]);
-	$triggersFormList->addRow(SPACE, [
+	$triggersFormList->addRow(null, [
 		$wrapOutline,
 		BR(),
 		BR(),
@@ -235,14 +242,13 @@ if ($data['expression_constructor'] == IM_TREE) {
 	]);
 
 	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
+		->addClass(ZBX_STYLE_BTN_LINK)
 		->onClick('javascript: '.
 			'document.getElementById("toggle_expression_constructor").value=1;'.
 			'document.getElementById("expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();')
-		->addClass(ZBX_STYLE_BTN_LINK);
-	$triggersFormList->addRow(SPACE, [$input_method_toggle, BR()]);
+			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
-
 $event_generation = (new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
 	->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
 	->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
@@ -261,10 +267,9 @@ $add_recovery_expression_button = (new CButton('insert',
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
-			'&dstfld1='.$data['recovery_expression_field_name'].
+			'&dstfld1='.$data['recovery_expression_field_name'].url_param('parent_discoveryid').
 			'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
-			'&recovery_expression="'.
-				'+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
+			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
 	);
 
 if ($data['limited']) {
@@ -389,7 +394,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					!$data['limited']
 						? (new CCheckBox('recovery_expr_target_single', $e['id']))
 							->setChecked($i == 0)
-							->onClick('check_target(this);')
+							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
 						: null,
 					$e['list'],
 					!$data['limited']
@@ -441,7 +446,8 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 		->onClick('javascript: '.
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
 			'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+			'document.forms["'.$triggersForm->getName().'"].submit();'
+		);
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 
