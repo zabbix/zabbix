@@ -50,76 +50,81 @@ my $times_from = get_cycle_bounds($now - $delay, $delay);
 my $times_till = ($times_from + $delay + $delay * $cycles - 1);
 my $probe_times_ref = get_probe_times($times_from, $times_till);
 
-while ($cycles > 0)
+my $tld_index = 0;
+my $tld_count = scalar(@{$tlds_ref});
+
+while ($tld_index < $tld_count)
 {
-	my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
+	my $pid = fork_without_pipe();
 
-	$cycles--;
-	$now += $delay;
-
-	next if ($till > $max_avail_time);
-
-	my $tld_index = 0;
-	my $tld_count = scalar(@{$tlds_ref});
-
-	while ($tld_index < $tld_count)
+	if (!defined($pid))
 	{
-		my $pid = fork_without_pipe();
+		# max children reached, make sure to handle_children()
+	}
+	elsif ($pid)
+	{
+		# parent
+		$tld_index++;
+	}
+	else
+	{
+		# child
+		$tld = $tlds_ref->[$tld_index];
 
-		if (!defined($pid))
+		db_connect();
+
+		my $itemid;
+		if (!opt('dry-run'))
 		{
-			# max children reached, make sure to handle_children()
+			if (!($itemid = get_itemid_by_host($tld, $cfg_key_out)))
+			{
+				wrn("configuration error: ", rsm_slv_error());
+				exit(0);
+			}
+
 		}
-		elsif ($pid)
-		{
-			# parent
-			$tld_index++;
-		}
-		else
-		{
-			# child
-			$tld = $tlds_ref->[$tld_index];
 
-			init_values();
+		init_values();
 
-			db_connect();
+		while ($cycles > 0)
+		{
+			my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
+
+			$cycles--;
+			$now += $delay;
 
 			if (!opt('dry-run'))
 			{
-				my $itemid = get_itemid_by_host($tld, $cfg_key_out);
-				if (!$itemid)
-				{
-					wrn("configuration error: ", rsm_slv_error());
-					exit(0);
-				}
-
-				exit(0) if (avail_value_exists($value_ts, $itemid) == SUCCESS);
+				next if (avail_value_exists($value_ts, $itemid) == SUCCESS);
 			}
+
+			next if ($till > $max_avail_time);
 
 			my $result = process_slv_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline, $probe_times_ref,
 				\&check_item_values);
 
-			exit(0) unless ($result);
+			if ($result)
+			{
+				my $value = $result->{'value'};
+				my $message = $result->{'message'};
+				my $alert = $result->{'alert'};
 
-			my $value = $result->{'value'};
-			my $message = $result->{'message'};
-			my $alert = $result->{'alert'};
+				push_value($tld, $cfg_key_out, $value_ts, $value, $message);
 
-			push_value($tld, $cfg_key_out, $value_ts, $value, $message);
-
-			add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld ($message)") if ($alert);
-
-			send_values();
-
-			exit(0);
+				add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld ($message)") if ($alert);
+			}
 		}
 
-		handle_children();
+		send_values();
+
+		exit(0);
 	}
 
-	# unset TLD (for the logs)
-	$tld = undef;
+	handle_children();
 }
+
+# unset TLD (for the logs)
+$tld = undef;
 
 # wait till children finish
 while (children_running() > 0)

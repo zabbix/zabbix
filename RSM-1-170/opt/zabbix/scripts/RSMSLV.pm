@@ -1262,6 +1262,8 @@ sub get_probe_times
 
 	my $hostids = join(',', values(%$probes_ref));
 
+	fail("no probes configured") if (!$hostids);
+
 	my $items_ref = db_select(
 		"select itemid,hostid".
 		" from items".

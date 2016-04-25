@@ -49,50 +49,58 @@ my $times_from = get_cycle_bounds($now - $delay, $delay);
 my $times_till = ($times_from + $delay + $delay * $cycles - 1);
 my $probe_times_ref = get_probe_times($times_from, $times_till);
 
-while ($cycles > 0)
+my $tld_index = 0;
+my $tld_count = scalar(@{$tlds_ref});
+
+while ($tld_index < $tld_count)
 {
-	my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
+	my $pid = fork_without_pipe();
 
-	$cycles--;
-	$now += $delay;
-
-	next if ($till > $max_avail_time);
-
-	my $tld_index = 0;
-	my $tld_count = scalar(@{$tlds_ref});
-
-	while ($tld_index < $tld_count)
+	if (!defined($pid))
 	{
-		my $pid = fork_without_pipe();
+		# max children reached, make sure to handle_children()
+	}
+	elsif ($pid)
+	{
+		# parent
+		$tld_index++;
+	}
+	else
+	{
+		# child
+		$tld = $tlds_ref->[$tld_index];
 
-		if (!defined($pid))
-		{
-			# max children reached, make sure to handle_children()
-		}
-		elsif ($pid)
-		{
-			# parent
-			$tld_index++;
-		}
-		else
-		{
-			# child
-			$tld = $tlds_ref->[$tld_index];
+		db_connect();
 
-			db_connect();
+		my $itemid;
+		if (!opt('dry-run'))
+		{
+			my $result;
+
+			if (get_lastclock($tld, $cfg_key_out, \$result) != SUCCESS)
+			{
+				wrn("configuration error: DNS NS availability items not found (\"$cfg_key_out*\")");
+				exit(0);
+			}
+
+			$itemid = $result->{'itemid'};
+		}
+
+		init_values();
+
+		while ($cycles > 0)
+		{
+			my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
+
+			$cycles--;
+			$now += $delay;
 
 			if (!opt('dry-run'))
 			{
-				my $result;
-
-				if (get_lastclock($tld, $cfg_key_out, \$result) != SUCCESS)
-				{
-					wrn("configuration error: DNS NS availability items not found (\"$cfg_key_out*\")");
-					exit(0);
-				}
-
-				exit(0) if (avail_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
+				next if (avail_value_exists($value_ts, $itemid) == SUCCESS);
 			}
+
+			next if ($till > $max_avail_time);
 
 			my $result = process_slv_ns_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline,
 				$probe_times_ref, \&check_item_value);
@@ -103,8 +111,6 @@ while ($cycles > 0)
 			}
 			else
 			{
-				init_values();
-
 				foreach my $nsip (keys(%$result))
 				{
 					my $key = $cfg_key_out . $nsip . ']';
@@ -116,19 +122,19 @@ while ($cycles > 0)
 
 					add_alert(ts_str($value_ts) . "#system#zabbix#$key#PROBLEM#$tld ($message)") if ($alert);
 				}
-
-				send_values();
 			}
-
-			exit(0);
 		}
 
-		handle_children();
+		send_values();
+
+		exit(0);
 	}
 
-	# unset TLD (for the logs)
-	$tld = undef;
+	handle_children();
 }
+
+# unset TLD (for the logs)
+$tld = undef;
 
 # wait till children finish
 while (children_running() > 0)
