@@ -557,7 +557,9 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyTriggerPrototypes(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
 		$srcTriggers = API::TriggerPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
+				'templateid', 'type', 'recovery_mode', 'recovery_expression'
+			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
