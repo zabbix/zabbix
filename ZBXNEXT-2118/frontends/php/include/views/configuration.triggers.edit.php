@@ -37,7 +37,8 @@ $triggersForm = (new CForm())
 	->addVar('toggle_expression_constructor', '')
 	->addVar('toggle_recovery_expression_constructor', '')
 	->addVar('remove_expression', '')
-	->addVar('remove_recovery_expression', '');
+	->addVar('remove_recovery_expression', '')
+	->addVar('recovery_mode', $data['recovery_mode']);
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $data['triggerid']);
@@ -196,7 +197,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					!$data['limited']
 						? (new CCheckBox('expr_target_single', $e['id']))
 							->setChecked($i == 0)
-							->onClick('check_target(this);')
+							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 						: null,
 					$e['list'],
 					!$data['limited']
@@ -394,7 +395,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					!$data['limited']
 						? (new CCheckBox('recovery_expr_target_single', $e['id']))
 							->setChecked($i == 0)
-							->onClick('check_target(this);')
+							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
 						: null,
 					$e['list'],
 					!$data['limited']
