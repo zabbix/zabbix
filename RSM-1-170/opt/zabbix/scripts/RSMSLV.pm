@@ -1258,10 +1258,6 @@ sub get_probe_times
 	my $till = shift;
 	my $probes_ref = shift; # { host => hostid, ... }
 
-	$probes_ref = get_probes() unless (defined($probes_ref));
-
-	fail("no probes configured") if (!$hostids);
-
 	my $items_ref = db_select(
 		"select i.itemid,h.host".
 		" from items i,hosts h".
