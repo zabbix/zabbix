@@ -353,7 +353,9 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	$options = [
 		'triggerids' => $srcTriggerIds,
-		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
+			'recovery_mode', 'recovery_expression'
+		],
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'selectDependencies' => ['triggerid']
 	];
@@ -376,7 +378,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 	$dbSrcTriggers = API::Trigger()->get($options);
 
-	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers);
+	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers,
+		['sources' => ['expression', 'recovery_expression']]
+	);
 
 	$dbDstHosts = API::Host()->get([
 		'output' => ['hostid', 'host'],
@@ -417,6 +421,12 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				$dstHost['host']
 			);
 
+			if ($srcTrigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				$srcTrigger['recovery_expression'] = triggerExpressionReplaceHost($srcTrigger['recovery_expression'],
+					$host, $dstHost['host']
+				);
+			}
+
 			// The dependddencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
@@ -425,7 +435,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				'status' => $srcTrigger['status'],
 				'priority' => $srcTrigger['priority'],
 				'comments' => $srcTrigger['comments'],
-				'type' => $srcTrigger['type']
+				'type' => $srcTrigger['type'],
+				'recovery_mode' => $srcTrigger['recovery_mode'],
+				'recovery_expression' => $srcTrigger['recovery_expression']
 			]]);
 
 			if (!$result) {
@@ -451,12 +463,14 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 	$depTriggers = API::Trigger()->get([
 		'triggerids' => $depids,
-		'output' => ['description', 'expression'],
+		'output' => ['description', 'expression', 'recovery_mode', 'recovery_expression'],
 		'selectHosts' => ['hostid'],
 		'preservekeys' => true
 	]);
 
-	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers);
+	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers,
+		['sources' => ['expression', 'recovery_expression']]
+	);
 
 	// Map dependencies to the new trigger IDs and save.
 	if ($newTriggers) {
