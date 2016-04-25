@@ -402,6 +402,10 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
 
+	/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
+	if (0 != mysql_set_character_set(conn, "utf8"))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set MySQL character set to \"utf8\"");
+
 	if (ZBX_DB_OK == ret && 0 != mysql_select_db(conn, dbname))
 	{
 		zabbix_errlog(ERR_Z3001, dbname, mysql_errno(conn), mysql_error(conn));
@@ -410,12 +414,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
 		ret = ZBX_DB_DOWN;
-
-	if (ZBX_DB_OK == ret)
-	{
-		if (0 < (ret = zbx_db_execute("%s", "set names utf8")))
-			ret = ZBX_DB_OK;
-	}
 
 #elif defined(HAVE_ORACLE)
 #if defined(HAVE_GETENV) && defined(HAVE_PUTENV)
