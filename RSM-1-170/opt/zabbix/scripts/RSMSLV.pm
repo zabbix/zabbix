@@ -1700,12 +1700,25 @@ sub process_slv_ns_monthly
 
 	my $result;
 
+	$result->{'total_tests'} = 0;
+	$result->{'failed_tests'} = 0;
+	$result->{'successful_tests'} = 0;
+	$result->{'successful_accum'} = 0;	# accumulated successful values, to get the average later
+	$result->{'ipv4_addresses'} = 0;
+	$result->{'ipv6_addresses'} = 0;
+
 	foreach my $nsip (@$nsips_ref)
 	{
-		$result->{$nsip}->{'total_tests'} = 0;
-		$result->{$nsip}->{'failed_tests'} = 0;
-		$result->{$nsip}->{'successful_tests'} = 0;
-		$result->{$nsip}->{'successful_accum'} = 0;	# accumulated successful values, to get the average later
+		my $ip_version = get_ip_version(get_ip_from_nsip($nsip));
+
+		if ($ip_version == 4)
+		{
+			$result->{'ipv4_addresses'}++;
+		}
+		else
+		{
+			$result->{'ipv6_addresses'}++;
+		}
 	}
 
 	my $nsip_items_ref = get_nsip_items($nsips_ref, $cfg_key_in, $tld);
@@ -1729,16 +1742,16 @@ sub process_slv_ns_monthly
 				{
 					my $value = $values_ref->{$nsip}->{$itemid}->{$clock};
 
-					$result->{$nsip}->{'total_tests'}++;
+					$result->{'total_tests'}++;
 
 					if ($check_value_ref->($value) == SUCCESS)
 					{
-						$result->{$nsip}->{'successful_tests'}++;
-						$result->{$nsip}->{'successful_accum'} += $value;
+						$result->{'successful_tests'}++;
+						$result->{'successful_accum'} += $value;
 					}
 					else
 					{
-						$result->{$nsip}->{'failed_tests'}++;
+						$result->{'failed_tests'}++;
 					}
 				}
 			}

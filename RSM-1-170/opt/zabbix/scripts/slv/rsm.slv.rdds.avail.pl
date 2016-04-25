@@ -90,7 +90,7 @@ while ($cycles > 0)
 				if (!$itemid)
 				{
 					wrn("configuration error: ", rsm_slv_error());
-					next;
+					exit(0);
 				}
 
 				exit(0) if (avail_value_exists($value_ts, $itemid) == SUCCESS);

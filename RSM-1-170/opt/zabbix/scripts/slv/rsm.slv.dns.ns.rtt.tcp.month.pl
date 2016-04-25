@@ -126,27 +126,23 @@ while ($tld_index < $tld_count)
 
 		init_values();
 
-		foreach my $nsip (keys(%$result))
+		if (!$result->{'total_tests'})
 		{
-			if (!$result->{$nsip}->{'total_tests'})
-			{
-				wrn("$nsip: no values found in the database for a given period");
-				next;
-			}
-
-			my $ip_version = get_ip_version(get_ip_from_nsip($nsip));
-			my $failed = $result->{$nsip}->{'failed_tests'};
-			my $pfailed = (sprintf("%.3f", $result->{$nsip}->{'total_tests'} ?
-				$result->{$nsip}->{'failed_tests'} * 100 / $result->{$nsip}->{'total_tests'} : 0));
-			my $avg = (sprintf("%.3f", $result->{$nsip}->{'successful_tests'} ?
-				$result->{$nsip}->{'successful_accum'} / $result->{$nsip}->{'successful_tests'} : VALUE_INVALID));
-			my $max = ($ip_version == 4) ? $month_ipv4_cycles : $month_ipv6_cycles;
-
-			push_value($tld, $cfg_keys_out->{'failed'}  . "[$nsip]", $value_ts, $failed,  "failed tests (total: ", $result->{$nsip}->{'total_tests'}, ")");
-			push_value($tld, $cfg_keys_out->{'avg'}     . "[$nsip]", $value_ts, $avg,     "average RTT") unless ($avg == VALUE_INVALID);
-			push_value($tld, $cfg_keys_out->{'pfailed'} . "[$nsip]", $value_ts, $pfailed, "% of failed tests");
-			push_value($tld, $cfg_keys_out->{'max'}     . "[$nsip]", $value_ts, $max,     "max tests per month");
+			wrn("no values found in the database for a given period");
+			exit(0);
 		}
+
+		my $failed = $result->{'failed_tests'};
+		my $pfailed = (sprintf("%.3f", $result->{'total_tests'} ?
+			$result->{'failed_tests'} * 100 / $result->{'total_tests'} : 0));
+		my $avg = (sprintf("%.3f", $result->{'successful_tests'} ?
+			$result->{'successful_accum'} / $result->{'successful_tests'} : VALUE_INVALID));
+		my $max = $month_ipv4_cycles * $result->{'ipv4_addresses'} + $month_ipv6_cycles * $result->{'ipv6_addresses'};
+
+		push_value($tld, $cfg_keys_out->{'failed'},  $value_ts, $failed,  "failed tests (total: ", $result->{'total_tests'}, ")");
+		push_value($tld, $cfg_keys_out->{'avg'},     $value_ts, $avg,     "average RTT") unless ($avg == VALUE_INVALID);
+		push_value($tld, $cfg_keys_out->{'pfailed'}, $value_ts, $pfailed, "% of failed tests");
+		push_value($tld, $cfg_keys_out->{'max'},     $value_ts, $max,     "max tests per month");
 
 		send_values();
 
