@@ -251,9 +251,9 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
 $event_generation = (new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
-			->addValue(_('Expression'), TRIGGER_REC_MODE_EXPRESSION)
-			->addValue(_('Recovery expression'), TRIGGER_REC_MODE_REC_EXPRESSION)
-			->addValue(_('None'), TRIGGER_REC_MODE_NONE)
+			->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
+			->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
+			->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
 			->setModern(true);
 
 if ($data['limited']) {

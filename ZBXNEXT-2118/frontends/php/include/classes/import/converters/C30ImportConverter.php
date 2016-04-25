@@ -87,7 +87,7 @@ class C30ImportConverter extends CConverter {
 	 */
 	protected function convertTriggers(array $triggers) {
 		foreach ($triggers as &$trigger) {
-			$trigger['recovery_mode'] = TRIGGER_REC_MODE_EXPRESSION;
+			$trigger['recovery_mode'] = ZBX_RECOVERY_MODE_EXPRESSION;
 			$trigger['recovery_expression'] = '';
 
 			if (array_key_exists('dependencies', $trigger)) {

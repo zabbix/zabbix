@@ -39,8 +39,8 @@ $fields = [
 	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),		null],
 	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Name')],
 	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'isset({add}) || isset({update})', _('Expression')],
-	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.TRIGGER_REC_MODE_REC_EXPRESSION.'', _('Recovery expression')],
-	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(TRIGGER_REC_MODE_EXPRESSION.','.TRIGGER_REC_MODE_REC_EXPRESSION.','.TRIGGER_REC_MODE_NONE),	'isset({add}) || isset({update})'],
+	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
+	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	'isset({add}) || isset({update})'],
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
@@ -207,7 +207,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'recovery_expression' => getRequest('recovery_expression')
 	];
 
-	if ($trigger['recovery_mode'] != TRIGGER_REC_MODE_REC_EXPRESSION) {
+	if ($trigger['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$trigger['recovery_expression'] = '';
 	}
 
