@@ -8,9 +8,7 @@
 		});
 
 		function changeRecoveryMode() {
-			/*
-			 * Used textarea selector by ID because there are ID duplicates on page.
-			 */
+			// Used textarea selector by ID because there are ID duplicates on page.
 			if ($('input[name=recovery_mode]:checked').val() == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>) {
 				$('textarea[id="recovery_expression"]').closest('li').show();
 				$('textarea[id="expression"]').closest('li').find('label').html('<?= _('Problem expression') ?>');

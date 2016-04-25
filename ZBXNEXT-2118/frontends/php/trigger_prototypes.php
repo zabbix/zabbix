@@ -44,7 +44,7 @@ $fields = [
 	'status' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
 	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_expression_constructor})'],
 	'recovery_expression_constructor' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_recovery_expression_constructor})'],
-	'expr_temp' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'expr_temp' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
 	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
 	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
 	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))'],
@@ -142,7 +142,7 @@ if ($triggerPrototypeIds) {
  */
 $expression_action = '';
 if (hasRequest('add_expression')) {
-	$_REQUEST['expression'] = $_REQUEST['expr_temp'];
+	$_REQUEST['expression'] = getRequest('expr_temp');
 	$_REQUEST['expr_temp'] = '';
 }
 elseif (hasRequest('and_expression')) {
@@ -156,12 +156,12 @@ elseif (hasRequest('replace_expression')) {
 }
 elseif (hasRequest('remove_expression')) {
 	$expression_action = 'R';
-	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
+	$_REQUEST['expr_target_single'] = getRequest('remove_expression');
 }
 
 $recovery_expression_action = '';
 if (hasRequest('add_recovery_expression')) {
-	$_REQUEST['recovery_expression'] = $_REQUEST['recovery_expr_temp'];
+	$_REQUEST['recovery_expression'] = getRequest('recovery_expr_temp');
 	$_REQUEST['recovery_expr_temp'] = '';
 }
 elseif (hasRequest('and_recovery_expression')) {
@@ -175,7 +175,7 @@ elseif (hasRequest('replace_recovery_expression')) {
 }
 elseif (hasRequest('remove_recovery_expression')) {
 	$recovery_expression_action = 'R';
-	$_REQUEST['recovery_expr_target_single'] = $_REQUEST['remove_recovery_expression'];
+	$_REQUEST['recovery_expr_target_single'] = getRequest('remove_recovery_expression');
 }
 
 if (hasRequest('clone') && hasRequest('triggerid')) {

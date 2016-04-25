@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -153,7 +153,7 @@ if ($hostId && !API::Host()->isWritable([$hostId])) {
  */
 $expression_action = '';
 if (hasRequest('add_expression')) {
-	$_REQUEST['expression'] = $_REQUEST['expr_temp'];
+	$_REQUEST['expression'] = getRequest('expr_temp');
 	$_REQUEST['expr_temp'] = '';
 }
 elseif (hasRequest('and_expression')) {
@@ -167,12 +167,12 @@ elseif (hasRequest('replace_expression')) {
 }
 elseif (hasRequest('remove_expression')) {
 	$expression_action = 'R';
-	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
+	$_REQUEST['expr_target_single'] = getRequest('remove_expression');
 }
 
 $recovery_expression_action = '';
 if (hasRequest('add_recovery_expression')) {
-	$_REQUEST['recovery_expression'] = $_REQUEST['recovery_expr_temp'];
+	$_REQUEST['recovery_expression'] = getRequest('recovery_expr_temp');
 	$_REQUEST['recovery_expr_temp'] = '';
 }
 elseif (hasRequest('and_recovery_expression')) {
@@ -186,7 +186,7 @@ elseif (hasRequest('replace_recovery_expression')) {
 }
 elseif (hasRequest('remove_recovery_expression')) {
 	$recovery_expression_action = 'R';
-	$_REQUEST['recovery_expr_target_single'] = $_REQUEST['remove_recovery_expression'];
+	$_REQUEST['recovery_expr_target_single'] = getRequest('remove_recovery_expression');
 }
 
 if (hasRequest('clone') && hasRequest('triggerid')) {
@@ -561,8 +561,8 @@ else {
 	$data['paging'] = getPagingLine($data['triggers'], $sortOrder, $url);
 
 	$data['triggers'] = API::Trigger()->get([
-		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error',
-			'templateid', 'state', 'recovery_mode', 'recovery_expression'
+		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
+			'recovery_mode', 'recovery_expression'
 		],
 		'selectHosts' => ['hostid', 'host', 'name'],
 		'selectDependencies' => ['triggerid', 'description'],

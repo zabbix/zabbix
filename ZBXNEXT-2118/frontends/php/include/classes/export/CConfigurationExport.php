@@ -624,13 +624,13 @@ class CConfigurationExport {
 
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'output' => ['description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
+				'recovery_expression'
 			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectDependencies' => ['description', 'expression', 'recovery_expression'],
+			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -824,13 +824,13 @@ class CConfigurationExport {
 		$hostIds = array_merge($hostIds, $templateIds);
 
 		$triggers = API::Trigger()->get([
-			'hostids' => $hostIds,
-			'output' => ['description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
+				'recovery_expression'
 			],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'selectDependencies' => ['description', 'expression', 'recovery_expression'],
+			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
+			'hostids' => $hostIds,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -1349,8 +1349,8 @@ class CConfigurationExport {
 		$ids = [];
 
 		$triggers = API::Trigger()->get([
+			'output' => ['expression', 'description', 'recovery_expression'],
 			'triggerids' => $triggerIds,
-			'output' => ['description', 'expression', 'recovery_expression'],
 			'preservekeys' => true
 		]);
 

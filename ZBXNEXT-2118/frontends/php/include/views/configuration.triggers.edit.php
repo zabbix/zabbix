@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
 $widget = (new CWidget())->setTitle(_('Triggers'));
@@ -79,9 +80,7 @@ $expression_row = [
 	(new CTextArea(
 		$data['expression_field_name'],
 		$data['expression_field_value'],
-		[
-			'readonly' => $data['expression_field_readonly']
-		]
+		['readonly' => $data['expression_field_readonly']]
 	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
@@ -97,9 +96,9 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 	$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$expression_row[] = $insertMacroButton;
+	$expression_row[] = BR();
 
-	array_push($expression_row, BR());
-	if (empty($data['expression_formula'])) {
+	if ($data['expression_formula'] === '') {
 		// add button
 		$add_expression_button = (new CSubmit('add_expression', _('Add')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($data['limited']) {
@@ -158,7 +157,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 		]);
 
 	$allowed_testing = true;
-	if (!empty($data['expression_tree'])) {
+	if ($data['expression_tree']) {
 		foreach ($data['expression_tree'] as $i => $e) {
 			if (!isset($e['expression']['levelErrors'])) {
 				$errorImg = '';
@@ -183,7 +182,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
-					if (gettype($obj) == 'object' && get_class($obj) == 'CSpan'
+					if (gettype($obj) === 'object' && get_class($obj) === 'CSpan'
 							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
 						$obj->removeAttribute('class');
 						$obj->onClick(null);
@@ -223,13 +222,15 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 
 	$testButton = (new CButton('test_expression', _('Test')))
-		->onClick('openWinCentered("tr_testexpr.php?expression="+encodeURIComponent(this.form.elements["expression"].value),'.
-		'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
+		->onClick('openWinCentered("tr_testexpr.php?expression="+'.
+			'encodeURIComponent(this.form.elements["expression"].value),'.
+			'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;'
+		)
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
-	if (empty($data['expression_formula'])) {
+	if ($data['expression_formula'] === '') {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 
@@ -252,10 +253,10 @@ if ($data['expression_constructor'] == IM_TREE) {
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
 $event_generation = (new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
-			->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
-			->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
-			->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
-			->setModern(true);
+	->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
+	->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
+	->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
+	->setModern(true);
 
 if ($data['limited']) {
 	$event_generation->setEnabled(false);
@@ -283,17 +284,16 @@ $recovery_expression_row = [
 	(new CTextArea(
 		$data['recovery_expression_field_name'],
 		$data['recovery_expression_field_value'],
-		[
-			'readonly' => $data['recovery_expression_field_readonly']
-		]
+		['readonly' => $data['recovery_expression_field_readonly']]
 	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
 
 if ($data['recovery_expression_constructor'] == IM_TREE) {
-	array_push($recovery_expression_row, BR());
-	if (empty($data['recovery_expression_formula'])) {
+	$recovery_expression_row[] = BR();
+
+	if ($data['recovery_expression_formula'] === '') {
 		// add button
 		$add_recovery_expression_button = (new CSubmit('add_recovery_expression', _('Add')))
 			->addClass(ZBX_STYLE_BTN_GREY);
@@ -336,7 +336,8 @@ elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
 			'document.getElementById("recovery_expression_constructor").value='.
 				(($data['recovery_expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+			'document.forms["'.$triggersForm->getName().'"].submit();'
+		);
 	$recovery_expression_row[] = [BR(), $input_method_toggle];
 }
 
@@ -356,7 +357,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 
 	$allowed_testing = true;
 
-	if (!empty($data['recovery_expression_tree'])) {
+	if ($data['recovery_expression_tree']) {
 		foreach ($data['recovery_expression_tree'] as $i => $e) {
 			if (!isset($e['recovery_expression']['levelErrors'])) {
 				$errorImg = '';
@@ -381,7 +382,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			if ($data['limited']) {
 				// make all links inside inactive
 				foreach ($e['list'] as &$obj) {
-					if (gettype($obj) == 'object' && get_class($obj) == 'CSpan'
+					if (gettype($obj) === 'object' && get_class($obj) === 'CSpan'
 							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
 						$obj->removeAttribute('class');
 						$obj->onClick(null);
@@ -428,7 +429,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	if (!$allowed_testing) {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
-	if (empty($data['recovery_expression_formula'])) {
+	if ($data['recovery_expression_formula'] === '') {
 		$testButton->setAttribute('disabled', 'disabled');
 	}
 
