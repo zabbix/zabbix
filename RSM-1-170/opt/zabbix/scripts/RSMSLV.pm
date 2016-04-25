@@ -1242,6 +1242,29 @@ sub max_avail_time
 	return cycle_end(time() - $delay - AVAIL_SHIFT_BACK, $delay);
 }
 
+sub __print_probe_times
+{
+	my $probe_times_ref = shift;
+
+	info("Probe online times:");
+
+	foreach my $probe (keys(%{$probe_times_ref}))
+	{
+		info("  $probe");
+
+		my $idx = 0;
+		my $count = scalar(@{$probe_times_ref->{$probe}});
+
+		while ($idx < $count)
+		{
+			my $from = $probe_times_ref->{$probe}->[$idx++];
+			my $till = $probe_times_ref->{$probe}->[$idx++];
+
+			info("    ", selected_period($from, $till));
+		}
+	}
+}
+
 # Get online times of probe nodes.
 #
 # Returns hash of probe names as keys and array with online times as values:
@@ -1266,12 +1289,18 @@ sub get_probe_times
 			" and i.status<>".ITEM_STATUS_DISABLED.
 			" and i.key_='".PROBE_KEY_ONLINE."'");
 
+	my $result;
+
 	if (scalar(@{$items_ref}) == 0)
 	{
-		return get_probe_times2($from, $till, $probes_ref);
-	}
+		wrn("Probe main status items (".PROBE_KEY_ONLINE.") not available, will calculate manually.");
 
-	my $result;
+		$result = get_probe_times2($from, $till, $probes_ref);
+
+		__print_probe_times($result) if (opt('dry-run'));
+
+		return $result;
+	}
 
 	foreach my $item_ref (@{$items_ref})
 	{
@@ -1320,6 +1349,8 @@ sub get_probe_times
 			push(@{$result->{$probe}}, $till) if ($prev_value == UP);
 		}
 	}
+
+	__print_probe_times($result) if (opt('dry-run'));
 
 	return $result;
 }

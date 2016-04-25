@@ -52,10 +52,7 @@ my $cycle_till = cycle_end($value_ts, $delay);
 
 my $probes_ref = get_probes();
 
-my $t1 = time();
 my $probe_times_ref = get_probe_times($from, $cycle_till, $probes_ref);
-
-info("got probe times in ", format_stats_time(time() - $t1));
 
 my $tlds_ref;
 if (opt('tld'))
