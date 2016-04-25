@@ -471,7 +471,7 @@ if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 else {
 	$status = ($data['status'] == 0);
 }
-$triggersFormList->addRow(_('Enabled'),	(new CCheckBox('status'))->setChecked($status));
+$triggersFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // append tabs to form
 $triggersTab = new CTabView();
@@ -548,7 +548,7 @@ if (!empty($data['triggerid'])) {
 	}
 
 	$triggersTab->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),	[
+		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
 			new CButtonCancel(url_param('parent_discoveryid'))
