@@ -73,7 +73,7 @@ execute:
 			*len = match.rm_eo - match.rm_so;
 	}
 	else if (NULL != len)
-		len = 0;
+		*len = SUCCEED;
 out:
 	return c;
 }
