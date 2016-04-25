@@ -611,9 +611,10 @@ foreach ($triggers as $trigger) {
 
 	if ($showDetails) {
 		$description[] = BR();
+
 		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-			array_push($description, _('Problem'), ': ', $trigger['expression_html'], BR());
-			array_push($description, _('Recovery'), ': ', $trigger['recovery_expression_html']);
+			$description[] = [_('Problem'), ': ', $trigger['expression_html'], BR()];
+			$description[] = [_('Recovery'), ': ', $trigger['recovery_expression_html']];
 		}
 		else {
 			$description[] = $trigger['expression_html'];

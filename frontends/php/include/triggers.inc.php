@@ -14,8 +14,8 @@
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with this program; ifnot, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -1124,9 +1124,10 @@ function make_trigger_details($trigger) {
 }
 
 /**
- * Analyze an expression and returns expression html tree
+ * Analyze an expression and returns expression html tree.
  *
- * @param string $expression
+ * @param string $expression		Trigger expression or recovery expression string.
+ * @param int $type					Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
  * @return array
  */
@@ -1149,18 +1150,20 @@ function analyzeExpression($expression, $type) {
 }
 
 /**
- * Builds expression html tree
+ * Builds expression HTML tree.
  *
- * @param array 	$expressionTree 	output of getExpressionTree() function
- * @param array 	$next           	parameter only for recursive call; should be empty array
- * @param int 		$letterNum      	parameter only for recursive call; should be 0
- * @param int 		$level          	parameter only for recursive call
- * @param string 	$operator       	parameter only for recursive call
+ * @param array 	$expressionTree 	Output of getExpressionTree() function.
+ * @param array 	$next           	Parameter only for recursive call; should be empty array.
+ * @param int 		$letterNum      	Parameter only for recursive call; should be 0.
+ * @param int 		$level          	Parameter only for recursive call.
+ * @param string 	$operator       	Parameter only for recursive call.
+ * @param int		$type				Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
- * @return array	array containing the trigger expression formula as the first element and an array describing the
- *					expression tree as the second
+ * @return array	Array containing the trigger expression formula as the first element and an array describing the
+ *					expression tree as the second.
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null, $type) {
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
+		$type) {
 	$treeList = [];
 	$outline = '';
 
@@ -1189,7 +1192,8 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				$treeList[] = $levelDetails;
 
 				list($subOutline, $subTreeList) = buildExpressionHtmlTree($element['elements'], $next, $letterNum,
-						$level + 1, $element['operator'], $type);
+					$level + 1, $element['operator'], $type
+				);
 				$treeList = array_merge($treeList, $subTreeList);
 
 				$outline .= ($level == 0) ? $subOutline : '('.$subOutline.')';
@@ -1197,6 +1201,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$outline .= ' '.$operator.' ';
 				}
 				break;
+
 			case 'expression':
 				$next[$level] = ($key != $lastKey);
 
@@ -1244,6 +1249,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				break;
 		}
 	}
+
 	return [$outline, $treeList];
 }
 

@@ -586,7 +586,7 @@ class CTrigger extends CTriggerGeneral {
 
 		// select all triggers which are deleted (including children)
 		$delTriggers = $this->get([
-			'output' => ['triggerid', 'description', 'expression'],
+			'output' => ['triggerid', 'description'],
 			'triggerids' => $triggerIds,
 			'nopermissions' => true,
 			'selectHosts' => ['name']
@@ -595,10 +595,12 @@ class CTrigger extends CTriggerGeneral {
 		// TODO: REMOVE info
 		foreach ($delTriggers as $trigger) {
 			info(_s('Deleted: Trigger "%1$s" on "%2$s".', $trigger['description'],
-					implode(', ', zbx_objectValues($trigger['hosts'], 'name'))));
+				implode(', ', zbx_objectValues($trigger['hosts'], 'name'))
+			));
 
-			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'],
-					$trigger['description'], null, null, null);
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_TRIGGER, $trigger['triggerid'], $trigger['description'],
+				null, null, null
+			);
 		}
 
 		// execute delete

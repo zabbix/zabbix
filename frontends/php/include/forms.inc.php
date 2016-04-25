@@ -1418,13 +1418,15 @@ function getTriggerMassupdateFormData() {
  */
 function getTriggerFormData(array $data) {
 	if (!empty($data['triggerid'])) {
-		// get trigger
+		// Get trigger.
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
-		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+		$triggers = $data['parent_discoveryid']
+			? API::TriggerPrototype()->get($options)
+			: API::Trigger()->get($options);
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
@@ -1503,7 +1505,7 @@ function getTriggerFormData(array $data) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 		if ($analyze !== false) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
-			if ($data['expression_action'] !== '' && $data['expression_tree'] != null) {
+			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
 					$data['expression_action'], $data['expr_temp']
 				);
@@ -1542,7 +1544,7 @@ function getTriggerFormData(array $data) {
 		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
 		if ($analyze !== false) {
 			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] != null) {
+			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
 					$data['recovery_expression_action'], $data['recovery_expr_temp']
 				);

@@ -33,7 +33,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Get trigger prototypes from database.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.0/manual/api/reference/triggerprototype/get
+	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/get
 	 *
 	 * @param array $options
 	 *
@@ -428,7 +428,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Create new trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.0/manual/api/reference/triggerprototype/create
+	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/create
 	 *
 	 * @param array $trigger_prototypes
 	 *
@@ -464,43 +464,43 @@ class CTriggerPrototype extends CTriggerGeneral {
 	/**
 	 * Update existing trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.0/manual/api/reference/triggerprototype/update
+	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/update
 	 *
-	 * @param array $triggerPrototypes
+	 * @param array $trigger_prototypes
 	 *
 	 * @return array
 	 */
-	public function update(array $triggerPrototypes) {
-		$triggerPrototypes = zbx_toArray($triggerPrototypes);
+	public function update(array $trigger_prototypes) {
+		$trigger_prototypes = zbx_toArray($trigger_prototypes);
 		$db_triggers = [];
 
-		$this->validateUpdate($triggerPrototypes, $db_triggers);
-		$this->updateReal($triggerPrototypes, $db_triggers);
+		$this->validateUpdate($trigger_prototypes, $db_triggers);
+		$this->updateReal($trigger_prototypes, $db_triggers);
 
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			$this->inherit($triggerPrototype);
+		foreach ($trigger_prototypes as $trigger_prototype) {
+			$this->inherit($trigger_prototype);
 		}
 
 		$updateDependencies = false;
 
-		foreach ($triggerPrototypes as $triggerPrototype) {
-			if (isset($triggerPrototype['dependencies']) && is_array($triggerPrototype['dependencies'])) {
+		foreach ($trigger_prototypes as $trigger_prototype) {
+			if (isset($trigger_prototype['dependencies']) && is_array($trigger_prototype['dependencies'])) {
 				$updateDependencies = true;
 				break;
 			}
 		}
 
 		if ($updateDependencies) {
-			$this->updateDependencies($triggerPrototypes);
+			$this->updateDependencies($trigger_prototypes);
 		}
 
-		return ['triggerids' => zbx_objectValues($triggerPrototypes, 'triggerid')];
+		return ['triggerids' => zbx_objectValues($trigger_prototypes, 'triggerid')];
 	}
 
 	/**
 	 * Delete existing trigger prototypes.
 	 *
-	 * @see https://www.zabbix.com/documentation/3.0/manual/api/reference/triggerprototype/delete
+	 * @see https://www.zabbix.com/documentation/3.2/manual/api/reference/triggerprototype/delete
 	 *
 	 * @param array $triggerPrototypeIds
 	 * @param bool  $nopermissions

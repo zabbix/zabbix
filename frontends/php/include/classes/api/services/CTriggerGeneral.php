@@ -538,8 +538,8 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		$options = [
-			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
-				'status', 'priority', 'comments', 'type', 'templateid'
+			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
+				'templateid', 'recovery_mode', 'recovery_expression'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -560,7 +560,7 @@ abstract class CTriggerGeneral extends CApiService {
 		);
 
 		if ($class === 'CTrigger') {
-			// discovered fields, except status, cannot be updated
+			// Discovered fields, except status, cannot be updated.
 			$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 				'allowed' => ['triggerid', 'status'],
 				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
@@ -628,7 +628,7 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($expressions_changed) {
 				$this->checkTriggerExpressions($trigger);
 
-				// if the expression has changed, revalidate the existing dependencies
+				// If the expression has changed, revalidate the existing dependencies.
 				if (!array_key_exists('dependencies', $trigger)) {
 					$trigger['dependencies'] = $_db_trigger['dependencies'];
 				}
@@ -680,8 +680,6 @@ abstract class CTriggerGeneral extends CApiService {
 			default:
 				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
 		}
-
-		$hostnames = [];
 
 		$new_triggers = $triggers;
 		$new_functions = [];
@@ -925,9 +923,9 @@ abstract class CTriggerGeneral extends CApiService {
 		$functions_num = 0;
 
 		foreach ($triggers as $tnum => $trigger) {
-			$expressions_changed = $db_triggers === null
+			$expressions_changed = ($db_triggers === null
 				|| ($trigger['expression'] !== $db_triggers[$tnum]['expression']
-				|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']);
+					|| $trigger['recovery_expression'] !== $db_triggers[$tnum]['recovery_expression']));
 
 			if (!$expressions_changed) {
 				continue;
@@ -1249,7 +1247,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateTriggersWithMultipleTemplates($mt_triggers) {
+	protected function validateTriggersWithMultipleTemplates(array $mt_triggers) {
 		switch (get_class($this)) {
 			case 'CTrigger':
 				$expressionData = new CTriggerExpression(['lldmacros' => false]);
@@ -1318,7 +1316,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateMovedTriggers($moved_triggers) {
+	protected function validateMovedTriggers(array $moved_triggers) {
 		$_db_triggers = DBselect(
 			'SELECT t.templateid'.
 			' FROM triggers t'.
@@ -1360,5 +1358,4 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->inherit($trigger, $data['hostids']);
 		}
 	}
-
 }

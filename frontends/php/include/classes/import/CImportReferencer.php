@@ -794,7 +794,7 @@ class CImportReferencer {
 			$this->triggersRefs = [];
 
 			$dbTriggers = API::Trigger()->get([
-				'output' => ['description', 'expression', 'recovery_expression'],
+				'output' => ['triggerid', 'expression', 'description', 'recovery_expression'],
 				'filter' => [
 					'description' => array_keys($this->triggers),
 					'flags' => [
