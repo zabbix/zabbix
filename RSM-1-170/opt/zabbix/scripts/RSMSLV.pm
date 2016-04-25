@@ -1256,19 +1256,19 @@ sub get_probe_times
 {
 	my $from = shift;
 	my $till = shift;
-	my $probes_ref = shift;	# 'probe' => hostid
+	my $probes_ref = shift; # { host => hostid, ... }
 
-	$probes_ref = get_probes() unless ($probes_ref);
-
-	my $hostids = join(',', values(%$probes_ref));
+	$probes_ref = get_probes() unless (defined($probes_ref));
 
 	fail("no probes configured") if (!$hostids);
 
 	my $items_ref = db_select(
-		"select itemid,hostid".
-		" from items".
-		" where hostid in ($hostids)".
-			" and key_='".PROBE_KEY_ONLINE."'");
+		"select i.itemid,h.host".
+		" from items i,hosts h".
+		" where i.hostid=h.hostid".
+			" and i.templateid is not null".
+			" and i.status<>".ITEM_STATUS_DISABLED.
+			" and i.key_='".PROBE_KEY_ONLINE."'");
 
 	if (scalar(@{$items_ref}) == 0)
 	{
@@ -1277,13 +1277,12 @@ sub get_probe_times
 
 	my $result;
 
-	my %probes_reverse = reverse(%{$probes_ref});
-
 	foreach my $item_ref (@{$items_ref})
 	{
 		my $itemid = $item_ref->[0];
-		my $hostid = $item_ref->[1];
-		my $probe = $probes_reverse{$hostid};
+		my $host = $item_ref->[1];
+
+		my $probe = substr($host, 0, -length(' - mon'));	# get rid of " - mon"
 
 		my $values_ref = db_select(
 			"select clock,value".
@@ -1324,7 +1323,6 @@ sub get_probe_times
 		{
 			push(@{$result->{$probe}}, $till) if ($prev_value == UP);
 		}
-
 	}
 
 	return $result;

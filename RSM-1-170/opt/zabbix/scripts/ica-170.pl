@@ -74,6 +74,11 @@ my $slv_items_to_remove =
 	'rsm.slv.%.month%'
 ];
 
+my $probe_items_to_remove =
+[
+	'rsm.probe.online'
+];
+
 my $triggers_to_rename =
 {
 	'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for over {$IP.MAX.OFFLINE.MANUAL} hours'
@@ -92,4 +97,28 @@ foreach my $key (@{$slv_items_to_remove})
 {
 	db_exec("delete from items where key_ like '$key'");
 }
+foreach my $key (@{$probe_items_to_remove})
+{
+	db_exec("delete from items where key_='$key'");
+}
+
+
+print("Creating probe mon items...\n");
+{
+	my $result = $zabbix->get('template', {'filter' => {'host' => 'Template Proxy Health'}});
+	my $templateid = $result->{'templateid'};
+	$result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => 'Probe Availability'}});
+	pfail("cannot get application ID of 'Probe availability': ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
+	my $applicationid = $result->{'applicationid'};
+	pfail("cannot get application ID of 'Probe availability'") unless (defined($applicationid));
+	my $options = {'name' => 'Probe main status',
+		       'key_'=> 'rsm.probe.online',
+		       'hostid' => $templateid,
+		       'applications' => [$applicationid],
+		       'type' => 2, 'value_type' => 3,
+		       'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
+	$zabbix->create('item', $options);
+	pfail("cannot create item for probe main status: ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
+}
+
 print("Done!\n");

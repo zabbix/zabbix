@@ -1504,6 +1504,15 @@ sub create_probe_health_tmpl() {
 
     create_trigger($options);
 
+    $options = {'name' => 'Probe main status',
+		'key_'=> 'rsm.probe.online',
+		'hostid' => $templateid,
+		'applications' => [get_application_id('Probe Availability', $templateid)],
+		'type' => 2, 'value_type' => 3,
+		'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
+
+    create_item($options);
+
     return $templateid;
 }
 
