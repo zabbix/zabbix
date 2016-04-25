@@ -132,7 +132,7 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 		->addClass(ZBX_STYLE_BTN_LINK);
 	$expression_row[] = [BR(), $input_method_toggle];
 }
-$triggersFormList->addRow(_('Expression'), $expression_row);
+$triggersFormList->addRow(_('Expression'), $expression_row, 'expression_row');
 
 // Append expression table to form list.
 if ($data['expression_constructor'] == IM_TREE) {
@@ -332,7 +332,9 @@ elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
 	$recovery_expression_row[] = [BR(), $input_method_toggle];
 }
 
-$triggersFormList->addRow(_('Recovery expression'), $recovery_expression_row);
+$triggersFormList->addRow(_('Recovery expression'), $recovery_expression_row, null,
+	'recovery_expression_constructor_row'
+);
 
 // Append expression table to form list.
 if ($data['recovery_expression_constructor'] == IM_TREE) {
@@ -432,7 +434,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 		(new CDiv([$recovery_expression_table, $testButton]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	]);
+	], null, 'recovery_expression_constructor_row');
 
 	$input_method_toggle = (new CButton(null, _('Close expression constructor')))
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -440,7 +442,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
 			'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
 			'document.forms["'.$triggersForm->getName().'"].submit();');
-	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
+	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 
 $triggersFormList
