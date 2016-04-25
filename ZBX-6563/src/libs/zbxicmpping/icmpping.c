@@ -330,14 +330,7 @@ static int	process_ping(ZBX_FPING_HOST *hosts, int hosts_count, int count, int i
 			{
 				if (1 == host->status[index])
 				{
-					const double	min_ping_time = 0.0001;
-
 					sec = atof(c) / 1000; /* convert ms to seconds */
-
-					/* changing result to 0.0001 when latency is less than that avoid */
-					/* the result being rounded to 0 when storing  it in the database */
-					if (0 < sec && min_ping_time > sec)
-						sec = min_ping_time;
 
 					if (0 == host->rcv || host->min > sec)
 						host->min = sec;
