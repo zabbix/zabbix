@@ -272,8 +272,7 @@ $add_recovery_expression_button = (new CButton('insert',
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 			'&dstfld1='.$data['recovery_expression_field_name'].
 			'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
-			'&recovery_expression="'.
-				'+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
+			'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
 	);
 
 if ($data['limited']) {
