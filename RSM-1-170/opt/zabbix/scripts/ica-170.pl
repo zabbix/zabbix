@@ -79,6 +79,8 @@ my $triggers_to_rename =
 	'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for over {$IP.MAX.OFFLINE.MANUAL} hours'
 };
 
+my $slv_monthly_items =
+
 print("Renaming triggers...\n");
 foreach my $from (keys(%{$triggers_to_rename}))
 {
@@ -106,10 +108,7 @@ foreach my $key (@{$slv_items_to_remove})
 	{
 		print("Creating probe mon items...\n");
 
-		my $result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => $application}});
-		pfail("cannot get application ID of \"$application\": ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
-		my $applicationid = $result->{'applicationid'};
-		pfail("cannot get application ID of \"$application\"") unless (defined($applicationid));
+		my $applicationid = __get_applicationid($templateid, $application);
 
 		my $options = {'name' => $name,
 			       'key_'=> $item,
@@ -121,4 +120,185 @@ foreach my $key (@{$slv_items_to_remove})
 		pfail("cannot create item for probe main status: ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
 	}
 }
+
+print("Creating SLV items...\n");
+__create_missing_slv_montly_items();
 print("Done!\n");
+
+sub __create_item
+{
+	my $options = shift;
+
+	my $result;
+
+	if ($zabbix->exist('item', {'hostid' => $options->{'hostid'}, 'key_' => $options->{'key_'}}))
+	{
+		$result = $zabbix->get('item', {'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
+
+		if ('ARRAY' eq ref($result))
+		{
+			pfail("Request: ", Dumper($options),
+				"returned more than one item with key ", $options->{'key_'}, ":\n",
+				Dumper($result));
+		}
+
+		$options->{'itemid'} = $result->{'itemid'};
+
+		$result = $zabbix->update('item', $options);
+	}
+	else
+	{
+		$result = $zabbix->create('item', $options);
+	}
+
+	pfail($zabbix->last_error) if (defined($zabbix->last_error));
+
+	$result = ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
+
+	return $result;
+}
+
+sub __create_slv_item
+{
+	my $name = shift;
+	my $key = shift;
+	my $hostid = shift;
+	my $value_type = shift;
+	my $applicationids = shift;
+
+	my $options;
+	if ($value_type == VALUE_TYPE_AVAIL)
+	{
+		$options = {'name' => $name,
+			    'key_'=> $key,
+			    'hostid' => $hostid,
+			    'type' => 2, 'value_type' => 3,
+			    'applications' => $applicationids,
+			    'status' => ITEM_STATUS_ACTIVE,
+			    'valuemapid' => rsm_value_mappings->{'rsm_avail'}};
+	}
+	elsif ($value_type == VALUE_TYPE_NUM)
+	{
+		$options = {'name' => $name,
+			    'key_'=> $key,
+			    'hostid' => $hostid,
+			    'type' => 2, 'value_type' => 3,
+			    'status' => ITEM_STATUS_ACTIVE,
+			    'applications' => $applicationids};
+	}
+	elsif ($value_type == VALUE_TYPE_PERC)
+	{
+		$options = {'name' => $name,
+			    'key_'=> $key,
+			    'hostid' => $hostid,
+			    'type' => 2, 'value_type' => 0,
+			    'applications' => $applicationids,
+			    'status' => ITEM_STATUS_ACTIVE,
+			    'units' => '%'};
+	}
+	else
+	{
+		pfail("Unknown value type $value_type.");
+	}
+
+	return __create_item($options);
+}
+
+sub __get_applicationid
+{
+	my $hostid = shift;
+	my $application = shift;
+
+	my $result = $zabbix->get('application', {'hostids' => [$hostid], 'filter' => {'name' => $application}});
+	pfail("cannot get application ID of \"$application\": ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
+	my $applicationid = $result->{'applicationid'};
+	pfail("cannot get application ID of \"$application\"") unless (defined($applicationid));
+
+	return $applicationid;
+}
+
+sub __create_slv_monthly($$$)
+{
+	my $test_name = shift;
+	my $key_base = shift;
+	my $hostid = shift;
+
+	my $applicationid = __get_applicationid($hostid, APP_SLV_MONTHLY);
+
+	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.pfailed'}))
+	{
+		__create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC, [$applicationid]);
+	}
+	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.failed'}))
+	{
+		__create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,  [$applicationid]);
+	}
+	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.max'}))
+	{
+		__create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,  [$applicationid]);
+	}
+	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.avg'}))
+	{
+		__create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_NUM,  [$applicationid]);
+	}
+}
+
+sub __get_host_macro($$)
+{
+	my $hostid = shift;
+	my $m = shift;
+
+	my $rows_ref = db_select("select value from hostmacro where hostid=$hostid and macro='$m'");
+
+	fail("cannot find macro '$m'") unless (1 == scalar(@$rows_ref));
+
+	return $rows_ref->[0]->[0];
+}
+
+sub __create_missing_slv_montly_items
+{
+	foreach (@{$tlds_ref})
+	{
+		$tld = $_;	# set globally
+
+		print("  $tld\n");
+
+		my $rows_ref = db_select("select hostid from hosts where host='$tld'");
+
+		pfail("cannot find TLD \"$tld\" in the database") unless (scalar(@{$rows_ref}) == 1);
+
+		my $hostid = $rows_ref->[0]->[0];
+
+		$rows_ref = db_select("select hostid from hosts where host='Template $tld'");
+
+		pfail("cannot find TLD \"$tld\" in the database") unless (scalar(@{$rows_ref}) == 1);
+
+		my $templateid = $rows_ref->[0]->[0];
+
+		my $rdds_enabled = __get_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}');
+		my $epp_enabled = __get_host_macro($templateid, '{$RSM.TLD.EPP.ENABLED}');
+
+		__create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid);
+		__create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid);
+
+		if ($rdds_enabled == 1)
+		{
+			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid);
+			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds80.rtt", $hostid);
+		}
+
+		if ($epp_enabled == 1)
+		{
+			__create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $hostid);
+
+			if ($rdds_enabled == 1)
+			{
+				__create_slv_monthly("RDDS update time", "rsm.slv.rdds.upd", $hostid);
+			}
+
+			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.login', $hostid);
+			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.update', $hostid);
+			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.update', $hostid);
+		}
+	}
+}

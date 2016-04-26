@@ -1,10 +1,6 @@
 #!/usr/bin/perl
 #
 # DNS monthly resolution RTT (TCP)
-#
-# 1) run through all periods in a month (rsm.dns.tcp.rtt delay)
-# 2) for each period calculate resolution RTT of every NS taking probe status into account
-# 3) calculate and save the percentage of successful RTTs
 
 BEGIN
 {
