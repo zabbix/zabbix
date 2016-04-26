@@ -362,13 +362,20 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 		}
 		$result = DBend($result);
 
+		$graphids = zbx_toArray(getRequest('group_graphid'));
+
 		if ($result) {
 			uncheckTableRows(
 				(getRequest('parent_discoveryid') == 0) ? $hostId : getRequest('parent_discoveryid')
 			);
 			unset($_REQUEST['group_graphid']);
 		}
-		show_messages($result, _('Graphs copied'), _('Cannot copy graphs'));
+
+		$graphs_count = count($graphids);
+		show_messages($result,
+			_n('Graph copied', 'Graphs copied', $graphs_count),
+			_n('Cannot copy graph', 'Cannot copy graphs', $graphs_count)
+		);
 	}
 	else {
 		error(_('No target selected.'));
