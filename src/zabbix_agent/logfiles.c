@@ -1392,7 +1392,7 @@ static int	make_logfile_list(unsigned char flags, const char *filename, const in
 
 		if (0 == *logfiles_num)
 		{
-			/* Do not make logrt[] and /logrt.count[] items NOTSUPPORTED if there are no matching log */
+			/* Do not make logrt[] and logrt.count[] items NOTSUPPORTED if there are no matching log */
 			/* files or they are not accessible (can happen during a rotation), just log the problem. */
 #ifdef _WINDOWS
 			zabbix_log(LOG_LEVEL_WARNING, "there are no files matching \"%s\" in \"%s\" or insufficient "
