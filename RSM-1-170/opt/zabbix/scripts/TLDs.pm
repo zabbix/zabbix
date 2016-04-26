@@ -849,10 +849,10 @@ sub create_cron_jobs($) {
     my $downtime_limit = 11;
     my $downtime_cur = $downtime_shift;
 
-    my $month_shift = 10;
-    my $month_step = 1;
-    my $month_limit = 20;
-    my $month_cur = $month_shift;
+    my $rtt_shift = 10;
+    my $rtt_step = 1;
+    my $rtt_limit = 20;
+    my $rtt_cur = $rtt_shift;
 
     $rv = opendir DIR, $slv_path;
 
@@ -862,12 +862,12 @@ sub create_cron_jobs($) {
     while (($slv_file = readdir DIR)) {
 	next unless ($slv_file =~ /^rsm\..*\.pl$/);
 
-	if ($slv_file =~ /\.slv\..*\.month\.pl$/)
+	if ($slv_file =~ /\.slv\..*\.rtt\.pl$/)
 	{
-	    # monthly data
-	    system("echo '* * * * * root sleep $month_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
-	    $month_cur += $month_step;
-	    $month_cur = $month_shift if ($month_cur >= $month_limit);
+	    # monthly RTT data
+	    system("echo '* * * * * root sleep $rtt_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
+	    $rtt_cur += $rtt_step;
+	    $rtt_cur = $rtt_shift if ($rtt_cur >= $rtt_limit);
 	}
 	elsif ($slv_file =~ /\.slv\..*\.downtime\.pl$/)
 	{
