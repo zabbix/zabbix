@@ -624,11 +624,13 @@ class CConfigurationExport {
 
 		// gather trigger prototypes
 		$triggers = API::TriggerPrototype()->get([
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
+				'recovery_expression'
+			],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
-			'selectDependencies' => ['description', 'expression'],
+			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -822,11 +824,13 @@ class CConfigurationExport {
 		$hostIds = array_merge($hostIds, $templateIds);
 
 		$triggers = API::Trigger()->get([
-			'hostids' => $hostIds,
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'selectDependencies' => ['description', 'expression'],
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
+				'recovery_expression'
+			],
+			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
+			'hostids' => $hostIds,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
 			'preservekeys' => true
 		]);
@@ -877,11 +881,15 @@ class CConfigurationExport {
 				}
 			}
 
-			$trigger['dependencies'] = CMacrosResolverHelper::resolveTriggerExpressions($trigger['dependencies']);
+			$trigger['dependencies'] = CMacrosResolverHelper::resolveTriggerExpressions($trigger['dependencies'],
+				['sources' => ['expression', 'recovery_expression']]
+			);
 		}
 		unset($trigger);
 
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 
 		return $triggers;
 	}
@@ -1341,17 +1349,20 @@ class CConfigurationExport {
 		$ids = [];
 
 		$triggers = API::Trigger()->get([
+			'output' => ['expression', 'description', 'recovery_expression'],
 			'triggerids' => $triggerIds,
-			'output' => ['description', 'expression'],
 			'preservekeys' => true
 		]);
 
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
 
 		foreach ($triggers as $id => $trigger) {
 			$ids[$id] = [
 				'description' => $trigger['description'],
-				'expression' => $trigger['expression']
+				'expression' => $trigger['expression'],
+				'recovery_expression' => $trigger['recovery_expression']
 			];
 		}
 

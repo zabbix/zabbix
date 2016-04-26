@@ -45,7 +45,10 @@ $triggersTable = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
 	]);
 
-$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], ['html' => true]);
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
+	'html' => true,
+	'sources' => ['expression', 'recovery_expression']
+]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -131,6 +134,16 @@ foreach ($this->data['triggers'] as $trigger) {
 		->addClass(triggerIndicatorStyle($trigger['status']))
 		->addSID();
 
+	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+		$expression = [
+			_('Problem'), ': ', $trigger['expression'], BR(),
+			_('Recovery'), ': ', $trigger['recovery_expression']
+		];
+	}
+	else {
+		$expression = $trigger['expression'];
+	}
+
 	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);
 
@@ -138,7 +151,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		$checkBox,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
-		$trigger['expression'],
+		$expression,
 		$status
 	]);
 }
