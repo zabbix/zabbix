@@ -1341,7 +1341,7 @@ static int	get_history_log_value(const char *expression, char **replace_to, int 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid)
+static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_functionid, int raw)
 {
 	const char	*__function_name = "DBitem_lastvalue";
 
@@ -1380,7 +1380,10 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
-			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+
+			if (0 == raw)
+				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
 			ret = SUCCEED;
@@ -1403,7 +1406,7 @@ out:
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns)
+static int	DBitem_value(const char *expression, char **value, int N_functionid, int clock, int ns, int raw)
 {
 	const char	*__function_name = "DBitem_value";
 
@@ -1439,7 +1442,10 @@ static int	DBitem_value(const char *expression, char **value, int N_functionid, 
 
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
-			zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+
+			if (0 == raw)
+				zbx_format_value(tmp, sizeof(tmp), valuemapid, row[2], value_type);
+
 			*value = zbx_strdup(*value, tmp);
 
 			ret = SUCCEED;
@@ -2370,7 +2376,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED, pos = 0, func_macro,
-				found;
+				found, raw_value;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2409,6 +2415,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		require_numeric = 0;
 		/* temporarily reset function id to 0 before parsing possible indexed macros */
 		N_functionid = 0;
+		raw_value = 0;
 
 		switch (token.type)
 		{
@@ -2424,6 +2431,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					N_functionid = *p - '0';
 				break;
 			case ZBX_TOKEN_FUNC_MACRO:
+				raw_value = 1;
 				p = *data + token.data.func_macro.macro.r - 1;
 				m = *data + token.data.func_macro.macro.l;
 				if ('1' <= *p && *p <= '9')
@@ -2561,7 +2569,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
 					func_macro = 1;
-					ret = DBitem_lastvalue(c_event->trigger.expression, &replace_to, N_functionid);
+					ret = DBitem_lastvalue(c_event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_LOG_AGE))
 				{
@@ -2619,7 +2628,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					func_macro = 1;
 					ret = DBitem_value(c_event->trigger.expression, &replace_to, N_functionid,
-							c_event->clock, c_event->ns);
+							c_event->clock, c_event->ns, raw_value);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
@@ -3341,13 +3350,14 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				else if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
 				{
 					func_macro = 1;
-					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid);
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
 				{
 					func_macro = 1;
 					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
-							event->clock, event->ns);
+							event->clock, event->ns, raw_value);
 				}
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
