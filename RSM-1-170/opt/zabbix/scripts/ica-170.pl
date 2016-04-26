@@ -74,11 +74,6 @@ my $slv_items_to_remove =
 	'rsm.slv.%.month%'
 ];
 
-my $probe_items_to_remove =
-[
-	'rsm.probe.online'
-];
-
 my $triggers_to_rename =
 {
 	'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for over {$IP.MAX.OFFLINE.MANUAL} hours'
@@ -97,28 +92,33 @@ foreach my $key (@{$slv_items_to_remove})
 {
 	db_exec("delete from items where key_ like '$key'");
 }
-foreach my $key (@{$probe_items_to_remove})
-{
-	db_exec("delete from items where key_='$key'");
-}
 
-
-print("Creating probe mon items...\n");
 {
-	my $result = $zabbix->get('template', {'filter' => {'host' => 'Template Proxy Health'}});
+	my $host = 'Template Proxy Health';
+	my $item = 'rsm.probe.online';
+	my $name = 'Probe main status';
+	my $application = 'Probe Availability';
+
+	my $result = $zabbix->get('template', {'filter' => {'host' => $host}});
+	pfail("cannot find template \"$host\": ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
 	my $templateid = $result->{'templateid'};
-	$result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => 'Probe Availability'}});
-	pfail("cannot get application ID of 'Probe availability': ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
-	my $applicationid = $result->{'applicationid'};
-	pfail("cannot get application ID of 'Probe availability'") unless (defined($applicationid));
-	my $options = {'name' => 'Probe main status',
-		       'key_'=> 'rsm.probe.online',
-		       'hostid' => $templateid,
-		       'applications' => [$applicationid],
-		       'type' => 2, 'value_type' => 3,
-		       'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
-	$zabbix->create('item', $options);
-	pfail("cannot create item for probe main status: ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
-}
+	unless ($zabbix->exist('item', {'hostid' => $templateid, 'key_' => $item}))
+	{
+		print("Creating probe mon items...\n");
 
+		my $result = $zabbix->get('application', {'hostids' => [$templateid], 'filter' => {'name' => $application}});
+		pfail("cannot get application ID of \"$application\": ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
+		my $applicationid = $result->{'applicationid'};
+		pfail("cannot get application ID of \"$application\"") unless (defined($applicationid));
+
+		my $options = {'name' => $name,
+			       'key_'=> $item,
+			       'hostid' => $templateid,
+			       'applications' => [$applicationid],
+			       'type' => 2, 'value_type' => 3,
+			       'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
+		$zabbix->create('item', $options);
+		pfail("cannot create item for probe main status: ", Dumper($zabbix->last_error)) if (defined($zabbix->last_error));
+	}
+}
 print("Done!\n");
