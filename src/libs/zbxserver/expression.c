@@ -71,14 +71,9 @@
  ******************************************************************************/
 static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64_t *functionid, const char **end)
 {
-	const char			*__function_name = "get_N_functionid";
-
 	enum state_t {NORMAL, ID}	state = NORMAL;
 	int				num = 0, ret = FAIL;
 	const char			*c, *p_functionid = NULL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s' N_functionid:%d",
-			__function_name, expression, N_functionid);
 
 	for (c = expression; '\0' != *c; c++)
 	{
@@ -106,9 +101,6 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 			{
 				if (++num == N_functionid)
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() functionid:" ZBX_FS_UI64,
-							__function_name, *functionid);
-
 					if (NULL != end)
 						*end = c + 1;
 
@@ -121,8 +113,6 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
 	return ret;
 }
 
@@ -132,16 +122,18 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
  *                                                                            *
  * Purpose: get identifiers of the functions used in expression               *
  *                                                                            *
- * Parameters: expression   - [IN] null terminated trigger expression         *
- *                            '{11}=1 & {2346734}>5'                          *
- *             count        - [IN] the maximum number of functions to parse   *
- *             functionids  - [OUT] the resulting vector of function ids      *
+ * Parameters: functionids - [OUT] the resulting vector of function ids       *
+ *             expression  - [IN] null terminated trigger expression          *
+ *                           '{11}=1 & {2346734}>5'                           *
  *                                                                            *
  ******************************************************************************/
 void	get_functionids(zbx_vector_uint64_t *functionids, const char *expression)
 {
 	const char	*start = expression;
 	zbx_uint64_t	functionid;
+
+	if ('\0' == *expression)
+		return;
 
 	while (SUCCEED == get_N_functionid(start, 1, &functionid, &start))
 		zbx_vector_uint64_append(functionids, functionid);
@@ -1690,21 +1682,23 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_ITEM_LOG_SEVERITY		"{ITEM.LOG.SEVERITY}"
 #define MVAR_ITEM_LOG_NSEVERITY		"{ITEM.LOG.NSEVERITY}"
 #define MVAR_ITEM_LOG_EVENTID		"{ITEM.LOG.EVENTID}"
-#define MVAR_TRIGGER_DESCRIPTION	"{TRIGGER.DESCRIPTION}"
-#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"		/* deprecated */
-#define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
-#define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
-#define MVAR_TRIGGER_NAME_ORIG		"{TRIGGER.NAME.ORIG}"
-#define MVAR_TRIGGER_EXPRESSION		"{TRIGGER.EXPRESSION}"
-#define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
-#define MVAR_TRIGGER_NSEVERITY		"{TRIGGER.NSEVERITY}"
-#define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
-#define MVAR_TRIGGER_STATE		"{TRIGGER.STATE}"
-#define MVAR_TRIGGER_TEMPLATE_NAME	"{TRIGGER.TEMPLATE.NAME}"
-#define MVAR_TRIGGER_HOSTGROUP_NAME	"{TRIGGER.HOSTGROUP.NAME}"
-#define MVAR_STATUS			"{STATUS}"			/* deprecated */
-#define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
-#define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
+
+#define MVAR_TRIGGER_DESCRIPTION		"{TRIGGER.DESCRIPTION}"
+#define MVAR_TRIGGER_COMMENT			"{TRIGGER.COMMENT}"		/* deprecated */
+#define MVAR_TRIGGER_ID				"{TRIGGER.ID}"
+#define MVAR_TRIGGER_NAME			"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_NAME_ORIG			"{TRIGGER.NAME.ORIG}"
+#define MVAR_TRIGGER_EXPRESSION			"{TRIGGER.EXPRESSION}"
+#define MVAR_TRIGGER_EXPRESSION_RECOVERY	"{TRIGGER.EXPRESSION.RECOVERY}"
+#define MVAR_TRIGGER_SEVERITY			"{TRIGGER.SEVERITY}"
+#define MVAR_TRIGGER_NSEVERITY			"{TRIGGER.NSEVERITY}"
+#define MVAR_TRIGGER_STATUS			"{TRIGGER.STATUS}"
+#define MVAR_TRIGGER_STATE			"{TRIGGER.STATE}"
+#define MVAR_TRIGGER_TEMPLATE_NAME		"{TRIGGER.TEMPLATE.NAME}"
+#define MVAR_TRIGGER_HOSTGROUP_NAME		"{TRIGGER.HOSTGROUP.NAME}"
+#define MVAR_STATUS				"{STATUS}"			/* deprecated */
+#define MVAR_TRIGGER_VALUE			"{TRIGGER.VALUE}"
+#define MVAR_TRIGGER_URL			"{TRIGGER.URL}"
 
 #define MVAR_TRIGGER_EVENTS_ACK			"{TRIGGER.EVENTS.ACK}"
 #define MVAR_TRIGGER_EVENTS_UNACK		"{TRIGGER.EVENTS.UNACK}"
@@ -2252,11 +2246,14 @@ fail:
  *                                                                            *
  * Purpose: cache host identifiers referenced by trigger expression           *
  *                                                                            *
- * Parameters: hostids    - [OUT] the host identifier cache                   *
- *             expression - [IN] the trigger expression                       *
+ * Parameters: hostids             - [OUT] the host identifier cache          *
+ *             expression          - [IN] the trigger expression              *
+ *             recovery_expression - [IN] the trigger recovery expression     *
+ *                                        (can be empty)                      *
  *                                                                            *
  ******************************************************************************/
-static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression)
+static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expression,
+		const char *recovery_expression)
 {
 	if (0 == hostids->values_num)
 	{
@@ -2264,6 +2261,7 @@ static void	cache_trigger_hostids(zbx_vector_uint64_t *hostids, const char *expr
 
 		zbx_vector_uint64_create(&functionids);
 		get_functionids(&functionids, expression);
+		get_functionids(&functionids, recovery_expression);
 		DCget_hostids_by_functionids(&functionids, hostids);
 		zbx_vector_uint64_destroy(&functionids);
 	}
@@ -2460,7 +2458,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&hostids, c_event->trigger.expression);
+					cache_trigger_hostids(&hostids, c_event->trigger.expression,
+							c_event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
@@ -2649,6 +2648,17 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_strdup(replace_to, c_event->trigger.expression);
 					DCexpand_trigger_expression(&replace_to);
 				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY))
+				{
+					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
+					{
+						replace_to = zbx_strdup(replace_to,
+								c_event->trigger.recovery_expression);
+						DCexpand_trigger_expression(&replace_to);
+					}
+					else
+						replace_to = zbx_strdup(replace_to, "");
+				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
 					ret = DBget_trigger_hostgroup_name(c_event->objectid, userid, &replace_to);
@@ -2706,7 +2716,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&hostids, c_event->trigger.expression);
+					cache_trigger_hostids(&hostids, c_event->trigger.expression,
+							c_event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_ACTION, ZBX_CONST_STRLEN(MVAR_ACTION)))
@@ -2827,6 +2838,17 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				{
 					replace_to = zbx_strdup(replace_to, c_event->trigger.expression);
 					DCexpand_trigger_expression(&replace_to);
+				}
+				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION_RECOVERY))
+				{
+					if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == c_event->trigger.recovery_mode)
+					{
+						replace_to = zbx_strdup(replace_to,
+								c_event->trigger.recovery_expression);
+						DCexpand_trigger_expression(&replace_to);
+					}
+					else
+						replace_to = zbx_strdup(replace_to, "");
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_HOSTGROUP_NAME))
 				{
@@ -3329,7 +3351,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&hostids, event->trigger.expression);
+					cache_trigger_hostids(&hostids, event->trigger.expression,
+							event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 			}
@@ -3350,7 +3373,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					cache_trigger_hostids(&hostids, event->trigger.expression);
+					cache_trigger_hostids(&hostids, event->trigger.expression,
+							event->trigger.recovery_expression);
 					DCget_user_macro(hostids.values, hostids.values_num, m, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
@@ -3586,19 +3610,40 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	return res;
 }
 
+static int	extract_expression_functionids(zbx_vector_uint64_t *functionids, const char *expression)
+{
+	const char	*bl, *br;
+	zbx_uint64_t	functionid;
+
+	for (bl = strchr(expression, '{'); NULL != bl; bl = strchr(bl, '{'))
+	{
+		if (NULL == (br = strchr(bl, '}')))
+			break;
+
+		if (SUCCEED != is_uint64_n(bl + 1, br - bl - 1, &functionid))
+			break;
+
+		zbx_vector_uint64_append(functionids, functionid);
+
+		bl = br + 1;
+	}
+
+	return (NULL == bl ? SUCCEED : FAIL);
+}
+
 static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *triggers)
 {
 	const char	*__function_name = "zbx_extract_functionids";
 
 	DC_TRIGGER	*tr;
 	int		i, values_num_save;
-	char		*bl, *br;
-	zbx_uint64_t	functionid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
 
 	for (i = 0; i < triggers->values_num; i++)
 	{
+		const char	*error_expression = NULL;
+
 		tr = (DC_TRIGGER *)triggers->values[i];
 
 		if (NULL != tr->new_error)
@@ -3606,28 +3651,19 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 
 		values_num_save = functionids->values_num;
 
-		for (bl = strchr(tr->expression, '{'); NULL != bl; bl = strchr(bl, '{'))
+		if (SUCCEED != extract_expression_functionids(functionids, tr->expression))
 		{
-			if (NULL == (br = strchr(bl, '}')))
-				break;
-
-			*br = '\0';
-
-			if (SUCCEED != is_uint64(bl + 1, &functionid))
-			{
-				*br = '}';
-				break;
-			}
-
-			zbx_vector_uint64_append(functionids, functionid);
-
-			bl = br + 1;
-			*br = '}';
+			error_expression = tr->expression;
+		}
+		else if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode &&
+				SUCCEED != extract_expression_functionids(functionids, tr->recovery_expression))
+		{
+			error_expression = tr->recovery_expression;
 		}
 
-		if (NULL != bl)
+		if (NULL != error_expression)
 		{
-			tr->new_error = zbx_dsprintf(tr->new_error, "Invalid expression [%s]", tr->expression);
+			tr->new_error = zbx_dsprintf(tr->new_error, "Invalid expression [%s]", error_expression);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 			functionids->values_num = values_num_save;
 		}
@@ -3819,27 +3855,88 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *ifuncs)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+typedef struct
+{
+	zbx_uint64_t	functionid;
+	zbx_func_t	*function;
+}
+zbx_func_index_t;
+
+static int	substitute_expression_functions_results(zbx_hashset_t *func_index, char *expression, char **out,
+		size_t *out_alloc, char **error)
+{
+	char			*br, *bl;
+	size_t			out_offset = 0;
+	zbx_uint64_t		functionid;
+	zbx_func_index_t	*func_index_item;
+	zbx_func_t		*func;
+
+	for (br = expression, bl = strchr(expression, '{'); NULL != bl; bl = strchr(bl, '{'))
+	{
+		*bl = '\0';
+		zbx_strcpy_alloc(out, out_alloc, &out_offset, br);
+		*bl = '{';
+
+		if (NULL == (br = strchr(bl, '}')))
+		{
+			*error = zbx_strdup(*error, "Invalid trigger expression");
+			return FAIL;
+		}
+
+		*br = '\0';
+
+		ZBX_STR2UINT64(functionid, bl + 1);
+
+		*br++ = '}';
+		bl = br;
+
+		if (NULL == (func_index_item = zbx_hashset_search(func_index, &functionid)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot obtain function"
+					" and item for functionid: " ZBX_FS_UI64, functionid);
+			return FAIL;
+		}
+
+		func = func_index_item->function;
+
+		if (NULL != func->error)
+		{
+			*error = zbx_strdup(*error, func->error);
+			return FAIL;
+		}
+
+		if (NULL == func->value)
+		{
+			*error = zbx_strdup(*error, "Unexpected error while processing a trigger expression");
+			return FAIL;
+		}
+
+		if (SUCCEED != is_double_suffix(func->value) || '-' == *func->value)
+		{
+			zbx_chrcpy_alloc(out, out_alloc, &out_offset, '(');
+			zbx_strcpy_alloc(out, out_alloc, &out_offset, func->value);
+			zbx_chrcpy_alloc(out, out_alloc, &out_offset, ')');
+		}
+		else
+			zbx_strcpy_alloc(out, out_alloc, &out_offset, func->value);
+	}
+
+	zbx_strcpy_alloc(out, out_alloc, &out_offset, br);
+
+	return SUCCEED;
+}
+
 static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_ptr_t *triggers)
 {
-	const char	*__function_name = "zbx_substitute_functions_results";
-
-	typedef struct
-	{
-		zbx_uint64_t	functionid;
-		zbx_func_t	*function;
-	}
-	zbx_func_index_t;
+	const char		*__function_name = "zbx_substitute_functions_results";
 
 	DC_TRIGGER		*tr;
-	char			*out = NULL, *br, *bl;
-	size_t			out_alloc = TRIGGER_EXPRESSION_LEN_MAX, out_offset = 0;
+	char			*out = NULL;
+	size_t			out_alloc = TRIGGER_EXPRESSION_LEN_MAX;
 	int			i;
-	zbx_uint64_t		functionid;
-	zbx_func_t		*func;
 	zbx_ifunc_t		*ifunc;
 	zbx_hashset_iter_t	iter;
 	zbx_hashset_t		func_index;
-	zbx_func_index_t	*func_index_item;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d tr_num:%d",
 			__function_name, ifuncs->num_data, triggers->values_num);
@@ -3869,71 +3966,31 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 		if (NULL != tr->new_error)
 			continue;
 
-		out_offset = 0;
-
-		for (br = tr->expression, bl = strchr(tr->expression, '{'); NULL != bl; bl = strchr(bl, '{'))
+		if( SUCCEED != substitute_expression_functions_results(&func_index, tr->expression, &out,
+				&out_alloc, &tr->new_error))
 		{
-			*bl = '\0';
-			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, br);
-			*bl = '{';
-
-			if (NULL == (br = strchr(bl, '}')))
-			{
-				tr->new_error = zbx_strdup(tr->new_error, "Invalid trigger expression");
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
-				break;
-			}
-
-			*br = '\0';
-
-			ZBX_STR2UINT64(functionid, bl + 1);
-
-			*br++ = '}';
-			bl = br;
-
-			if (NULL == (func_index_item = zbx_hashset_search(&func_index, &functionid)))
-			{
-				tr->new_error = zbx_dsprintf(tr->new_error, "Cannot obtain function"
-						" and item for functionid: " ZBX_FS_UI64, functionid);
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
-				break;
-			}
-
-			func = func_index_item->function;
-
-			if (NULL != func->error)
-			{
-				tr->new_error = zbx_strdup(tr->new_error, func->error);
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
-				break;
-			}
-
-			if (NULL == func->value)
-			{
-				tr->new_error = zbx_strdup(tr->new_error, "Unexpected error while"
-						" processing a trigger expression");
-				tr->new_value = TRIGGER_VALUE_UNKNOWN;
-				break;
-			}
-
-			if (SUCCEED != is_double_suffix(func->value) || '-' == *func->value)
-			{
-				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, '(');
-				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
-				zbx_chrcpy_alloc(&out, &out_alloc, &out_offset, ')');
-			}
-			else
-				zbx_strcpy_alloc(&out, &out_alloc, &out_offset, func->value);
+			tr->new_value = TRIGGER_VALUE_UNKNOWN;
+			continue;
 		}
 
-		if (NULL == tr->new_error)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'", __function_name, i,
+				tr->expression, out);
+
+		tr->expression = zbx_strdup(tr->expression, out);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
 		{
-			zbx_strcpy_alloc(&out, &out_alloc, &out_offset, br);
+			if (SUCCEED != substitute_expression_functions_results(&func_index,
+					tr->recovery_expression, &out, &out_alloc, &tr->new_error))
+			{
+				tr->new_value = TRIGGER_VALUE_UNKNOWN;
+				continue;
+			}
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() expression[%d]:'%s' => '%s'",
-					__function_name, i, tr->expression, out);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() recovery_expression[%d]:'%s' => '%s'", __function_name, i,
+					tr->recovery_expression, out);
 
-			tr->expression = zbx_strdup(tr->expression, out);
+			tr->recovery_expression = zbx_strdup(tr->recovery_expression, out);
 		}
 	}
 
@@ -4037,30 +4094,27 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __function_name, triggers->values_num);
 
-	memset(&event, 0, sizeof(DB_EVENT));
-	event.source = EVENT_SOURCE_TRIGGERS;
 	event.object = EVENT_OBJECT_TRIGGER;
 
-	/* add triggers with their macros to user macro cache and create a vector with */
-	/* triggerid => functionids[] associations, extracted from trigger expressions */
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		tr = (DC_TRIGGER *)triggers->values[i];
 
-		event.objectid = tr->triggerid;
 		event.value = tr->value;
 
-		/* the trigger expression is used to parse function ids for referenced hostid caching */
-		/* when evaluating trigger expression                                                 */
-		event.trigger.expression = tr->expression_orig;
-
-		if (NULL != tr->expression)
+		if (NULL == tr->new_error)
 		{
-			substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
-					&tr->expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-		}
+			substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, &tr->expression,
+					MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
 
-		if (NULL != tr->new_error) {
+			if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
+			{
+				substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL,
+						&tr->recovery_expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+			}
+		}
+		else
+		{
 			zbx_snprintf(err, sizeof(err), "Cannot evaluate expression: %s.", tr->new_error);
 			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
@@ -4069,6 +4123,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 	substitute_functions(triggers);
 
+	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)
 	{
 		tr = (DC_TRIGGER *)triggers->values[i];
@@ -4080,13 +4135,46 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		{
 			tr->new_error = zbx_strdup(tr->new_error, err);
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
+			continue;
 		}
-		else if (SUCCEED == zbx_double_compare(expr_result, 0))
+
+		if (SUCCEED != zbx_double_compare(expr_result, 0))
 		{
-			tr->new_value = TRIGGER_VALUE_OK;
-		}
-		else
 			tr->new_value = TRIGGER_VALUE_PROBLEM;
+			continue;
+		}
+
+		if (TRIGGER_RECOVERY_MODE_NONE == tr->recovery_mode)
+		{
+			tr->new_value = TRIGGER_VALUE_NONE;
+			continue;
+		}
+
+		if (TRIGGER_VALUE_PROBLEM == tr->value)
+		{
+			if (TRIGGER_RECOVERY_MODE_EXPRESSION == tr->recovery_mode)
+			{
+				tr->new_value = TRIGGER_VALUE_OK;
+				continue;
+			}
+
+			/* processing recovery expression mode */
+			if (SUCCEED != evaluate(&expr_result, tr->recovery_expression, err, sizeof(err)))
+			{
+				tr->new_error = zbx_strdup(tr->new_error, err);
+				tr->new_value = TRIGGER_VALUE_UNKNOWN;
+				continue;
+			}
+
+			if (SUCCEED != zbx_double_compare(expr_result, 0))
+			{
+				tr->new_value = TRIGGER_VALUE_OK;
+				continue;
+			}
+		}
+
+		/* no changes, keep the old value */
+		tr->new_value = tr->value;
 	}
 
 	for (i = 0; i < triggers->values_num; i++)

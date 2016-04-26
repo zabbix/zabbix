@@ -537,6 +537,7 @@ zbx_maintenance_type_t;
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+#define TRIGGER_VALUE_NONE		3	/* only in server code, never in DB */
 const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
@@ -552,6 +553,11 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_SEVERITY_HIGH		4
 #define TRIGGER_SEVERITY_DISASTER	5
 #define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
+
+/* trigger recovery mode */
+#define TRIGGER_RECOVERY_MODE_EXPRESSION		0
+#define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
+#define TRIGGER_RECOVERY_MODE_NONE			2
 
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2

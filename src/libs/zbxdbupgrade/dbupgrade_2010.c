@@ -22,6 +22,7 @@
 #include "sysinfo.h"
 #include "dbupgrade.h"
 #include "log.h"
+#include "sysinfo.h"
 
 /*
  * 2.2 development database patches
