@@ -478,8 +478,9 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
  *                            (1) number of seconds/values                    *
  *                            (2) value to compare with (optional)            *
  *                                Becomes mandatory for numeric items if 3rd  *
- *                                parameter is specified. With "band" can     *
- *                                take one of 2 forms:                        *
+ *                                parameter is specified and is not "regexp"  *
+ *                                or "iregexp". With "band" can take one of   *
+ *                                2 forms:                                    *
  *                                  - value_to_compare_with/mask              *
  *                                  - mask                                    *
  *                            (3) comparison operator (optional)              *
@@ -495,7 +496,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	const char			*__function_name = "evaluate_COUNT";
 	int				arg1, flag, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
 	int				seconds = 0, nvalues = 0;
-	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL;
+	char				*arg2 = NULL, *arg2_2 = NULL, *arg3 = NULL, buf[ZBX_MAX_UINT64_LEN];
 	double				arg2_dbl;
 	zbx_uint64_t			arg2_ui64, arg2_2_ui64;
 	zbx_vector_ptr_t		regexps;
@@ -562,6 +563,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		goto out;
 	}
 
+	numeric_search = (0 != numeric_search && OP_REGEXP != op && OP_IREGEXP != op);
+
 	if (0 != numeric_search)
 	{
 		if (NULL != arg3 && '\0' != *arg3 && '\0' == *arg2)
@@ -570,7 +573,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 			goto out;
 		}
 
-		if (OP_LIKE == op || OP_REGEXP == op || OP_IREGEXP == op)
+		if (OP_LIKE == op)
 		{
 			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting numeric values",
 					arg3);
@@ -593,24 +596,36 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		{
 			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_ui64))
+				if (OP_BAND != op)
 				{
-					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned value",
-							arg2);
-					goto out;
-				}
-
-				if (NULL != arg2_2)
-				{
-					if (SUCCEED != is_uint64(arg2_2, &arg2_2_ui64))
+					if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_ui64))
 					{
 						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned "
-								"value", arg2_2);
+								"value", arg2);
 						goto out;
 					}
 				}
 				else
-					arg2_2_ui64 = arg2_ui64;
+				{
+					if (SUCCEED != is_uint64(arg2, &arg2_ui64))
+					{
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned "
+								"value", arg2);
+						goto out;
+					}
+
+					if (NULL != arg2_2)
+					{
+						if (SUCCEED != is_uint64(arg2_2, &arg2_2_ui64))
+						{
+							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric "
+							"unsigned value", arg2_2);
+							goto out;
+						}
+					}
+					else
+						arg2_2_ui64 = arg2_ui64;
+				}
 			}
 			else
 			{
@@ -659,12 +674,38 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 		switch (item->value_type)
 		{
 			case ITEM_VALUE_TYPE_UINT64:
-				for (i = 0; i < values.values_num; i++)
-					count_one_ui64(&count, op, values.values[i].value.ui64, arg2_ui64, arg2_2_ui64);
+				if (0 != numeric_search)
+				{
+					for (i = 0; i < values.values_num; i++)
+					{
+						count_one_ui64(&count, op, values.values[i].value.ui64, arg2_ui64,
+								arg2_2_ui64);
+					}
+				}
+				else
+				{
+					for (i = 0; i < values.values_num; i++)
+					{
+						zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64, values.values[i].value.ui64);
+						count_one_str(&count, op, buf, arg2, &regexps);
+					}
+				}
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				for (i = 0; i < values.values_num; i++)
-					count_one_dbl(&count, op, values.values[i].value.dbl, arg2_dbl);
+				if (0 != numeric_search)
+				{
+					for (i = 0; i < values.values_num; i++)
+						count_one_dbl(&count, op, values.values[i].value.dbl, arg2_dbl);
+				}
+				else
+				{
+					for (i = 0; i < values.values_num; i++)
+					{
+						zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4),
+								values.values[i].value.dbl);
+						count_one_str(&count, op, buf, arg2, &regexps);
+					}
+				}
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				for (i = 0; i < values.values_num && FAIL != count; i++)
