@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10693] fixed API configuration.import method for importing template and/or host with trigger prototype dependency (Cemeris)
 A.FG...PS. [ZBXNEXT-1263] added finishing touches to encryption support (Andris, asaveljevs, gleb, Oleg, Sandis)
 .......PS. [ZBX-10540] fixed encoding reset when Zabbix process auto-reconnects MySQL database (gleb)
 ..F....... [ZBX-10670] fixed disabling of script confirmation in Administration -> Script -> Edit form (Cemeris)
