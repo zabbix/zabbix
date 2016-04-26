@@ -3590,7 +3590,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 						&replace_to);
 			}
 			else
-				ret = FAIL;
+			{
+				/* ignore functions with macros not supporting them */
+				zbx_free(replace_to);
+			}
 		}
 
 		if (FAIL == ret)
