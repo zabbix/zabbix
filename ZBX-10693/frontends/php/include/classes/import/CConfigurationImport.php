@@ -253,6 +253,12 @@ class CConfigurationImport {
 						$hostsRefs[$expression['host']] = $expression['host'];
 						$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
 					}
+
+					if (array_key_exists('dependencies', $trigger)) {
+						foreach ($trigger['dependencies'] as $dependency) {
+							$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+						}
+					}
 				}
 
 				foreach ($discoveryRule['graph_prototypes'] as $graph) {
