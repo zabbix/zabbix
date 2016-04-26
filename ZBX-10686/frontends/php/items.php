@@ -787,6 +787,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 }
 elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('copy') && hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
+		$itemids = getRequest('group_itemid');
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
 			$hosts_ids = getRequest('copy_targetid');
@@ -811,8 +812,6 @@ elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && has
 
 		$result = copyItemsToHosts(getRequest('group_itemid'), $hosts_ids);
 		$result = DBend($result);
-
-		$itemids = zbx_toArray(getRequest('group_itemid', []));
 
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));

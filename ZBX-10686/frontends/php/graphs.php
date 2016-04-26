@@ -321,6 +321,7 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 } elseif (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$result = true;
+		$graphids = getRequest('group_graphid');
 
 		$options = [
 			'output' => ['hostid'],
@@ -361,8 +362,6 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 			}
 		}
 		$result = DBend($result);
-
-		$graphids = zbx_toArray(getRequest('group_graphid'));
 
 		if ($result) {
 			uncheckTableRows(
