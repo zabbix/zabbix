@@ -525,6 +525,14 @@ sub create_slv_item {
 					    'status' => ITEM_STATUS_ACTIVE,
 					      'units' => '%'};
     }
+    elsif ($value_type == VALUE_TYPE_DOUBLE) {
+	$options = {'name' => $name,
+                                              'key_'=> $key,
+                                              'hostid' => $hostid,
+                                              'type' => 2, 'value_type' => 0,
+                                              'applications' => $applicationids,
+					    'status' => ITEM_STATUS_ACTIVE};
+    }
     else {
 	pfail("Unknown value type $value_type.");
     }
@@ -1938,8 +1946,10 @@ sub create_slv_monthly($$$)
 	my $key_base = shift;
 	my $hostid = shift;
 
-	create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,  [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,  [get_application_id(APP_SLV_MONTHLY, $hostid)]);
-	create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_NUM,  [get_application_id(APP_SLV_MONTHLY, $hostid)]);
+	my $applicationid = get_application_id(APP_SLV_MONTHLY, $hostid);
+
+	create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC,   [$applicationid]);
+	create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,    [$applicationid]);
+	create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,    [$applicationid]);
+	create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
 }

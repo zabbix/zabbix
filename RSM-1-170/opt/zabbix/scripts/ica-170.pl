@@ -196,6 +196,15 @@ sub __create_slv_item
 			    'status' => ITEM_STATUS_ACTIVE,
 			    'units' => '%'};
 	}
+	elsif ($value_type == VALUE_TYPE_DOUBLE)
+	{
+		$options = {'name' => $name,
+			    'key_'=> $key,
+			    'hostid' => $hostid,
+			    'type' => 2, 'value_type' => 0,
+			    'applications' => $applicationids,
+			    'status' => ITEM_STATUS_ACTIVE};
+	}
 	else
 	{
 		pfail("Unknown value type $value_type.");
@@ -227,19 +236,19 @@ sub __create_slv_monthly($$$)
 
 	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.pfailed'}))
 	{
-		__create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC, [$applicationid]);
+		__create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC,  [$applicationid]);
 	}
 	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.failed'}))
 	{
-		__create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,  [$applicationid]);
+		__create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,   [$applicationid]);
 	}
 	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.max'}))
 	{
-		__create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,  [$applicationid]);
+		__create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,   [$applicationid]);
 	}
 	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.avg'}))
 	{
-		__create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_NUM,  [$applicationid]);
+		__create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
 	}
 }
 
