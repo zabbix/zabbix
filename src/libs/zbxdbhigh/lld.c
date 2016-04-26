@@ -593,7 +593,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 				lld_ruleid, zbx_host_key_string(lld_ruleid));
 
 		add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-				NULL, NULL, 0, 0);
+				NULL, NULL, NULL, 0, 0);
 		process_events();
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);

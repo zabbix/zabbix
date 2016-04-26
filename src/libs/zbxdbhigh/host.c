@@ -378,23 +378,17 @@ out:
  *                                                                            *
  * Return value: SUCCEED - if triggers coincide                               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
-static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
-		zbx_uint64_t triggerid2, const char *expression2)
+static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1, const char *recovery_expression1,
+		zbx_uint64_t triggerid2, const char *expression2, const char *recovery_expression2)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*search = NULL,
-			*replace = NULL,
-			*old_expr = NULL,
-			*expr = NULL;
+	char		search[MAX_ID_LEN + 3], replace[MAX_ID_LEN + 3], *old_expr = NULL, *expr = NULL, *rexpr = NULL;
 	int		res = SUCCEED;
 
-	expr = strdup(expression2);
+	expr = zbx_strdup(NULL, expression2);
+	rexpr = zbx_strdup(NULL, recovery_expression2);
 
 	result = DBselect(
 			"select f1.functionid,f2.functionid"
@@ -410,21 +404,23 @@ static int	DBcmp_triggers(zbx_uint64_t triggerid1, const char *expression1,
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		search = zbx_dsprintf(NULL, "{%s}", row[1]);
-		replace = zbx_dsprintf(NULL, "{%s}", row[0]);
+		zbx_snprintf(search, sizeof(search), "{%s}", row[1]);
+		zbx_snprintf(replace, sizeof(replace), "{%s}", row[0]);
 
 		old_expr = expr;
-		expr = string_replace(old_expr, search, replace);
+		expr = string_replace(expr, search, replace);
 		zbx_free(old_expr);
 
-		zbx_free(replace);
-		zbx_free(search);
+		old_expr = rexpr;
+		rexpr = string_replace(rexpr, search, replace);
+		zbx_free(old_expr);
 	}
 	DBfree_result(result);
 
-	if (0 != strcmp(expression1, expr))
+	if (0 != strcmp(expression1, expr) || 0 != strcmp(recovery_expression1, rexpr))
 		res = FAIL;
 
+	zbx_free(rexpr);
 	zbx_free(expr);
 
 	return res;
@@ -2105,6 +2101,8 @@ out:
  *             triggerid - trigger identificator from database                *
  *             description - trigger description                              *
  *             expression - trigger expression                                *
+ *             recovery_expression - trigger recovery expression              *
+ *             recovery_mode - trigger recovery mode                          *
  *             status - trigger status                                        *
  *             type - trigger type                                            *
  *             priority - trigger priority                                    *
@@ -2113,14 +2111,10 @@ out:
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
- * Author: Eugene Grigorjev, Alexander Vladishev                              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
  ******************************************************************************/
-static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t hostid,
-		zbx_uint64_t triggerid, const char *description, const char *expression,
-		unsigned char status, unsigned char type, unsigned char priority,
+static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t hostid, zbx_uint64_t triggerid,
+		const char *description, const char *expression, const char *recovery_expression,
+		unsigned char recovery_mode, unsigned char status, unsigned char type, unsigned char priority,
 		const char *comments, const char *url, unsigned char flags)
 {
 	DB_RESULT	result;
@@ -2131,8 +2125,10 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	char		*old_expression = NULL,
 			*new_expression = NULL,
 			*expression_esc = NULL,
-			*search = NULL,
-			*replace = NULL,
+			*new_recovery_expression = NULL,
+			*recovery_expression_esc = NULL,
+			search[MAX_ID_LEN + 3],
+			replace[MAX_ID_LEN + 3],
 			*description_esc = NULL,
 			*comments_esc = NULL,
 			*url_esc = NULL,
@@ -2147,7 +2143,7 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	description_esc = DBdyn_escape_string(description);
 
 	result = DBselect(
-			"select distinct t.triggerid,t.expression"
+			"select distinct t.triggerid,t.expression,t.recovery_expression"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -2160,17 +2156,17 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 	{
 		ZBX_STR2UINT64(h_triggerid, row[0]);
 
-		if (SUCCEED != DBcmp_triggers(triggerid, expression,
-				h_triggerid, row[1]))
+		if (SUCCEED != DBcmp_triggers(triggerid, expression, recovery_expression,
+				h_triggerid, row[1], row[2]))
 			continue;
 
 		/* link not linked trigger with same description and expression */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update triggers"
 				" set templateid=" ZBX_FS_UI64 ","
-					"flags=%d"
+					"flags=%d,recovery_mode=%d"
 				" where triggerid=" ZBX_FS_UI64 ";\n",
-				triggerid, (int)flags, h_triggerid);
+				triggerid, (int)flags, (int)recovery_mode, h_triggerid);
 
 		res = SUCCEED;
 		break;
@@ -2183,7 +2179,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		res = SUCCEED;
 
 		*new_triggerid = DBget_maxid("triggers");
-		new_expression = strdup(expression);
+		new_expression = zbx_strdup(NULL, expression);
+		new_recovery_expression = zbx_strdup(NULL, recovery_expression);
 
 		comments_esc = DBdyn_escape_string(comments);
 		url_esc = DBdyn_escape_string(url);
@@ -2191,12 +2188,12 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"insert into triggers"
 					" (triggerid,description,priority,status,"
-						"comments,url,type,value,state,templateid,flags)"
+						"comments,url,type,value,state,templateid,flags,recovery_mode)"
 					" values (" ZBX_FS_UI64 ",'%s',%d,%d,"
-						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d);\n",
+						"'%s','%s',%d,%d,%d," ZBX_FS_UI64 ",%d,%d);\n",
 					*new_triggerid, description_esc, (int)priority, (int)status, comments_esc,
 					url_esc, (int)type, TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL, triggerid,
-					(int)flags);
+					(int)flags, (int)recovery_mode);
 
 		zbx_free(url_esc);
 		zbx_free(comments_esc);
@@ -2220,8 +2217,8 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 
 				functionid = DBget_maxid("functions");
 
-				search = zbx_dsprintf(NULL, "{%s}", row[1]);
-				replace = zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", functionid);
+				zbx_snprintf(search, sizeof(search), "{%s}", row[1]);
+				zbx_snprintf(replace, sizeof(replace), "{" ZBX_FS_UI64 "}", functionid);
 
 				function_esc = DBdyn_escape_string(row[2]);
 				parameter_esc = DBdyn_escape_string(row[3]);
@@ -2235,13 +2232,15 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 						function_esc, parameter_esc);
 
 				old_expression = new_expression;
-				new_expression = string_replace(old_expression, search, replace);
-
+				new_expression = string_replace(new_expression, search, replace);
 				zbx_free(old_expression);
+
+				old_expression = new_recovery_expression;
+				new_recovery_expression = string_replace(new_recovery_expression, search, replace);
+				zbx_free(old_expression);
+
 				zbx_free(parameter_esc);
 				zbx_free(function_esc);
-				zbx_free(replace);
-				zbx_free(search);
 			}
 			else
 			{
@@ -2256,14 +2255,20 @@ static int	DBcopy_trigger_to_host(zbx_uint64_t *new_triggerid, zbx_uint64_t host
 		if (SUCCEED == res)
 		{
 			expression_esc = DBdyn_escape_string_len(new_expression, TRIGGER_EXPRESSION_LEN);
+			recovery_expression_esc = DBdyn_escape_string_len(new_recovery_expression,
+					TRIGGER_EXPRESSION_LEN);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update triggers set expression='%s' where triggerid=" ZBX_FS_UI64 ";\n",
-					expression_esc, *new_triggerid);
+					"update triggers"
+						" set expression='%s',recovery_expression='%s'"
+					" where triggerid=" ZBX_FS_UI64 ";\n",
+					expression_esc, recovery_expression_esc, *new_triggerid);
 
+			zbx_free(recovery_expression_esc);
 			zbx_free(expression_esc);
 		}
 
+		zbx_free(new_recovery_expression);
 		zbx_free(new_expression);
 	}
 	else
@@ -3523,7 +3528,7 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct t.triggerid,t.description,t.expression,t.status,"
-				"t.type,t.priority,t.comments,t.url,t.flags"
+				"t.type,t.priority,t.comments,t.url,t.flags,t.recovery_expression,t.recovery_mode"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -3541,6 +3546,8 @@ static int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64
 		res = DBcopy_trigger_to_host(&new_triggerid, hostid, triggerid,
 				row[1],				/* description */
 				row[2],				/* expression */
+				row[9],				/* recovery_expression */
+				(unsigned char)atoi(row[10]),	/* recovery_mode */
 				(unsigned char)atoi(row[3]),	/* status */
 				(unsigned char)atoi(row[4]),	/* type */
 				(unsigned char)atoi(row[5]),	/* priority */

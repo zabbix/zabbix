@@ -188,8 +188,10 @@ typedef struct _DC_TRIGGER
 	zbx_uint64_t	triggerid;
 	char		*description;
 	char		*expression_orig;
-	/* temporary value, allocated during processing and freed right after */
+	char		*recovery_expression_orig;
+	/* temporary values, allocated during processing and freed right after */
 	char		*expression;
+	char		*recovery_expression;
 
 	char		*error;
 	char		*new_error;
@@ -202,6 +204,7 @@ typedef struct _DC_TRIGGER
 	unsigned char	state;
 	unsigned char	new_value;
 	unsigned char	status;
+	unsigned char	recovery_mode;
 }
 DC_TRIGGER;
 

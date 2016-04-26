@@ -14,7 +14,7 @@
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with this program; ifnot, write to the Free Software
+** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
@@ -42,7 +42,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $expression = getRequest('expression', '');
 
 define('NO_LINK_IN_TESTING', true);
-list($outline, $eHTMLTree) = analyzeExpression($expression);
+list($outline, $eHTMLTree) = analyzeExpression($expression, TRIGGER_EXPRESSION);
 
 // test data (create table, create check fields)
 $dataTable = (new CTable())
