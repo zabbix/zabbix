@@ -452,10 +452,6 @@ static int	zbx_solaris_version_get(unsigned int *major_version, unsigned int *mi
 	int		res;
 	struct utsname	name;
 
-	/* Initially sysinfo(SI_RELEASE, ...) was considered for getting Solaris release. Its result type */
-	/* depends from version: on Solaris 8,9,10 sysinfo() returns 'long', on Solaris 11 it returns 'int'. */
-	/* Therefore uname() was chosen for getting Solaris release. */
-
 	if (-1 == (res = uname(&name)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): uname() failed: %s", __function_name, zbx_strerror(errno));
