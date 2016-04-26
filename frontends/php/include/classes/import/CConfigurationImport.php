@@ -246,7 +246,8 @@ class CConfigurationImport {
 				}
 
 				foreach ($discoveryRule['trigger_prototypes'] as $trigger) {
-					$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+					$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
+						true;
 
 					// add found hosts and items to references from parsed trigger expressions
 					foreach ($trigger['parsedExpressions'] as $expression) {
@@ -318,7 +319,7 @@ class CConfigurationImport {
 		}
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+			$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] = true;
 
 			// add found hosts and items to references from parsed trigger expressions
 			foreach ($trigger['parsedExpressions'] as $expression) {
@@ -328,7 +329,8 @@ class CConfigurationImport {
 
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
-					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+					$triggersRefs[$dependency['name']][$dependency['expression']][$dependency['recovery_expression']] =
+						true;
 				}
 			}
 		}
@@ -357,7 +359,7 @@ class CConfigurationImport {
 
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
 							$el = $selement['element'];
-							$triggersRefs[$el['description']][$el['expression']] = $el['expression'];
+							$triggersRefs[$el['description']][$el['expression']][$el['recovery_expression']] = true;
 							break;
 					}
 				}
@@ -368,7 +370,7 @@ class CConfigurationImport {
 					if (isset($link['linktriggers'])) {
 						foreach ($link['linktriggers'] as $linkTrigger) {
 							$t = $linkTrigger['trigger'];
-							$triggersRefs[$t['description']][$t['expression']] = $t['expression'];
+							$triggersRefs[$t['description']][$t['expression']][$t['recovery_expression']] = true;
 						}
 					}
 				}
@@ -1023,7 +1025,9 @@ class CConfigurationImport {
 						}
 					}
 
-					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+						$trigger['recovery_expression']
+					);
 
 					$triggers[] = $trigger;
 					unset($trigger['dependencies']);
@@ -1115,7 +1119,9 @@ class CConfigurationImport {
 
 			foreach ($result['triggerids'] as $tnum => $triggerid) {
 				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerid);
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression'], $triggerid
+				);
 			}
 		}
 		if ($triggersToUpdate) {
@@ -1148,10 +1154,14 @@ class CConfigurationImport {
 			}
 
 			$deps = [];
-			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+				$trigger['recovery_expression']
+			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression'],
+					$dependency['recovery_expression']
+				);
 
 				if (!$dep_triggerid) {
 					throw new Exception(_s('Trigger prototype "%1$s" depends on trigger "%2$s", which does not exist.',
@@ -1300,7 +1310,9 @@ class CConfigurationImport {
 				}
 			}
 
-			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+				$trigger['recovery_expression']
+			);
 
 			if ($triggerId) {
 				if ($this->options['triggers']['updateExisting']) {
@@ -1326,7 +1338,9 @@ class CConfigurationImport {
 
 			foreach ($result['triggerids'] as $tnum => $triggerid) {
 				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerid);
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression'], $triggerid
+				);
 			}
 		}
 
@@ -1356,10 +1370,14 @@ class CConfigurationImport {
 			}
 
 			$deps = [];
-			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+				$trigger['recovery_expression']
+			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression'],
+					$dependency['recovery_expression']
+				);
 
 				if (!$dep_triggerid) {
 					throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
@@ -1614,7 +1632,9 @@ class CConfigurationImport {
 
 		if ($allTriggers) {
 			foreach ($allTriggers as $trigger) {
-				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression']
+				);
 
 				if ($triggerId) {
 					$triggersXML[$triggerId] = $triggerId;
@@ -1805,7 +1825,7 @@ class CConfigurationImport {
 					// gather trigger prototype IDs to delete
 					foreach ($discoveryRule['trigger_prototypes'] as $triggerPrototype) {
 						$triggerPrototypeId = $this->referencer->resolveTrigger($triggerPrototype['description'],
-							$triggerPrototype['expression']
+							$triggerPrototype['expression'], $triggerPrototype['recovery_expression']
 						);
 
 						if ($triggerPrototypeId) {

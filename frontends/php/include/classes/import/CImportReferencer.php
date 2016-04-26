@@ -184,15 +184,20 @@ class CImportReferencer {
 	 *
 	 * @param string $name
 	 * @param string $expression
+	 * @param string $recovery_expression
 	 *
 	 * @return string|bool
 	 */
-	public function resolveTrigger($name, $expression) {
+	public function resolveTrigger($name, $expression, $recovery_expression) {
 		if ($this->triggersRefs === null) {
 			$this->selectTriggers();
 		}
 
-		return isset($this->triggersRefs[$name][$expression]) ? $this->triggersRefs[$name][$expression] : false;
+		return array_key_exists($name, $this->triggersRefs)
+				&& array_key_exists($expression, $this->triggersRefs[$name])
+				&& array_key_exists($recovery_expression, $this->triggersRefs[$name][$expression])
+			? $this->triggersRefs[$name][$expression][$recovery_expression]
+			: false;
 	}
 
 	/**
@@ -447,18 +452,30 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add trigger names/expressions that need association with a database trigger id.
-	 * Input array has format:
-	 * array('triggername1' => array('expr1', 'expr2'), 'triggername2' => array('expr1'), ...)
+	 * Add trigger description/expression/recovery_expression that need association with a database trigger id.
 	 *
 	 * @param array $triggers
+	 * @param array $triggers[<description>]
+	 * @param array $triggers[<description>][<expression>]
+	 * @param bool  $triggers[<description>][<expression>][<recovery_expression>]
 	 */
 	public function addTriggers(array $triggers) {
-		foreach ($triggers as $name => $expressions) {
-			if (!isset($this->triggers[$name])) {
-				$this->triggers[$name] = [];
+		foreach ($triggers as $description => $expressions) {
+			if (!array_key_exists($description, $this->triggers)) {
+				$this->triggers[$description] = [];
 			}
-			$this->triggers[$name] = array_unique(array_merge($this->triggers[$name], $expressions));
+
+			foreach ($expressions as $expression => $recovery_expressions) {
+				if (!array_key_exists($expression, $this->triggers[$description])) {
+					$this->triggers[$description][$expression] = [];
+				}
+
+				foreach ($recovery_expressions as $recovery_expression => $foo) {
+					if (!array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
+						$this->triggers[$description][$expression][$recovery_expression] = true;
+					}
+				}
+			}
 		}
 	}
 
@@ -483,10 +500,11 @@ class CImportReferencer {
 	 *
 	 * @param string $name
 	 * @param string $expression
-	 * @param string $triggerId
+	 * @param string $recovery_expression
+	 * @param string $triggerid
 	 */
-	public function addTriggerRef($name, $expression, $triggerId) {
-		$this->triggersRefs[$name][$expression] = $triggerId;
+	public function addTriggerRef($name, $expression, $recovery_expression, $triggerid) {
+		$this->triggersRefs[$name][$expression][$recovery_expression] = $triggerid;
 	}
 
 	/**
@@ -772,11 +790,11 @@ class CImportReferencer {
 	 * Select trigger ids for previously added trigger names/expressions.
 	 */
 	protected function selectTriggers() {
-		if (!empty($this->triggers)) {
+		if ($this->triggers) {
 			$this->triggersRefs = [];
 
 			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid', 'expression', 'description'],
+				'output' => ['triggerid', 'expression', 'description', 'recovery_expression'],
 				'filter' => [
 					'description' => array_keys($this->triggers),
 					'flags' => [
@@ -787,11 +805,19 @@ class CImportReferencer {
 				]
 			]);
 
-			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
+			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
 
 			foreach ($dbTriggers as $dbTrigger) {
-				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
-					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
+				$description = $dbTrigger['description'];
+				$expression = $dbTrigger['expression'];
+				$recovery_expression = $dbTrigger['recovery_expression'];
+
+				if (array_key_exists($description, $this->triggers)
+						&& array_key_exists($expression, $this->triggers[$description])
+						&& array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
+					$this->triggersRefs[$description][$expression][$recovery_expression] = $dbTrigger['triggerid'];
 				}
 			}
 		}

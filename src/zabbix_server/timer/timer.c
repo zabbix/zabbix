@@ -355,7 +355,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type,t.lastchange,t.value"
+			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type,t.lastchange,t.value,"
+				"t.recovery_expression"
 			" from triggers t,functions f,items i"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -382,7 +383,7 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 			continue;
 
 		add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, &ts, value_after,
-				row[1], row[2], (unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]));
+				row[1], row[2], row[7], (unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]));
 	}
 	DBfree_result(result);
 

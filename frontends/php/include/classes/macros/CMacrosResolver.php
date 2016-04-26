@@ -714,11 +714,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Purpose: Translate {10}>10 to something like {localhost:system.cpu.load.last()}>10
 	 *
 	 * @param array  $triggers
-	 * @param string $triggers[]['expression']
+	 * @param string $triggers[][<sources>]			see options['source']
 	 * @param array  $options
 	 * @param bool   $options['html']				returns formatted trigger expression
 	 * @param bool   $options['resolve_usermacros']	resolve user macros
 	 * @param bool   $options['resolve_macros']		resolve macros in item keys and functions
+	 * @param array  $options['sources']			an array of the field names
 	 *
 	 * @return string|array
 	 */
@@ -738,7 +739,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find macros.
 		foreach ($triggers as $key => $trigger) {
-			$matched_macros = $this->extractMacros([$trigger['expression']], $types);
+			$texts = [];
+			foreach ($options['sources'] as $source) {
+				$texts[] = $trigger[$source];
+			}
+
+			$matched_macros = $this->extractMacros($texts, $types);
 
 			$macro_values[$key] = $matched_macros['functionids'];
 
@@ -922,32 +928,34 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value.
 		foreach ($triggers as $key => &$trigger) {
-			$matched_macros = $this->getMacroPositions($trigger['expression'], $types);
+			foreach ($options['sources'] as $source) {
+				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
 
-			if ($options['html']) {
-				$expression = [];
-				$pos_left = 0;
+				if ($options['html']) {
+					$expression = [];
+					$pos_left = 0;
 
-				foreach ($matched_macros as $pos => $macro) {
-					if (array_key_exists($macro, $macro_values[$key])) {
-						if ($pos_left != $pos) {
-							$expression[] = substr($trigger['expression'], $pos_left, $pos - $pos_left);
+					foreach ($matched_macros as $pos => $macro) {
+						if (array_key_exists($macro, $macro_values[$key])) {
+							if ($pos_left != $pos) {
+								$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+							}
+
+							$expression[] = $macro_values[$key][$macro];
+
+							$pos_left = $pos + strlen($macro);
 						}
-
-						$expression[] = $macro_values[$key][$macro];
-
-						$pos_left = $pos + strlen($macro);
 					}
-				}
-				$expression[] = substr($trigger['expression'], $pos_left);
+					$expression[] = substr($trigger[$source], $pos_left);
 
-				$trigger['expression'] = $expression;
-			}
-			else {
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					if (array_key_exists($macro, $macro_values[$key])) {
-						$trigger['expression'] = substr_replace($trigger['expression'],
-							$macro_values[$key][$macro], $pos, strlen($macro));
+					$trigger[$source] = $expression;
+				}
+				else {
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						if (array_key_exists($macro, $macro_values[$key])) {
+							$trigger[$source] =
+								substr_replace($trigger[$source], $macro_values[$key][$macro], $pos, strlen($macro));
+						}
 					}
 				}
 			}
