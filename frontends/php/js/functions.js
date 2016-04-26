@@ -36,22 +36,49 @@ function check_target(e) {
 	}
 }
 
-function delete_expression(expr_id) {
-	document.getElementsByName('remove_expression')[0].value = expr_id;
+/**
+ * Remove part of expression.
+ *
+ * @param string id		Expression temporary ID.
+ * @param number type	Expression (type = 0) or recovery expression (type = 1).
+ */
+function delete_expression(id, type) {
+	// If type is expression.
+	if (type == 0) {
+		jQuery('#remove_expression').val(id);
+	}
+	// Type is recovery expression.
+	else {
+		jQuery('#remove_recovery_expression').val(id);
+	}
 }
 
-function copy_expression(id) {
-	var expr_temp = document.getElementsByName('expr_temp')[0];
-	if (expr_temp.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+/**
+ * Insert expression part into input field.
+ *
+ * @param string id		Expression temporary ID.
+ * @param number type	Expression (type = 0) or recovery expression (type = 1).
+ */
+function copy_expression(id, type) {
+	// If type is expression.
+	if (type == 0) {
+		var element = document.getElementsByName('expr_temp')[0];
+	}
+	// Type is recovery expression.
+	else {
+		var element = document.getElementsByName('recovery_expr_temp')[0];
+	}
+
+	if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 		return null;
 	}
 
 	var src = document.getElementById(id);
 	if (typeof src.textContent != 'undefined') {
-		expr_temp.value = src.textContent;
+		element.value = src.textContent;
 	}
 	else {
-		expr_temp.value = src.innerText;
+		element.value = src.innerText;
 	}
 }
 

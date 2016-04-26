@@ -28,11 +28,13 @@ typedef struct
 	zbx_uint64_t		triggerid;
 	char			*description;
 	char			*expression;
+	char			*recovery_expression;
 	char			*comments;
 	char			*url;
 	unsigned char		status;
 	unsigned char		type;
 	unsigned char		priority;
+	unsigned char		recovery_mode;
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
 }
@@ -46,6 +48,8 @@ typedef struct
 	char			*description_orig;
 	char			*expression;
 	char			*expression_orig;
+	char			*recovery_expression;
+	char			*recovery_expression_orig;
 	char			*comments;
 	char			*comments_orig;
 	char			*url;
@@ -53,18 +57,21 @@ typedef struct
 	zbx_vector_ptr_t	functions;
 	zbx_vector_ptr_t	dependencies;
 	zbx_vector_ptr_t	dependents;
-#define ZBX_FLAG_LLD_TRIGGER_UNSET			__UINT64_C(0x00)
-#define ZBX_FLAG_LLD_TRIGGER_DISCOVERED			__UINT64_C(0x01)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION		__UINT64_C(0x02)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION		__UINT64_C(0x04)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE		__UINT64_C(0x08)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY		__UINT64_C(0x10)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE_COMMENTS		__UINT64_C(0x20)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE_URL			__UINT64_C(0x40)
-#define ZBX_FLAG_LLD_TRIGGER_UPDATE									\
-		(ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION | ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION |	\
-		ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY |		\
-		ZBX_FLAG_LLD_TRIGGER_UPDATE_COMMENTS | ZBX_FLAG_LLD_TRIGGER_UPDATE_URL)
+#define ZBX_FLAG_LLD_TRIGGER_UNSET			__UINT64_C(0x0000)
+#define ZBX_FLAG_LLD_TRIGGER_DISCOVERED			__UINT64_C(0x0001)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION		__UINT64_C(0x0002)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION		__UINT64_C(0x0004)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE		__UINT64_C(0x0008)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY		__UINT64_C(0x0010)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_COMMENTS		__UINT64_C(0x0020)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_URL			__UINT64_C(0x0040)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION	__UINT64_C(0x0080)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE	__UINT64_C(0x0100)
+#define ZBX_FLAG_LLD_TRIGGER_UPDATE										\
+		(ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION | ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION |		\
+		ZBX_FLAG_LLD_TRIGGER_UPDATE_TYPE | ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY |			\
+		ZBX_FLAG_LLD_TRIGGER_UPDATE_COMMENTS | ZBX_FLAG_LLD_TRIGGER_UPDATE_URL |			\
+		ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION | ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE)
 	zbx_uint64_t		flags;
 }
 zbx_lld_trigger_t;
@@ -191,6 +198,7 @@ static void	lld_trigger_prototype_free(zbx_lld_trigger_prototype_t *trigger_prot
 	zbx_vector_ptr_destroy(&trigger_prototype->functions);
 	zbx_free(trigger_prototype->url);
 	zbx_free(trigger_prototype->comments);
+	zbx_free(trigger_prototype->recovery_expression);
 	zbx_free(trigger_prototype->expression);
 	zbx_free(trigger_prototype->description);
 	zbx_free(trigger_prototype);
@@ -207,6 +215,8 @@ static void	lld_trigger_free(zbx_lld_trigger_t *trigger)
 	zbx_free(trigger->url);
 	zbx_free(trigger->comments_orig);
 	zbx_free(trigger->comments);
+	zbx_free(trigger->recovery_expression_orig);
+	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->expression_orig);
 	zbx_free(trigger->expression);
 	zbx_free(trigger->description_orig);
@@ -233,7 +243,7 @@ static void	lld_trigger_prototoypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_
 
 	result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.status,t.type,t.priority,t.comments,"
-				"t.url"
+				"t.url,t.recovery_expression,t.recovery_mode"
 			" from triggers t,functions f,items i,item_discovery id"
 			" where t.triggerid=f.triggerid"
 				" and f.itemid=i.itemid"
@@ -249,9 +259,11 @@ static void	lld_trigger_prototoypes_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_
 		ZBX_STR2UINT64(trigger_prototype->triggerid, row[0]);
 		trigger_prototype->description = zbx_strdup(NULL, row[1]);
 		trigger_prototype->expression = zbx_strdup(NULL, row[2]);
+		trigger_prototype->recovery_expression = zbx_strdup(NULL, row[8]);
 		ZBX_STR2UCHAR(trigger_prototype->status, row[3]);
 		ZBX_STR2UCHAR(trigger_prototype->type, row[4]);
 		ZBX_STR2UCHAR(trigger_prototype->priority, row[5]);
+		ZBX_STR2UCHAR(trigger_prototype->recovery_mode, row[9]);
 		trigger_prototype->comments = zbx_strdup(NULL, row[6]);
 		trigger_prototype->url = zbx_strdup(NULL, row[7]);
 
@@ -305,7 +317,7 @@ static void	lld_triggers_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_pt
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
-				"t.comments,t.url"
+				"t.comments,t.url,t.recovery_expression,t.recovery_mode"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -344,6 +356,8 @@ static void	lld_triggers_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_pt
 		trigger->description_orig = NULL;
 		trigger->expression = zbx_strdup(NULL, row[3]);
 		trigger->expression_orig = NULL;
+		trigger->recovery_expression = zbx_strdup(NULL, row[8]);
+		trigger->recovery_expression_orig = NULL;
 
 		trigger->flags = ZBX_FLAG_LLD_TRIGGER_UNSET;
 
@@ -352,6 +366,9 @@ static void	lld_triggers_get(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_pt
 
 		if ((unsigned char)atoi(row[5]) != trigger_prototype->priority)
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_PRIORITY;
+
+		if ((unsigned char)atoi(row[9]) != trigger_prototype->recovery_mode)
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE;
 
 		trigger->comments = zbx_strdup(NULL, row[6]);
 		trigger->comments_orig = NULL;
@@ -967,7 +984,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 	const char		*__function_name = "lld_trigger_make";
 
 	zbx_lld_trigger_t	*trigger;
-	char			*buffer = NULL, *expression = NULL, err[64];
+	char			*buffer = NULL, *expression = NULL, *recovery_expression = NULL, err[64];
 	struct zbx_json_parse	*jp_row = &lld_row->jp_row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -975,7 +992,11 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 	trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links);
 
 	expression = zbx_strdup(expression, trigger_prototype->expression);
-	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)))
+	recovery_expression = zbx_strdup(recovery_expression, trigger_prototype->recovery_expression);
+
+	if (SUCCEED != substitute_discovery_macros(&expression, jp_row, ZBX_MACRO_NUMERIC, err, sizeof(err)) ||
+			SUCCEED != substitute_discovery_macros(&recovery_expression, jp_row, ZBX_MACRO_NUMERIC, err,
+					sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n", (NULL != trigger ? "update" : "create"), err);
 		goto out;
@@ -1000,6 +1021,14 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 			trigger->expression = expression;
 			expression = NULL;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION;
+		}
+
+		if (0 != strcmp(trigger->recovery_expression, recovery_expression))
+		{
+			trigger->recovery_expression_orig = trigger->recovery_expression;
+			trigger->recovery_expression = recovery_expression;
+			recovery_expression = NULL;
+			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION;
 		}
 
 		buffer = zbx_strdup(buffer, trigger_prototype->comments);
@@ -1040,6 +1069,10 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 		trigger->expression_orig = NULL;
 		expression = NULL;
 
+		trigger->recovery_expression = recovery_expression;
+		trigger->recovery_expression_orig = NULL;
+		recovery_expression = NULL;
+
 		trigger->comments = zbx_strdup(NULL, trigger_prototype->comments);
 		trigger->comments_orig = NULL;
 		substitute_discovery_macros(&trigger->comments, jp_row, ZBX_MACRO_ANY, NULL, 0);
@@ -1067,6 +1100,7 @@ static void 	lld_trigger_make(zbx_lld_trigger_prototype_t *trigger_prototype, zb
 
 	trigger->flags |= ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 out:
+	zbx_free(recovery_expression);
 	zbx_free(expression);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1386,8 +1420,11 @@ static int	lld_trigger_changed(zbx_lld_trigger_t *trigger)
 	if (0 == trigger->triggerid)
 		return SUCCEED;
 
-	if (0 != (trigger->flags & (ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION | ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION)))
+	if (0 != (trigger->flags & (ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION | ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION |
+			ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION)))
+	{
 		return SUCCEED;
+	}
 
 	for (i = 0; i < trigger->functions.values_num; i++)
 	{
@@ -1430,7 +1467,16 @@ static int	lld_triggers_equal(zbx_lld_trigger_t *trigger, zbx_lld_trigger_t *tri
 		expression_b = lld_expression_expand(trigger_b->expression, &trigger_b->functions);
 
 		if (0 == strcmp(expression, expression_b))
-			ret = SUCCEED;
+		{
+			zbx_free(expression);
+			zbx_free(expression_b);
+
+			expression = lld_expression_expand(trigger->recovery_expression, &trigger->functions);
+			expression_b = lld_expression_expand(trigger_b->recovery_expression, &trigger_b->functions);
+
+			if (0 == strcmp(expression, expression_b))
+				ret = SUCCEED;
+		}
 
 		zbx_free(expression);
 		zbx_free(expression_b);
@@ -1514,7 +1560,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		sql = zbx_malloc(sql, sql_alloc);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct t.triggerid,t.description,t.expression"
+				"select distinct t.triggerid,t.description,t.expression,t.recovery_expression"
 				" from triggers t,functions f,items i"
 				" where t.triggerid=f.triggerid"
 					" and f.itemid=i.itemid"
@@ -1543,6 +1589,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger->description_orig = NULL;
 			db_trigger->expression = zbx_strdup(NULL, row[2]);
 			db_trigger->expression_orig = NULL;
+			db_trigger->recovery_expression = zbx_strdup(NULL, row[3]);
+			db_trigger->recovery_expression_orig = NULL;
 			db_trigger->comments = NULL;
 			db_trigger->comments_orig = NULL;
 			db_trigger->url = NULL;
@@ -1566,6 +1614,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			db_trigger = (zbx_lld_trigger_t *)db_triggers.values[i];
 
 			lld_expression_simplify(&db_trigger->expression, &db_trigger->functions);
+			lld_expression_simplify(&db_trigger->recovery_expression, &db_trigger->functions);
 
 			for (j = 0; j < triggers->values_num; j++)
 			{
@@ -1587,6 +1636,10 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 					lld_field_str_rollback(&trigger->expression, &trigger->expression_orig,
 							&trigger->flags, ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION);
+
+					lld_field_str_rollback(&trigger->recovery_expression,
+							&trigger->recovery_expression_orig, &trigger->flags,
+							ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION);
 
 					for (k = 0; k < trigger->functions.values_num; k++)
 					{
@@ -1811,7 +1864,8 @@ static void	lld_triggers_save(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger_pro
 		triggerid = DBget_maxid_num("triggers", new_triggers);
 
 		zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "expression", "priority",
-				"status", "comments", "url", "type", "value", "state", "flags", NULL);
+				"status", "comments", "url", "type", "value", "state", "flags", "recovery_mode",
+				"recovery_expression", NULL);
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerid", "parent_triggerid",
 				NULL);
@@ -1878,13 +1932,17 @@ static void	lld_triggers_save(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger_pro
 		if (0 == trigger->triggerid || 0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION))
 			lld_expression_create(&trigger->expression, &trigger->functions);
 
+		if (0 == trigger->triggerid || 0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
+			lld_expression_create(&trigger->recovery_expression, &trigger->functions);
+
 		if (0 == trigger->triggerid)
 		{
 			zbx_db_insert_add_values(&db_insert, triggerid, trigger->description, trigger->expression,
 					(int)trigger_prototype->priority, (int)trigger_prototype->status,
 					trigger->comments, trigger->url, (int)trigger_prototype->type,
 					(int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
-					(int)ZBX_FLAG_DISCOVERY_CREATED);
+					(int)ZBX_FLAG_DISCOVERY_CREATED, (int)trigger_prototype->recovery_mode,
+					trigger->recovery_expression);
 
 			zbx_db_insert_add_values(&db_insert_tdiscovery, triggerid, trigger->parent_triggerid);
 
@@ -1911,6 +1969,22 @@ static void	lld_triggers_save(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger_pro
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sexpression='%s'", d,
 						expression_esc);
 				zbx_free(expression_esc);
+				d = ",";
+			}
+
+			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION))
+			{
+				expression_esc = DBdyn_escape_string(trigger->recovery_expression);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_expression='%s'", d,
+						expression_esc);
+				zbx_free(expression_esc);
+				d = ",";
+			}
+
+			if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_MODE))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%srecovery_mode=%d", d,
+						(int)trigger_prototype->recovery_mode);
 				d = ",";
 			}
 
@@ -2720,6 +2794,7 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 		trigger_prototype = (zbx_lld_trigger_prototype_t *)trigger_prototypes.values[i];
 
 		lld_expression_simplify(&trigger_prototype->expression, &trigger_prototype->functions);
+		lld_expression_simplify(&trigger_prototype->recovery_expression, &trigger_prototype->functions);
 	}
 
 	for (i = 0; i < triggers.values_num; i++)
@@ -2727,6 +2802,7 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 		trigger = (zbx_lld_trigger_t *)triggers.values[i];
 
 		lld_expression_simplify(&trigger->expression, &trigger->functions);
+		lld_expression_simplify(&trigger->recovery_expression, &trigger->functions);
 	}
 
 	/* making triggers */
