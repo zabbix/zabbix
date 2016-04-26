@@ -900,7 +900,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	{
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.operationid,m.default_msg,subject,message,mediatypeid"
+					"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
 				" from operations o"
 					" left join opmessage m"
 						" on m.operationid=o.operationid"
@@ -915,7 +915,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.operationid,m.default_msg,subject,message,mediatypeid"
+					"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
 				" from operations o"
 					" left join opmessage m"
 						" on m.operationid=o.operationid"
