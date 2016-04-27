@@ -1329,7 +1329,7 @@ sub get_probe_times
 				" and clock between $from and $till");
 
 		my $values_hash_ref;
-		foreach my $row_ref (sort {$a->[0] <=> $b->[0]} (@{$values_ref}))
+		foreach my $row_ref (sort {$a->[0] <=> $b->[0]} (@{$values_ref}))	# sort by clock
 		{
 			$values_hash_ref->{truncate_from($row_ref->[0])} = $row_ref->[1];
 		}
@@ -1338,9 +1338,10 @@ sub get_probe_times
 		my $step = 60;	# seconds
 		my $prev_value = DOWN;
 
+		# check probe status every minute, if the value is missing consider the probe down
 		while ($step_clock < $till)
 		{
-			my $value = (defined($values_hash_ref->{$step_clock}) ? $values_hash_ref->{$step_clock} : UP);
+			my $value = (defined($values_hash_ref->{$step_clock}) ? $values_hash_ref->{$step_clock} : DOWN);
 
 			if ($prev_value == DOWN && $value == UP)
 			{
@@ -1357,7 +1358,7 @@ sub get_probe_times
 		}
 
 		# push "till" to @times if it contains odd number of elements
-		if (scalar(@{$result->{$probe}}) != 0)
+		if ($result->{$probe})
 		{
 			push(@{$result->{$probe}}, $till) if ($prev_value == UP);
 		}
