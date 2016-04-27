@@ -59,6 +59,7 @@ typedef struct
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	recovery_msg;
+	unsigned char	maintenance_mode;
 }
 DB_ACTION;
 
@@ -1213,19 +1214,24 @@ static void	free_event_info(DB_EVENT *event)
  * Purpose: check whether the escalation trigger and related items, hosts are *
  *          not deleted or disabled.                                          *
  *                                                                            *
- * Parameters: triggerid  - [IN] the id of trigger to check                   *
- *             source     - [IN] the escalation event source                  *
- *             ignore     - [OUT] 1 if the escalation must be ignored because *
- *                                of dependent trigger being in PROBLEM state,*
- *                                0 otherwise                                 *
- *             error      - [OUT] message in case escalation is cancelled     *
+ * Parameters: triggerid   - [IN] the id of trigger to check                  *
+ *             source      - [IN] the escalation event source                 *
+ *             ignore      - [OUT] 1 - the escalation must be ignored because *
+ *                                     of dependent trigger being in PROBLEM  *
+ *                                     PROBLEM state,                         *
+ *                                 0 - otherwise                              *
+ *             maintenance - [OUT] HOST_MAINTENANCE_STATUS_ON - if at least   *
+ *                                 one of hosts used in expression is in      *
+ *                                 maintenance mode,                          *
+ *                                 HOST_MAINTENANCE_STATUS_OFF - otherwise    *
+ *             error       - [OUT] message in case escalation is cancelled    *
  *                                                                            *
  * Return value: FAIL if dependent trigger is in PROBLEM state                *
  *               SUCCEED otherwise                                            *
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source, unsigned char *ignore,
-		char **error)
+		unsigned char *maintenance, char **error)
 {
 	DC_TRIGGER		trigger;
 	zbx_vector_uint64_t	functionids, itemids;
@@ -1278,10 +1284,15 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
+	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
+
 	for (i = 0; i < itemids.values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
-			continue;
+		{
+			*error = zbx_dsprintf(*error, "item id:" ZBX_FS_UI64 " deleted.", itemids.values[i]);
+			break;
+		}
 
 		if (ITEM_STATUS_DISABLED == items[i].status)
 		{
@@ -1293,6 +1304,9 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 			*error = zbx_dsprintf(*error, "host \"%s\" disabled.", items[i].host.host);
 			break;
 		}
+
+		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status)
+			*maintenance = HOST_MAINTENANCE_STATUS_ON;
 	}
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
@@ -1332,7 +1346,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, unsigned char *ignore,
-		char **error)
+		unsigned char *maintenance, char **error)
 {
 	const char	*__function_name = "check_escalation";
 	DB_RESULT	result;
@@ -1357,10 +1371,11 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	}
 
 	*ignore = 0;
+	*maintenance = 0;
 
 	if (EVENT_OBJECT_TRIGGER == object)
 	{
-		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, ignore, error))
+		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, ignore, maintenance, error))
 			goto out;
 	}
 	else if (EVENT_SOURCE_INTERNAL == source)
@@ -1382,6 +1397,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 			{
 				*error = zbx_dsprintf(*error, "host \"%s\" disabled.", item.host.host);
 			}
+			else
+				*maintenance = HOST_MAINTENANCE_STATUS_ON;
 
 			DCconfig_clean_items(&item, &errcode, 1);
 
@@ -1394,7 +1411,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 
 	result = DBselect(
 			"select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,recovery_msg"
+				"r_longdata,recovery_msg,maintenance_mode"
 			" from actions"
 			" where actionid=" ZBX_FS_UI64,
 			escalation->actionid);
@@ -1408,13 +1425,15 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 		}
 
 		ZBX_STR2UINT64(action->actionid, row[0]);
-		action->eventsource = atoi(row[3]);
+		ZBX_STR2UCHAR(action->eventsource, row[3]);
 		action->esc_period = atoi(row[4]);
 		action->shortdata = zbx_strdup(NULL, row[5]);
 		action->longdata = zbx_strdup(NULL, row[6]);
 		action->r_shortdata = zbx_strdup(NULL, row[7]);
 		action->r_longdata = zbx_strdup(NULL, row[8]);
-		action->recovery_msg = atoi(row[9]);
+		ZBX_STR2UCHAR(action->recovery_msg, row[9]);
+		ZBX_STR2UCHAR(action->maintenance_mode, row[10]);
+
 	}
 	else
 	{
@@ -1622,24 +1641,45 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			DB_ACTION	action;
 			char		*error = NULL;
 			int		escalation_rc;
-			unsigned char	ignore;
+			unsigned char	ignore, maintenance;
 
-			DBbegin();
 
-			sql_offset = 0;
-
-			if (SUCCEED == (escalation_rc = check_escalation(&escalation, &action, &ignore, &error)))
+			if (SUCCEED == (escalation_rc = check_escalation(&escalation, &action, &ignore, &maintenance,
+					&error)))
 			{
 				/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
 				/* it normally in order to send notification about the error otherwise we     */
 				/* skip the escalation until dependable trigger changes value to OK.          */
 				if (0 != ignore)
 				{
-					DBrollback();
 					free_db_action(&action);
 					goto next;
 				}
+
+				if (ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
+						HOST_MAINTENANCE_STATUS_ON == maintenance)
+				{
+					/* remove paused escalations that were created and recovered */
+					/* during maintenance period                                 */
+					if (0 == escalation.esc_step && 0 != escalation.r_eventid)
+					{
+						zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+						goto next;
+					}
+
+					/* ignore paused escalations created before maintenance period */
+					/* until maintenance ends or the escalations are recovered     */
+					if (0 == escalation.r_eventid)
+					{
+						free_db_action(&action);
+						goto next;
+					}
+				}
 			}
+
+			DBbegin();
+
+			sql_offset = 0;
 
 			if (ESCALATION_STATUS_ACTIVE == escalation.status)
 			{
