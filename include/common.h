@@ -109,13 +109,13 @@ typedef struct
 zbx_timespec_t;
 
 /* time zone offset */
-typedef struct zbx_tz_offset
+typedef struct
 {
-	int	hours;
-	int	minutes;
-	char	sign;
+	char	tz_sign;	/* '+' or '-' */
+	int	tz_hour;
+	int	tz_min;
 }
-zbx_tz_offset_t;
+zbx_timezone_t;
 
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)

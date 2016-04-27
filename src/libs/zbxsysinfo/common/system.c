@@ -28,10 +28,9 @@
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*type, buf[32];
-	size_t		offset;
 	long		milliseconds;
 	struct tm	tm;
-	zbx_tz_offset_t	tz_offset;
+	zbx_timezone_t	tz;
 
 	if (1 < request->nparam)
 	{
@@ -49,12 +48,10 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		zbx_get_time(&tm, &milliseconds, &tz_offset);
 
-		offset = zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03ld,",
+		zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03ld,%c%02d:%02d",
 				1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
-				tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds);
-
-		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%c%02d:%02d",
-				tz_offset.sign, tz_offset.hours, tz_offset.minutes);
+				tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds,
+				tz.tz_sign, tz.tz_hour, tz.tz_min);
 
 		SET_STR_RESULT(result, strdup(buf));
 	}
