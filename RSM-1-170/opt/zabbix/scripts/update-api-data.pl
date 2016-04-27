@@ -518,7 +518,7 @@ foreach (keys(%$servicedata))
 
 		if ($service eq 'dns' || $service eq 'dnssec')
 		{
-			$nsips_ref = get_nsips($tld, $services->{$service}->{'key_rtt'}, 1);	# templated
+			$nsips_ref = get_templated_nsips($tld, $services->{$service}->{'key_rtt'}, 1);	# templated
 			$dns_items_ref = get_dns_itemids($nsips_ref, $services->{$service}->{'key_rtt'}, $tld, getopt('probe'));
 		}
 		elsif ($service eq 'rdds')

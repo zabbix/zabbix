@@ -43,7 +43,7 @@ foreach my $probe (keys(%$all_probes_ref))
 {
 	my $itemid = get_probe_online_key_itemid($probe);
 
-	next if (!opt('dry-run') && probe_online_value_exists($value_ts, $itemid) == SUCCESS);
+	next if (!opt('dry-run') && uint_value_exists($value_ts, $itemid) == SUCCESS);
 
 	my @result = grep(/^$probe$/, @online_probes);
 	my $status = (@result ? UP : DOWN);

@@ -133,7 +133,7 @@ foreach (@$tlds_ref)
 
 	if ("," eq substr($key, -1))
 	{
-		my $nsips_ref = get_nsips($tld, $key);
+		my $nsips_ref = get_templated_nsips($tld, $key);
 		$items_ref = __get_all_ns_items($nsips_ref, $key, $tld);
 	}
 	else

@@ -111,7 +111,7 @@ while ($tld_index < $tld_count)
 				exit(0);
 			}
 
-			exit(0) if (avail_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
+			exit(0) if (uint_value_exists($value_ts, $result->{'itemid'}) == SUCCESS);
 		}
 
 		$result = process_slv_ns_monthly($tld, $cfg_key_in, $from, $cycle_till, $value_ts, $delay,

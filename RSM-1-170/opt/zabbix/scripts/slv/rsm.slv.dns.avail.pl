@@ -96,7 +96,7 @@ while ($tld_index < $tld_count)
 
 			if (!opt('dry-run'))
 			{
-				next if (avail_value_exists($value_ts, $itemid) == SUCCESS);
+				next if (uint_value_exists($value_ts, $itemid) == SUCCESS);
 			}
 
 			next if ($till > $max_avail_time);

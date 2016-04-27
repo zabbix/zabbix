@@ -71,7 +71,7 @@ while ($period > 0)
 			next;
 		}
 
-		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
+		if (uint_value_exists($value_ts, $itemid) == SUCCESS)
 		{
 			# value already exists
 			next unless (opt('dry-run'));

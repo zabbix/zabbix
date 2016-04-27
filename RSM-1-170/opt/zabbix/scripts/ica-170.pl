@@ -19,6 +19,10 @@ use RSMSLV;
 use TLD_constants qw(:general :templates :value_types :ec :rsm :slv :config :api);
 use TLDs;
 
+parse_opts();
+
+setopt('nolog');
+
 my $config = get_rsm_config();
 
 my $zabbix = Zabbix->new(
@@ -66,7 +70,7 @@ foreach (@{$tlds_ref})
 	}
 }
 
-my $slv_items_to_remove =
+my $slv_items_to_remove_like =
 [
 	'rsm.slv.dns.ns.results[%',
 	'rsm.slv.dns.ns.positive[%',
@@ -90,7 +94,7 @@ foreach my $from (keys(%{$triggers_to_rename}))
 }
 
 print("Deleting obsoleted items...\n");
-foreach my $key (@{$slv_items_to_remove})
+foreach my $key (@{$slv_items_to_remove_like})
 {
 	db_exec("delete from items where key_ like '$key'");
 }
@@ -123,6 +127,43 @@ foreach my $key (@{$slv_items_to_remove})
 
 print("Creating SLV items...\n");
 __create_missing_slv_montly_items();
+
+print("Fixing applications...\n");
+my $name_from = 'SLV current month';
+my $name_to = 'SLV monthly';
+foreach (@{$tlds_ref})
+{
+	$tld = $_;	# set globally
+
+	my $rows_ref = db_select(
+		"select a.applicationid".
+		" from applications a,hosts h".
+		" where a.hostid=h.hostid".
+			" and h.host='$tld'".
+			" and a.name='$name_from'");
+
+	next if (scalar(@{$rows_ref}) == 0);
+
+	print("  $tld\n");
+
+	my $applicationid_from = $rows_ref->[0]->[0];
+
+	$rows_ref = db_select(
+		"select a.applicationid".
+		" from applications a,hosts h".
+		" where a.hostid=h.hostid".
+			" and h.host='$tld'".
+			" and a.name='$name_to'");
+
+	my $applicationid_to = $rows_ref->[0]->[0];
+
+	db_exec("update items_applications".
+		" set applicationid=$applicationid_to".
+		" where applicationid=$applicationid_from");
+
+	db_exec("delete from applications".
+		" where applicationid=$applicationid_from");
+}
 print("Done!\n");
 
 sub __create_item

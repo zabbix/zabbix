@@ -50,7 +50,7 @@ foreach (@$tlds_ref)
 
 	my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
 
-        if (rollweek_value_exists($value_ts, $itemid_out) == SUCCESS)
+        if (dbl_value_exists($value_ts, $itemid_out) == SUCCESS)
         {
                 # value already exists
                 next unless (opt('dry-run'));

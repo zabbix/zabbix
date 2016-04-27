@@ -88,8 +88,8 @@ my $lock_tmp;
 my %OPTS;	# command-line options
 
 our @EXPORT = qw($result $dbh $tld
-		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
-		MAX_INFO_ERROR PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
+		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR
+		MIN_INFO_ERROR MAX_INFO_ERROR PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
 		PROBE_ONLINE_SHIFT AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43
 		JSON_INTERFACE_RDDS80
 		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION
@@ -99,22 +99,29 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
-		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds get_probe_macros get_ipv_probes
-		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_disconnect db_select db_select_binds
+		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
+		get_probe_macros get_ipv_probes
+		get_probes get_templated_nsips get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled
+		db_connect db_disconnect db_select db_select_binds
 		db_exec set_slv_config get_cycle_bounds get_rollweek_bounds get_prev_month_bounds get_month_bounds
-		get_month_from get_num_cycles minutes_last_month max_avail_time get_probe_times get_probe_times2 get_probe_availabilities
+		get_month_from get_num_cycles minutes_last_month max_avail_time get_probe_times get_probe_times2
+		get_probe_availabilities
 		probe_offline_at probes2tldhostids get_probe_online_key_itemid
-		init_values push_value send_values get_nsip_from_key get_ip_from_nsip is_service_error process_slv_ns_monthly
-		process_slv_avail process_slv_ns_avail process_slv_monthly get_results probe_online_value_exists avail_value_exists
-		rollweek_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
+		init_values push_value send_values get_nsip_from_key get_ip_from_nsip is_service_error
+		process_slv_ns_monthly
+		process_slv_avail process_slv_ns_avail process_slv_downtime get_results uint_value_exists
+		dbl_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
 		get_service_status_itemids get_probe_results get_ip_version
-		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
+		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute
+		avail_result_msg
 		get_current_value get_itemids_by_hostids get_valuemaps get_statusmaps get_detailed_result
 		get_result_string get_tld_by_trigger truncate_from truncate_till get_value_ts alerts_enabled
 		is_from_valid is_till_valid get_test_start_time avail_up_down
-		get_real_services_period dbg info wrn fail format_stats_time friendly_delay slv_exit slv_stats_reset slv_lock slv_unlock
-		exit_if_running trim parse_opts parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
+		get_real_services_period dbg info wrn fail format_stats_time friendly_delay slv_exit slv_stats_reset
+		slv_lock slv_unlock
+		exit_if_running trim parse_opts parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str
+		ts_full selected_period write_file
 		cycle_start cycle_end get_default_period rsm_slv_error get_readable_tld usage);
 
 # configuration, set in set_slv_config()
@@ -670,14 +677,12 @@ sub get_nsips
 	my $host = shift;
 	my $key = shift;
 
-	my $sql =
-
 	my $rows_ref = db_select(
 		"select key_".
 		" from items i,hosts h".
 		" where i.hostid=h.hostid".
 			" and i.status<>".ITEM_STATUS_DISABLED.
-			" and h.host='Template $host'".
+			" and h.host='$host'".
 			" and i.key_ like '$key%'");
 
 	my @nss;
@@ -689,6 +694,14 @@ sub get_nsips
 	fail("cannot find items ($key*) at host ($host)") if (scalar(@nss) == 0);
 
 	return \@nss;
+}
+
+sub get_templated_nsips
+{
+	my $host = shift;
+	my $key = shift;
+
+	return get_nsips("Template $host", $key);
 }
 
 #
@@ -1721,7 +1734,7 @@ sub process_slv_ns_monthly
 	my $probe_times_ref = shift;	# reference to the probes that were online
 	my $check_value_ref = shift;	# a pointer to subroutine to check if the value was successful
 
-	my $nsips_ref = get_nsips($tld, $cfg_key_in);
+	my $nsips_ref = get_templated_nsips($tld, $cfg_key_in);
 
 	dbg("using filter '$cfg_key_in' found next NS:\n", Dumper($nsips_ref)) if (opt('debug'));
 
@@ -1891,7 +1904,7 @@ sub process_slv_ns_avail
 	my $probe_times_ref = shift;
 	my $check_value_ref = shift;
 
-	my $nsips_ref = get_nsips($tld, $cfg_key_in);
+	my $nsips_ref = get_templated_nsips($tld, $cfg_key_in);
 
 	dbg("using filter '$cfg_key_in' found next name servers:\n", Dumper($nsips_ref)) if (opt('debug'));
 
@@ -1976,6 +1989,62 @@ sub process_slv_ns_avail
 
 		#my $positive_sla = floor($probes_with_results * SLV_UNAVAILABILITY_LIMIT / 100);
 	}
+
+	return $result;
+}
+
+sub process_slv_downtime
+{
+	my $from = shift;
+	my $till = shift;
+	my $value_ts = shift;
+	my $key_in = shift;
+	my $key_out = shift;
+	my $tlds_ref = shift;
+
+	my $tld_items;
+
+	# just collect itemids
+	foreach (@$tlds_ref)
+	{
+		$tld = $_;	# set global variable here
+
+		my $itemid_in = get_itemid_by_host($tld, $key_in);
+
+		next unless ($itemid_in);
+
+		if (!opt('dry-run'))
+		{
+			my $itemid_out = get_itemid_by_host($tld, $key_out);
+
+			next unless ($itemid_out);
+
+			next if (uint_value_exists($value_ts, $itemid_out) == SUCCESS);
+		}
+
+		# for future calculation of downtime
+		$tld_items->{$tld} = $itemid_in;
+	}
+
+	# unset TLD (for the logs)
+	$tld = undef;
+
+	my $result;
+
+	# use bind for faster execution of the same SQL query
+	my $sth = get_downtime_prepare();
+
+	foreach (keys(%{$tld_items}))
+	{
+		$tld = $_;	# set global variable here
+
+		my $itemid = $tld_items->{$tld};
+
+		$result->{$tld} = get_downtime_execute($sth, $itemid, $from, $till);
+	}
+
+	# unset TLD (for the logs)
+	$tld = undef;
 
 	return $result;
 }
@@ -2080,7 +2149,7 @@ sub __get_item_values
 	return $result;
 }
 
-sub probe_online_value_exists
+sub uint_value_exists
 {
         my $clock = shift;
         my $itemid = shift;
@@ -2092,19 +2161,7 @@ sub probe_online_value_exists
         return E_FAIL;
 }
 
-sub avail_value_exists
-{
-        my $clock = shift;
-        my $itemid = shift;
-
-        my $rows_ref = db_select("select 1 from history_uint where itemid=$itemid and clock=$clock");
-
-        return SUCCESS if ($rows_ref->[0]->[0]);
-
-        return E_FAIL;
-}
-
-sub rollweek_value_exists
+sub dbl_value_exists
 {
         my $clock = shift;
         my $itemid = shift;
@@ -4167,7 +4224,7 @@ sub trim
 
 sub parse_opts
 {
-	if (!GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', 'stats!', @_))
+	if (!GetOptions(\%OPTS, 'now=i', 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', 'stats!', @_))
 	{
 		pod2usage(-verbose => 0, -input => $POD2USAGE_FILE);
 	}
@@ -4194,14 +4251,14 @@ sub parse_avail_opts
 {
 	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.avail.usage';
 
-	parse_opts('tld=s', 'now=n', 'cycles=n', @_);
+	parse_opts('tld=s', 'cycles=n', @_);
 }
 
 sub parse_rollweek_opts
 {
 	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.rollweek.usage';
 
-	parse_opts('tld=s', 'now=n', @_);
+	parse_opts('tld=s', , @_);
 }
 
 sub opt
