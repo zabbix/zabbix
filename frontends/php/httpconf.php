@@ -689,7 +689,11 @@ else {
 
 		order_result($httpTests, $sortField, $sortOrder);
 
-		$data['paging'] = getPagingLine($httpTests, $sortOrder);
+		$url = (new CUrl('httpconf.php'))
+			->setArgument('hostid', $data['hostid'])
+			->setArgument('groupid', $data['pageFilter']->groupid);
+
+		$data['paging'] = getPagingLine($httpTests, $sortOrder, $url);
 
 		if($data['showInfoColumn']) {
 			$httpTestsLastData = Manager::HttpTest()->getLastData(array_keys($httpTests));

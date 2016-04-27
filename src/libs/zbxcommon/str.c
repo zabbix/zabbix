@@ -352,7 +352,8 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	/* count the number of occurrences of sub_str1 */
 	for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
-	if ( 0 == count )	return strdup(str);
+	if (0 == count)
+		return zbx_strdup(NULL, str);
 
 	diff = (long)strlen(sub_str2) - len;
 

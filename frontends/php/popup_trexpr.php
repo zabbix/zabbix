@@ -663,7 +663,8 @@ $paramType = getRequest('paramtype');
 $exprType = getRequest('expr_type', 'last[=]');
 
 // opening the popup when editing an expression in the trigger constructor
-if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
+if ((getRequest('dstfld1') === 'expr_temp' || getRequest('dstfld1') === 'recovery_expr_temp')
+		&& hasRequest('expression')) {
 	$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
 	$expressionData = new CTriggerExpression();

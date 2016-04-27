@@ -30,7 +30,6 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
-#include "comms.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 static int	sync_in_progress = 0;
@@ -80,8 +79,12 @@ typedef struct
 	zbx_uint64_t	triggerid;
 	const char	*description;
 	const char	*expression;
-	/* cached expression with expanded user macros, can be NULL */
+	const char	*recovery_expression;
+
+	/* cached expressions with expanded user macros, can be NULL */
 	const char	*expression_ex;
+	const char	*recovery_expression_ex;
+
 	const char	*error;
 	int		lastchange;
 	unsigned char	topoindex;
@@ -92,6 +95,7 @@ typedef struct
 	unsigned char	locked;
 	unsigned char	status;
 	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
+	unsigned char	recovery_mode;	/* TRIGGER_RECOVERY_MODE_* defines  */
 }
 ZBX_DC_TRIGGER;
 
@@ -3004,9 +3008,11 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		DCstrpool_replace(found, &trigger->description, row[1]);
 		DCstrpool_replace(found, &trigger->expression, row[2]);
+		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
+		ZBX_STR2UCHAR(trigger->recovery_mode, row[10]);
 
 		if (0 == found)
 		{
@@ -3020,11 +3026,15 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		{
 			if (NULL != trigger->expression_ex)
 				zbx_strpool_release(trigger->expression_ex);
+
+			if (NULL != trigger->recovery_expression_ex)
+				zbx_strpool_release(trigger->recovery_expression_ex);
 		}
 
-		/* reset the cached expression to ensure the expression are expanded */
-		/* with updated user macro values                                    */
+		/* reset the cached expressions to ensure the expressions are expanded */
+		/* with updated user macro values                                      */
 		trigger->expression_ex = NULL;
+		trigger->recovery_expression_ex = NULL;
 
 		trigger->topoindex = 1;
 
@@ -3049,6 +3059,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		if (NULL != trigger->expression_ex)
 			zbx_strpool_release(trigger->expression_ex);
+
+		if (NULL != trigger->recovery_expression_ex)
+			zbx_strpool_release(trigger->recovery_expression_ex);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -3772,8 +3785,8 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (trig_result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.error,"
-				"t.priority,t.type,t.value,t.state,t.lastchange,t.status"
+			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
+				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -4722,7 +4735,34 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
 
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
+	{
+		*error = zbx_strdup(*error, "internal error: invalid connection type");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+#endif
 	LOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(host)))
@@ -4750,16 +4790,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		zbx_tls_conn_attr_t	attr;
-
-		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr.issuer))
 		{
@@ -4778,16 +4808,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
-		zbx_tls_conn_attr_t	attr;
-
-		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-
 		if (NULL != dc_host->tls_dc_psk)
 		{
 			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr.psk_identity_len ||
@@ -5146,8 +5166,8 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->triggerid = src_trigger->triggerid;
 	dst_trigger->description = zbx_strdup(NULL, src_trigger->description);
 	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
+	dst_trigger->recovery_expression_orig = zbx_strdup(NULL, src_trigger->recovery_expression);
 	dst_trigger->error = zbx_strdup(NULL, src_trigger->error);
-	dst_trigger->new_error = NULL;
 	dst_trigger->timespec.sec = 0;
 	dst_trigger->timespec.ns = 0;
 	dst_trigger->priority = src_trigger->priority;
@@ -5158,14 +5178,24 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->lastchange = src_trigger->lastchange;
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
+	dst_trigger->recovery_mode = src_trigger->recovery_mode;
+
+	dst_trigger->expression = NULL;
+	dst_trigger->recovery_expression = NULL;
+	dst_trigger->new_error = NULL;
 
 	if (ZBX_EXPAND_MACROS == expand)
 	{
 		dst_trigger->expression = dc_cache_expanded_expression(src_trigger->expression,
 				&src_trigger->expression_ex, &dst_trigger->new_error);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == dst_trigger->recovery_mode &&
+				NULL == dst_trigger->new_error)
+		{
+			dst_trigger->recovery_expression = dc_cache_expanded_expression(src_trigger->recovery_expression,
+					&src_trigger->recovery_expression_ex, &dst_trigger->new_error);
+		}
 	}
-	else
-		dst_trigger->expression = NULL;
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -5173,7 +5203,9 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->new_error);
 	zbx_free(trigger->error);
 	zbx_free(trigger->expression_orig);
+	zbx_free(trigger->recovery_expression_orig);
 	zbx_free(trigger->expression);
+	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->description);
 }
 

@@ -20,7 +20,6 @@
 package com.zabbix.gateway;
 
 import java.net.Socket;
-import java.util.Formatter;
 
 import org.json.*;
 
