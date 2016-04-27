@@ -321,7 +321,6 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 } elseif (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('copy') && hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$result = true;
-		$graphids = getRequest('group_graphid');
 
 		$options = [
 			'output' => ['hostid'],
@@ -363,14 +362,14 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 		}
 		$result = DBend($result);
 
+		$graphs_count = count(getRequest('group_graphid'));
+
 		if ($result) {
 			uncheckTableRows(
 				(getRequest('parent_discoveryid') == 0) ? $hostId : getRequest('parent_discoveryid')
 			);
 			unset($_REQUEST['group_graphid']);
 		}
-
-		$graphs_count = count($graphids);
 		show_messages($result,
 			_n('Graph copied', 'Graphs copied', $graphs_count),
 			_n('Cannot copy graph', 'Cannot copy graphs', $graphs_count)
