@@ -350,11 +350,16 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && 
 		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
 		$result = DBend($result);
 
+		$triggers_count = count(getRequest('g_triggerid'));
+
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
 			unset($_REQUEST['g_triggerid']);
 		}
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
+		show_messages($result,
+			_n('Trigger copied', 'Triggers copied', $triggers_count),
+			_n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count)
+		);
 	}
 	else {
 		show_error_message(_('No target selected'));
