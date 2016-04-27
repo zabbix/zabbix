@@ -30,6 +30,7 @@ if (!empty($this->data['hostid'])) {
 $httpForm = (new CForm())
 	->setName('httpForm')
 	->addVar('form', $this->data['form'])
+	->addVar('groupid', $data['groupid'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('steps', $this->data['steps'])
 	->addVar('templated', $this->data['templated']);
@@ -261,7 +262,7 @@ if (!empty($this->data['httptestid'])) {
 	if ($this->data['templated'] == 0) {
 		$buttons[] = new CButtonDelete(
 			_('Delete web scenario?'),
-			url_param('form').url_param('httptestid').url_param('hostid')
+			url_param('form').url_param('httptestid').url_params(['groupid', 'hostid'])
 		);
 	}
 
@@ -275,14 +276,14 @@ if (!empty($this->data['httptestid'])) {
 		);
 	}
 
-	$buttons[] = new CButtonCancel();
+	$buttons[] = new CButtonCancel(url_params(['groupid', 'hostid']));
 
 	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$httpTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		[new CButtonCancel(url_params(['groupid', 'hostid']))]
 	));
 }
 

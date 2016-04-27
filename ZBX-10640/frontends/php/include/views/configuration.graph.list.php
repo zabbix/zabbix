@@ -41,7 +41,6 @@ else {
 		->setTitle(_('Graphs'))
 		->setControls((new CForm('get'))
 			->cleanItems()
-			->addVar('hostid', $this->data['hostid'])
 			->addItem((new CList())
 				->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
 				->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
@@ -57,6 +56,7 @@ else {
 // create form
 $graphForm = (new CForm())
 	->setName('graphForm')
+	->addVar('groupid', $data['pageFilter']->groupid)
 	->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
@@ -130,6 +130,7 @@ foreach ($this->data['graphs'] as $graph) {
 			'graphs.php?'.
 				'form=update'.
 				'&graphid='.$graphid.url_param('parent_discoveryid').
+				'&groupid='.$data['pageFilter']->groupid.
 				'&hostid='.$this->data['hostid']
 		);
 	}

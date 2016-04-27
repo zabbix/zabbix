@@ -405,6 +405,7 @@ if (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasReq
 	// render view
 	$data = getCopyElementsFormData('group_graphid');
 	$data['action'] = 'graph.masscopyto';
+	$data['groupid'] = $pageFilter->groupid;
 	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();
 	$graphView->show();
@@ -416,6 +417,7 @@ elseif (isset($_REQUEST['form'])) {
 		'graphid' => getRequest('graphid', 0),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'group_gid' => getRequest('group_gid', []),
+		'groupid' => $pageFilter->groupid,
 		'hostid' => $hostId,
 		'normal_only' => getRequest('normal_only')
 	];

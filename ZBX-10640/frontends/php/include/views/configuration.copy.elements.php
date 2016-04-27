@@ -38,6 +38,10 @@ $triggersForm = (new CForm())
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('action', $this->data['action']);
 
+if ($data['action'] === 'trigger.masscopyto' || $data['action'] === 'graph.masscopyto') {
+	$triggersForm->addVar('groupid', $data['groupid']);
+}
+
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
 

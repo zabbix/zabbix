@@ -468,6 +468,7 @@ show_messages();
  */
 if (isset($_REQUEST['form'])) {
 	$data = [
+		'groupid' => getRequest('groupid'),
 		'hostid' => getRequest('hostid', 0),
 		'httptestid' => getRequest('httptestid'),
 		'form' => getRequest('form'),

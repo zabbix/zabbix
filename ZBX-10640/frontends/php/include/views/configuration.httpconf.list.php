@@ -44,7 +44,6 @@ $widget = (new CWidget())
 	->setTitle(_('Web monitoring'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
 		->addItem((new CList())
 			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
 			->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
@@ -95,7 +94,13 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 			->addClass(ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
-	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
+	$name[] = new CLink(
+		$httpTest['name'],
+		'?form=update'.
+			'&httptestid='.$httpTestId.
+			'&groupid='.$data['pageFilter']->groupid.
+			'&hostid='.$httpTest['hostid']
+	);
 
 	if ($this->data['showInfoColumn']) {
 		if($httpTest['status'] == HTTPTEST_STATUS_ACTIVE && isset($httpTestsLastData[$httpTestId]) && $httpTestsLastData[$httpTestId]['lastfailedstep']) {
@@ -136,6 +141,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		(new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
+				'&groupid='.$data['pageFilter']->groupid.
 				'&hostid='.$httpTest['hostid'].
 				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
 					? 'httptest.massenable'

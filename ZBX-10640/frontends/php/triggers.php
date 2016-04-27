@@ -380,13 +380,16 @@ if (hasRequest('action') && getRequest('action') == 'trigger.massupdateform' && 
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($exprAction));
+	$data = getTriggerFormData($exprAction);
+	$data['groupid'] = getRequest('groupid');
+	$triggersView = new CView('configuration.triggers.edit', $data);
 	$triggersView->render();
 	$triggersView->show();
 }
 elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && hasRequest('g_triggerid')) {
 	$data = getCopyElementsFormData('g_triggerid', _('CONFIGURATION OF TRIGGERS'));
 	$data['action'] = 'trigger.masscopyto';
+	$data['groupid'] = getRequest('groupid');
 	$triggersView = new CView('configuration.copy.elements', $data);
 	$triggersView->render();
 	$triggersView->show();

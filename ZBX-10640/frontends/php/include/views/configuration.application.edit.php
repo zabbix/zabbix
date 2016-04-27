@@ -26,6 +26,7 @@ $widget = (new CWidget())
 // create form
 $applicationForm = (new CForm())
 	->addVar('form', $this->data['form'])
+	->addVar('groupid', $data['groupid'])
 	->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addVar('applicationid', $this->data['applicationid']);
@@ -48,15 +49,15 @@ if (!empty($this->data['applicationid'])) {
 		new CSubmit('update', _('Update')),
 		[
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete application?'), url_params(['hostid', 'form', 'applicationid'])),
-			new CButtonCancel(url_param('hostid'))
+			new CButtonDelete(_('Delete application?'), url_params(['groupid', 'hostid', 'form', 'applicationid'])),
+			new CButtonCancel(url_params(['groupid', 'hostid']))
 		]
 	));
 }
 else {
 	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[new CButtonCancel(url_params(['groupid', 'hostid']))]
 	));
 }
 

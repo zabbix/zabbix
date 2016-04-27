@@ -58,7 +58,6 @@ $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
 		->addItem((new CList())
 			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
 			->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
@@ -132,7 +131,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	else {
 		$description[] = new CLink(
 			CHtml::encode($trigger['description']),
-			'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
+			'triggers.php?form=update&groupid='.$data['groupid'].'&hostid='.$data['hostid'].'&triggerid='.$triggerid
 		);
 	}
 
@@ -187,6 +186,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				? 'trigger.massenable'
 				: 'trigger.massdisable'
 			).
+			'&groupid='.$data['groupid'].
 			'&hostid='.$this->data['hostid'].
 			'&g_triggerid='.$triggerid))
 		->addClass(ZBX_STYLE_LINK_ACTION)

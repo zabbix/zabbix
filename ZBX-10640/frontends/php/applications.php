@@ -257,7 +257,8 @@ if (isset($_REQUEST['form'])) {
 	$data = [
 		'applicationid' => getRequest('applicationid'),
 		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh', 0)
+		'form_refresh' => getRequest('form_refresh', 0),
+		'groupid' => getRequest('groupid')
 	];
 
 	if (isset($data['applicationid']) && !isset($_REQUEST['form_refresh'])) {

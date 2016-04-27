@@ -34,6 +34,7 @@ else {
 $graphForm = (new CForm())
 	->setName('graphForm')
 	->addVar('form', $this->data['form'])
+	->addVar('groupid', $data['groupid'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('ymin_itemid', $this->data['ymin_itemid'])
 	->addVar('ymax_itemid', $this->data['ymax_itemid']);
@@ -353,7 +354,7 @@ if (!empty($this->data['graphid'])) {
 	$updateButton = new CSubmit('update', _('Update'));
 	$deleteButton = new CButtonDelete(
 		$this->data['parent_discoveryid'] ? _('Delete graph prototype?') : _('Delete graph?'),
-		url_params(['graphid', 'parent_discoveryid', 'hostid'])
+		url_params(['graphid', 'parent_discoveryid', 'groupid', 'hostid'])
 	);
 
 	if (!empty($this->data['templateid'])) {
@@ -366,14 +367,14 @@ if (!empty($this->data['graphid'])) {
 		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))
+			new CButtonCancel(url_params(['parent_discoveryid', 'groupid']).url_param('hostid', $this->data['hostid']))
 		]
 	));
 }
 else {
 	$graphTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('parent_discoveryid').url_param('hostid', $this->data['hostid']))]
+		[new CButtonCancel(url_params(['parent_discoveryid', 'groupid']).url_param('hostid', $this->data['hostid']))]
 	));
 }
 

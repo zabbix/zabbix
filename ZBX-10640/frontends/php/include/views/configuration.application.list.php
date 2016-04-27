@@ -115,7 +115,7 @@ foreach ($this->data['applications'] as $application) {
 	else {
 		$name = new CLink($application['name'],
 			'applications.php?form=update&applicationid='.$application['applicationid'].
-				'&hostid='.$application['hostid']
+				'&groupid='.$data['groupid'].'&hostid='.$application['hostid']
 		);
 
 		$info_icons[] = '';

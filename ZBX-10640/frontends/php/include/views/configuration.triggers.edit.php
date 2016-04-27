@@ -32,6 +32,7 @@ if (!empty($this->data['hostid'])) {
 $triggersForm = (new CForm())
 	->setName('triggersForm')
 	->addVar('form', $this->data['form'])
+	->addVar('groupid', $data['groupid'])
 	->addVar('hostid', $this->data['hostid'])
 	->addVar('input_method', $this->data['input_method'])
 	->addVar('toggle_input_method', '')
@@ -318,7 +319,7 @@ $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList
 
 // append buttons to form
 if (!empty($this->data['triggerid'])) {
-	$deleteButton = new CButtonDelete(_('Delete trigger?'), url_params(['form', 'hostid', 'triggerid']));
+	$deleteButton = new CButtonDelete(_('Delete trigger?'), url_params(['form', 'groupid', 'hostid', 'triggerid']));
 	if ($this->data['limited']) {
 		$deleteButton->setAttribute('disabled', 'disabled');
 	}
@@ -327,14 +328,14 @@ if (!empty($this->data['triggerid'])) {
 		new CSubmit('update', _('Update')), [
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
-			new CButtonCancel(url_param('hostid'))
+			new CButtonCancel(url_params(['groupid', 'hostid']))
 		]
 	));
 }
 else {
 	$triggersTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('hostid'))]
+		[new CButtonCancel(url_params(['groupid', 'hostid']))]
 	));
 }
 
