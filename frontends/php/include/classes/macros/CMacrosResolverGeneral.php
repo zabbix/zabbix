@@ -722,7 +722,11 @@ class CMacrosResolverGeneral {
 
 							$ci = ($token['function'] === 'iregsub') ? 'i' : '';
 
-							if (preg_match('/'.$token['parameters'][0].'/'.$ci, $value, $matches) === false) {
+							set_error_handler(function ($errno, $errstr) {});
+							$rc = preg_match('/'.$token['parameters'][0].'/'.$ci, $value, $matches);
+							restore_error_handler();
+
+							if ($rc === false) {
 								continue;
 							}
 
