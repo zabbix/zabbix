@@ -85,9 +85,9 @@ use constant cfg_default_rdds_ns_string => 'Name Server:';
 use constant rsm_host => 'rsm'; # global config history
 use constant rsm_group => 'rsm';
 
-use constant rsm_value_mappings => {'rsm_dns' => 13,
+use constant rsm_value_mappings => {'rsm_dns_result' => 13,
                                 'rsm_probe' => 14,
-                                'rsm_rdds_rttudp' => 15,
+                                'rsm_rdds_result' => 15,
                                 'rsm_avail' => 16,
                                 'rsm_rdds_avail' => 18,
                                 'rsm_epp' => 19};
@@ -106,7 +106,6 @@ use constant cfg_probe_status_delay => 60;
 use constant APP_SLV_MONTHLY => 'SLV monthly';
 use constant APP_SLV_ROLLWEEK => 'SLV rolling week';
 use constant APP_SLV_PARTTEST => 'SLV particular test';
-use constant APP_SLV_CURMON => 'SLV current month';
 
 use constant TLD_TYPE_G => 'gTLD';
 use constant TLD_TYPE_CC => 'ccTLD';
@@ -125,7 +124,7 @@ our @EXPORT_OK = qw(true false TIME_MINUTE TIME_HOUR TIME_DAY LINUX_TEMPLATEID V
 		    ITEM_STATUS_DISABLED INTERFACE_TYPE_AGENT TRIGGER_STATUS_DISABLED TRIGGER_STATUS_ENABLED TRIGGER_SEVERITY_NOT_CLASSIFIED
 		    ITEM_VALUE_TYPE_FLOAT ITEM_VALUE_TYPE_STR ITEM_VALUE_TYPE_LOG ITEM_VALUE_TYPE_UINT64 ITEM_VALUE_TYPE_TEXT
 		    ITEM_TYPE_ZABBIX ITEM_TYPE_TRAPPER ITEM_TYPE_SIMPLE ITEM_TYPE_INTERNAL ITEM_TYPE_ZABBIX_ACTIVE ITEM_TYPE_AGGREGATE ITEM_TYPE_EXTERNAL ITEM_TYPE_CALCULATED
-		    APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST APP_SLV_CURMON TLD_TYPE_G TLD_TYPE_CC TLD_TYPE_OTHER TLD_TYPE_TEST);
+		    APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST TLD_TYPE_G TLD_TYPE_CC TLD_TYPE_OTHER TLD_TYPE_TEST);
 
 our %EXPORT_TAGS = ( general => [ qw(true false TIME_MINUTE TIME_HOUR TIME_DAY) ],
 		     templates => [ qw(LINUX_TEMPLATEID) ],
@@ -144,6 +143,6 @@ our %EXPORT_TAGS = ( general => [ qw(true false TIME_MINUTE TIME_HOUR TIME_DAY) 
 				TRIGGER_STATUS_DISABLED TRIGGER_STATUS_ENABLED TRIGGER_SEVERITY_NOT_CLASSIFIED)],
 		    config => [ qw(cfg_probe_status_delay cfg_default_rdds_ns_string rsm_value_mappings rsm_trigger_rollweek_thresholds
 				    cfg_global_macros TLD_TYPE_G TLD_TYPE_CC TLD_TYPE_OTHER TLD_TYPE_TEST) ],
-		    slv => [ qw(APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST APP_SLV_CURMON) ] );
+		    slv => [ qw(APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST) ] );
 
 1;

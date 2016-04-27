@@ -1259,7 +1259,13 @@ sub __print_probe_times
 {
 	my $probe_times_ref = shift;
 
-	info("Probe online times:");
+	if (scalar(keys(%{$probe_times_ref})) == 0)
+	{
+		info("no probes were online at given period");
+		return;
+	}
+
+	info("probe online times:");
 
 	foreach my $probe (keys(%{$probe_times_ref}))
 	{

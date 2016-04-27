@@ -482,7 +482,7 @@ sub create_item_dns_rtt {
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
 					      'status' => ITEM_STATUS_ACTIVE,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_dns_result'}};
 
     create_item($options);
 
@@ -555,7 +555,7 @@ sub create_item_dns_udp_upd {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS RTT ('.$proto_uc.')', $templateid)],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_dns'},
+                                              'valuemapid' => rsm_value_mappings->{'rsm_dns_result'},
 		                              'status' => (defined($OPTS{'epp-servers'}) ? 0 : 1)};
 
     create_item($options);
@@ -587,7 +587,7 @@ sub create_items_dns {
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.UDP.DELAY}'}, 'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
+                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.UDP.DELAY}'}};
 
     create_item($options);
 }
@@ -606,7 +606,7 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 1,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
     create_item($options);
 
     $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
@@ -616,7 +616,7 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
     create_item($options);
 
 	$options = { 'description' => 'RDDS43-RTT {HOST.NAME}: problem',
@@ -642,7 +642,7 @@ sub create_items_rdds {
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
     create_item($options);
 
     $options = {'name' => 'RDDS availability of $1',
@@ -670,7 +670,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 3, 'value_type' => 3,
-		'delay' => $cfg_global_macros->{'{$RSM.EPP.DELAY}'}, 'valuemapid' => rsm_value_mappings->{'rsm_avail'}};
+		'delay' => $cfg_global_macros->{'{$RSM.EPP.DELAY}'}};
 
     create_item($options);
 
@@ -727,7 +727,7 @@ sub create_items_epp {
 		    'hostid' => $templateid,
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
+		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'},
 		    'status' => 0};
 	create_item($options);
     }
@@ -960,7 +960,7 @@ sub create_all_slv_ns_items {
     my $hostid = shift;
 
     create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_CURMON, $hostid)]);
+    create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 }
 
 sub create_slv_ns_items {
@@ -986,7 +986,7 @@ sub create_slv_items {
     create_slv_ns_items($ns_servers, $hostid);
 
     create_slv_item('DNS availability', 'rsm.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_CURMON, $hostid)]);
+    create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 
     create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid);
     create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid);
@@ -1080,7 +1080,7 @@ sub create_slv_items {
 
     if (defined($OPTS{'rdds43-servers'})) {
 	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_CURMON, $hostid)]);
+	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
@@ -1138,7 +1138,7 @@ sub create_slv_epp_items($$) {
     my $host_name = shift;
 
     create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [get_application_id(APP_SLV_PARTTEST, $hostid)]);
-    create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_CURMON, $hostid)]);
+    create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
     create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
     create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.login', $hostid);

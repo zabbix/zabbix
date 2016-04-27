@@ -40,6 +40,18 @@ if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
 set_slv_config($config);
 db_connect();
 
+print("Fixing value mappings...\n");
+db_exec("update valuemaps set name='RSM Service Availability' where valuemapid=16");
+my $rows_ref = db_select("select mappingid from mappings where mappingid=113");
+if (scalar(@{$rows_ref}) == 0)
+{
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (113,16,'2','Up (inconclusive)')");
+}
+db_exec("update valuemaps set name='RSM RDDS probe result' where valuemapid=18");
+db_exec("update valuemaps set name='RSM EPP result' where valuemapid=19");
+db_exec("update items set valuemapid=null where key_='" . 'rsm.dns.udp[{$RSM.TLD}]' . "'");
+db_exec("update items set valuemapid=null where key_='" . 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]' . "'");
+
 my $tlds_ref = get_tlds();
 
 print("Deleting obsoleted triggers...\n");
