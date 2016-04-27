@@ -136,10 +136,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'operations' => getRequest('operations', [])
 	];
 
-	if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
-	}
-
 	foreach ($action['operations'] as &$operation) {
 		if (isset($operation['opmessage']) && !isset($operation['opmessage']['default_msg'])) {
 			$operation['opmessage']['default_msg'] = 0;
@@ -193,6 +189,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		$action['actionid'] = getRequest('actionid');
 
+		if ($action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+			$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
+		}
+
 		$result = API::Action()->update($action);
 
 		$messageSuccess = _('Action updated');
@@ -203,6 +203,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$action['eventsource'] = getRequest('eventsource',
 			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
 		);
+
+		if ($action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+			$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
+		}
 
 		$result = API::Action()->create($action);
 
