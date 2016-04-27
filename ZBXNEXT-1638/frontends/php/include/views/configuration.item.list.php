@@ -72,8 +72,10 @@ if (!$this->data['filterSet']) {
 
 $current_time = time();
 
-$this->data['itemTriggers'] =
-	CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], ['html' => true]);
+$this->data['itemTriggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['itemTriggers'], [
+	'html' => true,
+	'sources' => ['expression', 'recovery_expression']
+]);
 
 foreach ($this->data['items'] as $item) {
 	// description
@@ -178,10 +180,20 @@ foreach ($this->data['items'] as $item) {
 
 		$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+			$expression = [
+				_('Problem'), ': ', $trigger['expression'], BR(),
+				_('Recovery'), ': ', $trigger['recovery_expression']
+			];
+		}
+		else {
+			$expression = $trigger['expression'];
+		}
+
 		$triggerHintTable->addRow([
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
-			$trigger['expression'],
+			$expression,
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
@@ -208,6 +220,10 @@ foreach ($this->data['items'] as $item) {
 		$triggers = [];
 
 		foreach ($item['triggers'] as $trigger) {
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				continue;
+			}
+
 			foreach ($trigger['functions'] as $function) {
 				if (!str_in_array($function['function'], ['regexp', 'iregexp'])) {
 					continue 2;

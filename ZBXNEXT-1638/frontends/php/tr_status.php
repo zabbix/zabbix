@@ -361,7 +361,15 @@ if (!$showMaintenance) {
 $triggers = API::Trigger()->get($options);
 
 order_result($triggers, $sortField, $sortOrder);
-$paging = getPagingLine($triggers, $sortOrder);
+
+$url = (new CUrl('tr_status.php'))
+	->setArgument('fullscreen', getRequest('fullscreen'))
+	->setArgument('groupid', $pageFilter->groupid)
+	->setArgument('hostid', $pageFilter->hostid)
+	->setArgument('show_triggers', getRequest('show_triggers'))
+	->setArgument('filter_set', getRequest('filter_set'));
+
+$paging = getPagingLine($triggers, $sortOrder, $url);
 
 $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -378,20 +386,17 @@ $triggers = API::Trigger()->get([
 $triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 if ($showDetails) {
 	foreach ($triggers as &$trigger) {
-		$trigger['expression_orig'] = $trigger['expression'];
-	}
-	unset($trigger);
-
-	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
-	);
-
-	foreach ($triggers as &$trigger) {
 		$trigger['expression_html'] = $trigger['expression'];
-		$trigger['expression'] = $trigger['expression_orig'];
-		unset($trigger['expression_orig']);
+		$trigger['recovery_expression_html'] = $trigger['recovery_expression'];
 	}
 	unset($trigger);
+
+	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers, [
+		'html' => true,
+		'resolve_usermacros' => true,
+		'resolve_macros' => true,
+		'sources' => ['expression_html', 'recovery_expression_html']
+	]);
 }
 
 order_result($triggers, $sortField, $sortOrder);
@@ -606,7 +611,14 @@ foreach ($triggers as $trigger) {
 
 	if ($showDetails) {
 		$description[] = BR();
-		$description[] = $trigger['expression_html'];
+
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+			$description[] = [_('Problem'), ': ', $trigger['expression_html'], BR()];
+			$description[] = [_('Recovery'), ': ', $trigger['recovery_expression_html']];
+		}
+		else {
+			$description[] = $trigger['expression_html'];
+		}
 	}
 
 	// host js menu
