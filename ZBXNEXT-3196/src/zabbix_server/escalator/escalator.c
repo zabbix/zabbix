@@ -1213,21 +1213,25 @@ static void	free_event_info(DB_EVENT *event)
  * Purpose: check whether the escalation trigger and related items, hosts are *
  *          not deleted or disabled.                                          *
  *                                                                            *
- * Parameters: triggerid - [IN] the id of trigger to check                    *
- *             source    - [IN] the esclation event source                    *
- *             error     - [OUT] message in case escalation is cancelled      *
+ * Parameters: triggerid  - [IN] the id of trigger to check                   *
+ *             source     - [IN] the escalation event source                  *
+ *             ignore     - [OUT] 1 if the escalation must be ignored because *
+ *                                of dependent trigger being in PROBLEM state,*
+ *                                0 otherwise                                 *
+ *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
  * Return value: FAIL if dependent trigger is in PROBLEM state                *
  *               SUCCEED otherwise                                            *
  *                                                                            *
  ******************************************************************************/
-static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source, char **error)
+static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source, unsigned char *ignore,
+		char **error)
 {
 	DC_TRIGGER		trigger;
 	zbx_vector_uint64_t	functionids, itemids;
 	DC_ITEM			*items = NULL;
 	DC_FUNCTION		*functions = NULL;
-	int			i, errcode, *errcodes = NULL, ret = SUCCEED;
+	int			i, errcode, *errcodes = NULL, ret = FAIL;
 
 	/* trigger disabled or deleted? */
 	DCconfig_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
@@ -1298,7 +1302,9 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&functionids);
 
-	ret = DCconfig_check_trigger_dependencies(trigger.triggerid);
+	*ignore = (SUCCEED == DCconfig_check_trigger_dependencies(trigger.triggerid) ? 0 : 1);
+
+	ret = SUCCEED;
 out:
 	DCconfig_clean_triggers(&trigger, &errcode, 1);
 
@@ -1314,13 +1320,16 @@ out:
  *                                                                            *
  * Parameters: escalation - [IN] escalation data                              *
  *             action     - [OUT] action data                                 *
+ *             ignore     - [OUT] 1 if the escalation must be ignored,        *
+ *                                0 otherwise                                 *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
  * Comments: 'action' is filled with information about action. If information *
  *           could not be gathered, 'action->actionid' is set to 0.           *
  *                                                                            *
  ******************************************************************************/
-static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, char **error)
+static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, unsigned char *ignore,
+		char **error)
 {
 	const char	*__function_name = "check_escalation";
 	DB_RESULT	result;
@@ -1341,14 +1350,17 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	else
 	{
 		*error = zbx_dsprintf(*error, "event id:" ZBX_FS_UI64 " deleted.", escalation->eventid);
+		goto out;
 	}
 
-	DBfree_result(result);
+	*ignore = 0;
 
-	if (NULL == *error && EVENT_OBJECT_TRIGGER == object)
-		ret = check_escalation_trigger(escalation->triggerid, source, error);
-
-	if (NULL == *error && EVENT_SOURCE_INTERNAL == source)
+	if (EVENT_OBJECT_TRIGGER == object)
+	{
+		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, ignore, error))
+			goto out;
+	}
+	else if (EVENT_SOURCE_INTERNAL == source)
 	{
 		if (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object)
 		{
@@ -1369,8 +1381,13 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 			}
 
 			DCconfig_clean_items(&item, &errcode, 1);
+
+			if (NULL != *error)
+				goto out;
 		}
 	}
+
+	DBfree_result(result);
 
 	result = DBselect(
 			"select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
@@ -1382,7 +1399,10 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	if (NULL != (row = DBfetch(result)))
 	{
 		if (ACTION_STATUS_ACTIVE != atoi(row[2]))
+		{
 			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
+			goto out;
+		}
 
 		ZBX_STR2UINT64(action->actionid, row[0]);
 		action->eventsource = atoi(row[3]);
@@ -1395,10 +1415,12 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	}
 	else
 	{
-		action->actionid = 0;
-
 		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", escalation->actionid);
+		goto out;
 	}
+
+	ret = SUCCEED;
+out:
 
 	DBfree_result(result);
 
@@ -1596,17 +1618,19 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			DB_ACTION	action;
 			char		*error = NULL;
+			int		escalation_rc;
+			unsigned char	ignore;
 
 			DBbegin();
 
 			sql_offset = 0;
 
-			if (SUCCEED != check_escalation(&escalation, &action, &error))
+			if (SUCCEED == (escalation_rc = check_escalation(&escalation, &action, &ignore, &error)))
 			{
 				/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
 				/* it normally in order to send notification about the error otherwise we     */
 				/* skip the escalation until dependable trigger changes value to OK.          */
-				if (NULL == error)
+				if (0 != ignore)
 				{
 					DBrollback();
 					free_db_action(&action);
@@ -1670,8 +1694,10 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				}
 			}
 
-			free_db_action(&action);
-			zbx_free(error);
+			if (SUCCEED == escalation_rc)
+				free_db_action(&action);
+			else
+				zbx_free(error);
 
 			DBexecute("%s", sql);
 
