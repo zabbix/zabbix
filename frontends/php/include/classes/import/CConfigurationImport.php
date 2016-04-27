@@ -249,10 +249,11 @@ class CConfigurationImport {
 					$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
 						true;
 
-					// add found hosts and items to references from parsed trigger expressions
-					foreach ($trigger['parsedExpressions'] as $expression) {
-						$hostsRefs[$expression['host']] = $expression['host'];
-						$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
+					if (array_key_exists('dependencies', $trigger)) {
+						foreach ($trigger['dependencies'] as $dependency) {
+							$triggersRefs[$dependency['name']][$dependency['expression']][$dependency['recovery_expression']] =
+								true;
+						}
 					}
 				}
 
@@ -320,12 +321,6 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
 			$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] = true;
-
-			// add found hosts and items to references from parsed trigger expressions
-			foreach ($trigger['parsedExpressions'] as $expression) {
-				$hostsRefs[$expression['host']] = $expression['host'];
-				$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
-			}
 
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
@@ -1008,23 +1003,6 @@ class CConfigurationImport {
 
 				// trigger prototypes
 				foreach ($item['trigger_prototypes'] as $trigger) {
-					// search for existing  items in trigger prototype expressions
-					foreach ($trigger['parsedExpressions'] as $expression) {
-						$hostId = $this->referencer->resolveHostOrTemplate($expression['host']);
-						$itemId = $hostId ? $this->referencer->resolveItem($hostId, $expression['item']) : false;
-
-						if (!$itemId) {
-							throw new Exception(_s(
-								'Cannot find item "%1$s" on "%2$s" used in trigger prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
-								$expression['item'],
-								$expression['host'],
-								$trigger['description'],
-								$item['name'],
-								$host
-							));
-						}
-					}
-
 					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
 						$trigger['recovery_expression']
 					);
@@ -1296,20 +1274,6 @@ class CConfigurationImport {
 		$triggers = [];
 
 		foreach ($allTriggers as $trigger) {
-			// search for existing items in trigger expressions
-			foreach ($trigger['parsedExpressions'] as $expression) {
-				$hostId = $this->referencer->resolveHostOrTemplate($expression['host']);
-				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $expression['item']) : false;
-
-				if (!$itemId) {
-					throw new Exception(_s('Cannot find item "%1$s" on "%2$s" used in trigger "%3$s".',
-						$expression['item'],
-						$expression['host'],
-						$trigger['description']
-					));
-				}
-			}
-
 			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
 				$trigger['recovery_expression']
 			);
@@ -2003,17 +1967,6 @@ class CConfigurationImport {
 	protected function getFormattedDiscoveryRules() {
 		if (!isset($this->formattedData['discoveryRules'])) {
 			$this->formattedData['discoveryRules'] = $this->adapter->getDiscoveryRules();
-
-			foreach ($this->formattedData['discoveryRules'] as &$discoveryRules) {
-				foreach ($discoveryRules as &$discoveryRule) {
-					foreach ($discoveryRule['trigger_prototypes'] as &$triggerPrototype) {
-						$triggerPrototype['parsedExpressions'] = $this->parseTriggerExpression($triggerPrototype['expression']);
-					}
-					unset($triggerPrototype);
-				}
-				unset($discoveryRule);
-			}
-			unset($discoveryRules);
 		}
 
 		return $this->formattedData['discoveryRules'];
@@ -2027,41 +1980,9 @@ class CConfigurationImport {
 	protected function getFormattedTriggers() {
 		if (!isset($this->formattedData['triggers'])) {
 			$this->formattedData['triggers'] = $this->adapter->getTriggers();
-
-			foreach ($this->formattedData['triggers'] as &$trigger) {
-				$trigger['parsedExpressions'] = $this->parseTriggerExpression($trigger['expression']);
-			}
-			unset($trigger);
 		}
 
 		return $this->formattedData['triggers'];
-	}
-
-	/**
-	 * Parses a trigger expression and returns an array of used hosts and items.
-	 *
-	 * @param string $expression
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
-	 */
-	protected function parseTriggerExpression($expression) {
-		$expressions = [];
-
-		$result = $this->triggerExpression->parse($expression);
-		if (!$result) {
-			throw new Exception($this->triggerExpression->error);
-		}
-
-		foreach ($result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) as $token) {
-			$expressions[] = [
-				'host' => $token['data']['host'],
-				'item' => $token['data']['item'],
-			];
-		}
-
-		return $expressions;
 	}
 
 	/**
