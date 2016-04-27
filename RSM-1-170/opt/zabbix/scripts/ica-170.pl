@@ -100,6 +100,14 @@ my $item_keys_to_rename =
 	'rsm.slv.dns.upd' => 'rsm.slv.dns.udp.upd'
 };
 
+my $item_names_to_rename =
+{
+	'EPP service availability at $1 ($2)' => 'EPP test',
+	'Number of working DNS Name Servers of $1 (UDP)' => 'DNS UDP test',
+	'Number of working DNS Name Servers of $1 (TCP)' => 'DNS TCP test',
+	'RDDS availability of $1' => 'RDDS test'
+};
+
 print("Renaming triggers...\n");
 foreach my $from (keys(%{$trigger_names_to_rename}))
 {
@@ -108,12 +116,20 @@ foreach my $from (keys(%{$trigger_names_to_rename}))
 	db_exec("update triggers set description='$to' where description='$from'");
 }
 
-print("Renaming SLV item keys...\n");
+print("Renaming item keys...\n");
 foreach my $from (keys(%{$item_keys_to_rename}))
 {
 	my $to = $item_keys_to_rename->{$from};
 
 	db_exec("update items set key_='$to' where key_='$from'");
+}
+
+print("Renaming item names...\n");
+foreach my $from (keys(%{$item_names_to_rename}))
+{
+	my $to = $item_names_to_rename->{$from};
+
+	db_exec("update items set name='$to' where name='$from'");
 }
 
 print("Deleting obsoleted items...\n");

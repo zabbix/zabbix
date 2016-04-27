@@ -569,7 +569,7 @@ sub create_items_dns {
     my $proto_uc = uc($proto);
     my $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
 
-    my $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
+    my $options = {'name' => "DNS $proto_uc test",
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
@@ -582,7 +582,7 @@ sub create_items_dns {
     $proto_uc = uc($proto);
     $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
 
-    $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
+    $options = {'name' => "DNS $proto_uc test",
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('DNS ('.$proto_uc.')', $templateid)],
@@ -645,13 +645,15 @@ sub create_items_rdds {
                                               'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
     create_item($options);
 
-    $options = {'name' => 'RDDS availability of $1',
+    $item_key = 'rsm.rdds[{$RSM.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
+
+    $options = {'name' => 'RDDS test',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [get_application_id('RDDS', $templateid)],
                                               'type' => 3, 'value_type' => 3,
 					      'delay' => $cfg_global_macros->{'{$RSM.RDDS.DELAY}'},
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_avail'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_probe_result'}};
     create_item($options);
 }
 
@@ -665,7 +667,7 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]';
 
-    $options = {'name' => 'EPP service availability at $1 ($2)',
+    $options = {'name' => 'EPP test',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
@@ -691,7 +693,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options);
 
@@ -702,7 +704,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options);
 
@@ -713,7 +715,7 @@ sub create_items_epp {
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options);
 
