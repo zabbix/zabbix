@@ -562,7 +562,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-//		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
+		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
@@ -692,7 +692,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
-//		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
+		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
 
 		if ($usermacros) {
 			// Get hosts for triggers.
