@@ -102,10 +102,10 @@ class CScreenHistory extends CScreenBase {
 		$output = [];
 
 		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+			'selectHosts' => ['name'],
 			'itemids' => $this->itemids,
 			'webitems' => true,
-			'selectHosts' => ['name'],
-			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
 			'preservekeys' => true
 		]);
 
