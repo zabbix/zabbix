@@ -1123,7 +1123,7 @@ sub create_slv_items {
 	undef($depend_down);
 
 	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid);
-	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds80.rtt", $hostid);
+	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid);
     }
 
     if (defined($OPTS{'epp-servers'})) {
