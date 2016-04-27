@@ -1042,7 +1042,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	AGENT_REQUEST	request;
 	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
 	char		*encoding_uc = NULL, *max_delay_str;
-	int		rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr, mtime_orig;
+	int		rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr, mtime_orig,
+			big_rec_orig;
 	zbx_uint64_t	lastlogsize_orig;
 	float		max_delay;
 
@@ -1166,9 +1167,12 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 		p_count = s_count_orig = s_count;
 
-		/* remember current position */
+		/* remember current position, we may need to restore it if log.count[] or logrt.count[] result cannot */
+		/* be sent to server */
+
 		lastlogsize_orig = metric->lastlogsize;
 		mtime_orig = metric->mtime;
+		big_rec_orig = metric->big_rec;
 	}
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
@@ -1201,8 +1205,10 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 			else
 			{
 				/* unable to send data, restore original position to try again in next check */
+
 				metric->lastlogsize = lastlogsize_orig;
 				metric->mtime =  mtime_orig;
+				metric->big_rec = big_rec_orig;
 			}
 		}
 	}
