@@ -96,13 +96,10 @@ class CControllerMapView extends CController {
 		];
 
 		$maps = API::Map()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectSelements' => API_OUTPUT_EXTEND,
-			'selectLinks' => API_OUTPUT_EXTEND,
-			'sysmapids' => [$this->sysmapid],
-			'expandUrls' => true
+			'output' => ['name', 'severity_min'],
+			'sysmapids' => [$this->sysmapid]
 		]);
-		$data['map'] = $maps[0];
+		$data['map'] = reset($maps);
 
 		$data['map']['editable'] = API::Map()->isWritable([$this->sysmapid]);
 

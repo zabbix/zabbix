@@ -14,8 +14,8 @@
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with this program; ifnot, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -353,7 +353,9 @@ function utf8RawUrlDecode($source) {
 function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	$options = [
 		'triggerids' => $srcTriggerIds,
-		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
+			'recovery_mode', 'recovery_expression'
+		],
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'selectDependencies' => ['triggerid']
 	];
@@ -376,7 +378,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 	$dbSrcTriggers = API::Trigger()->get($options);
 
-	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers);
+	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers,
+		['sources' => ['expression', 'recovery_expression']]
+	);
 
 	$dbDstHosts = API::Host()->get([
 		'output' => ['hostid', 'host'],
@@ -417,6 +421,12 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				$dstHost['host']
 			);
 
+			if ($srcTrigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				$srcTrigger['recovery_expression'] = triggerExpressionReplaceHost($srcTrigger['recovery_expression'],
+					$host, $dstHost['host']
+				);
+			}
+
 			// The dependddencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
@@ -425,7 +435,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				'status' => $srcTrigger['status'],
 				'priority' => $srcTrigger['priority'],
 				'comments' => $srcTrigger['comments'],
-				'type' => $srcTrigger['type']
+				'type' => $srcTrigger['type'],
+				'recovery_mode' => $srcTrigger['recovery_mode'],
+				'recovery_expression' => $srcTrigger['recovery_expression']
 			]]);
 
 			if (!$result) {
@@ -451,12 +463,14 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 	$depTriggers = API::Trigger()->get([
 		'triggerids' => $depids,
-		'output' => ['description', 'expression'],
+		'output' => ['description', 'expression', 'recovery_mode', 'recovery_expression'],
 		'selectHosts' => ['hostid'],
 		'preservekeys' => true
 	]);
 
-	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers);
+	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers,
+		['sources' => ['expression', 'recovery_expression']]
+	);
 
 	// Map dependencies to the new trigger IDs and save.
 	if ($newTriggers) {
@@ -591,95 +605,6 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 	$new_expression .= substr($expression, $pos_left, $pos - $pos_left);
 
 	return $new_expression;
-}
-
-/**
- * Implodes expression, replaces names and keys with IDs.
- *
- * For example: localhost:system.cpu.load.last(0)>10 will be translated to {12}>10 and created database representation.
- *
- * @throws Exception if error occurred
- *
- * @param string $expression Full expression with host names and item keys
- * @param numeric $triggerid
- * @param array optional $hostnames Reference to array which will be filled with unique visible host names.
- *
- * @return string Imploded expression (names and keys replaced by IDs)
- */
-function implode_exp($expression, $triggerId, &$hostnames = []) {
-	$expressionData = new CTriggerExpression();
-	if (!$expressionData->parse($expression)) {
-		throw new Exception($expressionData->error);
-	}
-
-	$newFunctions = [];
-	$functions = [];
-	$items = [];
-	$triggerFunctionValidator = new CFunctionValidator();
-
-	foreach ($expressionData->expressions as $exprPart) {
-		if (isset($newFunctions[$exprPart['expression']])) {
-			continue;
-		}
-
-		if (!isset($items[$exprPart['host']][$exprPart['item']])) {
-			$result = DBselect(
-				'SELECT i.itemid,i.value_type,h.name'.
-				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($exprPart['item']).
-					' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE]).
-					' AND h.host='.zbx_dbstr($exprPart['host']).
-					' AND h.hostid=i.hostid'
-			);
-			if ($row = DBfetch($result)) {
-				$hostnames[] = $row['name'];
-				$items[$exprPart['host']][$exprPart['item']] = [
-					'itemid' => $row['itemid'],
-					'valueType' => $row['value_type']
-				];
-			}
-			else {
-				throw new Exception(_s('Incorrect item key "%1$s" provided for trigger expression on "%2$s".',
-						$exprPart['item'], $exprPart['host']));
-			}
-		}
-
-		if (!$triggerFunctionValidator->validate([
-				'function' => $exprPart['function'],
-				'functionName' => $exprPart['functionName'],
-				'functionParamList' => $exprPart['functionParamList'],
-				'valueType' => $items[$exprPart['host']][$exprPart['item']]['valueType']])) {
-			throw new Exception($triggerFunctionValidator->getError());
-		}
-
-		$newFunctions[$exprPart['expression']] = 0;
-
-		$functions[] = [
-			'itemid' => $items[$exprPart['host']][$exprPart['item']]['itemid'],
-			'triggerid' => $triggerId,
-			'function' => $exprPart['functionName'],
-			'parameter' => $exprPart['functionParam']
-		];
-	}
-
-	$functionIds = DB::insert('functions', $functions);
-
-	$num = 0;
-	foreach ($newFunctions as &$newFunction) {
-		$newFunction = $functionIds[$num++];
-	}
-	unset($newFunction);
-
-	$exprPart = end($expressionData->expressions);
-	do {
-		$expression = substr_replace($expression, '{'.$newFunctions[$exprPart['expression']].'}',
-				$exprPart['pos'], strlen($exprPart['expression']));
-	}
-	while ($exprPart = prev($expressionData->expressions));
-
-	$hostnames = array_unique($hostnames);
-
-	return $expression;
 }
 
 function check_right_on_trigger_by_expression($permission, $expression) {
@@ -1171,9 +1096,6 @@ function make_trigger_details($trigger) {
 	}
 	array_pop($hostNames);
 
-	$expression = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression'],
-		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]);
-
 	$table = (new CTableInfo())
 		->addRow([
 			new CCol(_n('Host', 'Hosts', count($hosts))),
@@ -1186,10 +1108,25 @@ function make_trigger_details($trigger) {
 		->addRow([
 			_('Severity'),
 			getSeverityCell($trigger['priority'], $config)
+		]);
+
+	$trigger = CMacrosResolverHelper::resolveTriggerExpressions(zbx_toHash($trigger, 'triggerid'), [
+		'html' => true,
+		'resolve_usermacros' => true,
+		'resolve_macros' => true,
+		'sources' => ['expression', 'recovery_expression']
+	]);
+
+	$trigger = reset($trigger);
+
+	$table
+		->addRow([
+			new CCol(_('Problem expression')),
+			new CCol($trigger['expression'])
 		])
 		->addRow([
-			new CCol(_('Expression')),
-			new CCol($expression)
+			new CCol(_('Recovery expression')),
+			new CCol($trigger['recovery_expression'])
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])
@@ -1201,13 +1138,14 @@ function make_trigger_details($trigger) {
 }
 
 /**
- * Analyze an expression and returns expression html tree
+ * Analyze an expression and returns expression html tree.
  *
- * @param string $expression
+ * @param string $expression		Trigger expression or recovery expression string.
+ * @param int $type					Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
  * @return array
  */
-function analyzeExpression($expression) {
+function analyzeExpression($expression, $type) {
 	if (empty($expression)) {
 		return ['', null];
 	}
@@ -1222,22 +1160,24 @@ function analyzeExpression($expression) {
 
 	$next = [];
 	$letterNum = 0;
-	return buildExpressionHtmlTree($expressionTree, $next, $letterNum);
+	return buildExpressionHtmlTree($expressionTree, $next, $letterNum, 0, null, $type);
 }
 
 /**
- * Builds expression html tree
+ * Builds expression HTML tree.
  *
- * @param array 	$expressionTree 	output of getExpressionTree() function
- * @param array 	$next           	parameter only for recursive call; should be empty array
- * @param int 		$letterNum      	parameter only for recursive call; should be 0
- * @param int 		$level          	parameter only for recursive call
- * @param string 	$operator       	parameter only for recursive call
+ * @param array 	$expressionTree 	Output of getExpressionTree() function.
+ * @param array 	$next           	Parameter only for recursive call; should be empty array.
+ * @param int 		$letterNum      	Parameter only for recursive call; should be 0.
+ * @param int 		$level          	Parameter only for recursive call.
+ * @param string 	$operator       	Parameter only for recursive call.
+ * @param int		$type				Type can be either TRIGGER_EXPRESSION or TRIGGER_RECOVERY_EXPRESSION.
  *
- * @return array	array containing the trigger expression formula as the first element and an array describing the
- *					expression tree as the second
+ * @return array	Array containing the trigger expression formula as the first element and an array describing the
+ *					expression tree as the second.
  */
-function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null) {
+function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNum, $level = 0, $operator = null,
+		$type) {
 	$treeList = [];
 	$outline = '';
 
@@ -1266,7 +1206,8 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				$treeList[] = $levelDetails;
 
 				list($subOutline, $subTreeList) = buildExpressionHtmlTree($element['elements'], $next, $letterNum,
-						$level + 1, $element['operator']);
+					$level + 1, $element['operator'], $type
+				);
 				$treeList = array_merge($treeList, $subTreeList);
 
 				$outline .= ($level == 0) ? $subOutline : '('.$subOutline.')';
@@ -1274,6 +1215,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$outline .= ' '.$operator.' ';
 				}
 				break;
+
 			case 'expression':
 				$next[$level] = ($key != $lastKey);
 
@@ -1287,12 +1229,17 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$url = $element['expression'];
 				}
 				else {
-					$expressionId = 'expr_'.$element['id'];
+					if ($type == TRIGGER_EXPRESSION) {
+						$expressionId = 'expr_'.$element['id'];
+					}
+					else {
+						$expressionId = 'recovery_expr_'.$element['id'];
+					}
 
 					$url = (new CSpan($element['expression']))
 						->addClass(ZBX_STYLE_LINK_ACTION)
 						->setId($expressionId)
-						->onClick('javascript: copy_expression("'.$expressionId.'");');
+						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
@@ -1316,6 +1263,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				break;
 		}
 	}
+
 	return [$outline, $treeList];
 }
 
