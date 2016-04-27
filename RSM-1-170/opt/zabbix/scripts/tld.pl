@@ -1128,7 +1128,7 @@ sub create_slv_items {
 
     if (defined($OPTS{'epp-servers'})) {
         create_slv_epp_items($hostid, $host_name);
-	create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $hostid);
+	create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
 	create_slv_monthly("RDDS update time", "rsm.slv.rdds.upd", $hostid) if (defined($OPTS{'rdds43-servers'}));
     }
 }
@@ -1923,7 +1923,7 @@ sub update_epp_objects($) {
 
     my $ns_servers = get_nsservers_list($tld);
 
-    create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $main_hostid);
+    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $main_hostid);
     create_slv_monthly("RDDS update time", "rsm.slv.rdds.upd", $main_hostid) if (defined($OPTS{'rdds43-servers'}));
 
     foreach my $ipv (keys %{$ns_servers}) {

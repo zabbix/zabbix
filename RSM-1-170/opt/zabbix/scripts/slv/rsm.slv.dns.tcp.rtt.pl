@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# DNS monthly resolution RTT (TCP)
+# DNS TCP monthly Name Server resolution RTT
 
 BEGIN
 {

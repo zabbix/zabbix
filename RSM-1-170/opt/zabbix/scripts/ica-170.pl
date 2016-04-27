@@ -78,19 +78,30 @@ my $slv_items_to_remove_like =
 	'rsm.slv.%.month%'
 ];
 
-my $triggers_to_rename =
+my $trigger_names_to_rename =
 {
 	'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for over {$IP.MAX.OFFLINE.MANUAL} hours'
 };
 
-my $slv_monthly_items =
+my $item_keys_to_rename =
+{
+	'rsm.slv.dns.upd' => 'rsm.slv.dns.udp.upd'
+};
 
 print("Renaming triggers...\n");
-foreach my $from (keys(%{$triggers_to_rename}))
+foreach my $from (keys(%{$trigger_names_to_rename}))
 {
-	my $to = $triggers_to_rename->{$from};
+	my $to = $trigger_names_to_rename->{$from};
 
 	db_exec("update triggers set description='$to' where description='$from'");
+}
+
+print("Renaming SLV item keys...\n");
+foreach my $from (keys(%{$item_keys_to_rename}))
+{
+	my $to = $item_keys_to_rename->{$from};
+
+	db_exec("update items set key_='$to' where key_='$from'");
 }
 
 print("Deleting obsoleted items...\n");
