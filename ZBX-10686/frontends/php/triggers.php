@@ -350,7 +350,7 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && 
 		$result = copyTriggersToHosts(getRequest('g_triggerid'), $hosts_ids, getRequest('hostid'));
 		$result = DBend($result);
 
-		$triggers_count = count($_REQUEST['g_triggerid']);
+		$triggers_count = count(getRequest('g_triggerid'));
 
 		if ($result) {
 			uncheckTableRows(getRequest('hostid'));
