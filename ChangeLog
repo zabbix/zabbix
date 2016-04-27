@@ -1347,6 +1347,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
 ........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
