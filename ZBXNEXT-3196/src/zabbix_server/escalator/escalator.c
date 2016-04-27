@@ -1302,6 +1302,9 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&functionids);
 
+	if (NULL != *error)
+		goto out;
+
 	*ignore = (SUCCEED == DCconfig_check_trigger_dependencies(trigger.triggerid) ? 0 : 1);
 
 	ret = SUCCEED;
