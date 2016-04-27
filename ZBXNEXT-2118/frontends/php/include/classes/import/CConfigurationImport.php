@@ -248,13 +248,6 @@ class CConfigurationImport {
 				foreach ($discoveryRule['trigger_prototypes'] as $trigger) {
 					$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
 						true;
-
-					if (array_key_exists('dependencies', $trigger)) {
-						foreach ($trigger['dependencies'] as $dependency) {
-							$triggersRefs[$dependency['name']][$dependency['expression']][$dependency['recovery_expression']] =
-								true;
-						}
-					}
 				}
 
 				foreach ($discoveryRule['graph_prototypes'] as $graph) {
