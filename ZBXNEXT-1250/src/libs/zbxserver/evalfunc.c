@@ -437,7 +437,7 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 
 static void	count_one_str(int *count, int op, const char *value, const char *pattern, zbx_vector_ptr_t *regexps)
 {
-	int res;
+	int	res;
 
 	switch (op)
 	{
@@ -457,13 +457,13 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 			if (MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
 				(*count)++;
 			else if (FAIL == res)
-				(*count) = FAIL;
+				*count = FAIL;
 			break;
 		case OP_IREGEXP:
 			if (MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
 				(*count)++;
 			else if (FAIL == res)
-				(*count) = FAIL;
+				*count = FAIL;
 	}
 }
 
@@ -569,7 +569,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 	{
 		if (NULL != arg3 && '\0' != *arg3 && '\0' == *arg2)
 		{
-			*error = zbx_dsprintf(*error, "pattern must be provided along with operator for numeric values");
+			*error = zbx_strdup(*error, "pattern must be provided along with operator for numeric values");
 			goto out;
 		}
 
@@ -582,7 +582,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 
 		if (OP_BAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
-			*error = zbx_dsprintf(*error, "operator \"band\" is not supported for counting float values");
+			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
+					arg3);
 			goto out;
 		}
 
@@ -600,8 +601,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 				{
 					if (SUCCEED != str2uint64(arg2, "KMGTsmhdw", &arg2_ui64))
 					{
-						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned "
-								"value", arg2);
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
+								" value", arg2);
 						goto out;
 					}
 				}
@@ -609,8 +610,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 				{
 					if (SUCCEED != is_uint64(arg2, &arg2_ui64))
 					{
-						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned "
-								"value", arg2);
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
+								" value", arg2);
 						goto out;
 					}
 
@@ -618,8 +619,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 					{
 						if (SUCCEED != is_uint64(arg2_2, &arg2_2_ui64))
 						{
-							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric "
-							"unsigned value", arg2_2);
+							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
+									" unsigned value", arg2_2);
 							goto out;
 						}
 					}
@@ -631,7 +632,8 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 			{
 				if (SUCCEED != is_double_suffix(arg2))
 				{
-					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value", arg2);
+					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
+							arg2);
 					goto out;
 				}
 
@@ -663,7 +665,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
 	{
-		*error = zbx_strdup(*error, "unable to get values from value cache");
+		*error = zbx_strdup(*error, "cannot get values from value cache");
 		goto out;
 	}
 
@@ -684,9 +686,10 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 				}
 				else
 				{
-					for (i = 0; i < values.values_num; i++)
+					for (i = 0; i < values.values_num && FAIL != count; i++)
 					{
-						zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64, values.values[i].value.ui64);
+						zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64,
+								values.values[i].value.ui64);
 						count_one_str(&count, op, buf, arg2, &regexps);
 					}
 				}
@@ -699,7 +702,7 @@ static int	evaluate_COUNT(char *value, DC_ITEM *item, const char *function, cons
 				}
 				else
 				{
-					for (i = 0; i < values.values_num; i++)
+					for (i = 0; i < values.values_num && FAIL != count; i++)
 					{
 						zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4),
 								values.values[i].value.dbl);
@@ -2042,7 +2045,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
 	{
-		*error = zbx_strdup(*error, "unable to get values from value cache");
+		*error = zbx_strdup(*error, "cannot get values from value cache");
 		goto out;
 	}
 
@@ -2170,7 +2173,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
 	{
-		*error = zbx_strdup(*error, "unable to get values from value cache");
+		*error = zbx_strdup(*error, "cannot get values from value cache");
 		goto out;
 	}
 
