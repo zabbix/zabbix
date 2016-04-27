@@ -108,7 +108,7 @@ our @EXPORT = qw($result $dbh $tld
 		get_probe_availabilities
 		probe_offline_at probes2tldhostids get_probe_online_key_itemid
 		init_values push_value send_values get_nsip_from_key get_ip_from_nsip is_service_error
-		process_slv_ns_monthly
+		process_slv_monthly process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_downtime get_results uint_value_exists
 		dbl_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
@@ -1730,6 +1730,63 @@ sub is_service_error
 	return E_FAIL;
 }
 
+sub process_slv_monthly
+{
+	my $tld = shift;
+	my $cfg_key_in = shift;		# input key, e. g. 'rsm.rdds.43.rtt[{$RSM.TLD}]'
+	my $from = shift;		# start of the period
+	my $till = shift;		# end of the period
+	my $value_ts = shift;		# value timestamp
+	my $delay = shift;		# item delay
+	my $probe_times_ref = shift;	# reference to the probes that were online
+	my $check_value_ref = shift;	# a pointer to subroutine to check if the value was successful
+
+	my $result;
+
+	$result->{'total_tests'} = 0;
+	$result->{'failed_tests'} = 0;
+	$result->{'successful_tests'} = 0;
+	$result->{'successful_accum'} = 0;	# accumulated successful values, to get the average later
+
+	my $hostids_ref = probes2tldhostids($tld, $probe_times_ref);
+	if (!$hostids_ref)
+	{
+		wrn("no probes found");
+		return $result;
+	}
+
+	my $items_ref = get_items_by_hostids($hostids_ref, $cfg_key_in, 1);	# complete key
+	if (scalar(@$items_ref) == 0)
+	{
+		wrn("no items ($cfg_key_in) found");
+		return $result;
+	}
+
+	my $values_ref = __get_item_values($items_ref, $from, $till, ITEM_VALUE_TYPE_FLOAT);
+
+	foreach my $itemid (keys(%{$values_ref}))
+	{
+		foreach my $clock (keys(%{$values_ref->{$itemid}}))
+		{
+			my $value = $values_ref->{$itemid}->{$clock};
+
+			$result->{'total_tests'}++;
+
+			if ($check_value_ref->($value) == SUCCESS)
+			{
+				$result->{'successful_tests'}++;
+				$result->{'successful_accum'} += $value;
+			}
+			else
+			{
+				$result->{'failed_tests'}++;
+			}
+		}
+	}
+
+	return $result;
+}
+
 sub process_slv_ns_monthly
 {
 	my $tld = shift;
@@ -1834,8 +1891,6 @@ sub process_slv_avail
 	my $hostids_ref = probes2tldhostids($tld, $probe_times_ref, $from);
 	if (!$hostids_ref)
 	{
-		print(Dumper($probe_times_ref), "\nclock:", ts_full($from), "\n");
-
 		$result->{'value'} = UP_INCONCLUSIVE;
 		$result->{'message'} = "Up (inconclusive): no online probes";
 		$result->{'alert'} = 1 if (alerts_enabled() == SUCCESS);
@@ -1848,10 +1903,10 @@ sub process_slv_avail
 	if (scalar(@$items_ref) == 0)
 	{
 		wrn("no items ($cfg_key_in) found");
-		return;
+		return $result;
 	}
 
-	my $values_ref = __get_item_values($items_ref, $from, $till);
+	my $values_ref = __get_item_values($items_ref, $from, $till, ITEM_VALUE_TYPE_UINT64);
 	my $probes_with_results = scalar(keys(%{$values_ref}));
 	if ($probes_with_results < $cfg_minonline)
 	{
@@ -2063,9 +2118,9 @@ sub process_slv_downtime
 sub get_results
 {
 	my $tld = shift;
-	my $probe_times_ref = shift; # probe online times (for history data)
-	my $items_ref = shift;       # list of items to get results
-	my $check_value_ref = shift; # a pointer to subroutine to check if the value was successful
+	my $probe_times_ref = shift;	# probe online times (for history data)
+	my $items_ref = shift;		# list of items to get results
+	my $check_value_ref = shift;	# a pointer to subroutine to check if the value was successful
 
 	my $result;
 	foreach my $hostid (keys(%$items_ref))
@@ -2121,6 +2176,25 @@ sub __get_item_values
 	my $items_ref = shift;
 	my $from = shift;
 	my $till = shift;
+	my $value_type = shift;
+
+	my $table;
+	if ($value_type == ITEM_VALUE_TYPE_UINT64)
+	{
+		$table = 'history_uint';
+	}
+	elsif ($value_type == ITEM_VALUE_TYPE_FLOAT)
+	{
+		$table = 'history';
+	}
+	elsif ($value_type == ITEM_VALUE_TYPE_STR)
+	{
+		$table = 'history_str';
+	}
+	else
+	{
+		fail("THIS SHOULD NEVER HAPPEN: $value_type: unknown value_type");
+	}
 
 	my $result;
 
@@ -2135,7 +2209,7 @@ sub __get_item_values
 
 		my $rows_ref = db_select(
 			"select itemid,value,clock".
-			" from history_uint".
+			" from $table".
 			" where itemid in ($itemids_str)".
 				" and clock between $from and $till");
 

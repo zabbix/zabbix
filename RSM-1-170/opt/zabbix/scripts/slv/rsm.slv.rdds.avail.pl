@@ -98,7 +98,14 @@ while ($tld_index < $tld_count)
 				next if (uint_value_exists($value_ts, $itemid) == SUCCESS);
 			}
 
-			next if ($till > $max_avail_time);
+			if ($till > $max_avail_time)
+			{
+				my $seconds = $till - $max_avail_time;
+				wrn("RDDS availability calculation is not possible yet, please wait for $seconds".
+					" seconds (availability time: ", ts_full($max_avail_time), ",".
+					" selected period: ", selected_period($from, $till), ")");
+				next;
+			}
 
 			my $result = process_slv_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline, $probe_times_ref,
 				\&check_item_values);

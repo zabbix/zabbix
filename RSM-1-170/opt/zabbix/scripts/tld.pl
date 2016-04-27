@@ -601,7 +601,7 @@ sub create_items_rdds {
 
     my $item_key = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 
-    my $options = {'name' => 'RDDS43 IP of $1',
+    my $options = {'name' => 'RDDS43 IP',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
@@ -611,7 +611,7 @@ sub create_items_rdds {
 
     $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 
-    $options = {'name' => 'RDDS43 RTT of $1',
+    $options = {'name' => 'RDDS43 RTT',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
@@ -619,16 +619,9 @@ sub create_items_rdds {
                                               'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
     create_item($options);
 
-	$options = { 'description' => 'RDDS43-RTT {HOST.NAME}: problem',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
-                        'priority' => '2',
-                };
-
-	create_trigger($options);
-
     $item_key = 'rsm.rdds.80.ip[{$RSM.TLD}]';
 
-    $options = {'name' => 'RDDS80 IP of $1',
+    $options = {'name' => 'RDDS80 IP',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
@@ -637,7 +630,7 @@ sub create_items_rdds {
 
     $item_key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 
-    $options = {'name' => 'RDDS80 RTT of $1',
+    $options = {'name' => 'RDDS80 RTT',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
@@ -678,7 +671,7 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp.ip[{$RSM.TLD}]';
 
-    $options = {'name' => 'EPP IP of $1',
+    $options = {'name' => 'EPP IP',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
@@ -688,7 +681,7 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp.rtt[{$RSM.TLD},login]';
 
-    $options = {'name' => 'EPP $2 command RTT of $1',
+    $options = {'name' => 'EPP $2 command RTT',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
@@ -699,7 +692,7 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp.rtt[{$RSM.TLD},update]';
 
-    $options = {'name' => 'EPP $2 command RTT of $1',
+    $options = {'name' => 'EPP $2 command RTT',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
@@ -710,7 +703,7 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp.rtt[{$RSM.TLD},info]';
 
-    $options = {'name' => 'EPP $2 command RTT of $1',
+    $options = {'name' => 'EPP $2 command RTT',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
@@ -724,7 +717,7 @@ sub create_items_epp {
 
         my $applicationid_43 = get_application_id('RDDS43', $templateid);
 
-        $options = {'name' => 'RDDS43 update time of $1',
+        $options = {'name' => 'RDDS43 update time',
                     'key_'=> $item_key,
 		    'hostid' => $templateid,
 		    'applications' => [$applicationid_43],

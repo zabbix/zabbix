@@ -105,7 +105,14 @@ my $item_names_to_rename =
 	'EPP service availability at $1 ($2)' => 'EPP test',
 	'Number of working DNS Name Servers of $1 (UDP)' => 'DNS UDP test',
 	'Number of working DNS Name Servers of $1 (TCP)' => 'DNS TCP test',
-	'RDDS availability of $1' => 'RDDS test'
+	'RDDS availability of $1' => 'RDDS test',
+	'RDDS43 IP of $1' => 'RDDS43 IP',
+	'RDDS43 RTT of $1' => 'RDDS43 RTT',
+	'RDDS43 update time of $1' => 'RDDS43 update time',
+	'RDDS80 IP of $1' => 'RDDS80 IP',
+	'RDDS80 RTT of $1' => 'RDDS80 RTT',
+	'EPP IP of $1' => 'EPP IP',
+	'EPP $2 command RTT of $1' => 'EPP $2 command RTT',
 };
 
 print("Renaming triggers...\n");
