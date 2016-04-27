@@ -42,15 +42,17 @@ static size_t	events_alloc = 0, events_num = 0;
  *             value    - [IN] event value (TRIGGER_VALUE_*,                  *
  *                             TRIGGER_STATE_*, ITEM_STATE_* ... depends on   *
  *                             source and object)                             *
- *             trigger_description - [IN] trigger description                 *
- *             trigger_expression  - [IN] trigger short expression            *
- *             trigger_priority    - [IN] trigger priority                    *
- *             trigger_type        - [IN] trigger type (TRIGGER_TYPE_*)       *
+ *             trigger_description         - [IN] trigger description         *
+ *             trigger_expression          - [IN] trigger short expression    *
+ *             trigger_recovery_expression - [IN] trigger recovery expression *
+ *             trigger_priority            - [IN] trigger priority            *
+ *             trigger_type                - [IN] TRIGGER_TYPE_* defines      *
  *                                                                            *
  ******************************************************************************/
 void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, unsigned char trigger_priority, unsigned char trigger_type)
+		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
+		unsigned char trigger_type)
 {
 	if (events_num == events_alloc)
 	{
@@ -72,6 +74,7 @@ void	add_event(zbx_uint64_t eventid, unsigned char source, unsigned char object,
 		events[events_num].trigger.triggerid = objectid;
 		events[events_num].trigger.description = zbx_strdup(NULL, trigger_description);
 		events[events_num].trigger.expression = zbx_strdup(NULL, trigger_expression);
+		events[events_num].trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
 		events[events_num].trigger.priority = trigger_priority;
 		events[events_num].trigger.type = trigger_type;
 	}
@@ -135,6 +138,7 @@ static void	clean_events()
 
 		zbx_free(events[i].trigger.description);
 		zbx_free(events[i].trigger.expression);
+		zbx_free(events[i].trigger.recovery_expression);
 	}
 
 	events_num = 0;

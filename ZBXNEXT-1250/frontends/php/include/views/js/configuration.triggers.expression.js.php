@@ -8,11 +8,11 @@
 	}
 
 	function insertText(obj, value) {
-		<?php if ($this->data['dstfld1'] == 'expression') { ?>
+		<?php if ($this->data['dstfld1'] === 'expression' || $this->data['dstfld1'] === 'recovery_expression'): ?>
 			jQuery(obj).val(jQuery(obj).val() + value);
-		<?php } else { ?>
+		<?php else: ?>
 			jQuery(obj).val(value);
-		<?php } ?>
+		<?php endif ?>
 	}
 
 	jQuery(document).ready(function() {

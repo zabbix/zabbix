@@ -1,10 +1,11 @@
 Changes for 3.1.0
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Greek, Italian, Japanese, Korean, Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Georgian, Greek, Italian, Japanese, Korean, Polish, Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
+A.F.....S. [ZBXNEXT-2118] added support of trigger option "OK event generation" and recovery expression (Ivo, Oleg, Sasha, wiper)
 ........S. [ZBX-3823] improved validation and error messaging when history, discovery, autoregistration and host availability data sent by passive and active proxies are processed on server (gleb)
 A......... [ZBX-10030] fixed API action update method request with only "actionid" property (Cemeris)
 ..F....... [ZBX-9972] changed SERVICE_SLA constant to match database default goodsla value (Cemeris)
@@ -16,8 +17,19 @@ A......... [ZBX-10049] fixed optional field validation in drule.update API metho
 Changes for 3.0.3rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by default (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10693] fixed API configuration.import method for importing template and/or host with trigger prototype dependency (Cemeris)
+A.FG...PS. [ZBXNEXT-1263] added finishing touches to encryption support (Andris, asaveljevs, gleb, Oleg, Sandis)
+.......PS. [ZBX-10540] fixed encoding reset when Zabbix process auto-reconnects MySQL database (gleb)
+..F....... [ZBX-10670] fixed disabling of script confirmation in Administration -> Script -> Edit form (Cemeris)
+..F....... [ZBX-10670] fixed display of form fields for different types of script in Administration -> Script -> Edit form (Cemeris)
+..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
+...G...... [ZBX-10548] fixed agent compilation on Solaris without zone support (e.g. Solaris 9), added awareness of running on a newer Solaris with zones (Andris)
+..F....... [ZBX-10639] changed incorrect labels in item filters and host filters (Cemeris)
+..F....... [ZBX-10668] added hint for action operation steps on how to proceed infinitely (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
 ........S. [ZBX-10551] fixed possible crash when constants are extracted from invalid trigger expression containing '{' without matching '}' (gleb)
@@ -129,7 +141,7 @@ New features:
 A.F....... [ZBX-1357] updated English (United States), Italian, Japanese, Korean, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-10385] fixed "Case sensistive" checkbox on regular expression test function (Sasha)
+..F....... [ZBX-10385] fixed "Case sensitive" checkbox on regular expression test function (Sasha)
 ..F....... [ZBX-10381] fixed validation of length of a command in the Administration->Scripts form (Sasha)
 ....I..... [ZBX-10384] fixed upgrade of screens, maps and slide shows to make public them for simple users (Sasha)
 ..F....... [ZBX-10382] fixed "Too few arguments" error in the user profile form (Sasha)
@@ -1348,8 +1360,10 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.13rc1
 
 New features:
+A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
 ........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
@@ -2749,6 +2763,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.18rc1
 
 New features:
+A.F....... [ZBX-1357] updated French translation; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 
