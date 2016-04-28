@@ -380,8 +380,10 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 			ret = ZBX_REGEXP_MATCH;
 	}
 	else
+	{
 		ret = (NULL != (*output = regexp_sub(string, pattern, output_template, regexp_flags)) ?
 				ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
+	}
 
 	return ret;
 }
@@ -544,8 +546,8 @@ int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pat
 				break;
 			case EXPRESSION_TYPE_NOT_INCLUDED:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
-				if (FAIL != ret)	/* invert output value */
-					ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
+				/* invert output value */
+				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
 			case EXPRESSION_TYPE_ANY_INCLUDED:
 				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
