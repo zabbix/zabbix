@@ -145,7 +145,6 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 		for (i = first_index; i < last_index; i++)
 		{
 			const icmpitem_t	*item = &items[i];
-			const double		min_ping_time = 0.0001;
 
 			if (0 != strcmp(item->addr, host->addr))
 				continue;
@@ -183,10 +182,8 @@ static void	process_values(icmpitem_t *items, int first_index, int last_index, Z
 							break;
 					}
 
-					/* changing result to 0.0001 when latency is less than that avoid */
-					/* the result being rounded to 0 when storing  it in the database */
-					if (0 < value_dbl && min_ping_time > value_dbl)
-						value_dbl = min_ping_time;
+					if (0 < value_dbl && ZBX_FLOAT_PRECISION > value_dbl)
+						value_dbl = ZBX_FLOAT_PRECISION;
 
 					process_value(item->itemid, NULL, &value_dbl, ts, SUCCEED, NULL);
 					break;
