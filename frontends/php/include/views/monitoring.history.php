@@ -187,7 +187,7 @@ else {
 $screen = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_HISTORY,
 	'action' => $this->data['action'],
-	'items' => $this->data['items'],
+	'itemids' => $data['itemids'],
 	'profileIdx' => $profileIdx,
 	'profileIdx2' => $profileIdx2,
 	'updateProfile' => $updateProfile,
