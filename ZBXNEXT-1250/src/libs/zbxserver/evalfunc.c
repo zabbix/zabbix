@@ -242,7 +242,7 @@ static int	evaluate_LOGEVENTID(char *value, DC_ITEM *item, const char *function,
 		char	logeventid[16];
 
 		zbx_snprintf(logeventid, sizeof(logeventid), "%d", vc_value.value.log->logeventid);
-		if (MATCH == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
+		if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, logeventid, arg1, ZBX_CASE_SENSITIVE))
 			zbx_strlcpy(value, "1", MAX_BUFFER_LEN);
 		else
 			zbx_strlcpy(value, "0", MAX_BUFFER_LEN);
@@ -454,13 +454,13 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 				(*count)++;
 			break;
 		case OP_REGEXP:
-			if (MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+			if (ZBX_REGEXP_MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
 				(*count)++;
 			else if (FAIL == res)
 				*count = FAIL;
 			break;
 		case OP_IREGEXP:
-			if (MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
+			if (ZBX_REGEXP_MATCH == (res = regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
 				(*count)++;
 			else if (FAIL == res)
 				*count = FAIL;
@@ -1681,9 +1681,11 @@ static int	evaluate_STR_one(int func, zbx_vector_ptr_t *regexps, const char *val
 				return SUCCEED;
 			break;
 		case ZBX_FUNC_REGEXP:
-			return (MATCH == regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+			return (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, arg1, ZBX_CASE_SENSITIVE) ?
+					SUCCEED : FAIL);
 		case ZBX_FUNC_IREGEXP:
-			return (MATCH == regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE) ? SUCCEED : FAIL);
+			return (ZBX_REGEXP_MATCH == regexp_match_ex(regexps, value, arg1, ZBX_IGNORE_CASE) ?
+					SUCCEED : FAIL);
 	}
 
 	return FAIL;

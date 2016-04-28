@@ -353,10 +353,12 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
  *                                    (substitution) is stored.                   *
  *                                    Specify NULL to skip output value creation. *
  *                                                                                *
- * Return value: MATCH    - the string matches the specified regular expression   *
- *               NO_MATCH - the string does not match the regular expression      *
- *               FAIL     - the string is NULL or the specified regular           *
- *                          expression is invalid                                 *
+ * Return value: ZBX_REGEXP_MATCH    - the string matches the specified regular   *
+ *                                     expression                                 *
+ *               ZBX_REGEXP_NO_MATCH - the string does not match the regular      *
+ *                                     expression                                 *
+ *               FAIL                - the string is NULL or the specified        *
+ *                                     regular expression is invalid              *
  *                                                                                *
  **********************************************************************************/
 static int	regexp_match_ex_regsub(const char *string, const char *pattern, int case_sensitive,
@@ -372,13 +374,14 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 		if (NULL == zbx_regexp(string, pattern, &ret, regexp_flags))
 		{
 			if (FAIL != ret)
-				ret = NO_MATCH;
+				ret = ZBX_REGEXP_NO_MATCH;
 		}
 		else
-			ret = MATCH;
+			ret = ZBX_REGEXP_MATCH;
 	}
 	else
-		ret = (NULL != (*output = regexp_sub(string, pattern, output_template, regexp_flags)) ? MATCH : NO_MATCH);
+		ret = (NULL != (*output = regexp_sub(string, pattern, output_template, regexp_flags)) ?
+				ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
 
 	return ret;
 }
@@ -395,8 +398,8 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
  *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive search   *
  *                                    ZBX_CASE_SENSITIVE - case sensitive search  *
  *                                                                                *
- * Return value: MATCH    - string contains the specified substring               *
- *               NO_MATCH - string does not contain the specified substring       *
+ * Return value: ZBX_REGEXP_MATCH    - string contains the specified substring    *
+ *               ZBX_REGEXP_NO_MATCH - string does not contain the substring      *
  *                                                                                *
  **********************************************************************************/
 static int	regexp_match_ex_substring(const char *string, const char *pattern, int case_sensitive)
@@ -413,7 +416,7 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, in
 			break;
 	}
 
-	return NULL != ptr ? MATCH : NO_MATCH;
+	return (NULL != ptr ? ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
 }
 
 /**********************************************************************************
@@ -430,16 +433,17 @@ static int	regexp_match_ex_substring(const char *string, const char *pattern, in
  *             delimiter       - [IN] the delimiter separating items in the       *
  *                                    substring list                              *
  *                                                                                *
- * Return value: MATCH    - string contains a substring from the list             *
- *               NO_MATCH - string contains no substrings from the list           *
+ * Return value: ZBX_REGEXP_MATCH    - string contains a substring from the list  *
+ *               ZBX_REGEXP_NO_MATCH - string does not contain any substrings     *
+ *                                     from the list                              *
  *                                                                                *
  **********************************************************************************/
 static int	regexp_match_ex_substring_list(const char *string, char *pattern, int case_sensitive, char delimiter)
 {
-	int	ret = NO_MATCH;
+	int	ret = ZBX_REGEXP_NO_MATCH;
 	char	*s, *c;
 
-	for (s = pattern; '\0' != *s && MATCH != ret;)
+	for (s = pattern; '\0' != *s && ZBX_REGEXP_MATCH != ret;)
 	{
 		if (NULL != (c = strchr(s, delimiter)))
 			*c = '\0';
@@ -484,9 +488,11 @@ static int	regexp_match_ex_substring_list(const char *string, char *pattern, int
  *                                    (substitution) is stored.                   *
  *                                    Specify NULL to skip output value creation. *
  *                                                                                *
- * Return value: SUCCEED - the string matches the specified regular expression    *
- *               FAIL    - the string does not match the specified regular        *
- *                         expression                                             *
+ * Return value: ZBX_REGEXP_MATCH    - the string matches the specified regular   *
+ *                                     expression                                 *
+ *               ZBX_REGEXP_NO_MATCH - the string does not match the specified    *
+ *                                     regular expression                         *
+ *               FAIL                - invalid regular expression                 *
  *                                                                                *
  * Comments: For regular expressions and global regular expressions with 'Result  *
  *           is TRUE' type the output_template substitution result is stored into *
@@ -502,7 +508,7 @@ int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pat
 	if (NULL == pattern || '\0' == *pattern)
 	{
 		/* always match when no pattern is specified */
-		ret = MATCH;
+		ret = ZBX_REGEXP_MATCH;
 		goto out;
 	}
 
@@ -521,8 +527,6 @@ int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pat
 		if (0 != strcmp(regexp->name, pattern))
 			continue;
 
-		ret = FAIL;
-
 		switch (regexp->expression_type)
 		{
 			case EXPRESSION_TYPE_TRUE:
@@ -532,28 +536,31 @@ int	regexp_sub_ex(zbx_vector_ptr_t *regexps, const char *string, const char *pat
 			case EXPRESSION_TYPE_FALSE:
 				ret = regexp_match_ex_regsub(string, regexp->expression, regexp->case_sensitive,
 						NULL, NULL);
-				/* invert output value */
-				ret = (MATCH == ret) ? NO_MATCH : MATCH;
+				if (FAIL != ret)	/* invert output value */
+					ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
 			case EXPRESSION_TYPE_INCLUDED:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
 				break;
 			case EXPRESSION_TYPE_NOT_INCLUDED:
 				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
-				/* invert output value */
-				ret = (MATCH == ret) ? NO_MATCH : MATCH;
+				if (FAIL != ret)	/* invert output value */
+					ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
 				break;
 			case EXPRESSION_TYPE_ANY_INCLUDED:
 				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
 						regexp->exp_delimiter);
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				ret = FAIL;
 		}
 
-		if (FAIL == ret)
+		if (FAIL == ret || ZBX_REGEXP_NO_MATCH == ret)
 			break;
 	}
 out:
-	if (MATCH == ret && NULL != output && NULL == *output)
+	if (ZBX_REGEXP_MATCH == ret && NULL != output && NULL == *output)
 	{
 		/* Handle output value allocation for global regular expression types   */
 		/* that cannot perform output_template substitution (practically        */
