@@ -32,9 +32,9 @@ dbg("selecting period ", selected_period($from, $till), " (value_ts:", ts_str($v
 my $tlds_ref;
 if (opt('tld'))
 {
-        fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-        $tlds_ref = [ getopt('tld') ];
+	$tlds_ref = [ getopt('tld') ];
 }
 else
 {
@@ -45,14 +45,13 @@ init_values();
 
 foreach (@$tlds_ref)
 {
-        # NB! This is needed in order to set the value globally.
-        $tld = $_;
+	$tld = $_;	# set global variable here
 
 	my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
 
 	if (dbl_value_exists($value_ts, $itemid_out) == SUCCESS)
 	{
-                # value already exists
+		# value already exists
 		next unless (opt('dry-run'));
 	}
 
