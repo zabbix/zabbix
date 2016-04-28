@@ -1136,9 +1136,9 @@ sub create_slv_epp_items($$) {
     create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [get_application_id(APP_SLV_MONTHLY, $hostid)]);
     create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [get_application_id(APP_SLV_ROLLWEEK, $hostid)]);
 
-    create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.login', $hostid);
-    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.update', $hostid);
-    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.update', $hostid);
+    create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login', $hostid);
+    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
+    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
 
     # NB! Configuration trigger that is used in PHP and C code to detect incident!
     # priority must be set to 0!

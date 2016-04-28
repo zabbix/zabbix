@@ -186,56 +186,36 @@ sub get_macro_rdds_rtt_low
 	return __get_macro('{$RSM.RDDS.RTT.LOW}');
 }
 
-sub get_macro_dns_udp_delay
+sub __get_macro_delay
 {
+	my $m_name = shift;
 	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
 
-	my $item_param = 'RSM.DNS.UDP.DELAY';
-
-	my $value = __get_rsm_configvalue($item_param, $value_time);
+	my $value = __get_rsm_configvalue($m_name, $value_time);
 
 	return $value if ($value);
 
-	return __get_macro('{$' . $item_param . '}');
+	return __get_macro('{$' . $m_name . '}');
+}
+
+sub get_macro_dns_udp_delay
+{
+	return __get_macro_delay('RSM.DNS.UDP.DELAY', shift);
 }
 
 sub get_macro_dns_tcp_delay
 {
-	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
-
-	my $item_param = 'RSM.DNS.TCP.DELAY';
-
-	my $value = __get_rsm_configvalue($item_param, $value_time);
-
-	return $value if ($value);
-
-	return __get_macro('{$' . $item_param . '}');
+	return __get_macro_delay('RSM.DNS.TCP.DELAY', shift);
 }
 
 sub get_macro_rdds_delay
 {
-	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
-
-	my $item_param = 'RSM.RDDS.DELAY';
-
-	my $value = __get_rsm_configvalue($item_param, $value_time);
-
-	return $value if ($value);
-
-	return __get_macro('{$' . $item_param . '}');
+	return __get_macro_delay('RSM.RDDS.DELAY', shift);
 }
 
 sub get_macro_epp_delay
 {
-	my $value_time = (shift or int(time()) - AVAIL_SHIFT_BACK);
-
-	my $item_param = 'RSM.EPP.DELAY';
-
-	my $value = __get_rsm_configvalue($item_param, $value_time);
-
-	return $value if ($value);
-
-	return __get_macro('{$' . $item_param . '}');
+	return __get_macro_delay('RSM.EPP.DELAY', shift);
 }
 
 sub get_macro_dns_update_time

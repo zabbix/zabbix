@@ -385,9 +385,9 @@ sub __create_missing_slv_montly_items
 				__create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid);
 			}
 
-			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.login', $hostid);
-			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.update', $hostid);
-			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.update', $hostid);
+			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login', $hostid);
+			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
+			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
 		}
 	}
 }
