@@ -437,7 +437,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
  *     logfiles_num - [IN] number of elements in the array                    *
  *                                                                            *
  ******************************************************************************/
-static void	print_logfile_list(struct st_logfile *logfiles, int logfiles_num)
+static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_num)
 {
 	int	i;
 
@@ -2001,7 +2001,9 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  *     err_msg          - [IN/OUT] error message why an item became           *
  *                        NOTSUPPORTED                                        *
  *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
- *     logfiles_num_old - [IN/OUT] number of elements in "logfiles_old"       *
+ *     logfiles_num_old - [IN] number of elements in "logfiles_old"           *
+ *     logfiles_new     - [OUT] new array of logfiles                         *
+ *     logfiles_num_new - [OUT] number of elements in "logfiles_new"          *
  *     encoding         - [IN] text string describing encoding.               *
  *                          The following encodings are recognized:           *
  *                            "UNICODE"                                       *
@@ -2037,10 +2039,11 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  ******************************************************************************/
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
-		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
-		const char *encoding, zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template,
-		int *p_count, int *s_count, zbx_process_value_func_t process_value, const char *server,
-		unsigned short port, const char *hostname, const char *key, float max_delay, int refresh)
+		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
+		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
+		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
+		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
+		const char *key, float max_delay, int refresh)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -2178,16 +2181,6 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 	}
 
-	/* forget the old logfile list */
-	if (NULL != *logfiles_old)
-	{
-		for (i = 0; i < *logfiles_num_old; i++)
-			zbx_free((*logfiles_old)[i].filename);
-
-		*logfiles_num_old = 0;
-		zbx_free(*logfiles_old);
-	}
-
 	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
 	i = start_idx;
 
@@ -2260,11 +2253,11 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (0.0f != max_delay)
 		zbx_stopwatch_stop(&stopwatch);
 
-	/* remember the current logfile list */
-	*logfiles_num_old = logfiles_num;
+	/* remember the new logfile list */
+	*logfiles_num_new = logfiles_num;
 
 	if (0 < logfiles_num)
-		*logfiles_old = logfiles;
+		*logfiles_new = logfiles;
 out:
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{

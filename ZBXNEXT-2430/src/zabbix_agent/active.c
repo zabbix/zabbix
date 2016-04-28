@@ -1036,16 +1036,39 @@ static int	global_regexp_exists(const char *name)
 	return (i == regexps.values_num ? FAIL : SUCCEED);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: destroy_logfile_list                                             *
+ *                                                                            *
+ * Purpose: release resources allocated to a logfile list                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
+ *     logfiles_num   - [IN/OUT] number of elements                           *
+ *                                                                            *
+ ******************************************************************************/
+static void     destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_num)
+{
+	int	i;
+
+	for (i = 0; i < *logfiles_num; i++)
+		zbx_free((*logfiles)[i].filename);
+
+	*logfiles_num = 0;
+	zbx_free(*logfiles);
+}
+
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
-	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
-	char		*encoding_uc = NULL, *max_delay_str;
-	int		rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr, mtime_orig,
-			big_rec_orig;
-	zbx_uint64_t	lastlogsize_orig;
-	float		max_delay;
+	AGENT_REQUEST		request;
+	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
+	char			*encoding_uc = NULL, *max_delay_str;
+	int			rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr,
+				mtime_orig, big_rec_orig, logfiles_num_new = 0;
+	zbx_uint64_t		lastlogsize_orig;
+	float			max_delay;
+	struct st_logfile	*logfiles_new = NULL;
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
 		is_count_item = 1;
@@ -1167,27 +1190,42 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 		p_count = s_count_orig = s_count;
 
-		/* remember current position, we may need to restore it if log.count[] or logrt.count[] result cannot */
+		/* remember current state, we may need to restore it if log.count[] or logrt.count[] result cannot */
 		/* be sent to server */
 
 		lastlogsize_orig = metric->lastlogsize;
 		mtime_orig = metric->mtime;
 		big_rec_orig = metric->big_rec;
+
+		/* process_logrt() may modify old log file list 'metric->logfiles' but currently modifications are */
+		/* limited to 'retry' flag in existing list elements. We do not preserve original 'retry' flag values */
+		/* as there is no need to "rollback" their modifications if log.count[] or logrt.count[] result can */
+		/* not be sent to server. */
 	}
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
-			server, port, CONFIG_HOSTNAME, metric->key_orig, max_delay, metric->refresh);
+			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
+			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, max_delay,
+			metric->refresh);
+
+	if (0 == is_count_item && NULL != logfiles_new)
+	{
+		/* for log[] and logrt[] items - switch to the new log file list */
+
+		destroy_logfile_list(&metric->logfiles, &metric->logfiles_num);
+		metric->logfiles = logfiles_new;
+		metric->logfiles_num = logfiles_num_new;
+	}
 
 	if (SUCCEED == ret)
 	{
 		metric->error_count = 0;
 
-		/* send log.count[] or logrt.count[] item value to server */
-
 		if (1 == is_count_item)
 		{
+			/* send log.count[] or logrt.count[] item value to server */
+
 			int	match_count;			/* number of matching lines */
 			char	buf[ZBX_MAX_UINT64_LEN];
 
@@ -1201,14 +1239,21 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 			{
 				*lastlogsize_sent = metric->lastlogsize;
 				*mtime_sent = metric->mtime;
+
+				/* switch to the new log file list */
+				destroy_logfile_list(&metric->logfiles, &metric->logfiles_num);
+				metric->logfiles = logfiles_new;
+				metric->logfiles_num = logfiles_num_new;
 			}
 			else
 			{
-				/* unable to send data, restore original position to try again in next check */
+				/* unable to send data, restore original state to try again in next check */
 
 				metric->lastlogsize = lastlogsize_orig;
 				metric->mtime =  mtime_orig;
 				metric->big_rec = big_rec_orig;
+
+				/* the old log file list 'metric->logfiles' stays in its place */
 			}
 		}
 	}
