@@ -1,8 +1,15 @@
 Changes for 3.0.3rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by default (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-8924] improved performance of alert.get method (Sasha)
+..F....... [ZBX-10686] updated success and error messages for triggers, items and graphs 'Copy' operations (Cemeris)
+A......... [ZBX-10693] fixed API configuration.import method for importing template and/or host with trigger prototype dependency (Cemeris)
+A.FG...PS. [ZBXNEXT-1263] added finishing touches to encryption support (Andris, asaveljevs, gleb, Oleg, Sandis)
+.......PS. [ZBX-10540] fixed encoding reset when Zabbix process auto-reconnects MySQL database (gleb)
 ..F....... [ZBX-10670] fixed disabling of script confirmation in Administration -> Script -> Edit form (Cemeris)
 ..F....... [ZBX-10670] fixed display of form fields for different types of script in Administration -> Script -> Edit form (Cemeris)
 ..F....... [ZBX-9968] fixed monitoring discovery and monitoring map data refresh (Gunars)
@@ -120,7 +127,7 @@ New features:
 A.F....... [ZBX-1357] updated English (United States), Italian, Japanese, Korean, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
-..F....... [ZBX-10385] fixed "Case sensistive" checkbox on regular expression test function (Sasha)
+..F....... [ZBX-10385] fixed "Case sensitive" checkbox on regular expression test function (Sasha)
 ..F....... [ZBX-10381] fixed validation of length of a command in the Administration->Scripts form (Sasha)
 ....I..... [ZBX-10384] fixed upgrade of screens, maps and slide shows to make public them for simple users (Sasha)
 ..F....... [ZBX-10382] fixed "Too few arguments" error in the user profile form (Sasha)
@@ -1339,8 +1346,11 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.13rc1
 
 New features:
+A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-8924] improved performance of alert.get method (Sasha)
+..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
 ........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
@@ -2740,6 +2750,7 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.18rc1
 
 New features:
+A.F....... [ZBX-1357] updated French translation; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 
