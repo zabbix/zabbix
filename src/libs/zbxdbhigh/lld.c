@@ -232,7 +232,7 @@ static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *j
 
 		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
-			rc = (MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+			rc = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
 					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
 		}
 
@@ -290,7 +290,7 @@ static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_r
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
-			ret = (MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
 					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
 		}
 
@@ -335,7 +335,7 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
-			ret = (MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
 					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
 		}
 
@@ -389,7 +389,7 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
 		{
-			ret = (MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
 					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
 		}
 
