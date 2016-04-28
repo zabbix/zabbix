@@ -21,6 +21,9 @@
 
 #include "zbxalgo.h"
 
+#define ZBX_REGEXP_NO_MATCH	0
+#define ZBX_REGEXP_MATCH	1
+
 typedef struct
 {
 	char		*name;
