@@ -20,7 +20,7 @@
 
 
 /**
- * Validate import data from Zabbix 3.x.
+ * Validate import data from Zabbix 3.2.x.
  */
 class C32XmlValidator {
 
