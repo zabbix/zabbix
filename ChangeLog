@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-8924] improved performance of alert.get method (Sasha)
 ..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
