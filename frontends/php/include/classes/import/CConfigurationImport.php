@@ -40,11 +40,6 @@ class CConfigurationImport {
 	protected $importedObjectContainer;
 
 	/**
-	 * @var CTriggerExpression
-	 */
-	protected $triggerExpression;
-
-	/**
 	 * @var array
 	 */
 	protected $options;
@@ -67,10 +62,9 @@ class CConfigurationImport {
 	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"
 	 * @param CImportReferencer			$referencer					class containing all importable objects
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
-	 * @param CTriggerExpression		$triggerExpression			class to parse trigger expression
 	 */
 	public function __construct(array $options = [], CImportReferencer $referencer,
-			CImportedObjectContainer $importedObjectContainer, CTriggerExpression $triggerExpression) {
+			CImportedObjectContainer $importedObjectContainer) {
 		$this->options = [
 			'groups' => ['createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
@@ -91,7 +85,6 @@ class CConfigurationImport {
 		$this->options = array_merge($this->options, $options);
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
-		$this->triggerExpression = $triggerExpression;
 	}
 
 	/**
