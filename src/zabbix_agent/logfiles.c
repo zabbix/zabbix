@@ -1634,7 +1634,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					{
 						send_err = SUCCEED;
 
-						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+						if (ZBX_REGEXP_MATCH == regexp_sub_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE, output_template, &item_value))
 						{
 							send_err = process_value(server, port, hostname, key,
@@ -1662,7 +1662,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					}
 					else	/* log.count[] or logrt.count[] */
 					{
-						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+						if (ZBX_REGEXP_MATCH == regexp_sub_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE, NULL, NULL))
 						{
 							(*s_count)--;
@@ -1717,7 +1717,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					{
 						send_err = SUCCEED;
 
-						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+						if (ZBX_REGEXP_MATCH == regexp_sub_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE, output_template, &item_value))
 						{
 							send_err = process_value(server, port, hostname, key,
@@ -1742,7 +1742,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 					}
 					else	/* log.count[] or logrt.count[] */
 					{
-						if (SUCCEED == regexp_sub_ex(regexps, value, pattern,
+						if (ZBX_REGEXP_MATCH == regexp_sub_ex(regexps, value, pattern,
 								ZBX_CASE_SENSITIVE, NULL, NULL))
 						{
 							(*s_count)--;
