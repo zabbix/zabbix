@@ -91,8 +91,7 @@ class CConfiguration extends CApiService {
 		$configurationImport = new CConfigurationImport(
 			$params['rules'],
 			new CImportReferencer(),
-			new CImportedObjectContainer(),
-			new CTriggerExpression()
+			new CImportedObjectContainer()
 		);
 
 		return $configurationImport->import($adapter);
