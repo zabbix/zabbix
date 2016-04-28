@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 18:01+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
 "PO-Revision-Date: 2014-06-09 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2714,67 +2714,67 @@ msgstr "Vytvorené: Spúšťač \"%1$s\" na \"%2$s\"."
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Vytvorené: Prototyp spúšťača \"%1$s\" na \"%2$s\"."
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "Kritická chyba. Pole \"%1$s\" obsahuje multibytové znaky."
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "Kritická chyba. Pole \"%1$s\" je povinné."
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je IP rozsah."
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je IP."
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je farba."
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je desiatkové číslo."
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je celočíselný zoznam alebo rozsah."
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je celé číslo."
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "Kritická chyba. Pole \"%1$s\" nie je reťazec."
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "Kritická chyba. Pole \"%1$s\" musí chýbať."
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Kritická chyba. Nesprávna hodnota \"%1$s\" pre pole \"%2$s\"."
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Kritická chyba. Nesprávna hodnota \"%1$s\" pre pole \"%2$s\": musí byť medzi %3$s a %4$s."
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Kritická chyba. Nesprávna hodnota pre pole \"%1$s\": nemôže byť prázdne."
@@ -3895,7 +3895,7 @@ msgstr "Nedostupné"
 msgid "Download speed for scenario \"%s\"."
 msgstr "Rýchlosť sťahovania pre WEB scenár \"%s\"."
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Rýchlosť sťahovania pre krok \"%1$s\" WEB scenára \"%2$s\"."
@@ -9036,7 +9036,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operácia \"%s\" už existuje."
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operácia nemôže byť vykonaná vzhľadom k neoprávnenej požiadavke."
 
@@ -9333,7 +9333,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLÉM"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "Stránka prijala nesprávne údaje"
 
@@ -10106,7 +10106,7 @@ msgstr "Zdroj"
 msgid "Response code"
 msgstr "Návratový kód"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Návratový kód pre krok \"%1$s\" scenára \"%2$s\"."
@@ -10115,7 +10115,7 @@ msgstr "Návratový kód pre krok \"%1$s\" scenára \"%2$s\"."
 msgid "Response time"
 msgstr "Čas odozvy"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Čas odozvy pre krok \"%1$s\" scenára \"%2$s\"."
@@ -10521,11 +10521,7 @@ msgstr "Scenár zmazaný"
 msgid "Scenario disabled"
 msgstr "Scenár deaktivovaný"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "Meno kroku scenára by malo obsahovať len tlačitelné znaky."
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "Číslo kroku scenára nesmie byť menšie ako 1."
 
@@ -11368,7 +11364,7 @@ msgstr "Krok"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Krok \"%1$s\" [%2$s z %3$s] zlyhal: %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "Krok \"%s\" už existuje."
@@ -12860,67 +12856,67 @@ msgstr "Varovná"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Varovanie. Nie je môžné zobraziť viac ako jednu položku typu \"Súčtový graf\"."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "Varovanie. Pole \"%1$s\" je povinné."
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "Varovanie. Pole \"%1$s\" nie je IP rozsah."
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "Varovanie. Pole \"%1$s\" nie je IP adresa."
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "Varovanie. Pole \"%1$s\" nie je farba."
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "Varovanie. Pole \"%1$s\" nie je desiatkové číslo."
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "Varovanie. Pole \"%1$s\" nie je celočíselný zoznam alebo rozsah."
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "Varovanie. Pole \"%1$s\" nie je celé číslo."
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "Varovanie. Pole \"%1$s\" nie je reťazec."
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr "Varovanie. Pole \"%1$s\" má obmedzenie na multibytové znaky."
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr "Varovanie. Pole \"%1$s\" musí chýbať."
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "Varovanie. Neplatná hodnota pre pole \"%1$s\"."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Varovanie. Neplatná hodnota pre pole \"%1$s\": nemôže byť prázdne."
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Varovanie. Neplatná hodnota pre pole \"%1$s\": musí byť medzi %2$s a %3$s."
@@ -12953,12 +12949,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Web kontroly"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Web položka \"%s\" created."
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "Web položka s kľúčom \"%s\" už existuje."
@@ -13376,7 +13372,7 @@ msgstr "Zabbix agent (aktívny)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix súhrnne"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix prijal neplatnú požiadavku."
 

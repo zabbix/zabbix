@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 18:01+0200\n"
-"PO-Revision-Date: 2016-02-08 13:48+0300\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
+"PO-Revision-Date: 2016-04-20 07:17+0300\n"
 "Last-Translator: Sébastien <sebastien@maccagnoni.eu>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -11,9 +11,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1454932103.0\n"
+"X-POOTLE-MTIME: 1461129476.000000\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
@@ -2706,67 +2706,67 @@ msgstr "Créé : Déclencheur \"%1$s\" sur \"%2$s\"."
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Créé : Prototype de déclencheur \"%1$s\" sur \"%2$s\"."
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "Erreur critique. Le champ \"%1$s\" contient des caractères multi-octets."
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "Erreur critique. Le champ \"%1$s\" est obligatoire."
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas un intervalle IP."
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas une IP."
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas une couleur."
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas un nombre décimal."
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas une liste d'entiers ou un intervalle."
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas un entier."
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "Erreur critique. Le champ \"%1$s\" n'est pas une chaîne de caractères."
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "Erreur critique. Le champ \"%1$s\" est absent."
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Erreur critique. Valeur incorrecte \"%1$s\" pour le champ \"%2$s\"."
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Erreur critique. Valeur incorrecte \"%1$s\" pour le champ \"%2$s\" : doit être entre %3$s et %4$s."
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Erreur critique. Valeur incorrecte pour le champ \"%1$s\" : ne peut pas être vide."
@@ -3885,7 +3885,7 @@ msgstr "Arrêté"
 msgid "Download speed for scenario \"%s\"."
 msgstr "Vitesse de téléchargement pour le scénario \"%s\"."
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Vitesse de téléchargement pour l'étape \"%1$s\" du scénario \"%2$s\"."
@@ -4432,7 +4432,7 @@ msgstr "Ez Texting"
 #: jsLoader.php:130
 msgctxt "Friday short"
 msgid "F"
-msgstr "F"
+msgstr "V"
 
 #: include/forms.inc.php:1828 include/forms.inc.php:1848
 msgid "FALSE"
@@ -9022,7 +9022,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "L'opération \"%s\" existe déjà."
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "L'opération ne peut pas être effectuée en raison d'une requête non autorisée."
 
@@ -9319,7 +9319,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLÈME"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "La page a reçu des données incorrectes"
 
@@ -10091,7 +10091,7 @@ msgstr "Ressource"
 msgid "Response code"
 msgstr "Code de réponse"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Code de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
@@ -10100,7 +10100,7 @@ msgstr "Code de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
 msgid "Response time"
 msgstr "Temps de réponse"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Temps de réponse pour l'étape \"%1$s\" du scénario \"%2$s\"."
@@ -10506,11 +10506,7 @@ msgstr "Scénario supprimé"
 msgid "Scenario disabled"
 msgstr "Scénario désactivé"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "Le nom d'une étape de scénario ne doit contenir que des caractères imprimables."
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "Le nombre d'étapes d'un scénario ne peut pas être inférieur à 1."
 
@@ -11353,7 +11349,7 @@ msgstr "Étape"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Étape \"%1$s\" [%2$s sur %3$s] échouée : %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "L'étape \"%s\" existe déjà."
@@ -11447,7 +11443,7 @@ msgstr "Support"
 #: include/views/administration.users.edit.php:51
 #: include/views/administration.users.list.php:56 popup.php:898 users.php:47
 msgid "Surname"
-msgstr "Prénom"
+msgstr "Nom de famille"
 
 #: include/locales.inc.php:70
 msgid "Swedish (sv_SE)"
@@ -12842,67 +12838,67 @@ msgstr "Avertissement"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Avertissement. Impossible d'afficher plus d'un élément de type \"Somme de graphique\"."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "Avertissement. Le champ \"%1$s\" est obligatoire."
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas une plage d' adresses IP."
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas une IP."
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas une couleur."
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas un nombre décimal."
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas un entier ou un intervalle."
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas un entier."
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "Avertissement. Le champ \"%1$s\" n'est pas une chaîne de caractères."
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr "Avertissement. Les caractères multi-octets du champ \"%1$s\" sont restreints."
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr "Avertissement. Le champ \"%1$s\" doit être manquant."
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "Avertissement. Valeur incorrecte pour le champ \"%1$s\"."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Avertissement. Valeur incorrecte pour le champ \"%1$s\" : ne peut pas être vide."
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Avertissement. Valeur incorrecte pour le champ \"%1$s\" : doit être entre %2$s et %3$s."
@@ -12933,12 +12929,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Vérifications web"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Élément web \"%s\" créé."
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "L'élément web avec la clé \"%s\" existe déjà."
@@ -13356,7 +13352,7 @@ msgstr "agent Zabbix (actif)"
 msgid "Zabbix aggregate"
 msgstr "Agrégation Zabbix"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix a reçu une requête incorrecte."
 

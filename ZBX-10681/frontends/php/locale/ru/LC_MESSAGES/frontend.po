@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 18:01+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
 "PO-Revision-Date: 2015-08-29 14:41+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -2713,67 +2713,67 @@ msgstr "Создано: Триггер \"%1$s\" в \"%2$s\"."
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Создано: Прототип триггера \"%1$s\" в \"%2$s\"."
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "Критическая ошибка. Поле \"%1$s\" содержит многобайтовые символы."
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "Критическая ошибка. Поле \"%1$s\" является обязательным."
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является диапазоном IP."
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является IP."
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является цветом."
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является десятичным числом."
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является списком целых чисел или диапазоном."
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является целым числом."
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "Критическая ошибка. Поле \"%1$s\" не является строкой."
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "Критическая ошибка. Поле \"%1$s\" должно быть пропущено."
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Критичная ошибка. Некорректное значение \"%1$s\" для поля \"%2$s\"."
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Критическая ошибка. Некорректное значение \"%1$s\" для поля \"%2$s\": должно быть между %3$s и %4$s."
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Критическая ошибка. Некорректное значение поля \"%1$s\": не может быть пустым."
@@ -3893,7 +3893,7 @@ msgstr "Недоступен"
 msgid "Download speed for scenario \"%s\"."
 msgstr "Скорость загрузки для сценария \"%s\"."
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Скорость загрузки для шага \"%1$s\" сценария \"%2$s\"."
@@ -9035,7 +9035,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" уже существует."
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Операция не может быть выполнена из-за несанкционированного запроса."
 
@@ -9332,7 +9332,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "Страница получила некорректные данные"
 
@@ -10106,7 +10106,7 @@ msgstr "Ресурс"
 msgid "Response code"
 msgstr "Код ответа"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Код ответа для шага \"%1$s\" сценария \"%2$s\"."
@@ -10115,7 +10115,7 @@ msgstr "Код ответа для шага \"%1$s\" сценария \"%2$s\"."
 msgid "Response time"
 msgstr "Время ответа"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Время ответа для шага \"%1$s\" сценария \"%2$s\"."
@@ -10521,11 +10521,7 @@ msgstr "Сценарий удален"
 msgid "Scenario disabled"
 msgstr "Сценарий отключен"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "Имя шага сценария должно содержать только печатные символы."
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "Номер шага сценария не может быть меньше 1."
 
@@ -11368,7 +11364,7 @@ msgstr "Шаг"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Шаг \"%1$s\" [%2$s из %3$s] ошибочный: %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "Шаг \"%s\" уже существует."
@@ -12860,67 +12856,67 @@ msgstr "Предупреждение"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Предупреждение. Невозможно отобразить более чем один элемент с типом \"Суммарный график\"."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "Предупреждение. Поле \"%1$s\" обязательно."
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "Предупреждение. Поле \"%1$s\" не является диапазоном IP."
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "Предупреждение. Поле \"%1$s\" не является IP адресом."
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "Предупреждение. Поле \"%1$s\" не является цветом."
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "Предупреждение. Поле \"%1$s\" не является десятичным числом."
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "Предупреждение. Поле \"%1$s\" не является списком целых чисел или диапазоном."
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "Предупреждение. Поле \"%1$s\" не является целым числом."
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "Предупреждение. Поле \"%1$s\" не является строкой."
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr "Предупреждение. В поле \"%1$s\" мультибайтовые символы ограничено."
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr "Предупреждение. Поле \"%1$s\" должно быть пропущено."
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "Предупреждение. Некорректное значение для поля \"%1$s\"."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Предупреждение. Некорректное значение для поля \"%1$s\": не может быть пустым."
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Предупреждение. Некорректное значение для поля \"%1$s\": оно должно быть между %2$s и %3$s."
@@ -12953,12 +12949,12 @@ msgstr "Веб"
 msgid "Web checks"
 msgstr "Веб-проверки"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Веб элемент данных \"%s\" создан."
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "Веб элемент данных с ключем \"%s\" уже существует."
@@ -13376,7 +13372,7 @@ msgstr "Zabbix агент (активный)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix агрегированный"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix получил некорректный запрос."
 

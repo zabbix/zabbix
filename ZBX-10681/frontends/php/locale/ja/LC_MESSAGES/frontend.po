@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-02-22 18:01+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
 "PO-Revision-Date: 2016-02-09 14:12+0300\n"
 "Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -2695,67 +2695,67 @@ msgstr "作成: \"%2$s\"のトリガー\"%1$s\"。"
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "作成: \"%2$s\"のトリガーのプロトタイプ\"%1$s\"。"
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "クリティカルエラー。フィールド\"%1$s\"はマルチバイト文字列を含んでいます。"
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "クリティカルエラー。フィールド\"%1$s\"は必須です。"
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "クリティカルエラー。フィールド\"%1$s\"はIPアドレスの範囲ではありません。"
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "クリティカルエラー。フィールド\"%1$s\"はIPアドレスではありません。"
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "クリティカルエラー。フィールド\"%1$s\"は色ではありません。"
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "クリティカルエラー。フィールド\"%1$s\"は10進数ではありません。"
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "クリティカルエラー。フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "クリティカルエラー。フィールド\"%1$s\"は整数値ではありません。"
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "クリティカルエラー。フィールド\"%1$s\"は文字列ではありません。"
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "クリティカルエラー。フィールド\"%1$s\"が入力されていません。"
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "クリティカルエラー。\"%2$s\"フィールドの値\"%1$s\"が正しくありません。"
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "クリティカルエラー。\"%2$s\"フィールドの値\"%1$s\"が正しくありません: %3$sから%4$sの間で設定してください。"
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "クリティカルエラー。フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
@@ -3873,7 +3873,7 @@ msgstr "Down"
 msgid "Download speed for scenario \"%s\"."
 msgstr "シナリオ\"%s\"のダウンロード速度"
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のダウンロード速度"
@@ -9006,7 +9006,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "認証されていないリクエストのため操作を実行できません。"
 
@@ -9303,7 +9303,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "障害"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "誤ったデータを受信しました"
 
@@ -10074,7 +10074,7 @@ msgstr "リソース"
 msgid "Response code"
 msgstr "レスポンスコード"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスコード"
@@ -10083,7 +10083,7 @@ msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスコード"
 msgid "Response time"
 msgstr "レスポンスタイム"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "シナリオ\"%2$s\"のステップ\"%1$s\"のレスポンスタイム"
@@ -10489,11 +10489,7 @@ msgstr "シナリオを削除しました"
 msgid "Scenario disabled"
 msgstr "シナリオを無効にしました"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "シナリオのステップ名には表示可能な文字のみ使用できます"
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "シナリオのステップ数は1以下にはできません。"
 
@@ -11336,7 +11332,7 @@ msgstr "ステップ"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "ステップ\"%1$s\" [%3$sの%2$s] 失敗: %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "ステップ\"%s\"はすでに存在します。"
@@ -12822,67 +12818,67 @@ msgstr "警告"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "警告。グラフの合計値は2つ以上表示できません。"
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "警告。フィールド\"%1$s\"は必須です。"
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "警告。フィールド\"%1$s\"はIPアドレスの範囲ではありません。"
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "警告。フィールド\"%1$s\"はIPアドレスではありません。"
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "警告。フィールド\"%1$s\"は色ではありません。"
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "警告。フィールド\"%1$s\"は10進数ではありません。"
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "警告。フィールド\"%1$s\"はリストや指定された範囲内の整数値ではありません。"
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "警告。フィールド\"%1$s\"は整数値ではありません。"
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "警告。フィールド\"%1$s\"は文字列ではありません。"
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr "警告。フィールド\"%1$s\"のマルチバイト文字列は制限されています。"
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr "警告。フィールド\"%1$s\"が入力されていません。"
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "警告。フィールド\"%1$s\"の値が正しくありません。"
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "警告。フィールド\"%1$s\"の値が正しくありません: 空の値を設定することはできません。"
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "警告。フィールド\"%1$s\"の値が正しくありません: %2$sから%3$sの間で設定してください。"
@@ -12911,12 +12907,12 @@ msgstr "ウェブ"
 msgid "Web checks"
 msgstr "ウェブ監視"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Webアイテム\"%s\"を作成しました。"
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "キー\"%s\"を持つWebアイテムはすでに存在します。"
@@ -13334,7 +13330,7 @@ msgstr "Zabbixエージェント(アクティブ)"
 msgid "Zabbix aggregate"
 msgstr "Zabbixアグリゲート"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "不正なURLパラメータ"
 
