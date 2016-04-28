@@ -231,7 +231,10 @@ static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *j
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			rc = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			rc = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
@@ -286,7 +289,10 @@ static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_r
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		/* if any of conditions are false the evaluation returns false */
 		if (SUCCEED != ret)
@@ -328,7 +334,10 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		/* if any of conditions are true the evaluation returns true */
 		if (SUCCEED == ret)
@@ -379,7 +388,10 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		zbx_free(value);
 

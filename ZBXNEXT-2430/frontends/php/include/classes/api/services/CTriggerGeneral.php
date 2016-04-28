@@ -1250,12 +1250,10 @@ abstract class CTriggerGeneral extends CApiService {
 	protected function validateTriggersWithMultipleTemplates(array $mt_triggers) {
 		switch (get_class($this)) {
 			case 'CTrigger':
-				$expressionData = new CTriggerExpression(['lldmacros' => false]);
 				$error_different_linkages = _('Trigger "%1$s" belongs to templates with different linkages.');
 				break;
 
 			case 'CTriggerPrototype':
-				$expressionData = new CTriggerExpression();
 				$error_different_linkages = _('Trigger prototype "%1$s" belongs to templates with different linkages.');
 				break;
 

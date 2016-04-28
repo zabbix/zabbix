@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+A.......S. [ZBXNEXT-1250] added two new options "regexp" and "iregexp" to the third parameter <operator> of trigger function count() (asaveljevs, gleb, ivo)
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Georgian, Greek, Italian, Japanese, Korean, Polish, Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
@@ -21,6 +22,10 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
+A......... [ZBX-8924] improved performance of alert.get method (Sasha)
+..F....... [ZBX-10686] updated success and error messages for triggers, items and graphs 'Copy' operations (Cemeris)
+A......... [ZBX-10693] fixed API configuration.import method for importing template and/or host with trigger prototype dependency (Cemeris)
 A.FG...PS. [ZBXNEXT-1263] added finishing touches to encryption support (Andris, asaveljevs, gleb, Oleg, Sandis)
 .......PS. [ZBX-10540] fixed encoding reset when Zabbix process auto-reconnects MySQL database (gleb)
 ..F....... [ZBX-10670] fixed disabling of script confirmation in Administration -> Script -> Edit form (Cemeris)
@@ -1362,6 +1367,9 @@ New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
+A......... [ZBX-8924] improved performance of alert.get method (Sasha)
+..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
 ........S. [ZBX-10674] prohibited 'band' operator for counting float values (gleb)
 ........S. [ZBX-10658] fixed count() evaluation for numeric values with operator and empty pattern (gleb)
 ........S. [ZBX-10312] changed sum(), str(), regexp(), iregexp() trigger functions to return 0 if there are no data in the requested range (wiper)
@@ -2764,6 +2772,7 @@ New features:
 A.F....... [ZBX-1357] updated French translation; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.17
