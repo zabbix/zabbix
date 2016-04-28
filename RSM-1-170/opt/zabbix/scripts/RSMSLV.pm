@@ -514,43 +514,83 @@ sub get_lastclock
 
 sub get_tlds
 {
-	my $service = shift;
+	my $service = shift;	# in case of 2 services one of which is 'DNS' it has to be specified first
+	my $service2 = shift;	# if 2 services have to be enabled, e. g. RDDS and EPP
 
 	$service = defined($service) ? uc($service) : 'DNS';
+	$service2 = uc($service2) if ($service2);
 
-	my $sql;
+	my $rows_ref;
 
-	if ($service eq 'DNS')
+	if (!$service2)
 	{
-		$sql =
-			"select h.host".
-			" from hosts h,hosts_groups hg,groups g".
-			" where h.hostid=hg.hostid".
-				" and hg.groupid=g.groupid".
-				" and g.name='TLDs'".
-				" and h.status=0";
+		if ($service eq 'DNS')
+		{
+			$rows_ref = db_select(
+				"select h.host".
+				" from hosts h,hosts_groups hg,groups g".
+				" where h.hostid=hg.hostid".
+					" and hg.groupid=g.groupid".
+					" and g.name='TLDs'".
+					" and h.status=0");
+		}
+		else
+		{
+			$rows_ref = db_select(
+				"select h.host".
+				" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+				" where h.hostid=hg.hostid".
+					" and hg.groupid=g.groupid".
+					" and h2.name=concat('Template ', h.host)".
+					" and g.name='TLDs'".
+					" and h2.hostid=hm.hostid".
+					" and hm.macro='{\$RSM.TLD.$service.ENABLED}'".
+					" and hm.value!=0".
+					" and h.status=0");
+		}
 	}
 	else
 	{
-		$sql =
-			"select h.host".
-			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
-			" where h.hostid=hg.hostid".
-				" and hg.groupid=g.groupid".
-				" and h2.name=concat('Template ', h.host)".
-				" and g.name='TLDs'".
-				" and h2.hostid=hm.hostid".
-				" and hm.macro='{\$RSM.TLD.$service.ENABLED}'".
-				" and hm.value!=0".
-				" and h.status=0";
+		if ($service eq 'DNS')
+		{
+			$rows_ref = db_select(
+				"select h.host,h2.hostid".
+				" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+				" where h.hostid=hg.hostid".
+					" and hg.groupid=g.groupid".
+					" and h2.name=concat('Template ', h.host)".
+					" and g.name='TLDs'".
+					" and h2.hostid=hm.hostid".
+					" and hm.macro='{\$RSM.TLD.$service2.ENABLED}'".
+					" and hm.value!=0".
+					" and h.status=0");
+		}
+		else
+		{
+			my $rows_ref2 = db_select(
+				"select h.host,h2.hostid".
+				" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
+				" where h.hostid=hg.hostid".
+					" and hg.groupid=g.groupid".
+					" and h2.name=concat('Template ', h.host)".
+					" and g.name='TLDs'".
+					" and h2.hostid=hm.hostid".
+					" and hm.macro='{\$RSM.TLD.$service.ENABLED}'".
+					" and hm.value!=0".
+					" and h.status=0");
+
+			my $idx = 0;
+			foreach my $row_ref (@{$rows_ref2})
+			{
+				next if (__get_host_macro($row_ref->[1], "{\$RSM.TLD.$service2.ENABLED}") == 0);
+
+				$rows_ref->[$idx++]->[0] = $row_ref->[0];
+			}
+		}
 	}
 
-	$sql .= " order by h.host";
-
-	my $rows_ref = db_select($sql);
-
 	my @tlds;
-	foreach my $row_ref (@$rows_ref)
+	foreach my $row_ref (sort {$a->[0] cmp $b->[0]} (@$rows_ref))
 	{
 		push(@tlds, $row_ref->[0]);
 	}
@@ -4589,6 +4629,18 @@ sub __get_macro
 	my $m = shift;
 
 	my $rows_ref = db_select("select value from globalmacro where macro='$m'");
+
+	fail("cannot find macro '$m'") unless (1 == scalar(@$rows_ref));
+
+	return $rows_ref->[0]->[0];
+}
+
+sub __get_host_macro
+{
+	my $hostid = shift;
+	my $m = shift;
+
+	my $rows_ref = db_select("select value from hostmacro where hostid=$hostid and macro='$m'");
 
 	fail("cannot find macro '$m'") unless (1 == scalar(@$rows_ref));
 

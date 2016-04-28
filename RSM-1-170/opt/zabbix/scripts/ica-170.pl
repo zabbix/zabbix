@@ -95,10 +95,10 @@ my $trigger_names_to_rename =
 	'PROBE {HOST.NAME}: 8.3 - Probe has been disable more than {$IP.MAX.OFFLINE.MANUAL} hours ago' => 'PROBE {HOST.NAME}: 8.3 - Probe has been disabled for over {$IP.MAX.OFFLINE.MANUAL} hours'
 };
 
-my $item_keys_to_rename =
-{
-	'rsm.slv.dns.upd' => 'rsm.slv.dns.udp.upd'
-};
+my $item_keys_to_remove =
+[
+	'rsm.slv.dns.upd'
+];
 
 my $item_names_to_rename =
 {
@@ -124,11 +124,9 @@ foreach my $from (keys(%{$trigger_names_to_rename}))
 }
 
 print("Renaming item keys...\n");
-foreach my $from (keys(%{$item_keys_to_rename}))
+foreach my $key (@{$item_keys_to_remove})
 {
-	my $to = $item_keys_to_rename->{$from};
-
-	db_exec("update items set key_='$to' where key_='$from'");
+	db_exec("delete from items where key_='$key'");
 }
 
 print("Renaming item names...\n");
@@ -143,6 +141,10 @@ print("Deleting obsoleted items...\n");
 foreach my $key (@{$slv_items_to_remove_like})
 {
 	db_exec("delete from items where key_ like '$key'");
+}
+foreach my $key (@{$item_keys_to_remove})
+{
+	db_exec("delete from items where key_='$key'");
 }
 
 {
@@ -324,17 +326,8 @@ sub __create_slv_monthly($$$)
 	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.pfailed'}))
 	{
 		__create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC,  [$applicationid]);
-	}
-	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.failed'}))
-	{
 		__create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,   [$applicationid]);
-	}
-	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.max'}))
-	{
 		__create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,   [$applicationid]);
-	}
-	unless ($zabbix->exist('item', {'hostid' => $hostid, 'key_' => $key_base . '.avg'}))
-	{
 		__create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
 	}
 }
@@ -385,11 +378,11 @@ sub __create_missing_slv_montly_items
 
 		if ($epp_enabled == 1)
 		{
-			__create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $hostid);
+			__create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
 
 			if ($rdds_enabled == 1)
 			{
-				__create_slv_monthly("RDDS update time", "rsm.slv.rdds.upd", $hostid);
+				__create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid);
 			}
 
 			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.login', $hostid);
