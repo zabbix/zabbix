@@ -555,7 +555,9 @@ if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
 	if ($expressionData->parse($_REQUEST['expression']) && count($expressionData->expressions) == 1) {
 		$exprPart = reset($expressionData->expressions);
 
-		preg_match('/\}([=><#]{1})([0-9]+)$/', $_REQUEST['expression'], $exprSymbols);
+		preg_match('/\}([=><#]{1})([0-9]+['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)$/', $_REQUEST['expression'],
+			$exprSymbols
+		);
 
 		if (isset($exprSymbols[1])) {
 			$_REQUEST['expr_type'] = $exprPart['functionName'].'['.$exprSymbols[1].']';
