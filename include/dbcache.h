@@ -188,7 +188,7 @@ typedef struct
 	char	*tag;
 	char	*value;
 }
-zbx_trigger_tag_t;
+zbx_tag_t;
 
 typedef struct _DC_TRIGGER
 {
@@ -504,5 +504,7 @@ typedef struct
 	zbx_hc_data_t	*head;
 }
 zbx_hc_item_t;
+
+void	zbx_free_tag(zbx_tag_t *tag);
 
 #endif
