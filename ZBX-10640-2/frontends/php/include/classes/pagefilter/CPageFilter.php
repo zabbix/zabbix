@@ -390,7 +390,7 @@ class CPageFilter {
 		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
-		if ($groupId === null && $this->config['DDRemember'] && $this->_profileIds['groupid']) {
+		if ($groupId === null) {
 			// set group only if host is in group or hostid is not set
 			$host = null;
 			$template = null;
@@ -512,7 +512,7 @@ class CPageFilter {
 			}
 
 			// select remembered selection
-			if (is_null($hostId) && $this->config['DDRemember'] && $this->_profileIds['hostid']) {
+			if ($hostId === null) {
 				$hostId = $this->_profileIds['hostid'];
 			}
 
