@@ -1,12 +1,12 @@
 Changes for 3.1.0
 
 New features:
+A.F.....S. [ZBXNEXT-2118] added support of trigger option "OK event generation" and recovery expression (Ivo, Oleg, Sasha, wiper)
 A.......S. [ZBXNEXT-1250] added two new options "regexp" and "iregexp" to the third parameter <operator> of trigger function count() (asaveljevs, gleb, ivo)
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Georgian, Greek, Italian, Japanese, Korean, Polish, Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
-A.F.....S. [ZBXNEXT-2118] added support of trigger option "OK event generation" and recovery expression (Ivo, Oleg, Sasha, wiper)
 ........S. [ZBX-3823] improved validation and error messaging when history, discovery, autoregistration and host availability data sent by passive and active proxies are processed on server (gleb)
 A......... [ZBX-10030] fixed API action update method request with only "actionid" property (Cemeris)
 ..F....... [ZBX-9972] changed SERVICE_SLA constant to match database default goodsla value (Cemeris)
