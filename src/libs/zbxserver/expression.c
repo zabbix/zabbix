@@ -3554,6 +3554,21 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
 				replace_to = zbx_strdup(replace_to, alert->message);
 		}
+		else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
+		{
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
+				{
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
+				{
+					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+							event->clock, event->ns);
+				}
+			}
+		}
 
 		if (1 == require_numeric && NULL != replace_to)
 		{
