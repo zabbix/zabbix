@@ -270,15 +270,17 @@ DB_TRIGGER;
 
 typedef struct
 {
-	DB_TRIGGER	trigger;
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	objectid;
-	int		source;
-	int		object;
-	int		clock;
-	int		value;
-	int		acknowledged;
-	int		ns;
+	DB_TRIGGER		trigger;
+	zbx_uint64_t		eventid;
+	zbx_uint64_t		objectid;
+	int			source;
+	int			object;
+	int			clock;
+	int			value;
+	int			acknowledged;
+	int			ns;
+
+	zbx_vector_ptr_t	tags;
 }
 DB_EVENT;
 
