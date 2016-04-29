@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
 ........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
 A......... [ZBX-8924] improved performance of alert.get method (Sasha)
 ..F....... [ZBX-10686] updated success and error messages for triggers, items and graphs 'Copy' operations (Cemeris)
@@ -1350,6 +1351,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
 ........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
 A......... [ZBX-8924] improved performance of alert.get method (Sasha)
 ..F....... [ZBX-8635] fixed trigger expression constructor support of value suffixes (Cemeris)
