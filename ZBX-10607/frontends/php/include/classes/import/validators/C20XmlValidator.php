@@ -24,16 +24,13 @@
  */
 class C20XmlValidator {
 
-	/**
-	 * Base validation function.
-	 *
-	 * @param array  $data	import data
-	 * @param string $path	XML path (for error reporting)
-	 *
-	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
-	 *						an array, if desired. Converted array is returned.
-	 */
-	public function validate(array $data, $path) {
+	private $rules = [];
+
+	public function getRules() {
+		return $this->rules;
+	}
+
+	public function __construct() {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'date' =>					['type' => XML_STRING, 'ex_validate' => [$this, 'validateDateTime']],
@@ -803,8 +800,6 @@ class C20XmlValidator {
 				]]
 			]]
 		]];
-
-		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
 	}
 
 	/**

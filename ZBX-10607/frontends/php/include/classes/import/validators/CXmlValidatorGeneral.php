@@ -29,8 +29,19 @@ class CXmlValidatorGeneral {
 	 */
 	private $rules;
 
-	public function __construct(array $rules) {
+	/**
+	 * @var string
+	 */
+	private $format;
+
+	public function __construct($format = 'xml', array $rules = []) {
+		$this->format = $format;
 		$this->rules = $rules;
+	}
+
+	public function setRules($rules) {
+		$this->rules = $rules;
+		return $this;
 	}
 
 	/**
@@ -124,7 +135,7 @@ class CXmlValidatorGeneral {
 					continue;
 				}
 
-				if ($tag !== $prefix.($index == 0 ? '' : $index)) {
+				if ($this->format === 'xml' && $tag !== $prefix.($index == 0 ? '' : $index)) {
 					throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
 						_s('unexpected tag "%1$s"', $tag)
 					));
