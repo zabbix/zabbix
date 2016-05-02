@@ -1197,6 +1197,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 		ZBX_STR2UCHAR(event->trigger.recovery_mode, row[6]);
 	}
 
+	ret = SUCCEED;
 out:
 	DBfree_result(result);
 

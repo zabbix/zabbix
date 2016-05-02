@@ -317,6 +317,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
 #define CONDITION_TYPE_HOST_METADATA		24
+#define CONDITION_TYPE_EVENT_TAG		25
+#define CONDITION_TYPE_EVENT_TAG_VALUE		26
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
