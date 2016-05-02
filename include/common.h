@@ -1157,4 +1157,6 @@ unsigned int	zbx_alarm_off(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
+int	zbx_strcmp_natural(const char *s1, const char *s2);
+
 #endif
