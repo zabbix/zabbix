@@ -118,6 +118,7 @@ static int	DBpatch_3010011(void)
 
 	return DBadd_foreign_key("event_tag", 1, &field);
 }
+
 #endif
 
 DBPATCH_START(3010)
