@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+.......PS. [ZBX-6563] fixed potential incorrect data from icmppongsec item with low latency hosts (viktors)
 A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
 ........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
 A......... [ZBX-8924] improved performance of alert.get method (Sasha)
