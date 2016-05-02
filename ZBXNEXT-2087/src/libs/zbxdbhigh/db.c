@@ -2034,9 +2034,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, co
  *             ...   - [IN] names of the fields to insert                     *
  *             NULL  - [IN] terminating NULL pointer                          *
  *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
- *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
  *           function.                                                        *
  *                                                                            *

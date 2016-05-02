@@ -87,7 +87,7 @@ void	add_event( unsigned char source, unsigned char object, zbx_uint64_t objecti
 		{
 			for (i = 0; i < trigger_tags->values_num; i++)
 			{
-				const zbx_tag_t	*trigger_tag = (zbx_tag_t *)trigger_tags->values[i];
+				const zbx_tag_t	*trigger_tag = (const zbx_tag_t *)trigger_tags->values[i];
 				zbx_tag_t	*tag;
 
 				tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
