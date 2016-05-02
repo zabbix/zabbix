@@ -127,6 +127,8 @@ while (0)
 
 void    *get_result_value_by_type(AGENT_RESULT *result, int require_type);
 
+#define ZBX_FLOAT_PRECISION	0.0001
+
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_LOG_REMOTE_COMMANDS;
 extern int	CONFIG_UNSAFE_USER_PARAMETERS;
