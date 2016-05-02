@@ -19,7 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
-require_once dirname(__FILE__).'/testClicks.php';
+
+/*
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
@@ -49,15 +50,17 @@ require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPagePopup.php';
-//require_once dirname(__FILE__).'/testPageQueueDetails.php';
-//require_once dirname(__FILE__).'/testPageQueueOverview.php';
-//require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
+require_once dirname(__FILE__).'/testPageQueueDetails.php';
+require_once dirname(__FILE__).'/testPageQueueOverview.php';
+require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
+*/
 require_once dirname(__FILE__).'/testPageUsers.php';
+/*
 require_once dirname(__FILE__).'/testFormAction.php';
 require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
@@ -72,6 +75,9 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
+*/
+require_once dirname(__FILE__).'/testFormAdministrationUserCreate.php';
+/*
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
@@ -103,14 +109,14 @@ require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
+*/
 
 class SeleniumTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
-		$suite->addTestSuite('testClicks');
-		$suite->addTestSuite('testPageActions');
+/*		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationAudit');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
@@ -135,9 +141,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageOverview');
 		$suite->addTestSuite('testPagePopup');
-//		$suite->addTestSuite('testPageQueueDetails');
-//		$suite->addTestSuite('testPageQueueOverview');
-//		$suite->addTestSuite('testPageQueueOverviewByProxy');
+		$suite->addTestSuite('testPageQueueDetails');
+		$suite->addTestSuite('testPageQueueOverview');
+		$suite->addTestSuite('testPageQueueOverviewByProxy');
 		$suite->addTestSuite('testPageScreens');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageSlideShows');
@@ -190,7 +196,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testUrlParameters');
+		$suite->addTestSuite('testUrlParameters');*/
 
 		return $suite;
 	}

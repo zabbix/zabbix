@@ -67,11 +67,9 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 	];
 
 	public function testInstallPage() {
-		$this->zbxTestLogin();
+		$this->zbxTestLogin('setup.php');
 
 		// welcome page
-
-		$this->zbxTestOpen('setup.php');
 
 		$this->zbxTestCheckTitle('Installation');
 		$this->zbxTestTextNotPresent($this->failIfExists);

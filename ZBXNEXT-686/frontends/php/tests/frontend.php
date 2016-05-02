@@ -27,7 +27,7 @@ class All {
 		$suite = new PHPUnit_Framework_TestSuite('Project');
 
 		$suite->addTest(GeneralTests::suite());
-		$suite->addTest(ApiJsonTests::suite());
+//		$suite->addTest(ApiJsonTests::suite());
 		$suite->addTest(SeleniumTests::suite());
 
 		return $suite;

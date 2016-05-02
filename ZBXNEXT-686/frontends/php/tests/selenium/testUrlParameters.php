@@ -1098,10 +1098,8 @@ class testUrlParameters extends CWebTest {
 	 * @dataProvider data
 	 */
 	public function testUrlParameters_UrlLoad($title, $test_cases) {
-		$this->zbxTestLogin();
-
 		foreach ($test_cases as $test_case) {
-			$this->zbxTestOpenWait($test_case['url']);
+			$this->zbxTestLogin($test_case['url']);
 			$this->zbxTestCheckTitle($title);
 			$this->zbxTestTextPresent($test_case['text_present']);
 			if (isset($test_case['text_not_present'])) {

@@ -27,8 +27,7 @@ class testPagePopup extends CWebTest {
 			'popup.php?srctbl=applications&srcfld1=name&dstfrm=form&dstfld1=fld1';
 
 	public function testPagePopupProxies_CheckLayout() {
-		$this->zbxTestLogin();
-		$this->zbxTestOpen($this->urlPopupProxies);
+		$this->zbxTestLogin($this->urlPopupProxies);
 		$this->zbxTestCheckTitle('Proxies');
 		$this->zbxTestTextPresent('Proxies');
 		$this->zbxTestTextPresent(['Name']);
@@ -44,8 +43,7 @@ class testPagePopup extends CWebTest {
 	}
 
 	public function testPagePopupApplications_CheckLayout() {
-		$this->zbxTestLogin();
-		$this->zbxTestOpen($this->urlPopupApplications);
+		$this->zbxTestLogin($this->urlPopupApplications);
 		$this->zbxTestCheckTitle('Applications');
 		$this->zbxTestTextPresent('Applications');
 		$this->zbxTestTextPresent(['Group', 'Host']);

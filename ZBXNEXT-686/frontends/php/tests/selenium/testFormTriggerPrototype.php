@@ -848,7 +848,7 @@ class testFormTriggerPrototype extends CWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestOpen('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait('link=Discovery rules');
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
@@ -873,7 +873,7 @@ class testFormTriggerPrototype extends CWebTest {
 				$triggerId = $row['triggerid'];
 			}
 
-			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestOpen('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);

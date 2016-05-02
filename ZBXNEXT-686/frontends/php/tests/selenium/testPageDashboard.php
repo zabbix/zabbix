@@ -24,7 +24,7 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestTextPresent('PERSONAL DASHBOARD');
+		$this->zbx_test_check_header('Dashboard');
 		$this->zbxTestTextPresent('Favourite graphs');
 		$this->zbxTestTextPresent('Favourite screens');
 		$this->zbxTestTextPresent('Favourite maps');

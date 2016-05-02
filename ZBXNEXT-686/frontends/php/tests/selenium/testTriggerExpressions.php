@@ -34,8 +34,7 @@ class testTriggerExpression extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
-		$this->zbxTestLogin();
-		$this->zbxTestOpen('tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C'.$where);
+		$this->zbxTestLogin('tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C'.$where);
 		$this->zbxTestCheckTitle('Test');
 		$this->input_type("//input[@type='text']", $what);
 

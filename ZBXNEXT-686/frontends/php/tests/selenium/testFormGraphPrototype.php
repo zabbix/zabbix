@@ -1197,7 +1197,7 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestOpen('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);
@@ -1223,7 +1223,7 @@ class testFormGraphPrototype extends CWebTest {
 				$graphid = $row['graphid'];
 			}
 
-			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestOpen('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 			$this->zbxTestClickWait('link='.$this->discoveryRule);

@@ -1630,7 +1630,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestOpen('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait('link=Discovery rules');
 
@@ -1688,7 +1688,7 @@ class testFormDiscoveryRule extends CWebTest {
 				$itemId = $row['itemid'];
 			}
 
-			$this->zbxTestOpenWait('hosts.php');
+			$this->zbxTestOpen('hosts.php');
 			$this->zbxTestClickWait('link='.$this->host);
 			$this->zbxTestClickWait("link=Discovery rules");
 

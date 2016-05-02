@@ -24,7 +24,7 @@ class testPageOverview extends CWebTest {
 	public function testPageOverview_CheckLayout() {
 		$this->zbxTestLogin('overview.php');
 		$this->zbxTestCheckTitle('Overview \[refreshed every 30 sec.\]');
-		$this->zbxTestTextPresent('OVERVIEW');
+		$this->zbx_test_check_header('Overview');
 		$this->zbxTestTextPresent('Hosts location');
 		$this->zbxTestTextPresent('Group');
 		$this->zbxTestTextPresent('Type');

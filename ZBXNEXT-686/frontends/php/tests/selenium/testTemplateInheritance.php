@@ -148,7 +148,7 @@ class testTemplateInheritance extends CWebTest {
 		switch ($result) {
 			case TEST_GOOD:
 				// check that the inherited item matches the original
-				$this->zbxTestOpenWait('hosts.php');
+				$this->zbxTestOpen('hosts.php');
 				$this->zbxTestClickWait('link='.$this->hostName);
 				$this->zbxTestClickWait('link=Items');
 				$this->zbxTestTextPresent("$template: $itemName");
@@ -212,7 +212,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('add');
 
 		// check that the inherited trigger matches the original
-		$this->zbxTestOpenWait('hosts.php');
+		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
 
@@ -263,7 +263,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('add');
 
 		// check that the inherited graph matches the original
-		$this->zbxTestOpenWait('hosts.php');
+		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
 
@@ -313,7 +313,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('add');
 
 		// check that the inherited rule matches the original
-		$this->zbxTestOpenWait('hosts.php');
+		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD');
@@ -366,7 +366,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('add');
 
 		// check that the inherited item prototype matches the original
-		$this->zbxTestOpenWait('hosts.php');
+		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link=Test LLD');
@@ -414,7 +414,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickWait('add');
 
 		// check that the inherited trigger prototype matches the original
-		$this->zbxTestOpenWait('hosts.php');
+		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link=Test LLD');
@@ -476,7 +476,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('add');
 
 		// check that the inherited graph matches the original
-		$this->zbxTestOpenWait('hosts.php');
+		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickWait('link='.$this->hostName);
 		$this->zbxTestClickWait('link=Discovery rules');
 		$this->zbxTestClickWait('link=Test LLD');

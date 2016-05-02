@@ -25,20 +25,18 @@ class testFormAdministrationUserCreate extends CWebTest {
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbxTestClickWait('link=Users');
-		$this->zbxTestClickWait('id=form');
+		$this->zbxTestClick('form');
 		$this->input_type('alias', 'User alias');
 		$this->input_type('name', 'User name');
 		$this->input_type('surname', 'User surname');
-		$this->click('id=add_group');
-		$this->waitForPopUp('zbx_popup', '30000');
-		$this->selectWindow('name=zbx_popup');
-		$this->click('id=new_groups_7');
-		$this->click('id=select');
-		$this->waitForPageToLoad('30000');
-		$this->selectWindow('null');
-		$this->input_type('password1', '123');
+		$this->zbxTestClick('add_group');
+		$this->zbx_wait_window_and_switch_to_it('zbx_popup');
+		$this->zbxTestCheckboxSelect('new_groups_7');
+		$this->zbxTestClick('select');
+		$this->webDriver->switchTo()->window('');
+		$this->wait_input_type('password1', '123');
 		$this->input_type('password2', '123');
-		$this->zbxTestClickWait('add');
+		$this->zbxTestClick('add');
+		$this->zbxTestTextPresent('User added');
 	}
 }
