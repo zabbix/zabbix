@@ -71,13 +71,11 @@ void	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s",
 			j.buffer);
 
-	alarm(CONFIG_TIMEOUT);
-
-	if (FAIL == zbx_tcp_send(sock, j.buffer))
+	if (FAIL == zbx_tcp_send_to(sock, j.buffer, CONFIG_TRAPPER_TIMEOUT))
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "Error while sending configuration. %s",
 				zbx_tcp_strerror());
-
-	alarm(0);
+	}
 out:
 	zbx_json_free(&j);
 
