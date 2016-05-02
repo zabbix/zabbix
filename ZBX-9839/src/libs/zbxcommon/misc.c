@@ -2961,7 +2961,7 @@ unsigned int	zbx_alarm_off(void)
  *     signal handlers. To avoid this we use localtime_r().                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
 {
 #ifdef _WINDOWS
 	struct _timeb	current_time;
@@ -2997,9 +2997,9 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 		day_diff = tm->tm_yday - tm_utc.tm_yday;
 
 		if (0 <= min_diff)
-			tz_offset->sign = '+';
+			tz_offset->tz_sign = '+';
 		else
-			tz_offset->sign = '-';
+			tz_offset->tz_sign = '-';
 
 		/* the date difference can be only 0, 1 or -1 otherwise it is a year change */
 		if ((day_diff == 1) || (day_diff < -1))
@@ -3007,11 +3007,11 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_tz_offset_t *tz_offset)
 		else if ((day_diff == -1) || (day_diff > 1))
 			min_diff -= HOURS_PER_DAY * MIN_PER_HOUR;
 
-		tz_offset->hours = abs(min_diff / MIN_PER_HOUR);
-		tz_offset->minutes = abs(min_diff % MIN_PER_HOUR);
+		tz_offset->tz_hour = abs(min_diff / MIN_PER_HOUR);
+		tz_offset->tz_min = abs(min_diff % MIN_PER_HOUR);
 #else
-		tz_offset->hours = tm->tm_gmtoff / SEC_PER_HOUR;
-		tz_offset->minutes = (abs(tm->tm_gmtoff) - abs(tz_offset->hours) * SEC_PER_HOUR) / SEC_PER_MIN;
+		tz_offset->tz_hour = tm->tm_gmtoff / SEC_PER_HOUR;
+		tz_offset->tz_min = (abs(tm->tm_gmtoff) - abs(tz_offset->tz_hour) * SEC_PER_HOUR) / SEC_PER_MIN;
 #endif
 	}
 }
