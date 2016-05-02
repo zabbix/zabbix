@@ -2002,10 +2002,7 @@ class CAction extends CApiService {
 		// is present and is not empty. Also collect conditions and operations for more validation.
 		foreach ($actions as $action) {
 			if ($action['eventsource'] != EVENT_SOURCE_TRIGGERS) {
-				$this->checkNoParameters(
-					$action,
-					['maintenance_mode'],
-					_('Cannot set "%1$s" for action "%2$s".'),
+				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot set "%1$s" for action "%2$s".'),
 					$action['name']
 				);
 			}
@@ -2100,10 +2097,7 @@ class CAction extends CApiService {
 			);
 
 			if ($actionsDb[$action['actionid']]['eventsource'] != EVENT_SOURCE_TRIGGERS) {
-				$this->checkNoParameters(
-					$action,
-					['maintenance_mode'],
-					_('Cannot update "%1$s" for action "%2$s".'),
+				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot update "%1$s" for action "%2$s".'),
 					$actionName
 				);
 			}
