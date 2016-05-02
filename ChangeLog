@@ -2,7 +2,7 @@ Changes for 3.1.0
 
 New features:
 A.F.....S. [ZBXNEXT-2118] added support of trigger option "OK event generation" and recovery expression (Ivo, Oleg, Sasha, wiper)
-A.......S. [ZBXNEXT-1250] added two new options "regexp" and "iregexp" to the third parameter <operator> of trigger function count(); thanks to Michael Kolomiets for patch (asaveljevs, gleb, ivo)
+A.......S. [ZBXNEXT-1250] added two new options "regexp" and "iregexp" to the third parameter <operator> of trigger function count(); thanks to Michael Kolomiets for patch (asaveljevs, gleb, Ivo)
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English (United States), French, Georgian, Greek, Italian, Japanese, Korean, Polish, Romanian, Russian, Slovak, Turkish, Ukrainian, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
