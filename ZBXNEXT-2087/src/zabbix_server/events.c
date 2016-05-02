@@ -102,6 +102,48 @@ void	add_event( unsigned char source, unsigned char object, zbx_uint64_t objecti
 	events_num++;
 }
 
+typedef struct
+{
+	zbx_uint64_t	eventid;
+	zbx_tag_t	*tag;
+}
+zbx_event_tag_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Event tag indexing hashset support functions                               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hash_t	zbx_event_tag_hash_func(const void *data)
+{
+	zbx_event_tag_t	*event_tag = (zbx_event_tag_t *)data;
+	zbx_hash_t	hash;
+
+	hash = ZBX_DEFAULT_STRING_HASH_FUNC(event_tag->tag->tag);
+
+	if ('\0' != *event_tag->tag->value)
+		hash = ZBX_DEFAULT_STRING_HASH_ALGO(event_tag->tag->value, strlen(event_tag->tag->value), hash);
+
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&event_tag->eventid, sizeof(event_tag->eventid), hash);
+
+	return hash;
+}
+
+static int	zbx_event_tag_compare_func(const void *d1, const void *d2)
+{
+	int	ret;
+
+	zbx_event_tag_t	*event_tag1 = (zbx_event_tag_t *)d1;
+	zbx_event_tag_t	*event_tag2 = (zbx_event_tag_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(event_tag1->eventid, event_tag2->eventid);
+
+	if (0 != (ret = strcmp(event_tag1->tag->tag, event_tag2->tag->tag)))
+		return ret;
+
+	return strcmp(event_tag1->tag->value, event_tag2->tag->value);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: save_events                                                      *
@@ -111,10 +153,15 @@ void	add_event( unsigned char source, unsigned char object, zbx_uint64_t objecti
  ******************************************************************************/
 static void	save_events()
 {
-	size_t		i;
-	zbx_db_insert_t	db_insert, db_insert_tags;
-	int		j, new_tags = 0;
-	zbx_uint64_t	eventid, eventtagid;
+	size_t			i;
+	zbx_db_insert_t		db_insert, db_insert_tags;
+	int			j;
+	zbx_uint64_t		eventid, eventtagid;
+	zbx_hashset_t		event_tags;
+	zbx_event_tag_t		*event_tag;
+	zbx_hashset_iter_t	iter;
+
+	zbx_hashset_create(&event_tags, events_num, zbx_event_tag_hash_func, zbx_event_tag_compare_func);
 
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
 			NULL);
@@ -123,43 +170,51 @@ static void	save_events()
 
 	for (i = 0; i < events_num; i++)
 	{
+		zbx_event_tag_t	event_tag_local;
+
 		events[i].eventid = eventid++;
 
 		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
 				events[i].objectid, events[i].clock, events[i].ns, events[i].value);
 
-		new_tags += events[i].tags.values_num;
+		event_tag_local.eventid = events[i].eventid;
+
+		for (j = 0; j < events[i].tags.values_num; j++)
+		{
+			event_tag_local.tag = (zbx_tag_t *)events[i].tags.values[j];
+
+			substitute_simple_macros(NULL, &events[i], NULL, NULL, NULL, NULL, NULL, NULL,
+					&event_tag_local.tag->tag, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+
+			substitute_simple_macros(NULL, &events[i], NULL, NULL, NULL, NULL, NULL, NULL,
+					&event_tag_local.tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+
+			if (NULL == (event_tag = zbx_hashset_search(&event_tags, &event_tag_local)))
+				zbx_hashset_insert(&event_tags, &event_tag_local, sizeof(event_tag_local));
+		}
 	}
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	if (0 == new_tags)
-		return
+	if (0 == event_tags.num_data)
+		goto out;
 
 	zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
 
-	eventtagid = DBget_maxid_num("event_tag", new_tags);
+	eventtagid = DBget_maxid_num("event_tag", event_tags.num_data);
 
-	for (i = 0; i < events_num; i++)
+	zbx_hashset_iter_reset(&event_tags, &iter);
+	while (NULL != (event_tag = zbx_hashset_iter_next(&iter)))
 	{
-		for (j = 0; j < events[i].tags.values_num; j++)
-		{
-			zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
-
-			substitute_simple_macros(NULL, &events[i], NULL, NULL, NULL, NULL, NULL, NULL, &tag->tag,
-					MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-			substitute_simple_macros(NULL, &events[i], NULL, NULL, NULL, NULL, NULL, NULL, &tag->value,
-					MACRO_TYPE_TRIGGER_TAG, NULL, 0);
-
-			zbx_db_insert_add_values(&db_insert_tags, eventtagid++, events[i].eventid, tag->tag,
-					tag->value);
-		}
+		zbx_db_insert_add_values(&db_insert_tags, eventtagid++, event_tag->eventid, event_tag->tag->tag,
+				event_tag->tag->value);
 	}
 
 	zbx_db_insert_execute(&db_insert_tags);
 	zbx_db_insert_clean(&db_insert_tags);
+out:
+	zbx_hashset_destroy(&event_tags);
 }
 
 /******************************************************************************
