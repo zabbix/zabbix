@@ -2114,6 +2114,12 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
 	int			i;
 	zbx_vector_ptr_t	tags;
 
+	if (0 == event->tags.values_num)
+	{
+		*replace_to = zbx_strdup(*replace_to, "");
+		return;
+	}
+
 	zbx_free(*replace_to);
 
 	/* copy tags to temporary vector for sorting */

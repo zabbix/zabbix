@@ -189,6 +189,15 @@ static void	save_events()
 			substitute_simple_macros(NULL, &events[i], NULL, NULL, NULL, NULL, NULL, NULL,
 					&event_tag_local.tag->value, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 
+			/* remove tags containing invalid characters */
+			if (0 != strchr(event_tag_local.tag->tag, '/') || 0 != strchr(event_tag_local.tag->value, '/'))
+			{
+				zbx_free_tag(event_tag_local.tag);
+				events[i].tags.values[j] = events[i].tags.values[--events[i].tags.values_num];
+				j--;
+				continue;
+			}
+
 			if (NULL == (event_tag = zbx_hashset_search(&event_tags, &event_tag_local)))
 				zbx_hashset_insert(&event_tags, &event_tag_local, sizeof(event_tag_local));
 		}
