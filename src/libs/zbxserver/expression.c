@@ -4423,7 +4423,7 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, int flags,
 	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
 
 	/* substitute_lld_macros() can't fail with only ZBX_TOKEN_LLD_MACRO flag set */
-	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, 0);
+	substitute_lld_macros(&context, jp_row, ZBX_TOKEN_LLD_MACRO, NULL, NULL, 0);
 
 	context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
 
@@ -4434,6 +4434,48 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, int flags,
 
 	zbx_free(context_esc);
 	zbx_free(context);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: validate_func_macro                                              *
+ *                                                                            *
+ * Purpose: checks if the function macro located at token contains supported  *
+ *          macro                                                             *
+ *                                                                            *
+ * Parameters: expression  - [IN] the expression containing function macro    *
+ *             token       - [IN] the token with function macro location data *
+ *             func_macros - [IN] NULL terminated array of supported macro    *
+ *                                names without enclosing brackets            *
+ *                                                                            *
+ * Return value: SUCCEED - the function macro is supported                    *
+ *               FAIL    - the function macro is not supported                *
+ *                                                                            *
+ ******************************************************************************/
+int	validate_func_macro(const char *expression, zbx_token_t *token, const char **func_macros)
+{
+	const char	*macro;
+	size_t		len;
+
+	if (NULL == func_macros)
+		return SUCCEED;
+
+	macro = expression + token->data.func_macro.macro.l + 1;
+
+	for (; NULL != *func_macros; func_macros++)
+	{
+		len = strlen(*func_macros);
+
+		if (0 != strncmp(macro, *func_macros, len))
+			continue;
+
+		if ('}' != macro[len] && (0 == isdigit(macro[len]) || '}' != macro[len + 1]))
+			continue;
+
+		return SUCCEED;
+	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -4451,8 +4493,17 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, int flags,
  *                            resolved considering quotes.                    *
  *                            Flag ZBX_MACRO_NUMERIC doesn't affect these     *
  *                            macros.                                         *
+ *                           ZBX_MACRO_FUNC - function macros will be         *
+ *                            skipped (lld macros inside function macros will *
+ *                            be ignored) for macros specified in func_macros *
+ *                            array                                           *
+ *             func_macros - [IN] an optional NULL terminated array of macros *
+ *                            supporting functions. This array is used when   *
+ *                            ZBX_MACRO_FUNC flag is specified to determine   *
+ *                            if a function macro is supported.               *
  *             error  - [OUT] should be not NULL if ZBX_MACRO_NUMERIC flag is *
  *                            set                                             *
+ *             max_erro_len - [IN] the size of error buffer                   *
  *                                                                            *
  * Return value: Always SUCCEED if numeric flag is not set, otherwise SUCCEED *
  *               if all discovery macros resolved to numeric values,          *
@@ -4461,7 +4512,7 @@ static void	process_user_macro_token(char **data, zbx_token_t *token, int flags,
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
+int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags, const char **func_macros,
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "substitute_lld_macros";
@@ -4491,8 +4542,19 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					pos = token.token.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					/* lld macros are not supported inside macro functions */
-					pos = token.token.r;
+					/* LLD macros must be ignored inside supported function macros.       */
+					/* For example when expanding lld macro {#LLDMACRO} with value "ABC"  */
+					/* {{ITEM.VALUE}.regsub({#LLDMACRO})} should be translated to         */
+					/*     {{ITEM.VALUE}.regsub({#LLDMACRO})}, but                        */
+					/* {{ITEM.KEY}.regsub({#LLDMACRO})} should be translated to           */
+					/*     {{ITEM.KEY}.regsub(ABC}                                        */
+					/* In the first case the expression contains valid function macro and */
+					/* lld macros are not supported inside function macro parameters.     */
+					/* In the second case {ITEM.KEY} macro does not support functions, so */
+					/* it is not a valid function macro and is processed as a plain text, */
+					/* expanding lld macros inside it.                                    */
+					if (SUCCEED == validate_func_macro(*data, &token, func_macros))
+						pos = token.token.r;
 					break;
 			}
 		}
@@ -4545,7 +4607,7 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
 		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL,
 				&param, macro_type, NULL, 0);
 	else
-		substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 
 	if (0 != level)
 		quote_key_param(&param, quoted);
