@@ -96,8 +96,6 @@ const char	*zbx_result_string(int result);
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
-#define ZBX_DM_DELIMITER	'\255'
-
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 
