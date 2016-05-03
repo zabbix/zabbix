@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+........S. [ZBX-10614] fixed crash during configuration update when context is added to a macro without context (gleb)
 .......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
 ..F....... [ZBX-10600] fixed proxy sorting in "Monitored by proxy" dropdown in host edit form (Ivo)
 A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
