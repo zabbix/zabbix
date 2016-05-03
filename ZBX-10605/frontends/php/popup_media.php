@@ -31,8 +31,8 @@ define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-if (CWebUser::$data['type'] == USER_TYPE_ZABBIX_USER
-		|| (CWebUser::$data['alias'] == ZBX_GUEST_USER && CWebUser::$data['type'] == USER_TYPE_ZABBIX_ADMIN)) {
+if (CWebUser::getType() == USER_TYPE_ZABBIX_USER
+		|| (CWebUser::$data['alias'] == ZBX_GUEST_USER && CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN)) {
 	access_deny();
 }
 
