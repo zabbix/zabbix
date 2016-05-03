@@ -731,7 +731,7 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 						if (6 == sscanf(timestamp, "%d-%d-%dT%d:%d:%d.%*s",
 								&year, &mon, &mday, &hour, &min, &sec))
 						{
-							if (FAIL != (t = zbx_utc_time(year, mon, mday, hour, min, sec)))
+							if (FAIL != zbx_utc_time(year, mon, mday, hour, min, sec, &t))
 								add_result->log->timestamp = t;
 						}
 

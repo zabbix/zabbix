@@ -1118,7 +1118,7 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset);
 
-int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 
