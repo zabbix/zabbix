@@ -557,11 +557,10 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
  ******************************************************************************/
 static int	day_in_month(int year, int mon)
 {
-#define is_leap_year(year) (((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0)
 	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	if (is_leap_year(year))
+	if (IS_LEAP_YEAR(year))
 		return month_leap[mon];
 	else
 		return month[mon];

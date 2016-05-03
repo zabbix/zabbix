@@ -2984,31 +2984,35 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
 	if (NULL != tz_offset)
 	{
 #if !defined(HAVE_TM_TM_GMTOFF)
-		int		day_diff, min_diff;
+		int		offset_min;
 		struct tm	tm_utc;
 #ifdef _WINDOWS
 		gmtime_s(&tm_utc, &current_time.time);
 #else
 		gmtime_r(&current_time.tv_sec, &tm_utc);
 #endif
+		while (tm->tm_year > tm_utc.tm_year)
+		{
+			tm->tm_year--;
+			tm->tm_yday += DAYS_PER_YEAR + IS_LEAP_YEAR(tm->tm_year);
+		}
 
-		min_diff = (tm->tm_hour - tm_utc.tm_hour) * MIN_PER_HOUR + (tm->tm_min - tm_utc.tm_min);
+		while (tm_utc.tm_year > tm->tm_year)
+		{
+			tm_utc.tm_year--;
+			tm_utc.tm_yday += DAYS_PER_YEAR + IS_LEAP_YEAR(tm_utc.tm_year);
+		}
 
-		day_diff = tm->tm_yday - tm_utc.tm_yday;
+		offset_min = ((tm->tm_yday - tm_utc.tm_yday) * HOURS_PER_DAY + tm->tm_hour - tm_utc.tm_hour) *
+				MIN_PER_HOUR + tm->tm_min - tm_utc.tm_min;
 
-		if (0 <= min_diff)
+		if (0 <= offset_min)
 			tz_offset->tz_sign = '+';
 		else
 			tz_offset->tz_sign = '-';
 
-		/* the date difference can be only 0, 1 or -1 otherwise it is a year change */
-		if ((day_diff == 1) || (day_diff < -1))
-			min_diff += HOURS_PER_DAY * MIN_PER_HOUR;
-		else if ((day_diff == -1) || (day_diff > 1))
-			min_diff -= HOURS_PER_DAY * MIN_PER_HOUR;
-
-		tz_offset->tz_hour = abs(min_diff / MIN_PER_HOUR);
-		tz_offset->tz_min = abs(min_diff % MIN_PER_HOUR);
+		tz_offset->tz_hour = abs(offset_min / MIN_PER_HOUR);
+		tz_offset->tz_min = abs(offset_min % MIN_PER_HOUR);
 #else
 		tz_offset->tz_hour = tm->tm_gmtoff / SEC_PER_HOUR;
 		tz_offset->tz_min = (abs(tm->tm_gmtoff) - abs(tz_offset->tz_hour) * SEC_PER_HOUR) / SEC_PER_MIN;

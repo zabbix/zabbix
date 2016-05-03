@@ -915,6 +915,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define HOURS_PER_DAY		24
 #define DAYS_PER_YEAR		365
 
+#define IS_LEAP_YEAR(year) (((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0)
+
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
