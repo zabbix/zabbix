@@ -3029,33 +3029,34 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
  *     hour  - [IN] hour                                                      *
  *     min   - [IN] minute                                                    *
  *     sec   - [IN] second                                                    *
+ *     t     - [OUT] Epoch timestamp                                          *
  *                                                                            *
- * Return value:  Epoch timestamp - given the value is positive               *
+ * Return value:  SUCCEED - given the Epoch timestamp is positive             *
  *                FAIL - otherwise                                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec)
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t)
 {
 	const int	epoch_year = 1970;
-	int		feb_year, nleapdays, t;
+	int		feb_year, nleapdays, ret = FAIL;
 
 	/* days before the month */
-	static const unsigned short month_day[12] =
+	static const unsigned int month_day[12] =
 	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
 	/* minimal sanity checking not to access outside of the array */
-	if (0 > sec && sec < 61)	/* minutes	[0-61] where 60, 61 being leap seconds	*/
-		return FAIL;
-	if (0 > min && min < 59)	/* minutes	[0-59]					*/
-		return FAIL;
-	if (0 > hour && hour < 23)	/* hours	[0-23]					*/
-		return FAIL;
-	if (0 >= mday && mday < 31)	/* day		[1-31]					*/
-		return FAIL;
-	if (0 >= mon && mon < 12)	/* months	[1-12]					*/
-		return FAIL;
+	if (0 > sec || sec > 61)	/* minutes	[0-61] where 60, 61 being leap seconds	*/
+		return ret;
+	if (0 > min || min > 59)	/* minutes	[0-59]					*/
+		return ret;
+	if (0 > hour || hour > 23)	/* hours	[0-23]					*/
+		return ret;
+	if (0 >= mday || mday > 31)	/* day		[1-31]					*/
+		return ret;
+	if (0 >= mon || mon > 12)	/* months	[1-12]					*/
+		return ret;
 	if (year < epoch_year)
-		return FAIL;
+		return ret;
 
 	/* checking if the date is past February */
 	feb_year = mon < 3 ? year - 1 : year;
@@ -3066,8 +3067,11 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec)
 	nleapdays = feb_year / 4 - feb_year / 100 + feb_year / 400 -
 			((epoch_year - 1) / 4 - (epoch_year - 1) / 100 + (epoch_year - 1) / 400);
 
-	t = ((((year - epoch_year) * DAYS_PER_YEAR + month_day[mon] + mday - 1 + nleapdays) *
+	*t = ((((year - epoch_year) * DAYS_PER_YEAR + month_day[mon] + mday - 1 + nleapdays) *
 			HOURS_PER_DAY + hour) * MIN_PER_HOUR + min) * SEC_PER_MIN + sec;
 
-	return (t < 0 ? FAIL : t);
+	if (0 < *t)
+		ret = SUCCEED;
+
+	return ret;
 }
