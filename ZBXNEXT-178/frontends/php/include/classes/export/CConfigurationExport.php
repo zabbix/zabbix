@@ -267,40 +267,14 @@ class CConfigurationExport {
 		}
 		unset($template);
 
-		// applications
-		$applications = API::Application()->get([
-			'output' => ['hostid', 'name'],
-			'hostids' => $templateIds,
-			'inherited' => false,
-			'preservekeys' => true
-		]);
-
-		foreach ($applications as $application) {
-			$templates[$application['hostid']]['applications'][] = ['name' => $application['name']];
-		}
-
-		// screens
-		$screens = API::TemplateScreen()->get([
-			'templateids' => $templateIds,
-			'selectScreenItems' => API_OUTPUT_EXTEND,
-			'noInheritance' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true
-		]);
-		$this->prepareScreenExport($screens);
-
-		foreach ($screens as $screen) {
-			if (!isset($templates[$screen['templateid']]['screens'])) {
-				$templates[$screen['templateid']]['screens'] = [];
-			}
-
-			$templates[$screen['templateid']]['screens'][] = $screen;
+		if ($templates) {
+			$templates = $this->gatherTemplateScreens($templates);
+			$templates = $this->gatherApplications($templates);
+			$templates = $this->gatherItems($templates);
+			$templates = $this->gatherDiscoveryRules($templates);
 		}
 
 		$this->data['templates'] = $templates;
-
-		$this->gatherTemplateItems($templateIds);
-		$this->gatherTemplateDiscoveryRules($templateIds);
 	}
 
 	/**
@@ -334,79 +308,110 @@ class CConfigurationExport {
 		}
 		unset($host);
 
-		// applications
+		if ($hosts) {
+			$hosts = $this->gatherProxies($hosts);
+			$hosts = $this->gatherApplications($hosts);
+			$hosts = $this->gatherItems($hosts);
+			$hosts = $this->gatherDiscoveryRules($hosts);
+		}
+
+		$this->data['hosts'] = $hosts;
+	}
+
+	/**
+	 * Get template screens from database.
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	protected function gatherTemplateScreens(array $templates) {
+		$screens = API::TemplateScreen()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'selectScreenItems' => API_OUTPUT_EXTEND,
+			'templateids' => array_keys($templates),
+			'noInheritance' => true,
+			'preservekeys' => true
+		]);
+
+		$this->prepareScreenExport($screens);
+
+		foreach ($screens as $screen) {
+			$templates[$screen['templateid']]['screens'][] = $screen;
+		}
+
+		return $templates;
+	}
+
+	/**
+	 * Get proxies from database.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function gatherProxies(array $hosts) {
+		$proxy_hostids = [];
+		$db_proxies = [];
+
+		foreach ($hosts as $host) {
+			if ($host['proxy_hostid'] != 0) {
+				$proxy_hostids[$host['proxy_hostid']] = true;
+			}
+		}
+
+		if ($proxy_hostids) {
+			$db_proxies = DBfetchArray(DBselect(
+				'SELECT h.hostid,h.host'.
+				' FROM hosts h'.
+				' WHERE '.dbConditionInt('h.hostid', array_keys($proxy_hostids))
+			));
+			$db_proxies = zbx_toHash($db_proxies, 'hostid');
+		}
+
+		foreach ($hosts as &$host) {
+			$host['proxy'] = ($host['proxy_hostid'] != 0) ? ['name' => $db_proxies[$host['proxy_hostid']]] : null;
+		}
+		unset($host);
+
+		return $hosts;
+	}
+
+	/**
+	 * Get host applications from database.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function gatherApplications(array $hosts) {
 		$applications = API::Application()->get([
 			'output' => ['hostid', 'name'],
-			'hostids' => $hostIds,
+			'hostids' => array_keys($hosts),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
-			'preservekeys' => true,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'preservekeys' => true
 		]);
 
 		foreach ($applications as $application) {
 			$hosts[$application['hostid']]['applications'][] = ['name' => $application['name']];
 		}
 
-		// proxies
-		$dbProxies = DBselect(
-			'SELECT h.hostid,h.host'.
-			' FROM hosts h'.
-			' WHERE '.dbConditionInt('h.hostid', zbx_objectValues($hosts, 'proxy_hostid'))
-		);
-
-		$proxies = [];
-
-		while ($proxy = DBfetch($dbProxies)) {
-			$proxies[$proxy['hostid']] = $proxy['host'];
-		}
-
-		foreach ($hosts as &$host) {
-			$host['proxy'] = $host['proxy_hostid'] ? ['name' => $proxies[$host['proxy_hostid']]] : null;
-		}
-		unset($host);
-
-		$this->data['hosts'] = $hosts;
-
-		$this->gatherHostItems($hostIds);
-		$this->gatherHostDiscoveryRules($hostIds);
+		return $hosts;
 	}
 
 	/**
 	 * Get hosts items from database.
 	 *
-	 * @param array $hostIds
-	 */
-	protected function gatherHostItems(array $hostIds) {
-		$items = API::Item()->get([
-			'output' => $this->dataFields['item'],
-			'selectApplications' => ['name', 'flags'],
-			'hostids' => $hostIds,
-			'inherited' => false,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'preservekeys' => true
-		]);
-
-		$items = $this->prepareItems($items);
-
-		foreach ($items as $item) {
-			if (!isset($this->data['hosts'][$item['hostid']]['items'])) {
-				$this->data['hosts'][$item['hostid']]['items'] = [];
-			}
-
-			$this->data['hosts'][$item['hostid']]['items'][] = $item;
-		}
-	}
-
-	/**
-	 * Get templates items from database.
+	 * @param array $hosts
 	 *
-	 * @param array $templateIds
+	 * @return array
 	 */
-	protected function gatherTemplateItems(array $templateIds) {
+	protected function gatherItems(array $hosts) {
 		$items = API::Item()->get([
 			'output' => $this->dataFields['item'],
 			'selectApplications' => ['name', 'flags'],
-			'hostids' => $templateIds,
+			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
@@ -415,12 +420,10 @@ class CConfigurationExport {
 		$items = $this->prepareItems($items);
 
 		foreach ($items as $item) {
-			if (!isset($this->data['templates'][$item['hostid']]['items'])) {
-				$this->data['templates'][$item['hostid']]['items'] = [];
-			}
-
-			$this->data['templates'][$item['hostid']]['items'][] = $item;
+			$hosts[$item['hostid']]['items'][] = $item;
 		}
+
+		return $hosts;
 	}
 
 	/**
@@ -485,51 +488,26 @@ class CConfigurationExport {
 	/**
 	 * Get hosts discovery rules from database.
 	 *
-	 * @param array $hostIds
-	 */
-	protected function gatherHostDiscoveryRules(array $hostIds) {
-		$items = API::DiscoveryRule()->get([
-			'hostids' => $hostIds,
-			'output' => $this->dataFields['drule'],
-			'selectFilter' => ['evaltype', 'formula', 'conditions'],
-			'inherited' => false,
-			'preservekeys' => true
-		]);
-
-		$items = $this->prepareDiscoveryRules($items);
-
-		foreach ($items as $item) {
-			if (!isset($this->data['hosts'][$item['hostid']]['items'])) {
-				$this->data['hosts'][$item['hostid']]['discoveryRules'] = [];
-			}
-
-			$this->data['hosts'][$item['hostid']]['discoveryRules'][] = $item;
-		}
-	}
-
-	/**
-	 * Get templates discovery rules from database.
+	 * @param array $hosts
 	 *
-	 * @param array $templateIds
+	 * @return array
 	 */
-	protected function gatherTemplateDiscoveryRules(array $templateIds) {
-		$items = API::DiscoveryRule()->get([
-			'hostids' => $templateIds,
+	protected function gatherDiscoveryRules(array $hosts) {
+		$discovery_rules = API::DiscoveryRule()->get([
 			'output' => $this->dataFields['drule'],
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
+			'hostids' => array_keys($hosts),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		$items = $this->prepareDiscoveryRules($items);
+		$discovery_rules = $this->prepareDiscoveryRules($discovery_rules);
 
-		foreach ($items as $item) {
-			if (!isset($this->data['templates'][$item['hostid']]['discoveryRules'])) {
-				$this->data['templates'][$item['hostid']]['discoveryRules'] = [];
-			}
-
-			$this->data['templates'][$item['hostid']]['discoveryRules'][] = $item;
+		foreach ($discovery_rules as $discovery_rule) {
+			$hosts[$discovery_rule['hostid']]['discoveryRules'][] = $discovery_rule;
 		}
+
+		return $hosts;
 	}
 
 	/**
