@@ -30,7 +30,6 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
-#include "comms.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 static int	sync_in_progress = 0;
@@ -4744,7 +4743,34 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
 
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
+	{
+		*error = zbx_strdup(*error, "internal error: invalid connection type");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+#endif
 	LOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(host)))
@@ -4772,16 +4798,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		zbx_tls_conn_attr_t	attr;
-
-		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr.issuer))
 		{
@@ -4800,16 +4816,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
-		zbx_tls_conn_attr_t	attr;
-
-		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-
 		if (NULL != dc_host->tls_dc_psk)
 		{
 			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr.psk_identity_len ||

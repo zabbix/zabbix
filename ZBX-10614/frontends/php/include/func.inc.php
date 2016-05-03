@@ -38,8 +38,7 @@ function zbx_is_callable(array $names) {
 
 /************ REQUEST ************/
 function redirect($url) {
-	$curl = new CUrl($url);
-	$curl->removeArgument('sid');
+	$curl = (new CUrl($url))->removeArgument('sid');
 	header('Location: '.$curl->getUrl());
 	exit;
 }
@@ -1465,10 +1464,11 @@ function getPageNumber() {
  *
  * @param array  $items				list of items
  * @param string $sortorder			the order in which items are sorted ASC or DESC
+ * @param CUrl $url					URL object containing arguments and query
  *
  * @return CDiv
  */
-function getPagingLine(&$items, $sortorder) {
+function getPagingLine(&$items, $sortorder, CUrl $url) {
 	global $page;
 
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
@@ -1510,7 +1510,6 @@ function getPagingLine(&$items, $sortorder) {
 
 		$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-		$url = CUrlFactory::getContextUrl();
 		if ($startPage > 1) {
 			$url->setArgument('page', 1);
 			$tags[] = new CLink(_('First'), $url->getUrl());
@@ -1668,8 +1667,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to a page
 	else {
 		// url to redirect the user to after he loggs in
-		$url = new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : '');
-		$url->removeArgument('sid');
+		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
 		$url = urlencode($url->toString());
 
 		// if the user is logged in - render the access denied message
