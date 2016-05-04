@@ -264,6 +264,7 @@ class CConfigurationExport {
 			$template['applications'] = [];
 			$template['discoveryRules'] = [];
 			$template['items'] = [];
+			$template['httptests'] = [];
 		}
 		unset($template);
 
@@ -272,6 +273,7 @@ class CConfigurationExport {
 			$templates = $this->gatherApplications($templates);
 			$templates = $this->gatherItems($templates);
 			$templates = $this->gatherDiscoveryRules($templates);
+			$templates = $this->gatherHttpTests($templates);
 		}
 
 		$this->data['templates'] = $templates;
@@ -305,6 +307,7 @@ class CConfigurationExport {
 			$host['applications'] = [];
 			$host['discoveryRules'] = [];
 			$host['items'] = [];
+			$host['httptests'] = [];
 		}
 		unset($host);
 
@@ -313,6 +316,7 @@ class CConfigurationExport {
 			$hosts = $this->gatherApplications($hosts);
 			$hosts = $this->gatherItems($hosts);
 			$hosts = $this->gatherDiscoveryRules($hosts);
+			$hosts = $this->gatherHttpTests($hosts);
 		}
 
 		$this->data['hosts'] = $hosts;
@@ -370,7 +374,9 @@ class CConfigurationExport {
 		}
 
 		foreach ($hosts as &$host) {
-			$host['proxy'] = ($host['proxy_hostid'] != 0) ? ['name' => $db_proxies[$host['proxy_hostid']]] : null;
+			$host['proxy'] = ($host['proxy_hostid'] != 0 && array_key_exists($host['proxy_hostid'], $db_proxies))
+				? ['name' => $db_proxies[$host['proxy_hostid']]]
+				: null;
 		}
 		unset($host);
 
@@ -655,6 +661,74 @@ class CConfigurationExport {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Get web scenarios from database.
+	 *
+	 * @param array $hosts
+	 *
+	 * @return array
+	 */
+	protected function gatherHttpTests(array $hosts) {
+		$httptests = API::HttpTest()->get([
+			'output' => ['name', 'hostid', 'applicationid', 'delay', 'retries', 'agent', 'http_proxy', 'variables',
+				'headers', 'status', 'authentication', 'http_user', 'http_password', 'verify_peer', 'verify_host',
+				'ssl_cert_file', 'ssl_key_file', 'ssl_key_password'
+			],
+			'selectSteps' => ['no', 'name', 'url', 'posts', 'variables', 'headers', 'follow_redirects', 'retrieve_mode',
+				'timeout', 'required', 'status_codes'
+			],
+			'hostids' => array_keys($hosts),
+			'inherited' => false,
+			'preservekeys' => true
+		]);
+
+		$httptests = $this->gatherHttpTestApplications($httptests);
+
+		foreach ($httptests as $httptest) {
+			$hosts[$httptest['hostid']]['httptests'][] = $httptest;
+		}
+
+		return $hosts;
+	}
+
+	/**
+	 * Get web scenario applications from database.
+	 *
+	 * @param array $httptests
+	 *
+	 * @return array
+	 */
+	protected function gatherHttpTestApplications(array $httptests) {
+		$applicationids = [];
+		$db_applications = [];
+
+		foreach ($httptests as $httptest) {
+			if ($httptest['applicationid'] != 0) {
+				$applicationids[$httptest['applicationid']] = true;
+			}
+		}
+
+		if ($applicationids) {
+			$db_applications = API::Application()->get([
+				'output' => ['name'],
+				'applicationids' => array_keys($applicationids),
+				'inherited' => false,
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($httptests as &$httptest) {
+			$httptest['application'] =
+				($httptest['applicationid'] != 0 && array_key_exists($httptest['applicationid'], $db_applications))
+					? ['name' => $db_applications[$httptest['applicationid']]['name']]
+					: null;
+			unset($httptest['applicationid']);
+		}
+		unset($httptest);
+
+		return $httptests;
 	}
 
 	/**
