@@ -1016,10 +1016,11 @@ function item_get_history($db_item, $clock, $ns) {
 			' WHERE itemid='.zbx_dbstr($db_item['itemid']).
 				' AND clock='.zbx_dbstr($clock).
 				' AND ns='.zbx_dbstr($ns);
-	if (null != ($row = DBfetch(DBselect($sql, 1)))) {
+
+	if ($row = DBfetch(DBselect($sql, 1))) {
 		$value = $row['value'];
 	}
-	if ($value != null) {
+	if ($value !== null) {
 		return $value;
 	}
 
