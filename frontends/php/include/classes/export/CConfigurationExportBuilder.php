@@ -397,27 +397,27 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format web scenario steps.
 	 *
-	 * @param array $steps
+	 * @param array $httpsteps
 	 *
 	 * @return array
 	 */
-	protected function formatHttpSteps(array $steps) {
+	protected function formatHttpSteps(array $httpsteps) {
 		$result = [];
 
-		order_result($steps, 'no');
+		order_result($httpsteps, 'no');
 
-		foreach ($steps as $step) {
+		foreach ($httpsteps as $httpstep) {
 			$result[] = [
-				'name' => $step['name'],
-				'url' => $step['url'],
-				'posts' => $step['posts'],
-				'variables' => $step['variables'],
-				'headers' => $step['headers'],
-				'follow_redirects' => $step['follow_redirects'],
-				'retrieve_mode' => $step['retrieve_mode'],
-				'timeout' => $step['timeout'],
-				'required' => $step['required'],
-				'status_codes' => $step['status_codes']
+				'name' => $httpstep['name'],
+				'url' => $httpstep['url'],
+				'posts' => $httpstep['posts'],
+				'variables' => $httpstep['variables'],
+				'headers' => $httpstep['headers'],
+				'follow_redirects' => $httpstep['follow_redirects'],
+				'retrieve_mode' => $httpstep['retrieve_mode'],
+				'timeout' => $httpstep['timeout'],
+				'required' => $httpstep['required'],
+				'status_codes' => $httpstep['status_codes']
 			];
 		}
 
