@@ -148,7 +148,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 				}
 			}
 
-			if (SUCCEED != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
+			if (ZBX_REGEXP_MATCH != regexp_match_ex(&regexps, trap, regex, ZBX_CASE_SENSITIVE))
 				goto next;
 		}
 
