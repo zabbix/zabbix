@@ -3014,7 +3014,12 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
 		tz_offset->tz_hour = abs(offset_min / (SEC_PER_HOUR / SEC_PER_MIN));
 		tz_offset->tz_min = abs(offset_min % (SEC_PER_HOUR / SEC_PER_MIN));
 #else
-		tz_offset->tz_hour = tm->tm_gmtoff / SEC_PER_HOUR;
+		if (0 <= tm->tm_gmtoff)
+			tz_offset->tz_sign = '+';
+		else
+			tz_offset->tz_sign = '-';
+
+		tz_offset->tz_hour = abs(tm->tm_gmtoff / SEC_PER_HOUR);
 		tz_offset->tz_min = (abs(tm->tm_gmtoff) - abs(tz_offset->tz_hour) * SEC_PER_HOUR) / SEC_PER_MIN;
 #endif
 	}
