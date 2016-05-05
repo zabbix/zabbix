@@ -2411,7 +2411,7 @@ static void	lld_triggers_save(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger_pro
 					d = ",";
 				}
 
-				if (0 != (trigger->flags & ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION))
+				if (0 != (tag->flags & ZBX_FLAG_LLD_TAG_UPDATE_VALUE))
 				{
 					value_esc = DBdyn_escape_string(tag->value);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%svalue='%s'", d, value_esc);
