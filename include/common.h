@@ -1153,4 +1153,90 @@ unsigned int	zbx_alarm_off(void);
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
 
+/* {} tokens used in expressions */
+#define ZBX_TOKEN_OBJECTID	0x0001
+#define ZBX_TOKEN_MACRO		0x0002
+#define ZBX_TOKEN_LLD_MACRO	0x0004
+#define ZBX_TOKEN_USER_MACRO	0x0008
+#define ZBX_TOKEN_FUNC_MACRO	0x0010
+#define ZBX_TOKEN_SIMPLE_MACRO	0x0020
+
+/* additional token flags */
+#define ZBX_TOKEN_NUMERIC	0x8000
+
+/* location of a substring */
+typedef struct
+{
+	/* left position */
+	size_t	l;
+	/* right position */
+	size_t	r;
+}
+zbx_strloc_t;
+
+/* data used by macros, ldd macros and objectid tokens */
+typedef struct
+{
+	zbx_strloc_t	name;
+}
+zbx_token_macro_t;
+
+/* data used by user macros */
+typedef struct
+{
+	/* macro name */
+	zbx_strloc_t	name;
+	/* macro context, for macros without context the context.l and context.r fields are set to 0 */
+	zbx_strloc_t	context;
+}
+zbx_token_user_macro_t;
+
+/* data used by macro functions */
+typedef struct
+{
+	/* the macro including the opening and closing brackets {}, for example: {ITEM.VALUE} */
+	zbx_strloc_t	macro;
+	/* function + parameters, for example: regsub("([0-9]+)", \1) */
+	zbx_strloc_t	func;
+}
+zbx_token_func_macro_t;
+
+/* data used by simple (host:key) macros */
+typedef struct
+{
+	/* host name, supporting simple macros as a host name, for example Zabbix server or {HOST.HOST} */
+	zbx_strloc_t	host;
+	/* key + parameters, supporting {ITEM.KEYn} macro, for example system.uname or {ITEM.KEY1}  */
+	zbx_strloc_t	key;
+	/* function + parameters, for example avg(5m) */
+	zbx_strloc_t	func;
+}
+zbx_token_simple_macro_t;
+
+/* the token type specific data */
+typedef union
+{
+	zbx_token_macro_t		objectid;
+	zbx_token_macro_t		macro;
+	zbx_token_macro_t		lld_macro;
+	zbx_token_user_macro_t		user_macro;
+	zbx_token_func_macro_t		func_macro;
+	zbx_token_simple_macro_t	simple_macro;
+}
+zbx_token_data_t;
+
+/* {} token data */
+typedef struct
+{
+	/* token type, see ZBX_TOKEN_ defines */
+	int			type;
+	/* the token location in expression including opening and closing brackets {} */
+	zbx_strloc_t		token;
+	/* the token type specific data */
+	zbx_token_data_t	data;
+}
+zbx_token_t;
+
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
+
 #endif
