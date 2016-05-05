@@ -2385,7 +2385,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 {
 	const char		*__function_name = "substitute_simple_macros";
 
-	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
+	char			*p, *p_next, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED;
 	size_t			data_alloc, data_len;
@@ -2421,6 +2421,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
 	{
+		p_next = bl + 1;
+
 		indexed_macro = 0;
 		require_numeric = 0;
 
@@ -2432,11 +2434,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
 			{
-				p = bl + 1;
+				p = p_next;
 				continue;
 			}
 
 			br = bl + macro_r;
+			p_next = br + 1;
 		}
 		else
 		{
@@ -3590,12 +3593,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 
 			memcpy(bl, replace_to, sz_r);
-			p = bl + sz_r;
+			p_next = bl + sz_r;
 
 			zbx_free(replace_to);
 		}
-		else
-			p = bl + 1;
+
+		p = p_next;
 	}
 
 	zbx_vector_uint64_destroy(&hostids);

@@ -3574,12 +3574,9 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 {
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
-	const char	*ptr_context;
+	const char	*ptr_context = context;
 
-	for (ptr_context = context; ' ' == *ptr_context; ptr_context++)
-		;
-
-	if ('"' == *ptr_context)
+	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
 
 	for (; '\0' != *ptr_context; ptr_context++)
@@ -3598,9 +3595,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
 
 	*ptr_buffer++ = '"';
-
-	while (' ' == *context)
-		*ptr_buffer++ = *context++;
 
 	while ('\0' != *context)
 	{
