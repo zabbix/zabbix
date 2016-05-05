@@ -54,6 +54,7 @@ class CMacroParser extends CParser {
 	 * Array of strings to search for.
 	 *
 	 * @param array $macros		the list of macros, for example ['{ITEM.VALUE}', '{HOST.HOST}']
+	 * @param array $options
 	 */
 	public function __construct(array $macros, array $options = []) {
 		$this->set_parser = new CSetParser(array_map(function($macro) { return substr($macro, 1, -1); }, $macros));
