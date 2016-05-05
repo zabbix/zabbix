@@ -2970,7 +2970,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
 
 	*milliseconds = current_time.millitm;
 
-	*tm = *localtime(current_time.time);
+	*tm = *localtime(&current_time.time);
 #else
 	struct timeval	current_time;
 
