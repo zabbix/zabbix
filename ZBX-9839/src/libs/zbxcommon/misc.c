@@ -2994,25 +2994,25 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
 		while (tm->tm_year > tm_utc.tm_year)
 		{
 			tm->tm_year--;
-			tm->tm_yday += DAYS_PER_YEAR + IS_LEAP_YEAR(tm->tm_year);
+			tm->tm_yday += (SEC_PER_YEAR / SEC_PER_DAY) + IS_LEAP_YEAR(tm->tm_year);
 		}
 
 		while (tm_utc.tm_year > tm->tm_year)
 		{
 			tm_utc.tm_year--;
-			tm_utc.tm_yday += DAYS_PER_YEAR + IS_LEAP_YEAR(tm_utc.tm_year);
+			tm_utc.tm_yday += (SEC_PER_YEAR / SEC_PER_DAY) + IS_LEAP_YEAR(tm_utc.tm_year);
 		}
 
-		offset_min = ((tm->tm_yday - tm_utc.tm_yday) * HOURS_PER_DAY + tm->tm_hour - tm_utc.tm_hour) *
-				MIN_PER_HOUR + tm->tm_min - tm_utc.tm_min;
+		offset_min = ((tm->tm_yday - tm_utc.tm_yday) * (SEC_PER_DAY / SEC_PER_HOUR) + tm->tm_hour -
+				tm_utc.tm_hour) * (SEC_PER_HOUR / SEC_PER_MIN) + tm->tm_min - tm_utc.tm_min;
 
 		if (0 <= offset_min)
 			tz_offset->tz_sign = '+';
 		else
 			tz_offset->tz_sign = '-';
 
-		tz_offset->tz_hour = abs(offset_min / MIN_PER_HOUR);
-		tz_offset->tz_min = abs(offset_min % MIN_PER_HOUR);
+		tz_offset->tz_hour = abs(offset_min / (SEC_PER_HOUR / SEC_PER_MIN));
+		tz_offset->tz_min = abs(offset_min % (SEC_PER_HOUR / SEC_PER_MIN));
 #else
 		tz_offset->tz_hour = tm->tm_gmtoff / SEC_PER_HOUR;
 		tz_offset->tz_min = (abs(tm->tm_gmtoff) - abs(tz_offset->tz_hour) * SEC_PER_HOUR) / SEC_PER_MIN;
@@ -3071,8 +3071,8 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	nleapdays = feb_year / 4 - feb_year / 100 + feb_year / 400 -
 			((epoch_year - 1) / 4 - (epoch_year - 1) / 100 + (epoch_year - 1) / 400);
 
-	*t = ((((year - epoch_year) * DAYS_PER_YEAR + month_day[mon] + mday - 1 + nleapdays) *
-			HOURS_PER_DAY + hour) * MIN_PER_HOUR + min) * SEC_PER_MIN + sec;
+	*t = ((((year - epoch_year) * (SEC_PER_YEAR / SEC_PER_DAY) + month_day[--mon] + mday - 1 + nleapdays) *
+			(SEC_PER_DAY / SEC_PER_HOUR) + hour) * (SEC_PER_HOUR / SEC_PER_MIN) + min) * SEC_PER_MIN + sec;
 
 	if (0 < *t)
 		ret = SUCCEED;
