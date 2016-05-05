@@ -16,12 +16,12 @@ body {
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
-	margin-bottom: 60px; 
+	margin-bottom: 60px;
 	min-width: 950px;
 }
 
 a {
-  
+
 	&:link {
 		color: $link-color;
 		text-decoration: none;
@@ -31,11 +31,11 @@ a {
 
 	&:visited {
 		color: $link-visited-color;
-		text-decoration: none; 
+		text-decoration: none;
 	}
 
 	&:hover {
-		color: $link-hover-color; 
+		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
@@ -158,7 +158,7 @@ ol {
 
 	li {
 		padding: 0 0 0.7em 0;
-	} 
+	}
 }
 
 p {
@@ -256,7 +256,7 @@ nav {
 				left: 0;
 				right: 0;
 				margin: 0 auto;
-				width: 0; 
+				width: 0;
 				height: 0;
 				font-size: 0;
 				line-height: 0;
@@ -407,7 +407,7 @@ ul.top-nav-icons {
 		padding: 0 12px;
 
 		&:last-child {
-			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
+			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
 		}
 	}
 }
@@ -471,8 +471,8 @@ ul.top-nav-icons {
 }
 
 %arrow {
-	width: 0; 
-	height: 0; 
+	width: 0;
+	height: 0;
 	font-size: 0;
 	line-height: 0;
 	display: inline-block;
@@ -509,7 +509,7 @@ article {
 // Obgect Group Navigation
 .object-group {
 	margin: 0 0 10px 0;
-	
+
 	li {
 		display: inline-block;
 		padding: 0 5px 0 0;
@@ -540,7 +540,7 @@ article {
 }
 
 .hor-list {
-	
+
 	li {
 		display: inline-block;
 		margin: 0 6px 0 0;
@@ -586,7 +586,7 @@ footer {
 	width: 100%;
     background-color: $ui-bg-color;
     border: 1px solid $ui-border-color;
-	
+
 	thead th {
 		font-size: $font-h3-size;
 		color: $font-alt-color;
@@ -644,7 +644,7 @@ footer {
 	    	&:active {
 	    		text-decoration: none;
 	    		background-color: $ui-hover-color
-	    	}	    
+	    	}
 	    }
 	}
 
@@ -755,7 +755,7 @@ footer {
 	&.paging-selected {
 		color: $font-selected-color;
 		border-color: $ui-bg-selected-color;
-		background-color: $ui-bg-selected-color;	
+		background-color: $ui-bg-selected-color;
 		position: relative;
 		z-index: 1;
 
@@ -909,7 +909,7 @@ footer {
 		padding: 0 10px;
 	}
 
-	.list-table {                                       
+	.list-table {
 		margin-bottom: -10px;
 		border: none;
 
@@ -1070,7 +1070,7 @@ footer {
 .multiselect-matches {
 	padding: 0.4em 5px;
 	color: $font-color;
-	font-weight: bold; 
+	font-weight: bold;
 	@extend .multiselect-suggest;
 }
 
@@ -1110,7 +1110,7 @@ footer {
 	background-color: $action-hover-color;
 	margin: 5px 0;
 	@include border-radius(2px);
-	
+
 	button {
 
 		&:first-child {
@@ -1229,7 +1229,7 @@ footer {
 
 		a {
 			margin: 0 4px;
-		} 
+		}
 	}
 
 	.period {
@@ -1486,13 +1486,13 @@ footer {
 		&:checked + label {
 			color: $white;
 			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;;	
+			background-color: $ui-bg-selected-color;
 			position: relative;
 			z-index: 1;
 		}
 
 		&:checked:focus + label {
-			border-color: $form-border-focus-color;	
+			border-color: $form-border-focus-color;
 			position: relative;
 			z-index: 2;
 		}
@@ -1524,7 +1524,7 @@ input {
 		family: $font-stack;
 		size: $font-form-size;
 	}
-	
+
 	&[type="text"] {
 		@extend %form-input-height-padding;
 		@extend %form-input-style;
@@ -1575,7 +1575,7 @@ input {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
-	}  
+	}
 }
 
 textarea {
@@ -1596,7 +1596,7 @@ textarea {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
-	}   
+	}
 }
 
 select {
@@ -1635,7 +1635,7 @@ select {
 	&[readonly] {
 		color: $font-color!important;
 		@extend %form-disabled;
-	}   
+	}
 }
 
 .form-input-margin {
@@ -1990,7 +1990,7 @@ button[disabled] {
 			&:active {
 				background-color: $ui-hover-color;
 			}
-		} 
+		}
 
 		&.ui-tabs-active:first-child {
 			border-left: 0;
@@ -2214,7 +2214,7 @@ $form-icon-btn: (
 	}
 
 	ul li {
-		padding: 16px 0 0 0; 
+		padding: 16px 0 0 0;
 		font-size: $font-top-nav-size;
 
 		&.sign-in-txt {
@@ -2222,7 +2222,7 @@ $form-icon-btn: (
 		}
 	}
 
-	label {                                                                                                                                                                                                                                                                                                              
+	label {
 		display: inline-block;
 		margin: 0 0 2px 0;
 	}
@@ -2294,7 +2294,7 @@ $form-icon-btn: (
 		th {
 			@extend %dashbrd-widget-td;
 		}
-		
+
 		td {
 			@extend %dashbrd-widget-td;
 		}
@@ -2368,7 +2368,7 @@ $form-icon-btn: (
 		display: inline-block;
 		padding: 8px 0 8px 13px
 	}
-} 
+}
 
 // Action Menus, Pop-up Menus
 .action-menu {
@@ -2402,7 +2402,7 @@ $form-icon-btn: (
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
-		@extend %overflow-ellipsis; 
+		@extend %overflow-ellipsis;
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
@@ -2496,7 +2496,7 @@ $form-icon-btn: (
 		th {
 			@extend %dashbrd-widget-td;
 		}
-		
+
 		td {
 			@extend %dashbrd-widget-td;
 		}
@@ -3068,7 +3068,11 @@ a.blue {
 	min-width: 0.7em;
 	line-height: 1em;
 	display: inline-block;
-	@include border-radius(2px); 
+	@include border-radius(2px);
+}
+
+.lighter-yellow-bg {
+  background-color: $lighter-yellow;
 }
 
 .green-bg {
@@ -3323,7 +3327,7 @@ td.inactive-bg {
 
 			&:only-child {
 				margin-left: 0;
-			} 
+			}
 		}
 
 		&.msg-details-border {
@@ -3423,7 +3427,7 @@ td.inactive-bg {
 }
 
 a.overlay-close-btn {
-	@extend .overlay-close-btn; 
+	@extend .overlay-close-btn;
 }
 
 .subfilter-disable-btn {
@@ -3754,7 +3758,7 @@ title: Tables
 name: table
 ---
 
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
 
 ```html_example
 <div class="overflow-table">
@@ -3989,7 +3993,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
             <td>
                <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a> 
+               <a href="#">Collapsed</a>
                <div class="treeview"><span class="arrow-down"></span></div>
                <a href="#">Expanded</a>
             </td>
@@ -3998,7 +4002,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Severity</td>
             <td>asdasd</td>
             <td class="normal-bg">
-               <span class="link-action">25</span> 
+               <span class="link-action">25</span>
             </td>
          </tr>
       </tbody>
@@ -4053,7 +4057,7 @@ Forms contain UI elements that are used to submit information.
 
 ##Inputs
 
-Text on html5 input types 
+Text on html5 input types
 
 ```html_example
 <ul class="table-forms">
@@ -4228,7 +4232,7 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 
 ##Contextual Dialogs
 
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
 <ul class="action-menu">
@@ -4526,7 +4530,7 @@ title: Labels
 name: labels
 ---
 
-Labels add information. Different colors 
+Labels add information. Different colors
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
