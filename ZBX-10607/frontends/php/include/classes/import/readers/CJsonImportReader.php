@@ -30,6 +30,12 @@ class CJsonImportReader extends CImportReader {
 	 */
 	public function read($string) {
 		$json = new CJson;
-		return $json->decode($string, true);
+		$data = $json->decode($string, true);
+
+		if ($data === null){
+			throw new Exception(_s('Cannot read JSON: %1$s', json_last_error_msg()));
+		}
+
+		return $data;
 	}
 }
