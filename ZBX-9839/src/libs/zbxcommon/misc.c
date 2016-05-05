@@ -2987,7 +2987,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
 		int		offset_min;
 		struct tm	tm_utc;
 #ifdef _WINDOWS
-		gmtime_s(&tm_utc, &current_time.time);
+		tm_utc = *gmtime(&current_time.time);
 #else
 		gmtime_r(&current_time.tv_sec, &tm_utc);
 #endif
