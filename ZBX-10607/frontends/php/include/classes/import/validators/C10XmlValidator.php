@@ -25,6 +25,18 @@
 class C10XmlValidator {
 
 	/**
+	 * @var string
+	 */
+	private $format = '';
+
+	/**
+	 * @param string $format format of import source
+	 */
+	public function __construct($format) {
+		$this->format = $format;
+	}
+
+	/**
 	 * Base validation function.
 	 *
 	 * @param array  $data	import data
@@ -329,7 +341,7 @@ class C10XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 	}
 
 	/**
@@ -490,7 +502,7 @@ class C10XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 		}
 
 		return $data;
