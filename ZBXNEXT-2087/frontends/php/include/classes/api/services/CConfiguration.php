@@ -83,6 +83,7 @@ class CConfiguration extends CApiService {
 		$converterChain = new CConverterChain();
 		$converterChain->addConverter('1.0', $importConverterFactory->getObject('1.0'));
 		$converterChain->addConverter('2.0', $importConverterFactory->getObject('2.0'));
+		$converterChain->addConverter('3.0', $importConverterFactory->getObject('3.0'));
 
 		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
 		$adapter->load($data);
@@ -90,8 +91,7 @@ class CConfiguration extends CApiService {
 		$configurationImport = new CConfigurationImport(
 			$params['rules'],
 			new CImportReferencer(),
-			new CImportedObjectContainer(),
-			new CTriggerExpression()
+			new CImportedObjectContainer()
 		);
 
 		return $configurationImport->import($adapter);

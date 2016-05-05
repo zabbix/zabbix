@@ -1312,13 +1312,13 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-				if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-						SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
-								ZBX_IGNORE_CASE) &&
-						SUCCEED == regexp_match_ex(&regexps, provider, key_source,
-								ZBX_IGNORE_CASE) &&
-						SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
-								ZBX_CASE_SENSITIVE))
+				if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity,
+								key_severity, ZBX_IGNORE_CASE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, provider,
+								key_source, ZBX_IGNORE_CASE) &&
+						ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid,
+								key_logeventid, ZBX_CASE_SENSITIVE))
 				{
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
@@ -1408,11 +1408,12 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 
 			zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
 
-			if (SUCCEED == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_severity, key_severity,
+			if (ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, value, pattern, ZBX_CASE_SENSITIVE) &&
+					ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_severity, key_severity,
 							ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, source, key_source, ZBX_IGNORE_CASE) &&
-					SUCCEED == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
+					ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, source, key_source,
+							ZBX_IGNORE_CASE) &&
+					ZBX_REGEXP_MATCH == regexp_match_ex(&regexps, str_logeventid, key_logeventid,
 							ZBX_CASE_SENSITIVE))
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
