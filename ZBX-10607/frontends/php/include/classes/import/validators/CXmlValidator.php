@@ -47,15 +47,14 @@ class CXmlValidator {
 	 * @return array		Validator does some manipulation for the incoming data. For example, converts empty tags to
 	 *						an array, if desired. Converted array is returned.
 	 */
-	public function validate(array $data, $format) {
+	public function validate(array $data) {
 		$rules = ['type' => XML_ARRAY, 'rules' => [
 			'zabbix_export' => ['type' => XML_ARRAY | XML_REQUIRED, 'check_unexpected' => false, 'rules' => [
 				'version' => ['type' => XML_STRING | XML_REQUIRED]
 			]]
 		]];
 
-		$xml_validator = (new CXmlValidatorGeneral($format, $rules));
-		$data = $xml_validator->validate($data, '/');
+		$data = (new CXmlValidatorGeneral($rules))->validate($data, '/');
 		$version = $data['zabbix_export']['version'];
 
 		if (!array_key_exists($version, $this->versionValidators)) {
@@ -64,10 +63,7 @@ class CXmlValidator {
 			);
 		}
 
-		$data['zabbix_export'] = $xml_validator
-			->setRules(
-				(new $this->versionValidators[$version]())->getRules()
-			)
+		$data['zabbix_export'] = (new $this->versionValidators[$version]())
 			->validate($data['zabbix_export'], '/zabbix_export');
 
 		return $data;
