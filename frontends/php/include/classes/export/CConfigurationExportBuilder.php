@@ -387,7 +387,7 @@ class CConfigurationExportBuilder {
 				'ssl_cert_file' => $httptest['ssl_cert_file'],
 				'ssl_key_file' => $httptest['ssl_key_file'],
 				'ssl_key_password' => $httptest['ssl_key_password'],
-				'httpsteps' => $this->formatHttpSteps($httptest['steps'])
+				'steps' => $this->formatHttpSteps($httptest['steps'])
 			];
 		}
 
@@ -397,27 +397,27 @@ class CConfigurationExportBuilder {
 	/**
 	 * Format web scenario steps.
 	 *
-	 * @param array $httpsteps
+	 * @param array $steps
 	 *
 	 * @return array
 	 */
-	protected function formatHttpSteps(array $httpsteps) {
+	protected function formatHttpSteps(array $steps) {
 		$result = [];
 
-		order_result($httpsteps, 'no');
+		order_result($steps, 'no');
 
-		foreach ($httpsteps as $httpstep) {
+		foreach ($steps as $step) {
 			$result[] = [
-				'name' => $httpstep['name'],
-				'url' => $httpstep['url'],
-				'posts' => $httpstep['posts'],
-				'variables' => $httpstep['variables'],
-				'headers' => $httpstep['headers'],
-				'follow_redirects' => $httpstep['follow_redirects'],
-				'retrieve_mode' => $httpstep['retrieve_mode'],
-				'timeout' => $httpstep['timeout'],
-				'required' => $httpstep['required'],
-				'status_codes' => $httpstep['status_codes']
+				'name' => $step['name'],
+				'url' => $step['url'],
+				'posts' => $step['posts'],
+				'variables' => $step['variables'],
+				'headers' => $step['headers'],
+				'follow_redirects' => $step['follow_redirects'],
+				'retrieve_mode' => $step['retrieve_mode'],
+				'timeout' => $step['timeout'],
+				'required' => $step['required'],
+				'status_codes' => $step['status_codes']
 			];
 		}
 
