@@ -1225,6 +1225,7 @@ A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, 
 Changes for 2.3.0
 
 New features:
+A.F....PS. [ZBXNEXT-1782] added support for newlines and tabs in trigger expressions (asaveljevs, Pavels)
 A.F.I..PS. [ZBXNEXT-1782] added support of new trigger expression operators ">=", "<=", "<>", "and", "or" and "not"; removed existing "#", "|" and "&" (asaveljevs, Pavels)
 ...GI..PS. [ZBXNEXT-2203] added information on the reason items become not supported (Alexei, asaveljevs)
 ..F....... [ZBXNEXT-734] implemented support for URL as dynamic screen element and added macro support (Ivo)
