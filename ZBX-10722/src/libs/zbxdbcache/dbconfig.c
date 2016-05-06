@@ -545,7 +545,6 @@ extern int		CONFIG_TIMER_FORKS;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
-static char	*dc_expression_expand_user_macros(const char *expression, char **error);
 static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, char **error);
 
 /******************************************************************************
@@ -1888,7 +1887,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 
 	ZBX_DC_GMACRO		*gmacro;
 
-	int			found, update_index;
+	int			found, context_existed, update_index;
 	zbx_uint64_t		globalmacroid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1929,10 +1928,21 @@ static void	DCsync_gmacros(DB_RESULT result)
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
+		context_existed = (1 == found && NULL != gmacro->context);
+
 		if (NULL == context)
+		{
+			/* release the context if it was removed from the macro */
+			if (1 == context_existed)
+				zbx_strpool_release(gmacro->context);
+
 			gmacro->context = NULL;
+		}
 		else
-			DCstrpool_replace(found, &gmacro->context, context);
+		{
+			/* replace the existing context (1) or add context to macro (0) */
+			DCstrpool_replace(context_existed, &gmacro->context, context);
+		}
 
 		/* update gmacros_m index using new data */
 		if (1 == update_index)
@@ -1977,7 +1987,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 
 	ZBX_DC_HMACRO		*hmacro;
 
-	int			found, update_index;
+	int			found, context_existed, update_index;
 	zbx_uint64_t		hostmacroid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -2021,10 +2031,21 @@ static void	DCsync_hmacros(DB_RESULT result)
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
+		context_existed = (1 == found && NULL != hmacro->context);
+
 		if (NULL == context)
+		{
+			/* release the context if it was removed from the macro */
+			if (1 == context_existed)
+				zbx_strpool_release(hmacro->context);
+
 			hmacro->context = NULL;
+		}
 		else
-			DCstrpool_replace(found, &hmacro->context, context);
+		{
+			/* replace the existing context (1) or add context to macro (0) */
+			DCstrpool_replace(context_existed, &hmacro->context, context);
+		}
 
 		/* update hmacros_hm index using new data */
 		if (1 == update_index)
@@ -7553,7 +7574,7 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *val
  *             text           - [IN] the text value to expand                 *
  *             validator_func - [IN] an optional validator function           *
  *             error          - [OUT] the error message if expanding macros   *
- *                                    failed                                  *
+ *                                    failed (optional)                       *
  *                                                                            *
  * Return value: The text value with expanded user macros.                    *
  *                                                                            *
@@ -7595,7 +7616,9 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+			if (NULL != error)
+				*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+
 			ret = FAIL;
 		}
 
