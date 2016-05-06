@@ -7575,7 +7575,7 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *val
  *             text           - [IN] the text value to expand                 *
  *             validator_func - [IN] an optional validator function           *
  *             error          - [OUT] the error message if expanding macros   *
- *                                    failed                                  *
+ *                                    failed (optional)                       *
  *                                                                            *
  * Return value: The text value with expanded user macros.                    *
  *                                                                            *
@@ -7617,7 +7617,9 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+			if (NULL != error)
+				*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+
 			ret = FAIL;
 		}
 
