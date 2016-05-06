@@ -60,7 +60,7 @@ class CXmlValidator {
 
 		if (!array_key_exists($version, $this->versionValidators)) {
 			throw new Exception(
-				_s('Invalid XML tag "%1$s": %2$s.', '/zabbix_export/version', _('unsupported version number'))
+				_s('Invalid tag "%1$s": %2$s.', '/zabbix_export/version', _('unsupported version number'))
 			);
 		}
 

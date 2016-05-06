@@ -32,7 +32,7 @@ class CXmlImportReader extends CImportReader {
 	 */
 	public function read($string) {
 		if ($string === '') {
-			throw new Exception(_s('Cannot read %1$s: %2$s.', 'XML', _('XML is empty')));
+			throw new Exception(_s('Cannot read XML: %1$s.', _('XML is empty')));
 		}
 
 		libxml_use_internal_errors(true);
@@ -43,7 +43,7 @@ class CXmlImportReader extends CImportReader {
 			libxml_clear_errors();
 
 			foreach ($errors as $error) {
-				throw new Exception(_s('Cannot read %1$s: %2$s.', 'XML',_s('%1$s [Line: %2$s | Column: %3$s]',
+				throw new Exception(_s('Cannot read XML: %1$s.', _s('%1$s [Line: %2$s | Column: %3$s]',
 					'('.$error->code.') '.trim($error->message), $error->line, $error->column
 				)));
 			}
@@ -74,7 +74,7 @@ class CXmlImportReader extends CImportReader {
 						$data = [];
 					}
 					elseif (!is_array($data)) {
-						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 							_s('unexpected text "%1$s"', trim($data))
 						));
 					}
@@ -109,7 +109,7 @@ class CXmlImportReader extends CImportReader {
 							}
 						}
 						elseif ($child_data !== '') {
-							throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $sub_path,
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
 								_s('unexpected text "%1$s"', trim($child_data))
 							));
 						}
@@ -124,7 +124,7 @@ class CXmlImportReader extends CImportReader {
 						$data = $xml->value;
 					}
 					elseif (is_array($data)) {
-						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 							_s('unexpected text "%1$s"', trim($xml->value))
 						));
 					}

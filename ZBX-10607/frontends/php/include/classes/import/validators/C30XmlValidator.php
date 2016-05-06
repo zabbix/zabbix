@@ -27,7 +27,7 @@ class C30XmlValidator {
 	/**
 	 * @var string
 	 */
-	private $format = '';
+	private $format;
 
 	/**
 	 * @param string $format format of import source
@@ -893,7 +893,7 @@ class C30XmlValidator {
 	 */
 	public function validateDateTime($data, array $parent_data = null, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
 
 		return $data;
