@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-10722] fixed color picker wrapping (Pavel)
 ........S. [ZBX-10692] fixed crash when resolving {TRIGGER.NAME} of the trigger with expression containing unknown user macro (gleb)
 A......... [ZBX-10607] fixed validation of JSON import source data in configuration.import method (Sasha, Cemeris)
 ........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
