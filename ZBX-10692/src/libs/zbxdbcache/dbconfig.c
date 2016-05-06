@@ -545,7 +545,6 @@ extern int		CONFIG_TIMER_FORKS;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
-static char	*dc_expression_expand_user_macros(const char *expression, char **error);
 static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, char **error);
 
 /******************************************************************************
