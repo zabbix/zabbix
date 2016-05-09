@@ -317,8 +317,10 @@ class CPageFilter {
 		}
 
 		// minimum severity
-		$mapId = isset($options['severitiesMin']['mapId']) ? $options['severitiesMin']['mapId'] : null;
-		$this->_profileIds['severityMin'] = CProfile::get($this->_profileIdx['severityMin'], null, $mapId);
+		$mapid = (array_key_exists('severitiesMin', $options) && array_key_exists('mapId', $options['severitiesMin']))
+			? $options['severitiesMin']['mapId']
+			: null;
+		$this->_profileIds['severityMin'] = CProfile::get($this->_profileIdx['severityMin'], null, $mapid);
 
 		$this->_requestIds['groupid'] = isset($options['groupid']) ? $options['groupid'] : null;
 		$this->_requestIds['hostid'] = isset($options['hostid']) ? $options['hostid'] : null;
