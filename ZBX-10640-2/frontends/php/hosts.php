@@ -990,7 +990,7 @@ elseif (hasRequest('form')) {
 			'output' => ['host'],
 			'preservekeys' => true
 		]);
-		order_result($proxies, 'host');
+		order_result($data['proxies'], 'host');
 	}
 
 	foreach ($data['proxies'] as &$proxy) {

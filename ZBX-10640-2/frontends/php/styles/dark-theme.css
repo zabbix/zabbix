@@ -2312,7 +2312,8 @@ td.active-bg {
     color: #d9d9d9; }
 
 .color-picker {
-  height: 20px; }
+  height: 20px;
+  white-space: nowrap; }
   .color-picker div {
     display: inline-block;
     width: 18px;
@@ -2538,7 +2539,7 @@ title: Tables
 name: table
 ---
 
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
 
 ```html_example
 <div class="overflow-table">
@@ -2773,7 +2774,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
             <td>
                <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a> 
+               <a href="#">Collapsed</a>
                <div class="treeview"><span class="arrow-down"></span></div>
                <a href="#">Expanded</a>
             </td>
@@ -2782,7 +2783,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Severity</td>
             <td>asdasd</td>
             <td class="normal-bg">
-               <span class="link-action">25</span> 
+               <span class="link-action">25</span>
             </td>
          </tr>
       </tbody>
@@ -2836,7 +2837,7 @@ Forms contain UI elements that are used to submit information.
 
 ##Inputs
 
-Text on html5 input types 
+Text on html5 input types
 
 ```html_example
 <ul class="table-forms">
@@ -3010,7 +3011,7 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 
 ##Contextual Dialogs
 
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
 <ul class="action-menu">
@@ -3302,7 +3303,7 @@ title: Labels
 name: labels
 ---
 
-Labels add information. Different colors 
+Labels add information. Different colors
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>

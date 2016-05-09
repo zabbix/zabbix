@@ -111,8 +111,6 @@ function parse_schema($path) {
 	}
 	$str .= "];\n";
 
-	$str .= "?>\n";
-
 	return $str;
 }
 
@@ -134,4 +132,3 @@ function parse_schema($path) {
 		fwrite(STDERR, 'Cannot write file: "'.$path_dest.'"'."\n");
 		exit(1);
 	}
-?>
