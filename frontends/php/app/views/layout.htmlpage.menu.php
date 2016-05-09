@@ -83,10 +83,10 @@ foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
 		if ($sub_page['menu_action'] !== null) {
 			$url->setArgument('action', $sub_page['menu_action']);
 		}
-		else {
-			$url->setArgument('ddreset', 1);
-		}
-		$url->removeArgument('sid');
+
+		$url
+			->setArgument('ddreset', 1)
+			->removeArgument('sid');
 
 		$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl());
 		if ($sub_page['selected']) {
