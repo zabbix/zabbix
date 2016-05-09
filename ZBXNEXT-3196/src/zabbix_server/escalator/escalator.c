@@ -1398,7 +1398,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 				*error = zbx_dsprintf(*error, "host \"%s\" disabled.", item.host.host);
 			}
 			else
-				*maintenance = HOST_MAINTENANCE_STATUS_ON;
+				*maintenance = item.host.maintenance_status;
 
 			DCconfig_clean_items(&item, &errcode, 1);
 
