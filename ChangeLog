@@ -5,6 +5,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+..F....... [ZBX-10598] removed redundant closing PHP tags in configuration example file and when generating PHP files (Ivo)
 ....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
 ..F....... [ZBX-10722] fixed color picker wrapping (Pavel)
 ........S. [ZBX-10692] fixed crash when resolving {TRIGGER.NAME} of the trigger with expression containing unknown user macro (gleb)
