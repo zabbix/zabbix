@@ -911,7 +911,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-#define IS_LEAP_YEAR(year) (((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0)
+/* number of leap years before but not including year */
+#define ZBX_LEAP_YEARS(year)	(((year) - 1) / 4 - ((year) - 1) / 100 + ((year) - 1) / 400)
+#define ZBX_IS_LEAP_YEAR(year)	((0 == (year) % 4 && 0 != (year) % 100) || 0 == (year) % 400)
 
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
@@ -921,6 +923,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -1113,10 +1117,6 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value);
 void	zbx_trim_str_list(char *list, char delimiter);
 
 int	parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default);
-
-void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset);
-
-int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 
 int	zbx_strcmp_null(const char *s1, const char *s2);
 

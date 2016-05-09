@@ -2943,85 +2943,74 @@ unsigned int	zbx_alarm_off(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_time                                                         *
+ * Function: zbx_get_time                                                     *
  *                                                                            *
  * Purpose:                                                                   *
- *     get current time and store it in memory localtions provided by caller  *
+ *     get current time and store it in memory locations provided by caller   *
  *                                                                            *
  * Parameters:                                                                *
  *     tm           - [OUT] broken-down representation of the current time    *
  *     milliseconds - [OUT] milliseconds since the previous second            *
- *     tz_offset    - [OUT] time zone offset from UTC                         *
+ *     tz           - [OUT] local time offset from UTC (optional)             *
  *                                                                            *
  * Comments:                                                                  *
- *     On Windows localtime() returns pointer to static, thread-local storage *
- *     location. On Unix localtime() is not thread-safe and re-entrant as it  *
- *     returns pointer to static storage location which can be overwritten    *
- *     by localtime() itself or other time functions in other threads or      *
- *     signal handlers. To avoid this we use localtime_r().                   *
+ *     On Windows localtime() and gmtime() return pointers to static,         *
+ *     thread-local storage locations. On Unix localtime() and gmtime() are   *
+ *     not thread-safe and re-entrant as they return pointers to static       *
+ *     storage locations which can be overwritten by localtime(), gmtime()    *
+ *     or other time functions in other threads or signal handlers. To avoid  *
+ *     this we use localtime_r() and gmtime_r().                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 {
 #ifdef _WINDOWS
 	struct _timeb	current_time;
 
 	_ftime(&current_time);
-
+	*tm = *localtime(&current_time.time);	/* localtime() cannot return NULL if called with valid parameter */
 	*milliseconds = current_time.millitm;
-
-	*tm = *localtime(&current_time.time);
 #else
 	struct timeval	current_time;
 
 	gettimeofday(&current_time, NULL);
-
-	*milliseconds = current_time.tv_usec / 1000;
-
 	localtime_r(&current_time.tv_sec, tm);
+	*milliseconds = current_time.tv_usec / 1000;
 #endif
-	/* time zone offset */
-	if (NULL != tz_offset)
+	if (NULL != tz)
 	{
-#if !defined(HAVE_TM_TM_GMTOFF)
-		int		offset_min;
+#ifdef HAVE_TM_TM_GMTOFF
+#	define ZBX_UTC_OFF	tm->tm_gmtoff
+#else
+#	define ZBX_UTC_OFF	offset
+		int		offset;
 		struct tm	tm_utc;
 #ifdef _WINDOWS
-		tm_utc = *gmtime(&current_time.time);
+		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
 #else
 		gmtime_r(&current_time.tv_sec, &tm_utc);
 #endif
+		offset = (tm->tm_yday - tm_utc.tm_yday) * SEC_PER_DAY + (tm->tm_hour - tm_utc.tm_hour) * SEC_PER_HOUR +
+				(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
+
 		while (tm->tm_year > tm_utc.tm_year)
 		{
-			tm->tm_year--;
-			tm->tm_yday += (SEC_PER_YEAR / SEC_PER_DAY) + IS_LEAP_YEAR(tm->tm_year);
+			offset += (0 == ZBX_IS_LEAP_YEAR(tm_utc.tm_year) ? SEC_PER_YEAR : SEC_PER_YEAR + SEC_PER_DAY);
+			tm_utc.tm_year++;
 		}
 
-		while (tm_utc.tm_year > tm->tm_year)
+		while (tm->tm_year < tm_utc.tm_year)
 		{
 			tm_utc.tm_year--;
-			tm_utc.tm_yday += (SEC_PER_YEAR / SEC_PER_DAY) + IS_LEAP_YEAR(tm_utc.tm_year);
+			offset -= (0 == ZBX_IS_LEAP_YEAR(tm_utc.tm_year) ? SEC_PER_YEAR : SEC_PER_YEAR + SEC_PER_DAY);
 		}
-
-		offset_min = ((tm->tm_yday - tm_utc.tm_yday) * (SEC_PER_DAY / SEC_PER_HOUR) + tm->tm_hour -
-				tm_utc.tm_hour) * (SEC_PER_HOUR / SEC_PER_MIN) + tm->tm_min - tm_utc.tm_min;
-
-		if (0 <= offset_min)
-			tz_offset->tz_sign = '+';
-		else
-			tz_offset->tz_sign = '-';
-
-		tz_offset->tz_hour = abs(offset_min / (SEC_PER_HOUR / SEC_PER_MIN));
-		tz_offset->tz_min = abs(offset_min % (SEC_PER_HOUR / SEC_PER_MIN));
-#else
-		if (0 <= tm->tm_gmtoff)
-			tz_offset->tz_sign = '+';
-		else
-			tz_offset->tz_sign = '-';
-
-		tz_offset->tz_hour = abs(tm->tm_gmtoff / SEC_PER_HOUR);
-		tz_offset->tz_min = (abs(tm->tm_gmtoff) - abs(tz_offset->tz_hour) * SEC_PER_HOUR) / SEC_PER_MIN;
 #endif
+		tz->tz_sign = (0 <= ZBX_UTC_OFF ? '+' : '-');
+		ZBX_UTC_OFF = abs(ZBX_UTC_OFF);
+		tz->tz_hour = ZBX_UTC_OFF / SEC_PER_HOUR;
+		tz->tz_min = (ZBX_UTC_OFF - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
+		/* assuming no remaining seconds like in historic Asia/Riyadh87, Asia/Riyadh88 and Asia/Riyadh89 */
+#undef ZBX_UTC_OFF
 	}
 }
 
@@ -3032,55 +3021,33 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz_offset)
  * Purpose: get UTC time from time from broken down time elements             *
  *                                                                            *
  * Parameters:                                                                *
- *     year  - [IN] year                                                      *
- *     month - [IN] month                                                     *
- *     mday  - [IN] date                                                      *
- *     hour  - [IN] hour                                                      *
- *     min   - [IN] minute                                                    *
- *     sec   - [IN] second                                                    *
+ *     year  - [IN] year (1970-...)                                           *
+ *     month - [IN] month (1-12)                                              *
+ *     mday  - [IN] day of month (1-..., depending on month and year)         *
+ *     hour  - [IN] hours (0-23)                                              *
+ *     min   - [IN] minutes (0-59)                                            *
+ *     sec   - [IN] seconds (0-61, leap seconds are not strictly validated)   *
  *     t     - [OUT] Epoch timestamp                                          *
  *                                                                            *
- * Return value:  SUCCEED - given the Epoch timestamp is positive             *
+ * Return value:  SUCCEED - date is valid and resulting timestamp is positive *
  *                FAIL - otherwise                                            *
  *                                                                            *
  ******************************************************************************/
 int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t)
 {
-	const int	epoch_year = 1970;
-	int		feb_year, nleapdays, ret = FAIL;
+	/* days since the beginning of non-leap year till the beginning of the month */
+	static const int	month_day[13] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
+	static const int	epoch_year = 1970;
 
-	/* days before the month */
-	static const unsigned int month_day[12] =
-	{ 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday &&
+			mday <= month_day[mon] - month_day[mon - 1] + (2 == mon && 0 != ZBX_IS_LEAP_YEAR(year) ? 1 : 0) &&
+			0 <= hour && hour <= 23 && 0 <= min && min <= 59 && 0 <= sec && sec <= 61 &&
+			0 <= (*t = (year - epoch_year) * SEC_PER_YEAR +
+			(ZBX_LEAP_YEARS(2 < mon ? year + 1 : year) - ZBX_LEAP_YEARS(epoch_year)) * SEC_PER_DAY +
+			(month_day[mon - 1] + mday - 1) * SEC_PER_DAY + hour * SEC_PER_HOUR + min * SEC_PER_MIN + sec))
+	{
+		return SUCCEED;
+	}
 
-	/* minimal sanity checking not to access outside of the array */
-	if (0 > sec || sec > 61)	/* minutes	[0-61] where 60, 61 being leap seconds	*/
-		return ret;
-	if (0 > min || min > 59)	/* minutes	[0-59]					*/
-		return ret;
-	if (0 > hour || hour > 23)	/* hours	[0-23]					*/
-		return ret;
-	if (0 >= mday || mday > 31)	/* day		[1-31]					*/
-		return ret;
-	if (0 >= mon || mon > 12)	/* months	[1-12]					*/
-		return ret;
-	if (year < epoch_year)
-		return ret;
-
-	/* checking if the date is past February */
-	feb_year = mon < 3 ? year - 1 : year;
-
-	/* if a year is divisible by 4 then it IS a leap year		*/
-	/* if a year is divisible by 100 then it IS NOT a leap year	*/
-	/* except if a year is divisible by 400 then it IS a leap year	*/
-	nleapdays = feb_year / 4 - feb_year / 100 + feb_year / 400 -
-			((epoch_year - 1) / 4 - (epoch_year - 1) / 100 + (epoch_year - 1) / 400);
-
-	*t = ((((year - epoch_year) * (SEC_PER_YEAR / SEC_PER_DAY) + month_day[--mon] + mday - 1 + nleapdays) *
-			(SEC_PER_DAY / SEC_PER_HOUR) + hour) * (SEC_PER_HOUR / SEC_PER_MIN) + min) * SEC_PER_MIN + sec;
-
-	if (0 < *t)
-		ret = SUCCEED;
-
-	return ret;
+	return FAIL;
 }
