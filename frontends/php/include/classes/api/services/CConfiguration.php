@@ -75,8 +75,7 @@ class CConfiguration extends CApiService {
 		$importReader = CImportReaderFactory::getReader($params['format']);
 		$data = $importReader->read($params['source']);
 
-		// XML validation
-		$data = (new CXmlValidator())->validate($data);
+		$data = (new CXmlValidator())->validate($data, $params['format']);
 
 		$importConverterFactory = new CImportConverterFactory();
 

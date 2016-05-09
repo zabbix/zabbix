@@ -194,23 +194,27 @@ out:
  *                                    is used as output value.                   *
  *            flags            - [IN] the regcomp() function flags.              *
  *                                    See regcomp() manual.                      *
+ *            out              - [OUT] the output value if the input string      *
+ *                                     matches the specified regular expression  *
+ *                                     or NULL otherwise                         *
  *                                                                               *
- * Return value: Allocated string containing output value if the input           *
- *               string matches the specified regular expression or NULL         *
- *               otherwise.                                                      *
+ * Return value: SUCCEED - the regular expression match was done                 *
+ *               FAIL    - invalid regular expression                            *
  *                                                                               *
  *********************************************************************************/
-static char	*regexp_sub(const char *string, const char *pattern, const char *output_template, int flags)
+static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags, char **out)
 {
 	ZBX_THREAD_LOCAL static char	*old_pattern = NULL;
 	ZBX_THREAD_LOCAL static int	old_flags;
 	ZBX_THREAD_LOCAL static regex_t	re;
 
 	regmatch_t			match[10];	/* up to 10 capture groups in regexp */
-	char				*ptr = NULL;
 
 	if (NULL == string)
-		return NULL;
+	{
+		zbx_free(*out);
+		return SUCCEED;
+	}
 
 	if (NULL == output_template || '\0' == *output_template)
 		flags |= REG_NOSUB;
@@ -238,13 +242,15 @@ compile:
 		regfree(&re);
 #endif
 		zbx_free(old_pattern);
-		return NULL;
+		return FAIL;
 	}
 execute:
-	if (0 == regexec(&re, string, ARRSIZE(match), match, 0))
-		ptr = regexp_sub_replace(string, output_template, match, ARRSIZE(match));
+	zbx_free(*out);
 
-	return ptr;
+	if (0 == regexec(&re, string, ARRSIZE(match), match, 0))
+		*out = regexp_sub_replace(string, output_template, match, ARRSIZE(match));
+
+	return SUCCEED;
 }
 
 /*********************************************************************************
@@ -261,17 +267,19 @@ execute:
  *                                    string is constructed from template by     *
  *                                    replacing \<n> sequences with the captured *
  *                                    regexp group.                              *
+ *            out              - [OUT] the output value if the input string      *
+ *                                     matches the specified regular expression  *
+ *                                     or NULL otherwise                         *
  *                                                                               *
- * Return value: Allocated string containing resulting value or NULL if          *
- *               the input string does not match the specified regular           *
- *               expression.                                                     *
+ * Return value: SUCCEED - the regular expression match was done                 *
+ *               FAIL    - invalid regular expression                            *
  *                                                                               *
  * Comments: This function performs case sensitive match                         *
  *                                                                               *
  *********************************************************************************/
-char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template)
+int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, REG_EXTENDED | REG_NEWLINE);
+	return regexp_sub(string, pattern, output_template, REG_EXTENDED | REG_NEWLINE, out);
 }
 
 /*********************************************************************************
@@ -282,9 +290,22 @@ char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output
  *          multiline matches are accepted.                                      *
  *                                                                               *
  *********************************************************************************/
-char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template)
+int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
 {
-	return regexp_sub(string, pattern, output_template, REG_EXTENDED);
+	return regexp_sub(string, pattern, output_template, REG_EXTENDED, out);
+}
+
+/*********************************************************************************
+ *                                                                               *
+ * Function: zbx_iregexp_sub                                                     *
+ *                                                                               *
+ * Purpose: This function is similar to zbx_regexp_sub() with exception that     *
+ *          case insensitive matches are accepted.                               *
+ *                                                                               *
+ *********************************************************************************/
+int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out)
+{
+	return regexp_sub(string, pattern, output_template, REG_EXTENDED | REG_ICASE, out);
 }
 
 /******************************************************************************
@@ -381,8 +402,12 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 	}
 	else
 	{
-		ret = (NULL != (*output = regexp_sub(string, pattern, output_template, regexp_flags)) ?
-				ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
+		if (SUCCEED == regexp_sub(string, pattern, output_template, regexp_flags, output))
+		{
+			ret = (NULL != output ? ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
+		}
+		else
+			ret = FAIL;
 	}
 
 	return ret;
