@@ -1353,7 +1353,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	DB_ROW		row;
 	unsigned char	source = 0xff, object = 0xff;
 	DC_ITEM		item;
-	int		errcode, ret = SUCCEED;
+	int		errcode, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
