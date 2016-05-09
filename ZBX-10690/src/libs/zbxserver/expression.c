@@ -3545,7 +3545,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ALERT))
 		{
-			if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros are not supported here */
+				p_next = bl + 1;
+			else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				replace_to = zbx_strdup(replace_to, alert->sendto);
 			else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
 				replace_to = zbx_strdup(replace_to, alert->subject);
