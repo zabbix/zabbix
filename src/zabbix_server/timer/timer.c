@@ -560,7 +560,7 @@ static int	day_in_month(int year, int mon)
 	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	if (IS_LEAP_YEAR(year))
+	if (0 != ZBX_IS_LEAP_YEAR(year))
 		return month_leap[mon];
 	else
 		return month[mon];
