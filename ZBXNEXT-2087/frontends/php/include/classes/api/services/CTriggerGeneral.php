@@ -215,6 +215,23 @@ abstract class CTriggerGeneral extends CApiService {
 	}
 
 	/**
+	 * Validate trigger tags.
+	 *
+	 * @param array $tags	Array of trigger tags.
+	 *
+	 * @throws APIException if at least one trigger exists
+	 */
+	protected function validateAddTags(array $tags) {
+		// Check tag and value duplicates in input data.
+		$duplicate = CArrayHelper::findDuplicate($tags, 'tag', 'value');
+		if ($duplicate) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Tag "%1$s" with value "%2$s" already exists.', $duplicate['tag'], $duplicate['value'])
+			);
+		}
+	}
+
+	/**
 	 * Checks that no trigger with the same description and expression as $trigger exist on the given host.
 	 * Assumes the given trigger is valid.
 	 *
@@ -338,6 +355,19 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);
 			$result = $relationMap->mapMany($result, $functions, 'functions');
+		}
+
+		// Adding trigger tags.
+		if ($options['selectTags'] !== null) {
+			$tags = API::getApiService()->select('trigger_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['triggerid']),
+				'filter' => ['triggerid' => $triggerids],
+				'preservekeys' => true
+			]);
+
+			$relationMap = $this->createRelationMap($tags, 'triggerid', 'triggertagid');
+			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], $options['selectTags']);
+			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;
@@ -470,6 +500,10 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$this->checkTriggerExpressions($trigger);
 			$this->checkIfExistsOnHost($trigger);
+
+			if (array_key_exists('tags', $trigger) && $trigger['tags']) {
+				$this->validateAddTags($trigger['tags']);
+			}
 		}
 		unset($trigger);
 	}
@@ -542,6 +576,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'templateid', 'recovery_mode', 'recovery_expression'
 			],
 			'selectDependencies' => ['triggerid'],
+			'selectTags' => ['triggertagid', 'tag', 'value'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -639,6 +674,10 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$db_triggers[$tnum] = $_db_trigger;
+
+			if (array_key_exists('tags', $trigger) && $trigger['tags']) {
+				$this->validateAddTags($trigger['tags']);
+			}
 		}
 		unset($trigger);
 	}
@@ -684,6 +723,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_triggers = $triggers;
 		$new_functions = [];
 		$triggers_functions = [];
+		$new_tags = [];
 		$this->implode_expressions($new_triggers, null, $triggers_functions);
 
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
@@ -701,12 +741,23 @@ abstract class CTriggerGeneral extends CApiService {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			}
 
+			if (array_key_exists('tags', $new_trigger)) {
+				foreach ($new_trigger['tags'] as $tag) {
+					$tag['triggerid'] = $triggerid;
+					$new_tags[] = $tag;
+				}
+			}
+
 			$triggerid = bcadd($triggerid, 1, 0);
 		}
 		unset($new_trigger);
 
 		DB::insert('triggers', $new_triggers, false);
 		DB::insert('functions', $new_functions, false);
+
+		if ($new_tags) {
+			DB::insert('trigger_tag', $new_tags);
+		}
 
 		foreach ($triggers as $trigger) {
 			add_audit_ext(AUDIT_ACTION_ADD, $resource, $trigger['triggerid'], $trigger['description'], null, null,
@@ -771,6 +822,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$del_functions_triggerids = [];
 		$triggers_functions = [];
+		$new_tags = [];
+		$del_tags = [];
 		$save_triggers = $triggers;
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions);
 
@@ -827,6 +880,30 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($upd_trigger['values']) {
 				$upd_triggers[] = $upd_trigger;
 			}
+
+			if (array_key_exists('tags', $trigger)) {
+				// Add new trigger tags and replace changed ones.
+				$tags_delete = $db_trigger['tags'];
+				$tags_add = $trigger['tags'];
+
+				foreach ($tags_delete as $dt_key => $tag_delete) {
+					foreach ($tags_add as $nt_key => $tag_add) {
+						if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
+							unset($tags_delete[$dt_key], $tags_add[$nt_key]);
+							continue 2;
+						}
+					}
+				}
+
+				foreach ($tags_delete as $tag_delete) {
+					$del_tags[] = $tag_delete['triggertagid'];
+				}
+
+				foreach ($tags_add as $tag_add) {
+					$tag_add['triggerid'] = $trigger['triggerid'];
+					$new_tags[] = $tag_add;
+				}
+			}
 		}
 
 		if ($upd_triggers) {
@@ -837,6 +914,12 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		if ($new_functions) {
 			DB::insert('functions', $new_functions, false);
+		}
+		if ($del_tags) {
+			DB::delete('trigger_tag', ['triggertagid' => $del_tags]);
+		}
+		if ($new_tags) {
+			DB::insert('trigger_tag', $new_tags);
 		}
 
 		if ($class === 'CTrigger' && $changed_priority_triggerids
