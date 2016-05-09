@@ -88,6 +88,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'selectFunctions'				=> null,
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
+			'selectTags'					=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
