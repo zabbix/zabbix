@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -17,16 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYCFG_H
-#define ZABBIX_PROXYCFG_H
 
-#include "comms.h"
-#include "zbxjson.h"
+/**
+ * A parser for reference macros like \1-\9.
+ */
+class CReplacementParser extends CParser {
 
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_TRAPPER_TIMEOUT;
+	/**
+	 * @param string    $source
+	 * @param int       $pos
+	 *
+	 * @return int
+	 */
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
 
-void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp);
-void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp);
+		$p = $pos;
 
-#endif
+		if (!isset($source[$p]) || $source[$p] !== '\\') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		if (!isset($source[$p]) || $source[$p] < '1' || $source[$p] > '9') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+	}
+}

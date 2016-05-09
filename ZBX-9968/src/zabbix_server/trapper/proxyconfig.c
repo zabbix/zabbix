@@ -68,15 +68,11 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 			host, sock->peer, (zbx_fs_size_t)j.buffer_size);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s", j.buffer);
 
-	zbx_alarm_on(CONFIG_TIMEOUT);
-
-	if (SUCCEED != zbx_tcp_send(sock, j.buffer))
+	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TRAPPER_TIMEOUT))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy \"%s\" at \"%s\": %s",
 				host, sock->peer, zbx_socket_strerror());
 	}
-
-	zbx_alarm_off();
 clean:
 	zbx_json_free(&j);
 out:
