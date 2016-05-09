@@ -823,7 +823,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$del_functions_triggerids = [];
 		$triggers_functions = [];
 		$new_tags = [];
-		$del_tags = [];
+		$del_triggertagids = [];
 		$save_triggers = $triggers;
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions);
 
@@ -896,7 +896,7 @@ abstract class CTriggerGeneral extends CApiService {
 				}
 
 				foreach ($tags_delete as $tag_delete) {
-					$del_tags[] = $tag_delete['triggertagid'];
+					$del_triggertagids[] = $tag_delete['triggertagid'];
 				}
 
 				foreach ($tags_add as $tag_add) {
@@ -915,8 +915,8 @@ abstract class CTriggerGeneral extends CApiService {
 		if ($new_functions) {
 			DB::insert('functions', $new_functions, false);
 		}
-		if ($del_tags) {
-			DB::delete('trigger_tag', ['triggertagid' => $del_tags]);
+		if ($del_triggertagids) {
+			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
 		}
 		if ($new_tags) {
 			DB::insert('trigger_tag', $new_tags);
