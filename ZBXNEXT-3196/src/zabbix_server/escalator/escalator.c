@@ -1254,7 +1254,10 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	}
 
 	if (EVENT_SOURCE_TRIGGERS != source)
+	{
+		ret = SUCCEED;
 		goto out;
+	}
 
 	/* check items and hosts referenced by trigger expression */
 	zbx_vector_uint64_create(&functionids);
@@ -1710,14 +1713,16 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 					goto next;
 				}
 
-				if (ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
+				if (EVENT_SOURCE_TRIGGERS == action.eventsource &&
+						ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
 						HOST_MAINTENANCE_STATUS_ON == maintenance)
 				{
 					/* remove paused escalations that were created and recovered */
 					/* during maintenance period                                 */
 					if (0 == cur_esc.esc_step && 0 != cur_esc.r_eventid)
 					{
-						zbx_vector_uint64_append(&escalations_to_be_deleted, cur_esc.escalationid);
+						zbx_vector_uint64_append(&escalations_to_be_deleted,
+								cur_esc.escalationid);
 						goto next;
 					}
 
