@@ -2088,7 +2088,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 
 	if (0 == logfiles_num)
 	{
-		/* there were no files for a logrt[] or logt.count[] item to analyze */
+		/* there were no files for a logrt[] or logrt.count[] item to analyze */
 		ret = SUCCEED;
 		goto out;
 	}
@@ -2268,12 +2268,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* calculate jump */
 			bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
 
+			zabbix_log(LOG_LEVEL_WARNING, "item \"%s\": skipping " ZBX_FS_UI64 " bytes to meet maxdelay",
+					key, bytes_to_jump);
+
 			/* move ahead in the file list */
-		}
-		else
-		{
-			delay = 0.0;
-			bytes_to_jump = 0;
 		}
 	}
 
@@ -2294,9 +2292,11 @@ out:
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
 					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s bytes_to_jump:" ZBX_FS_UI64,
 					__function_name, zbx_result_string(ret), processed_bytes, remaining_bytes,
-					zbx_stopwatch_elapsed(&stopwatch),
-					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch), delay,
-					bytes_to_jump);
+					0 != processed_bytes ? zbx_stopwatch_elapsed(&stopwatch) : 0.0,
+					0 != processed_bytes ?
+					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch) : 0.0,
+					0 != processed_bytes ? delay : 0.0,
+					0 != processed_bytes ? bytes_to_jump : (zbx_uint64_t)0);
 		}
 	}
 
