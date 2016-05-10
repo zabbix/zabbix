@@ -2552,33 +2552,6 @@ $form-icon-btn: (
 	@include opacity(0.35);
 }
 
-.pop-up {
-	min-width: initial;
-	margin-bottom: 0;
-
-	article {
-		padding: 13px;
-	}
-
-	h1 {
-		border-bottom: none;
-		padding: 0;
-	}
-
-	.header-title {
-
-		ul {
-			position: absolute;
-			right: 0;
-			bottom: 0;
-		}
-	}
-
-	.dashbrd-widget-head {
-		padding: 8px 10px;
-	}
-}
-
 .calendar {
 	width: 200px;
 
@@ -3069,10 +3042,6 @@ a.blue {
 	line-height: 1em;
 	display: inline-block;
 	@include border-radius(2px);
-}
-
-.lighter-yellow-bg {
-  background-color: $lighter-yellow;
 }
 
 .green-bg {
