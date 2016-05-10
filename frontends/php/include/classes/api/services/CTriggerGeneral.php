@@ -409,7 +409,7 @@ abstract class CTriggerGeneral extends CApiService {
 			]);
 
 			$relationMap = $this->createRelationMap($tags, 'triggerid', 'triggertagid');
-			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], $options['selectTags']);
+			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], []);
 			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
