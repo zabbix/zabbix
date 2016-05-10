@@ -42,7 +42,15 @@ ob_end_flush();
 $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
 
+$script = API::Script()->get([
+	'scriptid' => $scriptId,
+	'output' => ['name', 'command']
+]);
+$script = reset($script);
+
 $data = [
+	'name' => $script['name'],
+	'command' => $script['command'],
 	'message' => ''
 ];
 
