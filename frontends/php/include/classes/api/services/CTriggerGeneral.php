@@ -397,7 +397,7 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		// Adding trigger tags.
-		if ($options['selectTags'] !== null) {
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
 			$tags = API::getApiService()->select('trigger_tag', [
 				'output' => $this->outputExtend($options['selectTags'], ['triggerid']),
 				'filter' => ['triggerid' => $triggerids],
