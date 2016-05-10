@@ -3039,8 +3039,7 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	static const int	month_day[13] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 	static const int	epoch_year = 1970;
 
-	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday &&
-			mday <= month_day[mon] - month_day[mon - 1] + (2 == mon && 0 != ZBX_IS_LEAP_YEAR(year) ? 1 : 0) &&
+	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon + 1) &&
 			0 <= hour && hour <= 23 && 0 <= min && min <= 59 && 0 <= sec && sec <= 61 &&
 			0 <= (*t = (year - epoch_year) * SEC_PER_YEAR +
 			(ZBX_LEAP_YEARS(2 < mon ? year + 1 : year) - ZBX_LEAP_YEARS(epoch_year)) * SEC_PER_DAY +
@@ -3050,4 +3049,30 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	}
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_day_in_month                                                 *
+ *                                                                            *
+ * Purpose: returns number of days in a month                                 *
+ *                                                                            *
+ * Parameters: year - year, month - month (0-11)                              *
+ *                                                                            *
+ * Return value: 28-31 depending on number of days in the month               *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_day_in_month(int year, int mon)
+{
+	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	if (0 != ZBX_IS_LEAP_YEAR(year))
+		return month_leap[mon];
+	else
+		return month[mon];
 }
