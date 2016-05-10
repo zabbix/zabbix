@@ -219,6 +219,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @param array $trigger	Trigger.
 	 *
+	 * @return array
+	 *
 	 * @throws APIException if at least one trigger exists.
 	 */
 	protected function checkTriggerTags(array $trigger) {
@@ -268,6 +270,8 @@ abstract class CTriggerGeneral extends CApiService {
 				_s('Tag "%1$s" with value "%2$s" already exists.', $tag['tag'], $tag['value'])
 			);
 		}
+
+		return $trigger;
 	}
 
 	/**
@@ -539,7 +543,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$this->checkTriggerExpressions($trigger);
 			$this->checkIfExistsOnHost($trigger);
-			$this->checkTriggerTags($trigger);
+			$trigger = $this->checkTriggerTags($trigger);
 		}
 		unset($trigger);
 	}
@@ -711,7 +715,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$db_triggers[$tnum] = $_db_trigger;
 
-			$this->checkTriggerTags($trigger);
+			$trigger = $this->checkTriggerTags($trigger);
 		}
 		unset($trigger);
 	}
@@ -926,8 +930,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 				foreach ($tags_delete as $dt_key => $tag_delete) {
 					foreach ($tags_add as $nt_key => $tag_add) {
-						if ($tag_delete['tag'] === $tag_add['tag'] && array_key_exists('value', $tag_delete)
-								&& array_key_exists('value', $tag_add) && $tag_delete['value'] === $tag_add['value']) {
+						if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
 							unset($tags_delete[$dt_key], $tags_add[$nt_key]);
 							continue 2;
 						}
