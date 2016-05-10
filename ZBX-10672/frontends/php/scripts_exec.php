@@ -41,39 +41,47 @@ ob_end_flush();
 
 $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
+$data = [
+	'name' => '',
+	'command' => '',
+	'message' => ''
+];
 
 $script = API::Script()->get([
 	'scriptids' => $scriptId,
 	'output' => ['name', 'command']
 ]);
-$script = reset($script);
 
-$data = [
-	'name' => $script['name'],
-	'command' => $script['command'],
-	'message' => ''
-];
+$error_exist = false;
 
-$result = API::Script()->execute([
-	'hostid' => $hostId,
-	'scriptid' => $scriptId
-]);
+if ($script) {
+	$script = reset($script);
 
-$isErrorExist = false;
+	$data['name'] = $script['name'];
+	$data['command'] = $script['command'];
 
-if (!$result) {
-	$isErrorExist = true;
-}
-elseif ($result['response'] == 'failed') {
-	error($result['value']);
+	$result = API::Script()->execute([
+		'hostid' => $hostId,
+		'scriptid' => $scriptId
+	]);
 
-	$isErrorExist = true;
+	if (!$result) {
+		$error_exist = true;
+	}
+	elseif ($result['response'] == 'failed') {
+		error($result['value']);
+		$error_exist = true;
+	}
+	else {
+		$data['message'] = $result['value'];
+	}
 }
 else {
-	$data['message'] = $result['value'];
+	error(_('No permissions to referred object or it does not exist!'));
+	$error_exist = true;
 }
 
-if ($isErrorExist) {
+if ($error_exist) {
 	show_error_message(_('Cannot execute script'));
 }
 
