@@ -616,7 +616,6 @@ abstract class CTriggerGeneral extends CApiService {
 				'templateid', 'recovery_mode', 'recovery_expression'
 			],
 			'selectDependencies' => ['triggerid'],
-			'selectTags' => ['triggertagid', 'tag', 'value'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 			'editable' => true,
 			'preservekeys' => true
@@ -641,6 +640,15 @@ abstract class CTriggerGeneral extends CApiService {
 				'messageAllowedField' => _('Cannot update "%2$s" for a discovered trigger "%1$s".')
 			]);
 		}
+
+		$_db_trigger_tags = API::getApiService()->select('trigger_tag', [
+			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+			'filter' => ['triggerid' => array_keys($_db_triggers)],
+			'preservekeys' => true
+		]);
+
+		$_db_triggers = $this->createRelationMap($_db_trigger_tags, 'triggerid', 'triggertagid')
+			->mapMany($_db_triggers, $_db_trigger_tags, 'tags');
 
 		foreach ($triggers as $tnum => &$trigger) {
 			// check permissions
