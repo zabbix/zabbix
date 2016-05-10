@@ -253,6 +253,19 @@ double	zbx_current_time(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_leap_year                                                     *
+ *                                                                            *
+ * Return value:  SUCCEED - year is a leap year                               *
+ *                FAIL    - year is not a leap year                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_leap_year(int year)
+{
+	return (0 == year % 4 && 0 != year % 100) || 0 == year % 400 ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_calloc2                                                      *
  *                                                                            *
  * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
@@ -2994,16 +3007,10 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 				(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
 
 		while (tm->tm_year > tm_utc.tm_year)
-		{
-			offset += (0 == ZBX_IS_LEAP_YEAR(tm_utc.tm_year) ? SEC_PER_YEAR : SEC_PER_YEAR + SEC_PER_DAY);
-			tm_utc.tm_year++;
-		}
+			offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 
 		while (tm->tm_year < tm_utc.tm_year)
-		{
-			tm_utc.tm_year--;
-			offset -= (0 == ZBX_IS_LEAP_YEAR(tm_utc.tm_year) ? SEC_PER_YEAR : SEC_PER_YEAR + SEC_PER_DAY);
-		}
+			offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 #endif
 		tz->tz_sign = (0 <= ZBX_UTC_OFF ? '+' : '-');
 		ZBX_UTC_OFF = abs(ZBX_UTC_OFF);
@@ -3035,8 +3042,11 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
  ******************************************************************************/
 int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t)
 {
+/* number of leap years before but not including year */
+#define ZBX_LEAP_YEARS(year)	(((year) - 1) / 4 - ((year) - 1) / 100 + ((year) - 1) / 400)
+
 	/* days since the beginning of non-leap year till the beginning of the month */
-	static const int	month_day[13] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
+	static const int	month_day[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 	static const int	epoch_year = 1970;
 
 	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon - 1) &&
@@ -3049,6 +3059,7 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	}
 
 	return FAIL;
+#undef ZBX_LEAP_YEARS
 }
 
 /******************************************************************************
@@ -3071,7 +3082,7 @@ int	zbx_day_in_month(int year, int mon)
 	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	if (0 != ZBX_IS_LEAP_YEAR(year))
+	if (SUCCEED == is_leap_year(year))
 		return month_leap[mon];
 	else
 		return month[mon];

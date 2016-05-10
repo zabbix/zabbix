@@ -911,10 +911,6 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
-/* number of leap years before but not including year */
-#define ZBX_LEAP_YEARS(year)	(((year) - 1) / 4 - ((year) - 1) / 100 + ((year) - 1) / 400)
-#define ZBX_IS_LEAP_YEAR(year)	((0 == (year) % 4 && 0 != (year) % 100) || 0 == (year) % 400)
-
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
