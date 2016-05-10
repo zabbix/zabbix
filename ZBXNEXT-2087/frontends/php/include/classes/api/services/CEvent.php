@@ -614,7 +614,7 @@ class CEvent extends CApiService {
 			]);
 
 			$relationMap = $this->createRelationMap($tags, 'eventid', 'eventtagid');
-			$tags = $this->unsetExtraFields($tags, ['eventtagid', 'eventid'], $options['selectTags']);
+			$tags = $this->unsetExtraFields($tags, ['eventtagid', 'eventid'], []);
 			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
