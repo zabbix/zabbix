@@ -43,7 +43,7 @@ $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
 
 $script = API::Script()->get([
-	'scriptid' => $scriptId,
+	'scriptids' => $scriptId,
 	'output' => ['name', 'command']
 ]);
 $script = reset($script);
