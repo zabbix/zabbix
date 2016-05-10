@@ -225,7 +225,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 */
 	protected function checkTriggerTags(array $trigger) {
 		if (!array_key_exists('tags', $trigger)) {
-			return;
+			return $trigger;
 		}
 
 		foreach ($trigger['tags'] as &$tag) {
