@@ -667,8 +667,11 @@ static int	process_maintenance(void)
 						day = (tm->tm_mday - 1) / 7 + 1;
 						if (5 == db_every && 4 == day)
 						{
-							if (tm->tm_mday + 7 <= zbx_day_in_month(tm->tm_year, tm->tm_mon))
+							if (tm->tm_mday + 7 <= zbx_day_in_month(1900 + tm->tm_year,
+									tm->tm_mon))
+							{
 								continue;
+							}
 						}
 						else if (db_every != day)
 						{
