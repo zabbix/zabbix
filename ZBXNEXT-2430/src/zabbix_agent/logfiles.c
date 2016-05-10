@@ -1978,7 +1978,7 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 		/* remainder bytes in last check */
 		remaining_bytes_last = remaining_bytes % processed_bytes;
 
-		/* 't_proc' is expected to be much smaller than 't_upd'. Therefore multiplications first then adding. */
+		/* 't_proc' is expected to be much smaller than 't_upd', therefore multiplications first then adding */
 		return (double)remaining_full_checks * t_proc + (double)remaining_full_checks * t_upd +
 				(double)remaining_bytes_last * t_proc / (double)processed_bytes;
 	}
@@ -2059,7 +2059,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
 	zbx_stopwatch_t		stopwatch;
-	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0;
+	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0, bytes_to_jump;
+	double			delay;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d is_count:%d filename:'%s' lastlogsize:" ZBX_FS_UI64
 			" mtime:%d", __function_name, ZBX_METRIC_FLAG_LOG_LOGRT & flags,
@@ -2258,7 +2259,23 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	}
 
 	if (0.0f != max_delay)
+	{
 		zbx_stopwatch_stop(&stopwatch);
+
+		if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(processed_bytes,
+				remaining_bytes, refresh, zbx_stopwatch_elapsed(&stopwatch))))
+		{
+			/* calculate jump */
+			bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
+
+			/* move ahead in the file list */
+		}
+		else
+		{
+			delay = 0.0;
+			bytes_to_jump = 0;
+		}
+	}
 
 	/* remember the new logfile list */
 	*logfiles_num_new = logfiles_num;
@@ -2275,12 +2292,11 @@ out:
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
-					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s", __function_name,
-					zbx_result_string(ret), processed_bytes, remaining_bytes,
+					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s bytes_to_jump:" ZBX_FS_UI64,
+					__function_name, zbx_result_string(ret), processed_bytes, remaining_bytes,
 					zbx_stopwatch_elapsed(&stopwatch),
-					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch),
-					calculate_delay(processed_bytes, remaining_bytes, refresh,
-					zbx_stopwatch_elapsed(&stopwatch)));
+					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch), delay,
+					bytes_to_jump);
 		}
 	}
 
