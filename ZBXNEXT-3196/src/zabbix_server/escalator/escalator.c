@@ -1255,6 +1255,7 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 
 	if (EVENT_SOURCE_TRIGGERS != source)
 	{
+		/* don't check dependency for internal trigger events */
 		ret = SUCCEED;
 		goto out;
 	}
@@ -1340,7 +1341,7 @@ out:
  *                                                                            *
  * Parameters: escalation - [IN] escalation data                              *
  *             action     - [OUT] action data                                 *
- *             ignore     - [OUT] 1 if the escalation must be ignored,        *
+ *             skip       - [OUT] 1 if the escalation must be skipped,        *
  *                                0 otherwise                                 *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
@@ -1348,8 +1349,8 @@ out:
  *           could not be gathered, 'action->actionid' is set to 0.           *
  *                                                                            *
  ******************************************************************************/
-static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, unsigned char *ignore,
-		unsigned char *maintenance, char **error)
+static int	check_escalation(const DB_ESCALATION *escalation, unsigned char *skip, unsigned char *maintenance,
+		char **error)
 {
 	const char	*__function_name = "check_escalation";
 	DB_RESULT	result;
@@ -1373,12 +1374,12 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 		goto out;
 	}
 
-	*ignore = 0;
+	*skip = 0;
 	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
 
 	if (EVENT_OBJECT_TRIGGER == object)
 	{
-		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, ignore, maintenance, error))
+		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, skip, maintenance, error))
 			goto out;
 	}
 	else if (EVENT_SOURCE_INTERNAL == source)
@@ -1410,43 +1411,8 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 		}
 	}
 
-	DBfree_result(result);
-
-	result = DBselect(
-			"select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
-				"r_longdata,recovery_msg,maintenance_mode"
-			" from actions"
-			" where actionid=" ZBX_FS_UI64,
-			escalation->actionid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		if (ACTION_STATUS_ACTIVE != atoi(row[2]))
-		{
-			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
-			goto out;
-		}
-
-		ZBX_STR2UINT64(action->actionid, row[0]);
-		ZBX_STR2UCHAR(action->eventsource, row[3]);
-		action->esc_period = atoi(row[4]);
-		action->shortdata = zbx_strdup(NULL, row[5]);
-		action->longdata = zbx_strdup(NULL, row[6]);
-		action->r_shortdata = zbx_strdup(NULL, row[7]);
-		action->r_longdata = zbx_strdup(NULL, row[8]);
-		ZBX_STR2UCHAR(action->recovery_msg, row[9]);
-		ZBX_STR2UCHAR(action->maintenance_mode, row[10]);
-
-	}
-	else
-	{
-		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", escalation->actionid);
-		goto out;
-	}
-
 	ret = SUCCEED;
 out:
-
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error: '%s'", __function_name, zbx_result_string(ret),
@@ -1511,6 +1477,63 @@ static void	execute_escalation(DB_ESCALATION *escalation, DB_ACTION *action, con
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_db_action                                                  *
+ *                                                                            *
+ * Purpose: read action from database and validates it                        *
+ *                                                                            *
+ * Parameters: actionid - [IN] the action identifier                          *
+ *             action   - [OUT] action data                                   *
+ *             error    - [OUT] message if action was disabled or deleted     *
+ *                                                                            *
+ * Return value: SUCEED - the action exists and is active                     *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_db_action(zbx_uint64_t actionid, DB_ACTION *action, char **error)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+
+	result = DBselect(
+			"select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
+				"r_longdata,recovery_msg,maintenance_mode"
+			" from actions"
+			" where actionid=" ZBX_FS_UI64,
+			actionid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (ACTION_STATUS_ACTIVE != atoi(row[2]))
+		{
+			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
+			ret = FAIL;
+		}
+
+		ZBX_STR2UINT64(action->actionid, row[0]);
+		ZBX_STR2UCHAR(action->eventsource, row[3]);
+		action->esc_period = atoi(row[4]);
+		action->shortdata = zbx_strdup(NULL, row[5]);
+		action->longdata = zbx_strdup(NULL, row[6]);
+		action->r_shortdata = zbx_strdup(NULL, row[7]);
+		action->r_longdata = zbx_strdup(NULL, row[8]);
+		ZBX_STR2UCHAR(action->recovery_msg, row[9]);
+		ZBX_STR2UCHAR(action->maintenance_mode, row[10]);
+	}
+	else
+	{
+		action->actionid = 0;
+		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", actionid);
+		ret = FAIL;
+	}
+
+	DBfree_result(result);
+
+	return ret;
 }
 
 static void	free_db_action(DB_ACTION *action)
@@ -1698,27 +1721,21 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			DB_ACTION	action;
 			char		*error = NULL;
+			unsigned char	skip, maintenance;
 			int		escalation_rc;
-			unsigned char	ignore, maintenance;
 
-			if (SUCCEED == (escalation_rc = check_escalation(&cur_esc, &action, &ignore, &maintenance,
-					&error)))
+			escalation_rc = check_escalation(&cur_esc, &skip, &maintenance, &error);
+			if (FAIL == check_db_action(cur_esc.actionid, &action, &error))
+				escalation_rc = FAIL;
+
+			if (FAIL != escalation_rc)
 			{
-				/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
-				/* it normally in order to send notification about the error otherwise we     */
-				/* skip the escalation until dependable trigger changes value to OK.          */
-				if (0 != ignore)
-				{
-					free_db_action(&action);
-					goto next;
-				}
-
 				if (EVENT_SOURCE_TRIGGERS == action.eventsource &&
 						ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
 						HOST_MAINTENANCE_STATUS_ON == maintenance)
 				{
-					/* remove paused escalations that were created and recovered */
-					/* during maintenance period                                 */
+					/* remove paused escalations that were created and recovered/cancelled */
+					/* during maintenance period                                           */
 					if (0 == cur_esc.esc_step && 0 != cur_esc.r_eventid)
 					{
 						zbx_vector_uint64_append(&escalations_to_be_deleted,
@@ -1726,13 +1743,31 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 						goto next;
 					}
 
-					/* ignore paused escalations created before maintenance period */
+					/* skip paused escalations created before maintenance period */
 					/* until maintenance ends or the escalations are recovered     */
-					if (0 == cur_esc.r_eventid)
+					if (0 == cur_esc.r_eventid && FAIL != escalation_rc)
 					{
 						free_db_action(&action);
 						goto next;
 					}
+				}
+
+				if (0 != skip)
+				{
+					/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
+					/* it normally in order to send notification about the error otherwise we     */
+					/* skip the escalation until dependable trigger changes value to OK.          */
+					free_db_action(&action);
+					goto next;
+				}
+			}
+			else
+			{
+				/* remove not started and cancelled escalations */
+				if (0 == cur_esc.esc_step)
+				{
+					zbx_vector_uint64_append(&escalations_to_be_deleted, cur_esc.escalationid);
+					goto next;
 				}
 			}
 
@@ -1799,10 +1834,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				}
 			}
 
-			if (SUCCEED == escalation_rc)
-				free_db_action(&action);
-			else
-				zbx_free(error);
+			free_db_action(&action);
+			zbx_free(error);
 
 			DBexecute("%s", sql);
 
