@@ -20,7 +20,7 @@ Changes for 3.0.3rc1
 
 New features:
 A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by default (zalex_ua)
-A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), English (United States), French, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
 ..F....... [ZBX-10640] fixed unexpected reset of group and host filter (Gunars)
