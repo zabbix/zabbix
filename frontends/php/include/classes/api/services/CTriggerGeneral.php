@@ -217,17 +217,49 @@ abstract class CTriggerGeneral extends CApiService {
 	/**
 	 * Validate trigger tags.
 	 *
-	 * @param array $tags	Array of trigger tags.
+	 * @param array $trigger	Trigger.
 	 *
-	 * @throws APIException if at least one trigger exists
+	 * @throws APIException if at least one trigger exists.
 	 */
-	protected function validateAddTags(array $tags) {
+	protected function validateAddTags(array $trigger) {
 		// Check tag and value duplicates in input data.
-		$duplicate = CArrayHelper::findDuplicate($tags, 'tag', 'value');
+		$duplicate = CArrayHelper::findDuplicate($trigger['tags'], 'tag', 'value');
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Tag "%1$s" with value "%2$s" already exists.', $duplicate['tag'], $duplicate['value'])
 			);
+		}
+
+		foreach ($trigger['tags'] as $tag) {
+			if (!array_key_exists('tag', $tag)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Field "%1$s" is mandatory.', 'tag')
+				);
+			}
+
+			if (!is_string($tag['tag'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag['tag'])
+				);
+			}
+
+			if (trim($tag['tag']) === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty'))
+				);
+			}
+
+			if (strpos($tag['tag'], '/') !== false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag['tag'])
+				);
+			}
+
+			if (array_key_exists('value', $tag) && !is_string($tag['value'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'value', $tag['value'])
+				);
+			}
 		}
 	}
 
@@ -500,10 +532,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$this->checkTriggerExpressions($trigger);
 			$this->checkIfExistsOnHost($trigger);
-
-			if (array_key_exists('tags', $trigger) && $trigger['tags']) {
-				$this->validateAddTags($trigger['tags']);
-			}
+			$this->validateAddTags($trigger);
 		}
 		unset($trigger);
 	}
@@ -675,9 +704,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$db_triggers[$tnum] = $_db_trigger;
 
-			if (array_key_exists('tags', $trigger) && $trigger['tags']) {
-				$this->validateAddTags($trigger['tags']);
-			}
+			$this->validateAddTags($trigger);
 		}
 		unset($trigger);
 	}
