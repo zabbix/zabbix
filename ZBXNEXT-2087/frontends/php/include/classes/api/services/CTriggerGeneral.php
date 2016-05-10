@@ -226,18 +226,14 @@ abstract class CTriggerGeneral extends CApiService {
 			return;
 		}
 
-		$tags = $trigger['tags'];
-
-		foreach ($tags as &$tag) {
+		foreach ($trigger['tags'] as &$tag) {
 			if (!array_key_exists('tag', $tag)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Field "%1$s" is mandatory.', 'tag')
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'tag'));
 			}
 
 			if (!is_string($tag['tag'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag['tag'])
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('a character string is expected'))
 				);
 			}
 
@@ -249,28 +245,27 @@ abstract class CTriggerGeneral extends CApiService {
 
 			if (strpos($tag['tag'], '/') !== false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag['tag'])
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('unacceptable characters are used'))
 				);
 			}
 
-			if (array_key_exists('value', $tag)) {
-				if (!is_string($tag['value'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value for field "%1$s": %2$s.', 'value', $tag['value'])
-					);
-				}
-			}
-			else {
+			if (!array_key_exists('value', $tag)) {
 				$tag['value'] = '';
+			}
+
+			if (!is_string($tag['value'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'value', _('a character string is expected'))
+				);
 			}
 		}
 		unset($tag);
 
 		// Check tag and value duplicates in input data.
-		$duplicate = CArrayHelper::findDuplicate($tags, 'tag', 'value');
-		if ($duplicate) {
+		$tag = CArrayHelper::findDuplicate($trigger['tags'], 'tag', 'value');
+		if ($tag !== null) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Tag "%1$s" with value "%2$s" already exists.', $duplicate['tag'], $duplicate['value'])
+				_s('Tag "%1$s" with value "%2$s" already exists.', $tag['tag'], $tag['value'])
 			);
 		}
 	}
