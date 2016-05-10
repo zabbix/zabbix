@@ -60,12 +60,6 @@ check_fields($fields);
 if (hasRequest('form')) {
 	if (hasRequest('clone')) {
 		unset($_REQUEST['groupid']);
-		API::Trigger()->update([
-			"triggerid"=> 66170,
-			"description"=> "Processor load is too high on {HOST.NAME}",
-			"expression"=> "{hostname_0001:system.cpu.load[percpu,avg1].last()}>8",
-			"tags" => [['tag' => 'a', 'value' => '']]
-		]);
 	}
 	elseif (hasRequest('add') || hasRequest('update')) {
 		$hostIds = getRequest('hosts', []);
