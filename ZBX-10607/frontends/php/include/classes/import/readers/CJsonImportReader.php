@@ -29,16 +29,9 @@ class CJsonImportReader extends CImportReader {
 	 * @return array
 	 */
 	public function read($string) {
-		if ($string === '') {
-			throw new Exception(_s('Cannot read JSON: %1$s.', _('JSON is empty')));
-		}
-
 		$data = (new CJson)->decode($string, true);
 
 		if ($data === null){
-			if (json_last_error() == JSON_ERROR_NONE) {
-				throw new Exception(_s('Cannot read JSON: %1$s.', _('Unknown error')));
-			}
 			throw new Exception(_s('Cannot read JSON: %1$s.', json_last_error_msg()));
 		}
 
