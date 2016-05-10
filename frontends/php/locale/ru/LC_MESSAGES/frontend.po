@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-10 12:01+0300\n"
-"PO-Revision-Date: 2016-04-22 12:30+0300\n"
-"Last-Translator: Alexey <dotneft@gmail.com>\n"
+"PO-Revision-Date: 2016-05-10 09:33+0300\n"
+"Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1461321028.000000\n"
+"X-POOTLE-MTIME: 1462865584.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1459,23 +1459,23 @@ msgstr "Не возможно подключиться к базе данных.
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось скопировать график"
+msgstr[1] "Не удалось скопировать графики"
+msgstr[2] "Не удалось скопировать графики"
 
 #: items.php:823
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось скопировать элемент даных"
+msgstr[1] "Не удалось скопировать элементы даных"
+msgstr[2] "Не удалось скопировать элементы даных"
 
 #: triggers.php:361
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не удалось скопировать триггер"
+msgstr[1] "Не удалось скопировать триггеры"
+msgstr[2] "Не удалось скопировать триггеры"
 
 #: include/triggers.inc.php:406
 #, c-format
@@ -2212,7 +2212,7 @@ msgstr "Не удалось обработать группы элементов
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "Не удалось прочитать JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -5975,9 +5975,9 @@ msgstr "График добавлен"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "График скопирован"
+msgstr[1] "Графики скопированы"
+msgstr[2] "Графики скопированы"
 
 #: graphs.php:295
 msgid "Graph deleted"
@@ -8457,7 +8457,7 @@ msgstr "Ошибочный второй параметр."
 #: include/classes/import/validators/CXmlValidator.php:63
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Ошибочный тэг \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
@@ -8569,9 +8569,9 @@ msgstr "Элемент данных добавлен"
 #: items.php:822
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Элемент даных скопирован"
+msgstr[1] "Элементы даных скопированы"
+msgstr[2] "Элементы даных скопированы"
 
 #: app/views/administration.proxy.list.php:48
 msgid "Item count"
@@ -14395,9 +14395,9 @@ msgstr "Триггер не может зависеть от триггера, �
 #: triggers.php:360
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Триггер скопирован"
+msgstr[1] "Триггера скопированы"
+msgstr[2] "Триггера скопированы"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -16941,7 +16941,7 @@ msgstr "неожиданный текст \"%1$s\""
 #: include/classes/api/services/CProxy.php:654
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "неожиданное значение \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407

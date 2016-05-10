@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-10 12:01+0300\n"
-"PO-Revision-Date: 2016-04-22 12:35+0300\n"
+"PO-Revision-Date: 2016-05-10 09:25+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1461321326.000000\n"
+"X-POOTLE-MTIME: 1462865150.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1454,28 +1454,28 @@ msgstr "Не вдалося клонувати прототипи тригері
 
 #: include/classes/setup/CSetupWizard.php:263
 msgid "Cannot connect to the database."
-msgstr "Не вдалось підключитись до бази даних."
+msgstr "Не вдалося підключитись до бази даних."
 
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося скопіювати графік"
+msgstr[1] "Не вдалося скопіювати графіки"
+msgstr[2] "Не вдалося скопіювати графіки"
 
 #: items.php:823
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося скопіювати елемент даних"
+msgstr[1] "Не вдалося скопіювати елементи даних"
+msgstr[2] "Не вдалося скопіювати елементи даних"
 
 #: triggers.php:361
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося скопіювати тригер"
+msgstr[1] "Не вдалося скопіювати тригери"
+msgstr[2] "Не вдалося скопіювати тригери"
 
 #: include/triggers.inc.php:406
 #, c-format
@@ -2212,7 +2212,7 @@ msgstr "Не вдалося обробити групи елементів да�
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "Не вдалося прочитати JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -5975,9 +5975,9 @@ msgstr "Графік додано"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Графік скопійовано"
+msgstr[1] "Графіки скопійовано"
+msgstr[2] "Графіки скопійовано"
 
 #: graphs.php:295
 msgid "Graph deleted"
@@ -8457,7 +8457,7 @@ msgstr "Неправильний другий параметр."
 #: include/classes/import/validators/CXmlValidator.php:63
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Неправильний тег \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
@@ -8569,9 +8569,9 @@ msgstr "Елемент додано"
 #: items.php:822
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Елемент даних скопійовано"
+msgstr[1] "Елементи даних скопійовано"
+msgstr[2] "Елементи даних скопійовано"
 
 #: app/views/administration.proxy.list.php:48
 msgid "Item count"
@@ -10661,7 +10661,7 @@ msgstr "Тригерів не визначено."
 #: include/views/configuration.item.prototype.edit.php:378
 #: include/views/configuration.item.prototype.edit.php:393
 msgid "None"
-msgstr "Нічого"
+msgstr "Немає"
 
 #: include/graphs.inc.php:24 include/items.inc.php:184
 #: include/triggers.inc.php:1194
@@ -14394,9 +14394,9 @@ msgstr "Тригер не може залежати від тригера, як�
 #: triggers.php:360
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Тригер скопійовано"
+msgstr[1] "Тригери скопійовано"
+msgstr[2] "Тригери скопійовано"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -16940,7 +16940,7 @@ msgstr "неочікуваний текст \"%1$s\""
 #: include/classes/api/services/CProxy.php:654
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "неочікуване значення \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
