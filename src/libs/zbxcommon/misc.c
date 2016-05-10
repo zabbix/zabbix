@@ -3039,7 +3039,7 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	static const int	month_day[13] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 };
 	static const int	epoch_year = 1970;
 
-	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon + 1) &&
+	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon - 1) &&
 			0 <= hour && hour <= 23 && 0 <= min && min <= 59 && 0 <= sec && sec <= 61 &&
 			0 <= (*t = (year - epoch_year) * SEC_PER_YEAR +
 			(ZBX_LEAP_YEARS(2 < mon ? year + 1 : year) - ZBX_LEAP_YEARS(epoch_year)) * SEC_PER_DAY +
