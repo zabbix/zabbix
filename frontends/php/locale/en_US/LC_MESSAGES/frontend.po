@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-05-10 12:01+0300\n"
-"PO-Revision-Date: 2016-03-25 20:27+0300\n"
+"PO-Revision-Date: 2016-05-10 09:18+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: \n"
 "Language: en_US\n"
@@ -11,8 +11,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1458930467.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
+"X-POOTLE-MTIME: 1462864704.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -136,7 +136,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:532
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - infinitely)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -1441,20 +1441,20 @@ msgstr "Cannot connect to the database."
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cannot copy graph"
+msgstr[1] "Cannot copy graphs"
 
 #: items.php:823
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cannot copy item"
+msgstr[1] "Cannot copy items"
 
 #: triggers.php:361
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cannot copy trigger"
+msgstr[1] "Cannot copy triggers"
 
 #: include/triggers.inc.php:406
 #, c-format
@@ -2160,7 +2160,7 @@ msgstr "Cannot process applications from different hosts or templates."
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "Cannot read JSON: %1$s."
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -5918,8 +5918,8 @@ msgstr "Graph added"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Graph copied"
+msgstr[1] "Graphs copied"
 
 #: graphs.php:295
 msgid "Graph deleted"
@@ -8393,7 +8393,7 @@ msgstr "Invalid second parameter."
 #: include/classes/import/validators/CXmlValidator.php:63
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Invalid tag \"%1$s\": %2$s."
 
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
@@ -8505,8 +8505,8 @@ msgstr "Item added"
 #: items.php:822
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Item copied"
+msgstr[1] "Items copied"
 
 #: app/views/administration.proxy.list.php:48
 msgid "Item count"
@@ -14310,8 +14310,8 @@ msgstr "Trigger cannot be dependent on a trigger that is inherited from it."
 #: triggers.php:360
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Trigger copied"
+msgstr[1] "Triggers copied"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -16846,7 +16846,7 @@ msgstr "unexpected text \"%1$s\""
 #: include/classes/api/services/CProxy.php:654
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "unexpected value \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
