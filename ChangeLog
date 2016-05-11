@@ -1380,6 +1380,7 @@ New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
 ....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
 ........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
 .......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
