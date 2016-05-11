@@ -540,33 +540,6 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: day_in_month                                                     *
- *                                                                            *
- * Purpose: returns number of days in a month                                 *
- *                                                                            *
- * Parameters: year - year, month - month (0-11)                              *
- *                                                                            *
- * Return value: 28-31 depending on number of days in the month               *
- *                                                                            *
- * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static int	day_in_month(int year, int mon)
-{
-#define is_leap_year(year) (((year % 4) == 0 && (year % 100) != 0) || (year % 400) == 0)
-	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
-	if (is_leap_year(year))
-		return month_leap[mon];
-	else
-		return month[mon];
-}
-
 static int	process_maintenance(void)
 {
 	const char			*__function_name = "process_maintenance";
@@ -694,8 +667,11 @@ static int	process_maintenance(void)
 						day = (tm->tm_mday - 1) / 7 + 1;
 						if (5 == db_every && 4 == day)
 						{
-							if (tm->tm_mday + 7 <= day_in_month(tm->tm_year, tm->tm_mon))
+							if (tm->tm_mday + 7 <= zbx_day_in_month(1900 + tm->tm_year,
+									tm->tm_mon))
+							{
 								continue;
+							}
 						}
 						else if (db_every != day)
 						{
