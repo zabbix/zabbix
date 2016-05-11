@@ -32,15 +32,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>		[T_ZBX_INT, O_OPT, P_ACT, DB_ID, null],
-	'scriptid' =>	[T_ZBX_INT, O_OPT, null, DB_ID, null]
+	'hostid' =>		[T_ZBX_INT, O_MAND, P_SYS, DB_ID, null],
+	'scriptid' =>	[T_ZBX_INT, O_MAND, P_SYS, DB_ID, null]
 ];
 check_fields($fields);
 
 ob_end_flush();
 
-$scriptId = getRequest('scriptid');
-$hostId = getRequest('hostid');
+$scriptid = getRequest('scriptid');
+$hostid = getRequest('hostid');
 $data = [
 	'name' => '',
 	'command' => '',
@@ -48,7 +48,7 @@ $data = [
 ];
 
 $scripts = API::Script()->get([
-	'scriptids' => $scriptId,
+	'scriptids' => $scriptid,
 	'output' => ['name', 'command']
 ]);
 
@@ -59,15 +59,15 @@ if ($scripts) {
 
 	$macros_data = CMacrosResolverHelper::resolve([
 		'config' => 'scriptConfirmation',
-		'data' => [$hostId => [$scriptId => $script['command']]]
+		'data' => [$hostid => [$scriptid => $script['command']]]
 	]);
 
 	$data['name'] = $script['name'];
-	$data['command'] = $macros_data[$hostId][$scriptId];
+	$data['command'] = $macros_data[$hostid][$scriptid];
 
 	$result = API::Script()->execute([
-		'hostid' => $hostId,
-		'scriptid' => $scriptId
+		'hostid' => $hostid,
+		'scriptid' => $scriptid
 	]);
 
 	if (!$result) {
