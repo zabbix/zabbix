@@ -23,6 +23,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), English (United States), French, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10752] fixed array formatting in exported JSON (Cemeris, Sasha)
 A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
 ........S. [ZBX-10690] fixed possible buffer overruns in discovery macro substitution and other macro context issues (asaveljevs)
 ..F....... [ZBX-10640] fixed unexpected reset of group and host filter (Gunars)
@@ -30,7 +31,7 @@ A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis mi
 ....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
 ..F....... [ZBX-10722] fixed color picker wrapping (Pavel)
 ........S. [ZBX-10692] fixed crash when resolving {TRIGGER.NAME} of the trigger with expression containing unknown user macro (gleb)
-A......... [ZBX-10607] fixed validation of JSON import source data in configuration.import method (Sasha, Cemeris)
+A......... [ZBX-10607] fixed validation of JSON import source data in configuration.import method (Cemeris, Sasha)
 ........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
 ........S. [ZBX-10614] fixed crash during configuration update when context is added to a macro without context (gleb)
 .......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
