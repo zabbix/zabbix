@@ -23,6 +23,7 @@ A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by def
 A.F....... [ZBX-1357] updated Chinese (China), English (United States), French, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+...G...PS. [ZBX-9839] fixed Windows compilation error and time zone related issues (gleb, viktors)
 A......... [ZBX-10752] fixed array formatting in exported JSON (Cemeris, Sasha)
 A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
 ........S. [ZBX-10690] fixed possible buffer overruns in discovery macro substitution and other macro context issues (asaveljevs)
