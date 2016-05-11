@@ -47,15 +47,15 @@ $data = [
 	'message' => ''
 ];
 
-$script = API::Script()->get([
+$scripts = API::Script()->get([
 	'scriptids' => $scriptId,
 	'output' => ['name', 'command']
 ]);
 
 $error_exist = false;
 
-if ($script) {
-	$script = reset($script);
+if ($scripts) {
+	$script = $scripts[0];
 
 	$data['name'] = $script['name'];
 	$data['command'] = $script['command'];
@@ -86,8 +86,8 @@ if ($error_exist) {
 }
 
 // render view
-$scriptView = new CView('general.script.execute', $data);
-$scriptView->render();
-$scriptView->show();
+(new CView('general.script.execute', $data))
+	->render()
+	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
