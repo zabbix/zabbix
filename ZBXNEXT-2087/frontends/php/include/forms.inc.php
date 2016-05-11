@@ -1424,13 +1424,23 @@ function getTriggerFormData(array $data) {
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
+
+		if (!hasRequest('form_refresh')) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
+
 		$triggers = $data['parent_discoveryid']
 			? API::TriggerPrototype()->get($options)
 			: API::Trigger()->get($options);
+
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		$data['trigger'] = reset($triggers);
+
+		if (!hasRequest('form_refresh')) {
+			$data['tags'] = $data['trigger']['tags'];
+		}
 
 		// Get templates.
 		$tmp_triggerid = $data['triggerid'];
@@ -1608,6 +1618,10 @@ function getTriggerFormData(array $data) {
 	unset($dependency);
 
 	order_result($data['db_dependencies'], 'description');
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	return $data;
 }
