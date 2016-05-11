@@ -30,7 +30,7 @@ $page['scripts'] = ['class.cviewswitcher.js'];
 
 ob_start();
 
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER || CWebUser::getType() < USER_TYPE_ZABBIX_USER) {
+if (CWebUser::isGuest() || !CWebUser::isLoggedIn()) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 

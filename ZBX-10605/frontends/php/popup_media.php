@@ -30,8 +30,8 @@ $page['file'] = 'popup_media.php';
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-if (CWebUser::getType() <= USER_TYPE_ZABBIX_USER
-		|| (CWebUser::$data['alias'] == ZBX_GUEST_USER && CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN)) {
+if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN
+		|| (CWebUser::isGuest() && CWebUser::getType() < USER_TYPE_SUPER_ADMIN)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 
