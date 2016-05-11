@@ -1190,8 +1190,6 @@ int	parse_host_key(char *exp, char **host, char **key)
 	return SUCCEED;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: num_param                                                        *
@@ -3598,9 +3596,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
 
 	*ptr_buffer++ = '"';
-
-	while (' ' == *context)
-		*ptr_buffer++ = *context++;
 
 	while ('\0' != *context)
 	{
