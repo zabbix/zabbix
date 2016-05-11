@@ -149,14 +149,13 @@ abstract class CTriggerGeneral extends CApiService {
 				'status', 'priority', 'comments', 'type', 'templateid'
 			],
 			'hostids' => $host['hostid'],
+			'filter' => ['templateid' => $trigger['templateid']],
 			'nopermissions' => true
 		];
 
 		if ($class === 'CTriggerPrototype') {
 			$options['selectDiscoveryRule'] = ['itemid'];
 		}
-
-		$options['filter'] = ['templateid' => $trigger['templateid']];
 
 		// check if a child trigger already exists on the host
 		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
@@ -192,6 +191,11 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (array_key_exists('triggerid', $trigger)) {
+			$db_trigger['tags'] = API::getApiService()->select('trigger_tag', [
+				'output' => ['triggertagid', 'tag', 'value'],
+				'filter' => ['triggerid' => $db_trigger['triggerid']]
+			]);
+
 			$this->updateReal([$trigger], [$db_trigger]);
 		}
 		else {
@@ -841,6 +845,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['templateid']              [IN]
 	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prorotypes only.
 	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
+	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
+	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
+	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
 	 *
 	 * @throws APIException
 	 */
@@ -1477,6 +1484,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
 				'priority', 'comments', 'type'
 			],
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);
