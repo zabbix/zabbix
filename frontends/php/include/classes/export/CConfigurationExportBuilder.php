@@ -514,7 +514,8 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies'])
+				'dependencies' => $this->formatDependencies($trigger['dependencies']),
+				'tags' => $this->formatTags($trigger['tags'])
 			];
 		}
 
@@ -725,6 +726,28 @@ class CConfigurationExportBuilder {
 		}
 
 		CArrayHelper::sort($result, ['name', 'expression', 'recovery_expression']);
+
+		return $result;
+	}
+
+	/**
+	 * Format trigger tags.
+	 *
+	 * @param array $tags
+	 *
+	 * @return array
+	 */
+	protected function formatTags(array $tags) {
+		$result = [];
+
+		CArrayHelper::sort($tags, ['tag', 'value']);
+
+		foreach ($tags as $tag) {
+			$result[] = [
+				'tag' => $tag['tag'],
+				'value' => $tag['value']
+			];
+		}
 
 		return $result;
 	}
