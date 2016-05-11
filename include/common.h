@@ -106,6 +106,15 @@ typedef struct
 }
 zbx_timespec_t;
 
+/* time zone offset */
+typedef struct
+{
+	char	tz_sign;	/* '+' or '-' */
+	int	tz_hour;
+	int	tz_min;
+}
+zbx_timezone_t;
+
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
 
@@ -914,6 +923,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
+int	zbx_day_in_month(int year, int mon);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
