@@ -57,8 +57,13 @@ $error_exist = false;
 if ($scripts) {
 	$script = $scripts[0];
 
+	$macros_data = CMacrosResolverHelper::resolve([
+		'config' => 'scriptConfirmation',
+		'data' => [$hostId => [$scriptId => $script['command']]]
+	]);
+
 	$data['name'] = $script['name'];
-	$data['command'] = $script['command'];
+	$data['command'] = $macros_data[$hostId][$scriptId];
 
 	$result = API::Script()->execute([
 		'hostid' => $hostId,
