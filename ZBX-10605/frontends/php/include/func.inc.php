@@ -1660,10 +1660,6 @@ function num2letter($number) {
 function access_deny($mode = ACCESS_DENY_OBJECT) {
 	// deny access to an object
 	if ($mode == ACCESS_DENY_OBJECT) {
-		if (!defined('ZBX_PAGE_NO_MENU')) {
-			define('ZBX_PAGE_NO_MENU', 1);
-		}
-
 		require_once dirname(__FILE__).'/page_header.php';
 		show_error_message(_('No permissions to referred object or it does not exist!'));
 		require_once dirname(__FILE__).'/page_footer.php';

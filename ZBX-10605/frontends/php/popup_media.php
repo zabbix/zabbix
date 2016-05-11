@@ -30,11 +30,11 @@ $page['file'] = 'popup_media.php';
 define('ZBX_PAGE_NO_MENU', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
-
 if (CWebUser::getType() <= USER_TYPE_ZABBIX_USER
 		|| (CWebUser::$data['alias'] == ZBX_GUEST_USER && CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN)) {
-	access_deny();
+	access_deny(ACCESS_DENY_PAGE);
 }
+
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
