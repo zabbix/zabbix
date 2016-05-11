@@ -27,14 +27,13 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 $page['title'] = _('Media');
 $page['file'] = 'popup_media.php';
 
-define('ZBX_PAGE_NO_MENU', 1);
-
-require_once dirname(__FILE__).'/include/page_header.php';
 if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN
 		|| (CWebUser::isGuest() && CWebUser::getType() < USER_TYPE_SUPER_ADMIN)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 
+define('ZBX_PAGE_NO_MENU', 1);
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
