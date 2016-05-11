@@ -630,6 +630,7 @@ class CConfigurationExport {
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
+			'selectTags' => ['tag', 'value'],
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
@@ -829,6 +830,7 @@ class CConfigurationExport {
 			],
 			'selectDependencies' => ['expression', 'description', 'recovery_expression'],
 			'selectItems' => ['itemid', 'flags', 'type'],
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $hostIds,
 			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'inherited' => false,
