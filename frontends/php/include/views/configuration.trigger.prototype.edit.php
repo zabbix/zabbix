@@ -464,6 +464,35 @@ $triggersFormList
 	->addRow(_('URL'), (new CTextBox('url', $data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
 
+// tags
+$tags_table = (new CTable())
+	->setId('tbl_tags')
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+
+foreach ($data['tags'] as $tag_key => $tag) {
+	$tags_table->addRow([
+		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], false, 255))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		'&nbsp;',
+		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], false, 255))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		(new CCol(
+			(new CButton('tags['.$tag_key.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
+}
+
+$tags_table->setFooter(new CCol(
+	(new CButton('tag_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+));
+$triggersFormList->addRow(_('Tags'), $tags_table);
+
 // append status to form list
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 	$status = true;
