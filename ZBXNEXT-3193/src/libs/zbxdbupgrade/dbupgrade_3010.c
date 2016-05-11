@@ -201,6 +201,8 @@ static int	assign_recovery_events(zbx_hashset_t *events, zbx_uint64_t *eventid)
 		}
 	}
 
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 	{
 		if (ZBX_DB_OK > DBexecute("%s", sql))
