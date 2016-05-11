@@ -2338,22 +2338,41 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  * Purpose: wrap a replacement string that represents a negative number in    *
  *          parentheses (for instance, turn "-123.456M" into "(-123.456M)")   *
  *                                                                            *
- * Parameters: replace_to - [IN] replacement string                           *
- *                                                                            *
- * Return value: wrapped "replace_to" if negative, original string otherwise  *
+ * Parameters: replace_to       - [IN/OUT] replacement string                 *
+ *             replace_to_alloc - [IN/OUT] number of allocated bytes          *
  *                                                                            *
  ******************************************************************************/
-static char	*wrap_negative_double_suffix(char *replace_to)
+static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_alloc)
 {
-	char	*wrapped;
+	size_t	replace_to_len;
 
-	if ('-' != *replace_to)
-		return replace_to;
+	if ('-' != (*replace_to)[0])
+		return;
 
-	wrapped = zbx_dsprintf(NULL, "(%s)", replace_to);
-	zbx_free(replace_to);
+	replace_to_len = strlen(*replace_to);
 
-	return wrapped;
+	if (NULL != replace_to_alloc && *replace_to_alloc >= replace_to_len + 3)
+	{
+		memmove(*replace_to + 1, *replace_to, replace_to_len);
+	}
+	else
+	{
+		char	*buffer;
+
+		if (NULL != replace_to_alloc)
+			*replace_to_alloc = replace_to_len + 3;
+
+		buffer = zbx_malloc(NULL, replace_to_len + 3);
+
+		memcpy(buffer + 1, *replace_to, replace_to_len);
+
+		zbx_free(*replace_to);
+		*replace_to = buffer;
+	}
+
+	(*replace_to)[0] = '(';
+	(*replace_to)[replace_to_len + 1] = ')';
+	(*replace_to)[replace_to_len + 2] = '\0';
 }
 
 /******************************************************************************
@@ -3610,7 +3629,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		if (1 == require_numeric && NULL != replace_to)
 		{
 			if (SUCCEED == (res = is_double_suffix(replace_to)))
-				replace_to = wrap_negative_double_suffix(replace_to);
+				wrap_negative_double_suffix(&replace_to, NULL);
 			else if (NULL != error)
 				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
@@ -3670,9 +3689,6 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		}
 
 		pos++;
-
-		if (SUCCEED != zbx_token_find(*data, pos, &token))
-			break;
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -4373,7 +4389,7 @@ static int	process_lld_macro_token(char **data, zbx_token_t *token, int flags,
 	{
 		if (SUCCEED == (ret = is_double_suffix(replace_to)))
 		{
-			replace_to = wrap_negative_double_suffix(replace_to);
+			wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 		}
 		else
 		{
@@ -4547,7 +4563,7 @@ int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags,
 					/* {{ITEM.VALUE}.regsub({#LLDMACRO})} should be translated to         */
 					/*     {{ITEM.VALUE}.regsub({#LLDMACRO})}, but                        */
 					/* {{ITEM.KEY}.regsub({#LLDMACRO})} should be translated to           */
-					/*     {{ITEM.KEY}.regsub(ABC}                                        */
+					/*     {{ITEM.KEY}.regsub(ABC)}                                       */
 					/* In the first case the expression contains valid function macro and */
 					/* lld macros are not supported inside function macro parameters.     */
 					/* In the second case {ITEM.KEY} macro does not support functions, so */
