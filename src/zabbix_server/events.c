@@ -122,6 +122,160 @@ static void	save_events()
 
 /******************************************************************************
  *                                                                            *
+ * Function: link_recovery_events                                             *
+ *                                                                            *
+ * Purpose: links trigger recovery (OK) events to corresponding problem       *
+ *          events                                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	link_recovery_events()
+{
+	char	*sql = NULL;
+	size_t	i, sql_alloc = 0, sql_offset = 0;
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < events_num; i++)
+	{
+		DB_EVENT	*event = &events[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
+			continue;
+
+		if (TRIGGER_VALUE_OK != event->value)
+			continue;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update events set r_eventid=" ZBX_FS_UI64
+				" where source=%d"
+					" and object=%d"
+					" and objectid=" ZBX_FS_UI64
+					" and value=%d;\n",
+				event->eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->trigger.triggerid,
+				TRIGGER_VALUE_PROBLEM);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	zbx_free(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: remove_problems                                                  *
+ *                                                                            *
+ * Purpose: remove problems created by now recovered (OK) triggers            *
+ *                                                                            *
+ ******************************************************************************/
+static void	remove_problems()
+{
+	char			*sql = NULL;
+	size_t			i, sql_alloc = 0, sql_offset = 0;
+	zbx_vector_uint64_t	triggerids;
+
+	zbx_vector_uint64_create(&triggerids);
+
+	for (i = 0; i < events_num; i++)
+	{
+		DB_EVENT	*event = &events[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
+			continue;
+
+		if (TRIGGER_VALUE_OK != event->value)
+			continue;
+
+		zbx_vector_uint64_append(&triggerids, event->trigger.triggerid);
+	}
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from problem where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values, triggerids.values_num);
+
+	DBexecute("%s", sql);
+
+	zbx_free(sql);
+	zbx_vector_uint64_destroy(&triggerids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_problems                                                     *
+ *                                                                            *
+ * Purpose: add problems based on problem events and their triggers           *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_problems()
+{
+	size_t		i;
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "problem", "problemid", "triggerid", "eventid", NULL);
+
+	for (i = 0; i < events_num; i++)
+	{
+		DB_EVENT	*event = &events[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
+			continue;
+
+		if (TRIGGER_VALUE_PROBLEM != event->value)
+			continue;
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event->trigger.triggerid, event->eventid);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "problemid");
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_trigger_events                                           *
+ *                                                                            *
+ * Purpose: process trigger based events                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	process_trigger_events()
+{
+	size_t	i;
+	int	problem_events_num = 0, recovery_events_num = 0;
+
+	for (i = 0; i < events_num; i++)
+	{
+		DB_EVENT	*event = &events[i];
+
+		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
+			continue;
+
+		switch (event->value)
+		{
+			case TRIGGER_VALUE_OK:
+				recovery_events_num++;
+				break;
+			case TRIGGER_VALUE_PROBLEM:
+				problem_events_num++;
+				break;
+		}
+	}
+
+	if (0 != recovery_events_num)
+	{
+		link_recovery_events();
+		remove_problems();
+	}
+
+	if (0 != problem_events_num)
+		add_problems();
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: clean_events                                                     *
  *                                                                            *
  * Purpose: cleans all array entries and resets events_num                    *
@@ -154,6 +308,8 @@ int	process_events(void)
 	if (0 != events_num)
 	{
 		save_events();
+
+		process_trigger_events();
 
 		process_actions(events, events_num);
 
