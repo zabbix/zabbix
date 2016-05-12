@@ -1268,3 +1268,6 @@ ini_set('precision', 14);
 if (function_exists('bcscale')) {
 	bcscale(7);
 }
+
+// Maximum number of tags to display in events list.
+define('EVENTS_LIST_TAGS_COUNT', 3);
