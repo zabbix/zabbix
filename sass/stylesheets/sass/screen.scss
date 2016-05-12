@@ -407,7 +407,7 @@ ul.top-nav-icons {
 		padding: 0 12px;
 
 		&:last-child {
-			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
+			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
 		}
 	}
 }
@@ -2550,33 +2550,6 @@ $form-icon-btn: (
 	top: 0;
 	left: 0;
 	@include opacity(0.35);
-}
-
-.pop-up {
-	min-width: initial;
-	margin-bottom: 0;
-
-	article {
-		padding: 13px;
-	}
-
-	h1 {
-		border-bottom: none;
-		padding: 0;
-	}
-
-	.header-title {
-
-		ul {
-			position: absolute;
-			right: 0;
-			bottom: 0;
-		}
-	}
-
-	.dashbrd-widget-head {
-		padding: 8px 10px;
-	}
 }
 
 .calendar {
