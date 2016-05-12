@@ -61,11 +61,11 @@ class CScreenHistory extends CScreenBase {
 	public $plaintext;
 
 	/**
-	 * Items data
+	 * Items ids.
 	 *
 	 * @var array
 	 */
-	public $items;
+	public $itemids;
 
 	/**
 	 * Init screen data.
@@ -75,7 +75,7 @@ class CScreenHistory extends CScreenBase {
 	 * @param int		$options['filterTask']
 	 * @param int		$options['markColor']
 	 * @param boolean	$options['plaintext']
-	 * @param array		$options['items']
+	 * @param array		$options['itemids']
 	 */
 	public function __construct(array $options = []) {
 		parent::__construct($options);
@@ -89,7 +89,7 @@ class CScreenHistory extends CScreenBase {
 		$this->graphType = isset($options['graphtype']) ? $options['graphtype'] : GRAPH_TYPE_NORMAL;
 
 		// optional
-		$this->items = isset($options['items']) ? $options['items'] : null;
+		$this->itemids = array_key_exists('itemids', $options) ?  $options['itemids'] : [];
 		$this->plaintext = isset($options['plaintext']) ? $options['plaintext'] : false;
 	}
 
@@ -101,9 +101,18 @@ class CScreenHistory extends CScreenBase {
 	public function get() {
 		$output = [];
 
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'key_', 'value_type', 'valuemapid'],
+			'selectHosts' => ['name'],
+			'itemids' => $this->itemids,
+			'webitems' => true,
+			'preservekeys' => true
+		]);
+
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+
 		$stime = zbxDateToTime($this->timeline['stime']);
-		$itemIds = zbx_objectValues($this->items, 'itemid');
-		$firstItem = reset($this->items);
+		$firstItem = reset($items);
 
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
@@ -117,7 +126,7 @@ class CScreenHistory extends CScreenBase {
 		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
 			$options = [
 				'history' => $firstItem['value_type'],
-				'itemids' => $itemIds,
+				'itemids' => $this->itemids,
 				'output' => API_OUTPUT_EXTEND,
 				'sortorder' => ZBX_SORT_DOWN
 			];
@@ -135,7 +144,7 @@ class CScreenHistory extends CScreenBase {
 
 			// text log
 			if (isset($iv_string[$firstItem['value_type']])) {
-				$isManyItems = (count($this->items) > 1);
+				$isManyItems = (count($items) > 1);
 				$useLogItem = ($firstItem['value_type'] == ITEM_VALUE_TYPE_LOG);
 				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
@@ -172,7 +181,7 @@ class CScreenHistory extends CScreenBase {
 					$data['value'] = rtrim($data['value'], " \t\r\n");
 
 					if (empty($this->plaintext)) {
-						$item = $this->items[$data['itemid']];
+						$item = $items[$data['itemid']];
 						$host = reset($item['hosts']);
 						$color = null;
 
@@ -265,7 +274,7 @@ class CScreenHistory extends CScreenBase {
 				$historyData = API::History()->get($options);
 
 				foreach ($historyData as $data) {
-					$item = $this->items[$data['itemid']];
+					$item = $items[$data['itemid']];
 					$value = rtrim($data['value'], " \t\r\n");
 
 					// format the value as float
@@ -319,7 +328,7 @@ class CScreenHistory extends CScreenBase {
 
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['containerid'] = $containerId;
-				$timeControlData['src'] = $this->getGraphUrl($itemIds);
+				$timeControlData['src'] = $this->getGraphUrl($this->itemids);
 				$timeControlData['objDims'] = $graphDims;
 				$timeControlData['loadSBox'] = 1;
 				$timeControlData['loadImage'] = 1;
@@ -346,7 +355,7 @@ class CScreenHistory extends CScreenBase {
 		else {
 			if ($this->mode != SCREEN_MODE_JS) {
 				$flickerfreeData = [
-					'itemids' => $itemIds,
+					'itemids' => $this->itemids,
 					'action' => ($this->action == HISTORY_BATCH_GRAPH) ? HISTORY_GRAPH : $this->action,
 					'filter' => $this->filter,
 					'filterTask' => $this->filterTask,

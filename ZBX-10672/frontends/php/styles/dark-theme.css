@@ -2297,7 +2297,8 @@ td.active-bg {
     color: #d9d9d9; }
 
 .color-picker {
-  height: 20px; }
+  height: 20px;
+  white-space: nowrap; }
   .color-picker div {
     display: inline-block;
     width: 18px;

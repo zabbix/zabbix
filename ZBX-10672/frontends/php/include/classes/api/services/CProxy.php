@@ -643,12 +643,16 @@ class CProxy extends CApiService {
 
 			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('tls_connect', $proxy)
 					&& !in_array($proxy['tls_connect'], $available_connect_types)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to proxy field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_connect',
+					_s('unexpected value "%1$s"', $proxy['tls_connect'])
+				));
 			}
 
 			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && array_key_exists('tls_accept', $proxy)
 					&& !in_array($proxy['tls_accept'], $available_accept_types)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from proxy field.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.', 'tls_accept',
+					_s('unexpected value "%1$s"', $proxy['tls_accept'])
+				));
 			}
 
 			// PSK validation.
@@ -658,11 +662,15 @@ class CProxy extends CApiService {
 							&& ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK
 							&& $proxy['status'] == HOST_STATUS_PROXY_ACTIVE)) {
 				if (!array_key_exists('tls_psk_identity', $proxy) || zbx_empty($proxy['tls_psk_identity'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk_identity', _('cannot be empty'))
+					);
 				}
 
 				if (!array_key_exists('tls_psk', $proxy) || zbx_empty($proxy['tls_psk'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'tls_psk', _('cannot be empty'))
+					);
 				}
 
 				if (!preg_match('/^([0-9a-f]{2})+$/i', $proxy['tls_psk'])) {

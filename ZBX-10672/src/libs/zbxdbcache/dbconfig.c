@@ -30,7 +30,6 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "cfg.h"
-#include "comms.h"
 #include "../zbxcrypto/tls_tcp_active.h"
 
 static int	sync_in_progress = 0;
@@ -546,7 +545,6 @@ extern int		CONFIG_TIMER_FORKS;
 ZBX_MEM_FUNC_IMPL(__config, config_mem)
 
 static void	dc_get_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
-static char	*dc_expression_expand_user_macros(const char *expression, char **error);
 static char	*dc_cache_expanded_expression(const char *expression, const char **expression_ex, char **error);
 
 /******************************************************************************
@@ -1889,7 +1887,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 
 	ZBX_DC_GMACRO		*gmacro;
 
-	int			found, update_index;
+	int			found, context_existed, update_index;
 	zbx_uint64_t		globalmacroid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -1930,10 +1928,21 @@ static void	DCsync_gmacros(DB_RESULT result)
 		DCstrpool_replace(found, &gmacro->macro, macro);
 		DCstrpool_replace(found, &gmacro->value, row[2]);
 
+		context_existed = (1 == found && NULL != gmacro->context);
+
 		if (NULL == context)
+		{
+			/* release the context if it was removed from the macro */
+			if (1 == context_existed)
+				zbx_strpool_release(gmacro->context);
+
 			gmacro->context = NULL;
+		}
 		else
-			DCstrpool_replace(found, &gmacro->context, context);
+		{
+			/* replace the existing context (1) or add context to macro (0) */
+			DCstrpool_replace(context_existed, &gmacro->context, context);
+		}
 
 		/* update gmacros_m index using new data */
 		if (1 == update_index)
@@ -1978,7 +1987,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 
 	ZBX_DC_HMACRO		*hmacro;
 
-	int			found, update_index;
+	int			found, context_existed, update_index;
 	zbx_uint64_t		hostmacroid, hostid;
 	zbx_vector_uint64_t	ids;
 	zbx_hashset_iter_t	iter;
@@ -2022,10 +2031,21 @@ static void	DCsync_hmacros(DB_RESULT result)
 		DCstrpool_replace(found, &hmacro->macro, macro);
 		DCstrpool_replace(found, &hmacro->value, row[3]);
 
+		context_existed = (1 == found && NULL != hmacro->context);
+
 		if (NULL == context)
+		{
+			/* release the context if it was removed from the macro */
+			if (1 == context_existed)
+				zbx_strpool_release(hmacro->context);
+
 			hmacro->context = NULL;
+		}
 		else
-			DCstrpool_replace(found, &hmacro->context, context);
+		{
+			/* replace the existing context (1) or add context to macro (0) */
+			DCstrpool_replace(context_existed, &hmacro->context, context);
+		}
 
 		/* update hmacros_hm index using new data */
 		if (1 == update_index)
@@ -4722,7 +4742,34 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
 
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+		{
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+	else if (ZBX_TCP_SEC_UNENCRYPTED != sock->connection_type)
+	{
+		*error = zbx_strdup(*error, "internal error: invalid connection type");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+#endif
 	LOCK_CACHE;
 
 	if (NULL == (dc_host = DCfind_proxy(host)))
@@ -4750,16 +4797,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
-		zbx_tls_conn_attr_t	attr;
-
-		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-
 		/* simplified match, not compliant with RFC 4517, 4518 */
 		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr.issuer))
 		{
@@ -4778,16 +4815,6 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
-		zbx_tls_conn_attr_t	attr;
-
-		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-		{
-			UNLOCK_CACHE;
-			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
-		}
-
 		if (NULL != dc_host->tls_dc_psk)
 		{
 			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr.psk_identity_len ||
@@ -7547,7 +7574,7 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *val
  *             text           - [IN] the text value to expand                 *
  *             validator_func - [IN] an optional validator function           *
  *             error          - [OUT] the error message if expanding macros   *
- *                                    failed                                  *
+ *                                    failed (optional)                       *
  *                                                                            *
  * Return value: The text value with expanded user macros.                    *
  *                                                                            *
@@ -7589,7 +7616,9 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+			if (NULL != error)
+				*error = zbx_dsprintf(*error, "macro '%.*s' is not found", len, ptr);
+
 			ret = FAIL;
 		}
 

@@ -74,7 +74,7 @@ class CXmlImportReader extends CImportReader {
 						$data = [];
 					}
 					elseif (!is_array($data)) {
-						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 							_s('unexpected text "%1$s"', trim($data))
 						));
 					}
@@ -109,7 +109,7 @@ class CXmlImportReader extends CImportReader {
 							}
 						}
 						elseif ($child_data !== '') {
-							throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $sub_path,
+							throw new Exception(_s('Invalid tag "%1$s": %2$s.', $sub_path,
 								_s('unexpected text "%1$s"', trim($child_data))
 							));
 						}
@@ -124,7 +124,7 @@ class CXmlImportReader extends CImportReader {
 						$data = $xml->value;
 					}
 					elseif (is_array($data)) {
-						throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path,
+						throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path,
 							_s('unexpected text "%1$s"', trim($xml->value))
 						));
 					}
