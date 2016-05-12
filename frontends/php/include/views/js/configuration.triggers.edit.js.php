@@ -4,7 +4,6 @@
 		(new CTextBox('tags[#{rowNum}][tag]', '', false, 255))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag')),
-		'&nbsp;',
 		(new CTextBox('tags[#{rowNum}][value]', '', false, 255))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('placeholder', _('value')),
