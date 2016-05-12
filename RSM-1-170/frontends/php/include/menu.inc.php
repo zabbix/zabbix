@@ -130,6 +130,14 @@ $ZBX_MENU = array(
 				'user_type'	=> array(USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE, USER_TYPE_COMPLIANCE,
 					USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
 				),
+			),
+			array(
+				'url' => 'rsm.slareports.php',
+				'label' => _('SLA reports'),
+				'sub_pages' => array('rsm.screens.php'),
+				'user_type'	=> array(USER_TYPE_ZABBIX_USER, USER_TYPE_TEHNICAL_SERVICE, USER_TYPE_COMPLIANCE,
+					USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN
+				)
 			)
 		)
 	),

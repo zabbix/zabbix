@@ -912,7 +912,8 @@ fieldset legend { margin: 0.2em 0.5em; }
 .particular-proxy .info-block .second-row-element { width: 300px; display: inline-block; }
 
 .incidents table.filter.info-block,
-.monthly-reports table.filter.info-block { text-align: left; }
+.monthly-reports table.filter.info-block,
+.sla-reports table.filter.info-block { text-align: left; }
 
 .incident-details .info-block,
 .tests .info-block,

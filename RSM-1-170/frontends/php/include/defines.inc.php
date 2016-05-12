@@ -925,6 +925,23 @@ define('RSM_RDDS_DELAY',		'{$RSM.RDDS.DELAY}');
 define('RSM_TLD_DNSSEC_ENABLED','{$RSM.TLD.DNSSEC.ENABLED}');
 define('RSM_TLD_EPP_ENABLED',	'{$RSM.TLD.EPP.ENABLED}');
 define('RSM_TLD_RDDS_ENABLED',	'{$RSM.TLD.RDDS.ENABLED}');
+define('RSM_SLV_NS_AVAIL',			'{$RSM.SLV.NS.AVAIL}');
+define('RSM_SLV_DNS_TCP_RTT',		'{$RSM.SLV.DNS.TCP.RTT}');
+define('RSM_DNS_TCP_RTT_LOW',		'{$RSM.DNS.TCP.RTT.LOW}');
+define('RSM_SLV_DNS_UDP_RTT',		'{$RSM.SLV.DNS.UDP.RTT}');
+define('RSM_DNS_UDP_RTT_LOW',		'{$RSM.DNS.UDP.RTT.LOW}');
+define('RSM_SLV_DNS_NS_UPD',		'{$RSM.SLV.DNS.NS.UPD}');
+define('RSM_DNS_UPDATE_TIME',		'{$RSM.DNS.UPDATE.TIME}');
+define('RSM_SLV_RDDS_UPD',			'{$RSM.SLV.RDDS.UPD}');
+define('RSM_SLV_RDDS43_RTT',		'{$RSM.SLV.RDDS43.RTT}');
+define('RSM_SLV_RDDS80_RTT',		'{$RSM.SLV.RDDS80.RTT}');
+define('RSM_RDDS_UPDATE_TIME',		'{$RSM.RDDS.UPDATE.TIME}');
+define('RSM_SLV_EPP_LOGIN',			'{$RSM.SLV.EPP.LOGIN}');
+define('RSM_EPP_LOGIN_RTT_LOW',		'{$RSM.EPP.LOGIN.RTT.LOW}');
+define('RSM_SLV_EPP_INFO',			'{$RSM.SLV.EPP.INFO}');
+define('RSM_EPP_INFO_RTT_LOW',		'{$RSM.EPP.INFO.RTT.LOW}');
+define('RSM_SLV_EPP_UPDATE',		'{$RSM.SLV.EPP.UPDATE}');
+define('RSM_EPP_UPDATE_RTT_LOW',	'{$RSM.EPP.UPDATE.RTT.LOW}');
 
 // SLA monitoring rolling week items keys
 define('RSM_SLV_DNS_ROLLWEEK',		'rsm.slv.dns.rollweek');
@@ -933,10 +950,27 @@ define('RSM_SLV_RDDS_ROLLWEEK',		'rsm.slv.rdds.rollweek');
 define('RSM_SLV_EPP_ROLLWEEK',		'rsm.slv.epp.rollweek');
 
 // SLA monitoring availability items keys
-define('RSM_SLV_DNS_AVAIL',		'rsm.slv.dns.avail');
-define('RSM_SLV_DNSSEC_AVAIL',	'rsm.slv.dnssec.avail');
-define('RSM_SLV_RDDS_AVAIL',	'rsm.slv.rdds.avail');
-define('RSM_SLV_EPP_AVAIL',		'rsm.slv.epp.avail');
+define('RSM_SLV_DNS_AVAIL',					'rsm.slv.dns.avail');
+define('RSM_SLV_DNS_DOWNTIME',				'rsm.slv.dns.downtime');
+define('RSM_SLV_DNS_NS_DOWNTIME',			'rsm.slv.dns.ns.downtime');
+define('RSM_SLV_DNS_TCP_RTT_PFAILED',		'rsm.slv.dns.tcp.rtt.pfailed');
+define('RSM_SLV_DNS_UDP_RTT_PFAILED',		'rsm.slv.dns.udp.rtt.pfailed');
+define('RSM_SLV_DNS_UDP_UPD_PFAILED',		'rsm.slv.dns.udp.upd.pfailed');
+define('RSM_SLV_RDDS_DOWNTIME',				'rsm.slv.rdds.downtime');
+define('RSM_SLV_RDDS43_RTT_PFAILED',		'rsm.slv.rdds43.rtt.pfailed');
+define('RSM_SLV_RDDS80_RTT_PFAILED',		'rsm.slv.rdds80.rtt.pfailed');
+define('RSM_SLV_RDDS43_UPD_PFAILED',		'rsm.slv.rdds43.upd.pfailed');
+define('RSM_SLV_EPP_DOWNTIME',				'rsm.slv.epp.downtime');
+define('RSM_SLV_EPP_RTT_LOGIN_PFAILED',		'rsm.slv.epp.rtt.login.pfailed');
+define('RSM_SLV_EPP_RTT_INFO_PFAILED',		'rsm.slv.epp.rtt.info.pfailed');
+define('RSM_SLV_EPP_RTT_UPDATE_PFAILED',	'rsm.slv.epp.rtt.update.pfailed');
+define('RSM_SLV_RDDS_AVAIL',				'rsm.slv.rdds.avail');
+define('RSM_SLV_EPP_AVAIL',					'rsm.slv.epp.avail');
+define('RSM_SLV_DNSSEC_AVAIL',				'rsm.slv.dnssec.avail');
+
+define('RSM_SLA_SCREEN_TYPE_GRAPH1',		0);
+define('RSM_SLA_SCREEN_TYPE_GRAPH2',		1);
+define('RSM_SLA_SCREEN_TYPE_SCREEN',		2);
 
 // SLA monitoring incident status
 define('INCIDENT_ACTIVE',			0);
