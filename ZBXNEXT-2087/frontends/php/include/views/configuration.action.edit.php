@@ -166,6 +166,8 @@ foreach (get_operators_by_conditiontype($this->data['new_condition']['conditiont
 	$conditionOperatorsComboBox->addItem($operator, condition_operator2str($operator));
 }
 
+$condition2 = null;
+
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
 		$condition = (new CMultiSelect([
@@ -347,6 +349,22 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
+	case CONDITION_TYPE_EVENT_TAG:
+		$condition = (new CTextBox('new_condition[value]', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag'));
+		break;
+
+	case CONDITION_TYPE_EVENT_TAG_VALUE:
+		$condition = (new CTextBox('new_condition[value]', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('value'));
+
+		$condition2 = (new CTextBox('new_condition[value2]', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag'));
+		break;
+
 	default:
 		$condition = null;
 }
@@ -359,6 +377,8 @@ $conditionFormList->addRow(_('New condition'),
 				new CCol([
 					$conditionTypeComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$condition2,
+					$condition2 === null ? '' : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$conditionOperatorsComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition

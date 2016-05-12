@@ -1538,7 +1538,7 @@ class CAction extends CApiService {
 
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				$conditions = API::getApiService()->select('conditions', [
-						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value'],
+						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value', 'value2'],
 						'filter' => ['actionid' => $actionIds],
 					'preservekeys' => true
 				]);
@@ -1559,6 +1559,7 @@ class CAction extends CApiService {
 						$sortFields = [
 							['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
 							['field' => 'operator', 'order' => ZBX_SORT_DOWN],
+							['field' => 'value2', 'order' => ZBX_SORT_DOWN],
 							['field' => 'value', 'order' => ZBX_SORT_DOWN]
 						];
 						CArrayHelper::sort($conditions, $sortFields);
@@ -1864,7 +1865,8 @@ class CAction extends CApiService {
 			CONDITION_TYPE_DSTATUS, CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_TEMPLATE,
 			CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_APPLICATION, CONDITION_TYPE_MAINTENANCE,
 			CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT,
-			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA
+			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG,
+			CONDITION_TYPE_EVENT_TAG_VALUE
 		];
 
 		$operators = [
@@ -1880,6 +1882,9 @@ class CAction extends CApiService {
 					'messageInvalid' => _('Incorrect filter condition type for action "%1$s".')
 				]) ,
 				'value' => new CStringValidator([
+					'empty' => true
+				]),
+				'value2' => new CStringValidator([
 					'empty' => true
 				]),
 				'formulaid' => new CStringValidator([
