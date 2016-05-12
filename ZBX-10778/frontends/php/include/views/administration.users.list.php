@@ -62,11 +62,15 @@ foreach ($this->data['users'] as $user) {
 
 	// online time
 	if ($session['lastaccess']) {
-		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
+		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout'])
+			? ZBX_USER_ONLINE_TIME
+			: $user['autologout'];
 
-		$online = (($session['lastaccess'] + $onlineTime) >= time())
-			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_RED);
+		$online = (($session['lastaccess'] + $onlineTime) >= time() && $user['users_status'] == USER_STATUS_ENABLED)
+			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
+				->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
+				->addClass(ZBX_STYLE_RED);
 	}
 	else {
 		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
@@ -152,3 +156,4 @@ $usersForm->addItem([
 $widget->addItem($usersForm);
 
 return $widget;
+
