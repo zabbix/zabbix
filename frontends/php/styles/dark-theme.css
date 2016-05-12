@@ -292,9 +292,9 @@ ul.top-nav-icons {
     float: left;
     padding: 0 12px; }
     .top-subnav li:last-child {
-      -webkit-box-shadow: 25px 0px 10px -10px #454545;
-      -moz-box-shadow: 25px 0px 10px -10px #454545;
-      box-shadow: 25px 0px 10px -10px #454545; }
+      -webkit-box-shadow: 25px 0 10px -10px #454545;
+      -moz-box-shadow: 25px 0 10px -10px #454545;
+      box-shadow: 25px 0 10px -10px #454545; }
 
 .top-subnav a {
   padding: 9px 1px; }
@@ -1759,21 +1759,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   left: 0;
   opacity: 0.35;
   filter: alpha(opacity=35); }
-
-.pop-up {
-  min-width: initial;
-  margin-bottom: 0; }
-  .pop-up article, .pop-up .article {
-    padding: 13px; }
-  .pop-up h1 {
-    border-bottom: none;
-    padding: 0; }
-  .pop-up .header-title ul {
-    position: absolute;
-    right: 0;
-    bottom: 0; }
-  .pop-up .dashbrd-widget-head {
-    padding: 8px 10px; }
 
 .calendar {
   width: 200px; }
