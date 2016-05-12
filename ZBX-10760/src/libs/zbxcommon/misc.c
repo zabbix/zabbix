@@ -261,7 +261,6 @@ double	zbx_current_time(void)
  ******************************************************************************/
 static int	is_leap_year(int year)
 {
-	/* same as (0 == year % 4 && 0 != year % 100) || 0 == year % 400 but more efficient */
 	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
 
@@ -307,7 +306,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 #	define ZBX_UTC_OFF	tm->tm_gmtoff
 #else
 #	define ZBX_UTC_OFF	offset
-		int		offset;
+		long		offset;
 		struct tm	tm_utc;
 #ifdef _WINDOWS
 		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
@@ -324,9 +323,8 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 			offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 #endif
 		tz->tz_sign = (0 <= ZBX_UTC_OFF ? '+' : '-');
-		ZBX_UTC_OFF = abs(ZBX_UTC_OFF);
-		tz->tz_hour = ZBX_UTC_OFF / SEC_PER_HOUR;
-		tz->tz_min = (ZBX_UTC_OFF - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
+		tz->tz_hour = labs(ZBX_UTC_OFF) / SEC_PER_HOUR;
+		tz->tz_min = (labs(ZBX_UTC_OFF) - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
 		/* assuming no remaining seconds like in historic Asia/Riyadh87, Asia/Riyadh88 and Asia/Riyadh89 */
 #undef ZBX_UTC_OFF
 	}
