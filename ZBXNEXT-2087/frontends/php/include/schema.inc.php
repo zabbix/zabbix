@@ -2305,6 +2305,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'value2' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'config' => [

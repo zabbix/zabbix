@@ -119,6 +119,13 @@ static int	DBpatch_3010011(void)
 	return DBadd_foreign_key("event_tag", 1, &field);
 }
 
+static int	DBpatch_3010012(void)
+{
+	const ZBX_FIELD	field = {"value2", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("conditions", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -137,5 +144,6 @@ DBPATCH_ADD(3010008, 0, 1)
 DBPATCH_ADD(3010009, 0, 1)
 DBPATCH_ADD(3010010, 0, 1)
 DBPATCH_ADD(3010011, 0, 1)
+DBPATCH_ADD(3010012, 0, 1)
 
 DBPATCH_END()
