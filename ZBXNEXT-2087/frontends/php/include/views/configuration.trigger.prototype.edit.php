@@ -465,16 +465,13 @@ $triggersFormList
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]));
 
 // tags
-$tags_table = (new CTable())
-	->setId('tbl_tags')
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+$tags_table = (new CTable())->setId('tbl_tags');
 
 foreach ($data['tags'] as $tag_key => $tag) {
 	$tags_table->addRow([
 		(new CTextBox('tags['.$tag_key.'][tag]', $tag['tag'], false, 255))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag')),
-		'&nbsp;',
 		(new CTextBox('tags['.$tag_key.'][value]', $tag['value'], false, 255))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAttribute('placeholder', _('value')),
@@ -491,7 +488,11 @@ $tags_table->setFooter(new CCol(
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
 ));
-$triggersFormList->addRow(_('Tags'), $tags_table);
+$triggersFormList->addRow(_('Tags'),
+	(new CDiv($tags_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+);
 
 // append status to form list
 if (empty($data['triggerid']) && empty($data['form_refresh'])) {
