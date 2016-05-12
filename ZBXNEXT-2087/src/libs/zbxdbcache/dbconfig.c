@@ -476,6 +476,7 @@ typedef struct
 	unsigned char	conditiontype;
 	unsigned char	operator;
 	const char	*value;
+	const char	*value2;
 }
 zbx_dc_action_condition_t;
 
@@ -3636,6 +3637,7 @@ static void	DCsync_action_conditions(DB_RESULT result)
 		ZBX_STR2UCHAR(condition->operator, row[3]);
 
 		DCstrpool_replace(found, &condition->value, row[4]);
+		DCstrpool_replace(found, &condition->value2, row[5]);
 
 		zbx_vector_ptr_append(&action->conditions, condition);
 	}
@@ -3652,6 +3654,7 @@ static void	DCsync_action_conditions(DB_RESULT result)
 			continue;
 
 		zbx_strpool_release(condition->value);
+		zbx_strpool_release(condition->value2);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -3974,7 +3977,7 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (action_condition_result = DBselect(
-			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value"
+			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value,c.value2"
 			" from conditions c,actions a"
 			" where c.actionid=a.actionid"
 				" and a.status=%d",
@@ -8806,6 +8809,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition->conditiontype = dc_condition->conditiontype;
 		condition->operator = dc_condition->operator;
 		condition->value = zbx_strdup(NULL, dc_condition->value);
+		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
 
 		zbx_vector_ptr_append(conditions, condition);
 	}

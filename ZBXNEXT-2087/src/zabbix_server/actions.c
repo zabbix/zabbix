@@ -27,36 +27,37 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: check_condition_tag_match                                        *
+ * Function: check_condition_pattern_match                                    *
  *                                                                            *
- * Purpose: check if condition value matches tag                              *
+ * Purpose: check if condition pattern matches the specified value            *
  *                                                                            *
- * Parameters: condition - condition for matching                             *
- *             value     - tag or tag value to match                          *
+ * Parameters: operator - [IN] the matching operator                          *
+ *             pattern  - [IN] the pattern to match                           *
+ *             value    - [IN] the value to match                             *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  ******************************************************************************/
-static int	check_condition_tag_match(const DB_CONDITION* condition, const char *value)
+static int	check_condition_pattern_match(unsigned char operator, const char *pattern, const char *value)
 {
 	int	ret = FAIL;
 
-	switch (condition->operator)
+	switch (operator)
 	{
 		case CONDITION_OPERATOR_EQUAL:
-			if (0 == strcmp(value, condition->value))
+			if (0 == strcmp(value, pattern))
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (0 != strcmp(value, condition->value))
+			if (0 != strcmp(value, pattern))
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_LIKE:
-			if (NULL != strstr(value, condition->value))
+			if (NULL != strstr(value, pattern))
 				ret = SUCCEED;
 			break;
 		case CONDITION_OPERATOR_NOT_LIKE:
-			if (NULL == strstr(value, condition->value))
+			if (NULL == strstr(value, pattern))
 				ret = SUCCEED;
 			break;
 	}
@@ -84,7 +85,7 @@ static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
-		ret = check_condition_tag_match(condition, tag->tag);
+		ret = check_condition_pattern_match(condition->operator, condition->value, tag->tag);
 	}
 
 	return ret;
@@ -110,7 +111,8 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
-		ret = check_condition_tag_match(condition, tag->value);
+		if (0 == strcmp(condition->value, tag->tag))
+			ret = check_condition_pattern_match(condition->operator, condition->value2, tag->value);
 	}
 
 	return ret;
@@ -1347,8 +1349,9 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 	const char	*__function_name = "check_action_condition";
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'",
-			__function_name, condition->actionid, condition->conditionid, condition->value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
+			condition->value, condition->value2);
 
 	switch (event->source)
 	{
