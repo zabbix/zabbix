@@ -187,6 +187,8 @@ static void	remove_problems(const zbx_vector_ptr_t *events)
 		zbx_vector_uint64_append(&triggerids, event->trigger.triggerid);
 	}
 
+	zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from problem where");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids.values, triggerids.values_num);
 
