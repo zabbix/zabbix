@@ -261,7 +261,8 @@ double	zbx_current_time(void)
  ******************************************************************************/
 static int	is_leap_year(int year)
 {
-	return (0 == year % 4 && 0 != year % 100) || 0 == year % 400 ? SUCCEED : FAIL;
+	/* same as (0 == year % 4 && 0 != year % 100) || 0 == year % 400 but more efficient */
+	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -359,7 +360,7 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	static const int	month_day[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 	static const int	epoch_year = 1970;
 
-	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon - 1) &&
+	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon) &&
 			0 <= hour && hour <= 23 && 0 <= min && min <= 59 && 0 <= sec && sec <= 61 &&
 			0 <= (*t = (year - epoch_year) * SEC_PER_YEAR +
 			(ZBX_LEAP_YEARS(2 < mon ? year + 1 : year) - ZBX_LEAP_YEARS(epoch_year)) * SEC_PER_DAY +
@@ -378,24 +379,25 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
  *                                                                            *
  * Purpose: returns number of days in a month                                 *
  *                                                                            *
- * Parameters: year - year, month - month (0-11)                              *
+ * Parameters:                                                                *
+ *     year  - [IN] year                                                      *
+ *     mon   - [IN] month (1-12)                                              *
  *                                                                            *
- * Return value: 28-31 depending on number of days in the month               *
+ * Return value: 28-31 depending on number of days in the month, defaults to  *
+ *               30 if the month is outside of allowed range                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_day_in_month(int year, int mon)
 {
-	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	/* number of days in the month of a non-leap year */
+	static const unsigned char	month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	if (SUCCEED == is_leap_year(year))
-		return month_leap[mon];
-	else
-		return month[mon];
+	if (1 <= mon && mon <= 12)	/* add one day in February of a leap year */
+		return month[mon - 1] + (2 == mon && SUCCEED == is_leap_year(year) ? 1 : 0);
+
+	return 30;
 }
 
 /******************************************************************************
