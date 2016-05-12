@@ -316,7 +316,7 @@ class C32XmlValidator {
 						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'application' =>			['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-								'name' =>                   ['type' => XML_STRING]
+								'name' =>					['type' => XML_STRING]
 							]],
 							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
 							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -675,7 +675,7 @@ class C32XmlValidator {
 						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'application' =>			['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-								'name' =>                   ['type' => XML_STRING]
+								'name' =>					['type' => XML_STRING]
 							]],
 							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
 							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
