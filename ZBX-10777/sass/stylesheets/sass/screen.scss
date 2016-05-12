@@ -407,7 +407,7 @@ ul.top-nav-icons {
 		padding: 0 12px;
 
 		&:last-child {
-			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
+			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
 		}
 	}
 }
@@ -1398,18 +1398,18 @@ footer {
 	}
 
 	label {
-		padding: 0 0 0 16px;
+		padding: 0 0 0 18px;
 		display: inline-block;
-		text-indent: -13px;
+		text-indent: -18px;
 		max-width: 600px;
 
 		input[type="checkbox"] {
-			left: -3px;
+			left: -4px;
 			margin: 0;
 		}
 
 		input[type="radio"] {
-			left: -3px;
+			left: -4px;
 			margin: 0;
 		}
 	}
@@ -1561,10 +1561,73 @@ input {
 	}
 
 	&[type="checkbox"] {
+    + label span {
+      @include border-radius(2px);
+
+      //&::after {
+      //  content:'';
+      //  border-color: $transparent;
+      //  @include transition(border-color .2s ease-out);
+    //  }
+    }
+
+    &:checked + label span {
+
+      &::after {
+        content:'';
+        position: absolute;
+				display: block;
+        width: 7px;
+        height: 4px;
+        top: 6px;
+        left: 7px;
+        border-left: 2px solid $btn-bg-color;
+				border-bottom: 2px solid $btn-bg-color;
+        @include transform(translate3d(-50%,-50%,0) rotate(-45deg));
+			}
+    }
+
+    &:checked[disabled] + label span {
+
+			&::after {
+				border-color: $form-border-color !important;
+			}
+		}
 		@extend %form-check-radio-style;
 	}
 
 	&[type="radio"] {
+    + label span {
+      @include border-radius(50%);
+
+      //&::after {
+      //  content: '';
+      //  border-color: $transparent;
+      //  @include transition(background-color .2s ease-out);
+    //  }
+    }
+
+    &:checked + label span {
+
+      &::after {
+        content: '';
+        position: absolute;
+        display: block;
+        width: 8px;
+        height: 8px;
+        top: 3px;
+        left: 3px;
+        background-color: $btn-bg-color;
+        @include border-radius(50%);
+      }
+    }
+
+		&:checked[disabled] + label span {
+
+			&::after {
+				background-color: $form-border-color !important;
+			}
+		}
 		@extend %form-check-radio-style;
 	}
 
@@ -1647,13 +1710,52 @@ select {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	vertical-align: middle;
-	position: relative;
-	top: -1px;
 	overflow: hidden;
 	width: 13px;
 	height: 13px;
 	background: none;
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px);
+
+  + label span {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin: 0 4px -3px 0;
+    border: 1px solid $form-border-color;
+    background-color: $form-bg-color;
+    //@include transition(background-color .2s ease-out);
+
+    &:active {
+      border-color: $form-border-color;
+    }
+  }
+
+  &:focus + label span {
+    border-color: $form-border-focus-color;
+  }
+
+  &:checked + label span {
+    position: relative;
+    z-index: 1;
+  }
+
+  &:checked:focus + label span {
+    border-color: $form-border-focus-color;
+  }
+
+  &:checked[disabled] + label span {
+    &::after {
+      border-color: $form-border-color !important;
+    }
+    @include transition(none);
+  }
+
+  &[disabled] + label span {
+    @include transition(none);
+    @extend %form-disabled;
+  }
+
 }
 
 %form-input-height-padding {
@@ -2552,6 +2654,33 @@ $form-icon-btn: (
 	@include opacity(0.35);
 }
 
+.pop-up {
+	min-width: initial;
+	margin-bottom: 0;
+
+	article {
+		padding: 13px;
+	}
+
+	h1 {
+		border-bottom: none;
+		padding: 0;
+	}
+
+	.header-title {
+
+		ul {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+		}
+	}
+
+	.dashbrd-widget-head {
+		padding: 8px 10px;
+	}
+}
+
 .calendar {
 	width: 200px;
 
@@ -3429,7 +3558,6 @@ a.overlay-close-btn {
 // Color picker
 .color-picker {
 	height: 20px;
-	white-space: nowrap;
 
 	div {
 		display: inline-block;
