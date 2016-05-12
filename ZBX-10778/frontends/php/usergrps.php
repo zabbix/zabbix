@@ -331,7 +331,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.m
 		show_messages($result, _('Debug mode updated'), _('Cannot update debug mode'));
 	}
 }
-elseif (str_in_array(getRequest('action'), ['usergroup.massenable', 'usergroup.massdisable'])) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), ['usergroup.massenable', 'usergroup.massdisable'])) {
 	$groupIds = getRequest('group_groupid', getRequest('usrgrpid'));
 	zbx_value2array($groupIds);
 
