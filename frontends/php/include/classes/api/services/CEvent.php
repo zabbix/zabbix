@@ -613,6 +613,8 @@ class CEvent extends CApiService {
 				'preservekeys' => true
 			]);
 
+			CArrayHelper::sort($tags, ['tag', 'value']);
+
 			$relationMap = $this->createRelationMap($tags, 'eventid', 'eventtagid');
 			$tags = $this->unsetExtraFields($tags, ['eventtagid', 'eventid'], []);
 			$result = $relationMap->mapMany($result, $tags, 'tags');
