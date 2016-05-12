@@ -127,23 +127,20 @@ static void	save_events()
  * Purpose: links trigger recovery (OK) events to corresponding problem       *
  *          events                                                            *
  *                                                                            *
+ * Parameters: events - [IN] recovery events                                  *
+ *                                                                            *
  ******************************************************************************/
-static void	link_recovery_events()
+static void	link_recovery_events(const zbx_vector_ptr_t *events)
 {
 	char	*sql = NULL;
-	size_t	i, sql_alloc = 0, sql_offset = 0;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	i;
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < events->values_num; i++)
 	{
-		DB_EVENT	*event = &events[i];
-
-		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
-			continue;
-
-		if (TRIGGER_VALUE_OK != event->value)
-			continue;
+		const DB_EVENT	*event = (const DB_EVENT *)events->values[i];
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update events set r_eventid=" ZBX_FS_UI64
@@ -171,24 +168,21 @@ static void	link_recovery_events()
  *                                                                            *
  * Purpose: remove problems created by now recovered (OK) triggers            *
  *                                                                            *
+ * Parameters: events - [IN] recovery events                                  *
+ *                                                                            *
  ******************************************************************************/
-static void	remove_problems()
+static void	remove_problems(const zbx_vector_ptr_t *events)
 {
 	char			*sql = NULL;
-	size_t			i, sql_alloc = 0, sql_offset = 0;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	triggerids;
+	int			i;
 
 	zbx_vector_uint64_create(&triggerids);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < events->values_num; i++)
 	{
-		DB_EVENT	*event = &events[i];
-
-		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
-			continue;
-
-		if (TRIGGER_VALUE_OK != event->value)
-			continue;
+		const DB_EVENT	*event = (const DB_EVENT *)events->values[i];
 
 		zbx_vector_uint64_append(&triggerids, event->trigger.triggerid);
 	}
@@ -208,23 +202,19 @@ static void	remove_problems()
  *                                                                            *
  * Purpose: add problems based on problem events and their triggers           *
  *                                                                            *
+ * Parameters: events - [IN] problem events                                   *
+ *                                                                            *
  ******************************************************************************/
-static void	add_problems()
+static void	add_problems(const zbx_vector_ptr_t *events)
 {
-	size_t		i;
+	int		i;
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, "problem", "problemid", "triggerid", "eventid", NULL);
 
-	for (i = 0; i < events_num; i++)
+	for (i = 0; i < events->values_num; i++)
 	{
-		DB_EVENT	*event = &events[i];
-
-		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
-			continue;
-
-		if (TRIGGER_VALUE_PROBLEM != event->value)
-			continue;
+		const DB_EVENT	*event = (const DB_EVENT *)events->values[i];
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event->trigger.triggerid, event->eventid);
 	}
@@ -244,7 +234,10 @@ static void	add_problems()
 static void	process_trigger_events()
 {
 	size_t	i;
-	int	problem_events_num = 0, recovery_events_num = 0;
+	zbx_vector_ptr_t	problem_events, recovery_events;
+
+	zbx_vector_ptr_create(&problem_events);
+	zbx_vector_ptr_create(&recovery_events);
 
 	for (i = 0; i < events_num; i++)
 	{
@@ -256,22 +249,25 @@ static void	process_trigger_events()
 		switch (event->value)
 		{
 			case TRIGGER_VALUE_OK:
-				recovery_events_num++;
+				zbx_vector_ptr_append(&recovery_events, event);
 				break;
 			case TRIGGER_VALUE_PROBLEM:
-				problem_events_num++;
+				zbx_vector_ptr_append(&problem_events, event);
 				break;
 		}
 	}
 
-	if (0 != recovery_events_num)
+	if (0 != recovery_events.values_num)
 	{
-		link_recovery_events();
-		remove_problems();
+		link_recovery_events(&recovery_events);
+		remove_problems(&recovery_events);
 	}
 
-	if (0 != problem_events_num)
-		add_problems();
+	if (0 != problem_events.values_num)
+		add_problems(&problem_events);
+
+	zbx_vector_ptr_destroy(&recovery_events);
+	zbx_vector_ptr_destroy(&problem_events);
 }
 
 /******************************************************************************
