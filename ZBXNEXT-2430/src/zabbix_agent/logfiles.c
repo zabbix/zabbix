@@ -1988,6 +1988,80 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 
 /******************************************************************************
  *                                                                            *
+ * Function: jump_ahead                                                       *
+ *                                                                            *
+ * Purpose: move to a new position in the log file list                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     key             - [IN] item key for logging                            *
+ *     logfiles        - [IN/OUT] list of log files                           *
+ *     logfiles_num    - [IN] number of elements in 'logfiles'                *
+ *     jump_from       - [IN] number of element where to start jump           *
+ *     seq             - [IN/OUT] sequence number of last processed file      *
+ *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
+ *     mtime           - [IN/OUT] last modification time of the file          *
+ *     remaining_bytes - [IN] number of remaining bytes in all logfiles       *
+ *     delay           - [IN] calculated delay is seconds                     *
+ *     max_delay       - [IN] "maxdelay" parameter in log[], logrt[],         *
+ *                            log.count[] and logrt.count[] items             *
+ *                                                                            *
+ ******************************************************************************/
+static void	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num, int jump_from,
+		int *seq, zbx_uint64_t *lastlogsize, int *mtime, zbx_uint64_t remaining_bytes, double delay,
+		float max_delay)
+{
+	zbx_uint64_t	bytes_to_jump, bytes_jumped = 0;
+	int		i, first_pass = 1;
+
+	/* calculate jump */
+	bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
+
+	/* enter the loop with index of the last file processed, later continue the loop from the start */
+	i = jump_from;
+
+	while (i < logfiles_num)
+	{
+		if (logfiles[i].size != logfiles[i].processed_size)
+		{
+			zbx_uint64_t	new_processed_size;
+
+			bytes_jumped = MIN(bytes_to_jump, logfiles[i].size - logfiles[i].processed_size);
+			new_processed_size = logfiles[i].processed_size + bytes_jumped;
+
+			zabbix_log(LOG_LEVEL_WARNING, "item:\"%s\" logfile:\"%s\" skipping " ZBX_FS_UI64 " bytes (from"
+					" byte " ZBX_FS_UI64 " to byte " ZBX_FS_UI64 ") to meet maxdelay", key,
+					logfiles[i].filename, bytes_jumped, logfiles[i].processed_size,
+					new_processed_size);
+
+			logfiles[i].processed_size = new_processed_size;
+
+			if (0 == logfiles[i].seq)
+				logfiles[i].seq = (*seq)++;
+
+			*lastlogsize = new_processed_size;
+			*mtime = logfiles[i].mtime;
+
+			bytes_to_jump -= bytes_jumped;
+		}
+
+		if (0 == bytes_to_jump)
+			break;
+
+		if (0 != first_pass)
+		{
+			first_pass = 0;
+
+			/* now proceed from the beginning of the file list */
+			i = 0;
+			continue;
+		}
+
+		i++;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_logrt                                                    *
  *                                                                            *
  * Purpose: Find new records in logfiles                                      *
@@ -2035,6 +2109,7 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  *     port             - [IN] port to send data to                           *
  *     hostname         - [IN] hostname the data comes from                   *
  *     key              - [IN] item key the data belongs to                   *
+ *     jumped           - [OUT] flag to indicate that a jump took place       *
  *     max_delay        - [IN] maximum allowed delay, s                       *
  *     refresh          - [IN] item update interval                           *
  *                                                                            *
@@ -2050,16 +2125,16 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key, float max_delay, int refresh)
+		const char *key, int *jumped, float max_delay, int refresh)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1;
+				max_old_seq = 0, old_last, from_first_file = 1, last_processed;
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
 	zbx_stopwatch_t		stopwatch;
-	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0, bytes_to_jump;
+	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0;
 	double			delay;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d is_count:%d filename:'%s' lastlogsize:" ZBX_FS_UI64
@@ -2190,7 +2265,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	}
 
 	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
-	i = start_idx;
+	last_processed = i = start_idx;
 
 	/* from now assume success - it could be that there is nothing to do */
 	ret = SUCCEED;
@@ -2224,6 +2299,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* the current checking. In the next check the file will be marked in the list of old files */
 			/* and we will know where we left off. */
 			logfiles[i].seq = seq++;
+			last_processed = i;
 
 			if (SUCCEED != ret)
 				break;
@@ -2258,20 +2334,19 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		i++;
 	}
 
-	if (0.0f != max_delay)
+	/* Consider jump only if 'SUCCEED == ret'. 'SUCCEED != ret' means that process_log() failed (can happen in */
+	/* case of file I/O error, bad regexp etc.). In this case we try up to 3 times and make item NOTSUPPORTED. */
+
+	if (0.0f != max_delay && SUCCEED == ret)
 	{
 		zbx_stopwatch_stop(&stopwatch);
 
 		if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(processed_bytes,
 				remaining_bytes, refresh, zbx_stopwatch_elapsed(&stopwatch))))
 		{
-			/* calculate jump */
-			bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
-
-			zabbix_log(LOG_LEVEL_WARNING, "item \"%s\": skipping " ZBX_FS_UI64 " bytes to meet maxdelay",
-					key, bytes_to_jump);
-
-			/* move ahead in the file list */
+			jump_ahead(key, logfiles, logfiles_num, last_processed, &seq, lastlogsize, mtime,
+					remaining_bytes, delay, max_delay);
+			*jumped = 1;
 		}
 	}
 
@@ -2290,13 +2365,12 @@ out:
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
-					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s bytes_to_jump:" ZBX_FS_UI64,
+					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s",
 					__function_name, zbx_result_string(ret), processed_bytes, remaining_bytes,
 					0 != processed_bytes ? zbx_stopwatch_elapsed(&stopwatch) : 0.0,
 					0 != processed_bytes ?
 					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch) : 0.0,
-					0 != processed_bytes ? delay : 0.0,
-					0 != processed_bytes ? bytes_to_jump : (zbx_uint64_t)0);
+					0 != processed_bytes ? delay : 0.0);
 		}
 	}
 
