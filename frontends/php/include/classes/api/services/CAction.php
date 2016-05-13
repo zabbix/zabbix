@@ -690,7 +690,7 @@ class CAction extends CApiService {
 		$actionConditions = [];
 		if ($newActionConditions !== null) {
 			$existingConditions = DBfetchArray(DBselect(
-				'SELECT conditionid,actionid,conditiontype,operator,value'.
+				'SELECT conditionid,actionid,conditiontype,operator,value,value2'.
 				' FROM conditions'.
 				' WHERE '.dbConditionInt('actionid', $actionIds).
 				' ORDER BY conditionid'
@@ -2002,9 +2002,17 @@ class CAction extends CApiService {
 			if (isset($action['filter'])) {
 				$filterValidator->setObjectName($action['name']);
 				$this->checkValidator($action['filter'], $filterValidator);
+				$filterConditionValidator->setObjectName($action['name']);
 
 				foreach ($action['filter']['conditions'] as $condition) {
-					$filterConditionValidator->setObjectName($action['name']);
+					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE &&
+							!array_key_exists('value2', $condition)) {
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s('No "%2$s" given for a filter condition of action "%1$s".', $action['name'], 'value2')
+						);
+					}
+
 					$this->checkValidator($condition, $filterConditionValidator);
 					$conditionsToValidate[] = $condition;
 				}
@@ -2135,6 +2143,14 @@ class CAction extends CApiService {
 				$this->checkValidator($actionFilter, $filterValidator);
 
 				foreach ($actionFilter['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE &&
+							!array_key_exists('value2', $condition)) {
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s('No "%2$s" given for a filter condition of action "%1$s".', $actionName, 'value2')
+						);
+					}
+
 					$this->checkValidator($condition, $filterConditionValidator);
 					$conditionsToValidate[] = $condition;
 				}

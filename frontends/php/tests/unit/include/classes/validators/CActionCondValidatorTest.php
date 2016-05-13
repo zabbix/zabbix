@@ -165,6 +165,15 @@ class CActionCondValidatorTest extends CValidatorTest {
 			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 				'value' => 'abc',
+			]],
+			[[], [
+				'conditiontype' => CONDITION_TYPE_EVENT_TAG,
+				'value' => 'Tag01'
+			]],
+			[[], [
+				'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+				'value' => 'Value 01',
+				'value2' => 'Tag01'
 			]]
 		];
 	}
