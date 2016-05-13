@@ -1065,7 +1065,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
 	char			*encoding_uc = NULL, *max_delay_str;
 	int			rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr,
-				mtime_orig, big_rec_orig, logfiles_num_new = 0;
+				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
 	zbx_uint64_t		lastlogsize_orig;
 	float			max_delay;
 	struct st_logfile	*logfiles_new = NULL;
@@ -1206,8 +1206,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
-			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, max_delay,
-			metric->refresh);
+			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, &jumped,
+			max_delay, metric->refresh);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -1235,8 +1235,12 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 			if (SUCCEED == process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
-					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL))
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL) || 0 != jumped)
 			{
+				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
+				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */
+				/* after jump */
+
 				*lastlogsize_sent = metric->lastlogsize;
 				*mtime_sent = metric->mtime;
 
@@ -1247,7 +1251,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 			}
 			else
 			{
-				/* unable to send data, restore original state to try again in next check */
+				/* unable to send data and no jump took place, restore original state to try again */
+				/* during the next check */
 
 				metric->lastlogsize = lastlogsize_orig;
 				metric->mtime =  mtime_orig;
@@ -1264,7 +1269,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		/* suppress first two errors */
 		if (3 > metric->error_count)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt) processing error #%d: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt)(.count) processing error #%d: %s",
 					metric->error_count, NULL != *error ? *error : "unknown error");
 
 			zbx_free(*error);
