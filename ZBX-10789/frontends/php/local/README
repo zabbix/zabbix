@@ -1,0 +1,9 @@
+The directory allows to extend or modify existing functionality of Zabbix. Files placed here have a priority and are preserved after upgrades.
+
+1. Front-end views
+
+Copy an existing view from app/views to local/app/views. Modify it. Done.
+
+2. Front-end Controllers
+
+Copy an existing controller from app/controllers to local/app/controllers. Modify it. Done.
