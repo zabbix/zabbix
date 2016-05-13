@@ -30,17 +30,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = array(
-	'export' =>			array(T_ZBX_INT, O_OPT,	P_ACT,	null,		null),
+	'export' =>			array(T_ZBX_INT, O_OPT,		P_ACT,	null,			null),
 	// filter
-	'filter_set' =>		array(T_ZBX_STR, O_OPT,	P_ACT,	null,		null),
-	'tld' =>			array(T_ZBX_STR, O_OPT,  null,	null,		null),
-	'filter_year' =>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
-	'filter_month' =>	array(T_ZBX_INT, O_OPT,  null,	null,		null),
-	'itemid' =>			array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
+	'filter_set' =>		array(T_ZBX_STR, O_OPT,		P_ACT,	null,			null),
+	'tld' =>			array(T_ZBX_STR, O_OPT,		null,	null,			null),
+	'filter_year' =>	array(T_ZBX_INT, O_OPT,		null,	null,			null),
+	'filter_month' =>	array(T_ZBX_INT, O_OPT,		null,	null,			null),
+	'itemid' =>			array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			null),
+	'type' =>			array(T_ZBX_INT, O_OPT,		null,	IN('0,1,2'),	null),
 	// ajax
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>			array(T_ZBX_STR, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>		array(T_ZBX_INT, O_OPT, P_ACT,  NOT_EMPTY,	'isset({favobj})&&("filter"=={favobj})')
+	'favobj' =>			array(T_ZBX_STR, O_OPT,		P_ACT,	null,			null),
+	'favref' =>			array(T_ZBX_STR, O_OPT,		P_ACT,  NOT_EMPTY,		'isset({favobj})'),
+	'favstate' =>		array(T_ZBX_INT, O_OPT,		P_ACT,  NOT_EMPTY,		'isset({favobj})&&("filter"=={favobj})')
 );
 
 check_fields($fields);

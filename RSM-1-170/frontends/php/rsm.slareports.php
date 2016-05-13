@@ -90,8 +90,9 @@ else {
 
 if ($data['filter_search']) {
 	$tld = API::Host()->get(array(
-		'tlds' => true,
 		'output' => array('hostid', 'host', 'name'),
+		'tlds' => true,
+		'selectMacros' => API_OUTPUT_EXTEND,
 		'filter' => array(
 			'name' => $data['filter_search']
 		)
@@ -101,8 +102,8 @@ if ($data['filter_search']) {
 	if ($data['tld']) {
 		$item_keys = array(RSM_SLV_DNS_DOWNTIME, RSM_SLV_RDDS_DOWNTIME, RSM_SLV_EPP_DOWNTIME,
 			RSM_SLV_DNS_TCP_RTT_PFAILED, RSM_SLV_DNS_UDP_RTT_PFAILED, RSM_SLV_DNS_UDP_UPD_PFAILED,
-			RSM_SLV_RDDS43_RTT_PFAILED, RSM_SLV_RDDS80_RTT_PFAILED, RSM_SLV_RDDS43_UPD_PFAILED,
-			RSM_SLV_EPP_RTT_LOGIN_PFAILED, RSM_SLV_EPP_RTT_UPDATE_PFAILED, RSM_SLV_EPP_RTT_INFO_PFAILED
+			RSM_SLV_EPP_RTT_LOGIN_PFAILED, RSM_SLV_EPP_RTT_UPDATE_PFAILED, RSM_SLV_EPP_RTT_INFO_PFAILED,
+			RSM_SLV_RDDS43_UPD_PFAILED
 		);
 
 		// Get items.
@@ -127,19 +128,42 @@ if ($data['filter_search']) {
 			exit;
 		}
 
-		// Macro values.
+		$macro_keys = array(RSM_SLV_NS_AVAIL, RSM_SLV_DNS_TCP_RTT, RSM_DNS_TCP_RTT_LOW, RSM_SLV_DNS_UDP_RTT,
+			RSM_DNS_UDP_RTT_LOW, RSM_SLV_DNS_NS_UPD, RSM_DNS_UPDATE_TIME, RSM_SLV_RDDS_UPD,
+			RSM_RDDS_UPDATE_TIME, RSM_SLV_EPP_LOGIN, RSM_EPP_LOGIN_RTT_LOW, RSM_SLV_EPP_INFO,
+			RSM_EPP_INFO_RTT_LOW, RSM_SLV_EPP_UPDATE, RSM_EPP_UPDATE_RTT_LOW, RSM_SLV_MACRO_DNS_AVAIL,
+			RSM_SLV_MACRO_EPP_AVAIL, RSM_SLV_MACRO_RDDS_AVAIL
+		);
+
 		$macros = API::UserMacro()->get(array(
 			'globalmacro' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'filter' => array(
-				'macro' => array(RSM_SLV_NS_AVAIL, RSM_SLV_DNS_TCP_RTT, RSM_DNS_TCP_RTT_LOW, RSM_SLV_DNS_UDP_RTT,
-					RSM_DNS_UDP_RTT_LOW, RSM_SLV_DNS_NS_UPD, RSM_DNS_UPDATE_TIME, RSM_SLV_RDDS_UPD, RSM_SLV_RDDS43_RTT,
-					RSM_SLV_RDDS80_RTT, RSM_RDDS_UPDATE_TIME, RSM_SLV_EPP_LOGIN, RSM_EPP_LOGIN_RTT_LOW,
-					RSM_SLV_EPP_INFO, RSM_EPP_INFO_RTT_LOW, RSM_SLV_EPP_UPDATE, RSM_EPP_UPDATE_RTT_LOW
-				)
+				'macro' => $macro_keys
 			)
 		));
+
 		$macros = zbx_toHash($macros, 'macro');
+
+		if (count($macro_keys) != count($macros)) {
+			$missed_macro = array();
+			foreach ($macro_keys as $macro) {
+				if (!array_key_exists($macro, $macros)) {
+					$missed_macro[] = $macro;
+				}
+			}
+
+			show_error_message(_s('Configuration error, cannot find macros: "%1$s".', implode(', ', $missed_macro)));
+			require_once dirname(__FILE__).'/include/page_footer.php';
+			exit;
+		}
+
+		foreach ($data['tld']['macros'] as $macro) {
+			$macros[$macro['macro']] = array(
+				'macro' => $macro['macro'],
+				'value' => $macro['value']
+			);
+		}
 
 		// time limits
 		$start_time = mktime(
@@ -186,7 +210,7 @@ if ($data['filter_search']) {
 			'from' => '-',
 			'to' => '-',
 			'slv' => $item_hystory['cnt'].' '._('min'),
-			'slr' => _s('%1$s minutes of downtime', 0),
+			'slr' => _s('%1$s minutes of downtime', ($macros[RSM_SLV_MACRO_DNS_AVAIL]['value'] / 60)),
 			'screen' => array(
 				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&itemid='.$items[RSM_SLV_DNS_DOWNTIME]['itemid'].'&filter_year='.$data['filter_year'].
@@ -401,7 +425,7 @@ if ($data['filter_search']) {
 			'from' => '-',
 			'to' => '-',
 			'slv' => $item_hystory['cnt'].' '._('min'),
-			'slr' => _s('%1$s min of downtime', ($macros[RSM_SLV_RDDS_UPD]['value'] / 60)),
+			'slr' => _s('%1$s min of downtime', ($macros[RSM_SLV_MACRO_RDDS_AVAIL]['value'] / 60)),
 			'screen' => array(
 				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&itemid='.$items[RSM_SLV_RDDS_DOWNTIME]['itemid'].'&filter_year='.$data['filter_year'].
@@ -432,52 +456,6 @@ if ($data['filter_search']) {
 				SPACE,
 				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&itemid=0&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'type='.RSM_SLA_SCREEN_TYPE_GRAPH2
-				)
-			)
-		];
-
-		// RDDS43 query RTT.
-		$slv = $macros[RSM_SLV_EPP_INFO]['value'];
-		$data['services'][] = [
-			'name' => 'RDDS43 query RTT',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $slv, //?
-			'slr' => _s('<=%1$s ms, for at least %2$s%% of the queries', 1, 2),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&itemid=0&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&itemid=0&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'type='.RSM_SLA_SCREEN_TYPE_GRAPH2
-				)
-			)
-		];
-
-		// RDDS80 query RTT.
-		$slv = $macros[RSM_SLV_RDDS80_RTT]['value'];
-		$data['services'][] = [
-			'name' => 'RDDS80 query RTT',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $slv, //?
-			'slr' => _s('<=%1$s ms, for at least %2$s%% of the queries', 1, 2),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&itemid='.$items[RSM_SLV_EPP_DOWNTIME]['itemid'].'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&itemid='.$items[RSM_SLV_EPP_DOWNTIME]['itemid'].'&filter_year='.$data['filter_year'].
 					'&filter_month='.$data['filter_month'].'type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 				)
 			)
@@ -540,7 +518,7 @@ if ($data['filter_search']) {
 			'from' => '-',
 			'to' => '-',
 			'slv' => $item_hystory['cnt'].' '._('min'),
-			'slr' => _s('%1$s min of downtime', '???'),
+			'slr' => _s('%1$s min of downtime', ($macros[RSM_SLV_MACRO_EPP_AVAIL]['value'] / 60)),
 			'screen' => array(
 				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&itemid='.$items[RSM_SLV_EPP_DOWNTIME]['itemid'].'&filter_year='.$data['filter_year'].
