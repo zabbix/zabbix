@@ -1511,14 +1511,14 @@ static void	lld_trigger_dependencies_make(zbx_vector_ptr_t *trigger_prototypes, 
  *                                                                            *
  * Function: lld_trigger_tag_make                                             *
  *                                                                            *
- * Purpose: create a trigger tags                                             *
+ * Purpose: create a trigger tag                                              *
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_tag_make(zbx_lld_trigger_prototype_t *trigger_prototype,
 		zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers, zbx_hashset_t *items_triggers,
 		zbx_lld_row_t *lld_row)
 {
-	const char			*__function_name = "lld_trigger_dependency_make";
+	const char			*__function_name = "lld_trigger_tag_make";
 
 	zbx_lld_trigger_t		*trigger;
 	int				i;
@@ -1576,6 +1576,13 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_tags_make                                            *
+ *                                                                            *
+ * Purpose: create a trigger tags                                             *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_trigger_tags_make(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
 		zbx_vector_ptr_t *lld_rows)
 {
@@ -1970,6 +1977,79 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 	zbx_vector_uint64_destroy(&triggerids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_validate_trigger_tag_field                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field, zbx_uint64_t flag,
+		size_t field_len, char **error)
+{
+	if (0 == (tag->flags & ZBX_FLAG_LLD_TAG_DISCOVERED))
+		return;
+
+	/* only new trigger tags or tags with changed data will be validated */
+	if (0 != tag->triggertagid && 0 == (tag->flags & flag))
+		return;
+
+	if (SUCCEED != zbx_is_utf8(field))
+	{
+		char	*field_utf8;
+
+		field_utf8 = zbx_strdup(NULL, field);
+		zbx_replace_invalid_utf8(field_utf8);
+		*error = zbx_strdcatf(*error, "Cannot %s trigger tag: value \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != tag->triggertagid ? "update" : "create"), field_utf8);
+
+		zbx_free(field_utf8);
+	}
+	else if (zbx_strlen_utf8(field) > field_len)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s trigger tag: value \"%s\" is too long.\n",
+				(0 != tag->triggertagid ? "update" : "create"), field);
+	}
+	else
+		return;
+
+	if (0 != tag->triggertagid)
+		tag->flags = ZBX_FLAG_LLD_TAG_DELETE;
+	else
+		tag->flags &= ~ZBX_FLAG_LLD_TAG_DISCOVERED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_trigger_tags_validate                                        *
+ *                                                                            *
+ * Purpose: validate created or updated trigger tags                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
+{
+	int				i, j;
+	zbx_lld_trigger_t		*trigger;
+	zbx_lld_tag_t			*tag;
+
+	/* marking dependencies which will be deleted */
+	for (i = 0; i < triggers->values_num; i++)
+	{
+		trigger = (zbx_lld_trigger_t *)triggers->values[i];
+
+		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
+			continue;
+
+		for (j = 0; j < trigger->tags.values_num; j++)
+		{
+			tag = (zbx_lld_tag_t *)trigger->tags.values[j];
+
+			lld_validate_trigger_tag_field(tag, tag->tag, ZBX_FLAG_LLD_TAG_UPDATE_TAG,
+					TRIGGER_TAG_LEN, error);
+			lld_validate_trigger_tag_field(tag, tag->value, ZBX_FLAG_LLD_TAG_UPDATE_VALUE,
+					TRIGGER_TAG_VALUE_LEN, error);
+		}
+	}
 }
 
 /******************************************************************************
@@ -3202,6 +3282,7 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, error);
 	lld_trigger_dependencies_validate(&triggers, error);
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows);
+	lld_trigger_tags_validate(&triggers, error);
 	lld_triggers_save(hostid, &trigger_prototypes, &triggers);
 
 	/* cleaning */
