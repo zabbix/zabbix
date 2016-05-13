@@ -352,17 +352,27 @@ function actionOperationConditionValueToString(array $conditions) {
  * @param string $conditionType
  * @param string $operator
  * @param string $value
+ * @param string $value2
  *
  * @return array
  */
-function getConditionDescription($conditionType, $operator, $value) {
-	return [
-		condition_type2str($conditionType),
-		SPACE,
-		condition_operator2str($operator),
-		SPACE,
-		italic(CHtml::encode($value))
-	];
+function getConditionDescription($conditionType, $operator, $value, $value2) {
+	$description = [condition_type2str($conditionType)];
+
+	if ($conditionType == CONDITION_TYPE_EVENT_TAG_VALUE) {
+		$description[] = '. '._('Tag').': ';
+		$description[] = italic(CHtml::encode($value2));
+		$description[] = ' '._('Value').': ';
+	}
+	else {
+		$description[] = ' ';
+	}
+
+	$description[] = condition_operator2str($operator);
+	$description[] = ' ';
+	$description[] = italic(CHtml::encode($value));
+
+	return $description;
 }
 
 /**

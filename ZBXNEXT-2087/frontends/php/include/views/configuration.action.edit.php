@@ -105,7 +105,7 @@ if ($this->data['action']['filter']['conditions']) {
 			[
 				$labelSpan,
 				getConditionDescription($condition['conditiontype'], $condition['operator'],
-					$actionConditionStringValues[0][$cIdx]
+					$actionConditionStringValues[0][$cIdx], $condition['value2']
 				),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
@@ -986,7 +986,7 @@ if (!empty($this->data['new_operation'])) {
 				[
 					$labelCol,
 					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-						$operationConditionStringValues[$cIdx]
+						$operationConditionStringValues[$cIdx], ''
 					),
 					(new CCol([
 						(new CButton('remove', _('Remove')))
