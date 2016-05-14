@@ -2015,7 +2015,6 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
 		zbx_replace_invalid_utf8(field_utf8);
 		*error = zbx_strdcatf(*error, "Cannot %s trigger tag: value \"%s\" has invalid UTF-8 sequence.\n",
 				(0 != tag->triggertagid ? "update" : "create"), field_utf8);
-
 		zbx_free(field_utf8);
 	}
 	else if (zbx_strlen_utf8(field) > field_len)
@@ -2041,9 +2040,9 @@ static void	lld_validate_trigger_tag_field(zbx_lld_tag_t *tag, const char *field
  ******************************************************************************/
 static void	lld_trigger_tags_validate(zbx_vector_ptr_t *triggers, char **error)
 {
-	int				i, j;
-	zbx_lld_trigger_t		*trigger;
-	zbx_lld_tag_t			*tag;
+	int			i, j;
+	zbx_lld_trigger_t	*trigger;
+	zbx_lld_tag_t		*tag;
 
 	/* marking dependencies which will be deleted */
 	for (i = 0; i < triggers->values_num; i++)
