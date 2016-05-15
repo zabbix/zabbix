@@ -50,7 +50,7 @@ static size_t	events_alloc = 0, events_num = 0;
  *             trigger_tags                - [IN] trigger tags                *
  *                                                                            *
  ******************************************************************************/
-void	add_event( unsigned char source, unsigned char object, zbx_uint64_t objectid,
+void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags)
@@ -206,23 +206,22 @@ static void	save_events()
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	if (0 == event_tags.num_data)
-		goto out;
+	if (0 != event_tags.num_data) {
+		zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
 
-	zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+		eventtagid = DBget_maxid_num("event_tag", event_tags.num_data);
 
-	eventtagid = DBget_maxid_num("event_tag", event_tags.num_data);
+		zbx_hashset_iter_reset(&event_tags, &iter);
+		while (NULL != (event_tag = zbx_hashset_iter_next(&iter)))
+		{
+			zbx_db_insert_add_values(&db_insert_tags, eventtagid++, event_tag->eventid, event_tag->tag->tag,
+					event_tag->tag->value);
+		}
 
-	zbx_hashset_iter_reset(&event_tags, &iter);
-	while (NULL != (event_tag = zbx_hashset_iter_next(&iter)))
-	{
-		zbx_db_insert_add_values(&db_insert_tags, eventtagid++, event_tag->eventid, event_tag->tag->tag,
-				event_tag->tag->value);
+		zbx_db_insert_execute(&db_insert_tags);
+		zbx_db_insert_clean(&db_insert_tags);
 	}
 
-	zbx_db_insert_execute(&db_insert_tags);
-	zbx_db_insert_clean(&db_insert_tags);
-out:
 	zbx_hashset_destroy(&event_tags);
 }
 

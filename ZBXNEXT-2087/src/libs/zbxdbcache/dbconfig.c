@@ -3691,19 +3691,20 @@ static void	DCsync_action_conditions(DB_RESULT result)
  ******************************************************************************/
 static void	DCsync_trigger_tags(DB_RESULT result)
 {
-	const char			*__function_name = "DCsync_trigger_tags";
+	const char		*__function_name = "DCsync_trigger_tags";
 
-	DB_ROW				row;
-	zbx_vector_uint64_t		ids;
-	int				found;
-	zbx_hashset_iter_t		iter;
-	zbx_uint64_t			triggerid, triggertagid;
-	ZBX_DC_TRIGGER			*trigger;
-	zbx_dc_trigger_tag_t		*trigger_tag;
+	DB_ROW			row;
+	zbx_vector_uint64_t	ids;
+	int			found;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		triggerid, triggertagid;
+	ZBX_DC_TRIGGER		*trigger;
+	zbx_dc_trigger_tag_t	*trigger_tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
+
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(triggerid, row[1]);
@@ -5348,20 +5349,20 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 
 	zbx_vector_ptr_create(&dst_trigger->tags);
 
-	if (0 < src_trigger->tags.values_num)
+	if (0 != src_trigger->tags.values_num)
 	{
 		zbx_vector_ptr_reserve(&dst_trigger->tags, src_trigger->tags.values_num);
 
 		for (i = 0; i < src_trigger->tags.values_num; i++)
 		{
 			zbx_dc_trigger_tag_t	*dc_trigger_tag = (zbx_dc_trigger_tag_t *)src_trigger->tags.values[i];
-			zbx_tag_t	*trigger_tag;
+			zbx_tag_t		*tag;
 
-			trigger_tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
-			trigger_tag->tag = zbx_strdup(NULL, dc_trigger_tag->tag);
-			trigger_tag->value = zbx_strdup(NULL, dc_trigger_tag->value);
+			tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, dc_trigger_tag->tag);
+			tag->value = zbx_strdup(NULL, dc_trigger_tag->value);
 
-			zbx_vector_ptr_append(&dst_trigger->tags, trigger_tag);
+			zbx_vector_ptr_append(&dst_trigger->tags, tag);
 		}
 	}
 }

@@ -2089,7 +2089,7 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
  *                                                                            *
  * Function: compare_tags                                                     *
  *                                                                            *
- * Purpose: comparison function to sort tags by tag/value                     **
+ * Purpose: comparison function to sort tags by tag/value                     *
  *                                                                            *
  ******************************************************************************/
 static int	compare_tags(const void *d1, const void *d2)
@@ -2143,7 +2143,7 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
 	{
 		const zbx_tag_t	*tag = (const zbx_tag_t *)tags.values[i];
 
-		if (0 < i)
+		if (0 != i)
 			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
 
 		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, tag->tag);
