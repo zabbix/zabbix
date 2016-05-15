@@ -48,14 +48,17 @@ static int	check_condition_pattern_match(unsigned char operator, const char *pat
 			if (0 == strcmp(value, pattern))
 				ret = SUCCEED;
 			break;
+
 		case CONDITION_OPERATOR_NOT_EQUAL:
 			if (0 != strcmp(value, pattern))
 				ret = SUCCEED;
 			break;
+
 		case CONDITION_OPERATOR_LIKE:
 			if (NULL != strstr(value, pattern))
 				ret = SUCCEED;
 			break;
+
 		case CONDITION_OPERATOR_NOT_LIKE:
 			if (NULL == strstr(value, pattern))
 				ret = SUCCEED;
@@ -111,8 +114,8 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
-		if (0 == strcmp(condition->value, tag->tag))
-			ret = check_condition_pattern_match(condition->operator, condition->value2, tag->value);
+		if (0 == strcmp(condition->value2, tag->tag))
+			ret = check_condition_pattern_match(condition->operator, condition->value, tag->value);
 	}
 
 	return ret;
