@@ -8757,6 +8757,7 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
  ******************************************************************************/
 static void	zbx_db_condition_free(DB_CONDITION *condition)
 {
+	zbx_free(condition->value2);
 	zbx_free(condition->value);
 	zbx_free(condition);
 }
