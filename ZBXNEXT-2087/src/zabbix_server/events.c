@@ -72,8 +72,6 @@ void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid
 	events[events_num].value = value;
 	events[events_num].acknowledged = EVENT_NOT_ACKNOWLEDGED;
 
-	zbx_vector_ptr_create(&events[events_num].tags);
-
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
 		events[events_num].trigger.triggerid = objectid;
@@ -82,6 +80,8 @@ void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid
 		events[events_num].trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
 		events[events_num].trigger.priority = trigger_priority;
 		events[events_num].trigger.type = trigger_type;
+
+		zbx_vector_ptr_create(&events[events_num].tags);
 
 		if (NULL != trigger_tags)
 		{
@@ -179,6 +179,9 @@ static void	save_events()
 
 		event_tag_local.eventid = events[i].eventid;
 
+		if (EVENT_SOURCE_TRIGGERS != events[i].source)
+			continue;
+
 		for (j = 0; j < events[i].tags.values_num; j++)
 		{
 			event_tag_local.tag = (zbx_tag_t *)events[i].tags.values[j];
@@ -238,15 +241,15 @@ static void	clean_events()
 
 	for (i = 0; i < events_num; i++)
 	{
-		zbx_vector_ptr_clear_ext(&events[i].tags, (zbx_clean_func_t)zbx_free_tag);
-		zbx_vector_ptr_destroy(&events[i].tags);
-
 		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
 
 		zbx_free(events[i].trigger.description);
 		zbx_free(events[i].trigger.expression);
 		zbx_free(events[i].trigger.recovery_expression);
+
+		zbx_vector_ptr_clear_ext(&events[i].tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&events[i].tags);
 	}
 
 	events_num = 0;

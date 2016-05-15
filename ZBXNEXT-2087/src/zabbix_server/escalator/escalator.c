@@ -1157,10 +1157,10 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 	event->acknowledged = atoi(row[6]);
 	event->ns = atoi(row[7]);
 
-	zbx_vector_ptr_create(&event->tags);
-
-	if (EVENT_OBJECT_TRIGGER == event->object)
+	if (EVENT_SOURCE_TRIGGERS == event->source)
 	{
+		zbx_vector_ptr_create(&event->tags);
+
 		DBfree_result(result);
 
 		result = DBselect("select tag,value from event_tag where eventid=" ZBX_FS_UI64, eventid);
@@ -1175,7 +1175,10 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 
 			zbx_vector_ptr_append(&event->tags, tag);
 		}
+	}
 
+	if (EVENT_OBJECT_TRIGGER == event->object)
+	{
 		DBfree_result(result);
 
 		result = DBselect(
@@ -1217,8 +1220,11 @@ out:
  ******************************************************************************/
 static void	free_event_info(DB_EVENT *event)
 {
-	zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
-	zbx_vector_ptr_destroy(&event->tags);
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&event->tags);
+	}
 
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
