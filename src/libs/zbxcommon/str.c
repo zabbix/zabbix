@@ -4171,8 +4171,7 @@ out:
  ******************************************************************************/
 int	zbx_strcmp_natural(const char *s1, const char *s2)
 {
-	int	ret;
-	int	value1, value2;
+	int	ret, value1, value2;
 
 	for (;'\0' != *s1 && '\0' != *s2; s1++, s2++)
 	{
