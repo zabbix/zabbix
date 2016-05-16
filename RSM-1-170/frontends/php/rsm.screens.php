@@ -34,9 +34,9 @@ $fields = array(
 	// filter
 	'filter_set' =>		array(T_ZBX_STR, O_OPT,		P_ACT,	null,			null),
 	'tld' =>			array(T_ZBX_STR, O_OPT,		null,	null,			null),
-	'filter_year' =>	array(T_ZBX_INT, O_OPT,		null,	null,			null),
-	'filter_month' =>	array(T_ZBX_INT, O_OPT,		null,	null,			null),
-	'itemid' =>			array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,			null),
+	'filter_year' =>	array(T_ZBX_STR, O_OPT,		null,	null,			null),
+	'filter_month' =>	array(T_ZBX_STR, O_OPT,		null,	null,			null),
+	'item_key' =>		array(T_ZBX_STR, O_OPT,		P_SYS,	DB_ID,			null),
 	'type' =>			array(T_ZBX_INT, O_OPT,		null,	IN('0,1,2'),	null),
 	// ajax
 	'favobj' =>			array(T_ZBX_STR, O_OPT,		P_ACT,	null,			null),
@@ -57,9 +57,16 @@ if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) 
 	exit();
 }
 
-$data = array();
-$data['tld'] = array();
-$data['services'] = array();
+/*
+ * Filter
+ */
+if (!array_key_exists('tld', $_REQUEST) || !array_key_exists('filter_year', $_REQUEST)
+		|| !array_key_exists('filter_month', $_REQUEST) || !array_key_exists('type', $_REQUEST)
+		|| !array_key_exists('item_key', $_REQUEST)) {
+	show_error_message(_('Incorrect input parameters.'));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
 
 $year = date('Y', time());
 $month = date('m', time());
@@ -72,45 +79,49 @@ else {
 	$month--;
 }
 
-/*
- * Filter
- */
-if (array_key_exists('filter_set', $_REQUEST)) {
-	$data['filter_search'] = get_request('filter_search');
-	$data['filter_year'] = get_request('filter_year');
-	$data['filter_month'] = get_request('filter_month');
+$data = array(
+	'filter_year' => get_request('filter_year'),
+	'filter_month' => get_request('filter_month'),
+	'type' => get_request('type'),
+	'item_key' => get_request('item_key')
+);
 
-	if ($year < $data['filter_year'] || ($year == $data['filter_year'] && $month < $data['filter_month'])) {
-		show_error_message(_('Incorrect report period.'));
-	}
-}
-else {
-	$data['filter_search'] = null;
-	$data['filter_year'] = $year;
-	$data['filter_month'] = $month;
+if ($year < $data['filter_year'] || ($year == $data['filter_year'] && $month < $data['filter_month'])) {
+	show_error_message(_('Incorrect report period.'));
 }
 
-if ($data['filter_search']) {
-	$tld = API::Host()->get(array(
-		'tlds' => true,
-		'output' => array('hostid', 'host', 'name'),
-		'filter' => array(
-			'name' => $data['filter_search']
-		)
-	));
-	$data['tld'] = reset($tld);
+$tld = API::Host()->get(array(
+	'tlds' => true,
+	'output' => array('hostid', 'host', 'name'),
+	'filter' => array(
+		'name' => get_request('tld')
+	)
+));
 
-	if ($data['tld']) {
-		// get items
-
-		// Graph #1.
-
-		// Graph #2
-
-		// Screen
-	}
+if (!$tld) {
+	show_error_message(_s('No permissions to referred TLD "%1$s" or it does not exist!', get_request('tld')));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
 }
 
+$data['tld'] = reset($tld);
+
+// Item validation.
+$item = API::Item()->get(array(
+	'output' => array('key_'),
+	'hostids' => $data['tld']['hostid'],
+	'filter' => array(
+		'key_' => get_request('item_key')
+	)
+));
+
+if (!$item) {
+	show_error_message(_s('Item with key "%1$s" not exist on TLD!', get_request('item_key')));
+	require_once dirname(__FILE__).'/include/page_footer.php';
+	exit;
+}
+
+// Get data by item key and type
 $rsmView = new CView('rsm.screens.view', $data);
 $rsmView->render();
 $rsmView->show();

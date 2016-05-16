@@ -65,12 +65,15 @@ $div_buttons->setAttribute('style', 'padding: 4px 0px;');
 
 $filter_table->addRow(new CCol($div_buttons, 'center'));
 
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addItem($filter_table);
-$filterForm->addVar('checkallvalue', 0);
-$filterForm->addVar('filter_set', 1);
-$widget->addFlicker($filterForm, CProfile::get('web.rsm.screens.filter.state', 0));
+$filter_form = new CForm('get');
+$filter_form->setAttribute('name', 'zbx_filter');
+$filter_form->setAttribute('id', 'zbx_filter');
+$filter_form->addItem($filter_table);
+$filter_form->addVar('checkallvalue', 0);
+$filter_form->addVar('filter_set', 1);
+$filter_form->addVar('tld', $data['tld']);
+$filter_form->addVar('type', $data['type']);
+$filter_form->addVar('item_key', $data['item_key']);
+$widget->addFlicker($filter_form, CProfile::get('web.rsm.screens.filter.state', 0));
 
 return $widget;
