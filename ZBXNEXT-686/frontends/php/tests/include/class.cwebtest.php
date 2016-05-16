@@ -78,7 +78,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->quit();
 	}
 
-	private function authenticate() {
+	public function authenticate() {
 		$this->webDriver->get(PHPUNIT_URL);
 		$row = DBfetch(DBselect("select null from sessions where sessionid='09e7d4286dfdca4ba7be15e0f3b2b55a'"));
 
@@ -104,7 +104,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestOpen($url);
 //$this->webDriver->takeScreenshot('/home/jenkins/public_html/screenshots/1.png');
 
-		$this->zbxTestTextPresent([$ZBX_SERVER_NAME, 'Admin']);
+//		$this->zbxTestTextPresent([$ZBX_SERVER_NAME, 'Admin']);
 		$this->zbxTestTextNotPresent('Login name or password is incorrect');
 	}
 
@@ -130,10 +130,15 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($title, $this->webDriver->getTitle());
 	}
 
-	public function zbx_test_check_header($header) {
+	public function zbxTestCheckHeader($header) {
+		$this->zbxWaitUntil(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::tagName("h1")), 'element is not visible');
 		$headerElemnt = $this->webDriver->findElement(WebDriverBy::tagName("h1"));
 		$headerElemnt->isDisplayed();
 		$this->assertEquals($header, $headerElemnt->getText());
+	}
+
+	public function zbxTestHeaderNotPresent($header) {
+		$this->assertFalse($this->zbxIsElementPresent(WebDriverBy::xpath("//h1[contains(text(),'".$header."')]")), '"'.$header.'" must not exist.' );
 	}
 
 	public function zbxTestTextPresent($strings) {
@@ -152,7 +157,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function zbxTestTexVisibleOnPage($strings) {
+	public function zbxTestTextVisibleOnPage($strings) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
@@ -172,9 +177,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
-//		$page_source = $this->webDriver->getPageSource();
+
 		foreach ($strings as $string) {
-//                        $this->assertTrue(strstr($page_source, $string) === false, '"'.$string.'" must not exist.');
 			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
 			$this->assertTrue(count($elements) === 0, '"'.$string.'" must not exist.');
 		}
@@ -182,6 +186,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestClickLinkText($link_text) {
 		$this->webDriver->findElement(WebDriverBy::linkText($link_text))->click();
+	}
+
+	public function zbxTestClickButtonText($button_text) {
+		$this->webDriver->findElement(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"))->click();
 	}
 
 	public function zbxTestClick($id) {
@@ -193,13 +201,21 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 //		$this->wait();
 	}
 
+	public function zbxTestClickXpath($xpath) {
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
 	public function zbxTestHrefClickWait($href) {
-		$this->click("xpath=//a[contains(@href,'$href')]");
-		$this->wait();
+		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@href,'$href')]"))->click();
+//		$this->wait();
 	}
 
 	public function href_click($a) {
-		$this->click("xpath=//a[contains(@href,'$a')]");
+		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@href,'$a')]"))->click();
+	}
+
+	public function zbxTestClickOnclick($a) {
+		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@onclick,'$a')]"))->click();
 	}
 
 	public function zbxTestCheckboxSelect($a, $select = true) {
@@ -214,11 +230,14 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function input_type($id, $str) {
-//		$this->type($id, $str);
 		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
 
-	public function wait_input_type($id, $str) {
+	public function zbxTestInputTypeByXpath($xpath, $str) {
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
+	}
+
+	public function zbxTestInputTypeWait($id, $str) {
 		$this->zbxWaitUntil(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id($id)), 'input is not visible');
 		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
@@ -258,6 +277,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 		if (count($elements) === 0) {
 			$this->fail("Element was not found");
+		}
+
+		$this->assertTrue(true);
+	}
+
+	public function zbxAssertElementNotPresent($by) {
+		$elements = $this->webDriver->findElements($by);
+
+		if (count($elements) !== 0) {
+			$this->fail("Element was found");
 		}
 
 		$this->assertTrue(true);
@@ -303,7 +332,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestCheckFatalErrors();
 	}
 
-	public function zbx_wait_window_and_switch_to_it($id) {
+	public function zbxWaitWindowAndSwitchToIt($id) {
 		$this->webDriver->wait(5)->until(function () use ($id) {
 			try {
 				$handles = count($this->webDriver->getWindowHandles());
@@ -320,12 +349,12 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxGetDropDownElements($dropdownId) {
-		$optionCount = $this->getXpathCount('//*[@id="'.$dropdownId.'"]/option');
+		$optionCount = count($this->webDriver->findElements(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option')));
 		$optionList = [];
 		for ($i = 1; $i <= $optionCount; $i++) {
 			$optionList[] = [
-				'id' => $this->getAttribute('//*[@id="'.$dropdownId.'"]/option['.$i.']@value'),
-				'content' => $this->getText('//*[@id="'.$dropdownId.'"]/option['.$i.']')
+				'id' => $this->webDriver->findElement(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option['.$i.']'))->getAttribute('value'),
+				'content' => $this->webDriver->findElement(WebDriverBy::xpath('//*[@id="'.$dropdownId.'"]/option['.$i.']'))->getText()
 			];
 		}
 		return $optionList;
@@ -338,7 +367,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	 * @param $value
 	 */
 	public function assertElementValue($name, $value) {
-		$this->assertElementPresent("//*[@name='".$name."' and @value='".$value."']");
+		$this->webDriver->findElement(WebDriverBy::xpath("//*[@name='".$name."' and @value='".$value."']"));
 	}
 
 	/**

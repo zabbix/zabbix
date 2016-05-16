@@ -31,12 +31,25 @@ class testPageUsers extends CWebTest {
 	public function testPageUsers_CheckLayout($user) {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbx_test_check_header('Users');
+		$this->zbxTestCheckHeader('Users');
 
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(['Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status']);
+		$this->zbxTestTextPresent(
+				[
+					'Alias',
+					'Name',
+					'Surname',
+					'User type',
+					'Groups',
+					'Is online?',
+					'Login',
+					'Frontend access',
+					'Debug mode',
+					'Status'
+					]
+		);
 		$this->zbxTestTextPresent([$user['alias'], $user['name'], $user['surname']]);
 		$this->zbxTestDropdownHasOptions('filter_usrgrpid', ['All', 'Disabled', 'Enabled debug mode', 'Guests', 'No access to the frontend', 'Zabbix administrators']);
 	}
@@ -47,6 +60,8 @@ class testPageUsers extends CWebTest {
 	public function testPageUsers_SimpleUpdate($user) {
 		$userid = $user['userid'];
 		$alias = $user['alias'];
+
+		DBexecute('UPDATE users SET autologout=0 WHERE userid=2');
 
 		$sqlHashUser = 'select * from users where userid='.$userid;
 		$oldHashUser = DBhash($sqlHashUser);
@@ -64,7 +79,7 @@ class testPageUsers extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestTextPresent('User updated');
 		$this->zbxTestTextPresent($alias);
-		$this->zbx_test_check_header('Users');
+		$this->zbxTestCheckHeader('Users');
 
 		$this->assertEquals($oldHashUser, DBhash($sqlHashUser));
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup), 'Chuck Norris: User update changed data in table users_groups');

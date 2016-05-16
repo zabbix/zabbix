@@ -27,9 +27,10 @@ class testPagePopup extends CWebTest {
 			'popup.php?srctbl=applications&srcfld1=name&dstfrm=form&dstfld1=fld1';
 
 	public function testPagePopupProxies_CheckLayout() {
-		$this->zbxTestLogin($this->urlPopupProxies);
+		$this->authenticate();
+		$this->zbxTestOpen($this->urlPopupProxies);
 		$this->zbxTestCheckTitle('Proxies');
-		$this->zbxTestTextPresent('Proxies');
+		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent(['Name']);
 
 		$result = DBselect(
@@ -43,15 +44,16 @@ class testPagePopup extends CWebTest {
 	}
 
 	public function testPagePopupApplications_CheckLayout() {
-		$this->zbxTestLogin($this->urlPopupApplications);
+		$this->authenticate();
+		$this->zbxTestOpen($this->urlPopupApplications);
 		$this->zbxTestCheckTitle('Applications');
-		$this->zbxTestTextPresent('Applications');
+		$this->zbxTestCheckHeader('Applications');
 		$this->zbxTestTextPresent(['Group', 'Host']);
 		$this->zbxTestTextPresent('Name');
-		$this->assertElementPresent('groupid');
-		$this->assertElementPresent('hostid');
-		$this->assertSomethingSelected('groupid');
-		$this->assertSomethingSelected('hostid');
+		$this->zbxAssertElementPresent(WebDriverBy::id('groupid'));
+		$this->zbxAssertElementPresent(WebDriverBy::id('hostid'));
+		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestDropdownSelectWait('hostid', 'Template OS Linux');
 
 		$ddGroups = $this->zbxGetDropDownElements('groupid');
 		$dbGroups = [];
@@ -68,6 +70,7 @@ class testPagePopup extends CWebTest {
 					' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')'.
 			')'
 		);
+
 		while ($row = DBfetch($result)) {
 			$dbGroups[] = $row;
 		}

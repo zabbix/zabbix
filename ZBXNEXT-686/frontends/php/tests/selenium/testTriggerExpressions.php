@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testTriggerExpression extends CWebTest {
+class testTriggerExpressions extends CWebTest {
 
 	public static function provider() {
 		return [
@@ -34,13 +34,13 @@ class testTriggerExpression extends CWebTest {
 	* @dataProvider provider
 	*/
 	public function testTriggerExpression_SimpleTest($where, $what, $expected) {
-		$this->zbxTestLogin('tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C'.$where);
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
+		$this->zbxTestOpen('tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C'.$where);
 		$this->zbxTestCheckTitle('Test');
-		$this->input_type("//input[@type='text']", $what);
+		$this->zbxTestCheckHeader('Test');
+		$this->zbxTestInputTypeByXpath("//input[@type='text']", $what);
 
-		$this->zbxTestClick("//input[@value='Test']");
-		$this->zbxTestClick("//input[@id='test_expression']");
-		$this->zbxTestClick("//input[@name='test_expression']");
+		$this->zbxTestClick("test_expression");
 		$this->zbxTestTextPresent($expected);
 	}
 }

@@ -22,6 +22,11 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationUserCreate extends CWebTest {
+
+	public function testFormAdministrationUserCreate_backup() {
+		DBsave_tables('users');
+	}
+
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
@@ -30,13 +35,17 @@ class testFormAdministrationUserCreate extends CWebTest {
 		$this->input_type('name', 'User name');
 		$this->input_type('surname', 'User surname');
 		$this->zbxTestClick('add_group');
-		$this->zbx_wait_window_and_switch_to_it('zbx_popup');
+		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestCheckboxSelect('new_groups_7');
 		$this->zbxTestClick('select');
 		$this->webDriver->switchTo()->window('');
-		$this->wait_input_type('password1', '123');
+		$this->zbxTestInputTypeWait('password1', '123');
 		$this->input_type('password2', '123');
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('User added');
+	}
+
+	public function testFormAdministrationUserCreate_restore() {
+		DBrestore_tables('users');
 	}
 }

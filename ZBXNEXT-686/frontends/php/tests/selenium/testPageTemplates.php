@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageTemplates extends CWebTest {
-	// Returns all templates
+
 	public static function allTemplates() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_TEMPLATE.')');
 	}
@@ -33,16 +33,13 @@ class testPageTemplates extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
 		$this->zbxTestCheckTitle('Configuration of templates');
-		$this->zbxTestTextPresent('TEMPLATES');
+		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('Displaying');
 
-		// header
 		$this->zbxTestTextPresent(['Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to']);
 
-		// data
 		$this->zbxTestTextPresent([$template['name']]);
-		$this->zbxTestDropdownHasOptions('action',
-				['Export selected', 'Delete selected', 'Delete selected with linked elements']);
+		$this->zbxTestTextPresent(['Export', 'Delete', 'Delete and clear']);
 	}
 
 	/**
@@ -54,7 +51,9 @@ class testPageTemplates extends CWebTest {
 
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = DBhash($sqlTemplate);
-		$sqlHosts = "select * from hosts order by hostid";
+		$sqlHosts = "select * from hosts ".
+				"where hostid not in ('15001', '20003', '40001', '50001', '50003', '50004', '50005', '50007', '50008')".
+				"order by hostid";
 		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
@@ -66,13 +65,14 @@ class testPageTemplates extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of templates');
 
-		$this->zbxTestTextPresent($name); // link is present on the screen?
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestTextPresent($name);
+		$this->zbxTestClickLinkText($name);
+		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template updated');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('TEMPLATES');
+		$this->zbxTestTextPresent($name);
+		$this->zbxTestCheckHeader('Templates');
 
 		$this->assertEquals($oldHashTemplate, DBhash($sqlTemplate));
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts));

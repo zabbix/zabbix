@@ -19,8 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
-
-/*
 require_once dirname(__FILE__).'/testPageDashboard.php';
 require_once dirname(__FILE__).'/testPageOverview.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
@@ -28,9 +26,9 @@ require_once dirname(__FILE__).'/testPageWeb.php';
 require_once dirname(__FILE__).'/testPageStatusOfTriggers.php';
 require_once dirname(__FILE__).'/testPageEvents.php';
 require_once dirname(__FILE__).'/testPageScreens.php';
-
 require_once dirname(__FILE__).'/testPageActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationAudit.php';
+require_once dirname(__FILE__).'/testPageAdministrationAuditActions.php';
 require_once dirname(__FILE__).'/testPageAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
@@ -58,7 +56,6 @@ require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
-*/
 require_once dirname(__FILE__).'/testPageUsers.php';
 /*
 require_once dirname(__FILE__).'/testFormAction.php';
@@ -95,8 +92,10 @@ require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
+*/
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
+/*
 require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
@@ -105,19 +104,21 @@ require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
+*/
+require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
-*/
 
 class SeleniumTests {
 	public static function suite() {
 		$suite = new PHPUnit_Framework_TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
-/*		$suite->addTestSuite('testPageActions');
+		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationAudit');
+		$suite->addTestSuite('testPageAdministrationAuditActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
@@ -153,7 +154,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
-		$suite->addTestSuite('testFormAction');
+/*		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
@@ -167,6 +168,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationScripts');
+*/
+		$suite->addTestSuite('testFormAdministrationUserCreate');
+/*
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
@@ -183,8 +187,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormGraphPrototype');
+*/
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
+/*
 		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceGraph');
@@ -193,10 +199,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testInheritanceGraphPrototype');
+*/
+		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testUrlParameters');*/
+		$suite->addTestSuite('testUrlParameters');
 
 		return $suite;
 	}
