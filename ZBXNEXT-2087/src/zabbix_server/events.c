@@ -204,7 +204,8 @@ static void	save_events()
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	if (0 != event_tags.num_data) {
+	if (0 != event_tags.num_data)
+	{
 		zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
 
 		eventtagid = DBget_maxid_num("event_tag", event_tags.num_data);
