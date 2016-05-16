@@ -412,8 +412,6 @@ abstract class CTriggerGeneral extends CApiService {
 				'preservekeys' => true
 			]);
 
-			CArrayHelper::sort($tags, ['tag', 'value']);
-
 			$relationMap = $this->createRelationMap($tags, 'triggerid', 'triggertagid');
 			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], []);
 			$result = $relationMap->mapMany($result, $tags, 'tags');

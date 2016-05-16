@@ -1441,6 +1441,7 @@ function getTriggerFormData(array $data) {
 
 		if (!hasRequest('form_refresh')) {
 			$data['tags'] = $trigger['tags'];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
 		// Get templates.

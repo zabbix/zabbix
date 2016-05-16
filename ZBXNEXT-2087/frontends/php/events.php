@@ -809,6 +809,8 @@ else {
 					}
 
 					// tags
+					CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
 					$tags = [];
 					$tags_count = 1;
 
