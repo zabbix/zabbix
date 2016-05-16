@@ -2266,8 +2266,9 @@ static void	dc_string_buffer_realloc(size_t len)
 		size_t	diff;
 
 		diff = string_values_offset + len - string_values_alloc;
-		diff = (diff + ZBX_STRING_REALLOC_STEP - 1) / ZBX_STRING_REALLOC_STEP;
-		diff = diff * ZBX_STRING_REALLOC_STEP;
+
+		diff += ZBX_STRING_REALLOC_STEP - 1;
+		diff -= diff % ZBX_STRING_REALLOC_STEP;
 
 		string_values_alloc += diff;
 		string_values = zbx_realloc(string_values, string_values_alloc);
