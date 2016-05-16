@@ -383,6 +383,34 @@ static void	parse_traps(int flag)
 
 /******************************************************************************
  *                                                                            *
+ * Function: delay_trap_logs                                                  *
+ *                                                                            *
+ * Purpose: delay SNMP trapper file related issue log entries by 60 seconds   *
+ *          unless this is the first time this issue has occurred             *
+ *                                                                            *
+ * Parameters: lastlogtime - [IN] time when caller called this function       *
+ *                                previous time                               *
+ *                                                                            *
+ * Return value: 0 - if caller is calling this function for the first time of *
+ *                   the perevious call was more than 60 seconds earlier      *
+ *              -1 - otherwise                                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	delay_trap_logs(int lastlogtime)
+{
+	const int	delay = 60;
+	int		ret = 0, now;
+
+	now = (int)time(NULL);
+
+	if (0 == lastlogtime || delay <= now - lastlogtime)
+		return ret;
+	else
+		return ret = -1;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: read_traps                                                       *
  *                                                                            *
  * Purpose: read the traps and then parse them with parse_traps()             *
@@ -399,15 +427,35 @@ static int	read_traps()
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to %d for \"%s\": %s", trap_lastsize,
-				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		int		write_log;
+		static int	now = 0;
+
+		write_log = delay_trap_logs(now);
+
+		if (0 == write_log)
+		{
+			now = (int)time(NULL);
+
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set position to %d for \"%s\": %s", trap_lastsize,
+					CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		}
 		goto exit;
 	}
 
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot read from SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-				zbx_strerror(errno));
+		int		write_log;
+		static int	now = 0;
+
+		write_log = delay_trap_logs(now);
+
+		if (0 == write_log)
+		{
+			now = (int)time(NULL);
+
+			zabbix_log(LOG_LEVEL_WARNING, "cannot read from SNMP trapper file \"%s\": %s",
+					CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		}
 		goto exit;
 	}
 
@@ -465,10 +513,20 @@ static int	open_trap_file()
 {
 	zbx_stat_t	file_buf;
 
-	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
+	if (-1 == zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-				zbx_strerror(errno));
+		int		write_log;
+		static int	now = 0;
+
+		write_log = delay_trap_logs(now);
+
+		if (0 == write_log)
+		{
+			now = (int)time(NULL);
+
+			zabbix_log(LOG_LEVEL_CRIT, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+					zbx_strerror(errno));
+		}
 		goto out;
 	}
 
@@ -490,8 +548,18 @@ static int	open_trap_file()
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-					zbx_strerror(errno));
+			int		write_log;
+			static int	now = 0;
+
+			write_log = delay_trap_logs(now);
+
+			if (0 == write_log)
+			{
+				now = (int)time(NULL);
+
+				zabbix_log(LOG_LEVEL_CRIT, "cannot open SNMP trapper file \"%s\": %s",
+						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+			}
 		}
 		goto out;
 	}
