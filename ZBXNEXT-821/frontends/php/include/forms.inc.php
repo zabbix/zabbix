@@ -912,7 +912,7 @@ function getItemFilterForm(&$items) {
 /**
  * Get data for item edit page.
  *
- * @param array	$item							item, item prototype or LLD rule to take the data from
+ * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
  * @param bool $options['is_discovery_rule']
  *
  * @return array
@@ -1218,8 +1218,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	// valuemapid
-	if ($data['limited']) {
+	if ($data['limited'] || ($item && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
 				'output' => ['name'],

@@ -575,12 +575,6 @@ class CItem extends CItemGeneral {
 				if ($delItem['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated item.'));
 				}
-
-				if ($delItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered item "%1$s".', $delItem['name']
-					));
-				}
 			}
 		}
 
