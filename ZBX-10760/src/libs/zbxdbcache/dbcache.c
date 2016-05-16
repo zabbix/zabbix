@@ -2261,18 +2261,11 @@ static void	DCcheck_ns(zbx_timespec_t *ts)
  ******************************************************************************/
 static void	dc_string_buffer_realloc(size_t len)
 {
-	if (string_values_alloc < string_values_offset + len)
-	{
-		size_t	diff;
+	if (string_values_alloc >= string_values_offset + len)
+		return;
 
-		diff = string_values_offset + len - string_values_alloc;
-
-		diff += ZBX_STRING_REALLOC_STEP - 1;
-		diff -= diff % ZBX_STRING_REALLOC_STEP;
-
-		string_values_alloc += diff;
-		string_values = zbx_realloc(string_values, string_values_alloc);
-	}
+	string_values_alloc = ((string_values_offset + len - 1) / ZBX_STRING_REALLOC_STEP + 1) * ZBX_STRING_REALLOC_STEP;
+	string_values = zbx_realloc(string_values, string_values_alloc);
 }
 
 static dc_item_value_t	*dc_local_get_history_slot()
