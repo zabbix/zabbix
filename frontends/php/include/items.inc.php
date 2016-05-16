@@ -340,7 +340,6 @@ function update_item_status($itemids, $status) {
 
 function copyItemsToHosts($srcItemIds, $dstHostIds) {
 	$srcItems = API::Item()->get([
-		'itemids' => $srcItemIds,
 		'output' => [
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
@@ -349,8 +348,8 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
 			'description', 'inventory_link'
 		],
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-		'selectApplications' => ['applicationid']
+		'selectApplications' => ['applicationid'],
+		'itemids' => $srcItemIds
 	]);
 
 	$dstHosts = API::Host()->get([
