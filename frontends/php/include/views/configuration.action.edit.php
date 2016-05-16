@@ -90,6 +90,9 @@ if ($this->data['action']['filter']['conditions']) {
 		if (!isset($condition['value'])) {
 			$condition['value'] = '';
 		}
+		if (!array_key_exists('value2', $condition)) {
+			$condition['value2'] = '';
+		}
 		if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
 			continue;
 		}
