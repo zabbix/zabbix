@@ -1526,12 +1526,14 @@ static int	check_db_action(zbx_uint64_t actionid, DB_ACTION *action, char **erro
 	}
 	else
 	{
-		action->actionid = 0;
 		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", actionid);
 		ret = FAIL;
 	}
 
 	DBfree_result(result);
+
+	if (FAIL == ret)
+		action->actionid = 0;
 
 	return ret;
 }
