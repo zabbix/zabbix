@@ -381,7 +381,7 @@ $conditionFormList->addRow(_('New condition'),
 					$conditionTypeComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition2,
-					$condition2 === null ? '' : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$condition2 === null ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$conditionOperatorsComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition

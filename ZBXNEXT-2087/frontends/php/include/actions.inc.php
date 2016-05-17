@@ -357,14 +357,14 @@ function actionOperationConditionValueToString(array $conditions) {
  * @return array
  */
 function getConditionDescription($conditionType, $operator, $value, $value2) {
-	$description = [condition_type2str($conditionType)];
-
 	if ($conditionType == CONDITION_TYPE_EVENT_TAG_VALUE) {
-		$description[] = '. '._('Tag').': ';
+		$description = [_('Tag')];
+		$description[] = ' ';
 		$description[] = italic(CHtml::encode($value2));
-		$description[] = ' '._('Value').': ';
+		$description[] = ' ';
 	}
 	else {
+		$description = [condition_type2str($conditionType)];
 		$description[] = ' ';
 	}
 
