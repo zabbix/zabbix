@@ -649,9 +649,6 @@ define('USER_TYPE_SUPER_ADMIN',		3);
 define('ZBX_NOT_INTERNAL_GROUP',	0);
 define('ZBX_INTERNAL_GROUP',		1);
 
-define('USER_STATUS_DISABLED', 1);
-define('USER_STATUS_ENABLED',	0);
-
 define('GROUP_STATUS_DISABLED', 1);
 define('GROUP_STATUS_ENABLED',	0);
 

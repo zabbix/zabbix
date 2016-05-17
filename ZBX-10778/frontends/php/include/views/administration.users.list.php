@@ -66,7 +66,7 @@ foreach ($this->data['users'] as $user) {
 			? ZBX_USER_ONLINE_TIME
 			: $user['autologout'];
 
-		$online = (($session['lastaccess'] + $online_time) >= time() && $user['users_status'] == USER_STATUS_ENABLED)
+		$online = (($session['lastaccess'] + $online_time) >= time() && $user['users_status'] == GROUP_STATUS_ENABLED)
 			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
 				->addClass(ZBX_STYLE_GREEN)
 			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
@@ -137,7 +137,7 @@ foreach ($this->data['users'] as $user) {
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_ORANGE)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),
-		($user['users_status'] == 1)
+		($user['users_status'] == GROUP_STATUS_DISABLED)
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
 			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 	]);
@@ -157,4 +157,3 @@ $usersForm->addItem([
 $widget->addItem($usersForm);
 
 return $widget;
-

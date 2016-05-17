@@ -82,7 +82,7 @@ $fields = [
 ];
 check_fields($fields);
 
-$_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? 0 : 1;
+$_REQUEST['users_status'] = isset($_REQUEST['users_status']) ? GROUP_STATUS_ENABLED : GROUP_STATUS_DISABLED;
 $_REQUEST['debug_mode'] = getRequest('debug_mode', 0);
 
 /*
