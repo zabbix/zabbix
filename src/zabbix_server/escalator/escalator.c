@@ -1136,7 +1136,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res = FAIL;
+	int		ret = FAIL;
 
 	memset(event, 0, sizeof(DB_EVENT));
 
@@ -1145,46 +1145,66 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 			" where eventid=" ZBX_FS_UI64,
 			eventid);
 
-	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(event->eventid, row[0]);
-		event->source = atoi(row[1]);
-		event->object = atoi(row[2]);
-		ZBX_STR2UINT64(event->objectid, row[3]);
-		event->clock = atoi(row[4]);
-		event->value = atoi(row[5]);
-		event->acknowledged = atoi(row[6]);
-		event->ns = atoi(row[7]);
+	if (NULL == (row = DBfetch(result)))
+		goto out;
 
-		res = SUCCEED;
+	ZBX_STR2UINT64(event->eventid, row[0]);
+	event->source = atoi(row[1]);
+	event->object = atoi(row[2]);
+	ZBX_STR2UINT64(event->objectid, row[3]);
+	event->clock = atoi(row[4]);
+	event->value = atoi(row[5]);
+	event->acknowledged = atoi(row[6]);
+	event->ns = atoi(row[7]);
+
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_create(&event->tags);
+
+		DBfree_result(result);
+
+		result = DBselect("select tag,value from event_tag where eventid=" ZBX_FS_UI64, eventid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_tag_t	*tag;
+
+			tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, row[0]);
+			tag->value = zbx_strdup(NULL, row[1]);
+
+			zbx_vector_ptr_append(&event->tags, tag);
+		}
 	}
-	DBfree_result(result);
 
-	if (SUCCEED == res && EVENT_OBJECT_TRIGGER == event->object)
+	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
+		DBfree_result(result);
+
 		result = DBselect(
 				"select description,expression,priority,comments,url,recovery_expression,recovery_mode"
 				" from triggers"
 				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
 
-		if (NULL != (row = DBfetch(result)))
-		{
-			event->trigger.triggerid = event->objectid;
-			event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
-			event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
-			ZBX_STR2UCHAR(event->trigger.priority, row[2]);
-			event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
-			event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
-			event->trigger.recovery_expression = zbx_strdup(event->trigger.recovery_expression, row[5]);
-			ZBX_STR2UCHAR(event->trigger.recovery_mode, row[6]);
-		}
-		else
-			res = FAIL;
-		DBfree_result(result);
+		if (NULL == (row = DBfetch(result)))
+			goto out;
+
+		event->trigger.triggerid = event->objectid;
+		event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
+		event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
+		ZBX_STR2UCHAR(event->trigger.priority, row[2]);
+		event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
+		event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
+		event->trigger.recovery_expression = zbx_strdup(event->trigger.recovery_expression, row[5]);
+		ZBX_STR2UCHAR(event->trigger.recovery_mode, row[6]);
 	}
 
-	return res;
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1200,6 +1220,12 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  ******************************************************************************/
 static void	free_event_info(DB_EVENT *event)
 {
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&event->tags);
+	}
+
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
 		zbx_free(event->trigger.description);

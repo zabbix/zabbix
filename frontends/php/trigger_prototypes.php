@@ -51,6 +51,7 @@ $fields = [
 	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
 	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
 	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
@@ -193,11 +194,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'type' => getRequest('type'),
 		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid'),
 		'recovery_mode' => getRequest('recovery_mode'),
-		'recovery_expression' => getRequest('recovery_expression')
+		'recovery_expression' => getRequest('recovery_expression'),
+		'tags' => getRequest('tags', [])
 	];
 
 	if ($trigger['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$trigger['recovery_expression'] = '';
+	}
+
+	// remove empty new tag lines
+	foreach ($trigger['tags'] as $tag_key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($trigger['tags'][$tag_key]);
+		}
 	}
 
 	if (hasRequest('update')) {
@@ -398,7 +407,8 @@ elseif (isset($_REQUEST['form'])) {
 		'templates' => [],
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
-		'recovery_expression_action' => $recovery_expression_action
+		'recovery_expression_action' => $recovery_expression_action,
+		'tags' => getRequest('tags', [])
 	]);
 
 	$data['hostid'] = $discoveryRule['hostid'];

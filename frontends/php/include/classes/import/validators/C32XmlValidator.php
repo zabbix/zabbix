@@ -259,6 +259,12 @@ class C32XmlValidator {
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
 										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
 									]]
 								]]
 							]],
@@ -581,6 +587,12 @@ class C32XmlValidator {
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
 										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
 									]]
 								]]
 							]],
@@ -700,6 +712,12 @@ class C32XmlValidator {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 							'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]

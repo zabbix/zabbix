@@ -4152,6 +4152,52 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_strcmp_natural                                               *
+ *                                                                            *
+ * Purpose: performs natural comparison of two strings                        *
+ *                                                                            *
+ * Parameters: s1 - [IN] the first string                                     *
+ *             s2 - [IN] the second string                                    *
+ *                                                                            *
+ * Return value:  0: the strings are equal                                    *
+ *               <0: s1 < s2                                                  *
+ *               >0: s1 > s2                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_natural(const char *s1, const char *s2)
+{
+	int	ret, value1, value2;
+
+	for (;'\0' != *s1 && '\0' != *s2; s1++, s2++)
+	{
+		if (0 == isdigit(*s1) || 0 == isdigit(*s2))
+		{
+			if (0 != (ret = *s1 - *s2))
+				return ret;
+
+			continue;
+		}
+
+		value1 = 0;
+		while (0 != isdigit(*s1))
+			value1 = value1 * 10 + *s1++ - '0';
+
+		value2 = 0;
+		while (0 != isdigit(*s2))
+			value2 = value2 * 10 + *s2++ - '0';
+
+		if (0 != (ret = value1 - value2))
+			return ret;
+
+		if ('\0' == *s1 || '\0' == *s2)
+			break;
+	}
+
+	return *s1 - *s2;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_token_parse_user_macro                                       *
  *                                                                            *
  * Purpose: parses user macro token                                           *

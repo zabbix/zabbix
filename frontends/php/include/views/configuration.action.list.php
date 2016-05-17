@@ -63,7 +63,7 @@ if ($this->data['actions']) {
 
 		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
 			$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],
-				$actionConditionStringValues[$aIdx][$cIdx]
+				$actionConditionStringValues[$aIdx][$cIdx], $condition['value2']
 			);
 			$conditions[] = BR();
 		}

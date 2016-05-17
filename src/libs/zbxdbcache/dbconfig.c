@@ -76,26 +76,28 @@ typedef int (*zbx_value_validator_func_t)(const char *macro, const char *value, 
 
 typedef struct
 {
-	zbx_uint64_t	triggerid;
-	const char	*description;
-	const char	*expression;
-	const char	*recovery_expression;
+	zbx_uint64_t		triggerid;
+	const char		*description;
+	const char		*expression;
+	const char		*recovery_expression;
 
 	/* cached expressions with expanded user macros, can be NULL */
-	const char	*expression_ex;
-	const char	*recovery_expression_ex;
+	const char		*expression_ex;
+	const char		*recovery_expression_ex;
 
-	const char	*error;
-	int		lastchange;
-	unsigned char	topoindex;
-	unsigned char	priority;
-	unsigned char	type;
-	unsigned char	value;
-	unsigned char	state;
-	unsigned char	locked;
-	unsigned char	status;
-	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
-	unsigned char	recovery_mode;	/* TRIGGER_RECOVERY_MODE_* defines  */
+	const char		*error;
+	int			lastchange;
+	unsigned char		topoindex;
+	unsigned char		priority;
+	unsigned char		type;
+	unsigned char		value;
+	unsigned char		state;
+	unsigned char		locked;
+	unsigned char		status;
+	unsigned char		functional;	/* see TRIGGER_FUNCTIONAL_* defines */
+	unsigned char		recovery_mode;	/* TRIGGER_RECOVERY_MODE_* defines  */
+
+	zbx_vector_ptr_t	tags;
 }
 ZBX_DC_TRIGGER;
 
@@ -474,6 +476,7 @@ typedef struct
 	unsigned char	conditiontype;
 	unsigned char	operator;
 	const char	*value;
+	const char	*value2;
 }
 zbx_dc_action_condition_t;
 
@@ -486,6 +489,14 @@ typedef struct
 	zbx_vector_ptr_t	conditions;
 }
 zbx_dc_action_t;
+
+typedef struct
+{
+	zbx_uint64_t	triggertagid;
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_trigger_tag_t;
 
 typedef struct
 {
@@ -530,6 +541,7 @@ typedef struct
 	zbx_hashset_t		expressions;
 	zbx_hashset_t		actions;
 	zbx_hashset_t		action_conditions;
+	zbx_hashset_t		trigger_tags;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
@@ -3042,6 +3054,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 			ZBX_STR2UCHAR(trigger->state, row[7]);
 			trigger->lastchange = atoi(row[8]);
 			trigger->locked = 0;
+
+			zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func, __config_mem_realloc_func,
+					__config_mem_free_func);
 		}
 		else
 		{
@@ -3050,6 +3065,22 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 			if (NULL != trigger->recovery_expression_ex)
 				zbx_strpool_release(trigger->recovery_expression_ex);
+
+			if (0 < trigger->tags.values_alloc)
+			{
+				/* Prepare used trigger tags vector.                                       */
+				/* Free trigger tags vector if trigger did not have tags during last sync. */
+				/* Otherwise just reset the tags vector so it can be initialized during    */
+				/* trigger tag synchronization.                                            */
+				if (0 == trigger->tags.values_num)
+				{
+					zbx_vector_ptr_destroy(&trigger->tags);
+					zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func,
+							__config_mem_realloc_func, __config_mem_free_func);
+				}
+				else
+					zbx_vector_ptr_clear(&trigger->tags);
+			}
 		}
 
 		/* reset the cached expressions to ensure the expressions are expanded */
@@ -3083,6 +3114,8 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		if (NULL != trigger->recovery_expression_ex)
 			zbx_strpool_release(trigger->recovery_expression_ex);
+
+		zbx_vector_ptr_destroy(&trigger->tags);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -3603,6 +3636,7 @@ static void	DCsync_action_conditions(DB_RESULT result)
 		ZBX_STR2UCHAR(condition->operator, row[3]);
 
 		DCstrpool_replace(found, &condition->value, row[4]);
+		DCstrpool_replace(found, &condition->value2, row[5]);
 
 		zbx_vector_ptr_append(&action->conditions, condition);
 	}
@@ -3619,6 +3653,7 @@ static void	DCsync_action_conditions(DB_RESULT result)
 			continue;
 
 		zbx_strpool_release(condition->value);
+		zbx_strpool_release(condition->value2);
 
 		zbx_hashset_iter_remove(&iter);
 	}
@@ -3631,6 +3666,77 @@ static void	DCsync_action_conditions(DB_RESULT result)
 	{
 		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
 			zbx_vector_ptr_sort(&action->conditions, dc_compare_action_conditions_by_type);
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_trigger_tags                                              *
+ *                                                                            *
+ * Purpose: Updates trigger tags in configuration cache                       *
+ *                                                                            *
+ * Parameters: result - [IN] the result of trigger tags database select       *
+ *                                                                            *
+ * Comments: The result contains the following fields:                        *
+ *           0 - triggertagid                                                 *
+ *           1 - triggerid                                                    *
+ *           2 - tag                                                          *
+ *           3 - value                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	DCsync_trigger_tags(DB_RESULT result)
+{
+	const char		*__function_name = "DCsync_trigger_tags";
+
+	DB_ROW			row;
+	zbx_vector_uint64_t	ids;
+	int			found;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		triggerid, triggertagid;
+	ZBX_DC_TRIGGER		*trigger;
+	zbx_dc_trigger_tag_t	*trigger_tag;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&ids);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(triggerid, row[1]);
+
+		if (NULL == (trigger = zbx_hashset_search(&config->triggers, &triggerid)))
+			continue;
+
+		ZBX_STR2UINT64(triggertagid, row[0]);
+
+		trigger_tag = DCfind_id(&config->trigger_tags, triggertagid, sizeof(zbx_dc_trigger_tag_t), &found);
+		DCstrpool_replace(found, &trigger_tag->tag, row[2]);
+		DCstrpool_replace(found, &trigger_tag->value, row[3]);
+
+		zbx_vector_ptr_append(&trigger->tags, trigger_tag);
+
+		zbx_vector_uint64_append(&ids, triggertagid);
+	}
+
+	/* remove unused trigger tags */
+
+	zbx_vector_uint64_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_hashset_iter_reset(&config->trigger_tags, &iter);
+
+	while (NULL != (trigger_tag = zbx_hashset_iter_next(&iter)))
+	{
+		if (FAIL != zbx_vector_uint64_bsearch(&ids, trigger_tag->triggertagid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			continue;
+
+		zbx_strpool_release(trigger_tag->tag);
+		zbx_strpool_release(trigger_tag->value);
+
+		zbx_hashset_iter_remove(&iter);
 	}
 
 	zbx_vector_uint64_destroy(&ids);
@@ -3687,12 +3793,13 @@ void	DCsync_configuration(void)
 	DB_RESULT		expr_result = NULL;
 	DB_RESULT		action_result = NULL;
 	DB_RESULT		action_condition_result = NULL;
+	DB_RESULT		trigger_tag_result = NULL;
 
 	int			i, refresh_unsupported_changed;
 	double			sec, csec, hsec, hisec, htsec, gmsec, hmsec, ifsec, isec, tsec, dsec, fsec, expr_sec,
 				csec2, hsec2, hisec2, htsec2, gmsec2, hmsec2, ifsec2, isec2, tsec2, dsec2, fsec2,
 				expr_sec2, action_sec, action_sec2, action_condition_sec, action_condition_sec2,
-				total, total2;
+				trigger_tag_sec, trigger_tag_sec2, total, total2;
 	const zbx_strpool_t	*strpool;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -3870,7 +3977,7 @@ void	DCsync_configuration(void)
 
 	sec = zbx_time();
 	if (NULL == (action_condition_result = DBselect(
-			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value"
+			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value,c.value2"
 			" from conditions c,actions a"
 			" where c.actionid=a.actionid"
 				" and a.status=%d",
@@ -3879,6 +3986,15 @@ void	DCsync_configuration(void)
 		goto out;
 	}
 	action_condition_sec = zbx_time() - sec;
+
+	sec = zbx_time();
+	if (NULL == (trigger_tag_result = DBselect(
+			"select triggertagid,triggerid,tag,value"
+			" from trigger_tag")))
+	{
+		goto out;
+	}
+	trigger_tag_sec = zbx_time() - sec;
 
 	START_SYNC;
 
@@ -3940,12 +4056,16 @@ void	DCsync_configuration(void)
 	DCsync_action_conditions(action_condition_result);
 	action_condition_sec2 = zbx_time() - sec;
 
+	sec = zbx_time();
+	DCsync_trigger_tags(trigger_tag_result);
+	trigger_tag_sec2 = zbx_time() - sec;
+
 	strpool = zbx_strpool_info();
 
 	total = csec + hsec + hisec + htsec + gmsec + hmsec + ifsec + isec + tsec + dsec + fsec + expr_sec +
-			action_sec + action_condition_sec;
+			action_sec + action_condition_sec + trigger_tag_sec;
 	total2 = csec2 + hsec2 + hisec2 + htsec2 + gmsec2 + hmsec2 + ifsec2 + isec2 + tsec2 + dsec2 + fsec2 +
-			expr_sec2 + action_sec2 + action_condition_sec2;
+			expr_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() config     : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			csec, csec2);
@@ -3967,14 +4087,16 @@ void	DCsync_configuration(void)
 			tsec, tsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			dsec, dsec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			trigger_tag_sec, trigger_tag_sec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			fsec, fsec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expressions: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			expr_sec, expr_sec2);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() actions    : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
 			action_sec, action_sec2);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.",
-			__function_name, action_condition_sec, action_condition_sec2);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() conditions : sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec.", __function_name,
+			action_condition_sec, action_condition_sec2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __function_name, total);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __function_name, total2);
@@ -4049,6 +4171,8 @@ void	DCsync_configuration(void)
 			config->triggers.num_data, config->triggers.num_slots);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() trigdeps   : %d (%d slots)", __function_name,
 			config->trigdeps.num_data, config->trigdeps.num_slots);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() trig. tags : %d (%d slots)", __function_name,
+			config->trigger_tags.num_data, config->trigger_tags.num_slots);
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() t_trigs[%d] : %d (%d allocated)", __function_name,
@@ -4099,6 +4223,7 @@ out:
 	DBfree_result(expr_result);
 	DBfree_result(action_result);
 	DBfree_result(action_condition_result);
+	DBfree_result(trigger_tag_result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -4470,6 +4595,7 @@ void	init_configuration_cache(void)
 	CREATE_HASHSET(config->expressions, 0);
 	CREATE_HASHSET(config->actions, 0);
 	CREATE_HASHSET(config->action_conditions, 0);
+	CREATE_HASHSET(config->trigger_tags, 0);
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
@@ -5184,6 +5310,8 @@ static void	DCget_function(DC_FUNCTION *dst_function, const ZBX_DC_FUNCTION *src
 
 static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, unsigned char expand)
 {
+	int	i;
+
 	dst_trigger->triggerid = src_trigger->triggerid;
 	dst_trigger->description = zbx_strdup(NULL, src_trigger->description);
 	dst_trigger->expression_orig = zbx_strdup(NULL, src_trigger->expression);
@@ -5217,6 +5345,32 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 					&src_trigger->recovery_expression_ex, &dst_trigger->new_error);
 		}
 	}
+
+	zbx_vector_ptr_create(&dst_trigger->tags);
+
+	if (0 != src_trigger->tags.values_num)
+	{
+		zbx_vector_ptr_reserve(&dst_trigger->tags, src_trigger->tags.values_num);
+
+		for (i = 0; i < src_trigger->tags.values_num; i++)
+		{
+			zbx_dc_trigger_tag_t	*dc_trigger_tag = (zbx_dc_trigger_tag_t *)src_trigger->tags.values[i];
+			zbx_tag_t		*tag;
+
+			tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, dc_trigger_tag->tag);
+			tag->value = zbx_strdup(NULL, dc_trigger_tag->value);
+
+			zbx_vector_ptr_append(&dst_trigger->tags, tag);
+		}
+	}
+}
+
+void	zbx_free_tag(zbx_tag_t *tag)
+{
+	zbx_free(tag->tag);
+	zbx_free(tag->value);
+	zbx_free(tag);
 }
 
 static void	DCclean_trigger(DC_TRIGGER *trigger)
@@ -5228,6 +5382,9 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->expression);
 	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->description);
+
+	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
+	zbx_vector_ptr_destroy(&trigger->tags);
 }
 
 /******************************************************************************
@@ -8601,6 +8758,7 @@ int	DCget_hosts_availability(zbx_vector_ptr_t *hosts, int *ts)
  ******************************************************************************/
 static void	zbx_db_condition_free(DB_CONDITION *condition)
 {
+	zbx_free(condition->value2);
 	zbx_free(condition->value);
 	zbx_free(condition);
 }
@@ -8654,6 +8812,7 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition->conditiontype = dc_condition->conditiontype;
 		condition->operator = dc_condition->operator;
 		condition->value = zbx_strdup(NULL, dc_condition->value);
+		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
 
 		zbx_vector_ptr_append(conditions, condition);
 	}

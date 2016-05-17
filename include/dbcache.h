@@ -183,28 +183,37 @@ typedef struct
 }
 DC_FUNCTION;
 
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_tag_t;
+
 typedef struct _DC_TRIGGER
 {
-	zbx_uint64_t	triggerid;
-	char		*description;
-	char		*expression_orig;
-	char		*recovery_expression_orig;
+	zbx_uint64_t		triggerid;
+	char			*description;
+	char			*expression_orig;
+	char			*recovery_expression_orig;
 	/* temporary values, allocated during processing and freed right after */
-	char		*expression;
-	char		*recovery_expression;
+	char			*expression;
+	char			*recovery_expression;
 
-	char		*error;
-	char		*new_error;
-	zbx_timespec_t	timespec;
-	int		lastchange;
-	unsigned char	topoindex;
-	unsigned char	priority;
-	unsigned char	type;
-	unsigned char	value;
-	unsigned char	state;
-	unsigned char	new_value;
-	unsigned char	status;
-	unsigned char	recovery_mode;
+	char			*error;
+	char			*new_error;
+	zbx_timespec_t		timespec;
+	int			lastchange;
+	unsigned char		topoindex;
+	unsigned char		priority;
+	unsigned char		type;
+	unsigned char		value;
+	unsigned char		state;
+	unsigned char		new_value;
+	unsigned char		status;
+	unsigned char		recovery_mode;
+
+	zbx_vector_ptr_t	tags;
 }
 DC_TRIGGER;
 
@@ -494,5 +503,7 @@ typedef struct
 	zbx_hc_data_t	*head;
 }
 zbx_hc_item_t;
+
+void	zbx_free_tag(zbx_tag_t *tag);
 
 #endif
