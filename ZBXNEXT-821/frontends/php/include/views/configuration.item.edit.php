@@ -590,9 +590,8 @@ if ($data['itemid'] != 0) {
 		);
 	}
 
-	if (!$data['limited']) {
-		$buttons[] = new CButtonDelete(_('Delete item?'), url_params(['form', 'groupid', 'itemid', 'hostid']));
-	}
+	$buttons[] = (new CButtonDelete(_('Delete item?'), url_params(['form', 'groupid', 'itemid', 'hostid'])))
+		->setEnabled(!$data['limited']);
 
 	$buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
 
