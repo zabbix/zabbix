@@ -1744,7 +1744,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 					/* skip paused escalations created before maintenance period */
 					/* until maintenance ends or the escalations are recovered     */
-					if (0 == cur_esc.r_eventid && FAIL != escalation_rc)
+					if (0 == cur_esc.r_eventid)
 					{
 						free_db_action(&action);
 						goto next;
