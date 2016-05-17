@@ -1190,8 +1190,6 @@ int	parse_host_key(char *exp, char **host, char **key)
 	return SUCCEED;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: num_param                                                        *
@@ -3599,9 +3597,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 
 	*ptr_buffer++ = '"';
 
-	while (' ' == *context)
-		*ptr_buffer++ = *context++;
-
 	while ('\0' != *context)
 	{
 		if ('"' == *context)
@@ -4439,7 +4434,7 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 static int	zbx_token_parse_function(const char *expression, const char *func, zbx_strloc_t *func_loc)
 {
 	size_t	len, next_pos, param_pos;
-	int	params_num = 0, offset;
+	int	offset;
 
 	/* FAIL if the expression doesn't start with a function name */
 	if (FAIL == function_parse_name(func, &len, &next_pos))
@@ -4454,10 +4449,6 @@ static int	zbx_token_parse_function(const char *expression, const char *func, zb
 
 		if (SUCCEED != function_parse_param(func, &param_pos, &len, &next_pos))
 			return FAIL;
-
-		/* if the only parameter is empty - it's a function without parameters */
-		if (0 == len && ')' == func[next_pos] && 0 == params_num)
-			break;
 	}
 	while (')' != func[next_pos]);
 

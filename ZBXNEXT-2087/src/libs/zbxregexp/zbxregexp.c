@@ -404,7 +404,7 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 	{
 		if (SUCCEED == regexp_sub(string, pattern, output_template, regexp_flags, output))
 		{
-			ret = (NULL != output ? ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
+			ret = (NULL != *output ? ZBX_REGEXP_MATCH : ZBX_REGEXP_NO_MATCH);
 		}
 		else
 			ret = FAIL;
