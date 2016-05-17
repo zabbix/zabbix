@@ -59,7 +59,9 @@ function condition_type2str($type) {
 		CONDITION_TYPE_APPLICATION => _('Application'),
 		CONDITION_TYPE_PROXY => _('Proxy'),
 		CONDITION_TYPE_EVENT_TYPE => _('Event type'),
-		CONDITION_TYPE_HOST_METADATA => _('Host metadata')
+		CONDITION_TYPE_HOST_METADATA => _('Host metadata'),
+		CONDITION_TYPE_EVENT_TAG => _('Tag'),
+		CONDITION_TYPE_EVENT_TAG_VALUE => _('Tag value')
 	];
 
 	return $types[$type];
@@ -143,6 +145,8 @@ function actionConditionValueToString(array $actions, array $config) {
 				case CONDITION_TYPE_DUPTIME:
 				case CONDITION_TYPE_DVALUE:
 				case CONDITION_TYPE_APPLICATION:
+				case CONDITION_TYPE_EVENT_TAG:
+				case CONDITION_TYPE_EVENT_TAG_VALUE:
 					$result[$i][$j] = $condition['value'];
 					break;
 
@@ -348,17 +352,27 @@ function actionOperationConditionValueToString(array $conditions) {
  * @param string $conditionType
  * @param string $operator
  * @param string $value
+ * @param string $value2
  *
  * @return array
  */
-function getConditionDescription($conditionType, $operator, $value) {
-	return [
-		condition_type2str($conditionType),
-		SPACE,
-		condition_operator2str($operator),
-		SPACE,
-		italic(CHtml::encode($value))
-	];
+function getConditionDescription($conditionType, $operator, $value, $value2) {
+	if ($conditionType == CONDITION_TYPE_EVENT_TAG_VALUE) {
+		$description = [_('Tag')];
+		$description[] = ' ';
+		$description[] = italic(CHtml::encode($value2));
+		$description[] = ' ';
+	}
+	else {
+		$description = [condition_type2str($conditionType)];
+		$description[] = ' ';
+	}
+
+	$description[] = condition_operator2str($operator);
+	$description[] = ' ';
+	$description[] = italic(CHtml::encode($value));
+
+	return $description;
 }
 
 /**
@@ -791,7 +805,9 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_TRIGGER_SEVERITY,
 		CONDITION_TYPE_TRIGGER_VALUE,
 		CONDITION_TYPE_TIME_PERIOD,
-		CONDITION_TYPE_MAINTENANCE
+		CONDITION_TYPE_MAINTENANCE,
+		CONDITION_TYPE_EVENT_TAG,
+		CONDITION_TYPE_EVENT_TAG_VALUE
 	];
 	$conditions[EVENT_SOURCE_DISCOVERY] = [
 		CONDITION_TYPE_DHOST_IP,
@@ -1023,6 +1039,18 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_EQUAL
 	];
 	$operators[CONDITION_TYPE_HOST_METADATA] = [
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	];
+	$operators[CONDITION_TYPE_EVENT_TAG] = [
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL,
+		CONDITION_OPERATOR_LIKE,
+		CONDITION_OPERATOR_NOT_LIKE
+	];
+	$operators[CONDITION_TYPE_EVENT_TAG_VALUE] = [
+		CONDITION_OPERATOR_EQUAL,
+		CONDITION_OPERATOR_NOT_EQUAL,
 		CONDITION_OPERATOR_LIKE,
 		CONDITION_OPERATOR_NOT_LIKE
 	];

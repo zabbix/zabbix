@@ -61,6 +61,71 @@ static int	DBpatch_3010005(void)
 	return DBadd_field("triggers", &field);
 }
 
+static int	DBpatch_3010006(void)
+{
+	const ZBX_TABLE table =
+			{"trigger_tag", "triggertagid", 0,
+				{
+					{"triggertagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010007(void)
+{
+	return DBcreate_index("trigger_tag", "trigger_tag_1", "triggerid", 0);
+}
+
+static int	DBpatch_3010008(void)
+{
+	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("trigger_tag", 1, &field);
+}
+
+static int	DBpatch_3010009(void)
+{
+	const ZBX_TABLE table =
+			{"event_tag", "eventtagid", 0,
+				{
+					{"eventtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010010(void)
+{
+	return DBcreate_index("event_tag", "event_tag_1", "eventid", 0);
+}
+
+static int	DBpatch_3010011(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_tag", 1, &field);
+}
+
+static int	DBpatch_3010012(void)
+{
+	const ZBX_FIELD	field = {"value2", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("conditions", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -73,5 +138,12 @@ DBPATCH_ADD(3010002, 0, 1)
 DBPATCH_ADD(3010003, 0, 1)
 DBPATCH_ADD(3010004, 0, 1)
 DBPATCH_ADD(3010005, 0, 1)
+DBPATCH_ADD(3010006, 0, 1)
+DBPATCH_ADD(3010007, 0, 1)
+DBPATCH_ADD(3010008, 0, 1)
+DBPATCH_ADD(3010009, 0, 1)
+DBPATCH_ADD(3010010, 0, 1)
+DBPATCH_ADD(3010011, 0, 1)
+DBPATCH_ADD(3010012, 0, 1)
 
 DBPATCH_END()
