@@ -375,8 +375,8 @@ foreach ($data['delay_flex'] as $i => $delay_flex) {
 
 	if ($delay_flex['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
 		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], 5, $discovered_item, true,
-				false
-			))->setAttribute('placeholder', 50);
+			false
+		))->setAttribute('placeholder', 50);
 		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], $discovered_item, 255))
 			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
 		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', $discovered_item, 255))
@@ -487,9 +487,9 @@ $itemFormList->addRow(_('Store value'), $deltaComboBox, 'row_delta');
 if ($readonly) {
 	$itemForm->addVar('valuemapid', $data['valuemapid']);
 	$valuemapComboBox = (new CTextBox('valuemap_name',
-			!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
-			true
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		!empty($data['valuemaps']) ? $data['valuemaps'] : _('As is'),
+		true
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 }
 else {
 	$valuemapComboBox = new CComboBox('valuemapid', $data['valuemapid']);
@@ -524,9 +524,9 @@ if ($discovered_item) {
 }
 else {
 	$itemFormList->addRow(new CLabel(_('New application'), 'new_application'), (new CSpan(
-			(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-	);
+		(new CTextBox('new_application', $data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->addClass(ZBX_STYLE_FORM_NEW_GROUP));
+
 	$applicationComboBox = new CListBox('applications[]', $data['applications'], 6);
 	$applicationComboBox->addItem(0, '-'._('None').'-');
 	foreach ($data['db_applications'] as $application) {
