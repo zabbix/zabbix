@@ -523,10 +523,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
 						&new_lastchange);
 
-				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_value, trigger->description,
 						trigger->expression_orig, trigger->recovery_expression_orig,
-						trigger->priority, trigger->type);
+						trigger->priority, trigger->type, &trigger->tags);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
@@ -541,10 +541,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 			if (0 != state_changed)
 			{
-				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_state, trigger->description,
 						trigger->expression_orig, trigger->recovery_expression_orig,
-						trigger->priority, trigger->type);
+						trigger->priority, trigger->type, NULL);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
 			}
@@ -1349,8 +1349,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
 
-		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
-				TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0);
+		add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL);
 		process_events();
 	}
 
@@ -2033,9 +2033,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, co
  *             table - [IN] the target table name                             *
  *             ...   - [IN] names of the fields to insert                     *
  *             NULL  - [IN] terminating NULL pointer                          *
- *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
  *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
  *           function.                                                        *

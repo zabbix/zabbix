@@ -57,6 +57,7 @@ $fields = [
 	'copy_targetid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
 	'copy_groupid' =>							[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
 	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,			null],
+	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
 	// filter
 	'filter_set' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
@@ -204,11 +205,19 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'type' => getRequest('type'),
 		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid'),
 		'recovery_mode' => getRequest('recovery_mode'),
-		'recovery_expression' => getRequest('recovery_expression')
+		'recovery_expression' => getRequest('recovery_expression'),
+		'tags' => getRequest('tags', [])
 	];
 
 	if ($trigger['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$trigger['recovery_expression'] = '';
+	}
+
+	// remove empty new tag lines
+	foreach ($trigger['tags'] as $tag_key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($trigger['tags'][$tag_key]);
+		}
 	}
 
 	if (hasRequest('update')) {
@@ -449,7 +458,8 @@ elseif (isset($_REQUEST['form'])) {
 		'templates' => [],
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
-		'recovery_expression_action' => $recovery_expression_action
+		'recovery_expression_action' => $recovery_expression_action,
+		'tags' => getRequest('tags', [])
 	];
 
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));
