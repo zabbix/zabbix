@@ -1726,7 +1726,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			unsigned char	skip, maintenance;
 			int		escalation_rc;
 
-			if (SUCCEED == check_db_action(cur_esc.actionid, &action, &error))
+			if (SUCCEED == (escalation_rc = check_db_action(cur_esc.actionid, &action, &error)))
 				escalation_rc = check_escalation(&cur_esc, &skip, &maintenance, &error);
 
 			if (FAIL != escalation_rc)
