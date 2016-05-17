@@ -1481,20 +1481,77 @@ static void	free_db_action(DB_ACTION *action)
 	}
 }
 
+typedef struct
+{
+	zbx_uint64_t		escalationid;
+
+	int			nextcheck;
+	int			esc_step;
+	zbx_escalation_status_t	status;
+
+#define ZBX_DIFF_ESCALATION_UNSET			__UINT64_C(0x0000)
+#define ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK		__UINT64_C(0x0001)
+#define ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP		__UINT64_C(0x0002)
+#define ZBX_DIFF_ESCALATION_UPDATE_STATUS		__UINT64_C(0x0004)
+#define ZBX_DIFF_ESCALATION_UPDATE 								\
+		(ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK | ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP |	\
+		ZBX_DIFF_ESCALATION_UPDATE_STATUS)
+	zbx_uint64_t		flags;
+}
+zbx_escalation_diff_t;
+
+static zbx_escalation_diff_t	*escalation_create_diff(const DB_ESCALATION *escalation)
+{
+	zbx_escalation_diff_t	*diff;
+
+	diff = (zbx_escalation_diff_t *)zbx_malloc(NULL, sizeof(zbx_escalation_diff_t));
+	diff->escalationid = escalation->escalationid;
+	diff->nextcheck = escalation->nextcheck;
+	diff->esc_step = escalation->esc_step;
+	diff->status = escalation->status;
+	diff->flags = ZBX_DIFF_ESCALATION_UNSET;
+
+	return diff;
+}
+
+static void	escalation_update_diff(const DB_ESCALATION *escalation, zbx_escalation_diff_t *diff)
+{
+	if (escalation->nextcheck != diff->nextcheck)
+	{
+		diff->nextcheck = escalation->nextcheck;
+		diff->flags |= ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK;
+	}
+
+	if (escalation->esc_step != diff->esc_step)
+	{
+		diff->esc_step = escalation->esc_step;
+		diff->flags |= ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP;
+	}
+
+	if (escalation->status != diff->status)
+	{
+		diff->status = escalation->status;
+		diff->flags |= ZBX_DIFF_ESCALATION_UPDATE_STATUS;
+	}
+}
+
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
 {
 	const char		*__function_name = "process_escalations";
 	DB_RESULT		result;
 	DB_ROW			row;
-	DB_ESCALATION		escalation, last_escalation;
+	DB_ESCALATION		escalation;
 	zbx_vector_uint64_t	escalationids;
 	char			*sql = NULL, *filter = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset, filter_alloc = 0, filter_offset = 0;
-	int			res;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, filter_alloc = 0, filter_offset = 0;
+	int			res, i;
+	zbx_escalation_diff_t	*diff;
+	zbx_vector_ptr_t	diffs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&escalationids);
+	zbx_vector_ptr_create(&diffs);
 	sql = zbx_malloc(sql, sql_alloc);
 
 	switch (escalation_source)
@@ -1537,176 +1594,135 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			filter);
 
 	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
-	memset(&escalation, 0, sizeof(escalation));
 
-	/* we read escalations into @last_escalation variable and process @escalation, which was previously read */
-	do
+	while (NULL != (row = DBfetch(result)))
 	{
-		unsigned char	esc_superseded = 0;
+		DB_ACTION		action;
+		char			*error = NULL;
 
-		memset(&last_escalation, 0, sizeof(last_escalation));
+		escalation.nextcheck = atoi(row[5]);
+		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
 
-		if (NULL != (row = DBfetch(result)))
+		if (escalation.nextcheck > now && 0 == escalation.r_eventid)
+			continue;
+
+		ZBX_STR2UINT64(escalation.escalationid, row[0]);
+		ZBX_STR2UINT64(escalation.actionid, row[1]);
+		ZBX_DBROW2UINT64(escalation.triggerid, row[2]);
+		ZBX_DBROW2UINT64(escalation.eventid, row[3]);
+		escalation.esc_step = atoi(row[6]);
+		escalation.status = atoi(row[7]);
+		ZBX_DBROW2UINT64(escalation.itemid, row[8]);
+
+		if (SUCCEED != check_escalation(&escalation, &action, &error))
 		{
-			ZBX_STR2UINT64(last_escalation.escalationid, row[0]);
-			ZBX_STR2UINT64(last_escalation.actionid, row[1]);
-			ZBX_DBROW2UINT64(last_escalation.triggerid, row[2]);
-			ZBX_DBROW2UINT64(last_escalation.eventid, row[3]);
-			ZBX_DBROW2UINT64(last_escalation.r_eventid, row[4]);
-			last_escalation.nextcheck = atoi(row[5]);
-			last_escalation.esc_step = atoi(row[6]);
-			last_escalation.status = atoi(row[7]);
-			ZBX_DBROW2UINT64(last_escalation.itemid, row[8]);
-
-			/* just delete on the next cycle */
-			if (0 != last_escalation.r_eventid)
-				last_escalation.status = ESCALATION_STATUS_COMPLETED;
-		}
-
-		if (0 == escalation.escalationid)
-			goto next;
-
-		if (ESCALATION_STATUS_COMPLETED == escalation.status)
-		{
-			/* delete a recovery record and skip all processing */
-			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			goto next;
-		}
-
-		/* handle superseded escalations (multiple problem events) */
-		if (0 != last_escalation.escalationid)
-		{
-			esc_superseded = (escalation.actionid == last_escalation.actionid &&
-					escalation.triggerid == last_escalation.triggerid &&
-					escalation.itemid == last_escalation.itemid);
-
-			if (0 != esc_superseded)
+			/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
+			/* it normally in order to send notification about the error otherwise we     */
+			/* skip the escalation until dependable trigger changes value to OK.          */
+			if (NULL == error)
 			{
-				if (0 != last_escalation.r_eventid)
-				{
-					/* recover this escalation */
-					escalation.r_eventid = last_escalation.r_eventid;
-					escalation.status = ESCALATION_STATUS_ACTIVE;
-				}
-				else if (escalation.nextcheck > now || ESCALATION_STATUS_SLEEP == escalation.status)
-				{
-					zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-					goto next;
-				}
+				free_db_action(&action);
+				continue;
 			}
 		}
 
-		if (escalation.nextcheck <= now || 0 != escalation.r_eventid)
+		diff = escalation_create_diff(&escalation);
+
+		if (ESCALATION_STATUS_ACTIVE == escalation.status || 0 != escalation.r_eventid)
 		{
-			DB_ACTION	action;
-			char		*error = NULL;
+			if (escalation.nextcheck <= now)
+				execute_escalation(&escalation, &action, error);
 
-			DBbegin();
-
-			sql_offset = 0;
-
-			if (SUCCEED != check_escalation(&escalation, &action, &error))
+			/* execute recovery if the same record has it */
+			if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
 			{
-				/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
-				/* it normally in order to send notification about the error otherwise we     */
-				/* skip the escalation until dependable trigger changes value to OK.          */
-				if (NULL == error)
-				{
-					DBrollback();
-					free_db_action(&action);
-					goto next;
-				}
+				escalation.status = ESCALATION_STATUS_RECOVERY;
+				execute_escalation(&escalation, &action, error);
 			}
-
-			if (ESCALATION_STATUS_ACTIVE == escalation.status)
+		}
+		else
+		{
+			if (NULL != error)
 			{
-				if (escalation.nextcheck <= now)
-					execute_escalation(&escalation, &action, error);
-
-				/* execute recovery if the same record has it */
-				if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
-				{
-					escalation.status = ESCALATION_STATUS_RECOVERY;
-					execute_escalation(&escalation, &action, error);
-				}
-				else if (0 != esc_superseded)
-				{
-					escalation.status = ESCALATION_STATUS_COMPLETED;
-				}
-
-				if (ESCALATION_STATUS_COMPLETED != escalation.status)
-				{
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"update escalations set status=%d", escalation.status);
-					if (ESCALATION_STATUS_ACTIVE == escalation.status)
-					{
-						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-								",esc_step=%d,nextcheck=%d",
-								escalation.esc_step, escalation.nextcheck);
-					}
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							" where escalationid=" ZBX_FS_UI64, escalation.escalationid);
-				}
-				else
-				{
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"delete from escalations where escalationid=" ZBX_FS_UI64,
-							escalation.escalationid);
-				}
+				escalation.status = ESCALATION_STATUS_COMPLETED;
+				zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
 			}
-			else	/* ESCALATION_STATUS_SLEEP == escalation.status */
-			{
-				if (NULL != error)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "escalation cancelled: %s", error);
-
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"delete from escalations where escalationid=" ZBX_FS_UI64,
-							escalation.escalationid);
-				}
-				else
-				{
-					escalation.nextcheck = time(NULL) + SEC_PER_MIN;
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"update escalations set nextcheck=%d"
-							" where escalationid=" ZBX_FS_UI64,
-							escalation.nextcheck, escalation.escalationid);
-				}
-			}
-
-			free_db_action(&action);
-			zbx_free(error);
-
-			DBexecute("%s", sql);
-
-			DBcommit();
+			else
+				escalation.nextcheck = time(NULL) + SEC_PER_MIN;
 		}
 
-		if (ESCALATION_STATUS_COMPLETED != escalation.status && escalation.nextcheck < *nextcheck)
-			*nextcheck = escalation.nextcheck;
-next:
-		if (NULL != row)
-			memcpy(&escalation, &last_escalation, sizeof(escalation));
+		escalation_update_diff(&escalation, diff);
+		zbx_vector_ptr_append(&diffs, diff);
 	}
-	while (NULL != row);
 
 	DBfree_result(result);
 
+	if (0 == diffs.values_num)
+		goto out;
+
+	zbx_vector_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	DBbegin();
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < diffs.values_num; i++)
+	{
+		char	separator = ' ';
+
+		diff = (zbx_escalation_diff_t *)diffs.values[i];
+
+		if (ESCALATION_STATUS_COMPLETED == diff->status)
+		{
+			zbx_vector_uint64_append(&escalationids, diff->escalationid);
+			continue;
+		}
+
+		if (0 == (diff->flags & ZBX_DIFF_ESCALATION_UPDATE))
+			continue;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set");
+
+		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck=%d", separator, diff->nextcheck);
+			separator = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cesc_step=%d", separator, diff->esc_step);
+			separator = ',';
+		}
+
+		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_STATUS))
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%d", separator, diff->status);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where escalationid=" ZBX_FS_UI64 ";\n",
+				diff->escalationid);
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
+
+	/* delete completed escalations */
+	if (0 != escalationids.values_num)
+		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
+
+	DBcommit();
+
+out:
 	zbx_free(filter);
 	zbx_free(sql);
 
 	res = escalationids.values_num;		/* performance metric */
 
-	/* delete completed escalations */
-	if (0 != escalationids.values_num)
-	{
-		zbx_vector_uint64_sort(&escalationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		DBbegin();
-		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
-		DBcommit();
-	}
-
+	zbx_vector_ptr_clear_ext(&diffs, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&diffs);
 	zbx_vector_uint64_destroy(&escalationids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
