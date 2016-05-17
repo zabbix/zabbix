@@ -292,9 +292,9 @@ ul.top-nav-icons {
     float: left;
     padding: 0 12px; }
     .top-subnav li:last-child {
-      -webkit-box-shadow: 25px 0px 10px -10px #454545;
-      -moz-box-shadow: 25px 0px 10px -10px #454545;
-      box-shadow: 25px 0px 10px -10px #454545; }
+      -webkit-box-shadow: 25px 0 10px -10px #454545;
+      -moz-box-shadow: 25px 0 10px -10px #454545;
+      box-shadow: 25px 0 10px -10px #454545; }
 
 .top-subnav a {
   padding: 9px 1px; }
@@ -1760,21 +1760,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   opacity: 0.35;
   filter: alpha(opacity=35); }
 
-.pop-up {
-  min-width: initial;
-  margin-bottom: 0; }
-  .pop-up article, .pop-up .article {
-    padding: 13px; }
-  .pop-up h1 {
-    border-bottom: none;
-    padding: 0; }
-  .pop-up .header-title ul {
-    position: absolute;
-    right: 0;
-    bottom: 0; }
-  .pop-up .dashbrd-widget-head {
-    padding: 8px 10px; }
-
 .calendar {
   width: 200px; }
   .calendar .selected, .calendar .selected:hover {
@@ -2312,7 +2297,8 @@ td.active-bg {
     color: #d9d9d9; }
 
 .color-picker {
-  height: 20px; }
+  height: 20px;
+  white-space: nowrap; }
   .color-picker div {
     display: inline-block;
     width: 18px;
@@ -2538,7 +2524,7 @@ title: Tables
 name: table
 ---
 
-Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it. 
+Tables are used to display tabular data. All tables are declared with the `list-table` class. Very wide tables should be housed inside a container with `overflow-table` class applied to it.
 
 ```html_example
 <div class="overflow-table">
@@ -2773,7 +2759,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
             <td>
                <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a> 
+               <a href="#">Collapsed</a>
                <div class="treeview"><span class="arrow-down"></span></div>
                <a href="#">Expanded</a>
             </td>
@@ -2782,7 +2768,7 @@ Besides textual information tables may contain other elements like icons. Table 
             <td>Severity</td>
             <td>asdasd</td>
             <td class="normal-bg">
-               <span class="link-action">25</span> 
+               <span class="link-action">25</span>
             </td>
          </tr>
       </tbody>
@@ -2836,7 +2822,7 @@ Forms contain UI elements that are used to submit information.
 
 ##Inputs
 
-Text on html5 input types 
+Text on html5 input types
 
 ```html_example
 <ul class="table-forms">
@@ -3010,7 +2996,7 @@ In exceptional cases dialogs may contain additional information inside a scrolla
 
 ##Contextual Dialogs
 
-Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch.
 
 ```html_example
 <ul class="action-menu">
@@ -3302,7 +3288,7 @@ title: Labels
 name: labels
 ---
 
-Labels add information. Different colors 
+Labels add information. Different colors
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>

@@ -32,46 +32,67 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>		[T_ZBX_INT, O_OPT, P_ACT, DB_ID, null],
-	'scriptid' =>	[T_ZBX_INT, O_OPT, null, DB_ID, null]
+	'hostid' =>		[T_ZBX_INT, O_MAND, P_SYS, DB_ID, null],
+	'scriptid' =>	[T_ZBX_INT, O_MAND, P_SYS, DB_ID, null]
 ];
 check_fields($fields);
 
 ob_end_flush();
 
-$scriptId = getRequest('scriptid');
-$hostId = getRequest('hostid');
-
+$scriptid = getRequest('scriptid');
+$hostid = getRequest('hostid');
 $data = [
+	'name' => '',
+	'command' => '',
 	'message' => ''
 ];
 
-$result = API::Script()->execute([
-	'hostid' => $hostId,
-	'scriptid' => $scriptId
+$scripts = API::Script()->get([
+	'scriptids' => $scriptid,
+	'output' => ['name', 'command']
 ]);
 
-$isErrorExist = false;
+$error_exist = false;
 
-if (!$result) {
-	$isErrorExist = true;
-}
-elseif ($result['response'] == 'failed') {
-	error($result['value']);
+if ($scripts) {
+	$script = $scripts[0];
 
-	$isErrorExist = true;
+	$macros_data = CMacrosResolverHelper::resolve([
+		'config' => 'scriptConfirmation',
+		'data' => [$hostid => [$scriptid => $script['command']]]
+	]);
+
+	$data['name'] = $script['name'];
+	$data['command'] = $macros_data[$hostid][$scriptid];
+
+	$result = API::Script()->execute([
+		'hostid' => $hostid,
+		'scriptid' => $scriptid
+	]);
+
+	if (!$result) {
+		$error_exist = true;
+	}
+	elseif ($result['response'] == 'failed') {
+		error($result['value']);
+		$error_exist = true;
+	}
+	else {
+		$data['message'] = $result['value'];
+	}
 }
 else {
-	$data['message'] = $result['value'];
+	error(_('No permissions to referred object or it does not exist!'));
+	$error_exist = true;
 }
 
-if ($isErrorExist) {
+if ($error_exist) {
 	show_error_message(_('Cannot execute script'));
 }
 
 // render view
-$scriptView = new CView('general.script.execute', $data);
-$scriptView->render();
-$scriptView->show();
+(new CView('general.script.execute', $data))
+	->render()
+	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
