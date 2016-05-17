@@ -1651,12 +1651,15 @@ static int	get_autoreg_value_by_event(const DB_EVENT *event, char **replace_to, 
 #define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
 #define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
 #define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
+#define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
 #define MVAR_EVENT_RECOVERY		MVAR_EVENT "RECOVERY."		/* a prefix for all recovery event macros */
 #define MVAR_EVENT_RECOVERY_DATE	MVAR_EVENT_RECOVERY "DATE}"
 #define MVAR_EVENT_RECOVERY_ID		MVAR_EVENT_RECOVERY "ID}"
 #define MVAR_EVENT_RECOVERY_STATUS	MVAR_EVENT_RECOVERY "STATUS}"
 #define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
 #define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"
+#define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
+
 #define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
 #define MVAR_PROXY_NAME			"{PROXY.NAME}"
 #define MVAR_PROXY_DESCRIPTION		"{PROXY.DESCRIPTION}"
@@ -2084,6 +2087,79 @@ static int	get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, 
 
 /******************************************************************************
  *                                                                            *
+ * Function: compare_tags                                                     *
+ *                                                                            *
+ * Purpose: comparison function to sort tags by tag/value                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	compare_tags(const void *d1, const void *d2)
+{
+	int	ret;
+
+	const zbx_tag_t	*tag1 = *(const zbx_tag_t **)d1;
+	const zbx_tag_t	*tag2 = *(const zbx_tag_t **)d2;
+
+	if (0 == (ret = zbx_strcmp_natural(tag1->tag, tag2->tag)))
+		ret = zbx_strcmp_natural(tag1->value, tag2->value);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_event_tags                                                   *
+ *                                                                            *
+ * Purpose: format event tags string in format <tag1>[:<value1>], ...         *
+ *                                                                            *
+ * Parameters: event        [IN] the event                                    *
+ *             replace_to - [OUT] replacement string                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_event_tags(const DB_EVENT *event, char **replace_to)
+{
+	size_t			replace_to_offset = 0, replace_to_alloc = 0;
+	int			i;
+	zbx_vector_ptr_t	tags;
+
+	if (0 == event->tags.values_num)
+	{
+		*replace_to = zbx_strdup(*replace_to, "");
+		return;
+	}
+
+	zbx_free(*replace_to);
+
+	/* copy tags to temporary vector for sorting */
+
+	zbx_vector_ptr_create(&tags);
+	zbx_vector_ptr_reserve(&tags, event->tags.values_num);
+
+	for (i = 0; i < event->tags.values_num; i++)
+		zbx_vector_ptr_append(&tags, event->tags.values[i]);
+
+	zbx_vector_ptr_sort(&tags, compare_tags);
+
+	for (i = 0; i < tags.values_num; i++)
+	{
+		const zbx_tag_t	*tag = (const zbx_tag_t *)tags.values[i];
+
+		if (0 != i)
+			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
+
+		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, tag->tag);
+
+		if ('\0' != *tag->value)
+		{
+			zbx_chrcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ':');
+			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, tag->value);
+		}
+	}
+
+	zbx_vector_ptr_destroy(&tags);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_recovery_event_value                                         *
  *                                                                            *
  * Purpose: request recovery event value by macro                             *
@@ -2111,6 +2187,10 @@ static void	get_recovery_event_value(const char *macro, DB_EVENT *r_event, char 
 	else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_VALUE))
 	{
 		*replace_to = zbx_dsprintf(*replace_to, "%d", r_event->value);
+	}
+	else if (EVENT_SOURCE_TRIGGERS == r_event->source && 0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
+	{
+		get_event_tags(r_event, replace_to);
 	}
 }
 
@@ -2159,6 +2239,10 @@ static void	get_event_value(const char *macro, const DB_EVENT *event, char **rep
 			else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
 			{
 				*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
+			}
+			else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
+			{
+				get_event_tags(event, replace_to);
 			}
 		}
 	}
@@ -3624,6 +3708,24 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				replace_to = zbx_strdup(replace_to, alert->subject);
 			else if (0 == strcmp(m, MVAR_ALERT_MESSAGE))
 				replace_to = zbx_strdup(replace_to, alert->message);
+		}
+		else if (macro_type & MACRO_TYPE_TRIGGER_TAG)
+		{
+			if (EVENT_SOURCE_TRIGGERS == event->source)
+			{
+				if (0 == strncmp(m, MVAR_ITEM_LASTVALUE, ZBX_CONST_STRLEN(MVAR_ITEM_LASTVALUE)))
+				{
+					func_macro = 1;
+					ret = DBitem_lastvalue(event->trigger.expression, &replace_to, N_functionid,
+							raw_value);
+				}
+				else if (0 == strncmp(m, MVAR_ITEM_VALUE, ZBX_CONST_STRLEN(MVAR_ITEM_VALUE)))
+				{
+					func_macro = 1;
+					ret = DBitem_value(event->trigger.expression, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value);
+				}
+			}
 		}
 
 		if (1 == require_numeric && NULL != replace_to)

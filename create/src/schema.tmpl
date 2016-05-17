@@ -516,6 +516,7 @@ FIELD		|actionid	|t_id		|	|NOT NULL	|0			|1|actions
 FIELD		|conditiontype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value2		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|actionid
 
 TABLE|config|configid|ZBX_DATA
@@ -1348,7 +1349,21 @@ TABLE|opinventory|operationid|ZBX_DATA
 FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
 FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 
+TABLE|trigger_tag|triggertagid|0
+FIELD		|triggertagid	|t_id		|	|NOT NULL	|0
+FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|triggerid
+
+TABLE|event_tag|eventtagid|0
+FIELD		|eventtagid	|t_id		|	|NOT NULL	|0
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|eventid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010005	|3010005
+ROW		|3010012	|3010012
