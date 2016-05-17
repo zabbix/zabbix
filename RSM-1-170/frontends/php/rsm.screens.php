@@ -108,7 +108,7 @@ $data['tld'] = reset($tld);
 
 // Item validation.
 $item = API::Item()->get(array(
-	'output' => array('key_'),
+	'output' => array('itemid', 'key_', 'value_type'),
 	'hostids' => $data['tld']['hostid'],
 	'filter' => array(
 		'key_' => get_request('item_key')
@@ -121,7 +121,71 @@ if (!$item) {
 	exit;
 }
 
+$data['item'] = reset($item);
+
+if (in_array($data['filter_month'], array(1, 3, 5, 7, 8, 10, 12))) {
+	$period = 3600 * 24 * 31;
+}
+if (in_array($data['filter_month'], array(4, 6, 9, 11))) {
+	$period = 3600 * 24 * 30;
+}
+elseif ($data['filter_month'] == 2 && $data['filter_year'] % 4 == 0) {
+	$period = 3600 * 24 * 29;
+}
+else {
+	$period = 3600 * 24 * 28;
+}
+
+$start_time = mktime(0, 0, 0, $data['filter_month'], 1, $data['filter_year']);
+$end_time = mktime(0, 0, 0, $data['filter_month'], 1, $data['filter_year']) + $period - 1;
+
+$stime = date('YmdHis', $start_time);
+
+$curtime = time();
+
 // Get data by item key and type
+switch ($data['item']['key_']) {
+	case RSM_SLV_DNS_DOWNTIME:
+		$graphs = API::Graph()->get(array(
+			'output' => array('graphid'),
+			'hostids' => $data['tld']['hostid'],
+			'filter' => array('name' => RSM_SLA_GRAPH_DNS_SERVICE_AVAILABILITY),
+			'limit' => 1
+		));
+
+		$graph = reset($graphs);
+
+		$src ='chart2.php?graphid='.$graph['graphid'].'&period='.$period.'&stime='.$stime.'&curtime='.$curtime;
+
+		$table = new CTableInfo(_('No date found.'));
+		$table->setHeader(array(
+			_('Date'),
+			_('TLD')
+		));
+
+		$item_values = API::History()->get(array(
+			'output' => array('clock', 'value'),
+			'itemids' => $item['itemid'],
+			'time_from' => $start_time,
+			'time_till' => $end_time,
+			'history' => $item['value_type'],
+			'limit' => 100
+		));
+
+		foreach ($item_values as $item_value) {
+			$table->addRow(array(
+				date('d.m.Y H:i', $item_value['clock']),
+				$item_value['value'],
+			));
+		}
+
+		$data['screen'] = new CDiv(array(
+			new CDiv(new CImg($src), 'center'),
+			BR(),
+			$table
+		));
+		break;
+}
 $rsmView = new CView('rsm.screens.view', $data);
 $rsmView->render();
 $rsmView->show();

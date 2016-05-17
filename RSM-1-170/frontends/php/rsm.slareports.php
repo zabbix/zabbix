@@ -123,6 +123,7 @@ if ($data['filter_search']) {
 					$missed_items[] = $item_key;
 				}
 			}
+
 			show_error_message(_s('Configuration error, cannot find items: "%1$s".', implode(', ', $missed_items)));
 			require_once dirname(__FILE__).'/include/page_footer.php';
 			exit;
@@ -165,7 +166,7 @@ if ($data['filter_search']) {
 			);
 		}
 
-		// time limits
+		// Time limits.
 		$start_time = mktime(
 			0,
 			0,
@@ -212,14 +213,9 @@ if ($data['filter_search']) {
 			'slv' => $item_hystory['cnt'].' '._('min'),
 			'slr' => _s('%1$s minutes of downtime', ($macros[RSM_SLV_MACRO_DNS_AVAIL]['value'] / 60)),
 			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+				new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&item_key='.RSM_SLV_DNS_DOWNTIME.'&filter_year='.$data['filter_year'].
 					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_DNS_DOWNTIME.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
 				)
 			)
 		];

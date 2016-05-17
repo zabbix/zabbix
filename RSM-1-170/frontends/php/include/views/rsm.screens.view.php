@@ -76,4 +76,6 @@ $filter_form->addVar('type', $data['type']);
 $filter_form->addVar('item_key', $data['item_key']);
 $widget->addFlicker($filter_form, CProfile::get('web.rsm.screens.filter.state', 0));
 
+$widget->addItem($data['screen']);
+
 return $widget;
