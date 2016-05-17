@@ -40,16 +40,14 @@ $fields = [
 	'gname' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Group name')],
 	'users' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	'gui_access' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),'isset({add}) || isset({update})'],
-	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'users_status' =>		[T_ZBX_INT, O_OPT, null,	IN(GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED),	null],
 	'debug_mode' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
 	'new_right' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'right_to_del' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_users_to_del' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_users' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'group_rights' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'set_users_status' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'set_gui_access' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1,2'),null],
-	'set_debug_mode' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	// actions
 	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"usergroup.massdisable","usergroup.massdisabledebug","usergroup.massdelete",'.
