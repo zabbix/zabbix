@@ -697,8 +697,6 @@ else {
 	}
 	unset($action);
 
-
-
 	// sorting && paging
 	order_result($data['actions'], $sortField, $sortOrder);
 	$data['paging'] = getPagingLine($data['actions'], $sortOrder, new CUrl('actionconf.php'));

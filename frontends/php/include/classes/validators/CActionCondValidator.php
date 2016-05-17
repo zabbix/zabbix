@@ -193,7 +193,15 @@ class CActionCondValidator extends CValidator {
 			case CONDITION_TYPE_APPLICATION:
 			case CONDITION_TYPE_HOST_NAME:
 			case CONDITION_TYPE_HOST_METADATA:
+			case CONDITION_TYPE_EVENT_TAG:
 				if (zbx_empty($conditionValue)) {
+					$this->setError(_('Empty action condition.'));
+				}
+				break;
+
+			case CONDITION_TYPE_EVENT_TAG_VALUE:
+				if (!is_string($condition['value']) || $condition['value'] === '' ||
+						!is_string($condition['value2']) || $condition['value2'] === '') {
 					$this->setError(_('Empty action condition.'));
 				}
 				break;
