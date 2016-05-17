@@ -445,6 +445,7 @@ else {
 		$csvRows[] = $header;
 	}
 	else {
+		$header[] = _('Tags');
 		$table->setHeader($header);
 	}
 }
@@ -700,6 +701,7 @@ else {
 				'eventids' => zbx_objectValues($events, 'eventid'),
 				'output' => API_OUTPUT_EXTEND,
 				'select_acknowledges' => API_OUTPUT_COUNT,
+				'selectTags' => ['tag', 'value'],
 				'sortfield' => ['clock', 'eventid'],
 				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => true
@@ -806,6 +808,26 @@ else {
 							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
+					// tags
+					CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
+					$tags = [];
+					$tags_count = 1;
+
+					foreach ($event['tags'] as $tag) {
+						if ($tags_count > EVENTS_LIST_TAGS_COUNT) {
+							$tags[] = new CSpan(bold('...'));
+							break;
+						}
+						else {
+							$tags[] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
+								->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+								->addClass(ZBX_STYLE_STATUS_GREY);
+						}
+
+						$tags_count++;
+					}
+
 					$table->addRow([
 						(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
@@ -816,7 +838,8 @@ else {
 						getSeverityCell($trigger['priority'], $config, null, !$event['value']),
 						$event['duration'],
 						$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
-						(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
+						(new CCol($action))->addClass(ZBX_STYLE_NOWRAP),
+						new CCol($tags)
 					]);
 				}
 			}

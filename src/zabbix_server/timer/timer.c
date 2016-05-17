@@ -382,8 +382,8 @@ static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maint
 		if (value_before == value_inside && value_inside == value_after)
 			continue;
 
-		add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, &ts, value_after,
-				row[1], row[2], row[7], (unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]));
+		add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, &ts, value_after,
+				row[1], row[2], row[7], (unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]), NULL);
 	}
 	DBfree_result(result);
 

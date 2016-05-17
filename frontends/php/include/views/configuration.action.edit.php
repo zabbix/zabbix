@@ -90,6 +90,9 @@ if ($this->data['action']['filter']['conditions']) {
 		if (!isset($condition['value'])) {
 			$condition['value'] = '';
 		}
+		if (!array_key_exists('value2', $condition)) {
+			$condition['value2'] = '';
+		}
 		if (!str_in_array($condition['conditiontype'], $this->data['allowedConditions'])) {
 			continue;
 		}
@@ -105,7 +108,7 @@ if ($this->data['action']['filter']['conditions']) {
 			[
 				$labelSpan,
 				getConditionDescription($condition['conditiontype'], $condition['operator'],
-					$actionConditionStringValues[0][$cIdx]
+					$actionConditionStringValues[0][$cIdx], $condition['value2']
 				),
 				(new CCol([
 					(new CButton('remove', _('Remove')))
@@ -165,6 +168,8 @@ $conditionOperatorsComboBox = new CComboBox('new_condition[operator]', $this->da
 foreach (get_operators_by_conditiontype($this->data['new_condition']['conditiontype']) as $operator) {
 	$conditionOperatorsComboBox->addItem($operator, condition_operator2str($operator));
 }
+
+$condition2 = null;
 
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
@@ -347,6 +352,22 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
+	case CONDITION_TYPE_EVENT_TAG:
+		$condition = (new CTextBox('new_condition[value]', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag'));
+		break;
+
+	case CONDITION_TYPE_EVENT_TAG_VALUE:
+		$condition = (new CTextBox('new_condition[value]', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('value'));
+
+		$condition2 = (new CTextBox('new_condition[value2]', ''))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag'));
+		break;
+
 	default:
 		$condition = null;
 }
@@ -359,6 +380,8 @@ $conditionFormList->addRow(_('New condition'),
 				new CCol([
 					$conditionTypeComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$condition2,
+					$condition2 === null ? null : (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$conditionOperatorsComboBox,
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					$condition
@@ -966,7 +989,7 @@ if (!empty($this->data['new_operation'])) {
 				[
 					$labelCol,
 					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
-						$operationConditionStringValues[$cIdx]
+						$operationConditionStringValues[$cIdx], ''
 					),
 					(new CCol([
 						(new CButton('remove', _('Remove')))
