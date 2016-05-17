@@ -1769,6 +1769,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				if (0 == cur_esc.esc_step)
 				{
 					zbx_vector_uint64_append(&escalations_to_be_deleted, cur_esc.escalationid);
+					free_db_action(&action);
+					zbx_free(error);
 					goto next;
 				}
 			}
