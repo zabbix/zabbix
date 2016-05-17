@@ -279,7 +279,9 @@ $itemFormList->addRow(_('SQL query'),
 	'label_params'
 );
 $itemFormList->addRow(_('Formula'),
-	(new CTextArea('params_f', $data['params'], $discovered_item))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CTextArea('params_f', $data['params'], $discovered_item))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setReadonly($discovered_item),
 	'label_formula'
 );
 
