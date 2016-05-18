@@ -383,6 +383,37 @@ static void	parse_traps(int flag)
 
 /******************************************************************************
  *                                                                            *
+ * Function: delay_trap_logs                                                  *
+ *                                                                            *
+ * Purpose: delay SNMP trapper file related issue log entries for 60 seconds  *
+ *          unless this is the first time this issue has occurred             *
+ *                                                                            *
+ * Parameters: message   - [IN] string containing log entry text              *
+ *             log_level - [IN] the log entry log level                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	delay_trap_logs(const char *message, int log_level)
+{
+	const int	delay = 10;	/* repeated log entry delay time in seconds */
+	int		now;
+	static int	lastlogtime = 0;
+	static char	*previous_message = "";
+	const char	*tmp;
+
+	tmp = previous_message;
+
+	now = (int)time(NULL);
+
+	if (delay <= now - lastlogtime || 0 != strcmp(message, tmp))
+	{
+		zabbix_log(log_level, "%s \"%s\": %s",message, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		lastlogtime = now;
+		previous_message = (char *)message;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: read_traps                                                       *
  *                                                                            *
  * Purpose: read the traps and then parse them with parse_traps()             *
@@ -399,15 +430,18 @@ static int	read_traps()
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to %d for \"%s\": %s", trap_lastsize,
-				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		char	*message = NULL;
+
+		message = zbx_dsprintf(message, "cannot set position to %d for", trap_lastsize);
+		delay_trap_logs(message, LOG_LEVEL_WARNING);
 		goto exit;
 	}
 
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot read from SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-				zbx_strerror(errno));
+		char	*message = "cannot read from SNMP trapper file";
+
+		delay_trap_logs(message, LOG_LEVEL_WARNING);
 		goto exit;
 	}
 
@@ -467,8 +501,9 @@ static int	open_trap_file()
 
 	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-				zbx_strerror(errno));
+		char	*message = "cannot stat SNMP trapper file";
+
+		delay_trap_logs(message, LOG_LEVEL_CRIT);
 		goto out;
 	}
 
@@ -490,8 +525,9 @@ static int	open_trap_file()
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
-					zbx_strerror(errno));
+			char	*message = "cannot open SNMP trapper file";
+
+			delay_trap_logs(message, LOG_LEVEL_CRIT);
 		}
 		goto out;
 	}
