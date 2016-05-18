@@ -1430,6 +1430,81 @@ footer {
 
 }
 
+.checkbox-switch {
+    position: relative;
+    width: 28px;
+
+		label {
+			display: block;
+			overflow: hidden;
+			@include border-radius(2px);
+		}
+
+		input[type="checkbox"] {
+			position: absolute;
+			clip: rect(1px, 1px, 1px, 1px);
+
+			&:checked + label .checkbox-switch-track {
+				margin-left: 0;
+			}
+
+			&:checked + label .checkbox-switch-thumb {
+				right: 0;
+				border: 1px solid darken(desaturate($alt-green, 10%), 20%);
+			}
+
+			&:active + label {
+				@include box-shadow(0 0 0 1px $form-border-focus-color);
+			}
+
+			&:focus + label {
+				@include box-shadow(0 0 0 1px $form-border-focus-color);
+			}
+		}
+}
+
+.checkbox-switch-track {
+	display: block;
+  width: 200%;
+  margin-left: -100%;
+  @include transition(margin 0.1s ease-in 0s);
+}
+
+.checkbox-switch-track {
+
+	&::before {
+		content: '';
+		background-color: darken(desaturate($alt-green, 10%), 16%);
+		display: block;
+	  float: left;
+	  width: 50%;
+	  height: 16px;
+	}
+
+	&::after {
+		content: '';
+    background-color: $switch-thumb-bg-color;
+		display: block;
+	  float: left;
+	  width: 50%;
+	  height: 16px;
+	}
+}
+
+.checkbox-switch-thumb {
+	display: block;
+  position: absolute;
+	width: 10px;
+	margin: 2px;
+	top: 0;
+  bottom: 0;
+  right: 12px;
+  border: 1px solid $form-border-color;
+	background-color: $white;
+  @include border-radius(2px);
+  @include transition(all 0.1s ease-in 0s);
+}
+
 .radio-segmented {
 	white-space: nowrap;
 
