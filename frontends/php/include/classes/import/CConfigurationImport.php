@@ -76,6 +76,7 @@ class CConfigurationImport {
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
@@ -105,6 +106,7 @@ class CConfigurationImport {
 		$this->processHosts();
 
 		// delete missing objects from processed hosts and templates
+		$this->deleteMissingHttpTests();
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
@@ -122,6 +124,7 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
+		$this->processHttpTests();
 
 		return true;
 	}
@@ -149,6 +152,8 @@ class CConfigurationImport {
 		$macrosRefs = [];
 		$proxyRefs = [];
 		$hostPrototypesRefs = [];
+		$httptestsRefs = [];
+		$httpstepsRefs = [];
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -456,6 +461,24 @@ class CConfigurationImport {
 			}
 		}
 
+		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
+			foreach ($httptests as $httptest) {
+				$httptestsRefs[$host][$httptest['name']] = $httptest['name'];
+
+				if (array_key_exists('name', $httptest['application'])) {
+					$applicationsRefs[$host][$httptest['application']['name']] = $httptest['application']['name'];
+				}
+			}
+		}
+
+		foreach ($this->getFormattedHttpSteps() as $host => $httptests) {
+			foreach ($httptests as $httptest_name => $httpsteps) {
+				foreach ($httpsteps as $httpstep) {
+					$httpstepsRefs[$host][$httptest_name][$httpstep['name']] = $httpstep['name'];
+				}
+			}
+		}
+
 		$this->referencer->addGroups($groupsRefs);
 		$this->referencer->addTemplates($templatesRefs);
 		$this->referencer->addHosts($hostsRefs);
@@ -471,6 +494,8 @@ class CConfigurationImport {
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
 		$this->referencer->addHostPrototypes($hostPrototypesRefs);
+		$this->referencer->addHttpTests($httptestsRefs);
+		$this->referencer->addHttpSteps($httpstepsRefs);
 	}
 
 	/**
@@ -1156,6 +1181,83 @@ class CConfigurationImport {
 		if ($dependencies) {
 			API::TriggerPrototype()->update($dependencies);
 		}
+	}
+
+	/**
+	 * Import web scenarios.
+	 */
+	protected function processHttpTests() {
+		if (!$this->options['httptests']['createMissing'] && !$this->options['httptests']['updateExisting']) {
+			return;
+		}
+
+		$all_httptests = $this->getFormattedHttpTests();
+
+		if (!$all_httptests) {
+			return;
+		}
+
+		$httptests_to_create = [];
+		$httptests_to_update = [];
+
+		foreach ($all_httptests as $host => $httptests) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+
+			if (!$this->importedObjectContainer->isHostProcessed($hostid)
+					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
+				continue;
+			}
+
+			foreach ($httptests as $httptest) {
+				$httptest['hostid'] = $hostid;
+
+				if (array_key_exists('name', $httptest['application'])) {
+					$applicationid = $this->referencer->resolveApplication($hostid, $httptest['application']['name']);
+
+					if ($applicationid === false) {
+						throw new Exception(_s('Web scenario "%1$s" on "%2$s": application "%3$s" does not exist.',
+							$httptest['name'], $host, $httptest['application']['name']));
+					}
+
+					$httptest['applicationid'] = $applicationid;
+				}
+				else {
+					$httptest['applicationid'] = 0;
+				}
+
+				unset($httptest['application']);
+
+				$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
+
+				if ($httptestid !== false) {
+					foreach ($httptest['steps'] as &$httpstep) {
+						$httpstepid = $this->referencer->resolveHttpStep($hostid, $httptestid, $httpstep['name']);
+
+						if ($httpstepid !== false) {
+							$httpstep['httpstepid'] = $httpstepid;
+						}
+					}
+					unset($httpstep);
+
+					$httptest['httptestid'] = $httptestid;
+					$httptests_to_update[] = $httptest;
+				}
+				else {
+					$httptests_to_create[] = $httptest;
+				}
+			}
+		}
+
+		// create/update web scenarios and create a hash hostid->name->httptestid
+		if ($this->options['httptests']['createMissing'] && $httptests_to_create) {
+			API::HttpTest()->create($httptests_to_create);
+		}
+
+		if ($this->options['httptests']['updateExisting'] && $httptests_to_update) {
+			API::HttpTest()->update($httptests_to_update);
+		}
+
+		$this->referencer->refreshHttpTests();
 	}
 
 	/**
@@ -1878,6 +1980,59 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Deletes web scenarios from DB that are missing in XML.
+	 */
+	protected function deleteMissingHttpTests() {
+		if (!$this->options['httptests']['deleteMissing']) {
+			return;
+		}
+
+		$processed_hostids = array_merge(
+			$this->importedObjectContainer->getHostIds(),
+			$this->importedObjectContainer->getTemplateIds()
+		);
+
+		// no hosts or templates have been processed
+		if (!$processed_hostids) {
+			return;
+		}
+
+		$xml_httptestids = [];
+
+		$all_httptests = $this->getFormattedHttpTests();
+
+		if ($all_httptests) {
+			foreach ($all_httptests as $host => $httptests) {
+				$hostid = $this->referencer->resolveHostOrTemplate($host);
+
+				foreach ($httptests as $httptest) {
+					$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
+
+					if ($httptestid) {
+						$xml_httptestids[$httptestid] = true;
+					}
+				}
+			}
+		}
+
+		$db_httptestids = API::HttpTest()->get([
+			'output' => [],
+			'hostids' => $processed_hostids,
+			'inherited' => false,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		$del_httptestids = array_diff_key($db_httptestids, $xml_httptestids);
+
+		if ($del_httptestids) {
+			API::HttpTest()->delete(array_keys($del_httptestids));
+		}
+
+		$this->referencer->refreshHttpTests();
+	}
+
+	/**
 	 * Get formatted groups.
 	 *
 	 * @return array
@@ -1966,6 +2121,32 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['discoveryRules'];
+	}
+
+	/**
+	 * Get formatted web scenarios.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedHttpTests() {
+		if (!array_key_exists('httptests', $this->formattedData)) {
+			$this->formattedData['httptests'] = $this->adapter->getHttpTests();
+		}
+
+		return $this->formattedData['httptests'];
+	}
+
+	/**
+	 * Get formatted web scenario steps.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedHttpSteps() {
+		if (!array_key_exists('httpsteps', $this->formattedData)) {
+			$this->formattedData['httpsteps'] = $this->adapter->getHttpSteps();
+		}
+
+		return $this->formattedData['httpsteps'];
 	}
 
 	/**
