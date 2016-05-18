@@ -164,11 +164,11 @@ switch ($data['item']['key_']) {
 		));
 
 		$item_values = API::History()->get(array(
-			'output' => array('clock', 'value'),
-			'itemids' => $item['itemid'],
+			'output' => API_OUTPUT_EXTEND,
+			'itemids' => $data['item']['itemid'],
 			'time_from' => $start_time,
 			'time_till' => $end_time,
-			'history' => $item['value_type'],
+			'history' => $data['item']['value_type'],
 			'limit' => 100
 		));
 
