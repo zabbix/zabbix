@@ -375,7 +375,7 @@ class CConfigurationExport {
 
 		foreach ($hosts as &$host) {
 			$host['proxy'] = ($host['proxy_hostid'] != 0 && array_key_exists($host['proxy_hostid'], $db_proxies))
-				? ['name' => $db_proxies[$host['proxy_hostid']]]
+				? ['name' => $db_proxies[$host['proxy_hostid']]['host']]
 				: null;
 		}
 		unset($host);
