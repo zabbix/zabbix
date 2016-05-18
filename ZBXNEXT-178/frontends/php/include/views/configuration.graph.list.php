@@ -41,7 +41,6 @@ else {
 		->setTitle(_('Graphs'))
 		->setControls((new CForm('get'))
 			->cleanItems()
-			->addVar('hostid', $this->data['hostid'])
 			->addItem((new CList())
 				->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
 				->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])

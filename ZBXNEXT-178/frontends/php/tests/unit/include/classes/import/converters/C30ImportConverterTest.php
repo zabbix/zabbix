@@ -65,6 +65,18 @@ class C30ImportConverterTest extends CImportConverterTest {
 							]
 						]
 					],
+					'triggers' => [
+						[
+							'description' => 'trigger1',
+							'expression' => '{host:item1.last()}',
+							'dependencies' => [
+								[
+									'description' => 'trigger2',
+									'expression' => '{host:item2.last()}'
+								]
+							]
+						]
+					],
 					'maps' => [
 						[
 							'selements' => [
@@ -111,7 +123,8 @@ class C30ImportConverterTest extends CImportConverterTest {
 													'expression' => '{Template:item2.last()}',
 													'recovery_expression' => ''
 												]
-											]
+											],
+											'tags' => []
 										]
 									]
 								]
@@ -134,11 +147,28 @@ class C30ImportConverterTest extends CImportConverterTest {
 													'expression' => '{host:item2.last()}',
 													'recovery_expression' => ''
 												]
-											]
+											],
+											'tags' => []
 										]
 									]
 								]
 							]
+						]
+					],
+					'triggers' => [
+						[
+							'description' => 'trigger1',
+							'expression' => '{host:item1.last()}',
+							'recovery_mode' => '0',
+							'recovery_expression' => '',
+							'dependencies' => [
+								[
+									'description' => 'trigger2',
+									'expression' => '{host:item2.last()}',
+									'recovery_expression' => ''
+								]
+							],
+							'tags' => []
 						]
 					],
 					'maps' => [

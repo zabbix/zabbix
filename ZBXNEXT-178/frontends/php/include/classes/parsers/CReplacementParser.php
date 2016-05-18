@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -17,17 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxalgo.h"
 
-void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags)
-{
-}
+/**
+ * A parser for reference macros like \1-\9.
+ */
+class CReplacementParser extends CParser {
 
-int	process_events(void)
-{
-	return 0;
+	/**
+	 * @param string    $source
+	 * @param int       $pos
+	 *
+	 * @return int
+	 */
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
+
+		$p = $pos;
+
+		if (!isset($source[$p]) || $source[$p] !== '\\') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		if (!isset($source[$p]) || $source[$p] < '1' || $source[$p] > '9') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+	}
 }
