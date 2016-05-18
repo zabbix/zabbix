@@ -76,7 +76,7 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'<screens></screens>text'."\n".
 				'<images></images>'."\n".
 				'</zabbix_export>',
-				'Invalid XML tag "/zabbix_export": unexpected text "text".'
+				'Invalid tag "/zabbix_export": unexpected text "text".'
 			],
 			[
 				'<'.'?xml version="1.0"?'.'>'."\n".
@@ -87,7 +87,7 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'    </host>'."\n".
 				'</hosts>'."\n".
 				'</zabbix_export>',
-				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "abc".'
+				'Invalid tag "/zabbix_export/hosts/host": unexpected text "abc".'
 			],
 			[
 				'<'.'?xml version="1.0"?'.'>'."\n".
@@ -99,7 +99,7 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'    </host>'."\n".
 				'</hosts>'."\n".
 				'</zabbix_export>',
-				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "abc".'
+				'Invalid tag "/zabbix_export/hosts/host": unexpected text "abc".'
 			],
 			[
 				'<'.'?xml version="1.0"?'.'>'."\n".
@@ -112,7 +112,7 @@ class CXmlImportReaderTest extends PHPUnit_Framework_TestCase {
 				'    </host>'."\n".
 				'</hosts>'."\n".
 				'</zabbix_export>',
-				'Invalid XML tag "/zabbix_export/hosts/host": unexpected text "p".'
+				'Invalid tag "/zabbix_export/hosts/host": unexpected text "p".'
 			],
 			[
 				'',

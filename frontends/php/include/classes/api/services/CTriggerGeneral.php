@@ -149,14 +149,13 @@ abstract class CTriggerGeneral extends CApiService {
 				'status', 'priority', 'comments', 'type', 'templateid'
 			],
 			'hostids' => $host['hostid'],
+			'filter' => ['templateid' => $trigger['templateid']],
 			'nopermissions' => true
 		];
 
 		if ($class === 'CTriggerPrototype') {
 			$options['selectDiscoveryRule'] = ['itemid'];
 		}
-
-		$options['filter'] = ['templateid' => $trigger['templateid']];
 
 		// check if a child trigger already exists on the host
 		$_db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->get($options),
@@ -192,6 +191,11 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (array_key_exists('triggerid', $trigger)) {
+			$db_trigger['tags'] = API::getApiService()->select('trigger_tag', [
+				'output' => ['triggertagid', 'tag', 'value'],
+				'filter' => ['triggerid' => $db_trigger['triggerid']]
+			]);
+
 			$this->updateReal([$trigger], [$db_trigger]);
 		}
 		else {
@@ -209,6 +213,66 @@ abstract class CTriggerGeneral extends CApiService {
 			$triggers = [$trigger];
 			$this->createReal($triggers);
 			$trigger = $triggers[0];
+		}
+
+		return $trigger;
+	}
+
+	/**
+	 * Validate trigger tags.
+	 *
+	 * @param array $trigger	Trigger.
+	 *
+	 * @return array
+	 *
+	 * @throws APIException if at least one trigger exists.
+	 */
+	protected function checkTriggerTags(array $trigger) {
+		if (!array_key_exists('tags', $trigger)) {
+			return $trigger;
+		}
+
+		foreach ($trigger['tags'] as &$tag) {
+			if (!array_key_exists('tag', $tag)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'tag'));
+			}
+
+			if (!is_string($tag['tag'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('a character string is expected'))
+				);
+			}
+
+			if (trim($tag['tag']) === '') {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty'))
+				);
+			}
+
+			if (strpos($tag['tag'], '/') !== false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('unacceptable characters are used'))
+				);
+			}
+
+			if (!array_key_exists('value', $tag)) {
+				$tag['value'] = '';
+			}
+
+			if (!is_string($tag['value'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'value', _('a character string is expected'))
+				);
+			}
+		}
+		unset($tag);
+
+		// Check tag and value duplicates in input data.
+		$tag = CArrayHelper::findDuplicate($trigger['tags'], 'tag', 'value');
+		if ($tag !== null) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Tag "%1$s" with value "%2$s" already exists.', $tag['tag'], $tag['value'])
+			);
 		}
 
 		return $trigger;
@@ -338,6 +402,19 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);
 			$result = $relationMap->mapMany($result, $functions, 'functions');
+		}
+
+		// Adding trigger tags.
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			$tags = API::getApiService()->select('trigger_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['triggerid']),
+				'filter' => ['triggerid' => $triggerids],
+				'preservekeys' => true
+			]);
+
+			$relationMap = $this->createRelationMap($tags, 'triggerid', 'triggertagid');
+			$tags = $this->unsetExtraFields($tags, ['triggertagid', 'triggerid'], []);
+			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;
@@ -470,6 +547,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 			$this->checkTriggerExpressions($trigger);
 			$this->checkIfExistsOnHost($trigger);
+			$trigger = $this->checkTriggerTags($trigger);
 		}
 		unset($trigger);
 	}
@@ -567,6 +645,15 @@ abstract class CTriggerGeneral extends CApiService {
 			]);
 		}
 
+		$_db_trigger_tags = API::getApiService()->select('trigger_tag', [
+			'output' => ['triggertagid', 'triggerid', 'tag', 'value'],
+			'filter' => ['triggerid' => array_keys($_db_triggers)],
+			'preservekeys' => true
+		]);
+
+		$_db_triggers = $this->createRelationMap($_db_trigger_tags, 'triggerid', 'triggertagid')
+			->mapMany($_db_triggers, $_db_trigger_tags, 'tags');
+
 		foreach ($triggers as $tnum => &$trigger) {
 			// check permissions
 			if (!array_key_exists($trigger['triggerid'], $_db_triggers)) {
@@ -639,6 +726,8 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$db_triggers[$tnum] = $_db_trigger;
+
+			$trigger = $this->checkTriggerTags($trigger);
 		}
 		unset($trigger);
 	}
@@ -684,6 +773,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_triggers = $triggers;
 		$new_functions = [];
 		$triggers_functions = [];
+		$new_tags = [];
 		$this->implode_expressions($new_triggers, null, $triggers_functions);
 
 		$triggerid = DB::reserveIds('triggers', count($new_triggers));
@@ -701,12 +791,23 @@ abstract class CTriggerGeneral extends CApiService {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 			}
 
+			if (array_key_exists('tags', $new_trigger)) {
+				foreach ($new_trigger['tags'] as $tag) {
+					$tag['triggerid'] = $triggerid;
+					$new_tags[] = $tag;
+				}
+			}
+
 			$triggerid = bcadd($triggerid, 1, 0);
 		}
 		unset($new_trigger);
 
 		DB::insert('triggers', $new_triggers, false);
 		DB::insert('functions', $new_functions, false);
+
+		if ($new_tags) {
+			DB::insert('trigger_tag', $new_tags);
+		}
 
 		foreach ($triggers as $trigger) {
 			add_audit_ext(AUDIT_ACTION_ADD, $resource, $trigger['triggerid'], $trigger['description'], null, null,
@@ -744,6 +845,9 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $db_triggers[<tnum>]['templateid']              [IN]
 	 * @param array  $db_triggers[<tnum>]['discoveryRule']           [IN] For trigger prorotypes only.
 	 * @param string $db_triggers[<tnum>]['discoveryRule']['itemid'] [IN]
+	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
+	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
+	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
 	 *
 	 * @throws APIException
 	 */
@@ -771,6 +875,8 @@ abstract class CTriggerGeneral extends CApiService {
 		$new_functions = [];
 		$del_functions_triggerids = [];
 		$triggers_functions = [];
+		$new_tags = [];
+		$del_triggertagids = [];
 		$save_triggers = $triggers;
 		$this->implode_expressions($triggers, $db_triggers, $triggers_functions);
 
@@ -827,6 +933,34 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($upd_trigger['values']) {
 				$upd_triggers[] = $upd_trigger;
 			}
+
+			if (array_key_exists('tags', $trigger)) {
+				// Add new trigger tags and replace changed ones.
+
+				CArrayHelper::sort($db_trigger['tags'], ['tag', 'value']);
+				CArrayHelper::sort($trigger['tags'], ['tag', 'value']);
+
+				$tags_delete = $db_trigger['tags'];
+				$tags_add = $trigger['tags'];
+
+				foreach ($tags_delete as $dt_key => $tag_delete) {
+					foreach ($tags_add as $nt_key => $tag_add) {
+						if ($tag_delete['tag'] === $tag_add['tag'] && $tag_delete['value'] === $tag_add['value']) {
+							unset($tags_delete[$dt_key], $tags_add[$nt_key]);
+							continue 2;
+						}
+					}
+				}
+
+				foreach ($tags_delete as $tag_delete) {
+					$del_triggertagids[] = $tag_delete['triggertagid'];
+				}
+
+				foreach ($tags_add as $tag_add) {
+					$tag_add['triggerid'] = $trigger['triggerid'];
+					$new_tags[] = $tag_add;
+				}
+			}
 		}
 
 		if ($upd_triggers) {
@@ -837,6 +971,12 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 		if ($new_functions) {
 			DB::insert('functions', $new_functions, false);
+		}
+		if ($del_triggertagids) {
+			DB::delete('trigger_tag', ['triggertagid' => $del_triggertagids]);
+		}
+		if ($new_tags) {
+			DB::insert('trigger_tag', $new_tags);
 		}
 
 		if ($class === 'CTrigger' && $changed_priority_triggerids
@@ -1344,6 +1484,7 @@ abstract class CTriggerGeneral extends CApiService {
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
 				'priority', 'comments', 'type'
 			],
+			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
 			'preservekeys' => true
 		]);

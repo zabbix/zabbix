@@ -25,6 +25,18 @@
 class C32XmlValidator {
 
 	/**
+	 * @var string
+	 */
+	private $format;
+
+	/**
+	 * @param string $format format of import source
+	 */
+	public function __construct($format) {
+		$this->format = $format;
+	}
+
+	/**
 	 * Base validation function.
 	 *
 	 * @param array  $data	import data
@@ -246,6 +258,12 @@ class C32XmlValidator {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]]
 								]]
@@ -606,6 +624,12 @@ class C32XmlValidator {
 											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
 										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
 									]]
 								]]
 							]],
@@ -762,6 +786,12 @@ class C32XmlValidator {
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
 							'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]
@@ -951,7 +981,7 @@ class C32XmlValidator {
 			]]
 		]];
 
-		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 	}
 
 	/**
@@ -965,7 +995,7 @@ class C32XmlValidator {
 	 */
 	public function validateDateTime($data, array $parent_data = null, $path) {
 		if (!preg_match('/^20[0-9]{2}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[01])T(2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]Z$/', $data)) {
-			throw new Exception(_s('Invalid XML tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
+			throw new Exception(_s('Invalid tag "%1$s": %2$s.', $path, _s('"%1$s" is expected', _x('YYYY-MM-DDThh:mm:ssZ', 'XML date and time format'))));
 		}
 
 		return $data;
@@ -1034,7 +1064,7 @@ class C32XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 		}
 
 		return $data;
@@ -1100,7 +1130,7 @@ class C32XmlValidator {
 					return $data;
 			}
 
-			$data = (new CXmlValidatorGeneral($rules))->validate($data, $path);
+			$data = (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 		}
 
 		return $data;
@@ -1126,7 +1156,7 @@ class C32XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 	}
 
 	/**
@@ -1149,7 +1179,7 @@ class C32XmlValidator {
 			$rules = ['type' => XML_ARRAY, 'rules' => []];
 		}
 
-		return (new CXmlValidatorGeneral($rules))->validate($data, $path);
+		return (new CXmlValidatorGeneral($rules, $this->format))->validate($data, $path);
 	}
 
 	/**

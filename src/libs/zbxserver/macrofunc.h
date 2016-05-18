@@ -17,17 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "common.h"
-#include "zbxalgo.h"
+#ifndef ZABBIX_MACROFUNC_H
+#define ZABBIX_MACROFUNC_H
 
-void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags)
-{
-}
+int	zbx_calculate_macro_function(const char *expression, size_t len, char **out);
 
-int	process_events(void)
-{
-	return 0;
-}
+#endif
