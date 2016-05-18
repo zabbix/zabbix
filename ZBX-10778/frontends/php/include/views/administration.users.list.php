@@ -66,7 +66,8 @@ foreach ($this->data['users'] as $user) {
 			? ZBX_USER_ONLINE_TIME
 			: $user['autologout'];
 
-		$online = (($session['lastaccess'] + $online_time) >= time() && $user['users_status'] == GROUP_STATUS_ENABLED)
+		$online = ($session['status'] == ZBX_SESSION_ACTIVE && $user['users_status'] == GROUP_STATUS_ENABLED
+				&& ($session['lastaccess'] + $online_time) >= time())
 			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
 				->addClass(ZBX_STYLE_GREEN)
 			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
