@@ -1216,7 +1216,7 @@ class CConfigurationImport {
 
 					if ($applicationid === false) {
 						throw new Exception(_s('Web scenario "%1$s" on "%2$s": application "%3$s" does not exist.',
-							$httptest['name'], $host, $application['name']));
+							$httptest['name'], $host, $httptest['application']['name']));
 					}
 
 					$httptest['applicationid'] = $applicationid;
