@@ -120,7 +120,6 @@ if ($triggerId !== null) {
 	$trigger = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'triggerids' => [$triggerId],
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'editable' => true
 	]);
 
@@ -213,7 +212,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$trigger['recovery_expression'] = '';
 	}
 
-	// remove empty new tag lines
+	// Remove empty new tag lines.
 	foreach ($trigger['tags'] as $tag_key => $tag) {
 		if ($tag['tag'] === '' && $tag['value'] === '') {
 			unset($trigger['tags'][$tag_key]);
@@ -223,8 +222,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		// update only changed fields
 		$old_triggers = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression'
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'flags',
+				'recovery_mode', 'recovery_expression'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
@@ -238,6 +237,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		);
 
 		$old_trigger = reset($old_triggers);
+
+		if ($old_trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+			unset($trigger['tags']);
+		}
+
 		$old_trigger['dependencies'] = zbx_toHash(zbx_objectValues($old_trigger['dependencies'], 'triggerid'));
 
 		$newDependencies = $trigger['dependencies'];
@@ -307,22 +311,36 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 	$visible = getRequest('visible', []);
 
 	if ($visible) {
-		$triggersToUpdate = [];
+		$triggerids = getRequest('g_triggerid');
+		$triggers_to_update = [];
 
-		foreach (getRequest('g_triggerid') as $triggerid) {
-			$trigger = ['triggerid' => $triggerid];
+		$triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'flags'],
+			'triggerids' => $triggerids,
+			'preservekeys' => true
+		]);
 
-			if (isset($visible['priority'])) {
-				$trigger['priority'] = getRequest('priority');
+		if ($triggers) {
+			foreach ($triggerids as $triggerid) {
+				if (array_key_exists($triggerid, $triggers)) {
+					if ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						$trigger = ['triggerid' => $triggerid];
+
+						if (array_key_exists('priority', $visible)) {
+							$trigger['priority'] = getRequest('priority');
+						}
+
+						if (array_key_exists('dependencies', $visible)) {
+							$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+						}
+
+						$triggers_to_update[] = $trigger;
+					}
+				}
 			}
-			if (isset($visible['dependencies'])) {
-				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-			}
-
-			$triggersToUpdate[] = $trigger;
 		}
 
-		$result = (bool) API::Trigger()->update($triggersToUpdate);
+		$result = (bool) API::Trigger()->update($triggers_to_update);
 	}
 
 	if ($result) {
