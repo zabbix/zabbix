@@ -394,7 +394,7 @@ static void	parse_traps(int flag)
  ******************************************************************************/
 static void	delay_trap_logs(const char *message, int log_level)
 {
-	const int	delay = 10;	/* repeated log entry delay time in seconds */
+	const int	delay = 60;	/* repeated log entry delay time in seconds */
 	int		now;
 	static int	lastlogtime = 0;
 	static char	*previous_message = "";
@@ -589,6 +589,11 @@ static int	get_latest_data()
 				parse_traps(1);
 
 			close_trap_file();
+		}
+		else if (0 != access(CONFIG_SNMPTRAP_FILE, R_OK))
+		{
+			if (EACCES == errno)
+				close_trap_file();
 		}
 		else if (file_buf.st_size == trap_lastsize)
 		{
