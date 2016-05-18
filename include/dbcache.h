@@ -21,6 +21,7 @@
 #define ZABBIX_DBCACHE_H
 
 #include "db.h"
+#include "comms.h"
 #include "sysinfo.h"
 #include "zbxalgo.h"
 
@@ -182,25 +183,37 @@ typedef struct
 }
 DC_FUNCTION;
 
+typedef struct
+{
+	char	*tag;
+	char	*value;
+}
+zbx_tag_t;
+
 typedef struct _DC_TRIGGER
 {
-	zbx_uint64_t	triggerid;
-	char		*description;
-	char		*expression_orig;
-	/* temporary value, allocated during processing and freed right after */
-	char		*expression;
+	zbx_uint64_t		triggerid;
+	char			*description;
+	char			*expression_orig;
+	char			*recovery_expression_orig;
+	/* temporary values, allocated during processing and freed right after */
+	char			*expression;
+	char			*recovery_expression;
 
-	char		*error;
-	char		*new_error;
-	zbx_timespec_t	timespec;
-	int		lastchange;
-	unsigned char	topoindex;
-	unsigned char	priority;
-	unsigned char	type;
-	unsigned char	value;
-	unsigned char	state;
-	unsigned char	new_value;
-	unsigned char	status;
+	char			*error;
+	char			*new_error;
+	zbx_timespec_t		timespec;
+	int			lastchange;
+	unsigned char		topoindex;
+	unsigned char		priority;
+	unsigned char		type;
+	unsigned char		value;
+	unsigned char		state;
+	unsigned char		new_value;
+	unsigned char		status;
+	unsigned char		recovery_mode;
+
+	zbx_vector_ptr_t	tags;
 }
 DC_TRIGGER;
 
@@ -413,6 +426,11 @@ int	DCconfig_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
+int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+size_t	DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, size_t psk_buf_len);
+#endif
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to);
 char	*DCexpression_expand_user_macros(const char *expression, char **error);
@@ -485,5 +503,7 @@ typedef struct
 	zbx_hc_data_t	*head;
 }
 zbx_hc_item_t;
+
+void	zbx_free_tag(zbx_tag_t *tag);
 
 #endif

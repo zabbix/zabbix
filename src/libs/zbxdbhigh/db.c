@@ -464,18 +464,18 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*                                                                                                */
 	/*   _          |                                                                                 */
 	/*    \__ to    |                                                                                 */
-	/*       \_____ |   OK           OK(?)        PROBLEM     PROBLEM(?)                              */
+	/*       \_____ |   OK           OK(?)        PROBLEM     PROBLEM(?)     NONE                     */
 	/*   from      \|                                                                                 */
 	/*              |                                                                                 */
-	/*  ------------+------------------------------------------------------                           */
+	/*  ------------+---------------------------------------------------------------------            */
 	/*              |                                                                                 */
-	/*  OK          |   no           T+I          T+E         I                                       */
+	/*  OK          |   no           T+I          T+E         I              no                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
+	/*  OK(?)       |   T+I          T(e)         T+E+I       -              T+I                      */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I            no                       */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
+	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)           T+I                      */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
@@ -489,13 +489,18 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*  (e) - if an error message has changed                                                         */
 	/*  I   - generate an internal event                                                              */
 	/*                                                                                                */
+	/*  NONE is a trigger value used internally to indicate that trigger value was calculated         */
+	/*  successfully, but should not affect trigger event generation (internal events still can       */
+	/*  be generated if the trigger was in unknown state.                                             */
+	/*                                                                                                */
 	/**************************************************************************************************/
 
 	new_error_local = (NULL == trigger->new_error ? "" : trigger->new_error);
 	new_lastchange = trigger->timespec.sec;
 
-	value_changed = (trigger->value != new_value ||
-			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state));
+	value_changed = ((trigger->value != new_value ||
+			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state)) &&
+			TRIGGER_VALUE_NONE != new_value);
 	state_changed = (trigger->state != new_state);
 	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type && TRIGGER_VALUE_PROBLEM == new_value &&
 			TRIGGER_STATE_NORMAL == new_state);
@@ -518,9 +523,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
 						&new_lastchange);
 
-				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_value, trigger->description,
-						trigger->expression_orig, trigger->priority, trigger->type);
+						trigger->expression_orig, trigger->recovery_expression_orig,
+						trigger->priority, trigger->type, &trigger->tags);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
@@ -535,9 +541,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 			if (0 != state_changed)
 			{
-				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_state, trigger->description,
-						trigger->expression_orig, trigger->priority, trigger->type);
+						trigger->expression_orig, trigger->recovery_expression_orig,
+						trigger->priority, trigger->type, NULL);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
 			}
@@ -1342,8 +1349,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
 
-		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
-				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+		add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL);
 		process_events();
 	}
 
@@ -2026,9 +2033,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, co
  *             table - [IN] the target table name                             *
  *             ...   - [IN] names of the fields to insert                     *
  *             NULL  - [IN] terminating NULL pointer                          *
- *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
  *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
  *           function.                                                        *

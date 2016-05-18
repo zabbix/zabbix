@@ -27,7 +27,8 @@ class CImportConverterFactory extends CRegistryFactory {
 	public function __construct() {
 		parent::__construct([
 			'1.0' => new C10ImportConverter(),
-			'2.0' => new C20ImportConverter()
+			'2.0' => new C20ImportConverter(),
+			'3.0' => new C30ImportConverter()
 		]);
 	}
 }

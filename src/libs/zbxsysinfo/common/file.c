@@ -256,7 +256,7 @@ err:
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
+	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
 	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts;
@@ -340,7 +340,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
-		ptr = zbx_regexp_sub(utf8, regexp, output);
+		zbx_regexp_sub(utf8, regexp, output, &ptr);
 		zbx_free(utf8);
 
 		if (NULL != ptr)
@@ -378,7 +378,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*filename, *regexp, *tmp, encoding[32];
 	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
-	int		nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
+	int		nbytes, res, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts;
 
@@ -462,7 +462,7 @@ int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		utf8 = convert_to_utf8(buf, nbytes, encoding);
 		zbx_rtrim(utf8, "\r\n");
-		if (NULL != zbx_regexp_match(utf8, regexp, &len))
+		if (NULL != zbx_regexp_match(utf8, regexp, NULL))
 			res = 1;
 		zbx_free(utf8);
 
