@@ -75,6 +75,10 @@ $fields = [
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form'				=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form_refresh'		=> [T_ZBX_INT, O_OPT, null,		null,	null],
+	// filter
+	'filter_set'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst'		=> [T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_name'		=> [T_ZBX_STR, O_OPT, null,		null,		null],
 	// sort and sortorder
 	'sort'				=> [T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder'			=> [T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -582,6 +586,23 @@ else {
 
 	$templateWidget->setControls($frmForm);
 
+	// filter
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.templates.filter_name');
+	}
+
+	$filter['name'] = CProfile::get('web.templates.filter_name', '');
+
+	$templateFilter = (new CFilter('web.templates.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Name like'),
+			(new CTextBox('filter_name', $filter['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		));
+
+	$templateWidget->addItem($templateFilter);
+
 	$form = (new CForm())->setName('templates');
 
 	$table = (new CTableInfo())
@@ -607,6 +628,7 @@ else {
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sortField],
+			'search' => ['host' => $filter['name']],
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortField,
