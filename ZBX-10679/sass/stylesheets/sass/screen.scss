@@ -1486,7 +1486,7 @@ footer {
 		&:checked + label {
 			color: $white;
 			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;;
+			background-color: $ui-bg-selected-color;
 			position: relative;
 			z-index: 1;
 		}
