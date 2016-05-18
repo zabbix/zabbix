@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+..F.....S. [ZBXNEXT-3175] added filering for the list of templates and host groups (Alexei)
 A.F.....S. [ZBXNEXT-2087] added trigger and event tags (Gunars, wiper)
 A.F.....S. [ZBXNEXT-1638] added macro functions to allow substring extraction from item value macros in triggers and notifications (wiper, Sasha)
 A.F.....S. [ZBXNEXT-2118] added support of trigger option "OK event generation" and recovery expression (Ivo, Oleg, Sasha, wiper)
