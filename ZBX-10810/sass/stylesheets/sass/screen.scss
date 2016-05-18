@@ -1460,6 +1460,26 @@ footer {
 			&:focus + label {
 				@include box-shadow(0 0 0 1px $form-border-focus-color);
 			}
+
+			&[disabled] + label {
+				@include box-shadow(none);
+			}
+
+			&[disabled] + label .checkbox-switch-track {
+
+				&::before {
+					@extend %form-disabled;
+				}
+
+				&::after {
+					@extend %form-disabled;
+				}
+			}
+
+			&[disabled] + label .checkbox-switch-thumb {
+				background-color: $form-border-color;
+				border-color: $form-border-color;
+			}
 		}
 }
 
@@ -1468,9 +1488,6 @@ footer {
   width: 200%;
   margin-left: -100%;
   @include transition(margin 0.1s ease-in 0s);
-}
-
-.checkbox-switch-track {
 
 	&::before {
 		content: '';
