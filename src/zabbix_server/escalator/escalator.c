@@ -1218,7 +1218,7 @@ static void	free_event_info(DB_EVENT *event)
  *             source      - [IN] the escalation event source                 *
  *             ignore      - [OUT] 1 - the escalation must be ignored because *
  *                                     of dependent trigger being in PROBLEM  *
- *                                     PROBLEM state,                         *
+ *                                     state,                                 *
  *                                 0 - otherwise                              *
  *             maintenance - [OUT] HOST_MAINTENANCE_STATUS_ON - if at least   *
  *                                 one of hosts used in expression is in      *
