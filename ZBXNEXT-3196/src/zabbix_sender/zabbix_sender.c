@@ -470,20 +470,25 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
 #endif
-	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
+	switch (configured_tls_connect_mode)
 	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
-	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
-	{
-		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
-		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
-	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			tls_arg1 = NULL;
+			tls_arg2 = NULL;
+			break;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		case ZBX_TCP_SEC_TLS_CERT:
+			tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+			tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+			break;
+		case ZBX_TCP_SEC_TLS_PSK:
+			tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+			tls_arg2 = NULL;	/* zbx_tls_connect() will find PSK */
+			break;
+#endif
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
 	}
 
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
@@ -514,7 +519,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 	if (FAIL == tcp_ret)
 		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s", zbx_socket_strerror());
-
+out:
 	zbx_thread_exit(ret);
 }
 
@@ -1006,10 +1011,14 @@ int	main(int argc, char **argv)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_validate_config();
+
+		if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+		{
 #if defined(_WINDOWS)
-		zbx_tls_init_parent();
+			zbx_tls_init_parent();
 #endif
-		zbx_tls_init_child();
+			zbx_tls_init_child();
+		}
 #else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 				" support");

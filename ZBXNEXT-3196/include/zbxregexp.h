@@ -21,6 +21,9 @@
 
 #include "zbxalgo.h"
 
+#define ZBX_REGEXP_NO_MATCH	0
+#define ZBX_REGEXP_MATCH	1
+
 typedef struct
 {
 	char		*name;
@@ -34,8 +37,9 @@ zbx_expression_t;
 /* regular expressions */
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 char	*zbx_iregexp_match(const char *string, const char *pattern, int *len);
-char	*zbx_regexp_sub(const char *string, const char *pattern, const char *output_template);
-char	*zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template);
+int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
+int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
+int	zbx_iregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
 
 void	zbx_regexp_clean_expressions(zbx_vector_ptr_t *expressions);
 

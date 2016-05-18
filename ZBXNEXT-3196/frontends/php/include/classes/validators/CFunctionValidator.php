@@ -429,14 +429,14 @@ class CFunctionValidator extends CValidator {
 	}
 
 	/**
-	 * Validate trigger function parameter which can contain operation (band, eq, ge, gt, le, like, lt, ne) or
-	 * an empty value.
+	 * Validate trigger function parameter which can contain operation (band, eq, ge, gt, le, like, lt, ne,
+	 * regexp, iregexp) or an empty value.
 	 *
 	 * @param string $param
 	 *
 	 * @return bool
 	 */
 	private function validateOperation($param) {
-		return preg_match('/^(eq|ne|gt|ge|lt|le|like|band|)$/', $param);
+		return preg_match('/^(eq|ne|gt|ge|lt|le|like|band|regexp|iregexp|)$/', $param);
 	}
 }

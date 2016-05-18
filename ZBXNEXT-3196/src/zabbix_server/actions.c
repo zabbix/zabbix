@@ -27,6 +27,102 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_condition_pattern_match                                    *
+ *                                                                            *
+ * Purpose: check if condition pattern matches the specified value            *
+ *                                                                            *
+ * Parameters: operator - [IN] the matching operator                          *
+ *             pattern  - [IN] the pattern to match                           *
+ *             value    - [IN] the value to match                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_condition_pattern_match(unsigned char operator, const char *pattern, const char *value)
+{
+	int	ret = FAIL;
+
+	switch (operator)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (0 == strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (0 != strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+
+		case CONDITION_OPERATOR_LIKE:
+			if (NULL != strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+
+		case CONDITION_OPERATOR_NOT_LIKE:
+			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_condition_event_tag                                        *
+ *                                                                            *
+ * Purpose: check event tag condition                                         *
+ *                                                                            *
+ * Parameters: event     - the event                                          *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *condition)
+{
+	int	i, ret = FAIL;
+
+	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	{
+		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+		ret = check_condition_pattern_match(condition->operator, condition->value, tag->tag);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_condition_event_tag_value                                  *
+ *                                                                            *
+ * Purpose: check event tag value condition                                   *
+ *                                                                            *
+ * Parameters: event     - the event                                          *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *condition)
+{
+	int	i, ret = FAIL;
+
+	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	{
+		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+		if (0 == strcmp(condition->value2, tag->tag))
+			ret = check_condition_pattern_match(condition->operator, condition->value, tag->value);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_trigger_condition                                          *
  *                                                                            *
  * Purpose: check if event matches single condition                           *
@@ -406,6 +502,14 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 				ret = NOTSUPPORTED;
 		}
 		DBfree_result(result);
+	}
+	else if (CONDITION_TYPE_EVENT_TAG == condition->conditiontype)
+	{
+		ret = check_condition_event_tag(event, condition);
+	}
+	else if (CONDITION_TYPE_EVENT_TAG_VALUE == condition->conditiontype)
+	{
+		ret = check_condition_event_tag_value(event, condition);
 	}
 	else
 	{
@@ -1248,8 +1352,9 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 	const char	*__function_name = "check_action_condition";
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'",
-			__function_name, condition->actionid, condition->conditionid, condition->value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
+			condition->value, condition->value2);
 
 	switch (event->source)
 	{

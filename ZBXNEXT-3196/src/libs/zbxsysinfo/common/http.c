@@ -228,7 +228,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 					*newline = '\0';
 			}
 
-			if (NULL != (ptr = zbx_regexp_sub(str, regexp, output)))
+			if (SUCCEED == zbx_regexp_sub(str, regexp, output, &ptr) && NULL != ptr)
 				break;
 
 			if (NULL != newline)
