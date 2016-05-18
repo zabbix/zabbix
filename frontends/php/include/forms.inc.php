@@ -1421,6 +1421,7 @@ function getTriggerFormData(array $data) {
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
 			'triggerids' => $data['triggerid']
 		];
 
@@ -1513,6 +1514,16 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
+	$readonly = false;
+	if (array_key_exists('triggerid', $data) && $data['triggerid'] != 0) {
+		$data['flags'] = $trigger['flags'];
+		$data['discoveryRule'] = $trigger['discoveryRule'];
+
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {
+			$readonly = true;
+		}
+	}
+
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
@@ -1549,7 +1560,7 @@ function getTriggerFormData(array $data) {
 	elseif ($data['expression_constructor'] != IM_TREE) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
-		$data['expression_field_readonly'] = $data['limited'];
+		$data['expression_field_readonly'] = $readonly;
 	}
 
 	// Trigger recovery expression constructor.
@@ -1589,7 +1600,7 @@ function getTriggerFormData(array $data) {
 	elseif ($data['recovery_expression_constructor'] != IM_TREE) {
 		$data['recovery_expression_field_name'] = 'recovery_expression';
 		$data['recovery_expression_field_value'] = $data['recovery_expression'];
-		$data['recovery_expression_field_readonly'] = $data['limited'];
+		$data['recovery_expression_field_readonly'] = $readonly;
 	}
 
 	if ($data['dependencies']) {

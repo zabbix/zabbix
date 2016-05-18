@@ -352,13 +352,13 @@ function utf8RawUrlDecode($source) {
  */
 function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	$options = [
-		'triggerids' => $srcTriggerIds,
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
 			'recovery_mode', 'recovery_expression'
 		],
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-		'selectDependencies' => ['triggerid']
+		'selectDependencies' => ['triggerid'],
+		'triggerids' => $srcTriggerIds
 	];
+
 	if ($srcHostId) {
 		$srcHost = API::Host()->get([
 			'output' => ['host'],

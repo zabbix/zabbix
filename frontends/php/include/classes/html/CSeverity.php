@@ -26,7 +26,7 @@ class CSeverity extends CList {
 	 * @param int    $options['value']		(optional) Default: TRIGGER_SEVERITY_NOT_CLASSIFIED
 	 * @param bool   $options['all']		(optional)
 	 */
-	public function __construct(array $options = []) {
+	public function __construct(array $options = [], $enabled = true) {
 		parent::__construct();
 
 		$id = zbx_formatDomId($options['name']);
@@ -50,9 +50,12 @@ class CSeverity extends CList {
 
 			$radio = (new CInput('radio', $options['name'], $severity))
 				->setId(zbx_formatDomId($options['name'].'_'.$severity));
+
 			if ($severity === $options['value']) {
 				$radio->setAttribute('checked', 'checked');
 			}
+
+			$enabled ? $radio->removeAttribute('disabled') : $radio->setAttribute('disabled', 'disabled');
 
 			parent::addItem(
 				(new CListItem([
