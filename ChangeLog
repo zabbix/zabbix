@@ -22,6 +22,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10806] fixed whitespace between elements in the IT services form (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.3
