@@ -96,8 +96,6 @@ const char	*zbx_result_string(int result);
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
-#define ZBX_DM_DELIMITER	'\255'
-
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 
@@ -107,6 +105,15 @@ typedef struct
 	int	ns;	/* nanoseconds */
 }
 zbx_timespec_t;
+
+/* time zone offset */
+typedef struct
+{
+	char	tz_sign;	/* '+' or '-' */
+	int	tz_hour;
+	int	tz_min;
+}
+zbx_timezone_t;
 
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
@@ -910,6 +917,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
+int	zbx_day_in_month(int year, int mon);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

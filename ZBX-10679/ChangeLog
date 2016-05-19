@@ -1,10 +1,40 @@
+Changes for 3.0.4rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-10778] fixed users online status in users.php users table (Cemeris, Gunars)
+..F....... [ZBX-10605] fixed access_deny() message layout for not logged in page visitors (Cemeris)
+..F....... [ZBX-10605] fixed access to popup_media for Zabbix Admin user in profile->media (Cemeris)
+..F....... [ZBX-10806] fixed whitespace between elements in the IT services form (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.3
+
+3.0.3rc1 was released as 3.0.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 3.0.3rc1
 
 New features:
+..F....... [ZBX-10672] added script name and command into a script execution form (Cemeris, Pavel, Sasha)
 A.F....... [ZBX-1357] enabled Chinese (China) translation to be displayed by default (zalex_ua)
-A.F....... [ZBX-1357] updated Chinese (China), French, Italian, Korean, Polish, Portuguese (Brazil), Russian, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
+A.F....... [ZBX-1357] updated Chinese (China), English (United States), French, Italian, Japanese, Korean, Polish, Portuguese (Brazil), Russian, Slovak, Spanish, Ukrainian translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+...G...PS. [ZBX-9839] fixed Windows compilation error and time zone related issues (gleb, viktors)
+A......... [ZBX-10752] fixed array formatting in exported JSON (Cemeris, Sasha)
+A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
+........S. [ZBX-10690] fixed possible buffer overruns in discovery macro substitution and other macro context issues (asaveljevs)
+..F....... [ZBX-10640] fixed unexpected reset of group and host filter (Gunars)
+..F....... [ZBX-10598] removed redundant closing PHP tags in configuration example file and when generating PHP files (Ivo)
+....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
+..F....... [ZBX-10722] fixed color picker wrapping (Pavel)
+........S. [ZBX-10692] fixed crash when resolving {TRIGGER.NAME} of the trigger with expression containing unknown user macro (gleb)
+A......... [ZBX-10607] fixed validation of JSON import source data in configuration.import method (Cemeris, Sasha)
+........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
+........S. [ZBX-10614] fixed crash during configuration update when context is added to a macro without context (gleb)
+.......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
 ..F....... [ZBX-10600] fixed proxy sorting in "Monitored by proxy" dropdown in host edit form (Ivo)
 A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
 ........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
@@ -1219,6 +1249,7 @@ A.F....... [ZBX-8194] improved validation for web scenarios and web steps (Ivo, 
 Changes for 2.3.0
 
 New features:
+A.F....PS. [ZBXNEXT-1782] added support for newlines and tabs in trigger expressions (asaveljevs, Pavels)
 A.F.I..PS. [ZBXNEXT-1782] added support of new trigger expression operators ">=", "<=", "<>", "and", "or" and "not"; removed existing "#", "|" and "&" (asaveljevs, Pavels)
 ...GI..PS. [ZBXNEXT-2203] added information on the reason items become not supported (Alexei, asaveljevs)
 ..F....... [ZBXNEXT-734] implemented support for URL as dynamic screen element and added macro support (Ivo)
@@ -1346,12 +1377,28 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.14rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13
+
+2.2.13rc1 was released as 2.2.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.13rc1
 
 New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
+....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
+........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
+.......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
 A......... [ZBX-10587] fixed inventory mode not being inherited for host prototypes when linking template to a template/host (Ivo)
 ........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
 A......... [ZBX-8924] improved performance of alert.get method (Sasha)
@@ -2752,12 +2799,26 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.19rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18
+
+2.0.18rc1 was released as 2.0.18 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.18rc1
 
 New features:
 A.F....... [ZBX-1357] updated French translation; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
+........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
 ........S. [ZBX-10681] fixed loss of trailing whitespace in unquoted function parameters when creating calculated items with low level discovery (wiper)
 
 --------------------------------------------------------------------------------

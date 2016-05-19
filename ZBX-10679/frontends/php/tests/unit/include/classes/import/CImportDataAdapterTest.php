@@ -1779,14 +1779,14 @@ class CImportDataAdapterTest extends PHPUnit_Framework_TestCase {
 				<date>2014-11-14T09:41:02Z</date>
 			</zabbix_export>';
 
-		$this->setExpectedException('Exception', 'Invalid XML tag "/zabbix_export/version": unsupported version number.');
+		$this->setExpectedException('Exception', 'Invalid tag "/zabbix_export/version": unsupported version number.');
 		$this->getAdapter($xml);
 	}
 
 	protected function getAdapter($source) {
 		$reader = CImportReaderFactory::getReader(CImportReaderFactory::XML);
 		$source = $reader->read($source);
-		$source = (new CXmlValidator())->validate($source);
+		$source = (new CXmlValidator())->validate($source, 'xml');
 
 		$importConverterFactory = new CImportConverterFactory();
 
