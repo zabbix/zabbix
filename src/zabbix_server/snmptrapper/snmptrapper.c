@@ -440,9 +440,7 @@ static int	read_traps()
 
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
-		char	*message = "cannot read from SNMP trapper file";
-
-		delay_trap_logs(message, LOG_LEVEL_WARNING);
+		delay_trap_logs("cannot read from SNMP trapper file", LOG_LEVEL_WARNING);
 		goto exit;
 	}
 
@@ -502,9 +500,7 @@ static int	open_trap_file()
 
 	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
-		char	*message = "cannot stat SNMP trapper file";
-
-		delay_trap_logs(message, LOG_LEVEL_CRIT);
+		delay_trap_logs("cannot stat SNMP trapper file", LOG_LEVEL_CRIT);
 		goto out;
 	}
 
@@ -525,11 +521,7 @@ static int	open_trap_file()
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
-		{
-			char	*message = "cannot open SNMP trapper file";
-
-			delay_trap_logs(message, LOG_LEVEL_CRIT);
-		}
+			delay_trap_logs("cannot open SNMP trapper file", LOG_LEVEL_CRIT);
 		goto out;
 	}
 
