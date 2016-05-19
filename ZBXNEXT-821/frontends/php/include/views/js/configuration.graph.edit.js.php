@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="itemTpl">
 <tr id="items_#{number}" class="sortable">
 	<!-- icon + hidden -->
-	<?php if ($this->data['templates']): ?>
+	<?php if ($readonly): ?>
 		<td>
 	<?php else: ?>
 		<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
@@ -25,7 +25,7 @@
 
 	<!-- name -->
 	<td>
-		<?php if ($this->data['templates']): ?>
+		<?php if ($readonly): ?>
 			<span id="items_#{number}_name">#{name}</span>
 		<?php else: ?>
 			<a href="javascript:void(0)"><span id="items_#{number}_name">#{name}</span></a>
@@ -88,7 +88,7 @@
 	<td>
 		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
 	</td>
-	<?php if (!$this->data['templates']): ?>
+	<?php if (!$readonly): ?>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
 		</td>
@@ -124,7 +124,7 @@
 		jQuery('#lbl_items_' + number + '_color').css('background-color', '#' + color);
 
 		colorPalette.incrementNextColor();
-		<?php if (!$this->data['templates']): ?>
+		<?php if (!$readonly): ?>
 			rewriteNameLinks();
 		<?php endif ?>
 	}
@@ -160,7 +160,7 @@
 			jQuery('#lbl_items_' + item['number'] + '_color').css('background-color', '#' + item['color']);
 		}
 
-		<?php if (!$this->data['templates']): ?>
+		<?php if (!$readonly): ?>
 			activateSortable();
 			rewriteNameLinks();
 		<?php endif ?>
@@ -174,7 +174,7 @@
 		<?php endif ?>
 	}
 
-<?php if (!$this->data['templates']): ?>
+<?php if (!$readonly): ?>
 	function rewriteNameLinks() {
 		var size = jQuery('#itemsTable tr.sortable').length;
 
@@ -199,7 +199,7 @@
 		jQuery('#items_' + number).remove();
 
 		recalculateSortOrder();
-		<?php if (!$this->data['templates']): ?>
+		<?php if (!$readonly): ?>
 			activateSortable();
 		<?php endif ?>
 	}
@@ -271,12 +271,12 @@
 			i++;
 		});
 
-		<?php if (!$this->data['templates']): ?>
+		<?php if (!$readonly): ?>
 			rewriteNameLinks();
 		<?php endif ?>
 	}
 
-<?php if (!$this->data['templates']): ?>
+<?php if (!$readonly): ?>
 	function initSortable() {
 		var itemsTable = jQuery('#itemsTable'),
 			itemsTableWidth = itemsTable.width(),
@@ -381,7 +381,7 @@
 			});
 		});
 
-		<?php if (!empty($this->data['templateid'])): ?>
+		<?php if ($readonly): ?>
 			$('#itemsTable').sortable({disabled: true}).find('input').prop('readonly', true);
 			$('select', '#itemsTable').prop('disabled', true);
 
@@ -435,7 +435,7 @@
 			$('form[name="graphForm"]').submit();
 		});
 
-		<?php if (!$this->data['templates']): ?>
+		<?php if (!$readonly): ?>
 			initSortable();
 		<?php endif ?>
 	});
