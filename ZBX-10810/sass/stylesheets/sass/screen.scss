@@ -1431,56 +1431,63 @@ footer {
 }
 
 .checkbox-switch {
-    position: relative;
-    width: 28px;
+  width: 28px;
+  position: relative;
 
-		label {
-			display: block;
-			overflow: hidden;
-			@include border-radius(2px);
-		}
+  label {
+    display: block;
+    overflow: hidden;
+    border: 1px solid $switch-thumb-bg-color;
+    @include border-radius(2px);
+    @include transition(border-color 0.1s ease-in 0s);
+  }
 
-		input[type="checkbox"] {
-			position: absolute;
-			clip: rect(1px, 1px, 1px, 1px);
+  input[type="checkbox"] {
+    position: absolute;
+    clip: rect(1px, 1px, 1px, 1px);
 
-			&:checked + label .checkbox-switch-track {
-				margin-left: 0;
-			}
+    &:checked + label {
+      border-color: darken(desaturate($alt-green, 10%), 16%);
+    }
 
-			&:checked + label .checkbox-switch-thumb {
-				right: 0;
-				border: 1px solid darken(desaturate($alt-green, 10%), 20%);
-			}
+    &:checked + label .checkbox-switch-track {
+      margin-left: 0;
+    }
 
-			&:active + label {
-				@include box-shadow(0 0 0 1px $form-border-focus-color);
-			}
+    &:checked + label .checkbox-switch-thumb {
+      right: 0;
+      border: 1px solid darken(desaturate($alt-green, 10%), 23%);
+    }
 
-			&:focus + label {
-				@include box-shadow(0 0 0 1px $form-border-focus-color);
-			}
+    &:active + label {
+      border-color: $form-border-focus-color;
+    }
 
-			&[disabled] + label {
-				@include box-shadow(none);
-			}
+    &:focus + label {
+      border-color: $form-border-focus-color;
+    }
 
-			&[disabled] + label .checkbox-switch-track {
+    &[disabled] + label {
+      border-color: $form-disabled-border-color;
+      @include transition(none);
 
-				&::before {
-					@extend %form-disabled;
-				}
+      .checkbox-switch-track {
 
-				&::after {
-					@extend %form-disabled;
-				}
-			}
+        &::before {
+          @extend %form-disabled;
+        }
 
-			&[disabled] + label .checkbox-switch-thumb {
-				background-color: $form-border-color;
-				border-color: $form-border-color;
-			}
-		}
+        &::after {
+          @extend %form-disabled;
+        }
+      }
+
+      .checkbox-switch-thumb {
+        background-color: $form-disabled-border-color;
+        border-color: $form-disabled-border-color;
+      }
+    }
+  }
 }
 
 .checkbox-switch-track {
@@ -1495,7 +1502,7 @@ footer {
 		display: block;
 	  float: left;
 	  width: 50%;
-	  height: 16px;
+	  height: 14px;
 	}
 
 	&::after {
@@ -1504,18 +1511,18 @@ footer {
 		display: block;
 	  float: left;
 	  width: 50%;
-	  height: 16px;
+	  height: 14px;
 	}
 }
 
 .checkbox-switch-thumb {
 	display: block;
-  position: absolute;
-	width: 10px;
+  width: 10px;
 	margin: 2px;
 	top: 0;
   bottom: 0;
   right: 12px;
+  position: absolute;
   border: 1px solid $form-border-color;
 	background-color: $white;
   @include border-radius(2px);
