@@ -1044,7 +1044,6 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
-FIELD		|r_eventid	|t_id		|	|NULL		|0			|-|events	|eventid
 INDEX		|1		|source,object,objectid,clock
 INDEX		|2		|source,object,clock
 
@@ -1351,11 +1350,18 @@ FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|problem|problemid|0
 FIELD		|problemid	|t_id		|	|NOT NULL	|0
-FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
-FIELD		|eventid	|t_id		|	|NOT NULL	|0			|2|events
-INDEX		|1		|triggerid
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
+FIELD		|source		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|object		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|objectid	|t_id		|'0'	|NOT NULL	|0
+INDEX		|1		|source,object,objectid
+
+TABLE|event_recovery|eventid|0
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
+FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
+INDEX		|1		|r_eventid
 
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010011	|3010011
+ROW		|3010012	|3010012
