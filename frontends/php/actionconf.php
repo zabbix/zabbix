@@ -184,14 +184,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	$action['filter'] = $filter;
 
+	$event_source = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
+
+	if ($event_source == EVENT_SOURCE_TRIGGERS) {
+		$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
+	}
+
 	DBstart();
 
 	if (hasRequest('update')) {
 		$action['actionid'] = getRequest('actionid');
-
-		if ($action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-			$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
-		}
 
 		$result = API::Action()->update($action);
 
@@ -200,13 +202,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$action['eventsource'] = getRequest('eventsource',
-			CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
-		);
-
-		if ($action['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-			$action['maintenance_mode'] = getRequest('maintenance_mode', ACTION_MAINTENANCE_MODE_NORMAL);
-		}
+		$action['eventsource'] = $event_source;
 
 		$result = API::Action()->create($action);
 
