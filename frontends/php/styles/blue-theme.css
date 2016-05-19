@@ -2077,10 +2077,10 @@ td.active-bg {
   color: #0e4123; }
 
 .info-bg, .info-bg input[type="radio"]:checked + label {
-  color: #00268e; }
+  color: #00268d; }
 
 .log-info-bg {
-  color: #00268e;
+  color: #00268d;
   background-color: #7499ff; }
 
 .average-bg, .average-bg input[type="radio"]:checked + label {
@@ -2158,17 +2158,17 @@ td.active-bg {
 
 .msg-details {
   font-size: 1em;
-  text-align: left;
-  max-height: 300px;
-  padding: 0 5px 0 0;
-  overflow-y: auto; }
+  text-align: left; }
   .msg-details .link-action {
     position: absolute;
     top: 7px;
     left: 15px;
     margin-bottom: 20px; }
   .msg-details ul {
-    font-size: 0.85em; }
+    font-size: 0.85em;
+    max-height: 300px;
+    padding: 0 5px 0 0;
+    overflow-y: auto; }
     .msg-details ul li {
       margin: .5em 0 .5em 1em; }
       .msg-details ul li::before {
@@ -2190,7 +2190,7 @@ td.active-bg {
 
 .msg-good, .msg-bad {
   font-size: 1.167em;
-  padding: 7px 15px;
+  padding: 7px 20px 7px 15px;
   margin: 0 0 12px 0;
   text-align: center;
   position: relative;
@@ -2378,11 +2378,11 @@ td.active-bg {
   padding: 10px 0 0 0;
   text-align: center; }
 
-.available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
+.available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, .overflow-table::-webkit-scrollbar {
   width: 9px; }
-.available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
+.available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track {
   background-color: #ebebeb; }
-.available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
+.available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb {
   background-color: #ccd5d9;
   border: 1px solid #bdc9ce; }
 
