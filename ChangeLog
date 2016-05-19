@@ -23,6 +23,8 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10605] fixed access_deny() message layout for not logged in page visitors (Cemeris)
+..F....... [ZBX-10605] fixed access to popup_media for Zabbix Admin user in profile->media (Cemeris)
 ..F....... [ZBX-10806] fixed whitespace between elements in the IT services form (Sasha)
 
 --------------------------------------------------------------------------------
