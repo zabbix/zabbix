@@ -332,10 +332,13 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
  */
 function copyGraphToHost($graphId, $hostId) {
 	$graphs = API::Graph()->get([
-		'graphids' => $graphId,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period', 'show_triggers',
+			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type',
+			'ymin_itemid', 'ymax_itemid'
+		],
 		'selectHosts' => ['hostid', 'name'],
-		'selectGraphItems' => API_OUTPUT_EXTEND
+		'selectGraphItems' => API_OUTPUT_EXTEND,
+		'graphids' => $graphId
 	]);
 	$graph = reset($graphs);
 	$graphHost = reset($graph['hosts']);
@@ -369,8 +372,6 @@ function copyGraphToHost($graphId, $hostId) {
 	if ($graph['ymin_itemid'] && $itemId = get_same_item_for_host($graph['ymin_itemid'], $hostId)) {
 		$graph['ymin_itemid'] = $itemId;
 	}
-
-	unset($graph['templateid']);
 
 	return API::Graph()->create($graph);
 }
