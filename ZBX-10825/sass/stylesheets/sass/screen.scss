@@ -588,31 +588,28 @@ footer {
     border: 1px solid $ui-border-color;
 
 	thead th {
-		font-size: $font-h3-size;
 		color: $font-alt-color;
-		text-transform: $font-transform;
-		letter-spacing: 0.0688em;
-		text-rendering: optimizeLegibility;
+    font-weight: bold;
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-	    padding: 8px 5px 6px 5px;
-	    vertical-align: bottom;
-	    border-bottom: 2px solid $table-border-color;
-	    text-align: left;
+    padding: 8px 5px 6px 5px;
+    vertical-align: bottom;
+    border-bottom: 2px solid $table-border-color;
+    text-align: left;
 
 	    .arrow-up {
-	    	margin: 0 0 0 4px;
+	    	margin: 0 0 0 3px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
 	    .arrow-right {
-	    	margin: 0 0 0 4px;
+	    	margin: 0 0 0 3px;
 	    	border-left-color: $font-alt-color;
 	    }
 
 	    .arrow-down {
-	    	margin: 0 0 0 4px;
+	    	margin: 0 0 0 3px;
 	    	border-top-color: $font-alt-color;
 	    }
 
