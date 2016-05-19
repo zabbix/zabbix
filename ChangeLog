@@ -23,6 +23,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10679] fixed vertical scrollbar overlapping in messages (Pavel)
 ..F....... [ZBX-10778] fixed users online status in users.php users table (Cemeris, Gunars)
 ..F....... [ZBX-10605] fixed access_deny() message layout for not logged in page visitors (Cemeris)
 ..F....... [ZBX-10605] fixed access to popup_media for Zabbix Admin user in profile->media (Cemeris)
