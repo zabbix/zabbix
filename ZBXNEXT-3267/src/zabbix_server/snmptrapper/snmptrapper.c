@@ -434,6 +434,7 @@ static int	read_traps()
 
 		message = zbx_dsprintf(message, "cannot set position to %d for", trap_lastsize);
 		delay_trap_logs(message, LOG_LEVEL_WARNING);
+		zbx_free(message);
 		goto exit;
 	}
 
