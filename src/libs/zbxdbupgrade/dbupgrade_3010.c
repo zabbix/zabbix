@@ -67,8 +67,10 @@ static int	DBpatch_3010006(void)
 			{"problem", "problemid", 0,
 				{
 					{"problemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"objectid", "0", NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -79,13 +81,12 @@ static int	DBpatch_3010006(void)
 
 static int	DBpatch_3010007(void)
 {
-	return DBcreate_index("problem", "problem_1", "triggerid", 0);
+	return DBcreate_index("problem", "problem_1", "source,object,objectid", 0);
 }
 
 static int	DBpatch_3010008(void)
 {
-
-	const ZBX_FIELD field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("problem", 1, &field);
@@ -93,19 +94,40 @@ static int	DBpatch_3010008(void)
 
 static int	DBpatch_3010009(void)
 {
+	const ZBX_TABLE table =
+			{"event_recovery", "eventid", 0,
+				{
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"r_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
 
-	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("problem", 2, &field);
+	return DBcreate_table(&table);
 }
 
 static int	DBpatch_3010010(void)
 {
-	const ZBX_FIELD	field = {"r_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
-
-	return DBadd_field("events", &field);
+	return DBcreate_index("event_recovery", "event_recovery_1", "r_eventid", 0);
 }
+
+static int	DBpatch_3010011(void)
+{
+	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_recovery", 1, &field);
+}
+
+static int	DBpatch_3010012(void)
+{
+	const ZBX_FIELD field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_recovery", 2, &field);
+}
+
 
 /* problem eventids by triggerid */
 typedef struct
@@ -216,7 +238,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3010011(void)
+static int	DBpatch_3010013(void)
 {
 	int			i, ret = FAIL;
 	zbx_uint64_t		eventid = 0, old_eventid;
@@ -291,5 +313,6 @@ DBPATCH_ADD(3010008, 0, 1)
 DBPATCH_ADD(3010009, 0, 1)
 DBPATCH_ADD(3010010, 0, 1)
 DBPATCH_ADD(3010011, 0, 1)
+DBPATCH_ADD(3010012, 0, 1)
 
 DBPATCH_END()
