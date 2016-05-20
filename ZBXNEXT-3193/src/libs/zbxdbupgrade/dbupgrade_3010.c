@@ -64,9 +64,8 @@ static int	DBpatch_3010005(void)
 static int	DBpatch_3010006(void)
 {
 	const ZBX_TABLE table =
-			{"problem", "problemid", 0,
+			{"problem", "eventid", 0,
 				{
-					{"problemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -261,7 +260,7 @@ static int	DBpatch_3010013(void)
 	zbx_object_events_t	*object_events;
 
 	zbx_hashset_create(&events, 1024, trigger_events_hash_func, trigger_events_compare_func);
-	zbx_db_insert_prepare(&db_insert, "problem", "problemid", "eventid", "source", "object", "objectid", NULL);
+	zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
 
 	do
 	{
@@ -279,25 +278,22 @@ static int	DBpatch_3010013(void)
 	{
 		for (i = 0; i < object_events->eventids.values_num; i++)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), object_events->eventids.values[i],
-					object_events->source, object_events->object, object_events->objectid);
+			zbx_db_insert_add_values(&db_insert, object_events->eventids.values[i], object_events->source,
+					object_events->object, object_events->objectid);
 		}
 
 		if (1000 < db_insert.rows.values_num)
 		{
-			zbx_db_insert_autoincrement(&db_insert, "problemid");
 			if (SUCCEED != zbx_db_insert_execute(&db_insert))
 				goto out;
 
 			zbx_db_insert_clean(&db_insert);
-			zbx_db_insert_prepare(&db_insert, "problem", "problemid", "eventid", "source", "object",
-					"objectid", NULL);
+			zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
 		}
 
 		zbx_vector_uint64_destroy(&object_events->eventids);
 	}
 
-	zbx_db_insert_autoincrement(&db_insert, "problemid");
 	if (SUCCEED != zbx_db_insert_execute(&db_insert))
 		goto out;
 
