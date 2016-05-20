@@ -71,6 +71,7 @@ class CConfigurationExportBuilder {
 				'applications' => $this->formatApplications($template['applications']),
 				'items' => $this->formatItems($template['items']),
 				'discovery_rules' => $this->formatDiscoveryRules($template['discoveryRules']),
+				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'screens' => $this->formatScreens($template['screens'])
@@ -113,6 +114,7 @@ class CConfigurationExportBuilder {
 				'applications' => $this->formatApplications($host['applications']),
 				'items' => $this->formatItems($host['items']),
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
+				'httptests' => $this->formatHttpTests($host['httptests']),
 				'macros' => $this->formatMacros($host['macros']),
 				'inventory' => $this->formatHostInventory($host['inventory'])
 			];
@@ -355,6 +357,74 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format web scenarios.
+	 *
+	 * @param array $httptests
+	 *
+	 * @return array
+	 */
+	protected function formatHttpTests(array $httptests) {
+		$result = [];
+
+		order_result($httptests, 'name');
+
+		foreach ($httptests as $httptest) {
+			$result[] = [
+				'name' => $httptest['name'],
+				'application' => $httptest['application'],
+				'delay' => $httptest['delay'],
+				'attempts' => $httptest['retries'],
+				'agent' => $httptest['agent'],
+				'http_proxy' => $httptest['http_proxy'],
+				'variables' => $httptest['variables'],
+				'headers' => $httptest['headers'],
+				'status' => $httptest['status'],
+				'authentication' => $httptest['authentication'],
+				'http_user' => $httptest['http_user'],
+				'http_password' => $httptest['http_password'],
+				'verify_peer' => $httptest['verify_peer'],
+				'verify_host' => $httptest['verify_host'],
+				'ssl_cert_file' => $httptest['ssl_cert_file'],
+				'ssl_key_file' => $httptest['ssl_key_file'],
+				'ssl_key_password' => $httptest['ssl_key_password'],
+				'steps' => $this->formatHttpSteps($httptest['steps'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format web scenario steps.
+	 *
+	 * @param array $httpsteps
+	 *
+	 * @return array
+	 */
+	protected function formatHttpSteps(array $httpsteps) {
+		$result = [];
+
+		order_result($httpsteps, 'no');
+
+		foreach ($httpsteps as $httpstep) {
+			$result[] = [
+				'name' => $httpstep['name'],
+				'url' => $httpstep['url'],
+				'posts' => $httpstep['posts'],
+				'variables' => $httpstep['variables'],
+				'headers' => $httpstep['headers'],
+				'follow_redirects' => $httpstep['follow_redirects'],
+				'retrieve_mode' => $httpstep['retrieve_mode'],
+				'timeout' => $httpstep['timeout'],
+				'required' => $httpstep['required'],
+				'status_codes' => $httpstep['status_codes']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Format host inventory.
 	 *
 	 * @param array $inventory
@@ -516,7 +586,8 @@ class CConfigurationExportBuilder {
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
 				'type' => $trigger['type'],
-				'dependencies' => $this->formatDependencies($trigger['dependencies'])
+				'dependencies' => $this->formatDependencies($trigger['dependencies']),
+				'tags' => $this->formatTags($trigger['tags'])
 			];
 		}
 
@@ -723,6 +794,28 @@ class CConfigurationExportBuilder {
 				'name' => $dependency['description'],
 				'expression' => $dependency['expression'],
 				'recovery_expression' => $dependency['recovery_expression']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format trigger tags.
+	 *
+	 * @param array $tags
+	 *
+	 * @return array
+	 */
+	protected function formatTags(array $tags) {
+		$result = [];
+
+		CArrayHelper::sort($tags, ['tag', 'value']);
+
+		foreach ($tags as $tag) {
+			$result[] = [
+				'tag' => $tag['tag'],
+				'value' => $tag['value']
 			];
 		}
 

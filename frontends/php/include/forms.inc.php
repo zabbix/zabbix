@@ -1424,13 +1424,25 @@ function getTriggerFormData(array $data) {
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
+
+		if (!hasRequest('form_refresh')) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
+
 		$triggers = $data['parent_discoveryid']
 			? API::TriggerPrototype()->get($options)
 			: API::Trigger()->get($options);
+
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
-		$data['trigger'] = reset($triggers);
+
+		$trigger = reset($triggers);
+
+		if (!hasRequest('form_refresh')) {
+			$data['tags'] = $trigger['tags'];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+		}
 
 		// Get templates.
 		$tmp_triggerid = $data['triggerid'];
@@ -1447,11 +1459,13 @@ function getTriggerFormData(array $data) {
 			if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
 				// parent trigger prototype link
 				if ($data['parent_discoveryid']) {
-					$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].
+						'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
 				}
 				// parent trigger link
 				else {
-					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].
+						'&hostid='.$db_triggers['hostid'];
 				}
 
 				$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
@@ -1462,10 +1476,10 @@ function getTriggerFormData(array $data) {
 		$data['templates'] = array_reverse($data['templates']);
 		array_shift($data['templates']);
 
-		$data['limited'] = ($data['trigger']['templateid'] != 0);
+		$data['limited'] = ($trigger['templateid'] != 0);
 
 		// select first host from triggers if gived not match
-		$hosts = $data['trigger']['hosts'];
+		$hosts = $trigger['hosts'];
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
@@ -1473,17 +1487,17 @@ function getTriggerFormData(array $data) {
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = $data['trigger']['expression'];
-		$data['recovery_expression'] = $data['trigger']['recovery_expression'];
+		$data['expression'] = $trigger['expression'];
+		$data['recovery_expression'] = $trigger['recovery_expression'];
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
-			$data['description'] = $data['trigger']['description'];
-			$data['type'] = $data['trigger']['type'];
-			$data['recovery_mode'] = $data['trigger']['recovery_mode'];
-			$data['priority'] = $data['trigger']['priority'];
-			$data['status'] = $data['trigger']['status'];
-			$data['comments'] = $data['trigger']['comments'];
-			$data['url'] = $data['trigger']['url'];
+			$data['description'] = $trigger['description'];
+			$data['type'] = $trigger['type'];
+			$data['recovery_mode'] = $trigger['recovery_mode'];
+			$data['priority'] = $trigger['priority'];
+			$data['status'] = $trigger['status'];
+			$data['comments'] = $trigger['comments'];
+			$data['url'] = $trigger['url'];
 
 			$db_triggers = DBselect(
 				'SELECT t.triggerid,t.description'.
@@ -1491,11 +1505,11 @@ function getTriggerFormData(array $data) {
 				' WHERE t.triggerid=d.triggerid_up'.
 					' AND d.triggerid_down='.zbx_dbstr($data['triggerid'])
 			);
-			while ($trigger = DBfetch($db_triggers)) {
-				if (uint_in_array($trigger['triggerid'], $data['dependencies'])) {
+			while ($db_trigger = DBfetch($db_triggers)) {
+				if (uint_in_array($db_trigger['triggerid'], $data['dependencies'])) {
 					continue;
 				}
-				array_push($data['dependencies'], $trigger['triggerid']);
+				array_push($data['dependencies'], $db_trigger['triggerid']);
 			}
 		}
 	}
@@ -1608,6 +1622,10 @@ function getTriggerFormData(array $data) {
 	unset($dependency);
 
 	order_result($data['db_dependencies'], 'description');
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	return $data;
 }
