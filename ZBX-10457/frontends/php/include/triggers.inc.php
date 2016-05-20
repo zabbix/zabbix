@@ -389,7 +389,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 
 	// Create each trigger for each host.
 	foreach ($dbDstHosts as $dstHost) {
-		foreach ($dbSrcTriggers as &$srcTrigger) {
+		foreach ($dbSrcTriggers as $srcTrigger) {
 			// If $srcHostId provided, get host 'host' for triggerExpressionReplaceHost().
 			if ($srcHostId != 0) {
 				$host = $srcHost['host'];
