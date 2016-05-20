@@ -6145,13 +6145,8 @@ return [
 		],
 	],
 	'problem' => [
-		'key' => 'problemid',
+		'key' => 'eventid',
 		'fields' => [
-			'problemid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'eventid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
