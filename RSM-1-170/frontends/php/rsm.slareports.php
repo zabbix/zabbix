@@ -479,7 +479,7 @@ if ($data['filter_search']) {
 				'details' => '-',
 				'from' => '-',
 				'to' => '-',
-				'slv' => '?',
+				'slv' => '-',
 				'slr' => _s('<=%1$s ms, for at least %2$s%% of the queries', 1, 2),
 				'screen' => array(
 					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].

@@ -968,6 +968,8 @@ define('RSM_SLV_EPP_AVAIL',					'rsm.slv.epp.avail');
 define('RSM_SLV_DNSSEC_AVAIL',				'rsm.slv.dnssec.avail');
 
 define('RSM_SLA_GRAPH_DNS_SERVICE_AVAILABILITY',	'DNS Service Availability');
+define('RSM_SLA_GRAPH_DNS_TCP_RTT_PFAILED_GRAPH1',	'Per test cycle, average expressed in ms');
+define('RSM_SLA_GRAPH_DNS_TCP_RTT_PFAILED_GRAPH2',	'Maximum expected number of tests per month');
 
 define('RSM_SLA_SCREEN_TYPE_GRAPH1',		0);
 define('RSM_SLA_SCREEN_TYPE_GRAPH2',		1);
