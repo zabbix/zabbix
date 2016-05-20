@@ -1988,9 +1988,166 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 
 /******************************************************************************
  *                                                                            *
+ * Function: adjust_position_after_jump                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *    After jumping over a number of bytes we "land" most likely somewhere in *
+ *    the middle of log file line. This function tries to adjust position to  *
+ *    the beginning of the log line.                                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     logfile     - [IN/OUT] log file data                                   *
+ *     lastlogsize - [IN/OUT] offset from the beginning of the file           *
+ *     min_size    - [IN] minimum offset to search from                       *
+ *     encoding    - [IN] text string describing encoding                     *
+ *     err_msg     - [IN/OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
+ *                                                                            *
+ ******************************************************************************/
+static int	adjust_position_after_jump(const struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
+		zbx_uint64_t min_size, const char *encoding, char **err_msg)
+{
+	int		fd, ret = FAIL;
+	size_t		szbyte;
+	ssize_t		nbytes;
+	const char	*cr, *lf, *p_end;
+	char		*p, *p_nl, *p_next;
+	zbx_uint64_t	lastlogsize_tmp, lastlogsize_aligned, seek_pos, remainder;
+	char   		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
+							/* encodings use 4 bytes for every character */
+
+	if (-1 == (fd = zbx_open(logfile->filename, O_RDONLY)))
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot open file \"%s\": %s", logfile->filename,
+				zbx_strerror(errno));
+		return FAIL;
+	}
+
+	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+
+	/* For multibyte character encodings 'lastlogsize' needs to be aligned to character border. */
+	/* Align it towards smaller offset. We assume that log file contains no corrupted data stream. */
+
+	lastlogsize_aligned = *lastlogsize;
+
+	if (1 < szbyte && 0 != (remainder = lastlogsize_aligned % szbyte))	/* remainder can be 0, 1, 2 or 3 */
+	{
+		if (min_size <= lastlogsize_aligned - remainder)
+			lastlogsize_aligned -= remainder;
+		else
+			lastlogsize_aligned = min_size;
+	}
+
+	if ((zbx_offset_t)-1 == zbx_lseek(fd, lastlogsize_aligned, SEEK_SET))
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
+				lastlogsize_aligned, logfile->filename, zbx_strerror(errno));
+		goto out;
+	}
+
+	/* search forward for the first newline until EOF */
+
+	lastlogsize_tmp = lastlogsize_aligned;
+
+	for (;;)
+	{
+		if (-1 == (nbytes = read(fd, buf, sizeof(buf))))
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot read from file \"%s\": %s", logfile->filename,
+					zbx_strerror(errno));
+			goto out;
+		}
+
+		if (0 == nbytes)	/* end of file reached */
+			break;
+
+		p = buf;
+		p_end = buf + nbytes;	/* no data from this position */
+
+		if (NULL != (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+		{
+			/* found the beginning of line */
+
+			*lastlogsize = lastlogsize_tmp + (zbx_uint64_t)(p_next - buf);
+			ret = SUCCEED;
+			goto out;
+		}
+
+		lastlogsize_tmp += (zbx_uint64_t)nbytes;
+	}
+
+	/* Searching forward did not find a newline. Now search backwards until 'min_size'. */
+
+	seek_pos = lastlogsize_tmp = lastlogsize_aligned;
+
+	for (;;)
+	{
+		if (sizeof(buf) <= seek_pos)
+			seek_pos -= MIN(sizeof(buf), seek_pos - min_size);
+		else
+			seek_pos = min_size;
+
+		if ((zbx_offset_t)-1 == zbx_lseek(fd, seek_pos, SEEK_SET))
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot set position to " ZBX_FS_UI64 " in file \"%s\": %s",
+					lastlogsize_aligned, logfile->filename, zbx_strerror(errno));
+			goto out;
+		}
+
+		if (-1 == (nbytes = read(fd, buf, sizeof(buf))))
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Cannot read from file \"%s\": %s", logfile->filename,
+					zbx_strerror(errno));
+			goto out;
+		}
+
+		if (0 == nbytes)	/* end of file reached */
+		{
+			*err_msg = zbx_dsprintf(*err_msg, "Unexpected end of file while reading file \"%s\"",
+					logfile->filename);
+			goto out;
+		}
+
+		p = buf;
+		p_end = buf + nbytes;	/* no data from this position */
+
+		if (NULL != (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+		{
+			/* Found the beginning of line. It may not be the one closest to place we jumped to */
+			/* (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
+
+			*lastlogsize = seek_pos + (zbx_uint64_t)(p_next - buf);
+			ret = SUCCEED;
+			goto out;
+		}
+
+		if (min_size == seek_pos)
+		{
+			/* We have searched backwards until 'min_size' and did not find a 'newline'. */
+			/* Effectively it turned out to be a jump with zero-length. */
+
+			*lastlogsize = min_size;
+			ret = SUCCEED;
+			goto out;
+		}
+	}
+out:
+	if (0 != close(fd))
+	{
+		*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", logfile->filename,
+				zbx_strerror(errno));
+		ret = FAIL;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: jump_ahead                                                       *
  *                                                                            *
- * Purpose: move to a new position in the log file list                       *
+ * Purpose: move forward to a new position in the log file list               *
  *                                                                            *
  * Parameters:                                                                *
  *     key             - [IN] item key for logging                            *
@@ -2000,24 +2157,31 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  *     seq             - [IN/OUT] sequence number of last processed file      *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN/OUT] last modification time of the file          *
+ *     encoding        - [IN] text string describing encoding                 *
+ *     err_msg         - [IN/OUT] error message                               *
  *     remaining_bytes - [IN] number of remaining bytes in all logfiles       *
  *     delay           - [IN] calculated delay is seconds                     *
  *     max_delay       - [IN] "maxdelay" parameter in log[], logrt[],         *
  *                            log.count[] and logrt.count[] items             *
  *                                                                            *
+ * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
+ *                                                                            *
  ******************************************************************************/
-static void	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num, int jump_from,
-		int *seq, zbx_uint64_t *lastlogsize, int *mtime, zbx_uint64_t remaining_bytes, double delay,
-		float max_delay)
+static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num, int jump_from,
+		int *seq, zbx_uint64_t *lastlogsize, int *mtime, const char *encoding, char **err_msg,
+		zbx_uint64_t remaining_bytes, double delay, float max_delay)
 {
-	zbx_uint64_t	bytes_to_jump, bytes_jumped = 0;
-	int		i, first_pass = 1;
+	zbx_uint64_t	bytes_to_jump, bytes_jumped = 0, lastlogsize_org, min_size;
+	int		i, first_pass = 1,
+			jumped_to = -1;		/* number of file in 'logfiles' list we jumped to */
 
 	/* calculate jump */
 	bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
 
 	/* enter the loop with index of the last file processed, later continue the loop from the start */
 	i = jump_from;
+
+	lastlogsize_org = *lastlogsize;
 
 	while (i < logfiles_num)
 	{
@@ -2042,6 +2206,8 @@ static void	jump_ahead(const char *key, struct st_logfile *logfiles, int logfile
 			*mtime = logfiles[i].mtime;
 
 			bytes_to_jump -= bytes_jumped;
+
+			jumped_to = i;
 		}
 
 		if (0 == bytes_to_jump)
@@ -2058,6 +2224,33 @@ static void	jump_ahead(const char *key, struct st_logfile *logfiles, int logfile
 
 		i++;
 	}
+
+	if (-1 == jumped_to)		/* no actual jump took place */
+		return SUCCEED;
+
+	/* We have jumped into file, most likely somewhere in the middle of log line. Now find the beginning */
+	/* of a line to avoid pattern-matching a line from a random position. */
+
+	if (jump_from == jumped_to)
+	{
+		/* if jumped within the same file - do not search the beginning of a line before "pre-jump" position */
+		min_size = lastlogsize_org;
+	}
+	else
+	{
+		/* if jumped into different file - may search the beginning of a line from beginning of file */
+		min_size = 0;
+	}
+
+/* TESTS */
+int k;
+for (k = 0; k < 430; k++)
+{
+	zbx_uint64_t	lastlogsize_test;
+	lastlogsize_test = k;
+	adjust_position_after_jump(&logfiles[jumped_to], &lastlogsize_test, min_size, encoding, err_msg);
+}
+	return adjust_position_after_jump(&logfiles[jumped_to], lastlogsize, min_size, encoding, err_msg);
 }
 
 /******************************************************************************
@@ -2344,9 +2537,11 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(processed_bytes,
 				remaining_bytes, refresh, zbx_stopwatch_elapsed(&stopwatch))))
 		{
-			jump_ahead(key, logfiles, logfiles_num, last_processed, &seq, lastlogsize, mtime,
-					remaining_bytes, delay, max_delay);
-			*jumped = 1;
+			if (SUCCEED == (ret = jump_ahead(key, logfiles, logfiles_num, last_processed, &seq, lastlogsize,
+					mtime, encoding, err_msg, remaining_bytes, delay, max_delay)))
+			{
+				*jumped = 1;
+			}
 		}
 	}
 
