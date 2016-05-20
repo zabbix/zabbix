@@ -107,6 +107,7 @@ class CTrigger extends CTriggerGeneral {
 			'selectDependencies'			=> null,
 			'selectDiscoveryRule'			=> null,
 			'selectLastEvent'				=> null,
+			'selectTags'					=> null,
 			'countOutput'					=> null,
 			'groupCount'					=> null,
 			'preservekeys'					=> null,
