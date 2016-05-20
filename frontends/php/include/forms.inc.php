@@ -1218,7 +1218,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if ($data['limited'] || ($item && $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
+	if ($data['limited'] || ($item && $data['parent_discoveryid'] === null
+			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
 				'output' => ['name'],
@@ -1416,12 +1417,11 @@ function getTriggerMassupdateFormData() {
  * @return array
  */
 function getTriggerFormData(array $data) {
-	if (!empty($data['triggerid'])) {
+	if ($data['triggerid'] !== null) {
 		// Get trigger.
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
 			'triggerids' => $data['triggerid']
 		];
 
@@ -1429,9 +1429,13 @@ function getTriggerFormData(array $data) {
 			$options['selectTags'] = ['tag', 'value'];
 		}
 
-		$triggers = $data['parent_discoveryid']
-			? API::TriggerPrototype()->get($options)
-			: API::Trigger()->get($options);
+		if ($data['parent_discoveryid'] === null) {
+			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$triggers = API::Trigger()->get($options);
+		}
+		else {
+			$triggers = API::TriggerPrototype()->get($options);
+		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
@@ -1473,6 +1477,7 @@ function getTriggerFormData(array $data) {
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
 		} while ($tmp_triggerid != 0);
+
 		$data['templates'] = array_reverse($data['templates']);
 		array_shift($data['templates']);
 
@@ -1515,9 +1520,12 @@ function getTriggerFormData(array $data) {
 	}
 
 	$readonly = false;
-	if (array_key_exists('triggerid', $data) && $data['triggerid'] != 0) {
+	if ($data['triggerid'] !== null) {
 		$data['flags'] = $trigger['flags'];
-		$data['discoveryRule'] = $trigger['discoveryRule'];
+
+		if ($data['parent_discoveryid'] === null) {
+			$data['discoveryRule'] = $trigger['discoveryRule'];
+		}
 
 		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {
 			$readonly = true;

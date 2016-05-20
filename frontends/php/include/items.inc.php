@@ -337,9 +337,16 @@ function update_item_status($itemids, $status) {
 	}
 	return $result;
 }
-
-function copyItemsToHosts($srcItemIds, $dstHostIds) {
-	$srcItems = API::Item()->get([
+/**
+ * Copies the given items to the given hosts or templates.
+ *
+ * @param array $src_itemids		Items which will be copied to $dst_hostids
+ * @param array $dst_hostids		Hosts and templates to whom add items.
+ *
+ * @return bool
+ */
+function copyItemsToHosts($src_itemids, $dst_hostids) {
+	$items = API::Item()->get([
 		'output' => [
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
@@ -349,13 +356,13 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 			'description', 'inventory_link'
 		],
 		'selectApplications' => ['applicationid'],
-		'itemids' => $srcItemIds
+		'itemids' => $src_itemids
 	]);
 
 	$dstHosts = API::Host()->get([
 		'output' => ['hostid', 'host', 'status'],
 		'selectInterfaces' => ['interfaceid', 'type', 'main'],
-		'hostids' => $dstHostIds,
+		'hostids' => $dst_hostids,
 		'preservekeys' => true,
 		'nopermissions' => true,
 		'templated_hosts' => true
@@ -368,36 +375,42 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 				$interfaceids[$interface['type']] = $interface['interfaceid'];
 			}
 		}
-		foreach ($srcItems as &$srcItem) {
+		foreach ($items as &$item) {
 			if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
-				$type = itemTypeInterface($srcItem['type']);
+				$type = itemTypeInterface($item['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
 					foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $itype) {
 						if (isset($interfaceids[$itype])) {
-							$srcItem['interfaceid'] = $interfaceids[$itype];
+							$item['interfaceid'] = $interfaceids[$itype];
 							break;
 						}
 					}
 				}
 				elseif ($type !== false) {
 					if (!isset($interfaceids[$type])) {
-						error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'], $srcItem['key_']));
+						error(_s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['host'],
+							$item['key_']
+						));
 						return false;
 					}
-					$srcItem['interfaceid'] = $interfaceids[$type];
+					$item['interfaceid'] = $interfaceids[$type];
 				}
 			}
-			unset($srcItem['itemid']);
-			$srcItem['hostid'] = $dstHost['hostid'];
-			$srcItem['applications'] = get_same_applications_for_host(zbx_objectValues($srcItem['applications'], 'applicationid'), $dstHost['hostid']);
+			unset($item['itemid']);
+			$item['hostid'] = $dstHost['hostid'];
+			$item['applications'] = get_same_applications_for_host(
+				zbx_objectValues($item['applications'], 'applicationid'),
+				$dstHost['hostid']
+			);
 		}
-		unset($srcItem);
+		unset($item);
 
-		if (!API::Item()->create($srcItems)) {
+		if (!API::Item()->create($items)) {
 			return false;
 		}
 	}
+
 	return true;
 }
 
