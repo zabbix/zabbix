@@ -2242,14 +2242,6 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
 		min_size = 0;
 	}
 
-/* TESTS */
-int k;
-for (k = 0; k < 430; k++)
-{
-	zbx_uint64_t	lastlogsize_test;
-	lastlogsize_test = k;
-	adjust_position_after_jump(&logfiles[jumped_to], &lastlogsize_test, min_size, encoding, err_msg);
-}
 	return adjust_position_after_jump(&logfiles[jumped_to], lastlogsize, min_size, encoding, err_msg);
 }
 
