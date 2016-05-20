@@ -1190,8 +1190,6 @@ int	parse_host_key(char *exp, char **host, char **key)
 	return SUCCEED;
 }
 
-
-
 /******************************************************************************
  *                                                                            *
  * Function: num_param                                                        *
@@ -3599,9 +3597,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 
 	*ptr_buffer++ = '"';
 
-	while (' ' == *context)
-		*ptr_buffer++ = *context++;
-
 	while ('\0' != *context)
 	{
 		if ('"' == *context)
@@ -4157,6 +4152,52 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_strcmp_natural                                               *
+ *                                                                            *
+ * Purpose: performs natural comparison of two strings                        *
+ *                                                                            *
+ * Parameters: s1 - [IN] the first string                                     *
+ *             s2 - [IN] the second string                                    *
+ *                                                                            *
+ * Return value:  0: the strings are equal                                    *
+ *               <0: s1 < s2                                                  *
+ *               >0: s1 > s2                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_natural(const char *s1, const char *s2)
+{
+	int	ret, value1, value2;
+
+	for (;'\0' != *s1 && '\0' != *s2; s1++, s2++)
+	{
+		if (0 == isdigit(*s1) || 0 == isdigit(*s2))
+		{
+			if (0 != (ret = *s1 - *s2))
+				return ret;
+
+			continue;
+		}
+
+		value1 = 0;
+		while (0 != isdigit(*s1))
+			value1 = value1 * 10 + *s1++ - '0';
+
+		value2 = 0;
+		while (0 != isdigit(*s2))
+			value2 = value2 * 10 + *s2++ - '0';
+
+		if (0 != (ret = value1 - value2))
+			return ret;
+
+		if ('\0' == *s1 || '\0' == *s2)
+			break;
+	}
+
+	return *s1 - *s2;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_token_parse_user_macro                                       *
  *                                                                            *
  * Purpose: parses user macro token                                           *
@@ -4393,7 +4434,7 @@ static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_
 static int	zbx_token_parse_function(const char *expression, const char *func, zbx_strloc_t *func_loc)
 {
 	size_t	len, next_pos, param_pos;
-	int	params_num = 0, offset;
+	int	offset;
 
 	/* FAIL if the expression doesn't start with a function name */
 	if (FAIL == function_parse_name(func, &len, &next_pos))
@@ -4408,10 +4449,6 @@ static int	zbx_token_parse_function(const char *expression, const char *func, zb
 
 		if (SUCCEED != function_parse_param(func, &param_pos, &len, &next_pos))
 			return FAIL;
-
-		/* if the only parameter is empty - it's a function without parameters */
-		if (0 == len && ')' == func[next_pos] && 0 == params_num)
-			break;
 	}
 	while (')' != func[next_pos]);
 

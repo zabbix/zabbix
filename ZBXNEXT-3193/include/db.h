@@ -80,6 +80,9 @@ struct	_DC_TRIGGER;
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
 
+#define TRIGGER_TAG_LEN			255
+#define TRIGGER_TAG_VALUE_LEN		255
+
 #define GROUP_NAME_LEN			64
 
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
@@ -270,15 +273,17 @@ DB_TRIGGER;
 
 typedef struct
 {
-	DB_TRIGGER	trigger;
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	objectid;
-	int		source;
-	int		object;
-	int		clock;
-	int		value;
-	int		acknowledged;
-	int		ns;
+	DB_TRIGGER		trigger;
+	zbx_uint64_t		eventid;
+	zbx_uint64_t		objectid;
+	int			source;
+	int			object;
+	int			clock;
+	int			value;
+	int			acknowledged;
+	int			ns;
+
+	zbx_vector_ptr_t	tags;
 }
 DB_EVENT;
 
@@ -331,6 +336,7 @@ typedef struct
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	char		*value;
+	char		*value2;
 	unsigned char	conditiontype;
 	unsigned char	operator;
 }
