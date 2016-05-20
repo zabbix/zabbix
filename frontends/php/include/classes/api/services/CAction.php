@@ -498,7 +498,7 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Add actions
+	 * Add actions.
 	 *
 	 * @param array $actions multidimensional array with actions data
 	 * @param array $actions[0,...]['expression']
@@ -509,7 +509,9 @@ class CAction extends CApiService {
 	 * @param array $actions[0,...]['comments'] OPTIONAL
 	 * @param array $actions[0,...]['url'] OPTIONAL
 	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @return boolean
+	 * @param array $actions[0,...]['maintenance_mode'] OPTIONAL
+	 *
+	 * @return array
 	 */
 	public function create($actions) {
 		$actions = zbx_toArray($actions);
@@ -571,7 +573,7 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Update actions
+	 * Update actions.
 	 *
 	 * @param array $actions multidimensional array with actions data
 	 * @param array $actions[0,...]['actionid']
@@ -583,7 +585,9 @@ class CAction extends CApiService {
 	 * @param array $actions[0,...]['comments'] OPTIONAL
 	 * @param array $actions[0,...]['url'] OPTIONAL
 	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @return boolean
+	 * @param array $actions[0,...]['maintenance_mode'] OPTIONAL
+	 *
+	 * @return array
 	 */
 	public function update($actions) {
 		$actions = zbx_toArray($actions);
@@ -1992,6 +1996,9 @@ class CAction extends CApiService {
 
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
+		$maintenance_mode_validator = new CLimitedSetValidator([
+			'values' => [ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]
+		]);
 
 		$conditionsToValidate = [];
 		$operationsToValidate = [];
@@ -1999,6 +2006,18 @@ class CAction extends CApiService {
 		// Validate "filter" sections and "conditions" in them, ensure that "operations" section
 		// is present and is not empty. Also collect conditions and operations for more validation.
 		foreach ($actions as $action) {
+			if ($action['eventsource'] != EVENT_SOURCE_TRIGGERS) {
+				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot set "%1$s" for action "%2$s".'),
+					$action['name']
+				);
+			}
+			elseif (array_key_exists('maintenance_mode', $action)
+					&& !$maintenance_mode_validator->validate($action['maintenance_mode'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $action['maintenance_mode'], 'maintenance_mode')
+				);
+			}
+
 			if (isset($action['filter'])) {
 				$filterValidator->setObjectName($action['name']);
 				$this->checkValidator($action['filter'], $filterValidator);
@@ -2057,6 +2076,10 @@ class CAction extends CApiService {
 		}
 		$actions = zbx_toHash($actions, 'actionid');
 
+		$maintenance_mode_validator = new CLimitedSetValidator([
+			'values' => [ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]
+		]);
+
 		// check fields
 		$duplicates = [];
 		foreach ($actions as $action) {
@@ -2085,6 +2108,18 @@ class CAction extends CApiService {
 				_('Cannot update "%1$s" for action "%2$s".'),
 				$actionName
 			);
+
+			if ($actionsDb[$action['actionid']]['eventsource'] != EVENT_SOURCE_TRIGGERS) {
+				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot update "%1$s" for action "%2$s".'),
+					$actionName
+				);
+			}
+			elseif (array_key_exists('maintenance_mode', $action)
+					&& !$maintenance_mode_validator->validate($action['maintenance_mode'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $action['maintenance_mode'], 'maintenance_mode')
+				);
+			}
 
 			if (!isset($action['name'])) {
 				continue;
