@@ -205,10 +205,10 @@ static void	save_events()
 		zbx_db_insert_add_values(&db_insert, events[i].eventid, events[i].source, events[i].object,
 				events[i].objectid, events[i].clock, events[i].ns, events[i].value);
 
-		event_tag_local.eventid = events[i].eventid;
-
 		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
+
+		event_tag_local.eventid = events[i].eventid;
 
 		for (j = 0; j < events[i].tags.values_num; j++)
 		{
