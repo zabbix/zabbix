@@ -66,7 +66,9 @@ $goodslaTextBox = (new CTextBox('goodsla', $this->data['goodsla'], false, 8))->s
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
 }
-$servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), [$showslaCheckbox, $goodslaTextBox]);
+$servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), [
+	$showslaCheckbox, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), $goodslaTextBox
+]);
 
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), [

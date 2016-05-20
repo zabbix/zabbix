@@ -106,6 +106,15 @@ typedef struct
 }
 zbx_timespec_t;
 
+/* time zone offset */
+typedef struct
+{
+	char	tz_sign;	/* '+' or '-' */
+	int	tz_hour;
+	int	tz_min;
+}
+zbx_timezone_t;
+
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
 
@@ -315,6 +324,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
 #define CONDITION_TYPE_HOST_METADATA		24
+#define CONDITION_TYPE_EVENT_TAG		25
+#define CONDITION_TYPE_EVENT_TAG_VALUE		26
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -573,6 +584,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* action statuses */
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
+
+/* action maintenance mode */
+#define ACTION_MAINTENANCE_MODE_NORMAL	0	/* ignore maintenance */
+#define ACTION_MAINTENANCE_MODE_PAUSE	1	/* pause escalation while host is in maintenance */
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
@@ -914,6 +929,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
+int	zbx_day_in_month(int year, int mon);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -1152,6 +1170,8 @@ unsigned int	zbx_alarm_off(void);
 #endif
 
 #define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
+
+int	zbx_strcmp_natural(const char *s1, const char *s2);
 
 /* {} tokens used in expressions */
 #define ZBX_TOKEN_OBJECTID	0x0001

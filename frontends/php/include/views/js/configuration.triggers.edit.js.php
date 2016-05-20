@@ -1,3 +1,22 @@
+<script type="text/x-jquery-tmpl" id="tagRow">
+<?=
+	(new CRow([
+		(new CTextBox('tags[#{rowNum}][tag]', '', false, 255))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		(new CTextBox('tags[#{rowNum}][value]', '', false, 255))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		(new CCol(
+			(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('form_row')
+		->toString()
+?>
+</script>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
 		// Refresh field visibility on document load.
@@ -18,6 +37,10 @@
 				$('#expression_row').find('label').html('<?= _('Expression') ?>');
 			}
 		}
+
+		$('#tbl_tags').dynamicRows({
+			template: '#tagRow'
+		});
 	});
 
 	/**

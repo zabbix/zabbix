@@ -64,6 +64,78 @@ static int	DBpatch_3010005(void)
 static int	DBpatch_3010006(void)
 {
 	const ZBX_TABLE table =
+			{"trigger_tag", "triggertagid", 0,
+				{
+					{"triggertagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010007(void)
+{
+	return DBcreate_index("trigger_tag", "trigger_tag_1", "triggerid", 0);
+}
+
+static int	DBpatch_3010008(void)
+{
+	const ZBX_FIELD	field = {"triggerid", NULL, "triggers", "triggerid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("trigger_tag", 1, &field);
+}
+
+static int	DBpatch_3010009(void)
+{
+	const ZBX_TABLE table =
+			{"event_tag", "eventtagid", 0,
+				{
+					{"eventtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010010(void)
+{
+	return DBcreate_index("event_tag", "event_tag_1", "eventid", 0);
+}
+
+static int	DBpatch_3010011(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_tag", 1, &field);
+}
+
+static int	DBpatch_3010012(void)
+{
+	const ZBX_FIELD	field = {"value2", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("conditions", &field);
+}
+
+static int	DBpatch_3010013(void)
+{
+	const ZBX_FIELD	field = {"maintenance_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
+static int	DBpatch_3010014(void)
+{
+	const ZBX_TABLE table =
 			{"problem", "eventid", 0,
 				{
 					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -78,12 +150,12 @@ static int	DBpatch_3010006(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3010007(void)
+static int	DBpatch_3010015(void)
 {
 	return DBcreate_index("problem", "problem_1", "source,object,objectid", 0);
 }
 
-static int	DBpatch_3010008(void)
+static int	DBpatch_3010016(void)
 {
 	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -91,7 +163,7 @@ static int	DBpatch_3010008(void)
 	return DBadd_foreign_key("problem", 1, &field);
 }
 
-static int	DBpatch_3010009(void)
+static int	DBpatch_3010017(void)
 {
 	const ZBX_TABLE table =
 			{"event_recovery", "eventid", 0,
@@ -106,12 +178,12 @@ static int	DBpatch_3010009(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3010010(void)
+static int	DBpatch_3010018(void)
 {
 	return DBcreate_index("event_recovery", "event_recovery_1", "r_eventid", 0);
 }
 
-static int	DBpatch_3010011(void)
+static int	DBpatch_3010019(void)
 {
 	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -119,7 +191,7 @@ static int	DBpatch_3010011(void)
 	return DBadd_foreign_key("event_recovery", 1, &field);
 }
 
-static int	DBpatch_3010012(void)
+static int	DBpatch_3010020(void)
 {
 	const ZBX_FIELD field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -250,7 +322,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3010013(void)
+static int	DBpatch_3010021(void)
 {
 	int			i, ret = FAIL;
 	zbx_uint64_t		eventid = 0, old_eventid;
@@ -325,5 +397,13 @@ DBPATCH_ADD(3010010, 0, 1)
 DBPATCH_ADD(3010011, 0, 1)
 DBPATCH_ADD(3010012, 0, 1)
 DBPATCH_ADD(3010013, 0, 1)
+DBPATCH_ADD(3010014, 0, 1)
+DBPATCH_ADD(3010015, 0, 1)
+DBPATCH_ADD(3010016, 0, 1)
+DBPATCH_ADD(3010017, 0, 1)
+DBPATCH_ADD(3010018, 0, 1)
+DBPATCH_ADD(3010019, 0, 1)
+DBPATCH_ADD(3010020, 0, 1)
+DBPATCH_ADD(3010021, 0, 1)
 
 DBPATCH_END()

@@ -28,16 +28,10 @@
 int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*type, buf[32];
-	struct tm	*tm;
-	size_t		offset;
-	int		gmtoff, ms;
-	unsigned short	h, m;
-#ifdef _WINDOWS
-        struct _timeb	tv;
-#else
-	struct timeval	tv;
-	struct timezone	tz;
-#endif
+	long		milliseconds;
+	struct tm	tm;
+	zbx_timezone_t	tz;
+
 	if (1 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
@@ -52,38 +46,12 @@ int	SYSTEM_LOCALTIME(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(type, "local"))
 	{
-#ifdef _WINDOWS
-	        _ftime(&tv);
-		tm = localtime(&tv.time);
-		ms = tv.millitm;
-#else
-		gettimeofday(&tv, &tz);
-		tm = localtime(&tv.tv_sec);
-		ms = (int)(tv.tv_usec / 1000);
-#endif
-		offset = zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03d,",
-				1900 + tm->tm_year, 1 + tm->tm_mon, tm->tm_mday,
-				tm->tm_hour, tm->tm_min, tm->tm_sec, ms);
+		zbx_get_time(&tm, &milliseconds, &tz);
 
-		/* timezone offset */
-#if defined(HAVE_TM_TM_GMTOFF)
-		gmtoff = tm->tm_gmtoff;
-#else
-		gmtoff = -timezone;
-#endif
-#ifdef _WINDOWS
-		if (0 < tm->tm_isdst)		/* daylight saving time */
-			gmtoff += SEC_PER_HOUR;	/* assume DST is one hour */
-#endif
-		h = (unsigned short)(abs(gmtoff) / SEC_PER_HOUR);
-		m = (unsigned short)((abs(gmtoff) - h * SEC_PER_HOUR) / SEC_PER_MIN);
-
-		if (0 <= gmtoff)
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "+");
-		else
-			offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "-");
-
-		offset += zbx_snprintf(buf + offset, sizeof(buf) - offset, "%02d:%02d", (int)h, (int)m);
+		zbx_snprintf(buf, sizeof(buf), "%04d-%02d-%02d,%02d:%02d:%02d.%03ld,%01c%02d:%02d",
+				1900 + tm.tm_year, 1 + tm.tm_mon, tm.tm_mday,
+				tm.tm_hour, tm.tm_min, tm.tm_sec, milliseconds,
+				tz.tz_sign, tz.tz_hour, tz.tz_min);
 
 		SET_STR_RESULT(result, strdup(buf));
 	}
