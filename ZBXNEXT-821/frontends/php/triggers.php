@@ -315,27 +315,26 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
 		$triggers_to_update = [];
 
 		$triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'flags'],
+			'output' => [],
 			'triggerids' => $triggerids,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
 
 		if ($triggers) {
 			foreach ($triggerids as $triggerid) {
 				if (array_key_exists($triggerid, $triggers)) {
-					if ($triggers[$triggerid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-						$trigger = ['triggerid' => $triggerid];
+					$trigger = ['triggerid' => $triggerid];
 
-						if (array_key_exists('priority', $visible)) {
-							$trigger['priority'] = getRequest('priority');
-						}
-
-						if (array_key_exists('dependencies', $visible)) {
-							$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
-						}
-
-						$triggers_to_update[] = $trigger;
+					if (array_key_exists('priority', $visible)) {
+						$trigger['priority'] = getRequest('priority');
 					}
+
+					if (array_key_exists('dependencies', $visible)) {
+						$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+					}
+
+					$triggers_to_update[] = $trigger;
 				}
 			}
 		}

@@ -41,13 +41,14 @@ $triggersForm = (new CForm())
 	->addVar('remove_recovery_expression', '')
 	->addVar('recovery_mode', $data['recovery_mode']);
 
+$discovered_trigger = false;
+
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $data['triggerid']);
-}
 
-$discovered_trigger = false;
-if (array_key_exists('flags', $data) && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$discovered_trigger = true;
+	if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$discovered_trigger = true;
+	}
 }
 
 $readonly = false;

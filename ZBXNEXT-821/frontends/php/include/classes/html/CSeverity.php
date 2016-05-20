@@ -25,6 +25,7 @@ class CSeverity extends CList {
 	 * @param string $options['name']
 	 * @param int    $options['value']		(optional) Default: TRIGGER_SEVERITY_NOT_CLASSIFIED
 	 * @param bool   $options['all']		(optional)
+	 * @param bool	 $enabled				If set to false, radio buttons (severities) are marked as disabled.
 	 */
 	public function __construct(array $options = [], $enabled = true) {
 		parent::__construct();

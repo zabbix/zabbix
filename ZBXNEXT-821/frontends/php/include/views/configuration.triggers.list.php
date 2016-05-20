@@ -146,10 +146,10 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			);
 
 			$triggerDependencies[] = (new CLink($depTriggerDescription,
-					'triggers.php?form=update&triggerid='.$depTrigger['triggerid']
-				))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(triggerIndicatorStyle($depTrigger['status']));
+				'triggers.php?form=update&triggerid='.$depTrigger['triggerid']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(triggerIndicatorStyle($depTrigger['status']));
 
 			$triggerDependencies[] = BR();
 		}

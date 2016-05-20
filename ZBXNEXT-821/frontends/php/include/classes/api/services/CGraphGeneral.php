@@ -605,11 +605,11 @@ abstract class CGraphGeneral extends CApiService {
 
 		switch (get_class($this)) {
 			case 'CGraph':
-				$error_cannot_set = _('Cannot update "%1$s" for graph "%2$s".');
+				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
 				break;
 
 			case 'CGraphPrototype':
-				$error_cannot_set = _('Cannot update "%1$s" for graph prototype "%2$s".');
+				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
 				break;
 
 			default:
@@ -619,7 +619,7 @@ abstract class CGraphGeneral extends CApiService {
 		$read_only_fields = ['templateid', 'flags'];
 
 		foreach ($graphs as $graph) {
-			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
+			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
 
 			$templatedGraph = false;
 
