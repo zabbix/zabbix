@@ -126,6 +126,13 @@ static int	DBpatch_3010012(void)
 	return DBadd_field("conditions", &field);
 }
 
+static int	DBpatch_3010013(void)
+{
+	const ZBX_FIELD	field = {"maintenance_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("actions", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -145,5 +152,6 @@ DBPATCH_ADD(3010009, 0, 1)
 DBPATCH_ADD(3010010, 0, 1)
 DBPATCH_ADD(3010011, 0, 1)
 DBPATCH_ADD(3010012, 0, 1)
+DBPATCH_ADD(3010013, 0, 1)
 
 DBPATCH_END()

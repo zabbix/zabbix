@@ -425,6 +425,7 @@ FIELD		|recovery_msg	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|r_shortdata	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|r_longdata	|t_shorttext	|''	|NOT NULL	|0
 FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|maintenance_mode|t_integer	|'1'	|NOT NULL	|0
 INDEX		|1		|eventsource,status
 UNIQUE		|2		|name
 
@@ -1366,4 +1367,4 @@ INDEX		|1		|eventid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010012	|3010012
+ROW		|3010013	|3010013

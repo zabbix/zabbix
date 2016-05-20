@@ -1936,6 +1936,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'maintenance_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
 		],
 	],
 	'operations' => [
