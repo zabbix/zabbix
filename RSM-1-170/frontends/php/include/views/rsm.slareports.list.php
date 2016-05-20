@@ -19,6 +19,8 @@
 **/
 
 
+require_once dirname(__FILE__).'/js/rsm.slareports.list.js.php';
+
 $widget = new CWidget(null, 'sla-reports');
 
 $widget->addPageHeader(_('SLA report'));
@@ -112,7 +114,5 @@ foreach ($data['services'] as $name => $service) {
 }
 
 $widget->addItem($table);
-
-require_once dirname(__FILE__).'/js/rsm.slareports.list.js.php';
 
 return $widget;

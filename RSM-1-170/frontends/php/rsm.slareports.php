@@ -100,11 +100,54 @@ if ($data['filter_search']) {
 	$data['tld'] = reset($tld);
 
 	if ($data['tld']) {
-		$item_keys = array(RSM_SLV_DNS_DOWNTIME, RSM_SLV_RDDS_DOWNTIME, RSM_SLV_EPP_DOWNTIME,
-			RSM_SLV_DNS_TCP_RTT_PFAILED, RSM_SLV_DNS_UDP_RTT_PFAILED, RSM_SLV_DNS_UDP_UPD_PFAILED,
-			RSM_SLV_EPP_RTT_LOGIN_PFAILED, RSM_SLV_EPP_RTT_UPDATE_PFAILED, RSM_SLV_EPP_RTT_INFO_PFAILED,
-			RSM_SLV_RDDS43_UPD_PFAILED
+		// Get TLD template
+		$templates = API::Template()->get(array(
+			'output' => array('templateid'),
+			'filter' => array(
+				'host' => 'Template '.$data['tld']['host']
+			)
+		));
+
+		$template = reset($templates);
+
+		$template_macros = API::UserMacro()->get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'hostids' => $template['templateid'],
+			'filter' => array(
+				'macro' => array(RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS_ENABLED)
+			)
+		));
+
+		$item_keys = array(RSM_SLV_DNS_DOWNTIME, RSM_SLV_DNS_TCP_RTT_PFAILED, RSM_SLV_DNS_UDP_RTT_PFAILED,
+			RSM_SLV_DNS_UDP_UPD_PFAILED
 		);
+
+		$macro_keys = array(RSM_SLV_NS_AVAIL, RSM_SLV_DNS_TCP_RTT, RSM_DNS_TCP_RTT_LOW, RSM_SLV_DNS_UDP_RTT,
+			RSM_DNS_UDP_RTT_LOW, RSM_SLV_DNS_NS_UPD, RSM_DNS_UPDATE_TIME, RSM_SLV_MACRO_DNS_AVAIL
+		);
+
+		$rdds = false;
+		$epp = false;
+
+		foreach ($template_macros as $template_macro) {
+			if ($template_macro['macro'] == RSM_TLD_RDDS_ENABLED && $template_macro['value'] == 1) {
+				$rdds = true;
+				$item_keys = array_merge($item_keys, array(RSM_SLV_RDDS_DOWNTIME, RSM_SLV_RDDS43_UPD_PFAILED));
+				$macro_keys = array_merge($macro_keys, array(RSM_SLV_MACRO_RDDS_AVAIL, RSM_SLV_RDDS_UPD,
+					RSM_RDDS_UPDATE_TIME
+				));
+			}
+			elseif ($template_macro['macro'] == RSM_TLD_EPP_ENABLED && $template_macro['value'] == 1) {
+				$epp = true;
+				$item_keys = array_merge($item_keys, array(RSM_SLV_EPP_DOWNTIME, RSM_SLV_EPP_RTT_LOGIN_PFAILED,
+					RSM_SLV_EPP_RTT_UPDATE_PFAILED, RSM_SLV_EPP_RTT_INFO_PFAILED
+				));
+				$macro_keys = array_merge($macro_keys, array(RSM_SLV_MACRO_EPP_AVAIL, RSM_SLV_EPP_LOGIN,
+					RSM_EPP_LOGIN_RTT_LOW, RSM_SLV_EPP_INFO, RSM_EPP_INFO_RTT_LOW, RSM_SLV_EPP_UPDATE,
+					RSM_EPP_UPDATE_RTT_LOW
+				));
+			}
+		}
 
 		// Get items.
 		$items = API::Item()->get(array(
@@ -128,13 +171,6 @@ if ($data['filter_search']) {
 			require_once dirname(__FILE__).'/include/page_footer.php';
 			exit;
 		}
-
-		$macro_keys = array(RSM_SLV_NS_AVAIL, RSM_SLV_DNS_TCP_RTT, RSM_DNS_TCP_RTT_LOW, RSM_SLV_DNS_UDP_RTT,
-			RSM_DNS_UDP_RTT_LOW, RSM_SLV_DNS_NS_UPD, RSM_DNS_UPDATE_TIME, RSM_SLV_RDDS_UPD,
-			RSM_RDDS_UPDATE_TIME, RSM_SLV_EPP_LOGIN, RSM_EPP_LOGIN_RTT_LOW, RSM_SLV_EPP_INFO,
-			RSM_EPP_INFO_RTT_LOW, RSM_SLV_EPP_UPDATE, RSM_EPP_UPDATE_RTT_LOW, RSM_SLV_MACRO_DNS_AVAIL,
-			RSM_SLV_MACRO_EPP_AVAIL, RSM_SLV_MACRO_RDDS_AVAIL
-		);
 
 		$macros = API::UserMacro()->get(array(
 			'globalmacro' => true,
@@ -211,7 +247,7 @@ if ($data['filter_search']) {
 			'from' => '-',
 			'to' => '-',
 			'slv' => $item_hystory['cnt'].' '._('min'),
-			'slr' => _s('%1$s minutes of downtime', ($macros[RSM_SLV_MACRO_DNS_AVAIL]['value'] / 60)),
+			'slr' => _s('%1$s minutes of downtime', round($macros[RSM_SLV_MACRO_DNS_AVAIL]['value'] / 60, 2)),
 			'screen' => array(
 				new CLink(_('Screen'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 					'&item_key='.RSM_SLV_DNS_DOWNTIME.'&filter_year='.$data['filter_year'].
@@ -264,7 +300,7 @@ if ($data['filter_search']) {
 				'from' => $from,
 				'to' => $to,
 				'slv' => count($item_values).' '._('min'),
-				'slr' => _s('%1$s min of downtime', ($macros[RSM_SLV_NS_AVAIL]['value'] / 60)),
+				'slr' => _s('%1$s min of downtime', round($macros[RSM_SLV_NS_AVAIL]['value'] / 60, 2)),
 				'screen' => array(
 					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
 						'&item_key='.$ns_item['itemid'].'&filter_year='.$data['filter_year'].
@@ -405,248 +441,255 @@ if ($data['filter_search']) {
 		];
 
 		// RDDS availability.
-		$item_hystory = DBfetch(DBselect(
-			'SELECT count(h.itemid) AS cnt'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_RDDS_DOWNTIME]['itemid']).
-				' AND h.value=0'.
-				' AND h.clock>='.zbx_dbstr($start_time).
-				' AND h.clock<'.zbx_dbstr($end_time)
-		));
+		if ($rdds) {
+			$item_hystory = DBfetch(DBselect(
+				'SELECT count(h.itemid) AS cnt'.
+				' FROM history_uint h'.
+				' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_RDDS_DOWNTIME]['itemid']).
+					' AND h.value=0'.
+					' AND h.clock>='.zbx_dbstr($start_time).
+					' AND h.clock<'.zbx_dbstr($end_time)
+			));
 
-		$data['services'][] = [
-			'name' => 'RDDS service availability',
-			'main' => true,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $item_hystory['cnt'].' '._('min'),
-			'slr' => _s('%1$s min of downtime', ($macros[RSM_SLV_MACRO_RDDS_AVAIL]['value'] / 60)),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_RDDS_DOWNTIME.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_RDDS_DOWNTIME.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+			$data['services'][] = [
+				'name' => 'RDDS service availability',
+				'main' => true,
+				'details' => '-',
+				'from' => '-',
+				'to' => '-',
+				'slv' => $item_hystory['cnt'].' '._('min'),
+				'slr' => _s('%1$s min of downtime', round($macros[RSM_SLV_MACRO_RDDS_AVAIL]['value'] / 60, 2)),
+				'screen' => array(
+					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_RDDS_DOWNTIME.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+					),
+					SPACE,
+					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_RDDS_DOWNTIME.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+					)
 				)
-			)
-		];
+			];
 
-		// RDDS Query RTT (combined from 43 and 80 below).
-		$data['services'][] = [
-			'name' => 'RDDS Query RTT (combined from 43 and 80 below)',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => '?',
-			'slr' => _s('<=%1$s ms, for at least %2$s%% of the queries', 1, 2),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key=0&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key=0&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+			// RDDS Query RTT (combined from 43 and 80 below).
+			$data['services'][] = [
+				'name' => 'RDDS Query RTT (combined from 43 and 80 below)',
+				'main' => false,
+				'details' => '-',
+				'from' => '-',
+				'to' => '-',
+				'slv' => '?',
+				'slr' => _s('<=%1$s ms, for at least %2$s%% of the queries', 1, 2),
+				'screen' => array(
+					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key=0&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+					),
+					SPACE,
+					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key=0&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+					)
 				)
-			)
-		];
+			];
 
-		// RDDS update time.
-		$item_hystory = DBfetch(DBselect(
-			'SELECT h.value'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_RDDS43_UPD_PFAILED]['itemid']).
-				' AND h.value=0'.
-				' AND h.clock>='.zbx_dbstr($start_time).
-				' AND h.clock<'.zbx_dbstr($end_time).
-			' ORDER BY h.clock DESC'.
-			' LIMIT 1'
-		));
+			// If RDDS and EPP is avail
+			if ($epp) {
+				// RDDS update time.
+				$item_hystory = DBfetch(DBselect(
+					'SELECT h.value'.
+					' FROM history_uint h'.
+					' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_RDDS43_UPD_PFAILED]['itemid']).
+						' AND h.value=0'.
+						' AND h.clock>='.zbx_dbstr($start_time).
+						' AND h.clock<'.zbx_dbstr($end_time).
+					' ORDER BY h.clock DESC'.
+					' LIMIT 1'
+				));
 
-		if ($item_hystory['value'] === null) {
-			$item_hystory['value'] = '-';
+				if ($item_hystory['value'] === null) {
+					$item_hystory['value'] = '-';
+				}
+
+				$slv = $item_hystory['value'].'% > '.$macros[RSM_RDDS_UPDATE_TIME]['value']._('ms');
+				$data['services'][] = [
+					'name' => 'RDDS update time',
+					'main' => false,
+					'details' => '-',
+					'from' => '-',
+					'to' => '-',
+					'slv' => $slv,
+					'slr' => _s('<=%1$s ms, for at least %2$s%% probes', $macros[RSM_RDDS_UPDATE_TIME]['value'],
+						$macros[RSM_SLV_RDDS_UPD]['value']
+					),
+					'screen' => array(
+						new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+							'&item_key='.RSM_SLV_RDDS43_UPD_PFAILED.'&filter_year='.$data['filter_year'].
+							'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+						),
+						SPACE,
+						new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+							'&item_key='.RSM_SLV_RDDS43_UPD_PFAILED.'&filter_year='.$data['filter_year'].
+							'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+						)
+					)
+				];
+			}
 		}
-
-		$slv = $item_hystory['value'].'% > '.$macros[RSM_RDDS_UPDATE_TIME]['value']._('ms');
-		$data['services'][] = [
-			'name' => 'RDDS update time',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $slv,
-			'slr' => _s('<=%1$s ms, for at least %2$s%% probes', $macros[RSM_RDDS_UPDATE_TIME]['value'],
-				$macros[RSM_SLV_RDDS_UPD]['value']
-			),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_RDDS43_UPD_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_RDDS43_UPD_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
-				)
-			)
-		];
 
 		// EPP service availability.
-		$item_hystory = DBfetch(DBselect(
-			'SELECT count(h.itemid) AS cnt'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_DOWNTIME]['itemid']).
-				' AND h.value=0'.
-				' AND h.clock>='.zbx_dbstr($start_time).
-				' AND h.clock<'.zbx_dbstr($end_time)
-		));
+		if ($epp) {
+			$item_hystory = DBfetch(DBselect(
+				'SELECT count(h.itemid) AS cnt'.
+				' FROM history_uint h'.
+				' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_DOWNTIME]['itemid']).
+					' AND h.value=0'.
+					' AND h.clock>='.zbx_dbstr($start_time).
+					' AND h.clock<'.zbx_dbstr($end_time)
+			));
 
-		$data['services'][] = [
-			'name' => 'EPP service availability',
-			'main' => true,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $item_hystory['cnt'].' '._('min'),
-			'slr' => _s('%1$s min of downtime', ($macros[RSM_SLV_MACRO_EPP_AVAIL]['value'] / 60)),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_DOWNTIME.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_DOWNTIME.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+			$data['services'][] = [
+				'name' => 'EPP service availability',
+				'main' => true,
+				'details' => '-',
+				'from' => '-',
+				'to' => '-',
+				'slv' => $item_hystory['cnt'].' '._('min'),
+				'slr' => _s('%1$s min of downtime', round($macros[RSM_SLV_MACRO_EPP_AVAIL]['value'] / 60, 2)),
+				'screen' => array(
+					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_DOWNTIME.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+					),
+					SPACE,
+					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_DOWNTIME.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+					)
 				)
-			)
-		];
+			];
 
-		// EPP session-command RTT.
-		$item_hystory = DBfetch(DBselect(
-			'SELECT h.value'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_RTT_LOGIN_PFAILED]['itemid']).
-				' AND h.value=0'.
-				' AND h.clock>='.zbx_dbstr($start_time).
-				' AND h.clock<'.zbx_dbstr($end_time).
-			' ORDER BY h.clock DESC'.
-			' LIMIT 1'
-		));
+			// EPP session-command RTT.
+			$item_hystory = DBfetch(DBselect(
+				'SELECT h.value'.
+				' FROM history_uint h'.
+				' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_RTT_LOGIN_PFAILED]['itemid']).
+					' AND h.value=0'.
+					' AND h.clock>='.zbx_dbstr($start_time).
+					' AND h.clock<'.zbx_dbstr($end_time).
+				' ORDER BY h.clock DESC'.
+				' LIMIT 1'
+			));
 
-		if ($item_hystory['value'] === null) {
-			$item_hystory['value'] = '-';
+			if ($item_hystory['value'] === null) {
+				$item_hystory['value'] = '-';
+			}
+
+			$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_INFO_RTT_LOW]['value']._('ms');
+			$data['services'][] = [
+				'name' => 'EPP session-command RTT',
+				'main' => false,
+				'details' => '-',
+				'from' => '-',
+				'to' => '-',
+				'slv' => $slv,
+				'slr' => _s('<=%1$s ms, for at least %2$s%% of the commands', $macros[RSM_EPP_INFO_RTT_LOW]['value'],
+					$macros[RSM_SLV_EPP_INFO]['value']
+				),
+				'screen' => array(
+					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_RTT_LOGIN_PFAILED.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+					),
+					SPACE,
+					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_RTT_LOGIN_PFAILED.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+					)
+				)
+			];
+
+			// EPP query-command RTT.
+			$item_hystory = DBfetch(DBselect(
+				'SELECT h.value'.
+				' FROM history_uint h'.
+				' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_RTT_INFO_PFAILED]['itemid']).
+					' AND h.value=0'.
+					' AND h.clock>='.zbx_dbstr($start_time).
+					' AND h.clock<'.zbx_dbstr($end_time).
+				' ORDER BY h.clock DESC'.
+				' LIMIT 1'
+			));
+
+			if ($item_hystory['value'] === null) {
+				$item_hystory['value'] = '-';
+			}
+
+			$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_INFO_RTT_LOW]['value']._('ms');
+			$data['services'][] = [
+				'name' => 'EPP query-command RTT',
+				'main' => false,
+				'details' => '-',
+				'from' => '-',
+				'to' => '-',
+				'slv' => $slv,
+				'slr' => _s('<=%1$s ms, for at least %2$s%% of the commands', $macros[RSM_EPP_INFO_RTT_LOW]['value'],
+					$macros[RSM_SLV_EPP_INFO]['value']
+				),
+				'screen' => array(
+					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_RTT_INFO_PFAILED.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+					),
+					SPACE,
+					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_RTT_INFO_PFAILED.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+					)
+				)
+			];
+
+			// EPP transform-command RTT.
+			$item_hystory = DBfetch(DBselect(
+				'SELECT h.value'.
+				' FROM history_uint h'.
+				' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_RTT_UPDATE_PFAILED]['itemid']).
+					' AND h.value=0'.
+					' AND h.clock>='.zbx_dbstr($start_time).
+					' AND h.clock<'.zbx_dbstr($end_time).
+				' ORDER BY h.clock DESC'.
+				' LIMIT 1'
+			));
+
+			if ($item_hystory['value'] === null) {
+				$item_hystory['value'] = '-';
+			}
+
+			$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_UPDATE_RTT_LOW]['value']._('ms');
+			$data['services'][] = [
+				'name' => 'EPP transform-command RTT',
+				'main' => false,
+				'details' => '-',
+				'from' => '-',
+				'to' => '-',
+				'slv' => $slv,
+				'slr' => _s('<=%1$s ms, for at least %2$s%% of the commands', $macros[RSM_EPP_UPDATE_RTT_LOW]['value'],
+					$macros[RSM_SLV_EPP_UPDATE]['value']
+				),
+				'screen' => array(
+					new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_RTT_UPDATE_PFAILED.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
+					),
+					SPACE,
+					new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
+						'&item_key='.RSM_SLV_EPP_RTT_UPDATE_PFAILED.'&filter_year='.$data['filter_year'].
+						'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
+					)
+				)
+			];
 		}
-
-		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_INFO_RTT_LOW]['value']._('ms');
-		$data['services'][] = [
-			'name' => 'EPP session-command RTT',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $slv,
-			'slr' => _s('<=%1$s ms, for at least %2$s%% of the commands', $macros[RSM_EPP_INFO_RTT_LOW]['value'],
-				$macros[RSM_SLV_EPP_INFO]['value']
-			),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_RTT_LOGIN_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_RTT_LOGIN_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
-				)
-			)
-		];
-
-		// EPP query-command RTT.
-		$item_hystory = DBfetch(DBselect(
-			'SELECT h.value'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_RTT_INFO_PFAILED]['itemid']).
-				' AND h.value=0'.
-				' AND h.clock>='.zbx_dbstr($start_time).
-				' AND h.clock<'.zbx_dbstr($end_time).
-			' ORDER BY h.clock DESC'.
-			' LIMIT 1'
-		));
-
-		if ($item_hystory['value'] === null) {
-			$item_hystory['value'] = '-';
-		}
-
-		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_INFO_RTT_LOW]['value']._('ms');
-		$data['services'][] = [
-			'name' => 'EPP query-command RTT',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $slv,
-			'slr' => _s('<=%1$s ms, for at least %2$s%% of the commands', $macros[RSM_EPP_INFO_RTT_LOW]['value'],
-				$macros[RSM_SLV_EPP_INFO]['value']
-			),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_RTT_INFO_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_RTT_INFO_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
-				)
-			)
-		];
-
-		// EPP transform-command RTT.
-		$item_hystory = DBfetch(DBselect(
-			'SELECT h.value'.
-			' FROM history_uint h'.
-			' WHERE h.itemid='.zbx_dbstr($items[RSM_SLV_EPP_RTT_UPDATE_PFAILED]['itemid']).
-				' AND h.value=0'.
-				' AND h.clock>='.zbx_dbstr($start_time).
-				' AND h.clock<'.zbx_dbstr($end_time).
-			' ORDER BY h.clock DESC'.
-			' LIMIT 1'
-		));
-
-		if ($item_hystory['value'] === null) {
-			$item_hystory['value'] = '-';
-		}
-
-		$slv = $item_hystory['value'].'% '._('queries').' > '.$macros[RSM_EPP_UPDATE_RTT_LOW]['value']._('ms');
-		$data['services'][] = [
-			'name' => 'EPP transform-command RTT',
-			'main' => false,
-			'details' => '-',
-			'from' => '-',
-			'to' => '-',
-			'slv' => $slv,
-			'slr' => _s('<=%1$s ms, for at least %2$s%% of the commands', $macros[RSM_EPP_UPDATE_RTT_LOW]['value'],
-				$macros[RSM_SLV_EPP_UPDATE]['value']
-			),
-			'screen' => array(
-				new CLink(_('Graph 1'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_RTT_UPDATE_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH1
-				),
-				SPACE,
-				new CLink(_('Graph 2'), 'rsm.screens.php?filter_set=1&tld='.$data['filter_search'].
-					'&item_key='.RSM_SLV_EPP_RTT_UPDATE_PFAILED.'&filter_year='.$data['filter_year'].
-					'&filter_month='.$data['filter_month'].'&type='.RSM_SLA_SCREEN_TYPE_GRAPH2
-				)
-			)
-		];
 	}
 }
 
