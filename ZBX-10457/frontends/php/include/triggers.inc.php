@@ -440,7 +440,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				'srcTriggerContextHost' => $host
 			];
 		}
-		unset($srcTrigger);
 	}
 
 	$depids = [];
