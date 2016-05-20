@@ -95,7 +95,6 @@ require_once dirname(__FILE__).'/testFormGraphPrototype.php';
 */
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
-/*
 require_once dirname(__FILE__).'/testInheritanceItem.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceGraph.php';
@@ -104,12 +103,13 @@ require_once dirname(__FILE__).'/testInheritanceDiscoveryRule.php';
 require_once dirname(__FILE__).'/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceGraphPrototype.php';
-*/
+require_once dirname(__FILE__).'/testTemplateInheritance.php';
+require_once dirname(__FILE__).'/testTriggerDependencies.php';
 require_once dirname(__FILE__).'/testTriggerExpressions.php';
+require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testZBX6339.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
-require_once dirname(__FILE__).'/testUrlParameters.php';
 
 class SeleniumTests {
 	public static function suite() {
@@ -190,7 +190,6 @@ class SeleniumTests {
 */
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
-/*
 		$suite->addTestSuite('testInheritanceItem');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceGraph');
@@ -199,13 +198,15 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testInheritanceGraphPrototype');
-*/
+		$suite->addTestSuite('testTemplateInheritance');
+		$suite->addTestSuite('testTriggerDependencies');
 		$suite->addTestSuite('testTriggerExpressions');
+		$suite->addTestSuite('testUrlParameters');
 		$suite->addTestSuite('testZBX6339');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
-		$suite->addTestSuite('testUrlParameters');
 
 		return $suite;
 	}
 }
+

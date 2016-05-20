@@ -49,22 +49,22 @@ class testTemplateInheritance extends CWebTest {
 
 	public function testFormItem_linkHost(){
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
+		$this->zbxTestClickLinkText($this->hostName);
 
 		$this->zbxTestClick('tab_templateTab');
 
-		$this->assertElementPresent("//div[@id='templates_']/input");
-		$this->input_type("//div[@id='templates_']/input", 'Template App Zabbix Agent');
-		$this->zbxTestClick("//span[@class='matched']");
+		$this->zbxAssertElementPresent(WebdriverBy::id("add_templates_"));
+		$this->zbxTestInputTypeByXpath('//input[@class="input"]', 'Template App Zabbix Agent');
+		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//span[@class='suggest-found']"));
+		$this->zbxTestClickXpath("//span[@class='suggest-found']");
 		$this->zbxTestClickWait('add_template');
 
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
-		$this->zbxTestClickWait('add');
+		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent('Host updated');
 	}
 
-	// Returns all possible item data
 	public static function dataCreate() {
 	// result, template, itemName, keyName, errorMsg
 		return [
@@ -82,7 +82,7 @@ class testTemplateInheritance extends CWebTest {
 				'Test LLD item1',
 				'test-general-item',
 				[
-						'ERROR: Cannot add item',
+						'Cannot add item',
 						'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
 							'another template.'
 						]
@@ -104,9 +104,8 @@ class testTemplateInheritance extends CWebTest {
 	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
 		$this->zbxTestLogin('templates.php');
 
-		// create an item
-		$this->zbxTestClickWait("link=$template");
-		$this->zbxTestClickWait('link=Items');
+		$this->zbxTestClickLinkText($template);
+		$this->zbxTestClickLinkText('Items');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', $itemName);
@@ -121,7 +120,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->input_type('history', '54');
 		$this->input_type('trends', '55');
 		$this->input_type('description', 'description');
-		$this->assertAttribute('//*[@id="status"]/@checked', 'checked');
+		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 
 		$this->zbxTestClickWait('add');
@@ -130,12 +129,12 @@ class testTemplateInheritance extends CWebTest {
 			case TEST_GOOD:
 				$this->zbxTestTextPresent('Item added');
 				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+				$this->zbxTestCheckHeader('Items');
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+				$this->zbxTestCheckHeader('Items');
 				foreach ($errorMsgs as $msg) {
 					$this->zbxTestTextPresent($msg);
 				}
@@ -149,10 +148,10 @@ class testTemplateInheritance extends CWebTest {
 			case TEST_GOOD:
 				// check that the inherited item matches the original
 				$this->zbxTestOpen('hosts.php');
-				$this->zbxTestClickWait('link='.$this->hostName);
-				$this->zbxTestClickWait('link=Items');
-				$this->zbxTestTextPresent("$template: $itemName");
-				$this->zbxTestClickWait("link=$itemName");
+				$this->zbxTestClickLinkText($this->hostName);
+				$this->zbxTestClickLinkText('Items');
+				$this->assertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
+				$this->zbxTestClickLinkText($itemName);
 				$this->assertElementValue('name', $itemName);
 				$this->assertElementValue('key', $keyName);
 				$this->assertElementValue('typename', 'Simple check');
@@ -163,8 +162,10 @@ class testTemplateInheritance extends CWebTest {
 				$this->assertElementValue('delay', '33');
 				$this->assertElementValue('history', '54');
 				$this->assertElementValue('trends', '55');
-				$this->assertElementText('description', 'description');
+				$this->assertElementText('//*[@name="description"]', 'description');
 				$this->assertElementValue('delta_name', 'Delta (simple change)');
+				$this->zbxTestTextPresent('Parent items');
+				$this->zbxTestTextPresent($template);
 				break;
 			case TEST_BAD:
 				break;
@@ -179,15 +180,18 @@ class testTemplateInheritance extends CWebTest {
 		$hostid = $row['hostid'];
 
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
+		$this->zbxTestClickLinkText($this->hostName);
 
 		$this->zbxTestClick('tab_templateTab');
-		sleep(1);
+		$this->zbxTestTextPresent('Template App Zabbix Agent');
+		$this->zbxWaitUntilElementVisible(WebdriverBy::id('unlink_and_clear_'.$hostid));
 		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestTextNotPresent('Template App Zabbix Agent');
 
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Host updated');
 	}
+
 	/**
 	 * Creates a new trigger on the template and checks that the inherited trigger matches the original.
 	 *
@@ -197,8 +201,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		// create a trigger
-		$this->zbxTestClickWait('link='.$this->templateName);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+		$this->zbxTestClickLinkText($this->templateName);
+		$this->zbxTestClickLinkText('Triggers');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('description', 'Test LLD trigger1');
@@ -206,26 +210,28 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
-		$this->zbxTestClick('priority_label_2');
+		$this->zbxTestClickXpath("//label[@for='priority_2']");
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
+		$this->zbxTestTextPresent('Trigger added');
 
 		// check that the inherited trigger matches the original
 		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Triggers']");
+		$this->zbxTestClickLinkText($this->hostName);
+		$this->zbxTestClickLinkText('Triggers');
 
-		$this->zbxTestTextPresent($this->templateName.': Test LLD trigger1');
-		$this->zbxTestClickWait('link=Test LLD trigger1');
+		$this->assertElementText("//a[text()='Test LLD trigger1']/parent::td", "$this->templateName: Test LLD trigger1");
+		$this->zbxTestClickLinkText('Test LLD trigger1');
 
 		$this->assertElementValue('description', 'Test LLD trigger1');
 		$this->assertElementValue('expression', '{Template inheritance test host:test-general-item.last(0)}=0');
-		$this->assertTrue($this->isChecked('type'));
-		$this->assertElementText('comments', 'comments');
+		$this->assertTrue($this->zbxTestCheckboxSelected('type'));
+		$this->assertElementText('//*[@name="comments"]', 'comments');
 		$this->assertElementValue('url', 'url');
-		$this->assertTrue($this->isChecked('priority_2'));
-		$this->assertFalse($this->isChecked('status'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
+		$this->zbxTestTextPresent('Parent triggers');
 	}
 
 	/**
@@ -237,8 +243,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		// create a graph
-		$this->zbxTestClickWait('link='.$this->templateName);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+		$this->zbxTestClickLinkText($this->templateName);
+		$this->zbxTestClickLinkText('Graphs');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD graph1');
@@ -249,41 +255,42 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
+		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
-		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 		$this->zbxTestClick('add_item');
 
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->zbxTestClick('link=Test LLD item1');
-		$this->selectWindow(null);
+		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestClickLinkText('Test LLD item1');
+		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClick('add');
+		$this->zbxTestTextPresent('Graph added');
 
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Graphs']");
+		$this->zbxTestClickLinkText($this->hostName);
+		$this->zbxTestClickLinkText('Graphs');
 
-		$this->zbxTestTextPresent($this->templateName.': Test LLD graph1');
-		$this->zbxTestClickWait('link=Test LLD graph1');
+		$this->assertElementText("//a[text()='Test LLD graph1']/parent::td", "$this->templateName: Test LLD graph1");
+		$this->zbxTestClickLinkText('Test LLD graph1');
 
 		$this->assertElementValue('name', 'Test LLD graph1');
 		$this->assertElementValue('width', '950');
 		$this->assertElementValue('height', '250');
-		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
-		$this->assertFalse($this->isChecked('show_legend'));
-		$this->assertFalse($this->isChecked('show_work_period'));
-		$this->assertFalse($this->isChecked('show_triggers'));
-		$this->assertTrue($this->isChecked('visible_percent_left'));
+		$this->zbxTestDrowpdownAssertSelected('graphtype', 'Normal');
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
 		$this->assertElementValue('percent_left', '4.00');
-		$this->assertTrue($this->isChecked('visible_percent_right'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
 		$this->assertElementValue('percent_right', '5.00');
-		$this->assertAttribute('//*[@id="ymin_type"]/option[1]/@selected', 'selected');
-		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
-		$this->zbxTestTextPresent('Template inheritance test host: Test LLD item1');
+		$this->zbxTestDrowpdownAssertSelected('ymin_type', 'Calculated');
+		$this->zbxTestDrowpdownAssertSelected('ymax_type', 'Calculated');
+		$this->zbxTestTextPresent('Parent graphs');
+		$this->zbxTestTextPresent($this->hostName.': Test LLD item1');
 	}
 
 	/**
@@ -296,8 +303,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		// create an LLD rule
-		$this->zbxTestClickWait('link='.$this->templateName);
-		$this->zbxTestClickWait('link=Discovery rules');
+		$this->zbxTestClickLinkText($this->templateName);
+		$this->zbxTestClickLinkText('Discovery rules');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD');
@@ -305,33 +312,32 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->input_type('delay', '31');
 		$this->input_type('lifetime', '32');
-		$this->input_type('filter_macro', 'macro');
-		$this->input_type('filter_value', 'regexp');
 		$this->input_type('description', 'description');
-		$this->assertAttribute('//*[@id="status"]/@checked', 'checked');
+		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('add');
+		$this->zbxTestTextPresent('Discovery rule created');
 
 		// check that the inherited rule matches the original
 		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestTextPresent($this->templateName.': Test LLD');
-		$this->zbxTestClickWait('link=Test LLD');
+		$this->zbxTestClickLinkText($this->hostName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->assertElementText("//a[text()='Test LLD']/parent::td", "$this->templateName: Test LLD");
+		$this->zbxTestClickLinkText('Test LLD');
 
 		$this->assertElementValue('name', 'Test LLD');
 		$this->assertElementValue('key', 'test-lld');
 		$this->assertElementValue('typename', 'Simple check');
 		$this->assertElementValue('delay', '31');
 		$this->assertElementValue('lifetime', '32');
-		$this->assertElementValue('filter_macro', 'macro');
-		$this->assertElementValue('filter_value', 'regexp');
-		$this->assertElementText('description', 'description');
-		$this->zbxTestCheckboxSelect('status', false);
+		$this->assertElementText('//*[@name="description"]', 'description');
+		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
+		$this->zbxTestTextPresent('Parent discovery rules');
+		$this->zbxTestTextPresent($this->templateName);
 	}
 
 	/**
-	 * Creates a new trigger prototype on the template and checks that the inherited item prototype matches
+	 * Creates a new item prototype on the template and checks that the inherited item prototype matches
 	 * the original.
 	 *
 	 * @todo match fields for different item types
@@ -342,10 +348,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		// create an item prototype
-		$this->zbxTestClickWait('link='.$this->templateName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Test LLD');
-		$this->zbxTestClickWait('link=Item prototypes');
+		$this->zbxTestClickLinkText($this->templateName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkText('Test LLD');
+		$this->zbxTestClickLinkText('Item prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD item');
@@ -364,15 +370,17 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
+		$this->zbxTestTextPresent('Item prototype added');
+		$this->zbxTestTextPresent('Test LLD item');
 
 		// check that the inherited item prototype matches the original
 		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Test LLD');
-		$this->zbxTestClickWait('link=Item prototypes');
-		$this->zbxTestTextPresent($this->templateName.': Test LLD item');
-		$this->zbxTestClickWait('link=Test LLD item');
+		$this->zbxTestClickLinkText($this->hostName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkText('Test LLD');
+		$this->zbxTestClickLinkText('Item prototypes');
+		$this->assertElementText("//a[text()='Test LLD item']/parent::td", "$this->templateName: Test LLD item");
+		$this->zbxTestClickLinkText('Test LLD item');
 
 		$this->assertElementValue('name', 'Test LLD item');
 		$this->assertElementValue('key', 'test-lld-item');
@@ -384,8 +392,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertElementValue('delay', '33');
 		$this->assertElementValue('history', '54');
 		$this->assertElementValue('trends', '55');
-		$this->assertElementText('description', 'description');
+		$this->assertElementText('//*[@name="description"]', 'description');
 		$this->assertElementValue('delta_name', 'Delta (simple change)');
+		$this->zbxTestTextPresent('Parent items');
+		$this->zbxTestTextPresent($this->templateName);
 	}
 
 	/**
@@ -397,10 +407,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		// create a trigger prototype
-		$this->zbxTestClickWait('link='.$this->templateName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Test LLD');
-		$this->zbxTestClickWait('link=Trigger prototypes');
+		$this->zbxTestClickLinkText($this->templateName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkText('Test LLD');
+		$this->zbxTestClickLinkText('Trigger prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('description', 'Test LLD trigger');
@@ -408,27 +418,31 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('type');
 		$this->input_type('comments', 'comments');
 		$this->input_type('url', 'url');
-		$this->zbxTestClick('priority_label_2');
+		$this->zbxTestClickXpath("//label[@for='priority_2']");
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
+		$this->zbxTestTextPresent('Trigger prototype added');
+		$this->zbxTestTextPresent('Test LLD trigger');
 
 		// check that the inherited trigger prototype matches the original
 		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Test LLD');
-		$this->zbxTestClickWait('link=Trigger prototypes');
-		$this->zbxTestTextPresent($this->templateName.': Test LLD trigger');
-		$this->zbxTestClickWait('link=Test LLD trigger');
+		$this->zbxTestClickLinkText($this->hostName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkText('Test LLD');
+		$this->zbxTestClickLinkText('Trigger prototypes');
+		$this->assertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
+		$this->zbxTestClickLinkText('Test LLD trigger');
 
 		$this->assertElementValue('description', 'Test LLD trigger');
 		$this->assertElementValue('expression', '{Template inheritance test host:test-lld-item.last(0)}=0');
-		$this->assertTrue($this->isChecked('type'));
-		$this->assertElementText('comments', 'comments');
+		$this->assertTrue($this->zbxTestCheckboxSelected('type'));
+		$this->assertElementText('//*[@name="comments"]', 'comments');
 		$this->assertElementValue('url', 'url');
-		$this->assertTrue($this->isChecked('priority_2'));
-		$this->assertFalse($this->isChecked('status'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
+		$this->zbxTestTextPresent('Parent triggers');
+		$this->zbxTestTextPresent($this->templateName);
 	}
 
 	/**
@@ -439,10 +453,10 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		// create a graph
-		$this->zbxTestClickWait('link='.$this->templateName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Test LLD');
-		$this->zbxTestClickWait('link=Graph prototypes');
+		$this->zbxTestClickLinkText($this->templateName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkText('Test LLD');
+		$this->zbxTestClickLinkText('Graph prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD graph');
@@ -453,53 +467,55 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
+		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->input_type('percent_left', '4');
 		$this->input_type('percent_right', '5');
-		$this->zbxTestCheckboxSelect('visible_percent_right');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
 		$this->zbxTestClick('add_protoitem');
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->zbxTestClick("//span[text()='Test LLD item']");
-		$this->selectWindow(null);
-		sleep(1);
+		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestClickLinkText('Test LLD item');
+		$this->webDriver->switchTo()->window('');
+		$this->zbxTestTextPresent($this->templateName.': Test LLD item');
 
 		$this->zbxTestClick('add_item');
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->zbxTestClick('link=Test LLD item1');
-		$this->selectWindow(null);
-		sleep(1);
+		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestClickLinkText('Test LLD item1');
+		$this->webDriver->switchTo()->window('');
+		$this->zbxTestTextPresent($this->templateName.': Test LLD item1');
 
 		$this->zbxTestClick('add');
+		$this->zbxTestTextPresent('Graph prototype added');
+		$this->zbxTestTextPresent('Test LLD graph');
 
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen('hosts.php');
-		$this->zbxTestClickWait('link='.$this->hostName);
-		$this->zbxTestClickWait('link=Discovery rules');
-		$this->zbxTestClickWait('link=Test LLD');
-		$this->zbxTestClickWait('link=Graph prototypes');
+		$this->zbxTestClickLinkText($this->hostName);
+		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkText('Test LLD');
+		$this->zbxTestClickLinkText('Graph prototypes');
 
-		$this->zbxTestTextPresent($this->templateName.': Test LLD graph');
-		$this->zbxTestClickWait('link=Test LLD graph');
+		$this->assertElementText("//a[text()='Test LLD graph']/parent::td", "$this->templateName: Test LLD graph");
+		$this->zbxTestClickLinkText('Test LLD graph');
 
 		$this->assertElementValue('name', 'Test LLD graph');
 		$this->assertElementValue('width', '950');
 		$this->assertElementValue('height', '250');
-		$this->assertAttribute('//*[@id="graphtype"]/option[1]/@selected', 'selected');
-		$this->assertFalse($this->isChecked('show_legend'));
-		$this->assertFalse($this->isChecked('show_work_period'));
-		$this->assertFalse($this->isChecked('show_triggers'));
-		$this->assertTrue($this->isChecked('visible_percent_left'));
+		$this->zbxTestDrowpdownAssertSelected('graphtype', 'Normal');
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
 		$this->assertElementValue('percent_left', '4.00');
-		$this->assertTrue($this->isChecked('visible_percent_right'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
 		$this->assertElementValue('percent_right', '5.00');
-		$this->assertAttribute('//*[@id="ymin_type"]/option[1]/@selected', 'selected');
-		$this->assertAttribute('//*[@id="ymax_type"]/option[1]/@selected', 'selected');
-		$this->zbxTestTextPresent('Template inheritance test host: Test LLD item');
-		$this->zbxTestTextPresent('Template inheritance test host: Test LLD item1');
+		$this->zbxTestDrowpdownAssertSelected('ymin_type', 'Calculated');
+		$this->zbxTestDrowpdownAssertSelected('ymax_type', 'Calculated');
+		$this->zbxTestTextPresent($this->hostName.': Test LLD item');
+		$this->zbxTestTextPresent($this->hostName.': Test LLD item1');
+		$this->zbxTestTextPresent('Parent graphs');
+		$this->zbxTestTextPresent($this->templateName);
 	}
 
 	/**

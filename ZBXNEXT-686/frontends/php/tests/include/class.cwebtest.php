@@ -64,6 +64,13 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		'Sign out'
 	];
 
+	protected function putBreak() {
+		fwrite(STDOUT, "\033[s    \033[93m[Breakpoint] Press \033[1;93m[RETURN]\033[0;93m to continue...\033[0m");
+			while (fgets(STDIN, 1024) == '') {}
+			fwrite(STDOUT, "\033[u");
+		return;
+		}
+
 	protected function setUp() {
 		global $DB;
 
@@ -214,10 +221,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@href,'$a')]"))->click();
 	}
 
-	public function zbxTestClickOnclick($a) {
-		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@onclick,'$a')]"))->click();
-	}
-
 	public function zbxTestCheckboxSelect($a, $select = true) {
 		$checkbox = $this->webDriver->findElement(WebDriverBy::id($a));
 		if ($select != $checkbox->isSelected()) {
@@ -225,12 +228,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function zbxTestCheckboxSelected($id, $select = true) {
+		return $this->webDriver->findElement(WebDriverBy::id($id))->isSelected();
+	}
+
 	public function zbxTestClickButton($value) {
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[@value='".$value."']"))->click();
 	}
 
 	public function input_type($id, $str) {
-		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
+		$this->webDriver->findElement(WebDriverBy::id($id))->clear()->sendKeys($str);
 	}
 
 	public function zbxTestInputTypeByXpath($xpath, $str) {
@@ -252,7 +259,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestDropdownSelect($id, $string) {
-		$attribute = $this->zbXisElementPresent(WebDriverBy::xpath("//select[@id='".$id."']")) ? 'id' : 'name';
+		$attribute = $this->zbxIsElementPresent(WebDriverBy::xpath("//select[@id='".$id."']")) ? 'id' : 'name';
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@".$attribute."='".$id."']"));
 
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@".$attribute."='".$id."']//option[text()='".$string."']"));
@@ -282,6 +289,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(true);
 	}
 
+	public function zbxAssertAttribute($xpath, $attribute, $value) {
+		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath));
+		$this->assertEquals($element->getAttribute($attribute), $value);
+	}
+
 	public function zbxAssertElementNotPresent($by) {
 		$elements = $this->webDriver->findElements($by);
 
@@ -299,6 +311,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	public function zbxWaitUntil($condition, $message) {
 		$this->webDriver->wait(5)->until($condition, $message);
 		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function zbxWaitUntilElementVisible($by) {
+		$this->webDriver->wait(5)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 5 sec element still not visible');
 	}
 
 	/**
@@ -325,11 +341,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	// zbx_popup is the default opened window id if none is passed
 	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
-		// the above does not seem to work, thus this ugly method has to be used - at least until buttons get unique names...
-		$this->click("//input[@id='$buttonId']");	// and contains(@onclick, 'return PopUp')
-		$this->waitForPopUp($windowId, 6000);
-		$this->selectWindow($windowId);
-		$this->zbxTestCheckFatalErrors();
+		$this->zbxTestClick($buttonId);
+		$this->zbxWaitWindowAndSwitchToIt($windowId);
 	}
 
 	public function zbxWaitWindowAndSwitchToIt($id) {
@@ -361,24 +374,27 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Assert that the element with the given name has a specific value.
+	 * Assert that the element with the given id has a specific value.
 	 *
 	 * @param $name
 	 * @param $value
 	 */
-	public function assertElementValue($name, $value) {
-		$this->webDriver->findElement(WebDriverBy::xpath("//*[@name='".$name."' and @value='".$value."']"));
+	public function assertElementValue($id, $value) {
+		$element = $this->webDriver->findElement(WebDriverBy::id($id));
+		$this->assertEquals($element->getAttribute('value'), $value);
 	}
 
 	/**
-	 * Assert that the element with the given name contains a specific text.
+	 * Assert that the element with the given xpath contains a specific text.
 	 *
-	 * @param $name
+	 * @param $xpath
 	 * @param $text
 	 */
-	public function assertElementText($name, $text) {
-		$this->assertElementPresent("//*[@name='".$name."' and text()='".$text."']");
+	public function assertElementText($xpath, $text){
+		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath));
+		$this->assertEquals($text, $element->getText());
 	}
+
 
 	// check that page does not have real (not visible) host or template names
 	public function checkNoRealHostnames() {

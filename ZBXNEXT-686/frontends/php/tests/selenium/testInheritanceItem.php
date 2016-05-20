@@ -98,7 +98,7 @@ class testInheritanceItem extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestTextPresent('Item added');
 
 				$itemId = 0;
@@ -135,8 +135,8 @@ class testInheritanceItem extends CWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-				$this->zbxTestTextPresent('ERROR: Cannot add item');
+				$this->zbxTestCheckHeader('Items');
+				$this->zbxTestTextPresent('Cannot add item');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

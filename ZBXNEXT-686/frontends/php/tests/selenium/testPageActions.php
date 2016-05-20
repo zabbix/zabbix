@@ -221,12 +221,12 @@ class testPageActions extends CWebTest {
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$this->zbxTestClickOnclick('actionid[]='.$action['actionid'].'&');
+				$this->zbxTestClickXpath("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
 				$this->zbxTestTextPresent('Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
-				$this->zbxTestClickOnclick('actionid[]='.$action['actionid'].'&');
+				$this->zbxTestClickXpath("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
 				$this->zbxTestTextPresent('Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;
 				break;

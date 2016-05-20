@@ -77,6 +77,19 @@ class testInheritanceWeb extends CWebTest {
 						['name' => 'testInheritanceStep1', 'url' => 'http://testInheritanceStep1/']
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => 'testInheritanceWeb1',
+					'addStep' => [
+						['name' => 'testInheritanceStep1', 'url' => 'http://testInheritanceStep1/']
+					],
+					'errors' => [
+						'Cannot add web scenario',
+						'Web scenario "testInheritanceWeb1" already exists.'
+					]
+				]
 			]
 		];
 	}
@@ -95,8 +108,9 @@ class testInheritanceWeb extends CWebTest {
 			$this->input_type('name', $step['name']);
 			$this->input_type('url', $step['url']);
 			$this->zbxTestClick('add');
-			$this->selectWindow();
-			sleep(1);
+			$this->webDriver->switchTo()->window('');
+			$this->zbxWaitUntilElementVisible(WebdriverBy::id('add'));
+			$this->zbxTestTextPresent($data['name']);
 		}
 
 		$this->zbxTestClickWait('add');
@@ -104,13 +118,13 @@ class testInheritanceWeb extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
-				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
+				$this->zbxTestCheckHeader('Web monitoring');
 				$this->zbxTestTextPresent('Web scenario added');
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
-				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
+				$this->zbxTestCheckHeader('Web monitoring');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

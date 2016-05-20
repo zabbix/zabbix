@@ -96,7 +96,7 @@ class testInheritanceDiscoveryRule extends CWebTest {
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
-				$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+				$this->zbxTestCheckHeader('Discovery rules');
 				$this->zbxTestTextPresent('Discovery rule created');
 
 				$itemId = 0;
@@ -133,8 +133,8 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of discovery rules');
-				$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
-				$this->zbxTestTextPresent('ERROR: Cannot add discovery rule');
+				$this->zbxTestCheckHeader('Discovery rules');
+				$this->zbxTestTextPresent('Cannot add discovery rule');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}
