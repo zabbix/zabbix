@@ -243,165 +243,8 @@ static void	process_maintenance_hosts(zbx_host_maintenance_t **hm, int *hm_alloc
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: get_trigger_values                                               *
- *                                                                            *
- * Purpose: get trigger values for specified period                           *
- *                                                                            *
- * Parameters: triggerid        - [IN] trigger identifier from database       *
- *             maintenance_from - [IN] maintenance period start               *
- *             value_before     - [OUT] trigger value before maintenance      *
- *             value_inside     - [OUT] trigger value inside maintenance      *
- *                                      (only if value_before=value_after)    *
- *             value_after      - [IN] trigger value after maintenance        *
- *                                                                            *
- * Return value: SUCCEED if found event with OK or PROBLEM statuses           *
- *                                                                            *
- ******************************************************************************/
-static void	get_trigger_values(zbx_uint64_t triggerid, int maintenance_from, unsigned char *value_before,
-		unsigned char *value_inside, unsigned char value_after)
-{
-	const char	*__function_name = "get_trigger_values";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		sql[256];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() from:'%s %s'", __function_name,
-			zbx_date2str(maintenance_from), zbx_time2str(maintenance_from));
-
-	/* check for value before maintenance period */
-	zbx_snprintf(sql, sizeof(sql),
-			"select value"
-			" from events"
-			" where source=%d"
-				" and object=%d"
-				" and objectid=" ZBX_FS_UI64
-				" and clock<%d"
-			" order by eventid desc",
-			EVENT_SOURCE_TRIGGERS,
-			EVENT_OBJECT_TRIGGER,
-			triggerid,
-			maintenance_from);
-
-	result = DBselectN(sql, 1);
-
-	if (NULL != (row = DBfetch(result)))
-		*value_before = atoi(row[0]);
-	else
-		*value_before = TRIGGER_VALUE_UNKNOWN;
-	DBfree_result(result);
-
-	if (value_after != *value_before)
-	{
-		*value_inside = TRIGGER_VALUE_UNKNOWN;	/* not important what value is here */
-		goto out;
-	}
-
-	/* check for value inside maintenance period */
-	zbx_snprintf(sql, sizeof(sql),
-			"select value"
-			" from events"
-			" where source=%d"
-				" and object=%d"
-				" and objectid=" ZBX_FS_UI64
-				" and clock>=%d"
-				" and value=%d",
-			EVENT_SOURCE_TRIGGERS,
-			EVENT_OBJECT_TRIGGER,
-			triggerid,
-			maintenance_from,
-			value_after == TRIGGER_VALUE_OK ? TRIGGER_VALUE_PROBLEM : TRIGGER_VALUE_OK);
-
-	result = DBselectN(sql, 1);
-
-	if (NULL != (row = DBfetch(result)))
-		*value_inside = atoi(row[0]);
-	else
-		*value_inside = *value_before;
-	DBfree_result(result);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() before:%d inside:%d after:%d",
-			__function_name, (int)*value_before, (int)*value_inside, (int)value_after);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: generate_events                                                  *
- *                                                                            *
- * Purpose: Generate events for triggers after maintenance period. Events     *
- *          will be generated if trigger value changed during maintenance.    *
- *                                                                            *
- * Parameters: hostid - host identifier from database                         *
- *             maintenance_from, maintenance_to - maintenance period bounds   *
- *                                                                            *
- ******************************************************************************/
-static void	generate_events(zbx_uint64_t hostid, int maintenance_from, int maintenance_to)
-{
-	const char	*__function_name = "generate_events";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	triggerid;
-	zbx_timespec_t	ts;
-	unsigned char	value_before, value_inside, value_after;
-
-	ts.sec = maintenance_to;
-	ts.ns = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	result = DBselect(
-			"select distinct t.triggerid,t.description,t.expression,t.priority,t.type,t.lastchange,t.value,"
-				"t.recovery_expression"
-			" from triggers t,functions f,items i"
-			" where t.triggerid=f.triggerid"
-				" and f.itemid=i.itemid"
-				" and t.status=%d"
-				" and i.status=%d"
-				" and i.state=%d"
-				" and i.hostid=" ZBX_FS_UI64,
-			TRIGGER_STATUS_ENABLED,
-			ITEM_STATUS_ACTIVE,
-			ITEM_STATE_NORMAL,
-			hostid);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		if (atoi(row[5]) < maintenance_from)	/* if no events inside maintenance */
-			continue;
-
-		ZBX_STR2UINT64(triggerid, row[0]);
-		ZBX_STR2UCHAR(value_after, row[6]);
-
-		get_trigger_values(triggerid, maintenance_from, &value_before, &value_inside, value_after);
-
-		if (value_before == value_inside && value_inside == value_after)
-			continue;
-
-		add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, &ts, value_after,
-				row[1], row[2], row[7], (unsigned char)atoi(row[3]), (unsigned char)atoi(row[4]), NULL);
-	}
-	DBfree_result(result);
-
-	process_events();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
 static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, int now)
 {
-	typedef struct
-	{
-		zbx_uint64_t	hostid;
-		int		maintenance_from;
-		void		*next;
-	}
-	maintenance_t;
-
 	const char	*__function_name = "update_maintenance_hosts";
 	int		i;
 	zbx_uint64_t	*ids = NULL, hostid;
@@ -410,7 +253,6 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
 	DB_ROW		row;
 	char		*sql = NULL;
 	size_t		sql_alloc = ZBX_KIBIBYTE, sql_offset;
-	maintenance_t	*maintenances = NULL, *m;
 	int		ret = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -489,15 +331,6 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
 		ZBX_STR2UINT64(hostid, row[0]);
 
 		uint64_array_add(&ids, &ids_alloc, &ids_num, hostid, 4);
-
-		if (MAINTENANCE_TYPE_NORMAL != atoi(row[2]))
-			continue;
-
-		m = zbx_malloc(NULL, sizeof(maintenance_t));
-		m->hostid = hostid;
-		m->maintenance_from = atoi(row[3]);
-		m->next = maintenances;
-		maintenances = m;
 	}
 	DBfree_result(result);
 
@@ -526,15 +359,6 @@ static int	update_maintenance_hosts(zbx_host_maintenance_t *hm, int hm_count, in
 
 	zbx_free(sql);
 	zbx_free(ids);
-
-	for (m = maintenances; NULL != m; m = m->next)
-		generate_events(m->hostid, m->maintenance_from, now);
-
-	for (m = maintenances; NULL != m; m = maintenances)
-	{
-		maintenances = m->next;
-		zbx_free(m);
-	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
