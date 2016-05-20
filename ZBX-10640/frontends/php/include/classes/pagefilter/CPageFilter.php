@@ -253,7 +253,11 @@ class CPageFilter {
 
 		// groups
 		if (isset($options['groups'])) {
-			$this->_initGroups($options['groupid'], $options['groups'], isset($options['hostid']) ? $options['hostid'] : null);
+			$this->_initGroups(
+				$options['groupid'],
+				$options['groups'],
+				$this->_requestIds['hostid'] === null ? $this->_profileIds['hostid'] : $this->_requestIds['hostid']
+			);
 		}
 
 		// hosts
@@ -420,7 +424,7 @@ class CPageFilter {
 		// nonexisting or unset $groupId
 		if ((!isset($this->data['groups'][$groupId]) && $groupId > 0) || $groupId === null) {
 			// for popup select first group in the list
-			if ($this->config['popupDD'] && $this->data['groups']) {
+			if ($this->config['popupDD'] && $this->data['groups'] && !$hostId) {
 				reset($this->data['groups']);
 				$groupId = key($this->data['groups']);
 			}
