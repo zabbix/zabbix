@@ -3270,10 +3270,6 @@ td.inactive-bg {
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
-	max-height: 300px;
-    padding: 0 5px 0 0;
-    overflow-y: auto;
-    @extend %webkit-scrollbar;
 
 	.link-action {
 		position: absolute;
@@ -3284,6 +3280,10 @@ td.inactive-bg {
 
 	ul {
 		font-size: $font-msg-reset-size;
+		max-height: 300px;
+		padding: 0 5px 0 0;
+		overflow-y: auto;
+		@extend %webkit-scrollbar;
 
 		li {
 			margin: .5em 0 .5em 1em;
@@ -3318,7 +3318,7 @@ td.inactive-bg {
 
 %msg {
 	font-size: $font-top-nav-size;
-	padding: 7px 15px;
+	padding: 7px 20px 7px 15px;
 	margin: 0 0 12px 0;
 	text-align: center;
 	position: relative;
