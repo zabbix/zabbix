@@ -24,6 +24,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+...GI..... [ZBX-10760] fixed agent, get and sender being erroneously linked against UnixODBC (gleb)
 ..F....... [ZBX-10647] removed disabled status for "Export to CSV" button (Ivo)
 ..F....... [ZBX-10679] fixed vertical scrollbar overlapping in messages (Pavel)
 ..F....... [ZBX-10778] fixed users online status in users.php users table (Cemeris, Gunars)
