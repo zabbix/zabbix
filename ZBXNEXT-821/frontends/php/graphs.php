@@ -217,8 +217,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	// create and update graph prototypes
 	if (hasRequest('parent_discoveryid')) {
-		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 		if (hasRequest('graphid')) {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::GraphPrototype()->update($graph);
