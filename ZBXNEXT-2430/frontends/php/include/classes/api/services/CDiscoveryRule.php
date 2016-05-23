@@ -645,7 +645,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			/*
-			 * Search for original dependant triggers and expressions to find corresponding triggers on destination host
+			 * Search for original dependent triggers and expressions to find corresponding triggers on destination host
 			 * with same expression.
 			 */
 			$dep_triggers = API::Trigger()->get([
@@ -666,7 +666,7 @@ class CDiscoveryRule extends CItemGeneral {
 						$dep_triggerid = $dependency['triggerid'];
 
 						/*
-						 * We have added a dependant trigger prototype and we know corresponding trigger prototype ID
+						 * We have added a dependent trigger prototype and we know corresponding trigger prototype ID
 						 * for newly created trigger prototype.
 						 */
 						if (array_key_exists($dependency['triggerid'], $new_trigger_prototypes)) {
