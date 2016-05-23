@@ -1576,13 +1576,20 @@ static int	DBpatch_2010101(void)
 				quote_key_param(&param, 0);
 			quote_key_param(&dsn, 0);
 
-			key_offset = 0;
-			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
+			if (NULL == param)
+				error_message = zbx_dsprintf(error_message, "\"%s\" cannot be quoted", param);
+			else if (NULL == dsn)
+				error_message = zbx_dsprintf(error_message, "\"%s\" cannot be quoted", dsn);
+			else
+			{
+				key_offset = 0;
+				zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
 
-			zbx_free(param);
+				zbx_free(param);
 
-			if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
-				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+				if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+					error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+			}
 		}
 
 		if (NULL == error_message)
