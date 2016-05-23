@@ -1,7 +1,6 @@
 Changes for 3.1.0
 
 New features:
-..F....... [ZBX-10804] fixed php comment typo 'dependant' to 'dependent' (Cemeris)
 A.F.....S. [ZBXNEXT-3196] added action option to pause escalations during maintenance (Gunars, wiper)
 A.F....... [ZBXNEXT-178] implemented web scenarios import/export (Sasha)
 A.F.....S. [ZBXNEXT-2087] added trigger and event tags (Gunars, wiper)
