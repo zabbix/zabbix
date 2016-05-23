@@ -220,10 +220,10 @@ static char 	**extract_numbers(const char *str, int *count)
 		if (!isdigit(*s))
 			continue;
 
-		if (s != str && '{' == *(s - 1))
+		if (s != str && '{' == *(s - 1) && NULL != (e = strchr(s, '}')))
 		{
 			/* skip functions '{65432}' */
-			s = strchr(s, '}');
+			s = e;
 			continue;
 		}
 
@@ -2333,22 +2333,41 @@ static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
  * Purpose: wrap a replacement string that represents a negative number in    *
  *          parentheses (for instance, turn "-123.456M" into "(-123.456M)")   *
  *                                                                            *
- * Parameters: replace_to - [IN] replacement string                           *
- *                                                                            *
- * Return value: wrapped "replace_to" if negative, original string otherwise  *
+ * Parameters: replace_to       - [IN/OUT] replacement string                 *
+ *             replace_to_alloc - [IN/OUT] number of allocated bytes          *
  *                                                                            *
  ******************************************************************************/
-static char	*wrap_negative_double_suffix(char *replace_to)
+static void	wrap_negative_double_suffix(char **replace_to, size_t *replace_to_alloc)
 {
-	char	*wrapped;
+	size_t	replace_to_len;
 
-	if ('-' != *replace_to)
-		return replace_to;
+	if ('-' != (*replace_to)[0])
+		return;
 
-	wrapped = zbx_dsprintf(NULL, "(%s)", replace_to);
-	zbx_free(replace_to);
+	replace_to_len = strlen(*replace_to);
 
-	return wrapped;
+	if (NULL != replace_to_alloc && *replace_to_alloc >= replace_to_len + 3)
+	{
+		memmove(*replace_to + 1, *replace_to, replace_to_len);
+	}
+	else
+	{
+		char	*buffer;
+
+		if (NULL != replace_to_alloc)
+			*replace_to_alloc = replace_to_len + 3;
+
+		buffer = zbx_malloc(NULL, replace_to_len + 3);
+
+		memcpy(buffer + 1, *replace_to, replace_to_len);
+
+		zbx_free(*replace_to);
+		*replace_to = buffer;
+	}
+
+	(*replace_to)[0] = '(';
+	(*replace_to)[replace_to_len + 1] = ')';
+	(*replace_to)[replace_to_len + 2] = '\0';
 }
 
 /******************************************************************************
@@ -2366,7 +2385,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 {
 	const char		*__function_name = "substitute_simple_macros";
 
-	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
+	char			*p, *p_next, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
 	int			N_functionid, indexed_macro, require_numeric, ret, res = SUCCEED;
 	size_t			data_alloc, data_len;
@@ -2402,6 +2421,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
 	{
+		p_next = bl + 1;
+
 		indexed_macro = 0;
 		require_numeric = 0;
 
@@ -2413,11 +2434,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
 			{
-				p = bl + 1;
+				p = p_next;
 				continue;
 			}
 
 			br = bl + macro_r;
+			p_next = br + 1;
 		}
 		else
 		{
@@ -3523,7 +3545,9 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		}
 		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_ALERT))
 		{
-			if (0 == strcmp(m, MVAR_ALERT_SENDTO))
+			if (0 == strncmp(m, "{$", 2))	/* user defined macros are not supported here */
+				p_next = bl + 1;
+			else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
 				replace_to = zbx_strdup(replace_to, alert->sendto);
 			else if (0 == strcmp(m, MVAR_ALERT_SUBJECT))
 				replace_to = zbx_strdup(replace_to, alert->subject);
@@ -3534,7 +3558,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		if (1 == require_numeric && NULL != replace_to)
 		{
 			if (SUCCEED == (res = is_double_suffix(replace_to)))
-				replace_to = wrap_negative_double_suffix(replace_to);
+				wrap_negative_double_suffix(&replace_to, NULL);
 			else if (NULL != error)
 				zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 		}
@@ -3571,12 +3595,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			}
 
 			memcpy(bl, replace_to, sz_r);
-			p = bl + sz_r;
+			p_next = bl + sz_r;
 
 			zbx_free(replace_to);
 		}
-		else
-			p = bl + 1;
+
+		p = p_next;
 	}
 
 	zbx_vector_uint64_destroy(&hostids);
@@ -3879,9 +3903,8 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 
 			if (NULL == (br = strchr(bl, '}')))
 			{
-				tr[i].new_error = zbx_strdup(tr[i].new_error, "Invalid trigger expression");
-				tr[i].new_value = TRIGGER_VALUE_UNKNOWN;
-				THIS_SHOULD_NEVER_HAPPEN;
+				tr->new_error = zbx_strdup(tr->new_error, "Invalid trigger expression");
+				tr->new_value = TRIGGER_VALUE_UNKNOWN;
 				break;
 			}
 
@@ -4236,7 +4259,7 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 			{
 				if (SUCCEED == is_double_suffix(replace_to))
 				{
-					replace_to = wrap_negative_double_suffix(replace_to);
+					wrap_negative_double_suffix(&replace_to, &replace_to_alloc);
 				}
 				else
 				{
@@ -4290,7 +4313,8 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 			zbx_free(context);
 
 			/* move cursor to the end of user macro */
-			while ('}' != (*data)[r++])
+
+			while ('}' != (*data)[++r])
 				;
 		}
 		/* substitute LLD macros, located in the item key parameters in simple macros */

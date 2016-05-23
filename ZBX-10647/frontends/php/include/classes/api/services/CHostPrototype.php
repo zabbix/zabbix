@@ -870,7 +870,8 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'selectDiscoveryRule' => ['itemid']
+			'selectDiscoveryRule' => ['itemid'],
+			'selectInventory' => ['inventory_mode']
 		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
