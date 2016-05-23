@@ -2322,7 +2322,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
 	zbx_stopwatch_t		stopwatch;
-	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp, remaining_bytes = 0;
+	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp = 0, remaining_bytes = 0;
 	double			delay;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d is_count:%d filename:'%s' lastlogsize:" ZBX_FS_UI64
