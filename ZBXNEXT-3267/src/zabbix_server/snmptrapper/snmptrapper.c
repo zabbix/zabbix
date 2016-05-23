@@ -392,23 +392,21 @@ static void	parse_traps(int flag)
  *             log_level - [IN] the log entry log level                       *
  *                                                                            *
  ******************************************************************************/
-static void	delay_trap_logs(const char *message, int log_level)
+static void	delay_trap_logs(char *message, int log_level)
 {
-	const int	delay = 60;	/* repeated log entry delay time in seconds */
 	int		now;
-	static int	lastlogtime = 0;
-	static char	*previous_message = "";
-	const char	*tmp;
+	static int	lastlogtime = 0, previous_check = 0;
+	zbx_hash_t	check;
 
-	tmp = previous_message;
+	check = zbx_default_string_hash_func(message);
 
 	now = (int)time(NULL);
 
-	if (delay <= now - lastlogtime || 0 != strcmp(message, tmp))
+	if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || previous_check != (int)check)
 	{
-		zabbix_log(log_level, "%s \"%s\": %s",message, CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		zabbix_log(log_level, "%s", message);
 		lastlogtime = now;
-		previous_message = (char *)message;
+		previous_check = check;
 	}
 }
 
@@ -425,22 +423,25 @@ static int	read_traps()
 {
 	const char	*__function_name = "read_traps";
 	int		nbytes = 0;
+	char		*log_entry = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		char	*message = NULL;
-
-		message = zbx_dsprintf(message, "cannot set position to %d for", trap_lastsize);
-		delay_trap_logs(message, LOG_LEVEL_WARNING);
-		zbx_free(message);
+		log_entry = zbx_dsprintf(log_entry, "cannot set position to %d for \"%s\": %s", trap_lastsize,
+				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		delay_trap_logs(log_entry, LOG_LEVEL_WARNING);
+		zbx_free(log_entry);
 		goto exit;
 	}
 
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
-		delay_trap_logs("cannot read from SNMP trapper file", LOG_LEVEL_WARNING);
+		log_entry = zbx_dsprintf(log_entry, "cannot read from SNMP trapper file \"%s\": %s",
+				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		delay_trap_logs(log_entry, LOG_LEVEL_WARNING);
+		zbx_free(log_entry);
 		goto exit;
 	}
 
@@ -497,10 +498,15 @@ static void	close_trap_file()
 static int	open_trap_file()
 {
 	zbx_stat_t	file_buf;
+	char		*log_entry = NULL;
+
 
 	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
-		delay_trap_logs("cannot stat SNMP trapper file", LOG_LEVEL_CRIT);
+		log_entry = zbx_dsprintf(log_entry, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+				zbx_strerror(errno));
+		delay_trap_logs(log_entry, LOG_LEVEL_CRIT);
+		zbx_free(log_entry);
 		goto out;
 	}
 
@@ -521,7 +527,12 @@ static int	open_trap_file()
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
-			delay_trap_logs("cannot open SNMP trapper file", LOG_LEVEL_CRIT);
+		{
+			log_entry = zbx_dsprintf(log_entry, "cannot open SNMP trapper file \"%s\": %s",
+					CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+			delay_trap_logs(log_entry, LOG_LEVEL_CRIT);
+			zbx_free(log_entry);
+		}
 		goto out;
 	}
 
@@ -583,6 +594,7 @@ static int	get_latest_data()
 
 			close_trap_file();
 		}
+		/* in case when file access permission is changed and read permission is denied */
 		else if (0 != access(CONFIG_SNMPTRAP_FILE, R_OK))
 		{
 			if (EACCES == errno)
