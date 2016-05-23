@@ -200,8 +200,8 @@ $itemId = getRequest('itemid');
 if ($itemId) {
 	$items = API::Item()->get([
 		'output' => ['itemid'],
-		'itemids' => $itemId,
 		'selectHosts' => ['status'],
+		'itemids' => $itemId,
 		'editable' => true
 	]);
 	if (!$items) {
