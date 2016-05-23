@@ -72,10 +72,13 @@ foreach ($this->data['images'] as $image) {
 if (($count % 5) != 0) {
 	$imageTable->addItem($imageRow);
 }
+elseif ($count == 0) {
+	$imageTable->addItem(_('No data found.'));
+}
 
 // form
 $imageForm = (new CForm())
-	->addItem($imageTable);
+	->addItem((new CTabView())->addTab('image', null, $imageTable));
 
 $widget
 	->addItem($imageComboBoxForm)
