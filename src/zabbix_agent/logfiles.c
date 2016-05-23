@@ -2005,8 +2005,8 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
  * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
  *                                                                            *
  ******************************************************************************/
-static int	adjust_position_after_jump(const struct st_logfile *logfile, zbx_uint64_t *lastlogsize,
-		zbx_uint64_t min_size, const char *encoding, char **err_msg)
+static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *lastlogsize, zbx_uint64_t min_size,
+		const char *encoding, char **err_msg)
 {
 	int		fd, ret = FAIL;
 	size_t		szbyte;
@@ -2070,6 +2070,7 @@ static int	adjust_position_after_jump(const struct st_logfile *logfile, zbx_uint
 			/* found the beginning of line */
 
 			*lastlogsize = lastlogsize_tmp + (zbx_uint64_t)(p_next - buf);
+			logfile->processed_size = *lastlogsize;
 			ret = SUCCEED;
 			goto out;
 		}
@@ -2118,6 +2119,7 @@ static int	adjust_position_after_jump(const struct st_logfile *logfile, zbx_uint
 			/* (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */
 
 			*lastlogsize = seek_pos + (zbx_uint64_t)(p_next - buf);
+			logfile->processed_size = *lastlogsize;
 			ret = SUCCEED;
 			goto out;
 		}
@@ -2128,6 +2130,7 @@ static int	adjust_position_after_jump(const struct st_logfile *logfile, zbx_uint
 			/* Effectively it turned out to be a jump with zero-length. */
 
 			*lastlogsize = min_size;
+			logfile->processed_size = *lastlogsize;
 			ret = SUCCEED;
 			goto out;
 		}
