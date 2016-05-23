@@ -133,6 +133,13 @@ static int	DBpatch_3010013(void)
 	return DBadd_field("actions", &field);
 }
 
+static int	DBpatch_3010014(void)
+{
+	const ZBX_FIELD	field = {"recovery", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("operations", &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -153,5 +160,6 @@ DBPATCH_ADD(3010010, 0, 1)
 DBPATCH_ADD(3010011, 0, 1)
 DBPATCH_ADD(3010012, 0, 1)
 DBPATCH_ADD(3010013, 0, 1)
+DBPATCH_ADD(3010014, 0, 1)
 
 DBPATCH_END()
