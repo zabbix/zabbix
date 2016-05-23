@@ -198,18 +198,16 @@ $subfiltersList = ['subfilter_apps', 'subfilter_types', 'subfilter_value_types',
  */
 $itemId = getRequest('itemid');
 if ($itemId) {
-	$item = API::Item()->get([
+	$items = API::Item()->get([
 		'output' => ['itemid'],
 		'itemids' => $itemId,
 		'selectHosts' => ['status'],
-		'editable' => true,
-		'preservekeys' => true
+		'editable' => true
 	]);
-	if (!$item) {
+	if (!$items) {
 		access_deny();
 	}
-	$item = reset($item);
-	$hosts = $item['hosts'];
+	$hosts = $items[0]['hosts'];
 }
 else {
 	$hostId = getRequest('hostid');
