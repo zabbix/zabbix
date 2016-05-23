@@ -104,8 +104,8 @@
 #define ZBX_MACRO_TLD_RDDS_ENABLED	"{$RSM.TLD.RDDS.ENABLED}"
 #define ZBX_MACRO_TLD_EPP_ENABLED	"{$RSM.TLD.EPP.ENABLED}"
 
-#define ZBX_RSM_UDP_TIMEOUT	5	/* seconds */
-#define ZBX_RSM_UDP_RETRY	3
+#define ZBX_RSM_UDP_TIMEOUT	3	/* seconds */
+#define ZBX_RSM_UDP_RETRY	2
 #define ZBX_RSM_TCP_TIMEOUT	20	/* seconds */
 #define ZBX_RSM_TCP_RETRY	1
 
