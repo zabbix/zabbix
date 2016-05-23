@@ -2068,8 +2068,6 @@ sub process_slv_ns_avail
 
 		$result->{$nsip}->{'value'} = $status_value;
 		$result->{$nsip}->{'message'} = $status_message;
-
-		#my $positive_sla = floor($probes_with_results * SLV_UNAVAILABILITY_LIMIT / 100);
 	}
 
 	return $result;

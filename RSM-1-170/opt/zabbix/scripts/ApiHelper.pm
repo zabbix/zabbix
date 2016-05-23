@@ -448,7 +448,7 @@ sub ah_save_incident_results
 
 	$tr_ref->{'lastUpdateApiDatabase'} = $now;
 
-	return __write_file("$inc_path/$clock.$incidentid" . AH_FILE_POSTFIX, __encode_json($tr_ref));
+	return __write_file("$inc_path/$clock.$eventid" . AH_FILE_POSTFIX, __encode_json($tr_ref));
 }
 
 sub ah_get_continue_file
