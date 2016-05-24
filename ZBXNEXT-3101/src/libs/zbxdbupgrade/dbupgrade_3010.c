@@ -166,6 +166,11 @@ static int	DBpatch_3010015(void)
 	return ret;
 }
 
+static int	DBpatch_3010016(void)
+{
+	return DBdrop_field("actions", "recovery_msg");
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -188,5 +193,6 @@ DBPATCH_ADD(3010012, 0, 1)
 DBPATCH_ADD(3010013, 0, 1)
 DBPATCH_ADD(3010014, 0, 1)
 DBPATCH_ADD(3010015, 0, 1)
+DBPATCH_ADD(3010016, 0, 1)
 
 DBPATCH_END()
