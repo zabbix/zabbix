@@ -33,7 +33,6 @@ static ino_t	trap_ino = 0;
 static char	*buffer = NULL;
 static int	offset = 0;
 static int	force = 0;
-static int	overflow_warning = 0;
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -388,25 +387,25 @@ static void	parse_traps(int flag)
  * Purpose: delay SNMP trapper file related issue log entries for 60 seconds  *
  *          unless this is the first time this issue has occurred             *
  *                                                                            *
- * Parameters: message   - [IN] string containing log entry text              *
+ * Parameters: error     - [IN] string containing log entry text              *
  *             log_level - [IN] the log entry log level                       *
  *                                                                            *
  ******************************************************************************/
-static void	delay_trap_logs(char *message, int log_level)
+static void	delay_trap_logs(char *error, int log_level)
 {
-	int		now;
-	static int	lastlogtime = 0, previous_check = 0;
-	zbx_hash_t	check;
-
-	check = zbx_default_string_hash_func(message);
+	int			now;
+	static int		lastlogtime = 0;
+	static zbx_hash_t	last_error_hash = 0;
+	zbx_hash_t		error_hash;
 
 	now = (int)time(NULL);
+	error_hash = zbx_default_string_hash_func(error);
 
-	if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || previous_check != (int)check)
+	if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || last_error_hash != error_hash)
 	{
-		zabbix_log(log_level, "%s", message);
+		zabbix_log(log_level, "%s", error);
 		lastlogtime = now;
-		previous_check = check;
+		last_error_hash = error_hash;
 	}
 }
 
@@ -423,26 +422,24 @@ static int	read_traps()
 {
 	const char	*__function_name = "read_traps";
 	int		nbytes = 0;
-	char		*log_entry = NULL;
+	char		*error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastsize:%d", __function_name, trap_lastsize);
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		log_entry = zbx_dsprintf(log_entry, "cannot set position to %d for \"%s\": %s", trap_lastsize,
+		error = zbx_dsprintf(error, "cannot set position to %d for \"%s\": %s", trap_lastsize,
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
-		delay_trap_logs(log_entry, LOG_LEVEL_WARNING);
-		zbx_free(log_entry);
-		goto exit;
+		delay_trap_logs(error, LOG_LEVEL_WARNING);
+		goto out;
 	}
 
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
-		log_entry = zbx_dsprintf(log_entry, "cannot read from SNMP trapper file \"%s\": %s",
+		error = zbx_dsprintf(error, "cannot read from SNMP trapper file \"%s\": %s",
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
-		delay_trap_logs(log_entry, LOG_LEVEL_WARNING);
-		zbx_free(log_entry);
-		goto exit;
+		delay_trap_logs(error, LOG_LEVEL_WARNING);
+		goto out;
 	}
 
 	if (0 < nbytes)
@@ -450,7 +447,7 @@ static int	read_traps()
 		if (INT_MAX < (zbx_uint64_t)trap_lastsize + nbytes)
 		{
 			nbytes = 0;
-			goto exit;
+			goto out;
 		}
 
 		buffer[nbytes + offset] = '\0';
@@ -458,8 +455,11 @@ static int	read_traps()
 		DBupdate_lastsize();
 		parse_traps(0);
 	}
-exit:
+out:
+	zbx_free(error);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
 	return nbytes;
 }
 
@@ -498,46 +498,39 @@ static void	close_trap_file()
 static int	open_trap_file()
 {
 	zbx_stat_t	file_buf;
-	char		*log_entry = NULL;
-
+	char		*error = NULL;
 
 	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
 	{
-		log_entry = zbx_dsprintf(log_entry, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+		error = zbx_dsprintf(error, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
 				zbx_strerror(errno));
-		delay_trap_logs(log_entry, LOG_LEVEL_CRIT);
-		zbx_free(log_entry);
+		delay_trap_logs(error, LOG_LEVEL_CRIT);
 		goto out;
 	}
 
 	if (INT_MAX < file_buf.st_size)
 	{
-		if (0 == overflow_warning)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot process SNMP trapper file \"%s\":"
-					" file size exceeds the maximum supported size of 2 GB",
-					CONFIG_SNMPTRAP_FILE);
-			overflow_warning = 1;
-		}
+		error = zbx_dsprintf(error, "cannot process SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+				"file size exceeds the maximum supported size of 2 GB");
+		delay_trap_logs(error, LOG_LEVEL_CRIT);
 		goto out;
 	}
-
-	overflow_warning = 0;
 
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
 		{
-			log_entry = zbx_dsprintf(log_entry, "cannot open SNMP trapper file \"%s\": %s",
+			error = zbx_dsprintf(error, "cannot open SNMP trapper file \"%s\": %s",
 					CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
-			delay_trap_logs(log_entry, LOG_LEVEL_CRIT);
-			zbx_free(log_entry);
+			delay_trap_logs(error, LOG_LEVEL_CRIT);
 		}
 		goto out;
 	}
 
 	trap_ino = file_buf.st_ino;	/* a new file was opened */
 out:
+	zbx_free(error);
+
 	return trap_fd;
 }
 
