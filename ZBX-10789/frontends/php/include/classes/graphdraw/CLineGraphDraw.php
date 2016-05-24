@@ -2662,8 +2662,7 @@ class CLineGraphDraw extends CGraphDraw {
 						break;
 					}
 				}
-				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER
-						|| ($has_scheduling && $delay == 0)) {
+				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER || ($has_scheduling && $delay == 0)) {
 					$draw = true;
 				}
 				else {
@@ -2671,10 +2670,10 @@ class CLineGraphDraw extends CGraphDraw {
 					$cell = ($this->to_time - $this->from_time) / $this->sizeX;
 
 					if ($cell > $delay) {
-						$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
 					}
 					else {
-						$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
 					}
 				}
 
