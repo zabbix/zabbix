@@ -140,6 +140,32 @@ static int	DBpatch_3010014(void)
 	return DBadd_field("operations", &field);
 }
 
+static int	DBpatch_3010015(void)
+{
+	zbx_db_insert_t	db_insert;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret;
+	zbx_uint64_t	actionid;
+
+	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", 0);
+
+	result = DBselect("select actionid from actions where recovery_msg=1");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid,  (int)OPERATION_TYPE_MESSAGE, (int)1);
+	}
+	DBfree_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "operationid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -161,5 +187,6 @@ DBPATCH_ADD(3010011, 0, 1)
 DBPATCH_ADD(3010012, 0, 1)
 DBPATCH_ADD(3010013, 0, 1)
 DBPATCH_ADD(3010014, 0, 1)
+DBPATCH_ADD(3010015, 0, 1)
 
 DBPATCH_END()
