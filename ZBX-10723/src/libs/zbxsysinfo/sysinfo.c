@@ -1098,29 +1098,19 @@ void	unquote_key_param(char *param)
  *                            0 - do nothing if the paramter does not contain *
  *                                any special characters                      *
  *                                                                            *
- * Comments: frees item key parameter if it cannot be quoted properly         *
- *                                                                            *
  ******************************************************************************/
 void	quote_key_param(char **param, int forced)
 {
 	size_t	sz_src, sz_dst;
 
-	if (0 == forced && '"' != **param && ' ' != **param && NULL == strchr(*param, ',') &&
-			NULL == strchr(*param, ']'))
+	if (0 == forced)
 	{
-		return;
-	}
-
-	sz_src = strlen(*param);
-
-	/* parameter must be quoted to preserve leading spaces, but quoted parameter cannot end with backslash */
-	if (0 == forced && ' ' == **param && '\\' == (*param)[sz_src - 1])
-	{
-		zbx_free(*param);
-		return;
+		if ('"' != **param && ' ' != **param && NULL == strchr(*param, ',') && NULL == strchr(*param, ']'))
+			return;
 	}
 
 	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
+	sz_src = strlen(*param);
 
 	*param = zbx_realloc(*param, sz_dst);
 
