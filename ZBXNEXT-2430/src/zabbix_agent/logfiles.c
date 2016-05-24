@@ -1969,6 +1969,7 @@ out:
 static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaining_bytes, int t_upd, double t_proc)
 {
 	zbx_uint64_t	remaining_full_checks, remaining_bytes_last;
+	double		delay;
 
 	if (0 != processed_bytes)
 	{
@@ -1979,11 +1980,23 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 		remaining_bytes_last = remaining_bytes % processed_bytes;
 
 		/* 't_proc' is expected to be much smaller than 't_upd', therefore multiplications first then adding */
-		return (double)remaining_full_checks * t_proc + (double)remaining_full_checks * t_upd +
+		delay = (double)remaining_full_checks * t_proc + (double)remaining_full_checks * t_upd +
 				(double)remaining_bytes_last * t_proc / (double)processed_bytes;
+
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "calculate_delay(): processed bytes:" ZBX_FS_UI64
+					" remaining bytes:" ZBX_FS_UI64 " t_upd:%d s t_proc:%e s speed:%e B/s"
+					" remaining_full_checks:" ZBX_FS_UI64 " remaining_bytes_last:" ZBX_FS_UI64
+					" delay:%e s", processed_bytes, remaining_bytes, t_upd, t_proc,
+					(double)processed_bytes / t_proc, remaining_full_checks, remaining_bytes_last,
+					delay);
+		}
 	}
 	else
-		return 0.0;
+		delay = 0.0;
+
+	return delay;
 }
 
 /******************************************************************************
@@ -2013,7 +2026,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	ssize_t		nbytes;
 	const char	*cr, *lf, *p_end;
 	char		*p, *p_nl, *p_next;
-	zbx_uint64_t	lastlogsize_tmp, lastlogsize_aligned, seek_pos, remainder;
+	zbx_uint64_t	lastlogsize_tmp, lastlogsize_aligned, lastlogsize_org, seek_pos, remainder;
 	char   		buf[32 * ZBX_KIBIBYTE];		/* buffer must be of size multiple of 4 as some character */
 							/* encodings use 4 bytes for every character */
 
@@ -2029,6 +2042,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 	/* For multibyte character encodings 'lastlogsize' needs to be aligned to character border. */
 	/* Align it towards smaller offset. We assume that log file contains no corrupted data stream. */
 
+	lastlogsize_org = *lastlogsize;
 	lastlogsize_aligned = *lastlogsize;
 
 	if (1 < szbyte && 0 != (remainder = lastlogsize_aligned % szbyte))	/* remainder can be 0, 1, 2 or 3 */
@@ -2080,7 +2094,8 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 
 	/* Searching forward did not find a newline. Now search backwards until 'min_size'. */
 
-	seek_pos = lastlogsize_tmp = lastlogsize_aligned;
+	lastlogsize_tmp = lastlogsize_aligned;
+	seek_pos = lastlogsize_aligned;
 
 	for (;;)
 	{
@@ -2141,6 +2156,24 @@ out:
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot close file \"%s\": %s", logfile->filename,
 				zbx_strerror(errno));
 		ret = FAIL;
+	}
+
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		const char	*dbg_msg;
+
+		if (SUCCEED == ret)
+			dbg_msg = "NEWLINE FOUND";
+		else
+			dbg_msg = "NEWLINE NOT FOUND";
+
+		zabbix_log(LOG_LEVEL_DEBUG, "adjust_position_after_jump(): szbyte:" ZBX_FS_SIZE_T " lastlogsize_org:"
+				ZBX_FS_UI64 " lastlogsize_aligned:" ZBX_FS_UI64 " (change " ZBX_FS_I64 " bytes)"
+				" lastlogsize_after:" ZBX_FS_UI64 " (change " ZBX_FS_I64 " bytes) %s %s",
+				(zbx_fs_size_t)szbyte, lastlogsize_org, lastlogsize_aligned,
+				(zbx_int64_t)lastlogsize_aligned - (zbx_int64_t)lastlogsize_org, *lastlogsize,
+				(zbx_int64_t)*lastlogsize - (zbx_int64_t)lastlogsize_aligned,
+				dbg_msg, ZBX_NULL2EMPTY_STR(*err_msg));
 	}
 
 	return ret;
@@ -2546,23 +2579,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	if (0 < logfiles_num)
 		*logfiles_new = logfiles;
 out:
-	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
-	{
-		if (0.0f == max_delay)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s processed bytes:" ZBX_FS_UI64 ", remaining bytes:"
-					ZBX_FS_UI64 ", time:%e s, speed:%e B/s, delay:%e s",
-					__function_name, zbx_result_string(ret), processed_bytes, remaining_bytes,
-					0 != processed_bytes ? zbx_stopwatch_elapsed(&stopwatch) : 0.0,
-					0 != processed_bytes ?
-					(double)processed_bytes / zbx_stopwatch_elapsed(&stopwatch) : 0.0,
-					0 != processed_bytes ? delay : 0.0);
-		}
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
