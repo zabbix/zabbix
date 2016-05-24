@@ -24,21 +24,22 @@ $widget = (new CWidget())
 	->setControls((new CForm())
 		->cleanItems()
 		->addVar('imagetype', $data['imagetype'])
-		->addItem((new CList())
-			->addItem(makeAdministrationGeneralMenu('adm.images.php'))
-			->addItem(
-				new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background'))
-			)
+		->addItem(
+			(new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
+				->addItem([_('Type'), SPACE, new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
+					IMAGE_TYPE_ICON => _('Icon'),
+					IMAGE_TYPE_BACKGROUND => _('Background')])
+				])
+				->addItem(
+					new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON)
+						? _('Create icon')
+						: _('Create background'))
+				)
 		)
 	);
 
 // header
-$imageComboBoxForm = (new CForm())
-	->addItem([_('Type'), SPACE, new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
-		IMAGE_TYPE_ICON => _('Icon'),
-		IMAGE_TYPE_BACKGROUND => _('Background')])
-	]);
-
 $imageTable = (new CDiv())
 	->addClass(ZBX_STYLE_TABLE)
 	->addClass(ZBX_STYLE_ADM_IMG);
@@ -81,7 +82,6 @@ $imageForm = (new CForm())
 	->addItem((new CTabView())->addTab('image', null, $imageTable));
 
 $widget
-	->addItem($imageComboBoxForm)
 	->addItem($imageForm);
 
 return $widget;

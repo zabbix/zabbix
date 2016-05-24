@@ -22,7 +22,14 @@ $widget = (new CWidget())
 	->setTitle(_('Images'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.images.php')))
+		->addItem(
+			(new CList())
+				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
+				->addItem([_('Type'), SPACE, new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
+					IMAGE_TYPE_ICON => _('Icon'),
+					IMAGE_TYPE_BACKGROUND => _('Background')])
+				])
+		)
 	);
 
 $imageForm = (new CForm('post', null, 'multipart/form-data'))
@@ -59,15 +66,17 @@ if (isset($this->data['imageid'])) {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
-			new CButtonCancel()
+			new CButtonDelete(_('Delete selected image?'), url_param('form') . url_param('imageid') .
+				url_param('imagetype')
+			),
+			new CButtonCancel(url_param('imagetype'))
 		]
 	));
 }
 else {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel()]
+		[new CButtonCancel(url_param('imagetype'))]
 	));
 }
 
