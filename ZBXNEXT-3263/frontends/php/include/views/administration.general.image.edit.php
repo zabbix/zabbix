@@ -67,16 +67,16 @@ if (isset($this->data['imageid'])) {
 		new CSubmit('update', _('Update')),
 		[
 			new CButtonDelete(_('Delete selected image?'), url_param('form') . url_param('imageid') .
-				url_param('imagetype')
+				url_param($data['imagetype'], false, 'imagetype')
 			),
-			new CButtonCancel(url_param('imagetype'))
+			new CButtonCancel(url_param($data['imagetype'], false, 'imagetype'))
 		]
 	));
 }
 else {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('imagetype'))]
+		[new CButtonCancel(url_param($data['imagetype'], false, 'imagetype'))]
 	));
 }
 
