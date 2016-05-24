@@ -27,7 +27,7 @@ $widget = (new CWidget())
 		->addItem(
 			(new CList())
 				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
-				->addItem([_('Type'), SPACE, new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
+				->addItem([_('Type'), SPACE, new CComboBox('imagetype', $data['imagetype'], 'submit();', [
 					IMAGE_TYPE_ICON => _('Icon'),
 					IMAGE_TYPE_BACKGROUND => _('Background')])
 				])
@@ -46,7 +46,7 @@ $imageTable = (new CDiv())
 
 $count = 0;
 $imageRow = (new CDiv())->addClass(ZBX_STYLE_ROW);
-foreach ($this->data['images'] as $image) {
+foreach ($data['images'] as $image) {
 	$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
 		? new CLink(
 			new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'),
@@ -77,11 +77,10 @@ elseif ($count == 0) {
 	$imageTable->addItem(_('No data found.'));
 }
 
-// form
-$imageForm = (new CForm())
-	->addItem((new CTabView())->addTab('image', null, $imageTable));
-
-$widget
-	->addItem($imageForm);
+$widget->addItem(
+	(new CForm())->addItem(
+		(new CTabView())->addTab('image', null, $imageTable)
+	)
+);
 
 return $widget;
