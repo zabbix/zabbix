@@ -83,7 +83,7 @@ zbx_hash_t	zbx_hash_lookup2(const void *data, size_t len, zbx_hash_t seed)
 }
 
 /*
- * modified FNV hash function (see http://home.comcast.net/~bretm/hash/6.html)
+ * modified FNV hash function (see http://www.isthe.com/chongo/tech/comp/fnv/)
  */
 zbx_hash_t	zbx_hash_modfnv(const void *data, size_t len, zbx_hash_t seed)
 {
