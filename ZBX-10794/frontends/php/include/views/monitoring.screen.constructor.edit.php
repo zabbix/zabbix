@@ -24,17 +24,15 @@ if (isset($_REQUEST['screenitemid'])) {
 	$action .= '&screenitemid='.getRequest('screenitemid');
 }
 
-// create screen form
-$screen_form = (new CForm('post', $action))->setName('screen_item_form');
+$screen_form = (new CForm('post', $action))
+	->setName('screen_item_form')
+	->addVar('screenid', getRequest('screenid'));
 
 if ($data['screen']['templateid'] != 0) {
 	$screen_form->addVar('templateid', $data['screen']['templateid']);
 }
 
-// create screen form list
-$screenFormList = (new CFormList())->addVar('screenid', $_REQUEST['screenid']);
-
-if (isset($_REQUEST['screenitemid'])) {
+if (hasRequest('screenitemid')) {
 	$screen_form->addVar('screenitemid', getRequest('screenitemid'));
 	$screenItems = zbx_toHash($this->data['screen']['screenitems'], 'screenitemid');
 }
@@ -91,7 +89,9 @@ if ($this->data['screen']['templateid']) {
 		$screenResources[SCREEN_RESOURCE_TRIGGERS_INFO], $screenResources[SCREEN_RESOURCE_TRIGGERS_OVERVIEW]
 	);
 }
-$screenFormList->addRow(_('Resource'), new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources));
+
+$screenFormList = (new CFormList())
+	->addRow(_('Resource'), new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources));
 
 /*
  * Screen item: Graph
@@ -341,6 +341,8 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		$caption = $item['host']['name'].NAME_DELIMITER.$item['name_expanded'];
 	}
 
+	$screen_form->addVar('resourceid', $id);
+
 	if ($this->data['screen']['templateid']) {
 		$selectButton = (new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -358,7 +360,6 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	}
 
 	$screenFormList
-		->addVar('resourceid', $id)
 		->addRow(_('Item'), [
 			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
