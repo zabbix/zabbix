@@ -12,6 +12,7 @@ libzbxcommon_a_SOURCES = \
 	file.c \
 	setproctitle.c \
 	iprange.c \
-	stopwatch.c
+	stopwatch.c \
+	stopwatch.h
 
 libzbxcommon_a_CFLAGS = @ICONV_CFLAGS@

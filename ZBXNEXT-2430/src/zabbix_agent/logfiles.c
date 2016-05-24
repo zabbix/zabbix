@@ -25,6 +25,7 @@
 #if defined(_WINDOWS)
 #	include "gnuregex.h"
 #	include "symbols.h"
+#	include "comms.h"	/* ssize_t */
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the initial part of the file to calculate MD5 sum for */
