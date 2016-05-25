@@ -10,6 +10,9 @@
 	<property name="agentport" value="${AGENTPORT}"/>
 	<property name="serverport" value="${SERVERPORT}"/>
 	<property name="url" value="${URL}"/>
+	<property name="host" value="${HOST}"/>
+	<property name="screenshot_dir" value="${SCREENSHOT_DIR}"/>
+	<property name="screenshot_url" value="${SCREENSHOT_URL}"/>
 
 	<target name="buildagent">
 		<!-- Build agent binaries -->
@@ -89,6 +92,9 @@
 		</exec>
 		<copy overwrite="true" file="frontends/php/tests/bootstrap.php.template" tofile="frontends/php/tests/bootstrap.php"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{URL}" value="${url}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{HOST}" value="${host}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_DIR}" value="${screenshot_dir}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${screenshot_url}"/>
 	</target>
 
 	<target name="create-configs" depends="init-common">
@@ -244,12 +250,12 @@
 
 	<target name="test-frontend">
 		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=build/logs/phpunit.xml --bootstrap=bootstrap.php frontend.php"/>
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=bootstrap.php frontend.php"/>
 		</exec>
 	</target>
 
-	<target name="build-mysql" depends="killdaemons,init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons" />
-	<target name="build-postgresql" depends="killdaemons,init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons" />
+	<target name="build-mysql" depends="killdaemons,init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
+	<target name="build-postgresql" depends="killdaemons,init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
