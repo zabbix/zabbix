@@ -25,6 +25,8 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10504] decreased padding and margins in tables and across the whole UI (Pavel)
+..F....... [ZBX-10504] added compression of generated CSS files to reduce size from 99K to around 56K (asaveljevs, Pavel)
 ...GI..... [ZBX-10760] fixed agent, get and sender being erroneously linked against UnixODBC (gleb)
 ..F....... [ZBX-10647] removed disabled status for "Export to CSV" button (Ivo)
 ..F....... [ZBX-10679] fixed vertical scrollbar overlapping in messages (Pavel)
