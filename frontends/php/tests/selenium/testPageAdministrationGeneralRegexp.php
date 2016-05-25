@@ -110,7 +110,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 
 		$this->verifyHash();
 	}
@@ -125,7 +125,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('regexpids['.$this->oldRegexpId.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Regular expression deleted');
 
@@ -146,7 +146,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('all_regexps');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Regular expressions deleted');
 

@@ -90,7 +90,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestDropdownSelect('go', 'Disable selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Media type disabled');
 
@@ -110,7 +110,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestDropdownSelect('go', 'Enable selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Media type enabled');
 
@@ -139,7 +139,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 
 		$sql = 'SELECT NULL FROM media_type WHERE mediatypeid='.$mediatype['mediatypeid'];

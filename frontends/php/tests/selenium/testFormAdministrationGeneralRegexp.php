@@ -232,7 +232,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClickWait('link='.$this->regexp2);
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent(array('Regular expression deleted', 'CONFIGURATION OF REGULAR EXPRESSIONS', 'Regular expressions', 'Name', 'Expressions'));
 
@@ -255,7 +255,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('goButton');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Regular expressions deleted');
 
