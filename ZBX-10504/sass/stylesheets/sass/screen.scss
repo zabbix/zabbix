@@ -263,13 +263,13 @@ nav {
 				line-height: 0;
 				border-left: 9px solid transparent;
 				border-right: 9px solid transparent;
-			    border-bottom: 9px solid $main-subnav-bg-color;
+				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
 				color: $link-main-nav-active-color;
 			}
-	    }
+		}
 	}
 
 	a {
@@ -344,7 +344,7 @@ ul.top-nav-icons {
 		&:focus {
 			@include opacity(1);
 		}
-    }
+	}
 
 	.top-nav-help {
 		background: url(../img/icon-sprite.svg) no-repeat -6px -32px;
@@ -360,7 +360,7 @@ ul.top-nav-icons {
 
 	.top-nav-zbbshare {
 		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
-	    width: auto;
+		width: auto;
 		padding: 0 6px 0 17px;
 		-webkit-transform-style: preserve-3d;
 	}
@@ -557,9 +557,9 @@ article {
 // Footer
 footer {
 	position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 30px;
+	bottom: 0;
+	width: 100%;
+	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
 
@@ -587,8 +587,8 @@ footer {
 // Tables
 .list-table {
 	width: 100%;
-    background-color: $ui-bg-color;
-    border: 1px solid $ui-border-color;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
 
 	thead th {
 		font-size: $font-h3-size;
@@ -599,56 +599,56 @@ footer {
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-	    padding: 6px 5px;
-	    vertical-align: bottom;
-	    border-bottom: 2px solid $table-border-color;
-	    text-align: left;
+		padding: 6px 5px;
+		vertical-align: bottom;
+		border-bottom: 2px solid $table-border-color;
+		text-align: left;
 
-	    .arrow-up {
-	    	margin: 0 0 0 4px;
-	    	border-bottom-color: $font-alt-color;
-	    }
+		.arrow-up {
+			margin: 0 0 0 4px;
+			border-bottom-color: $font-alt-color;
+		}
 
-	    .arrow-right {
-	    	margin: 0 0 0 4px;
-	    	border-left-color: $font-alt-color;
-	    }
+		.arrow-right {
+			margin: 0 0 0 4px;
+			border-left-color: $font-alt-color;
+		}
 
-	    .arrow-down {
-	    	margin: 0 0 0 4px;
-	    	border-top-color: $font-alt-color;
-	    }
+		.arrow-down {
+			margin: 0 0 0 4px;
+			border-top-color: $font-alt-color;
+		}
 
-	    .treeview {
+		.treeview {
 
-	    	span {
-	    		margin: 0;
-	    	}
-	    }
+			span {
+				margin: 0;
+			}
+		}
 
-	    a {
-	    	display: block;
-	    	position: relative;
-	    	margin: -1em;
-	    	padding: 1em;
-	    	border: none;
-	    	@include transition(background-color .2s ease-out);
+		a {
+			display: block;
+			position: relative;
+			margin: -1em;
+			padding: 1em;
+			border: none;
+			@include transition(background-color .2s ease-out);
 
-	    	&:hover {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
+			&:hover {
+				text-decoration: none;
+				background-color: $ui-hover-color
+			}
 
-	    	&:focus {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
+			&:focus {
+				text-decoration: none;
+				background-color: $ui-hover-color
+			}
 
-	    	&:active {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
-	    }
+			&:active {
+				text-decoration: none;
+				background-color: $ui-hover-color
+			}
+		}
 	}
 
 	tbody tr {
@@ -706,9 +706,9 @@ footer {
 .table-stats {
 	color: $font-alt-color;
 	display: inline-block;
-    padding: 4px 0;
-    position: absolute;
-    right: 5px;
+	padding: 4px 0;
+	position: absolute;
+	right: 5px;
 }
 
 .radio-switch {
@@ -1346,14 +1346,14 @@ footer {
 				margin-right: 5px;
 			}
 
-			 &.center {
-			 	text-align: center;
-			 	vertical-align: middle;
+			&.center {
+				text-align: center;
+				vertical-align: middle;
 
-			 	.btn-grey {
-			 		margin: 3px 0;
-			 	}
-			 }
+				.btn-grey {
+					margin: 3px 0;
+				}
+			}
 		}
 	}
 
@@ -1838,10 +1838,10 @@ $icon-btn: (
 );
 
 @each $icon-btn, $bgimage in $icon-btn {
-    .btn-#{$icon-btn} {
-        background: $bgimage;
-        @extend %button-icon-size;
-    }
+	.btn-#{$icon-btn} {
+		background: $bgimage;
+		@extend %button-icon-size;
+	}
 }
 
 $icon-widget-btn: (
@@ -1855,10 +1855,10 @@ $icon-widget-btn: (
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
-    .btn-#{$icon-widget-btn} {
-        background: $bgimage;
-        @extend %btn-widget;
-    }
+	.btn-#{$icon-widget-btn} {
+		background: $bgimage;
+		@extend %btn-widget;
+	}
 }
 
 %btn-widget {
@@ -2029,13 +2029,13 @@ $var-icons: (
 );
 
 @each $var-icons, $bgimage in $var-icons {
-    .icon-#{$var-icons} {
-    	margin: 0 18px 0 0;
-    	&::before {
-    		background: $bgimage;
-    		@extend %var-icons;
-    	}
-    }
+	.icon-#{$var-icons} {
+		margin: 0 18px 0 0;
+		&::before {
+			background: $bgimage;
+			@extend %var-icons;
+		}
+	}
 }
 
 $form-icon-btn: (
@@ -2045,14 +2045,14 @@ $form-icon-btn: (
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
-    .icon-#{$form-icon-btn} {
-        background: $transparent $bgimage;
-        @extend %form-icon-btn;
+	.icon-#{$form-icon-btn} {
+		background: $transparent $bgimage;
+		@extend %form-icon-btn;
 
-        @if $form-icon-btn == 'wzrd-action' {
-        	margin-top: -16px;
-        }
-    }
+		@if $form-icon-btn == 'wzrd-action' {
+			margin-top: -16px;
+		}
+	}
 }
 
 %form-icon-btn {
@@ -2980,9 +2980,9 @@ a.blue {
 
 .progress-bar-bg {
 	padding: 3px 0 2px 0;
-    font-size: $font-h3-size;
-    line-height: 1em;
-    display: inline-block;
+	font-size: $font-h3-size;
+	line-height: 1em;
+	display: inline-block;
 
 	&.green-bg {
 		background-color: darken(desaturate($alt-green, 10%), 16%);
@@ -3038,7 +3038,7 @@ a.blue {
 }
 
 .status-green {
-    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
+	border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
@@ -3527,17 +3527,17 @@ $browser-logos: (
 );
 
 @each $browser, $bgimage in $browser-logos {
-    .browser-logo-#{$browser} {
-        background: $bgimage;
-        @extend %browser-logo-style;
-    }
+	.browser-logo-#{$browser} {
+		background: $bgimage;
+		@extend %browser-logo-style;
+	}
 }
 
 %browser-logo-style {
 	width: 66px;
-    height: 66px;
-    margin: 0 auto;
-    margin-bottom: 5px;
+	height: 66px;
+	margin: 0 auto;
+	margin-bottom: 5px;
 }
 
 .browser-warning-container {
