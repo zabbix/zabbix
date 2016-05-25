@@ -675,8 +675,8 @@ footer {
 		padding: 6px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
-    border-spacing:0;
-    border-collapse:no-collapse;
+		border-spacing: 0;
+		border-collapse: no-collapse;
 	}
 
 	.vertical_rotation_inner {
@@ -686,7 +686,7 @@ footer {
 }
 
 .table-paging {
-  text-align: center;
+	text-align: center;
 	background-color: $ui-bg-color;
 	margin-top: -1px;
 	padding: 6px 5px;
@@ -2296,7 +2296,6 @@ $form-icon-btn: (
 
 	.list-table {
 		border: none;
-    //@include box-shadow(none);
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2499,7 +2498,6 @@ $form-icon-btn: (
 
 	.list-table {
 		border: none;
-    //@include box-shadow(none);
 
 		th {
 			@extend %dashbrd-widget-td;
