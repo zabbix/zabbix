@@ -249,7 +249,7 @@ sub get_global_macros {
     my @macros = shift;
     my $result = {};
     my $options = {'globalmacro' => true, output => 'extend', 'filter' => {'macro' => @macros}, 'preservekeys' => 1};
-    
+
     my $data = $zabbix->get('usermacro', $options);
 
     return $result unless defined($data);
@@ -425,12 +425,11 @@ sub item_update_require {
 		}
 
 		if (compare_arrays(\@data, \@tmp_data) eq false) {
-		    $result = true;                                                         
-	            last; 
+		    $result = true;
+	            last;
 		}
 	    }
 	}
-
     }
 
     return $result;
@@ -445,7 +444,7 @@ sub create_item {
     my @fields = keys %{$options};
 
     $is_new = false unless defined $is_new;
-    
+
     if ($is_new eq false) {
 	$result = $zabbix->get('item', {'output' => [@fields], 'selectApplications' => 'refer', 'hostids' => $options->{'hostid'}, 'filter' => {'key_' => $options->{'key_'}}});
     }
@@ -610,7 +609,7 @@ sub bulk_macro_create {
 sub get_host_macro {
     my $templateid = shift;
     my $name = shift;
-    
+
     my $result;
 
     $result = $zabbix->get('usermacro',{'hostids' => $templateid, 'output' => 'extend', 'filter' => {'macro' => $name}});
