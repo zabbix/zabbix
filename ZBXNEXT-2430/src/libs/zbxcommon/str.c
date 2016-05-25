@@ -2651,11 +2651,13 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		return utf8_string;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding, codepage);
+	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:" ZBX_FS_SIZE_T " encoding:'%s' codepage:%u",
+			(zbx_fs_size_t)in_size, encoding, codepage);
 
-	if (1200 != codepage)	/* UTF-16 */
+	if (1200 != codepage)	/* not UTF-16 */
 	{
 		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
+
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
 		else
