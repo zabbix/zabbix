@@ -2651,9 +2651,6 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		return utf8_string;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:" ZBX_FS_SIZE_T " encoding:'%s' codepage:%u",
-			(zbx_fs_size_t)in_size, encoding, codepage);
-
 	if (1200 != codepage)	/* not UTF-16 */
 	{
 		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
@@ -2678,7 +2675,6 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	/* convert from wide_string to utf8_string */
 	WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, utf8_string, utf8_size, NULL, NULL);
 	utf8_string[utf8_size] = '\0';
-	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() utf8_size:%d utf8_string:'%s'", utf8_size, utf8_string);
 
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
