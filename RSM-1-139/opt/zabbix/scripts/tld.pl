@@ -66,7 +66,7 @@ sub create_tld_host($$$$);
 sub create_probe_health_tmpl;
 sub manage_tld_objects($$$$$);
 sub manage_tld_hosts($$);
-
+sub update_epp_objects($);
 sub update_epp_objects($);
 sub get_nsservers_list($);
 sub update_nsservers($$);
@@ -1196,6 +1196,28 @@ sub create_items_epp {
     foreach my $trigger (@new_data) {
         create_trigger($trigger, true);
     }
+
+    if (defined($OPTS{'rdds43-servers'})) {
+        $item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+        
+        my $applicationid_43 = get_application_id('RDDS43', $templateid);
+
+        $options = {'name' => 'RDDS43 update time of $1',
+                    'key_'=> $item_key,
+		    'hostid' => $templateid,
+		    'applications' => [$applicationid_43],
+		    'type' => 2, 'value_type' => 0,
+		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
+		    'status' => 0};
+	create_item($options);
+
+	$options = { 'description' => 'RDDS43-UPD {HOST.NAME}: No UNIX timestamp',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
+                        'priority' => '2',
+                };
+
+	create_trigger($options);
+    }
 }
 
 
@@ -1226,7 +1248,7 @@ sub exp_get_keysalt
 
     if ($self->match() =~ m/^([^\s]+\|[^\s]+)/)
     {
-	$exp_output = $1;
+        $exp_output = $1;
     }
 }
 
@@ -1297,9 +1319,9 @@ sub read_file {
     my $file = shift;
 
     my $contents = do {
-	local $/ = undef;
-	open my $fh, "<", $file or pfail("could not open $file: $!");
-	<$fh>;
+        local $/ = undef;
+        open my $fh, "<", $file or pfail("could not open $file: $!");
+        <$fh>;
     };
 
     return $contents;
@@ -2318,6 +2340,8 @@ sub add_new_ns($$) {
 
 	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'tcp', $ipv);
 	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'udp', $ipv);
+	    create_item_dns_udp_upd($ns, $ip, $main_templateid, 'Template '.$TLD, $ipv) if (defined($OPTS{'epp-servers'}));
+
 	    create_item_dns_udp_upd($ns, $ip, $main_templateid, 'Template '.$TLD, $ipv) if (defined($OPTS{'epp-servers'}));
 
     	    create_all_slv_ns_items($ns, $ip, $main_hostid);

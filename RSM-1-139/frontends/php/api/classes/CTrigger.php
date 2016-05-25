@@ -1261,11 +1261,6 @@ class CTrigger extends CTriggerGeneral {
 			'value_id' => $pks
 		));
 
-		DB::delete('events', array(
-			'objectid' => $pks,
-			'object' => EVENT_OBJECT_TRIGGER
-		));
-
 		DB::delete('sysmaps_elements', array(
 			'elementid' => $pks,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER

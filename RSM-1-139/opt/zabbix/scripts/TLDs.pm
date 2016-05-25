@@ -1026,7 +1026,7 @@ sub create_cron_jobs($) {
 
     my $avail_cur = $avail_shift;
     my $rollweek_cur = $rollweek_shift;
-    
+
     $rv = opendir DIR, $slv_path;
 
     pfail("cannot open $slv_path") unless ($rv);
