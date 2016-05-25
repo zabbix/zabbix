@@ -225,6 +225,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 
 				if (SVC_AGENT == dcheck->type)
 				{
+					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+
 					if (SUCCEED == get_value_agent(&item, &result) && NULL != GET_STR_RESULT(&result))
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, result.str);
 					else

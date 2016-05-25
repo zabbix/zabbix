@@ -238,7 +238,7 @@ class CScreenBase {
 		if (array_key_exists('screenitem', $options) && is_array($options['screenitem'])) {
 			$this->screenitem = $options['screenitem'];
 		}
-		elseif (array_key_exists('screenitemid', $options)) {
+		elseif (array_key_exists('screenitemid', $options) && $options['screenitemid'] > 0) {
 			$screenitem_output = ['screenitemid', 'screenid', 'resourcetype', 'resourceid', 'width', 'height',
 				'elements', 'halign', 'valign', 'style', 'url', 'dynamic', 'sort_triggers', 'application',
 				'max_columns'

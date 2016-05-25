@@ -73,8 +73,9 @@ class CControllerScriptUpdate extends CController {
 		$script = [];
 
 		$this->getInputs($script, ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
-			'groupid', 'host_access', 'confirmation'
+			'groupid', 'host_access'
 		]);
+		$script['confirmation'] = $this->getInput('confirmation', '');
 
 		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI
 				&& $this->hasInput('commandipmi')) {

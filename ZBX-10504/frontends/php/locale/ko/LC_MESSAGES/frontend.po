@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-25 20:12+0200\n"
-"PO-Revision-Date: 2016-03-23 11:23+0300\n"
+"POT-Creation-Date: 2016-05-10 12:01+0300\n"
+"PO-Revision-Date: 2016-04-12 02:57+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
@@ -11,40 +11,40 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1458725000.0\n"
+"X-POOTLE-MTIME: 1460422652.000000\n"
 
-#: include/classes/import/validators/C10XmlValidator.php:346
-#: include/classes/import/validators/C10XmlValidator.php:363
-#: include/classes/import/validators/C20XmlValidator.php:821
-#: include/classes/import/validators/C30XmlValidator.php:884
+#: include/classes/import/validators/C10XmlValidator.php:358
+#: include/classes/import/validators/C10XmlValidator.php:375
+#: include/classes/import/validators/C20XmlValidator.php:833
+#: include/classes/import/validators/C30XmlValidator.php:896
 #, c-format
 msgid "\"%1$s\" is expected"
 msgstr "\"%1$s\" 로 지정해 주세요"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
-#: include/classes/api/services/CMaintenance.php:497
-#: include/classes/api/services/CMaintenance.php:502 maintenance.php:146
+#: include/classes/api/services/CMaintenance.php:498
+#: include/classes/api/services/CMaintenance.php:503 maintenance.php:146
 #: maintenance.php:158 services.php:193 services.php:207
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
 msgstr "\"%s\" 는 1970.01.01에서 2038.01.18 사이로 지정해 주세요."
 
-#: include/classes/import/validators/C10XmlValidator.php:381
-#: include/classes/import/validators/C10XmlValidator.php:403
-#: include/classes/import/validators/C10XmlValidator.php:424
+#: include/classes/import/validators/C10XmlValidator.php:393
+#: include/classes/import/validators/C10XmlValidator.php:415
+#: include/classes/import/validators/C10XmlValidator.php:436
 msgid "\"host:key\" pair is expected"
 msgstr "\"host:key\"의 페어로 지정해 주십시오"
 
-#: include/func.inc.php:453
+#: include/func.inc.php:452
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] "%1$d 일"
 
-#: include/blocks.inc.php:770
+#: include/blocks.inc.php:771
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
@@ -64,7 +64,7 @@ msgstr[0] "항목 %1$s개"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [행: %2$s | 열: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -112,7 +112,7 @@ msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] "%4$s 의 로그인 시도 실패가 있었습니다. 마지막 시도 실패는 %3$s %2$s %1$s 에 있었습니다."
 
-#: include/classes/screens/CScreenDiscovery.php:218
+#: include/classes/screens/CScreenDiscovery.php:220
 #, c-format
 msgid "%d device"
 msgid_plural "%d devices"
@@ -124,13 +124,17 @@ msgctxt "user fullname"
 msgid "(%1$s %2$s)"
 msgstr "(%1$s %2$s)"
 
+#: include/views/configuration.action.edit.php:532
+msgid "(0 - infinitely)"
+msgstr ""
+
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
 #: include/views/configuration.template.edit.php:123
 msgid "(Only super admins can create groups)"
 msgstr "(최고관리자만 그룹을 작성할 수 있습니다)"
 
-#: include/views/configuration.action.edit.php:537
+#: include/views/configuration.action.edit.php:539
 msgid "(minimum 60 seconds, 0 - use action default)"
 msgstr "(최소 60초, 0 - 디폴트 값 사용)"
 
@@ -145,11 +149,11 @@ msgstr "(프록시 없음)"
 msgid "0 - use default port"
 msgstr "0 - 기본 포트 사용"
 
-#: include/triggers.inc.php:1841 include/triggers.inc.php:1843
-#: include/triggers.inc.php:1844 include/triggers.inc.php:1846
-#: include/triggers.inc.php:1848 include/triggers.inc.php:1851
-#: include/triggers.inc.php:1855 include/triggers.inc.php:1856
-#: include/triggers.inc.php:1869
+#: include/triggers.inc.php:1801 include/triggers.inc.php:1803
+#: include/triggers.inc.php:1804 include/triggers.inc.php:1806
+#: include/triggers.inc.php:1808 include/triggers.inc.php:1811
+#: include/triggers.inc.php:1815 include/triggers.inc.php:1816
+#: include/triggers.inc.php:1829
 msgid "0 or 1"
 msgstr "0 또는 1"
 
@@ -227,7 +231,7 @@ msgstr "최근값과 그 이전값의 차가 N 이 아니다"
 msgid "Acceptable SLA"
 msgstr "허용 가능한 SLA"
 
-#: include/func.inc.php:1678
+#: include/func.inc.php:1676
 msgid "Access denied"
 msgstr "엑세스가 거부되었습니다"
 
@@ -241,9 +245,9 @@ msgid "Account is blocked for %s seconds"
 msgstr "계정이 %s 초 동안 정지 되었습니다"
 
 #: events.php:440 include/actions.inc.php:150 include/actions.inc.php:338
-#: include/blocks.inc.php:631 include/blocks.inc.php:794
+#: include/blocks.inc.php:632 include/blocks.inc.php:795
 #: include/events.inc.php:198 include/events.inc.php:302
-#: include/views/configuration.action.edit.php:1060 tr_status.php:285
+#: include/views/configuration.action.edit.php:1057 tr_status.php:285
 msgid "Ack"
 msgstr "인지"
 
@@ -285,14 +289,14 @@ msgstr "장애대응 코멘트"
 #: include/views/administration.general.regularexpressions.edit.php:47
 #: include/views/administration.general.valuemapping.edit.php:46
 #: include/views/administration.users.edit.php:200
-#: include/views/configuration.action.edit.php:78
-#: include/views/configuration.action.edit.php:391
-#: include/views/configuration.action.edit.php:395
-#: include/views/configuration.action.edit.php:590
-#: include/views/configuration.action.edit.php:603
-#: include/views/configuration.action.edit.php:765
-#: include/views/configuration.action.edit.php:941
-#: include/views/configuration.action.edit.php:1095
+#: include/views/configuration.action.edit.php:76
+#: include/views/configuration.action.edit.php:389
+#: include/views/configuration.action.edit.php:393
+#: include/views/configuration.action.edit.php:591
+#: include/views/configuration.action.edit.php:604
+#: include/views/configuration.action.edit.php:766
+#: include/views/configuration.action.edit.php:938
+#: include/views/configuration.action.edit.php:1093
 #: include/views/configuration.graph.edit.php:282
 #: include/views/configuration.host.discovery.edit.php:198
 #: include/views/configuration.host.discovery.edit.php:288
@@ -379,7 +383,7 @@ msgstr[0] "액션이 활성화 되었습니다"
 msgid "Action log"
 msgstr "액션 로그"
 
-#: include/views/configuration.action.edit.php:500
+#: include/views/configuration.action.edit.php:498
 msgid "Action operations"
 msgstr "액션 실행내용"
 
@@ -387,7 +391,7 @@ msgstr "액션 실행내용"
 msgid "Action updated"
 msgstr "액션을 갱신하였습니다"
 
-#: events.php:441 include/blocks.inc.php:632 include/blocks.inc.php:795
+#: events.php:441 include/blocks.inc.php:633 include/blocks.inc.php:796
 #: include/events.inc.php:199 include/menu.inc.php:229
 #: include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:22
@@ -408,7 +412,7 @@ msgid "Active"
 msgstr "활성"
 
 #: include/classes/api/services/CMaintenance.php:352
-#: include/classes/api/services/CMaintenance.php:497
+#: include/classes/api/services/CMaintenance.php:498
 #: include/views/configuration.maintenance.edit.php:92
 #: include/views/configuration.maintenance.list.php:41 maintenance.php:140
 #: maintenance.php:146
@@ -416,7 +420,7 @@ msgid "Active since"
 msgstr "시작시간"
 
 #: include/classes/api/services/CMaintenance.php:357
-#: include/classes/api/services/CMaintenance.php:502
+#: include/classes/api/services/CMaintenance.php:503
 #: include/views/configuration.maintenance.edit.php:93
 #: include/views/configuration.maintenance.list.php:42 maintenance.php:154
 #: maintenance.php:158
@@ -427,7 +431,7 @@ msgstr "종료시간"
 #: app/views/administration.mediatype.edit.php:101
 #: app/views/administration.mediatype.edit.php:154
 #: app/views/administration.proxy.edit.php:132
-#: app/views/administration.script.edit.js.php:32
+#: app/views/administration.script.edit.js.php:34
 #: app/views/administration.script.edit.php:112
 #: include/views/administration.auditlogs.list.php:39
 #: include/views/administration.general.iconmap.edit.php:105
@@ -446,12 +450,12 @@ msgstr "종료시간"
 #: include/views/administration.users.edit.php:261
 #: include/views/administration.users.edit.php:423
 #: include/views/common.filter.trigger.php:142
-#: include/views/configuration.action.edit.php:369
-#: include/views/configuration.action.edit.php:592
-#: include/views/configuration.action.edit.php:605
-#: include/views/configuration.action.edit.php:1069
-#: include/views/configuration.action.edit.php:1082
-#: include/views/configuration.action.edit.php:1119
+#: include/views/configuration.action.edit.php:367
+#: include/views/configuration.action.edit.php:593
+#: include/views/configuration.action.edit.php:606
+#: include/views/configuration.action.edit.php:1066
+#: include/views/configuration.action.edit.php:1080
+#: include/views/configuration.action.edit.php:1117
 #: include/views/configuration.application.edit.php:58
 #: include/views/configuration.discovery.edit.php:111
 #: include/views/configuration.graph.edit.php:291
@@ -520,7 +524,7 @@ msgstr "종료시간"
 #: include/views/monitoring.sysmap.edit.php:283
 #: include/views/monitoring.sysmap.edit.php:313
 #: include/views/monitoring.sysmap.edit.php:374 jsLoader.php:182
-#: popup_media.php:139 tr_logform.php:279 tr_logform.php:388 tr_status.php:695
+#: popup_media.php:139 tr_logform.php:279 tr_logform.php:388 tr_status.php:729
 msgid "Add"
 msgstr "추가"
 
@@ -574,7 +578,7 @@ msgstr "관리"
 msgid "Advanced labels"
 msgstr "확장 라벨"
 
-#: include/blocks.inc.php:629 include/blocks.inc.php:792
+#: include/blocks.inc.php:630 include/blocks.inc.php:793
 #: include/events.inc.php:197 include/events.inc.php:302
 #: include/events.inc.php:305 tr_status.php:283
 msgid "Age"
@@ -623,7 +627,7 @@ msgstr "에이전트, SNMP, JMX, IPMI 인터페이스"
 msgid "Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual."
 msgstr "어그리게이트 체크는 감시대상의 호스트상에서 에이전트가 기동될 필요는 없습니다. Zabbix서버는 데이터베이스에서 직접 정보를 수집합니다. 자세한 것은 메뉴얼을 참고하십시오."
 
-#: app/controllers/CControllerAcknowledgeEdit.php:146
+#: app/controllers/CControllerAcknowledgeEdit.php:147
 #: app/views/monitoring.acknowledge.edit.php:84
 msgid "Alarm acknowledgements"
 msgstr "알림 확인"
@@ -646,7 +650,7 @@ msgstr "맞춤"
 #: include/views/administration.general.gui.edit.php:36
 #: include/views/administration.usergroups.edit.php:45
 #: include/views/administration.users.list.php:22
-#: include/views/configuration.action.edit.php:658
+#: include/views/configuration.action.edit.php:659
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/monitoring.dashconf.php:52
 #: include/views/monitoring.dashconf.php:116
@@ -689,17 +693,17 @@ msgstr "허가된 호스트"
 msgid "Alternatively, you can install it manually:"
 msgstr "혹은, 수동으로 인스톨 하실 수 있습니다:"
 
-#: include/triggers.inc.php:1293
-#: include/views/configuration.action.edit.php:135
-#: include/views/configuration.action.edit.php:993
+#: include/triggers.inc.php:1253
+#: include/views/configuration.action.edit.php:133
+#: include/views/configuration.action.edit.php:990
 #: include/views/configuration.host.discovery.edit.php:269
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.triggers.edit.php:104
 msgid "And"
 msgstr "And"
 
-#: include/views/configuration.action.edit.php:134
-#: include/views/configuration.action.edit.php:992
+#: include/views/configuration.action.edit.php:132
+#: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:268
 msgid "And/Or"
 msgstr "And/Or"
@@ -719,7 +723,7 @@ msgstr "어떤 문자열이 포함됨"
 #: include/views/configuration.application.list.php:52
 #: include/views/configuration.httpconf.edit.php:62
 #: include/views/configuration.httpconf.edit.php:67
-#: include/views/configuration.httpconf.list.php:78
+#: include/views/configuration.httpconf.list.php:77
 #: include/views/inventory.host.view.php:168
 #: include/views/js/monitoring.sysmaps.js.php:115
 #: include/views/monitoring.screen.constructor.edit.php:512 latest.php:374
@@ -770,7 +774,7 @@ msgstr "\"%2$s\"에 ID \"%1$s\" 를 가진 어플리케이션은 이용할 수 �
 #: include/views/configuration.template.edit.php:183
 #: include/views/conf.import.php:33 include/views/inventory.host.view.php:155
 #: popup.php:55 search.php:134 search.php:160 search.php:189 search.php:399
-#: search.php:424 search.php:456 templates.php:593 templates.php:719
+#: search.php:424 search.php:456 templates.php:593 templates.php:723
 msgid "Applications"
 msgstr "어플리케이션"
 
@@ -785,12 +789,12 @@ msgctxt "maintenance status"
 msgid "Approaching"
 msgstr "메인터넌스 중"
 
-#: include/func.inc.php:240
+#: include/func.inc.php:239
 msgid "Apr"
 msgstr "4월"
 
-#: include/forms.inc.php:1790 include/func.inc.php:120
-#: include/func.inc.php:257 jsLoader.php:116
+#: include/forms.inc.php:1790 include/func.inc.php:119
+#: include/func.inc.php:256 jsLoader.php:116
 msgid "April"
 msgstr "4월"
 
@@ -856,14 +860,14 @@ msgid "At (hour:minute)"
 msgstr "시작시간 (시:분)"
 
 #: include/classes/api/services/CMaintenance.php:278
-#: include/classes/api/services/CMaintenance.php:527
+#: include/classes/api/services/CMaintenance.php:529
 msgid "At least one host or group should be selected."
 msgstr "적어도 한 개 이상의 호스트 혹은 호스트 그룹을 선택해야 합니다."
 
-#: include/classes/api/services/CMaintenance.php:367
-#: include/classes/api/services/CMaintenance.php:374
-#: include/classes/api/services/CMaintenance.php:512
-#: include/classes/api/services/CMaintenance.php:517
+#: include/classes/api/services/CMaintenance.php:368
+#: include/classes/api/services/CMaintenance.php:373
+#: include/classes/api/services/CMaintenance.php:514
+#: include/classes/api/services/CMaintenance.php:519
 msgid "At least one maintenance period must be created."
 msgstr "적어도 한 개 이상의 메인터넌스 기간을 작성할 필요가 있습니다."
 
@@ -877,7 +881,7 @@ msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be s
 msgstr "MySQL, PostgreSQL, Oracle, SQLite3, IBM DB2 중에 최소 한 가지가 지원될 필요가 있습니다."
 
 #: httpconf.php:46 include/views/configuration.httpconf.edit.php:80
-#: include/views/configuration.httpconf.list.php:75
+#: include/views/configuration.httpconf.list.php:74
 msgid "Attempts"
 msgstr "시도횟수"
 
@@ -899,19 +903,19 @@ msgstr "감사 데이터 보존기간 (일) \"%1$s\"."
 msgid "Audit log"
 msgstr "감사 로그"
 
-#: include/func.inc.php:244
+#: include/func.inc.php:243
 msgid "Aug"
 msgstr "8월"
 
-#: include/forms.inc.php:1774 include/func.inc.php:124
-#: include/func.inc.php:261 jsLoader.php:120
+#: include/forms.inc.php:1774 include/func.inc.php:123
+#: include/func.inc.php:260 jsLoader.php:120
 msgid "August"
 msgstr "8월"
 
 #: app/views/administration.mediatype.edit.php:73 include/menu.inc.php:270
 #: include/views/administration.authentication.edit.php:22
 #: include/views/configuration.httpconf.edit.php:252
-#: include/views/configuration.httpconf.list.php:76
+#: include/views/configuration.httpconf.list.php:75
 msgid "Authentication"
 msgstr "인증"
 
@@ -920,7 +924,7 @@ msgstr "인증"
 msgid "Authentication algorithm"
 msgstr "인증 알고리즘"
 
-#: include/views/configuration.action.edit.php:826
+#: include/views/configuration.action.edit.php:827
 #: include/views/configuration.host.discovery.edit.php:164
 #: include/views/configuration.item.edit.php:174
 #: include/views/configuration.item.massupdate.php:248
@@ -956,7 +960,7 @@ msgstr "인증 패스 프레이즈"
 msgid "Authentication protocol"
 msgstr "인증 프로토콜"
 
-#: include/views/configuration.action.list.php:31
+#: include/views/configuration.action.list.php:30
 msgid "Auto registration"
 msgstr "자동 등록"
 
@@ -983,7 +987,7 @@ msgstr "자동 등록 이벤트와 알림의 데이터 보존기간 (일 단위)
 
 #: include/hosts.inc.php:1075
 #: include/views/administration.general.other.edit.php:52
-#: include/views/configuration.action.edit.php:920
+#: include/views/configuration.action.edit.php:917
 #: include/views/configuration.host.edit.php:691
 #: include/views/configuration.host.massupdate.php:293
 #: include/views/configuration.host.prototype.edit.php:341
@@ -1106,7 +1110,7 @@ msgstr "아래쪽"
 msgid "Bulgarian (bg_BG)"
 msgstr "불가리아어 (bg_BG)"
 
-#: tr_status.php:769
+#: tr_status.php:803
 msgid "Bulk acknowledge"
 msgstr "장애대응 코멘트의 일괄처리"
 
@@ -1126,7 +1130,7 @@ msgstr "트리거 템플릿을 통해"
 msgid "CERT"
 msgstr "증명서"
 
-#: triggers.php:388
+#: triggers.php:393
 msgid "CONFIGURATION OF TRIGGERS"
 msgstr "트리거 설정"
 
@@ -1172,8 +1176,8 @@ msgstr "캐나다 (136 글자 수)"
 #: app/views/monitoring.acknowledge.edit.php:80
 #: include/classes/html/CButtonCancel.php:25
 #: include/classes/setup/CSetupWizard.php:103
-#: include/views/configuration.action.edit.php:1070
-#: include/views/configuration.action.edit.php:1084
+#: include/views/configuration.action.edit.php:1067
+#: include/views/configuration.action.edit.php:1082
 #: include/views/configuration.maintenance.edit.php:155
 #: include/views/configuration.services.parent.list.php:70
 #: include/views/conf.import.php:114
@@ -1228,10 +1232,11 @@ msgid "Cannot add application"
 msgstr "애플리케이션을 추가할 수 없습니다"
 
 #: include/classes/api/services/CTrigger.php:1304
-#: include/classes/api/services/CTriggerPrototype.php:1056
+#: include/classes/api/services/CTriggerPrototype.php:1055
 msgid "Cannot add dependency from a host to a template."
 msgstr "호스트에서 템플릿에 의존관계는 작성할 수 없습니다."
 
+#: include/classes/api/services/CDiscoveryRule.php:708
 #: include/triggers.inc.php:517
 #, c-format
 msgid "Cannot add dependency from trigger \"%1$s:%2$s\" to non existing trigger \"%3$s:%4$s\"."
@@ -1344,7 +1349,7 @@ msgstr "슬라이드 쇼를 추가할 수 없습니다"
 msgid "Cannot add template"
 msgstr "템플릿을 추가할 수 없습니다"
 
-#: triggers.php:226 triggers.php:357 tr_logform.php:152
+#: triggers.php:226 tr_logform.php:152
 msgid "Cannot add trigger"
 msgstr "트리거를 추가할 수 없습니다"
 
@@ -1375,7 +1380,7 @@ msgstr "Web시나리오를 추가할 수 없습니다"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "파라미터 없이는 메소드 \"%1$s.%2$s\"를 불러올 수 없습니다."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -1393,23 +1398,23 @@ msgstr "인증방법을 LDAP로 변경할 수 없습니다"
 msgid "Cannot change authentication method to Zabbix internal"
 msgstr "인증방법을 Zabbix 내부 데이터베이스로 변경할 수 없습니다"
 
-#: httpconf.php:191 httpconf.php:452 items.php:562 items.php:862
+#: httpconf.php:191 httpconf.php:452 items.php:562 items.php:867
 msgid "Cannot clear history"
 msgstr "히스토리를 정리할 수 없습니다"
 
-#: include/classes/api/services/CDiscoveryRule.php:1194
+#: include/classes/api/services/CDiscoveryRule.php:1326
 msgid "Cannot clone graph prototypes."
 msgstr "그래프 프로토타입을 복제할 수 없습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:1242
+#: include/classes/api/services/CDiscoveryRule.php:1374
 msgid "Cannot clone host prototypes."
 msgstr "호스트 프로토타입을 복제할 수 없습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:1076
+#: include/classes/api/services/CDiscoveryRule.php:1208
 msgid "Cannot clone item prototypes."
 msgstr "아이템 프로토타입을 복제할 수 없습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:595
+#: include/classes/api/services/CDiscoveryRule.php:621
 msgid "Cannot clone trigger prototypes."
 msgstr "트리거 프로토타입을 복제할 수 없습니다."
 
@@ -1417,13 +1422,20 @@ msgstr "트리거 프로토타입을 복제할 수 없습니다."
 msgid "Cannot connect to the database."
 msgstr "데이터베이스에 접속할 수 없습니다."
 
-#: graphs.php:371
-msgid "Cannot copy graphs"
-msgstr "그래프를 복사할 수 없습니다"
+#: graphs.php:375
+msgid "Cannot copy graph"
+msgid_plural "Cannot copy graphs"
+msgstr[0] ""
 
-#: items.php:819
-msgid "Cannot copy items"
-msgstr "아이템을 복사할 수 없습니다"
+#: items.php:823
+msgid "Cannot copy item"
+msgid_plural "Cannot copy items"
+msgstr[0] ""
+
+#: triggers.php:361
+msgid "Cannot copy trigger"
+msgid_plural "Cannot copy triggers"
+msgstr[0] ""
 
 #: include/triggers.inc.php:406
 #, c-format
@@ -1440,7 +1452,7 @@ msgid "Cannot create another database connection."
 msgstr "데이터베이스에 커넥션을 작성할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:1338
-#: include/classes/api/services/CTriggerPrototype.php:1087
+#: include/classes/api/services/CTriggerPrototype.php:1086
 msgid "Cannot create circular dependencies."
 msgstr "순환하는 의존관계는 작성할 수 없습니다."
 
@@ -1448,7 +1460,7 @@ msgstr "순환하는 의존관계는 작성할 수 없습니다."
 msgid "Cannot create dependency on trigger itself."
 msgstr "재귀적 의존관계(dependency on itself)는 허용되지 않습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:1026
+#: include/classes/api/services/CTriggerPrototype.php:1025
 msgid "Cannot create dependency on trigger prototype itself."
 msgstr "트리거 프로토타입 자신에 대한 의존관계는 작성할 수 없습니다."
 
@@ -1497,7 +1509,7 @@ msgid_plural "Cannot delete applications"
 msgstr[0] "애플리케이션을 삭제할 수 없습니다"
 
 #: include/classes/api/services/CTrigger.php:961
-#: include/classes/api/services/CTriggerPrototype.php:853
+#: include/classes/api/services/CTriggerPrototype.php:852
 msgid "Cannot delete dependency"
 msgstr "의존관계를 삭제할 수 없습니다"
 
@@ -1591,7 +1603,7 @@ msgstr "아이템 프로토타입을 삭제할 수 없습니다"
 msgid "Cannot delete item prototypes"
 msgstr "아이템 프로토타입을 삭제할 수 없습니다"
 
-#: items.php:892
+#: items.php:897
 msgid "Cannot delete items"
 msgstr "아이템을 삭제할 수 없습니다"
 
@@ -1666,7 +1678,7 @@ msgstr "템플릿 어플리케이션을 삭제할 수 없습니다."
 msgid "Cannot delete templated graphs."
 msgstr "템플릿 그래프를 삭제할 수 없습니다."
 
-#: include/classes/api/services/CHostPrototype.php:1107
+#: include/classes/api/services/CHostPrototype.php:1108
 msgid "Cannot delete templated host prototype."
 msgstr "템플릿 호스트 프로토타입을 삭제할 수 없습니다."
 
@@ -1683,7 +1695,7 @@ msgid "Cannot delete templated items."
 msgstr "템플릿 아이템을 삭제할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:1795
-#: include/classes/api/services/CTriggerPrototype.php:606
+#: include/classes/api/services/CTriggerPrototype.php:605
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "템플릿 트리거 \"%1$s:%2$s\"를 삭제할 수 없습니다"
@@ -1705,7 +1717,7 @@ msgstr "트리거 프로토타입을 삭제할 수 없습니다"
 msgid "Cannot delete trigger prototypes"
 msgstr "트리거의 프로토타입을 삭제할 수 없습니다"
 
-#: triggers.php:369
+#: triggers.php:374
 msgid "Cannot delete triggers"
 msgstr "트리거를 삭제할 수 없습니다"
 
@@ -1880,13 +1892,13 @@ msgstr "맵 \"%2$s\"에서 이용되는 호스트 \"%1$s\"를 찾을 수 없습�
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"에서 이용되고 있는 호스트 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:889
+#: include/classes/import/CConfigurationImport.php:895
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타입 \"%2$s\"를 위한 호스트 그룹 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:972
-#: include/classes/api/services/CDiscoveryRule.php:1058
+#: include/classes/api/services/CDiscoveryRule.php:1104
+#: include/classes/api/services/CDiscoveryRule.php:1190
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:386
 #: include/items.inc.php:439
 #, c-format
@@ -1903,42 +1915,42 @@ msgstr "맵 \"%2$s\"에서 이용되는 아이콘 \"%1$s\"를 찾을 수 없습�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "맵 \"%2$s\"에서 이용되는 아이콘 매핑 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1219
+#: include/classes/import/CConfigurationImport.php:1225
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"의 Y축의 최대치로서 이용되는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1070
+#: include/classes/import/CConfigurationImport.php:1076
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최대치로서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1203
+#: include/classes/import/CConfigurationImport.php:1209
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"의 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1050
+#: include/classes/import/CConfigurationImport.php:1056
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\"에서 Y축의 최소값으로 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1238
+#: include/classes/import/CConfigurationImport.php:1244
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "그래프 \"%3$s\"내에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1090
+#: include/classes/import/CConfigurationImport.php:1096
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 그래프 프로토타입 \"%3$s\" 에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1295
+#: include/classes/import/CConfigurationImport.php:1301
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr "트리거 \"%3$s\"내에서 이용되고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:1016
+#: include/classes/import/CConfigurationImport.php:1022
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "\"%5$s\"상의 디스커버리 규칙 \"%4$s\"의 트리거 프로토타입 \"%3$s\"에서 이용하고 있는 \"%2$s\"상의 아이템 \"%1$s\"를 찾을 수 없습니다."
@@ -1967,7 +1979,7 @@ msgstr "그 이름의 오브젝트는 존재하지 않습니다"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"에서 이용되고 있는 스크린 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:912
+#: include/classes/import/CConfigurationImport.php:918
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타입 \"%2$s\"를 위한 템플릿 \"%1$s\"를 찾을 수 없습니다."
@@ -1978,12 +1990,12 @@ msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 호스트 프로토타
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "맵 \"%2$s\"에서 이용되고 있는 트리거 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:694
+#: include/classes/import/CConfigurationImport.php:700
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "\"%3$s\"상의 아이템 \"%2$s\"에서 이용되고 있는 값의 매핑 \"%1$s\"를 찾을 수 없습니다."
 
-#: include/classes/import/CConfigurationImport.php:856
+#: include/classes/import/CConfigurationImport.php:862
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"상의 디스커버리 규칙 \"%3$s\"의 아이템 프로토타입 \"%2$s\"에서 이용되고 있는 값 매핑 \"%1$s\"를 찾을 수 없습니다."
@@ -2002,8 +2014,8 @@ msgstr "템플릿 표시명에 공백은 설정할 수 없습니다."
 
 #: include/classes/api/services/CTrigger.php:994
 #: include/classes/api/services/CTrigger.php:1133
-#: include/classes/api/services/CTriggerPrototype.php:703
-#: include/classes/api/services/CTriggerPrototype.php:770
+#: include/classes/api/services/CTriggerPrototype.php:702
+#: include/classes/api/services/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
 msgstr "조건식\"%s\"를 전개할 수 없습니다"
@@ -2012,13 +2024,13 @@ msgstr "조건식\"%s\"를 전개할 수 없습니다"
 #, c-format
 msgid "Cannot import screen \"%1$s\": subscreen \"%2$s\" does not exist."
 msgid_plural "Cannot import screen \"%1$s\": subscreens \"%2$s\" do not exist."
-msgstr[0] "스크린 \"%1$s\"를 임포트 할 수 없습니다 : 서브 스크린 \"%2$s\"이 없습니다."
+msgstr[0] "스크린 \"%1$s\"를 가져올 수 없습니다 : 서브 스크린 \"%2$s\"이 없습니다."
 
 #: include/classes/import/importers/CTemplateImporter.php:119
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "템플릿 \"%1$s\"를 임포트 할 수 없습니다. 링크되어 있는 템플릿 \"%2$s\"가 존재하지 않습니다."
+msgstr[0] "템플릿 \"%1$s\"를 가져올 수 없습니다. 링크되어 있는 템플릿 \"%2$s\"가 존재하지 않습니다."
 
 #: include/classes/mvc/CView.php:219
 #, c-format
@@ -2095,11 +2107,16 @@ msgstr "where가 없기 때문에 \"%1$s\"테이블에 update문을 실행할 �
 msgid "Cannot process applications from different hosts or templates."
 msgstr "다른 호스트 혹은 템플릿의 어플리케이션을 처리할 수 없습니다."
 
+#: include/classes/import/readers/CJsonImportReader.php:35
+#, c-format
+msgid "Cannot read JSON: %1$s."
+msgstr ""
+
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "Cannot read XML: %1$s."
-msgstr ""
+msgstr "XML: %1$s 을 읽을 수 없습니다."
 
 #: include/classes/server/CZabbixServer.php:221
 #, c-format
@@ -2128,7 +2145,7 @@ msgstr "커맨드를 송신할 수 없습니다. Zabbix서버 \"%1$s\"와의 접
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
 msgstr "어플리케이션 \"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
-#: include/classes/api/services/CHostGroup.php:389
+#: include/classes/api/services/CHostGroup.php:376
 #, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr "호스트 그룹\"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
@@ -2160,14 +2177,14 @@ msgid "Cannot set \"templateid\" for screen \"%1$s\"."
 msgstr "스크린\"%1$s\"에 \"templateid\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CTriggerPrototype.php:475
-#: include/classes/api/services/CTriggerPrototype.php:1491
+#: include/classes/api/services/CTriggerPrototype.php:1455
 #, c-format
 msgid "Cannot set \"templateid\" for trigger prototype \"%1$s\"."
 msgstr "트리거 프로토타입\"%1$s\"에 \"templateid\"를 설정할 수 없습니다."
 
 #: include/classes/api/services/CHost.php:897
-#: include/classes/api/services/CHost.php:1669
-#: include/classes/api/services/CHost.php:1797
+#: include/classes/api/services/CHost.php:1677
+#: include/classes/api/services/CHost.php:1805
 msgid "Cannot set inventory fields for disabled inventory."
 msgstr "비활성의 상태의 인벤토리 항목은 설정할 수 없습니다."
 
@@ -2241,7 +2258,7 @@ msgstr "액션 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
 msgstr "어플리케이션 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
-#: include/classes/api/services/CHostGroup.php:451
+#: include/classes/api/services/CHostGroup.php:438
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
 msgstr "호스트 그룹 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
@@ -2256,7 +2273,7 @@ msgstr "아이템 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 msgid "Cannot update \"%1$s\" for trigger \"%2$s\"."
 msgstr "트리거 \"%2$s\"의 \"%1$s\"를 갱신할 수 없습니다."
 
-#: include/classes/api/services/CHost.php:1781
+#: include/classes/api/services/CHost.php:1789
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
 msgstr "디스커버리 된 호스트 \"%1$s\" 의\"%2$s\"를 갱신할 수 없습니다."
@@ -2300,7 +2317,7 @@ msgstr "템플릿스크린\"%1$s\"의 \"templateid\"를 갱신할 수 없습니�
 msgid "Cannot update a discovered graph."
 msgstr "발견된 그래프를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CHostGroup.php:466
+#: include/classes/api/services/CHostGroup.php:453
 msgid "Cannot update a discovered host group."
 msgstr "발견된 호스트 그룹을 갱신할 수 없습니다"
 
@@ -2355,9 +2372,9 @@ msgstr "그룹을 갱신할 수 없습니다"
 msgid "Cannot update group."
 msgstr "그룹을 갱신할 수 없습니다."
 
-#: include/classes/api/services/CHostGroup.php:878
-#: include/classes/api/services/CHostGroup.php:983
-#: include/classes/api/services/CHostGroup.php:1124
+#: include/classes/api/services/CHostGroup.php:865
+#: include/classes/api/services/CHostGroup.php:970
+#: include/classes/api/services/CHostGroup.php:1111
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "발견된 호스트 \"%1$s\"의 그룹을 갱신할 수 없습니다"
@@ -2425,8 +2442,8 @@ msgstr "네트워크 맵을 갱신할 수 없습니다"
 msgid "Cannot update proxy"
 msgstr "프록시를 갱신할 수 없습니다"
 
-#: include/classes/api/services/CProxy.php:758
-#: include/classes/api/services/CProxy.php:849
+#: include/classes/api/services/CProxy.php:766
+#: include/classes/api/services/CProxy.php:857
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
 msgstr "발견된 호스트 \"%1$s\"의 프록시를 갱신할 수 없습니다"
@@ -2440,7 +2457,7 @@ msgid "Cannot update screen"
 msgstr "스크린을 갱신할 수 없습니다"
 
 #: app/controllers/CControllerScriptUpdate.php:48
-#: app/controllers/CControllerScriptUpdate.php:108
+#: app/controllers/CControllerScriptUpdate.php:109
 msgid "Cannot update script"
 msgstr "스크립트를 갱신할 수 없습니다"
 
@@ -2549,7 +2566,7 @@ msgid "Change password"
 msgstr "암호 변경"
 
 #: include/forms.inc.php:453 include/items.inc.php:129
-#: include/triggers.inc.php:1818 include/views/configuration.item.edit.php:217
+#: include/triggers.inc.php:1778 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:217
 #: include/views/configuration.item.prototype.edit.php:215
 msgid "Character"
@@ -2695,7 +2712,7 @@ msgstr "템플릿의 모순된 링크는 할 수 없습니다."
 msgid "Clear"
 msgstr "클리어"
 
-#: include/views/configuration.httpconf.list.php:159
+#: include/views/configuration.httpconf.list.php:158
 #: include/views/configuration.item.list.php:263
 msgid "Clear history"
 msgstr "히스토리를 삭제"
@@ -2719,7 +2736,7 @@ msgstr "시각"
 #: include/views/administration.general.iconmap.edit.php:137
 #: include/views/administration.general.regularexpressions.edit.php:135
 #: include/views/administration.general.valuemapping.edit.php:96
-#: include/views/configuration.action.edit.php:1108
+#: include/views/configuration.action.edit.php:1106
 #: include/views/configuration.application.edit.php:50
 #: include/views/configuration.discovery.edit.php:103
 #: include/views/configuration.graph.edit.php:367
@@ -2740,7 +2757,7 @@ msgstr "시각"
 msgid "Clone"
 msgstr "복제"
 
-#: include/func.inc.php:1775 include/views/js/monitoring.sysmaps.js.php:185
+#: include/func.inc.php:1773 include/views/js/monitoring.sysmaps.js.php:185
 #: include/views/js/monitoring.sysmaps.js.php:284
 #: include/views/js/monitoring.sysmaps.js.php:373 tr_testexpr.php:193
 msgid "Close"
@@ -2802,8 +2819,8 @@ msgstr "커맨드 액션"
 
 #: app/views/administration.script.edit.php:56
 #: app/views/administration.script.list.php:45
-#: include/views/configuration.action.edit.php:860
-#: include/views/configuration.action.edit.php:864 popup.php:1829
+#: include/views/configuration.action.edit.php:858
+#: include/views/configuration.action.edit.php:862 popup.php:1829
 msgid "Commands"
 msgstr "커맨드"
 
@@ -2833,7 +2850,7 @@ msgstr "조건"
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
 msgstr "액션\"%1$s\"의 조건 \"%2$s\"는 식 \"%3$s\"에서 이용되지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:832
+#: include/classes/api/services/CDiscoveryRule.php:964
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 조건 \"%2$s\"는 식 \"%3$s\"에서 이용되지 않습니다."
@@ -2843,15 +2860,15 @@ msgstr "디스커버리 규칙 \"%1$s\"의 조건 \"%2$s\"는 식 \"%3$s\"에서
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
 msgstr "액션\"%1$s\"의 식 \"%3$s\"내에서 이용되어 있는 조건 \"%2$s\"는 설정되어 있지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:831
+#: include/classes/api/services/CDiscoveryRule.php:963
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for discovery rule \"%1$s\" is not defined."
 msgstr "디스커버리 규칙\"%1$s\"의 식 \"%3$s\"내에서 이용되어있는 조건 \"%2$s\"는 설정되어 있지 않습니다."
 
-#: include/views/configuration.action.edit.php:147
-#: include/views/configuration.action.edit.php:1010
-#: include/views/configuration.action.edit.php:1096
-#: include/views/configuration.action.list.php:50
+#: include/views/configuration.action.edit.php:145
+#: include/views/configuration.action.edit.php:1007
+#: include/views/configuration.action.edit.php:1094
+#: include/views/configuration.action.list.php:49
 msgid "Conditions"
 msgstr "조건"
 
@@ -2871,7 +2888,7 @@ msgstr "설정 파일 \"%1$s\"를 작성하였습니다."
 
 #: conf.import.php:25 map.import.php:25 screen.import.php:25
 msgid "Configuration import"
-msgstr "설정의 임포트"
+msgstr "가져오기 설정"
 
 #: adm.gui.php:24
 msgid "Configuration of GUI"
@@ -2950,7 +2967,7 @@ msgid "Configuration of maintenance periods"
 msgstr "메인터넌스 기간 설정"
 
 #: app/controllers/CControllerMediatypeEdit.php:185
-#: app/controllers/CControllerMediatypeList.php:109
+#: app/controllers/CControllerMediatypeList.php:112
 msgid "Configuration of media types"
 msgstr "미디어 타입의 설정"
 
@@ -2959,7 +2976,7 @@ msgid "Configuration of network maps"
 msgstr "네트워크 맵 설정"
 
 #: app/controllers/CControllerProxyEdit.php:166
-#: app/controllers/CControllerProxyList.php:117
+#: app/controllers/CControllerProxyList.php:121
 msgid "Configuration of proxies"
 msgstr "프록시 설정"
 
@@ -2972,7 +2989,7 @@ msgid "Configuration of screens"
 msgstr "스크린 설정"
 
 #: app/controllers/CControllerScriptEdit.php:155
-#: app/controllers/CControllerScriptList.php:128
+#: app/controllers/CControllerScriptList.php:132
 msgid "Configuration of scripts"
 msgstr "스크립트 설정"
 
@@ -3148,9 +3165,9 @@ msgid "Coordinates"
 msgstr "좌표"
 
 #: include/views/configuration.copy.elements.php:108
-#: include/views/configuration.graph.list.php:160
+#: include/views/configuration.graph.list.php:159
 #: include/views/configuration.item.list.php:266
-#: include/views/configuration.triggers.list.php:229
+#: include/views/configuration.triggers.list.php:228
 msgid "Copy"
 msgstr "복사"
 
@@ -3173,7 +3190,7 @@ msgstr "회"
 msgid "Count of context switches. Returns integer"
 msgstr "컨텍스트 스위치의 횟수. integer를 리턴."
 
-#: include/views/configuration.action.list.php:35
+#: include/views/configuration.action.list.php:34
 msgid "Create action"
 msgstr "액션 작성"
 
@@ -3227,7 +3244,7 @@ msgstr "아이콘 작성"
 msgid "Create icon map"
 msgstr "아이콘 매핑 작성"
 
-#: include/views/configuration.item.list.php:27 items.php:898
+#: include/views/configuration.item.list.php:27 items.php:903
 msgid "Create item"
 msgstr "아이템 작성"
 
@@ -3312,7 +3329,7 @@ msgstr "Web시나리오 작성(먼저 호스트를 선택)"
 msgid "Created: Application \"%1$s\" on \"%2$s\"."
 msgstr "작성: \"%2$s\" 어플리케이션\"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:651
+#: include/classes/api/services/CDiscoveryRule.php:783
 #, c-format
 msgid "Created: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "작성: \"%2$s\" 디스커버리 규칙\"%1$s\"."
@@ -3337,7 +3354,7 @@ msgstr "작성: \"%2$s\" 아이템 프로토타입\"%1$s\"."
 msgid "Created: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "작성: \"%2$s\" 트리거 \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:699
+#: include/classes/api/services/CTriggerPrototype.php:698
 #, c-format
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "작성: \"%2$s\" 트리거 프로토타입\"%1$s\"."
@@ -3404,7 +3421,7 @@ msgstr "이번 주"
 msgid "Current year"
 msgstr "올해"
 
-#: include/views/configuration.action.edit.php:137
+#: include/views/configuration.action.edit.php:135
 #: include/views/configuration.host.discovery.edit.php:271
 msgid "Custom expression"
 msgstr "커스텀 조건식"
@@ -3439,7 +3456,7 @@ msgstr "승수"
 msgid "Custom screens"
 msgstr "커스텀 스크린"
 
-#: include/views/configuration.action.edit.php:787
+#: include/views/configuration.action.edit.php:788
 msgid "Custom script"
 msgstr "커스텀스크립트"
 
@@ -3459,7 +3476,7 @@ msgstr "커스텀슬라이드"
 msgid "Czech (cs_CZ)"
 msgstr "체코어 (cs_CZ)"
 
-#: include/classes/import/validators/C10XmlValidator.php:346
+#: include/classes/import/validators/C10XmlValidator.php:358
 msgctxt "XML date format"
 msgid "DD.MM.YY"
 msgstr "DD.MM.YY"
@@ -3693,12 +3710,12 @@ msgstr "디버그 모드"
 msgid "Debug mode updated"
 msgstr "디버그 모드를 갱신하였습니다"
 
-#: include/func.inc.php:248
+#: include/func.inc.php:247
 msgid "Dec"
 msgstr "12월"
 
-#: include/forms.inc.php:1814 include/func.inc.php:128
-#: include/func.inc.php:265 jsLoader.php:124
+#: include/forms.inc.php:1814 include/func.inc.php:127
+#: include/func.inc.php:264 jsLoader.php:124
 msgid "December"
 msgstr "12월"
 
@@ -3708,7 +3725,7 @@ msgstr "10진수"
 
 #: include/hosts.inc.php:31
 #: include/views/administration.general.iconmap.edit.php:121
-#: include/views/configuration.action.edit.php:439
+#: include/views/configuration.action.edit.php:437
 #: include/views/configuration.host.edit.php:133
 #: include/views/configuration.host.edit.php:216
 #: include/views/configuration.host.prototype.edit.php:93
@@ -3730,16 +3747,16 @@ msgstr "디폴트 갱신 간격(초)"
 msgid "Default host inventory mode"
 msgstr "기본 호스트 인벤토리 모드"
 
-#: include/views/configuration.action.edit.php:50
-#: include/views/configuration.action.edit.php:670
+#: include/views/configuration.action.edit.php:48
+#: include/views/configuration.action.edit.php:671
 msgid "Default message"
 msgstr "디폴트 메시지"
 
-#: actionconf.php:45 include/views/configuration.action.edit.php:381
+#: actionconf.php:45 include/views/configuration.action.edit.php:379
 msgid "Default operation step duration"
 msgstr "디폴트 액션 실행 스텝의 간격"
 
-#: include/views/configuration.action.edit.php:47
+#: include/views/configuration.action.edit.php:45
 msgid "Default subject"
 msgstr "디폴트 제목"
 
@@ -3779,23 +3796,23 @@ msgstr "연장 시간"
 #: include/views/administration.general.valuemapping.list.php:69
 #: include/views/administration.usergroups.list.php:151
 #: include/views/administration.users.list.php:147
-#: include/views/configuration.action.list.php:112
+#: include/views/configuration.action.list.php:111
 #: include/views/configuration.application.list.php:152
 #: include/views/configuration.discovery.list.php:74
-#: include/views/configuration.graph.list.php:162
+#: include/views/configuration.graph.list.php:161
 #: include/views/configuration.host.discovery.list.php:151
 #: include/views/configuration.hostgroups.list.php:148
 #: include/views/configuration.host.list.php:271
 #: include/views/configuration.host.prototype.list.php:137
-#: include/views/configuration.httpconf.list.php:162
+#: include/views/configuration.httpconf.list.php:161
 #: include/views/configuration.item.list.php:268
 #: include/views/configuration.item.prototype.list.php:122
 #: include/views/configuration.maintenance.list.php:78
 #: include/views/configuration.trigger.prototype.list.php:161
-#: include/views/configuration.triggers.list.php:231
+#: include/views/configuration.triggers.list.php:230
 #: include/views/monitoring.screen.list.php:110
 #: include/views/monitoring.slideconf.list.php:87
-#: include/views/monitoring.sysmap.list.php:80 templates.php:753
+#: include/views/monitoring.sysmap.list.php:80 templates.php:757
 msgid "Delete"
 msgstr "삭제"
 
@@ -3803,11 +3820,11 @@ msgstr "삭제"
 msgid "Delete all elements that are not present in the XML file?"
 msgstr "XML파일 내의 존재하지 않는 모든 요소를 삭제하시겠습니까?"
 
-#: include/views/configuration.template.edit.php:488 templates.php:754
+#: include/views/configuration.template.edit.php:488 templates.php:758
 msgid "Delete and clear"
 msgstr "삭제와 클리어"
 
-#: templates.php:755
+#: templates.php:759
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "선택한 템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되어 있는 모든 호스트에서 데이터가 삭제됩니다!)"
 
@@ -3819,7 +3836,7 @@ msgstr "템플릿과 데이터를 삭제하시겠습니까? (경고: 링크되�
 msgid "Delete application?"
 msgstr "어플리케이션을 삭제하시겠습니까?"
 
-#: include/views/configuration.action.edit.php:1110
+#: include/views/configuration.action.edit.php:1108
 msgid "Delete current action?"
 msgstr "현재 액션을 삭제하시겠습니까?"
 
@@ -3845,7 +3862,7 @@ msgstr "그래프를 삭제하시겠습니까?"
 msgid "Delete history of selected items?"
 msgstr "선택한 아이템의 히스토리를 삭제하시겠습니까?"
 
-#: include/views/configuration.httpconf.list.php:160
+#: include/views/configuration.httpconf.list.php:159
 msgid "Delete history of selected web scenarios?"
 msgstr "선택한 Web시나리오의 히스토리를 삭제하시겠습니까?"
 
@@ -3900,7 +3917,7 @@ msgstr "스크립트를 삭제하시겠습니까?"
 msgid "Delete selected"
 msgstr "선택 항목 삭제"
 
-#: include/views/configuration.action.list.php:112
+#: include/views/configuration.action.list.php:111
 msgid "Delete selected actions?"
 msgstr "선택한 액션을 삭제하시겠습니까?"
 
@@ -3917,11 +3934,11 @@ msgstr "선택한 디스커버리 규칙를 삭제하시겠습니까?"
 msgid "Delete selected elements?"
 msgstr "선택한 요소를 삭제하시겠습니까?"
 
-#: include/views/configuration.graph.list.php:163
+#: include/views/configuration.graph.list.php:162
 msgid "Delete selected graph prototypes?"
 msgstr "선택한 그래프 프로토타입을 삭제하시겠습니까?"
 
-#: include/views/configuration.graph.list.php:164
+#: include/views/configuration.graph.list.php:163
 msgid "Delete selected graphs?"
 msgstr "선택한 그래프를 삭제하시겠습니까?"
 
@@ -4002,7 +4019,7 @@ msgstr "선택한 스크립트를 삭제하시겠습니까?"
 msgid "Delete selected slide shows?"
 msgstr "선택한 슬라이드 쇼를 삭제하시겠습니까?"
 
-#: templates.php:753
+#: templates.php:757
 msgid "Delete selected templates?"
 msgstr "선택한 템플릿을 삭제하시겠습니까?"
 
@@ -4010,7 +4027,7 @@ msgstr "선택한 템플릿을 삭제하시겠습니까?"
 msgid "Delete selected trigger prototypes?"
 msgstr "선택한 트리거 프로토타입을 삭제하시겠습니까?"
 
-#: include/views/configuration.triggers.list.php:231
+#: include/views/configuration.triggers.list.php:230
 msgid "Delete selected triggers?"
 msgstr "선택한 트리거를 삭제하시겠습니까?"
 
@@ -4036,7 +4053,7 @@ msgstr[0] "선택한 값의 매핑을 삭제하시겠습니까? 이 설정은 �
 msgid "Delete selected value maps?"
 msgstr "선택한 값의 맵을 삭제하시겠습니까?"
 
-#: include/views/configuration.httpconf.list.php:162
+#: include/views/configuration.httpconf.list.php:161
 msgid "Delete selected web scenarios?"
 msgstr "선택한 Web시나리오를 삭제하시겠습니까?"
 
@@ -4089,7 +4106,7 @@ msgstr "삭제: \"%2$s\" 그래프\"%1$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "삭제: 호스트\"%1$s\"."
 
-#: include/classes/api/services/CHostPrototype.php:970
+#: include/classes/api/services/CHostPrototype.php:971
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "삭제: \"%2$s\" 호스트 프로토타입\"%1$s\"."
@@ -4119,7 +4136,7 @@ msgstr "삭제: 템플릿 \"%1$s\"."
 msgid "Deleted: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "삭제: \"%2$s\"의 트리거 \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:650
+#: include/classes/api/services/CTriggerPrototype.php:649
 #, c-format
 msgid "Deleted: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "삭제: \"%2$s\"의 트리거 프로토타입\"%1$s\"."
@@ -4158,15 +4175,15 @@ msgstr "거부"
 msgid "Dependencies"
 msgstr "의존관계"
 
-#: include/triggers.inc.php:979 tr_status.php:559
+#: include/triggers.inc.php:939 tr_status.php:578
 msgid "Dependent"
 msgstr "의존처"
 
-#: include/triggers.inc.php:961
+#: include/triggers.inc.php:921
 #: include/views/configuration.services.edit.php:123
 #: include/views/configuration.trigger.prototype.list.php:88
-#: include/views/configuration.triggers.list.php:137 popup.php:1145
-#: tr_status.php:544
+#: include/views/configuration.triggers.list.php:136 popup.php:1145
+#: tr_status.php:563
 msgid "Depends on"
 msgstr "의존 대상"
 
@@ -4209,10 +4226,10 @@ msgid "Detailed host information. Returns string"
 msgstr "상세 호스트 정보. 문자열값을 리턴."
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1183
-#: include/blocks.inc.php:467 include/func.inc.php:1747
+#: include/blocks.inc.php:468 include/func.inc.php:1745
 #: include/views/administration.auditlogs.list.php:66
-#: include/views/configuration.action.edit.php:391
-#: include/views/configuration.action.edit.php:395
+#: include/views/configuration.action.edit.php:389
+#: include/views/configuration.action.edit.php:393
 #: include/views/inventory.host.view.php:212 queue.php:73
 msgid "Details"
 msgstr "자세히"
@@ -4294,17 +4311,17 @@ msgstr "크기(열x행)"
 #: app/views/administration.mediatype.list.php:131
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.usergroups.list.php:144
-#: include/views/configuration.action.list.php:111
+#: include/views/configuration.action.list.php:110
 #: include/views/configuration.application.list.php:151
 #: include/views/configuration.discovery.list.php:73
 #: include/views/configuration.host.discovery.list.php:148
 #: include/views/configuration.host.list.php:268
 #: include/views/configuration.host.prototype.list.php:134
-#: include/views/configuration.httpconf.list.php:158
+#: include/views/configuration.httpconf.list.php:157
 #: include/views/configuration.item.list.php:262
 #: include/views/configuration.item.prototype.list.php:119
 #: include/views/configuration.trigger.prototype.list.php:157
-#: include/views/configuration.triggers.list.php:228
+#: include/views/configuration.triggers.list.php:227
 msgid "Disable"
 msgstr "비활성"
 
@@ -4337,7 +4354,7 @@ msgstr "선택한 호스트 그룹의 호스트를 비활성으로 하시겠습�
 msgid "Disable hosts monitored by selected proxies?"
 msgstr "선택한 프록시에 의한 호스트 감시를 비활성으로 하시겠습니까?"
 
-#: include/views/configuration.action.list.php:111
+#: include/views/configuration.action.list.php:110
 msgid "Disable selected actions?"
 msgstr "선택한 액션을 비활성으로 하시겠습니까?"
 
@@ -4378,11 +4395,11 @@ msgstr "선택한 연락 방법을 삭제하시겠습니까?"
 msgid "Disable selected trigger prototypes?"
 msgstr "선택한 트리거 프로토타입을 비활성으로 하시겠습니까?"
 
-#: include/views/configuration.triggers.list.php:228
+#: include/views/configuration.triggers.list.php:227
 msgid "Disable selected triggers?"
 msgstr "선택한 트리거를 비활성으로 하시겠습니까?"
 
-#: include/views/configuration.httpconf.list.php:158
+#: include/views/configuration.httpconf.list.php:157
 msgid "Disable selected web scenarios?"
 msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 
@@ -4390,7 +4407,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: include/discovery.inc.php:117 include/hosts.inc.php:1073
 #: include/html.inc.php:338 include/httptest.inc.php:46
 #: include/items.inc.php:159 include/items.inc.php:213
-#: include/triggers.inc.php:1236 include/triggers.inc.php:2068
+#: include/triggers.inc.php:1196 include/triggers.inc.php:2028
 #: include/users.inc.php:85
 #: include/views/administration.general.other.edit.php:50
 #: include/views/administration.usergroups.list.php:53
@@ -4399,7 +4416,7 @@ msgstr "선택한 Web시나리오를 비활성으로 하시겠습니까?"
 #: include/views/administration.users.edit.php:210
 #: include/views/administration.users.list.php:134
 #: include/views/administration.users.list.php:136
-#: include/views/configuration.action.list.php:79
+#: include/views/configuration.action.list.php:78
 #: include/views/configuration.host.edit.php:689
 #: include/views/configuration.host.list.php:114
 #: include/views/configuration.host.massupdate.php:190
@@ -4429,13 +4446,13 @@ msgid "Discovered device"
 msgstr "발견된 디바이스"
 
 #: events.php:295 include/menu.inc.php:103 include/menu.inc.php:233
-#: include/views/configuration.action.list.php:30
+#: include/views/configuration.action.list.php:29
 #: include/views/configuration.host.list.php:63
 #: include/views/configuration.host.list.php:246
 #: include/views/inventory.host.view.php:161
 #: include/views/inventory.host.view.php:172 search.php:138 search.php:176
 #: search.php:205 search.php:404 search.php:444 search.php:461
-#: templates.php:598 templates.php:739
+#: templates.php:598 templates.php:743
 msgid "Discovery"
 msgstr "디스커버리"
 
@@ -4491,7 +4508,7 @@ msgstr "디스커버리 규칙\"%1$s\"은 \"%2$s\"에 이미 존재합니다."
 msgid "Discovery rule \"%1$s\" already exists."
 msgstr "디스커버리 규칙\"%1$s\"은 이미 존재합니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:876
+#: include/classes/api/services/CDiscoveryRule.php:1008
 #, c-format
 msgid "Discovery rule \"%1$s:%2$s\" has incorrect lifetime: \"%3$s\". (min: %4$d, max: %5$d, user macro allowed)"
 msgstr "디스커버리 규칙\"%1$s:%2$s\"의 생성기간이 올바르지 않습니다: \"%3$s\".(사용자매크로에서는 최소 : %4$d, 최대: %5$d 가 허가되어 있습니다)"
@@ -4567,12 +4584,12 @@ msgstr "그래프 표시"
 msgid "Display stacked graph"
 msgstr "누계 그래프 표시"
 
-#: include/func.inc.php:1548 search.php:251 search.php:347 search.php:488
+#: include/func.inc.php:1547 search.php:251 search.php:347 search.php:488
 #, c-format
 msgid "Displaying %1$s of %2$s found"
 msgstr "%2$s 중 %1$s건을 표시하고 있습니다"
 
-#: include/func.inc.php:1570
+#: include/func.inc.php:1569
 #, c-format
 msgid "Displaying %1$s to %2$s of %3$s found"
 msgstr "%3$s 건 중 %1$s 에서 %2$s 까지를 표시하고 있습니다"
@@ -4610,8 +4627,8 @@ msgstr "설정 파일 다운로드"
 
 #: app/views/report.services.php:54 app/views/report.services.php:55
 #: app/views/report.services.php:56 app/views/report.services.php:57
-#: include/classes/screens/CScreenDiscovery.php:127
-#: include/classes/screens/CScreenDiscovery.php:256
+#: include/classes/screens/CScreenDiscovery.php:129
+#: include/classes/screens/CScreenDiscovery.php:258
 #: include/views/configuration.services.edit.php:151
 #: include/views/configuration.services.edit.php:193
 msgid "Downtime"
@@ -4669,7 +4686,7 @@ msgstr "값의 맵 \"name\"의 값 \"%1$s\"가 중복되었습니다."
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "트리거\"%1$s\"의 의존관계가 중복되어 있습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:1257
+#: include/classes/api/services/CTriggerPrototype.php:1256
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
 msgstr "트리거 프로토타입 \"%1$s\"의 의존관계가 중복되었습니다."
@@ -4684,14 +4701,14 @@ msgstr "호스트 프로토타입 \"%1$s\"의 그룹 프로토타입 이름\"%2$
 msgid "Duplicate host group ID \"%2$s\" for host prototype \"%1$s\"."
 msgstr "호스트 프로토타입 \"%1$s\"의 호스트 그룹ID\"%2$s\"가 중복되어 있습니다."
 
-#: include/classes/api/services/CHost.php:1617
-#: include/classes/api/services/CHost.php:1827
+#: include/classes/api/services/CHost.php:1625
+#: include/classes/api/services/CHost.php:1835
 #, c-format
 msgid "Duplicate host. Host with the same host name \"%s\" already exists in data."
 msgstr "호스트가 중복되어 있습니다. 같은 호스트 이름 \"%s\"를 지닌 호스트설정이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1624
-#: include/classes/api/services/CHost.php:1847
+#: include/classes/api/services/CHost.php:1632
+#: include/classes/api/services/CHost.php:1855
 #, c-format
 msgid "Duplicate host. Host with the same visible name \"%s\" already exists in data."
 msgstr "호스트가 중복되어 있습니다. 같은 호스트 표시 이름 \"%s\"를 지닌 호스트가 이미 존재합니다."
@@ -4740,7 +4757,7 @@ msgstr "스크린 \"%2$s\"을 위한 유저그룹 내의 usrgrpid \"%1$s\"가 �
 msgid "Duration"
 msgstr "기간"
 
-#: include/views/configuration.action.edit.php:391
+#: include/views/configuration.action.edit.php:389
 msgid "Duration (sec)"
 msgstr "기간 (초)"
 
@@ -4757,8 +4774,8 @@ msgid "Each URL should have a unique name. Please make sure there is only one UR
 msgstr "각URL의 이름은 중복될 수 없습니다. 같은 URL 이름이 이용되지 않는지 확인해 주세요"
 
 #: include/views/administration.users.edit.php:246
-#: include/views/configuration.action.edit.php:451
-#: include/views/configuration.action.edit.php:467
+#: include/views/configuration.action.edit.php:449
+#: include/views/configuration.action.edit.php:465
 #: include/views/configuration.maintenance.edit.php:114
 #: include/views/configuration.trigger.prototype.edit.php:64
 #: include/views/configuration.triggers.edit.php:60
@@ -4848,12 +4865,12 @@ msgstr "색의 설정이 공백입니다."
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "액션 \"%1$s\"의 필터조건식ID가 공백입니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:859
+#: include/classes/api/services/CDiscoveryRule.php:991
 #, c-format
 msgid "Empty filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 필터조건식ID가 공백입니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:851
+#: include/classes/api/services/CDiscoveryRule.php:983
 #, c-format
 msgid "Empty filter condition macro for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙\"%1$s\"의 필터조건 매크로가 공백입니다."
@@ -4872,11 +4889,11 @@ msgstr "호스트가 공백입니다."
 #: include/classes/api/services/CDRule.php:605
 #: include/classes/api/services/CGraph.php:529
 #: include/classes/api/services/CGraphPrototype.php:545
-#: include/classes/api/services/CHostGroup.php:432
-#: include/classes/api/services/CHostGroup.php:509
+#: include/classes/api/services/CHostGroup.php:419
+#: include/classes/api/services/CHostGroup.php:496
 #: include/classes/api/services/CHostInterface.php:391
 #: include/classes/api/services/CHost.php:1171
-#: include/classes/api/services/CHostPrototype.php:906
+#: include/classes/api/services/CHostPrototype.php:907
 #: include/classes/api/services/CIconMap.php:301
 #: include/classes/api/services/CItem.php:554
 #: include/classes/api/services/CItemPrototype.php:705
@@ -4897,7 +4914,7 @@ msgstr "호스트가 공백입니다."
 #: include/classes/api/services/CTrigger.php:748
 #: include/classes/api/services/CTrigger.php:836
 #: include/classes/api/services/CTrigger.php:926
-#: include/classes/api/services/CTriggerPrototype.php:585
+#: include/classes/api/services/CTriggerPrototype.php:584
 #: include/classes/api/services/CUserGroup.php:581
 #: include/classes/api/services/CUserMacro.php:366
 #: include/classes/api/services/CUserMacro.php:534
@@ -4985,17 +5002,17 @@ msgstr "Web시나리오ID가 공백입니다."
 #: app/views/administration.mediatype.list.php:130
 #: include/views/administration.auditlogs.list.php:42
 #: include/views/administration.usergroups.list.php:143
-#: include/views/configuration.action.list.php:110
+#: include/views/configuration.action.list.php:109
 #: include/views/configuration.application.list.php:150
 #: include/views/configuration.discovery.list.php:72
 #: include/views/configuration.host.discovery.list.php:145
 #: include/views/configuration.host.list.php:267
 #: include/views/configuration.host.prototype.list.php:131
-#: include/views/configuration.httpconf.list.php:157
+#: include/views/configuration.httpconf.list.php:156
 #: include/views/configuration.item.list.php:261
 #: include/views/configuration.item.prototype.list.php:116
 #: include/views/configuration.trigger.prototype.list.php:154
-#: include/views/configuration.triggers.list.php:227
+#: include/views/configuration.triggers.list.php:226
 msgid "Enable"
 msgstr "활성"
 
@@ -5043,7 +5060,7 @@ msgstr "선택한 프록시에 의한 호스트의 감시를 활성화 하시겠
 msgid "Enable internal housekeeping"
 msgstr "데이터 삭제처리를 활성화"
 
-#: include/views/configuration.action.list.php:110
+#: include/views/configuration.action.list.php:109
 msgid "Enable selected actions?"
 msgstr "선택한 액션을 활성화 하시겠습니까?"
 
@@ -5085,11 +5102,11 @@ msgstr "선택한 미디어 타입을 활성화 하시겠습니까?"
 msgid "Enable selected trigger prototypes?"
 msgstr "선택한 트리거 프로토타입을 활성화 하시겠습니까?"
 
-#: include/views/configuration.triggers.list.php:227
+#: include/views/configuration.triggers.list.php:226
 msgid "Enable selected triggers?"
 msgstr "선택한 트리거를 활성화 하시겠습니까?"
 
-#: include/views/configuration.httpconf.list.php:157
+#: include/views/configuration.httpconf.list.php:156
 msgid "Enable selected web scenarios?"
 msgstr "선택한 Web시나리오를 활성화 하시겠습니까?"
 
@@ -5097,7 +5114,7 @@ msgstr "선택한 Web시나리오를 활성화 하시겠습니까?"
 #: app/views/administration.mediatype.list.php:103 auditlogs.php:136
 #: include/discovery.inc.php:116 include/html.inc.php:334
 #: include/httptest.inc.php:45 include/items.inc.php:158
-#: include/items.inc.php:210 include/triggers.inc.php:2065
+#: include/items.inc.php:210 include/triggers.inc.php:2025
 #: include/views/administration.usergroups.edit.php:65
 #: include/views/administration.usergroups.edit.php:79
 #: include/views/administration.usergroups.edit.php:80
@@ -5107,8 +5124,8 @@ msgstr "선택한 Web시나리오를 활성화 하시겠습니까?"
 #: include/views/administration.users.edit.php:204
 #: include/views/administration.users.list.php:133
 #: include/views/administration.users.list.php:137
-#: include/views/configuration.action.edit.php:65
-#: include/views/configuration.action.list.php:87
+#: include/views/configuration.action.edit.php:63
+#: include/views/configuration.action.list.php:86
 #: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.host.discovery.edit.php:257
 #: include/views/configuration.host.edit.php:301
@@ -5159,7 +5176,7 @@ msgstr "에러: %1$s"
 msgid "Event"
 msgstr "이벤트"
 
-#: include/classes/screens/CScreenHistory.php:177
+#: include/classes/screens/CScreenHistory.php:164
 msgid "Event ID"
 msgstr "이벤트ID"
 
@@ -5186,7 +5203,7 @@ msgstr "이벤트 장애대응 코멘트 \"%1$s\"."
 msgid "Event details"
 msgstr "이벤트 세부 내용"
 
-#: include/triggers.inc.php:1234
+#: include/triggers.inc.php:1194
 msgid "Event generation"
 msgstr "이벤트 생성"
 
@@ -5198,7 +5215,7 @@ msgstr "이벤트리스트 [최근20]"
 msgid "Event log monitoring. Returns log"
 msgstr "이벤트 로그의 감시. 로그 값을 리턴."
 
-#: include/views/configuration.action.list.php:27
+#: include/views/configuration.action.list.php:26
 msgid "Event source"
 msgstr "이벤트 소스"
 
@@ -5249,7 +5266,7 @@ msgstr "WMI쿼리를 실행하여 처음의 검색결과를 리턴. 리퀘스트
 
 #: app/views/administration.script.edit.php:50
 #: app/views/administration.script.list.php:44
-#: include/views/configuration.action.edit.php:807 popup.php:1828
+#: include/views/configuration.action.edit.php:808 popup.php:1828
 msgid "Execute on"
 msgstr "다음 실행"
 
@@ -5298,15 +5315,15 @@ msgstr "분해도 그래프"
 #: include/views/administration.general.valuemapping.list.php:68
 #: include/views/configuration.host.list.php:269
 #: include/views/monitoring.screen.list.php:107
-#: include/views/monitoring.sysmap.list.php:79 templates.php:752
+#: include/views/monitoring.sysmap.list.php:79 templates.php:756
 msgid "Export"
-msgstr "익스포트"
+msgstr "내보내기"
 
 #: events.php:299
 msgid "Export to CSV"
-msgstr "CSV 익스포트"
+msgstr "CSV 내보내기"
 
-#: include/triggers.inc.php:1231
+#: include/triggers.inc.php:1191
 #: include/views/administration.general.iconmap.edit.php:48
 #: include/views/administration.general.regularexpressions.edit.php:44
 #: include/views/administration.general.regularexpressions.edit.php:117
@@ -5316,7 +5333,7 @@ msgstr "CSV 익스포트"
 #: include/views/configuration.trigger.prototype.list.php:44
 #: include/views/configuration.triggers.edit.php:136
 #: include/views/configuration.triggers.edit.php:145
-#: include/views/configuration.triggers.list.php:87 trigger_prototypes.php:38
+#: include/views/configuration.triggers.list.php:86 trigger_prototypes.php:38
 #: triggers.php:41 triggers.php:47 tr_logform.php:257 tr_logform.php:292
 #: tr_testexpr.php:146
 msgid "Expression"
@@ -5419,12 +5436,12 @@ msgstr "즐겨찾기의 슬라이드 쇼"
 msgid "Favourites"
 msgstr "즐겨찾기"
 
-#: include/func.inc.php:238
+#: include/func.inc.php:237
 msgid "Feb"
 msgstr "2월"
 
-#: include/forms.inc.php:1770 include/func.inc.php:118
-#: include/func.inc.php:255 jsLoader.php:114
+#: include/forms.inc.php:1770 include/func.inc.php:117
+#: include/func.inc.php:254 jsLoader.php:114
 msgid "February"
 msgstr "2월"
 
@@ -5593,7 +5610,7 @@ msgstr "종료"
 msgid "Finnish (fi_FI)"
 msgstr "핀란드어 (fi_FI)"
 
-#: include/forms.inc.php:1831 include/func.inc.php:1516
+#: include/forms.inc.php:1831 include/func.inc.php:1515
 #: include/maintenances.inc.php:111
 msgid "First"
 msgstr "첫번째"
@@ -5657,12 +5674,12 @@ msgstr "네번째"
 msgid "French (fr_FR)"
 msgstr "프랑스어 (fr_FR)"
 
-#: include/func.inc.php:218
+#: include/func.inc.php:217
 msgid "Fri"
 msgstr "금"
 
 #: include/forms.inc.php:1736 include/forms.inc.php:1867
-#: include/func.inc.php:140 include/func.inc.php:230
+#: include/func.inc.php:139 include/func.inc.php:229
 msgid "Friday"
 msgstr "금"
 
@@ -5746,7 +5763,7 @@ msgstr "독일어 (de_DE)"
 msgid "Get content of web page. Returns web page source as text"
 msgstr "Web페이지 콘텐츠 습득. text로 Web페이지 소스를 리턴."
 
-#: include/triggers.inc.php:1369 tr_testexpr.php:35
+#: include/triggers.inc.php:1329 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "설정한 조건식은 매크로가 아닙니다"
 
@@ -5754,7 +5771,7 @@ msgstr "설정한 조건식은 매크로가 아닙니다"
 msgid "Global expression does not exist."
 msgstr "글로벌 조건식이 존재하지 않습니다."
 
-#: include/views/configuration.action.edit.php:790
+#: include/views/configuration.action.edit.php:791
 msgid "Global script"
 msgstr "글로벌 스크립트"
 
@@ -5770,7 +5787,7 @@ msgstr "글로벌 값"
 msgid "Go to"
 msgstr "다음 페이지로 이동"
 
-#: app/views/system.warning.php:26 include/func.inc.php:1691
+#: app/views/system.warning.php:26 include/func.inc.php:1689
 msgid "Go to dashboard"
 msgstr "대쉬보드로 이동"
 
@@ -5844,6 +5861,11 @@ msgstr "템플릿의 아이템을 포함한 그래프 \"%1$s\"에는 다른 호�
 msgid "Graph added"
 msgstr "그래프를 추가하였습니다"
 
+#: graphs.php:374
+msgid "Graph copied"
+msgid_plural "Graphs copied"
+msgstr[0] ""
+
 #: graphs.php:295
 msgid "Graph deleted"
 msgstr "그래프를 삭제하였습니다"
@@ -5910,7 +5932,7 @@ msgid "Graph sum"
 msgstr "그래프 합계치"
 
 #: include/views/configuration.graph.edit.php:68
-#: include/views/configuration.graph.list.php:75
+#: include/views/configuration.graph.list.php:74
 #: include/views/monitoring.history.php:233 popup.php:1432
 msgid "Graph type"
 msgstr "그래프 종류"
@@ -5945,13 +5967,9 @@ msgstr "같은 이름에 다른 타입의 그래프가 존재합니다."
 #: include/views/monitoring.charts.php:21 jsLoader.php:199 popup.php:91
 #: search.php:131 search.php:137 search.php:172 search.php:201 search.php:235
 #: search.php:287 search.php:337 search.php:402 search.php:436 search.php:459
-#: templates.php:596 templates.php:731
+#: templates.php:596 templates.php:735
 msgid "Graphs"
 msgstr "그래프"
-
-#: graphs.php:371
-msgid "Graphs copied"
-msgstr "그래프를 복사하였습니다"
 
 #: graphs.php:319
 msgid "Graphs deleted"
@@ -5977,11 +5995,11 @@ msgstr "그리드"
 #: include/screens.inc.php:680
 #: include/views/configuration.application.list.php:34
 #: include/views/configuration.copy.elements.php:61
-#: include/views/configuration.graph.list.php:46
+#: include/views/configuration.graph.list.php:45
 #: include/views/configuration.host.list.php:27
-#: include/views/configuration.httpconf.list.php:47
+#: include/views/configuration.httpconf.list.php:46
 #: include/views/configuration.maintenance.list.php:26
-#: include/views/configuration.triggers.list.php:61
+#: include/views/configuration.triggers.list.php:60
 #: include/views/inventory.host.list.php:25
 #: include/views/inventory.host.list.php:60
 #: include/views/monitoring.charts.php:24
@@ -5996,7 +6014,7 @@ msgstr "그리드"
 msgid "Group"
 msgstr "그룹"
 
-#: include/classes/api/services/CHostGroup.php:541
+#: include/classes/api/services/CHostGroup.php:528
 #, c-format
 msgid "Group \"%1$s\" cannot be deleted, because it is used by a host prototype."
 msgstr "호스트 프로토타입에서 이용되고 있기 때문에 그룹\"%1$s\"은 삭제할 수 없습니다."
@@ -6092,7 +6110,7 @@ msgid "HTTP authentication"
 msgstr "HTTP 인증"
 
 #: include/views/configuration.httpconf.edit.php:102
-#: include/views/configuration.httpconf.list.php:77
+#: include/views/configuration.httpconf.list.php:76
 msgid "HTTP proxy"
 msgstr "HTTP 프록시"
 
@@ -6124,7 +6142,7 @@ msgid "Headers"
 msgstr "헤더"
 
 #: graphs.php:42 include/views/configuration.graph.edit.php:64
-#: include/views/configuration.graph.list.php:74
+#: include/views/configuration.graph.list.php:73
 #: include/views/js/monitoring.sysmaps.js.php:47
 #: include/views/monitoring.screen.constructor.edit.php:688
 #: include/views/monitoring.sysmap.edit.php:109
@@ -6180,7 +6198,7 @@ msgid "History (in days)"
 msgstr "히스토리 (일)"
 
 #: httpconf.php:184 httpconf.php:191 httpconf.php:440 httpconf.php:452
-#: items.php:555 items.php:562 items.php:850 items.php:862
+#: items.php:555 items.php:562 items.php:855 items.php:867
 msgid "History cleared"
 msgstr "이력이 삭제되었습니다"
 
@@ -6223,30 +6241,30 @@ msgstr "가로 위치"
 #: app/views/monitoring.web.view.php:29 app/views/monitoring.web.view.php:36
 #: app/views/monitoring.widget.hosts.view.php:256
 #: app/views/monitoring.widget.hosts.view.php:313 events.php:289
-#: events.php:435 events.php:535 httpconf.php:184 httpconf.php:331
+#: events.php:435 events.php:541 httpconf.php:184 httpconf.php:331
 #: httpconf.php:389 httpconf.php:440 include/actions.inc.php:47
-#: include/audit.inc.php:27 include/blocks.inc.php:624
-#: include/blocks.inc.php:790 include/classes/api/services/CHttpTest.php:417
+#: include/audit.inc.php:27 include/blocks.inc.php:625
+#: include/blocks.inc.php:791 include/classes/api/services/CHttpTest.php:417
 #: include/classes/screens/CScreenEvents.php:37
 #: include/classes/screens/CScreenHostgroupTriggers.php:135
 #: include/classes/screens/CScreenHostTriggers.php:67
 #: include/classes/screens/CScreenHostTriggers.php:135
 #: include/classes/screens/CScreenTriggersInfo.php:40
 #: include/classes/setup/CSetupWizard.php:282 include/forms.inc.php:483
-#: include/maps.inc.php:24 include/triggers.inc.php:871
-#: include/triggers.inc.php:1219
+#: include/maps.inc.php:24 include/triggers.inc.php:831
+#: include/triggers.inc.php:1179
 #: include/views/configuration.application.list.php:35
 #: include/views/configuration.application.list.php:51
-#: include/views/configuration.graph.list.php:47
+#: include/views/configuration.graph.list.php:46
 #: include/views/configuration.host.edit.php:556
 #: include/views/configuration.host.massupdate.php:385
 #: include/views/configuration.host.prototype.edit.php:175
-#: include/views/configuration.httpconf.list.php:48
-#: include/views/configuration.httpconf.list.php:70
+#: include/views/configuration.httpconf.list.php:47
+#: include/views/configuration.httpconf.list.php:69
 #: include/views/configuration.item.list.php:56
-#: include/views/configuration.triggers.list.php:62
-#: include/views/configuration.triggers.list.php:85
-#: include/views/configuration.triggers.list.php:104
+#: include/views/configuration.triggers.list.php:61
+#: include/views/configuration.triggers.list.php:84
+#: include/views/configuration.triggers.list.php:103
 #: include/views/inventory.host.list.php:59
 #: include/views/inventory.host.view.php:154
 #: include/views/inventory.host.view.php:167
@@ -6258,8 +6276,8 @@ msgstr "가로 위치"
 #: include/views/monitoring.screen.constructor.edit.php:420
 #: include/views/monitoring.screen.php:70
 #: include/views/monitoring.slides.php:74
-#: include/views/reports.toptriggers.php:118 items.php:555 items.php:849
-#: items.php:882 jsLoader.php:141 latest.php:432 latest.php:452 popup.php:492
+#: include/views/reports.toptriggers.php:118 items.php:555 items.php:854
+#: items.php:887 jsLoader.php:141 latest.php:432 latest.php:452 popup.php:492
 #: popup.php:518 popup.php:1210 queue.php:248 report2.php:342 report2.php:367
 #: search.php:125 tr_status.php:207 tr_status.php:286
 msgid "Host"
@@ -6333,24 +6351,24 @@ msgstr[0] "호스트를 활성화 하였습니다"
 msgid "Host group"
 msgstr "호스트 그룹"
 
+#: include/classes/api/services/CHostGroup.php:384
 #: include/classes/api/services/CHostGroup.php:397
-#: include/classes/api/services/CHostGroup.php:410
-#: include/classes/api/services/CHostGroup.php:481
+#: include/classes/api/services/CHostGroup.php:468
 #, c-format
 msgid "Host group \"%1$s\" already exists."
 msgstr "호스트 그룹\"%1$s\"는 모두 존재합니다."
 
-#: include/classes/api/services/CHostGroup.php:573
+#: include/classes/api/services/CHostGroup.php:560
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because it is used in a global script."
 msgstr "글로벌 스크립트에 이용되고 있기 때문에 호스트그룹 \"%1$s\"를 삭제할 수 없습니다."
 
-#: include/classes/api/services/CHostGroup.php:554
+#: include/classes/api/services/CHostGroup.php:541
 #, c-format
 msgid "Host group \"%1$s\" cannot be deleted, because some hosts depend on it."
 msgstr "몇가지의 호스트가 소속되어 있기 때문에 호스트 그룹 \"%1$s\"를 삭제할 수 없습니다."
 
-#: include/classes/api/services/CHostGroup.php:528
+#: include/classes/api/services/CHostGroup.php:515
 #, c-format
 msgid "Host group \"%1$s\" is internal and can not be deleted."
 msgstr "호스트 그룹 \"%1$s\"는 내부적으로 사용되어 있기 때문에 삭제할 수 없습니다."
@@ -6369,13 +6387,13 @@ msgstr "호스트 그룹의 장애"
 msgid "Host group label type"
 msgstr "호스트 그룹의 라벨타입"
 
-#: include/classes/api/services/CHostGroup.php:384
-#: include/classes/api/services/CHostGroup.php:473
+#: include/classes/api/services/CHostGroup.php:371
+#: include/classes/api/services/CHostGroup.php:460
 msgid "Host group name cannot be empty."
 msgstr "호스트 그룹명이 설정되어 있지 않습니다."
 
 #: include/forms.inc.php:189 include/menu.inc.php:194
-#: include/views/configuration.action.edit.php:884
+#: include/views/configuration.action.edit.php:881
 #: include/views/configuration.copy.elements.php:49
 #: include/views/configuration.hostgroups.edit.php:22
 #: include/views/configuration.hostgroups.list.php:31
@@ -6478,22 +6496,22 @@ msgstr[0] "호스트 프로토타입을 활성화 하였습니다"
 msgid "Host prototype updated"
 msgstr "호스트 프로토타입을 갱신하였습니다."
 
-#: include/classes/api/services/CHostPrototype.php:1131
+#: include/classes/api/services/CHostPrototype.php:1132
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
-#: include/classes/api/services/CHostPrototype.php:1127
+#: include/classes/api/services/CHostPrototype.php:1128
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "호스트명 \"%1$s\"을 가진 호스트 프로토타입은 이미 존재합니다."
 
-#: include/classes/api/services/CHostPrototype.php:1139
+#: include/classes/api/services/CHostPrototype.php:1140
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트의 표시명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
-#: include/classes/api/services/CHostPrototype.php:1136
+#: include/classes/api/services/CHostPrototype.php:1137
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "호스트의 표시명 \"%1$s\"을 가진 호스트 프로토타입은 이미 존재합니다."
@@ -6544,8 +6562,8 @@ msgstr "호스트를 갱신하였습니다"
 msgid "Host with the same name \"%1$s\" already exists."
 msgstr "같은 호스트 이름\"%1$s\"를 지닌 호스트가 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1700
-#: include/classes/api/services/CHost.php:1880
+#: include/classes/api/services/CHost.php:1708
+#: include/classes/api/services/CHost.php:1888
 #, c-format
 msgid "Host with the same name \"%s\" already exists."
 msgstr "같은 호스트 이름\"%s\"를 지닌 호스트가 이미 존재합니다."
@@ -6556,8 +6574,8 @@ msgstr "같은 호스트 이름\"%s\"를 지닌 호스트가 이미 존재합니
 msgid "Host with the same visible name \"%1$s\" already exists."
 msgstr "같은 호스트의 표시 이름 \"%1$s\"를 지닌 호스트가 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1706
-#: include/classes/api/services/CHost.php:1887
+#: include/classes/api/services/CHost.php:1714
+#: include/classes/api/services/CHost.php:1895
 #, c-format
 msgid "Host with the same visible name \"%s\" already exists."
 msgstr "같은 호스트의 표시 이름 \"%s\"를 지닌 호스트가 이미 존재합니다."
@@ -6567,7 +6585,7 @@ msgstr "같은 호스트의 표시 이름 \"%s\"를 지닌 호스트가 이미 �
 #: include/forms.inc.php:853 include/items.inc.php:753
 #: include/menu.inc.php:137 include/menu.inc.php:206
 #: include/views/configuration.copy.elements.php:47
-#: include/views/configuration.graph.list.php:71
+#: include/views/configuration.graph.list.php:70
 #: include/views/configuration.host.discovery.list.php:45
 #: include/views/configuration.host.edit.php:25
 #: include/views/configuration.hostgroups.edit.php:63
@@ -6691,7 +6709,7 @@ msgstr "IP주소의 범위는 필수항목입니다."
 
 #: app/views/administration.script.edit.php:44
 #: app/views/administration.script.list.php:57 include/hosts.inc.php:471
-#: include/items.inc.php:289 include/views/configuration.action.edit.php:786
+#: include/items.inc.php:289 include/views/configuration.action.edit.php:787
 #: include/views/configuration.host.edit.php:660
 #: include/views/configuration.host.massupdate.php:387
 #: include/views/configuration.host.prototype.edit.php:316
@@ -6889,7 +6907,7 @@ msgstr "아이콘 매핑이 비활성입니다."
 msgid "Icons"
 msgstr "아이콘"
 
-#: include/func.inc.php:1681 include/func.inc.php:1700
+#: include/func.inc.php:1679 include/func.inc.php:1698
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "이 메시지가 잘못된 경우엔, 필요한 권한을 얻기 위하여 관리자에게 문의하여 주십시오."
 
@@ -6946,7 +6964,7 @@ msgstr "이미지"
 msgid "Images for all maps will be updated!"
 msgstr "모든 맵의 이미지가 업로드 됩니다!"
 
-#: include/views/configuration.action.edit.php:442
+#: include/views/configuration.action.edit.php:440
 msgid "Immediately"
 msgstr "즉시"
 
@@ -6960,7 +6978,7 @@ msgstr "가져오기"
 
 #: conf.import.php:179 map.import.php:179 screen.import.php:179
 msgid "Import failed"
-msgstr "임포트에 실패하였습니다"
+msgstr "가져오기에 실패하였습니다"
 
 #: include/views/conf.import.php:105
 msgid "Import file"
@@ -6968,7 +6986,7 @@ msgstr "파일 가져오기"
 
 #: conf.import.php:179 map.import.php:179 screen.import.php:179
 msgid "Imported successfully"
-msgstr "임포트에 성공하였습니다."
+msgstr "가져오기에 성공하였습니다."
 
 #: hostinventories.php:187
 #, c-format
@@ -7295,14 +7313,14 @@ msgid "Incorrect characters used for host \"%1$s\"."
 msgstr "호스트 \"%1$s\"에 잘못된 문자열이 사용되어 있습니다."
 
 #: include/classes/api/services/CHost.php:842
-#: include/classes/api/services/CHost.php:1595
-#: include/classes/api/services/CHost.php:1821
+#: include/classes/api/services/CHost.php:1603
+#: include/classes/api/services/CHost.php:1829
 #, c-format
 msgid "Incorrect characters used for host name \"%s\"."
 msgstr "호스트 \"%s\"에 잘못된 문자열이 사용되어 있습니다."
 
-#: include/classes/api/services/CProxy.php:701
-#: include/classes/api/services/CProxy.php:790
+#: include/classes/api/services/CProxy.php:709
+#: include/classes/api/services/CProxy.php:798
 #, c-format
 msgid "Incorrect characters used for proxy name \"%1$s\"."
 msgstr "프록시명 \"%1$s\"에 이용되고 있는 문자열이 올바르지 않습니다."
@@ -7318,7 +7336,7 @@ msgstr "템플릿 이름 \"%1$s\"에서 이용되고 있는 문자열이 올바�
 msgid "Incorrect conditions for action \"%1$s\"."
 msgstr "액션 \"%1$s\"의 조건식이 올바르지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:825
+#: include/classes/api/services/CDiscoveryRule.php:957
 #, c-format
 msgid "Incorrect conditions for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 조건식이 올바르지 않습니다."
@@ -7328,7 +7346,7 @@ msgstr "디스커버리 규칙 \"%1$s\"의 조건식이 올바르지 않습니�
 msgid "Incorrect custom expression \"%2$s\" for action \"%1$s\": %3$s."
 msgstr "액션 \"%1$s\"의 커스텀 조건식 \"%2$s\"이 올바르지 않습니다 ： %3$s."
 
-#: include/classes/api/services/CDiscoveryRule.php:830
+#: include/classes/api/services/CDiscoveryRule.php:962
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for discovery rule \"%1$s\": %3$s."
 msgstr "디스커버리 규칙 \"%1$s\"의 커스텀 조건식 \"%2$s\"이 올바르지 않습니다 : %3$s."
@@ -7347,11 +7365,11 @@ msgstr "호스트 프로토타입 \"%1$s\"의 디스커버리 규칙 ID가 올�
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "이벤트 소스 \"%3$s\" (%4$s)에 대한 이벤트 오브젝트 \"%1$s\" (%2$s)가 올바르지 않습니다. 다음 오브젝트만 지원됩니다 : %5$s."
 
-#: include/classes/api/services/CAlert.php:342
+#: include/classes/api/services/CAlert.php:357
 msgid "Incorrect eventobject value."
 msgstr "이벤트 오브젝트의 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CAlert.php:335
+#: include/classes/api/services/CAlert.php:350
 msgid "Incorrect eventsource value."
 msgstr "이벤트 소스의 값이 올바르지 않습니다."
 
@@ -7377,12 +7395,12 @@ msgstr "업로드된 파일이 올바르지 않습니다."
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "액션 \"%1$s\"의 필터조건식ID가 올바르지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:860
+#: include/classes/api/services/CDiscoveryRule.php:992
 #, c-format
 msgid "Incorrect filter condition formula ID for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 필터 조건식ID가 올바르지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:852
+#: include/classes/api/services/CDiscoveryRule.php:984
 #, c-format
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 필드 조건 매크로가 올바르지 않습니다."
@@ -7392,7 +7410,7 @@ msgstr "디스커버리 규칙 \"%1$s\"의 필드 조건 매크로가 올바르�
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "액션 \"%1$s\"의 필터 조건연산자가 올바르지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:864
+#: include/classes/api/services/CDiscoveryRule.php:996
 #, c-format
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 필터조건연산자가 올바르지 않습니다."
@@ -7408,7 +7426,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr "Web시나리오 \"%2$s\"의 스텝 \"%1$s\"의 리다이렉트 값이 올바르지 않습니다."
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1370 tr_testexpr.php:36
+#: include/triggers.inc.php:1330 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "잘못된 함수가 이용되어 있습니다."
 
@@ -7479,8 +7497,8 @@ msgstr "인터페이스의 DNS 파라미터 \"%s\"가 올바르지 않습니다.
 msgid "Incorrect interface port \"%s\" provided."
 msgstr "인터페이스의 포트 \"%s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1675
-#: include/classes/api/services/CHost.php:1803
+#: include/classes/api/services/CHost.php:1683
+#: include/classes/api/services/CHost.php:1811
 #, c-format
 msgid "Incorrect inventory field \"%s\"."
 msgstr "인벤토리 항목 \"%s\"이 올바르지 않습니다."
@@ -7614,7 +7632,7 @@ msgid "Incorrect parameters for icon map update method \"%s\"."
 msgstr "아이콘의 매핑의 갱신메소드 \"%s\"의 파라미터가 올바르지 않습니다."
 
 #: include/classes/api/services/CMaintenance.php:326
-#: include/classes/api/services/CMaintenance.php:567
+#: include/classes/api/services/CMaintenance.php:569
 msgid "Incorrect parameters for maintenance."
 msgstr "메인터넌스의 파라미터가 올바르지 않습니다."
 
@@ -7704,8 +7722,8 @@ msgstr "서비스 \"%1$s\"의 연결 순서가 올바르지 않습니다."
 msgid "Incorrect source value."
 msgstr "소스 값이 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1652
-#: include/classes/api/services/CHost.php:1776
+#: include/classes/api/services/CHost.php:1660
+#: include/classes/api/services/CHost.php:1784
 #, c-format
 msgid "Incorrect status for host \"%1$s\"."
 msgstr "호스트 \"%1$s\" 상태가 올바르지 않습니다."
@@ -7767,7 +7785,7 @@ msgstr "잘못된 트리거의 조건식"
 msgid "Incorrect trigger expression."
 msgstr "트리거조건식이 올바르지 않습니다."
 
-#: include/triggers.inc.php:744
+#: include/triggers.inc.php:704
 #, c-format
 msgid "Incorrect trigger expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "트리거조건식이 올바르지 않습니다. 호스트\"%1$s\"가 존재하지 않거나, 호스트에 액세스 권한이 없습니다."
@@ -7789,16 +7807,16 @@ msgstr "트리거조건식이 올바르지 않습니다. 트리거 조건식에�
 msgid "Incorrect trigger function \"%1$s\" provided in expression."
 msgstr "조건식의 트리거 함수\"%1$s\"가 올바르지 않습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:1525
+#: include/classes/api/services/CTriggerPrototype.php:1538
 #, c-format
 msgid "Incorrect trigger prototype expression. Host \"%1$s\" does not exist or you have no access to this host."
 msgstr "트리거 프로토타입 조건식이 올바르지 않습니다. 호스트\"%1$s\"가 존재하지 않거나 앱세스 권한이 없습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:1536
+#: include/classes/api/services/CTriggerPrototype.php:1531
 msgid "Incorrect trigger prototype expression. Trigger prototype expression elements should not belong to a template and a host simultaneously."
 msgstr "트리거 프로토타입 조건식이 올바르지 않습니다. 트리거 프로토타입 조건식은 템플릿과 동시에 호스트에 넣을 수 없습니다."
 
-#: include/func.inc.php:1015
+#: include/func.inc.php:1014
 msgid "Incorrect type of asort_by_key."
 msgstr "asort_by_key의 타입이 올바르지 않습니다."
 
@@ -7807,7 +7825,7 @@ msgstr "asort_by_key의 타입이 올바르지 않습니다."
 msgid "Incorrect type of calculation for action \"%1$s\"."
 msgstr "액션\"%1$s\"의 계산 타입이 올바르지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:818
+#: include/classes/api/services/CDiscoveryRule.php:950
 #, c-format
 msgid "Incorrect type of calculation for discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙\"%1$s\"의 계산 타입이 올바르지 않습니다."
@@ -7894,7 +7912,15 @@ msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
 msgstr "미디어 타입 \"%3$s\"를 위한 필드 \"%2$s\"내의 값 \"%1$s\"가 올바르지 않습니다."
 
 #: include/classes/api/services/CEvent.php:436
+#: include/classes/api/services/CHost.php:1538
+#: include/classes/api/services/CHost.php:1544
+#: include/classes/api/services/CHost.php:1555
+#: include/classes/api/services/CHost.php:1561
 #: include/classes/api/services/CMediatype.php:418
+#: include/classes/api/services/CProxy.php:646
+#: include/classes/api/services/CProxy.php:653
+#: include/classes/api/services/CProxy.php:666
+#: include/classes/api/services/CProxy.php:672
 #: include/classes/api/services/CScreen.php:423
 #: include/classes/api/services/CScreen.php:429
 #: include/classes/validators/CNewValidator.php:88
@@ -7912,29 +7938,13 @@ msgstr "항목 \"%1$s\"의 값이 올바르지 않습니다: 공백으로 설정
 msgid "Incorrect value map ID."
 msgstr "값의 맵ID가 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1559
-#: include/classes/api/services/CProxy.php:670
+#: include/classes/api/services/CHost.php:1567
+#: include/classes/api/services/CProxy.php:678
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
 msgstr "PSK 필드에 이용된 값이 올바르지 않습니다. 16진수 문자열로 구성되어 있지 않습니다."
 
-#: include/classes/api/services/CHost.php:1542
-msgid "Incorrect value used for connections from host field."
-msgstr "호스트에서 접속하기 위해 지정된 값이 올바르지 않습니다."
-
-#: include/classes/api/services/CProxy.php:651
-msgid "Incorrect value used for connections from proxy field."
-msgstr "프록시에서 접속하기 위해 지정된 값이 올바르지 않습니다."
-
-#: include/classes/api/services/CHost.php:1538
-msgid "Incorrect value used for connections to host field."
-msgstr "호스트 접속에 지정된 값이 올바르지 않습니다."
-
-#: include/classes/api/services/CProxy.php:646
-msgid "Incorrect value used for connections to proxy field."
-msgstr "프록시 접속에 지정된 값이 올바르지 않습니다."
-
-#: include/classes/api/services/CProxy.php:726
-#: include/classes/api/services/CProxy.php:824
+#: include/classes/api/services/CProxy.php:734
+#: include/classes/api/services/CProxy.php:832
 #, c-format
 msgid "Incorrect value used for proxy status \"%1$s\"."
 msgstr "프록시 상태 \"%1$s\"에 이용되는 값이 올바르지 않습니다."
@@ -7948,7 +7958,7 @@ msgid "Indonesian (id_ID)"
 msgstr "인도네시아어 (id_ID)"
 
 #: include/actions.inc.php:1092 include/actions.inc.php:1183
-#: include/blocks.inc.php:630 include/blocks.inc.php:793
+#: include/blocks.inc.php:631 include/blocks.inc.php:794
 #: include/classes/html/CFormList.php:74
 #: include/classes/screens/CScreenActions.php:132
 #: include/views/administration.auditacts.list.php:51
@@ -7956,11 +7966,11 @@ msgstr "인도네시아어 (id_ID)"
 #: include/views/configuration.host.discovery.list.php:50
 #: include/views/configuration.hostgroups.list.php:51
 #: include/views/configuration.host.list.php:70
-#: include/views/configuration.httpconf.list.php:80
+#: include/views/configuration.httpconf.list.php:79
 #: include/views/configuration.item.list.php:66
 #: include/views/configuration.trigger.prototype.edit.php:142
 #: include/views/configuration.triggers.edit.php:147
-#: include/views/configuration.triggers.list.php:89 latest.php:443
+#: include/views/configuration.triggers.list.php:88 latest.php:443
 #: tr_status.php:281
 msgid "Info"
 msgstr "정보"
@@ -8042,7 +8052,7 @@ msgctxt "authentication"
 msgid "Internal"
 msgstr "내부 이벤트"
 
-#: include/views/configuration.action.list.php:32
+#: include/views/configuration.action.list.php:31
 msgctxt "event source"
 msgid "Internal"
 msgstr "내부 이벤트"
@@ -8061,6 +8071,7 @@ msgid "Internal data storage period (in days)"
 msgstr "내부 데이터 보존기간 (일)"
 
 #: include/classes/core/CJsonRpc.php:189
+#: include/classes/import/validators/CXmlValidatorGeneral.php:147
 msgid "Internal error."
 msgstr "내부 에러."
 
@@ -8116,29 +8127,6 @@ msgstr "JSON데이터가 올바르지 않습니다. JSON 텍스트의 Parse중 �
 #: include/classes/core/CJsonRpc.php:174
 msgid "Invalid Request."
 msgstr "리퀘스트가 올바르지 않습니다."
-
-#: include/classes/import/readers/CXmlImportReader.php:77
-#: include/classes/import/readers/CXmlImportReader.php:112
-#: include/classes/import/readers/CXmlImportReader.php:127
-#: include/classes/import/validators/C10XmlValidator.php:346
-#: include/classes/import/validators/C10XmlValidator.php:363
-#: include/classes/import/validators/C10XmlValidator.php:381
-#: include/classes/import/validators/C10XmlValidator.php:385
-#: include/classes/import/validators/C10XmlValidator.php:403
-#: include/classes/import/validators/C10XmlValidator.php:407
-#: include/classes/import/validators/C10XmlValidator.php:424
-#: include/classes/import/validators/C20XmlValidator.php:821
-#: include/classes/import/validators/C30XmlValidator.php:884
-#: include/classes/import/validators/CXmlValidatorGeneral.php:80
-#: include/classes/import/validators/CXmlValidatorGeneral.php:95
-#: include/classes/import/validators/CXmlValidatorGeneral.php:114
-#: include/classes/import/validators/CXmlValidatorGeneral.php:128
-#: include/classes/import/validators/CXmlValidatorGeneral.php:172
-#: include/classes/import/validators/CXmlValidatorGeneral.php:186
-#: include/classes/import/validators/CXmlValidator.php:62
-#, c-format
-msgid "Invalid XML tag \"%1$s\": %2$s."
-msgstr "XML태그 \"%1$s\": %2$s가 올바르지 않습니다."
 
 #: maintenance.php:140 maintenance.php:154 services.php:187 services.php:201
 #, c-format
@@ -8323,6 +8311,29 @@ msgstr "레스폰스 코드 \"%1$s\"가 올바르지 않습니다."
 msgid "Invalid second parameter."
 msgstr "2번째의 파라미터가 올바르지 않습니다."
 
+#: include/classes/import/readers/CXmlImportReader.php:77
+#: include/classes/import/readers/CXmlImportReader.php:112
+#: include/classes/import/readers/CXmlImportReader.php:127
+#: include/classes/import/validators/C10XmlValidator.php:358
+#: include/classes/import/validators/C10XmlValidator.php:375
+#: include/classes/import/validators/C10XmlValidator.php:393
+#: include/classes/import/validators/C10XmlValidator.php:397
+#: include/classes/import/validators/C10XmlValidator.php:415
+#: include/classes/import/validators/C10XmlValidator.php:419
+#: include/classes/import/validators/C10XmlValidator.php:436
+#: include/classes/import/validators/C20XmlValidator.php:833
+#: include/classes/import/validators/C30XmlValidator.php:896
+#: include/classes/import/validators/CXmlValidatorGeneral.php:90
+#: include/classes/import/validators/CXmlValidatorGeneral.php:105
+#: include/classes/import/validators/CXmlValidatorGeneral.php:124
+#: include/classes/import/validators/CXmlValidatorGeneral.php:151
+#: include/classes/import/validators/CXmlValidatorGeneral.php:193
+#: include/classes/import/validators/CXmlValidatorGeneral.php:207
+#: include/classes/import/validators/CXmlValidator.php:63
+#, c-format
+msgid "Invalid tag \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
 msgstr "3번째의 파라미터가 올바르지 않습니다."
@@ -8346,7 +8357,7 @@ msgstr "호스트\"%1$s\"의 인벤토리를 비활성 하였습니다."
 msgid "Inventory field"
 msgstr "인벤토리 항목"
 
-#: include/views/configuration.action.edit.php:915
+#: include/views/configuration.action.edit.php:912
 #: include/views/configuration.host.massupdate.php:284
 msgid "Inventory mode"
 msgstr "인벤토리 모드"
@@ -8355,7 +8366,7 @@ msgstr "인벤토리 모드"
 msgid "Is online?"
 msgstr "로그인 상태"
 
-#: include/blocks.inc.php:625 include/blocks.inc.php:791
+#: include/blocks.inc.php:626 include/blocks.inc.php:792
 msgid "Issue"
 msgstr "이슈"
 
@@ -8378,7 +8389,7 @@ msgstr "사용자의 패스워드에 따른 검색은 할 수 없습니다."
 msgid "Italian (it_IT)"
 msgstr "이탈리아어 (it_IT)"
 
-#: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:168
+#: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:155
 #: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1070
 #: include/views/configuration.graph.edit.php:131
 #: include/views/configuration.graph.edit.php:193
@@ -8386,7 +8397,7 @@ msgstr "이탈리아어 (it_IT)"
 #: include/views/monitoring.screen.constructor.edit.php:234
 #: include/views/monitoring.screen.constructor.edit.php:362
 #: include/views/monitoring.screen.constructor.edit.php:635 items.php:554
-#: items.php:849 items.php:882 tr_logform.php:244
+#: items.php:854 items.php:887 tr_logform.php:244
 msgid "Item"
 msgstr "아이템"
 
@@ -8395,7 +8406,7 @@ msgstr "아이템"
 msgid "Item \"%1$s\""
 msgstr "아이템\"%1$s\""
 
-#: include/classes/api/services/CHostPrototype.php:1047
+#: include/classes/api/services/CHostPrototype.php:1048
 #: include/classes/api/services/CItem.php:37
 #, c-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
@@ -8416,7 +8427,7 @@ msgstr "아이템\"%1$s\"는 항목번호가 존재하지 않는 호스트 인�
 msgid "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgstr "아이템\"%1$s\"는 템플릿\"%2$s\"에 존재하지 않습니다."
 
-#: include/classes/import/CConfigurationImport.php:677
+#: include/classes/import/CConfigurationImport.php:683
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\" 상의 아이템 \"%1$s\": 어플리케이션 \"%3$s\"는 존재하지 않습니다."
@@ -8429,6 +8440,11 @@ msgstr "아이템 \"%1$s:%2$s\"의 포트 \"%3$s\"는 올바르지 않습니다.
 #: items.php:524
 msgid "Item added"
 msgstr "아이템을 추가하였습니다"
+
+#: items.php:822
+msgid "Item copied"
+msgid_plural "Items copied"
+msgstr[0] ""
 
 #: app/views/administration.proxy.list.php:48
 msgid "Item count"
@@ -8580,9 +8596,9 @@ msgstr "키\"%1$s\"가 설정된 아이템이 이미 존재합니다."
 #: include/views/configuration.item.massupdate.php:22
 #: include/views/configuration.template.edit.php:207
 #: include/views/conf.import.php:34 include/views/inventory.host.view.php:158
-#: include/views/inventory.host.view.php:169 items.php:1068 popup.php:75
+#: include/views/inventory.host.view.php:169 items.php:1073 popup.php:75
 #: queue.php:103 search.php:135 search.php:164 search.php:193 search.php:400
-#: search.php:428 search.php:457 templates.php:594 templates.php:723
+#: search.php:428 search.php:457 templates.php:594 templates.php:727
 msgid "Items"
 msgstr "아이템"
 
@@ -8590,11 +8606,7 @@ msgstr "아이템"
 msgid "Items (m/d/n)"
 msgstr "아이템 수(감시/미감시/취득불가)"
 
-#: items.php:819
-msgid "Items copied"
-msgstr "아이템을 복사하였습니다"
-
-#: items.php:892
+#: items.php:897
 msgid "Items deleted"
 msgstr "아이템을 삭제하였습니다"
 
@@ -8647,12 +8659,12 @@ msgstr "Jabber"
 msgid "Jabber identifier"
 msgstr "JabberID"
 
-#: include/func.inc.php:237
+#: include/func.inc.php:236
 msgid "Jan"
 msgstr "1월"
 
-#: include/forms.inc.php:1760 include/func.inc.php:117
-#: include/func.inc.php:254 jsLoader.php:113
+#: include/forms.inc.php:1760 include/func.inc.php:116
+#: include/func.inc.php:253 jsLoader.php:113
 msgid "January"
 msgstr "1월"
 
@@ -8660,21 +8672,21 @@ msgstr "1월"
 msgid "Japanese (ja_JP)"
 msgstr "일본어 (ja_JP)"
 
-#: include/func.inc.php:243
+#: include/func.inc.php:242
 msgid "Jul"
 msgstr "7월"
 
-#: include/forms.inc.php:1764 include/func.inc.php:123
-#: include/func.inc.php:260 jsLoader.php:119
+#: include/forms.inc.php:1764 include/func.inc.php:122
+#: include/func.inc.php:259 jsLoader.php:119
 msgid "July"
 msgstr "7월"
 
-#: include/func.inc.php:242
+#: include/func.inc.php:241
 msgid "Jun"
 msgstr "6월"
 
-#: include/forms.inc.php:1810 include/func.inc.php:122
-#: include/func.inc.php:259 jsLoader.php:118
+#: include/forms.inc.php:1810 include/func.inc.php:121
+#: include/func.inc.php:258 jsLoader.php:118
 msgid "June"
 msgstr "6월"
 
@@ -8703,7 +8715,7 @@ msgstr "키\"%1$s\"가 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item k
 msgid "Key like"
 msgstr "키"
 
-#: include/views/configuration.action.edit.php:850
+#: include/views/configuration.action.edit.php:849
 #: include/views/js/common.item.edit.js.php:237
 msgid "Key passphrase"
 msgstr "키의 패스프레이즈"
@@ -8747,8 +8759,8 @@ msgstr "LDAP에 의한 로그인을 실패하였습니다"
 msgid "LOST"
 msgstr "LOST"
 
-#: include/maps.inc.php:45 include/views/configuration.action.edit.php:78
-#: include/views/configuration.action.edit.php:941
+#: include/maps.inc.php:45 include/views/configuration.action.edit.php:76
+#: include/views/configuration.action.edit.php:938
 #: include/views/configuration.host.discovery.edit.php:288
 #: include/views/js/monitoring.sysmaps.js.php:59
 #: include/views/js/monitoring.sysmaps.js.php:220
@@ -8765,7 +8777,7 @@ msgstr "라벨 위치"
 msgid "Language"
 msgstr "언어"
 
-#: include/forms.inc.php:1835 include/func.inc.php:1543
+#: include/forms.inc.php:1835 include/func.inc.php:1542
 #: include/maintenances.inc.php:115
 msgid "Last"
 msgstr "최근"
@@ -8809,7 +8821,7 @@ msgstr "최근 365일"
 msgid "Last 7 days"
 msgstr "최근 7일"
 
-#: include/blocks.inc.php:627 include/blocks.inc.php:628 tr_status.php:282
+#: include/blocks.inc.php:628 include/blocks.inc.php:629 tr_status.php:282
 msgid "Last change"
 msgstr "최근 갱신"
 
@@ -9016,7 +9028,7 @@ msgstr "Web페이지 전체의 초 단위 읽기 시간. float를 리턴"
 msgid "Local"
 msgstr "로컬"
 
-#: include/classes/screens/CScreenHistory.php:169
+#: include/classes/screens/CScreenHistory.php:156
 #: include/views/monitoring.screen.constructor.edit.php:614
 msgid "Local time"
 msgstr "로컬 시간"
@@ -9034,7 +9046,7 @@ msgid "Location longitude"
 msgstr "경도"
 
 #: include/forms.inc.php:454 include/items.inc.php:131
-#: include/triggers.inc.php:1819 include/views/configuration.item.edit.php:218
+#: include/triggers.inc.php:1779 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:218
 #: include/views/configuration.item.prototype.edit.php:216
 msgid "Log"
@@ -9086,7 +9098,7 @@ msgstr "매치하지 않은 SNMP트랩을 로그에 기록"
 msgid "Logged in as"
 msgstr "다음 사용자로 로그인"
 
-#: auditlogs.php:130 include/func.inc.php:1688 include/func.inc.php:1703
+#: auditlogs.php:130 include/func.inc.php:1686 include/func.inc.php:1701
 #: include/menu.inc.php:303 include/views/administration.auditlogs.list.php:37
 #: include/views/administration.authentication.edit.php:98
 #: include/views/administration.users.list.php:53
@@ -9222,14 +9234,14 @@ msgstr "메인터넌스"
 
 #: include/classes/api/services/CMaintenance.php:332
 #: include/classes/api/services/CMaintenance.php:346
-#: include/classes/api/services/CMaintenance.php:464
-#: include/classes/api/services/CMaintenance.php:485
+#: include/classes/api/services/CMaintenance.php:465
+#: include/classes/api/services/CMaintenance.php:486
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
 msgstr "메인터넌스\"%1$s\"는 이미 존재합니다."
 
 #: include/classes/api/services/CMaintenance.php:362
-#: include/classes/api/services/CMaintenance.php:507
+#: include/classes/api/services/CMaintenance.php:508
 msgid "Maintenance \"Active since\" value cannot be bigger than \"Active till\"."
 msgstr "메인터넌스 기간의 \"시작 시간\" 은 \"종료 시간\" 보다 큰 값으로 지정할 수 없습니다."
 
@@ -9270,13 +9282,13 @@ msgstr "메인터넌스 타입"
 msgid "Maintenance updated"
 msgstr "메인터넌스를 갱신하였습니다"
 
-#: include/blocks.inc.php:683 include/views/inventory.host.view.php:47
-#: tr_status.php:612
+#: include/blocks.inc.php:684 include/views/inventory.host.view.php:47
+#: tr_status.php:646
 msgid "Maintenance with data collection"
 msgstr "데이터수집을 하는 메인터넌스"
 
-#: include/blocks.inc.php:682 include/views/inventory.host.view.php:46
-#: tr_status.php:611
+#: include/blocks.inc.php:683 include/views/inventory.host.view.php:46
+#: tr_status.php:645
 msgid "Maintenance without data collection"
 msgstr "데이터수집을 하지 않는 메인터넌스"
 
@@ -9286,7 +9298,7 @@ msgstr "필수 파라미터가 설정되어 있지 않습니다."
 
 #: include/hosts.inc.php:1074
 #: include/views/administration.general.other.edit.php:51
-#: include/views/configuration.action.edit.php:919
+#: include/views/configuration.action.edit.php:916
 #: include/views/configuration.host.edit.php:690
 #: include/views/configuration.host.massupdate.php:292
 #: include/views/configuration.host.prototype.edit.php:340
@@ -9365,12 +9377,12 @@ msgstr "매핑"
 msgid "Maps"
 msgstr "맵"
 
-#: include/func.inc.php:239
+#: include/func.inc.php:238
 msgid "Mar"
 msgstr "3월"
 
-#: include/forms.inc.php:1780 include/func.inc.php:119
-#: include/func.inc.php:256 jsLoader.php:115
+#: include/forms.inc.php:1780 include/func.inc.php:118
+#: include/func.inc.php:255 jsLoader.php:115
 msgid "March"
 msgstr "3월"
 
@@ -9395,7 +9407,7 @@ msgstr "마스크"
 #: include/views/configuration.item.massupdate.php:575
 #: include/views/configuration.trigger.prototype.list.php:160
 #: include/views/configuration.trigger.prototype.massupdate.php:115
-#: include/views/configuration.triggers.list.php:230
+#: include/views/configuration.triggers.list.php:229
 #: include/views/configuration.triggers.massupdate.php:109
 msgid "Mass update"
 msgstr "일괄갱신"
@@ -9454,12 +9466,12 @@ msgstr "기간T 값의 최대치 > N"
 msgid "Maximum value for period T is NOT N"
 msgstr "기간T 값의 최대치 NOT N"
 
-#: include/forms.inc.php:1800 include/func.inc.php:121
-#: include/func.inc.php:258 jsLoader.php:117
+#: include/forms.inc.php:1800 include/func.inc.php:120
+#: include/func.inc.php:257 jsLoader.php:117
 msgid "May"
 msgstr "5월"
 
-#: include/func.inc.php:241
+#: include/func.inc.php:240
 msgctxt "May short"
 msgid "May"
 msgstr "5월"
@@ -9544,7 +9556,7 @@ msgstr "바이트 단위의 프로세스 사용 메모리. integer를 리턴."
 #: include/actions.inc.php:1092 include/classes/screens/CScreenActions.php:130
 #: include/views/administration.auditacts.list.php:49
 #: include/views/administration.auditacts.list.php:80
-#: include/views/configuration.action.edit.php:678
+#: include/views/configuration.action.edit.php:679
 msgid "Message"
 msgstr "메시지"
 
@@ -9695,12 +9707,12 @@ msgstr "모드"
 msgid "Model"
 msgstr "모델"
 
-#: include/func.inc.php:214
+#: include/func.inc.php:213
 msgid "Mon"
 msgstr "월"
 
 #: include/forms.inc.php:1712 include/forms.inc.php:1843
-#: include/func.inc.php:136 include/func.inc.php:226
+#: include/func.inc.php:135 include/func.inc.php:225
 msgid "Monday"
 msgstr "월"
 
@@ -9710,7 +9722,7 @@ msgstr "월"
 msgid "Monitored by proxy"
 msgstr "프록시에 의한 감시"
 
-#: include/classes/screens/CScreenDiscovery.php:126
+#: include/classes/screens/CScreenDiscovery.php:128
 msgid "Monitored host"
 msgstr "감시중의 호스트"
 
@@ -9744,7 +9756,7 @@ msgstr "호스트에 \"%1$s\"의 이름을 지닌 그래프가 하나 이상 존
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1235
+#: include/triggers.inc.php:1195
 msgid "Multiple PROBLEM events"
 msgstr "장애이벤트를 계속해서 생성"
 
@@ -9783,16 +9795,16 @@ msgstr "NTLM"
 #: include/views/administration.general.valuemapping.edit.php:38
 #: include/views/administration.general.valuemapping.list.php:42
 #: include/views/administration.usergroups.list.php:37
-#: include/views/configuration.action.edit.php:42
-#: include/views/configuration.action.edit.php:78
-#: include/views/configuration.action.edit.php:941
-#: include/views/configuration.action.list.php:49
+#: include/views/configuration.action.edit.php:40
+#: include/views/configuration.action.edit.php:76
+#: include/views/configuration.action.edit.php:938
+#: include/views/configuration.action.list.php:48
 #: include/views/configuration.application.edit.php:38
 #: include/views/configuration.discovery.edit.php:36
 #: include/views/configuration.discovery.list.php:37
 #: include/views/configuration.graph.edit.php:55
 #: include/views/configuration.graph.edit.php:266
-#: include/views/configuration.graph.list.php:72
+#: include/views/configuration.graph.list.php:71
 #: include/views/configuration.host.discovery.edit.php:46
 #: include/views/configuration.host.discovery.list.php:41
 #: include/views/configuration.host.edit.php:567
@@ -9804,7 +9816,7 @@ msgstr "NTLM"
 #: include/views/configuration.host.prototype.list.php:44
 #: include/views/configuration.httpconf.edit.php:57
 #: include/views/configuration.httpconf.edit.php:160
-#: include/views/configuration.httpconf.list.php:72
+#: include/views/configuration.httpconf.list.php:71
 #: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:46
 #: include/views/configuration.item.list.php:57
@@ -9821,7 +9833,7 @@ msgstr "NTLM"
 #: include/views/configuration.trigger.prototype.massupdate.php:55
 #: include/views/configuration.triggers.edit.php:49
 #: include/views/configuration.triggers.edit.php:277
-#: include/views/configuration.triggers.list.php:86
+#: include/views/configuration.triggers.list.php:85
 #: include/views/configuration.triggers.massupdate.php:58
 #: include/views/inventory.host.list.php:61
 #: include/views/js/monitoring.sysmaps.js.php:165
@@ -9899,8 +9911,8 @@ msgid "Network maps"
 msgstr "네트워크 맵"
 
 #: app/views/administration.proxy.list.php:122
-#: app/views/monitoring.web.view.php:78 include/func.inc.php:208
-#: tr_status.php:710
+#: app/views/monitoring.web.view.php:78 include/func.inc.php:207
+#: tr_status.php:744
 msgid "Never"
 msgstr "감시 안함"
 
@@ -9909,9 +9921,9 @@ msgstr "감시 안함"
 msgid "Never executed"
 msgstr "미실행"
 
-#: include/views/configuration.action.edit.php:497
-#: include/views/configuration.action.edit.php:769
-#: include/views/configuration.action.edit.php:1007
+#: include/views/configuration.action.edit.php:495
+#: include/views/configuration.action.edit.php:770
+#: include/views/configuration.action.edit.php:1004
 #: include/views/configuration.discovery.edit.php:66
 #: include/views/configuration.maintenance.edit.php:138
 msgid "New"
@@ -9927,7 +9939,7 @@ msgstr "어플리케이션 작성"
 msgid "New application prototype"
 msgstr "어플리케이션 프로토타입의 작성"
 
-#: include/views/configuration.action.edit.php:356
+#: include/views/configuration.action.edit.php:354
 msgid "New condition"
 msgstr "새 조건"
 
@@ -9958,11 +9970,11 @@ msgstr "새 서비스 시간"
 msgid "Next step"
 msgstr "다음 스텝"
 
-#: events.php:768 include/events.inc.php:377 include/func.inc.php:2000
-#: include/triggers.inc.php:1237
+#: events.php:779 include/events.inc.php:377 include/func.inc.php:1998
+#: include/triggers.inc.php:1197
 #: include/views/administration.users.list.php:69
 #: include/views/administration.users.list.php:72
-#: include/views/configuration.httpconf.list.php:131 tr_status.php:649
+#: include/views/configuration.httpconf.list.php:130 tr_status.php:683
 msgid "No"
 msgstr "아니오"
 
@@ -10017,7 +10029,7 @@ msgstr "Web시나리오에 \"%1$s\"가 정의되어 있지 않습니다."
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "액션\"%1$s\"필터조건의 \"%2$s\"가 정의되어 있지 않습니다"
 
-#: include/classes/api/services/CDiscoveryRule.php:868
+#: include/classes/api/services/CDiscoveryRule.php:1000
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\" 필터조건의 \"%2$s\"가 정의되어 있지 않습니다."
@@ -10032,7 +10044,7 @@ msgstr "호스트 프로토타입 \"%1$s\"에 \"%2$s\"가 정의되어 있지 �
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "액션\"%1$s\"의 필터의 \"%2$s\"가 정의되어 있지 않습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:836
+#: include/classes/api/services/CDiscoveryRule.php:968
 #, c-format
 msgid "No \"%2$s\" given for the filter of discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 필터의 \"%2$s\"가 정의되어 있지 않습니다."
@@ -10101,7 +10113,7 @@ msgstr "실행하는 액션 커맨드가 설정되어 있지 않습니다"
 msgid "No command type specified for action operation."
 msgstr "실행하는 액션 커맨드 타입이 설정되어 있지 않습니다"
 
-#: include/views/configuration.action.edit.php:75
+#: include/views/configuration.action.edit.php:73
 msgid "No conditions defined."
 msgstr "액션 실행조건이 설정되어 있지 않습니다"
 
@@ -10158,7 +10170,7 @@ msgstr "디스커버리 규칙ID이 설정되어 있지 않습니다"
 msgid "No encryption"
 msgstr "암호 없음"
 
-#: include/blocks.inc.php:731 include/blocks.inc.php:813 tr_status.php:673
+#: include/blocks.inc.php:732 include/blocks.inc.php:817 tr_status.php:707
 msgid "No events"
 msgstr "이벤트는 없습니다"
 
@@ -10188,8 +10200,8 @@ msgstr "스크린 요소의 그래프 프로토타입ID가 설정되어 있지 �
 msgid "No graphs added."
 msgstr "그래프가 추가되어 있지 않습니다."
 
-#: include/classes/api/services/CHost.php:1606
-#: include/classes/api/services/CHost.php:1764
+#: include/classes/api/services/CHost.php:1614
+#: include/classes/api/services/CHost.php:1772
 #, c-format
 msgid "No groups for host \"%1$s\"."
 msgstr "호스트\"%1$s\"에 그룹이 설정되어 있지 않습니다"
@@ -10258,14 +10270,14 @@ msgstr "인터페이스를 찾을 수 없습니다."
 msgid "No interface found."
 msgstr "인터페이스를 찾을 수 없습니다."
 
-#: include/classes/api/services/CProxy.php:734
-#: include/classes/api/services/CProxy.php:859
+#: include/classes/api/services/CProxy.php:742
+#: include/classes/api/services/CProxy.php:867
 #, c-format
 msgid "No interface provided for proxy \"%s\"."
 msgstr "프록시\"%s\"에 인터페이스가 설정되어 있지 않습니다"
 
-#: include/classes/api/services/CHost.php:1659
-#: include/classes/api/services/CHost.php:1814
+#: include/classes/api/services/CHost.php:1667
+#: include/classes/api/services/CHost.php:1822
 #, c-format
 msgid "No interfaces for host \"%s\"."
 msgstr "호스트\"%s\"에 인터페이스가 설정되어 있지 않습니다"
@@ -10344,24 +10356,24 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CHostBase.php:45
 #: include/classes/api/services/CHostGeneral.php:65
 #: include/classes/api/services/CHostGeneral.php:115
-#: include/classes/api/services/CHostGroup.php:445
-#: include/classes/api/services/CHostGroup.php:523
-#: include/classes/api/services/CHostGroup.php:912
-#: include/classes/api/services/CHostGroup.php:942
-#: include/classes/api/services/CHostGroup.php:1071
-#: include/classes/api/services/CHostGroup.php:1173
-#: include/classes/api/services/CHostGroup.php:1200
+#: include/classes/api/services/CHostGroup.php:432
+#: include/classes/api/services/CHostGroup.php:510
+#: include/classes/api/services/CHostGroup.php:899
+#: include/classes/api/services/CHostGroup.php:929
+#: include/classes/api/services/CHostGroup.php:1058
+#: include/classes/api/services/CHostGroup.php:1160
+#: include/classes/api/services/CHostGroup.php:1187
 #: include/classes/api/services/CHostInterface.php:243
 #: include/classes/api/services/CHostInterface.php:259
 #: include/classes/api/services/CHostInterface.php:402
 #: include/classes/api/services/CHostInterface.php:639
 #: include/classes/api/services/CHost.php:1516
-#: include/classes/api/services/CHost.php:1642
-#: include/classes/api/services/CHost.php:1758
-#: include/classes/api/services/CHostPrototype.php:1019
-#: include/classes/api/services/CHostPrototype.php:1066
-#: include/classes/api/services/CHostPrototype.php:1079
-#: include/classes/api/services/CHostPrototype.php:1092
+#: include/classes/api/services/CHost.php:1650
+#: include/classes/api/services/CHost.php:1766
+#: include/classes/api/services/CHostPrototype.php:1020
+#: include/classes/api/services/CHostPrototype.php:1067
+#: include/classes/api/services/CHostPrototype.php:1080
+#: include/classes/api/services/CHostPrototype.php:1093
 #: include/classes/api/services/CHttpTest.php:357
 #: include/classes/api/services/CHttpTest.php:441
 #: include/classes/api/services/CHttpTest.php:487
@@ -10379,9 +10391,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CMaintenance.php:266
 #: include/classes/api/services/CMaintenance.php:291
 #: include/classes/api/services/CMaintenance.php:304
-#: include/classes/api/services/CMaintenance.php:440
-#: include/classes/api/services/CMaintenance.php:457
-#: include/classes/api/services/CMaintenance.php:553
+#: include/classes/api/services/CMaintenance.php:441
+#: include/classes/api/services/CMaintenance.php:458
+#: include/classes/api/services/CMaintenance.php:555
 #: include/classes/api/services/CMapElement.php:60
 #: include/classes/api/services/CMapElement.php:119
 #: include/classes/api/services/CMapElement.php:190
@@ -10391,9 +10403,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CProxy.php:167
 #: include/classes/api/services/CProxy.php:259
 #: include/classes/api/services/CProxy.php:510
-#: include/classes/api/services/CProxy.php:752
-#: include/classes/api/services/CProxy.php:783
-#: include/classes/api/services/CProxy.php:843
+#: include/classes/api/services/CProxy.php:760
+#: include/classes/api/services/CProxy.php:791
+#: include/classes/api/services/CProxy.php:851
 #: include/classes/api/services/CScreenItem.php:387
 #: include/classes/api/services/CScreenItem.php:485
 #: include/classes/api/services/CScreen.php:769
@@ -10410,10 +10422,10 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CTrigger.php:855
 #: include/classes/api/services/CTrigger.php:876
 #: include/classes/api/services/CTrigger.php:1774
-#: include/classes/api/services/CTriggerPrototype.php:600
-#: include/classes/api/services/CTriggerPrototype.php:976
-#: include/classes/api/services/CTriggerPrototype.php:994
-#: include/classes/api/services/CTriggerPrototype.php:1486
+#: include/classes/api/services/CTriggerPrototype.php:599
+#: include/classes/api/services/CTriggerPrototype.php:975
+#: include/classes/api/services/CTriggerPrototype.php:993
+#: include/classes/api/services/CTriggerPrototype.php:1451
 #: include/classes/api/services/CUserMacro.php:681
 #: include/classes/api/services/CUser.php:700
 #: include/classes/api/services/CUser.php:879
@@ -10423,7 +10435,7 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:413
 #: include/classes/screens/CScreenHttpTestDetails.php:46
-#: include/func.inc.php:1665
+#: include/func.inc.php:1664
 msgid "No permissions to referred object or it does not exist!"
 msgstr "대상이 존재하지 않거나, 액세스 권한이 없습니다!"
 
@@ -10465,15 +10477,15 @@ msgstr "스크린이 추가되어 있지 않습니다."
 msgid "No script specified for action operation command."
 msgstr "실행하는 액션 커맨드에 스크립트가 설정되어 있지 않습니다"
 
-#: include/classes/api/services/CProxy.php:722
+#: include/classes/api/services/CProxy.php:730
 msgid "No status for proxy."
 msgstr "프록시에 상태가 설정되어 있지 않습니다"
 
-#: triggers.php:360
+#: triggers.php:365
 msgid "No target selected"
 msgstr "아무 것도 선택되어 있지 않습니다"
 
-#: graphs.php:374 items.php:822
+#: graphs.php:379 items.php:827
 msgid "No target selected."
 msgstr "아무 것도 선택되어 있지 않습니다."
 
@@ -10505,7 +10517,7 @@ msgid "None"
 msgstr "없음"
 
 #: include/graphs.inc.php:24 include/items.inc.php:184
-#: include/triggers.inc.php:1234
+#: include/triggers.inc.php:1194
 #: include/views/configuration.triggers.list.php:42
 #: include/views/monitoring.history.php:235 popup.php:1492
 msgid "Normal"
@@ -10520,7 +10532,7 @@ msgid "Normal view"
 msgstr "일반 표시"
 
 #: include/actions.inc.php:150 include/actions.inc.php:338
-#: include/views/configuration.action.edit.php:1059
+#: include/views/configuration.action.edit.php:1056
 msgid "Not Ack"
 msgstr "코멘트없음"
 
@@ -10529,7 +10541,7 @@ msgid "Not Templated items"
 msgstr "템플릿이 아닌 아이템"
 
 #: include/classes/api/services/CTrigger.php:1383
-#: include/classes/api/services/CTriggerPrototype.php:1135
+#: include/classes/api/services/CTriggerPrototype.php:1134
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "모든 템플릿은 \"%s\"에 링크되어 있지 않습니다."
@@ -10587,12 +10599,12 @@ msgstr "통지 보고서"
 msgid "Notifications"
 msgstr "통지"
 
-#: include/func.inc.php:247
+#: include/func.inc.php:246
 msgid "Nov"
 msgstr "11월"
 
-#: include/forms.inc.php:1804 include/func.inc.php:127
-#: include/func.inc.php:264 jsLoader.php:123
+#: include/forms.inc.php:1804 include/func.inc.php:126
+#: include/func.inc.php:263 jsLoader.php:123
 msgid "November"
 msgstr "11월"
 
@@ -10609,11 +10621,11 @@ msgstr "CPU 수. integer를 리턴."
 msgid "Number of enabled items on the host."
 msgstr "호스트상의 유효 아이템 수."
 
-#: include/blocks.inc.php:478 include/blocks.inc.php:479
+#: include/blocks.inc.php:479 include/blocks.inc.php:480
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr "호스트수 (활성/비활성/템플릿)"
 
-#: include/blocks.inc.php:486
+#: include/blocks.inc.php:487
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr "아이템수 (활성/비활성/습득불가)"
 
@@ -10675,7 +10687,7 @@ msgid "Number of status changes"
 msgstr "상태 변경 횟수"
 
 #: app/views/monitoring.web.view.php:38
-#: include/views/configuration.httpconf.list.php:73
+#: include/views/configuration.httpconf.list.php:72
 msgid "Number of steps"
 msgstr "스텝 수"
 
@@ -10695,7 +10707,7 @@ msgstr "기간T내에 포함되는(조건0을 만족)값V의 개수 > N"
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
 msgstr "기간T내에 포함되는(조건0을 만족)값V의 개수 NOT N"
 
-#: include/blocks.inc.php:495
+#: include/blocks.inc.php:496
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr "트리거 수 (활성/비활성 [장애/정상])"
 
@@ -10711,7 +10723,7 @@ msgstr "Zabbix데이터베이스 내의 습득불가 아이템 수."
 msgid "Number of unsupported items on the host."
 msgstr "호스트 상의 습득불가 아이템 수."
 
-#: include/blocks.inc.php:505
+#: include/blocks.inc.php:506
 msgid "Number of users (online)"
 msgstr "유저 수 (온라인)"
 
@@ -10758,15 +10770,15 @@ msgid "Number or percentage of inodes. Returns integer for number; float for per
 msgstr "inode의 수 혹은 퍼센트. 수치라면 integer를 리턴하고 퍼센트라면 float를 리턴."
 
 #: include/forms.inc.php:452 include/items.inc.php:127
-#: include/triggers.inc.php:1817 include/views/configuration.item.edit.php:216
+#: include/triggers.inc.php:1777 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:216
 #: include/views/configuration.item.prototype.edit.php:214
 msgid "Numeric (float)"
 msgstr "수치 (float)"
 
-#: include/triggers.inc.php:1816 include/triggers.inc.php:1832
-#: include/triggers.inc.php:1836 include/triggers.inc.php:1847
-#: include/triggers.inc.php:1852 include/triggers.inc.php:1857
+#: include/triggers.inc.php:1776 include/triggers.inc.php:1792
+#: include/triggers.inc.php:1796 include/triggers.inc.php:1807
+#: include/triggers.inc.php:1812 include/triggers.inc.php:1817
 msgid "Numeric (integer 64bit)"
 msgstr "수치 (정수)"
 
@@ -10819,7 +10831,7 @@ msgstr "OS (전체설명)"
 msgid "OS (Short)"
 msgstr "OS (간이설명)"
 
-#: include/func.inc.php:246
+#: include/func.inc.php:245
 msgid "Oct"
 msgstr "10월"
 
@@ -10827,8 +10839,8 @@ msgstr "10월"
 msgid "Octal"
 msgstr "8진수"
 
-#: include/forms.inc.php:1794 include/func.inc.php:126
-#: include/func.inc.php:263 jsLoader.php:122
+#: include/forms.inc.php:1794 include/func.inc.php:125
+#: include/func.inc.php:262 jsLoader.php:122
 msgid "October"
 msgstr "10월"
 
@@ -10860,9 +10872,9 @@ msgstr "상태가 바뀐 트리거의 점멸기간"
 msgid "Once"
 msgstr "한번"
 
-#: include/classes/api/services/CHostGroup.php:1080
-#: include/classes/api/services/CHostGroup.php:1089
-#: include/classes/api/services/CHostGroup.php:1182
+#: include/classes/api/services/CHostGroup.php:1067
+#: include/classes/api/services/CHostGroup.php:1076
+#: include/classes/api/services/CHostGroup.php:1169
 msgid "One of the objects is left without a host group."
 msgstr "호스트 그룹이 설정되지 않은 오브젝트가 남아있습니다"
 
@@ -10879,7 +10891,7 @@ msgstr "일시적인 정지 시간"
 msgid "Only Super Admins can create global macros."
 msgstr "최고관리자만 글로벌 매크로를 작성할 수 있습니다."
 
-#: include/classes/api/services/CHostGroup.php:379
+#: include/classes/api/services/CHostGroup.php:366
 msgid "Only Super Admins can create host groups."
 msgstr "최고관리자만 호스트 그룹을 작성할 수 있습니다."
 
@@ -10949,7 +10961,7 @@ msgstr "관리자만 스크린의 소유자를 설정할 수 있습니다."
 msgid "Only administrators can set slide show owner."
 msgstr "관리자만 슬라이드쇼의 소유자를 설정할 수 있습니다."
 
-#: include/blocks.inc.php:487
+#: include/blocks.inc.php:488
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "활성화된 호스트의 아이템만 카운트"
 
@@ -10987,7 +10999,7 @@ msgstr "상위 20%%의 영역이 표시되어 있습니다."
 msgid "Only trigger events can be acknowledged."
 msgstr "장애대응 코멘트는 트리거의 이벤트에만 추가가능합니다."
 
-#: include/blocks.inc.php:496
+#: include/blocks.inc.php:497
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 
@@ -11009,11 +11021,11 @@ msgstr "실행하는 액션\"%s\"은 이미 존재합니다."
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "인증되지 않은 리퀘스트이기 때문에 조작을 실행할 수 없습니다."
 
-#: include/views/configuration.action.edit.php:1065
+#: include/views/configuration.action.edit.php:1062
 msgid "Operation condition"
 msgstr "액션의 실행조건"
 
-#: include/views/configuration.action.edit.php:1078
+#: include/views/configuration.action.edit.php:1075
 msgid "Operation details"
 msgstr "실행내용의 상세 정보"
 
@@ -11025,13 +11037,13 @@ msgstr "조작대상의 그룹이 없습니다."
 msgid "Operation has no template to operate."
 msgstr "조작대상의 템플릿이 없습니다."
 
-#: include/views/configuration.action.edit.php:545
-#: include/views/configuration.action.edit.php:557
+#: include/views/configuration.action.edit.php:546
+#: include/views/configuration.action.edit.php:558
 msgid "Operation type"
 msgstr "오퍼레이션 종류"
 
-#: include/views/configuration.action.edit.php:1097
-#: include/views/configuration.action.list.php:51
+#: include/views/configuration.action.edit.php:1095
+#: include/views/configuration.action.list.php:50
 msgid "Operations"
 msgstr "오퍼레이션"
 
@@ -11039,9 +11051,9 @@ msgstr "오퍼레이션"
 msgid "Operator"
 msgstr "오퍼레이터"
 
-#: include/triggers.inc.php:1293
-#: include/views/configuration.action.edit.php:136
-#: include/views/configuration.action.edit.php:994
+#: include/triggers.inc.php:1253
+#: include/views/configuration.action.edit.php:134
+#: include/views/configuration.action.edit.php:991
 #: include/views/configuration.host.discovery.edit.php:270
 #: include/views/configuration.trigger.prototype.edit.php:106
 #: include/views/configuration.triggers.edit.php:111
@@ -11354,11 +11366,6 @@ msgstr "장애"
 msgid "PSK"
 msgstr "PSK"
 
-#: include/classes/api/services/CHost.php:1554
-#: include/classes/api/services/CProxy.php:665
-msgid "PSK cannot be empty."
-msgstr "PSK를 설정해 주세요."
-
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:780
 #: include/views/configuration.host.massupdate.php:358
@@ -11366,13 +11373,8 @@ msgstr "PSK를 설정해 주세요."
 msgid "PSK identity"
 msgstr "PSK 아이덴티티"
 
-#: include/classes/api/services/CHost.php:1550
-#: include/classes/api/services/CProxy.php:661
-msgid "PSK identity cannot be empty."
-msgstr "PSK 아이덴티티를 설정해 주세요."
-
-#: include/classes/api/services/CHost.php:1565
-#: include/classes/api/services/CProxy.php:676
+#: include/classes/api/services/CHost.php:1573
+#: include/classes/api/services/CProxy.php:684
 #, c-format
 msgid "PSK is too short. Minimum is %1$s hex-digits."
 msgstr "PSK가 너무 짧습니다. %1$s 자리의 16진수로 설정해 주십시오."
@@ -11381,7 +11383,7 @@ msgstr "PSK가 너무 짧습니다. %1$s 자리의 16진수로 설정해 주십�
 msgid "Page received incorrect data"
 msgstr "잘못된 데이터를 수신하였습니다"
 
-#: app/views/administration.mediatype.edit.php:84 include/blocks.inc.php:465
+#: app/views/administration.mediatype.edit.php:84 include/blocks.inc.php:466
 msgid "Parameter"
 msgstr "파라미터"
 
@@ -11435,8 +11437,8 @@ msgstr "패시브"
 #: include/views/administration.users.edit.php:87
 #: include/views/administration.users.edit.php:105
 #: include/views/administration.users.edit.php:109
-#: include/views/configuration.action.edit.php:821
-#: include/views/configuration.action.edit.php:841
+#: include/views/configuration.action.edit.php:822
+#: include/views/configuration.action.edit.php:840
 #: include/views/configuration.host.discovery.edit.php:161
 #: include/views/configuration.host.discovery.edit.php:177
 #: include/views/configuration.host.edit.php:668
@@ -11601,12 +11603,13 @@ msgstr "호스트 인벤토리 필드의 자동설정"
 
 #: app/views/administration.proxy.edit.php:46 authentication.php:40
 #: disc_prototypes.php:106 host_discovery.php:81
-#: include/classes/setup/CSetupWizard.php:287
+#: include/classes/setup/CSetupWizard.php:287 include/forms.inc.php:579
 #: include/views/administration.authentication.edit.php:58
-#: include/views/configuration.action.edit.php:853
+#: include/views/configuration.action.edit.php:852
 #: include/views/configuration.host.discovery.edit.php:150
 #: include/views/configuration.host.edit.php:132
 #: include/views/configuration.host.edit.php:215
+#: include/views/configuration.host.list.php:44
 #: include/views/configuration.host.prototype.edit.php:92
 #: include/views/configuration.item.edit.php:159
 #: include/views/configuration.item.massupdate.php:198
@@ -11619,10 +11622,6 @@ msgstr "포트"
 #: include/classes/api/services/CHostInterface.php:623
 msgid "Port cannot be empty for host interface."
 msgstr "호스트 인터페이스의 포트는 필수항목입니다."
-
-#: include/forms.inc.php:579 include/views/configuration.host.list.php:44
-msgid "Port like"
-msgstr "포트"
 
 #: include/views/js/configuration.discovery.edit.js.php:44
 msgid "Port range"
@@ -11721,7 +11720,7 @@ msgstr "프라이버시 프로토콜"
 msgid "Private"
 msgstr "비공개"
 
-#: include/views/configuration.action.edit.php:837
+#: include/views/configuration.action.edit.php:836
 #: include/views/configuration.host.discovery.edit.php:173
 #: include/views/configuration.item.edit.php:184
 #: include/views/configuration.item.massupdate.php:284
@@ -11805,8 +11804,8 @@ msgstr "호스트 \"%2$s\"의 프록시 \"%1$s\"는 존재하지 앖습니다."
 msgid "Proxy \"%1$s\" is used by discovery rule \"%2$s\"."
 msgstr "프록시 \"%1$s\"는 디스커버리 규칙 \"%2$s\"에 이용되어 있습니다."
 
-#: include/classes/api/services/CProxy.php:715
-#: include/classes/api/services/CProxy.php:811
+#: include/classes/api/services/CProxy.php:723
+#: include/classes/api/services/CProxy.php:819
 #, c-format
 msgid "Proxy \"%s\" already exists."
 msgstr "프록시 \"%s\"는 이미 존재합니다."
@@ -11850,7 +11849,7 @@ msgstr "프록시를 갱신하였습니다"
 msgid "Public"
 msgstr "공개"
 
-#: include/views/configuration.action.edit.php:822
+#: include/views/configuration.action.edit.php:823
 #: include/views/configuration.host.discovery.edit.php:162
 #: include/views/configuration.item.edit.php:172
 #: include/views/configuration.item.massupdate.php:255
@@ -11941,12 +11940,12 @@ msgstr "수신처"
 msgid "Recovery"
 msgstr "복구"
 
-#: actionconf.php:51 include/views/configuration.action.edit.php:55
-#: include/views/configuration.action.edit.php:61
+#: actionconf.php:51 include/views/configuration.action.edit.php:53
+#: include/views/configuration.action.edit.php:59
 msgid "Recovery message"
 msgstr "리커버리 메시지"
 
-#: actionconf.php:50 include/views/configuration.action.edit.php:58
+#: actionconf.php:50 include/views/configuration.action.edit.php:56
 msgid "Recovery subject"
 msgstr "리커버리 통지의 제목"
 
@@ -12040,10 +12039,10 @@ msgstr "원격 명령"
 #: include/views/administration.general.valuemapping.edit.php:55
 #: include/views/administration.users.edit.php:249
 #: include/views/common.filter.trigger.php:132
-#: include/views/configuration.action.edit.php:113
-#: include/views/configuration.action.edit.php:453
-#: include/views/configuration.action.edit.php:469
-#: include/views/configuration.action.edit.php:975
+#: include/views/configuration.action.edit.php:111
+#: include/views/configuration.action.edit.php:451
+#: include/views/configuration.action.edit.php:467
+#: include/views/configuration.action.edit.php:972
 #: include/views/configuration.host.discovery.edit.php:227
 #: include/views/configuration.host.discovery.edit.php:321
 #: include/views/configuration.httpconf.edit.php:214
@@ -12175,7 +12174,7 @@ msgstr "요구 퍼포먼스 (vps)"
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr "Zabbix서버의 요구 퍼포먼스를 1초간격으로 기대되는 값을 취득"
 
-#: include/blocks.inc.php:506
+#: include/blocks.inc.php:507
 msgid "Required server performance, new values per second"
 msgstr "1초간의 감시항목수(Zabbix서버의 요구 퍼포먼스)"
 
@@ -12435,7 +12434,7 @@ msgstr "SNMP"
 msgid "SNMP Key"
 msgstr "SNMP 키"
 
-#: disc_prototypes.php:101 host_discovery.php:78
+#: disc_prototypes.php:101 host_discovery.php:78 include/forms.inc.php:559
 #: include/views/configuration.host.discovery.edit.php:101
 #: include/views/configuration.item.edit.php:110
 #: include/views/configuration.item.prototype.edit.php:109
@@ -12443,11 +12442,7 @@ msgstr "SNMP 키"
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: include/forms.inc.php:559
-msgid "SNMP OID like"
-msgstr "SNMP OID"
-
-#: disc_prototypes.php:96 host_discovery.php:75
+#: disc_prototypes.php:96 host_discovery.php:75 include/forms.inc.php:533
 #: include/views/configuration.host.discovery.edit.php:109
 #: include/views/configuration.item.edit.php:118
 #: include/views/configuration.item.massupdate.php:93
@@ -12455,10 +12450,6 @@ msgstr "SNMP OID"
 #: include/views/js/configuration.discovery.edit.js.php:50 items.php:81
 msgid "SNMP community"
 msgstr "SNMP community"
-
-#: include/forms.inc.php:533
-msgid "SNMP community like"
-msgstr "SNMP 커뮤니티"
 
 #: include/views/configuration.host.edit.php:157
 #: include/views/configuration.host.edit.php:243
@@ -12514,7 +12505,7 @@ msgid "SQL statement execution has failed \"%1$s\"."
 msgstr "SQL의 실행에 실패하였습니다 \"%1$s\"."
 
 #: include/discovery.inc.php:56
-#: include/views/configuration.action.edit.php:788
+#: include/views/configuration.action.edit.php:789
 #: include/views/js/configuration.discovery.edit.js.php:179
 msgid "SSH"
 msgstr "SSH"
@@ -12557,12 +12548,12 @@ msgstr "STARTTLS"
 msgid "Safari"
 msgstr "Safari"
 
-#: include/func.inc.php:219
+#: include/func.inc.php:218
 msgid "Sat"
 msgstr "토"
 
 #: include/forms.inc.php:1742 include/forms.inc.php:1873
-#: include/func.inc.php:141 include/func.inc.php:231
+#: include/func.inc.php:140 include/func.inc.php:230
 msgid "Saturday"
 msgstr "토"
 
@@ -12682,7 +12673,7 @@ msgstr "스크린을 갱신하였습니다"
 #: include/views/monitoring.slideconf.list.php:25
 #: include/views/monitoring.slides.php:44 popup.php:83 popup.php:107
 #: search.php:132 search.php:236 search.php:403 search.php:440 search.php:460
-#: templates.php:597 templates.php:735
+#: templates.php:597 templates.php:739
 msgid "Screens"
 msgstr "스크린"
 
@@ -12721,7 +12712,7 @@ msgstr "스크립트의 메뉴 경로 \"%1$s\"는 스크립트 이름 \"%2$s\"�
 
 #: app/views/administration.mediatype.edit.php:80
 #: app/views/administration.mediatype.list.php:60
-#: include/views/configuration.action.edit.php:804
+#: include/views/configuration.action.edit.php:805
 msgid "Script name"
 msgstr "스크립트 이름"
 
@@ -12749,7 +12740,7 @@ msgstr "미디어 타입 \"%2$s\"를 위한 스크립트 파라미터 \"%1$s\"�
 msgid "Script profiler"
 msgstr "스크립트 프로파일러"
 
-#: app/controllers/CControllerScriptUpdate.php:103
+#: app/controllers/CControllerScriptUpdate.php:104
 msgid "Script updated"
 msgstr "스크립트를 갱신하였습니다"
 
@@ -12825,6 +12816,7 @@ msgstr "초"
 msgid "Security level"
 msgstr "보안 레벨"
 
+#: include/forms.inc.php:537
 #: include/views/configuration.host.discovery.edit.php:113
 #: include/views/configuration.item.edit.php:122
 #: include/views/configuration.item.massupdate.php:115
@@ -12833,19 +12825,15 @@ msgstr "보안 레벨"
 msgid "Security name"
 msgstr "보안 이름"
 
-#: include/forms.inc.php:537
-msgid "Security name like"
-msgstr "보안 명"
-
 #: events.php:344 include/classes/html/CMultiSelect.php:54
 #: include/forms.inc.php:523
 #: include/views/administration.auditacts.list.php:30
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:107
-#: include/views/configuration.action.edit.php:266
-#: include/views/configuration.action.edit.php:278
-#: include/views/configuration.action.edit.php:290
-#: include/views/configuration.action.edit.php:800
+#: include/views/configuration.action.edit.php:264
+#: include/views/configuration.action.edit.php:276
+#: include/views/configuration.action.edit.php:288
+#: include/views/configuration.action.edit.php:801
 #: include/views/configuration.graph.edit.php:155
 #: include/views/configuration.graph.edit.php:217
 #: include/views/configuration.item.edit.php:68
@@ -12922,7 +12910,7 @@ msgstr "유저 그룹에게 메시지를 송신"
 msgid "Send message to users"
 msgstr "사용자에게 메시지를 송신"
 
-#: include/views/configuration.action.edit.php:669
+#: include/views/configuration.action.edit.php:670
 msgid "Send only to"
 msgstr "다른 미디어만 사용"
 
@@ -12930,11 +12918,11 @@ msgstr "다른 미디어만 사용"
 msgid "Send to"
 msgstr "수신처"
 
-#: include/views/configuration.action.edit.php:646
+#: include/views/configuration.action.edit.php:647
 msgid "Send to User groups"
 msgstr "유저 그룹에게 송신"
 
-#: include/views/configuration.action.edit.php:651
+#: include/views/configuration.action.edit.php:652
 msgid "Send to Users"
 msgstr "사용자에게 송신"
 
@@ -12944,7 +12932,7 @@ msgstr "사용자에게 송신"
 msgid "Sent"
 msgstr "송신 완료"
 
-#: include/func.inc.php:245
+#: include/func.inc.php:244
 msgid "Sep"
 msgstr "9월"
 
@@ -12953,8 +12941,8 @@ msgstr "9월"
 msgid "Separated"
 msgstr "장애와 미대응 보이기"
 
-#: include/forms.inc.php:1784 include/func.inc.php:125
-#: include/func.inc.php:262 jsLoader.php:121
+#: include/forms.inc.php:1784 include/func.inc.php:124
+#: include/func.inc.php:261 jsLoader.php:121
 msgid "September"
 msgstr "9월"
 
@@ -12979,7 +12967,7 @@ msgstr "서버 정보"
 msgid "Server time"
 msgstr "서버 시간"
 
-#: events.php:549 include/actions.inc.php:71
+#: events.php:555 include/actions.inc.php:71
 #: include/views/configuration.services.child.list.php:38
 #: include/views/configuration.services.edit.php:329
 #: include/views/configuration.services.parent.list.php:35 services.php:480
@@ -13056,14 +13044,14 @@ msgid "Set host inventory mode"
 msgstr "인벤토리 모드의 설정"
 
 #: events.php:438 include/classes/screens/CScreenEvents.php:37
-#: include/classes/screens/CScreenHistory.php:174
-#: include/triggers.inc.php:1227 include/views/configuration.item.list.php:139
+#: include/classes/screens/CScreenHistory.php:161
+#: include/triggers.inc.php:1187 include/views/configuration.item.list.php:139
 #: include/views/configuration.trigger.prototype.edit.php:248
 #: include/views/configuration.trigger.prototype.list.php:42
 #: include/views/configuration.trigger.prototype.massupdate.php:40
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:34
-#: include/views/configuration.triggers.list.php:84
+#: include/views/configuration.triggers.list.php:83
 #: include/views/configuration.triggers.massupdate.php:43
 #: include/views/reports.toptriggers.php:103
 #: include/views/reports.toptriggers.php:120 popup.php:1059 tr_logform.php:371
@@ -13096,7 +13084,7 @@ msgid "Sharing option \"%1$s\" is missing a value for screen \"%2$s\"."
 msgstr "스크린 \"%2$s\"의 공유 옵션 \"%1$s\"의 값이 없습니다."
 
 #: include/views/js/monitoring.sysmaps.js.php:24 report2.php:391
-#: tr_status.php:695 tr_status.php:700
+#: tr_status.php:729 tr_status.php:734
 msgid "Show"
 msgstr "보이기"
 
@@ -13375,7 +13363,7 @@ msgstr "다음에 의한 트리거의 정렬"
 msgid "Sorting by field \"%1$s\" not allowed."
 msgstr "항목 \"%1$s\"에 의한 정렬은 허가되어 있지 않습니다."
 
-#: events.php:293 include/classes/screens/CScreenHistory.php:171
+#: events.php:293 include/classes/screens/CScreenHistory.php:158
 msgid "Source"
 msgstr "소스"
 
@@ -13408,7 +13396,7 @@ msgstr "누적 그래프"
 msgid "Standard items"
 msgstr "표준 아이템"
 
-#: include/views/configuration.action.edit.php:391
+#: include/views/configuration.action.edit.php:389
 msgid "Start in"
 msgstr "시작시간"
 
@@ -13433,21 +13421,21 @@ msgstr "스테이터스"
 #: include/views/administration.auditacts.list.php:50
 #: include/views/administration.usergroups.list.php:42
 #: include/views/administration.users.list.php:56
-#: include/views/configuration.action.list.php:52
+#: include/views/configuration.action.list.php:51
 #: include/views/configuration.discovery.list.php:41
 #: include/views/configuration.host.discovery.list.php:49
 #: include/views/configuration.host.list.php:67
 #: include/views/configuration.host.massupdate.php:183
 #: include/views/configuration.host.prototype.list.php:46
 #: include/views/configuration.httpconf.list.php:31
-#: include/views/configuration.httpconf.list.php:79
+#: include/views/configuration.httpconf.list.php:78
 #: include/views/configuration.item.list.php:65
 #: include/views/configuration.item.list.php:142
 #: include/views/configuration.item.massupdate.php:407
 #: include/views/configuration.item.prototype.list.php:50
 #: include/views/configuration.trigger.prototype.list.php:45
 #: include/views/configuration.triggers.list.php:46
-#: include/views/configuration.triggers.list.php:88 popup.php:1060
+#: include/views/configuration.triggers.list.php:87 popup.php:1060
 #: popup.php:1221 srv_status.php:143 tr_status.php:280
 msgid "Status"
 msgstr "상태"
@@ -13500,12 +13488,12 @@ msgid "Step"
 msgstr "스텝"
 
 #: app/views/monitoring.web.view.php:63
-#: include/views/configuration.httpconf.list.php:105
+#: include/views/configuration.httpconf.list.php:104
 #, c-format
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "스텝\"%1$s\" [%3$s의 %2$s] 실패: %4$s"
 
-#: include/views/configuration.action.edit.php:533
+#: include/views/configuration.action.edit.php:535
 msgid "Step duration"
 msgstr "스텝 지속기간"
 
@@ -13518,7 +13506,7 @@ msgstr "Web시나리오 스텝"
 msgid "Step with name \"%1$s\" already exists."
 msgstr "\"%1$s\"의 이름를 지닌 스텝이 이미 존재합니다."
 
-#: httpconf.php:54 include/views/configuration.action.edit.php:391
+#: httpconf.php:54 include/views/configuration.action.edit.php:389
 #: include/views/configuration.action.edit.php:524
 #: include/views/configuration.httpconf.edit.php:244
 #: include/views/configuration.httpconf.edit.php:251
@@ -13549,7 +13537,7 @@ msgid "Subfilter"
 msgstr "서브필터"
 
 #: include/views/administration.auditacts.list.php:75
-#: include/views/configuration.action.edit.php:674
+#: include/views/configuration.action.edit.php:675
 msgid "Subject"
 msgstr "제목"
 
@@ -13590,12 +13578,12 @@ msgstr "기간T 값의 합계치 > N"
 msgid "Sum of values of a period T is NOT N"
 msgstr "기간T 값의 합계치 NOT N"
 
-#: include/func.inc.php:213
+#: include/func.inc.php:212
 msgid "Sun"
 msgstr "일"
 
 #: include/forms.inc.php:1748 include/forms.inc.php:1879
-#: include/func.inc.php:143 include/func.inc.php:225
+#: include/func.inc.php:142 include/func.inc.php:224
 msgid "Sunday"
 msgstr "일"
 
@@ -13711,7 +13699,7 @@ msgstr "테이블\"%1$s\"에 항목 이름 \"%2$s\"가 존재하지 않습니다
 msgid "Tag"
 msgstr "태그"
 
-#: include/views/configuration.action.edit.php:765
+#: include/views/configuration.action.edit.php:766
 #: include/views/configuration.copy.elements.php:97
 #: include/views/configuration.trigger.prototype.edit.php:139
 #: include/views/configuration.triggers.edit.php:144
@@ -13719,7 +13707,7 @@ msgstr "태그"
 msgid "Target"
 msgstr "대상"
 
-#: include/views/configuration.action.edit.php:761
+#: include/views/configuration.action.edit.php:762
 msgid "Target list"
 msgstr "대상 리스트"
 
@@ -13728,7 +13716,7 @@ msgid "Target type"
 msgstr "대상 종류"
 
 #: include/discovery.inc.php:70
-#: include/views/configuration.action.edit.php:789
+#: include/views/configuration.action.edit.php:790
 #: include/views/js/configuration.discovery.edit.js.php:180
 msgid "Telnet"
 msgstr "Telnet"
@@ -13808,8 +13796,8 @@ msgstr "템플릿 값"
 msgid "Template with the same name \"%1$s\" already exists."
 msgstr "같은 이름 \"%1$s\"를 지닌 템플릿이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1721
-#: include/classes/api/services/CHost.php:1905
+#: include/classes/api/services/CHost.php:1729
+#: include/classes/api/services/CHost.php:1913
 #, c-format
 msgid "Template with the same name \"%s\" already exists."
 msgstr "같은 이름 \"%s\"를 지닌 템플릿이 이미 존재합니다."
@@ -13820,8 +13808,8 @@ msgstr "같은 이름 \"%s\"를 지닌 템플릿이 이미 존재합니다."
 msgid "Template with the same visible name \"%1$s\" already exists."
 msgstr "같은 표시 이름\"%1$s\"를 지닌 템플릿이 이미 존재합니다."
 
-#: include/classes/api/services/CHost.php:1727
-#: include/classes/api/services/CHost.php:1913
+#: include/classes/api/services/CHost.php:1735
+#: include/classes/api/services/CHost.php:1921
 #, c-format
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "같은 표시 이름\"%s\"를 지닌 템플릿이 이미 존재합니다"
@@ -13830,7 +13818,7 @@ msgstr "같은 표시 이름\"%s\"를 지닌 템플릿이 이미 존재합니다
 msgid "Templated items"
 msgstr "템플릿의 아이템"
 
-#: include/menu.inc.php:198 include/views/configuration.action.edit.php:900
+#: include/menu.inc.php:198 include/views/configuration.action.edit.php:897
 #: include/views/configuration.copy.elements.php:48
 #: include/views/configuration.host.edit.php:638
 #: include/views/configuration.hostgroups.list.php:49
@@ -13880,7 +13868,7 @@ msgid "Test string"
 msgstr "테스트문자열"
 
 #: include/forms.inc.php:455 include/items.inc.php:133
-#: include/triggers.inc.php:1820 include/views/configuration.item.edit.php:219
+#: include/triggers.inc.php:1780 include/views/configuration.item.edit.php:219
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:217
 msgid "Text"
@@ -14022,12 +14010,12 @@ msgstr "올해"
 msgid "Threshold"
 msgstr "허용치(Threshold)"
 
-#: include/func.inc.php:217
+#: include/func.inc.php:216
 msgid "Thu"
 msgstr "목"
 
 #: include/forms.inc.php:1730 include/forms.inc.php:1861
-#: include/func.inc.php:139 include/func.inc.php:229
+#: include/func.inc.php:138 include/func.inc.php:228
 msgid "Thursday"
 msgstr "목"
 
@@ -14111,8 +14099,8 @@ msgstr "PHP의 타임존이 설정되어 있지 않습니다 (\"date.timezone\"�
 msgid "Timeout"
 msgstr "타임아웃"
 
-#: include/classes/screens/CScreenHistory.php:167
-#: include/classes/screens/CScreenHistory.php:281
+#: include/classes/screens/CScreenHistory.php:154
+#: include/classes/screens/CScreenHistory.php:268
 #: include/classes/screens/CScreenPlainText.php:42
 #: include/classes/screens/CScreenPlainText.php:64
 msgid "Timestamp"
@@ -14200,7 +14188,7 @@ msgstr "트렌드 (일)"
 
 #: events.php:294 events.php:340 include/actions.inc.php:43
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:488
-#: include/maps.inc.php:26 include/triggers.inc.php:1223
+#: include/maps.inc.php:26 include/triggers.inc.php:1183
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:72
 #: include/views/configuration.services.edit.php:97
@@ -14220,7 +14208,7 @@ msgstr "트리거"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "트리거 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 
-#: include/classes/import/CConfigurationImport.php:1365
+#: include/classes/import/CConfigurationImport.php:1371
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "트리거 \"%1$s\"는 존재하지않는 트리거\"%2$s\"에 의존하고 있습니다."
@@ -14230,13 +14218,18 @@ msgstr "트리거 \"%1$s\"는 존재하지않는 트리거\"%2$s\"에 의존하�
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "트리거\"%s\"는 링크되어있는 다른 템플릿에 포함되어 있습니다"
 
-#: triggers.php:226 triggers.php:357 tr_logform.php:152
+#: triggers.php:226 tr_logform.php:152
 msgid "Trigger added"
 msgstr "트리거를 추가하였습니다"
 
 #: include/classes/api/services/CTrigger.php:1426
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "트리거는 자신을 계승한 트리거와 의존관계를 지닐 수 없습니다."
+
+#: triggers.php:360
+msgid "Trigger copied"
+msgid_plural "Triggers copied"
+msgstr[0] ""
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -14280,7 +14273,7 @@ msgid "Trigger expression condition"
 msgstr "트리거조건식의 상태"
 
 #: include/classes/api/services/CTrigger.php:564
-#: include/classes/api/services/CTriggerPrototype.php:758
+#: include/classes/api/services/CTriggerPrototype.php:757
 msgid "Trigger expression must contain at least one host:key reference."
 msgstr "트리거조건식에는 적어도 1개 이상의 호스트와 아이템의 키를 설정할 필요가 있습니다."
 
@@ -14323,17 +14316,17 @@ msgstr "트리거 이름"
 msgid "Trigger prototype"
 msgstr "트리거 프로토타입"
 
-#: include/classes/api/services/CTriggerPrototype.php:1454
+#: include/classes/api/services/CTriggerPrototype.php:1561
 #, c-format
 msgid "Trigger prototype \"%1$s\" contains item prototypes from multiple discovery rules."
 msgstr "트리거 프로토타입 \"%1$s\"에 복수의 디스커버리 규칙에서의 아이템 프로토타입이 포함되어 있습니다."
 
-#: include/classes/import/CConfigurationImport.php:1157
+#: include/classes/import/CConfigurationImport.php:1163
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "트리거 프로토타입 \"%1$s\"는 트리거 \"%2$s\"에 의존하지만 존재하지 않습니다."
 
-#: include/classes/api/services/CTriggerPrototype.php:1460
+#: include/classes/api/services/CTriggerPrototype.php:1569
 #, c-format
 msgid "Trigger prototype \"%1$s\" must contain at least one item prototype."
 msgstr "트리거 프로토타입\"%1$s\"은 적어도 하나 이상의 아이템 프로토타입을 설정할 필요가 있습니다."
@@ -14342,7 +14335,7 @@ msgstr "트리거 프로토타입\"%1$s\"은 적어도 하나 이상의 아이�
 msgid "Trigger prototype added"
 msgstr "트리거 프로토타입을 추가하였습니다"
 
-#: include/classes/api/services/CTriggerPrototype.php:1192
+#: include/classes/api/services/CTriggerPrototype.php:1191
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
 msgstr "트리거 프로토타입은 자신을 계승한 트리거에 의존할 수 없습니다."
 
@@ -14410,7 +14403,7 @@ msgid "Trigger value"
 msgstr "트리거 값"
 
 #: include/forms.inc.php:547 include/html.inc.php:390 include/menu.inc.php:68
-#: include/triggers.inc.php:846 include/views/configuration.action.list.php:29
+#: include/triggers.inc.php:806 include/views/configuration.action.list.php:28
 #: include/views/configuration.host.discovery.list.php:43
 #: include/views/configuration.host.edit.php:376
 #: include/views/configuration.host.list.php:61
@@ -14428,7 +14421,7 @@ msgstr "트리거 값"
 #: include/views/monitoring.overview.triggers.php:81 jsLoader.php:215
 #: popup.php:59 search.php:129 search.php:136 search.php:168 search.php:197
 #: search.php:233 search.php:285 search.php:335 search.php:401 search.php:432
-#: search.php:458 templates.php:595 templates.php:727
+#: search.php:458 templates.php:595 templates.php:731
 msgid "Triggers"
 msgstr "트리거"
 
@@ -14436,7 +14429,7 @@ msgstr "트리거"
 msgid "Triggers (e/d)[p/o]"
 msgstr "트리거수 (활성/비활성)[장애/정상]"
 
-#: triggers.php:369
+#: triggers.php:374
 msgid "Triggers deleted"
 msgstr "트리거를 삭제하였습니다"
 
@@ -14471,12 +14464,12 @@ msgstr "Truncated"
 msgid "Try to read inaccessible property \"%s\"."
 msgstr "액서스되지 않는 프로퍼티 \"%s\"를 참조하려 하였습니다."
 
-#: include/func.inc.php:215
+#: include/func.inc.php:214
 msgid "Tue"
 msgstr "화"
 
 #: include/forms.inc.php:1718 include/forms.inc.php:1849
-#: include/func.inc.php:137 include/func.inc.php:227
+#: include/func.inc.php:136 include/func.inc.php:226
 msgid "Tuesday"
 msgstr "화"
 
@@ -14501,7 +14494,7 @@ msgstr "2개의 아이템(\"%1$s\"와 \"%2$s\")에서 하나의 호스트의 인
 #: include/hosts.inc.php:99 include/views/administration.auditacts.list.php:47
 #: include/views/administration.general.image.list.php:37
 #: include/views/administration.users.edit.php:200
-#: include/views/configuration.action.edit.php:803
+#: include/views/configuration.action.edit.php:804
 #: include/views/configuration.graph.edit.php:268
 #: include/views/configuration.host.discovery.edit.php:54
 #: include/views/configuration.host.discovery.edit.php:61
@@ -14549,8 +14542,8 @@ msgstr "타입 (오름차순)"
 msgid "Type (descending)"
 msgstr "타입 (내림차순)"
 
-#: include/views/configuration.action.edit.php:141
-#: include/views/configuration.action.edit.php:999
+#: include/views/configuration.action.edit.php:139
+#: include/views/configuration.action.edit.php:996
 #: include/views/configuration.host.discovery.edit.php:265
 msgid "Type of calculation"
 msgstr "계산 종류"
@@ -14697,8 +14690,8 @@ msgid "Units"
 msgstr "단위"
 
 #: app/views/monitoring.web.view.php:79
-#: app/views/monitoring.widget.web.view.php:76 events.php:532 events.php:533
-#: events.php:543 events.php:544 events.php:545 events.php:546
+#: app/views/monitoring.widget.web.view.php:76 events.php:538 events.php:539
+#: events.php:549 events.php:550 events.php:551 events.php:552
 #: include/actions.inc.php:113 include/actions.inc.php:899
 #: include/classes/screens/CScreenHostsInfo.php:89
 #: include/classes/screens/CScreenHttpTestDetails.php:117
@@ -14714,7 +14707,7 @@ msgstr "단위"
 #: include/maps.inc.php:39 include/regexp.inc.php:236
 #: include/screens.inc.php:57 include/triggers.inc.php:68
 #: include/triggers.inc.php:181 include/triggers.inc.php:200
-#: include/triggers.inc.php:2065 include/triggers.inc.php:2071
+#: include/triggers.inc.php:2025 include/triggers.inc.php:2031
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/configuration.triggers.list.php:43
 #: include/views/js/configuration.discovery.edit.js.php:189
@@ -14728,7 +14721,7 @@ msgstr "알 수 없는 액션"
 #: app/views/monitoring.web.view.php:59
 #: include/classes/screens/CScreenHttpTestDetails.php:112
 #: include/classes/screens/CScreenHttpTestDetails.php:184
-#: include/views/configuration.httpconf.list.php:109
+#: include/views/configuration.httpconf.list.php:108
 msgid "Unknown error"
 msgstr "알 수 없는 에러"
 
@@ -14736,11 +14729,11 @@ msgstr "알 수 없는 에러"
 msgid "Unknown function."
 msgstr "알 수 없는 함수."
 
-#: include/triggers.inc.php:1368 popup_trexpr.php:733 tr_testexpr.php:34
+#: include/triggers.inc.php:1328 popup_trexpr.php:733 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "알 수 없는 아이템. 선택한 호스트에 그런 아이템은 존재하지 않습니다"
 
-#: include/triggers.inc.php:1367 tr_testexpr.php:33
+#: include/triggers.inc.php:1327 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "알 수 없는 호스트. 그런 호스트는 존재하지 않습니다"
 
@@ -14753,7 +14746,7 @@ msgid "Unknown resource"
 msgstr "알 수 없는 리소스"
 
 #: app/views/monitoring.web.view.php:68
-#: include/views/configuration.httpconf.list.php:111
+#: include/views/configuration.httpconf.list.php:110
 #, c-format
 msgid "Unknown step failed: %1$s"
 msgstr "알 수 없는 스텝 실패: %1$s"
@@ -14838,12 +14831,12 @@ msgstr "음소거 해제"
 #: include/classes/import/readers/CImportReaderFactory.php:65
 #, c-format
 msgid "Unsupported import file extension \"%1$s\"."
-msgstr "임포트 파일의 확장자 \"%1$s\"는 지원하지 않습니다."
+msgstr "가져오기 파일의 확장자 \"%1$s\"는 지원하지 않습니다."
 
 #: include/classes/import/readers/CImportReaderFactory.php:44
 #, c-format
 msgid "Unsupported import format \"%1$s\"."
-msgstr "임포트 포맷 \"%1$s\"는 지원하지 않습니다."
+msgstr "가져오기 포맷 \"%1$s\"는 지원하지 않습니다."
 
 #: include/classes/api/services/CHostPrototype.php:227
 #: include/classes/api/services/CHostPrototype.php:245
@@ -14856,7 +14849,7 @@ msgstr "그룹 프로토타입에서는 파라미터\"%1$s\"는 이용할 수 �
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "액션 \"%1$s\"의 필터조건에서는 파라미터 \"%2$s\"는 이용할 수 없습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:869
+#: include/classes/api/services/CDiscoveryRule.php:1001
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙\"%1$s\"의 필터조건에서는 파라미터\"%2$s\"는 지원하지 않습니다."
@@ -14876,7 +14869,7 @@ msgstr "호스트 프로토타입 %1$s 호스트 인벤토리에서는 파라미
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "액션\"%1$s\"의 필터에서는 파라미터\"%2$s\"는 이용할 수 없습니다."
 
-#: include/classes/api/services/CDiscoveryRule.php:837
+#: include/classes/api/services/CDiscoveryRule.php:969
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of discovery rule \"%1$s\"."
 msgstr "디스커버리 규칙 \"%1$s\"의 필터에서 파라미터\"%2$s\"는 지원되지 않습니다."
@@ -14909,8 +14902,8 @@ msgstr "Up"
 #: include/views/administration.general.workingtime.edit.php:38
 #: include/views/administration.usergroups.edit.php:158
 #: include/views/administration.users.edit.php:419
-#: include/views/configuration.action.edit.php:1082
-#: include/views/configuration.action.edit.php:1106
+#: include/views/configuration.action.edit.php:1080
+#: include/views/configuration.action.edit.php:1104
 #: include/views/configuration.application.edit.php:48
 #: include/views/configuration.discovery.edit.php:101
 #: include/views/configuration.graph.edit.php:353
@@ -14948,7 +14941,7 @@ msgstr "갱신"
 msgid "Update existing"
 msgstr "기존설정을 덮어씌움"
 
-#: include/views/configuration.httpconf.list.php:74 items.php:158
+#: include/views/configuration.httpconf.list.php:73 items.php:158
 msgid "Update interval"
 msgstr "갱신 간격"
 
@@ -14997,7 +14990,7 @@ msgstr "갱신시간: %s"
 msgid "Updated: Application \"%1$s\" on \"%2$s\"."
 msgstr "갱신: \"%2$s\"의 어플리케이션\"%1$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:735
+#: include/classes/api/services/CDiscoveryRule.php:867
 #, c-format
 msgid "Updated: Discovery rule \"%1$s\" on \"%2$s\"."
 msgstr "갱신: \"%2$s\"의 디스커버리 규칙\"%1$s\"."
@@ -15022,7 +15015,7 @@ msgstr "갱신: \"%2$s\"의 아이템 프로토타입\"%1$s\"."
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "갱신: \"%2$s\"의 트리거 \"%1$s\"."
 
-#: include/classes/api/services/CTriggerPrototype.php:807
+#: include/classes/api/services/CTriggerPrototype.php:806
 #, c-format
 msgid "Updated: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "갱신: \"%2$s\"의 트리거 프로토타입\"%1$s\"."
@@ -15040,8 +15033,8 @@ msgstr "업로드"
 msgid "Upper level maps"
 msgstr "상위레벨 맵"
 
-#: include/classes/screens/CScreenDiscovery.php:127
-#: include/classes/screens/CScreenDiscovery.php:253
+#: include/classes/screens/CScreenDiscovery.php:129
+#: include/classes/screens/CScreenDiscovery.php:255
 #: include/views/configuration.services.edit.php:146
 #: include/views/configuration.services.edit.php:192
 msgid "Uptime"
@@ -15083,7 +15076,7 @@ msgstr "아이템으로 사용"
 #: include/hosts.inc.php:61 include/views/administration.auditlogs.list.php:28
 #: include/views/administration.auditlogs.list.php:60
 #: include/views/administration.users.edit.php:369
-#: include/views/configuration.action.edit.php:603
+#: include/views/configuration.action.edit.php:604
 #: include/views/configuration.httpconf.edit.php:126
 msgid "User"
 msgstr "유저"
@@ -15144,7 +15137,7 @@ msgstr "사용자를 삭제하였습니다"
 #: app/views/administration.script.list.php:46 include/audit.inc.php:31
 #: include/views/administration.usergroups.edit.php:149
 #: include/views/administration.users.list.php:33
-#: include/views/configuration.action.edit.php:590
+#: include/views/configuration.action.edit.php:591
 msgid "User group"
 msgstr "유저 그룹"
 
@@ -15236,7 +15229,7 @@ msgid "User may not modify system status for himself by becoming a member of use
 msgstr "사용자는 그룹\"%s\"의 멤버가 되었으므로 자기자신의 시스템상태를 변경할 수 없습니다."
 
 #: disc_prototypes.php:76 host_discovery.php:63
-#: include/views/configuration.action.edit.php:827
+#: include/views/configuration.action.edit.php:828
 #: include/views/configuration.host.discovery.edit.php:165
 #: include/views/configuration.item.edit.php:175
 #: include/views/configuration.item.massupdate.php:262
@@ -15513,10 +15506,10 @@ msgstr "VMware가상머신의 공유하지 않은 저장용량, <url> - VMware�
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware가상머신 가동시간, <url> - VMware서비스 URL, <uuid> - VMware 가상머신 호스트명"
 
-#: include/blocks.inc.php:466 include/classes/graphdraw/CPieGraphDraw.php:334
+#: include/blocks.inc.php:467 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:37
-#: include/classes/screens/CScreenHistory.php:179
-#: include/classes/screens/CScreenHistory.php:282
+#: include/classes/screens/CScreenHistory.php:166
+#: include/classes/screens/CScreenHistory.php:269
 #: include/classes/screens/CScreenPlainText.php:64
 #: include/views/administration.general.macros.edit.php:33
 #: include/views/administration.general.valuemapping.edit.php:46
@@ -15685,7 +15678,7 @@ msgstr "뷰를 랜더링 할 수 없었습니다."
 msgid "Visible name"
 msgstr "표시명"
 
-#: include/classes/api/services/CHost.php:1839
+#: include/classes/api/services/CHost.php:1847
 msgid "Visible name cannot be empty if host name is missing."
 msgstr "호스트명을 설정하지 않은 경우 표시명은 필수항목입니다."
 
@@ -15717,11 +15710,11 @@ msgstr "요소를 보존가능한 최대치에 도달하였습니다."
 #: include/views/inventory.host.view.php:173 search.php:133 search.php:139
 #: search.php:180 search.php:209 search.php:237 search.php:288 search.php:338
 #: search.php:405 search.php:448 search.php:462 templates.php:599
-#: templates.php:743
+#: templates.php:747
 msgid "Web"
 msgstr "웹"
 
-#: app/controllers/CControllerWebView.php:155
+#: app/controllers/CControllerWebView.php:162
 #: app/views/monitoring.dashboard.view.php:113
 #: app/views/monitoring.web.view.php:23
 #: app/views/monitoring.widget.web.view.php:91 include/items.inc.php:102
@@ -15807,12 +15800,12 @@ msgstr "Web시나리오를 갱신했습니다."
 msgid "Web scenarios"
 msgstr "Web시나리오"
 
-#: include/func.inc.php:216
+#: include/func.inc.php:215
 msgid "Wed"
 msgstr "수"
 
 #: include/forms.inc.php:1724 include/forms.inc.php:1855
-#: include/func.inc.php:138 include/func.inc.php:228
+#: include/func.inc.php:137 include/func.inc.php:227
 msgid "Wednesday"
 msgstr "수"
 
@@ -15834,7 +15827,7 @@ msgid "When active"
 msgstr "연락 허용 시간대"
 
 #: graphs.php:41 include/views/configuration.graph.edit.php:60
-#: include/views/configuration.graph.list.php:73
+#: include/views/configuration.graph.list.php:72
 #: include/views/js/monitoring.sysmaps.js.php:41
 #: include/views/monitoring.screen.constructor.edit.php:685
 #: include/views/monitoring.sysmap.edit.php:105
@@ -15903,8 +15896,8 @@ msgstr "서비스 \"%1$s\"의 의존관계 필드가 올바르지 않습니다."
 msgid "Wrong fields for element."
 msgstr "요소의 설정이 올바르지 않습니다."
 
-#: include/classes/api/services/CHost.php:1588
-#: include/classes/api/services/CHost.php:1751
+#: include/classes/api/services/CHost.php:1596
+#: include/classes/api/services/CHost.php:1759
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
 msgstr "호스트 \"%1$s\"의 필드가 올바르지 않습니다."
@@ -15938,8 +15931,8 @@ msgstr "매크로 \"%1$s\"의 설정이 올바르지 않습니다."
 msgid "Wrong fields for map link."
 msgstr "맵 링크 설정이 올바르지 않습니다."
 
-#: include/classes/api/services/CProxy.php:696
-#: include/classes/api/services/CProxy.php:779
+#: include/classes/api/services/CProxy.php:704
+#: include/classes/api/services/CProxy.php:787
 #, c-format
 msgid "Wrong fields for proxy \"%1$s\"."
 msgstr "프록시 \"%1$s\"의 설정이 올바르지 않습니다."
@@ -15960,7 +15953,7 @@ msgid "Wrong fields for time for service \"%1$s\"."
 msgstr "서비스 \"%1$s\"를 위한 시간의 설정이 올바르지 않습니다."
 
 #: include/classes/api/services/CTriggerPrototype.php:470
-#: include/classes/api/services/CTriggerPrototype.php:1482
+#: include/classes/api/services/CTriggerPrototype.php:1447
 msgid "Wrong fields for trigger."
 msgstr "트리거의 설정이 올바르지 않습니다."
 
@@ -15975,7 +15968,7 @@ msgstr "X"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 msgid "XML is empty"
-msgstr ""
+msgstr "XML이 비어있습니다."
 
 #: include/views/js/monitoring.sysmaps.js.php:158
 msgid "Y"
@@ -16010,8 +16003,8 @@ msgstr "Y/m/d H:i"
 msgid "Y-m-d H:i:s"
 msgstr "Y/m/d H:i:s"
 
-#: include/classes/import/validators/C20XmlValidator.php:821
-#: include/classes/import/validators/C30XmlValidator.php:884
+#: include/classes/import/validators/C20XmlValidator.php:833
+#: include/classes/import/validators/C30XmlValidator.php:896
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
 msgstr "YYYY-MM-DDThh:mm:ssZ"
@@ -16025,12 +16018,12 @@ msgstr "년"
 msgid "Yearly"
 msgstr "연간"
 
-#: events.php:768 include/blocks.inc.php:475
+#: events.php:779 include/blocks.inc.php:476
 #: include/classes/screens/CScreenServerInfo.php:31 include/events.inc.php:368
-#: include/func.inc.php:2000 include/triggers.inc.php:1237
+#: include/func.inc.php:1998 include/triggers.inc.php:1197
 #: include/views/administration.general.valuemapping.list.php:60
 #: include/views/administration.users.list.php:68
-#: include/views/configuration.httpconf.list.php:131 tr_status.php:661
+#: include/views/configuration.httpconf.list.php:130 tr_status.php:695
 msgid "Yes"
 msgstr "예"
 
@@ -16038,7 +16031,7 @@ msgstr "예"
 msgid "Yesterday"
 msgstr "어제"
 
-#: include/func.inc.php:1680
+#: include/func.inc.php:1678
 #, c-format
 msgid "You are logged in as \"%1$s\"."
 msgstr "\"%1$s\"로 로그인 하였습니다."
@@ -16052,7 +16045,7 @@ msgstr "Web서버의 언어가 인스톨되어있지 않기 때문에 몇 언어
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "유저 \"%s\"의 권한변경은 허가되지 않았습니다."
 
-#: include/func.inc.php:1697
+#: include/func.inc.php:1695
 msgid "You are not logged in"
 msgstr "당신은 로그인 되지 않았습니다"
 
@@ -16082,9 +16075,9 @@ msgstr "액션 클로벌 스크립트 \"%s\"의 타겟이 지정되어 있지 �
 #: include/classes/api/services/CGraphPrototype.php:558
 #: include/classes/api/services/CHost.php:733
 #: include/classes/api/services/CHost.php:794
-#: include/classes/api/services/CMaintenance.php:540
-#: include/classes/api/services/CMaintenance.php:658
-#: include/classes/api/services/CMaintenance.php:670
+#: include/classes/api/services/CMaintenance.php:542
+#: include/classes/api/services/CMaintenance.php:660
+#: include/classes/api/services/CMaintenance.php:672
 #: include/classes/api/services/CScript.php:287
 #: include/classes/api/services/CScript.php:384
 #: include/classes/api/services/CScript.php:412
@@ -16109,11 +16102,11 @@ msgstr "다른 사용자를 갱신하는 권한이 없습니다."
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "사용자를 갱신하는 권한이 없거나 사용자가 존재하지 않습니다."
 
-#: include/func.inc.php:1680
+#: include/func.inc.php:1678
 msgid "You have no permissions to access this page."
 msgstr "이 페이지를 표시하는 권한이 없습니다."
 
-#: include/func.inc.php:1699
+#: include/func.inc.php:1697
 msgid "You must login to view this page."
 msgstr "이 페이지를 표시하기 위해서는 로그인이 필요합니다."
 
@@ -16142,7 +16135,7 @@ msgid "Zabbix User"
 msgstr "ZABBIX 유저"
 
 #: app/views/administration.script.edit.php:52 include/discovery.inc.php:65
-#: include/items.inc.php:85 include/views/configuration.action.edit.php:811
+#: include/items.inc.php:85 include/views/configuration.action.edit.php:812
 #: include/views/js/configuration.discovery.edit.js.php:181
 msgid "Zabbix agent"
 msgstr "ZABBIX 에이전트"
@@ -16170,7 +16163,7 @@ msgstr "Zabbix 내부 데이터베이스 유저 정보에 의한 인증"
 #: app/views/administration.script.edit.php:53
 #: include/classes/screens/CScreenServerInfo.php:40
 #: include/classes/setup/CSetupWizard.php:335
-#: include/views/configuration.action.edit.php:812
+#: include/views/configuration.action.edit.php:813
 msgid "Zabbix server"
 msgstr "Zabbix 서버"
 
@@ -16185,7 +16178,7 @@ msgstr ""
 "1. \"zabbix.conf.php\"에 설정된 서버의 IP혹은 DNS가 올바르지 않음;\n"
 "2. Incorrect network configuration.\n"
 
-#: include/blocks.inc.php:476
+#: include/blocks.inc.php:477
 msgid "Zabbix server IP or port is not set!"
 msgstr "Zabbix server의 IP주소 혹은 포트번호가 설정되어 있지 않습니다."
 
@@ -16202,7 +16195,7 @@ msgstr "Zabbix 서버의 정보"
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix 서버가 동작하지 않습니다. (화면을 재시작하여 스테이터스를 다시 확인해주세요)"
 
-#: include/blocks.inc.php:474
+#: include/blocks.inc.php:475
 msgid "Zabbix server is running"
 msgstr "Zabbix 서버 가동 중"
 
@@ -16227,24 +16220,24 @@ msgstr "Zabbix 트랩퍼"
 msgid "Zoom"
 msgstr "줌"
 
-#: include/func.inc.php:146
+#: include/func.inc.php:145
 #, c-format
 msgid "[Wrong value for day: \"%s\" ]"
 msgstr "[일(day) 설정이 바르지 않습니다: \"%s\" ]"
 
-#: include/func.inc.php:131
+#: include/func.inc.php:130
 #, c-format
 msgid "[Wrong value for month: \"%s\" ]"
 msgstr "[월(month) 설정이 바르지 않습니다: \"%s\" ]"
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:172
+#: include/classes/import/validators/CXmlValidatorGeneral.php:193
 #: include/classes/validators/CNewValidator.php:231
 msgid "a character string is expected"
 msgstr "문자열로 지정해 주십시오"
 
 #: include/classes/api/services/CScreen.php:423
 msgid "a numeric value is expected"
-msgstr ""
+msgstr "숫자로 지정해주세요"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
@@ -16278,12 +16271,12 @@ msgstr "전체"
 msgid "all media"
 msgstr "모든 미디어"
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:186
+#: include/classes/import/validators/CXmlValidatorGeneral.php:207
 msgid "an array is expected"
 msgstr "배열로 지정해주세요"
 
-#: include/classes/import/validators/C10XmlValidator.php:385
-#: include/classes/import/validators/C10XmlValidator.php:407
+#: include/classes/import/validators/C10XmlValidator.php:397
+#: include/classes/import/validators/C10XmlValidator.php:419
 msgid "an empty string is expected"
 msgstr "공백문자(empty string)로 지정해 주십시오."
 
@@ -16323,7 +16316,11 @@ msgid "blinking"
 msgstr "점멸"
 
 #: include/classes/api/services/CEvent.php:436
+#: include/classes/api/services/CHost.php:1555
+#: include/classes/api/services/CHost.php:1561
 #: include/classes/api/services/CMediatype.php:418
+#: include/classes/api/services/CProxy.php:666
+#: include/classes/api/services/CProxy.php:672
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
 msgstr "공백으로 지정할 수 없습니다"
@@ -16338,7 +16335,7 @@ msgstr "\"%1$s\"에서 시작되는 조건식을 확인해주세요."
 msgid "configure"
 msgstr "설정"
 
-#: include/func.inc.php:564 include/views/configuration.item.list.php:244
+#: include/func.inc.php:563 include/views/configuration.item.list.php:244
 #: include/views/configuration.item.list.php:245
 #: include/views/configuration.item.prototype.list.php:100
 #: include/views/configuration.item.prototype.list.php:101 jsLoader.php:99
@@ -16405,7 +16402,7 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "글로벌 데이터의 보존기간 설정"
 
-#: include/func.inc.php:565 jsLoader.php:100
+#: include/func.inc.php:564 jsLoader.php:100
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
@@ -16415,7 +16412,7 @@ msgstr "h"
 msgid "hh"
 msgstr "hh"
 
-#: include/classes/import/validators/C10XmlValidator.php:363
+#: include/classes/import/validators/C10XmlValidator.php:375
 msgctxt "XML time format"
 msgid "hh.mm"
 msgstr "hh.mm"
@@ -16482,12 +16479,12 @@ msgstr "포함"
 msgid "low-level discovery rule"
 msgstr "low-level 디스커버리 룰"
 
-#: include/func.inc.php:566 jsLoader.php:101
+#: include/func.inc.php:565 jsLoader.php:101
 msgctxt "minute short"
 msgid "m"
 msgstr "m"
 
-#: include/func.inc.php:563 jsLoader.php:98
+#: include/func.inc.php:562 jsLoader.php:98
 msgctxt "month short"
 msgid "m"
 msgstr "m"
@@ -16508,7 +16505,7 @@ msgstr "매크로가 설정되어 있지 않습니다"
 msgid "macro(s)"
 msgstr "매크로"
 
-#: include/actions.inc.php:154 include/views/configuration.action.edit.php:258
+#: include/actions.inc.php:154 include/views/configuration.action.edit.php:256
 msgid "maintenance"
 msgstr "메인터넌스"
 
@@ -16538,7 +16535,7 @@ msgstr "최대"
 msgid "min"
 msgstr "최소"
 
-#: include/views/configuration.action.edit.php:384
+#: include/views/configuration.action.edit.php:382
 msgid "minimum 60 seconds"
 msgstr "최소 60초"
 
@@ -16548,7 +16545,7 @@ msgstr "최소 60초"
 msgid "mm"
 msgstr "mm"
 
-#: include/func.inc.php:568
+#: include/func.inc.php:567
 msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
@@ -16560,7 +16557,7 @@ msgstr "유효한 LDAP서버가 필요합니다."
 #: include/classes/api/services/CScreen.php:430
 #, c-format
 msgid "must be between \"%1$s\" and \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\"에서 \"%2$s\"의 수치로 설정해주세요"
 
 #: include/classes/html/CMultiSelect.php:53 jsLoader.php:177
 msgid "new"
@@ -16600,7 +16597,7 @@ msgstr "선택되지 않음"
 msgid "now"
 msgstr "현재"
 
-#: app/views/monitoring.widget.hosts.view.php:369 include/blocks.inc.php:444
+#: app/views/monitoring.widget.hosts.view.php:369 include/blocks.inc.php:445
 msgid "of"
 msgstr "of"
 
@@ -16675,7 +16672,7 @@ msgstr "root"
 msgid "running"
 msgstr "가동 중"
 
-#: include/func.inc.php:567
+#: include/func.inc.php:566
 msgctxt "second short"
 msgid "s"
 msgstr "s"
@@ -16712,8 +16709,8 @@ msgstr "값 매핑의 표시"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "템플릿ID \"%1$s\"가 %2$s번 사용되고 있습니다"
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:96
-#: include/classes/import/validators/CXmlValidatorGeneral.php:115
+#: include/classes/import/validators/CXmlValidatorGeneral.php:106
+#: include/classes/import/validators/CXmlValidatorGeneral.php:125
 #, c-format
 msgid "the tag \"%1$s\" is missing"
 msgstr "태그 \"%1$s\"를 찾을 수 없습니다"
@@ -16740,8 +16737,8 @@ msgstr "키의 끝부분이 잘못되어 있습니다"
 msgid "unexpected end of macro"
 msgstr "매크로의 끝부분이 잘못되어 있습니다"
 
-#: include/classes/import/validators/CXmlValidatorGeneral.php:81
-#: include/classes/import/validators/CXmlValidatorGeneral.php:129
+#: include/classes/import/validators/CXmlValidatorGeneral.php:91
+#: include/classes/import/validators/CXmlValidatorGeneral.php:151
 #, c-format
 msgid "unexpected tag \"%1$s\""
 msgstr "태그 \"%1$s\"가 잘못되어 있습니다"
@@ -16751,6 +16748,14 @@ msgstr "태그 \"%1$s\"가 잘못되어 있습니다"
 #: include/classes/import/readers/CXmlImportReader.php:128
 #, c-format
 msgid "unexpected text \"%1$s\""
+msgstr "텍스트 \"%1$s\"가 잘못되었습니다."
+
+#: include/classes/api/services/CHost.php:1539
+#: include/classes/api/services/CHost.php:1545
+#: include/classes/api/services/CProxy.php:647
+#: include/classes/api/services/CProxy.php:654
+#, c-format
+msgid "unexpected value \"%1$s\""
 msgstr ""
 
 #: include/classes/setup/CFrontendSetup.php:225
@@ -16759,7 +16764,7 @@ msgstr ""
 msgid "unknown"
 msgstr "불명"
 
-#: include/classes/import/validators/CXmlValidator.php:62
+#: include/classes/import/validators/CXmlValidator.php:63
 msgid "unsupported version number"
 msgstr "지원되지 않는 버전의 번호입니다."
 
@@ -16774,7 +16779,7 @@ msgstr "값"
 msgid "via"
 msgstr "via"
 
-#: include/func.inc.php:562 jsLoader.php:97
+#: include/func.inc.php:561 jsLoader.php:97
 msgctxt "year short"
 msgid "y"
 msgstr "y"

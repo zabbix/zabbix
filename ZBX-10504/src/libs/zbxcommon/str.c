@@ -3574,12 +3574,9 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 {
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
-	const char	*ptr_context;
+	const char	*ptr_context = context;
 
-	for (ptr_context = context; ' ' == *ptr_context; ptr_context++)
-		;
-
-	if ('"' == *ptr_context)
+	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
 
 	for (; '\0' != *ptr_context; ptr_context++)
@@ -3598,9 +3595,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
 
 	*ptr_buffer++ = '"';
-
-	while (' ' == *context)
-		*ptr_buffer++ = *context++;
 
 	while ('\0' != *context)
 	{
@@ -3788,10 +3782,6 @@ static int	function_parse_unquoted_param(const char *expr, size_t *length, size_
 		}
 	}
 out:
-	/* trim the trailing whitespace */
-	while (ptr > expr && ' ' == *(ptr - 1))
-		ptr--;
-
 	*length = ptr - expr;
 
 	return SUCCEED;
@@ -3807,7 +3797,7 @@ out:
  *                             parameter separator: (p1,p2 ... or ,p2,p3 ...  *
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
- *             length    - [OUT] the parameter length excluding trailing      *
+ *             length    - [OUT] the parameter length including trailing      *
  *                               whitespace                                   *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *

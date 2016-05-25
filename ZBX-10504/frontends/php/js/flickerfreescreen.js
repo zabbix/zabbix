@@ -65,7 +65,7 @@ jQuery(function($) {
 
 				default:
 					ajaxParams = ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
-						'updateProfile', 'screenitemid', 'timeline'
+						'updateProfile', 'screenitemid'
 					];
 			}
 
@@ -90,7 +90,7 @@ jQuery(function($) {
 			}
 
 			// timeline params
-			if ($.inArray('timeline', ajaxParams) > -1) {
+			if (screen.resourcetype != 21 && screen.resourcetype != 22) {
 				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
 			}

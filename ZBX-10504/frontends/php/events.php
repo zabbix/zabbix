@@ -253,8 +253,6 @@ else {
 
 	$eventsWidget = (new CWidget())->setTitle(_('Events'));
 
-	$csvDisabled = true;
-
 	// header
 	$frmForm = (new CForm('get'))
 		->addVar('stime', $stime, 'stime_csv')
@@ -452,9 +450,12 @@ else {
 if (!$firstEvent) {
 	$starttime = null;
 
+	$url = (new CUrl('events.php'))
+		->setArgument('fullscreen', getRequest('fullscreen'));
+
 	if (!$csvExport) {
 		$events = [];
-		$paging = getPagingLine($events, ZBX_SORT_UP);
+		$paging = getPagingLine($events, ZBX_SORT_UP, $url);
 	}
 }
 else {
@@ -489,11 +490,10 @@ else {
 		]);
 		$dsc_events = array_slice($dsc_events, 0, $config['search_limit'] + 1);
 
-		$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN);
+		$url = (new CUrl('events.php'))
+			->setArgument('fullscreen', getRequest('fullscreen'));
 
-		if (!$csvExport) {
-			$csvDisabled = zbx_empty($dsc_events);
-		}
+		$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN, $url);
 
 		$objectids = [];
 		foreach ($dsc_events as $event_data) {
@@ -680,7 +680,12 @@ else {
 			$events = array_slice($events, 0, $config['search_limit'] + 1);
 
 			// get paging
-			$paging = getPagingLine($events, ZBX_SORT_DOWN);
+			$url = (new CUrl('events.php'))
+				->setArgument('fullscreen', getRequest('fullscreen'))
+				->setArgument('groupid', $pageFilter->groupid)
+				->setArgument('hostid', $pageFilter->hostid);
+
+			$paging = getPagingLine($events, ZBX_SORT_DOWN, $url);
 
 			// query event with extend data
 			$events = API::Event()->get([
@@ -693,10 +698,6 @@ else {
 				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => true
 			]);
-
-			if (!$csvExport) {
-				$csvDisabled = zbx_empty($events);
-			}
 
 			$triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url'],
@@ -813,7 +814,13 @@ else {
 		else {
 			if (!$csvExport) {
 				$events = [];
-				$paging = getPagingLine($events, ZBX_SORT_UP);
+
+				$url = (new CUrl('events.php'))
+					->setArgument('fullscreen', getRequest('fullscreen'))
+					->setArgument('groupid', $pageFilter->groupid)
+					->setArgument('hostid', $pageFilter->hostid);
+
+				$paging = getPagingLine($events, ZBX_SORT_UP, $url);
 			}
 		}
 	}
@@ -851,10 +858,6 @@ else {
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$eventsWidget->show();
-
-	if ($csvDisabled) {
-		zbx_add_post_js('document.getElementById("csv_export").disabled = true;');
-	}
 
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }

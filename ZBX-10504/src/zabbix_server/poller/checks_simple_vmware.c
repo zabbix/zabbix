@@ -664,8 +664,6 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 	zbx_uint64_t		key;
 	char			*value, xpath[MAX_STRING_LEN];
 	int			i, ret = SYSINFO_RET_FAIL;
-	struct tm		tm;
-	time_t			t;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, lastlogsize);
 
@@ -720,7 +718,6 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 					char	*timestamp;
 
 					add_result->log->logeventid = ids.values[i];
-					add_result->log->timestamp = 0;
 
 					zbx_snprintf(xpath, sizeof(xpath), ZBX_XPATH_LN2("Event", "key")
 							"[.='" ZBX_FS_UI64 "']/.." ZBX_XPATH_LN("createdTime"),
@@ -728,28 +725,14 @@ static int	vmware_get_events(const char *events, zbx_uint64_t lastlogsize, const
 
 					if (NULL != (timestamp = zbx_xml_read_value(events, xpath)))
 					{
+						int	year, mon, mday, hour, min, sec, t;
+
 						/* 2013-06-04T14:19:23.406298Z */
-						if (6 == sscanf(timestamp, "%d-%d-%dT%d:%d:%d.%*s", &tm.tm_year,
-								&tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
-								&tm.tm_sec))
+						if (6 == sscanf(timestamp, "%d-%d-%dT%d:%d:%d.%*s",
+								&year, &mon, &mday, &hour, &min, &sec))
 						{
-							int		tz_offset;
-#if defined(HAVE_TM_TM_GMTOFF)
-							struct tm	*ptm;
-							time_t		now;
-
-							now = time(NULL);
-							ptm = localtime(&now);
-							tz_offset = ptm->tm_gmtoff;
-#else
-							tz_offset = -timezone;
-#endif
-							tm.tm_year -= 1900;
-							tm.tm_mon--;
-							tm.tm_isdst = -1;
-
-							if (0 < (t = mktime(&tm)))
-								add_result->log->timestamp = (int)t + tz_offset;
+							if (FAIL != zbx_utc_time(year, mon, mday, hour, min, sec, &t))
+								add_result->log->timestamp = t;
 						}
 
 						zbx_free(timestamp);

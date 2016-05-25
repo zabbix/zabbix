@@ -410,7 +410,7 @@ ul.top-nav-icons {
 		padding: 0 10px;
 
 		&:last-child {
-			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
+			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
 		}
 	}
 }
@@ -636,17 +636,17 @@ footer {
 
 			&:hover {
 				text-decoration: none;
-				background-color: $ui-hover-color
+				background-color: $ui-hover-color;
 			}
 
 			&:focus {
 				text-decoration: none;
-				background-color: $ui-hover-color
+				background-color: $ui-hover-color;
 			}
 
 			&:active {
 				text-decoration: none;
-				background-color: $ui-hover-color
+				background-color: $ui-hover-color;
 			}
 		}
 	}
@@ -1489,7 +1489,7 @@ footer {
 		&:checked + label {
 			color: $white;
 			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;;
+			background-color: $ui-bg-selected-color;
 			position: relative;
 			z-index: 1;
 		}
@@ -1587,6 +1587,7 @@ textarea {
 		size: $font-form-size;
 	}
 	padding: 4px 5px;
+	margin: 0;
 	overflow: auto;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
@@ -1606,6 +1607,7 @@ select {
 		family: $font-stack;
 		size: $font-form-size;
 	}
+	height: 24px;
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
@@ -2554,33 +2556,6 @@ $form-icon-btn: (
 	@include opacity(0.35);
 }
 
-.pop-up {
-	min-width: initial;
-	margin-bottom: 0;
-
-	article {
-		padding: 13px;
-	}
-
-	h1 {
-		border-bottom: none;
-		padding: 0;
-	}
-
-	.header-title {
-
-		ul {
-			position: absolute;
-			right: 0;
-			bottom: 0;
-		}
-	}
-
-	.dashbrd-widget-head {
-		padding: 8px 10px;
-	}
-}
-
 .calendar {
 	width: 200px;
 
@@ -3458,6 +3433,7 @@ a.overlay-close-btn {
 // Color picker
 .color-picker {
 	height: 20px;
+	white-space: nowrap;
 
 	div {
 		display: inline-block;
