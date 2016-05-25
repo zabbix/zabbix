@@ -156,8 +156,8 @@ static int	DBpatch_3010015(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(actionid, row[0]);
-		/* operationtype: 0 - OPERATION_TYPE_MESSAGE */
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, 0, 1);
+		/* operationtype: 11 - OPERATION_TYPE_RECOVERY_MESSAGE */
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, 11, 1);
 	}
 	DBfree_result(result);
 
@@ -654,12 +654,12 @@ static int	DBpatch_3010018(void)
 		eventsource = atoi(row[1]);
 		evaltype = atoi(row[2]);
 
+		index = conditionids.values_num;
+		DBpatch_3010018_get_conditionids(actionid, eventsource, &conditionids);
+
 		/* evaltype: 3 - CONDITION_EVAL_TYPE_EXPRESSION */
 		if (3 != evaltype)
 			continue;
-
-		index = conditionids.values_num;
-		DBpatch_3010018_get_conditionids(actionid, eventsource, &conditionids);
 
 		/* no new conditions to remove, process next action */
 		if (index == conditionids.values_num)
