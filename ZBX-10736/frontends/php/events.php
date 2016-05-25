@@ -253,8 +253,6 @@ else {
 
 	$eventsWidget = (new CWidget())->setTitle(_('Events'));
 
-	$csvDisabled = true;
-
 	// header
 	$frmForm = (new CForm('get'))
 		->addVar('stime', $stime, 'stime_csv')
@@ -497,10 +495,6 @@ else {
 
 		$paging = getPagingLine($dsc_events, ZBX_SORT_DOWN, $url);
 
-		if (!$csvExport) {
-			$csvDisabled = zbx_empty($dsc_events);
-		}
-
 		$objectids = [];
 		foreach ($dsc_events as $event_data) {
 			$objectids[$event_data['objectid']] = $event_data['objectid'];
@@ -705,10 +699,6 @@ else {
 				'nopermissions' => true
 			]);
 
-			if (!$csvExport) {
-				$csvDisabled = zbx_empty($events);
-			}
-
 			$triggers = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url'],
 				'selectHosts' => ['hostid', 'name', 'status'],
@@ -868,10 +858,6 @@ else {
 	zbx_add_post_js('timeControl.processObjects();');
 
 	$eventsWidget->show();
-
-	if ($csvDisabled) {
-		zbx_add_post_js('document.getElementById("csv_export").disabled = true;');
-	}
 
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
