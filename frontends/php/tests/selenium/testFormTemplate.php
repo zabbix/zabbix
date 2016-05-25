@@ -110,7 +110,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$this->template_tmp);
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestTextPresent('Template deleted');

@@ -105,7 +105,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClickWait('link='.$this->icon_image_name2);
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image deleted'));
@@ -153,7 +153,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClickWait("//form[@name='imageForm']//table//a[text()='".$this->bg_image_name2."']");
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Image deleted'));
