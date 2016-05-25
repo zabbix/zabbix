@@ -138,21 +138,21 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${basedir}/database/postgresql/images.sql" failonerror="on">
+		<exec executable="psql" input="database/postgresql/images.sql" failonerror="on">
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${basedir}/database/postgresql/data.sql" failonerror="on">
+		<exec executable="psql" input="database/postgresql/data.sql" failonerror="on">
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="${dbname}"/>
 		</exec>
-		<exec executable="psql" input="${basedir}/tests/data/data_test.sql" failonerror="on">
+		<exec executable="psql" input="tests/data/data_test.sql" failonerror="on">
 			<arg line="-h '${dbhost}'"/>
 			<arg line="-U '${dbuser}'"/>
 			<arg line="-1"/>
@@ -243,8 +243,8 @@
 	</target>
 
 	<target name="test-frontend">
-		<exec executable="phpunit" dir="${basedir}/frontends/php/tests" failonerror="off">
-			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml --bootstrap=${basedir}/frontends/php/tests/bootstrap.php frontend.php"/>
+		<exec executable="phpunit" dir="frontends/php/tests" failonerror="off">
+			<arg line="--log-junit=build/logs/phpunit.xml --bootstrap=bootstrap.php frontend.php"/>
 		</exec>
 	</target>
 
@@ -253,5 +253,4 @@
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
-
 </project>
