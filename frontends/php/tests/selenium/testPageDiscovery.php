@@ -95,14 +95,6 @@ class testPageDiscovery extends CWebTest {
 		DBrestore_tables('drules');
 	}
 
-	/**
-	* @dataProvider allRules
-	*/
-	public function testPageDiscovery_ChangeStatus($rule) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	public function testPageDiscovery_MassEnableAll() {
 		DBexecute('update drules set status='.DRULE_STATUS_DISABLED);
 
@@ -187,10 +179,5 @@ class testPageDiscovery extends CWebTest {
 
 		$sql = "select * from drules where druleid=$druleid and status=".DRULE_STATUS_DISABLED;
 		$this->assertEquals(1, DBcount($sql));
-	}
-
-	public function testPageDiscovery_Sorting() {
-// TODO
-		$this->markTestIncomplete();
 	}
 }

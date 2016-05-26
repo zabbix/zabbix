@@ -53,9 +53,4 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 		$this->zbxTestTextPresent('...');
 	}
-
-	public function testPageHosts_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

@@ -47,9 +47,4 @@ class testPageQueueOverview extends CWebTest {
 			)
 		);
 	}
-
-	public function testPageQeueOverview_VerifyDisplayedNumbers() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

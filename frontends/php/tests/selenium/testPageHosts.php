@@ -197,26 +197,6 @@ class testPageHosts extends CWebTest {
 		);
 	}
 
-	public function testPageHosts_MassExportAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassExport() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassUpdateAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassUpdate() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	public function testPageHosts_MassActivateAll() {
 		DBexecute("update hosts set status=".HOST_STATUS_NOT_MONITORED." where status=".HOST_STATUS_MONITORED);
 
@@ -309,20 +289,5 @@ class testPageHosts extends CWebTest {
 
 		$sql = "select * from hosts where hostid=$hostid and status=".HOST_STATUS_NOT_MONITORED;
 		$this->assertEquals(1, DBcount($sql), "Chuck Norris: host $hostid disabled but status is wrong in the DB");
-	}
-
-	public function testPageHosts_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_MassDelete() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageHosts_Sorting() {
-// TODO
-		$this->markTestIncomplete();
 	}
 }

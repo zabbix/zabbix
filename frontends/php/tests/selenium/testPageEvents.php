@@ -64,11 +64,6 @@ class testPageEvents extends CWebTest {
 		}
 	}
 
-	public function testPageEvents_Triggers_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 // Check that no real host or template names displayed
 	public function testPageEvents_Triggers_NoHostNames() {
 		$this->zbxTestLogin('events.php');

@@ -107,16 +107,6 @@ class testPageActionsDiscovery extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsDiscovery_Create() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageActionsDiscovery_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allActions
 	*/
@@ -142,11 +132,6 @@ class testPageActionsDiscovery extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsDiscovery_MassEnableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allActions
 	*/
@@ -170,11 +155,6 @@ class testPageActionsDiscovery extends CWebTest {
 
 		$sql = "select * from actions where actionid=$actionid and status=0";
 		$this->assertEquals(1, DBcount($sql));
-	}
-
-	public function testPageActionsDiscovery_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
 	}
 
 	/**
@@ -207,10 +187,5 @@ class testPageActionsDiscovery extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('actions');
-	}
-
-	public function testPageActionsDiscovery_Sorting() {
-// TODO
-		$this->markTestIncomplete();
 	}
 }

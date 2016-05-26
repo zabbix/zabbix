@@ -30,9 +30,4 @@ class testPageQueueDetails extends CWebTest {
 		$this->zbxTestTextPresent(array('Next check', 'Delayed by', 'Host', 'Name'));
 		$this->zbxTestTextPresent('Total:');
 	}
-
-	public function testPageQeueOverviewDetails_VerifyDisplayedNumbers() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
