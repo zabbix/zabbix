@@ -231,9 +231,8 @@ nav {
 }
 
 .top-nav-container {
-	height: 45px;
-	line-height: 45px;
-	padding: 0 10px 0 10px;
+	height: 49px;
+	line-height: 49px;
 	position: relative;
 	background-color: $main-nav-bg-color;
 }
@@ -273,7 +272,7 @@ nav {
 	}
 
 	a {
-		padding: 15px 10px;
+		padding: 17px 13px;
 		color: $link-main-nav-color;
 		text-decoration: none;
 		cursor: pointer;
@@ -304,19 +303,17 @@ nav {
 ul.top-nav-icons {
 	position: absolute;
 	top: 0;
-	right: 10px;
+	right: 0;
 
 	li {
 		display: block;
 		float: left;
-		padding: 0 0 0 10px;
 
 		.search-suggest {
 			min-width: 186px;
 
 			li {
 				float: none;
-				padding: 0.4em 5px;
 
 				a {
 					opacity: inherit;
@@ -328,9 +325,9 @@ ul.top-nav-icons {
 
 	a {
 		display: block;
-		width: 24px;
-		height: 45px;
-		line-height: 45px;
+		width: 38px;
+		height: 49px;
+		line-height: 49px;
 		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
@@ -347,21 +344,22 @@ ul.top-nav-icons {
 	}
 
 	.top-nav-help {
-		background: url(../img/icon-sprite.svg) no-repeat -6px -32px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -30px;
 	}
 
 	.top-nav-profile {
-		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -102px;
 	}
 
 	.top-nav-signout {
-		background: url(../img/icon-sprite.svg) no-repeat -6px -140px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -138px;
+		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -66px;
 		width: auto;
-		padding: 0 6px 0 17px;
+		padding: 0 12px 0 27px;
 		-webkit-transform-style: preserve-3d;
 	}
 
@@ -373,7 +371,7 @@ ul.top-nav-icons {
 		background-color: darken($main-nav-bg-color, 7%);
 		border: 1px solid darken($main-nav-bg-color, 10%);
 		width: 198px;
-		margin: 6px 3px 0 0;
+		margin: 6px 7px 0 0;
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
@@ -391,11 +389,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
-	height: 30px;
-	line-height: 30px;
+	height: 32px;
+	line-height: 32px;
 	background-color: $main-subnav-bg-color;
 	position: relative;
-	padding: 0 10px;
+	padding: 0 13px;
 }
 
 .top-subnav {
@@ -406,16 +404,16 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		padding: 0 10px;
+		padding: 0 12px;
 
 		&:last-child {
-			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
+			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
 		}
 	}
 }
 
 .top-subnav a {
-	padding: 8px 0;
+	padding: 9px 1px;
 
 	&:link {
 		color: $link-main-subnav-color;
@@ -439,7 +437,7 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
-		padding: 8px 0 5px 0;
+		padding: 9px 1px 6px 1px;
 		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
 	}
 }
@@ -494,14 +492,14 @@ ul.top-nav-icons {
 			display: block;
 			float: left;
 			position: relative;
-			padding: 0 0 0 10px;
+			padding: 0 0 0 14px;
 		}
 	}
 }
 
 // Article
 article {
-	padding: 10px 10px 0 10px;
+	padding: 13px 13px 0 13px;
 }
 
 .article {
@@ -579,7 +577,7 @@ footer {
 	display: block;
 	width: 95px;
 	height: 25px;
-	margin: 10px 10px 0 0;
+	margin: 12px 9px 0 13px;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
 }
 
@@ -599,7 +597,7 @@ footer {
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-		padding: 6px 5px;
+		padding: 8px 5px 6px 5px;
 		vertical-align: bottom;
 		border-bottom: 2px solid $table-border-color;
 		text-align: left;
@@ -640,14 +638,14 @@ footer {
 			}
 
 			&:focus {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
+			text-decoration: none;
+			background-color: $ui-hover-color;
+		}
 
-			&:active {
-				text-decoration: none;
-				background-color: $ui-hover-color;
-			}
+		&:active {
+			text-decoration: none;
+			background-color: $ui-hover-color;
+		}
 		}
 	}
 
@@ -672,11 +670,9 @@ footer {
 	}
 
 	td {
-		padding: 6px 5px;
+		padding: 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
-		border-spacing: 0;
-		border-collapse: no-collapse;
 	}
 
 	.vertical_rotation_inner {
@@ -689,7 +685,7 @@ footer {
 	text-align: center;
 	background-color: $ui-bg-color;
 	margin-top: -1px;
-	padding: 6px 5px;
+	padding: 7px 5px;
 	overflow: hidden;
 	position: relative;
 	border: 1px solid $ui-border-color;
@@ -901,7 +897,7 @@ footer {
 }
 
 .filter-container {
-	padding: 10px 0;
+	padding: 15px 0 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
@@ -1491,7 +1487,7 @@ footer {
 		&:checked + label {
 			color: $white;
 			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;
+			background-color: $ui-bg-selected-color;;
 			position: relative;
 			z-index: 1;
 		}
@@ -1779,8 +1775,8 @@ button {
 	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
-	top: 11px;
-	right: 4px;
+	top: 13px;
+	right: 8px;
 	width: 24px;
 	min-height: 22px;
 	padding: 0;
@@ -1972,8 +1968,8 @@ button[disabled] {
 }
 
 .ui-tabs-nav {
-	height: 30px;
-	line-height: 30px;
+	height: 36px;
+	line-height: 36px;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
@@ -1981,7 +1977,7 @@ button[disabled] {
 
 		a {
 			@extend %no-border;
-			padding: 8px 10px;
+			padding: 11px 13px;
 			@include transition(background-color .2s ease-out);
 
 			&:hover {
@@ -2004,7 +2000,7 @@ button[disabled] {
 		&.ui-tabs-active {
 
 			a {
-				padding: 8px 13px 6px 13px;
+				padding: 11px 13px 9px 13px;
 				background-color: $transparent;
 				color: $font-color;
 				text-decoration: none;
@@ -2019,7 +2015,6 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
-				@extend %no-border;
 			}
 		}
 	}
@@ -2296,6 +2291,7 @@ $form-icon-btn: (
 
 	.list-table {
 		border: none;
+	//@include box-shadow(none);
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2490,7 +2486,7 @@ $form-icon-btn: (
 .overlay-dialogue {
 	position: absolute;
 	z-index: 1000;
-	padding: 15px 10px 10px 10px;
+	padding: 15px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -2498,6 +2494,7 @@ $form-icon-btn: (
 
 	.list-table {
 		border: none;
+	//@include box-shadow(none);
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2556,6 +2553,33 @@ $form-icon-btn: (
 	top: 0;
 	left: 0;
 	@include opacity(0.35);
+}
+
+.pop-up {
+	min-width: initial;
+	margin-bottom: 0;
+
+	article {
+		padding: 13px;
+	}
+
+	h1 {
+		border-bottom: none;
+		padding: 0;
+	}
+
+	.header-title {
+
+		ul {
+			position: absolute;
+			right: 0;
+			bottom: 0;
+		}
+	}
+
+	.dashbrd-widget-head {
+		padding: 8px 10px;
+	}
 }
 
 .calendar {
@@ -3276,20 +3300,20 @@ td.inactive-bg {
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
+	max-height: 300px;
+	padding: 0 5px 0 0;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
 
 	.link-action {
 		position: absolute;
 		top: 7px;
-		left: 10px;
+		left: 15px;
 		margin-bottom: 20px;
 	}
 
 	ul {
 		font-size: $font-msg-reset-size;
-		max-height: 300px;
-		padding: 0 5px 0 0;
-		overflow-y: auto;
-		@extend %webkit-scrollbar;
 
 		li {
 			margin: .5em 0 .5em 1em;
@@ -3324,7 +3348,7 @@ td.inactive-bg {
 
 %msg {
 	font-size: $font-top-nav-size;
-	padding: 7px 20px 7px 15px;
+	padding: 7px 15px;
 	margin: 0 0 12px 0;
 	text-align: center;
 	position: relative;
@@ -3435,7 +3459,6 @@ a.overlay-close-btn {
 // Color picker
 .color-picker {
 	height: 20px;
-	white-space: nowrap;
 
 	div {
 		display: inline-block;
@@ -3739,75 +3762,75 @@ Tables are used to display tabular data. All tables are declared with the `list-
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
+	  <thead>
+		 <tr>
+			<th class="cell-width"><input type="checkbox"></th>
+			<th><a href="">Hosts<span class="arrow-down"></span></a></th>
+			<th><a href="">Applications<span class="arrow-up"></span></a></th>
+			<th>Items</th>
+			<th>Triggers</th>
+			<th>Graphs</th>
+			<th>Discovery</th>
+			<th>Web</th>
+			<th>Interface</th>
+			<th>Templates</th>
+			<th><a href="">Status</a></th>
+		 </tr>
+	  </thead>
+	  <tbody>
+		 <tr>
+			<td><input type="checkbox"></td>
+			<td><a href="">Test host</a></td>
+			<td><a href="">Applications</a></td>
+			<td><a href="">Items</a></td>
+			<td><a href="">Triggers</a></td>
+			<td><a href="">Graphs</a></td>
+			<td><a href="">Discovery</a></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+		 <tr class="row-selected">
+			<td><input type="checkbox" checked=""></td>
+			<td><a href="">Zabbix server</a></td>
+			<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+			<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+			<td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+			<td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+			<td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+		 <tr>
+			<td><input type="checkbox"></td>
+			<td><a href="">Main server</a></td>
+			<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+			<td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+			<td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+			<td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+			<td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+		 <tr>
+			<td><input type="checkbox"></td>
+			<td><a href="">Backup server</a></td>
+			<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+			<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+			<td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+			<td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+			<td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+	  </tbody>
    </table>
 </div>
 ```
@@ -3819,75 +3842,75 @@ Pagination is used to separate large amounts of tabular data into descrete peice
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Test host</a></td>
-            <td><a href="">Applications</a></td>
-            <td><a href="">Items</a></td>
-            <td><a href="">Triggers</a></td>
-            <td><a href="">Graphs</a></td>
-            <td><a href="">Discovery</a></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr class="row-selected">
-            <td><input type="checkbox" checked=""></td>
-            <td><a href="">Zabbix server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Main server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-         <tr>
-            <td><input type="checkbox"></td>
-            <td><a href="">Backup server</a></td>
-            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
-            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
-            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
-            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
-            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
-            <td><a href="">Web</a></td>
-            <td>127.0.01: 10050</td>
-            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
-            <td><a href="">Enabled</a></td>
-         </tr>
-      </tbody>
+	  <thead>
+		 <tr>
+			<th class="cell-width"><input type="checkbox"></th>
+			<th><a href="">Hosts<span class="arrow-down"></span></a></th>
+			<th><a href="">Applications<span class="arrow-up"></span></a></th>
+			<th>Items</th>
+			<th>Triggers</th>
+			<th>Graphs</th>
+			<th>Discovery</th>
+			<th>Web</th>
+			<th>Interface</th>
+			<th>Templates</th>
+			<th><a href="">Status</a></th>
+		 </tr>
+	  </thead>
+	  <tbody>
+		 <tr>
+			<td><input type="checkbox"></td>
+			<td><a href="">Test host</a></td>
+			<td><a href="">Applications</a></td>
+			<td><a href="">Items</a></td>
+			<td><a href="">Triggers</a></td>
+			<td><a href="">Graphs</a></td>
+			<td><a href="">Discovery</a></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+		 <tr class="row-selected">
+			<td><input type="checkbox" checked=""></td>
+			<td><a href="">Zabbix server</a></td>
+			<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+			<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+			<td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+			<td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+			<td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+		 <tr>
+			<td><input type="checkbox"></td>
+			<td><a href="">Main server</a></td>
+			<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+			<td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+			<td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+			<td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+			<td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+		 <tr>
+			<td><input type="checkbox"></td>
+			<td><a href="">Backup server</a></td>
+			<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+			<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+			<td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+			<td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+			<td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+			<td><a href="">Web</a></td>
+			<td>127.0.01: 10050</td>
+			<td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+			<td><a href="">Enabled</a></td>
+		 </tr>
+	  </tbody>
    </table>
 </div>
 <div class="table-paging">
@@ -3902,26 +3925,26 @@ In cases when no data can be shown, table should be accompanied by an explanator
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
-      <thead>
-         <tr>
-            <th class="cell-width"><input type="checkbox"></th>
-            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
-            <th><a href="">Applications<span class="arrow-up"></span></a></th>
-            <th>Items</th>
-            <th>Triggers</th>
-            <th>Graphs</th>
-            <th>Discovery</th>
-            <th>Web</th>
-            <th>Interface</th>
-            <th>Templates</th>
-            <th><a href="">Status</a></th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr class="nothing-to-show">
-            <td colspan="11">We couldn't find any results</td>
-         </tr>
-      </tbody>
+	  <thead>
+		 <tr>
+			<th class="cell-width"><input type="checkbox"></th>
+			<th><a href="">Hosts<span class="arrow-down"></span></a></th>
+			<th><a href="">Applications<span class="arrow-up"></span></a></th>
+			<th>Items</th>
+			<th>Triggers</th>
+			<th>Graphs</th>
+			<th>Discovery</th>
+			<th>Web</th>
+			<th>Interface</th>
+			<th>Templates</th>
+			<th><a href="">Status</a></th>
+		 </tr>
+	  </thead>
+	  <tbody>
+		 <tr class="nothing-to-show">
+			<td colspan="11">We couldn't find any results</td>
+		 </tr>
+	  </tbody>
    </table>
 </div>
 ```
@@ -3933,55 +3956,55 @@ Besides textual information tables may contain other elements like icons. Table 
 ```html_example
 <div class="overflow-table">
    <table class="list-table">
-      <thead>
-         <tr>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Example</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>Alert labels</td>
-            <td>asdasasdasd</td>
-            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
-         </tr>
-         <tr>
-            <td>Icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Links with icons</td>
-            <td>asdasasdasd</td>
-            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
-         </tr>
-         <tr>
-            <td>Labels</td>
-            <td>asdasasdasd</td>
-            <td>
-               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
-               <div class="status-container"><span class="status-red">label</span></div>
-            </td>
-         </tr>
-         <tr>
-            <td>Tree</td>
-            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
-            <td>
-               <div class="treeview"><span class="arrow-right"></span></div>
-               <a href="#">Collapsed</a>
-               <div class="treeview"><span class="arrow-down"></span></div>
-               <a href="#">Expanded</a>
-            </td>
-         </tr>
-          <tr>
-            <td>Severity</td>
-            <td>asdasd</td>
-            <td class="normal-bg">
-               <span class="link-action">25</span>
-            </td>
-         </tr>
-      </tbody>
+	  <thead>
+		 <tr>
+			<th>Type</th>
+			<th>Description</th>
+			<th>Example</th>
+		 </tr>
+	  </thead>
+	  <tbody>
+		 <tr>
+			<td>Alert labels</td>
+			<td>asdasasdasd</td>
+			<td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
+		 </tr>
+		 <tr>
+			<td>Icons</td>
+			<td>asdasasdasd</td>
+			<td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
+		 </tr>
+		 <tr>
+			<td>Links with icons</td>
+			<td>asdasasdasd</td>
+			<td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
+		 </tr>
+		 <tr>
+			<td>Labels</td>
+			<td>asdasasdasd</td>
+			<td>
+			   <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
+			   <div class="status-container"><span class="status-red">label</span></div>
+			</td>
+		 </tr>
+		 <tr>
+			<td>Tree</td>
+			<td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
+			<td>
+			   <div class="treeview"><span class="arrow-right"></span></div>
+			   <a href="#">Collapsed</a>
+			   <div class="treeview"><span class="arrow-down"></span></div>
+			   <a href="#">Expanded</a>
+			</td>
+		 </tr>
+		  <tr>
+			<td>Severity</td>
+			<td>asdasd</td>
+			<td class="normal-bg">
+			   <span class="link-action">25</span>
+			</td>
+		 </tr>
+	  </tbody>
    </table>
 </div>
 ```
@@ -4038,25 +4061,25 @@ Text on html5 input types
 ```html_example
 <ul class="table-forms">
    <li>
-      <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="DefaultInput">
-         <div class="red">You can't leave this empty.</div>
-      </div>
+	  <div class="table-forms-td-left"><label for="DefaultInput">Default Input</label></div>
+	  <div class="table-forms-td-right">
+		 <input type="text" placeholder="Text" id="DefaultInput">
+		 <div class="red">You can't leave this empty.</div>
+	  </div>
    </li>
    <li>
-      <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
+	  <div class="table-forms-td-left"><label for="DisabledInput">Disabled Input</label></div>
+	  <div class="table-forms-td-right"><input type="text" placeholder="Text" id="DisabledtInput" disabled></div>
    </li>
    <li>
-      <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
-      <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
+	  <div class="table-forms-td-left"><label for="ReadOnlyInput">Readonly Input</label></div>
+	  <div class="table-forms-td-right"><input type="text" placeholder="Text" id="ReadOnlyInput" readonly></div>
    </li>
    <li>
-      <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
-      <div class="table-forms-td-right">
-         <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
-      </div>
+	  <div class="table-forms-td-left"><label for="ButtonInput">Input with a Button</label></div>
+	  <div class="table-forms-td-right">
+		 <input type="text" placeholder="Text" id="ButtonInput"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+	  </div>
    </li>
 </ul>
 ```
@@ -4129,7 +4152,7 @@ Alert dialogs are used to urgently inform the user about a certain situation. Pr
 <div class="overlay-dialogue">
    <!--<span class="overlay-close-btn"></span>-->
    <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
+	  <h4>Delete the selected item?</h4>
    </div>
    <div class="overlay-dialogue-body">Some explanatory information</div>
    <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
@@ -4138,7 +4161,7 @@ Alert dialogs are used to urgently inform the user about a certain situation. Pr
 <div class="overlay-dialogue">
    <!--<span class="overlay-close-btn"></span>-->
    <div class="dashbrd-widget-head cursor-move">
-      <h4>Delete the selected item?</h4>
+	  <h4>Delete the selected item?</h4>
    </div>
    <div class="overlay-dialogue-body"></div>
    <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
@@ -4156,52 +4179,52 @@ In exceptional cases dialogs may contain additional information inside a scrolla
    </div>
    <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
    <table class="list-table">
-      <thead>
-         <tr>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Duration</th>
-            <th>Age</th>
-            <th>Ack</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td>2015-09-08 13:47:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>15d 23h 45m</td>
-            <td>15d 23h 45m</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 06:14:58</td>
-            <td><span class="green">OK</span></td>
-            <td>1m 4d 7h</td>
-            <td>1m 20d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-05 05:32:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>42m</td>
-            <td>1m 20d 8h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 06:11:58</td>
-            <td><span class="green">OK</span></td>
-            <td>23h 21m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-         <tr>
-            <td>2015-08-04 05:38:58</td>
-            <td><span class="red">PROBLEM</span></td>
-            <td>33m</td>
-            <td>1m 21d 7h</td>
-            <td><a class="link-alt red" href="">No</a></td>
-         </tr>
-      </tbody>
+	  <thead>
+		 <tr>
+			<th>Time</th>
+			<th>Status</th>
+			<th>Duration</th>
+			<th>Age</th>
+			<th>Ack</th>
+		 </tr>
+	  </thead>
+	  <tbody>
+		 <tr>
+			<td>2015-09-08 13:47:58</td>
+			<td><span class="red">PROBLEM</span></td>
+			<td>15d 23h 45m</td>
+			<td>15d 23h 45m</td>
+			<td><a class="link-alt red" href="">No</a></td>
+		 </tr>
+		 <tr>
+			<td>2015-08-05 06:14:58</td>
+			<td><span class="green">OK</span></td>
+			<td>1m 4d 7h</td>
+			<td>1m 20d 7h</td>
+			<td><a class="link-alt red" href="">No</a></td>
+		 </tr>
+		 <tr>
+			<td>2015-08-05 05:32:58</td>
+			<td><span class="red">PROBLEM</span></td>
+			<td>42m</td>
+			<td>1m 20d 8h</td>
+			<td><a class="link-alt red" href="">No</a></td>
+		 </tr>
+		 <tr>
+			<td>2015-08-04 06:11:58</td>
+			<td><span class="green">OK</span></td>
+			<td>23h 21m</td>
+			<td>1m 21d 7h</td>
+			<td><a class="link-alt red" href="">No</a></td>
+		 </tr>
+		 <tr>
+			<td>2015-08-04 05:38:58</td>
+			<td><span class="red">PROBLEM</span></td>
+			<td>33m</td>
+			<td>1m 21d 7h</td>
+			<td><a class="link-alt red" href="">No</a></td>
+		 </tr>
+	  </tbody>
    </table>
 </div>
 ```
@@ -4213,21 +4236,21 @@ Contextual dialogs are used to display commands that are directly related to an 
 ```html_example
 <ul class="action-menu">
    <li>
-      <h3>Favourite screens</h3>
+	  <h3>Favourite screens</h3>
    </li>
    <li><span class="action-menu-item">Add</span></li>
    <li>
-      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
-      <ul class="action-menu" style="top: 47px; left: 203px;">
-         <li><span class="action-menu-item">Zabbix server</span></li>
-      </ul>
+	  <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
+	  <ul class="action-menu" style="top: 47px; left: 203px;">
+		 <li><span class="action-menu-item">Zabbix server</span></li>
+	  </ul>
    </li>
    <li><span class="action-menu-item">Remove all</span></li>
    <li>
-      <div></div>
+	  <div></div>
    </li>
    <li>
-      <h3>Favourite slide shows</h3>
+	  <h3>Favourite slide shows</h3>
    </li>
    <li><span class="action-menu-item selected">Add</span></li>
    <li><span class="action-menu-item-disabled">Remove</span></li>
@@ -4253,13 +4276,13 @@ Success notification appears after an action has been completed without errors. 
 <div class="msg-good">
    Well done! You successfully added new parameters.
    <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
+	  <span class="link-action">Details</span>
+	  <ul class="msg-details-border">
+		 <li>Something</li>
+		 <li>Something</li>
+		 <li>Something</li>
+		 <li>Something</li>
+	  </ul>
    </div>
    <span class="overlay-close-btn" title="Close"></span>
 </div>
@@ -4273,13 +4296,13 @@ Error notification appears after an action has been completed with errors or an 
 <div class="msg-bad">
    Oh snap! Check form fields and try submitting again.
    <div class="msg-details">
-      <span class="link-action">Details</span>
-      <ul class="msg-details-border">
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-         <li>Something</li>
-      </ul>
+	  <span class="link-action">Details</span>
+	  <ul class="msg-details-border">
+		 <li>Something</li>
+		 <li>Something</li>
+		 <li>Something</li>
+		 <li>Something</li>
+	  </ul>
    </div>
    <span class="overlay-close-btn" title="Close"></span>
 </div>
@@ -4320,79 +4343,79 @@ Datepickers are used to select a single date or a date range.
 ```html_example
 <div class="overlay-dialogue calendar">
    <div class="calendar-header">
-      <div class="calendar-year">
-         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
-      </div>
-      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+	  <div class="calendar-year">
+		 <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
+	  </div>
+	  <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
    </div>
    <table>
-      <thead>
-         <tr>
-            <th>M</th>
-            <th>T</th>
-            <th>W</th>
-            <th>T</th>
-            <th>F</th>
-            <th>S</th>
-            <th>S</th>
-         </tr>
-      </thead>
-      <tbody>
-         <tr>
-            <td class="grey">29</td>
-            <td>1</td>
-            <td>2</td>
-            <td>3</td>
-            <td>4</td>
-            <td>5</td>
-            <td>6</td>
-         </tr>
-         <tr>
-            <td>7</td>
-            <td>8</td>
-            <td>9</td>
-            <td>10</td>
-            <td>11</td>
-            <td>12</td>
-            <td>13</td>
-         </tr>
-         <tr>
-            <td>14</td>
-            <td>15</td>
-            <td class="selected">16</td>
-            <td>17</td>
-            <td>18</td>
-            <td>19</td>
-            <td>20</td>
-         </tr>
-         <tr>
-            <td>21</td>
-            <td>22</td>
-            <td>23</td>
-            <td>24</td>
-            <td>25</td>
-            <td>26</td>
-            <td>27</td>
-         </tr>
-         <tr>
-            <td>28</td>
-            <td>29</td>
-            <td>30</td>
-            <td>31</td>
-            <td class="grey">1</td>
-            <td class="grey">2</td>
-            <td class="grey">3</td>
-         </tr>
-         <tr>
-            <td class="grey">4</td>
-            <td class="grey">5</td>
-            <td class="grey">6</td>
-            <td class="grey">7</td>
-            <td class="grey">8</td>
-            <td class="grey">9</td>
-            <td class="grey">10</td>
-         </tr>
-      </tbody>
+	  <thead>
+		 <tr>
+			<th>M</th>
+			<th>T</th>
+			<th>W</th>
+			<th>T</th>
+			<th>F</th>
+			<th>S</th>
+			<th>S</th>
+		 </tr>
+	  </thead>
+	  <tbody>
+		 <tr>
+			<td class="grey">29</td>
+			<td>1</td>
+			<td>2</td>
+			<td>3</td>
+			<td>4</td>
+			<td>5</td>
+			<td>6</td>
+		 </tr>
+		 <tr>
+			<td>7</td>
+			<td>8</td>
+			<td>9</td>
+			<td>10</td>
+			<td>11</td>
+			<td>12</td>
+			<td>13</td>
+		 </tr>
+		 <tr>
+			<td>14</td>
+			<td>15</td>
+			<td class="selected">16</td>
+			<td>17</td>
+			<td>18</td>
+			<td>19</td>
+			<td>20</td>
+		 </tr>
+		 <tr>
+			<td>21</td>
+			<td>22</td>
+			<td>23</td>
+			<td>24</td>
+			<td>25</td>
+			<td>26</td>
+			<td>27</td>
+		 </tr>
+		 <tr>
+			<td>28</td>
+			<td>29</td>
+			<td>30</td>
+			<td>31</td>
+			<td class="grey">1</td>
+			<td class="grey">2</td>
+			<td class="grey">3</td>
+		 </tr>
+		 <tr>
+			<td class="grey">4</td>
+			<td class="grey">5</td>
+			<td class="grey">6</td>
+			<td class="grey">7</td>
+			<td class="grey">8</td>
+			<td class="grey">9</td>
+			<td class="grey">10</td>
+		 </tr>
+	  </tbody>
    </table>
    <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
    <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
@@ -4414,38 +4437,38 @@ Main navigation is used to jump between high level sections of the application.
 ```html_example
 <nav role="navigation">
    <div class="top-nav-container">
-      <ul class="top-nav">
-         <li class="selected"><a href="#">Monitoring</a></li>
-         <li><a href="#">Inventory</a></li>
-         <li><a href="#">Reports</a></li>
-         <li><a href="#">Configuration</a></li>
-         <li><a href="#">Administration</a></li>
-      </ul>
-      <!--<ul class="top-nav-icons">
-         <li>
-            <form><input type="text"><button type="button" class="btn-search"></button></form>
-         </li>
-         <li><a href="#" class="top-nav-help" title="Help"></a></li>
-         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
-         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
-         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
-      </ul>-->
+	  <ul class="top-nav">
+		 <li class="selected"><a href="#">Monitoring</a></li>
+		 <li><a href="#">Inventory</a></li>
+		 <li><a href="#">Reports</a></li>
+		 <li><a href="#">Configuration</a></li>
+		 <li><a href="#">Administration</a></li>
+	  </ul>
+	  <!--<ul class="top-nav-icons">
+		 <li>
+			<form><input type="text"><button type="button" class="btn-search"></button></form>
+		 </li>
+		 <li><a href="#" class="top-nav-help" title="Help"></a></li>
+		 <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
+		 <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
+		 <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
+	  </ul>-->
    </div>
    <div class="top-subnav-container">
-      <ul class="top-subnav">
-         <li><a href="#" class="selected">Dashboard</a></li>
-         <li><a href="#">Overview</a></li>
-         <li><a href="#">Web</a></li>
-         <li><a href="#">Latest data</a></li>
-         <li><a href="#">Triggers</a></li>
-         <li><a href="#">Events</a></li>
-         <li><a href="#">Graphs</a></li>
-         <li><a href="#">Screens</a></li>
-         <li><a href="#">Maps</a></li>
-         <li><a href="#">Discovery</a></li>
-         <li><a href="#">IT services</a></li>
-      </ul>
-      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
+	  <ul class="top-subnav">
+		 <li><a href="#" class="selected">Dashboard</a></li>
+		 <li><a href="#">Overview</a></li>
+		 <li><a href="#">Web</a></li>
+		 <li><a href="#">Latest data</a></li>
+		 <li><a href="#">Triggers</a></li>
+		 <li><a href="#">Events</a></li>
+		 <li><a href="#">Graphs</a></li>
+		 <li><a href="#">Screens</a></li>
+		 <li><a href="#">Maps</a></li>
+		 <li><a href="#">Discovery</a></li>
+		 <li><a href="#">IT services</a></li>
+	  </ul>
+	  <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
    </div>
 </nav>
 ```
@@ -4457,7 +4480,7 @@ Main navigation is used to jump between high level sections of the application.
    <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
    <li class="green">Enabled</li>
    <li>
-      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+	  <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
    </li>
    <li><span class="selected"><a href="#">Discovery</a></span></li>
    <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
@@ -4541,26 +4564,26 @@ Widgets are used as containers to group any related information. Widget consists
 ```html_example
 <div class="dashbrd-widget">
    <div class="dashbrd-widget-head cursor-move">
-      <h4>Favorite screens</h4>
-      <ul>
-         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
-         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
-         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
-      </ul>
+	  <h4>Favorite screens</h4>
+	  <ul>
+		 <li><button type="button" class="btn-widget-action" title="Action"></button></li>
+		 <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
+		 <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
+	  </ul>
    </div>
    <table class="list-table">
-      <tbody>
-         <tr>
-            <td><a href="#">Zabbix server</a></td>
-         </tr>
-         <tr>
-            <td><a href="#">My 2nd megaserver</a></td>
-         </tr>
-      </tbody>
+	  <tbody>
+		 <tr>
+			<td><a href="#">Zabbix server</a></td>
+		 </tr>
+		 <tr>
+			<td><a href="#">My 2nd megaserver</a></td>
+		 </tr>
+	  </tbody>
    </table>
    <ul class="dashbrd-widget-foot">
-      <li><a href="#">Screens</a></li>
-      <li><a href="#">Slide shows</a></li>
+	  <li><a href="#">Screens</a></li>
+	  <li><a href="#">Slide shows</a></li>
    </ul>
 </div>
 ```
