@@ -25,6 +25,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10794] fixed saving of "Show text as HTML" checkbox in Monitoring->Screens (Cemeris)
 ..F....... [ZBX-10504] decreased padding and margins in tables and across the whole UI (Pavel)
 ..F....... [ZBX-10504] added compression of generated CSS files to reduce size from 99K to around 56K (asaveljevs, Pavel)
 ...GI..... [ZBX-10760] fixed agent, get and sender being erroneously linked against UnixODBC (gleb)
