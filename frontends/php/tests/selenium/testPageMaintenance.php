@@ -32,7 +32,7 @@ class testPageMaintenance extends CWebTest {
 	public function testPageMaintenance_CheckLayout($maintenance) {
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 
 		$this->zbxTestTextPresent('Maintenance');
 		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
@@ -65,10 +65,10 @@ class testPageMaintenance extends CWebTest {
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('save');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestTextPresent('Maintenance updated');
 		$this->zbxTestTextPresent("$name");
 		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
@@ -92,13 +92,13 @@ class testPageMaintenance extends CWebTest {
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestCheckboxSelect('maintenanceids['.$maintenanceid.']');
 		$this->zbxTestDropdownSelect('go', 'Delete selected');
 		$this->zbxTestClickWait('goButton');
 
 		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestTextPresent('Maintenance deleted');
 
 		$sql = "select * from maintenances where maintenanceid=$maintenanceid";
