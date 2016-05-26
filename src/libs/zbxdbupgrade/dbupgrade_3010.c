@@ -220,7 +220,7 @@ static zbx_hash_t	trigger_events_hash_func(const void *data)
 
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&oe->objectid);
 	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&oe->source, sizeof(oe->source), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&oe->source, sizeof(oe->object), hash);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&oe->object, sizeof(oe->object), hash);
 
 	return hash;
 }
