@@ -322,6 +322,7 @@ static int	update_event_recovery(zbx_hashset_t *events, zbx_uint64_t *eventid)
 			zbx_vector_uint64_clear(&object_events->eventids);
 		}
 	}
+	DBfree_result(result);
 
 	ret = zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
