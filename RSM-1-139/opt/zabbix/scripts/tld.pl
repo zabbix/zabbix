@@ -1425,9 +1425,9 @@ sub create_epp_objects($$$$) {
     pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
 
     if ($OPTS{'epp-commands'}) {
-	    create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, true);
+	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, true);
     } else {
-	    create_macro('{$RSM.EPP.COMMANDS}', '/opt/test-sla/epp-commands/'.$tld, $templateid);
+	create_macro('{$RSM.EPP.COMMANDS}', '/opt/test-sla/epp-commands/'.$tld, $templateid);
     }
 
     create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid, true, $is_new);
@@ -1826,9 +1826,9 @@ Other options
         --epp-user
                 specify EPP username
 	--epp-cert
-                path to EPP Client certificates file
+                path to EPP Client certificate file
 	--epp-servercert
-                path to EPP Server certificates file
+                path to EPP Server certificate file
 	--epp-privkey
                 path to EPP Client private key file (unencrypted)
 	--epp-serverid
@@ -1902,15 +1902,23 @@ sub validate_input {
 
     if ($OPTS{'epp-servers'} or defined($OPTS{'only-epp'})) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
-	if (!$OPTS{'epp-cert'}) {
-		$msg .= "EPP Client certificate file must be specified (--epp-cert)\n";
-	} elsif (! -r $OPTS{'epp-cert'}) {
-		$msg .= "Cannot read EPP Client certificate file \"" . $OPTS{'epp-cert'} . "\"\n";
-	}
-	$msg .= "EPP Client private key file must be specified (--epp-privkey)\n" unless ($OPTS{'epp-privkey'});
 	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
 	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
-	$msg .= "EPP Server certificate file must be specified (--epp-servercert)\n" unless ($OPTS{'epp-servercert'});
+	if (!$OPTS{'epp-cert'}) {
+	    $msg .= "EPP Client certificate file must be specified (--epp-cert)\n";
+	} elsif (! -r $OPTS{'epp-cert'}) {
+	    $msg .= "Cannot read EPP Client certificate file \"" . $OPTS{'epp-cert'} . "\"\n";
+	}
+	if (!$OPTS{'epp-servercert'}) {
+	    $msg .= "EPP Server certificate file must be specified (--epp-servercert)\n";
+	} elsif (! -r $OPTS{'epp-servercert'}) {
+	    $msg .= "Cannot read EPP Server certificate file \"" . $OPTS{'epp-servercert'} . "\"\n";
+	}
+	if (!$OPTS{'epp-privkey'}) {
+	    $msg .= "EPP Client private key file must be specified (--epp-privkey)\n";
+	} elsif(! -r $OPTS{'epp-privkey'}) {
+	    $msg .= "Cannot read EPP Client private key file \"" . $OPTS{'epp-privkey'} . "\"\n";
+	}
     }
 
     $OPTS{'ipv4'} = 0 if (defined($OPTS{'update-nsservers'}));
