@@ -305,7 +305,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_TRIGGER			2
 #define CONDITION_TYPE_TRIGGER_NAME		3
 #define CONDITION_TYPE_TRIGGER_SEVERITY		4
-#define CONDITION_TYPE_TRIGGER_VALUE		5
+/* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define CONDITION_TYPE_TIME_PERIOD		6
 #define CONDITION_TYPE_DHOST_IP			7
 #define CONDITION_TYPE_DSERVICE_TYPE		8
@@ -340,11 +340,11 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 
 /* event type action condition values */
 #define EVENT_TYPE_ITEM_NOTSUPPORTED		0
-#define EVENT_TYPE_ITEM_NORMAL			1
+/* #define EVENT_TYPE_ITEM_NORMAL		1	 deprecated */
 #define EVENT_TYPE_LLDRULE_NOTSUPPORTED		2
-#define EVENT_TYPE_LLDRULE_NORMAL		3
+/* #define EVENT_TYPE_LLDRULE_NORMAL		3	 deprecated */
 #define EVENT_TYPE_TRIGGER_UNKNOWN		4
-#define EVENT_TYPE_TRIGGER_NORMAL		5
+/* #define EVENT_TYPE_TRIGGER_NORMAL		5	 deprecated */
 
 #define SCREEN_RESOURCE_GRAPH			0
 #define SCREEN_RESOURCE_SIMPLE_GRAPH		1
@@ -428,7 +428,7 @@ const char	*zbx_alert_status_string(unsigned char type, unsigned char status);
 typedef enum
 {
 	ESCALATION_STATUS_ACTIVE = 0,
-	ESCALATION_STATUS_RECOVERY,	/* only in server code, never in DB */
+	ESCALATION_STATUS_RECOVERY,	/* only in server code, never in DB, deprecated */
 	ESCALATION_STATUS_SLEEP,
 	ESCALATION_STATUS_COMPLETED	/* only in server code, never in DB */
 }
@@ -617,6 +617,11 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_HOST_ENABLE	8
 #define OPERATION_TYPE_HOST_DISABLE	9
 #define OPERATION_TYPE_HOST_INVENTORY	10
+#define OPERATION_TYPE_RECOVERY_MESSAGE	11
+
+/* normal and recovery operations */
+#define ZBX_OPERATION_MODE_NORMAL	0
+#define ZBX_OPERATION_MODE_RECOVERY	1
 
 /* algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
