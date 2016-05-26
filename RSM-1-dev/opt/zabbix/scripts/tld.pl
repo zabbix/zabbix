@@ -1999,9 +1999,9 @@ sub get_services($) {
 
     my $result;
 
-    my $main_templateid = get_template('Template '.$tld, false, false);
+    my $templateid = get_template('Template '.$tld, false, false);
 
-    my $macros = get_host_macro($main_templateid, undef);
+    my $macros = get_host_macro($templateid, undef);
 
     my $tld_host = get_host($tld, true);
 
@@ -2051,8 +2051,8 @@ sub update_epp_objects($) {
 
     create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
 
-    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $main_hostid);
-    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $main_hostid) if (defined($OPTS{'rdds43-servers'}));
+    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
+    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid) if (defined($OPTS{'rdds43-servers'}));
 
     my $ns_servers = get_nsservers_list($tld);
 
