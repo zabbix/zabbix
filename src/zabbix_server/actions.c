@@ -363,20 +363,6 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 				ret = NOTSUPPORTED;
 		}
 	}
-	else if (CONDITION_TYPE_TRIGGER_VALUE == condition->conditiontype)
-	{
-		int	condition_value_i = atoi(condition->value);
-
-		switch (condition->operator)
-		{
-			case CONDITION_OPERATOR_EQUAL:
-				if (event->value == condition_value_i)
-					ret = SUCCEED;
-				break;
-			default:
-				ret = NOTSUPPORTED;
-		}
-	}
 	else if (CONDITION_TYPE_TIME_PERIOD == condition->conditiontype)
 	{
 		switch (condition->operator)
@@ -1050,24 +1036,12 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 
 		switch (condition_value)
 		{
-			case EVENT_TYPE_ITEM_NORMAL:
-				if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NORMAL == event->value)
-					ret = SUCCEED;
-				break;
 			case EVENT_TYPE_ITEM_NOTSUPPORTED:
 				if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NOTSUPPORTED == event->value)
 					ret = SUCCEED;
 				break;
-			case EVENT_TYPE_TRIGGER_NORMAL:
-				if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_STATE_NORMAL == event->value)
-					ret = SUCCEED;
-				break;
 			case EVENT_TYPE_TRIGGER_UNKNOWN:
 				if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_STATE_UNKNOWN == event->value)
-					ret = SUCCEED;
-				break;
-			case EVENT_TYPE_LLDRULE_NORMAL:
-				if (EVENT_OBJECT_LLDRULE == event->object && ITEM_STATE_NORMAL == event->value)
 					ret = SUCCEED;
 				break;
 			case EVENT_TYPE_LLDRULE_NOTSUPPORTED:
@@ -1645,6 +1619,47 @@ static void	escalation_add_values(zbx_db_insert_t *db_insert, int escalations_nu
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_recovery_event                                                *
+ *                                                                            *
+ * Purpose: checks if the event is recovery event                             *
+ *                                                                            *
+ * Parameters: event - [IN] the event to check                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is recovery event                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_recovery_event(const DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
+			return SUCCEED;
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (TRIGGER_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_ITEM:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
@@ -1687,7 +1702,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 			if (action->eventsource != event->source)
 				continue;
 
-			if (SUCCEED == check_action_conditions(event, action))
+			if (SUCCEED == check_action_conditions(event, action) && SUCCEED != is_recovery_event(event))
 			{
 				escalation_add_values(&db_insert, escalations_num++, action->actionid, event, 0);
 
