@@ -69,8 +69,10 @@
 
 	function toggleAdvancedLabels(toggle) {
 		jQuery.each(inputs, function() {
-			jQuery('#' + this).parentsUntil('ul').toggle(toggle);
-		});
+			jQuery('#' + this).parents('li').toggle(toggle);
+			jQuery('#' + this).parents('li').next().toggle(
+				jQuery('#' + this).val() == '<?= MAP_LABEL_TYPE_CUSTOM ?>' && toggle);
+			});
 
 		jQuery('#label_type').parentsUntil('ul').toggle(!toggle);
 	}
@@ -79,7 +81,6 @@
 		jQuery(e.target)
 			.parents('li')
 			.next()
-			.find('textarea')
 			.toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?= MAP_LABEL_TYPE_CUSTOM ?>');
 	}
 
@@ -89,7 +90,9 @@
 		});
 
 		$.each(inputs, function() {
-			$('#' + this).change(toggleCustomLabel);
+			$('#' + this)
+				.change(toggleCustomLabel)
+				.change();
 		});
 
 		toggleAdvancedLabels($('#label_format:checked').length != 0);
