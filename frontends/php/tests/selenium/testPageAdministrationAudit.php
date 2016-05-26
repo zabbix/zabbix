@@ -118,7 +118,7 @@ class testPageAdministrationAudit extends CWebTest {
 				'SELECT a.clock,u.alias,a.ip'.
 				' FROM auditlog a,users u'.
 				' WHERE u.userid=a.userid'.
-					' AND u.alias='.zbx_dbstr('Admin').
+					" AND u.alias='Admin'".
 					' AND a.action=4'.
 					' AND resourcetype=0'.
 				' LIMIT 1'
@@ -156,7 +156,7 @@ class testPageAdministrationAudit extends CWebTest {
 			'SELECT a.clock,u.alias,a.ip,a.details'.
 			' FROM auditlog a,users u'.
 			' WHERE u.userid=a.userid'.
-				' AND u.alias='.zbx_dbstr('Admin').
+				" AND u.alias='Admin'".
 				' AND a.action=0'.
 				' AND resourcetype=0'.
 			' LIMIT 1');
@@ -195,7 +195,7 @@ class testPageAdministrationAudit extends CWebTest {
 				'SELECT a.clock,u.alias,a.ip,a.details'.
 				' FROM auditlog a,users u'.
 				' WHERE u.userid=a.userid'.
-					' AND u.alias='.zbx_dbstr('Admin').
+					" AND u.alias='Admin'".
 					' AND a.action=1'.
 					' AND resourcetype=0'.
 				' LIMIT 1');
@@ -233,7 +233,7 @@ class testPageAdministrationAudit extends CWebTest {
 				'SELECT a.clock,a.details,u.alias,a.ip,a.resourceid'.
 				' FROM auditlog a,users u'.
 				' WHERE u.userid=a.userid'.
-					' AND u.alias='.zbx_dbstr('Admin').
+					" AND u.alias='Admin'".
 					' AND a.action=2'.
 					' AND resourcetype=0'.
 				' LIMIT 1'
@@ -273,7 +273,7 @@ class testPageAdministrationAudit extends CWebTest {
 				'SELECT a.clock,a.details,a.resourcename,u.alias,a.ip'.
 				' FROM auditlog a,users u'.
 				' WHERE u.userid=a.userid'.
-					' AND u.alias='.zbx_dbstr('Admin').
+					" AND u.alias='Admin'".
 					' AND a.action=0'.
 					' AND resourcetype=4'.
 				' LIMIT 1'
