@@ -77,7 +77,8 @@
 
 	function toggleCustomLabel(e) {
 		jQuery(e.target)
-			.parent()
+			.parents('li')
+			.next()
 			.find('textarea')
 			.toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?= MAP_LABEL_TYPE_CUSTOM ?>');
 	}
