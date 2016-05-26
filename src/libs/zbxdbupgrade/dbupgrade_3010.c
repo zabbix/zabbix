@@ -20,6 +20,7 @@
 #include "common.h"
 #include "db.h"
 #include "dbupgrade.h"
+#include "log.h"
 
 /*
  * 3.2 development database patches
@@ -199,6 +200,7 @@ static int	DBpatch_3010020(void)
 	return DBadd_foreign_key("event_recovery", 2, &field);
 }
 
+#define ZBX_OPEN_EVENT_WARNING_NUM	10000000
 
 /* problem eventids by triggerid */
 typedef struct
@@ -302,6 +304,13 @@ static int	update_event_recovery(zbx_hashset_t *events, zbx_uint64_t *eventid)
 			/* 1 - TRIGGER_VALUE_TRUE (PROBLEM state) */
 
 			zbx_vector_uint64_append(&object_events->eventids, *eventid);
+
+			if (ZBX_OPEN_EVENT_WARNING_NUM == object_events->eventids.values_num)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "too many open problem events by event source:%d,"
+						" object:%d and objectid:" ZBX_FS_UI64, object_events->source,
+						object_events->object, object_events->objectid);
+			}
 		}
 		else
 		{
