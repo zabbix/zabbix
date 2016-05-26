@@ -164,7 +164,8 @@ $map_tab
 	);
 
 // Append trigger to form list.
-$map_tab->addRow(_('Trigger label type'),
+$map_tab
+	->addRow(_('Trigger label type'),
 		new CComboBox('label_type_trigger', $data['sysmap']['label_type_trigger'], null, $data['labelTypesLimited'])
 	)
 	->addRow(null,
@@ -173,7 +174,8 @@ $map_tab->addRow(_('Trigger label type'),
 	);
 
 // Append map to form list.
-$map_tab->addRow(_('Map label type'),
+$map_tab
+	->addRow(_('Map label type'),
 		new CComboBox('label_type_map', $data['sysmap']['label_type_map'], null, $data['labelTypesLimited'])
 	)
 	->addRow(null,
@@ -182,7 +184,8 @@ $map_tab->addRow(_('Map label type'),
 	);
 
 // Append image to form list.
-$map_tab->addRow(_('Image label type'),
+$map_tab
+	->addRow(_('Image label type'),
 		new CComboBox('label_type_image', $data['sysmap']['label_type_image'], null, $data['labelTypesImage'])
 	)
 	->addRow(null,

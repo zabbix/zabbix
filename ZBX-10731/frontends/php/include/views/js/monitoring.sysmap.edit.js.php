@@ -65,37 +65,31 @@
 </script>
 
 <script type="text/javascript">
-	inputs = ['label_type_hostgroup', 'label_type_host', 'label_type_trigger', 'label_type_map', 'label_type_image'];
+	var inputs = '#label_type_hostgroup, #label_type_host, #label_type_trigger, #label_type_map, #label_type_image';
 
-	function toggleAdvancedLabels(toggle) {
-		jQuery.each(inputs, function() {
-			jQuery('#' + this).parents('li').toggle(toggle);
-			jQuery('#' + this).parents('li').next().toggle(
-				jQuery('#' + this).val() == '<?= MAP_LABEL_TYPE_CUSTOM ?>' && toggle);
-			});
+	function toggleAdvancedLabels() {
+		var toggle = (jQuery('#label_format:checked').length != 0);
+
+		jQuery(inputs).each(function() {
+			jQuery(this).parentsUntil('ul')
+				.toggle(toggle)
+				.next().toggle(jQuery(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?> && toggle);
+		});
 
 		jQuery('#label_type').parentsUntil('ul').toggle(!toggle);
-	}
-
-	function toggleCustomLabel(e) {
-		jQuery(e.target)
-			.parents('li')
-			.next()
-			.toggle(e.target.options[e.target.selectedIndex].value.toString() == '<?= MAP_LABEL_TYPE_CUSTOM ?>');
-	}
+	};
 
 	jQuery(function($) {
 		$('#label_format').click(function() {
-			toggleAdvancedLabels($('#label_format:checked').length != 0);
+			toggleAdvancedLabels();
 		});
+		toggleAdvancedLabels();
 
-		$.each(inputs, function() {
-			$('#' + this)
-				.change(toggleCustomLabel)
-				.change();
-		});
-
-		toggleAdvancedLabels($('#label_format:checked').length != 0);
+		$(inputs)
+			.change(function() {
+				$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
+			})
+			.change();
 
 		// clone button
 		$('#clone').click(function() {
