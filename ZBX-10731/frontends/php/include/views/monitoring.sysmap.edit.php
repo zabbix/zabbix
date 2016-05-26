@@ -148,7 +148,6 @@ $map_tab->addRow(_('Host group label type'), [
 	new CComboBox('label_type_hostgroup', $data['sysmap']['label_type_hostgroup'], null, $data['labelTypesLimited']),
 	BR(),
 	(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
-		->setAttribute('style', 'display:none;')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ]);
 
@@ -157,7 +156,6 @@ $map_tab->addRow(_('Host label type'), [
 	new CComboBox('label_type_host', $data['sysmap']['label_type_host'], null, $data['labelTypes']),
 	BR(),
 	(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
-		->setAttribute('style', 'display:none;')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ]);
 
@@ -166,7 +164,6 @@ $map_tab->addRow(_('Trigger label type'), [
 	new CComboBox('label_type_trigger', $data['sysmap']['label_type_trigger'], null, $data['labelTypesLimited']),
 	BR(),
 	(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
-		->setAttribute('style', 'display:none;')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ]);
 
@@ -175,7 +172,6 @@ $map_tab->addRow(_('Map label type'), [
 	new CComboBox('label_type_map', $data['sysmap']['label_type_map'], null, $data['labelTypesLimited']),
 	BR(),
 	(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
-		->setAttribute('style', 'display:none;')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ]);
 
@@ -184,7 +180,6 @@ $map_tab->addRow(_('Image label type'), [
 	new CComboBox('label_type_image', $data['sysmap']['label_type_image'], null, $data['labelTypesImage']),
 	BR(),
 	(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
-		->setAttribute('style', 'display:none;')
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ]);
 
