@@ -17,20 +17,18 @@ use TLD_constants qw(:ec);
 my $cfg_key_in = 'rsm.dns.udp.rtt[';
 my $cfg_key_out = 'rsm.slv.dnssec.avail';
 
-parse_avail_opts();
+parse_avail_opts('now=i');
 exit_if_running();
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $interval = get_macro_dns_udp_delay();
+my $delay = get_macro_dns_udp_delay();
 my $cfg_minonline = get_macro_dns_probe_online();
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
-my $now = time();
-
-my $clock = (opt('from') ? getopt('from') : $now - $interval - AVAIL_SHIFT_BACK);
+my $now = (opt('now') ? getopt('now') : time());
 my $period = (opt('period') ? getopt('period') : 1);
 
 my $max_avail_time = max_avail_time($now);
@@ -49,10 +47,10 @@ else
 
 while ($period > 0)
 {
-	my ($from, $till, $value_ts) = get_interval_bounds($interval, $clock);
+	my ($from, $till, $value_ts) = get_cycle_bounds($now, $delay);
 
-	$period -= $interval / 60;
-	$clock += $interval;
+	$period -= $delay / 60;
+	$now += $delay;
 
 	next if ($till > $max_avail_time);
 
@@ -73,7 +71,7 @@ while ($period > 0)
 			next;
 		}
 
-		if (avail_value_exists($value_ts, $itemid) == SUCCESS)
+		if (uint_value_exists($value_ts, $itemid) == SUCCESS)
 		{
 			# value already exists
 			next unless (opt('dry-run'));
@@ -128,7 +126,7 @@ while ($period > 0)
 		my $perc = $success_values * 100 / $total_values;
 		my $test_result = $perc > SLV_UNAVAILABILITY_LIMIT ? UP : DOWN;
 
-		push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc, $value_ts));
+		push_value($tld, $cfg_key_out, $value_ts, $test_result, avail_result_msg($test_result, $success_values, $total_values, $perc));
 	}
 
 	# unset TLD (for the logs)

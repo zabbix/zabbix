@@ -4,19 +4,19 @@ rsm.slv.*.rollweek.pl - scripts to calculate different service rolling week unav
 
 =head1 SYNOPSIS
 
-rsm.slv.*.rollweek.pl [--from <timestamp>] [--tld <tld>] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
+rsm.slv.*.rollweek.pl [--tld <tld>] [--now <timestamp>] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
 
 =head1 OPTIONS
 
 =over 8
 
-=item B<--from> timestamp
-
-Specify Unix timestamp of the beginning of the rolling week.
-
 =item B<--tld> tld
 
-Specify TLD.
+Specify the TLD to process. By default all tlds will be processed.
+
+=item B<--now> timestamp
+
+Specify Unix timestamp within the test cycle to handle. You don't need to specify the first second of the test cycle.
 
 =item B<--dry-run>
 

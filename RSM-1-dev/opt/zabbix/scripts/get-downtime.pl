@@ -1,11 +1,19 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
-use lib '/opt/zabbix/scripts';
+BEGIN
+{
+	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
+}
+use lib $MYDIR;
 
+use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 
 parse_opts('tld=s', 'from=n', 'till=n', 'service=s');
+
+setopt('nolog');
 
 if (opt('debug'))
 {
@@ -19,25 +27,33 @@ unless (opt('service'))
 	usage(2);
 }
 
-my ($key, $service_type);
+set_slv_config(get_rsm_config());
+
+db_connect();
+
+my ($key, $service_type, $delay);
 
 if (getopt('service') eq 'dns')
 {
 	$key = 'rsm.slv.dns.avail';
+	$delay = get_macro_dns_udp_delay();
 }
 elsif (getopt('service') eq 'dns-ns')
 {
 	$key = 'rsm.slv.dns.ns.avail[';
+	$delay = get_macro_dns_udp_delay();
 }
 elsif (getopt('service') eq 'rdds')
 {
 	$service_type = 'rdds';
 	$key = 'rsm.slv.rdds.avail';
+	$delay = get_macro_rdds_delay();
 }
 elsif (getopt('service') eq 'epp')
 {
 	$service_type = 'epp';
 	$key = 'rsm.slv.epp.avail';
+	$delay = get_macro_epp_delay();
 }
 else
 {
@@ -45,23 +61,9 @@ else
 	usage(2);
 }
 
-set_slv_config(get_rsm_config());
+my ($from, $till) = get_default_period(time() - $delay - AVAIL_SHIFT_BACK, $delay, getopt('from'), getopt('till'));
 
-db_connect();
-
-my ($from, $till, @bounds);
-
-$from = getopt('from');
-$till = getopt('till');
-
-unless (defined($from) and defined($till))
-{
-	dbg("getting current month bounds");
-	@bounds = get_curmon_bounds();
-
-	$from = $bounds[0] unless (defined($from));
-	$till = $bounds[1] unless (defined($till));
-}
+info('selected period: ', selected_period($from, $till));
 
 my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
@@ -85,7 +87,7 @@ foreach (@$tlds_ref)
 		my $itemid = get_itemid_by_host($tld, $key);
 		if (!$itemid)
 		{
-			wrn("configuration error: service $service enabled but item item not found: ", rsm_slv_error());
+			wrn("configuration error: service \"", getopt('service'), "\" enabled but item $key not found: ", rsm_slv_error());
 		}
 
 		my $downtime = get_downtime($itemid, $from, $till);

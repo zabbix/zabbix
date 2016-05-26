@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# DNS availability
+# EPP availability
 
 BEGIN
 {
@@ -15,21 +15,19 @@ use RSMSLV;
 use Alerts;
 use Parallel;
 
-my $cfg_key_in = 'rsm.dns.udp[{$RSM.TLD}]';
-my $cfg_key_out = 'rsm.slv.dns.avail';
+my $cfg_key_in = 'rsm.epp[{$RSM.TLD}';
+my $cfg_key_out = 'rsm.slv.epp.avail';
 
-parse_avail_opts();
+parse_avail_opts('now=i');
 exit_if_running();
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $delay = get_macro_dns_udp_delay();
-my $cfg_minonline = get_macro_dns_probe_online();
+my $delay = get_macro_epp_delay();
+my $cfg_minonline = get_macro_epp_probe_online();
 my $probe_avail_limit = get_macro_probe_avail_limit();
-
-my $cfg_minns = get_macro_minns();
 
 my $now = (opt('now') ? getopt('now') : time());
 my $cycles = (opt('cycles') ? getopt('cycles') : 1);
@@ -39,13 +37,13 @@ my $max_avail_time = max_avail_time($delay);
 my $tlds_ref;
 if (opt('tld'))
 {
-	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+        fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-	$tlds_ref = [ getopt('tld') ];
+        $tlds_ref = [ getopt('tld') ];
 }
 else
 {
-	$tlds_ref = get_tlds();
+        $tlds_ref = get_tlds('EPP');
 }
 
 my $times_from = get_cycle_bounds($now - $delay, $delay);
@@ -110,6 +108,7 @@ while ($tld_index < $tld_count)
 				my $message = $result->{'message'};
 				my $alert = $result->{'alert'};
 
+
 				push_value($tld, $cfg_key_out, $value_ts, $value, $message);
 
 				add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld ($message)") if ($alert);
@@ -143,7 +142,7 @@ sub check_item_values
 
 	return SUCCESS if (!defined($value));
 
-	return SUCCESS if ($value >= $cfg_minns);
+	return SUCCESS if ($value == UP);
 
 	return E_FAIL;
 }

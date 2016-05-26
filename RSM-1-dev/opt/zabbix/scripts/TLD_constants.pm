@@ -17,6 +17,7 @@ use constant LINUX_TEMPLATEID => 10001;
 use constant VALUE_TYPE_AVAIL => 0;
 use constant VALUE_TYPE_PERC => 1;
 use constant VALUE_TYPE_NUM => 2;
+use constant VALUE_TYPE_DOUBLE => 3;
 
 use constant HOST_STATUS_MONITORED => 0;
 use constant HOST_STATUS_NOT_MONITORED => 1;
@@ -29,6 +30,8 @@ use constant ITEM_STATUS_DISABLED => 1;
 
 use constant TRIGGER_STATUS_ENABLED => 0;
 use constant TRIGGER_STATUS_DISABLED => 1;
+
+use constant TRIGGER_SEVERITY_NOT_CLASSIFIED => 0;
 
 use constant INTERFACE_TYPE_AGENT => 1;
 
@@ -82,12 +85,12 @@ use constant cfg_default_rdds_ns_string => 'Name Server:';
 use constant rsm_host => 'rsm'; # global config history
 use constant rsm_group => 'rsm';
 
-use constant rsm_value_mappings => {'rsm_dns' => 13,
+use constant rsm_value_mappings => {'rsm_dns_result' => 13,
                                 'rsm_probe' => 14,
-                                'rsm_rdds_rttudp' => 15,
+                                'rsm_rdds_result' => 15,
                                 'rsm_avail' => 16,
-                                'rsm_rdds_avail' => 18,
-                                'rsm_epp' => 19};
+                                'rsm_rdds_probe_result' => 18,
+                                'rsm_epp_result' => 19};
 
 use constant rsm_trigger_rollweek_thresholds => { '1' => {'threshold' => '10', 'priority' => 2},
                                     '2' => {'threshold' => '25', 'priority' => 3},
@@ -103,14 +106,13 @@ use constant cfg_probe_status_delay => 60;
 use constant APP_SLV_MONTHLY => 'SLV monthly';
 use constant APP_SLV_ROLLWEEK => 'SLV rolling week';
 use constant APP_SLV_PARTTEST => 'SLV particular test';
-use constant APP_SLV_CURMON => 'SLV current month';
 
 use constant TLD_TYPE_G => 'gTLD';
 use constant TLD_TYPE_CC => 'ccTLD';
 use constant TLD_TYPE_OTHER => 'otherTLD';
 use constant TLD_TYPE_TEST => 'testTLD';
 
-our @EXPORT_OK = qw(true false TIME_MINUTE TIME_HOUR TIME_DAY LINUX_TEMPLATEID VALUE_TYPE_AVAIL VALUE_TYPE_PERC VALUE_TYPE_NUM
+our @EXPORT_OK = qw(true false TIME_MINUTE TIME_HOUR TIME_DAY LINUX_TEMPLATEID VALUE_TYPE_AVAIL VALUE_TYPE_PERC VALUE_TYPE_NUM VALUE_TYPE_DOUBLE
 		    ZBX_EC_INTERNAL ZBX_EC_DNS_NS_NOREPLY ZBX_EC_DNS_NS_ERRREPLY ZBX_EC_DNS_NS_NOTS ZBX_EC_DNS_NS_ERRTS ZBX_EC_DNS_NS_ERRTS
                     ZBX_EC_DNS_NS_ERRSIG ZBX_EC_DNS_RES_NOREPLY ZBX_EC_DNS_RES_NOADBIT ZBX_EC_RDDS43_NOREPLY ZBX_EC_RDDS43_NONS ZBX_EC_RDDS43_NOTS
                     ZBX_EC_RDDS43_ERRTS ZBX_EC_RDDS80_NOREPLY ZBX_EC_RDDS_ERRRES ZBX_EC_RDDS80_NOHTTPCODE ZBX_EC_RDDS80_EHTTPCODE ZBX_EC_EPP_NO_IP
@@ -119,14 +121,14 @@ our @EXPORT_OK = qw(true false TIME_MINUTE TIME_HOUR TIME_DAY LINUX_TEMPLATEID V
 		    RSM_ROLLWEEK_THRESHOLDS rsm_host rsm_group rsm_value_mappings cfg_probe_status_delay
 		    cfg_default_rdds_ns_string rsm_trigger_rollweek_thresholds cfg_global_macros
 		    HOST_STATUS_MONITORED HOST_STATUS_NOT_MONITORED HOST_STATUS_PROXY_ACTIVE HOST_STATUS_PROXY_PASSIVE ITEM_STATUS_ACTIVE
-		    ITEM_STATUS_DISABLED INTERFACE_TYPE_AGENT TRIGGER_STATUS_DISABLED TRIGGER_STATUS_ENABLED
+		    ITEM_STATUS_DISABLED INTERFACE_TYPE_AGENT TRIGGER_STATUS_DISABLED TRIGGER_STATUS_ENABLED TRIGGER_SEVERITY_NOT_CLASSIFIED
 		    ITEM_VALUE_TYPE_FLOAT ITEM_VALUE_TYPE_STR ITEM_VALUE_TYPE_LOG ITEM_VALUE_TYPE_UINT64 ITEM_VALUE_TYPE_TEXT
 		    ITEM_TYPE_ZABBIX ITEM_TYPE_TRAPPER ITEM_TYPE_SIMPLE ITEM_TYPE_INTERNAL ITEM_TYPE_ZABBIX_ACTIVE ITEM_TYPE_AGGREGATE ITEM_TYPE_EXTERNAL ITEM_TYPE_CALCULATED
-		    APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST APP_SLV_CURMON TLD_TYPE_G TLD_TYPE_CC TLD_TYPE_OTHER TLD_TYPE_TEST);
+		    APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST TLD_TYPE_G TLD_TYPE_CC TLD_TYPE_OTHER TLD_TYPE_TEST);
 
 our %EXPORT_TAGS = ( general => [ qw(true false TIME_MINUTE TIME_HOUR TIME_DAY) ],
 		     templates => [ qw(LINUX_TEMPLATEID) ],
-		     value_types => [ qw(VALUE_TYPE_AVAIL VALUE_TYPE_PERC VALUE_TYPE_NUM) ],
+		     value_types => [ qw(VALUE_TYPE_AVAIL VALUE_TYPE_PERC VALUE_TYPE_NUM VALUE_TYPE_DOUBLE) ],
 		     ec => [ qw(ZBX_EC_INTERNAL ZBX_EC_DNS_NS_NOREPLY ZBX_EC_DNS_NS_ERRREPLY ZBX_EC_DNS_NS_NOTS ZBX_EC_DNS_NS_ERRTS ZBX_EC_DNS_NS_ERRTS
 				ZBX_EC_DNS_NS_ERRSIG ZBX_EC_DNS_RES_NOREPLY ZBX_EC_DNS_RES_NOADBIT ZBX_EC_RDDS43_NOREPLY ZBX_EC_RDDS43_NONS ZBX_EC_RDDS43_NOTS
 				ZBX_EC_RDDS43_ERRTS ZBX_EC_RDDS80_NOREPLY ZBX_EC_RDDS_ERRRES ZBX_EC_RDDS80_NOHTTPCODE ZBX_EC_RDDS80_EHTTPCODE ZBX_EC_EPP_NO_IP
@@ -138,9 +140,9 @@ our %EXPORT_TAGS = ( general => [ qw(true false TIME_MINUTE TIME_HOUR TIME_DAY) 
 				ITEM_VALUE_TYPE_FLOAT ITEM_VALUE_TYPE_STR ITEM_VALUE_TYPE_LOG ITEM_VALUE_TYPE_UINT64 ITEM_VALUE_TYPE_TEXT
 				ITEM_TYPE_ZABBIX ITEM_TYPE_TRAPPER ITEM_TYPE_SIMPLE ITEM_TYPE_INTERNAL ITEM_TYPE_ZABBIX_ACTIVE
 				ITEM_TYPE_AGGREGATE ITEM_TYPE_EXTERNAL ITEM_TYPE_CALCULATED
-				TRIGGER_STATUS_DISABLED TRIGGER_STATUS_ENABLED)],
+				TRIGGER_STATUS_DISABLED TRIGGER_STATUS_ENABLED TRIGGER_SEVERITY_NOT_CLASSIFIED)],
 		    config => [ qw(cfg_probe_status_delay cfg_default_rdds_ns_string rsm_value_mappings rsm_trigger_rollweek_thresholds
 				    cfg_global_macros TLD_TYPE_G TLD_TYPE_CC TLD_TYPE_OTHER TLD_TYPE_TEST) ],
-		    slv => [ qw(APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST APP_SLV_CURMON) ] );
+		    slv => [ qw(APP_SLV_MONTHLY APP_SLV_ROLLWEEK APP_SLV_PARTTEST) ] );
 
 1;

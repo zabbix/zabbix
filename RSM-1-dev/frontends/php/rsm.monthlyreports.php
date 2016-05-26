@@ -147,6 +147,8 @@ if ($data['filter_search']) {
 				'output' => array('itemid', 'name', 'key_', 'value_type')
 			));
 
+			$usedMacro = array();
+
 			foreach ($items as $item) {
 				$itemKey = new CItemKey($item['key_']);
 				switch ($itemKey->getKeyId()) {

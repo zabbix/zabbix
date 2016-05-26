@@ -120,8 +120,11 @@ sub _decode_answer {
         if ( $ident eq 'ZBXD' ) {
             my $ref = $self->_json()->decode($answer);
             if ( $ref->{'response'} eq 'success' ) {
-                return 1;
+		if ( substr($ref->{'info'}, 0, 12) ne 'Processed 0 ' ) {
+		    return 1;
+		}
             }
+	    $self->_sender_err($ref->{'info'});
         }
     }
     return;
@@ -149,7 +152,10 @@ sub send_arrref {
 
     return 1 if ($status == 1);
 
-    $self->_sender_err("server busy (spent ", time() - $start, "seconds in $attempts attempts)");
+    if (!$err_msg)
+    {
+	    $self->_sender_err("server busy (spent ", time() - $start, "seconds in $attempts attempts)");
+    }
 
     return;
 }

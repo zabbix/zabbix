@@ -4,23 +4,23 @@ rsm.slv.*.avail.pl - scripts to calculate different service status results and s
 
 =head1 SYNOPSIS
 
-rsm.slv.*.avail.pl [--from <timestamp>] [--period minutes] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
+rsm.slv.*.avail.pl [--tld <tld>] [--now <timestamp>] [--cycles <cycles>] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
 
 =head1 OPTIONS
 
 =over 8
 
-=item B<--from> timestamp
+=item B<--tld> tld
 
-Specify Unix timestamp within the oldest test cycle to handle in this run. You don't need to specify the
-first second of the test cycle, any timestamp within it will work. Number of minutes to handle within
-this run can be specified using option --period otherwise all completed test cycles available in the
-database up till now will be handled.
+Specify the TLD to process. By default all tlds will be processed.
 
-=item B<--period> minutes
+=item B<--now> timestamp
 
-Specify number minutes of the period to handle during this run. The first cycle to handle can be specified
-using options --from or --continue (continue from the last time when --continue was used) (see below).
+Specify Unix timestamp within the test cycle to handle. You don't need to specify the first second of the test cycle.
+
+=item B<--cycles> cycles
+
+Specify number cycles to process. By default 1 cycle will be processed.
 
 =item B<--dry-run>
 

@@ -72,6 +72,7 @@ sub get_nsservers_list($);
 sub update_nsservers($$);
 sub get_tld_list();
 sub get_services($);
+sub create_slv_monthly($$$);
 
 my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
@@ -116,7 +117,7 @@ my $rv = GetOptions(\%OPTS,
 		    "get-nsservers-list!",
 		    "update-nsservers!",
 		    "list-services!",
-		    "setup-cron!",
+		    "setup-cron:s",
 		    "verbose!",
 		    "quiet!",
 		    "help|?");
@@ -508,124 +509,9 @@ sub create_item_dns_rtt {
                                               'applications' => [$applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'}],
                                               'type' => 2, 'value_type' => 0,
 					      'status' => ITEM_STATUS_ACTIVE,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_dns_result'}};
 
-    my $itemid = create_item($options, $is_new);
-
-    my @data;
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: Internal error '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from Name Server '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOREPLY.
-					    '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - Invalid reply from Name Server '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRREPLY.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - UNIX timestamp is missing from '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 6 - Invalid UNIX timestamp from '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRTS.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-    if (defined($OPTS{'dnssec'})) {
-	$options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 7 - DNSSEC error from '.$ns_name.' ['.$ip.']',
-		     'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_NS_ERRSIG.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-		     'priority' => '2',
-		    'status' => TRIGGER_STATUS_ENABLED
-	};
-
-	push @data, $options;
-    }
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 5 - No reply from resolver',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOREPLY.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-			'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'DNS-RTT-'.$proto_uc.' {HOST.NAME}: 5.1.1 Step 2 - AD bit is missing from '.$ns_name.' ['.$ip.']',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_DNS_RES_NOADBIT.
-                                            '&{'.$template_name.':'.'probe.configvalue[RSM.IP'.$ipv.'.ENABLED]'.'.last(0)}=1',
-			'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED
-                };
-
-    push @data, $options;
-
-
-    my $zbx_data = get_triggers_by_itemid($itemid, $is_new);
-
-    my @new_data;
-
-    for my $trigger (@data) {
-	my $tmp_trigger;
-
-	foreach my $zbx_trigger (keys %{$zbx_data}) {
-	    if ($trigger->{'expression'} eq $zbx_data->{$zbx_trigger}->{'expression'}) {
-		$tmp_trigger = $zbx_data->{$zbx_trigger};
-		delete $tmp_trigger->{'items'};
-		last;
-	    }
-	}
-
-	if (defined($tmp_trigger)) {
-	    # it is possible to change, remove already existing triggers here
-	    if ($tmp_trigger->{'description'} eq $trigger->{'description'} and 
-		$tmp_trigger->{'priority'} eq $trigger->{'priority'} and
-		$tmp_trigger->{'status'} eq $trigger->{'status'}) {
-		#some actions in case of the same trigger
-	    }
-	    else {
-		push @new_data, $tmp_trigger;
-	    }
-	}
-	else {
-	    push @new_data, $trigger;
-	}
-
-    }
-
-    foreach my $trigger (@new_data) {
-	create_trigger($trigger, true);
-    }
-
-    return;
+    create_item($options, $is_new);
 }
 
 sub create_slv_item {
@@ -664,6 +550,14 @@ sub create_slv_item {
 					    'status' => ITEM_STATUS_ACTIVE,
 					      'units' => '%'};
     }
+    elsif ($value_type == VALUE_TYPE_DOUBLE) {
+	$options = {'name' => $name,
+                                              'key_'=> $key,
+                                              'hostid' => $hostid,
+                                              'type' => 2, 'value_type' => 0,
+                                              'applications' => $applicationids,
+					    'status' => ITEM_STATUS_ACTIVE};
+    }
     else {
 	pfail("Unknown value type $value_type.");
     }
@@ -693,9 +587,10 @@ sub create_item_dns_udp_upd {
                                               'hostid' => $templateid,
                                               'applications' => [$applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'}],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_dns'},
+                                              'valuemapid' => rsm_value_mappings->{'rsm_dns_result'},
 		                              'status' => (defined($OPTS{'epp-servers'}) ? 0 : 1)};
-    return create_item($options, $is_new);
+
+    create_item($options, $is_new);
 }
 
 sub create_items_dns {
@@ -703,17 +598,17 @@ sub create_items_dns {
     my $template_name = shift;
     my $is_new = shift;
 
+    $is_new = false unless defined $is_new;
+
     my $proto = 'tcp';
     my $proto_uc = uc($proto);
     my $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
-
-    $is_new = false unless defined $is_new;
 
     unless (exists($applications->{$templateid}->{'DNS ('.$proto_uc.')'})) {
         $applications->{$templateid}->{'DNS ('.$proto_uc.')'} = get_application_id('DNS ('.$proto_uc.')', $templateid, $is_new)
     }
 
-    my $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
+    my $options = {'name' => "DNS $proto_uc test",
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
@@ -721,13 +616,6 @@ sub create_items_dns {
                                               'delay' => $cfg_global_macros->{'{$RSM.DNS.TCP.DELAY}'}};
 
     create_item($options, $is_new);
-
-    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$RSM.DNS.AVAIL.MINNS} NS servers have answered succesfully',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$RSM.DNS.AVAIL.MINNS}',
-			'priority' => '4',
-                };
-
-    create_trigger($options, $is_new);
 
     $proto = 'udp';
     $proto_uc = uc($proto);
@@ -737,21 +625,14 @@ sub create_items_dns {
         $applications->{$templateid}->{'DNS ('.$proto_uc.')'} = get_application_id('DNS ('.$proto_uc.')', $templateid, $is_new)
     }
 
-    $options = {'name' => 'Number of working DNS Name Servers of $1 ('.$proto_uc.')',
+    $options = {'name' => "DNS $proto_uc test",
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.UDP.DELAY}'}, 'valuemapid' => rsm_value_mappings->{'rsm_dns'}};
+                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.UDP.DELAY}'}};
 
     create_item($options, $is_new);
-
-    $options = { 'description' => 'DNS-'.$proto_uc.' {HOST.NAME}: 5.2.3 - Less than {$RSM.DNS.AVAIL.MINNS} NS servers have answered succesfully',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}<{$RSM.DNS.AVAIL.MINNS}',
-			'priority' => '4',
-                };
-
-    create_trigger($options, $is_new);
 }
 
 sub create_items_rdds {
@@ -774,109 +655,24 @@ sub create_items_rdds {
 
     my $item_key = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 
-    my $options = {'name' => 'RDDS43 IP of $1',
+    my $options = {'name' => 'RDDS43 IP',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 1,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
     create_item($options, $is_new);
 
     $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 
-    $options = {'name' => 'RDDS43 RTT of $1',
+    $options = {'name' => 'RDDS43 RTT',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_43],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
-    my $itemid = create_item($options, $is_new);
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
 
-    my @data;
-
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: Internal error',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOREPLY,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 5 - The server output does not contain "{$RSM.RDDS.NS.STRING}"',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NONS,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 6 - UNIX timestamp is missing in reply from the server',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 6 - Invalid UNIX timestamp in reply from the server',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_ERRTS,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS43-RTT {HOST.NAME}: 6.1.1 Step 2 - Cannot resolve a host',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS_ERRRES,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    my $zbx_data = get_triggers_by_itemid($itemid, $is_new);
-
-    my @new_data;
-
-    for my $trigger (@data) {
-        my $tmp_trigger;
-
-        foreach my $zbx_trigger (keys %{$zbx_data}) {
-            if ($trigger->{'expression'} eq $zbx_data->{$zbx_trigger}->{'expression'}) {
-                $tmp_trigger = $zbx_data->{$zbx_trigger};
-                delete $tmp_trigger->{'items'};
-                last;
-            }
-        }
-
-        if (defined($tmp_trigger)) {
-            # it is possible to change, remove already existing triggers here
-            if ($tmp_trigger->{'description'} eq $trigger->{'description'} and
-                $tmp_trigger->{'priority'} eq $trigger->{'priority'} and
-                $tmp_trigger->{'status'} eq $trigger->{'status'}) {
-                #some actions in case of the same trigger
-            }
-            else {
-                push @new_data, $tmp_trigger;
-            }
-        }
-        else {
-            push @new_data, $trigger;
-        }
-
-    }
-
-    foreach my $trigger (@new_data) {
-        create_trigger($trigger, true);
-    }
+    create_item($options, $is_new);
 
     if (defined($OPTS{'epp-servers'})) {
 	$item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
@@ -888,12 +684,13 @@ sub create_items_rdds {
 		    'type' => 2, 'value_type' => 0,
 		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
 		    'status' => 0};
+
 	create_item($options, $is_new);
     }
 
     $item_key = 'rsm.rdds.80.ip[{$RSM.TLD}]';
 
-    $options = {'name' => 'RDDS80 IP of $1',
+    $options = {'name' => 'RDDS80 IP',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
@@ -902,93 +699,14 @@ sub create_items_rdds {
 
     $item_key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
 
-    $options = {'name' => 'RDDS80 RTT of $1',
+    $options = {'name' => 'RDDS80 RTT',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applicationid_80],
                                               'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
 
-    undef $itemid;
-    $itemid = create_item($options, $is_new);
-
-    undef @data;
-
-    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: Internal error',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 5 - No reply from the server',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_NOREPLY,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 2 - Cannot resolve a host',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS_ERRRES,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 2 - Cannot get HTTP response code from the server',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_NOHTTPCODE,
-                        'priority' => '2',
-			'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    $options = { 'description' => 'RDDS80-RTT {HOST.NAME}: 6.1.1 Step 2 - Invalid HTTP response code from the server',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS80_EHTTPCODE,
-                        'priority' => '2',
-			    'status' => TRIGGER_STATUS_ENABLED,
-                };
-
-    push @data, $options;
-
-    undef $zbx_data;
-    $zbx_data = get_triggers_by_itemid($itemid, $is_new);
-
-    undef @new_data;
-
-    for my $trigger (@data) {
-        my $tmp_trigger;
-
-        foreach my $zbx_trigger (keys %{$zbx_data}) {
-            if ($trigger->{'expression'} eq $zbx_data->{$zbx_trigger}->{'expression'}) {
-                $tmp_trigger = $zbx_data->{$zbx_trigger};
-                delete $tmp_trigger->{'items'};
-                last;
-            }
-        }
-
-        if (defined($tmp_trigger)) {
-            # it is possible to change, remove already existing triggers here
-            if ($tmp_trigger->{'description'} eq $trigger->{'description'} and
-                $tmp_trigger->{'priority'} eq $trigger->{'priority'} and
-                $tmp_trigger->{'status'} eq $trigger->{'status'}) {
-                #some actions in case of the same trigger
-            }
-            else {
-                push @new_data, $tmp_trigger;
-            }
-        }
-        else {
-            push @new_data, $trigger;
-        }
-    }
-
-    foreach my $trigger (@new_data) {
-        create_trigger($trigger, true);
-    }
+    create_item($options, $is_new);
 
     $item_key = 'rsm.rdds[{$RSM.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
 
@@ -996,13 +714,13 @@ sub create_items_rdds {
         $applications->{$templateid}->{'RDDS'} = get_application_id('RDDS', $templateid, $is_new)
     }
 
-    $options = {'name' => 'RDDS availability of $1',
+    $options = {'name' => 'RDDS test',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
                                               'applications' => [$applications->{$templateid}->{'RDDS'}],
                                               'type' => 3, 'value_type' => 3,
 					      'delay' => $cfg_global_macros->{'{$RSM.RDDS.DELAY}'},
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_avail'}};
+                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_probe_result'}};
     create_item($options, $is_new);
 }
 
@@ -1023,18 +741,18 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]';
 
-    $options = {'name' => 'EPP service availability at $1 ($2)',
+    $options = {'name' => 'EPP test',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 3, 'value_type' => 3,
-		'delay' => $cfg_global_macros->{'{$RSM.EPP.DELAY}'}, 'valuemapid' => rsm_value_mappings->{'rsm_avail'}};
+		'delay' => $cfg_global_macros->{'{$RSM.EPP.DELAY}'}};
 
     create_item($options, $is_new);
 
     $item_key = 'rsm.epp.ip[{$RSM.TLD}]';
 
-    $options = {'name' => 'EPP IP of $1',
+    $options = {'name' => 'EPP IP',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
@@ -1044,182 +762,53 @@ sub create_items_epp {
 
     $item_key = 'rsm.epp.rtt[{$RSM.TLD},login]';
 
-    $options = {'name' => 'EPP $2 command RTT of $1',
+    $options = {'name' => 'EPP $2 command RTT',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options, $is_new);
 
     $item_key = 'rsm.epp.rtt[{$RSM.TLD},update]';
 
-    $options = {'name' => 'EPP $2 command RTT of $1',
+    $options = {'name' => 'EPP $2 command RTT',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options, $is_new);
 
     $item_key = 'rsm.epp.rtt[{$RSM.TLD},info]';
 
-    $options = {'name' => 'EPP $2 command RTT of $1',
+    $options = {'name' => 'EPP $2 command RTT',
 		'key_'=> $item_key,
 		'hostid' => $templateid,
 		'applications' => [$applicationid],
 		'type' => 2, 'value_type' => 0,
-		'valuemapid' => rsm_value_mappings->{'rsm_epp'}};
+		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
-    my $itemid = create_item($options, $is_new);
-
-    my @data;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: Internal error',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_INTERNAL,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 2 - IP is missing',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_NO_IP,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 4 - Cannot connect to the server',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_CONNECT,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 5 - Invalid certificate or private key',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_CRYPT,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 5 - First message timeout',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_FIRSTTO,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 5 - First message is invalid',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_FIRSTINVAL,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 6 - LOGIN command timeout',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_LOGINTO,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 6 - Invalid reply to LOGIN command',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_LOGININVAL,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - UPDATE command timeout',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_UPDATETO,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - Invalid reply to UPDATE command',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_UPDATEINVAL,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - INFO command timeout',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_INFOTO,
-                'priority' => '2',
-    };
-
-    create_trigger($options, $is_new);
-
-    $options = { 'description' => 'EPP-INFO {HOST.NAME}: 7.1.1 Step 7 - Invalid reply to INFO command',
-                 'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_EPP_INFOINVAL,
-                'priority' => '2',
-    };
-
-    push @data, $options;
-
-    my $zbx_data = get_triggers_by_itemid($itemid, $is_new);
-
-    my @new_data;
-
-    for my $trigger (@data) {
-        my $tmp_trigger;
-
-        foreach my $zbx_trigger (keys %{$zbx_data}) {
-            if ($trigger->{'expression'} eq $zbx_data->{$zbx_trigger}->{'expression'}) {
-                $tmp_trigger = $zbx_data->{$zbx_trigger};
-                delete $tmp_trigger->{'items'};
-                last;
-            }
-        }
-
-        if (defined($tmp_trigger)) {
-            # it is possible to change, remove already existing triggers here
-            if ($tmp_trigger->{'description'} eq $trigger->{'description'} and
-                $tmp_trigger->{'priority'} eq $trigger->{'priority'} and
-                $tmp_trigger->{'status'} eq $trigger->{'status'}) {
-                #some actions in case of the same trigger
-            }
-            else {
-                push @new_data, $tmp_trigger;
-            }
-        }
-        else {
-            push @new_data, $trigger;
-        }
-
-    }
-
-    foreach my $trigger (@new_data) {
-        create_trigger($trigger, true);
-    }
+    create_item($options, $is_new);
 
     if (defined($OPTS{'rdds43-servers'})) {
         $item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-        
+
         my $applicationid_43 = get_application_id('RDDS43', $templateid);
 
-        $options = {'name' => 'RDDS43 update time of $1',
+        $options = {'name' => 'RDDS43 update time',
                     'key_'=> $item_key,
 		    'hostid' => $templateid,
 		    'applications' => [$applicationid_43],
 		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
+		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'},
 		    'status' => 0};
+
 	create_item($options);
-
-	$options = { 'description' => 'RDDS43-UPD {HOST.NAME}: No UNIX timestamp',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
-                        'priority' => '2',
-                };
-
-	create_trigger($options);
     }
 }
-
 
 sub trim
 {
@@ -1458,19 +1047,9 @@ sub create_all_slv_ns_items {
     unless (exists($applications->{$hostid}->{APP_SLV_PARTTEST})) {
         $applications->{$hostid}->{APP_SLV_PARTTEST} = get_application_id(APP_SLV_PARTTEST, $hostid)
     }
-    unless (exists($applications->{$hostid}->{APP_SLV_CURMON})) {
-        $applications->{$hostid}->{APP_SLV_CURMON} = get_application_id(APP_SLV_CURMON, $hostid)
-    }
 
-    create_slv_item('% of successful monthly DNS resolution RTT (UDP): $1 ($2)', 'rsm.slv.dns.ns.rtt.udp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('% of successful monthly DNS resolution RTT (TCP): $1 ($2)', 'rsm.slv.dns.ns.rtt.tcp.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]) if (defined($OPTS{'epp-servers'}));
     create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
-    create_slv_item('DNS NS probes that returned results: $1 ($2)', 'rsm.slv.dns.ns.results['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
-    create_slv_item('DNS NS probes that returned positive results: $1 ($2)', 'rsm.slv.dns.ns.positive['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
-    create_slv_item('DNS NS positive results by SLA: $1 ($2)', 'rsm.slv.dns.ns.sla['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
-    create_slv_item('% of monthly DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+    create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
 }
 
 sub create_slv_ns_items {
@@ -1498,15 +1077,18 @@ sub create_slv_items {
     unless (exists($applications->{$hostid}->{APP_SLV_PARTTEST})) {
         $applications->{$hostid}->{APP_SLV_PARTTEST} = get_application_id(APP_SLV_PARTTEST, $hostid)
     }
-    unless (exists($applications->{$hostid}->{APP_SLV_CURMON})) {
-        $applications->{$hostid}->{APP_SLV_CURMON} = get_application_id(APP_SLV_CURMON, $hostid)
+    unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
+        $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
     }
     unless (exists($applications->{$hostid}->{APP_SLV_ROLLWEEK})) {
         $applications->{$hostid}->{APP_SLV_ROLLWEEK} = get_application_id(APP_SLV_ROLLWEEK, $hostid)
     }
 
     create_slv_item('DNS availability', 'rsm.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
+    create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+
+    create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid);
+    create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid);
 
     my $options;
 
@@ -1597,7 +1179,7 @@ sub create_slv_items {
 
     if (defined($OPTS{'rdds43-servers'})) {
 	create_slv_item('RDDS availability', 'rsm.slv.rdds.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
+	create_slv_item('RDDS minutes of downtime', 'rsm.slv.rdds.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
 
 	# NB! Configuration trigger that is used in PHP and C code to detect incident!
 	# priority must be set to 0!
@@ -1639,13 +1221,8 @@ sub create_slv_items {
 
 	undef($depend_down);
 
-	unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
-	    $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid);
-        }
-
-	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'rsm.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-	create_slv_item('% of successful monthly RDDS80 resolution RTT', 'rsm.slv.rdds.80.rtt.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-	create_slv_item('% of successful monthly RDDS update time', 'rsm.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]) if (defined($OPTS{'epp-servers'}));
+	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid);
+	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid);
     }
 
     create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
@@ -1656,16 +1233,12 @@ sub create_slv_epp_items($$) {
     my $host_name = shift;
 
     create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
+    create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
     create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
 
-    unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
-        $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
-    }
-
-    create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'rsm.slv.epp.rtt.login.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'rsm.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('% of successful monthly EPP INFO resolution RTT', 'rsm.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+    create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login', $hostid);
+    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
+    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
 
     # NB! Configuration trigger that is used in PHP and C code to detect incident!
     # priority must be set to 0!
@@ -1703,6 +1276,9 @@ sub create_slv_epp_items($$) {
 
 	$depend_down = $triggerid;
     }
+
+    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
+    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid) if (defined($OPTS{'rdds43-servers'}));
 }
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
@@ -2064,6 +1640,15 @@ sub create_probe_health_tmpl() {
             };
 
     create_trigger($options);
+
+    $options = {'name' => 'Probe main status',
+		'key_'=> 'rsm.probe.online',
+		'hostid' => $templateid,
+		'applications' => [get_application_id('Probe Availability', $templateid)],
+		'type' => 2, 'value_type' => 3,
+		'valuemapid' => rsm_value_mappings->{'rsm_probe'}};
+
+    create_item($options);
 
     return $templateid;
 }
@@ -2460,19 +2045,14 @@ sub update_epp_objects($) {
     my $templateid = $result->{'templateid'};
     print "success\n";
 
-    unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
-	$applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
-    }
-
-    if (defined($OPTS{'rdds43-servers'})) {
-	create_slv_item('% of successful monthly RDDS update time', 'rsm.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}])
-    }
-
     create_slv_epp_items($hostid, $tld);
 
     create_macro('{$RSM.TLD.EPP.ENABLED}', 1, $templateid, true, $is_new);
 
     create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
+
+    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $main_hostid);
+    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $main_hostid) if (defined($OPTS{'rdds43-servers'}));
 
     my $ns_servers = get_nsservers_list($tld);
 
@@ -2481,12 +2061,29 @@ sub update_epp_objects($) {
 
 	$ipv =~s/v([46])/$1/;
 
-	foreach my $ns_name (keys %{$ns_by_ipv}) {
-	    my $ns = $ns_by_ipv->{$ns_name};
-	    foreach my $ip (@{$ns}) {
+        foreach my $ns_name (keys %{$ns_by_ipv}) {
+            my $ns = $ns_by_ipv->{$ns_name};
+            foreach my $ip (@{$ns}) {
 		create_item_dns_udp_upd($ns_name, $ip, $templateid, 'Template '.$tld, $ipv, $is_new);
-		create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-	    }
-	}
+            }
+        }
     }
+}
+
+sub create_slv_monthly($$$)
+{
+    my $test_name = shift;
+    my $key_base = shift;
+    my $hostid = shift;
+
+    unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
+	$applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
+    }
+
+    my $applicationid = $applications->{$hostid}->{APP_SLV_MONTHLY};
+
+    create_slv_item($test_name . ': % of failed tests',   $key_base . '.pfailed', $hostid, VALUE_TYPE_PERC,   [$applicationid]);
+    create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,    [$applicationid]);
+    create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,    [$applicationid]);
+    create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
 }

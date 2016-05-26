@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# DNS availability
+# DNS NS availability
 
 BEGIN
 {
@@ -12,28 +12,25 @@ use strict;
 use warnings;
 use RSM;
 use RSMSLV;
-use Alerts;
 use Parallel;
+use Alerts;
 
-my $cfg_key_in = 'rsm.dns.udp[{$RSM.TLD}]';
-my $cfg_key_out = 'rsm.slv.dns.avail';
+my $cfg_key_in = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+my $cfg_key_out = 'rsm.slv.dns.ns.avail[';
 
 parse_avail_opts();
 exit_if_running();
+
+my $now = (opt('now') ? getopt('now') : time());
+my $cycles = (opt('cycles') ? getopt('cycles') : 1);
 
 set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $delay = get_macro_dns_udp_delay();
+my $delay = get_macro_dns_udp_delay($now);
 my $cfg_minonline = get_macro_dns_probe_online();
-my $probe_avail_limit = get_macro_probe_avail_limit();
-
-my $cfg_minns = get_macro_minns();
-
-my $now = (opt('now') ? getopt('now') : time());
-my $cycles = (opt('cycles') ? getopt('cycles') : 1);
-
+my $cfg_max_value = get_macro_dns_udp_rtt_high();
 my $max_avail_time = max_avail_time($delay);
 
 my $tlds_ref;
@@ -78,11 +75,15 @@ while ($tld_index < $tld_count)
 		my $itemid;
 		if (!opt('dry-run'))
 		{
-			if (!($itemid = get_itemid_by_host($tld, $cfg_key_out)))
+			my $result;
+
+			if (get_lastclock($tld, $cfg_key_out, \$result) != SUCCESS)
 			{
-				wrn("configuration error: ", rsm_slv_error());
+				wrn("configuration error: DNS NS availability items not found (\"$cfg_key_out*\")");
 				exit(0);
 			}
+
+			$itemid = $result->{'itemid'};
 		}
 
 		init_values();
@@ -101,18 +102,26 @@ while ($tld_index < $tld_count)
 
 			next if ($till > $max_avail_time);
 
-			my $result = process_slv_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline, $probe_times_ref,
-				\&check_item_values);
+			my $result = process_slv_ns_avail($tld, $cfg_key_in, $from, $till, $cfg_minonline,
+				$probe_times_ref, \&check_item_value);
 
-			if ($result)
+			if (scalar(keys(%{$result})) == 0)
 			{
-				my $value = $result->{'value'};
-				my $message = $result->{'message'};
-				my $alert = $result->{'alert'};
+				wrn("no DNS NS UDP test results found in the database (cycle: ", ts_full(cycle_start($value_ts, $delay)), ")");
+			}
+			else
+			{
+				foreach my $nsip (keys(%$result))
+				{
+					my $key = $cfg_key_out . $nsip . ']';
+					my $value = $result->{$nsip}->{'value'};
+					my $message = $result->{$nsip}->{'message'};
+					my $alert = $result->{$nsip}->{'alert'};
 
-				push_value($tld, $cfg_key_out, $value_ts, $value, $message);
+					push_value($tld, $key, $value_ts, $value, $message);
 
-				add_alert(ts_str($value_ts) . "#system#zabbix#$cfg_key_out#PROBLEM#$tld ($message)") if ($alert);
+					add_alert(ts_str($value_ts) . "#system#zabbix#$key#PROBLEM#$tld ($message)") if ($alert);
+				}
 			}
 		}
 
@@ -135,15 +144,9 @@ while (children_running() > 0)
 
 slv_exit(SUCCESS);
 
-# SUCCESS - no values or at least one successful value
-# E_FAIL  - all values unsuccessful
-sub check_item_values
+sub check_item_value
 {
 	my $value = shift;
 
-	return SUCCESS if (!defined($value));
-
-	return SUCCESS if ($value >= $cfg_minns);
-
-	return E_FAIL;
+	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? E_FAIL : SUCCESS;
 }
