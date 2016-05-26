@@ -30,7 +30,7 @@ class testPageItemPrototypes extends CWebTest {
 			' WHERE i.itemid=d.itemid'.
 				' AND h.hostid=i.hostid'.
 				' AND d.parent_itemid=di.itemid'.
-				' AND i.key_ LIKE '.zbx_dbstr('%-layout-test%')
+				" AND i.key_ LIKE '%-layout-test%'"
 		);
 	}
 
@@ -123,7 +123,7 @@ class testPageItemPrototypes extends CWebTest {
 			' WHERE i.itemid=d.itemid'.
 				' AND h.hostid=i.hostid'.
 				' AND d.parent_itemid=di.itemid'.
-				' AND h.host LIKE '.zbx_dbstr('%-layout-test-%')
+				" AND h.host LIKE '%-layout-test-%'"
 		);
 	}
 
