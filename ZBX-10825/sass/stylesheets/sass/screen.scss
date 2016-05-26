@@ -591,13 +591,12 @@ footer {
 
 	thead th {
 		color: $font-alt-color;
-		font-weight: bold;
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-		padding: 6px 5px;
+		padding: 7px 5px;
 		vertical-align: bottom;
-		border-bottom: 2px solid $table-border-color;
+		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
 
 		.arrow-up {
@@ -668,7 +667,7 @@ footer {
 	}
 
 	td {
-		padding: 6px 5px;
+		padding: 7px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
@@ -915,10 +914,6 @@ footer {
 		thead {
 
 			th {
-				font-size: $font-form-size;
-				text-transform: none;
-				text-rendering: auto;
-				letter-spacing: normal;
 				color: initial;
 				padding: 8px 5px 5px 5px;
 				border-bottom-width: 1px;
