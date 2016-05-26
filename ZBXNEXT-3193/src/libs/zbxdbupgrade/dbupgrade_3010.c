@@ -240,12 +240,12 @@ static int	trigger_events_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: assign_recovery_events                                           *
+ * Function: update_event_recovery                                            *
  *                                                                            *
  * Purpose: set events.r_eventid field with corresponding recovery event id   *
  *                                                                            *
  * Parameters: events   - [IN/OUT] unrecovered events indexed by triggerid    *
- *             *eventid - [IN/OUT] the last processed event id                *
+ *             eventid  - [IN/OUT] the last processed event id                *
  *                                                                            *
  * Return value: SUCCEED - the operation was completed successfully           *
  *               FAIL    - otherwise                                          *
