@@ -231,8 +231,9 @@ nav {
 }
 
 .top-nav-container {
-	height: 49px;
-	line-height: 49px;
+	height: 45px;
+	line-height: 45px;
+	padding: 0 10px 0 10px;
 	position: relative;
 	background-color: $main-nav-bg-color;
 }
@@ -262,17 +263,17 @@ nav {
 				line-height: 0;
 				border-left: 9px solid transparent;
 				border-right: 9px solid transparent;
-			    border-bottom: 9px solid $main-subnav-bg-color;
+				border-bottom: 9px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
 				color: $link-main-nav-active-color;
 			}
-	    }
+		}
 	}
 
 	a {
-		padding: 17px 13px;
+		padding: 15px 10px;
 		color: $link-main-nav-color;
 		text-decoration: none;
 		cursor: pointer;
@@ -303,17 +304,19 @@ nav {
 ul.top-nav-icons {
 	position: absolute;
 	top: 0;
-	right: 0;
+	right: 10px;
 
 	li {
 		display: block;
 		float: left;
+		padding: 0 0 0 10px;
 
 		.search-suggest {
 			min-width: 186px;
 
 			li {
 				float: none;
+				padding: 0.4em 5px;
 
 				a {
 					opacity: inherit;
@@ -325,9 +328,9 @@ ul.top-nav-icons {
 
 	a {
 		display: block;
-		width: 38px;
-		height: 49px;
-		line-height: 49px;
+		width: 24px;
+		height: 45px;
+		line-height: 45px;
 		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
@@ -341,25 +344,24 @@ ul.top-nav-icons {
 		&:focus {
 			@include opacity(1);
 		}
-    }
+	}
 
 	.top-nav-help {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -30px;
+		background: url(../img/icon-sprite.svg) no-repeat -6px -32px;
 	}
 
 	.top-nav-profile {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -102px;
+		background: url(../img/icon-sprite.svg) no-repeat -6px -104px;
 	}
 
 	.top-nav-signout {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -138px;
-		width: 44px;
+		background: url(../img/icon-sprite.svg) no-repeat -6px -140px;
 	}
 
 	.top-nav-zbbshare {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -66px;
-	    width: auto;
-		padding: 0 12px 0 27px;
+		background: url(../img/icon-sprite.svg) no-repeat -9px -68px;
+		width: auto;
+		padding: 0 6px 0 17px;
 		-webkit-transform-style: preserve-3d;
 	}
 
@@ -371,7 +373,7 @@ ul.top-nav-icons {
 		background-color: darken($main-nav-bg-color, 7%);
 		border: 1px solid darken($main-nav-bg-color, 10%);
 		width: 198px;
-		margin: 6px 7px 0 0;
+		margin: 6px 3px 0 0;
 		color: $font-color;
 		padding: 4px 24px 4px 5px;
 		@include opacity(1);
@@ -389,11 +391,11 @@ ul.top-nav-icons {
 }
 
 .top-subnav-container {
-	height: 32px;
-	line-height: 32px;
+	height: 30px;
+	line-height: 30px;
 	background-color: $main-subnav-bg-color;
 	position: relative;
-	padding: 0 13px;
+	padding: 0 10px;
 }
 
 .top-subnav {
@@ -404,7 +406,7 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		padding: 0 12px;
+		padding: 0 10px;
 
 		&:last-child {
 			@include box-shadow (25px 0 10px -10px rgba($main-subnav-bg-color, 1));
@@ -413,7 +415,7 @@ ul.top-nav-icons {
 }
 
 .top-subnav a {
-	padding: 9px 1px;
+	padding: 8px 0;
 
 	&:link {
 		color: $link-main-subnav-color;
@@ -437,7 +439,7 @@ ul.top-nav-icons {
 
 	&.selected {
 		color: $link-main-subnav-active-color;
-		padding: 9px 1px 6px 1px;
+		padding: 8px 0 5px 0;
 		border-bottom: 3px solid lighten($main-subnav-bg-color, 20%);
 	}
 }
@@ -492,14 +494,14 @@ ul.top-nav-icons {
 			display: block;
 			float: left;
 			position: relative;
-			padding: 0 0 0 14px;
+			padding: 0 0 0 10px;
 		}
 	}
 }
 
 // Article
 article {
-	padding: 13px 13px 0 13px;
+	padding: 10px 10px 0 10px;
 }
 
 .article {
@@ -554,9 +556,9 @@ article {
 // Footer
 footer {
 	position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 30px;
+	bottom: 0;
+	width: 100%;
+	height: 30px;
 	text-align: center;
 	color: $font-alt-color;
 
@@ -577,15 +579,15 @@ footer {
 	display: block;
 	width: 95px;
 	height: 25px;
-	margin: 12px 9px 0 13px;
+	margin: 10px 10px 0 0;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -903px;
 }
 
 // Tables
 .list-table {
 	width: 100%;
-    background-color: $ui-bg-color;
-    border: 1px solid $ui-border-color;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
 
 	thead th {
 		font-size: $font-h3-size;
@@ -596,56 +598,56 @@ footer {
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-	    padding: 8px 5px 6px 5px;
-	    vertical-align: bottom;
-	    border-bottom: 2px solid $table-border-color;
-	    text-align: left;
+		padding: 6px 5px;
+		vertical-align: bottom;
+		border-bottom: 2px solid $table-border-color;
+		text-align: left;
 
-	    .arrow-up {
-	    	margin: 0 0 0 4px;
-	    	border-bottom-color: $font-alt-color;
-	    }
+		.arrow-up {
+			margin: 0 0 0 4px;
+			border-bottom-color: $font-alt-color;
+		}
 
-	    .arrow-right {
-	    	margin: 0 0 0 4px;
-	    	border-left-color: $font-alt-color;
-	    }
+		.arrow-right {
+			margin: 0 0 0 4px;
+			border-left-color: $font-alt-color;
+		}
 
-	    .arrow-down {
-	    	margin: 0 0 0 4px;
-	    	border-top-color: $font-alt-color;
-	    }
+		.arrow-down {
+			margin: 0 0 0 4px;
+			border-top-color: $font-alt-color;
+		}
 
-	    .treeview {
+		.treeview {
 
-	    	span {
-	    		margin: 0;
-	    	}
-	    }
+			span {
+				margin: 0;
+			}
+		}
 
-	    a {
-	    	display: block;
-	    	position: relative;
-	    	margin: -1em;
-	    	padding: 1em;
-	    	border: none;
-	    	@include transition(background-color .2s ease-out);
+		a {
+			display: block;
+			position: relative;
+			margin: -1em;
+			padding: 1em;
+			border: none;
+			@include transition(background-color .2s ease-out);
 
-	    	&:hover {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
+			&:hover {
+				text-decoration: none;
+				background-color: $ui-hover-color;
+			}
 
-	    	&:focus {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
+			&:focus {
+				text-decoration: none;
+				background-color: $ui-hover-color;
+			}
 
-	    	&:active {
-	    		text-decoration: none;
-	    		background-color: $ui-hover-color
-	    	}
-	    }
+			&:active {
+				text-decoration: none;
+				background-color: $ui-hover-color;
+			}
+		}
 	}
 
 	tbody tr {
@@ -669,7 +671,7 @@ footer {
 	}
 
 	td {
-		padding: 8px 5px;
+		padding: 6px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
@@ -684,7 +686,7 @@ footer {
 	text-align: center;
 	background-color: $ui-bg-color;
 	margin-top: -1px;
-	padding: 7px 5px;
+	padding: 6px 5px;
 	overflow: hidden;
 	position: relative;
 	border: 1px solid $ui-border-color;
@@ -703,9 +705,9 @@ footer {
 .table-stats {
 	color: $font-alt-color;
 	display: inline-block;
-    padding: 4px 0;
-    position: absolute;
-    right: 5px;
+	padding: 4px 0;
+	position: absolute;
+	right: 5px;
 }
 
 .radio-switch {
@@ -896,7 +898,7 @@ footer {
 }
 
 .filter-container {
-	padding: 15px 0 10px 0;
+	padding: 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
@@ -1343,14 +1345,14 @@ footer {
 				margin-right: 5px;
 			}
 
-			 &.center {
-			 	text-align: center;
-			 	vertical-align: middle;
+			&.center {
+				text-align: center;
+				vertical-align: middle;
 
-			 	.btn-grey {
-			 		margin: 3px 0;
-			 	}
-			 }
+				.btn-grey {
+					margin: 3px 0;
+				}
+			}
 		}
 	}
 
@@ -1774,8 +1776,8 @@ button {
 	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
-	top: 13px;
-	right: 8px;
+	top: 11px;
+	right: 4px;
 	width: 24px;
 	min-height: 22px;
 	padding: 0;
@@ -1837,10 +1839,10 @@ $icon-btn: (
 );
 
 @each $icon-btn, $bgimage in $icon-btn {
-    .btn-#{$icon-btn} {
-        background: $bgimage;
-        @extend %button-icon-size;
-    }
+	.btn-#{$icon-btn} {
+		background: $bgimage;
+		@extend %button-icon-size;
+	}
 }
 
 $icon-widget-btn: (
@@ -1854,10 +1856,10 @@ $icon-widget-btn: (
 );
 
 @each $icon-widget-btn, $bgimage in $icon-widget-btn {
-    .btn-#{$icon-widget-btn} {
-        background: $bgimage;
-        @extend %btn-widget;
-    }
+	.btn-#{$icon-widget-btn} {
+		background: $bgimage;
+		@extend %btn-widget;
+	}
 }
 
 %btn-widget {
@@ -1967,8 +1969,8 @@ button[disabled] {
 }
 
 .ui-tabs-nav {
-	height: 36px;
-	line-height: 36px;
+	height: 30px;
+	line-height: 30px;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
@@ -1976,7 +1978,7 @@ button[disabled] {
 
 		a {
 			@extend %no-border;
-			padding: 11px 13px;
+			padding: 8px 10px;
 			@include transition(background-color .2s ease-out);
 
 			&:hover {
@@ -1999,7 +2001,7 @@ button[disabled] {
 		&.ui-tabs-active {
 
 			a {
-				padding: 11px 13px 9px 13px;
+				padding: 8px 13px 6px 13px;
 				background-color: $transparent;
 				color: $font-color;
 				text-decoration: none;
@@ -2014,6 +2016,7 @@ button[disabled] {
 				cursor: default;
 				color: $btn-disabled-font-color;
 				background-color: $transparent;
+				@extend %no-border;
 			}
 		}
 	}
@@ -2027,13 +2030,13 @@ $var-icons: (
 );
 
 @each $var-icons, $bgimage in $var-icons {
-    .icon-#{$var-icons} {
-    	margin: 0 18px 0 0;
-    	&::before {
-    		background: $bgimage;
-    		@extend %var-icons;
-    	}
-    }
+	.icon-#{$var-icons} {
+		margin: 0 18px 0 0;
+		&::before {
+			background: $bgimage;
+			@extend %var-icons;
+		}
+	}
 }
 
 $form-icon-btn: (
@@ -2043,14 +2046,14 @@ $form-icon-btn: (
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
-    .icon-#{$form-icon-btn} {
-        background: $transparent $bgimage;
-        @extend %form-icon-btn;
+	.icon-#{$form-icon-btn} {
+		background: $transparent $bgimage;
+		@extend %form-icon-btn;
 
-        @if $form-icon-btn == 'wzrd-action' {
-        	margin-top: -16px;
-        }
-    }
+		@if $form-icon-btn == 'wzrd-action' {
+			margin-top: -16px;
+		}
+	}
 }
 
 %form-icon-btn {
@@ -2484,7 +2487,7 @@ $form-icon-btn: (
 .overlay-dialogue {
 	position: absolute;
 	z-index: 1000;
-	padding: 15px;
+	padding: 15px 10px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -2951,9 +2954,9 @@ a.blue {
 
 .progress-bar-bg {
 	padding: 3px 0 2px 0;
-    font-size: $font-h3-size;
-    line-height: 1em;
-    display: inline-block;
+	font-size: $font-h3-size;
+	line-height: 1em;
+	display: inline-block;
 
 	&.green-bg {
 		background-color: darken(desaturate($alt-green, 10%), 16%);
@@ -3009,7 +3012,7 @@ a.blue {
 }
 
 .status-green {
-    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
+	border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
@@ -3274,7 +3277,7 @@ td.inactive-bg {
 	.link-action {
 		position: absolute;
 		top: 7px;
-		left: 15px;
+		left: 10px;
 		margin-bottom: 20px;
 	}
 
@@ -3499,17 +3502,17 @@ $browser-logos: (
 );
 
 @each $browser, $bgimage in $browser-logos {
-    .browser-logo-#{$browser} {
-        background: $bgimage;
-        @extend %browser-logo-style;
-    }
+	.browser-logo-#{$browser} {
+		background: $bgimage;
+		@extend %browser-logo-style;
+	}
 }
 
 %browser-logo-style {
 	width: 66px;
-    height: 66px;
-    margin: 0 auto;
-    margin-bottom: 5px;
+	height: 66px;
+	margin: 0 auto;
+	margin-bottom: 5px;
 }
 
 .browser-warning-container {

@@ -136,12 +136,268 @@ static int	DBpatch_3010013(void)
 
 static int	DBpatch_3010014(void)
 {
+	const ZBX_TABLE table =
+			{"problem", "eventid", 0,
+				{
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"object", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"objectid", "0", NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010015(void)
+{
+	return DBcreate_index("problem", "problem_1", "source,object,objectid", 0);
+}
+
+static int	DBpatch_3010016(void)
+{
+	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("problem", 1, &field);
+}
+
+static int	DBpatch_3010017(void)
+{
+	const ZBX_TABLE table =
+			{"event_recovery", "eventid", 0,
+				{
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"r_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010018(void)
+{
+	return DBcreate_index("event_recovery", "event_recovery_1", "r_eventid", 0);
+}
+
+static int	DBpatch_3010019(void)
+{
+	const ZBX_FIELD field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_recovery", 1, &field);
+}
+
+static int	DBpatch_3010020(void)
+{
+	const ZBX_FIELD field = {"r_eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("event_recovery", 2, &field);
+}
+
+/* DBpatch_301002 () */
+
+#define ZBX_OPEN_EVENT_WARNING_NUM	10000000
+
+/* problem eventids by triggerid */
+typedef struct
+{
+	int			source;
+	int			object;
+	zbx_uint64_t		objectid;
+	zbx_vector_uint64_t	eventids;
+}
+zbx_object_events_t;
+
+
+/* source events hashset support */
+static zbx_hash_t	DBpatch_3010021_trigger_events_hash_func(const void *data)
+{
+	const zbx_object_events_t	*oe = (const zbx_object_events_t *)data;
+
+	zbx_hash_t		hash;
+
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&oe->objectid);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&oe->source, sizeof(oe->source), hash);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&oe->object, sizeof(oe->object), hash);
+
+	return hash;
+}
+
+static int	DBpatch_3010021_trigger_events_compare_func(const void *d1, const void *d2)
+{
+	const zbx_object_events_t	*oe1 = (const zbx_object_events_t *)d1;
+	const zbx_object_events_t	*oe2 = (const zbx_object_events_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(oe1->source, oe2->source);
+	ZBX_RETURN_IF_NOT_EQUAL(oe1->object, oe2->object);
+	ZBX_RETURN_IF_NOT_EQUAL(oe1->objectid, oe2->objectid);
+
+	return 0;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010021_update_event_recovery                            *
+ *                                                                            *
+ * Purpose: set events.r_eventid field with corresponding recovery event id   *
+ *                                                                            *
+ * Parameters: events   - [IN/OUT] unrecovered events indexed by triggerid    *
+ *             eventid  - [IN/OUT] the last processed event id                *
+ *                                                                            *
+ * Return value: SUCCEED - the operation was completed successfully           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint64_t *eventid)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	char			*sql = NULL;
+	size_t			sql_alloc = 4096, sql_offset = 0;
+	int			i, value, ret = FAIL;
+	zbx_object_events_t	*object_events, object_events_local;
+	zbx_db_insert_t		db_insert;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select source,object,objectid,eventid,value"
+			" from events"
+			" where eventid>" ZBX_FS_UI64
+			" order by eventid",
+			*eventid);
+
+	/* process events by 10k large batches */
+	if (NULL == (result = DBselectN(sql, 10000)))
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", NULL);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		object_events_local.source = atoi(row[0]);
+		object_events_local.object = atoi(row[1]);
+
+		/* source: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL */
+		if (0 != atoi(row[0]) && 3 != atoi(row[0]))
+			continue;
+
+		ZBX_STR2UINT64(object_events_local.objectid, row[2]);
+		ZBX_STR2UINT64(*eventid, row[3]);
+		value = atoi(row[4]);
+
+		if (NULL == (object_events = (zbx_object_events_t *)zbx_hashset_search(events, &object_events_local)))
+		{
+			object_events = (zbx_object_events_t *)zbx_hashset_insert(events, &object_events_local,
+					sizeof(object_events_local));
+
+			zbx_vector_uint64_create(&object_events->eventids);
+		}
+
+		if (1 == value)
+		{
+			/* 1 - TRIGGER_VALUE_TRUE (PROBLEM state) */
+
+			zbx_vector_uint64_append(&object_events->eventids, *eventid);
+
+			if (ZBX_OPEN_EVENT_WARNING_NUM == object_events->eventids.values_num)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "too many open problem events by event source:%d,"
+						" object:%d and objectid:" ZBX_FS_UI64, object_events->source,
+						object_events->object, object_events->objectid);
+			}
+		}
+		else
+		{
+			/* 0 - TRIGGER_VALUE_FALSE (OK state) */
+
+			for (i = 0; i < object_events->eventids.values_num; i++)
+				zbx_db_insert_add_values(&db_insert, object_events->eventids.values[i], *eventid);
+
+			zbx_vector_uint64_clear(&object_events->eventids);
+		}
+	}
+	DBfree_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3010021(void)
+{
+	int			i, ret = FAIL;
+	zbx_uint64_t		eventid = 0, old_eventid;
+	zbx_db_insert_t		db_insert;
+	zbx_hashset_t		events;
+	zbx_hashset_iter_t	iter;
+	zbx_object_events_t	*object_events;
+
+	zbx_hashset_create(&events, 1024, DBpatch_3010021_trigger_events_hash_func,
+			DBpatch_3010021_trigger_events_compare_func);
+	zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
+
+	do
+	{
+		old_eventid = eventid;
+
+		if (SUCCEED != DBpatch_3010021_update_event_recovery(&events, &eventid))
+			goto out;
+	}
+	while (eventid != old_eventid);
+
+	/* generate problems from unrecovered events */
+
+	zbx_hashset_iter_reset(&events, &iter);
+	while (NULL != (object_events = (zbx_object_events_t *)zbx_hashset_iter_next(&iter)))
+	{
+		for (i = 0; i < object_events->eventids.values_num; i++)
+		{
+			zbx_db_insert_add_values(&db_insert, object_events->eventids.values[i], object_events->source,
+					object_events->object, object_events->objectid);
+		}
+
+		if (1000 < db_insert.rows.values_num)
+		{
+			if (SUCCEED != zbx_db_insert_execute(&db_insert))
+				goto out;
+
+			zbx_db_insert_clean(&db_insert);
+			zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
+		}
+
+		zbx_vector_uint64_destroy(&object_events->eventids);
+	}
+
+	if (SUCCEED != zbx_db_insert_execute(&db_insert))
+		goto out;
+
+	ret = SUCCEED;
+out:
+	zbx_db_insert_clean(&db_insert);
+	zbx_hashset_destroy(&events);
+
+	return ret;
+}
+
+static int	DBpatch_3010022(void)
+{
 	const ZBX_FIELD	field = {"recovery", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("operations", &field);
 }
 
-static int	DBpatch_3010015(void)
+static int	DBpatch_3010023(void)
 {
 	zbx_db_insert_t	db_insert;
 	DB_ROW		row;
@@ -168,14 +424,14 @@ static int	DBpatch_3010015(void)
 	return ret;
 }
 
-static int	DBpatch_3010016(void)
+static int	DBpatch_3010024(void)
 {
 	return DBdrop_field("actions", "recovery_msg");
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010017_validate_action                                  *
+ * Function: DBpatch_3010025_validate_action                                  *
  *                                                                            *
  * Purpose: checks if the action might match success event                    *
  *                                                                            *
@@ -187,7 +443,7 @@ static int	DBpatch_3010016(void)
  *           is not easy to do, so to be safe failure is returned.            *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_3010017_validate_action(zbx_uint64_t actionid, int eventsource, int evaltype)
+static int	DBpatch_3010025_validate_action(zbx_uint64_t actionid, int eventsource, int evaltype)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
@@ -249,7 +505,7 @@ out:
 	return ret;
 }
 
-static int	DBpatch_3010017(void)
+static int	DBpatch_3010025(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -268,7 +524,7 @@ static int	DBpatch_3010017(void)
 		eventsource = atoi(row[2]);
 		evaltype = atoi(row[3]);
 
-		if (FAIL == DBpatch_3010017_validate_action(actionid, eventsource, evaltype))
+		if (FAIL == DBpatch_3010025_validate_action(actionid, eventsource, evaltype))
 		{
 			zbx_vector_uint64_append(&actionids, actionid);
 			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" was disabled during database upgrade:"
@@ -299,7 +555,20 @@ static int	DBpatch_3010017(void)
 	return ret;
 }
 
-static void	DBpatch_3010018_get_conditionids(zbx_uint64_t actionid, int eventsource,
+/* patch 3010026 */
+
+#define	ZBX_3010026_TOKEN_UNKNOWN	0
+#define	ZBX_3010026_TOKEN_OPEN		1
+#define	ZBX_3010026_TOKEN_CLOSE		2
+#define	ZBX_3010026_TOKEN_AND		3
+#define	ZBX_3010026_TOKEN_OR		4
+#define	ZBX_3010026_TOKEN_VALUE		5
+#define	ZBX_3010026_TOKEN_END		6
+
+#define ZBX_3010026_PARSE_VALUE		0
+#define ZBX_3010026_PARSE_OP		1
+
+static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, int eventsource,
 		zbx_vector_uint64_t *conditionids)
 {
 	DB_ROW		row;
@@ -336,22 +605,9 @@ static void	DBpatch_3010018_get_conditionids(zbx_uint64_t actionid, int eventsou
 	DBfree_result(result);
 }
 
-/* patch 3010018 */
-
-#define	ZBX_3010018_TOKEN_UNKNOWN	0
-#define	ZBX_3010018_TOKEN_OPEN		1
-#define	ZBX_3010018_TOKEN_CLOSE		2
-#define	ZBX_3010018_TOKEN_AND		3
-#define	ZBX_3010018_TOKEN_OR		4
-#define	ZBX_3010018_TOKEN_VALUE		5
-#define	ZBX_3010018_TOKEN_END		6
-
-#define ZBX_3010018_PARSE_VALUE		0
-#define ZBX_3010018_PARSE_OP		1
-
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_skip_whitespace                       *
+ * Function: DBpatch_3010026_expression_skip_whitespace                       *
  *                                                                            *
  * Purpose: skips whitespace characters                                       *
  *                                                                            *
@@ -361,7 +617,7 @@ static void	DBpatch_3010018_get_conditionids(zbx_uint64_t actionid, int eventsou
  * Return value: the position of first non-whitespace character after offset  *
  *                                                                            *
  ******************************************************************************/
-static size_t	DBpatch_3010018_expression_skip_whitespace(const char *expression, size_t offset)
+static size_t	DBpatch_3010026_expression_skip_whitespace(const char *expression, size_t offset)
 {
 	while (' ' == expression[offset])
 		offset++;
@@ -371,7 +627,7 @@ static size_t	DBpatch_3010018_expression_skip_whitespace(const char *expression,
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_get_token                             *
+ * Function: DBpatch_3010026_expression_get_token                             *
  *                                                                            *
  * Purpose: gets the next expression token starting with offset               *
  *                                                                            *
@@ -379,44 +635,44 @@ static size_t	DBpatch_3010018_expression_skip_whitespace(const char *expression,
  *             offset     - [IN] the starting offset in expression            *
  *             token      - [OUT] the token location in expression            *
  *                                                                            *
- * Return value: the token type (see ZBX_3010018_TOKEN_* defines)             *
+ * Return value: the token type (see ZBX_3010026_TOKEN_* defines)             *
  *                                                                            *
  * Comments: The recognized tokens are '(', ')', 'and', 'or' and '{<id>}'.    *                                                                           *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_3010018_expression_get_token(const char *expression, int offset, zbx_strloc_t *token)
+static int	DBpatch_3010026_expression_get_token(const char *expression, int offset, zbx_strloc_t *token)
 {
-	int	ret = ZBX_3010018_TOKEN_UNKNOWN;
+	int	ret = ZBX_3010026_TOKEN_UNKNOWN;
 
-	offset = DBpatch_3010018_expression_skip_whitespace(expression, offset);
+	offset = DBpatch_3010026_expression_skip_whitespace(expression, offset);
 	token->l = offset;
 
 	switch (expression[offset])
 	{
 		case '\0':
 			token->r = offset;
-			ret = ZBX_3010018_TOKEN_END;
+			ret = ZBX_3010026_TOKEN_END;
 			break;
 		case '(':
 			token->r = offset;
-			ret = ZBX_3010018_TOKEN_OPEN;
+			ret = ZBX_3010026_TOKEN_OPEN;
 			break;
 		case ')':
 			token->r = offset;
-			ret = ZBX_3010018_TOKEN_CLOSE;
+			ret = ZBX_3010026_TOKEN_CLOSE;
 			break;
 		case 'o':
 			if ('r' == expression[offset + 1])
 			{
 				token->r = offset + 1;
-				ret = ZBX_3010018_TOKEN_OR;
+				ret = ZBX_3010026_TOKEN_OR;
 			}
 			break;
 		case 'a':
 			if ('n' == expression[offset + 1] && 'd' == expression[offset + 2])
 			{
 				token->r = offset + 2;
-				ret = ZBX_3010018_TOKEN_AND;
+				ret = ZBX_3010026_TOKEN_AND;
 			}
 			break;
 		case '{':
@@ -425,7 +681,7 @@ static int	DBpatch_3010018_expression_get_token(const char *expression, int offs
 			if ('}' == expression[offset])
 			{
 				token->r = offset;
-				ret = ZBX_3010018_TOKEN_VALUE;
+				ret = ZBX_3010026_TOKEN_VALUE;
 			}
 			break;
 	}
@@ -435,7 +691,7 @@ static int	DBpatch_3010018_expression_get_token(const char *expression, int offs
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_validate_value                        *
+ * Function: DBpatch_3010026_expression_validate_value                        *
  *                                                                            *
  * Purpose: checks if the value does not match any filter value               *
  *                                                                            *
@@ -447,7 +703,7 @@ static int	DBpatch_3010018_expression_get_token(const char *expression, int offs
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_3010018_expression_validate_value(const char *expression, zbx_strloc_t *value,
+static int	DBpatch_3010026_expression_validate_value(const char *expression, zbx_strloc_t *value,
 		const zbx_vector_str_t *filter)
 {
 	int	i;
@@ -463,7 +719,7 @@ static int	DBpatch_3010018_expression_validate_value(const char *expression, zbx
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_cut_substring                         *
+ * Function: DBpatch_3010026_expression_cut_substring                         *
  *                                                                            *
  * Purpose: cuts substring from the expression                                *
  *                                                                            *
@@ -471,7 +727,7 @@ static int	DBpatch_3010018_expression_validate_value(const char *expression, zbx
  *             cu         - [IN] the substring location                       *
  *                                                                            *
  ******************************************************************************/
-static void	DBpatch_3010018_expression_cut_substring(char *expression, zbx_strloc_t *cut)
+static void	DBpatch_3010026_expression_cut_substring(char *expression, zbx_strloc_t *cut)
 {
 	if (cut->l <= cut->r)
 		memmove(expression + cut->l, expression + cut->r + 1, strlen(expression + cut->r + 1) + 1);
@@ -479,7 +735,7 @@ static void	DBpatch_3010018_expression_cut_substring(char *expression, zbx_strlo
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_move_location                         *
+ * Function: DBpatch_3010026_expression_move_location                         *
  *                                                                            *
  * Purpose: location by the specified offset                                  *
  *                                                                            *
@@ -487,7 +743,7 @@ static void	DBpatch_3010018_expression_cut_substring(char *expression, zbx_strlo
  *             offset    - [IN] the offset                                    *
  *                                                                            *
  ******************************************************************************/
-static void	DBpatch_3010018_expression_move_location(zbx_strloc_t *location, int offset)
+static void	DBpatch_3010026_expression_move_location(zbx_strloc_t *location, int offset)
 {
 	location->l += offset;
 	location->r += offset;
@@ -495,7 +751,7 @@ static void	DBpatch_3010018_expression_move_location(zbx_strloc_t *location, int
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_remove_values_impl                    *
+ * Function: DBpatch_3010026_expression_remove_values_impl                    *
  *                                                                            *
  * Purpose: removes values specified in filter from the location              *
  *                                                                            *
@@ -507,34 +763,34 @@ static void	DBpatch_3010018_expression_move_location(zbx_strloc_t *location, int
  *               FAIL    - failed to parse expression                         *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_strloc_t *exp_token,
+static int	DBpatch_3010026_expression_remove_values_impl(char *expression, zbx_strloc_t *exp_token,
 		const zbx_vector_str_t *filter)
 {
 	zbx_strloc_t	token, cut_loc, op_token, value_token;
-	int		token_type, cut_value = 0, state = ZBX_3010018_PARSE_VALUE,
-			prevop_type = ZBX_3010018_TOKEN_UNKNOWN;
+	int		token_type, cut_value = 0, state = ZBX_3010026_PARSE_VALUE,
+			prevop_type = ZBX_3010026_TOKEN_UNKNOWN;
 
 	exp_token->r = exp_token->l;
 
-	while (ZBX_3010018_TOKEN_UNKNOWN != (token_type =
-			DBpatch_3010018_expression_get_token(expression, exp_token->r, &token)))
+	while (ZBX_3010026_TOKEN_UNKNOWN != (token_type =
+			DBpatch_3010026_expression_get_token(expression, exp_token->r, &token)))
 	{
 		/* parse value */
-		if (ZBX_3010018_PARSE_VALUE == state)
+		if (ZBX_3010026_PARSE_VALUE == state)
 		{
-			state = ZBX_3010018_PARSE_OP;
+			state = ZBX_3010026_PARSE_OP;
 
-			if (ZBX_3010018_TOKEN_OPEN == token_type)
+			if (ZBX_3010026_TOKEN_OPEN == token_type)
 			{
 				token.l = token.r + 1;
 
-				if (FAIL == DBpatch_3010018_expression_remove_values_impl(expression, &token, filter))
+				if (FAIL == DBpatch_3010026_expression_remove_values_impl(expression, &token, filter))
 					return FAIL;
 
 				if (')' != expression[token.r])
 					return FAIL;
 
-				if (token.r == DBpatch_3010018_expression_skip_whitespace(expression, token.l))
+				if (token.r == DBpatch_3010026_expression_skip_whitespace(expression, token.l))
 					cut_value = 1;
 
 				/* include opening '(' into token */
@@ -545,10 +801,10 @@ static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_s
 
 				continue;
 			}
-			else if (ZBX_3010018_TOKEN_VALUE != token_type)
+			else if (ZBX_3010026_TOKEN_VALUE != token_type)
 				return FAIL;
 
-			if (SUCCEED == DBpatch_3010018_expression_validate_value(expression, &token, filter))
+			if (SUCCEED == DBpatch_3010026_expression_validate_value(expression, &token, filter))
 				cut_value = 1;
 
 			value_token = token;
@@ -558,16 +814,16 @@ static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_s
 		}
 
 		/* parse operator */
-		state = ZBX_3010018_PARSE_VALUE;
+		state = ZBX_3010026_PARSE_VALUE;
 
 		if (1 == cut_value)
 		{
-			if (ZBX_3010018_TOKEN_AND == prevop_type || (ZBX_3010018_TOKEN_OR == prevop_type &&
-					(ZBX_3010018_TOKEN_CLOSE == token_type || ZBX_3010018_TOKEN_END == token_type)))
+			if (ZBX_3010026_TOKEN_AND == prevop_type || (ZBX_3010026_TOKEN_OR == prevop_type &&
+					(ZBX_3010026_TOKEN_CLOSE == token_type || ZBX_3010026_TOKEN_END == token_type)))
 			{
 				cut_loc.l = op_token.l;
 				cut_loc.r = value_token.r;
-				DBpatch_3010018_expression_move_location(&token, -(cut_loc.r - cut_loc.l + 1));
+				DBpatch_3010026_expression_move_location(&token, -(cut_loc.r - cut_loc.l + 1));
 				prevop_type = token_type;
 				op_token = token;
 			}
@@ -575,14 +831,14 @@ static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_s
 			{
 				cut_loc.l = value_token.l;
 
-				if (ZBX_3010018_TOKEN_CLOSE == token_type || ZBX_3010018_TOKEN_END == token_type)
+				if (ZBX_3010026_TOKEN_CLOSE == token_type || ZBX_3010026_TOKEN_END == token_type)
 					cut_loc.r = token.l - 1;
 				else
 					cut_loc.r = token.r;
 
-				DBpatch_3010018_expression_move_location(&token, -(cut_loc.r - cut_loc.l + 1));
+				DBpatch_3010026_expression_move_location(&token, -(cut_loc.r - cut_loc.l + 1));
 			}
-			DBpatch_3010018_expression_cut_substring(expression, &cut_loc);
+			DBpatch_3010026_expression_cut_substring(expression, &cut_loc);
 			cut_value = 0;
 		}
 		else
@@ -591,13 +847,13 @@ static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_s
 			op_token = token;
 		}
 
-		if (ZBX_3010018_TOKEN_CLOSE == token_type || ZBX_3010018_TOKEN_END == token_type)
+		if (ZBX_3010026_TOKEN_CLOSE == token_type || ZBX_3010026_TOKEN_END == token_type)
 		{
 			exp_token->r = token.r;
 			return SUCCEED;
 		}
 
-		if (ZBX_3010018_TOKEN_AND != token_type && ZBX_3010018_TOKEN_OR != token_type)
+		if (ZBX_3010026_TOKEN_AND != token_type && ZBX_3010026_TOKEN_OR != token_type)
 			return FAIL;
 
 		exp_token->r = token.r + 1;
@@ -608,7 +864,7 @@ static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_s
 
 /******************************************************************************
  *                                                                            *
- * Function: DBpatch_3010018_expression_remove_values                         *
+ * Function: DBpatch_3010026_expression_remove_values                         *
  *                                                                            *
  * Purpose: removes values specified in filter from the location              *
  *                                                                            *
@@ -619,18 +875,18 @@ static int	DBpatch_3010018_expression_remove_values_impl(char *expression, zbx_s
  *               FAIL    - failed to parse expression                         *
  *                                                                            *
  ******************************************************************************/
-static int	DBpatch_3010018_expression_remove_values(char *expression, const zbx_vector_str_t *filter)
+static int	DBpatch_3010026_expression_remove_values(char *expression, const zbx_vector_str_t *filter)
 {
 	int		ret;
 	zbx_strloc_t	token = {0};
 
-	if (SUCCEED == (ret = DBpatch_3010018_expression_remove_values_impl(expression, &token, filter)))
+	if (SUCCEED == (ret = DBpatch_3010026_expression_remove_values_impl(expression, &token, filter)))
 		zbx_lrtrim(expression, " ");
 
 	return ret;
 }
 
-static int	DBpatch_3010018(void)
+static int	DBpatch_3010026(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -655,7 +911,7 @@ static int	DBpatch_3010018(void)
 		evaltype = atoi(row[2]);
 
 		index = conditionids.values_num;
-		DBpatch_3010018_get_conditionids(actionid, eventsource, &conditionids);
+		DBpatch_3010026_get_conditionids(actionid, eventsource, &conditionids);
 
 		/* evaltype: 3 - CONDITION_EVAL_TYPE_EXPRESSION */
 		if (3 != evaltype)
@@ -670,7 +926,7 @@ static int	DBpatch_3010018(void)
 		for (i = index; i < conditionids.values_num; i++)
 			zbx_vector_str_append(&filter, zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", conditionids.values[i]));
 
-		if (SUCCEED == DBpatch_3010018_expression_remove_values(formula, &filter))
+		if (SUCCEED == DBpatch_3010026_expression_remove_values(formula, &filter))
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set formula='%s'", formula);
 			if ('\0' == *formula)
@@ -744,5 +1000,13 @@ DBPATCH_ADD(3010015, 0, 1)
 DBPATCH_ADD(3010016, 0, 1)
 DBPATCH_ADD(3010017, 0, 1)
 DBPATCH_ADD(3010018, 0, 1)
+DBPATCH_ADD(3010019, 0, 1)
+DBPATCH_ADD(3010020, 0, 1)
+DBPATCH_ADD(3010021, 0, 1)
+DBPATCH_ADD(3010022, 0, 1)
+DBPATCH_ADD(3010023, 0, 1)
+DBPATCH_ADD(3010024, 0, 1)
+DBPATCH_ADD(3010025, 0, 1)
+DBPATCH_ADD(3010026, 0, 1)
 
 DBPATCH_END()
