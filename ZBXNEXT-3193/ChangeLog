@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+.......PS. [ZBXNEXT-3267] added one minute delay for repeated SNMP trap file error log entries (viktors)
 A.F.....S. [ZBXNEXT-3196] added action option to pause escalations during maintenance (Gunars, wiper)
 A.F....... [ZBXNEXT-178] implemented web scenarios import/export (Sasha)
 A.F.....S. [ZBXNEXT-2087] added trigger and event tags (Gunars, wiper)
@@ -24,6 +25,11 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10794] fixed saving of "Show text as HTML" checkbox in Monitoring->Screens (Cemeris)
+..F....... [ZBX-10504] decreased padding and margins in tables and across the whole UI (Pavel)
+..F....... [ZBX-10504] added compression of generated CSS files to reduce size from 99K to around 56K (asaveljevs, Pavel)
+...GI..... [ZBX-10760] fixed agent, get and sender being erroneously linked against UnixODBC (gleb)
+..F....... [ZBX-10647] removed disabled status for "Export to CSV" button (Ivo)
 ..F....... [ZBX-10679] fixed vertical scrollbar overlapping in messages (Pavel)
 ..F....... [ZBX-10778] fixed users online status in users.php users table (Cemeris, Gunars)
 ..F....... [ZBX-10605] fixed access_deny() message layout for not logged in page visitors (Cemeris)

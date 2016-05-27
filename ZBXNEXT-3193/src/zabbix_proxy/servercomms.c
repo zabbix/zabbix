@@ -85,7 +85,7 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 			{
 				now = (int)time(NULL);
 
-				if (60 <= now - lastlogtime)
+				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
 					lastlogtime = now;

@@ -200,6 +200,8 @@ static int	DBpatch_3010020(void)
 	return DBadd_foreign_key("event_recovery", 2, &field);
 }
 
+/* DBpatch_301002 () */
+
 #define ZBX_OPEN_EVENT_WARNING_NUM	10000000
 
 /* problem eventids by triggerid */
@@ -214,7 +216,7 @@ zbx_object_events_t;
 
 
 /* source events hashset support */
-static zbx_hash_t	trigger_events_hash_func(const void *data)
+static zbx_hash_t	DBpatch_3010021_trigger_events_hash_func(const void *data)
 {
 	const zbx_object_events_t	*oe = (const zbx_object_events_t *)data;
 
@@ -227,7 +229,7 @@ static zbx_hash_t	trigger_events_hash_func(const void *data)
 	return hash;
 }
 
-static int	trigger_events_compare_func(const void *d1, const void *d2)
+static int	DBpatch_3010021_trigger_events_compare_func(const void *d1, const void *d2)
 {
 	const zbx_object_events_t	*oe1 = (const zbx_object_events_t *)d1;
 	const zbx_object_events_t	*oe2 = (const zbx_object_events_t *)d2;
@@ -242,7 +244,7 @@ static int	trigger_events_compare_func(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: update_event_recovery                                            *
+ * Function: DBpatch_3010021_update_event_recovery                            *
  *                                                                            *
  * Purpose: set events.r_eventid field with corresponding recovery event id   *
  *                                                                            *
@@ -253,7 +255,7 @@ static int	trigger_events_compare_func(const void *d1, const void *d2)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	update_event_recovery(zbx_hashset_t *events, zbx_uint64_t *eventid)
+static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint64_t *eventid)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
@@ -341,14 +343,15 @@ static int	DBpatch_3010021(void)
 	zbx_hashset_iter_t	iter;
 	zbx_object_events_t	*object_events;
 
-	zbx_hashset_create(&events, 1024, trigger_events_hash_func, trigger_events_compare_func);
+	zbx_hashset_create(&events, 1024, DBpatch_3010021_trigger_events_hash_func,
+			DBpatch_3010021_trigger_events_compare_func);
 	zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
 
 	do
 	{
 		old_eventid = eventid;
 
-		if (SUCCEED != update_event_recovery(&events, &eventid))
+		if (SUCCEED != DBpatch_3010021_update_event_recovery(&events, &eventid))
 			goto out;
 	}
 	while (eventid != old_eventid);
