@@ -24,6 +24,7 @@
 
 #include "actions.h"
 #include "operations.h"
+#include "events.h"
 
 /******************************************************************************
  *                                                                            *
@@ -1628,35 +1629,71 @@ zbx_escalation_rec_t;
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_recovery_event                                                *
+ *                                                                            *
+ * Purpose: checks if the event is recovery event                             *
+ *                                                                            *
+ * Parameters: event - [IN] the event to check                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is recovery event                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_recovery_event(const DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
+			return SUCCEED;
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (TRIGGER_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_ITEM:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
  *                                                                            *
  * Parameters: events     - [IN] events to apply actions for                  *
  *             events_num - [IN] number of events                             *
+ *             event_recovery - [IN] a vector of (problem eventid, OK event)  *
+ *                                   pairs.                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const DB_EVENT *events, size_t events_num)
+void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t *event_recovery)
 {
 	const char			*__function_name = "process_actions";
 
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_uint64_t			actionid, escalationid;
 	size_t				i;
-	int				j;
-	zbx_vector_uint64_t		rec_actionids;	/* actionids of possible recovery events */
-	zbx_vector_uint64_pair_t	rec_mapping;	/* which action is possibly recovered by which event */
 	const DB_EVENT			*event;
+	int				j;
 	zbx_vector_ptr_t		actions, new_escalations;
 	zbx_hashset_t			rec_escalations;
 	zbx_escalation_new_t		*new_escalation;
 	zbx_escalation_rec_t		*rec_escalation;
+	zbx_uint64_t			escalationid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
-
-	zbx_vector_uint64_create(&rec_actionids);
-	zbx_vector_uint64_pair_create(&rec_mapping);
 
 	zbx_vector_ptr_create(&new_escalations);
 	zbx_hashset_create(&rec_escalations, events_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -1668,6 +1705,10 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 	for (i = 0; i < events_num; i++)
 	{
 		event = &events[i];
+
+		/* OK events can't start escalations - skip them */
+		if (SUCCEED == is_recovery_event(event))
+			continue;
 
 		for (j = 0; j < actions.values_num; j++)
 		{
@@ -1689,106 +1730,67 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 					execute_operations(event, action->actionid);
 				}
 			}
-			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
-			{
-				/* Action conditions evaluated to false, but it could be a recovery */
-				/* event for this action. Remember this and check escalations later. */
-
-				zbx_uint64_pair_t	pair;
-
-				pair.first = action->actionid;
-				pair.second = (zbx_uint64_t)i;
-
-				zbx_vector_uint64_pair_append(&rec_mapping, pair);
-
-				zbx_vector_uint64_append(&rec_actionids, action->actionid);
-			}
 		}
 	}
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
 
-	if (0 != rec_actionids.values_num)
+	if (0 != event_recovery->values_num)
 	{
-		char		*sql = NULL;
-		size_t		sql_alloc = 0, sql_offset = 0;
-		zbx_uint64_t	triggerid, itemid;
+		char			*sql = NULL;
+		size_t			sql_alloc = 0, sql_offset = 0;
+		zbx_vector_uint64_t	eventids;
+		zbx_event_recovery_t	*recovery;
+		DB_ROW			row;
+		DB_RESULT		result;
+		zbx_uint64_t		actionid, eventid;
+		int			i, index;
 
-		zbx_vector_uint64_sort(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_create(&eventids);
 
-		/* list of ongoing escalations matching actionids collected before */
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select actionid,triggerid,itemid,escalationid"
-				" from escalations"
-				" where r_eventid is null"
-					" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid",
-				rec_actionids.values, rec_actionids.values_num);
+		for (i = 0; i < event_recovery->values_num; i++)
+		{
+			recovery = (zbx_event_recovery_t *)event_recovery->values[i];
+			zbx_vector_uint64_append(&eventids, recovery->eventid);
+		}
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid from escalations where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
+
 		result = DBselect("%s", sql);
-		zbx_free(sql);
-
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(actionid, row[0]);
-			ZBX_DBROW2UINT64(triggerid, row[1]);
-			ZBX_DBROW2UINT64(itemid, row[2]);
+			ZBX_STR2UINT64(eventid, row[1]);
 
-			for (j = 0; j < rec_mapping.values_num; j++)
+			if (FAIL == (index = zbx_vector_ptr_bsearch(event_recovery, &eventid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				if (actionid != rec_mapping.values[j].first)
-					continue;
-
-				event = &events[(int)rec_mapping.values[j].second];
-
-				/* only add recovery if it matches event */
-				switch (event->source)
-				{
-					case EVENT_SOURCE_TRIGGERS:
-						if (triggerid != event->objectid)
-							continue;
-						break;
-					case EVENT_SOURCE_INTERNAL:
-						switch (event->object)
-						{
-							case EVENT_OBJECT_TRIGGER:
-								if (triggerid != event->objectid)
-									continue;
-								break;
-							case EVENT_OBJECT_ITEM:
-							case EVENT_OBJECT_LLDRULE:
-								if (itemid != event->objectid)
-									continue;
-								break;
-							default:
-								THIS_SHOULD_NEVER_HAPPEN;
-						}
-
-						break;
-					default:
-						continue;
-				}
-
-				if (NULL == (rec_escalation = zbx_hashset_search(&rec_escalations,
-						&event->eventid)))
-				{
-					zbx_escalation_rec_t	esc_rec_local;
-
-					esc_rec_local.r_eventid = event->eventid;
-					rec_escalation = zbx_hashset_insert(&rec_escalations, &esc_rec_local,
-							sizeof(esc_rec_local));
-
-					zbx_vector_uint64_create(&rec_escalation->escalationids);
-				}
-
-				ZBX_DBROW2UINT64(escalationid, row[3]);
-				zbx_vector_uint64_append(&rec_escalation->escalationids, escalationid);
-
-				break;
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
 			}
+
+			recovery = event_recovery->values[index];
+
+			if (NULL == (rec_escalation = zbx_hashset_search(&rec_escalations, &event->eventid)))
+			{
+				zbx_escalation_rec_t	esc_rec_local;
+
+				esc_rec_local.r_eventid = event->eventid;
+				rec_escalation = zbx_hashset_insert(&rec_escalations, &esc_rec_local,
+						sizeof(esc_rec_local));
+
+				zbx_vector_uint64_create(&rec_escalation->escalationids);
+			}
+
+			ZBX_DBROW2UINT64(escalationid, row[3]);
+			zbx_vector_uint64_append(&rec_escalation->escalationids, escalationid);
+
 		}
 		DBfree_result(result);
+		zbx_free(sql);
+		zbx_vector_uint64_destroy(&eventids);
 	}
 
 	if (0 != new_escalations.values_num)
@@ -1856,9 +1858,6 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 
 	zbx_hashset_destroy(&rec_escalations);
 	zbx_vector_ptr_destroy(&new_escalations);
-
-	zbx_vector_uint64_pair_destroy(&rec_mapping);
-	zbx_vector_uint64_destroy(&rec_actionids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
