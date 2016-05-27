@@ -1028,10 +1028,19 @@ static int	global_regexp_exists(const char *name)
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
-	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
-	char		*encoding_uc = NULL;
-	int		rate, ret = FAIL, s_count, p_count;
+	AGENT_REQUEST		request;
+	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
+	char			*encoding_uc = NULL, *max_delay_str;
+	int			rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr,
+				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
+	zbx_uint64_t		lastlogsize_orig;
+	float			max_delay;
+	struct st_logfile	*logfiles_new = NULL;
+
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
+		is_count_item = 1;
+	else
+		is_count_item = 0;
 
 	init_request(&request);
 
@@ -1047,7 +1056,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	if (6 < get_rparams_num(&request))
+	if (7 < get_rparams_num(&request) || (1 == is_count_item && 6 < get_rparams_num(&request)))
 	{
 		*error = zbx_strdup(*error, "Too many parameters.");
 		goto out;
@@ -1080,11 +1089,18 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		encoding = encoding_uc;
 	}
 
+	/* parameter 3 is <maxlines> for log[], logrt[], but <maxproclines> for log.count[], logrt.count[] */
+
 	if (NULL == (maxlines_persec = get_rparam(&request, 3)) || '\0' == *maxlines_persec)
 	{
-		rate = CONFIG_MAX_LINES_PER_SECOND;
+		if (0 == is_count_item)
+			rate = CONFIG_MAX_LINES_PER_SECOND;	/* log[], logrt[] */
+		else
+			rate = 4 * CONFIG_MAX_LINES_PER_SECOND;	/* log.count[], logrt.count[] */
 	}
-	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
+	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) ||
+			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
+			(1 == is_count_item && 4 * MAX_VALUE_LINES < rate))
 	{
 		*error = zbx_strdup(*error, "Invalid fourth parameter.");
 		goto out;
@@ -1100,8 +1116,27 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	if (NULL == (template = get_rparam(&request, 5)))
+	/* parameter 5 is <output> for log[], logrt[], but <maxdelay> for log.count[], logrt.count[] */
+
+	if (1 == is_count_item || (NULL == (template = get_rparam(&request, 5))))
 		template = "";
+
+	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
+
+	if (0 == is_count_item)
+		max_delay_par_nr = 6;				/* log[], logrt[] */
+	else
+		max_delay_par_nr = 5;				/* log.count[], logrt.count[] */
+
+	if (NULL == (max_delay_str = get_rparam(&request, max_delay_par_nr)) || '\0' == *max_delay_str)
+	{
+		max_delay = 0.0f;
+	}
+	else if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay = atof(max_delay_str)))
+	{
+		*error = zbx_strdup(*error, "Invalid seventh parameter.");
+		goto out;
+	}
 
 	/* do not flood Zabbix server if file grows too fast */
 	s_count = rate * metric->refresh;
@@ -1125,7 +1160,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		/* suppress first two errors */
 		if (3 > metric->error_count)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt) processing error #%d: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt)(.count) processing error #%d: %s",
 					metric->error_count, NULL != *error ? *error : "unknown error");
 
 			zbx_free(*error);
