@@ -98,6 +98,7 @@
 		<replace file="frontends/php/tests/bootstrap.php" token="{HOST}" value="${host}"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_DIR}" value="${screenshot_dir}"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{SCREENSHOT_URL}" value="${screenshot_url}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{BASEDIR}" value="${basedir}"/>
 	</target>
 
 	<target name="create-configs" depends="init-common">
