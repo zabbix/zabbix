@@ -22,14 +22,7 @@ $widget = (new CWidget())
 	->setTitle(_('Images'))
 	->setControls((new CForm())
 		->cleanItems()
-		->addItem(
-			(new CList())
-				->addItem(makeAdministrationGeneralMenu('adm.images.php'))
-				->addItem([_('Type'), SPACE, new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
-					IMAGE_TYPE_ICON => _('Icon'),
-					IMAGE_TYPE_BACKGROUND => _('Background')])
-				])
-		)
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.images.php')))
 	);
 
 $imageForm = (new CForm('post', null, 'multipart/form-data'))
