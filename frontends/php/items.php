@@ -445,49 +445,65 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		$item = [
-			'name' => getRequest('name'),
-			'description' => getRequest('description'),
-			'key_' => getRequest('key'),
-			'hostid' => getRequest('hostid'),
-			'history' => getRequest('history'),
-			'status' => getRequest('status', ITEM_STATUS_DISABLED),
-			'type' => getRequest('type'),
-			'snmp_community' => getRequest('snmp_community'),
-			'snmp_oid' => getRequest('snmp_oid'),
-			'value_type' => getRequest('value_type'),
-			'trapper_hosts' => getRequest('trapper_hosts'),
-			'port' => getRequest('port'),
-			'units' => getRequest('units'),
-			'multiplier' => getRequest('multiplier', 0),
-			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula', '1'),
-			'logtimefmt' => getRequest('logtimefmt'),
-			'delay_flex' => $delay_flex,
-			'username' => getRequest('username'),
-			'password' => getRequest('password'),
-			'publickey' => getRequest('publickey'),
-			'privatekey' => getRequest('privatekey'),
-			'params' => getRequest('params'),
-			'ipmi_sensor' => getRequest('ipmi_sensor')
-		];
+		if (hasRequest('update')) {
+			$itemid = getRequest('itemid');
+			$db_item = get_item_by_itemid_limited($itemid);
+			$db_item['applications'] = get_applications_by_itemid($itemid);
+		}
+
+		$item = ['status' => getRequest('status', ITEM_STATUS_DISABLED)];
+
+		if (hasRequest('add') || hasRequest('update') && $db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			$item += [
+				'description' => getRequest('description'),
+				'hostid' => getRequest('hostid'),
+				'interfaceid' => getRequest('interfaceid', 0),
+				'delay' => getRequest('delay'),
+				'history' => getRequest('history'),
+				'snmp_community' => getRequest('snmp_community'),
+				'trapper_hosts' => getRequest('trapper_hosts'),
+				'port' => getRequest('port'),
+				'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+				'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+				'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+				'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+				'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+				'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+				'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
+				'trends' => getRequest('trends'),
+				'delay_flex' => $delay_flex,
+				'authtype' => getRequest('authtype'),
+				'username' => getRequest('username'),
+				'password' => getRequest('password'),
+				'publickey' => getRequest('publickey'),
+				'privatekey' => getRequest('privatekey'),
+				'params' => getRequest('params'),
+				'applications' => $applications,
+				'inventory_link' => getRequest('inventory_link')
+			];
+
+			if (hasRequest('add') || hasRequest('update') && $db_item['templateid'] == 0) {
+				// Item is not templated.
+				$item += [
+					'name' => getRequest('name'),
+					'type' => getRequest('type'),
+					'key_' => getRequest('key'),
+					'snmp_oid' => getRequest('snmp_oid'),
+					'ipmi_sensor' => getRequest('ipmi_sensor'),
+					'value_type' => getRequest('value_type'),
+					'data_type' => getRequest('data_type'),
+					'units' => getRequest('units'),
+					'multiplier' => getRequest('multiplier', 0),
+					'formula' => getRequest('formula', '1'),
+					'logtimefmt' => getRequest('logtimefmt'),
+					'delta' => getRequest('delta'),
+					'valuemapid' => getRequest('valuemapid')
+				];
+			}
+		}
 
 		if (hasRequest('update')) {
-			$itemId = getRequest('itemid');
-
-			$dbItem = get_item_by_itemid_limited($itemId);
-			$dbItem['applications'] = get_applications_by_itemid($itemId);
-
-			if ($dbItem['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$item['interfaceid'] = getRequest('interfaceid', 0);
-				$item['delta'] = getRequest('delta');
-				$item['snmpv3_securitylevel'] = getRequest('snmpv3_securitylevel');
-				$item['snmpv3_authprotocol'] = getRequest('snmpv3_authprotocol');
-				$item['snmpv3_privprotocol'] = getRequest('snmpv3_privprotocol');
-
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				// unset snmpv3 fields
 				if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 					$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
@@ -496,35 +512,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				elseif ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
 					$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
 				}
-
-				$item['authtype'] = getRequest('authtype');
-				$item['applications'] = $applications;
-				$item['delay'] = getRequest('delay');
-				$item['trends'] = getRequest('trends');
-				$item['data_type'] = getRequest('data_type');
-				$item['valuemapid'] = getRequest('valuemapid');
-				$item['inventory_link'] = getRequest('inventory_link');
 			}
 
-			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
-			$item['itemid'] = $itemId;
+			$item = CArrayHelper::unsetEqualValues($item, $db_item);
+			$item['itemid'] = $itemid;
 
 			$result = API::Item()->update($item);
 		}
 		else {
-			$item['interfaceid'] = getRequest('interfaceid', 0);
-			$item['delta'] = getRequest('delta');
-			$item['snmpv3_securitylevel'] = getRequest('snmpv3_securitylevel');
-			$item['snmpv3_authprotocol'] = getRequest('snmpv3_authprotocol');
-			$item['snmpv3_privprotocol'] = getRequest('snmpv3_privprotocol');
-			$item['authtype'] = getRequest('authtype');
-			$item['applications'] = $applications;
-			$item['delay'] = getRequest('delay');
-			$item['trends'] = getRequest('trends');
-			$item['data_type'] = getRequest('data_type');
-			$item['valuemapid'] = getRequest('valuemapid');
-			$item['inventory_link'] = getRequest('inventory_link');
-
 			$result = API::Item()->create($item);
 		}
 	}
@@ -759,7 +754,6 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 							'ipmi_sensor' => getRequest('ipmi_sensor'),
 							'applications' => $applications,
 							'data_type' => getRequest('data_type'),
-							'itemid' => $itemid
 						];
 					}
 

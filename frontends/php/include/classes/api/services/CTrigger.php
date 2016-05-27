@@ -616,7 +616,7 @@ class CTrigger extends CTriggerGeneral {
 	 * @param array		$triggerids			Trigger IDs.
 	 * @param bool		$nopermissions		If set to true permissions will not be checked.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateDelete(array $triggerids, $nopermissions) {
 		if (!$triggerids) {
