@@ -292,7 +292,8 @@ $recovery_expression_row = [
 			'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 				'&dstfld1='.$data['recovery_expression_field_name'].
 				'&srctbl='.$data['recovery_expression_field_name'].'&srcfld1='.$data['recovery_expression_field_name'].
-				'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].'"]\').val()));'
+				'&expression="+encodeURIComponent(jQuery(\'[name="'.$data['recovery_expression_field_name'].
+				'"]\').val()));'
 		)
 		->setEnabled(!$readonly)
 ];
