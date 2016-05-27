@@ -1646,6 +1646,47 @@ static void	escalation_add_values(zbx_db_insert_t *db_insert, int escalations_nu
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_recovery_event                                                *
+ *                                                                            *
+ * Purpose: checks if the event is recovery event                             *
+ *                                                                            *
+ * Parameters: event - [IN] the event to check                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is recovery event                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_recovery_event(const DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
+			return SUCCEED;
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (TRIGGER_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_ITEM:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
@@ -1676,29 +1717,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 		event = &events[i];
 
 		/* OK events can't start escalations - skip them */
-		if (EVENT_SOURCE_TRIGGERS == event->source)
-		{
-			if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
-				continue;
-		}
-		else if (EVENT_SOURCE_INTERNAL == event->source)
-		{
-			switch (event->object)
-			{
-				case EVENT_OBJECT_TRIGGER:
-					if (TRIGGER_STATE_NORMAL == event->value)
-						continue;
-					break;
-				case EVENT_OBJECT_ITEM:
-					if (ITEM_STATE_NORMAL == event->value)
-						continue;
-					break;
-				case EVENT_OBJECT_LLDRULE:
-					if (ITEM_STATE_NORMAL == event->value)
-						continue;
-					break;
-			}
-		}
+		if (SUCCEED == is_recovery_event(event))
+			continue;
 
 		for (j = 0; j < actions.values_num; j++)
 		{
