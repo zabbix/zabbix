@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Zabbix" default="build" basedir=".">
-	<property name="basedir" value="${WORKSPACE}"/>
 	<property name="dbenable" value="${DBENABLE}"/>
 	<property name="dbtype" value="${DBTYPE}"/>
 	<property name="dbhost" value="${DBHOST}"/>
@@ -15,6 +14,8 @@
 	<property name="screenshot_url" value="${SCREENSHOT_URL}"/>
 
 	<target name="buildagent">
+		<antcall target="killagent"/>
+
 		<!-- Build agent binaries -->
 		<exec executable="./configure" failonerror="on">
 			<arg value="--enable-agent"/>
@@ -32,6 +33,8 @@
 	</target>
 
 	<target name="buildserver">
+		<antcall target="killserver"/>
+
 		<!-- Build server binaries -->
 		<exec executable="./configure" failonerror="on">
 			<arg value="--enable-server"/>
@@ -254,8 +257,8 @@
 		</exec>
 	</target>
 
-	<target name="build-mysql" depends="killdaemons,init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
-	<target name="build-postgresql" depends="killdaemons,init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
+	<target name="build-mysql" depends="init-mysql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
+	<target name="build-postgresql" depends="init-postgresql,runagent,runserver,buildproxy,sleep5m,killdaemons,test-frontend" />
 
 	<!-- Default target -->
 	<target name="build" depends="build-mysql,build-postgresql" />
