@@ -1025,6 +1025,28 @@ static int	global_regexp_exists(const char *name)
 	return (i == regexps.values_num ? FAIL : SUCCEED);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: destroy_logfile_list                                             *
+ *                                                                            *
+ * Purpose: release resources allocated to a logfile list                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     logfiles     - [IN/OUT] pointer to the list of logfiles                *
+ *     logfiles_num - [IN/OUT] number of elements in the list                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_num)
+{
+	int	i;
+
+	for (i = 0; i < *logfiles_num; i++)
+		zbx_free((*logfiles)[i].filename);
+
+	*logfiles_num = 0;
+	zbx_free(*logfiles);
+}
+
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
