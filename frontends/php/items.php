@@ -717,56 +717,68 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 		$items_to_update = [];
 
 		if ($items) {
+			$item = [];
+			$discovered_item = [];
+
 			foreach ($itemids as $itemid) {
 				if (array_key_exists($itemid, $items)) {
 					if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-						$item = [
-							'interfaceid' => getRequest('interfaceid'),
-							'description' => getRequest('description'),
-							'delay' => getRequest('delay'),
-							'history' => getRequest('history'),
-							'type' => getRequest('type'),
-							'snmp_community' => getRequest('snmp_community'),
-							'snmp_oid' => getRequest('snmp_oid'),
-							'value_type' => getRequest('value_type'),
-							'trapper_hosts' => getRequest('trapper_hosts'),
-							'port' => getRequest('port'),
-							'units' => getRequest('units'),
-							'multiplier' => $multiplier,
-							'delta' => getRequest('delta'),
-							'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-							'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-							'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-							'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-							'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-							'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-							'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-							'formula' => $formula,
-							'trends' => getRequest('trends'),
-							'logtimefmt' => getRequest('logtimefmt'),
-							'valuemapid' => getRequest('valuemapid'),
-							'delay_flex' => $delay_flex,
-							'authtype' => getRequest('authtype'),
-							'username' => getRequest('username'),
-							'password' => getRequest('password'),
-							'publickey' => getRequest('publickey'),
-							'privatekey' => getRequest('privatekey'),
-							'ipmi_sensor' => getRequest('ipmi_sensor'),
-							'applications' => $applications,
-							'data_type' => getRequest('data_type'),
-						];
-					}
+						if (!$item) {
+							$item = [
+								'interfaceid' => getRequest('interfaceid'),
+								'description' => getRequest('description'),
+								'delay' => getRequest('delay'),
+								'history' => getRequest('history'),
+								'type' => getRequest('type'),
+								'snmp_community' => getRequest('snmp_community'),
+								'snmp_oid' => getRequest('snmp_oid'),
+								'value_type' => getRequest('value_type'),
+								'trapper_hosts' => getRequest('trapper_hosts'),
+								'port' => getRequest('port'),
+								'units' => getRequest('units'),
+								'multiplier' => $multiplier,
+								'delta' => getRequest('delta'),
+								'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+								'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+								'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+								'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+								'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+								'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+								'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
+								'formula' => $formula,
+								'trends' => getRequest('trends'),
+								'logtimefmt' => getRequest('logtimefmt'),
+								'valuemapid' => getRequest('valuemapid'),
+								'delay_flex' => $delay_flex,
+								'authtype' => getRequest('authtype'),
+								'username' => getRequest('username'),
+								'password' => getRequest('password'),
+								'publickey' => getRequest('publickey'),
+								'privatekey' => getRequest('privatekey'),
+								'ipmi_sensor' => getRequest('ipmi_sensor'),
+								'applications' => $applications,
+								'data_type' => getRequest('data_type'),
+								'status' => getRequest('status')
+							];
 
-					$item['status'] = getRequest('status');
-					$item['itemid'] = $itemid;
-
-					foreach ($item as $key => $field) {
-						if ($field === null) {
-							unset($item[$key]);
+							foreach ($item as $key => $field) {
+								if ($field === null) {
+									unset($item[$key]);
+								}
+							}
 						}
-					}
 
-					$items_to_update[] = $item;
+						$item['itemid'] = $itemid;
+						$items_to_update[] = $item;
+					}
+					else {
+						if (!$discovered_item && hasRequest('status')) {
+							$discovered_item = ['status' => getRequest('status')];
+						}
+
+						$discovered_item['itemid'] = $itemid;
+						$items_to_update[] = $discovered_item;
+					}
 				}
 			}
 		}
