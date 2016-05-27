@@ -85,11 +85,9 @@
 		});
 		toggleAdvancedLabels();
 
-		$(inputs)
-			.change(function() {
-				$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
-			})
-			.change();
+		$(inputs).change(function() {
+			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
+		});
 
 		// clone button
 		$('#clone').click(function() {
