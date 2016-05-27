@@ -40,6 +40,10 @@ struct	st_logfile
 	md5_byte_t	md5buf[MD5_DIGEST_SIZE];	/* md5 sum of the initial part of the file */
 };
 
+typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
+		unsigned char, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
+		unsigned char);
+
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int *logfiles_num_old,
