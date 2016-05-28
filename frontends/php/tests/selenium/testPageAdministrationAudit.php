@@ -80,77 +80,6 @@ class testPageAdministrationAudit extends CWebTest {
 
 	}
 
-	public static function allLogsForLoginUser() {
-		return DBdata(
-				'SELECT a.clock,u.alias,a.ip,u.userid'.
-				' FROM auditlog a,users u'.
-				' WHERE u.userid=a.userid'.
-					' AND a.action=3'.
-					' AND resourcetype=0'.
-				' LIMIT 1'
-		);
-	}
-
-	/**
-	* @dataProvider allLogsForLoginUser
-	*/
-	public function testPageAdministrationAudit_LoginUser($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->input_type('alias', '');
-		$this->zbxTestDropdownSelect('action', 'Login');
-		$this->zbxTestDropdownSelect('resourcetype', 'User');
-
-		$this->zbxTestClickWait('filter');
-
-		$time = $auditlog['clock'];
-		$today = date('d M Y H:i:s', $time);
-		$ip = $auditlog['ip'];
-		$user = $auditlog['alias'];
-
-		$this->zbxTestTextPresent(array($today, $user, $ip, 'User', 'Login', $auditlog['userid']));
-	}
-
-	public static function allLogsForLogoutUser() {
-		return DBdata(
-				'SELECT a.clock,u.alias,a.ip'.
-				' FROM auditlog a,users u'.
-				' WHERE u.userid=a.userid'.
-					" AND u.alias='Admin'".
-					' AND a.action=4'.
-					' AND resourcetype=0'.
-				' LIMIT 1'
-		);
-	}
-
-	/**
-	* @dataProvider allLogsForLogoutUser
-	*/
-	public function testPageAdministrationAudit_LogoutUser($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Logout');
-		$this->zbxTestDropdownSelect('resourcetype', 'User');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-
-		$today = date('d M Y H:i:s', $time);
-		$this->zbxTestTextPresent(array($today, 'Admin', $ip, 'User', 'Logout'));
-	}
-
 	public static function allLogsForAddUser() {
 		return DBdata(
 			'SELECT a.clock,u.alias,a.ip,a.details'.
@@ -916,79 +845,6 @@ class testPageAdministrationAudit extends CWebTest {
 
 	}
 
-	public static function allLogsForUpdateTrigger() {
-		// return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=1 AND a.resourcetype=13 LIMIT 1");
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details, ad.field_name, ad.oldvalue, ad.newvalue FROM auditlog a, auditlog_details ad, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=1 AND a.resourcetype=13 AND ad.field_name='description' AND ad.auditid= a.auditid LIMIT 1");
-
-	}
-
-	/**
-	* @dataProvider allLogsForUpdateTrigger
-	*/
-	public function testPageAdministrationAudit_UpdateTrigger($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Update');
-		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		//$details = $auditlog['details'];
-		$details = '.'.$auditlog['field_name'].': '.$auditlog['oldvalue'].' => '.$auditlog['newvalue'];
-		$today = date('d M Y H:i:s', $time);
-
-		//$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], $auditlog['resourcename']));
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Updated', $auditlog['resourceid'], "$details"));
-
-	}
-
-	public static function allLogsForDeleteTrigger() {
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=2 AND a.resourcetype=13 LIMIT 1");
-	}
-
-	/**
-	* @dataProvider allLogsForDeleteTrigger
-	*/
-	public function testPageAdministrationAudit_DeleteTrigger($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Delete');
-		$this->zbxTestDropdownSelect('resourcetype', 'Trigger');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		$details = $auditlog['details'];
-		$today = date('d M Y H:i:s', $time);
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Trigger', 'Deleted', $auditlog['resourceid'], 'updated'));
-
-	}
-
 	public static function allLogsForDisableTrigger() {
 		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=1 AND a.resourcetype=13 LIMIT 1");
 	}
@@ -1677,39 +1533,6 @@ class testPageAdministrationAudit extends CWebTest {
 
 	}
 
-	public static function allLogsForDeleteMacro() {
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=2 AND a.resourcetype=29 AND a.auditid=537 LIMIT 1");
-	}
-
-	/**
-	* @dataProvider allLogsForDeleteMacro
-	*/
-	public function testPageAdministrationAudit_DeleteMacro($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Delete');
-		$this->zbxTestDropdownSelect('resourcetype', 'Macro');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		$today = date('d M Y H:i:s', $time);
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Macro', 'Deleted', $auditlog['resourceid'], 'Array ⇒ xyz', ''));
-
-	}
-
 	public static function allLogsForAddMaintenance() {
 		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=0 AND a.resourcetype=27 LIMIT 1");
 	}
@@ -2081,107 +1904,6 @@ class testPageAdministrationAudit extends CWebTest {
 
 	}
 
-	public static function allLogsForAddRegexp() {
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=0 AND a.resourcetype=28 LIMIT 1");
-	}
-
-	/**
-	* @dataProvider allLogsForAddRegexp
-	*/
-	public function testPageAdministrationAudit_AddRegexp ($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Add');
-		$this->zbxTestDropdownSelect('resourcetype', 'Regular expression');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		$today = date('d M Y H:i:s', $time);
-
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Regular expression', 'Added', $auditlog['resourceid'], '', $auditlog['details']));
-
-	}
-
-	public static function allLogsForUpdateRegexp() {
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=1 AND a.resourcetype=28 LIMIT 1");
-	}
-
-	/**
-	* @dataProvider allLogsForUpdateRegexp
-	*/
-	public function testPageAdministrationAudit_UpdateRegexp($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Update');
-		$this->zbxTestDropdownSelect('resourcetype', 'Regular expression');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		$today = date('d M Y H:i:s', $time);
-
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Regular expression', 'Updated', $auditlog['resourceid'], '', $auditlog['details']));
-
-	}
-
-	public static function allLogsForDeleteRegexp() {
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=2 AND a.resourcetype=28 LIMIT 1");
-	}
-
-	/**
-	* @dataProvider allLogsForDeleteRegexp
-	*/
-	public function testPageAdministrationAudit_DeleteRegexp($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Delete');
-		$this->zbxTestDropdownSelect('resourcetype', 'Regular expression');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		$today = date('d M Y H:i:s', $time);
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Regular expression', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
-
-	}
-
 	public static function allLogsForAddScenario() {
 		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=0 AND a.resourcetype=22 LIMIT 1");
 	}
@@ -2319,39 +2041,6 @@ class testPageAdministrationAudit extends CWebTest {
 		$today = date('d M Y H:i:s', $time);
 		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', "$details"));
 		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Updated', $auditlog['resourceid'], '', 'Scenario activated'));
-
-	}
-
-	public static function allLogsForDeleteScenario() {
-		return DBdata("SELECT a.auditid, a.clock, u.alias, a.ip, a.resourcetype, a.action, a.resourceid, a.resourcename, a.details FROM auditlog a, users u WHERE u.userid=a.userid AND u.alias='Admin' AND a.action=2 AND a.resourcetype=22 LIMIT 1");
-	}
-
-	/**
-	* @dataProvider allLogsForDeleteScenario
-	*/
-	public function testPageAdministrationAudit_DeleteScenario($auditlog) {
-		$this->zbxTestLogin('auditlogs.php?period=3600&stime='.date('YmdHis', $auditlog['clock'] - 1800));
-		$this->checkTitle('Audit logs');
-		$this->assertElementPresent('config');
-
-		$this->zbxTestTextPresent('AUDIT LOGS');
-		$this->zbxTestTextPresent('LOGS');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
-
-		$this->assertElementPresent('alias');
-		$this->assertElementPresent('btn1');
-
-		$this->input_type('alias', 'Admin');
-		$this->zbxTestDropdownSelect('action', 'Delete');
-		$this->zbxTestDropdownSelect('resourcetype', 'Scenario');
-
-		$this->zbxTestClickWait('filter');
-
-		$ip = $auditlog['ip'];
-		$alias = $auditlog['alias'];
-		$time = $auditlog['clock'];
-		$today = date('d M Y H:i:s', $time);
-		$this->zbxTestTextPresent(array("$today", 'Admin', "$ip", 'Scenario', 'Deleted', $auditlog['resourceid'], '', $auditlog['details']));
 
 	}
 
