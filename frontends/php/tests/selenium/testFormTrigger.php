@@ -32,9 +32,6 @@ class testFormTrigger extends CWebTest {
 		DBsave_tables('triggers');
 	}
 
-	/**
-	 * @dataProvider itemTypes
-	 */
 	public function testFormTrigger_CheckLayout() {
 
 		$this->zbxTestLogin('triggers.php');
