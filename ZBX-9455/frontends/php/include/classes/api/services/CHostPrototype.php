@@ -168,7 +168,7 @@ class CHostPrototype extends CHostBase {
 		return [
 			'validators' => [
 				'host' => new CLldMacroStringValidator([
-					'maxLength' => 64,
+					'maxLength' => 128,
 					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
 					'messageEmpty' => _('Empty host.'),
 					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
