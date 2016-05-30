@@ -53,13 +53,12 @@ $fields = [
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]), null],
 	'def_shortdata' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'def_longdata' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'recovery_msg' =>			[T_ZBX_INT, O_OPT, null,	null,		null],
 	'r_shortdata' =>			[T_ZBX_STR, O_OPT, null,	null,
-									'isset({recovery_msg}) && (isset({add}) || isset({update}))',
+									'isset({add}) || isset({update})',
 									_('Recovery subject')
 								],
 	'r_longdata' =>				[T_ZBX_STR, O_OPT, null,	null,
-									'isset({recovery_msg}) && (isset({add}) || isset({update}))',
+									'isset({add}) || isset({update})',
 									_('Recovery message')
 								],
 	'g_actionid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
@@ -130,7 +129,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'esc_period' => getRequest('esc_period', 0),
 		'def_shortdata' => getRequest('def_shortdata', ''),
 		'def_longdata' => getRequest('def_longdata', ''),
-		'recovery_msg' => getRequest('recovery_msg', 0),
 		'r_shortdata' => getRequest('r_shortdata', ''),
 		'r_longdata' => getRequest('r_longdata', ''),
 		'operations' => getRequest('operations', [])
@@ -348,7 +346,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			break;
 	}
 
-	if (API::Action()->validateOperationsIntegrity($new_operation)) {
+	if (API::Action()->validateOperationsIntegrity($new_operation, ACTION_OPERATION)) {
 		$_REQUEST['operations'] = getRequest('operations', []);
 
 		$uniqOperations = [
@@ -523,7 +521,6 @@ if (hasRequest('form')) {
 		$data['action']['name'] = getRequest('name');
 		$data['action']['esc_period'] = getRequest('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
-		$data['action']['recovery_msg'] = getRequest('recovery_msg', 0);
 		$data['action']['operations'] = getRequest('operations', []);
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
@@ -574,12 +571,6 @@ if (hasRequest('form')) {
 				'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 				'operator' => CONDITION_OPERATOR_NOT_IN,
 				'value' => ''
-			],
-			[
-				'formulaid' => 'B',
-				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-				'operator' => CONDITION_OPERATOR_EQUAL,
-				'value' => TRIGGER_VALUE_TRUE
 			]
 		];
 	}

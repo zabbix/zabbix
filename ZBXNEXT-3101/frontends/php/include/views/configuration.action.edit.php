@@ -50,9 +50,6 @@ $actionFormList = (new CFormList())
 	);
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$actionFormList->addRow(_('Recovery message'),
-		(new CCheckBox('recovery_msg'))->setChecked($this->data['action']['recovery_msg'] == 1)
-	);
 	$actionFormList->addRow(_('Recovery subject'),
 		(new CTextBox('r_shortdata', $this->data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -234,14 +231,6 @@ switch ($this->data['new_condition']['conditiontype']) {
 
 	case CONDITION_TYPE_TRIGGER_NAME:
 		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-		break;
-
-	case CONDITION_TYPE_TRIGGER_VALUE:
-		$triggerValues = [];
-		foreach ([TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE] as $triggerValue) {
-			$triggerValues[$triggerValue] = trigger_value2str($triggerValue);
-		}
-		$condition = new CComboBox('new_condition[value]', null, null, $triggerValues);
 		break;
 
 	case CONDITION_TYPE_TIME_PERIOD:
