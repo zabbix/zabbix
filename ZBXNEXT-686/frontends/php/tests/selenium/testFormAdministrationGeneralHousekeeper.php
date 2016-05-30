@@ -24,162 +24,151 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 	public function testFormAdministrationGeneralHousekeeper_CheckLayout() {
 		$this->zbxTestLogin('adm.housekeeper.php');
-		$this->assertElementPresent('configDropDown');
+		$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
 
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
-		$this->zbxTestTextPresent(['CONFIGURATION OF HOUSEKEEPING', 'Housekeeping']);
+		$this->zbxTestCheckHeader('Housekeeping');
 
 		// events and alerts
 
 		$this->zbxTestTextPresent('Events and alerts');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
-		$this->assertVisible('hk_events_mode');
-		$this->assertAttribute("//input[@id='hk_events_mode']/@checked", 'checked');
+		$this->assertVisible(WebDriverBy::id('hk_events_mode'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('hk_events_mode'));
 
 		$this->zbxTestTextPresent('Trigger data storage period (in days)');
-		$this->assertVisible('hk_events_trigger');
-		$this->assertAttribute("//input[@id='hk_events_trigger']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_events_trigger']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_events_trigger']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_trigger']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_events_trigger'));
+		$this->zbxAssertAttribute("//input[@id='hk_events_trigger']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_events_trigger']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_events_trigger'][@disabled]"));
 
 		$this->zbxTestTextPresent('Internal data storage period (in days)');
-		$this->assertVisible('hk_events_internal');
-		$this->assertAttribute("//input[@id='hk_events_internal']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_events_internal']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_events_internal']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_internal']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_events_internal'));
+		$this->zbxAssertAttribute("//input[@id='hk_events_internal']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_events_internal']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_events_internal'][@disabled]"));
 
 		$this->zbxTestTextPresent('Network discovery data storage period (in days)');
-		$this->assertVisible('hk_events_discovery');
-		$this->assertAttribute("//input[@id='hk_events_discovery']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_events_discovery']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_events_discovery']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_discovery']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_events_discovery'));
+		$this->zbxAssertAttribute("//input[@id='hk_events_discovery']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_events_discovery']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_events_discovery'][@disabled]"));
 
 		$this->zbxTestTextPresent('Auto-registration data storage period (in days)');
-		$this->assertVisible('hk_events_autoreg');
-		$this->assertAttribute("//input[@id='hk_events_autoreg']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_events_autoreg']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_events_autoreg']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_events_autoreg']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_events_autoreg'));
+		$this->zbxAssertAttribute("//input[@id='hk_events_autoreg']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_events_autoreg']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_events_autoreg'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_events_mode', false);
-		$this->assertElementPresent("//input[@id='hk_events_trigger']/@disabled");
-		$this->assertElementPresent("//input[@id='hk_events_internal']/@disabled");
-		$this->assertElementPresent("//input[@id='hk_events_discovery']/@disabled");
-		$this->assertElementPresent("//input[@id='hk_events_autoreg']/@disabled");
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_events_trigger'][@disabled]"));
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_events_internal'][@disabled]"));
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_events_discovery'][@disabled]"));
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_events_autoreg'][@disabled]"));
 
 		// IT services
 
 		$this->zbxTestTextPresent('IT services');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
-		$this->assertVisible('hk_services_mode');
-		$this->assertAttribute("//input[@id='hk_services_mode']/@checked", 'checked');
+		$this->assertVisible(WebDriverBy::id('hk_services_mode'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('hk_services_mode'));
 
 		$this->zbxTestTextPresent('Data storage period (in days)');
-		$this->assertVisible('hk_services');
-		$this->assertAttribute("//input[@id='hk_services']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_services']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_services']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_services']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_services'));
+		$this->zbxAssertAttribute("//input[@id='hk_services']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_services']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_services'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_services_mode', false);
-		$this->assertElementPresent("//input[@id='hk_services']/@disabled");
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_services'][@disabled]"));
 
 		// audit
 
 		$this->zbxTestTextPresent('Audit');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
-		$this->assertVisible('hk_audit_mode');
-		$this->assertAttribute("//input[@id='hk_audit_mode']/@checked", 'checked');
+		$this->assertVisible(WebDriverBy::id('hk_audit_mode'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('hk_audit_mode'));
 
 		$this->zbxTestTextPresent('Data storage period (in days)');
-		$this->assertVisible('hk_audit');
-		$this->assertAttribute("//input[@id='hk_audit']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_audit']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_audit']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_audit']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_audit'));
+		$this->zbxAssertAttribute("//input[@id='hk_audit']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_audit']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_audit'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_audit_mode', false);
-		$this->assertElementPresent("//input[@id='hk_audit']/@disabled");
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_audit'][@disabled]"));
 
 		//	user sessions
 
 		$this->zbxTestTextPresent('User sessions');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
-		$this->assertVisible('hk_sessions_mode');
-		$this->assertAttribute("//input[@id='hk_sessions_mode']/@checked", 'checked');
+		$this->assertVisible(WebDriverBy::id('hk_sessions_mode'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('hk_sessions_mode'));
 
 		$this->zbxTestTextPresent('Data storage period (in days)');
-		$this->assertVisible('hk_sessions');
-		$this->assertAttribute("//input[@id='hk_sessions']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_sessions']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_sessions']/@value", 365);
-		$this->assertElementNotPresent("//input[@id='hk_sessions']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_sessions'));
+		$this->zbxAssertAttribute("//input[@id='hk_sessions']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_sessions']", "value", 365);
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_sessions'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_sessions_mode', false);
-		$this->assertElementPresent("//input[@id='hk_sessions']/@disabled");
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_sessions'][@disabled]"));
 
 		// history
 
 		$this->zbxTestTextPresent('History');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
-		$this->assertVisible('hk_history_mode');
-		$this->assertAttribute("//input[@id='hk_history_mode']/@checked", 'checked');
+		$this->assertVisible(WebDriverBy::id('hk_history_mode'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('hk_history_mode'));
 
 		$this->zbxTestTextPresent('Override item history period');
-		$this->assertVisible('hk_history_global');
-		$this->assertElementNotPresent("//input[@id='hk_history_global']/@checked");
-		$this->assertElementNotPresent("//input[@id='hk_history_global']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_history_global'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('hk_history_global'));
 
 		$this->zbxTestTextPresent('Data storage period (in days)');
-		$this->assertVisible('hk_history');
-		$this->assertAttribute("//input[@id='hk_history']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_history']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_history']/@value", 90);
-		$this->assertElementPresent("//input[@id='hk_history']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_history'));
+		$this->zbxAssertAttribute("//input[@id='hk_history']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_history']", "value", 90);
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_history'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_history_global');
-		$this->assertElementNotPresent("//input[@id='hk_history']/@disabled");
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_history'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_history_mode', false);
-		$this->assertElementNotPresent("//input[@id='hk_history_global']/@disabled");
-		$this->assertElementNotPresent("//input[@id='hk_history']/@disabled");
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_history_global'][@disabled]"));
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_history'][@disabled]"));
 
 		// trends
 
 		$this->zbxTestTextPresent('Trends');
 		$this->zbxTestTextPresent('Enable internal housekeeping');
-		$this->assertVisible('hk_trends_mode');
-		$this->assertAttribute("//input[@id='hk_trends_mode']/@checked", 'checked');
+		$this->assertVisible(WebDriverBy::id('hk_trends_mode'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('hk_trends_mode'));
 
 		$this->zbxTestTextPresent('Override item trend period');
-		$this->assertVisible('hk_trends_global');
-		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@checked");
-		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_trends_global'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('hk_trends_global'));
 
 		$this->zbxTestTextPresent('Data storage period (in days)');
-		$this->assertVisible('hk_trends');
-		$this->assertAttribute("//input[@id='hk_trends']/@maxlength", 5);
-		$this->assertAttribute("//input[@id='hk_trends']/@size", 5);
-		$this->assertAttribute("//input[@id='hk_trends']/@value", 365);
-		$this->assertElementPresent("//input[@id='hk_trends']/@disabled");
+		$this->assertVisible(WebDriverBy::id('hk_trends'));
+		$this->zbxAssertAttribute("//input[@id='hk_trends']", "maxlength", 5);
+		$this->zbxAssertAttribute("//input[@id='hk_trends']", "value", 365);
+		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='hk_trends'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_trends_global');
-		$this->assertElementNotPresent("//input[@id='hk_trends']/@disabled");
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_trends'][@disabled]"));
 
 		$this->zbxTestCheckboxSelect('hk_trends_mode', false);
-		$this->assertElementNotPresent("//input[@id='hk_trends_global']/@disabled");
-		$this->assertElementNotPresent("//input[@id='hk_trends']/@disabled");
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_trends_global'][@disabled]"));
+		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//input[@id='hk_trends'][@disabled]"));
 
 		// buttons
 
-		$this->assertVisible('update');
-		$this->assertAttribute("//input[@id='update']/@value", 'Update');
+		$this->assertVisible(WebDriverBy::id('update'));
+		$this->assertElementValue('update', 'Update');
 
-		$this->assertVisible('resetDefaults');
-		$this->assertAttribute("//input[@id='resetDefaults']/@value", 'Reset defaults');
+		$this->assertVisible(WebDriverBy::id('resetDefaults'));
+		$this->assertElementText("//button[@id='resetDefaults']", "Reset defaults");
 	}
 
 	public static function update() {
@@ -187,6 +176,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
+//					'resetDefaults' => true,
 					'hk_events_mode' => true,
 					'hk_events_trigger' => 101,
 					'hk_events_internal' => 102,
@@ -251,7 +241,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 					'hk_trends_global' => true,
 					'hk_trends' => -1,
 					'errors' => [
-						'ERROR: Page received incorrect data',
+						'Page received incorrect data',
 						'Incorrect value "0" for "Trigger event and alert data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "Internal event and alert data storage period" field: must be between 1 and 99999.',
 						'Incorrect value "0" for "Network discovery event and alert data storage period" field: must be between 1 and 99999.',
@@ -296,7 +286,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 
 		if (isset($data['resetDefaults'])) {
 			$this->zbxTestClick('resetDefaults');
-			$this->zbxTestClick("//button[@type='button']/span[text()='Reset defaults']");
+			$this->zbxTestClickXpath("//div[@id='overlay_dialogue']//button[text()='Reset defaults']");
 		}
 		else {
 			// events and alerts
@@ -362,7 +352,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_history'])) {
-				$this->input_type('hk_history', $data['hk_history']);
+				$this->zbxTestInputTypeOverwrite('hk_history', $data['hk_history']);
 			}
 
 			// trends
@@ -376,13 +366,13 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			}
 
 			if (isset($data['hk_trends'])) {
-				$this->input_type('hk_trends', $data['hk_trends']);
+				$this->zbxTestInputTypeOverwrite('hk_trends', $data['hk_trends']);
 			}
 		}
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of housekeeping');
-		$this->zbxTestTextPresent('CONFIGURATION OF HOUSEKEEPING');
+		$this->zbxTestCheckHeader('Housekeeping');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -399,7 +389,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// events and alerts
 
 			if (isset($data['hk_events_mode'])) {
-				$this->assertEquals($this->isChecked('hk_events_mode'), $data['hk_events_mode']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_events_mode'), $data['hk_events_mode']);
 			}
 
 			if (isset($data['hk_events_trigger'])) {
@@ -421,7 +411,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// IT services
 
 			if (isset($data['hk_services_mode'])) {
-				$this->assertEquals($this->isChecked('hk_services_mode'), $data['hk_services_mode']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_services_mode'), $data['hk_services_mode']);
 			}
 
 			if (isset($data['hk_services'])) {
@@ -431,7 +421,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// audit
 
 			if (isset($data['hk_audit_mode'])) {
-				$this->assertEquals($this->isChecked('hk_audit_mode'), $data['hk_audit_mode']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_audit_mode'), $data['hk_audit_mode']);
 			}
 
 			if (isset($data['hk_audit'])) {
@@ -441,7 +431,7 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// user sessions
 
 			if (isset($data['hk_sessions_mode'])) {
-				$this->assertEquals($this->isChecked('hk_sessions_mode'), $data['hk_sessions_mode']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_sessions_mode'), $data['hk_sessions_mode']);
 			}
 
 			if (isset($data['hk_sessions'])) {
@@ -451,11 +441,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// history
 
 			if (isset($data['hk_history_mode'])) {
-				$this->assertEquals($this->isChecked('hk_history_mode'), $data['hk_history_mode']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_history_mode'), $data['hk_history_mode']);
 			}
 
 			if (isset($data['hk_history_global'])) {
-				$this->assertEquals($this->isChecked('hk_history_global'), $data['hk_history_global']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_history_global'), $data['hk_history_global']);
 			}
 
 			if (isset($data['hk_history'])) {
@@ -465,11 +455,11 @@ class testFormAdministrationGeneralHousekeeper extends CWebTest {
 			// trends
 
 			if (isset($data['hk_trends_mode'])) {
-				$this->assertEquals($this->isChecked('hk_trends_mode'), $data['hk_trends_mode']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_trends_mode'), $data['hk_trends_mode']);
 			}
 
 			if (isset($data['hk_trends_global'])) {
-				$this->assertEquals($this->isChecked('hk_trends_global'), $data['hk_trends_global']);
+				$this->assertEquals($this->zbxTestCheckboxSelected('hk_trends_global'), $data['hk_trends_global']);
 			}
 
 			if (isset($data['hk_trends'])) {

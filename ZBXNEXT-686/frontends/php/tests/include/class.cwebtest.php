@@ -240,6 +240,14 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::id($id))->clear()->sendKeys($str);
 	}
 
+	public function zbxTestInputTypeOverwrite($id, $str) {
+		$this->webDriver->findElement(WebDriverBy::id($id))->click();
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::CONTROL);
+		$this->webDriver->getKeyboard()->pressKey('a');
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::CONTROL);
+		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
+	}
+
 	public function zbxTestInputTypeByXpath($xpath, $str) {
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->sendKeys($str);
 	}
@@ -289,7 +297,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue(true);
 	}
 
-	public function zbxAssertAttribute($xpath, $attribute, $value) {
+	public function zbxAssertAttribute($xpath, $attribute, $value = 'true') {
 		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath));
 		$this->assertEquals($element->getAttribute($attribute), $value);
 	}
@@ -381,7 +389,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function assertElementValue($id, $value) {
 		$element = $this->webDriver->findElement(WebDriverBy::id($id));
-		$this->assertEquals($element->getAttribute('value'), $value);
+		$this->assertEquals($value, $element->getAttribute('value'));
 	}
 
 	/**
@@ -395,6 +403,9 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($text, $element->getText());
 	}
 
+	public function assertVisible($id){
+		$this->webDriver->findElement($id)->isDisplayed();
+	}
 
 	// check that page does not have real (not visible) host or template names
 	public function checkNoRealHostnames() {
