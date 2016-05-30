@@ -110,8 +110,10 @@ class CScreenHttpTest extends CScreenBase {
 		// Create table.
 		$table = (new CTableInfo())
 			->setHeader([
-				$this->hostid == 0 ? make_sorting_header(_('Host'), 'hostname', $sort_field, $sort_order) : null,
-				make_sorting_header(_('Name'), 'name', $sort_field, $sort_order),
+				$this->hostid == 0
+					? make_sorting_header(_('Host'), 'hostname', $sort_field, $sort_order, 'zabbix.php?action=web.view')
+					: null,
+				make_sorting_header(_('Name'), 'name', $sort_field, $sort_order, 'zabbix.php?action=web.view'),
 				_('Number of steps'),
 				_('Last check'),
 				_('Status')
