@@ -40,6 +40,51 @@ if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
 set_slv_config($config);
 db_connect();
 
+my $tlds_ref = get_tlds();
+
+if (0)
+{
+	print("Deleting triggers...\n");
+	my $triggerids;
+
+	my $rows_ref = db_select("select triggerid from triggers where description like '% under 99%'");
+
+	foreach my $row_ref (@{$rows_ref})
+	{
+		push(@{$triggerids}, $row_ref->[0]);
+	}
+	__delete_triggers($triggerids);
+}
+
+foreach (@{$tlds_ref})
+{
+	$tld = $_;	# set globally
+
+	my $hostid = get_hostid($tld);
+
+	print("  $tld\n");
+
+	my $rows_ref = db_select("select key_ from items where hostid=$hostid and key_ like 'rsm.slv.dns.ns.downtime[%]'");
+
+	foreach my $row_ref (@{$rows_ref})
+	{
+		my $key = $row_ref->[0];
+
+		my ($ns, $ip) = split(',', get_nsip_from_key($key));
+
+		print("    $ns ($ip) [$key]\n");
+
+		my $options = {
+			'description' => "Name Server $ns ($ip)".' has been down for over {$RSM.SLV.NS.AVAIL} minutes',
+			'expression' => '{'.$tld.':'.$key.'.last(0)}>{$RSM.SLV.NS.AVAIL}',
+			'priority' => '4'
+		};
+
+		__create_trigger($options);
+	}
+}
+undef($tld);
+
 print("Fixing value mappings...\n");
 db_exec("update valuemaps set name='RSM Service Availability' where valuemapid=16");
 my $rows_ref = db_select("select mappingid from mappings where mappingid=113");
@@ -51,8 +96,6 @@ db_exec("update valuemaps set name='RSM RDDS probe result' where valuemapid=18")
 db_exec("update valuemaps set name='RSM EPP result' where valuemapid=19");
 db_exec("update items set valuemapid=null where key_='" . 'rsm.dns.udp[{$RSM.TLD}]' . "'");
 db_exec("update items set valuemapid=null where key_='" . 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]' . "'");
-
-my $tlds_ref = get_tlds();
 
 print("Deleting obsoleted triggers...\n");
 foreach (@{$tlds_ref})
@@ -81,6 +124,7 @@ foreach (@{$tlds_ref})
 		pfail("cannot delete triggers by ID ", join(',', @triggerids), ": ", Dumper($zabbix->last_error())) unless ($result);
 	}
 }
+undef($tld);
 
 my $slv_items_to_remove_like =
 [
@@ -173,8 +217,8 @@ foreach my $key (@{$item_keys_to_remove})
 	}
 }
 
-print("Creating SLV items...\n");
-__create_missing_slv_montly_items();
+print("Creating SLV monthly items and triggers...\n");
+__create_missing_slv_montly_items_and_triggers();
 
 print("Fixing applications...\n");
 my $name_from = 'SLV current month';
@@ -212,6 +256,19 @@ foreach (@{$tlds_ref})
 	db_exec("delete from applications".
 		" where applicationid=$applicationid_from");
 }
+undef($tld);
+
+print("Creating macros...\n");
+my $global_macros = {
+	'{$RSM.SLV.DNS.AVAIL}' => 0,
+	'{$RSM.SLV.NS.AVAIL}' => 432,
+	'{$RSM.SLV.RDDS.AVAIL}' => 864,
+	'{$RSM.SLV.EPP.AVAIL}' => 864
+};
+foreach my $m (keys(%{$global_macros}))
+{
+	__create_macro($m, $global_macros->{$m}, undef, 1);	# global, force update
+}
 print("Done!\n");
 
 sub __create_item
@@ -243,6 +300,109 @@ sub __create_item
 	pfail($zabbix->last_error) if (defined($zabbix->last_error));
 
 	$result = ${$result->{'itemids'}}[0] if (defined(${$result->{'itemids'}}[0]));
+
+	return $result;
+}
+
+sub __create_trigger
+{
+	my $options = shift;
+	my $is_new = shift;
+
+	my $result;
+
+	$is_new = false unless defined $is_new;
+
+	if ($is_new eq false)
+	{
+		if ($zabbix->exist('trigger', {'expression' => $options->{'expression'}}))
+		{
+			#$result = $zabbix->update('trigger', $options);
+		}
+		else
+		{
+			$result = $zabbix->create('trigger', $options);
+		}
+	}
+	else
+	{
+		$result = $zabbix->create('trigger', $options);
+	}
+
+	#    pfail("cannot create trigger:\n", Dumper($options)) if (ref($result) ne '' or $result eq '');
+
+	return $result;
+}
+
+sub __delete_triggers
+{
+	my $triggerids = shift;
+
+	return unless $triggerids && scalar(@{$triggerids});
+
+	return $zabbix->remove('trigger', $triggerids);
+}
+
+sub __create_macro
+{
+	my $name = shift;
+	my $value = shift;
+	my $templateid = shift;
+	my $force_update = shift;
+	my $is_new = shift;
+
+	my $macroid;
+
+	my $result;
+
+	$is_new = false unless defined $is_new;
+
+	if (defined($templateid))
+	{
+		if ($is_new eq false)
+		{
+			$result = $zabbix->get('usermacro',{'output' => 'extend', 'hostids' => $templateid, 'filter' => {'macro' => $name}});
+		}
+
+		if (exists($result->{'hostmacroid'}))
+		{
+			$macroid = $result->{'hostmacroid'};
+			my $zbx_value = $result->{'value'};
+
+			if ($value ne $zbx_value)
+			{
+				$zabbix->update('usermacro',{'hostmacroid' => $macroid, 'value' => $value}) if defined($force_update);
+			}
+		}
+		else
+		{
+			$result = $zabbix->create('usermacro',{'hostid' => $templateid, 'macro' => $name, 'value' => $value});
+			$macroid = pop(@{$result->{'hostmacroids'}});
+		}
+	}
+	else
+	{
+		if ($is_new eq false)
+		{
+			$result = $zabbix->get('usermacro',{'output' => 'extend', 'globalmacro' => 1, 'filter' => {'macro' => $name}} );
+		}
+
+		if (exists($result->{'globalmacroid'}))
+		{
+			$macroid = $result->{'globalmacroid'};
+			my $zbx_value = $result->{'value'};
+
+			if ($value ne $zbx_value)
+			{
+				$zabbix->macro_global_update({'globalmacroid' => $macroid, 'value' => $value}) if defined($force_update);
+			}
+		}
+		else
+		{
+			$result = $zabbix->macro_global_create({'macro' => $name, 'value' => $value});
+			$macroid = pop(@{$result->{'globalmacroids'}});
+		}
+	}
 
 	return $result;
 }
@@ -315,11 +475,13 @@ sub __get_applicationid
 	return $applicationid;
 }
 
-sub __create_slv_monthly($$$)
+sub __create_slv_monthly($$$$$)
 {
 	my $test_name = shift;
 	my $key_base = shift;
 	my $hostid = shift;
+	my $host_name = shift;
+	my $macro = shift;
 
 	my $applicationid = __get_applicationid($hostid, APP_SLV_MONTHLY);
 
@@ -344,7 +506,7 @@ sub __get_host_macro($$)
 	return $rows_ref->[0]->[0];
 }
 
-sub __create_missing_slv_montly_items
+sub __create_missing_slv_montly_items_and_triggers
 {
 	foreach (@{$tlds_ref})
 	{
@@ -367,27 +529,47 @@ sub __create_missing_slv_montly_items
 		my $rdds_enabled = __get_host_macro($templateid, '{$RSM.TLD.RDDS.ENABLED}');
 		my $epp_enabled = __get_host_macro($templateid, '{$RSM.TLD.EPP.ENABLED}');
 
-		__create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid);
-		__create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid);
+		__create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid, $tld, '{$RSM.SLV.DNS.UDP.RTT}');
+		__create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid, $tld, '{$RSM.SLV.DNS.TCP.RTT}');
+
+		# create Service downtime triggers
+		my @services = ('dns');
+		push(@services, 'rdds') if ($rdds_enabled == 1);
+		push(@services, 'epp') if ($epp_enabled == 1);
+
+		foreach my $service (@services)
+		{
+			my $item_key = 'rsm.slv.'.$service.'.downtime';
+
+			my $options = {
+				'description' => uc($service).' has been down for over {$RSM.SLV.'.uc($service).'.AVAIL} minutes',
+				'expression' => '{'.$tld.':'.$item_key.'.last(0)}>{$RSM.SLV.'.uc($service).'.AVAIL}',
+				'priority' => '4'
+			};
+
+			__create_trigger($options);
+		}
 
 		if ($rdds_enabled == 1)
 		{
-			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid);
-			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds80.rtt", $hostid);
+			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
+			__create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $tld, '{$RSM.SLV.RDDS.RTT}');
 		}
 
 		if ($epp_enabled == 1)
 		{
-			__create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
+			__create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
 
 			if ($rdds_enabled == 1)
 			{
-				__create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid);
+				__create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}');
 			}
 
-			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login', $hostid);
-			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
-			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
+			__create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login',  $hostid, $tld, '{$RSM.SLV.EPP.LOGIN}');
+			__create_slv_monthly('EPP Query-Command RTT',     'rsm.slv.epp.rtt.info',   $hostid, $tld, '{$RSM.SLV.EPP.INFO}');
+			__create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid, $tld, '{$RSM.SLV.EPP.UPDATE}');
 		}
 	}
+
+	undef($tld);
 }

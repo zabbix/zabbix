@@ -72,7 +72,7 @@ sub get_nsservers_list($);
 sub update_nsservers($$);
 sub get_tld_list();
 sub get_services($);
-sub create_slv_monthly($$$);
+sub create_slv_monthly($$$$$);
 
 my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
@@ -1039,6 +1039,7 @@ sub create_epp_objects($$$$) {
 sub create_all_slv_ns_items {
     my $ns_name = shift;
     my $ip = shift;
+    my $host_name = shift;
     my $hostid = shift;
 
     unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
@@ -1050,10 +1051,19 @@ sub create_all_slv_ns_items {
 
     create_slv_item('DNS NS availability: $1 ($2)', 'rsm.slv.dns.ns.avail['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
     create_slv_item('DNS NS minutes of downtime: $1 ($2)', 'rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+
+    my $options = {
+	    'description' => 'Name Server '.$ns_name.' ('.$ip.') has been down for over {$RSM.SLV.NS.AVAIL} minutes',
+	    'expression' => '{'.$host_name.':rsm.slv.dns.ns.downtime['.$ns_name.','.$ip.'].last(0)}>{$RSM.SLV.NS.AVAIL}',
+	    'priority' => '4'
+    };
+
+    create_trigger($options);
 }
 
 sub create_slv_ns_items {
     my $ns_servers = shift;
+    my $host_name = shift;
     my $hostid = shift;
 
     foreach my $ns_name (sort keys %{$ns_servers}) {
@@ -1061,7 +1071,7 @@ sub create_slv_ns_items {
 	    my $ip_list = $ns_servers->{$ns_name}->{$ipv};
 
 	    foreach my $ip (@{$ip_list}) {
-		create_all_slv_ns_items($ns_name, $ip, $hostid);
+		create_all_slv_ns_items($ns_name, $ip, $host_name, $hostid);
 	    }
 	}
     }
@@ -1072,7 +1082,9 @@ sub create_slv_items {
     my $hostid = shift;
     my $host_name = shift;
 
-    create_slv_ns_items($ns_servers, $hostid);
+    my $options;
+
+    create_slv_ns_items($ns_servers, $host_name, $hostid);
 
     unless (exists($applications->{$hostid}->{APP_SLV_PARTTEST})) {
         $applications->{$hostid}->{APP_SLV_PARTTEST} = get_application_id(APP_SLV_PARTTEST, $hostid)
@@ -1087,10 +1099,18 @@ sub create_slv_items {
     create_slv_item('DNS availability', 'rsm.slv.dns.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
     create_slv_item('DNS minutes of downtime', 'rsm.slv.dns.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
 
-    create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid);
-    create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid);
+    my $item_key = 'rsm.slv.dns.downtime';
 
-    my $options;
+    $options = {
+	'description' => 'DNS has been down for over {$RSM.SLV.DNS.AVAIL} minutes',
+	'expression' => '{'.$host_name.':'.$item_key.'.last(0)}>{$RSM.SLV.DNS.AVAIL}',
+	'priority' => '4'
+    };
+
+    create_trigger($options);
+
+    create_slv_monthly("DNS UDP Resolution RTT", "rsm.slv.dns.udp.rtt", $hostid, $host_name, '{$RSM.SLV.DNS.UDP.RTT}');
+    create_slv_monthly("DNS TCP Resolution RTT", "rsm.slv.dns.tcp.rtt", $hostid, $host_name, '{$RSM.SLV.DNS.TCP.RTT}');
 
     # NB! Configuration trigger that is used in PHP and C code to detect incident!
     # priority must be set to 0!
@@ -1193,6 +1213,14 @@ sub create_slv_items {
 
 	create_trigger($options);
 
+	$options = {
+	    'description' => 'RDDS has been down for over {$RSM.SLV.RDDS.AVAIL} minutes',
+	    'expression' => '{'.$host_name.':rsm.slv.rdds.downtime.last(0)}>{$RSM.SLV.RDDS.AVAIL}',
+	    'priority' => '4'
+	};
+
+	create_trigger($options);
+
 	create_slv_item('RDDS weekly unavailability', 'rsm.slv.rdds.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
 
         my $depend_down;
@@ -1221,8 +1249,8 @@ sub create_slv_items {
 
 	undef($depend_down);
 
-	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid);
-	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid);
+	create_slv_monthly("RDDS43 Query RTT", "rsm.slv.rdds43.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
+	create_slv_monthly("RDDS80 Query RTT", "rsm.slv.rdds80.rtt", $hostid, $host_name, '{$RSM.SLV.RDDS.RTT}');
     }
 
     create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
@@ -1236,9 +1264,9 @@ sub create_slv_epp_items($$) {
     create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
     create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
 
-    create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login', $hostid);
-    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
-    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid);
+    create_slv_monthly('EPP Session-Command RTT',   'rsm.slv.epp.rtt.login',  $hostid, $host_name, '{$RSM.SLV.EPP.LOGIN}');
+    create_slv_monthly('EPP Query-Command RTT',     'rsm.slv.epp.rtt.info',   $hostid, $host_name, '{$RSM.SLV.EPP.INFO}');
+    create_slv_monthly('EPP Transform-Command RTT', 'rsm.slv.epp.rtt.update', $hostid, $host_name, '{$RSM.SLV.EPP.UPDATE}');
 
     # NB! Configuration trigger that is used in PHP and C code to detect incident!
     # priority must be set to 0!
@@ -1248,6 +1276,14 @@ sub create_slv_epp_items($$) {
 			    '({TRIGGER.VALUE}=1&'.
 			    '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
 			    'priority' => '0',
+    };
+
+    create_trigger($options);
+
+    $options = {
+	'description' => 'EPP has been down for over {$RSM.SLV.EPP.AVAIL} minutes',
+	'expression' => '{'.$host_name.':rsm.slv.epp.downtime.last(0)}>{$RSM.SLV.EPP.AVAIL}',
+	'priority' => '4'
     };
 
     create_trigger($options);
@@ -1277,8 +1313,8 @@ sub create_slv_epp_items($$) {
 	$depend_down = $triggerid;
     }
 
-    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
-    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid) if (defined($OPTS{'rdds43-servers'}));
+    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $host_name, '{$RSM.SLV.DNS.NS.UPD}');
+    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
 }
 
 # calculated items, configuration history (TODO: rename host to something like config_history)
@@ -1317,7 +1353,8 @@ sub create_rsm_items {
 		        'RSM.SLV.NS.AVAIL',
 		        'RSM.SLV.RDDS43.RTT',
 		        'RSM.SLV.RDDS80.RTT',
-		        'RSM.SLV.RDDS.UPD',
+			'RSM.SLV.RDDS.UPD',
+			'RSM.SLV.RDDS.RTT',
 		        'RSM.SLV.DNS.NS.UPD',
 		        'RSM.SLV.EPP.LOGIN',
 		        'RSM.SLV.EPP.UPDATE',
@@ -1526,7 +1563,7 @@ sub add_default_actions() {
 }
 
 sub create_global_macros() {
-    my $global_macros = { 
+    my $global_macros = {
 	'{$RSM.IP4.MIN.PROBE.ONLINE}' => 2,
         '{$RSM.IP6.MIN.PROBE.ONLINE}' => 2,
 
@@ -1578,23 +1615,27 @@ sub create_global_macros() {
         '{$RSM.INCIDENT.EPP.FAIL}' => 2,
         '{$RSM.INCIDENT.EPP.RECOVER}' => 2,
 
-        '{$RSM.SLV.DNS.UDP.RTT}' => 99,
-        '{$RSM.SLV.DNS.TCP.RTT}' => 99,
-        '{$RSM.SLV.NS.AVAIL}' => 99,
-        '{$RSM.SLV.RDDS43.RTT}' => 99,
-        '{$RSM.SLV.RDDS80.RTT}' => 99,
-        '{$RSM.SLV.RDDS.UPD}' => 99,
-        '{$RSM.SLV.DNS.NS.UPD}' => 99,
-        '{$RSM.SLV.EPP.LOGIN}' => 99,
-        '{$RSM.SLV.EPP.UPDATE}' => 99,
-        '{$RSM.SLV.EPP.INFO}' => 99,
+        '{$RSM.SLV.DNS.UDP.RTT}' => 95,
+        '{$RSM.SLV.DNS.TCP.RTT}' => 95,
+        '{$RSM.SLV.DNS.AVAIL}' => 0,
+        '{$RSM.SLV.NS.AVAIL}' => 432,
+        '{$RSM.SLV.RDDS43.RTT}' => 95,
+        '{$RSM.SLV.RDDS80.RTT}' => 95,
+        '{$RSM.SLV.RDDS.UPD}' => 95,
+	'{$RSM.SLV.RDDS.RTT}' => 95,
+        '{$RSM.SLV.RDDS.AVAIL}' => 864,
+        '{$RSM.SLV.DNS.NS.UPD}' => 95,
+        '{$RSM.SLV.EPP.LOGIN}' => 90,
+        '{$RSM.SLV.EPP.UPDATE}' => 90,
+        '{$RSM.SLV.EPP.INFO}' => 90,
+        '{$RSM.SLV.EPP.AVAIL}' => 864,
 
         '{$RSM.ROLLWEEK.THRESHOLDS}' => RSM_ROLLWEEK_THRESHOLDS,
         '{$RSM.ROLLWEEK.SECONDS}' => 7200,
         '{$RSM.PROBE.AVAIL.LIMIT}' => '60'  # For finding unreachable probes. Probes are considered unreachable if last access time is over this limit of seconds.
     };
 
-    bulk_macro_create($global_macros, undef);
+    bulk_macro_create($global_macros, undef);	# do not force update
 }
 
 sub create_tld_host($$$$) {
@@ -1937,7 +1978,7 @@ sub add_new_ns($$) {
 
 	    create_item_dns_udp_upd($ns, $ip, $main_templateid, 'Template '.$TLD, $ipv) if (defined($OPTS{'epp-servers'}));
 
-    	    create_all_slv_ns_items($ns, $ip, $main_hostid);
+    	    create_all_slv_ns_items($ns, $ip, $TLD, $main_hostid);
 	}
     }
 }
@@ -2051,8 +2092,8 @@ sub update_epp_objects($) {
 
     create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
 
-    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid);
-    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid) if (defined($OPTS{'rdds43-servers'}));
+    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
+    create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
 
     my $ns_servers = get_nsservers_list($tld);
 
@@ -2070,11 +2111,13 @@ sub update_epp_objects($) {
     }
 }
 
-sub create_slv_monthly($$$)
+sub create_slv_monthly($$$$$)
 {
     my $test_name = shift;
     my $key_base = shift;
     my $hostid = shift;
+    my $host_name = shift;
+    my $macro = shift;
 
     unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
 	$applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
@@ -2086,4 +2129,12 @@ sub create_slv_monthly($$$)
     create_slv_item($test_name . ': # of failed tests',   $key_base . '.failed',  $hostid, VALUE_TYPE_NUM,    [$applicationid]);
     create_slv_item($test_name . ': expected # of tests', $key_base . '.max',     $hostid, VALUE_TYPE_NUM,    [$applicationid]);
     create_slv_item($test_name . ': average result',      $key_base . '.avg',     $hostid, VALUE_TYPE_DOUBLE, [$applicationid]);
+
+    my $options = {
+	    'description' => $test_name . ' < ' . $macro . '%',
+	    'expression' => '{'.$host_name.':'.$key_base.'.pfailed.last(0)}<'.$macro,
+	    'priority' => '4'
+    };
+
+    create_trigger($options);
 }
