@@ -47,7 +47,6 @@ extern ZBX_THREAD_LOCAL int		server_num, process_num;
 #endif
 
 #include "../libs/zbxcrypto/tls.h"
-#include "../libs/zbxcommon/stopwatch.h"
 
 ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
 ZBX_THREAD_LOCAL static zbx_vector_ptr_t	active_metrics;
@@ -685,7 +684,6 @@ static int	check_response(char *response)
  *                                                                            *
  * Parameters: host - IP or Hostname of Zabbix server                         *
  *             port - port number                                             *
- *             stopwatch - pointer for stopwatch control, can be NULL         *
  *                                                                            *
  * Return value: returns SUCCEED on successful sending,                       *
  *               FAIL on other cases                                          *
@@ -693,7 +691,7 @@ static int	check_response(char *response)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	send_buffer(const char *host, unsigned short port, zbx_stopwatch_t *stopwatch)
+static int	send_buffer(const char *host, unsigned short port)
 {
 	const char			*__function_name = "send_buffer";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
@@ -776,10 +774,6 @@ static int	send_buffer(const char *host, unsigned short port, zbx_stopwatch_t *s
 			goto out;
 	}
 
-	/* do not count time spent on sending data to server */
-	if (NULL != stopwatch)
-		zbx_stopwatch_stop(stopwatch);
-
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
@@ -811,9 +805,6 @@ static int	send_buffer(const char *host, unsigned short port, zbx_stopwatch_t *s
 	else
 		err_send_step = "[connect] ";
 out:
-	if (NULL != stopwatch)
-		zbx_stopwatch_start(stopwatch);
-
 	zbx_json_free(&json);
 
 	if (SUCCEED == ret)
@@ -876,7 +867,6 @@ ret:
  *                           the event; used for monitoring of Windows        *
  *                           event logs                                       *
  *             flags       - metric flags                                     *
- *             stopwatch   - pointer for stopwatch control                    *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
@@ -894,8 +884,7 @@ ret:
  ******************************************************************************/
 static int	process_value(const char *server, unsigned short port, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, int *mtime, unsigned long *timestamp,
-		const char *source, unsigned short *severity, unsigned long *logeventid, unsigned char flags,
-		zbx_stopwatch_t *stopwatch)
+		const char *source, unsigned short *severity, unsigned long *logeventid, unsigned char flags)
 {
 	const char			*__function_name = "process_value";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el = NULL;
@@ -904,7 +893,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __function_name, host, key, ZBX_NULL2STR(value));
 
-	send_buffer(server, port, stopwatch);
+	send_buffer(server, port);
 
 	if (0 != (ZBX_METRIC_FLAG_PERSISTENT & flags) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 	{
