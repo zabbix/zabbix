@@ -22,7 +22,6 @@
 
 #include "zbxregexp.h"
 #include "md5.h"
-#include "../libs/zbxcommon/stopwatch.h"
 
 struct	st_logfile
 {
@@ -43,7 +42,7 @@ struct	st_logfile
 
 typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char *, const char *, const char *,
 		unsigned char, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
-		unsigned char, zbx_stopwatch_t *);
+		unsigned char);
 
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
