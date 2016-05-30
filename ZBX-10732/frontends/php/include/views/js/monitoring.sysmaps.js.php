@@ -22,7 +22,7 @@
 						]))->setId('elementType')
 					)
 					->addRow(_('Show'),
-						(new CRadioButtonList('elementsubtype', null))
+						(new CRadioButtonList('elementsubtype', SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP))
 							->addValue(_('Host group'), SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP, 'subtypeHostGroup')
 							->addValue(_('Host group elements'), SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS,
 								'subtypeHostGroupElements'
@@ -31,7 +31,7 @@
 						'subtypeRow'
 					)
 					->addRow(_('Area type'),
-						(new CRadioButtonList('areatype', null))
+						(new CRadioButtonList('areatype', SYSMAP_ELEMENT_AREA_TYPE_FIT))
 							->addValue(_('Fit to map'), SYSMAP_ELEMENT_AREA_TYPE_FIT, 'areaTypeAuto')
 							->addValue(_('Custom size'), SYSMAP_ELEMENT_AREA_TYPE_CUSTOM, 'areaTypeCustom')
 							->setModern(true),
