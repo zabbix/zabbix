@@ -500,15 +500,6 @@
 
 		jQuery('#new_operation_opmessage_default_msg').trigger('change');
 
-		jQuery('#recovery_msg').on('change', function() {
-			var recovery_msg = jQuery(this).is(':checked');
-
-			jQuery('#r_shortdata').closest('li').toggle(recovery_msg);
-			jQuery('#r_longdata').closest('li').toggle(recovery_msg);
-		});
-
-		jQuery('#recovery_msg').trigger('change');
-
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();

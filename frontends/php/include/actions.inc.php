@@ -36,7 +36,6 @@ function condition_operator2str($operator) {
 
 function condition_type2str($type) {
 	$types = [
-		CONDITION_TYPE_TRIGGER_VALUE => _('Trigger value'),
 		CONDITION_TYPE_MAINTENANCE => _('Maintenance status'),
 		CONDITION_TYPE_TRIGGER_NAME => _('Trigger name'),
 		CONDITION_TYPE_TRIGGER_SEVERITY => _('Trigger severity'),
@@ -156,10 +155,6 @@ function actionConditionValueToString(array $actions, array $config) {
 
 				case CONDITION_TYPE_MAINTENANCE:
 					$result[$i][$j] = _('maintenance');
-					break;
-
-				case CONDITION_TYPE_TRIGGER_VALUE:
-					$result[$i][$j] = trigger_value2str($condition['value']);
 					break;
 
 				case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -803,7 +798,6 @@ function get_conditions_by_eventsource($eventsource) {
 		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_NAME,
 		CONDITION_TYPE_TRIGGER_SEVERITY,
-		CONDITION_TYPE_TRIGGER_VALUE,
 		CONDITION_TYPE_TIME_PERIOD,
 		CONDITION_TYPE_MAINTENANCE,
 		CONDITION_TYPE_EVENT_TAG,
@@ -969,9 +963,6 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_NOT_EQUAL,
 		CONDITION_OPERATOR_MORE_EQUAL,
 		CONDITION_OPERATOR_LESS_EQUAL
-	];
-	$operators[CONDITION_TYPE_TRIGGER_VALUE] = [
-		CONDITION_OPERATOR_EQUAL
 	];
 	$operators[CONDITION_TYPE_TIME_PERIOD] = [
 		CONDITION_OPERATOR_IN,
