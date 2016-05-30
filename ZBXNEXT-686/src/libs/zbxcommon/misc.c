@@ -253,6 +253,153 @@ double	zbx_current_time(void)
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_leap_year                                                     *
+ *                                                                            *
+ * Return value:  SUCCEED - year is a leap year                               *
+ *                FAIL    - year is not a leap year                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_leap_year(int year)
+{
+	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_time                                                     *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     get current time and store it in memory locations provided by caller   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     tm           - [OUT] broken-down representation of the current time    *
+ *     milliseconds - [OUT] milliseconds since the previous second            *
+ *     tz           - [OUT] local time offset from UTC (optional)             *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     On Windows localtime() and gmtime() return pointers to static,         *
+ *     thread-local storage locations. On Unix localtime() and gmtime() are   *
+ *     not thread-safe and re-entrant as they return pointers to static       *
+ *     storage locations which can be overwritten by localtime(), gmtime()    *
+ *     or other time functions in other threads or signal handlers. To avoid  *
+ *     this we use localtime_r() and gmtime_r().                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
+{
+#ifdef _WINDOWS
+	struct _timeb	current_time;
+
+	_ftime(&current_time);
+	*tm = *localtime(&current_time.time);	/* localtime() cannot return NULL if called with valid parameter */
+	*milliseconds = current_time.millitm;
+#else
+	struct timeval	current_time;
+
+	gettimeofday(&current_time, NULL);
+	localtime_r(&current_time.tv_sec, tm);
+	*milliseconds = current_time.tv_usec / 1000;
+#endif
+	if (NULL != tz)
+	{
+#ifdef HAVE_TM_TM_GMTOFF
+#	define ZBX_UTC_OFF	tm->tm_gmtoff
+#else
+#	define ZBX_UTC_OFF	offset
+		long		offset;
+		struct tm	tm_utc;
+#ifdef _WINDOWS
+		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
+#else
+		gmtime_r(&current_time.tv_sec, &tm_utc);
+#endif
+		offset = (tm->tm_yday - tm_utc.tm_yday) * SEC_PER_DAY + (tm->tm_hour - tm_utc.tm_hour) * SEC_PER_HOUR +
+				(tm->tm_min - tm_utc.tm_min) * SEC_PER_MIN;	/* assuming seconds are equal */
+
+		while (tm->tm_year > tm_utc.tm_year)
+			offset += (SUCCEED == is_leap_year(tm_utc.tm_year++) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+
+		while (tm->tm_year < tm_utc.tm_year)
+			offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
+#endif
+		tz->tz_sign = (0 <= ZBX_UTC_OFF ? '+' : '-');
+		tz->tz_hour = labs(ZBX_UTC_OFF) / SEC_PER_HOUR;
+		tz->tz_min = (labs(ZBX_UTC_OFF) - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
+		/* assuming no remaining seconds like in historic Asia/Riyadh87, Asia/Riyadh88 and Asia/Riyadh89 */
+#undef ZBX_UTC_OFF
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_utc_time                                                     *
+ *                                                                            *
+ * Purpose: get UTC time from time from broken down time elements             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     year  - [IN] year (1970-...)                                           *
+ *     month - [IN] month (1-12)                                              *
+ *     mday  - [IN] day of month (1-..., depending on month and year)         *
+ *     hour  - [IN] hours (0-23)                                              *
+ *     min   - [IN] minutes (0-59)                                            *
+ *     sec   - [IN] seconds (0-61, leap seconds are not strictly validated)   *
+ *     t     - [OUT] Epoch timestamp                                          *
+ *                                                                            *
+ * Return value:  SUCCEED - date is valid and resulting timestamp is positive *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t)
+{
+/* number of leap years before but not including year */
+#define ZBX_LEAP_YEARS(year)	(((year) - 1) / 4 - ((year) - 1) / 100 + ((year) - 1) / 400)
+
+	/* days since the beginning of non-leap year till the beginning of the month */
+	static const int	month_day[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+	static const int	epoch_year = 1970;
+
+	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon) &&
+			0 <= hour && hour <= 23 && 0 <= min && min <= 59 && 0 <= sec && sec <= 61 &&
+			0 <= (*t = (year - epoch_year) * SEC_PER_YEAR +
+			(ZBX_LEAP_YEARS(2 < mon ? year + 1 : year) - ZBX_LEAP_YEARS(epoch_year)) * SEC_PER_DAY +
+			(month_day[mon - 1] + mday - 1) * SEC_PER_DAY + hour * SEC_PER_HOUR + min * SEC_PER_MIN + sec))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+#undef ZBX_LEAP_YEARS
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_day_in_month                                                 *
+ *                                                                            *
+ * Purpose: returns number of days in a month                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     year  - [IN] year                                                      *
+ *     mon   - [IN] month (1-12)                                              *
+ *                                                                            *
+ * Return value: 28-31 depending on number of days in the month, defaults to  *
+ *               30 if the month is outside of allowed range                  *
+ *                                                                            *
+ * Author: Alexander Vladishev                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_day_in_month(int year, int mon)
+{
+	/* number of days in the month of a non-leap year */
+	static const unsigned char	month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+	if (1 <= mon && mon <= 12)	/* add one day in February of a leap year */
+		return month[mon - 1] + (2 == mon && SUCCEED == is_leap_year(year) ? 1 : 0);
+
+	return 30;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_calloc2                                                      *
  *                                                                            *
  * Purpose: allocates nmemb * size bytes of memory and fills it with zeros    *
