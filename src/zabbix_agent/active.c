@@ -1120,15 +1120,12 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		else
 			rate = 4 * CONFIG_MAX_LINES_PER_SECOND;	/* log.count[], logrt.count[] */
 	}
-	else
+	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) ||
+			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
+			(1 == is_count_item && 4 * MAX_VALUE_LINES < rate))
 	{
-		if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) ||
-				(0 == is_count_item && MAX_VALUE_LINES < rate) ||
-				(1 == is_count_item && 4 * MAX_VALUE_LINES < rate))
-		{
-			*error = zbx_strdup(*error, "Invalid fourth parameter.");
-			goto out;
-		}
+		*error = zbx_strdup(*error, "Invalid fourth parameter.");
+		goto out;
 	}
 
 	if (NULL == (skip = get_rparam(&request, 4)) || '\0' == *skip || 0 == strcmp(skip, "all"))
