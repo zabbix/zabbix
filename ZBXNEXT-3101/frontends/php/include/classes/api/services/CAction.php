@@ -919,9 +919,9 @@ class CAction extends CApiService {
 
 	/**
 	 * @param array $operations
-	 * @param array $actionsDb
+	 * @param array $db_actions
 	 */
-	protected function updateOperations($operations, $actionsDb) {
+	protected function updateOperations($operations, $db_actions) {
 		$operationsUpdate = [];
 
 		// messages
@@ -961,7 +961,7 @@ class CAction extends CApiService {
 		$opInventoryToDeleteByOpId = [];
 
 		foreach ($operations as $operation) {
-			$operationsDb = zbx_toHash($actionsDb[$operation['actionid']]['operations'], 'operationid');
+			$operationsDb = zbx_toHash($db_actions[$operation['actionid']]['operations'], 'operationid');
 			$operationDb = $operationsDb[$operation['operationid']];
 
 			$typeChanged = false;
@@ -2401,8 +2401,6 @@ class CAction extends CApiService {
 	 *
 	 * @param array $actions
 	 * @param array $db_actions
-	 *
-	 * @internal param array $actionDb
 	 */
 	protected function validateUpdate($actions, $db_actions) {
 		foreach ($actions as $action) {
@@ -2487,7 +2485,7 @@ class CAction extends CApiService {
 		$conditionsToValidate = [];
 
 		foreach ($actions as $actionId => $action) {
-			$actionDb = $db_actions[$actionId];
+			$db_action = $db_actions[$actionId];
 
 			if (isset($action['name'])) {
 				$actionName = $action['name'];
@@ -2506,7 +2504,7 @@ class CAction extends CApiService {
 				}
 			}
 			else {
-				$actionName = $actionDb['name'];
+				$actionName = $db_action['name'];
 			}
 
 			if (isset($action['filter'])) {
