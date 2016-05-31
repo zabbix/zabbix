@@ -1200,7 +1200,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
 			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, &jumped,
-			max_delay, metric->refresh, &metric->start_time, &metric->processed_bytes);
+			max_delay, &metric->start_time, &metric->processed_bytes);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
