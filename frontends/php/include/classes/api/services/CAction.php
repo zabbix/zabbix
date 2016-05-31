@@ -605,13 +605,13 @@ class CAction extends CApiService {
 		$actionIds = array_keys($actions);
 
 		$db_actions = $this->get([
-			'actionids' => $actionIds,
-			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
+			'selectFilter' => ['formula', 'conditions'],
 			'selectOperations' => API_OUTPUT_EXTEND,
 			'selectRecoveryOperations' => API_OUTPUT_EXTEND,
-			'selectFilter' => ['formula', 'conditions']
+			'actionids' => $actionIds,
+			'editable' => true,
+			'preservekeys' => true
 		]);
 
 		$this->validateUpdate($actions, $db_actions);
