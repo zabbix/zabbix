@@ -368,6 +368,13 @@ class CActionCondValidatorTest extends CValidatorTest {
 			],
 			[[],
 				[
+					'conditiontype' => 5,	/*CONDITION_TYPE_TRIGGER_VALUE*/
+					'value' => '',
+				],
+				'Incorrect action condition type.'
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => '',
 				],
