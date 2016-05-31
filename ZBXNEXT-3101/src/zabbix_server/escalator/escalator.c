@@ -1226,8 +1226,8 @@ static void	execute_recovery_operations(DB_ESCALATION *escalation, DB_EVENT *eve
 						message = action->r_longdata;
 					}
 
-					add_sentusers_msg(&user_msg, action->actionid, event, r_event,
-							action->r_shortdata, action->r_longdata);
+					add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject,
+							message);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					execute_commands(r_event, action->actionid, operationid, escalation->esc_step);
