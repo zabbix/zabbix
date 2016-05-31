@@ -1364,25 +1364,22 @@ class CAction extends CApiService {
 				}
 			}
 
-			$userids = [];
-			$user_groupids = [];
-
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					if (array_key_exists('opmessage_usr', $operation)) {
-						$userids = zbx_objectValues($operation['opmessage_usr'], 'userid');
-					}
+					$userids = array_key_exists('opmessage_usr', $operation)
+						? zbx_objectValues($operation['opmessage_usr'], 'userid')
+						: [];
 
-					if (array_key_exists('opmessage_grp', $operation)) {
-						$user_groupids = zbx_objectValues($operation['opmessage_grp'], 'usrgrpid');
-					}
+					$usrgrpids = array_key_exists('opmessage_grp', $operation)
+						? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid')
+						: [];
 
-					if (!$userids && !$user_groupids) {
+					if (!$userids && !$usrgrpids) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
 					}
 
 					$all_userids = array_merge($all_userids, $userids);
-					$all_usrgrpids = array_merge($all_usrgrpids, $user_groupids);
+					$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (!array_key_exists('type', $operation['opcommand'])) {
