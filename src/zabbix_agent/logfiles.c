@@ -1630,6 +1630,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 							" is running.", value);
 
 					lastlogsize1 = (size_t)offset + (size_t)nbytes;
+					send_err = FAIL;
 
 					if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))	/* log[] or logrt[] */
 					{
@@ -1715,6 +1716,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						value = p_start;
 
 					lastlogsize1 = (size_t)offset + (size_t)(p_next - buf);
+					send_err = FAIL;
 
 					if (0 == (ZBX_METRIC_FLAG_LOG_COUNT & flags))   /* log[] or logrt[] */
 					{
@@ -2189,7 +2191,8 @@ out:
  *     key             - [IN] item key for logging                            *
  *     logfiles        - [IN/OUT] list of log files                           *
  *     logfiles_num    - [IN] number of elements in 'logfiles'                *
- *     jump_from       - [IN] number of element where to start jump           *
+ *     jump_from_to    - [IN/OUT] on input - number of element where to start *
+ *                       jump, on output - number of element we jumped into   *
  *     seq             - [IN/OUT] sequence number of last processed file      *
  *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
  *     mtime           - [IN/OUT] last modification time of the file          *
@@ -2203,7 +2206,7 @@ out:
  * Return value: SUCCEED or FAIL (with error message allocated in 'err_msg')  *
  *                                                                            *
  ******************************************************************************/
-static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num, int jump_from,
+static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles_num, int *jump_from_to,
 		int *seq, zbx_uint64_t *lastlogsize, int *mtime, const char *encoding, char **err_msg,
 		zbx_uint64_t remaining_bytes, double delay, float max_delay)
 {
@@ -2215,7 +2218,7 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
 	bytes_to_jump = (zbx_uint64_t)((double)remaining_bytes * (delay - (double)max_delay) / delay);
 
 	/* enter the loop with index of the last file processed, later continue the loop from the start */
-	i = jump_from;
+	i = *jump_from_to;
 
 	lastlogsize_org = *lastlogsize;
 
@@ -2261,20 +2264,22 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
 		i++;
 	}
 
-	if (-1 == jumped_to)		/* no actual jump took place */
+	if (-1 == jumped_to)		/* no actual jump took place, no need to modify 'jump_from_to' */
 		return SUCCEED;
 
 	/* We have jumped into file, most likely somewhere in the middle of log line. Now find the beginning */
 	/* of a line to avoid pattern-matching a line from a random position. */
 
-	if (jump_from == jumped_to)
+	if (*jump_from_to == jumped_to)
 	{
-		/* if jumped within the same file - do not search the beginning of a line before "pre-jump" position */
+		/* jumped within the same file - do not search the beginning of a line before "pre-jump" position */
 		min_size = lastlogsize_org;
 	}
 	else
 	{
-		/* if jumped into different file - may search the beginning of a line from beginning of file */
+		*jump_from_to = jumped_to;
+
+		/* jumped into different file - may search the beginning of a line from beginning of file */
 		min_size = 0;
 	}
 
@@ -2333,6 +2338,8 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
  *     jumped           - [OUT] flag to indicate that a jump took place       *
  *     max_delay        - [IN] maximum allowed delay, s                       *
  *     refresh          - [IN] item update interval                           *
+ *     start_time       - [IN/OUT] start time of check                        *
+ *     processed_bytes  - [IN/OUT] number of bytes processed                  *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -2346,7 +2353,8 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key, int *jumped, float max_delay, int refresh)
+		const char *key, int *jumped, float max_delay, int refresh, double *start_time,
+		zbx_uint64_t *processed_bytes)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -2354,7 +2362,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
-	zbx_uint64_t		processed_bytes = 0, processed_bytes_tmp = 0, remaining_bytes = 0;
+	zbx_uint64_t		processed_bytes_sum = 0, processed_bytes_tmp = 0, remaining_bytes = 0;
 	double			delay;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() is_logrt:%d is_count:%d filename:'%s' lastlogsize:" ZBX_FS_UI64
@@ -2484,11 +2492,39 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			zabbix_log(LOG_LEVEL_DEBUG, "   file list empty");
 	}
 
-	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
-	last_processed = i = start_idx;
+	/* number of file last processed - start from this */
+	last_processed = start_idx;
 
 	/* from now assume success - it could be that there is nothing to do */
 	ret = SUCCEED;
+
+	if (0.0f != max_delay)
+	{
+		if (0.0 != *start_time)
+		{
+			/* calculate number of remaining bytes */
+			for (j = 0; j < logfiles_num; j++)
+				remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
+
+			/* calculate delay and jump if necessary */
+
+			if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(*processed_bytes,
+					remaining_bytes, refresh, zbx_time() - *start_time)))
+			{
+				if (SUCCEED == (ret = jump_ahead(key, logfiles, logfiles_num, &last_processed, &seq,
+						lastlogsize, mtime, encoding, err_msg, remaining_bytes, delay,
+						max_delay)))
+				{
+					*jumped = 1;
+				}
+			}
+		}
+
+		*start_time = zbx_time();	/* mark new start time for using in the next check */
+	}
+
+	/* enter the loop with index of the first file to be processed, later continue the loop from the start */
+	i = last_processed;
 
 	while (i < logfiles_num)
 	{
@@ -2513,25 +2549,16 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* the current checking. In the next check the file will be marked in the list of old files */
 			/* and we will know where we left off. */
 			logfiles[i].seq = seq++;
-			last_processed = i;
 
 			if (SUCCEED != ret)
 				break;
 
 			if (0.0f != max_delay)
 			{
-				processed_bytes += processed_bytes_tmp;
+				processed_bytes_sum += processed_bytes_tmp;
 
 				if (0 >= *p_count || 0 >= *s_count)
-				{
-					/* calculate number of remaining bytes, not processed due to 'p_count' or */
-					/* 's_count' limit */
-
-					for (j = 0; j < logfiles_num; j++)
-						remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
-
 					break;
-				}
 			}
 		}
 
@@ -2548,23 +2575,23 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		i++;
 	}
 
-	/* Consider jump only if 'SUCCEED == ret'. 'SUCCEED != ret' means that process_log() failed (can happen in */
-	/* case of file I/O error, bad regexp etc.). In this case we try up to 3 times and make item NOTSUPPORTED. */
-
-	if (0.0f != max_delay && SUCCEED == ret)
+	/* store number of processed bytes for using in the next check */
+	if (0.0f != max_delay)
 	{
-		if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(processed_bytes,
-				remaining_bytes, refresh, zbx_stopwatch_elapsed(&stopwatch))))
+		if (SUCCEED == ret)
 		{
-			if (SUCCEED == (ret = jump_ahead(key, logfiles, logfiles_num, last_processed, &seq, lastlogsize,
-					mtime, encoding, err_msg, remaining_bytes, delay, max_delay)))
-			{
-				*jumped = 1;
-			}
+			*processed_bytes = processed_bytes_sum;
+		}
+		else
+		{
+			/* 'SUCCEED != ret' means that process_log() failed (can happen in case of file I/O error, */
+			/* bad regexp etc.). In this case we try up to 3 times and make item NOTSUPPORTED. */
+			/* Invalidate start_time to prevent jump in the next check. */
+			*start_time = 0.0;
 		}
 	}
 
-	/* remember the new logfile list */
+	/* store the new log file list for using in the next check */
 	*logfiles_num_new = logfiles_num;
 
 	if (0 < logfiles_num)
