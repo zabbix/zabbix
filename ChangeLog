@@ -3,6 +3,7 @@ Changes for 2.2.14rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.13

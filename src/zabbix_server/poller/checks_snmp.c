@@ -1299,14 +1299,14 @@ retry:
 				*min_fail = mapping_num;
 		}
 	}
-	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex &&
-			ITEM_TYPE_SNMPv1 == items[0].type)
+	else if (STAT_SUCCESS == status && SNMP_ERR_NOSUCHNAME == response->errstat && 0 != response->errindex)
 	{
 		/* If a request PDU contains a bad variable, the specified behavior is different between SNMPv1 and */
 		/* later versions. In SNMPv1, the whole PDU is rejected and "response->errindex" is set to indicate */
 		/* the bad variable. In SNMPv2 and later, the SNMP agent processes the PDU by filling values for the */
-		/* known variables and marking unknown variables individually in the variable binding list. So if we */
-		/* get this error with SNMPv1, we fix the PDU by removing the bad variable and retry the request. */
+		/* known variables and marking unknown variables individually in the variable binding list. However, */
+		/* SNMPv2 allows SNMPv1 behavior, too. So regardless of the SNMP version used, if we get this error, */
+		/* then we fix the PDU by removing the bad variable and retry the request. */
 
 		i = response->errindex - 1;
 
