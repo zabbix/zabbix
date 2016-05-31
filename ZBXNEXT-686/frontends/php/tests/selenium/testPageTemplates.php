@@ -57,7 +57,7 @@ class testPageTemplates extends CWebTest {
 		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);
-		$sqlTriggers = "select * from triggers order by triggerid";
+		$sqlTriggers = "select triggerid,expression,description,url,status,value,priority,comments,error,templateid,type,state,flags from triggers order by triggerid";
 		$oldHashTriggers = DBhash($sqlTriggers);
 
 		$this->zbxTestLogin('templates.php');
@@ -67,6 +67,7 @@ class testPageTemplates extends CWebTest {
 
 		$this->zbxTestTextPresent($name);
 		$this->zbxTestClickLinkText($name);
+		$this->zbxTestCheckHeader('Templates');
 		$this->zbxTestTextPresent('All templates');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of templates');

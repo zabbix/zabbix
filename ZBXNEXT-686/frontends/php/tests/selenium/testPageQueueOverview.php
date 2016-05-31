@@ -24,6 +24,7 @@ class testPageQueueOverview extends CWebTest {
 	public function testPageQueueOverview_CheckLayout() {
 		$this->zbxTestLogin('queue.php?config=0');
 		$this->zbxTestCheckTitle('Queue [refreshed every 30 sec.]');
+		$this->zbxTestTextNotPresent('Cannot display item queue.');
 		$this->zbxTestCheckHeader('Queue of items to be updated');
 		$this->zbxTestDropdownSelectWait('config', 'Overview');
 		$this->zbxTestDropdownHasOptions('config', ['Overview', 'Overview by proxy', 'Details']);

@@ -48,6 +48,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	/**
 	* @dataProvider allBgImages
 	*/
+/*
 	public function testPageAdministrationGeneralImages_CheckLayoutBgImages($bgimage) {
 
 		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2');
@@ -66,6 +67,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 				$this->zbxAssertElementPresent(WebDriverBy::xpath("//form[@action='adm.images.php']//a[text()='".$bgimage['name']."']"));
 		}
 	}
+*/
 
 	/**
 	* @dataProvider allIcons
@@ -90,9 +92,11 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->assertEquals($oldHashIconImages, $newHashIconImages, "Chuck Norris: no-change icon image update should not update data in table 'images'");
 	}
 
+// TODO: need background images
 	/**
 	* @dataProvider allBgImages
 	*/
+/*
 	public function testPageAdministrationGeneralImages_BgImageSimpleUpdate($bgimage_name) {
 
 		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 ORDER BY imageid limit 5';
@@ -112,4 +116,5 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$newHashBgImages = DBhash($sqlBgImages);
 		$this->assertEquals($oldHashBgImages, $newHashBgImages, "Chuck Norris: no-change background image update should not update data in table 'images'");
 	}
+*/
 }

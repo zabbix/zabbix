@@ -52,7 +52,7 @@ class testPagePopup extends CWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxAssertElementPresent(WebDriverBy::id('groupid'));
 		$this->zbxAssertElementPresent(WebDriverBy::id('hostid'));
-		$this->zbxTestDropdownSelectWait('groupid', 'Templates');
+		$this->zbxTestDropdownSelect('groupid', 'Templates');
 		$this->zbxTestDropdownSelectWait('hostid', 'Template OS Linux');
 
 		$ddGroups = $this->zbxGetDropDownElements('groupid');

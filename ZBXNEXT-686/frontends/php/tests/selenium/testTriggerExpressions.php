@@ -38,6 +38,7 @@ class testTriggerExpressions extends CWebTest {
 		$this->zbxTestOpen('tr_testexpr.php?expression={Zabbix%20server%3Avm.memory.size[total].last%280%29}%3C'.$where);
 		$this->zbxTestCheckTitle('Test');
 		$this->zbxTestCheckHeader('Test');
+		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//input[@type='text']"));
 		$this->zbxTestInputTypeByXpath("//input[@type='text']", $what);
 
 		$this->zbxTestClick("test_expression");
