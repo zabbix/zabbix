@@ -95,6 +95,10 @@ typedef struct
 	int			error_count;	/* number of file reading errors in consecutive checks */
 	int			logfiles_num;
 	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[], logrt.count[] items */
+	double			start_time;	/* Start time of check for log[], log.count[], logrt[], logrt.count[] */
+						/* items. Used for measuring duration of checks. */
+	zbx_uint64_t		processed_bytes;	/* number of processed bytes for log[], log.count[], logrt[], */
+							/* logrt.count[] items */
 }
 ZBX_ACTIVE_METRIC;
 

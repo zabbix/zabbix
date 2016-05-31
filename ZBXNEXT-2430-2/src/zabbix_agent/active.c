@@ -208,6 +208,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 			zbx_free(metric->logfiles);
 			metric->logfiles_num = 0;
+			metric->start_time = 0.0;
+			metric->processed_bytes = 0;
 		}
 
 		/* replace metric */
@@ -222,6 +224,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			/* Currently receiving list of active checks works as a signal to refresh unsupported */
 			/* items. Hopefully in the future this will be controlled by server (ZBXNEXT-2633). */
 			metric->refresh_unsupported = 1;
+			metric->start_time = 0.0;
+			metric->processed_bytes = 0;
 		}
 
 		goto out;
@@ -260,6 +264,9 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	}
 	else if (0 == strncmp(metric->key, "eventlog[", 9))
 		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+
+	metric->start_time = 0.0;
+	metric->processed_bytes = 0;
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
@@ -1193,7 +1200,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
 			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, &jumped,
-			max_delay, metric->refresh);
+			max_delay, metric->refresh, &metric->start_time, &metric->processed_bytes);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -1221,7 +1228,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 
 			if (SUCCEED == process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
-					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL) || 0 != jumped)
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
 			{
 				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
 				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */
@@ -1617,7 +1624,7 @@ static int	process_common_check(char *server, unsigned short port, ZBX_ACTIVE_ME
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
 		process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
-				NULL, NULL, NULL, NULL, metric->flags, NULL);
+				NULL, NULL, NULL, NULL, metric->flags);
 	}
 out:
 	free_result(&result);
@@ -1672,12 +1679,13 @@ static void	process_active_checks(char *server, unsigned short port)
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->refresh_unsupported = 0;
 			metric->error_count = 0;
+			metric->start_time = 0.0;
+			metric->processed_bytes = 0;
 
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
 
 			process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
-					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags,
-					NULL);
+					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags);
 
 			zbx_free(error);
 		}
@@ -1702,7 +1710,7 @@ static void	process_active_checks(char *server, unsigned short port)
 					/* meta information update */
 					process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
-							NULL, NULL, metric->flags, NULL);
+							NULL, NULL, metric->flags);
 				}
 
 				/* remove "new metric" flag */
@@ -1748,7 +1756,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (time(NULL) >= nextsend)
 		{
-			send_buffer(activechk_args.host, activechk_args.port, NULL);
+			send_buffer(activechk_args.host, activechk_args.port);
 			nextsend = (int)time(NULL) + 1;
 		}
 
