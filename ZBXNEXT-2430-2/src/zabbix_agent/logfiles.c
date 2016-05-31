@@ -1961,14 +1961,13 @@ out:
  * Parameters:                                                                *
  *     processed_bytes - [IN] number of processed bytes in logfile            *
  *     remaining_bytes - [IN] number of remaining bytes in all logfiles       *
- *     t_upd           - [IN] update interval, s                              *
  *     t_proc          - [IN] processing time, s                              *
  *                                                                            *
  * Return value:                                                              *
  *     delay in seconds                                                       *
  *                                                                            *
  ******************************************************************************/
-static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaining_bytes, int t_upd, double t_proc)
+static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaining_bytes, double t_proc)
 {
 	zbx_uint64_t	remaining_full_checks, remaining_bytes_last;
 	double		delay;
@@ -1981,16 +1980,15 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 		/* remainder bytes in last check */
 		remaining_bytes_last = remaining_bytes % processed_bytes;
 
-		/* 't_proc' is expected to be much smaller than 't_upd', therefore multiplications first then adding */
-		delay = (double)remaining_full_checks * t_proc + (double)remaining_full_checks * t_upd +
+		delay = (double)remaining_full_checks * t_proc +
 				(double)remaining_bytes_last * t_proc / (double)processed_bytes;
 
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "calculate_delay(): processed bytes:" ZBX_FS_UI64
-					" remaining bytes:" ZBX_FS_UI64 " t_upd:%d s t_proc:%e s speed:%e B/s"
+					" remaining bytes:" ZBX_FS_UI64 " t_proc:%e s speed:%e B/s"
 					" remaining_full_checks:" ZBX_FS_UI64 " remaining_bytes_last:" ZBX_FS_UI64
-					" delay:%e s", processed_bytes, remaining_bytes, t_upd, t_proc,
+					" delay:%e s", processed_bytes, remaining_bytes, t_proc,
 					(double)processed_bytes / t_proc, remaining_full_checks, remaining_bytes_last,
 					delay);
 		}
@@ -2337,7 +2335,6 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
  *     key              - [IN] item key the data belongs to                   *
  *     jumped           - [OUT] flag to indicate that a jump took place       *
  *     max_delay        - [IN] maximum allowed delay, s                       *
- *     refresh          - [IN] item update interval                           *
  *     start_time       - [IN/OUT] start time of check                        *
  *     processed_bytes  - [IN/OUT] number of bytes processed                  *
  *                                                                            *
@@ -2353,8 +2350,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		struct st_logfile **logfiles_new, int *logfiles_num_new, const char *encoding,
 		zbx_vector_ptr_t *regexps, const char *pattern, const char *output_template, int *p_count, int *s_count,
 		zbx_process_value_func_t process_value, const char *server, unsigned short port, const char *hostname,
-		const char *key, int *jumped, float max_delay, int refresh, double *start_time,
-		zbx_uint64_t *processed_bytes)
+		const char *key, int *jumped, float max_delay, double *start_time, zbx_uint64_t *processed_bytes)
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
@@ -2509,7 +2505,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* calculate delay and jump if necessary */
 
 			if (0 != remaining_bytes && (double)max_delay < (delay = calculate_delay(*processed_bytes,
-					remaining_bytes, refresh, zbx_time() - *start_time)))
+					remaining_bytes, zbx_time() - *start_time)))
 			{
 				if (SUCCEED == (ret = jump_ahead(key, logfiles, logfiles_num, &last_processed, &seq,
 						lastlogsize, mtime, encoding, err_msg, remaining_bytes, delay,
