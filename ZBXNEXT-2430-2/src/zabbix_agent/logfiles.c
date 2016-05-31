@@ -2499,6 +2499,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		if (0.0 != *start_time)
 		{
 			/* calculate number of remaining bytes */
+
 			for (j = 0; j < logfiles_num; j++)
 				remaining_bytes += logfiles[j].size - logfiles[j].processed_size;
 
@@ -2571,9 +2572,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		i++;
 	}
 
-	/* store number of processed bytes for using in the next check */
 	if (0.0f != max_delay)
 	{
+		/* store number of processed bytes for using in the next check */
+
 		if (SUCCEED == ret)
 		{
 			*processed_bytes = processed_bytes_sum;
