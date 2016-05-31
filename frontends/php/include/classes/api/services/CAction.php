@@ -1319,8 +1319,8 @@ class CAction extends CApiService {
 	/**
 	 * Validate operation and recovery operation.
 	 *
-	 * @param array $operations		Operation data array.
-	 * @param int $recovery			Operation recovery.
+	 * @param array $operations Operation data array.
+	 * @param int   $recovery   Operation recovery.
 	 *
 	 * @return bool
 	 */
