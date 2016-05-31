@@ -26,7 +26,7 @@ class testPageTriggers extends CWebTest {
 		return DBdata(
 			'SELECT hostid,status'.
 			' FROM hosts'.
-			' WHERE host LIKE '.zbx_dbstr('%-layout-test-%')
+			" WHERE host LIKE '%-layout-test-%'"
 		);
 	}
 
