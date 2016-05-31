@@ -151,8 +151,8 @@ static int	zbx_event_tag_compare_func(const void *d1, const void *d2)
  ******************************************************************************/
 static void	expand_event_tag_macros()
 {
-	size_t			i;
-	int			j;
+	size_t	i;
+	int	j;
 
 	for (i = 0; i < events_num; i++)
 	{
