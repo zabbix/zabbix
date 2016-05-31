@@ -594,7 +594,7 @@ footer {
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-		padding: 7px 5px;
+		padding: 6px 5px;
 		vertical-align: bottom;
 		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
@@ -658,8 +658,8 @@ footer {
 		}
 
 		&.nothing-to-show {
-				@extend %nothing-to-show;
-			}
+			@extend %nothing-to-show;
+		}
 
 		&:last-child td {
 			border-bottom: none;
