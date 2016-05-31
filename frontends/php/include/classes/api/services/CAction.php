@@ -535,7 +535,7 @@ class CAction extends CApiService {
 		$operations_to_create = [];
 
 		// Collect conditions and operations to be created and set appropriate action ID.
-		foreach ($actions as $actionid => $action) {
+		foreach ($actions as $actionid => &$action) {
 			if (isset($action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
 					$condition['actionid'] = $actionid;
@@ -557,6 +557,7 @@ class CAction extends CApiService {
 				}
 			}
 		}
+		unset($action);
 
 		$createdConditions = $this->addConditions($conditions_to_create);
 
