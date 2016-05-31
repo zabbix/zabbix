@@ -1327,10 +1327,10 @@ class CAction extends CApiService {
 	public function validateOperationsIntegrity($operations, $recovery) {
 		$operations = zbx_toArray($operations);
 
-		$hostids_all = [];
-		$host_groupids_all = [];
-		$userids_all = [];
-		$user_groupids_all = [];
+		$all_groupids = [];
+		$all_hostids = [];
+		$all_userids = [];
+		$all_usrgrpids = [];
 
 		foreach ($operations as $operation) {
 			if ($recovery == ACTION_OPERATION) {
@@ -1381,8 +1381,8 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
 					}
 
-					$userids_all = array_merge($userids_all, $userids);
-					$user_groupids_all = array_merge($user_groupids_all, $user_groupids);
+					$all_userids = array_merge($all_userids, $userids);
+					$all_usrgrpids = array_merge($all_usrgrpids, $user_groupids);
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (!array_key_exists('type', $operation['opcommand'])) {
@@ -1526,8 +1526,8 @@ class CAction extends CApiService {
 						}
 					}
 
-					$hostids_all = array_merge($hostids_all, $hostids);
-					$host_groupids_all = array_merge($host_groupids_all, $groupids);
+					$all_hostids = array_merge($all_hostids, $hostids);
+					$all_groupids = array_merge($all_groupids, $groupids);
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
@@ -1539,7 +1539,7 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Action operation has no group to operate.'));
 					}
 
-					$host_groupids_all = array_merge($host_groupids_all, $groupids);
+					$all_groupids = array_merge($all_groupids, $groupids);
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
@@ -1551,7 +1551,7 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Action operation has no template to operate.'));
 					}
 
-					$hostids_all = array_merge($hostids_all, $templateids);
+					$all_hostids = array_merge($all_hostids, $templateids);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1577,22 +1577,22 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($host_groupids_all && !API::HostGroup()->isWritable($host_groupids_all)) {
+		if ($all_groupids && !API::HostGroup()->isWritable($all_groupids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _(
 				'Incorrect action operation host group. Host group does not exist or you have no access to this host group.'
 			));
 		}
-		if ($hostids_all && !API::Host()->isWritable($hostids_all)) {
+		if ($all_hostids && !API::Host()->isWritable($all_hostids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _(
 				'Incorrect action operation host. Host does not exist or you have no access to this host.'
 			));
 		}
-		if ($userids_all && !API::User()->isReadable($userids_all)) {
+		if ($all_userids && !API::User()->isReadable($all_userids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _(
 				'Incorrect action operation user. User does not exist or you have no access to this user.'
 			));
 		}
-		if ($user_groupids_all && !API::UserGroup()->isReadable($user_groupids_all)) {
+		if ($all_usrgrpids && !API::UserGroup()->isReadable($all_usrgrpids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _(
 				'Incorrect action operation user group. User group does not exist or you have no access to this user group.'
 			));
