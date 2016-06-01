@@ -1956,7 +1956,7 @@ out:
  * Function: calculate_delay                                                  *
  *                                                                            *
  * Purpose: calculate delay based on number of processed and remaining bytes, *
- *          update interval and processing time                               *
+ *          and processing time                                               *
  *                                                                            *
  * Parameters:                                                                *
  *     processed_bytes - [IN] number of processed bytes in logfile            *
@@ -1969,28 +1969,19 @@ out:
  ******************************************************************************/
 static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaining_bytes, double t_proc)
 {
-	zbx_uint64_t	remaining_full_checks, remaining_bytes_last;
 	double		delay;
 
 	if (0 != processed_bytes)
 	{
-		/* integer division to get quotient */
-		remaining_full_checks = remaining_bytes / processed_bytes;
-
-		/* remainder bytes in last check */
-		remaining_bytes_last = remaining_bytes % processed_bytes;
-
-		delay = (double)remaining_full_checks * t_proc +
-				(double)remaining_bytes_last * t_proc / (double)processed_bytes;
+		delay = (double)remaining_bytes * t_proc / (double)processed_bytes;
 
 		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "calculate_delay(): processed bytes:" ZBX_FS_UI64
 					" remaining bytes:" ZBX_FS_UI64 " t_proc:%e s speed:%e B/s"
-					" remaining_full_checks:" ZBX_FS_UI64 " remaining_bytes_last:" ZBX_FS_UI64
-					" delay:%e s", processed_bytes, remaining_bytes, t_proc,
-					(double)processed_bytes / t_proc, remaining_full_checks, remaining_bytes_last,
-					delay);
+					" remaining full checks:" ZBX_FS_UI64 " delay:%e s", processed_bytes,
+					remaining_bytes, t_proc, (double)processed_bytes / t_proc,
+					remaining_bytes / processed_bytes, delay);
 		}
 	}
 	else
