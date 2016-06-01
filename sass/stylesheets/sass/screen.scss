@@ -590,31 +590,27 @@ footer {
 	border: 1px solid $ui-border-color;
 
 	thead th {
-		font-size: $font-h3-size;
 		color: $font-alt-color;
-		text-transform: $font-transform;
-		letter-spacing: 0.0688em;
-		text-rendering: optimizeLegibility;
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
 		padding: 6px 5px;
 		vertical-align: bottom;
-		border-bottom: 2px solid $table-border-color;
+		border-bottom: 2px solid darken($table-border-color, 5%);
 		text-align: left;
 
 		.arrow-up {
-			margin: 0 0 0 4px;
+			margin: 0 0 0 3px;
 			border-bottom-color: $font-alt-color;
 		}
 
 		.arrow-right {
-			margin: 0 0 0 4px;
+			margin: 0 0 0 3px;
 			border-left-color: $font-alt-color;
 		}
 
 		.arrow-down {
-			margin: 0 0 0 4px;
+			margin: 0 0 0 3px;
 			border-top-color: $font-alt-color;
 		}
 
@@ -662,8 +658,8 @@ footer {
 		}
 
 		&.nothing-to-show {
-				@extend %nothing-to-show;
-			}
+			@extend %nothing-to-show;
+		}
 
 		&:last-child td {
 			border-bottom: none;
@@ -686,7 +682,7 @@ footer {
 	text-align: center;
 	background-color: $ui-bg-color;
 	margin-top: -1px;
-	padding: 6px 5px;
+	padding: 4px 5px;
 	overflow: hidden;
 	position: relative;
 	border: 1px solid $ui-border-color;
@@ -918,10 +914,6 @@ footer {
 		thead {
 
 			th {
-				font-size: $font-form-size;
-				text-transform: none;
-				text-rendering: auto;
-				letter-spacing: normal;
 				color: initial;
 				padding: 8px 5px 5px 5px;
 				border-bottom-width: 1px;
@@ -1282,11 +1274,7 @@ footer {
 	}
 
 	th {
-		font-size: $font-h3-size;
 		color: $font-alt-color;
-		text-transform: $font-transform;
-		letter-spacing: 0.0688em;
-		text-rendering: optimizeLegibility;
 		padding: 0 5px 0 0;
 
 		&:last-child {
@@ -2564,8 +2552,8 @@ $form-icon-btn: (
 
 		&:hover {
 			@extend .selected
-			}
 		}
+	}
 
 	table {
 		width: 100%;
