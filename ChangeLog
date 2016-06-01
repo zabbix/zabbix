@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+....I...S. [ZBXNEXT-3193] added event_recovery table to link problem and recovery events, added problem table to cache active problem events (wiper)
 .......PS. [ZBXNEXT-3267] added one minute delay for repeated SNMP trap file error log entries (viktors)
 A.F.....S. [ZBXNEXT-3196] added action option to pause escalations during maintenance (Gunars, wiper)
 A.F....... [ZBXNEXT-178] implemented web scenarios import/export (Sasha)
@@ -25,6 +26,9 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
+..F....... [ZBX-10825] reverted table header capitalization. fixed calendar header (asaveljevs, Pavel)
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
 ..F....... [ZBX-10794] fixed saving of "Show text as HTML" checkbox in Monitoring->Screens (Cemeris)
 ..F....... [ZBX-10504] decreased padding and margins in tables and across the whole UI (Pavel)
 ..F....... [ZBX-10504] added compression of generated CSS files to reduce size from 99K to around 56K (asaveljevs, Pavel)
@@ -1410,6 +1414,8 @@ Changes for 2.2.14rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.13
