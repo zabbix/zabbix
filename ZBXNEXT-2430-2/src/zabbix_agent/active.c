@@ -1467,7 +1467,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 					send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 							ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, provider,
 							&severity, &logeventid,
-							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL);
+							metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 					if (SUCCEED == send_err)
 					{
@@ -1562,7 +1562,7 @@ static int	process_eventlog_check(char *server, unsigned short port, ZBX_ACTIVE_
 			{
 				send_err = process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, value,
 						ITEM_STATE_NORMAL, &lastlogsize, NULL, &timestamp, source, &severity,
-						&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT, NULL);
+						&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT);
 
 				if (SUCCEED == send_err)
 				{
