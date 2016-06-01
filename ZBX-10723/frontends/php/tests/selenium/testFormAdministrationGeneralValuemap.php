@@ -181,7 +181,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickWait('link='.$newVmName);
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Value map deleted');
 
@@ -208,7 +208,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickWait('link='.$this->valuemapWithMultipleMappings);
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Value map deleted');
 

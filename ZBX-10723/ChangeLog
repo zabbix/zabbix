@@ -1,9 +1,24 @@
+Changes for 2.2.14rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13
+
+2.2.13rc1 was released as 2.2.13 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.13rc1
 
 New features:
 A.F....... [ZBX-1357] updated French, Spanish, Vietnamese translations; thanks to Zabbix translators (zalex_ua)
 
 Bug fixes:
+A......... [ZBX-10755] fixed deletion of the items which used in graph Y axis min/max parameters (Sasha)
 ....I..... [ZBX-10741] enforced bash usage in mysql.size user parameter configuration script to avoid issues with different default shells; thanks to Timo Lindfors for reporting it (wiper)
 ........S. [ZBX-10727] fixed timeout being too low when sending configuration data to active proxy (asaveljevs)
 .......PS. [ZBX-6563] fixed potential incorrect data from icmppingsec item with low latency hosts (viktors)
@@ -1405,6 +1420,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18
+
+2.0.18rc1 was released as 2.0.18 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.18rc1

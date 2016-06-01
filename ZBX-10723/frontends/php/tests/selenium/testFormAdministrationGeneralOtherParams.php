@@ -97,9 +97,6 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 
 	}
 
-	/**
-	* @dataProvider RefreshUnsupported
-	*/
 	public function testFormAdministrationGeneralOtherParams_OtherParams() {
 
 		$this->zbxTestLogin('adm.other.php');
