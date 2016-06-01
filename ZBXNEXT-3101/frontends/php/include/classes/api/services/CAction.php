@@ -2570,12 +2570,8 @@ class CAction extends CApiService {
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
-		if ($operations_to_validate) {
-			$this->validateOperationsIntegrity($operations_to_validate, ACTION_OPERATION);
-		}
-		if ($recovery_operations_to_validate) {
-			$this->validateOperationsIntegrity($recovery_operations_to_validate, ACTION_RECOVERY_OPERATION);
-		}
+		$this->validateOperationsIntegrity($operations_to_validate, ACTION_OPERATION);
+		$this->validateOperationsIntegrity($recovery_operations_to_validate, ACTION_RECOVERY_OPERATION);
 	}
 
 	/**
