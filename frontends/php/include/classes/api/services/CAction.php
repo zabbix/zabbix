@@ -1959,9 +1959,6 @@ class CAction extends CApiService {
 
 			$opmessage = [];
 			$opcommand = [];
-			$opgroup = [];
-			$optemplate = [];
-			$opinventory = [];
 
 			foreach ($recovery_operations as $recovery_operationid => $recovery_operation) {
 				switch ($recovery_operation['operationtype']) {
@@ -1970,22 +1967,6 @@ class CAction extends CApiService {
 						break;
 					case OPERATION_TYPE_COMMAND:
 						$opcommand[] = $recovery_operationid;
-						break;
-					case OPERATION_TYPE_GROUP_ADD:
-					case OPERATION_TYPE_GROUP_REMOVE:
-						$opgroup[] = $recovery_operationid;
-						break;
-					case OPERATION_TYPE_TEMPLATE_ADD:
-					case OPERATION_TYPE_TEMPLATE_REMOVE:
-						$optemplate[] = $recovery_operationid;
-						break;
-					case OPERATION_TYPE_HOST_ADD:
-					case OPERATION_TYPE_HOST_REMOVE:
-					case OPERATION_TYPE_HOST_ENABLE:
-					case OPERATION_TYPE_HOST_DISABLE:
-						break;
-					case OPERATION_TYPE_HOST_INVENTORY:
-						$opinventory[] = $recovery_operationid;
 						break;
 				}
 			}
@@ -2082,60 +2063,6 @@ class CAction extends CApiService {
 					);
 					while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
 						$recovery_operations[$opcommand_grp['operationid']]['opcommand_grp'][] = $opcommand_grp;
-					}
-				}
-			}
-
-			// Get OPERATION_TYPE_GROUP_ADD, OPERATION_TYPE_GROUP_REMOVE data.
-			if ($opgroup) {
-				if ($this->outputIsRequested('opgroup', $options['selectRecoveryOperations'])) {
-					foreach ($opgroup as $recovery_operationid) {
-						$recovery_operations[$recovery_operationid]['opgroup'] = [];
-					}
-
-					$db_opgroup = DBselect(
-						'SELECT o.operationid,o.groupid'.
-							' FROM opgroup o'.
-							' WHERE '.dbConditionInt('operationid', $opgroup)
-					);
-					while ($opgroup = DBfetch($db_opgroup)) {
-						$recovery_operations[$opgroup['operationid']]['opgroup'][] = $opgroup;
-					}
-				}
-			}
-
-			// Get OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE data.
-			if ($optemplate) {
-				if ($this->outputIsRequested('optemplate', $options['selectRecoveryOperations'])) {
-					foreach ($optemplate as $recovery_operationid) {
-						$recovery_operations[$recovery_operationid]['optemplate'] = [];
-					}
-
-					$db_optemplate = DBselect(
-						'SELECT o.operationid,o.templateid'.
-							' FROM optemplate o'.
-							' WHERE '.dbConditionInt('operationid', $optemplate)
-					);
-					while ($optemplate = DBfetch($db_optemplate)) {
-						$recovery_operations[$optemplate['operationid']]['optemplate'][] = $optemplate;
-					}
-				}
-			}
-
-			// Get OPERATION_TYPE_HOST_INVENTORY data.
-			if ($opinventory) {
-				if ($this->outputIsRequested('opinventory', $options['selectRecoveryOperations'])) {
-					foreach ($opinventory as $recovery_operationid) {
-						$recovery_operations[$recovery_operationid]['opinventory'] = [];
-					}
-
-					$db_opinventory = DBselect(
-						'SELECT o.operationid,o.inventory_mode'.
-							' FROM opinventory o'.
-							' WHERE '.dbConditionInt('operationid', $opinventory)
-					);
-					while ($opinventory = DBfetch($db_opinventory)) {
-						$recovery_operations[$opinventory['operationid']]['opinventory'] = $opinventory;
 					}
 				}
 			}
