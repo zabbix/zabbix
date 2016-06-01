@@ -1383,9 +1383,7 @@ class CAction extends CApiService {
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (!array_key_exists('type', $operation['opcommand'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No command type specified for action operation.')
-						);
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command type specified for action operation.'));
 					}
 
 					if ((!array_key_exists('command', $operation['opcommand'])
@@ -1402,7 +1400,8 @@ class CAction extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No execution target specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
-								));
+									)
+								);
 							}
 							break;
 						case ZBX_SCRIPT_TYPE_SSH:
@@ -1411,7 +1410,8 @@ class CAction extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication type specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
-								));
+									)
+								);
 							}
 
 							if (!array_key_exists('username', $operation['opcommand'])
@@ -1419,7 +1419,8 @@ class CAction extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
-								));
+									)
+								);
 							}
 
 							if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
@@ -1428,14 +1429,16 @@ class CAction extends CApiService {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('No public key file specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
-									));
+										)
+									);
 								}
 								if (!array_key_exists('privatekey', $operation['opcommand'])
 										|| zbx_empty($operation['opcommand']['privatekey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('No private key file specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
-									));
+										)
+									);
 								}
 							}
 							break;
@@ -1445,7 +1448,8 @@ class CAction extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
-								));
+									)
+								);
 							}
 							break;
 						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
