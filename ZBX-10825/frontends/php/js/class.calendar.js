@@ -64,7 +64,6 @@ calendar.prototype = {
 		this.timeobjects = new Array();
 		if (!(this.status = this.checkOuterObj(timeobjects))) {
 			throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
-			return false;
 		}
 		this.calendarcreate(parentNodeid);
 
@@ -249,7 +248,6 @@ calendar.prototype = {
 				break;
 			default:
 				return false;
-				break;
 		}
 
 		if (!is_null(this.clndr_utime_field)) {
@@ -349,7 +347,6 @@ calendar.prototype = {
 	},
 
 	setDone: function() {
-		this.syncSDT();
 		this.syncBSDateBySDT();
 		this.ondateselected();
 	},
