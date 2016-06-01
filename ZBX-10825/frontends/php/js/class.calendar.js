@@ -493,21 +493,17 @@ calendar.prototype = {
 	},
 
 	createDaysTab: function() {
-		this.clndr_days.update('');
-		var table = document.createElement('table');
-		this.clndr_days.appendChild(table);
-
-		var tbody = document.createElement('tbody');
-		table.appendChild(tbody);
+		var tbody = this.clndr_days;
+		tbody.update('');
 
 		var cur_month = this.cdt.getMonth();
 
-		// make 0 - monday, not sunday(as default)
+		// make 0 - Monday, not Sunday (as default)
 		var prev_days = this.cdt.getDay() - 1;
 		if (prev_days < 0) {
 			prev_days = 6;
 		}
-		if(prev_days > 0) {
+		if (prev_days > 0) {
 			this.cdt.setTime(this.cdt.getTime() - prev_days * 86400000);
 		}
 
@@ -614,11 +610,11 @@ calendar.prototype = {
 		var table = document.createElement('table');
 		this.clndr_calendar.appendChild(table);
 
-		var tbody = document.createElement('thead');
-		table.appendChild(tbody);
+		var thead = document.createElement('thead');
+		table.appendChild(thead);
 
 		var tr = document.createElement('tr');
-		tbody.appendChild(tr);
+		thead.appendChild(tr);
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
@@ -651,10 +647,9 @@ calendar.prototype = {
 		/*
 		 * Days calendar
 		 */
-		this.clndr_days = document.createElement('div');
+		this.clndr_days = document.createElement('tbody');
 		Element.extend(this.clndr_days);
-		this.clndr_calendar.appendChild(this.clndr_days);
-		this.clndr_days.className = 'calendar-day';
+		table.appendChild(this.clndr_days);
 
 		/*
 		 * Hours & minutes
