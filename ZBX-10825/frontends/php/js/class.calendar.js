@@ -515,9 +515,6 @@ calendar.prototype = {
 				tr.appendChild(td);
 				Element.extend(td);
 
-				if (x > 4) {
-					td.className = 'holiday';
-				}
 				if (cur_month != this.cdt.getMonth()) {
 					td.addClassName('grey');
 				}
