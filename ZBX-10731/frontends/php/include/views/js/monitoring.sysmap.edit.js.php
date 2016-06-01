@@ -65,25 +65,20 @@
 </script>
 
 <script type="text/javascript">
-	var inputs = '#label_type_hostgroup, #label_type_host, #label_type_trigger, #label_type_map, #label_type_image';
-
-	function toggleAdvancedLabels() {
-		var toggle = (jQuery('#label_format:checked').length != 0);
-
-		jQuery(inputs).each(function() {
-			jQuery(this).parentsUntil('ul')
-				.toggle(toggle)
-				.next().toggle(jQuery(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?> && toggle);
-		});
-
-		jQuery('#label_type').parentsUntil('ul').toggle(!toggle);
-	};
-
 	jQuery(function($) {
+		var inputs = '#label_type_hostgroup, #label_type_host, #label_type_trigger, #label_type_map, #label_type_image';
+
 		$('#label_format').click(function() {
-			toggleAdvancedLabels();
+			var toggle = $('#label_format').is(':checked');
+
+			$(inputs).each(function() {
+				$(this).parentsUntil('ul')
+					.toggle(toggle)
+					.next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?> && toggle);
+			});
+
+			$('#label_type').parentsUntil('ul').toggle(!toggle);
 		});
-		toggleAdvancedLabels();
 
 		$(inputs).change(function() {
 			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
@@ -112,6 +107,8 @@
 				'name': $('#current_user_fullname').val()
 			});
 		});
+
+		$('#label_format').triggerHandler('click');
 	});
 
 	/**
