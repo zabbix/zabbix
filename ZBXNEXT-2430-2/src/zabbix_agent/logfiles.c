@@ -2551,12 +2551,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				break;
 
 			if (0.0f != max_delay)
-			{
 				processed_bytes_sum += processed_bytes_tmp;
 
-				if (0 >= *p_count || 0 >= *s_count)
-					break;
-			}
+			if (0 >= *p_count || 0 >= *s_count)
+				break;
 		}
 
 		if (0 != from_first_file)
