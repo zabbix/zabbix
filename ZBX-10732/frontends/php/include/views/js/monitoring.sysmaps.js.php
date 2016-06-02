@@ -238,7 +238,9 @@
 					)
 					->addRow(
 						new CLabel([
-							(new CCheckBox('chkbox_use_iconmap'))->setId('chkboxMassUseIconmap'),
+							(new CCheckBox('chkbox_use_iconmap'))
+								->setEnabled($data['sysmap']['iconmapid'] !== '0')
+								->setId('chkboxMassUseIconmap'),
 							_('Automatic icon selection')
 						], 'chkboxMassUseIconmap'),
 						(new CCheckBox('use_iconmap'))->setId('massUseIconmap')
