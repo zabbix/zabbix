@@ -26,6 +26,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10731] fixed textarea visibility in monitoring->maps properties (Cemeris)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
 ..F....... [ZBX-10825] reverted table header capitalization. fixed calendar header (asaveljevs, Pavel)
 .......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
