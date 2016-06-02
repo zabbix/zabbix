@@ -1584,7 +1584,7 @@ ZABBIX.apps.map = (function($) {
 			 * @return array
 			 */
 			getValues: function() {
-				var values = $(':input', '#massForm').not(this.actionProcessor.hidden).serializeArray(),
+				var values = $('#massForm').serializeArray(),
 					data = {},
 					i,
 					ln;
