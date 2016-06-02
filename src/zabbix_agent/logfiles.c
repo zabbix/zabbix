@@ -2534,7 +2534,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* we do not check for errors here */
 			logfiles[i].processed_size = *lastlogsize;
 
-			/* log file could grow during processing, adjust size in our list */
+			/* log file could grow during processing, update size in our list */
 			if (*lastlogsize > logfiles[i].size)
 				logfiles[i].size = *lastlogsize;
 
