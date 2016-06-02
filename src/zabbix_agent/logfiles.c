@@ -2534,6 +2534,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 			/* we do not check for errors here */
 			logfiles[i].processed_size = *lastlogsize;
 
+			/* log file could grow during processing, adjust size in our list */
+			if (*lastlogsize > logfiles[i].size)
+				logfiles[i].size = *lastlogsize;
+
 			/* Mark file as processed (at least partially). In case if process_log() failed we will stop */
 			/* the current checking. In the next check the file will be marked in the list of old files */
 			/* and we will know where we left off. */
