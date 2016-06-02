@@ -194,12 +194,44 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	if (hasRequest('update')) {
+	$tags = getRequest('tags', []);
+	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+
+	// Remove empty new tag lines.
+	foreach ($tags as $key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($tags[$key]);
+		}
+	}
+
+	if (hasRequest('add')) {
+		$trigger = [
+			'description' => getRequest('description'),
+			'expression' => getRequest('expression'),
+			'recovery_mode' => getRequest('recovery_mode'),
+			'type' => getRequest('type'),
+			'url' => getRequest('url'),
+			'priority' => getRequest('priority'),
+			'comments' => getRequest('comments'),
+			'tags' => $tags,
+			'dependencies' => $dependencies,
+			'status' => getRequest('status')
+		];
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+			$trigger['recovery_expression'] = getRequest('recovery_expression');
+		}
+
+		$result = API::Trigger()->create($trigger);
+
+		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
+	}
+	else {
 		$old_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
 				'flags', 'recovery_mode', 'recovery_expression'
 			],
 			'selectDependencies' => ['triggerid'],
+			'selectTags' => ['tag', 'value'],
 			'triggerids' => getRequest('triggerid')
 		]);
 
@@ -208,82 +240,68 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		);
 
 		$old_trigger = reset($old_triggers);
-	}
 
-	$trigger = ['status' => getRequest('status')];
-
-	if (hasRequest('add') || hasRequest('update') && $old_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$trigger += [
-			'url' => getRequest('url'),
-			'priority' => getRequest('priority'),
-			'comments' => getRequest('comments'),
-			'type' => getRequest('type'),
-			'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid'),
-			'tags' => getRequest('tags', [])
-		];
-
-		if (hasRequest('add') || hasRequest('update') && $old_trigger['templateid'] == 0) {
-			// Not templated trigger.
-			$trigger += [
-				'expression' => getRequest('expression'),
-				'description' => getRequest('description'),
-				'recovery_mode' => getRequest('recovery_mode'),
-				'recovery_expression' => getRequest('recovery_expression'),
-			];
-
-			if ($trigger['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-				$trigger['recovery_expression'] = '';
-			}
-		}
-
-		// Remove empty new tag lines.
-		foreach ($trigger['tags'] as $tag_key => $tag) {
-			if ($tag['tag'] === '' && $tag['value'] === '') {
-				unset($trigger['tags'][$tag_key]);
-			}
-		}
-	}
-
-	if (hasRequest('update')) {
-		// Update only changed fields.
-		$update_depencencies = false;
+		$trigger = [];
 
 		if ($old_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$old_trigger['dependencies'] = zbx_toHash(zbx_objectValues($old_trigger['dependencies'], 'triggerid'));
-
-			$new_dependencies = $trigger['dependencies'];
-			$old_dependencies = $old_trigger['dependencies'];
-
-			unset($trigger['dependencies'], $old_trigger['dependencies']);
-
-			// dependencies
-			if (count($new_dependencies) != count($old_dependencies)) {
-				$update_depencencies = true;
-			}
-			else {
-				foreach ($new_dependencies as $dependency) {
-					if (!array_key_exists($dependency['triggerid'], $old_dependencies)) {
-						$update_depencencies = true;
-					}
+			if ($old_trigger['templateid'] == 0) {
+				if ($old_trigger['description'] !== getRequest('description')) {
+					$trigger['description'] = getRequest('description');
+				}
+				if ($old_trigger['expression'] !== getRequest('expression')) {
+					$trigger['expression'] = getRequest('expression');
+				}
+				if ($old_trigger['recovery_mode'] != getRequest('recovery_mode')) {
+					$trigger['recovery_mode'] = getRequest('recovery_mode');
+				}
+				if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
+						&& $old_trigger['recovery_expression'] !== getRequest('recovery_expression')) {
+					$trigger['recovery_expression'] = getRequest('recovery_expression');
 				}
 			}
+
+			if ($old_trigger['type'] != getRequest('type')) {
+				$trigger['type'] = getRequest('type');
+			}
+			if ($old_trigger['url'] !== getRequest('url')) {
+				$trigger['url'] = getRequest('url');
+			}
+			if ($old_trigger['priority'] != getRequest('priority')) {
+				$trigger['priority'] = getRequest('priority');
+			}
+			if ($old_trigger['comments'] !== getRequest('comments')) {
+				$trigger['comments'] = getRequest('comments');
+			}
+
+			$old_tags = $old_trigger['tags'];
+			CArrayHelper::sort($old_tags, ['tag', 'value']);
+			CArrayHelper::sort($tags, ['tag', 'value']);
+			if (array_values($old_tags) !== array_values($tags)) {
+				$trigger['tags'] = $tags;
+			}
+
+			$old_dependencies = $old_trigger['dependencies'];
+			CArrayHelper::sort($old_dependencies, ['triggerid']);
+			CArrayHelper::sort($dependencies, ['triggerid']);
+			if (array_values($old_dependencies) !== array_values($dependencies)) {
+				$trigger['dependencies'] = $dependencies;
+			}
 		}
 
-		$trigger_to_update = array_diff_assoc($trigger, $old_trigger);
-		$trigger_to_update['triggerid'] = getRequest('triggerid');
-
-		if ($update_depencencies) {
-			$trigger_to_update['dependencies'] = $new_dependencies;
+		if ($old_trigger['status'] != getRequest('status')) {
+			$trigger['status'] = getRequest('status');
 		}
 
-		$result = API::Trigger()->update($trigger_to_update);
+		if ($trigger) {
+			$trigger['triggerid'] = getRequest('triggerid');
+
+			$result = API::Trigger()->update($trigger);
+		}
+		else {
+			$result = true;
+		}
 
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
-	}
-	else {
-		$result = API::Trigger()->create($trigger);
-
-		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 
 	if ($result) {
