@@ -1964,14 +1964,17 @@ out:
  *     t_proc          - [IN] processing time, s                              *
  *                                                                            *
  * Return value:                                                              *
- *     delay in seconds                                                       *
+ *     delay in seconds or 0 (if cannot be calculated)                        *
  *                                                                            *
  ******************************************************************************/
 static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaining_bytes, double t_proc)
 {
-	double		delay;
+	double	delay = 0.0;
 
-	if (0 != processed_bytes)
+	/* Processing time could be negative or 0 if the system clock has been set back in time. */
+	/* In this case return 0 and jump over log lines will not take place. */
+
+	if (0 != processed_bytes && 0.0 < t_proc)
 	{
 		delay = (double)remaining_bytes * t_proc / (double)processed_bytes;
 
@@ -1984,8 +1987,6 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 					remaining_bytes / processed_bytes, delay);
 		}
 	}
-	else
-		delay = 0.0;
 
 	return delay;
 }
