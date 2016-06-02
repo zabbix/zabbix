@@ -1972,7 +1972,7 @@ static double	calculate_delay(zbx_uint64_t processed_bytes, zbx_uint64_t remaini
 	double	delay = 0.0;
 
 	/* Processing time could be negative or 0 if the system clock has been set back in time. */
-	/* In this case return 0 and jump over log lines will not take place. */
+	/* In this case return 0, then a jump over log lines will not take place. */
 
 	if (0 != processed_bytes && 0.0 < t_proc)
 	{
