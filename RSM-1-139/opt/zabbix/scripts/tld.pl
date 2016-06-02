@@ -43,11 +43,7 @@
 # - EPP monthly UPDATE resolution RTT	(monthly)		rsm.slv.epp.rtt.update.month	-|-
 # - EPP monthly INFO resolution RTT	(monthly)		rsm.slv.epp.rtt.info.month	-|-
 
-BEGIN
-{
-	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
-}
-use lib $MYDIR;
+use lib '/opt/zabbix/scripts';
 
 use strict;
 use warnings;
@@ -66,8 +62,7 @@ sub create_tld_host($$$$);
 sub create_probe_health_tmpl;
 sub manage_tld_objects($$$$$);
 sub manage_tld_hosts($$);
-sub update_epp_objects($);
-sub update_epp_objects($);
+
 sub get_nsservers_list($);
 sub update_nsservers($$);
 sub get_tld_list();
@@ -99,7 +94,6 @@ my $rv = GetOptions(\%OPTS,
 		    "ipv6!",
 		    "dns!",
 		    "epp!",
-		    "only-epp!",
 		    "rdds!",
 		    "dnssec!",
 		    "epp-servers=s",
@@ -249,6 +243,11 @@ if (defined($OPTS{'disable'})) {
     exit;
 }
 
+#### Adding new TLD ####
+my $proxies = get_proxies_list($OPTS{'only-tld'});
+
+pfail("Cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
+
 ## Creating all global macros##
 ## Please check the function to change default values of macros ##
 unless ($OPTS{'only-tld'} eq true) {
@@ -268,17 +267,6 @@ foreach my $macro (keys %{$cfg_global_macros}) {
 	pfail('cannot get global macro ', $macro);
     }
 }
-
-#### Update only EPP params ####
-if (defined($OPTS{'only-epp'})) {
-	update_epp_objects($OPTS{'tld'});
-	exit;
-}
-
-#### Adding new TLD ####
-my $proxies = get_proxies_list($OPTS{'only-tld'});
-
-pfail("Cannot find existing proxies") if (scalar(keys %{$proxies}) == 0);
 
 # RSM host is required to have history of global configuration changes #
 # There are monitored changes of global macros #
@@ -488,8 +476,6 @@ sub create_item_dns_rtt {
     my $ipv = shift;
     my $is_new = shift;
 
-    $is_new = false unless defined $is_new;
-
     pfail("undefined template ID passed to create_item_dns_rtt()") unless ($templateid);
     pfail("no protocol parameter specified to create_item_dns_rtt()") unless ($proto);
 
@@ -677,7 +663,6 @@ sub create_item_dns_udp_upd {
     my $ip = shift;
     my $templateid = shift;
     my $template_name = shift;
-    my $ipv = shift;
     my $is_new = shift;
 
     my $proto_uc = 'UDP';
@@ -871,9 +856,9 @@ sub create_items_rdds {
         else {
             push @new_data, $trigger;
         }
-
-    }
-
+        
+    }   
+    
     foreach my $trigger (@new_data) {
         create_trigger($trigger, true);
     }
@@ -889,6 +874,13 @@ sub create_items_rdds {
 		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
 		    'status' => 0};
 	create_item($options, $is_new);
+
+	$options = { 'description' => 'RDDS43-UPD {HOST.NAME}: No UNIX timestamp',
+                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
+                        'priority' => '2',
+                };
+
+	create_trigger($options, $is_new);
     }
 
     $item_key = 'rsm.rdds.80.ip[{$RSM.TLD}]';
@@ -958,10 +950,10 @@ sub create_items_rdds {
     $zbx_data = get_triggers_by_itemid($itemid, $is_new);
 
     undef @new_data;
-
+                                              
     for my $trigger (@data) {
         my $tmp_trigger;
-
+    
         foreach my $zbx_trigger (keys %{$zbx_data}) {
             if ($trigger->{'expression'} eq $zbx_data->{$zbx_trigger}->{'expression'}) {
                 $tmp_trigger = $zbx_data->{$zbx_trigger};
@@ -969,7 +961,7 @@ sub create_items_rdds {
                 last;
             }
         }
-
+        
         if (defined($tmp_trigger)) {
             # it is possible to change, remove already existing triggers here
             if ($tmp_trigger->{'description'} eq $trigger->{'description'} and
@@ -984,6 +976,7 @@ sub create_items_rdds {
         else {
             push @new_data, $trigger;
         }
+        
     }
 
     foreach my $trigger (@new_data) {
@@ -1021,7 +1014,7 @@ sub create_items_epp {
 
     my ($item_key, $options);
 
-    $item_key = 'rsm.epp[{$RSM.TLD},"{$RSM.EPP.SERVERS}"]';
+    $item_key = 'rsm.epp[{$RSM.TLD},"'.$OPTS{'epp-servers'}.'"]';
 
     $options = {'name' => 'EPP service availability at $1 ($2)',
 		'key_'=> $item_key,
@@ -1162,12 +1155,12 @@ sub create_items_epp {
     push @data, $options;
 
     my $zbx_data = get_triggers_by_itemid($itemid, $is_new);
-
+    
     my @new_data;
-
+    
     for my $trigger (@data) {
         my $tmp_trigger;
-
+                                              
         foreach my $zbx_trigger (keys %{$zbx_data}) {
             if ($trigger->{'expression'} eq $zbx_data->{$zbx_trigger}->{'expression'}) {
                 $tmp_trigger = $zbx_data->{$zbx_trigger};
@@ -1175,7 +1168,7 @@ sub create_items_epp {
                 last;
             }
         }
-
+    
         if (defined($tmp_trigger)) {
             # it is possible to change, remove already existing triggers here
             if ($tmp_trigger->{'description'} eq $trigger->{'description'} and
@@ -1195,28 +1188,6 @@ sub create_items_epp {
 
     foreach my $trigger (@new_data) {
         create_trigger($trigger, true);
-    }
-
-    if (defined($OPTS{'rdds43-servers'})) {
-        $item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-        
-        my $applicationid_43 = get_application_id('RDDS43', $templateid);
-
-        $options = {'name' => 'RDDS43 update time of $1',
-                    'key_'=> $item_key,
-		    'hostid' => $templateid,
-		    'applications' => [$applicationid_43],
-		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
-		    'status' => 0};
-	create_item($options);
-
-	$options = { 'description' => 'RDDS43-UPD {HOST.NAME}: No UNIX timestamp',
-                         'expression' => '{'.$template_name.':'.$item_key.'.last(0)}='.ZBX_EC_RDDS43_NOTS,
-                        'priority' => '2',
-                };
-
-	create_trigger($options);
     }
 }
 
@@ -1248,7 +1219,7 @@ sub exp_get_keysalt
 
     if ($self->match() =~ m/^([^\s]+\|[^\s]+)/)
     {
-        $exp_output = $1;
+	$exp_output = $1;
     }
 }
 
@@ -1319,9 +1290,9 @@ sub read_file {
     my $file = shift;
 
     my $contents = do {
-        local $/ = undef;
-        open my $fh, "<", $file or pfail("could not open $file: $!");
-        <$fh>;
+	local $/ = undef;
+	open my $fh, "<", $file or pfail("could not open $file: $!");
+	<$fh>;
     };
 
     return $contents;
@@ -1354,6 +1325,7 @@ sub create_main_template {
 
     pfail("Could not create main template for '".$tld."' TLD. ".$templateid->{'data'}) if check_api_error($templateid) eq true;
 
+
     unless (exists($applications->{$templateid}->{'Configuration'})) {
         $applications->{$templateid}->{'Configuration'} = get_application_id('Configuration', $templateid, $is_new)
     }
@@ -1381,23 +1353,51 @@ sub create_main_template {
     foreach my $ns_name (sort keys %{$ns_servers}) {
 	print $ns_name."\n";
 
-	foreach my $ipv (keys %{$ns_servers->{$ns_name}}) {
-	    my $ip_list = $ns_servers->{$ns_name}->{$ipv};
+        my @ipv4 = defined(@{$ns_servers->{$ns_name}{'v4'}}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
+	my @ipv6 = defined(@{$ns_servers->{$ns_name}{'v6'}}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
 
-	    $ipv =~s/v([46])/$1/;
-	    foreach my $ip (@{$ip_list}) {
-		print "        --v$ipv     $ip\n";
+        foreach (my $i_ipv4 = 0; $i_ipv4 <= $#ipv4; $i_ipv4++) {
+	    next unless defined $ipv4[$i_ipv4];
+	    print "	--v4     $ipv4[$i_ipv4]\n";
 
-		create_item_dns_rtt($ns_name, $ip, $templateid, $template_name, "tcp", $ipv, $is_new);
-		create_item_dns_rtt($ns_name, $ip, $templateid, $template_name, "udp", $ipv, $is_new);
-		create_item_dns_udp_upd($ns_name, $ip, $templateid, $template_name, $ipv, $is_new) if (defined($OPTS{'epp-servers'}));
+            create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "tcp", '4', $is_new);
+	    create_item_dns_rtt($ns_name, $ipv4[$i_ipv4], $templateid, $template_name, "udp", '4', $is_new);
+	    if (defined($OPTS{'epp-servers'})) {
+    		create_item_dns_udp_upd($ns_name, $ipv4[$i_ipv4], $templateid, $is_new);
+
+		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv4[$i_ipv4].']',
+            	             'expression' => '{'.$template_name.':'.'rsm.dns.udp.upd[{$RSM.TLD},'.$ns_name.','.$ipv4[$i_ipv4].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+					     '&{'.$template_name.':'.'probe.configvalue[RSM.IP4.ENABLED]'.'.last(0)}=1',
+                	    'priority' => '2',
+                };
+
+	        create_trigger($options, $is_new);
+    	    }
+        }
+
+	foreach (my $i_ipv6 = 0; $i_ipv6 <= $#ipv6; $i_ipv6++) {
+	    next unless defined $ipv6[$i_ipv6];
+    	    print "	--v6     $ipv6[$i_ipv6]\n";
+
+	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "tcp", '6', $is_new);
+    	    create_item_dns_rtt($ns_name, $ipv6[$i_ipv6], $templateid, $template_name, "udp", '6', $is_new);
+	    if (defined($OPTS{'epp-servers'})) {
+    		create_item_dns_udp_upd($ns_name, $ipv6[$i_ipv6], $templateid, $is_new);
+
+		my $options = { 'description' => 'DNS-UPD-UDP {HOST.NAME}: No UNIX timestamp for ['.$ipv6[$i_ipv6].']',
+                             'expression' => '{'.$template_name.':'.'rsm.dns.udp.upd[{$RSM.TLD},'.$ns_name.','.$ipv6[$i_ipv6].']'.'.last(0)}='.ZBX_EC_DNS_NS_NOTS.
+						'&{'.$template_name.':'.'probe.configvalue[RSM.IP6.ENABLED]'.'.last(0)}=1',
+                            'priority' => '2',
+                };
+
+                create_trigger($options, $is_new);
 	    }
         }
     }
 
     create_items_dns($templateid, $template_name, $is_new);
     create_items_rdds($templateid, $template_name, $is_new) if (defined($OPTS{'rdds43-servers'}));
-    create_epp_objects($templateid, $template_name, $tld, $is_new) if (defined($OPTS{'epp-servers'}));
+    create_items_epp($templateid, $template_name, $is_new) if (defined($OPTS{'epp-servers'}));
 
     create_macro('{$RSM.TLD}', $tld, $templateid, undef, $is_new);
     create_macro('{$RSM.DNS.TESTPREFIX}', $OPTS{'dns-test-prefix'}, $templateid, undef, $is_new);
@@ -1407,44 +1407,36 @@ sub create_main_template {
     create_macro('{$RSM.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid, true, $is_new);
     create_macro('{$RSM.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid, true, $is_new);
 
-    return $templateid;
-}
+    if ($OPTS{'epp-servers'})
+    {
+	my $m = '{$RSM.EPP.KEYSALT}';
+	my $keysalt = get_global_macro_value($m);
+	pfail('cannot get macro ', $m) unless defined($keysalt);
+	trim($keysalt);
+	pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
 
-sub create_epp_objects($$$$) {
-    my $templateid = shift;
-    my $template_name = shift;
-    my $tld = shift;
-    my $is_new = shift;
+	if ($OPTS{'epp-commands'}) {
+	    create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, 1);
+	} else {
+	    create_macro('{$RSM.EPP.COMMANDS}', '/opt/test-sla/epp-commands/'.$tld, $templateid);
+	}
+	create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid, true, $is_new);
+	create_macro('{$RSM.EPP.CERT}', encode_base64(read_file($OPTS{'epp-cert'}), ''),  $templateid, true, $is_new);
+	create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid, true, $is_new);
+	create_macro('{$RSM.EPP.TESTPREFIX}', $OPTS{'epp-test-prefix'}, $templateid, true, $is_new);
+	create_macro('{$RSM.EPP.SERVERCERTMD5}', get_md5($OPTS{'epp-servercert'}), $templateid, true, $is_new);
 
-    create_items_epp($templateid, $template_name, $is_new);
+	my $passphrase = get_sensdata("Enter EPP secret key passphrase: ");
+	my $passwd = get_sensdata("Enter EPP password: ");
+	create_macro('{$RSM.EPP.PASSWD}', get_encrypted_passwd($keysalt, $passphrase, $passwd), $templateid, true, $is_new);
+	$passwd = undef;
+	create_macro('{$RSM.EPP.PRIVKEY}', get_encrypted_privkey($keysalt, $passphrase, $OPTS{'epp-privkey'}), $templateid, true, $is_new);
+	$passphrase = undef;
 
-    my $m = '{$RSM.EPP.KEYSALT}';
-    my $keysalt = get_global_macro_value($m);
-    pfail('cannot get macro ', $m) unless defined($keysalt);
-    trim($keysalt);
-    pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
-
-    if ($OPTS{'epp-commands'}) {
-	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, true);
-    } else {
-	create_macro('{$RSM.EPP.COMMANDS}', '/opt/test-sla/epp-commands/'.$tld, $templateid);
+	print("EPP data saved successfully.\n");
     }
 
-    create_macro('{$RSM.EPP.USER}', $OPTS{'epp-user'}, $templateid, true, $is_new);
-    create_macro('{$RSM.EPP.CERT}', encode_base64(read_file($OPTS{'epp-cert'}), ''),  $templateid, true, $is_new);
-    create_macro('{$RSM.EPP.SERVERID}', $OPTS{'epp-serverid'}, $templateid, true, $is_new);
-    create_macro('{$RSM.EPP.TESTPREFIX}', $OPTS{'epp-test-prefix'}, $templateid, true, $is_new);
-    create_macro('{$RSM.EPP.SERVERCERTMD5}', get_md5($OPTS{'epp-servercert'}), $templateid, true, $is_new);
-    create_macro('{$RSM.EPP.SERVERS}', $OPTS{'epp-servers'}, $templateid, true, $is_new);
-
-    my $passphrase = get_sensdata("Enter EPP secret key passphrase: ");
-    my $passwd = get_sensdata("Enter EPP password: ");
-    create_macro('{$RSM.EPP.PASSWD}', get_encrypted_passwd($keysalt, $passphrase, $passwd), $templateid, true, $is_new);
-    $passwd = undef;
-    create_macro('{$RSM.EPP.PRIVKEY}', get_encrypted_privkey($keysalt, $passphrase, $OPTS{'epp-privkey'}), $templateid, true, $is_new);
-    $passphrase = undef;
-
-    print("EPP data saved successfully.\n");
+    return $templateid;
 }
 
 sub create_all_slv_ns_items {
@@ -1478,13 +1470,20 @@ sub create_slv_ns_items {
     my $hostid = shift;
 
     foreach my $ns_name (sort keys %{$ns_servers}) {
-	foreach my $ipv (keys %{$ns_servers->{$ns_name}}) {
-	    my $ip_list = $ns_servers->{$ns_name}->{$ipv};
+        my @ipv4 = defined(@{$ns_servers->{$ns_name}{'v4'}}) ? @{$ns_servers->{$ns_name}{'v4'}} : undef;
+	my @ipv6 = defined(@{$ns_servers->{$ns_name}{'v6'}}) ? @{$ns_servers->{$ns_name}{'v6'}} : undef;
 
-	    foreach my $ip (@{$ip_list}) {
-		create_all_slv_ns_items($ns_name, $ip, $hostid);
-	    }
-	}
+        foreach (my $i_ipv4 = 0; $i_ipv4 <= $#ipv4; $i_ipv4++) {
+	    next unless defined $ipv4[$i_ipv4];
+
+	    create_all_slv_ns_items($ns_name, $ipv4[$i_ipv4], $hostid);
+        }
+
+	foreach (my $i_ipv6 = 0; $i_ipv6 <= $#ipv6; $i_ipv6++) {
+	    next unless defined $ipv6[$i_ipv6];
+
+	    create_all_slv_ns_items($ns_name, $ipv6[$i_ipv6], $hostid);
+        }
     }
 }
 
@@ -1640,7 +1639,7 @@ sub create_slv_items {
 	undef($depend_down);
 
 	unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
-	    $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid);
+	    $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
         }
 
 	create_slv_item('% of successful monthly RDDS43 resolution RTT', 'rsm.slv.rdds.43.rtt.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
@@ -1648,60 +1647,56 @@ sub create_slv_items {
 	create_slv_item('% of successful monthly RDDS update time', 'rsm.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]) if (defined($OPTS{'epp-servers'}));
     }
 
-    create_slv_epp_items($hostid, $host_name) if (defined($OPTS{'epp-servers'}));
-}
+    if (defined($OPTS{'epp-servers'})) {
+	create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
+	create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
+	create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
 
-sub create_slv_epp_items($$) {
-    my $hostid = shift;
-    my $host_name = shift;
+	unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
+            $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
+        }
 
-    create_slv_item('EPP availability', 'rsm.slv.epp.avail', $hostid, VALUE_TYPE_AVAIL, [$applications->{$hostid}->{APP_SLV_PARTTEST}]);
-    create_slv_item('EPP minutes of downtime', 'rsm.slv.epp.downtime', $hostid, VALUE_TYPE_NUM, [$applications->{$hostid}->{APP_SLV_CURMON}]);
-    create_slv_item('EPP weekly unavailability', 'rsm.slv.epp.rollweek', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_ROLLWEEK}]);
+	create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'rsm.slv.epp.rtt.login.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+	create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'rsm.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
+	create_slv_item('% of successful monthly EPP INFO resolution RTT', 'rsm.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
 
-    unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
-        $applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
-    }
-
-    create_slv_item('% of successful monthly EPP LOGIN resolution RTT', 'rsm.slv.epp.rtt.login.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('% of successful monthly EPP UPDATE resolution RTT', 'rsm.slv.epp.rtt.update.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-    create_slv_item('% of successful monthly EPP INFO resolution RTT', 'rsm.slv.epp.rtt.info.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-
-    # NB! Configuration trigger that is used in PHP and C code to detect incident!
-    # priority must be set to 0!
-    my $options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
-		    'expression' => '({TRIGGER.VALUE}=0&'.
-			    '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.FAIL},0,"eq")}={$RSM.INCIDENT.EPP.FAIL})|'.
-			    '({TRIGGER.VALUE}=1&'.
-			    '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
-			    'priority' => '0',
-    };
-
-    create_trigger($options);
-
-    my $depend_down;
-
-    foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
-	my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
-	my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
-
-	next if ($threshold eq 0);
-
-	$options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
-		     'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
-			     '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
-			     'priority' => $priority,
+	# NB! Configuration trigger that is used in PHP and C code to detect incident!
+	# priority must be set to 0!
+	$options = { 'description' => 'EPP-AVAIL {HOST.NAME}: 7.2.3 - The service is not available',
+		     'expression' => '({TRIGGER.VALUE}=0&'.
+			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.FAIL},0,"eq")}={$RSM.INCIDENT.EPP.FAIL})|'.
+			 '({TRIGGER.VALUE}=1&'.
+			 '{'.$host_name.':rsm.slv.epp.avail.count(#{$RSM.INCIDENT.EPP.RECOVER},0,"ne")}<{$RSM.INCIDENT.EPP.RECOVER})',
+			 'priority' => '0',
 	};
 
-	my $result = create_trigger($options);
+	create_trigger($options);
 
-	my $triggerid = $result->{'triggerids'}[0];
+        my $depend_down;
 
-	if (defined($depend_down)) {
-	    add_dependency($triggerid, $depend_down);
-	}
+	foreach my $position (sort keys %{$trigger_rollweek_thresholds}) {
+    	    my $threshold = $trigger_rollweek_thresholds->{$position}->{'threshold'};
+    	    my $priority = $trigger_rollweek_thresholds->{$position}->{'priority'};
+    	    next if ($threshold eq 0);
 
-	$depend_down = $triggerid;
+            $options = { 'description' => 'EPP-ROLLWEEK {HOST.NAME}: 7.2.4 - The Service Availability [{ITEM.LASTVALUE1}] >'.$threshold.'%',
+                         'expression' => '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}>'.$threshold.'|'.
+					    '{'.$host_name.':rsm.slv.epp.rollweek.last(0)}='.$threshold,
+                        'priority' => $priority,
+                };
+
+	    my $result = create_trigger($options);
+
+    	    my $triggerid = $result->{'triggerids'}[0];
+
+	    if (defined($depend_down)) {
+    	        add_dependency($triggerid, $depend_down);
+    	    }
+
+    	    $depend_down = $triggerid;
+        }
+
+	undef($depend_down);
     }
 }
 
@@ -1789,8 +1784,6 @@ Other options
                 delete specified TLD
         --disable
                 disable specified TLD
-        --only-epp
-                action with EPP only
 	--list-services
 		list services of each TLD, the output is comma-separated list:
                 <TLD>,<TLD-TYPE>,<RDDS.DNS.TESTPREFIX>,<RDDS.NS.STRING>,<RDDS.TESTPREFIX>,<TLD.DNSSEC.ENABLED>,<TLD.EPP.ENABLED>,<TLD.RDDS.ENABLED>
@@ -1826,9 +1819,9 @@ Other options
         --epp-user
                 specify EPP username
 	--epp-cert
-                path to EPP Client certificate file
+                path to EPP Client certificates file
 	--epp-servercert
-                path to EPP Server certificate file
+                path to EPP Server certificates file
 	--epp-privkey
                 path to EPP Client private key file (unencrypted)
 	--epp-serverid
@@ -1867,7 +1860,7 @@ sub validate_input {
 
     $msg  = "TLD must be specified (--tld)\n" if (!defined($OPTS{'tld'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'list-services'}));
 
-    if (!defined($OPTS{'delete'}) and !defined($OPTS{'only-epp'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}) and !defined($OPTS{'list-services'}))
+    if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'}) and !defined($OPTS{'list-services'}))
     {
 	    if (!defined($OPTS{'type'}))
 	    {
@@ -1888,11 +1881,11 @@ sub validate_input {
 	    return;
     }
 
-    $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'only-epp'})
+    $msg .= "at least one IPv4 or IPv6 must be enabled (--ipv4 or --ipv6)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'})
 										and !defined($OPTS{'ipv4'}) and !defined($OPTS{'ipv6'})
 										and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'})
 										and !defined($OPTS{'list-services'}));
-    $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'only-epp'}) and !defined($OPTS{'dns-test-prefix'})
+    $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'dns-test-prefix'})
 									    and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'})
 									    and !defined($OPTS{'list-services'}));
     $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
@@ -1900,25 +1893,13 @@ sub validate_input {
     $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
 											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
 
-    if ($OPTS{'epp-servers'} or defined($OPTS{'only-epp'})) {
+    if ($OPTS{'epp-servers'}) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
+	$msg .= "EPP Client certificate file must be specified (--epp-cert)\n" unless ($OPTS{'epp-cert'});
+	$msg .= "EPP Client private key file must be specified (--epp-privkey)\n" unless ($OPTS{'epp-privkey'});
 	$msg .= "EPP server ID must be specified (--epp-serverid)\n" unless ($OPTS{'epp-serverid'});
 	$msg .= "EPP domain test prefix must be specified (--epp-test-prefix)\n" unless ($OPTS{'epp-serverid'});
-	if (!$OPTS{'epp-cert'}) {
-	    $msg .= "EPP Client certificate file must be specified (--epp-cert)\n";
-	} elsif (! -r $OPTS{'epp-cert'}) {
-	    $msg .= "Cannot read EPP Client certificate file \"" . $OPTS{'epp-cert'} . "\"\n";
-	}
-	if (!$OPTS{'epp-servercert'}) {
-	    $msg .= "EPP Server certificate file must be specified (--epp-servercert)\n";
-	} elsif (! -r $OPTS{'epp-servercert'}) {
-	    $msg .= "Cannot read EPP Server certificate file \"" . $OPTS{'epp-servercert'} . "\"\n";
-	}
-	if (!$OPTS{'epp-privkey'}) {
-	    $msg .= "EPP Client private key file must be specified (--epp-privkey)\n";
-	} elsif(! -r $OPTS{'epp-privkey'}) {
-	    $msg .= "Cannot read EPP Client private key file \"" . $OPTS{'epp-privkey'} . "\"\n";
-	}
+	$msg .= "EPP Server certificate file must be specified (--epp-servercert)\n" unless ($OPTS{'epp-servercert'});
     }
 
     $OPTS{'ipv4'} = 0 if (defined($OPTS{'update-nsservers'}));
@@ -2077,6 +2058,8 @@ sub manage_tld_objects($$$$$) {
 
     my $types = {'dns' => $dns, 'epp' => $epp, 'rdds' => $rdds};
 
+    my $main_temlateid;
+
     my @tld_hostids;
 
     print "Trying to $action '$tld' TLD\n";
@@ -2089,7 +2072,8 @@ sub manage_tld_objects($$$$$) {
 	print "success\n";
     }
     else {
-        pfail "Could not find '$tld' host";
+        print "Could not find '$tld' host\n";
+        exit;
     }
 
     print "Getting main template of the TLD: ";
@@ -2100,7 +2084,8 @@ sub manage_tld_objects($$$$$) {
 	print "success\n";
     }
     else {
-        pfail "Could not find 'Template .$tld' template";
+        print "Could not find 'Template .$tld' template\n";
+        exit;
     }
 
     foreach my $host (@{$tld_template->{'hosts'}}) {
@@ -2214,7 +2199,6 @@ sub get_tld_list() {
 
 sub get_nsservers_list($) {
     my $TLD = shift;
-
     my $result;
 
     my $templateid = get_template('Template '.$TLD, false, false);
@@ -2261,13 +2245,13 @@ sub update_nsservers($$) {
     foreach my $new_nsname (keys %{$new_ns_servers}) {
 	my $new_ns = $new_ns_servers->{$new_nsname};
 
-	foreach my $ipv (keys %{$new_ns}) {
-	    my $new_ips = $new_ns->{$ipv};
+	foreach my $proto (keys %{$new_ns}) {
+	    my $new_ips = $new_ns->{$proto};
 	    foreach my $new_ip (@{$new_ips}) {
 		    my $need_to_add = true;
 
-		    if (defined($old_ns_servers->{$ipv}) and defined($old_ns_servers->{$ipv}->{$new_nsname})) {
-			foreach my $old_ip (@{$old_ns_servers->{$ipv}->{$new_nsname}}) {
+		    if (defined($old_ns_servers->{$proto}) and defined($old_ns_servers->{$proto}->{$new_nsname})) {
+			foreach my $old_ip (@{$old_ns_servers->{$proto}->{$new_nsname}}) {
 			    $need_to_add = false if $old_ip eq $new_ip;
 			}
 		    }
@@ -2275,7 +2259,7 @@ sub update_nsservers($$) {
 		    if ($need_to_add == true) {
 			my $ns_ip;
 			$ns_ip->{$new_ip}->{'ns'} = $new_nsname;
-			$ns_ip->{$new_ip}->{'ipv'} = $ipv;
+			$ns_ip->{$new_ip}->{'proto'} = $proto;
 			push @to_be_added, $ns_ip;
 		    }
 	    }
@@ -2283,16 +2267,16 @@ sub update_nsservers($$) {
 	}
     }
 
-    foreach my $ipv (keys %{$old_ns_servers}) {
-	my $old_ns = $old_ns_servers->{$ipv};
+    foreach my $proto (keys %{$old_ns_servers}) {
+	my $old_ns = $old_ns_servers->{$proto};
 	foreach my $old_nsname (keys %{$old_ns}) {
 	    foreach my $old_ip (@{$old_ns->{$old_nsname}}) {
 		my $need_to_remove = false;
 
-		if (defined($new_ns_servers->{$old_nsname}->{$ipv})) {
+		if (defined($new_ns_servers->{$old_nsname}->{$proto})) {
 		    $need_to_remove = true;
 
-		    foreach my $new_ip (@{$new_ns_servers->{$old_nsname}->{$ipv}}) {
+		    foreach my $new_ip (@{$new_ns_servers->{$old_nsname}->{$proto}}) {
 		    	    $need_to_remove = false if $new_ip eq $old_ip;
 		        }
 		}
@@ -2315,7 +2299,7 @@ sub update_nsservers($$) {
     disable_old_ns($TLD, \@to_be_removed) if scalar(@to_be_removed);
 }
 
-sub add_new_ns($$) {
+sub add_new_ns($) {
     my $TLD = shift;
     my $ns_servers = shift;
 
@@ -2341,16 +2325,13 @@ sub add_new_ns($$) {
 
     foreach my $ns_ip (@$ns_servers) {
 	foreach my $ip (keys %{$ns_ip}) {
-	    my $ipv = $ns_ip->{$ip}->{'ipv'};
+	    my $proto = $ns_ip->{$ip}->{'proto'};
 	    my $ns = $ns_ip->{$ip}->{'ns'};
 
-	    $ipv=~s/v(\d)/$1/;
+	    $proto=~s/v(\d)/$1/;
 
-	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'tcp', $ipv);
-	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'udp', $ipv);
-	    create_item_dns_udp_upd($ns, $ip, $main_templateid, 'Template '.$TLD, $ipv) if (defined($OPTS{'epp-servers'}));
-
-	    create_item_dns_udp_upd($ns, $ip, $main_templateid, 'Template '.$TLD, $ipv) if (defined($OPTS{'epp-servers'}));
+	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'tcp', $proto);
+	    create_item_dns_rtt($ns, $ip, $main_templateid, 'Template '.$TLD, 'udp', $proto);
 
     	    create_all_slv_ns_items($ns, $ip, $main_hostid);
 	}
@@ -2435,58 +2416,3 @@ sub get_services($) {
     return $result;
 }
 
-sub update_epp_objects($) {
-    my $tld = shift;
-
-    my $is_new = false;
-
-    print "Getting main host of the TLD: ";
-    my $result = get_host($tld, false);
-
-    if (!scalar(%{$result})) {
-	pfail "Could not find '$tld' host";
-    }
-
-    my $hostid = $result->{'hostid'};
-    print "success\n";
-
-    print "Getting main template of the TLD: ";
-    $result = get_template('Template '.$tld, true, false);
-
-    if (!scalar(%{$result})) {
-	pfail "Could not find 'Template .$tld' template";
-    }
-
-    my $templateid = $result->{'templateid'};
-    print "success\n";
-
-    unless (exists($applications->{$hostid}->{APP_SLV_MONTHLY})) {
-	$applications->{$hostid}->{APP_SLV_MONTHLY} = get_application_id(APP_SLV_MONTHLY, $hostid)
-    }
-
-    if (defined($OPTS{'rdds43-servers'})) {
-	create_slv_item('% of successful monthly RDDS update time', 'rsm.slv.rdds.upd.month', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}])
-    }
-
-    create_slv_epp_items($hostid, $tld);
-
-    create_macro('{$RSM.TLD.EPP.ENABLED}', 1, $templateid, true, $is_new);
-
-    create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
-
-    my $ns_servers = get_nsservers_list($tld);
-
-    foreach my $ipv (keys %{$ns_servers}) {
-	my $ns_by_ipv = $ns_servers->{$ipv};
-
-	$ipv =~s/v([46])/$1/;
-
-	foreach my $ns_name (keys %{$ns_by_ipv}) {
-	    my $ns = $ns_by_ipv->{$ns_name};
-	    foreach my $ip (@{$ns}) {
-		create_item_dns_udp_upd($ns_name, $ip, $templateid, 'Template '.$tld, $ipv, $is_new);
-		create_slv_item('% of successful monthly DNS update time: $1 ($2)', 'rsm.slv.dns.ns.upd.month['.$ns_name.','.$ip.']', $hostid, VALUE_TYPE_PERC, [$applications->{$hostid}->{APP_SLV_MONTHLY}]);
-	    }
-	}
-    }
-}

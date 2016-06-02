@@ -1,16 +1,12 @@
 #!/usr/bin/perl -w
 
-BEGIN
-{
-	our $MYDIR = $0; $MYDIR =~ s,(.*)/.*,$1,; $MYDIR = '.' if ($MYDIR eq $0);
-}
-use lib $MYDIR;
+use lib '/opt/zabbix/scripts';
 
 use strict;
 use RSM;
 use RSMSLV;
 
-parse_opts("tld=s", "from=n", "till=n", "failed!");
+parse_opts("tld=s", "from=n", "till=n");
 
 # do not write any logs
 setopt('nolog');
@@ -41,12 +37,6 @@ foreach (@$tlds_ref)
 		my $key = "rsm.slv.$service.avail";
 
 		my $itemid = get_itemid_by_host($tld, $key);
-		if (!$itemid)
-		{
-			wrn("configuration error: ", rsm_slv_error());
-			next;
-		}
-
 		my $incidents = get_incidents($itemid, $from, $till);
 
 		foreach (@$incidents)
@@ -56,21 +46,16 @@ foreach (@$tlds_ref)
 			my $end = $_->{'end'};
 			my $false_positive = $_->{'false_positive'};
 
-			my $failed_tests = "";
+			my $time_condition = defined($end) ? "clock between $start and $end" : "clock>=$start";
 
-			if (opt('failed'))
-			{
-				my $time_condition = defined($end) ? "clock between $start and $end" : "clock>=$start";
+			my $rows_ref = db_select(
+				"select count(*)".
+				" from history_uint".
+				" where itemid=$itemid".
+					" and value=".DOWN.
+					" and ".sql_time_condition($start, $end));
 
-				my $rows_ref = db_select(
-					"select count(*)".
-					" from history_uint".
-					" where itemid=$itemid".
-						" and value=".DOWN.
-						" and ".sql_time_condition($start, $end));
-
-				$failed_tests = ',' . $rows_ref->[0]->[0];
-			}
+			my $failed_tests = $rows_ref->[0]->[0];
 
 			my $status;
 			if ($false_positive != 0)
@@ -87,7 +72,7 @@ foreach (@$tlds_ref)
 			}
 
 			# "IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident"
-			print("$eventid,$tld,$service,$status," . ts_full($start) . ",", (defined($end) ? ts_full($end) : ""), "$failed_tests\n");
+			print("$eventid,$tld,$service,$status,$start,", (defined($end) ? $end : ""), ",$failed_tests\n");
 		}
 	}
 }
@@ -107,7 +92,7 @@ IncidentID,TLD,Status,StartTime,EndTime,FailedTestsWithinIncident
 
 =head1 SYNOPSIS
 
-get-incidents.pl [--tld tld] [--from timestamp] [--till timestamp] [--failed] [--debug] [--help]
+get-incidents.pl [--tld tld] [--from timestamp] [--till timestamp] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -125,10 +110,6 @@ incident at the specified time it will be displayed with full details.
 =item B<--till> timestamp
 
 Optionally specify the end of period for getting incidents.
-
-=item B<--failed>
-
-Include number if failed tests within incident in the output.
 
 =item B<--debug>
 

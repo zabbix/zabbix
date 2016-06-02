@@ -83,11 +83,6 @@ foreach (@$tlds_ref)
 	else
 	{
 		my $itemid = get_itemid_by_host($tld, $key);
-		if (!$itemid)
-		{
-			wrn("configuration error: service $service enabled but item item not found: ", rsm_slv_error());
-		}
-
 		my $downtime = get_downtime($itemid, $from, $till);
 
 		info("$downtime minutes of downtime from ", ts_str($from), " ($from) till ", ts_str($till), " ($till)");

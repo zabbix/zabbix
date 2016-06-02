@@ -10,7 +10,7 @@ use RSMSLV;
 parse_opts('tld=s', 'from=n', 'till=n', 'service=s');
 
 # do not write any logs
-setopt('nolog');
+setopt('test');
 
 if (opt('debug'))
 {
@@ -133,14 +133,14 @@ foreach (@$tlds_ref)
 	if ("," eq substr($key, -1))
 	{
 		my $nsips_ref = get_nsips($tld, $key, 1); # templated
-		$items_ref = __get_all_ns_items($nsips_ref, $key, $tld);
+		$items_ref = get_all_ns_items($nsips_ref, $key, $tld);
 	}
 	else
 	{
 		$items_ref = get_all_items($key, $tld);
 	}
 
-	my $result = get_results($tld, $value_ts, $probe_times_ref, $items_ref, \&__check_test);
+	my $result = get_results($tld, $value_ts, $probe_times_ref, $items_ref, \&check_item_value);
 
 	foreach my $nsip (keys(%$result))
 	{
@@ -170,41 +170,11 @@ $tld = undef;
 
 slv_exit(SUCCESS);
 
-sub __check_test
+sub check_item_value
 {
 	my $value = shift;
 
 	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? E_FAIL : SUCCESS;
-}
-
-sub __get_all_ns_items
-{
-	my $nss_ref = shift; # array reference of name servers ("name,IP")
-	my $cfg_key_in = shift;
-	my $tld = shift;
-
-	my @keys;
-	push(@keys, "'" . $cfg_key_in . $_ . "]'") foreach (@$nss_ref);
-
-	my $keys_str = join(',', @keys);
-
-	my $rows_ref = db_select(
-		"select h.hostid,i.itemid,i.key_,h.host ".
-		"from items i,hosts h ".
-		"where i.hostid=h.hostid".
-			" and h.host like '$tld %'".
-			" and i.templateid is not null".
-			" and i.key_ in ($keys_str)");
-
-	my %all_ns_items;
-	foreach my $row_ref (@$rows_ref)
-	{
-		$all_ns_items{$row_ref->[0]}{$row_ref->[1]} = get_nsip_from_key($row_ref->[2]);
-	}
-
-	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%all_ns_items)) == 0);
-
-	return \%all_ns_items;
 }
 
 __END__
