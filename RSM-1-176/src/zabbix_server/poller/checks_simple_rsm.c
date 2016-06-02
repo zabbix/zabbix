@@ -1628,6 +1628,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 						zbx_rsm_errf(log_fd, "cannot write to pipe: %s", zbx_strerror(errno));
 
 					close(fd[1]);
+					fclose(log_fd);
 
 					exit(EXIT_SUCCESS);
 				}
@@ -1714,9 +1715,6 @@ out:
 	if (NULL != keys)
 		ldns_rr_list_deep_free(keys);
 
-	if (NULL != log_fd)
-		fclose(log_fd);
-
 	if (NULL != res)
 	{
 		if (0 != ldns_resolver_nameserver_count(res))
@@ -1727,6 +1725,9 @@ out:
 
 	if (0 != ISSET_MSG(result))
 		zbx_rsm_err(log_fd, result->msg);
+
+	if (NULL != log_fd)
+		fclose(log_fd);
 
 	zbx_free(testprefix);
 	zbx_free(res_ip);
