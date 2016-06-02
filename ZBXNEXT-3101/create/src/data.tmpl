@@ -17,6 +17,11 @@
 -- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --
 
+TABLE |users
+FIELDS|userid|alias|name  |surname      |passwd                          |url|autologin|autologout|lang |refresh|type|theme  |rows_per_page|
+ROW   |1     |Admin|Zabbix|Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30     |3   |default|50           |
+ROW   |2     |guest|      |             |d41d8cd98f00b204e9800998ecf8427e|   |0        |900       |en_GB|30     |1   |default|50           |
+
 TABLE |hosts
 FIELDS|hostid|proxy_hostid|host                           |status|ipmi_authtype|ipmi_privilege|ipmi_username|ipmi_password|name                           |flags|templateid|description|tls_connect|tls_accept|tls_issuer|tls_subject|tls_psk_identity|tls_psk|
 ROW   |10001 |NULL        |Template OS Linux              |3     |0            |2             |             |             |Template OS Linux              |0    |NULL      |           |1          |1         |          |           |                |       |
@@ -1036,11 +1041,6 @@ FIELDS|mediatypeid|type|description|smtp_server     |smtp_helo  |smtp_email     
 ROW   |1          |0   |Email      |mail.company.com|company.com|zabbix@company.com|         |          |                  |      |0     |25       |0            |0               |0               |0                  |           |
 ROW   |2          |3   |Jabber     |                |           |                  |         |          |jabber@company.com|zabbix|0     |25       |0            |0               |0               |0                  |           |
 ROW   |3          |2   |SMS        |                |           |                  |         |/dev/ttyS0|                  |      |0     |25       |0            |0               |0               |0                  |           |
-
-TABLE |users
-FIELDS|userid|alias|name  |surname      |passwd                          |url|autologin|autologout|lang |refresh|type|theme  |rows_per_page|
-ROW   |1     |Admin|Zabbix|Administrator|5fce1b3e34b520afeffb37ce08c7cd66|   |1        |0         |en_GB|30     |3   |default|50           |
-ROW   |2     |guest|      |             |d41d8cd98f00b204e9800998ecf8427e|   |0        |900       |en_GB|30     |1   |default|50           |
 
 TABLE |usrgrp
 FIELDS|usrgrpid|name                     |gui_access|users_status|debug_mode|

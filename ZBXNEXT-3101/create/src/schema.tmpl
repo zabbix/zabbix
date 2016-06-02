@@ -22,6 +22,25 @@
 -- Tables must be sorted to match referential integrity rules
 --
 
+TABLE|users|userid|ZBX_DATA
+FIELD		|userid		|t_id		|	|NOT NULL	|0
+FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|0
+FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|0
+FIELD		|lang		|t_varchar(5)	|'en_GB'|NOT NULL	|0
+FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
+FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|0
+FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
+FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
+FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
+UNIQUE		|1		|alias
+
 TABLE|maintenances|maintenanceid|ZBX_DATA
 FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0
 FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|0
@@ -362,25 +381,6 @@ FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
 FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|description
-
-TABLE|users|userid|ZBX_DATA
-FIELD		|userid		|t_id		|	|NOT NULL	|0
-FIELD		|alias		|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|name		|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|surname	|t_varchar(100)	|''	|NOT NULL	|0
-FIELD		|passwd		|t_char(32)	|''	|NOT NULL	|0
-FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|autologin	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|0
-FIELD		|lang		|t_varchar(5)	|'en_GB'|NOT NULL	|0
-FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|0
-FIELD		|type		|t_integer	|'1'	|NOT NULL	|0
-FIELD		|theme		|t_varchar(128)	|'default'|NOT NULL	|0
-FIELD		|attempt_failed	|t_integer	|0	|NOT NULL	|ZBX_NODATA
-FIELD		|attempt_ip	|t_varchar(39)	|''	|NOT NULL	|ZBX_NODATA
-FIELD		|attempt_clock	|t_integer	|0	|NOT NULL	|ZBX_NODATA
-FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
-UNIQUE		|1		|alias
 
 TABLE|usrgrp|usrgrpid|ZBX_DATA
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0

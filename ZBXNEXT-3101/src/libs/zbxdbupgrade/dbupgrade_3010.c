@@ -200,7 +200,7 @@ static int	DBpatch_3010020(void)
 	return DBadd_foreign_key("event_recovery", 2, &field);
 }
 
-/* DBpatch_301002 () */
+/* DBpatch_3010021 () */
 
 #define ZBX_OPEN_EVENT_WARNING_NUM	10000000
 
