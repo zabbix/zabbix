@@ -26,6 +26,8 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBXNEXT-3263] moved image type selection to top in administration->general->images (Cemeris)
+..F....... [ZBXNEXT-3263] added "No data found." message in administration->general->images (Cemeris)
 ..F....... [ZBX-10731] fixed textarea visibility in monitoring->maps properties (Cemeris)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
 ..F....... [ZBX-10825] reverted table header capitalization. fixed calendar header (asaveljevs, Pavel)
