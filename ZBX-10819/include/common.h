@@ -856,6 +856,8 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	(2 * ZBX_GIBIBYTE)
+
 double	zbx_time();
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time();
