@@ -7393,7 +7393,7 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 }
 
 static void	dc_get_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
-		char **value, char **value_default)
+		const char **value, const char **value_default)
 {
 	int			i, j;
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
@@ -7415,18 +7415,15 @@ static void	dc_get_host_macro(zbx_uint64_t *hostids, int host_num, const char *m
 			{
 				ZBX_DC_HMACRO	*hmacro = (ZBX_DC_HMACRO *)hmacro_hm->hmacros.values[j];
 
-				if (0 == strcmp(hmacro->macro, macro))
+				if (0 == zbx_strcmp_null(hmacro->context, context))
 				{
-					if (0 == zbx_strcmp_null(hmacro->context, context))
-					{
-						*value = zbx_strdup(*value, hmacro->value);
-						return;
-					}
-
-					/* check for the default (without parameters) macro value */
-					if (NULL == *value_default && NULL != context && NULL == hmacro->context)
-						*value_default = zbx_strdup(*value_default, hmacro->value);
+					*value = hmacro->value;
+					return;
 				}
+
+				/* check for the default (without parameters) macro value */
+				if (NULL == *value_default && NULL != context && NULL == hmacro->context)
+					*value_default = hmacro->value;
 			}
 		}
 	}
@@ -7452,7 +7449,8 @@ static void	dc_get_host_macro(zbx_uint64_t *hostids, int host_num, const char *m
 	zbx_vector_uint64_destroy(&templateids);
 }
 
-static void	dc_get_global_macro(const char *macro, const char *context, char **value, char **value_default)
+static void	dc_get_global_macro(const char *macro, const char *context, const char **value,
+		const char **value_default)
 {
 	int		i;
 	ZBX_DC_GMACRO_M	*gmacro_m, gmacro_m_local;
@@ -7465,26 +7463,23 @@ static void	dc_get_global_macro(const char *macro, const char *context, char **v
 		{
 			ZBX_DC_GMACRO	*gmacro = (ZBX_DC_GMACRO *)gmacro_m->gmacros.values[i];
 
-			if (0 == strcmp(gmacro->macro, macro))
+			if (0 == zbx_strcmp_null(gmacro->context, context))
 			{
-				if (0 == zbx_strcmp_null(gmacro->context, context))
-				{
-					*value = zbx_strdup(*value, gmacro->value);
-					break;
-				}
-
-				/* check for the default (without parameters) macro value */
-				if (NULL == *value_default && NULL != context && NULL == gmacro->context)
-					*value_default = zbx_strdup(*value_default, gmacro->value);
+				*value = gmacro->value;
+				break;
 			}
+
+			/* check for the default (without parameters) macro value */
+			if (NULL == *value_default && NULL != context && NULL == gmacro->context)
+				*value_default = gmacro->value;
 		}
 	}
 }
 
-static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, const char *context,
-		char **replace_to)
+static const char	*dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro,
+		const char *context)
 {
-	char	*value = NULL, *value_default = NULL;
+	const char	*value = NULL, *value_default = NULL;
 
 	/* User macros should be expanded according to the following priority: */
 	/*                                                                     */
@@ -7503,23 +7498,16 @@ static void	dc_get_user_macro(zbx_uint64_t *hostids, int hostids_num, const char
 		dc_get_global_macro(macro, context, &value, &value_default);
 
 	if (NULL != value)
-	{
-		zbx_free(*replace_to);
-		*replace_to = value;
-
-		zbx_free(value_default);
-	}
-	else if (NULL != value_default)
-	{
-		zbx_free(*replace_to);
-		*replace_to = value_default;
-	}
+		return value;
+	else
+		return value_default;
 }
 
 void	DCget_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
 	char		*name = NULL, *context = NULL;
+	const char	*value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
@@ -7528,7 +7516,10 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int hostids_num, const char *macro,
 
 	LOCK_CACHE;
 
-	dc_get_user_macro(hostids, hostids_num, name, context, replace_to);
+	if (NULL != (value = dc_get_user_macro(hostids, hostids_num, name, context)))
+		*replace_to = zbx_strdup(*replace_to, value);
+	else
+		zbx_free(*replace_to);
 
 	UNLOCK_CACHE;
 
@@ -7584,8 +7575,8 @@ static int	dc_expression_user_macro_validator(const char *macro, const char *val
 static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int hostids_num,
 		zbx_value_validator_func_t validator_func, char **error)
 {
-	char		*exp = NULL, *macro = NULL, *name = NULL, *context = NULL, *value = NULL;
-	const char	*ptr, *start;
+	char		*exp = NULL, *macro = NULL, *name = NULL, *context = NULL;
+	const char	*ptr, *start, *value;
 	size_t		exp_alloc = 0, exp_offset = 0;
 	int		len, ret = SUCCEED;
 
@@ -7599,7 +7590,7 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 
 		zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, start, ptr - start);
 
-		dc_get_user_macro(hostids, hostids_num, name, context, &value);
+		value = dc_get_user_macro(hostids, hostids_num, name, context);
 
 		if (NULL != value)
 		{
@@ -7611,8 +7602,6 @@ static char	*dc_expand_user_macros(const char *text, zbx_uint64_t *hostids, int 
 
 			if (SUCCEED == ret)
 				zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, value);
-
-			zbx_free(value);
 		}
 		else
 		{
