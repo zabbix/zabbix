@@ -290,8 +290,15 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Delete']"));
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Cancel']"));
 
-		$sqlHash = "SELECT hostid,proxy_hostid,status,,error,available,errors_from,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash = DBhash($sqlHash);
+		$sql=
+			'SELECT hostid,proxy_hostid,status,error,available,errors_from,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
+				'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
+				'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error'.
+			' FROM hosts'.
+			' ORDER BY hostid';
+
+		$oldHash = DBhash($sql);
 
 		// update proxy name
 		$this->input_type('host', $newname);
@@ -301,8 +308,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
 
-		$newHash = DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
+		$this->assertEquals($oldHash, DBhash($sql));
 
 		// check that proxy name has been updated in the DB
 		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
@@ -334,9 +340,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxAssertElementPresent(WebDriverBy::id('clone'));
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Delete']"));
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Cancel']"));
-
-		$sqlHash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash = DBhash($sqlHash);
 
 		// update proxy name
 		$this->zbxTestClickWait('clone');
