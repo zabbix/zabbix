@@ -212,22 +212,14 @@ elseif (hasRequest('applications')
 		&& str_in_array(getRequest('action'), ['application.massenable', 'application.massdisable'])) {
 	$status = (getRequest('action') === 'application.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
-	$applications = API::Application()->get([
-		'output' => [],
-		'selectItems' => ['itemid'],
+	$db_items = API::Item()->get([
+		'output' => ['itemid'],
 		'applicationids' => getRequest('applications', [])
 	]);
 
-	$itemids = [];
-	foreach ($applications as $application) {
-		foreach ($application['items'] as $item) {
-			$itemids[$item['itemid']] = true;
-		}
-	}
-
 	$items = [];
-	foreach (array_keys($itemids) as $itemid) {
-		$items[] = ['itemid' => $itemid, 'status' => $status];
+	foreach ($db_items as $db_item) {
+		$items[] = ['itemid' => $db_item['itemid'], 'status' => $status];
 	}
 
 	$result = (bool) API::Item()->update($items);
@@ -236,7 +228,7 @@ elseif (hasRequest('applications')
 		uncheckTableRows($pageFilter->hostid);
 	}
 
-	$updated = count($itemids);
+	$updated = count($items);
 
 	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
 		? _n('Item enabled', 'Items enabled', $updated)
