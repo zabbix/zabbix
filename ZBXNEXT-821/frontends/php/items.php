@@ -491,7 +491,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$result = (bool) API::Item()->create($item);
 		}
 		else {
-			$old_items = API::Item()->get([
+			$db_items = API::Item()->get([
 				'output' => [
 					'name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
 					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
@@ -503,138 +503,138 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'selectApplications' => ['applicationid'],
 				'itemids' => getRequest('itemid')
 			]);
-			$old_item = reset($old_items);
+			$db_item = reset($db_items);
 
 			$item = [];
 
-			if ($old_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				if ($old_item['templateid'] == 0) {
-					if ($old_item['name'] !== getRequest('name', '')) {
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($db_item['templateid'] == 0) {
+					if ($db_item['name'] !== getRequest('name', '')) {
 						$item['name'] = getRequest('name', '');
 					}
-					if ($old_item['type'] != getRequest('type', ITEM_TYPE_ZABBIX)) {
+					if ($db_item['type'] != getRequest('type', ITEM_TYPE_ZABBIX)) {
 						$item['type'] = getRequest('type', ITEM_TYPE_ZABBIX);
 					}
-					if ($old_item['key_'] !== getRequest('key', '')) {
+					if ($db_item['key_'] !== getRequest('key', '')) {
 						$item['key_'] = getRequest('key', '');
 					}
-					if ($old_item['snmp_oid'] !== getRequest('snmp_oid', '')) {
+					if ($db_item['snmp_oid'] !== getRequest('snmp_oid', '')) {
 						$item['snmp_oid'] = getRequest('snmp_oid', '');
 					}
-					if ($old_item['ipmi_sensor'] !== getRequest('ipmi_sensor', '')) {
+					if ($db_item['ipmi_sensor'] !== getRequest('ipmi_sensor', '')) {
 						$item['ipmi_sensor'] = getRequest('ipmi_sensor', '');
 					}
-					if ($old_item['value_type'] != getRequest('value_type', ITEM_VALUE_TYPE_FLOAT)) {
+					if ($db_item['value_type'] != getRequest('value_type', ITEM_VALUE_TYPE_FLOAT)) {
 						$item['value_type'] = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
 					}
-					if ($old_item['data_type'] != getRequest('data_type', ITEM_DATA_TYPE_DECIMAL)) {
+					if ($db_item['data_type'] != getRequest('data_type', ITEM_DATA_TYPE_DECIMAL)) {
 						$item['data_type'] = getRequest('data_type', ITEM_DATA_TYPE_DECIMAL);
 					}
-					if ($old_item['units'] !== getRequest('units', '')) {
+					if ($db_item['units'] !== getRequest('units', '')) {
 						$item['units'] = getRequest('units', '');
 					}
-					if ($old_item['multiplier'] != getRequest('multiplier', 0)) {
+					if ($db_item['multiplier'] != getRequest('multiplier', 0)) {
 						$item['multiplier'] = getRequest('multiplier', 0);
 					}
-					if ($old_item['formula'] !== getRequest('formula', '1')) {
+					if ($db_item['formula'] !== getRequest('formula', '1')) {
 						$item['formula'] = getRequest('formula', '1');
 					}
-					if ($old_item['delta'] != getRequest('delta', 0)) {
+					if ($db_item['delta'] != getRequest('delta', 0)) {
 						$item['delta'] = getRequest('delta', 0);
 					}
-					if (bccomp($old_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
+					if (bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
 						$item['valuemapid'] = getRequest('valuemapid', 0);
 					}
-					if ($old_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
+					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
 						$item['logtimefmt'] = getRequest('logtimefmt', '');
 					}
 				}
 
-				if (bccomp($old_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
 					$item['interfaceid'] = getRequest('interfaceid', 0);
 				}
-				if ($old_item['snmp_community'] !== getRequest('snmp_community', '')) {
+				if ($db_item['snmp_community'] !== getRequest('snmp_community', '')) {
 					$item['snmp_community'] = getRequest('snmp_community', '');
 				}
-				if ($old_item['snmpv3_contextname'] !== getRequest('snmpv3_contextname', '')) {
+				if ($db_item['snmpv3_contextname'] !== getRequest('snmpv3_contextname', '')) {
 					$item['snmpv3_contextname'] = getRequest('snmpv3_contextname', '');
 				}
-				if ($old_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
+				if ($db_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
 					$item['snmpv3_securityname'] = getRequest('snmpv3_securityname', '');
 				}
 				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);;
-				if ($old_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
+				if ($db_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
 					$item['snmpv3_securitylevel'] = $snmpv3_securitylevel;
 				}
 				$snmpv3_authprotocol = ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
 					? ITEM_AUTHPROTOCOL_MD5
 					: getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5);
-				if ($old_item['snmpv3_authprotocol'] != $snmpv3_authprotocol) {
+				if ($db_item['snmpv3_authprotocol'] != $snmpv3_authprotocol) {
 					$item['snmpv3_authprotocol'] = $snmpv3_authprotocol;
 				}
-				if ($old_item['snmpv3_authpassphrase'] !== getRequest('snmpv3_authpassphrase', '')) {
+				if ($db_item['snmpv3_authpassphrase'] !== getRequest('snmpv3_authpassphrase', '')) {
 					$item['snmpv3_authpassphrase'] = getRequest('snmpv3_authpassphrase', '');
 				}
 				$snmpv3_privprotocol = ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
 					? getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES)
 					: ITEM_AUTHPROTOCOL_MD5;
-				if ($old_item['snmpv3_privprotocol'] != $snmpv3_privprotocol) {
+				if ($db_item['snmpv3_privprotocol'] != $snmpv3_privprotocol) {
 					$item['snmpv3_privprotocol'] = $snmpv3_privprotocol;
 				}
-				if ($old_item['snmpv3_privpassphrase'] !== getRequest('snmpv3_privpassphrase', '')) {
+				if ($db_item['snmpv3_privpassphrase'] !== getRequest('snmpv3_privpassphrase', '')) {
 					$item['snmpv3_privpassphrase'] = getRequest('snmpv3_privpassphrase', '');
 				}
-				if ($old_item['port'] !== getRequest('port', '')) {
+				if ($db_item['port'] !== getRequest('port', '')) {
 					$item['port'] = getRequest('port', '');
 				}
-				if ($old_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
 					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
 				}
-				if ($old_item['username'] !== getRequest('username', '')) {
+				if ($db_item['username'] !== getRequest('username', '')) {
 					$item['username'] = getRequest('username', '');
 				}
-				if ($old_item['password'] !== getRequest('password', '')) {
+				if ($db_item['password'] !== getRequest('password', '')) {
 					$item['password'] = getRequest('password', '');
 				}
-				if ($old_item['publickey'] !== getRequest('publickey', '')) {
+				if ($db_item['publickey'] !== getRequest('publickey', '')) {
 					$item['publickey'] = getRequest('publickey', '');
 				}
-				if ($old_item['privatekey'] !== getRequest('privatekey', '')) {
+				if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
 					$item['privatekey'] = getRequest('privatekey', '');
 				}
-				if ($old_item['params'] !== getRequest('params', '')) {
+				if ($db_item['params'] !== getRequest('params', '')) {
 					$item['params'] = getRequest('params', '');
 				}
-				if ($old_item['delay'] != getRequest('delay', 0)) {
+				if ($db_item['delay'] != getRequest('delay', 0)) {
 					$item['delay'] = getRequest('delay', 0);
 				}
-				if ($old_item['delay_flex'] !== $delay_flex) {
+				if ($db_item['delay_flex'] !== $delay_flex) {
 					$item['delay_flex'] = $delay_flex;
 				}
-				if ($old_item['history'] != getRequest('history', 0)) {
+				if ($db_item['history'] != getRequest('history', 0)) {
 					$item['history'] = getRequest('history', 0);
 				}
-				if ($old_item['trends'] != getRequest('trends', 0)) {
+				if ($db_item['trends'] != getRequest('trends', 0)) {
 					$item['trends'] = getRequest('trends', 0);
 				}
-				if ($old_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
+				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
 				}
-				$old_applications = zbx_objectValues($old_item['applications'], 'applicationid');
+				$old_applications = zbx_objectValues($db_item['applications'], 'applicationid');
 				natsort($old_applications);
 				natsort($applications);
 				if (array_values($old_applications) !== array_values($applications)) {
 					$item['applications'] = $applications;
 				}
-				if ($old_item['inventory_link'] != getRequest('inventory_link', 0)) {
+				if ($db_item['inventory_link'] != getRequest('inventory_link', 0)) {
 					$item['inventory_link'] = getRequest('inventory_link', 0);
 				}
-				if ($old_item['description'] !== getRequest('description', '')) {
+				if ($db_item['description'] !== getRequest('description', '')) {
 					$item['description'] = getRequest('description', '');
 				}
 			}
 
-			if ($old_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
+			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
 				$item['status'] = getRequest('status', ITEM_STATUS_DISABLED);
 			}
 

@@ -211,7 +211,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
 	}
 	else {
-		$old_trigger_prototypes = API::TriggerPrototype()->get([
+		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
 				'recovery_mode', 'recovery_expression'
 			],
@@ -220,58 +220,58 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'triggerids' => getRequest('triggerid')
 		]);
 
-		$old_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($old_trigger_prototypes,
+		$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$old_trigger_prototype = reset($old_trigger_prototypes);
+		$db_trigger_prototype = reset($db_trigger_prototypes);
 
 		$trigger_prototype = [];
 
-		if ($old_trigger_prototype['templateid'] == 0) {
-			if ($old_trigger_prototype['description'] !== getRequest('description')) {
+		if ($db_trigger_prototype['templateid'] == 0) {
+			if ($db_trigger_prototype['description'] !== getRequest('description')) {
 				$trigger_prototype['description'] = getRequest('description');
 			}
-			if ($old_trigger_prototype['expression'] !== getRequest('expression')) {
+			if ($db_trigger_prototype['expression'] !== getRequest('expression')) {
 				$trigger_prototype['expression'] = getRequest('expression');
 			}
-			if ($old_trigger_prototype['recovery_mode'] != getRequest('recovery_mode')) {
+			if ($db_trigger_prototype['recovery_mode'] != getRequest('recovery_mode')) {
 				$trigger_prototype['recovery_mode'] = getRequest('recovery_mode');
 			}
 			if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-					&& $old_trigger_prototype['recovery_expression'] !== getRequest('recovery_expression')) {
+					&& $db_trigger_prototype['recovery_expression'] !== getRequest('recovery_expression')) {
 				$trigger_prototype['recovery_expression'] = getRequest('recovery_expression');
 			}
 		}
 
-		if ($old_trigger_prototype['type'] != getRequest('type')) {
+		if ($db_trigger_prototype['type'] != getRequest('type')) {
 			$trigger_prototype['type'] = getRequest('type');
 		}
-		if ($old_trigger_prototype['url'] !== getRequest('url')) {
+		if ($db_trigger_prototype['url'] !== getRequest('url')) {
 			$trigger_prototype['url'] = getRequest('url');
 		}
-		if ($old_trigger_prototype['priority'] != getRequest('priority')) {
+		if ($db_trigger_prototype['priority'] != getRequest('priority')) {
 			$trigger_prototype['priority'] = getRequest('priority');
 		}
-		if ($old_trigger_prototype['comments'] !== getRequest('comments')) {
+		if ($db_trigger_prototype['comments'] !== getRequest('comments')) {
 			$trigger_prototype['comments'] = getRequest('comments');
 		}
 
-		$old_tags = $old_trigger_prototype['tags'];
+		$old_tags = $db_trigger_prototype['tags'];
 		CArrayHelper::sort($old_tags, ['tag', 'value']);
 		CArrayHelper::sort($tags, ['tag', 'value']);
 		if (array_values($old_tags) !== array_values($tags)) {
 			$trigger_prototype['tags'] = $tags;
 		}
 
-		$old_dependencies = $old_trigger_prototype['dependencies'];
+		$old_dependencies = $db_trigger_prototype['dependencies'];
 		CArrayHelper::sort($old_dependencies, ['triggerid']);
 		CArrayHelper::sort($dependencies, ['triggerid']);
 		if (array_values($old_dependencies) !== array_values($dependencies)) {
 			$trigger_prototype['dependencies'] = $dependencies;
 		}
 
-		if ($old_trigger_prototype['status'] != getRequest('status')) {
+		if ($db_trigger_prototype['status'] != getRequest('status')) {
 			$trigger_prototype['status'] = getRequest('status');
 		}
 

@@ -226,7 +226,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 	else {
-		$old_triggers = API::Trigger()->get([
+		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
 				'flags', 'recovery_mode', 'recovery_expression'
 			],
@@ -235,52 +235,52 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'triggerids' => getRequest('triggerid')
 		]);
 
-		$old_triggers = CMacrosResolverHelper::resolveTriggerExpressions($old_triggers,
+		$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$old_trigger = reset($old_triggers);
+		$db_trigger = reset($db_triggers);
 
 		$trigger = [];
 
-		if ($old_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			if ($old_trigger['templateid'] == 0) {
-				if ($old_trigger['description'] !== getRequest('description')) {
+		if ($db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			if ($db_trigger['templateid'] == 0) {
+				if ($db_trigger['description'] !== getRequest('description')) {
 					$trigger['description'] = getRequest('description');
 				}
-				if ($old_trigger['expression'] !== getRequest('expression')) {
+				if ($db_trigger['expression'] !== getRequest('expression')) {
 					$trigger['expression'] = getRequest('expression');
 				}
-				if ($old_trigger['recovery_mode'] != getRequest('recovery_mode')) {
+				if ($db_trigger['recovery_mode'] != getRequest('recovery_mode')) {
 					$trigger['recovery_mode'] = getRequest('recovery_mode');
 				}
 				if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
-						&& $old_trigger['recovery_expression'] !== getRequest('recovery_expression')) {
+						&& $db_trigger['recovery_expression'] !== getRequest('recovery_expression')) {
 					$trigger['recovery_expression'] = getRequest('recovery_expression');
 				}
 			}
 
-			if ($old_trigger['type'] != getRequest('type')) {
+			if ($db_trigger['type'] != getRequest('type')) {
 				$trigger['type'] = getRequest('type');
 			}
-			if ($old_trigger['url'] !== getRequest('url')) {
+			if ($db_trigger['url'] !== getRequest('url')) {
 				$trigger['url'] = getRequest('url');
 			}
-			if ($old_trigger['priority'] != getRequest('priority')) {
+			if ($db_trigger['priority'] != getRequest('priority')) {
 				$trigger['priority'] = getRequest('priority');
 			}
-			if ($old_trigger['comments'] !== getRequest('comments')) {
+			if ($db_trigger['comments'] !== getRequest('comments')) {
 				$trigger['comments'] = getRequest('comments');
 			}
 
-			$old_tags = $old_trigger['tags'];
+			$old_tags = $db_trigger['tags'];
 			CArrayHelper::sort($old_tags, ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
 			if (array_values($old_tags) !== array_values($tags)) {
 				$trigger['tags'] = $tags;
 			}
 
-			$old_dependencies = $old_trigger['dependencies'];
+			$old_dependencies = $db_trigger['dependencies'];
 			CArrayHelper::sort($old_dependencies, ['triggerid']);
 			CArrayHelper::sort($dependencies, ['triggerid']);
 			if (array_values($old_dependencies) !== array_values($dependencies)) {
@@ -288,7 +288,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		if ($old_trigger['status'] != getRequest('status')) {
+		if ($db_trigger['status'] != getRequest('status')) {
 			$trigger['status'] = getRequest('status');
 		}
 
