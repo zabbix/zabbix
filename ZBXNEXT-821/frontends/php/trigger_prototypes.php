@@ -206,7 +206,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$trigger['recovery_expression'] = getRequest('recovery_expression');
 		}
 
-		$result = API::TriggerPrototype()->create($trigger);
+		$result = (bool) API::TriggerPrototype()->create($trigger);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
 	}
@@ -278,7 +278,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($trigger_prototype) {
 			$trigger_prototype['triggerid'] = getRequest('triggerid');
 
-			$result = API::TriggerPrototype()->update($trigger_prototype);
+			$result = (bool) API::TriggerPrototype()->update($trigger_prototype);
 		}
 		else {
 			$result = true;
