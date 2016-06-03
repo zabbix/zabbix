@@ -18,6 +18,7 @@
 		<!-- Create bootstrap.php -->
 		<copy overwrite="true" file="frontends/php/tests/bootstrap.php.template" tofile="frontends/php/tests/bootstrap.php"/>
 		<replace file="frontends/php/tests/bootstrap.php" token="{URL}" value="${url}"/>
+		<replace file="frontends/php/tests/bootstrap.php" token="{BASEDIR}" value="${basedir}"/>
 
 		<!-- Create PHP config file -->
 		<copy overwrite="true" file="tests/templates/zabbix.conf.php" tofile="frontends/php/conf/zabbix.conf.php"/>

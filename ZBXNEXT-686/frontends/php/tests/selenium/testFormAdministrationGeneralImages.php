@@ -21,11 +21,11 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralImages extends CWebTest {
-		public $icon_image_name = '1image1';
-		public $icon_image_name2 = '2image2';
-		public $bg_image_name = '1bgimage1';
-		public $bg_image_name2 = '2bgimage2';
-		public $file_path = '/home/hudson/public_html/trunk-FRONTEND-MYSQL/frontends/php/images/general/bttn/minus.png';
+	public $icon_image_name = '1image1';
+	public $icon_image_name2 = '2image2';
+	public $bg_image_name = '1bgimage1';
+	public $bg_image_name2 = '2bgimage2';
+	public $file_path = PHPUNIT_BASEDIR.'/tests/images/image.png';
 
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
