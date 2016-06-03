@@ -69,7 +69,7 @@ foreach ($data['discoveries'] as $discovery) {
 	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		'?hostid='.$_REQUEST['hostid'].
-			'&g_hostdruleid='.$discovery['itemid'].
+			'&g_hostdruleid[]='.$discovery['itemid'].
 			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'

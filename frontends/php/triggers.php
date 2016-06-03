@@ -221,7 +221,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$trigger['recovery_expression'] = getRequest('recovery_expression');
 		}
 
-		$result = API::Trigger()->create($trigger);
+		$result = (bool) API::Trigger()->create($trigger);
 
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
@@ -295,7 +295,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($trigger) {
 			$trigger['triggerid'] = getRequest('triggerid');
 
-			$result = API::Trigger()->update($trigger);
+			$result = (bool) API::Trigger()->update($trigger);
 		}
 		else {
 			$result = true;

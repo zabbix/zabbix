@@ -105,7 +105,7 @@ foreach ($this->data['items'] as $item) {
 	// status
 	$status = new CCol((new CLink(
 		itemIndicator($item['status'], $item['state']),
-		'?group_itemid='.$item['itemid'].
+		'?group_itemid[]='.$item['itemid'].
 			'&hostid='.$item['hostid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
 		->addClass(ZBX_STYLE_LINK_ACTION)

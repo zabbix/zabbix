@@ -317,26 +317,6 @@ function itemTypeInterface($type = null) {
 	}
 }
 
-function update_item_status($itemids, $status) {
-	zbx_value2array($itemids);
-	$result = true;
-
-	$db_items = DBselect('SELECT i.* FROM items i WHERE '.dbConditionInt('i.itemid', $itemids));
-	while ($item = DBfetch($db_items)) {
-		$old_status = $item['status'];
-		if ($status != $old_status) {
-			$result &= DBexecute(
-				'UPDATE items SET status='.zbx_dbstr($status).' WHERE itemid='.zbx_dbstr($item['itemid'])
-			);
-			if ($result) {
-				$host = get_host_by_hostid($item['hostid']);
-				$item_new = get_item_by_itemid($item['itemid']);
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM, $item['itemid'], $host['host'].NAME_DELIMITER.$item['name'], 'items', $item, $item_new);
-			}
-		}
-	}
-	return $result;
-}
 /**
  * Copies the given items to the given hosts or templates.
  *
@@ -488,36 +468,6 @@ function copyApplications($source_hostid, $destination_hostid) {
 	unset($application);
 
 	return (bool) API::Application()->create($applications_to_create);
-}
-
-function activate_item($itemids) {
-	zbx_value2array($itemids);
-
-	// first update status for child items
-	$child_items = [];
-	$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
-	while ($item = DBfetch($db_items)) {
-		$child_items[$item['itemid']] = $item['itemid'];
-	}
-	if (!empty($child_items)) {
-		activate_item($child_items); // Recursion !!!
-	}
-	return update_item_status($itemids, ITEM_STATUS_ACTIVE);
-}
-
-function disable_item($itemids) {
-	zbx_value2array($itemids);
-
-	// first update status for child items
-	$chd_items = [];
-	$db_tmp_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
-	while ($db_tmp_item = DBfetch($db_tmp_items)) {
-		$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
-	}
-	if (!empty($chd_items)) {
-		disable_item($chd_items); // Recursion !!!
-	}
-	return update_item_status($itemids, ITEM_STATUS_DISABLED);
 }
 
 function get_item_by_itemid($itemid) {
