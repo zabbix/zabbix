@@ -43,6 +43,9 @@ class testFormAdministrationUserCreate extends CWebTest {
 		$this->input_type('password2', '123');
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('User added');
+
+		$sql = 'SELECT * FROM users WHERE alias=\'User alias\'';
+		$this->assertEquals(1, DBcount($sql), 'User with such alias has not been added');
 	}
 
 	public function testFormAdministrationUserCreate_restore() {

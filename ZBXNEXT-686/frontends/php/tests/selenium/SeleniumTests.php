@@ -59,6 +59,7 @@ require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testPageUsers.php';
 /*
 require_once dirname(__FILE__).'/testFormAction.php';
+ */
 require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
@@ -72,10 +73,9 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralWorkperiod.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralInstallation.php';
 require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
-*/
 require_once dirname(__FILE__).'/testFormAdministrationUserCreate.php';
-/*
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
+/*
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormItem.php';
@@ -155,6 +155,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
 /*		$suite->addTestSuite('testFormAction');
+ */
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
@@ -168,10 +169,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralInstallation');
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationScripts');
-*/
 		$suite->addTestSuite('testFormAdministrationUserCreate');
-/*
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
+/*
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormItem');
@@ -209,4 +209,3 @@ class SeleniumTests {
 		return $suite;
 	}
 }
-

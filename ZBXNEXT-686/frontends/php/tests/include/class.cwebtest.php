@@ -394,6 +394,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($value, $element->getAttribute('value'));
 	}
 
+	public function zbxGetValue($xpath) {
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getAttribute('value');
+	}
+
 	/**
 	 * Assert that the element with the given xpath contains a specific text.
 	 *
@@ -405,8 +409,12 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($text, $element->getText());
 	}
 
-	public function assertVisible($id){
-		$this->webDriver->findElement($id)->isDisplayed();
+	public function assertNotVisible($id){
+		$this->assertFalse($this->webDriver->findElement($id)->isDisplayed());
+	}
+
+		public function assertVisible($id){
+		$this->assertTrue($this->webDriver->findElement($id)->isDisplayed());
 	}
 
 	// check that page does not have real (not visible) host or template names
@@ -421,4 +429,5 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 			$this->zbxTestTextNotPresent($row['host']);
 		}
 	}
+
 }

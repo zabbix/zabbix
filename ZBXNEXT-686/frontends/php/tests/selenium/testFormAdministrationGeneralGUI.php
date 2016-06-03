@@ -417,7 +417,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestTextPresent('Show warning if Zabbix server is down');
 		$this->assertTrue($this->zbxTestCheckboxSelected('server_check_interval'));
 
-		$sql = 'SELECT server_check_interval FROM config WHERE server_check_interval=1';
+		$sql = 'SELECT server_check_interval FROM config WHERE server_check_interval=10';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "server_check_interval"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');

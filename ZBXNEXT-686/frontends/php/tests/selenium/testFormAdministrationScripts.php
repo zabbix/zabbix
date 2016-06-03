@@ -40,29 +40,29 @@ class testFormAdministrationScripts extends CWebTest {
 			],
 			[
 				[
-					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'name', 'value' => 'script1', 'type' => 'text'],
 					['name' => 'command', 'value' => 'run', 'type' => 'text'],
 					['name' => 'type', 'value' => 'IPMI', 'type' => 'select']
 				],
 				true,
 				[
-					'name' => 'script',
+					'name' => 'script1',
 					'command' => 'run',
 					'type' => 1
 				]
 			],
 			[
 				[
-					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'name', 'value' => 'script2', 'type' => 'text'],
 					['name' => 'command', 'value' => 'run', 'type' => 'text'],
-					['name' => 'enableConfirmation', 'type' => 'check']
+					['name' => 'enable_confirmation', 'type' => 'check']
 				],
 				false,
 				[]
 			],
 			[
 				[
-					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'name', 'value' => 'script3', 'type' => 'text'],
 					['name' => 'command', 'value' => '', 'type' => 'text']
 				],
 				false,
@@ -73,56 +73,58 @@ class testFormAdministrationScripts extends CWebTest {
 	}
 
 	public function testFormAdministrationScripts_testLayout() {
-		$this->zbxTestLogin('scripts.php?form');
+		$this->zbxTestLogin('zabbix.php?action=script.edit');
 		$this->zbxTestCheckTitle('Configuration of scripts');
-
-		$this->zbxTestTextPresent('CONFIGURATION OF SCRIPTS');
-		$this->zbxTestTextPresent('Script');
+		$this->zbxTestCheckHeader('Scripts');
 
 		$this->zbxTestTextPresent(['Name']);
-		$this->assertElementPresent('name');
+		$this->zbxAssertElementPresent(WebDriverBy::id('name'));
 
 		$this->zbxTestTextPresent(['Type']);
-		$this->assertElementPresent('type');
-		$this->assertSelectHasOption('type', 'IPMI');
-		$this->assertSelectHasOption('type', 'Script');
+		$this->zbxAssertElementPresent(WebDriverBy::id('type'));
+		$this->zbxTestDropdownHasOptions('type', ['IPMI', 'Script']);
 
 		$this->zbxTestTextPresent(['Execute on', 'Zabbix agent', 'Zabbix server']);
-		$this->assertElementPresent('execute_on_1');
-		$this->assertElementPresent('execute_on_2');
+		$this->zbxAssertElementPresent(WebDriverBy::id('execute_on_0'));
+		$this->zbxAssertElementPresent(WebDriverBy::id('execute_on_1'));
 
 		$this->zbxTestTextPresent(['Commands']);
-		$this->assertElementPresent('command');
+		$this->zbxAssertElementPresent(WebDriverBy::id('command'));
 
 		$this->zbxTestTextPresent(['Description']);
-		$this->assertElementPresent('description');
+		$this->zbxAssertElementPresent(WebDriverBy::id('description'));
 
 		$this->zbxTestTextPresent(['User group']);
-		$this->assertElementPresent('usrgrpid');
+		$this->zbxAssertElementPresent(WebDriverBy::id('usrgrpid'));
+		$this->zbxTestDropdownHasOptions('usrgrpid', ['All', 'Disabled', 'Enabled debug mode', 'Guests', 'No access to the frontend', 'Zabbix administrators']);
 
 		$this->zbxTestTextPresent(['Host group']);
-		$this->assertElementPresent('groupid');
+		$this->zbxAssertElementPresent(WebDriverBy::id('hgstype'));
+		$this->zbxTestDropdownHasOptions('hgstype', ['All', 'Selected']);
 
 		$this->zbxTestTextPresent(['Required host permissions']);
-		$this->assertElementPresent('access');
-		$this->assertSelectHasOption('access', 'Read');
-		$this->assertSelectHasOption('access', 'Write');
+		$this->zbxAssertElementPresent(WebDriverBy::id('host_access'));
+		$this->zbxTestDropdownHasOptions('host_access', ['Read', 'Write']);
 
 		$this->zbxTestTextPresent(['Enable confirmation']);
-		$this->assertElementPresent('enableConfirmation');
-		$this->assertNotChecked('enableConfirmation');
+		$this->zbxAssertElementPresent(WebDriverBy::id('enable_confirmation'));
+		$this->assertFalse($this->zbxTestCheckboxSelected('enable_confirmation'));
 
 		$this->zbxTestTextPresent(['Confirmation text']);
-		$this->assertElementPresent('confirmation');
+		$this->zbxAssertElementPresent(WebDriverBy::id('confirmation'));
+	}
+
+	public function testFormAdministrationScripts_backup() {
+		DBsave_tables('scripts');
 	}
 
 	/**
 	 * @dataProvider providerScripts
 	 */
 	public function testFormAdministrationScripts_testCreate($data, $resultSave, $dbValues) {
-		DBsave_tables('scripts');
-
-		$this->zbxTestLogin('scripts.php?form');
+		$this->zbxTestLogin('zabbix.php?action=script.edit');
+		$this->zbxTestCheckTitle('Configuration of scripts');
+		$this->zbxTestCheckHeader('Scripts');
 
 		foreach ($data as $field) {
 			switch ($field['type']) {
@@ -130,10 +132,10 @@ class testFormAdministrationScripts extends CWebTest {
 					$this->input_type($field['name'], $field['value']);
 					break;
 				case 'select':
-					$this->select($field['name'], $field['value']);
+					$this->zbxTestDropdownSelect($field['name'], $field['value']);
 					break;
 				case 'check':
-					$this->check($field['name']);
+					$this->zbxTestCheckboxSelect($field['name']);
 					break;
 			}
 
@@ -163,10 +165,12 @@ class testFormAdministrationScripts extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextPresent('ERROR:');
+			$this->zbxTestTextPresent('Cannot add script');
 			$this->assertEquals($DBhash, DBhash($sql));
 		}
+	}
 
+	public function testFormAdministrationScripts_restore() {
 		DBrestore_tables('scripts');
 	}
 
