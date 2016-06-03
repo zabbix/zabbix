@@ -128,19 +128,17 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestCheckTitle($title) {
-/*
 		global $ZBX_SERVER_NAME;
 
 		if ($ZBX_SERVER_NAME !== '') {
 			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
 		}
- */
 
 		$this->assertEquals($title, $this->webDriver->getTitle());
 	}
 
 	public function zbxTestCheckHeader($header) {
-		$this->zbxWaitUntil(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::tagName("h1")), 'element is not visible');
+		$this->zbxWaitUntil(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::tagName('h1')), 'element is not visible');
 		$headerElemnt = $this->webDriver->findElement(WebDriverBy::tagName('h1'));
 		$headerElemnt->isDisplayed();
 		$this->assertEquals($header, $headerElemnt->getText());
@@ -230,7 +228,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function zbxTestCheckboxSelected($id, $select = true) {
+	public function zbxTestCheckboxSelected($id) {
 		return $this->webDriver->findElement(WebDriverBy::id($id))->isSelected();
 	}
 
