@@ -127,10 +127,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->zbxTestTextPresent($this->failIfNotExists);
 	}
 
-	public function zbxTestCheckTitle($title) {
+	public function zbxTestCheckTitle($title, $check_server_name = true) {
 		global $ZBX_SERVER_NAME;
 
-		if ($ZBX_SERVER_NAME !== '') {
+		if ($check_server_name && $ZBX_SERVER_NAME !== '') {
 			$title = $ZBX_SERVER_NAME.NAME_DELIMITER.$title;
 		}
 
