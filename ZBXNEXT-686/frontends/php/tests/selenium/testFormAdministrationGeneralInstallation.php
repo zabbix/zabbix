@@ -74,7 +74,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 
 		// welcome page
 
-		$this->zbxTestCheckTitle('Installation');
+		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 
@@ -85,7 +85,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 
 		// check of pre-requisites
 
-		$this->zbxTestCheckTitle('Installation');
+		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestCheckHeader('Check of pre-requisites');
 		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
@@ -99,7 +99,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 
 		// configure db connection
 
-		$this->zbxTestCheckTitle('Installation');
+		$this->zbxTestCheckTitle('Installation', false);
 		$this->zbxTestCheckHeader('Configure DB connection');
 		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
