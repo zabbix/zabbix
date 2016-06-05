@@ -112,24 +112,24 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxAssertElementPresent(WebDriverBy::id('type'));
 
 		$this->zbxAssertElementPresent(WebDriverBy::id('server'));
-		$this->zbxAssertAttribute("//input[@id='server']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='server']", "size", 20);
+		$this->zbxAssertAttribute("//input[@id='server']", 'maxlength', 255);
+		$this->zbxAssertAttribute("//input[@id='server']", 'size', 20);
 
 		$this->zbxAssertElementPresent(WebDriverBy::id('port'));
-		$this->zbxAssertAttribute("//input[@id='port']", "maxlength", 5);
-		$this->zbxAssertAttribute("//input[@id='port']", "size", 20);
+		$this->zbxAssertAttribute("//input[@id='port']", 'maxlength', 5);
+		$this->zbxAssertAttribute("//input[@id='port']", 'size', 20);
 
 		$this->zbxAssertElementPresent(WebDriverBy::id('database'));
-		$this->zbxAssertAttribute("//input[@id='database']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='database']", "size", 20);
+		$this->zbxAssertAttribute("//input[@id='database']", 'maxlength', 255);
+		$this->zbxAssertAttribute("//input[@id='database']", 'size', 20);
 
 		$this->zbxAssertElementPresent(WebDriverBy::id('user'));
-		$this->zbxAssertAttribute("//input[@id='user']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='user']", "size", 20);
+		$this->zbxAssertAttribute("//input[@id='user']", 'maxlength', 255);
+		$this->zbxAssertAttribute("//input[@id='user']", 'size', 20);
 
 		$this->zbxAssertElementPresent(WebDriverBy::id('password'));
-		$this->zbxAssertAttribute("//input[@id='password']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='password']", "size", 20);
+		$this->zbxAssertAttribute("//input[@id='password']", 'maxlength', 255);
+		$this->zbxAssertAttribute("//input[@id='password']", 'size', 20);
 
 		$this->zbxTestClickWait('cancel');
 
