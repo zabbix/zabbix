@@ -558,7 +558,7 @@ sub __create_missing_slv_montly_items_and_triggers
 
 		if ($epp_enabled == 1)
 		{
-			__create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
+			__create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
 
 			if ($rdds_enabled == 1)
 			{

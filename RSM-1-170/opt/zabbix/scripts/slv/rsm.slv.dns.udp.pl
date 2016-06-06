@@ -19,10 +19,10 @@ use constant VALUE_INVALID	=> -1;	# used internally
 my $cfg_key_in = 'rsm.dns.udp.upd[{$RSM.TLD},';
 my $cfg_keys_out =
 {
-	'failed'	=> 'rsm.slv.dns.udp.upd.failed',
-	'max'		=> 'rsm.slv.dns.udp.upd.max',
-	'avg'		=> 'rsm.slv.dns.udp.upd.avg',
-	'pfailed'	=> 'rsm.slv.dns.udp.upd.pfailed'
+	'failed'	=> 'rsm.slv.dns.upd.failed',
+	'max'		=> 'rsm.slv.dns.upd.max',
+	'avg'		=> 'rsm.slv.dns.upd.avg',
+	'pfailed'	=> 'rsm.slv.dns.upd.pfailed'
 };
 
 parse_opts('tld=s', 'now=i');

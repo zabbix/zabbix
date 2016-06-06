@@ -1313,7 +1313,7 @@ sub create_slv_epp_items($$) {
 	$depend_down = $triggerid;
     }
 
-    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $host_name, '{$RSM.SLV.DNS.NS.UPD}');
+    create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $hostid, $host_name, '{$RSM.SLV.DNS.NS.UPD}');
     create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $host_name, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
 }
 
@@ -2092,7 +2092,7 @@ sub update_epp_objects($) {
 
     create_epp_objects($templateid, 'Template '.$tld, $tld, $is_new);
 
-    create_slv_monthly("DNS update time", "rsm.slv.dns.udp.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
+    create_slv_monthly("DNS update time", "rsm.slv.dns.upd", $hostid, $tld, '{$RSM.SLV.DNS.NS.UPD}');
     create_slv_monthly("RDDS update time", "rsm.slv.rdds43.upd", $hostid, $tld, '{$RSM.SLV.RDDS.UPD}') if (defined($OPTS{'rdds43-servers'}));
 
     my $ns_servers = get_nsservers_list($tld);
