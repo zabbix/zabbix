@@ -4742,6 +4742,7 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
  * Example:  key                     | macro       | result                   *
  *          -------------------------+-------------+-----------------         *
  *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
+ *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]            *
  *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
  *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
  *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *

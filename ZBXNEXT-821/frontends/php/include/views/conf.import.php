@@ -35,6 +35,7 @@ $titles = [
 	'discoveryRules' => _('Discovery rules'),
 	'triggers' => _('Triggers'),
 	'graphs' => _('Graphs'),
+	'httptests' => _('Web scenarios'),
 	'screens' => _('Screens'),
 	'maps' => _('Maps')
 ];

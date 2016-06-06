@@ -242,6 +242,72 @@ class CImportDataAdapter {
 	}
 
 	/**
+	 * Get web scenarios from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getHttpTests() {
+		$httptests = [];
+
+		if (array_key_exists('hosts', $this->data)) {
+			foreach ($this->data['hosts'] as $host) {
+				if (array_key_exists('httptests', $host)) {
+					foreach ($host['httptests'] as $httptest) {
+						$httptests[$host['host']][$httptest['name']] = $this->formatHttpTest($httptest);
+					}
+				}
+			}
+		}
+
+		if (array_key_exists('templates', $this->data)) {
+			foreach ($this->data['templates'] as $template) {
+				if (array_key_exists('httptests', $template)) {
+					foreach ($template['httptests'] as $httptest) {
+						$httptests[$template['template']][$httptest['name']] = $this->formatHttpTest($httptest);
+					}
+				}
+			}
+		}
+
+		return $httptests;
+	}
+
+	/**
+	 * Get web scenario steps from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getHttpSteps() {
+		$httpsteps = [];
+
+		if (array_key_exists('hosts', $this->data)) {
+			foreach ($this->data['hosts'] as $host) {
+				if (array_key_exists('httptests', $host)) {
+					foreach ($host['httptests'] as $httptest) {
+						foreach ($httptest['steps'] as $httpstep) {
+							$httpsteps[$host['host']][$httptest['name']][$httpstep['name']] = $httpstep;
+						}
+					}
+				}
+			}
+		}
+
+		if (array_key_exists('templates', $this->data)) {
+			foreach ($this->data['templates'] as $template) {
+				if (array_key_exists('httptests', $template)) {
+					foreach ($template['httptests'] as $httptest) {
+						foreach ($httptest['steps'] as $httpstep) {
+							$httpsteps[$template['template']][$httptest['name']][$httpstep['name']] = $httpstep;
+						}
+					}
+				}
+			}
+		}
+
+		return $httpsteps;
+	}
+
+	/**
 	 * Get graphs from the imported data.
 	 *
 	 * @return array
@@ -377,6 +443,36 @@ class CImportDataAdapter {
 	 */
 	protected function renameItemFields(array $item) {
 		return CArrayHelper::renameKeys($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
+	}
+
+	/**
+	 * Format web scenario.
+	 *
+	 * @param array $httptest
+	 *
+	 * @return array
+	 */
+	protected function formatHttpTest(array $httptest) {
+		$httptest = $this->renameHttpTestFields($httptest);
+
+		$no = 0;
+		foreach ($httptest['steps'] as &$step) {
+			$step['no'] = ++$no;
+		}
+		unset($step);
+
+		return $httptest;
+	}
+
+	/**
+	 * Rename web scenarios fields.
+	 *
+	 * @param array $httptest
+	 *
+	 * @return array
+	 */
+	protected function renameHttpTestFields(array $httptest) {
+		return CArrayHelper::renameKeys($httptest, ['attempts' => 'retries']);
 	}
 
 	/**
