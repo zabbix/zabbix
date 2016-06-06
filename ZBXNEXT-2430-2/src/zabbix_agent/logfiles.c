@@ -2344,7 +2344,7 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 {
 	const char		*__function_name = "process_logrt";
 	int			i, j, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
-				max_old_seq = 0, old_last, from_first_file = 1, last_processed;
+				max_old_seq = 0, old_last, from_first_file = 1, last_processed, limit_reached = 0;
 	char			*old2new = NULL;
 	struct st_logfile	*logfiles = NULL;
 	time_t			now;
@@ -2548,7 +2548,10 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 				processed_bytes_sum += processed_bytes_tmp;
 
 			if (0 >= *p_count || 0 >= *s_count)
+			{
+				limit_reached = 1;
 				break;
+			}
 		}
 
 		if (0 != from_first_file)
@@ -2564,29 +2567,25 @@ int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastl
 		i++;
 	}
 
-	if (0.0f != max_delay)
-	{
-		/* store number of processed bytes for using in the next check */
-
-		if (SUCCEED == ret)
-		{
-			*processed_bytes = processed_bytes_sum;
-		}
-		else
-		{
-			/* 'SUCCEED != ret' means that process_log() failed (can happen in case of file I/O error, */
-			/* bad regexp etc.). In this case we try up to 3 times and make item NOTSUPPORTED. */
-			/* Invalidate start_time to prevent jump in the next check. */
-			*start_time = 0.0;
-		}
-	}
-
 	/* store the new log file list for using in the next check */
 	*logfiles_num_new = logfiles_num;
 
 	if (0 < logfiles_num)
 		*logfiles_new = logfiles;
 out:
+	if (0.0f != max_delay)
+	{
+		if (SUCCEED == ret)
+			*processed_bytes = processed_bytes_sum;
+
+		if (SUCCEED != ret || 0 == limit_reached)
+		{
+			/* FAIL or number of lines limits were not reached. */
+			/* Invalidate start_time to prevent jump in the next check. */
+			*start_time = 0.0;
+		}
+	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
