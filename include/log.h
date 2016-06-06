@@ -38,6 +38,8 @@
 #define ZBX_OPTION_LOGTYPE_FILE		"file"
 #define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
+#define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
+
 typedef enum
 {
 	ERR_Z3001 = 3001,
