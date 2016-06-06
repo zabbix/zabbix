@@ -570,9 +570,12 @@ sub get_tlds
 	}
 
 	my @tlds;
-	foreach my $row_ref (sort {$a->[0] cmp $b->[0]} (@$rows_ref))
+	if (defined($rows_ref))
 	{
-		push(@tlds, $row_ref->[0]);
+		foreach my $row_ref (sort {$a->[0] cmp $b->[0]} (@$rows_ref))
+		{
+			push(@tlds, $row_ref->[0]);
+		}
 	}
 
 	return \@tlds;
@@ -1204,7 +1207,7 @@ sub get_month_bounds
 	my $now = shift;
 	my $delay = shift;
 
-	fail("internal error: get_month_bounds() requires 2 parameters: timestamp, delay") unless ($now && $delay);
+	fail("internal error: get_month_bounds() requires 2 non-zero parameters: timestamp, delay") unless ($now && $delay);
 
 	$now -= $delay + AVAIL_SHIFT_BACK;
 
