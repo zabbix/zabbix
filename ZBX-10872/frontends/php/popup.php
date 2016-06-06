@@ -1374,14 +1374,6 @@ elseif ($srctbl == 'applications') {
 	$parentId = $dstfld1 ? CJs::encodeJson($dstfld1) : 'null';
 
 	foreach ($apps as &$app) {
-		$name = (new CLink($app['name'], 'javascript:void(0);'))
-			->setId('spanid'.$app['applicationid']);
-
-		$js_action = 'javascript: addValue('.CJs::encodeJson($reference).', '.$app['applicationid'].', '.
-			$parentId.');';
-
-		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
-
 		$data[$app['applicationid']] = [
 			'id' => $app['applicationid'],
 			'name' => $app['name']
@@ -1391,7 +1383,11 @@ elseif ($srctbl == 'applications') {
 			$multiselect
 				? (new CCheckBox('applications['.$app[$srcfld1].']', $app['applicationid']))
 				: null,
-			$name
+			(new CLink($app['name'], 'javascript:void(0);'))
+				->setId('spanid'.$app['applicationid'])
+				->onClick('javascript: addValue('.CJs::encodeJson($reference).', '.$app['applicationid'].', '.$parentId.');'
+			);
+
 		]);
 	}
 	unset($app);
