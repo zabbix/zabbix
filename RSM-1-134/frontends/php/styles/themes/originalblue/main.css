@@ -1,0 +1,35 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2013 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+@import "jquery-ui.css";
+
+.unknown, a.unknown { color: #777; }
+a.unknown:hover { color: #999; }
+
+table.filter { background: white; border: 1px solid #EEE; }
+table.filter tr td { border: 1px solid #EEE; }
+
+ul.formlist li.new { background: #EEFFEE; }
+
+.dropArea { background-color: #FFB; }
+.dropHereText { color: #5481AB; }
+
+table.ack_msgs tr.msg { background-color: #F8F8F8; }
+
+.ui-widget-content a.on { color: #EE0000; }
+.ui-widget-content a.on:hover { color: #CC4444; }

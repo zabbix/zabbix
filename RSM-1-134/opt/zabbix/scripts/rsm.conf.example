@@ -1,0 +1,22 @@
+[zapi]
+url = https://zabbix.example.com
+user = Admin
+password = zabbix
+
+[slv]
+path = /opt/zabbix/scripts/slv
+zserver = 127.0.0.1
+zport = 10051
+
+[db]
+name = zabbix
+user = zabbix
+password = zabbix
+host = localhost
+
+[salesforce]
+username = someone@example.com
+password = password
+
+[redis]
+enabled = 1
