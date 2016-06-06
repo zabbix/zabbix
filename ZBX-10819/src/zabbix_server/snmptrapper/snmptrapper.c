@@ -461,7 +461,7 @@ static int	open_trap_file()
 		goto out;
 	}
 
-	if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= file_buf.st_size)
+	if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)file_buf.st_size)
 	{
 		if (0 == overflow_warning)
 		{
@@ -527,7 +527,7 @@ static int	get_latest_data()
 
 			close_trap_file();
 		}
-		else if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= file_buf.st_size)
+		else if (ZBX_SNMP_TRAPFILE_MAX_SIZE <= (zbx_uint64_t)file_buf.st_size)
 		{
 			close_trap_file();
 		}
