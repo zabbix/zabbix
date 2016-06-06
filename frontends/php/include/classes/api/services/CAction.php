@@ -1320,11 +1320,10 @@ class CAction extends CApiService {
 	 * Validate operation and recovery operation.
 	 *
 	 * @param array $operations Operation data array.
-	 * @param int   $recovery   Operation recovery.
 	 *
 	 * @return bool
 	 */
-	public function validateOperationsIntegrity($operations, $recovery) {
+	public function validateOperationsIntegrity($operations) {
 		$operations = zbx_toArray($operations);
 
 		$all_groupids = [];
@@ -1333,10 +1332,10 @@ class CAction extends CApiService {
 		$all_usrgrpids = [];
 
 		foreach ($operations as $operation) {
-			if ($recovery == ACTION_OPERATION) {
+			if ($operation['flag'] == ACTION_OPERATION) {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 						&& (!array_key_exists('esc_step_from', $operation)
-							&& !array_key_exists('esc_step_to', $operation))) {
+							|| !array_key_exists('esc_step_to', $operation))) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('esc_step_from and esc_step_to must be set together in action operation.')
 					);
@@ -1356,11 +1355,9 @@ class CAction extends CApiService {
 					}
 				}
 
-				if (array_key_exists('esc_period', $operation)) {
-					if (array_key_exists('esc_period', $operation) && $operation['esc_period'] != 0
-							&& $operation['esc_period'] < SEC_PER_MIN) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation step duration.'));
-					}
+				if (array_key_exists('esc_period', $operation) && $operation['esc_period'] != 0
+						&& $operation['esc_period'] < SEC_PER_MIN) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation step duration.'));
 				}
 			}
 
@@ -1382,11 +1379,11 @@ class CAction extends CApiService {
 					$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					if (!array_key_exists('type', $operation['opcommand'])) {
+					if (!isset($operation['opcommand']['type'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command type specified for action operation.'));
 					}
 
-					if ((!array_key_exists('command', $operation['opcommand'])
+					if ((!isset($operation['opcommand']['command'])
 							|| zbx_empty(trim($operation['opcommand']['command'])))
 							&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command specified for action operation.'));
@@ -1396,7 +1393,7 @@ class CAction extends CApiService {
 						case ZBX_SCRIPT_TYPE_IPMI:
 							break;
 						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-							if (!array_key_exists('execute_on', $operation['opcommand'])) {
+							if (!isset($operation['opcommand']['execute_on'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No execution target specified for action operation command "%1$s".',
 										$operation['opcommand']['command']
@@ -1405,7 +1402,7 @@ class CAction extends CApiService {
 							}
 							break;
 						case ZBX_SCRIPT_TYPE_SSH:
-							if (!array_key_exists('authtype', $operation['opcommand'])
+							if (!isset($operation['opcommand']['authtype'])
 									|| zbx_empty($operation['opcommand']['authtype'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication type specified for action operation command "%1$s".',
@@ -1414,7 +1411,7 @@ class CAction extends CApiService {
 								);
 							}
 
-							if (!array_key_exists('username', $operation['opcommand'])
+							if (!isset($operation['opcommand']['username'])
 									|| zbx_empty($operation['opcommand']['username'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%1$s".',
@@ -1424,7 +1421,7 @@ class CAction extends CApiService {
 							}
 
 							if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-								if (!array_key_exists('publickey', $operation['opcommand'])
+								if (!isset($operation['opcommand']['publickey'])
 										|| zbx_empty($operation['opcommand']['publickey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('No public key file specified for action operation command "%1$s".',
@@ -1432,7 +1429,7 @@ class CAction extends CApiService {
 										)
 									);
 								}
-								if (!array_key_exists('privatekey', $operation['opcommand'])
+								if (!isset($operation['opcommand']['privatekey'])
 										|| zbx_empty($operation['opcommand']['privatekey'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
 										_s('No private key file specified for action operation command "%1$s".',
@@ -1443,7 +1440,7 @@ class CAction extends CApiService {
 							}
 							break;
 						case ZBX_SCRIPT_TYPE_TELNET:
-							if (!array_key_exists('username', $operation['opcommand'])
+							if (!isset($operation['opcommand']['username'])
 									|| zbx_empty($operation['opcommand']['username'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('No authentication user name specified for action operation command "%1$s".',
@@ -1453,7 +1450,7 @@ class CAction extends CApiService {
 							}
 							break;
 						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-							if (!array_key_exists('scriptid', $operation['opcommand'])
+							if (!isset($operation['opcommand']['scriptid'])
 									|| zbx_empty($operation['opcommand']['scriptid'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_('No script specified for action operation command.')
@@ -1464,7 +1461,7 @@ class CAction extends CApiService {
 								'scriptids' => $operation['opcommand']['scriptid'],
 								'preservekeys' => true
 							]);
-							if (!array_key_exists($operation['opcommand']['scriptid'], $scripts)) {
+							if (!isset($scripts[$operation['opcommand']['scriptid']])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _(
 									'Specified script does not exist or you do not have rights on it for action operation command.'
 								));
@@ -1474,8 +1471,7 @@ class CAction extends CApiService {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
 					}
 
-					if (array_key_exists('port', $operation['opcommand'])
-							&& !zbx_empty($operation['opcommand']['port'])) {
+					if (isset($operation['opcommand']['port']) && !zbx_empty($operation['opcommand']['port'])) {
 						if (zbx_ctype_digit($operation['opcommand']['port'])) {
 							if ($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -2261,7 +2257,6 @@ class CAction extends CApiService {
 
 		$conditionsToValidate = [];
 		$operations_to_validate = [];
-		$recovery_operations_to_validate = [];
 
 		// Validate "filter" sections and "conditions" in them, ensure that "operations" section
 		// is present and is not empty. Also collect conditions and operations for more validation.
@@ -2305,13 +2300,15 @@ class CAction extends CApiService {
 			}
 			else {
 				foreach ($action['operations'] as $operation) {
+					$operation['flag'] = ACTION_OPERATION;
 					$operations_to_validate[] = $operation;
 				}
 			}
 
 			if (array_key_exists('recovery_operations', $action)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
-					$recovery_operations_to_validate[] = $recovery_operation;
+					$recovery_operation['flag'] = ACTION_RECOVERY_OPERATION;
+					$operations_to_validate[] = $recovery_operation;
 				}
 			}
 		}
@@ -2320,8 +2317,7 @@ class CAction extends CApiService {
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
-		$this->validateOperationsIntegrity($operations_to_validate, ACTION_OPERATION);
-		$this->validateOperationsIntegrity($recovery_operations_to_validate, ACTION_RECOVERY_OPERATION);
+		$this->validateOperationsIntegrity($operations_to_validate);
 	}
 
 	/**
@@ -2409,7 +2405,6 @@ class CAction extends CApiService {
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
 
 		$operations_to_validate = [];
-		$recovery_operations_to_validate = [];
 		$conditionsToValidate = [];
 
 		foreach ($actions as $actionId => $action) {
@@ -2463,10 +2458,9 @@ class CAction extends CApiService {
 			elseif (isset($action['operations'])) {
 				$db_operations = zbx_toHash($db_actions[$action['actionid']]['operations'], 'operationid');
 				foreach ($action['operations'] as $operation) {
-					if (!array_key_exists('operationid', $operation)) {
-						$operations_to_validate[] = $operation;
-					}
-					elseif (array_key_exists($operation['operationid'], $db_operations)) {
+					if (!array_key_exists('operationid', $operation)
+							|| array_key_exists($operation['operationid'], $db_operations)) {
+						$operation['flag'] = ACTION_OPERATION;
 						$operations_to_validate[] = $operation;
 					}
 					else {
@@ -2481,11 +2475,10 @@ class CAction extends CApiService {
 					'operationid'
 				);
 				foreach ($action['recovery_operations'] as $recovery_operation) {
-					if (!array_key_exists('operationid', $recovery_operation)) {
-						$recovery_operations_to_validate[] = $recovery_operation;
-					}
-					elseif (array_key_exists($recovery_operation['operationid'], $db_recovery_operations)) {
-						$recovery_operations_to_validate[] = $recovery_operation;
+					if (!array_key_exists('operationid', $recovery_operation)
+							|| array_key_exists($recovery_operation['operationid'], $db_recovery_operations)) {
+						$recovery_operation['flag'] = ACTION_RECOVERY_OPERATION;
+						$operations_to_validate[] = $recovery_operation;
 					}
 					else {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operationid.'));
@@ -2497,8 +2490,7 @@ class CAction extends CApiService {
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
-		$this->validateOperationsIntegrity($operations_to_validate, ACTION_OPERATION);
-		$this->validateOperationsIntegrity($recovery_operations_to_validate, ACTION_RECOVERY_OPERATION);
+		$this->validateOperationsIntegrity($operations_to_validate);
 	}
 
 	/**
