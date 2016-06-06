@@ -1386,8 +1386,7 @@ elseif ($srctbl == 'applications') {
 			(new CLink($app['name'], 'javascript:void(0);'))
 				->setId('spanid'.$app['applicationid'])
 				->onClick('javascript: addValue('.CJs::encodeJson($reference).', '.$app['applicationid'].', '.$parentId.');'
-			);
-
+			)
 		]);
 	}
 	unset($app);
