@@ -325,36 +325,39 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 /**
  * Copy specified graph to specified host.
  *
- * @param string $graphId
- * @param string $hostId
+ * @param string $graphid
+ * @param string $hostid
  *
  * @return array
  */
-function copyGraphToHost($graphId, $hostId) {
+function copyGraphToHost($graphid, $hostid) {
 	$graphs = API::Graph()->get([
-		'graphids' => $graphId,
-		'output' => API_OUTPUT_EXTEND,
+		'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period', 'show_triggers',
+			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type',
+			'ymin_itemid', 'ymax_itemid'
+		],
+		'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 		'selectHosts' => ['hostid', 'name'],
-		'selectGraphItems' => API_OUTPUT_EXTEND
+		'graphids' => $graphid
 	]);
 	$graph = reset($graphs);
-	$graphHost = reset($graph['hosts']);
+	$host = reset($graph['hosts']);
 
-	if ($graphHost['hostid'] == $hostId) {
-		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $graphHost['name']));
+	if ($host['hostid'] == $hostid) {
+		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $host['name']));
 
 		return false;
 	}
 
 	$graph['gitems'] = getSameGraphItemsForHost(
 		$graph['gitems'],
-		$hostId,
+		$hostid,
 		true,
 		[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 	);
 
 	if (!$graph['gitems']) {
-		$host = get_host_by_hostid($hostId);
+		$host = get_host_by_hostid($hostid);
 
 		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
 
@@ -362,15 +365,13 @@ function copyGraphToHost($graphId, $hostId) {
 	}
 
 	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid'] && $itemId = get_same_item_for_host($graph['ymax_itemid'], $hostId)) {
-		$graph['ymax_itemid'] = $itemId;
+	if ($graph['ymax_itemid'] && $itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
+		$graph['ymax_itemid'] = $itemid;
 	}
 
-	if ($graph['ymin_itemid'] && $itemId = get_same_item_for_host($graph['ymin_itemid'], $hostId)) {
-		$graph['ymin_itemid'] = $itemId;
+	if ($graph['ymin_itemid'] && $itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
+		$graph['ymin_itemid'] = $itemid;
 	}
-
-	unset($graph['templateid']);
 
 	return API::Graph()->create($graph);
 }

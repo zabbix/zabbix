@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+A.F....... [ZBXNEXT-821] added possibility to view, copy, mass update and delete lld created elements (Gunars, Ivo, Sasha)
 ....I...S. [ZBXNEXT-3193] added event_recovery table to link problem and recovery events, added problem table to cache active problem events (wiper)
 .......PS. [ZBXNEXT-3267] added one minute delay for repeated SNMP trap file error log entries (viktors)
 A.F.....S. [ZBXNEXT-3196] added action option to pause escalations during maintenance (Gunars, wiper)

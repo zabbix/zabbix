@@ -198,19 +198,16 @@ $subfiltersList = ['subfilter_apps', 'subfilter_types', 'subfilter_value_types',
  */
 $itemId = getRequest('itemid');
 if ($itemId) {
-	$item = API::Item()->get([
+	$items = API::Item()->get([
 		'output' => ['itemid'],
-		'itemids' => $itemId,
-		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
 		'selectHosts' => ['status'],
-		'editable' => true,
-		'preservekeys' => true
+		'itemids' => $itemId,
+		'editable' => true
 	]);
-	if (!$item) {
+	if (!$items) {
 		access_deny();
 	}
-	$item = reset($item);
-	$hosts = $item['hosts'];
+	$hosts = $items[0]['hosts'];
 }
 else {
 	$hostId = getRequest('hostid');
@@ -379,7 +376,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$applications = getRequest('applications', []);
 	$application = reset($applications);
-	if (empty($application)) {
+	if ($application == 0) {
 		array_shift($applications);
 	}
 
@@ -448,80 +445,217 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($result) {
-		$item = [
-			'name' => getRequest('name'),
-			'description' => getRequest('description'),
-			'key_' => getRequest('key'),
-			'hostid' => getRequest('hostid'),
-			'interfaceid' => getRequest('interfaceid', 0),
-			'delay' => getRequest('delay'),
-			'history' => getRequest('history'),
-			'status' => getRequest('status', ITEM_STATUS_DISABLED),
-			'type' => getRequest('type'),
-			'snmp_community' => getRequest('snmp_community'),
-			'snmp_oid' => getRequest('snmp_oid'),
-			'value_type' => getRequest('value_type'),
-			'trapper_hosts' => getRequest('trapper_hosts'),
-			'port' => getRequest('port'),
-			'units' => getRequest('units'),
-			'multiplier' => getRequest('multiplier', 0),
-			'delta' => getRequest('delta'),
-			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-			'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-			'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => getRequest('formula', '1'),
-			'trends' => getRequest('trends'),
-			'logtimefmt' => getRequest('logtimefmt'),
-			'valuemapid' => getRequest('valuemapid'),
-			'delay_flex' => $delay_flex,
-			'authtype' => getRequest('authtype'),
-			'username' => getRequest('username'),
-			'password' => getRequest('password'),
-			'publickey' => getRequest('publickey'),
-			'privatekey' => getRequest('privatekey'),
-			'params' => getRequest('params'),
-			'ipmi_sensor' => getRequest('ipmi_sensor'),
-			'data_type' => getRequest('data_type'),
-			'applications' => $applications,
-			'inventory_link' => getRequest('inventory_link')
-		];
+		if (hasRequest('add')) {
+			$item = [
+				'hostid' => getRequest('hostid'),
+				'name' => getRequest('name', ''),
+				'type' => getRequest('type', ITEM_TYPE_ZABBIX),
+				'key_' => getRequest('key', ''),
+				'interfaceid' => getRequest('interfaceid', 0),
+				'snmp_oid' => getRequest('snmp_oid', ''),
+				'snmp_community' => getRequest('snmp_community', ''),
+				'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
+				'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
+				'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV),
+				'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5),
+				'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase', ''),
+				'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES),
+				'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase', ''),
+				'port' => getRequest('port', ''),
+				'authtype' => getRequest('authtype', ITEM_AUTHTYPE_PASSWORD),
+				'username' => getRequest('username', ''),
+				'password' => getRequest('password', ''),
+				'publickey' => getRequest('publickey', ''),
+				'privatekey' => getRequest('privatekey', ''),
+				'params' => getRequest('params', ''),
+				'ipmi_sensor' => getRequest('ipmi_sensor', ''),
+				'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_FLOAT),
+				'data_type' => getRequest('data_type', ITEM_DATA_TYPE_DECIMAL),
+				'units' => getRequest('units', ''),
+				'multiplier' => getRequest('multiplier', 0),
+				'formula' => getRequest('formula', '1'),
+				'delay' => getRequest('delay', 0),
+				'delay_flex' => $delay_flex,
+				'history' => getRequest('history', 0),
+				'trends' => getRequest('trends', 0),
+				'delta' => getRequest('delta', 0),
+				'valuemapid' => getRequest('valuemapid', 0),
+				'logtimefmt' => getRequest('logtimefmt', ''),
+				'trapper_hosts' => getRequest('trapper_hosts', ''),
+				'applications' => $applications,
+				'inventory_link' => getRequest('inventory_link', 0),
+				'description' => getRequest('description', ''),
+				'status' => getRequest('status', ITEM_STATUS_DISABLED)
+			];
 
-		if (hasRequest('update')) {
-			$itemId = getRequest('itemid');
-
-			$dbItem = get_item_by_itemid_limited($itemId);
-			$dbItem['applications'] = get_applications_by_itemid($itemId);
-
-			// unset snmpv3 fields
-			if ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-				$item['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-			}
-			elseif ($item['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-				$item['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-			}
-
-			$item = CArrayHelper::unsetEqualValues($item, $dbItem);
-			$item['itemid'] = $itemId;
-
-			$result = API::Item()->update($item);
+			$result = (bool) API::Item()->create($item);
 		}
 		else {
-			$result = API::Item()->create($item);
+			$db_items = API::Item()->get([
+				'output' => [
+					'name', 'type', 'key_', 'interfaceid', 'snmp_oid', 'snmp_community', 'snmpv3_contextname',
+					'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase',
+					'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'port', 'authtype', 'username', 'password',
+					'publickey', 'privatekey', 'params', 'ipmi_sensor', 'value_type', 'data_type', 'units',
+					'multiplier', 'formula', 'delay', 'delay_flex', 'history', 'trends', 'delta', 'valuemapid',
+					'logtimefmt', 'trapper_hosts', 'inventory_link', 'description', 'status', 'templateid', 'flags'
+				],
+				'selectApplications' => ['applicationid'],
+				'itemids' => getRequest('itemid')
+			]);
+			$db_item = reset($db_items);
+
+			$item = [];
+
+			if ($db_item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				if ($db_item['templateid'] == 0) {
+					if ($db_item['name'] !== getRequest('name', '')) {
+						$item['name'] = getRequest('name', '');
+					}
+					if ($db_item['type'] != getRequest('type', ITEM_TYPE_ZABBIX)) {
+						$item['type'] = getRequest('type', ITEM_TYPE_ZABBIX);
+					}
+					if ($db_item['key_'] !== getRequest('key', '')) {
+						$item['key_'] = getRequest('key', '');
+					}
+					if ($db_item['snmp_oid'] !== getRequest('snmp_oid', '')) {
+						$item['snmp_oid'] = getRequest('snmp_oid', '');
+					}
+					if ($db_item['ipmi_sensor'] !== getRequest('ipmi_sensor', '')) {
+						$item['ipmi_sensor'] = getRequest('ipmi_sensor', '');
+					}
+					if ($db_item['value_type'] != getRequest('value_type', ITEM_VALUE_TYPE_FLOAT)) {
+						$item['value_type'] = getRequest('value_type', ITEM_VALUE_TYPE_FLOAT);
+					}
+					if ($db_item['data_type'] != getRequest('data_type', ITEM_DATA_TYPE_DECIMAL)) {
+						$item['data_type'] = getRequest('data_type', ITEM_DATA_TYPE_DECIMAL);
+					}
+					if ($db_item['units'] !== getRequest('units', '')) {
+						$item['units'] = getRequest('units', '');
+					}
+					if ($db_item['multiplier'] != getRequest('multiplier', 0)) {
+						$item['multiplier'] = getRequest('multiplier', 0);
+					}
+					if ($db_item['formula'] !== getRequest('formula', '1')) {
+						$item['formula'] = getRequest('formula', '1');
+					}
+					if ($db_item['delta'] != getRequest('delta', 0)) {
+						$item['delta'] = getRequest('delta', 0);
+					}
+					if (bccomp($db_item['valuemapid'], getRequest('valuemapid', 0)) != 0) {
+						$item['valuemapid'] = getRequest('valuemapid', 0);
+					}
+					if ($db_item['logtimefmt'] !== getRequest('logtimefmt', '')) {
+						$item['logtimefmt'] = getRequest('logtimefmt', '');
+					}
+				}
+
+				if (bccomp($db_item['interfaceid'], getRequest('interfaceid', 0)) != 0) {
+					$item['interfaceid'] = getRequest('interfaceid', 0);
+				}
+				if ($db_item['snmp_community'] !== getRequest('snmp_community', '')) {
+					$item['snmp_community'] = getRequest('snmp_community', '');
+				}
+				if ($db_item['snmpv3_contextname'] !== getRequest('snmpv3_contextname', '')) {
+					$item['snmpv3_contextname'] = getRequest('snmpv3_contextname', '');
+				}
+				if ($db_item['snmpv3_securityname'] !== getRequest('snmpv3_securityname', '')) {
+					$item['snmpv3_securityname'] = getRequest('snmpv3_securityname', '');
+				}
+				$snmpv3_securitylevel = getRequest('snmpv3_securitylevel', ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV);;
+				if ($db_item['snmpv3_securitylevel'] != $snmpv3_securitylevel) {
+					$item['snmpv3_securitylevel'] = $snmpv3_securitylevel;
+				}
+				$snmpv3_authprotocol = ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV)
+					? ITEM_AUTHPROTOCOL_MD5
+					: getRequest('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5);
+				if ($db_item['snmpv3_authprotocol'] != $snmpv3_authprotocol) {
+					$item['snmpv3_authprotocol'] = $snmpv3_authprotocol;
+				}
+				if ($db_item['snmpv3_authpassphrase'] !== getRequest('snmpv3_authpassphrase', '')) {
+					$item['snmpv3_authpassphrase'] = getRequest('snmpv3_authpassphrase', '');
+				}
+				$snmpv3_privprotocol = ($snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
+					? getRequest('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES)
+					: ITEM_AUTHPROTOCOL_MD5;
+				if ($db_item['snmpv3_privprotocol'] != $snmpv3_privprotocol) {
+					$item['snmpv3_privprotocol'] = $snmpv3_privprotocol;
+				}
+				if ($db_item['snmpv3_privpassphrase'] !== getRequest('snmpv3_privpassphrase', '')) {
+					$item['snmpv3_privpassphrase'] = getRequest('snmpv3_privpassphrase', '');
+				}
+				if ($db_item['port'] !== getRequest('port', '')) {
+					$item['port'] = getRequest('port', '');
+				}
+				if ($db_item['authtype'] != getRequest('authtype', ITEM_AUTHTYPE_PASSWORD)) {
+					$item['authtype'] = getRequest('authtype', ITEM_AUTHTYPE_PASSWORD);
+				}
+				if ($db_item['username'] !== getRequest('username', '')) {
+					$item['username'] = getRequest('username', '');
+				}
+				if ($db_item['password'] !== getRequest('password', '')) {
+					$item['password'] = getRequest('password', '');
+				}
+				if ($db_item['publickey'] !== getRequest('publickey', '')) {
+					$item['publickey'] = getRequest('publickey', '');
+				}
+				if ($db_item['privatekey'] !== getRequest('privatekey', '')) {
+					$item['privatekey'] = getRequest('privatekey', '');
+				}
+				if ($db_item['params'] !== getRequest('params', '')) {
+					$item['params'] = getRequest('params', '');
+				}
+				if ($db_item['delay'] != getRequest('delay', 0)) {
+					$item['delay'] = getRequest('delay', 0);
+				}
+				if ($db_item['delay_flex'] !== $delay_flex) {
+					$item['delay_flex'] = $delay_flex;
+				}
+				if ($db_item['history'] != getRequest('history', 0)) {
+					$item['history'] = getRequest('history', 0);
+				}
+				if ($db_item['trends'] != getRequest('trends', 0)) {
+					$item['trends'] = getRequest('trends', 0);
+				}
+				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
+					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
+				}
+				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
+				natsort($db_applications);
+				natsort($applications);
+				if (array_values($db_applications) !== array_values($applications)) {
+					$item['applications'] = $applications;
+				}
+				if ($db_item['inventory_link'] != getRequest('inventory_link', 0)) {
+					$item['inventory_link'] = getRequest('inventory_link', 0);
+				}
+				if ($db_item['description'] !== getRequest('description', '')) {
+					$item['description'] = getRequest('description', '');
+				}
+			}
+
+			if ($db_item['status'] != getRequest('status', ITEM_STATUS_DISABLED)) {
+				$item['status'] = getRequest('status', ITEM_STATUS_DISABLED);
+			}
+
+			if ($item) {
+				$item['itemid'] = getRequest('itemid');
+
+				$result = (bool) API::Item()->update($item);
+			}
+			else {
+				$result = true;
+			}
 		}
 	}
 
 	$result = DBend($result);
 
-	if (hasRequest('itemid')) {
-		show_messages($result, _('Item updated'), _('Cannot update item'));
+	if (hasRequest('add')) {
+		show_messages($result, _('Item added'), _('Cannot add item'));
 	}
 	else {
-		show_messages($result, _('Item added'), _('Cannot add item'));
+		show_messages($result, _('Item updated'), _('Cannot update item'));
 	}
 
 	if ($result) {
@@ -564,6 +698,7 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 // mass update
 elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$visible = getRequest('visible', []);
+	$itemids = getRequest('group_itemid');
 
 	$result = true;
 
@@ -684,70 +819,94 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			}
 		}
 
-		$item = [
-			'interfaceid' => getRequest('interfaceid'),
-			'description' => getRequest('description'),
-			'delay' => getRequest('delay'),
-			'history' => getRequest('history'),
-			'status' => getRequest('status'),
-			'type' => getRequest('type'),
-			'snmp_community' => getRequest('snmp_community'),
-			'snmp_oid' => getRequest('snmp_oid'),
-			'value_type' => getRequest('value_type'),
-			'trapper_hosts' => getRequest('trapper_hosts'),
-			'port' => getRequest('port'),
-			'units' => getRequest('units'),
-			'multiplier' => $multiplier,
-			'delta' => getRequest('delta'),
-			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-			'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-			'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-			'formula' => $formula,
-			'trends' => getRequest('trends'),
-			'logtimefmt' => getRequest('logtimefmt'),
-			'valuemapid' => getRequest('valuemapid'),
-			'delay_flex' => $delay_flex,
-			'authtype' => getRequest('authtype'),
-			'username' => getRequest('username'),
-			'password' => getRequest('password'),
-			'publickey' => getRequest('publickey'),
-			'privatekey' => getRequest('privatekey'),
-			'ipmi_sensor' => getRequest('ipmi_sensor'),
-			'applications' => $applications,
-			'data_type' => getRequest('data_type')
-		];
-
 		// add applications
 		if (!empty($existApplication) && (!isset($visible['applications']) || !isset($_REQUEST['applications']))) {
 			foreach ($existApplication as $linkApp) {
 				$linkApplications[] = ['applicationid' => $linkApp];
 			}
-			foreach (getRequest('group_itemid') as $linkItem) {
-				$linkItems[] = ['itemid' => $linkItem];
+			foreach ($itemids as $itemid) {
+				$link_items[] = ['itemid' => $itemid];
 			}
 			$linkApp = [
 				'applications' => $linkApplications,
-				'items' => $linkItems
+				'items' => $link_items
 			];
 			API::Application()->massAdd($linkApp);
 		}
 
-		foreach ($item as $key => $field) {
-			if ($field === null) {
-				unset($item[$key]);
+		$items = API::Item()->get([
+			'output' => ['itemid', 'flags'],
+			'itemids' => $itemids,
+			'preservekeys' => true
+		]);
+		$items_to_update = [];
+
+		if ($items) {
+			$item = [
+				'interfaceid' => getRequest('interfaceid'),
+				'description' => getRequest('description'),
+				'delay' => getRequest('delay'),
+				'history' => getRequest('history'),
+				'type' => getRequest('type'),
+				'snmp_community' => getRequest('snmp_community'),
+				'snmp_oid' => getRequest('snmp_oid'),
+				'value_type' => getRequest('value_type'),
+				'trapper_hosts' => getRequest('trapper_hosts'),
+				'port' => getRequest('port'),
+				'units' => getRequest('units'),
+				'multiplier' => $multiplier,
+				'delta' => getRequest('delta'),
+				'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+				'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+				'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+				'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+				'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+				'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+				'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
+				'formula' => $formula,
+				'trends' => getRequest('trends'),
+				'logtimefmt' => getRequest('logtimefmt'),
+				'valuemapid' => getRequest('valuemapid'),
+				'delay_flex' => $delay_flex,
+				'authtype' => getRequest('authtype'),
+				'username' => getRequest('username'),
+				'password' => getRequest('password'),
+				'publickey' => getRequest('publickey'),
+				'privatekey' => getRequest('privatekey'),
+				'ipmi_sensor' => getRequest('ipmi_sensor'),
+				'applications' => $applications,
+				'data_type' => getRequest('data_type'),
+				'status' => getRequest('status')
+			];
+			foreach ($item as $key => $field) {
+				if ($field === null) {
+					unset($item[$key]);
+				}
+			}
+
+			$discovered_item = [];
+			if (hasRequest('status')) {
+				$discovered_item['status'] = getRequest('status');
+			}
+
+			foreach ($itemids as $itemid) {
+				if (array_key_exists($itemid, $items)) {
+					if ($items[$itemid]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						if ($item) {
+							$items_to_update[] = ['itemid' => $itemid] + $item;
+						}
+					}
+					else {
+						if ($discovered_item) {
+							$items_to_update[] = ['itemid' => $itemid] + $discovered_item;
+						}
+					}
+				}
 			}
 		}
 
-		foreach ($_REQUEST['group_itemid'] as $id) {
-			$item['itemid'] = $id;
-
-			if (!$result = API::Item()->update($item)) {
-				break;
-			}
+		if ($items_to_update) {
+			$result = API::Item()->update($items_to_update);
 		}
 	}
 	catch (Exception $e) {
@@ -763,29 +922,33 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	show_messages($result, _('Items updated'), _('Cannot update items'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massenable', 'item.massdisable']) && hasRequest('group_itemid')) {
-	$groupItemId = getRequest('group_itemid');
-	$enable = (getRequest('action') == 'item.massenable');
+	$itemids = getRequest('group_itemid');
+	$status = (getRequest('action') == 'item.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
-	DBstart();
-	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
-	$result = DBend($result);
+	$items = [];
+	foreach ($itemids as $itemid) {
+		$items[] = ['itemid' => $itemid, 'status' => $status];
+	}
+
+	$result = (bool) API::Item()->update($items);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
 
-	$updated = count($groupItemId);
+	$updated = count($itemids);
 
-	$messageSuccess = $enable
+	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
 		? _n('Item enabled', 'Items enabled', $updated)
 		: _n('Item disabled', 'Items disabled', $updated);
-	$messageFailed = $enable
+	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
 		? _n('Cannot enable item', 'Cannot enable items', $updated)
 		: _n('Cannot disable item', 'Cannot disable items', $updated);
 
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('copy') && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
+		&& hasRequest('group_itemid')) {
 	if (hasRequest('copy_targetid') && getRequest('copy_targetid') > 0 && hasRequest('copy_type')) {
 		// hosts or templates
 		if (getRequest('copy_type') == COPY_TYPE_TO_HOST || getRequest('copy_type') == COPY_TYPE_TO_TEMPLATE) {
@@ -866,7 +1029,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
-elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
 
 	$group_itemid = getRequest('group_itemid');
@@ -903,17 +1066,18 @@ elseif (hasRequest('action') && getRequest('action') == 'item.massdelete' && has
 if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'), 'update', 'clone'])) {
 	if (hasRequest('itemid')) {
 		$items = API::Item()->get([
-			'itemids' => getRequest('itemid'),
 			'output' => [
 				'itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
 				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
 				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags',
 				'interfaceid', 'port', 'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname'
 			],
-			'selectHosts' => ['status']
+			'selectHosts' => ['status'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'itemids' => getRequest('itemid')
 		]);
 		$item = $items[0];
 		$host = $item['hosts'][0];
@@ -943,7 +1107,8 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	$itemView->render();
 	$itemView->show();
 }
-elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform') || hasRequest('massupdate')) && hasRequest('group_itemid')) {
+elseif (((hasRequest('action') && getRequest('action') === 'item.massupdateform') || hasRequest('massupdate'))
+		&& hasRequest('group_itemid')) {
 	$data = [
 		'form' => getRequest('form'),
 		'action' => 'item.massupdateform',
@@ -1068,7 +1233,7 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 	$itemView->render();
 	$itemView->show();
 }
-elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('group_itemid')) {
+elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('group_itemid')) {
 	// render view
 	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
