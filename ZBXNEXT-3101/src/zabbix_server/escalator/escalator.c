@@ -39,6 +39,9 @@ extern int	CONFIG_ESCALATOR_FORKS;
 #define ZBX_ESCALATION_SOURCE_ITEM	1
 #define ZBX_ESCALATION_SOURCE_TRIGGER	2
 
+#define ZBX_ACTION_RECOVERY_NONE	0
+#define ZBX_ACTION_RECOVERY_OPERATIONS	1
+
 typedef struct
 {
 	zbx_uint64_t	userid;
@@ -1102,7 +1105,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 	if (0 == action->esc_period)
 	{
-		escalation->status = (1 == action->recovery) ? ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED;
+		escalation->status = (ZBX_ACTION_RECOVERY_OPERATIONS == action->recovery ? ESCALATION_STATUS_SLEEP :
+				ESCALATION_STATUS_COMPLETED);
 	}
 	else
 	{
@@ -1128,8 +1132,8 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 		}
 		else
 		{
-			escalation->status = (1 == action->recovery) ? ESCALATION_STATUS_SLEEP :
-					ESCALATION_STATUS_COMPLETED;
+			escalation->status = (ZBX_ACTION_RECOVERY_OPERATIONS == action->recovery ?
+					ESCALATION_STATUS_SLEEP : ESCALATION_STATUS_COMPLETED);
 		}
 	}
 
@@ -1766,7 +1770,8 @@ static int	get_db_action(zbx_uint64_t actionid, DB_ACTION *action)
 		result = DBselect("select null from operations where actionid=" ZBX_FS_UI64 " and recovery=%d",
 				action->actionid, ZBX_OPERATION_MODE_RECOVERY);
 
-		action->recovery = (NULL == DBfetch(result) ? 0 : 1);
+		action->recovery = (NULL == DBfetch(result) ? ZBX_ACTION_RECOVERY_NONE :
+				ZBX_ACTION_RECOVERY_OPERATIONS);
 
 		ret = SUCCEED;
 	}
