@@ -18,6 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$widget = (new CWidget())
+	->setTitle(_('Templates'))
+	->addItem(get_header_host_table('', $data['templateid']));
 
 $divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
@@ -33,7 +36,7 @@ $macros = getRequest('macros', []);
 
 $frm_title = _('Template');
 
-if ($data['templateId'] != 0) {
+if ($data['templateid'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
@@ -41,11 +44,11 @@ $frmHost = (new CForm())
 	->addVar('form', $data['form'])
 	->addVar('groupid', $data['groupId']);
 
-if ($data['templateId'] != 0) {
-	$frmHost->addVar('templateid', $data['templateId']);
+if ($data['templateid'] != 0) {
+	$frmHost->addVar('templateid', $data['templateid']);
 }
 
-if ($data['templateId'] != 0 && !hasRequest('form_refresh')) {
+if ($data['templateid'] != 0 && !hasRequest('form_refresh')) {
 	$host = $this->data['dbTemplate']['host'];
 	$visiblename = $this->data['dbTemplate']['name'];
 
@@ -136,7 +139,7 @@ foreach ($data['groupsAllowed'] as $group) {
 $hostsTB = new CTweenBox($frmHost, 'hosts', $data['hostIdsLinkedTo'], 20);
 
 foreach ($data['hostsAllowedToAdd'] as $host) {
-	if (bccomp($host['hostid'], $data['templateId']) == 0) {
+	if (bccomp($host['hostid'], $data['templateid']) == 0) {
 		continue;
 	}
 	if (isset($data['hostIdsLinkedTo'][$host['hostid']])) {
@@ -165,7 +168,7 @@ $templateList->addRow(_('Description'),
 if ($data['form'] === 'full_clone') {
 	// template applications
 	$templateApps = API::Application()->get([
-		'hostids' => $data['templateId'],
+		'hostids' => $data['templateid'],
 		'inherited' => false,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
@@ -185,7 +188,7 @@ if ($data['form'] === 'full_clone') {
 
 	// items
 	$hostItems = API::Item()->get([
-		'hostids' => $data['templateId'],
+		'hostids' => $data['templateid'],
 		'inherited' => false,
 		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'output' => ['itemid', 'key_', 'name', 'hostid']
@@ -210,7 +213,7 @@ if ($data['form'] === 'full_clone') {
 // Triggers
 	$hostTriggers = API::Trigger()->get([
 		'inherited' => false,
-		'hostids' => $data['templateId'],
+		'hostids' => $data['templateid'],
 		'output' => API_OUTPUT_EXTEND,
 		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]]
 	]);
@@ -231,7 +234,7 @@ if ($data['form'] === 'full_clone') {
 // Graphs
 	$hostGraphs = API::Graph()->get([
 		'inherited' => false,
-		'hostids' => $data['templateId'],
+		'hostids' => $data['templateid'],
 		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
 		'output' => API_OUTPUT_EXTEND,
 	]);
@@ -252,7 +255,7 @@ if ($data['form'] === 'full_clone') {
 	// discovery rules
 	$hostDiscoveryRules = API::DiscoveryRule()->get([
 		'inherited' => false,
-		'hostids' => $data['templateId'],
+		'hostids' => $data['templateid'],
 		'output' => API_OUTPUT_EXTEND,
 	]);
 
@@ -274,7 +277,7 @@ if ($data['form'] === 'full_clone') {
 
 		// item prototypes
 		$hostItemPrototypes = API::ItemPrototype()->get([
-			'hostids' => $data['templateId'],
+			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
@@ -298,7 +301,7 @@ if ($data['form'] === 'full_clone') {
 
 // Trigger prototypes
 		$hostTriggerPrototypes = API::TriggerPrototype()->get([
-			'hostids' => $data['templateId'],
+			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND
@@ -319,7 +322,7 @@ if ($data['form'] === 'full_clone') {
 
 // Graph prototypes
 		$hostGraphPrototypes = API::GraphPrototype()->get([
-			'hostids' => $data['templateId'],
+			'hostids' => $data['templateid'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
@@ -342,7 +345,7 @@ if ($data['form'] === 'full_clone') {
 	// screens
 	$screens = API::TemplateScreen()->get([
 		'inherited' => false,
-		'templateids' => $data['templateId'],
+		'templateids' => $data['templateid'],
 		'output' => ['screenid', 'name'],
 	]);
 	if (!empty($screens)) {
@@ -362,7 +365,7 @@ if ($data['form'] === 'full_clone') {
 	// web scenarios
 	$httpTests = API::HttpTest()->get([
 		'output' => ['httptestid', 'name'],
-		'hostids' => $data['templateId'],
+		'hostids' => $data['templateid'],
 		'inherited' => false
 	]);
 
@@ -394,8 +397,8 @@ $tmplList = new CFormList();
 
 $ignoredTemplates = [];
 
-if ($data['templateId'] != 0) {
-	$ignoredTemplates[$data['templateId']] = $data['dbTemplate']['host'];
+if ($data['templateid'] != 0) {
+	$ignoredTemplates[$data['templateid']] = $data['dbTemplate']['host'];
 }
 
 $linkedTemplateTable = (new CTable())
@@ -442,7 +445,7 @@ $newTemplateTable = (new CTable())
 			'ignored' => $ignoredTemplates,
 			'popup' => [
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1&templateid='.$data['templateId']
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1&templateid='.$data['templateid']
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
@@ -476,7 +479,7 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 
 // Footer
-if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
+if ($data['templateid'] != 0 && $data['form'] !== 'full_clone') {
 	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
@@ -502,4 +505,6 @@ else {
 
 $frmHost->addItem($divTabs);
 
-return $frmHost;
+$widget->addItem($frmHost);
+
+return $widget;
