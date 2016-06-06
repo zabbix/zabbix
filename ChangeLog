@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+A.F....... [ZBXNEXT-821] added possibility to view, copy, mass update and delete lld created elements (Gunars, Ivo, Sasha)
 ....I...S. [ZBXNEXT-3193] added event_recovery table to link problem and recovery events, added problem table to cache active problem events (wiper)
 .......PS. [ZBXNEXT-3267] added one minute delay for repeated SNMP trap file error log entries (viktors)
 A.F.....S. [ZBXNEXT-3196] added action option to pause escalations during maintenance (Gunars, wiper)
@@ -26,6 +27,11 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-9455] fixed length limit for host prototype name (Gunars, Sasha)
+..F....... [ZBX-10806] fixed whitespace between elements in host, host mass update, host prototype and proxy forms (Sasha)
+..F....... [ZBXNEXT-3263] moved image type selection to top in administration->general->images (Cemeris)
+..F....... [ZBXNEXT-3263] added "No data found." message in administration->general->images (Cemeris)
+..F....... [ZBX-10731] fixed textarea visibility in monitoring->maps properties (Cemeris)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
 ..F....... [ZBX-10825] reverted table header capitalization. fixed calendar header (asaveljevs, Pavel)
 .......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)

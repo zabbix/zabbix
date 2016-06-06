@@ -131,7 +131,6 @@ elseif (hasRequest('graphid')) {
 	// check whether graph is normal and editable by user
 	$graph = (bool) API::Graph()->get([
 		'output' => [],
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'graphids' => getRequest('graphid'),
 		'editable' => true
 	]);
@@ -172,7 +171,7 @@ if (isset($_REQUEST['clone']) && isset($_REQUEST['graphid'])) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	if($graph['templateid']) {
+	if ($graph['templateid'] || $graph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		$_REQUEST = array_merge($_REQUEST, $graph);
 	}
 	else {
@@ -218,8 +217,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 	// create and update graph prototypes
 	if (hasRequest('parent_discoveryid')) {
-		$graph['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-
 		if (hasRequest('graphid')) {
 			$graph['graphid'] = getRequest('graphid');
 			$result = API::GraphPrototype()->update($graph);
@@ -299,7 +296,7 @@ elseif (hasRequest('delete') && hasRequest('graphid')) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && hasRequest('group_graphid')) {
+elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
 
 	if (hasRequest('parent_discoveryid')) {
@@ -318,7 +315,9 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 		}
 		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
 	}
-} elseif (hasRequest('action') && getRequest('action') == 'graph.masscopyto' && hasRequest('copy') && hasRequest('group_graphid')) {
+}
+elseif (hasRequest('action') && getRequest('action') === 'graph.masscopyto' && hasRequest('copy')
+		&& hasRequest('group_graphid')) {
 	if (getRequest('copy_targetid') != 0 && hasRequest('copy_type')) {
 		$result = true;
 
@@ -334,22 +333,23 @@ elseif (hasRequest('action') && getRequest('action') == 'graph.massdelete' && ha
 		}
 		// host groups
 		else {
-			zbx_value2array(getRequest('copy_targetid'));
+			$groupids = getRequest('copy_targetid');
+			zbx_value2array($groupids);
 
 			$dbGroups = API::HostGroup()->get([
 				'output' => ['groupid'],
-				'groupids' => getRequest('copy_targetid'),
+				'groupids' => $groupids,
 				'editable' => true
 			]);
 			$dbGroups = zbx_toHash($dbGroups, 'groupid');
 
-			foreach (getRequest('copy_targetid') as $groupid) {
+			foreach ($groupids as $groupid) {
 				if (!isset($dbGroups[$groupid])) {
 					access_deny();
 				}
 			}
 
-			$options['groupids'] = getRequest('copy_targetid');
+			$options['groupids'] = $groupids;
 		}
 
 		$dbHosts = API::Host()->get($options);
@@ -431,7 +431,15 @@ elseif (isset($_REQUEST['form'])) {
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid']
 		];
-		$graph = empty($data['parent_discoveryid']) ? API::Graph()->get($options) : API::GraphPrototype()->get($options);
+
+		if ($data['parent_discoveryid'] === null) {
+			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$graph = API::Graph()->get($options);
+		}
+		else {
+			$graph = API::GraphPrototype()->get($options);
+		}
+
 		$graph = reset($graph);
 
 		$data['name'] = $graph['name'];
@@ -452,6 +460,11 @@ elseif (isset($_REQUEST['form'])) {
 		$data['percent_right'] = $graph['percent_right'];
 		$data['templateid'] = $graph['templateid'];
 		$data['templates'] = [];
+
+		if ($data['parent_discoveryid'] === null) {
+			$data['flags'] = $graph['flags'];
+			$data['discoveryRule'] = $graph['discoveryRule'];
+		}
 
 		// if no host has been selected for the navigation panel, use the first graph host
 		if ($data['hostid'] == 0) {
