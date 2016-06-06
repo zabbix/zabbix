@@ -1000,9 +1000,9 @@ static int	check_operation_conditions(DB_EVENT *event, zbx_uint64_t operationid,
 	return ret;
 }
 
-static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action)
+static void	escalation_execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_ACTION *action)
 {
-	const char	*__function_name = "execute_operations";
+	const char	*__function_name = "escalation_execute_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		next_esc_period = 0, esc_period;
@@ -1146,7 +1146,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 /******************************************************************************
  *                                                                            *
- * Function: execute_recovery_operations                                      *
+ * Function: escalation_execute_recovery_operations                           *
  *                                                                            *
  * Purpose: execute escalation recovery operations                            *
  *                                                                            *
@@ -1156,10 +1156,10 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
  *             action     - [IN] the action                                   *
  *                                                                            *
  ******************************************************************************/
-static void	execute_recovery_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event,
+static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event,
 		DB_ACTION *action)
 {
-	const char	*__function_name = "execute_recovery_operations";
+	const char	*__function_name = "escalation_execute_recovery_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_USER_MSG	*user_msg = NULL;
@@ -1686,7 +1686,7 @@ static void	escalation_execute(DB_ESCALATION *escalation, DB_ACTION *action)
 
 	if (SUCCEED == get_event_info(escalation->eventid, &event))
 	{
-		execute_operations(escalation, &event, action);
+		escalation_execute_operations(escalation, &event, action);
 		free_event_info(&event);
 	}
 
@@ -1715,7 +1715,7 @@ static void	escalation_recover(DB_ESCALATION *escalation, DB_ACTION *action)
 	{
 		if (SUCCEED == get_event_info(escalation->r_eventid, &r_event))
 		{
-			execute_recovery_operations(escalation, &event, &r_event, action);
+			escalation_execute_recovery_operations(escalation, &event, &r_event, action);
 			free_event_info(&r_event);
 		}
 		free_event_info(&event);
