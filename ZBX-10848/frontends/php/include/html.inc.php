@@ -663,6 +663,33 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
 }
 
 /**
+ * Returns the discovered application lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the application
+ *
+ * @return CDiv
+ */
+function getApplicationLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The application is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
+}
+
+/**
  * Returns the discovered item lifetime indicator.
  *
  * @param string $current_time	current Unix timestamp

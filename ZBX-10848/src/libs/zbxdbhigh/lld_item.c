@@ -1828,7 +1828,7 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 		/* Applications vector contains only discovered applications and  */
 		/* apparently the item was linked to a normal application.        */
 		/* Undiscovered item-application links to normal application must */
-		/* be removed if item has been also discovered - his means that   */
+		/* be removed if item has been also discovered - this means that  */
 		/* the item prototype - application link was removed by frontend. */
 		goto check_item;
 	}
