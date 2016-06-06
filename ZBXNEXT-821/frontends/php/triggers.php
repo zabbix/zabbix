@@ -273,17 +273,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				$trigger['comments'] = getRequest('comments');
 			}
 
-			$old_tags = $db_trigger['tags'];
-			CArrayHelper::sort($old_tags, ['tag', 'value']);
+			$db_tags = $db_trigger['tags'];
+			CArrayHelper::sort($db_tags, ['tag', 'value']);
 			CArrayHelper::sort($tags, ['tag', 'value']);
-			if (array_values($old_tags) !== array_values($tags)) {
+			if (array_values($db_tags) !== array_values($tags)) {
 				$trigger['tags'] = $tags;
 			}
 
-			$old_dependencies = $db_trigger['dependencies'];
-			CArrayHelper::sort($old_dependencies, ['triggerid']);
+			$db_dependencies = $db_trigger['dependencies'];
+			CArrayHelper::sort($db_dependencies, ['triggerid']);
 			CArrayHelper::sort($dependencies, ['triggerid']);
-			if (array_values($old_dependencies) !== array_values($dependencies)) {
+			if (array_values($db_dependencies) !== array_values($dependencies)) {
 				$trigger['dependencies'] = $dependencies;
 			}
 		}
