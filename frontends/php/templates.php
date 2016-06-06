@@ -571,21 +571,6 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$config = select_config();
-
-	$controls = (new CList())
-		->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
-		->addItem(new CSubmit('form', _('Create template')))
-		->addItem(
-			(new CButton('form', _('Import')))
-				->onClick('redirect("conf.import.php?rules_preset=template")')
-		);
-	$frmForm = (new CForm('get'))
-		->cleanItems()
-		->addItem($controls);
-
-	$templateWidget->setControls($frmForm);
-
 	// filter
 	if (hasRequest('filter_set')) {
 		CProfile::update('web.templates.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
@@ -594,14 +579,30 @@ else {
 		CProfile::delete('web.templates.filter_name');
 	}
 
-	$filter['name'] = CProfile::get('web.templates.filter_name', '');
+	$filter = [
+		'name' => CProfile::get('web.templates.filter_name', '')
+	];
 
-	$templateFilter = (new CFilter('web.templates.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name like'),
-			(new CTextBox('filter_name', $filter['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-		));
+	$config = select_config();
 
-	$templateWidget->addItem($templateFilter);
+	$templateWidget
+		->setControls((new CForm('get'))
+			->cleanItems()
+			->addItem(
+				(new CList())
+					->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
+					->addItem(new CSubmit('form', _('Create template')))
+					->addItem(
+						(new CButton('form', _('Import')))
+							->onClick('redirect("conf.import.php?rules_preset=template")')
+					)
+			)
+		)
+		->addItem((new CFilter('web.templates.filter.state'))
+			->addColumn((new CFormList())->addRow(_('Name like'),
+				(new CTextBox('filter_name', $filter['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			))
+		);
 
 	$form = (new CForm())->setName('templates');
 
@@ -628,7 +629,9 @@ else {
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sortField],
-			'search' => ['host' => $filter['name']],
+			'search' => [
+				'host' => ($filter['name'] === '' ? null : $filter['name'])
+			],
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortField,

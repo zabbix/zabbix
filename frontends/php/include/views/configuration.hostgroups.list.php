@@ -32,15 +32,12 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())->addItem($create_button))
+	)
+	->addItem((new CFilter('web.groups.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Name like'),
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
 	);
-
-// filter
-$filter = (new CFilter('web.groups.filter.state'))
-	->addColumn((new CFormList())->addRow(_('Name like'),
-		(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-	));
-
-$widget->addItem($filter);
 
 // create form
 $hostGroupForm = (new CForm())->setName('hostgroupForm');

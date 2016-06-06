@@ -412,7 +412,9 @@ else {
 		CProfile::delete('web.groups.filter_name');
 	}
 
-	$filter['name'] = CProfile::get('web.groups.filter_name', '');
+	$filter = [
+		'name' => CProfile::get('web.groups.filter_name', '')
+	];
 
 	$config = select_config();
 
@@ -425,7 +427,9 @@ else {
 
 	$groups = API::HostGroup()->get([
 		'output' => ['groupid', $sortField],
-		'search' => ['name' => $filter['name']],
+		'search' => [
+			'name' => ($filter['name'] === '') ? null : $filter['name']
+		],
 		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
