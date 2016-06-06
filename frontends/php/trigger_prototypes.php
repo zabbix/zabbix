@@ -126,15 +126,10 @@ if ($triggerPrototypeIds) {
 		'preservekeys' => true
 	]);
 
-	if ($triggerPrototypes) {
-		foreach ($triggerPrototypeIds as $triggerPrototypeId) {
-			if (!isset($triggerPrototypes[$triggerPrototypeId])) {
-				access_deny();
-			}
+	foreach ($triggerPrototypeIds as $triggerPrototypeId) {
+		if (!array_key_exists($triggerPrototypeId, $triggerPrototypes)) {
+			access_deny();
 		}
-	}
-	else {
-		access_deny();
 	}
 }
 
@@ -184,86 +179,112 @@ if (hasRequest('clone') && hasRequest('triggerid')) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$trigger = [
-		'expression' => getRequest('expression'),
-		'description' => getRequest('description'),
-		'url' => getRequest('url'),
-		'status' => getRequest('status'),
-		'priority' => getRequest('priority'),
-		'comments' => getRequest('comments'),
-		'type' => getRequest('type'),
-		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid'),
-		'recovery_mode' => getRequest('recovery_mode'),
-		'recovery_expression' => getRequest('recovery_expression'),
-		'tags' => getRequest('tags', [])
-	];
+	$tags = getRequest('tags', []);
+	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 
-	if ($trigger['recovery_mode'] != ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-		$trigger['recovery_expression'] = '';
-	}
-
-	// remove empty new tag lines
-	foreach ($trigger['tags'] as $tag_key => $tag) {
+	// Remove empty new tag lines.
+	foreach ($tags as $key => $tag) {
 		if ($tag['tag'] === '' && $tag['value'] === '') {
-			unset($trigger['tags'][$tag_key]);
+			unset($tags[$key]);
 		}
 	}
 
-	if (hasRequest('update')) {
-		// Update only changed fields.
+	if (hasRequest('add')) {
+		$trigger = [
+			'description' => getRequest('description'),
+			'expression' => getRequest('expression'),
+			'recovery_mode' => getRequest('recovery_mode'),
+			'type' => getRequest('type'),
+			'url' => getRequest('url'),
+			'priority' => getRequest('priority'),
+			'comments' => getRequest('comments'),
+			'tags' => $tags,
+			'dependencies' => $dependencies,
+			'status' => getRequest('status')
+		];
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+			$trigger['recovery_expression'] = getRequest('recovery_expression');
+		}
 
-		$old_trigger_prototypes = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type', 'recovery_mode',
-				'recovery_expression'
+		$result = (bool) API::TriggerPrototype()->create($trigger);
+
+		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
+	}
+	else {
+		$db_trigger_prototypes = API::TriggerPrototype()->get([
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
+				'recovery_mode', 'recovery_expression'
 			],
 			'selectDependencies' => ['triggerid'],
+			'selectTags' => ['tag', 'value'],
 			'triggerids' => getRequest('triggerid')
 		]);
-		if (!$old_trigger_prototypes) {
-			access_deny();
-		}
 
-		$old_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($old_trigger_prototypes,
+		$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$old_trigger_prototype = reset($old_trigger_prototypes);
-		$old_trigger_prototype['dependencies'] = zbx_toHash(
-			zbx_objectValues($old_trigger_prototype['dependencies'], 'triggerid')
-		);
+		$db_trigger_prototype = reset($db_trigger_prototypes);
 
-		$newDependencies = $trigger['dependencies'];
-		$oldDependencies = $old_trigger_prototype['dependencies'];
+		$trigger_prototype = [];
 
-		unset($trigger['dependencies'], $old_trigger_prototype['dependencies']);
-
-		$trigger_to_update = array_diff_assoc($trigger, $old_trigger_prototype);
-		$trigger_to_update['triggerid'] = getRequest('triggerid');
-
-		// dependencies
-		$updateDepencencies = false;
-		if (count($newDependencies) != count($oldDependencies)) {
-			$updateDepencencies = true;
-		}
-		else {
-			foreach ($newDependencies as $dependency) {
-				if (!isset($oldDependencies[$dependency['triggerid']])) {
-					$updateDepencencies = true;
-				}
+		if ($db_trigger_prototype['templateid'] == 0) {
+			if ($db_trigger_prototype['description'] !== getRequest('description')) {
+				$trigger_prototype['description'] = getRequest('description');
+			}
+			if ($db_trigger_prototype['expression'] !== getRequest('expression')) {
+				$trigger_prototype['expression'] = getRequest('expression');
+			}
+			if ($db_trigger_prototype['recovery_mode'] != getRequest('recovery_mode')) {
+				$trigger_prototype['recovery_mode'] = getRequest('recovery_mode');
+			}
+			if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
+					&& $db_trigger_prototype['recovery_expression'] !== getRequest('recovery_expression')) {
+				$trigger_prototype['recovery_expression'] = getRequest('recovery_expression');
 			}
 		}
-		if ($updateDepencencies) {
-			$trigger_to_update['dependencies'] = $newDependencies;
+
+		if ($db_trigger_prototype['type'] != getRequest('type')) {
+			$trigger_prototype['type'] = getRequest('type');
+		}
+		if ($db_trigger_prototype['url'] !== getRequest('url')) {
+			$trigger_prototype['url'] = getRequest('url');
+		}
+		if ($db_trigger_prototype['priority'] != getRequest('priority')) {
+			$trigger_prototype['priority'] = getRequest('priority');
+		}
+		if ($db_trigger_prototype['comments'] !== getRequest('comments')) {
+			$trigger_prototype['comments'] = getRequest('comments');
 		}
 
-		$result = API::TriggerPrototype()->update($trigger_to_update);
+		$db_tags = $db_trigger_prototype['tags'];
+		CArrayHelper::sort($db_tags, ['tag', 'value']);
+		CArrayHelper::sort($tags, ['tag', 'value']);
+		if (array_values($db_tags) !== array_values($tags)) {
+			$trigger_prototype['tags'] = $tags;
+		}
+
+		$db_dependencies = $db_trigger_prototype['dependencies'];
+		CArrayHelper::sort($db_dependencies, ['triggerid']);
+		CArrayHelper::sort($dependencies, ['triggerid']);
+		if (array_values($db_dependencies) !== array_values($dependencies)) {
+			$trigger_prototype['dependencies'] = $dependencies;
+		}
+
+		if ($db_trigger_prototype['status'] != getRequest('status')) {
+			$trigger_prototype['status'] = getRequest('status');
+		}
+
+		if ($trigger_prototype) {
+			$trigger_prototype['triggerid'] = getRequest('triggerid');
+
+			$result = (bool) API::TriggerPrototype()->update($trigger_prototype);
+		}
+		else {
+			$result = true;
+		}
 
 		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
-	}
-	else {
-		$result = API::TriggerPrototype()->create($trigger);
-
-		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
 	}
 
 	if ($result) {

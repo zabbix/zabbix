@@ -39,7 +39,6 @@ class CGraphPrototype extends CGraphGeneral {
 			self::ERROR_MISSING_GRAPH_NAME => _('Missing "name" field for graph prototype.'),
 			self::ERROR_MISSING_GRAPH_ITEMS => _('Missing items for graph prototype "%1$s".'),
 			self::ERROR_MISSING_REQUIRED_VALUE => _('No "%1$s" given for graph prototype.'),
-			self::ERROR_TEMPLATED_ID => _('Cannot update "templateid" for graph prototype "%1$s".'),
 			self::ERROR_GRAPH_SUM => _('Cannot add more than one item with type "Graph sum" on graph prototype "%1$s".')
 		]);
 	}
