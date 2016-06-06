@@ -2227,12 +2227,10 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
 					new_processed_size);
 
 			logfiles[i].processed_size = new_processed_size;
-
-			if (0 == logfiles[i].seq)
-				logfiles[i].seq = (*seq)++;
-
 			*lastlogsize = new_processed_size;
 			*mtime = logfiles[i].mtime;
+
+			logfiles[i].seq = (*seq)++;
 
 			bytes_to_jump -= bytes_jumped;
 
