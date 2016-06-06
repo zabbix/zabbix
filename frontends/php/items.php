@@ -620,10 +620,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if ($db_item['trapper_hosts'] !== getRequest('trapper_hosts', '')) {
 					$item['trapper_hosts'] = getRequest('trapper_hosts', '');
 				}
-				$old_applications = zbx_objectValues($db_item['applications'], 'applicationid');
-				natsort($old_applications);
+				$db_applications = zbx_objectValues($db_item['applications'], 'applicationid');
+				natsort($db_applications);
 				natsort($applications);
-				if (array_values($old_applications) !== array_values($applications)) {
+				if (array_values($db_applications) !== array_values($applications)) {
 					$item['applications'] = $applications;
 				}
 				if ($db_item['inventory_link'] != getRequest('inventory_link', 0)) {
