@@ -1336,7 +1336,7 @@ class CAction extends CApiService {
 		$all_usrgrpids = [];
 
 		foreach ($operations as $operation) {
-			if ($operation['flag'] == ACTION_OPERATION) {
+			if ($operation['recovery'] == ACTION_OPERATION) {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 						&& (!array_key_exists('esc_step_from', $operation)
 							|| !array_key_exists('esc_step_to', $operation))) {
@@ -1367,192 +1367,217 @@ class CAction extends CApiService {
 
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					$userids = array_key_exists('opmessage_usr', $operation)
-						? zbx_objectValues($operation['opmessage_usr'], 'userid')
-						: [];
+					if ($operation['recovery'] == ACTION_OPERATION
+							|| ($operation['recovery'] == ACTION_RECOVERY_OPERATION
+								&& ($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
+									|| $operation['eventsource'] == EVENT_SOURCE_INTERNAL))) {
+						$userids = array_key_exists('opmessage_usr', $operation)
+							? zbx_objectValues($operation['opmessage_usr'], 'userid')
+							: [];
 
-					$usrgrpids = array_key_exists('opmessage_grp', $operation)
-						? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid')
-						: [];
+						$usrgrpids = array_key_exists('opmessage_grp', $operation)
+							? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid')
+							: [];
 
-					if (!$userids && !$usrgrpids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
+						if (!$userids && !$usrgrpids) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
+						}
+
+						$all_userids = array_merge($all_userids, $userids);
+						$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
 					}
-
-					$all_userids = array_merge($all_userids, $userids);
-					$all_usrgrpids = array_merge($all_usrgrpids, $usrgrpids);
 					break;
 				case OPERATION_TYPE_COMMAND:
-					if (!isset($operation['opcommand']['type'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command type specified for action operation.'));
-					}
+					if ($operation['recovery'] == ACTION_OPERATION
+							&& ($operation['eventsource'] != EVENT_SOURCE_INTERNAL
+								|| ($operation['recovery'] == ACTION_RECOVERY_OPERATION
+									&& $operation['eventsource'] == EVENT_SOURCE_TRIGGERS))) {
+						if (!isset($operation['opcommand']['type'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No command type specified for action operation.')
+							);
+						}
 
-					if ((!isset($operation['opcommand']['command'])
-							|| zbx_empty(trim($operation['opcommand']['command'])))
-							&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('No command specified for action operation.'));
-					}
+						if ((!isset($operation['opcommand']['command'])
+								|| zbx_empty(trim($operation['opcommand']['command'])))
+								&& $operation['opcommand']['type'] != ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('No command specified for action operation.'));
+						}
 
-					switch ($operation['opcommand']['type']) {
-						case ZBX_SCRIPT_TYPE_IPMI:
-							break;
-						case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
-							if (!isset($operation['opcommand']['execute_on'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No execution target specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-							break;
-						case ZBX_SCRIPT_TYPE_SSH:
-							if (!isset($operation['opcommand']['authtype'])
-									|| zbx_empty($operation['opcommand']['authtype'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication type specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-
-							if (!isset($operation['opcommand']['username'])
-									|| zbx_empty($operation['opcommand']['username'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-
-							if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
-								if (!isset($operation['opcommand']['publickey'])
-										|| zbx_empty($operation['opcommand']['publickey'])) {
+						switch ($operation['opcommand']['type']) {
+							case ZBX_SCRIPT_TYPE_IPMI:
+								break;
+							case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
+								if (!isset($operation['opcommand']['execute_on'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No public key file specified for action operation command "%1$s".',
+										_s('No execution target specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
 										)
 									);
 								}
-								if (!isset($operation['opcommand']['privatekey'])
-										|| zbx_empty($operation['opcommand']['privatekey'])) {
+								break;
+							case ZBX_SCRIPT_TYPE_SSH:
+								if (!isset($operation['opcommand']['authtype'])
+										|| zbx_empty($operation['opcommand']['authtype'])) {
 									self::exception(ZBX_API_ERROR_PARAMETERS,
-										_s('No private key file specified for action operation command "%1$s".',
+										_s('No authentication type specified for action operation command "%1$s".',
 											$operation['opcommand']['command']
 										)
 									);
 								}
-							}
-							break;
-						case ZBX_SCRIPT_TYPE_TELNET:
-							if (!isset($operation['opcommand']['username'])
-									|| zbx_empty($operation['opcommand']['username'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('No authentication user name specified for action operation command "%1$s".',
-										$operation['opcommand']['command']
-									)
-								);
-							}
-							break;
-						case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
-							if (!isset($operation['opcommand']['scriptid'])
-									|| zbx_empty($operation['opcommand']['scriptid'])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_('No script specified for action operation command.')
-								);
-							}
-							$scripts = API::Script()->get([
-								'output' => ['scriptid','name'],
-								'scriptids' => $operation['opcommand']['scriptid'],
-								'preservekeys' => true
-							]);
-							if (!isset($scripts[$operation['opcommand']['scriptid']])) {
-								self::exception(ZBX_API_ERROR_PARAMETERS, _(
-									'Specified script does not exist or you do not have rights on it for action operation command.'
-								));
-							}
-							break;
-						default:
-							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
-					}
 
-					if (isset($operation['opcommand']['port']) && !zbx_empty($operation['opcommand']['port'])) {
-						if (zbx_ctype_digit($operation['opcommand']['port'])) {
-							if ($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
-								);
-							}
+								if (!isset($operation['opcommand']['username'])
+										|| zbx_empty($operation['opcommand']['username'])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('No authentication user name specified for action operation command "%1$s".',
+											$operation['opcommand']['command']
+										)
+									);
+								}
+
+								if ($operation['opcommand']['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
+									if (!isset($operation['opcommand']['publickey'])
+											|| zbx_empty($operation['opcommand']['publickey'])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('No public key file specified for action operation command "%1$s".',
+												$operation['opcommand']['command']
+											)
+										);
+									}
+									if (!isset($operation['opcommand']['privatekey'])
+											|| zbx_empty($operation['opcommand']['privatekey'])) {
+										self::exception(ZBX_API_ERROR_PARAMETERS,
+											_s('No private key file specified for action operation command "%1$s".',
+												$operation['opcommand']['command']
+											)
+										);
+									}
+								}
+								break;
+							case ZBX_SCRIPT_TYPE_TELNET:
+								if (!isset($operation['opcommand']['username'])
+										|| zbx_empty($operation['opcommand']['username'])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('No authentication user name specified for action operation command "%1$s".',
+											$operation['opcommand']['command']
+										)
+									);
+								}
+								break;
+							case ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT:
+								if (!isset($operation['opcommand']['scriptid'])
+										|| zbx_empty($operation['opcommand']['scriptid'])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_('No script specified for action operation command.')
+									);
+								}
+								$scripts = API::Script()->get([
+									'output' => ['scriptid','name'],
+									'scriptids' => $operation['opcommand']['scriptid'],
+									'preservekeys' => true
+								]);
+								if (!isset($scripts[$operation['opcommand']['scriptid']])) {
+									self::exception(ZBX_API_ERROR_PARAMETERS, _(
+										'Specified script does not exist or you do not have rights on it for action operation command.'
+									));
+								}
+								break;
+							default:
+								self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation command type.'));
 						}
-						else {
-							$user_macro_parser = new CUserMacroParser();
 
-							if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
-								self::exception(ZBX_API_ERROR_PARAMETERS,
-									_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
-								);
-							}
-						}
-					}
-
-					$groupids = [];
-					if (array_key_exists('opcommand_grp', $operation)) {
-						$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
-					}
-
-					$hostids = [];
-					$withoutCurrent = true;
-					if (array_key_exists('opcommand_hst', $operation)) {
-						foreach ($operation['opcommand_hst'] as $hstCommand) {
-							if ($hstCommand['hostid'] == 0) {
-								$withoutCurrent = false;
+						if (isset($operation['opcommand']['port'])
+								&& !zbx_empty($operation['opcommand']['port'])) {
+							if (zbx_ctype_digit($operation['opcommand']['port'])) {
+								if ($operation['opcommand']['port'] > 65535 || $operation['opcommand']['port'] < 1) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
+									);
+								}
 							}
 							else {
-								$hostids[$hstCommand['hostid']] = $hstCommand['hostid'];
+								$user_macro_parser = new CUserMacroParser();
+
+								if ($user_macro_parser->parse($operation['opcommand']['port']) != CParser::PARSE_SUCCESS) {
+									self::exception(ZBX_API_ERROR_PARAMETERS,
+										_s('Incorrect action operation port "%1$s".', $operation['opcommand']['port'])
+									);
+								}
 							}
 						}
-					}
 
-					if (!$groupids && !$hostids && $withoutCurrent) {
-						if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation global script "%1$s".',
-									$scripts[$operation['opcommand']['scriptid']]['name']
-							));
+						$groupids = [];
+						if (array_key_exists('opcommand_grp', $operation)) {
+							$groupids = zbx_objectValues($operation['opcommand_grp'], 'groupid');
 						}
-						else {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_s('You did not specify targets for action operation command "%1$s".',
-									$operation['opcommand']['command']
-							));
-						}
-					}
 
-					$all_hostids = array_merge($all_hostids, $hostids);
-					$all_groupids = array_merge($all_groupids, $groupids);
+						$hostids = [];
+						$withoutCurrent = true;
+						if (array_key_exists('opcommand_hst', $operation)) {
+							foreach ($operation['opcommand_hst'] as $hstCommand) {
+								if ($hstCommand['hostid'] == 0) {
+									$withoutCurrent = false;
+								}
+								else {
+									$hostids[$hstCommand['hostid']] = $hstCommand['hostid'];
+								}
+							}
+						}
+
+						if (!$groupids && !$hostids && $withoutCurrent) {
+							if ($operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('You did not specify targets for action operation global script "%1$s".',
+										$scripts[$operation['opcommand']['scriptid']]['name']
+								));
+							}
+							else {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('You did not specify targets for action operation command "%1$s".',
+										$operation['opcommand']['command']
+								));
+							}
+						}
+
+						$all_hostids = array_merge($all_hostids, $hostids);
+						$all_groupids = array_merge($all_groupids, $groupids);
+					}
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					$groupids = array_key_exists('opgroup', $operation)
-						? zbx_objectValues($operation['opgroup'], 'groupid')
-						: [];
+					if ($operation['recovery'] == ACTION_OPERATION
+							&& ($operation['eventsource'] == EVENT_SOURCE_DISCOVERY
+								|| ($operation['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION
+									&& $operation['operationtype'] != OPERATION_TYPE_GROUP_REMOVE))) {
+						$groupids = array_key_exists('opgroup', $operation)
+							? zbx_objectValues($operation['opgroup'], 'groupid')
+							: [];
 
-					if (!$groupids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Action operation has no group to operate.'));
+						if (!$groupids) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _('Action operation has no group to operate.'));
+						}
+
+						$all_groupids = array_merge($all_groupids, $groupids);
 					}
-
-					$all_groupids = array_merge($all_groupids, $groupids);
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$templateids = isset($operation['optemplate'])
-						? zbx_objectValues($operation['optemplate'], 'templateid')
-						: [];
+					if ($operation['recovery'] == ACTION_OPERATION
+							&& ($operation['eventsource'] == EVENT_SOURCE_DISCOVERY
+								|| ($operation['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION
+									&& $operation['operationtype'] != OPERATION_TYPE_GROUP_REMOVE))) {
+						$templateids = isset($operation['optemplate'])
+							? zbx_objectValues($operation['optemplate'], 'templateid')
+							: [];
 
-					if (!$templateids) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Action operation has no template to operate.'));
+						if (!$templateids) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('Action operation has no template to operate.')
+							);
+						}
+
+						$all_hostids = array_merge($all_hostids, $templateids);
 					}
-
-					$all_hostids = array_merge($all_hostids, $templateids);
 					break;
 				case OPERATION_TYPE_HOST_ADD:
 				case OPERATION_TYPE_HOST_REMOVE:
@@ -1561,15 +1586,22 @@ class CAction extends CApiService {
 					break;
 
 				case OPERATION_TYPE_HOST_INVENTORY:
-					if (!array_key_exists('opinventory', $operation)
-							|| !array_key_exists('inventory_mode', $operation['opinventory'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('No inventory mode specified for action operation.')
-						);
-					}
-					if ($operation['opinventory']['inventory_mode'] != HOST_INVENTORY_MANUAL
-							&& $operation['opinventory']['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
+					if ($operation['recovery'] == ACTION_OPERATION
+							&& ($operation['eventsource'] == EVENT_SOURCE_DISCOVERY
+								|| ($operation['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION
+									&& $operation['operationtype'] != OPERATION_TYPE_GROUP_REMOVE))) {
+						if (!array_key_exists('opinventory', $operation)
+								|| !array_key_exists('inventory_mode', $operation['opinventory'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('No inventory mode specified for action operation.')
+							);
+						}
+						if ($operation['opinventory']['inventory_mode'] != HOST_INVENTORY_MANUAL
+								&& $operation['opinventory']['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('Incorrect inventory mode in action operation.')
+							);
+						}
 					}
 					break;
 
@@ -2304,7 +2336,8 @@ class CAction extends CApiService {
 			}
 			else {
 				foreach ($action['operations'] as $operation) {
-					$operation['flag'] = ACTION_OPERATION;
+					$operation['recovery'] = ACTION_OPERATION;
+					$operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $operation;
 				}
 			}
@@ -2313,7 +2346,8 @@ class CAction extends CApiService {
 					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
 						|| $action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
-					$recovery_operation['flag'] = ACTION_RECOVERY_OPERATION;
+					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+					$recovery_operation['eventsource'] = $action['eventsource'];
 					$operations_to_validate[] = $recovery_operation;
 				}
 			}
@@ -2466,7 +2500,8 @@ class CAction extends CApiService {
 				foreach ($action['operations'] as $operation) {
 					if (!array_key_exists('operationid', $operation)
 							|| array_key_exists($operation['operationid'], $db_operations)) {
-						$operation['flag'] = ACTION_OPERATION;
+						$operation['recovery'] = ACTION_OPERATION;
+						$operation['eventsource'] = $db_action['eventsource'];
 						$operations_to_validate[] = $operation;
 					}
 					else {
@@ -2485,7 +2520,8 @@ class CAction extends CApiService {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					if (!array_key_exists('operationid', $recovery_operation)
 							|| array_key_exists($recovery_operation['operationid'], $db_recovery_operations)) {
-						$recovery_operation['flag'] = ACTION_RECOVERY_OPERATION;
+						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+						$recovery_operation['eventsource'] = $db_action['eventsource'];
 						$operations_to_validate[] = $recovery_operation;
 					}
 					else {
