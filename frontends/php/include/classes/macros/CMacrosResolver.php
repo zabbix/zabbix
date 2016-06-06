@@ -890,8 +890,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								? ($function['state'] == ITEM_STATE_NORMAL) ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY
 								: $style = ZBX_STYLE_RED;
 
-							if ($function['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-									|| $function['type'] == ITEM_TYPE_HTTPTEST) {
+							if ($function['type'] == ITEM_TYPE_HTTPTEST) {
 								$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
 							}
 							elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {

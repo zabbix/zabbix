@@ -68,7 +68,7 @@ foreach ($this->data['items'] as $item) {
 
 	$status = (new CLink(
 		itemIndicator($item['status']),
-		'?group_itemid='.$item['itemid'].
+		'?group_itemid[]='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED
 				? 'itemprototype.massenable'
