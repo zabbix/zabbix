@@ -61,7 +61,7 @@ while ($tld_index < $tld_count)
 
 		my $nsips_ref = get_nsips($tld, $cfg_key_in);
 
-		foreach my $nsip (@$nsips_ref)
+		foreach my $nsip (@{$nsips_ref})
 		{
 			my $itemid_in = get_itemid_by_host($tld, "$cfg_key_in$nsip]");
 
@@ -79,7 +79,7 @@ while ($tld_index < $tld_count)
 
 		init_values();
 
-		foreach my $nsip (@{$nsips_ref})
+		foreach my $nsip (keys(%{$tld_items}))
 		{
 			my $downtime = get_downtime($tld_items->{$nsip}, $month_from, $month_till, 1);	# ignore incidents
 
