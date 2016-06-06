@@ -1371,18 +1371,14 @@ elseif ($srctbl == 'applications') {
 	CArrayHelper::sort($apps, ['name']);
 
 	$data = [];
-	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
+	$parentId = $dstfld1 ? CJs::encodeJson($dstfld1) : 'null';
 
 	foreach ($apps as &$app) {
 		$name = (new CLink($app['name'], 'javascript:void(0);'))
 			->setId('spanid'.$app['applicationid']);
 
-		$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($app['applicationid']).', '.
+		$js_action = 'javascript: addValue('.CJs::encodeJson($reference).', '.$app['applicationid'].', '.
 			$parentId.');';
-
-		if ($multiselect) {
-			$checkBox = new CCheckBox('applications['.zbx_jsValue('applicationid').']', $app['applicationid']);
-		}
 
 		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
@@ -1391,7 +1387,12 @@ elseif ($srctbl == 'applications') {
 			'name' => $app['name']
 		];
 
-		$table->addRow([$multiselect ? $checkBox : null, $name]);
+		$table->addRow([
+			$multiselect
+				? (new CCheckBox('applications['.$app[$srcfld1].']', $app['applicationid']))
+				: null,
+			$name
+		]);
 	}
 	unset($app);
 
@@ -1399,12 +1400,12 @@ elseif ($srctbl == 'applications') {
 		$table->setFooter(
 			new CCol(
 				(new CButton('select', _('Select')))
-					->onClick("javascript: addSelectedValues('applications', ".zbx_jsvalue($reference).', '.$parentId.');')
+					->onClick("javascript: addSelectedValues('applications', ".CJs::encodeJson($reference).', '.$parentId.');')
 			)
 		);
 	}
 
-	insert_js('var popupReference = '.zbx_jsvalue($data, true).';');
+	insert_js('var popupReference = '.CJs::encodeJson($data, true).';');
 
 	$form->addItem($table);
 	$widget->addItem($form)->show();
