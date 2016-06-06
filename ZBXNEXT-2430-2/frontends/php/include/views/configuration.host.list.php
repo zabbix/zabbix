@@ -243,7 +243,7 @@ foreach ($data['hosts'] as $host) {
 			CViewHelper::showNum($host['graphs'])
 		],
 		[
-			new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
+			new CLink(_('Discovery'), 'host_discovery.php?hostid='.$host['hostid']),
 			CViewHelper::showNum($host['discoveries'])
 		],
 		[
