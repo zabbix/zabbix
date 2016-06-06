@@ -549,7 +549,9 @@ class CAction extends CApiService {
 				$operations_to_create[] = $operation;
 			}
 
-			if (array_key_exists('recovery_operations', $action)) {
+			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
+					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					$operation['actionid'] = $actionid;
 					$operation['recovery'] = ACTION_RECOVERY_OPERATION;
@@ -668,7 +670,9 @@ class CAction extends CApiService {
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_operations));
 			}
 
-			if (array_key_exists('recovery_operations', $action)) {
+			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
+					&& ($db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $db_actions[$action['actionid']]['eventsource'] = EVENT_SOURCE_INTERNAL)) {
 				$db_recovery_operations = zbx_toHash($db_action['recoveryOperations'], 'operationid');
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
@@ -2305,7 +2309,9 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (array_key_exists('recovery_operations', $action)) {
+			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
+					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					$recovery_operation['flag'] = ACTION_RECOVERY_OPERATION;
 					$operations_to_validate[] = $recovery_operation;
@@ -2470,7 +2476,9 @@ class CAction extends CApiService {
 			}
 
 			// Recovery operations.
-			if (array_key_exists('recovery_operations', $action)) {
+			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
+					&& ($db_actions[$action['actionid']]['eventsource'] == EVENT_SOURCE_TRIGGERS
+						|| $db_actions[$action['actionid']]['eventsource'] = EVENT_SOURCE_INTERNAL)) {
 				$db_recovery_operations = zbx_toHash($db_actions[$action['actionid']]['recoveryOperations'],
 					'operationid'
 				);
