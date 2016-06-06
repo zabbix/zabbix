@@ -31,7 +31,7 @@ my $probe_avail_limit = get_macro_probe_avail_limit();
 my $now = (opt('now') ? getopt('now') : time());
 my $period = (opt('period') ? getopt('period') : 1);
 
-my $max_avail_time = max_avail_time($now);
+my $max_avail_time = max_avail_time($delay);
 
 my $tlds_ref;
 if (opt('tld'))
