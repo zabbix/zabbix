@@ -1159,7 +1159,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 static void	execute_recovery_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event,
 		DB_ACTION *action)
 {
-	const char	*__function_name = "execute_operations";
+	const char	*__function_name = "execute_recovery_operations";
 	DB_RESULT	result;
 	DB_ROW		row;
 	ZBX_USER_MSG	*user_msg = NULL;
