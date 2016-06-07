@@ -266,6 +266,8 @@ out:
 
 	return SYSINFO_RET_OK;
 
+#undef ZBX_L2PSIZE
+
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE
