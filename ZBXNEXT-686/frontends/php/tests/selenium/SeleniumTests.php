@@ -48,9 +48,11 @@ require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPagePopup.php';
+/*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
 require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
+*/
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageSlideShows.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
@@ -142,9 +144,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageOverview');
 		$suite->addTestSuite('testPagePopup');
+/*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
 		$suite->addTestSuite('testPageQueueOverviewByProxy');
+*/
 		$suite->addTestSuite('testPageScreens');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageSlideShows');
