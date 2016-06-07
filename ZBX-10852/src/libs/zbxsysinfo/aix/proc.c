@@ -76,6 +76,9 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_DRSS	7
 #define ZBX_TRSS	8
 
+/* The pi_???_l2psize fields are described as: log2 of a proc's ??? pg sz */
+/* Basically it's bits per page, so define 12 bits (4kb) for earlier AIX  */
+/* versions that do not support those fields.                             */
 #ifdef _AIX61
 #	define ZBX_L2PSIZE(field) 	field
 #else
