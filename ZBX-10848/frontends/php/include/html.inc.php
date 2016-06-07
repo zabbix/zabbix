@@ -357,7 +357,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem(getHostAvailabilityTable($db_host));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-			$list->addItem(getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']));
+			$lifetime_indicator = getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']);
+			$list->addItem((new CDiv($lifetime_indicator))->addClass(ZBX_STYLE_STATUS_CONTAINER));
 		}
 	}
 
