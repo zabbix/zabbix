@@ -51,7 +51,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
 
-		$this->zbxTestClick('tab_templateTab');
+		$this->zbxTestClickWait('tab_templateTab');
 
 		$this->zbxAssertElementPresent(WebdriverBy::id("add_templates_"));
 		$this->zbxTestInputTypeByXpath('//input[@class="input"]', 'Template App Zabbix Agent');
@@ -105,7 +105,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 
 		$this->zbxTestClickLinkText($template);
-		$this->zbxTestClickLinkText('Items');
+		$this->zbxTestClickLinkTextWait('Items');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', $itemName);
@@ -136,6 +136,7 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				foreach ($errorMsgs as $msg) {
+					$this->zbxWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
 					$this->zbxTestTextPresent($msg);
 				}
 				$this->zbxTestTextPresent('Host');
@@ -149,7 +150,8 @@ class testTemplateInheritance extends CWebTest {
 				// check that the inherited item matches the original
 				$this->zbxTestOpen('hosts.php');
 				$this->zbxTestClickLinkText($this->hostName);
-				$this->zbxTestClickLinkText('Items');
+				$this->zbxTestClickLinkTextWait('Items');
+				$this->zbxTestCheckHeader('Items');
 				$this->assertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
 				$this->zbxTestClickLinkText($itemName);
 				$this->assertElementValue('name', $itemName);
@@ -182,9 +184,9 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
 
-		$this->zbxTestClick('tab_templateTab');
-		$this->zbxTestTextPresent('Template App Zabbix Agent');
+		$this->zbxTestClickWait('tab_templateTab');
 		$this->zbxWaitUntilElementVisible(WebdriverBy::id('unlink_and_clear_'.$hostid));
+		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
 		$this->zbxTestTextNotPresent('Template App Zabbix Agent');
 
@@ -202,7 +204,7 @@ class testTemplateInheritance extends CWebTest {
 
 		// create a trigger
 		$this->zbxTestClickLinkText($this->templateName);
-		$this->zbxTestClickLinkText('Triggers');
+		$this->zbxTestClickLinkTextWait('Triggers');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('description', 'Test LLD trigger1');
@@ -219,7 +221,7 @@ class testTemplateInheritance extends CWebTest {
 		// check that the inherited trigger matches the original
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
-		$this->zbxTestClickLinkText('Triggers');
+		$this->zbxTestClickLinkTextWait('Triggers');
 
 		$this->assertElementText("//a[text()='Test LLD trigger1']/parent::td", "$this->templateName: Test LLD trigger1");
 		$this->zbxTestClickLinkText('Test LLD trigger1');
@@ -244,7 +246,7 @@ class testTemplateInheritance extends CWebTest {
 
 		// create a graph
 		$this->zbxTestClickLinkText($this->templateName);
-		$this->zbxTestClickLinkText('Graphs');
+		$this->zbxTestClickLinkTextWait('Graphs');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD graph1');
@@ -263,7 +265,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClick('add_item');
 
 		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
-		$this->zbxTestClickLinkText('Test LLD item1');
+		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Graph added');
@@ -271,7 +273,7 @@ class testTemplateInheritance extends CWebTest {
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
-		$this->zbxTestClickLinkText('Graphs');
+		$this->zbxTestClickLinkTextWait('Graphs');
 
 		$this->assertElementText("//a[text()='Test LLD graph1']/parent::td", "$this->templateName: Test LLD graph1");
 		$this->zbxTestClickLinkText('Test LLD graph1');
@@ -304,7 +306,7 @@ class testTemplateInheritance extends CWebTest {
 
 		// create an LLD rule
 		$this->zbxTestClickLinkText($this->templateName);
-		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD');
@@ -321,7 +323,7 @@ class testTemplateInheritance extends CWebTest {
 		// check that the inherited rule matches the original
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
-		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->assertElementText("//a[text()='Test LLD']/parent::td", "$this->templateName: Test LLD");
 		$this->zbxTestClickLinkText('Test LLD');
 
@@ -349,9 +351,9 @@ class testTemplateInheritance extends CWebTest {
 
 		// create an item prototype
 		$this->zbxTestClickLinkText($this->templateName);
-		$this->zbxTestClickLinkText('Discovery rules');
-		$this->zbxTestClickLinkText('Test LLD');
-		$this->zbxTestClickLinkText('Item prototypes');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Test LLD');
+		$this->zbxTestClickLinkTextWait('Item prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD item');
@@ -376,9 +378,11 @@ class testTemplateInheritance extends CWebTest {
 		// check that the inherited item prototype matches the original
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
-		$this->zbxTestClickLinkText('Discovery rules');
-		$this->zbxTestClickLinkText('Test LLD');
-		$this->zbxTestClickLinkText('Item prototypes');
+		$this->zbxTestCheckHeader('Hosts');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestCheckHeader('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Test LLD');
+		$this->zbxTestClickLinkTextWait('Item prototypes');
 		$this->assertElementText("//a[text()='Test LLD item']/parent::td", "$this->templateName: Test LLD item");
 		$this->zbxTestClickLinkText('Test LLD item');
 
@@ -408,9 +412,9 @@ class testTemplateInheritance extends CWebTest {
 
 		// create a trigger prototype
 		$this->zbxTestClickLinkText($this->templateName);
-		$this->zbxTestClickLinkText('Discovery rules');
-		$this->zbxTestClickLinkText('Test LLD');
-		$this->zbxTestClickLinkText('Trigger prototypes');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Test LLD');
+		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('description', 'Test LLD trigger');
@@ -425,12 +429,19 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestTextPresent('Trigger prototype added');
 		$this->zbxTestTextPresent('Test LLD trigger');
 
+		$sql = "SELECT triggerid FROM triggers WHERE description='Test LLD trigger' AND status='1' AND templateid IS NULL";
+		$this->assertEquals(1, DBcount($sql), 'Trigger prototype has not been added into Zabbix DB');
+
+		$sql = "SELECT triggerid FROM triggers WHERE description='Test LLD trigger' AND status='1' AND templateid IS NOT NULL";
+		$this->assertEquals(1, DBcount($sql), 'Trigger prototype has not been added into Zabbix DB');
+
 		// check that the inherited trigger prototype matches the original
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
-		$this->zbxTestClickLinkText('Discovery rules');
-		$this->zbxTestClickLinkText('Test LLD');
-		$this->zbxTestClickLinkText('Trigger prototypes');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Test LLD');
+		$this->zbxTestClickLinkTextWait('Trigger prototypes');
+		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->assertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
 		$this->zbxTestClickLinkText('Test LLD trigger');
 
@@ -454,9 +465,9 @@ class testTemplateInheritance extends CWebTest {
 
 		// create a graph
 		$this->zbxTestClickLinkText($this->templateName);
-		$this->zbxTestClickLinkText('Discovery rules');
-		$this->zbxTestClickLinkText('Test LLD');
-		$this->zbxTestClickLinkText('Graph prototypes');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Test LLD');
+		$this->zbxTestClickLinkTextWait('Graph prototypes');
 		$this->zbxTestClickWait('form');
 
 		$this->input_type('name', 'Test LLD graph');
@@ -475,13 +486,13 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestClick('add_protoitem');
 		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
-		$this->zbxTestClickLinkText('Test LLD item');
+		$this->zbxTestClickLinkTextWait('Test LLD item');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item');
 
 		$this->zbxTestClick('add_item');
 		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
-		$this->zbxTestClickLinkText('Test LLD item1');
+		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item1');
 
@@ -492,9 +503,9 @@ class testTemplateInheritance extends CWebTest {
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
-		$this->zbxTestClickLinkText('Discovery rules');
-		$this->zbxTestClickLinkText('Test LLD');
-		$this->zbxTestClickLinkText('Graph prototypes');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Test LLD');
+		$this->zbxTestClickLinkTextWait('Graph prototypes');
 
 		$this->assertElementText("//a[text()='Test LLD graph']/parent::td", "$this->templateName: Test LLD graph");
 		$this->zbxTestClickLinkText('Test LLD graph');

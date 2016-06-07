@@ -138,9 +138,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestCheckHeader($header) {
-		$this->zbxWaitUntil(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::tagName('h1')), 'element is not visible');
+		$this->zbxWaitUntilElementVisible(WebDriverBy::tagName('h1'));
 		$headerElemnt = $this->webDriver->findElement(WebDriverBy::tagName('h1'));
-		$headerElemnt->isDisplayed();
 		$this->assertEquals($header, $headerElemnt->getText());
 	}
 
@@ -195,6 +194,11 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::linkText($link_text))->click();
 	}
 
+	public function zbxTestClickLinkTextWait($link_text) {
+		$this->zbxWaitUntilElementVisible(WebDriverBy::linkText($link_text));
+		$this->webDriver->findElement(WebDriverBy::linkText($link_text))->click();
+	}
+
 	public function zbxTestClickButtonText($button_text) {
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"))->click();
 	}
@@ -204,11 +208,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickWait($id) {
+		$this->zbxWaitUntilElementVisible(WebDriverBy::id($id));
 		$this->webDriver->findElement(WebDriverBy::id($id))->click();
-//		$this->wait();
 	}
 
 	public function zbxTestClickXpath($xpath) {
+		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
+	}
+
+	public function zbxTestClickXpathWait($xpath) {
+		$this->zbxWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$this->webDriver->findElement(WebDriverBy::xpath($xpath))->click();
 	}
 
@@ -253,7 +262,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestInputTypeWait($id, $str) {
-		$this->zbxWaitUntil(WebDriverExpectedCondition::visibilityOfElementLocated(WebDriverBy::id($id)), 'input is not visible');
+		$this->zbxWaitUntilElementVisible(WebDriverBy::id($id));
 		$this->webDriver->findElement(WebDriverBy::id($id))->sendKeys($str);
 	}
 
@@ -317,12 +326,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxWaitUntil($condition, $message) {
-		$this->webDriver->wait(5)->until($condition, $message);
+		$this->webDriver->wait(10)->until($condition, $message);
 		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxWaitUntilElementVisible($by) {
-		$this->webDriver->wait(5)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 5 sec element still not visible');
+		$this->webDriver->wait(10)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 10 sec element still not visible');
+	}
+
+	public function zbxWaitUntilMessageTextPresent($css, $string) {
+		$this->webDriver->wait(10)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
 	}
 
 	/**
@@ -349,7 +362,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	// zbx_popup is the default opened window id if none is passed
 	public function zbxTestLaunchPopup($buttonId, $windowId = 'zbx_popup') {
-		$this->zbxTestClick($buttonId);
+		$this->zbxTestClickWait($buttonId);
 		$this->zbxWaitWindowAndSwitchToIt($windowId);
 	}
 

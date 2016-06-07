@@ -81,6 +81,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
 		$this->zbxTestClickLinkText($icon_name['name']);
+		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Name', 'Upload', 'Image']);
 		$this->zbxAssertElementPresent(WebDriverBy::id('update'));
 		$this->zbxAssertElementPresent(WebDriverBy::id('delete'));

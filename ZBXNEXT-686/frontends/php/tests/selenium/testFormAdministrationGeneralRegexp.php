@@ -183,7 +183,8 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxTestTextPresent(['Regular expression deleted', 'Regular expressions', 'Name', 'Expressions']);
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
+		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($this->regexp2);
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Regexp has not been deleted from the DB');

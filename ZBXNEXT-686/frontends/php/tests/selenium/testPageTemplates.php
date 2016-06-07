@@ -51,9 +51,14 @@ class testPageTemplates extends CWebTest {
 
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = DBhash($sqlTemplate);
-		$sqlHosts = "select * from hosts ".
-				"where hostid not in ('15001', '20003', '40001', '50001', '50003', '50004', '50005', '50007', '50008')".
-				"order by hostid";
+		$sqlHosts =
+				'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
+				'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
+				'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,'.
+				'name,flags,templateid,description,tls_connect,tls_accept'.
+			' FROM hosts'.
+			' ORDER BY hostid';
 		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items order by itemid";
 		$oldHashItems = DBhash($sqlItems);

@@ -219,7 +219,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestCheckHeader('Media types');
 		$this->zbxTestClickLinkText($name);
 
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickWait('delete');
 
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of media types');

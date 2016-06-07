@@ -184,7 +184,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickLinkText($newVmName);
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxTestTextPresent('Value map deleted');
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');
@@ -211,7 +211,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickLinkText($this->valuemapWithMultipleMappings);
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxTestTextPresent('Value map deleted');
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$this->valuemapWithMultipleMappings.'\'';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');

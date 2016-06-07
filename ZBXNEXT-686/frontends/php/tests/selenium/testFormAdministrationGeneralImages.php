@@ -148,7 +148,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestClickLinkText($this->bg_image_name2);
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxTestCheckTitle('Configuration of images');
+		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';

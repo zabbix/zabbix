@@ -34,8 +34,8 @@ class testTriggerDependencies extends CWebTest {
 		$this->zbxTestLogin('triggers.php?groupid=1&hostid='.$hostId);
 
 		$this->zbxTestClickLinkText('{HOST.NAME} has just been restarted');
-		$this->zbxTestClick('tab_dependenciesTab');
-		$this->zbxTestClick('bnt1');
+		$this->zbxTestClickWait('tab_dependenciesTab');
+		$this->zbxTestClickWait('bnt1');
 		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestDropdownSelect('hostid', 'Template OS FreeBSD');
 		$this->zbxTestClickLinkText('/etc/passwd has been changed on Template OS FreeBSD');

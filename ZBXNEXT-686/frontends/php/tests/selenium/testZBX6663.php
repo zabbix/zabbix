@@ -191,13 +191,13 @@ class testZBX6663 extends CWebTest {
 		}
 
 		if (isset($zbx_data['discoveryRule'])) {
-			$this->zbxTestClickLinkText('Discovery rules');
+			$this->zbxTestClickLinkTextWait('Discovery rules');
 			$this->zbxTestClickLinkText($this->discoveryRule);
 			$this->zbxTestClickLinkText($zbx_data['discoveryRule']);
 		}
 		else {
 			$link = $zbx_data['link'];
-			$this->zbxTestClickXpath("//ul[@class='object-group']//a[text()='$link']");
+			$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='$link']");
 		}
 
 		$this->zbxTestTextPresent('0 selected');

@@ -73,7 +73,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestClickLinkText($mediatype['description']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestTextPresent('Media type updated');
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Media type updated');
 		$this->zbxTestTextPresent($mediatype['description']);
 
 		$this->verifyHash();
@@ -94,7 +94,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestClickButton('mediatype.disable');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestTextPresent('Media type disabled');
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Media type disabled');
 
 		$this->assertEquals(1, DBcount(
 			'SELECT NULL'.
@@ -119,7 +119,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestClickButton('mediatype.enable');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of media types');
-		$this->zbxTestTextPresent('Media type enabled');
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Media type enabled');
 
 		$this->assertEquals(1, DBcount(
 			'SELECT NULL'.
@@ -158,7 +158,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals(1, DBcount($sql));
 		}
 		else {
-				$this->zbxTestTextPresent('Media type deleted');
+				$this->zbxWaitUntilMessageTextPresent('msg-good', 'Media type deleted');
 				$this->assertEquals(0, DBcount($sql));
 		}
 	}

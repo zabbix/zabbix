@@ -283,6 +283,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);
+		$this->zbxTestCheckHeader('Proxies');
 
 		// check presence of buttons
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='proxy.update']"));
@@ -334,6 +335,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestClickLinkText($name);
+		$this->zbxTestCheckHeader('Proxies');
 
 		// check presence of buttons
 		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='proxy.update']"));
@@ -379,7 +381,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
-		$this->zbxTestTextPresent('Proxy deleted');
+		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Proxy deleted');
 		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//a[text()='".$name."']"));
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
