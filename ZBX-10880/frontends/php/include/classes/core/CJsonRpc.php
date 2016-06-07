@@ -54,7 +54,7 @@ class CJsonRpc {
 		}
 	}
 
-	public function execute($encoded = true) {
+	public function execute() {
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
 			// notification
 			if (!isset($call['id'])) {
@@ -74,14 +74,9 @@ class CJsonRpc {
 			$this->processResult($call, $result);
 		}
 
-		if (!$encoded) {
-			return array_key_exists('jsonrpc', $this->_jsonDecoded) ? $this->_response[0] : $this->_response;
-		}
-		else {
-			return $this->json->encode(
-				array_key_exists('jsonrpc', $this->_jsonDecoded) ? $this->_response[0] : $this->_response
-			);
-		}
+		return $this->json->encode(
+			array_key_exists('jsonrpc', $this->_jsonDecoded) ? $this->_response[0] : $this->_response
+		);
 	}
 
 	public function validate($call) {
