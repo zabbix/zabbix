@@ -1335,6 +1335,28 @@ class CAction extends CApiService {
 		$all_userids = [];
 		$all_usrgrpids = [];
 
+		$valid_operationtypes = [
+			ACTION_OPERATION => [
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND],
+				EVENT_SOURCE_DISCOVERY => [
+					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
+					OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_TEMPLATE_REMOVE,
+					OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE,
+					OPERATION_TYPE_HOST_DISABLE, OPERATION_TYPE_HOST_INVENTORY
+				],
+				EVENT_SOURCE_AUTO_REGISTRATION => [
+					OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND, OPERATION_TYPE_GROUP_ADD,
+					OPERATION_TYPE_TEMPLATE_ADD, OPERATION_TYPE_HOST_ADD, OPERATION_TYPE_HOST_DISABLE,
+					OPERATION_TYPE_HOST_INVENTORY
+				],
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
+			],
+			ACTION_RECOVERY_OPERATION => [
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND],
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
+			]
+		];
+
 		foreach ($operations as $operation) {
 			if ($operation['recovery'] == ACTION_OPERATION) {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
@@ -1363,48 +1385,16 @@ class CAction extends CApiService {
 				}
 			}
 
-			// Event source triggers validation.
-			if ($operation['eventsource'] == EVENT_SOURCE_TRIGGERS
-					&& $operation['operationtype'] != OPERATION_TYPE_MESSAGE
-					&& $operation['operationtype'] != OPERATION_TYPE_COMMAND) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.',
-						$operation['operationtype'], 'operationtype'
-				));
+			$eventsource = $operation['eventsource'];
+			$recovery = $operation['recovery'];
+			$operationtype = $operation['operationtype'];
+
+			if (!array_key_exists($eventsource, $valid_operationtypes[$recovery])
+					|| !in_array($operationtype, $valid_operationtypes[$recovery][$eventsource])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation type.'));
 			}
 
-			// Event source discovery validation.
-			if ($operation['eventsource'] == EVENT_SOURCE_DISCOVERY
-					&& $operation['recovery'] == ACTION_RECOVERY_OPERATION) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.',
-						$operation['operationtype'], 'operationtype'
-				));
-			}
-
-			// Event source auto registration validation.
-			$not_allowed_types = [OPERATION_TYPE_GROUP_REMOVE, OPERATION_TYPE_TEMPLATE_REMOVE,
-				OPERATION_TYPE_HOST_REMOVE, OPERATION_TYPE_HOST_ENABLE
-			];
-			if ($operation['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION
-					&& ($operation['recovery'] == ACTION_RECOVERY_OPERATION
-						|| in_array($operation['operationtype'], $not_allowed_types))) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.',
-						$operation['operationtype'], 'operationtype'
-				));
-			}
-
-			// Event source internal validation.
-			if ($operation['eventsource'] == EVENT_SOURCE_INTERNAL
-					&& $operation['operationtype'] != OPERATION_TYPE_MESSAGE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value "%1$s" for "%2$s" field.',
-						$operation['operationtype'], 'operationtype'
-				));
-			}
-
-			switch ($operation['operationtype']) {
+			switch ($operationtype) {
 				case OPERATION_TYPE_MESSAGE:
 					$userids = array_key_exists('opmessage_usr', $operation)
 						? zbx_objectValues($operation['opmessage_usr'], 'userid')
@@ -1611,9 +1601,6 @@ class CAction extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
 					}
 					break;
-
-				default:
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation type.'));
 			}
 		}
 
