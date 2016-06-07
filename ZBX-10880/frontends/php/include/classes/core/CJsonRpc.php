@@ -55,14 +55,16 @@ class CJsonRpc {
 	}
 
 	public function execute($encoded = true) {
-		$call = $this->_jsonDecoded;
+		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
+			// notification
+			if (!isset($call['id'])) {
+				$call['id'] = null;
+			}
 
-		// notification
-		if (!isset($call['id'])) {
-			$call['id'] = null;
-		}
+			if (!$this->validate($call)) {
+				continue;
+			}
 
-		if ($this->validate($call)) {
 			$params = isset($call['params']) ? $call['params'] : null;
 			$auth = isset($call['auth']) ? $call['auth'] : null;
 
@@ -73,10 +75,12 @@ class CJsonRpc {
 		}
 
 		if (!$encoded) {
-			return $this->_response;
+			return array_key_exists('jsonrpc', $this->_jsonDecoded) ? $this->_response[0] : $this->_response;
 		}
 		else {
-			return $this->json->encode($this->_response);
+			return $this->json->encode(
+				array_key_exists('jsonrpc', $this->_jsonDecoded) ? $this->_response[0] : $this->_response
+			);
 		}
 	}
 
@@ -122,7 +126,7 @@ class CJsonRpc {
 				'id' => $call['id']
 			];
 
-			$this->_response = $formedResp;
+			$this->_response[] = $formedResp;
 		}
 	}
 
@@ -159,7 +163,7 @@ class CJsonRpc {
 			'id' => $id
 		];
 
-		$this->_response = $formed_error;
+		$this->_response[] = $formed_error;
 	}
 
 	private function initErrors() {
