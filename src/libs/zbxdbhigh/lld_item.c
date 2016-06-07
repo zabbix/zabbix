@@ -1807,7 +1807,7 @@ out:
  * Return value: SUCCEED - item-application link should not be removed        *
  *               FAIL    - item-application link should be removed            *
  *                                                                            *
- * Comments: Item-application link should be removed if either the            *
+ * Comments: Undiscovered item-application link must be removed if either the *
  *           application was not discovered or item was discovered.           *
  *           The only case when undiscovered item-application link is not     *
  *           removed is when we have valid application and undiscovered item. *
@@ -1825,11 +1825,12 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 	if (FAIL == (index = zbx_vector_ptr_bsearch(applications, &item_application->application_ref.applicationid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
-		/* Applications vector contains only discovered applications and */
-		/* apparently the item was linked to non-discovered application. */
-		/* Item-application links to normal application must be removed  */
-		/* if not discovered.                                            */
-		return FAIL;
+		/* Applications vector contains only discovered applications and  */
+		/* apparently the item was linked to a normal application.        */
+		/* Undiscovered item-application links to normal application must */
+		/* be removed if item has been also discovered - this means that  */
+		/* the item prototype - application link was removed by frontend. */
+		goto check_item;
 	}
 
 	application = (zbx_lld_application_t *)applications->values[index];
@@ -1837,6 +1838,7 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 	if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
 		return FAIL;
 
+check_item:
 	if (FAIL == (index = zbx_vector_ptr_bsearch(items, &item_application->item_ref.itemid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
@@ -1846,7 +1848,7 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 
 	item = (zbx_lld_item_t *)items->values[index];
 
-	if (0 != (item->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return FAIL;
 
 	return SUCCEED;
