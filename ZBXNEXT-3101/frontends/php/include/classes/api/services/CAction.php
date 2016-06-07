@@ -1340,9 +1340,7 @@ class CAction extends CApiService {
 				if ((array_key_exists('esc_step_from', $operation) || array_key_exists('esc_step_to', $operation))
 						&& (!array_key_exists('esc_step_from', $operation)
 							|| !array_key_exists('esc_step_to', $operation))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('esc_step_from and esc_step_to must be set together in action operation.')
-					);
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('esc_step_from and esc_step_to must be set together.'));
 				}
 
 				if (array_key_exists('esc_step_from', $operation) && array_key_exists('esc_step_to', $operation)) {
