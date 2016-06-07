@@ -27,6 +27,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 A.F....... [ZBX-9455] fixed length limit for host prototype name (Gunars, Sasha)
 ..F....... [ZBX-10806] fixed whitespace between elements in host, host mass update, host prototype and proxy forms (Sasha)
 ..F....... [ZBXNEXT-3263] moved image type selection to top in administration->general->images (Cemeris)
@@ -1420,6 +1421,7 @@ Changes for 2.2.14rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
 .......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
 
@@ -2844,6 +2846,7 @@ Changes for 2.0.19rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.18
