@@ -34,7 +34,7 @@ class testPageAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestTextPresent(['Name', 'Value map']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestTextPresent($valuemap['name']);
 
 		// checking that in the "Value map" column are correct values

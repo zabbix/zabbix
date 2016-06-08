@@ -34,6 +34,6 @@ class testPageLatestData extends CWebTest {
 	public function testPageLatestData_NoHostNames() {
 		$this->zbxTestLogin('latest.php');
 		$this->zbxTestCheckTitle('Latest data [refreshed every 30 sec.]');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

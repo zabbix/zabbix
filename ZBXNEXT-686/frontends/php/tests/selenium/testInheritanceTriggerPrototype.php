@@ -103,8 +103,8 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 		$this->zbxTestLogin('trigger_prototypes.php?form=Create+trigger+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('description', $data['description']);
-		$this->input_type('expression', $data['expression']);
+		$this->zbxTestInputType('description', $data['description']);
+		$this->zbxTestInputType('expression', $data['expression']);
 
 		$this->zbxTestClickWait('add');
 

@@ -59,17 +59,17 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestTextPresent('Other hosts');
 		$this->zbxTestTextPresent('Description');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('host'));
+		$this->zbxTestAssertElementPresentId('host');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
-		$this->zbxAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
-		$this->zbxAssertElementPresent(WebDriverBy::id('status'));
+		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
+		$this->zbxTestAssertElementPresentId('status');
 		$this->zbxTestDropdownHasOptions('status', ['Active', 'Passive']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('proxy_hostids_left'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('proxy_hostids_right'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('add'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('remove'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='proxy.create']"));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Cancel']"));
+		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
+		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
+		$this->zbxTestAssertElementPresentId('add');
+		$this->zbxTestAssertElementPresentId('remove');
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.create']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		// Switch to passive mode
 		$this->zbxTestDropdownSelectWait('status', 'Passive');
@@ -82,20 +82,20 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestTextPresent('Other hosts');
 		$this->zbxTestTextPresent('Description');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('host'));
+		$this->zbxTestAssertElementPresentId('host');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
-		$this->zbxAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
-		$this->zbxAssertElementPresent(WebDriverBy::id('status'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('ip'));
-		$this->zbxAssertAttribute('//input[@id=\'ip\']', 'maxlength', '64');
-		$this->zbxAssertElementPresent(WebDriverBy::id('dns'));
-		$this->zbxAssertAttribute('//input[@id=\'dns\']', 'maxlength', '64');
-		$this->zbxAssertElementPresent(WebDriverBy::id('port'));
-		$this->zbxAssertAttribute('//input[@id=\'port\']', 'maxlength', '64');
-		$this->zbxAssertElementPresent(WebDriverBy::id('proxy_hostids_left'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('proxy_hostids_right'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='proxy.create']"));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Cancel']"));
+		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
+		$this->zbxTestAssertElementPresentId('status');
+		$this->zbxTestAssertElementPresentId('ip');
+		$this->zbxTestAssertAttribute('//input[@id=\'ip\']', 'maxlength', '64');
+		$this->zbxTestAssertElementPresentId('dns');
+		$this->zbxTestAssertAttribute('//input[@id=\'dns\']', 'maxlength', '64');
+		$this->zbxTestAssertElementPresentId('port');
+		$this->zbxTestAssertAttribute('//input[@id=\'port\']', 'maxlength', '64');
+		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
+		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.create']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 	}
 
 
@@ -209,7 +209,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 
-		$this->input_type('host', $name);
+		$this->zbxTestInputType('host', $name);
 		switch ($mode) {
 			case HOST_STATUS_PROXY_ACTIVE:
 				$this->zbxTestDropdownSelectWait('status', 'Active');
@@ -217,10 +217,10 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 			case HOST_STATUS_PROXY_PASSIVE:
 				$this->zbxTestDropdownSelectWait('status', 'Passive');
-				$this->input_type('ip', $ip);
-				$this->input_type('dns', $dns);
+				$this->zbxTestInputType('ip', $ip);
+				$this->zbxTestInputType('dns', $dns);
 // TODO connect_to is not supported yet
-				$this->input_type('port', $port);
+				$this->zbxTestInputType('port', $port);
 				break;
 		}
 
@@ -286,10 +286,10 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 
 		// check presence of buttons
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='proxy.update']"));
-		$this->zbxAssertElementPresent(WebDriverBy::id('clone'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Delete']"));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Cancel']"));
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
+		$this->zbxTestAssertElementPresentId('clone');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		$sql=
 			'SELECT hostid,proxy_hostid,status,error,available,errors_from,ipmi_authtype,ipmi_privilege,ipmi_username,'.
@@ -302,7 +302,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$oldHash = DBhash($sql);
 
 		// update proxy name
-		$this->input_type('host', $newname);
+		$this->zbxTestInputType('host', $newname);
 		$this->zbxTestClickButton('proxy.update');
 		$this->zbxTestTextPresent('Proxy updated');
 		$this->zbxTestCheckTitle('Configuration of proxies');
@@ -338,15 +338,15 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->zbxTestCheckHeader('Proxies');
 
 		// check presence of buttons
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='proxy.update']"));
-		$this->zbxAssertElementPresent(WebDriverBy::id('clone'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Delete']"));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[text()='Cancel']"));
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
+		$this->zbxTestAssertElementPresentId('clone');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		// update proxy name
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestTextPresent('Proxy');
-		$this->input_type('host', $newname);
+		$this->zbxTestInputType('host', $newname);
 		$this->zbxTestClickButton('proxy.create');
 		$this->zbxTestTextPresent('Proxy added');
 		$this->zbxTestCheckTitle('Configuration of proxies');
@@ -381,8 +381,8 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
-		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Proxy deleted');
-		$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//a[text()='".$name."']"));
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Proxy deleted');
+		$this->zbxTestAssertElementNotPresentXpath("//a[text()='".$name."']");
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Proxy has not been deleted');

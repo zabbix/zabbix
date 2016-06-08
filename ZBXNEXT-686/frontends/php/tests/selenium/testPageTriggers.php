@@ -59,7 +59,7 @@ class testPageTriggers extends CWebTest {
 					'Status'
 				]
 			);
-			$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//table[@class='list-table']//th[text()='Info']"));
+			$this->zbxTestAssertElementNotPresentXpath("//table[@class='list-table']//th[text()='Info']");
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');

@@ -268,7 +268,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Name');
-		$this->assertVisible('name');
+		$this->zbxTestAssertVisibleId('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='name']/@size", 50);
 		$this->assertAttribute("//input[@id='name']/@autofocus", 'autofocus');
@@ -278,7 +278,7 @@ class testFormDiscoveryRule extends CWebTest {
 
 		$this->zbxTestTextPresent('Type');
 		if (!isset($data['templatedHost'])) {
-			$this->assertVisible('type');
+			$this->zbxTestAssertVisibleId('type');
 			$this->zbxTestDropdownHasOptions('type', [
 				'Zabbix agent',
 				'Zabbix agent (active)',
@@ -300,7 +300,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$type = $this->getSelectedLabel('type');
 		}
 		else {
-			$this->assertVisible('typename');
+			$this->zbxTestAssertVisibleId('typename');
 			$this->assertAttribute("//input[@id='typename']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='typename']/@size", 50);
 			$this->assertAttribute("//input[@id='typename']/@readonly", 'readonly');
@@ -309,7 +309,7 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Key');
-		$this->assertVisible('key');
+		$this->zbxTestAssertVisibleId('key');
 		$this->assertAttribute("//input[@id='key']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='key']/@size", 50);
 		if (isset($data['templatedHost'])) {
@@ -370,12 +370,12 @@ class testFormDiscoveryRule extends CWebTest {
 					}
 					else {
 						$this->zbxTestTextPresent('No interface found');
-						$this->assertNotVisible('interfaceid');
+						$this->zbxTestAssertNotVisibleId('interfaceid');
 					}
 					break;
 				default:
 					$this->zbxTestTextNotPresent(['Host interface', 'No interface found']);
-					$this->assertNotVisible('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interfaceid');
 					break;
 			}
 		}
@@ -387,45 +387,45 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		$this->zbxTestTextNotPresent('Additional parameters');
-		$this->assertNotVisible('params_ap');
+		$this->zbxTestAssertNotVisibleId('params_ap');
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
-			$this->assertVisible('params_es');
+			$this->zbxTestAssertVisibleId('params_es');
 			$this->assertAttribute("//textarea[@id='params_es']/@rows", 7);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Executed script');
-			$this->assertNotVisible('params_es');
+			$this->zbxTestAssertNotVisibleId('params_es');
 		}
 
 		$this->zbxTestTextNotPresent('Formula');
-		$this->assertNotVisible('params_f');
+		$this->zbxTestAssertNotVisibleId('params_f');
 
 		if ($type == 'IPMI agent') {
 			$this->zbxTestTextPresent('IPMI sensor');
-			$this->assertVisible('ipmi_sensor');
+			$this->zbxTestAssertVisibleId('ipmi_sensor');
 			$this->assertAttribute("//input[@id='ipmi_sensor']/@maxlength", 128);
 			$this->assertAttribute("//input[@id='ipmi_sensor']/@size", 50);
 		}
 		else {
 			$this->zbxTestTextNotPresent('IPMI sensor');
-			$this->assertNotVisible('ipmi_sensor');
+			$this->zbxTestAssertNotVisibleId('ipmi_sensor');
 		}
 
 		if ($type == 'SSH agent') {
 			$this->zbxTestTextPresent('Authentication method');
-			$this->assertVisible('authtype');
+			$this->zbxTestAssertVisibleId('authtype');
 			$this->zbxTestDropdownHasOptions('authtype', ['Password', 'Public key']);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Authentication method');
-			$this->assertNotVisible('authtype');
+			$this->zbxTestAssertNotVisibleId('authtype');
 		}
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check') {
 			$this->zbxTestTextPresent('User name');
-			$this->assertVisible('username');
+			$this->zbxTestAssertVisibleId('username');
 			$this->assertAttribute("//input[@id='username']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='username']/@size", 25);
 
@@ -435,125 +435,125 @@ class testFormDiscoveryRule extends CWebTest {
 			else {
 				$this->zbxTestTextPresent('Password');
 			}
-			$this->assertVisible('password');
+			$this->zbxTestAssertVisibleId('password');
 			$this->assertAttribute("//input[@id='password']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='password']/@size", 25);
 		}
 		else {
 			$this->zbxTestTextNotPresent(['User name', 'Password', 'Key passphrase']);
-			$this->assertNotVisible('username');
-			$this->assertNotVisible('password');
+			$this->zbxTestAssertNotVisibleId('username');
+			$this->zbxTestAssertNotVisibleId('password');
 		}
 
 		if	(isset($authtype) && $authtype == 'Public key') {
 			$this->zbxTestTextPresent('Public key file');
-			$this->assertVisible('publickey');
+			$this->zbxTestAssertVisibleId('publickey');
 			$this->assertAttribute("//input[@id='publickey']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='publickey']/@size", 25);
 
 			$this->zbxTestTextPresent('Private key file');
-			$this->assertVisible('privatekey');
+			$this->zbxTestAssertVisibleId('privatekey');
 			$this->assertAttribute("//input[@id='privatekey']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='privatekey']/@size", 25);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Public key file');
-			$this->assertNotVisible('publickey');
+			$this->zbxTestAssertNotVisibleId('publickey');
 
 			$this->zbxTestTextNotPresent('Private key file');
-			$this->assertNotVisible('publickey');
+			$this->zbxTestAssertNotVisibleId('publickey');
 		}
 
 		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent' || $type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('SNMP OID');
-			$this->assertVisible('snmp_oid');
+			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->assertAttribute("//input[@id='snmp_oid']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='snmp_oid']/@size", 50);
 			$this->assertAttribute("//input[@id='snmp_oid']/@value", 'interfaces.ifTable.ifEntry.ifInOctets.1');
 
 			$this->zbxTestTextPresent('Port');
-			$this->assertVisible('port');
+			$this->zbxTestAssertVisibleId('port');
 			$this->assertAttribute("//input[@id='port']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='port']/@size", 25);
 		}
 		else {
 			$this->zbxTestTextNotPresent('SNMP OID');
-			$this->assertNotVisible('snmp_oid');
+			$this->zbxTestAssertNotVisibleId('snmp_oid');
 
 			$this->zbxTestTextNotPresent('Port');
-			$this->assertNotVisible('port');
+			$this->zbxTestAssertNotVisibleId('port');
 		}
 
 		if	($type == 'SNMPv1 agent' || $type == 'SNMPv2 agent') {
 			$this->zbxTestTextPresent('SNMP community');
-			$this->assertVisible('snmp_community');
+			$this->zbxTestAssertVisibleId('snmp_community');
 			$this->assertAttribute("//input[@id='snmp_community']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='snmp_community']/@size", 50);
 			$this->assertAttribute("//input[@id='snmp_community']/@value", 'public');
 		}
 		else {
 			$this->zbxTestTextNotPresent('SNMP community');
-			$this->assertNotVisible('snmp_community');
+			$this->zbxTestAssertNotVisibleId('snmp_community');
 		}
 
 		if	($type == 'SNMPv3 agent') {
 			$this->zbxTestTextPresent('Security name');
-			$this->assertVisible('snmpv3_securityname');
+			$this->zbxTestAssertVisibleId('snmpv3_securityname');
 			$this->assertAttribute("//input[@id='snmpv3_securityname']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='snmpv3_securityname']/@size", 50);
 
 			$this->zbxTestTextPresent('Security level');
-			$this->assertVisible('snmpv3_securitylevel');
+			$this->zbxTestAssertVisibleId('snmpv3_securitylevel');
 			$this->zbxTestDropdownHasOptions('snmpv3_securitylevel', ['noAuthNoPriv', 'authNoPriv', 'authPriv']);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Security name');
-			$this->assertNotVisible('snmpv3_securityname');
+			$this->zbxTestAssertNotVisibleId('snmpv3_securityname');
 
 			$this->zbxTestTextNotPresent('Security level');
-			$this->assertNotVisible('snmpv3_securitylevel');
+			$this->zbxTestAssertNotVisibleId('snmpv3_securitylevel');
 		}
 
 		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel != 'noAuthNoPriv') {
 			$this->zbxTestTextPresent('Authentication protocol');
-			$this->assertVisible('row_snmpv3_authprotocol');
-			$this->assertVisible("//span[text()='MD5']");
-			$this->assertVisible("//span[text()='SHA']");
+			$this->zbxTestAssertVisibleId('row_snmpv3_authprotocol');
+			$this->zbxTestAssertVisibleXpath("//span[text()='MD5']");
+			$this->zbxTestAssertVisibleXpath("//span[text()='SHA']");
 
 			$this->zbxTestTextPresent('Authentication passphrase');
-			$this->assertVisible('snmpv3_authpassphrase');
+			$this->zbxTestAssertVisibleId('snmpv3_authpassphrase');
 			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='snmpv3_authpassphrase']/@size", 50);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Authentication protocol');
-			$this->assertNotVisible('row_snmpv3_authprotocol');
-			$this->assertNotVisible("//span[text()='MD5']");
-			$this->assertNotVisible("//span[text()='SHA']");
+			$this->zbxTestAssertNotVisibleId('row_snmpv3_authprotocol');
+			$this->zbxTestAssertNotVisibleXpath("//span[text()='MD5']");
+			$this->zbxTestAssertNotVisibleXpath("//span[text()='SHA']");
 
 			$this->zbxTestTextNotPresent('Authentication passphrase');
-			$this->assertNotVisible('snmpv3_authpassphrase');
+			$this->zbxTestAssertNotVisibleId('snmpv3_authpassphrase');
 		}
 
 		if (isset($snmpv3_securitylevel) && $snmpv3_securitylevel == 'authPriv') {
 			$this->zbxTestTextPresent('Privacy protocol');
-			$this->assertVisible('row_snmpv3_privprotocol');
-			$this->assertVisible("//span[text()='DES']");
-			$this->assertVisible("//span[text()='AES']");
+			$this->zbxTestAssertVisibleId('row_snmpv3_privprotocol');
+			$this->zbxTestAssertVisibleXpath("//span[text()='DES']");
+			$this->zbxTestAssertVisibleXpath("//span[text()='AES']");
 
 			$this->zbxTestTextPresent('Privacy passphrase');
-			$this->assertVisible('snmpv3_privpassphrase');
+			$this->zbxTestAssertVisibleId('snmpv3_privpassphrase');
 			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@maxlength", 64);
 			$this->assertAttribute("//input[@id='snmpv3_privpassphrase']/@size", 50);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Privacy protocol');
-			$this->assertNotVisible('row_snmpv3_privprotocol');
-			$this->assertNotVisible("//span[text()='DES']");
-			$this->assertNotVisible("//span[text()='AES']");
+			$this->zbxTestAssertNotVisibleId('row_snmpv3_privprotocol');
+			$this->zbxTestAssertNotVisibleXpath("//span[text()='DES']");
+			$this->zbxTestAssertNotVisibleXpath("//span[text()='AES']");
 
 			$this->zbxTestTextNotPresent('Privacy passphrase');
-			$this->assertNotVisible('snmpv3_privpassphrase');
+			$this->zbxTestAssertNotVisibleId('snmpv3_privpassphrase');
 		}
 
 		switch ($type) {
@@ -570,7 +570,7 @@ class testFormDiscoveryRule extends CWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 				$this->zbxTestTextPresent('Update interval (in sec)');
-				$this->assertVisible('delay');
+				$this->zbxTestAssertVisibleId('delay');
 				$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
 				$this->assertAttribute("//input[@id='delay']/@size", 5);
 				if (!isset($data['form'])) {
@@ -579,11 +579,11 @@ class testFormDiscoveryRule extends CWebTest {
 				break;
 			default:
 				$this->zbxTestTextNotPresent('Update interval (in sec)');
-				$this->assertNotVisible('delay');
+				$this->zbxTestAssertNotVisibleId('delay');
 		}
 
 		$this->zbxTestTextPresent('Keep lost resources period (in days)');
-		$this->assertVisible('lifetime');
+		$this->zbxTestAssertVisibleId('lifetime');
 		$this->assertAttribute("//input[@id='lifetime']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='lifetime']/@size", 25);
 		$this->assertAttribute("//input[@id='lifetime']/@value", 30);
@@ -601,58 +601,58 @@ class testFormDiscoveryRule extends CWebTest {
 			case 'TELNET agent':
 			case 'JMX agent':
 				$this->zbxTestTextPresent(['Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.']);
-				$this->assertVisible('delayFlexTable');
+				$this->zbxTestAssertVisibleId('delayFlexTable');
 
 				$this->zbxTestTextPresent('New flexible interval', 'Update interval (in sec)', 'Period');
-				$this->assertVisible('new_delay_flex_delay');
+				$this->zbxTestAssertVisibleId('new_delay_flex_delay');
 				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@maxlength", 5);
 				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@size", 5);
 				$this->assertAttribute("//input[@id='new_delay_flex_delay']/@value", 50);
 
-				$this->assertVisible('new_delay_flex_period');
+				$this->zbxTestAssertVisibleId('new_delay_flex_period');
 				$this->assertAttribute("//input[@id='new_delay_flex_period']/@maxlength", 255);
 				$this->assertAttribute("//input[@id='new_delay_flex_period']/@size", 20);
 				$this->assertAttribute("//input[@id='new_delay_flex_period']/@value", '1-7,00:00-24:00');
-				$this->assertVisible('add_delay_flex');
+				$this->zbxTestAssertVisibleId('add_delay_flex');
 				break;
 			default:
 				$this->zbxTestTextNotPresent(['Flexible intervals', 'Interval', 'Period', 'No flexible intervals defined.']);
-				$this->assertNotVisible('delayFlexTable');
+				$this->zbxTestAssertNotVisibleId('delayFlexTable');
 
 				$this->zbxTestTextNotPresent('New flexible interval', 'Update interval (in sec)', 'Period');
-				$this->assertNotVisible('new_delay_flex_period');
-				$this->assertNotVisible('new_delay_flex_delay');
-				$this->assertNotVisible('add_delay_flex');
+				$this->zbxTestAssertNotVisibleId('new_delay_flex_period');
+				$this->zbxTestAssertNotVisibleId('new_delay_flex_delay');
+				$this->zbxTestAssertNotVisibleId('add_delay_flex');
 		}
 
 		if ($type == 'Zabbix trapper') {
 			$this->zbxTestTextPresent('Allowed hosts');
-			$this->assertVisible('trapper_hosts');
+			$this->zbxTestAssertVisibleId('trapper_hosts');
 			$this->assertAttribute("//input[@id='trapper_hosts']/@maxlength", 255);
 			$this->assertAttribute("//input[@id='trapper_hosts']/@size", 50);
 		}
 		else {
 			$this->zbxTestTextNotPresent('Allowed hosts');
-			$this->assertNotVisible('trapper_hosts');
+			$this->zbxTestAssertNotVisibleId('trapper_hosts');
 		}
 
 		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent('Macro');
-		$this->assertVisible('filter_macro');
+		$this->zbxTestAssertVisibleId('filter_macro');
 		$this->assertAttribute("//input[@id='filter_macro']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='filter_macro']/@size", 13);
 
 		$this->zbxTestTextPresent('Regexp');
-		$this->assertVisible('filter_value');
+		$this->zbxTestAssertVisibleId('filter_value');
 		$this->assertAttribute("//input[@id='filter_value']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='filter_value']/@size", 20);
 
 		$this->zbxTestTextPresent('Description');
-		$this->assertVisible('description');
+		$this->zbxTestAssertVisibleId('description');
 		$this->assertAttribute("//textarea[@id='description']/@rows", 7);
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->assertVisible('status');
+		$this->zbxTestAssertVisibleId('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 	}
 
@@ -1521,21 +1521,21 @@ class testFormDiscoveryRule extends CWebTest {
 				$interfaceid = $this->getSelectedLabel('interfaceid');
 				break;
 			default:
-				$this->assertNotVisible('interfaceid');
+				$this->zbxTestAssertNotVisibleId('interfaceid');
 		}
 
 		if (isset($data['name'])) {
-			$this->input_type('name', $data['name']);
+			$this->zbxTestInputType('name', $data['name']);
 		}
 		$name = $this->getValue('name');
 
 		if (isset($data['key'])) {
-			$this->input_type('key', $data['key']);
+			$this->zbxTestInputType('key', $data['key']);
 		}
 		$key = $this->getValue('key');
 
 		if (isset($data['username'])) {
-			$this->input_type('username', $data['username']);
+			$this->zbxTestInputType('username', $data['username']);
 		}
 
 		if (isset($data['ipmi_sensor'])) {
@@ -1544,22 +1544,22 @@ class testFormDiscoveryRule extends CWebTest {
 				$ipmi_sensor = $this->getEval("this.browserbot.findElement('ipmi_sensor').value;");
 			}
 			else {
-				$this->input_type('ipmi_sensor', $data['ipmi_sensor']);
+				$this->zbxTestInputType('ipmi_sensor', $data['ipmi_sensor']);
 				$ipmi_sensor = $this->getValue('ipmi_sensor');
 			}
 		}
 
 		if (isset($data['params_es'])) {
-			$this->input_type('params_es', $data['params_es']);
+			$this->zbxTestInputType('params_es', $data['params_es']);
 		}
 
 		if (isset($data['formula'])) {
 			$this->zbxTestCheckboxSelect('multiplier');
-			$this->input_type('formula', $data['formula']);
+			$this->zbxTestInputType('formula', $data['formula']);
 		}
 
 		if (isset($data['delay']))	{
-			$this->input_type('delay', $data['delay']);
+			$this->zbxTestInputType('delay', $data['delay']);
 		}
 
 		$itemFlexFlag = true;
@@ -1567,11 +1567,11 @@ class testFormDiscoveryRule extends CWebTest {
 
 			$itemCount = 0;
 			foreach ($data['flexPeriod'] as $period) {
-				$this->input_type('new_delay_flex_period', $period['flexTime']);
+				$this->zbxTestInputType('new_delay_flex_period', $period['flexTime']);
 				$itemCount ++;
 
 				if (isset($period['flexDelay'])) {
-					$this->input_type('new_delay_flex_delay', $period['flexDelay']);
+					$this->zbxTestInputType('new_delay_flex_delay', $period['flexDelay']);
 				}
 				$this->zbxTestClickWait('add_delay_flex');
 
@@ -1583,12 +1583,12 @@ class testFormDiscoveryRule extends CWebTest {
 				}
 
 				if (isset($period['maximumItems']) || $itemCount == 7) {
-					$this->assertNotVisible('new_delay_flex_delay');
-					$this->assertNotVisible('new_delay_flex_period');
+					$this->zbxTestAssertNotVisibleId('new_delay_flex_delay');
+					$this->zbxTestAssertNotVisibleId('new_delay_flex_period');
 				}
 				else {
-					$this->assertVisible('new_delay_flex_delay');
-					$this->assertVisible('new_delay_flex_period');
+					$this->zbxTestAssertVisibleId('new_delay_flex_delay');
+					$this->zbxTestAssertVisibleId('new_delay_flex_period');
 				}
 
 				if (isset($period['remove'])) {
@@ -1600,11 +1600,11 @@ class testFormDiscoveryRule extends CWebTest {
 		}
 
 		if (isset($data['history'])) {
-			$this->input_type('history', $data['history']);
+			$this->zbxTestInputType('history', $data['history']);
 		}
 
 		if (isset($data['trends'])) {
-			$this->input_type('trends', $data['trends']);
+			$this->zbxTestInputType('trends', $data['trends']);
 		}
 
 		if ($itemFlexFlag == true) {
@@ -1660,7 +1660,7 @@ class testFormDiscoveryRule extends CWebTest {
 					$this->assertElementPresent("//select[@id='interfaceid']/optgroup/option[text()='".$interfaceid."']");
 					break;
 				default:
-					$this->assertNotVisible('interfaceid');
+					$this->zbxTestAssertNotVisibleId('interfaceid');
 			}
 
 			if (isset($data['ipmi_sensor'])) {

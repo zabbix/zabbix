@@ -46,7 +46,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $this->host);
+		$this->zbxTestInputType('host', $this->host);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
@@ -59,7 +59,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
+		$this->zbxTestInputType('host', $host);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
@@ -83,12 +83,12 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClick('tab_macroTab');
-		$this->input_type('macros_0_macro', '{$TEST_MACRO}');
-		$this->input_type('macros_0_value', '1');
+		$this->zbxTestInputType('macros_0_macro', '{$TEST_MACRO}');
+		$this->zbxTestInputType('macros_0_value', '1');
 		$this->zbxTestClick('macro_add');
 		$this->verifyElementPresent('macros_1_macro');
-		$this->input_type('macros_1_macro', '{$TEST_MACRO2}');
-		$this->input_type('macros_1_value', '2');
+		$this->zbxTestInputType('macros_1_macro', '{$TEST_MACRO2}');
+		$this->zbxTestInputType('macros_1_value', '2');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Host updated');
 	}
@@ -102,7 +102,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
+		$this->zbxTestInputType('host', $host);
 
 		$this->zbxTestClickWait('add');
 
@@ -122,7 +122,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
+		$this->zbxTestInputType('host', $host);
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -142,8 +142,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'Zabbix servers');
 		$this->zbxTestClickWait('form');
-		$this->input_type('host', $host);
-		$this->input_type('visiblename', $hostVisible);
+		$this->zbxTestInputType('host', $host);
+		$this->zbxTestInputType('visiblename', $hostVisible);
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
@@ -159,8 +159,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('clone');
-		$this->input_type('host', $this->host_cloned);
-		$this->input_type('visiblename', $this->host_cloned_visible);
+		$this->zbxTestInputType('host', $this->host_cloned);
+		$this->zbxTestInputType('visiblename', $this->host_cloned_visible);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
@@ -185,8 +185,8 @@ class testFormHost extends CWebTest {
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$this->host);
 		$this->zbxTestClickWait('full_clone');
-		$this->input_type('host', $this->host_fullcloned);
-		$this->input_type('visiblename', $this->host_fullcloned_visible);
+		$this->zbxTestInputType('host', $this->host_fullcloned);
+		$this->zbxTestInputType('visiblename', $this->host_fullcloned_visible);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host added');
@@ -210,7 +210,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickWait('link='.$this->host);
-		$this->input_type('host', $this->host_tmp);
+		$this->zbxTestInputType('host', $this->host_tmp);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestTextPresent('Host updated');
@@ -247,7 +247,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestClick('tab_templateTab');
 		$this->assertElementPresent("//div[@id='add_templates_']/input");
-		$this->input_type("//div[@id='add_templates_']/input", 'Template OS Linux');
+		$this->zbxTestInputType("//div[@id='add_templates_']/input", 'Template OS Linux');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClickWait('add_template');
@@ -309,7 +309,7 @@ class testFormHost extends CWebTest {
 
 		$this->zbxTestClick('tab_templateTab');
 		$this->assertElementPresent("//div[@id='add_templates_']/input");
-		$this->input_type("//div[@id='add_templates_']/input", 'Template OS Linux');
+		$this->zbxTestInputType("//div[@id='add_templates_']/input", 'Template OS Linux');
 		sleep(1);
 		$this->zbxTestClick("//span[@class='matched']");
 		$this->zbxTestClickWait('add_template');

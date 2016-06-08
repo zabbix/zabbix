@@ -26,7 +26,8 @@ class testUrlParameters extends CWebTest {
 		return [
 			[
 				'title' => 'Configuration of host groups',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'hostgroups.php?form=update&groupid=1',
@@ -75,7 +76,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of templates',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'templates.php?form=update&templateid=10001&groupid=0',
@@ -131,7 +133,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of hosts',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'hosts.php?form=update&hostid=10084&groupid=0',
@@ -187,7 +190,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of maintenance periods',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'maintenance.php?form=update&maintenanceid=1&groupid=0',
@@ -243,7 +247,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of actions',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'actionconf.php?form=update&actionid=3',
@@ -292,7 +297,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of screens',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'screenedit.php?screenid=16',
@@ -341,7 +347,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of slide shows',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'slideconf.php',
@@ -382,7 +389,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of network maps',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'sysmap.php?sysmapid=1',
@@ -431,7 +439,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of discovery rules',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'discoveryconf.php?form=update&druleid=2',
@@ -480,7 +489,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Overview [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'overview.php?groupid=4&type=0',
@@ -524,7 +534,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Details of web scenario',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'httpdetails.php?httptestid=94',
@@ -573,7 +584,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Latest data [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'latest.php?groupid=4&hostid=50009',
@@ -628,7 +640,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Status of triggers [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'tr_status.php?groupid=4&hostid=10084',
@@ -683,7 +696,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Latest events [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'events.php?triggerid=13491',
@@ -728,7 +742,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Custom graphs [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'charts.php?groupid=4&hostid=10084&graphid=524',
@@ -793,7 +808,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Custom screens [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'screens.php?elementid=16',
@@ -834,7 +850,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Configuration of screens',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'screens.php',
@@ -845,6 +862,7 @@ class testUrlParameters extends CWebTest {
 			[
 				'title' => 'Configuration of network maps',
 				'check_serer_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'sysmaps.php?sysmapid=1&severity_min=0',
@@ -905,7 +923,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Status of discovery',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=discovery.view&druleid=3',
@@ -919,7 +938,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Fatal error, please report to the Zabbix team',
-				'check_serer_name' => false,
+				'check_server_name' => false,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=discovery.view&druleid=abc',
@@ -949,7 +969,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Warning [refreshed every 30 sec.]',
-				'check_serer_name' => false,
+				'check_server_name' => false,
+				'server_name_on_page' => false,
 				'test_cases' => [
 					[
 						'url' => 'zabbix.php?action=discovery.view&druleid=9999999',
@@ -964,7 +985,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'IT services [refreshed every 30 sec.]',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'srv_status.php?period=today',
@@ -1038,7 +1060,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Host inventory overview',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'hostinventoriesoverview.php?groupid=4&groupby=',
@@ -1087,7 +1110,8 @@ class testUrlParameters extends CWebTest {
 			],
 			[
 				'title' => 'Host inventory',
-				'check_serer_name' => true,
+				'check_server_name' => true,
+				'server_name_on_page' => true,
 				'test_cases' => [
 					[
 						'url' => 'hostinventories.php?groupid=4',
@@ -1136,9 +1160,9 @@ class testUrlParameters extends CWebTest {
 	/**
 	 * @dataProvider data
 	 */
-	public function testUrlParameters_UrlLoad($title, $check_server_name, $test_cases) {
+	public function testUrlParameters_UrlLoad($title, $check_server_name, $server_name_on_page, $test_cases) {
 		foreach ($test_cases as $test_case) {
-			$this->zbxTestLogin($test_case['url']);
+			$this->zbxTestLogin($test_case['url'], $server_name_on_page);
 			$this->zbxTestCheckTitle($title, $check_server_name);
 			$this->zbxTestTextPresent($test_case['text_present']);
 			if (isset($test_case['text_not_present'])) {

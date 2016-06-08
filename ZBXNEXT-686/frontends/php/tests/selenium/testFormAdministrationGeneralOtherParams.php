@@ -46,7 +46,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestDrowpdownAssertSelected('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
-		$this->assertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);
+		$this->zbxTestAssertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);
 
 		// checkbox "snmptrap_logging"
 		if ($allValues['snmptrap_logging']) {
@@ -55,13 +55,13 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		if ($allValues['snmptrap_logging']==0) {
 			$this->assertFalse($this->zbxTestCheckboxSelected('snmptrap_logging'));
 
-			$this->zbxAssertElementPresent(WebDriverBy::id('refresh_unsupported'));
-			$this->zbxAssertElementPresent(WebDriverBy::id('snmptrap_logging'));
-			$this->zbxAssertElementPresent(WebDriverBy::id('default_inventory_mode'));
+			$this->zbxTestAssertElementPresentId('refresh_unsupported');
+			$this->zbxTestAssertElementPresentId('snmptrap_logging');
+			$this->zbxTestAssertElementPresentId('default_inventory_mode');
 
 			// ckecking presence of drop-down elements
-			$this->zbxAssertElementPresent(WebDriverBy::id('discovery_groupid'));
-			$this->zbxAssertElementPresent(WebDriverBy::id('alert_usrgrpid'));
+			$this->zbxTestAssertElementPresentId('discovery_groupid');
+			$this->zbxTestAssertElementPresentId('alert_usrgrpid');
 		}
 	}
 
@@ -76,7 +76,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$sql = 'SELECT groupid FROM groups';
 		$hgroups = DBfetchArray(DBselect($sql));
 		foreach ($hgroups as $group) {
-			$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']"));
+			$this->zbxTestAssertElementPresentXpath("//select[@id='discovery_groupid']/option[@value='".$group['groupid']."']");
 		}
 	}
 
@@ -91,7 +91,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$sql = 'SELECT usrgrpid FROM usrgrp';
 		$usrgrp = DBfetchArray(DBselect($sql));
 		foreach ($usrgrp as $usrgroup) {
-			$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']"));
+			$this->zbxTestAssertElementPresentXpath("//select[@id='alert_usrgrpid']/option[@value='".$usrgroup['usrgrpid']."']");
 		}
 
 		$this->zbxTestDropdownHasOptions('alert_usrgrpid', ['None']);
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 
-		$this->input_type('refresh_unsupported', '700');
+		$this->zbxTestInputType('refresh_unsupported', '700');
 		$this->zbxTestDropdownSelect('discovery_groupid', 'Linux servers');
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Zabbix administrators');
 		$this->zbxTestCheckboxSelect('snmptrap_logging');  // 1 - yes, 0 - no

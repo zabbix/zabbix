@@ -89,8 +89,8 @@ class testInheritanceDiscoveryRule extends CWebTest {
 	public function testInheritanceDiscoveryRule_SimpleCreate($data) {
 		$this->zbxTestLogin('host_discovery.php?form=Create+discovery+rule&hostid='.$this->templateid);
 
-		$this->input_type('name', $data['name']);
-		$this->input_type('key', $data['key']);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {

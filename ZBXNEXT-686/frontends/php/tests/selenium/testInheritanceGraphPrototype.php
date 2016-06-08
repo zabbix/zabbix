@@ -107,7 +107,7 @@ class testInheritanceGraphPrototype extends CWebTest {
 	public function testInheritanceGraphPrototype_SimpleCreate($data) {
 		$this->zbxTestLogin('graphs.php?form=Create+graph+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('name', $data['name']);
+		$this->zbxTestInputType('name', $data['name']);
 
 		if (isset($data['addItemPrototypes'])) {
 			foreach ($data['addItemPrototypes'] as $item) {

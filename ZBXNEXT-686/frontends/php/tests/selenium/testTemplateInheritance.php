@@ -53,9 +53,9 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestClickWait('tab_templateTab');
 
-		$this->zbxAssertElementPresent(WebdriverBy::id("add_templates_"));
+		$this->zbxTestAssertElementPresentId('add_templates_');
 		$this->zbxTestInputTypeByXpath('//input[@class="input"]', 'Template App Zabbix Agent');
-		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//span[@class='suggest-found']"));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//span[@class='suggest-found']"));
 		$this->zbxTestClickXpath("//span[@class='suggest-found']");
 		$this->zbxTestClickWait('add_template');
 
@@ -108,18 +108,18 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Items');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $itemName);
-		$this->input_type('key', $keyName);
+		$this->zbxTestInputType('name', $itemName);
+		$this->zbxTestInputType('key', $keyName);
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestDropdownSelect('data_type', 'Octal');
-		$this->input_type('units', 'units');
+		$this->zbxTestInputType('units', 'units');
 		$this->zbxTestCheckboxSelect('multiplier');
-		$this->input_type('formula', 3);
-		$this->input_type('delay', '33');
-		$this->input_type('history', '54');
-		$this->input_type('trends', '55');
-		$this->input_type('description', 'description');
+		$this->zbxTestInputType('formula', 3);
+		$this->zbxTestInputType('delay', '33');
+		$this->zbxTestInputType('history', '54');
+		$this->zbxTestInputType('trends', '55');
+		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 
@@ -136,7 +136,7 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestCheckTitle('Configuration of items');
 				$this->zbxTestCheckHeader('Items');
 				foreach ($errorMsgs as $msg) {
-					$this->zbxWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
+					$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot add item');
 					$this->zbxTestTextPresent($msg);
 				}
 				$this->zbxTestTextPresent('Host');
@@ -152,20 +152,20 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestClickLinkText($this->hostName);
 				$this->zbxTestClickLinkTextWait('Items');
 				$this->zbxTestCheckHeader('Items');
-				$this->assertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
+				$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
 				$this->zbxTestClickLinkText($itemName);
-				$this->assertElementValue('name', $itemName);
-				$this->assertElementValue('key', $keyName);
-				$this->assertElementValue('typename', 'Simple check');
-				$this->assertElementValue('value_type_name', 'Numeric (unsigned)');
-				$this->assertElementValue('data_type_name', 'Octal');
-				$this->assertElementValue('units', 'units');
-				$this->assertElementValue('formula', 3);
-				$this->assertElementValue('delay', '33');
-				$this->assertElementValue('history', '54');
-				$this->assertElementValue('trends', '55');
-				$this->assertElementText('//*[@name="description"]', 'description');
-				$this->assertElementValue('delta_name', 'Delta (simple change)');
+				$this->zbxTestAssertElementValue('name', $itemName);
+				$this->zbxTestAssertElementValue('key', $keyName);
+				$this->zbxTestAssertElementValue('typename', 'Simple check');
+				$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
+				$this->zbxTestAssertElementValue('data_type_name', 'Octal');
+				$this->zbxTestAssertElementValue('units', 'units');
+				$this->zbxTestAssertElementValue('formula', 3);
+				$this->zbxTestAssertElementValue('delay', '33');
+				$this->zbxTestAssertElementValue('history', '54');
+				$this->zbxTestAssertElementValue('trends', '55');
+				$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
+				$this->zbxTestAssertElementValue('delta_name', 'Delta (simple change)');
 				$this->zbxTestTextPresent('Parent items');
 				$this->zbxTestTextPresent($template);
 				break;
@@ -185,7 +185,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkText($this->hostName);
 
 		$this->zbxTestClickWait('tab_templateTab');
-		$this->zbxWaitUntilElementVisible(WebdriverBy::id('unlink_and_clear_'.$hostid));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('unlink_and_clear_'.$hostid));
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
 		$this->zbxTestTextNotPresent('Template App Zabbix Agent');
@@ -207,11 +207,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Triggers');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('description', 'Test LLD trigger1');
-		$this->input_type('expression', '{Inheritance test template:test-general-item.last(0)}=0');
+		$this->zbxTestInputType('description', 'Test LLD trigger1');
+		$this->zbxTestInputType('expression', '{Inheritance test template:test-general-item.last(0)}=0');
 		$this->zbxTestCheckboxSelect('type');
-		$this->input_type('comments', 'comments');
-		$this->input_type('url', 'url');
+		$this->zbxTestInputType('comments', 'comments');
+		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
 		$this->zbxTestCheckboxSelect('status', false);
 
@@ -223,14 +223,14 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkText($this->hostName);
 		$this->zbxTestClickLinkTextWait('Triggers');
 
-		$this->assertElementText("//a[text()='Test LLD trigger1']/parent::td", "$this->templateName: Test LLD trigger1");
+		$this->zbxTestAssertElementText("//a[text()='Test LLD trigger1']/parent::td", "$this->templateName: Test LLD trigger1");
 		$this->zbxTestClickLinkText('Test LLD trigger1');
 
-		$this->assertElementValue('description', 'Test LLD trigger1');
-		$this->assertElementValue('expression', '{Template inheritance test host:test-general-item.last(0)}=0');
+		$this->zbxTestAssertElementValue('description', 'Test LLD trigger1');
+		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:test-general-item.last(0)}=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('type'));
-		$this->assertElementText('//*[@name="comments"]', 'comments');
-		$this->assertElementValue('url', 'url');
+		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
+		$this->zbxTestAssertElementValue('url', 'url');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestTextPresent('Parent triggers');
@@ -249,22 +249,22 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Graphs');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', 'Test LLD graph1');
-		$this->input_type('width', '950');
-		$this->input_type('height', '250');
+		$this->zbxTestInputType('name', 'Test LLD graph1');
+		$this->zbxTestInputType('width', '950');
+		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->zbxTestCheckboxSelect('visible_percent_right');
-		$this->input_type('percent_left', '4');
-		$this->input_type('percent_right', '5');
+		$this->zbxTestInputType('percent_left', '4');
+		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 		$this->zbxTestClick('add_item');
 
-		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestClick('add');
@@ -275,20 +275,20 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkText($this->hostName);
 		$this->zbxTestClickLinkTextWait('Graphs');
 
-		$this->assertElementText("//a[text()='Test LLD graph1']/parent::td", "$this->templateName: Test LLD graph1");
+		$this->zbxTestAssertElementText("//a[text()='Test LLD graph1']/parent::td", "$this->templateName: Test LLD graph1");
 		$this->zbxTestClickLinkText('Test LLD graph1');
 
-		$this->assertElementValue('name', 'Test LLD graph1');
-		$this->assertElementValue('width', '950');
-		$this->assertElementValue('height', '250');
+		$this->zbxTestAssertElementValue('name', 'Test LLD graph1');
+		$this->zbxTestAssertElementValue('width', '950');
+		$this->zbxTestAssertElementValue('height', '250');
 		$this->zbxTestDrowpdownAssertSelected('graphtype', 'Normal');
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
-		$this->assertElementValue('percent_left', '4.00');
+		$this->zbxTestAssertElementValue('percent_left', '4.00');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
-		$this->assertElementValue('percent_right', '5.00');
+		$this->zbxTestAssertElementValue('percent_right', '5.00');
 		$this->zbxTestDrowpdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDrowpdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent('Parent graphs');
@@ -309,12 +309,12 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Discovery rules');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', 'Test LLD');
-		$this->input_type('key', 'test-lld');
+		$this->zbxTestInputType('name', 'Test LLD');
+		$this->zbxTestInputType('key', 'test-lld');
 		$this->zbxTestDropdownSelect('type', 'Simple check');
-		$this->input_type('delay', '31');
-		$this->input_type('lifetime', '32');
-		$this->input_type('description', 'description');
+		$this->zbxTestInputType('delay', '31');
+		$this->zbxTestInputType('lifetime', '32');
+		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('add');
@@ -324,15 +324,15 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestOpen('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
 		$this->zbxTestClickLinkTextWait('Discovery rules');
-		$this->assertElementText("//a[text()='Test LLD']/parent::td", "$this->templateName: Test LLD");
+		$this->zbxTestAssertElementText("//a[text()='Test LLD']/parent::td", "$this->templateName: Test LLD");
 		$this->zbxTestClickLinkText('Test LLD');
 
-		$this->assertElementValue('name', 'Test LLD');
-		$this->assertElementValue('key', 'test-lld');
-		$this->assertElementValue('typename', 'Simple check');
-		$this->assertElementValue('delay', '31');
-		$this->assertElementValue('lifetime', '32');
-		$this->assertElementText('//*[@name="description"]', 'description');
+		$this->zbxTestAssertElementValue('name', 'Test LLD');
+		$this->zbxTestAssertElementValue('key', 'test-lld');
+		$this->zbxTestAssertElementValue('typename', 'Simple check');
+		$this->zbxTestAssertElementValue('delay', '31');
+		$this->zbxTestAssertElementValue('lifetime', '32');
+		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestTextPresent('Parent discovery rules');
 		$this->zbxTestTextPresent($this->templateName);
@@ -356,18 +356,18 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Item prototypes');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', 'Test LLD item');
-		$this->input_type('key', 'test-lld-item');
+		$this->zbxTestInputType('name', 'Test LLD item');
+		$this->zbxTestInputType('key', 'test-lld-item');
 		$this->zbxTestDropdownSelect('type', 'Simple check');
 		$this->zbxTestDropdownSelect('value_type', 'Numeric (unsigned)');
 		$this->zbxTestDropdownSelect('data_type', 'Octal');
-		$this->input_type('units', 'units');
+		$this->zbxTestInputType('units', 'units');
 		$this->zbxTestCheckboxSelect('multiplier');
-		$this->input_type('formula', 3);
-		$this->input_type('delay', '33');
-		$this->input_type('history', '54');
-		$this->input_type('trends', '55');
-		$this->input_type('description', 'description');
+		$this->zbxTestInputType('formula', 3);
+		$this->zbxTestInputType('delay', '33');
+		$this->zbxTestInputType('history', '54');
+		$this->zbxTestInputType('trends', '55');
+		$this->zbxTestInputType('description', 'description');
 		$this->zbxTestDropdownSelect('delta', 'Delta (simple change)');
 		$this->zbxTestCheckboxSelect('status', false);
 
@@ -383,21 +383,21 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckHeader('Discovery rules');
 		$this->zbxTestClickLinkTextWait('Test LLD');
 		$this->zbxTestClickLinkTextWait('Item prototypes');
-		$this->assertElementText("//a[text()='Test LLD item']/parent::td", "$this->templateName: Test LLD item");
+		$this->zbxTestAssertElementText("//a[text()='Test LLD item']/parent::td", "$this->templateName: Test LLD item");
 		$this->zbxTestClickLinkText('Test LLD item');
 
-		$this->assertElementValue('name', 'Test LLD item');
-		$this->assertElementValue('key', 'test-lld-item');
-		$this->assertElementValue('typename', 'Simple check');
-		$this->assertElementValue('value_type_name', 'Numeric (unsigned)');
-		$this->assertElementValue('data_type_name', 'Octal');
-		$this->assertElementValue('units', 'units');
-		$this->assertElementValue('formula', 3);
-		$this->assertElementValue('delay', '33');
-		$this->assertElementValue('history', '54');
-		$this->assertElementValue('trends', '55');
-		$this->assertElementText('//*[@name="description"]', 'description');
-		$this->assertElementValue('delta_name', 'Delta (simple change)');
+		$this->zbxTestAssertElementValue('name', 'Test LLD item');
+		$this->zbxTestAssertElementValue('key', 'test-lld-item');
+		$this->zbxTestAssertElementValue('typename', 'Simple check');
+		$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
+		$this->zbxTestAssertElementValue('data_type_name', 'Octal');
+		$this->zbxTestAssertElementValue('units', 'units');
+		$this->zbxTestAssertElementValue('formula', 3);
+		$this->zbxTestAssertElementValue('delay', '33');
+		$this->zbxTestAssertElementValue('history', '54');
+		$this->zbxTestAssertElementValue('trends', '55');
+		$this->zbxTestAssertElementText('//*[@name="description"]', 'description');
+		$this->zbxTestAssertElementValue('delta_name', 'Delta (simple change)');
 		$this->zbxTestTextPresent('Parent items');
 		$this->zbxTestTextPresent($this->templateName);
 	}
@@ -417,11 +417,11 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('description', 'Test LLD trigger');
-		$this->input_type('expression', '{Inheritance test template:test-lld-item.last(0)}=0');
+		$this->zbxTestInputType('description', 'Test LLD trigger');
+		$this->zbxTestInputType('expression', '{Inheritance test template:test-lld-item.last(0)}=0');
 		$this->zbxTestCheckboxSelect('type');
-		$this->input_type('comments', 'comments');
-		$this->input_type('url', 'url');
+		$this->zbxTestInputType('comments', 'comments');
+		$this->zbxTestInputType('url', 'url');
 		$this->zbxTestClickXpath("//label[@for='priority_2']");
 		$this->zbxTestCheckboxSelect('status', false);
 
@@ -442,14 +442,14 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Test LLD');
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->assertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
+		$this->zbxTestAssertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
 		$this->zbxTestClickLinkText('Test LLD trigger');
 
-		$this->assertElementValue('description', 'Test LLD trigger');
-		$this->assertElementValue('expression', '{Template inheritance test host:test-lld-item.last(0)}=0');
+		$this->zbxTestAssertElementValue('description', 'Test LLD trigger');
+		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:test-lld-item.last(0)}=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('type'));
-		$this->assertElementText('//*[@name="comments"]', 'comments');
-		$this->assertElementValue('url', 'url');
+		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
+		$this->zbxTestAssertElementValue('url', 'url');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('status'));
 		$this->zbxTestTextPresent('Parent triggers');
@@ -470,28 +470,28 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', 'Test LLD graph');
-		$this->input_type('width', '950');
-		$this->input_type('height', '250');
+		$this->zbxTestInputType('name', 'Test LLD graph');
+		$this->zbxTestInputType('width', '950');
+		$this->zbxTestInputType('height', '250');
 		$this->zbxTestDropdownSelect('graphtype', 'Normal');
 		$this->zbxTestCheckboxSelect('show_legend', false);
 		$this->zbxTestCheckboxSelect('show_work_period', false);
 		$this->zbxTestCheckboxSelect('show_triggers', false);
 		$this->zbxTestCheckboxSelect('visible_percent_left');
 		$this->zbxTestCheckboxSelect('visible_percent_right');
-		$this->input_type('percent_left', '4');
-		$this->input_type('percent_right', '5');
+		$this->zbxTestInputType('percent_left', '4');
+		$this->zbxTestInputType('percent_right', '5');
 		$this->zbxTestDropdownSelect('ymin_type', 'Calculated');
 		$this->zbxTestDropdownSelect('ymax_type', 'Calculated');
 
 		$this->zbxTestClick('add_protoitem');
-		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestClickLinkTextWait('Test LLD item');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item');
 
 		$this->zbxTestClick('add_item');
-		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item1');
@@ -507,20 +507,20 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestClickLinkTextWait('Test LLD');
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
 
-		$this->assertElementText("//a[text()='Test LLD graph']/parent::td", "$this->templateName: Test LLD graph");
+		$this->zbxTestAssertElementText("//a[text()='Test LLD graph']/parent::td", "$this->templateName: Test LLD graph");
 		$this->zbxTestClickLinkText('Test LLD graph');
 
-		$this->assertElementValue('name', 'Test LLD graph');
-		$this->assertElementValue('width', '950');
-		$this->assertElementValue('height', '250');
+		$this->zbxTestAssertElementValue('name', 'Test LLD graph');
+		$this->zbxTestAssertElementValue('width', '950');
+		$this->zbxTestAssertElementValue('height', '250');
 		$this->zbxTestDrowpdownAssertSelected('graphtype', 'Normal');
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_left'));
-		$this->assertElementValue('percent_left', '4.00');
+		$this->zbxTestAssertElementValue('percent_left', '4.00');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
-		$this->assertElementValue('percent_right', '5.00');
+		$this->zbxTestAssertElementValue('percent_right', '5.00');
 		$this->zbxTestDrowpdownAssertSelected('ymin_type', 'Calculated');
 		$this->zbxTestDrowpdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent($this->hostName.': Test LLD item');

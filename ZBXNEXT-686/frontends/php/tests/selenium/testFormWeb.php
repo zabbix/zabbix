@@ -403,7 +403,7 @@ class testFormWeb extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Name');
-		$this->assertVisible('name');
+		$this->zbxTestAssertVisibleId('name');
 		$this->assertAttribute("//input[@id='name']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='name']/@size", 50);
 		if (isset($data['templatedHost'])) {
@@ -416,12 +416,12 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestTextPresent('Application');
 
 		$this->zbxTestTextPresent('New application');
-		$this->assertVisible('new_application');
+		$this->zbxTestAssertVisibleId('new_application');
 		$this->assertAttribute("//input[@id='new_application']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='new_application']/@size", 50);
 
 		$this->zbxTestTextPresent('Authentication');
-		$this->assertVisible('authentication');
+		$this->zbxTestAssertVisibleId('authentication');
 		$this->zbxTestDropdownHasOptions('authentication', [
 			'None',
 			'Basic authentication',
@@ -430,12 +430,12 @@ class testFormWeb extends CWebTest {
 
 		if ($authentication!='None') {
 		$this->zbxTestTextPresent('User');
-		$this->assertVisible('http_user');
+		$this->zbxTestAssertVisibleId('http_user');
 		$this->assertAttribute("//input[@id='http_user']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='http_user']/@size", 50);
 
 		$this->zbxTestTextPresent('Password');
-		$this->assertVisible('http_password');
+		$this->zbxTestAssertVisibleId('http_password');
 		$this->assertAttribute("//input[@id='http_password']/@maxlength", 64);
 		$this->assertAttribute("//input[@id='http_password']/@size", 50);
 		}
@@ -446,20 +446,20 @@ class testFormWeb extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Update interval (in sec)');
-		$this->assertVisible('delay');
+		$this->zbxTestAssertVisibleId('delay');
 		$this->assertAttribute("//input[@id='delay']/@maxlength", 5);
 		$this->assertAttribute("//input[@id='delay']/@size", 5);
 		$this->assertAttribute("//input[@id='delay']/@value", 60);
 
 		$this->zbxTestTextPresent('Attempts');
-		$this->assertVisible('retries');
+		$this->zbxTestAssertVisibleId('retries');
 		$this->assertAttribute("//input[@id='retries']/@maxlength", 2);
 		$this->assertAttribute("//input[@id='retries']/@size", 2);
 		$this->assertAttribute("//input[@id='retries']/@value", 1);
 
 		if ((isset($data['agent']) && $data['agent'] !='(other ...)') || !isset($data['agent'])) {
 			$this->zbxTestTextPresent('Agent');
-			$this->assertVisible('agent');
+			$this->zbxTestAssertVisibleId('agent');
 			if (!isset($data['form'])) {
 				$this->assertElementPresent("//select[@id='agent']/option[text()='(other ...)']");
 			}
@@ -515,36 +515,36 @@ class testFormWeb extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('HTTP proxy');
-		$this->assertVisible('http_proxy');
+		$this->zbxTestAssertVisibleId('http_proxy');
 		$this->assertAttribute("//input[@id='http_proxy']/@maxlength", 255);
 		$this->assertAttribute("//input[@id='http_proxy']/@size", 50);
 		$this->assertElementPresent("//input[@placeholder='http://[user[:password]@]proxy.example.com[:port]']");
 
 		$this->zbxTestTextPresent('Variables');
-		$this->assertVisible('variables');
+		$this->zbxTestAssertVisibleId('variables');
 		$this->assertAttribute("//textarea[@id='variables']/@rows", 7);
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->assertVisible('status');
+		$this->zbxTestAssertVisibleId('status');
 		$this->assertAttribute("//*[@id='status']/@checked", 'checked');
 
-		$this->assertVisible('update');
+		$this->zbxTestAssertVisibleId('update');
 		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 		$this->assertAttribute("//input[@id='update']/@role", 'button');
 
-		$this->assertVisible('cancel');
+		$this->zbxTestAssertVisibleId('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 		$this->assertAttribute("//input[@id='cancel']/@role", 'button');
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->assertVisible('clone');
+			$this->zbxTestAssertVisibleId('clone');
 			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
 
-			$this->assertVisible('delete');
+			$this->zbxTestAssertVisibleId('delete');
 			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
 		}
 		elseif (isset($data['form']) && isset($data['templatedHost']))  {
-			$this->assertVisible('clone');
+			$this->zbxTestAssertVisibleId('clone');
 			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
 		}
 		else {
@@ -555,19 +555,19 @@ class testFormWeb extends CWebTest {
 		$this->zbxTestClick('link=Steps');
 		$this->zbxTestTextPresent('Steps');
 		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes']);
-		$this->assertVisible('tab_stepTab');
+		$this->zbxTestAssertVisibleId('tab_stepTab');
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->assertVisible('add_step');
+			$this->zbxTestAssertVisibleId('add_step');
 			$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
 			$this->assertAttribute("//input[@id='add_step']/@type", 'button');
 
-			$this->assertVisible('remove_0');
+			$this->zbxTestAssertVisibleId('remove_0');
 			$this->assertAttribute("//input[@id='remove_0']/@value", 'Remove');
 			$this->assertAttribute("//input[@id='remove_0']/@type", 'button');
 		}
 		elseif (!isset($data['form'])) {
-			$this->assertVisible('add_step');
+			$this->zbxTestAssertVisibleId('add_step');
 			$this->assertAttribute("//input[@id='add_step']/@value", 'Add');
 			$this->assertAttribute("//input[@id='add_step']/@type", 'button');
 
@@ -1467,11 +1467,11 @@ class testFormWeb extends CWebTest {
 		$authentication = $this->getSelectedLabel('authentication');
 
 		if (isset($data['http_user'])) {
-			$this->input_type('http_user', $data['http_user']);
+			$this->zbxTestInputType('http_user', $data['http_user']);
 		}
 
 		if (isset($data['http_password'])) {
-			$this->input_type('http_password', $data['http_password']);
+			$this->zbxTestInputType('http_password', $data['http_password']);
 		}
 
 		if (isset($data['agent'])) {
@@ -1482,7 +1482,7 @@ class testFormWeb extends CWebTest {
 					$agent = $this->getValue("//div[@class='dd']/input[@name='agent']");
 					$agentForm = $agent;
 					if (isset($data['removeAgent'])) {
-						$this->input_type("//div[@class='dd']/input[@name='agent']", '');
+						$this->zbxTestInputType("//div[@class='dd']/input[@name='agent']", '');
 					}
 					break;
 				default:
@@ -1494,31 +1494,31 @@ class testFormWeb extends CWebTest {
 		}
 
 		if (isset($data['name'])) {
-			$this->input_type('name', $data['name']);
+			$this->zbxTestInputType('name', $data['name']);
 		}
 		$name = $this->getValue('name');
 
 		if (isset($data['new_application'])) {
-			$this->input_type('new_application', $data['new_application']);
+			$this->zbxTestInputType('new_application', $data['new_application']);
 		}
 		$new_application = $this->getValue('new_application');
 
 		if (isset($data['delay']))	{
-			$this->input_type('delay', $data['delay']);
+			$this->zbxTestInputType('delay', $data['delay']);
 		}
 		$delay = $this->getValue('delay');
 
 		if (isset($data['retries'])) {
-			$this->input_type('retries', $data['retries']);
+			$this->zbxTestInputType('retries', $data['retries']);
 		}
 		$retries = $this->getValue('retries');
 
 		if (isset($data['http_proxy'])) {
-			$this->input_type('http_proxy', $data['http_proxy']);
+			$this->zbxTestInputType('http_proxy', $data['http_proxy']);
 		}
 
 		if (isset($data['variables'])) {
-			$this->input_type('variables', $data['variables']);
+			$this->zbxTestInputType('variables', $data['variables']);
 		}
 
 		$check = false;
@@ -1530,9 +1530,9 @@ class testFormWeb extends CWebTest {
 				$this->selectWindow('zbx_popup');
 				$this->zbxTestCheckFatalErrors();
 				$step = $item['step']." step";
-				$this->input_type('name',$step);
+				$this->zbxTestInputType('name',$step);
 				$url = $step." url";
-				$this->input_type('url', $url);
+				$this->zbxTestInputType('url', $url);
 				$this->zbxTestClick('add');
 				$this->selectWindow(null);
 
@@ -1600,9 +1600,9 @@ class testFormWeb extends CWebTest {
 			foreach ($data['createTriggers'] as $trigger) {
 				$this->zbxTestClickWait('form');
 
-				$this->input_type('description', $trigger);
+				$this->zbxTestInputType('description', $trigger);
 				$expressionTrigger = '{'.$this->host.':'.$trigger.'.last(0)}=0';
-				$this->input_type('expression', $expressionTrigger);
+				$this->zbxTestInputType('expression', $expressionTrigger);
 				$this->zbxTestClickWait('add');
 
 				$this->zbxTestTextPresent('Trigger added');

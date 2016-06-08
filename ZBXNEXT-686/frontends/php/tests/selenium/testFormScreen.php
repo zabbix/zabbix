@@ -29,7 +29,7 @@ class testFormScreen extends CWebTest {
 
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestClickWait('form');
-		$this->input_type('name', $this->testscreen);
+		$this->zbxTestInputType('name', $this->testscreen);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Screen added');
 	}

@@ -43,12 +43,12 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
-		$this->zbxAssertElementPresent(WebDriverBy::id('name'));
-		$this->zbxAssertAttribute("//input[@id='name']", "maxlength", 128);
-		$this->zbxAssertAttribute("//input[@id='name']", "size", 20);
+		$this->zbxTestAssertElementPresentId('name');
+		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 128);
+		$this->zbxTestAssertAttribute("//input[@id='name']", "size", 20);
 
-		$this->zbxAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='expressions_0_expression']", "size", 20);
+		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "size", 20);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
 			'Character string included',
@@ -85,8 +85,8 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $name);
-		$this->input_type('expressions_0_expression', $expression);
+		$this->zbxTestInputType('name', $name);
+		$this->zbxTestInputType('expressions_0_expression', $expression);
 		$this->zbxTestDropdownSelect('expressions_0_expression_type', $expression_type);
 		if ($case_sensitive == 1) {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
@@ -96,7 +96,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		}
 
 		$this->zbxTestClick('tab_test');
-		$this->input_type('test_string', $test_string);
+		$this->zbxTestInputType('test_string', $test_string);
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('Regular expression added');
 
@@ -109,8 +109,8 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $this->regexp);
-		$this->input_type('expressions_0_expression', 'first test string');
+		$this->zbxTestInputType('name', $this->regexp);
+		$this->zbxTestInputType('expressions_0_expression', 'first test string');
 		$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		$this->zbxTestClickWait('add');
 
@@ -123,7 +123,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 
 		$this->zbxTestClickWait('form');
-		$this->input_type('name', '1_regexp3');
+		$this->zbxTestInputType('name', '1_regexp3');
 		$this->zbxTestClickWait('add');
 
 		$this->zbxTestTextPresent(['Cannot add regular expression', 'Expression cannot be empty']);
@@ -135,7 +135,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestClick('tab_test');
-		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='green']"));
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -145,9 +145,9 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestClick('tab_test');
 
-		$this->input_type('test_string', 'abcdef');
+		$this->zbxTestInputType('test_string', 'abcdef');
 		$this->zbxTestClick('testExpression');
-		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//table[@id='testResultTable']//span[@class='red']"));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='testResultTable']//span[@class='red']"));
 		$this->zbxTestTextPresent('FALSE');
 	}
 
@@ -156,7 +156,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestClick('clone');
-		$this->input_type('name', $this->regexp.'_clone');
+		$this->zbxTestInputType('name', $this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Regular expression added');
 
@@ -168,7 +168,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->input_type('name', $this->regexp.'2');
+		$this->zbxTestInputType('name', $this->regexp.'2');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Regular expression updated');
 
@@ -183,7 +183,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Regular expression deleted');
 		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($this->regexp2);

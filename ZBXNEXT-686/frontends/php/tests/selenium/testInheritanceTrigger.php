@@ -95,8 +95,8 @@ class testInheritanceTrigger extends CWebTest {
 	public function testInheritanceTrigger_SimpleCreate($data) {
 		$this->zbxTestLogin('triggers.php?form=Create+trigger&hostid='.$this->templateid);
 
-		$this->input_type('description', $data['description']);
-		$this->input_type('expression', $data['expression']);
+		$this->zbxTestInputType('description', $data['description']);
+		$this->zbxTestInputType('expression', $data['expression']);
 
 		$this->zbxTestClickWait('add');
 

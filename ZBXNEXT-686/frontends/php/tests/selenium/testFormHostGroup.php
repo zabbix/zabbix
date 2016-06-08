@@ -67,7 +67,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $this->hostGroup);
+		$this->zbxTestInputType('name', $this->hostGroup);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Group added');
 	}
@@ -76,7 +76,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->zbxTestClickWait('form');
 
-		$this->input_type('name', $this->hostGroup);
+		$this->zbxTestInputType('name', $this->hostGroup);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('ERROR: Cannot add group');
 		$this->zbxTestTextPresent('Host group "'.$this->hostGroup.'" already exists.');
@@ -86,7 +86,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->zbxTestClickWait('link='.$this->hostGroup);
 
-		$this->input_type('name', '');
+		$this->zbxTestInputType('name', '');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('ERROR: Page received incorrect data');
 		$this->zbxTestTextPresent('Incorrect value for field "name": cannot be empty.');
@@ -101,7 +101,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->zbxTestClickWait('link='.$this->hostGroup);
 
-		$this->input_type('name', $hostGroup['name']);
+		$this->zbxTestInputType('name', $hostGroup['name']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('ERROR: Cannot update group');
 		$this->zbxTestTextPresent('Host group "'.$hostGroup['name'].'" already exists.');
@@ -111,7 +111,7 @@ class testFormHostGroup extends CWebTest {
 		$this->zbxTestLogin('hostgroups.php');
 		$this->zbxTestClickWait('link='.$this->hostGroup);
 
-		$this->input_type('name', $this->hostGroup.' 2');
+		$this->zbxTestInputType('name', $this->hostGroup.' 2');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Group updated');
 	}

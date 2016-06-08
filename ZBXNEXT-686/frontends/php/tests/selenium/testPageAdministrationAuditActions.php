@@ -26,15 +26,15 @@ class testPageAdministrationAuditActions extends CWebTest {
 
 		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
 		$this->zbxTestCheckTitle('Action log');
-		$this->zbxAssertElementPresent(WebDriverBy::id('config'));
+		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
 
 		$this->zbxTestTextPresent('Recipient');
-		$this->zbxAssertElementPresent(WebDriverBy::id('alias'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='alias' and @maxlength='255']"));
-		$this->zbxAssertElementPresent(WebDriverBy::id('btn1'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('filter_set'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[contains(text(),'Reset')]"));
+		$this->zbxTestAssertElementPresentId('alias');
+		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
+		$this->zbxTestAssertElementPresentId('btn1');
+		$this->zbxTestAssertElementPresentId('filter_set');
+		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
 		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient(s)', 'Message', 'Status', 'Info']);
 
 	}
@@ -50,7 +50,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 
 		$this->zbxTestLogin('auditacts.php?stime=20120220090000&period=63072000');
 		$this->zbxTestCheckTitle('Action log');
-		$this->zbxAssertElementPresent(WebDriverBy::id('config'));
+		$this->zbxTestAssertElementPresentId('config');
 		$this->zbxTestCheckHeader('Action log');
 
 		$time = $auditactions['clock'];
@@ -100,7 +100,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 				]
 		);
 
-		$this->input_type('alias', 'guest');
+		$this->zbxTestInputType('alias', 'guest');
 		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent('No data found.');
 

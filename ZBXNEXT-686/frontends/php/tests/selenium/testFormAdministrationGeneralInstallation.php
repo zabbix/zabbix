@@ -70,7 +70,7 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 	];
 
 	public function testInstallPage() {
-		$this->zbxTestLogin('setup.php');
+		$this->zbxTestLogin('setup.php', false);
 
 		// welcome page
 
@@ -78,8 +78,8 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestTextNotPresent($this->failIfExists);
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('next_0'));
+		$this->zbxTestAssertElementPresentId('cancel');
+		$this->zbxTestAssertElementPresentId('next_0');
 
 		$this->zbxTestClickWait('next_0');
 
@@ -91,9 +91,9 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 		$this->zbxTestTextPresent($this->failIfNotExistsPrereq);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('back_1'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('next_1'));
+		$this->zbxTestAssertElementPresentId('cancel');
+		$this->zbxTestAssertElementPresentId('back_1');
+		$this->zbxTestAssertElementPresentId('next_1');
 
 		$this->zbxTestClickWait('next_1');
 
@@ -105,31 +105,31 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		$this->zbxTestTextPresent($this->failIfNotExistsInstall);
 		$this->zbxTestTextPresent($this->failIfNotExistsDBConf);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('back_2'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('next_2'));
+		$this->zbxTestAssertElementPresentId('cancel');
+		$this->zbxTestAssertElementPresentId('back_2');
+		$this->zbxTestAssertElementPresentId('next_2');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('type'));
+		$this->zbxTestAssertElementPresentId('type');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('server'));
-		$this->zbxAssertAttribute("//input[@id='server']", 'maxlength', 255);
-		$this->zbxAssertAttribute("//input[@id='server']", 'size', 20);
+		$this->zbxTestAssertElementPresentId('server');
+		$this->zbxTestAssertAttribute("//input[@id='server']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='server']", 'size', 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('port'));
-		$this->zbxAssertAttribute("//input[@id='port']", 'maxlength', 5);
-		$this->zbxAssertAttribute("//input[@id='port']", 'size', 20);
+		$this->zbxTestAssertElementPresentId('port');
+		$this->zbxTestAssertAttribute("//input[@id='port']", 'maxlength', 5);
+		$this->zbxTestAssertAttribute("//input[@id='port']", 'size', 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('database'));
-		$this->zbxAssertAttribute("//input[@id='database']", 'maxlength', 255);
-		$this->zbxAssertAttribute("//input[@id='database']", 'size', 20);
+		$this->zbxTestAssertElementPresentId('database');
+		$this->zbxTestAssertAttribute("//input[@id='database']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='database']", 'size', 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('user'));
-		$this->zbxAssertAttribute("//input[@id='user']", 'maxlength', 255);
-		$this->zbxAssertAttribute("//input[@id='user']", 'size', 20);
+		$this->zbxTestAssertElementPresentId('user');
+		$this->zbxTestAssertAttribute("//input[@id='user']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='user']", 'size', 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('password'));
-		$this->zbxAssertAttribute("//input[@id='password']", 'maxlength', 255);
-		$this->zbxAssertAttribute("//input[@id='password']", 'size', 20);
+		$this->zbxTestAssertElementPresentId('password');
+		$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='password']", 'size', 20);
 
 		$this->zbxTestClickWait('cancel');
 

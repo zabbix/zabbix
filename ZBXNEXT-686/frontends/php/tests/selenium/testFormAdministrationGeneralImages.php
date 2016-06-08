@@ -30,21 +30,21 @@ class testFormAdministrationGeneralImages extends CWebTest {
 	public function testFormAdministrationGeneralImages_CheckLayout() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
+		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Images');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Type']);
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@id='imagetype']/option[text()='Icon']"));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@id='imagetype']/option[text()='Background']"));
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentXpath("//select[@id='imagetype']/option[text()='Icon']");
+		$this->zbxTestAssertElementPresentXpath("//select[@id='imagetype']/option[text()='Background']");
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestClickWait('form');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('name'));
-		$this->zbxAssertAttribute("//input[@id='name']", "maxlength", '64');
-		$this->zbxAssertElementPresent(WebDriverBy::id('image'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('add'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
+		$this->zbxTestAssertElementPresentId('name');
+		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", '64');
+		$this->zbxTestAssertElementPresentId('image');
+		$this->zbxTestAssertElementPresentId('add');
+		$this->zbxTestAssertElementPresentId('cancel');
 
 	}
 
@@ -53,9 +53,9 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickWait('form');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('name'));
-		$this->input_type('name', $this->icon_image_name);
-		$this->input_type('image', $this->file_path);
+		$this->zbxTestAssertElementPresentId('name');
+		$this->zbxTestInputType('name', $this->icon_image_name);
+		$this->zbxTestInputType('image', $this->file_path);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
@@ -73,8 +73,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
-		$this->input_type('name', $this->icon_image_name2);
-		$this->input_type('image', $this->file_path);
+		$this->zbxTestInputType('name', $this->icon_image_name2);
+		$this->zbxTestInputType('image', $this->file_path);
 		$this->zbxTestClick('cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box
@@ -86,8 +86,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
-		$this->input_type('name', $this->icon_image_name2);
-		$this->input_type('image', $this->file_path);
+		$this->zbxTestInputType('name', $this->icon_image_name2);
+		$this->zbxTestInputType('image', $this->file_path);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(['Images', 'Image updated']);
@@ -114,8 +114,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestDropdownSelect('imagetype', 'Background');
 		$this->zbxTestClickWait('form');
-		$this->input_type('name', $this->bg_image_name);
-		$this->input_type('image', $this->file_path);
+		$this->zbxTestInputType('name', $this->bg_image_name);
+		$this->zbxTestInputType('image', $this->file_path);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(['Images', 'Type', 'Image added']);
@@ -129,10 +129,10 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestTextPresent('Type');
-		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//div[@class='cell']"));
+		$this->zbxTestWaitUntilElementVisible(WebdriverBy::xpath("//div[@class='cell']"));
 		$this->zbxTestClickLinkText($this->bg_image_name);
-		$this->input_type('name', $this->bg_image_name2);
-		$this->input_type('image', $this->file_path);
+		$this->zbxTestInputType('name', $this->bg_image_name2);
+		$this->zbxTestInputType('image', $this->file_path);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestTextPresent(['Images', 'Image updated']);

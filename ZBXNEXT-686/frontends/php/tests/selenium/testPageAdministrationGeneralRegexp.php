@@ -58,7 +58,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			'GUI', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
 			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
 		]);
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentId('form');
 
 		$this->zbxTestTextPresent(['Name', 'Expressions']);
 
@@ -68,7 +68,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$this->zbxTestTextPresent($dbRow['name']);
 		}
 
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//button[@value='regexp.massdelete' and @disabled]"));
+		$this->zbxTestAssertElementPresentXpath("//button[@value='regexp.massdelete' and @disabled]");
 	}
 
 	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {

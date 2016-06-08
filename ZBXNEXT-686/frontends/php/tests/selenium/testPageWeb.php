@@ -33,6 +33,6 @@ class testPageWeb extends CWebTest {
 	public function testPageWeb_NoHostNames() {
 		$this->zbxTestLogin('zabbix.php?action=web.view');
 		$this->zbxTestCheckTitle('Web monitoring');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

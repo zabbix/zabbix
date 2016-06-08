@@ -32,8 +32,8 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
 
-		$this->input_type('name', 'Admin');
-		$this->input_type('password', 'zabbix');
+		$this->zbxTestInputType('name', 'Admin');
+		$this->zbxTestInputType('password', 'zabbix');
 		$this->zbxTestClickWait('enter');
 
 		$this->zbxTestTextNotPresent('Password');
@@ -49,8 +49,8 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestTextPresent('Username');
 		$this->zbxTestTextPresent('Password');
 
-		$this->input_type('name', 'Admin');
-		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+		$this->zbxTestInputType('name', 'Admin');
+		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(['Login name or password is incorrect', 'Username', 'Password']);
 
@@ -74,8 +74,8 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestTextPresent('Password');
 
 		for ($i = 1; $i <= 5; $i++) {
-			$this->input_type('name', 'Admin');
-			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+			$this->zbxTestInputType('name', 'Admin');
+			$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
 			$this->zbxTestTextPresent(['Login name or password is incorrect', 'Username', 'Password']);
 
@@ -87,8 +87,8 @@ class testFormLogin extends CWebTest {
 			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.');
 		}
 
-		$this->input_type('name', 'Admin');
-		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+		$this->zbxTestInputType('name', 'Admin');
+		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
 
@@ -105,8 +105,8 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestTextPresent('Password');
 
 		for ($i = 1; $i <= 5; $i++) {
-			$this->input_type('name', 'Admin');
-			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+			$this->zbxTestInputType('name', 'Admin');
+			$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
 			$this->zbxTestTextPresent('Login name or password is incorrect');
 			$this->zbxTestTextPresent('Username');
@@ -120,8 +120,8 @@ class testFormLogin extends CWebTest {
 			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_ip should not be empty after incorrect login.');
 		}
 
-		$this->input_type('name', 'Admin');
-		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
+		$this->zbxTestInputType('name', 'Admin');
+		$this->zbxTestInputType('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
 		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
 
@@ -133,8 +133,8 @@ class testFormLogin extends CWebTest {
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent(['Username', 'Password']);
 
-		$this->input_type('name', 'Admin');
-		$this->input_type('password', 'zabbix');
+		$this->zbxTestInputType('name', 'Admin');
+		$this->zbxTestInputType('password', 'zabbix');
 		$this->zbxTestClickWait('enter');
 
 		$this->zbxTestTextNotPresent('Password');

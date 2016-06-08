@@ -92,8 +92,8 @@ class testInheritanceItemPrototype extends CWebTest {
 	public function testInheritanceItemPrototype_SimpleCreate($data) {
 		$this->zbxTestLogin('disc_prototypes.php?form=Create+item+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('name', $data['name']);
-		$this->input_type('key', $data['key']);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestClickWait('add');
 		switch ($data['expected']) {

@@ -56,7 +56,7 @@ class testZBX6339 extends CWebTest {
 		$this->zbxTestClickLinkText($host);
 
 		$this->zbxTestCheckHeader('Templates');
-		$this->zbxWaitUntilElementVisible(WebdriverBy::xpath("//ul[@class='object-group']//a[text()='Screens']"));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//ul[@class='object-group']//a[text()='Screens']"));
 		$this->zbxTestClickXpath("//ul[@class='object-group']//a[text()='Screens']");
 		$this->zbxTestCheckTitle('Configuration of screens');
 

@@ -116,30 +116,30 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger severities');
 
 		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_name_0'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_color_0'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('lbl_severity_color_0'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_name_1'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_color_1'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('lbl_severity_color_1'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_name_2'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_color_2'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('lbl_severity_color_2'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_name_3'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_color_3'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('lbl_severity_color_3'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_name_4'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_color_4'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('lbl_severity_color_4'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_name_5'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('severity_color_5'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('lbl_severity_color_5'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('update'));
+		$this->zbxTestAssertElementPresentId('severity_name_0');
+		$this->zbxTestAssertElementPresentId('severity_color_0');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_0');
+		$this->zbxTestAssertElementPresentId('severity_name_1');
+		$this->zbxTestAssertElementPresentId('severity_color_1');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_1');
+		$this->zbxTestAssertElementPresentId('severity_name_2');
+		$this->zbxTestAssertElementPresentId('severity_color_2');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_2');
+		$this->zbxTestAssertElementPresentId('severity_name_3');
+		$this->zbxTestAssertElementPresentId('severity_color_3');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_3');
+		$this->zbxTestAssertElementPresentId('severity_name_4');
+		$this->zbxTestAssertElementPresentId('severity_color_4');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_4');
+		$this->zbxTestAssertElementPresentId('severity_name_5');
+		$this->zbxTestAssertElementPresentId('severity_color_5');
+		$this->zbxTestAssertElementPresentId('lbl_severity_color_5');
+		$this->zbxTestAssertElementPresentId('update');
 
-		$this->zbxAssertElementPresent(WebDriverBy::className('color-picker'));
-		$this->assertNotVisible(WebDriverBy::className('color-picker'));
+		$this->zbxTestAssertElementPresentXpath('//div[@class="overlay-dialogue"]/div[@class="color-picker"]');
+		$this->zbxTestAssertNotVisibleXpath('//div[@class="color-picker"]');
 		$this->zbxTestClick('lbl_severity_color_0');
-		$this->assertVisible(WebDriverBy::className('color-picker'));
+		$this->zbxTestAssertVisibleXpath('//div[@class="color-picker"]');
 	}
 
 	public function testFormTriggerSeverity_backup() {
@@ -155,7 +155,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		$this->zbxTestCheckHeader('Trigger severities');
 
 		foreach ($data as $field => $value) {
-			$this->input_type($field, $value);
+			$this->zbxTestInputType($field, $value);
 		}
 
 		$sql = 'SELECT '.implode(', ', array_keys($data)).' FROM config';

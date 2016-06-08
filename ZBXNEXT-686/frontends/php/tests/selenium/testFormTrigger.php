@@ -225,19 +225,19 @@ class testFormTrigger extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Name');
-		$this->assertVisible('description');
+		$this->zbxTestAssertVisibleId('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='description']/@size", '50');
 
 		if (!isset($data['constructor']) || $data['constructor'] == 'open_close') {
 			$this->zbxTestTextPresent(['Expression', 'Expression constructor']);
-			$this->assertVisible("//textarea[@id='expression']");
+			$this->zbxTestAssertVisibleXpath("//textarea[@id='expression']");
 			$this->assertAttribute("//textarea[@id='expression']/@rows", '7');
 			if (isset($data['templatedHost'])) {
 				$this->assertAttribute("//textarea[@id='expression']/@readonly", 'readonly');
 			}
 
-			$this->assertVisible('insert');
+			$this->zbxTestAssertVisibleId('insert');
 			$this->assertAttribute("//input[@id='insert']/@value", 'Add');
 			if (isset($data['templatedHost'])) {
 				$this->assertElementPresent("//input[@id='insert']/@disabled");
@@ -249,27 +249,27 @@ class testFormTrigger extends CWebTest {
 		}
 		else {
 			$this->zbxTestTextPresent('Expression');
-			$this->assertVisible('expr_temp');
+			$this->zbxTestAssertVisibleId('expr_temp');
 			$this->assertAttribute("//textarea[@id='expr_temp']/@rows", '7');
 			$this->assertAttribute("//textarea[@id='expr_temp']/@readonly", 'readonly');
 			$this->zbxTestTextNotPresent('Expression constructor');
-			$this->assertNotVisible('expression');
+			$this->zbxTestAssertNotVisibleId('expression');
 
 			if (!isset($data['form'])) {
-				$this->assertVisible('add_expression');
+				$this->zbxTestAssertVisibleId('add_expression');
 				$this->assertAttribute("//input[@id='add_expression']/@value", 'Add');
 			}
 			else {
 				$this->assertElementNotPresent('add_expression');
 			}
 
-			$this->assertVisible('insert');
+			$this->zbxTestAssertVisibleId('insert');
 			$this->assertAttribute("//input[@id='insert']/@value", 'Edit');
 			if (isset($data['templatedHost'])) {
 				$this->assertElementPresent("//input[@id='insert']/@disabled");
 			}
 
-			$this->assertVisible('insert_macro');
+			$this->zbxTestAssertVisibleId('insert_macro');
 			$this->assertAttribute("//input[@id='insert_macro']/@value", 'Insert macro');
 			if (isset($data['templatedHost'])) {
 				$this->assertElementPresent("//input[@id='insert_macro']/@disabled");
@@ -281,35 +281,35 @@ class testFormTrigger extends CWebTest {
 			else {
 				$this->zbxTestTextPresent(['Expression', 'Error', 'Close expression constructor']);
 			}
-			$this->assertVisible('exp_list');
+			$this->zbxTestAssertVisibleId('exp_list');
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
 
 		$this->zbxTestTextPresent('Multiple PROBLEM events generation');
-		$this->assertVisible('type');
+		$this->zbxTestAssertVisibleId('type');
 		$this->assertAttribute("//input[@id='type']/@type", 'checkbox');
 
 		$this->zbxTestTextPresent('Description');
-		$this->assertVisible('comments');
+		$this->zbxTestAssertVisibleId('comments');
 		$this->assertAttribute("//textarea[@id='comments']/@rows", '7');
 
 		$this->zbxTestTextPresent('URL');
-		$this->assertVisible('url');
+		$this->zbxTestAssertVisibleId('url');
 		$this->assertAttribute("//input[@id='url']/@maxlength", '255');
 		$this->assertAttribute("//input[@id='url']/@size", '50');
 
-		$this->assertVisible('priority_0');
+		$this->zbxTestAssertVisibleId('priority_0');
 		$this->assertAttribute("//*[@id='priority_0']/@checked", 'checked');
 		$this->assertElementPresent("//*[@id='priority_label_0']/span[text()='Not classified']");
-		$this->assertVisible('priority_1');
+		$this->zbxTestAssertVisibleId('priority_1');
 		$this->assertElementPresent("//*[@id='priority_label_1']/span[text()='Information']");
-		$this->assertVisible('priority_2');
+		$this->zbxTestAssertVisibleId('priority_2');
 		$this->assertElementPresent("//*[@id='priority_label_2']/span[text()='Warning']");
-		$this->assertVisible('priority_3');
+		$this->zbxTestAssertVisibleId('priority_3');
 		$this->assertElementPresent("//*[@id='priority_label_3']/span[text()='Average']");
-		$this->assertVisible('priority_4');
+		$this->zbxTestAssertVisibleId('priority_4');
 		$this->assertElementPresent("//*[@id='priority_label_4']/span[text()='High']");
-		$this->assertVisible('priority_5');
+		$this->zbxTestAssertVisibleId('priority_5');
 		$this->assertElementPresent("//*[@id='priority_label_5']/span[text()='Disaster']");
 
 		if (isset($data['severity'])) {
@@ -336,20 +336,20 @@ class testFormTrigger extends CWebTest {
 		}
 
 		$this->zbxTestTextPresent('Enabled');
-		$this->assertVisible('status');
+		$this->zbxTestAssertVisibleId('status');
 		$this->assertAttribute("//input[@id='status']/@type", 'checkbox');
 
-		$this->assertVisible('update');
+		$this->zbxTestAssertVisibleId('update');
 		$this->assertAttribute("//input[@id='update']/@value", 'Update');
 
-		$this->assertVisible('cancel');
+		$this->zbxTestAssertVisibleId('cancel');
 		$this->assertAttribute("//input[@id='cancel']/@value", 'Cancel');
 
 		if (isset($data['form'])) {
-			$this->assertVisible('clone');
+			$this->zbxTestAssertVisibleId('clone');
 			$this->assertAttribute("//input[@id='clone']/@value", 'Clone');
 
-			$this->assertVisible('delete');
+			$this->zbxTestAssertVisibleId('delete');
 			$this->assertAttribute("//input[@id='delete']/@value", 'Delete');
 			if (isset($data['templatedHost'])) {
 				$this->assertElementPresent("//input[@id='delete']/@disabled");
@@ -746,12 +746,12 @@ class testFormTrigger extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
 
 		if (isset($data['description'])) {
-			$this->input_type('description', $data['description']);
+			$this->zbxTestInputType('description', $data['description']);
 		}
 		$description = $this->getValue('description');
 
 		if (isset($data['expression'])) {
-			$this->input_type('expression', $data['expression']);
+			$this->zbxTestInputType('expression', $data['expression']);
 		}
 		$expression = $this->getValue('expression');
 
@@ -765,12 +765,12 @@ class testFormTrigger extends CWebTest {
 
 
 		if (isset($data['comments'])) {
-			$this->input_type('comments', $data['comments']);
+			$this->zbxTestInputType('comments', $data['comments']);
 		}
 		$comments = $this->getValue('comments');
 
 		if (isset($data['url'])) {
-			$this->input_type('url', $data['url']);
+			$this->zbxTestInputType('url', $data['url']);
 		}
 		$url = $this->getValue('url');
 

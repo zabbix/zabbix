@@ -35,8 +35,8 @@ class testPageAdministrationGeneralImages extends CWebTest {
 	public function testPageAdministrationGeneralImages_CheckLayoutIcons($icon_name) {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentId('configDropDown');
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestCheckTitle('Configuration of images');
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent('Type');
@@ -58,13 +58,13 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		}
 		else {
 				$this->zbxTestLogin('adm.images.php');
-				$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
+				$this->zbxTestAssertElementPresentId('configDropDown');
 				$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-				$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+				$this->zbxTestAssertElementPresentId('form');
 				$this->zbxTestCheckTitle('Configuration of images');
 				$this->zbxTestCheckHeader('Images');
 				$this->zbxTestDropdownHasOptions('imagetype', ['Icon', 'Background']);
-				$this->zbxAssertElementPresent(WebDriverBy::xpath("//form[@action='adm.images.php']//a[text()='".$bgimage['name']."']"));
+				$this->zbxTestAssertElementPresentXpath("//form[@action='adm.images.php']//a[text()='".$bgimage['name']."']"));
 		}
 	}
 */
@@ -78,14 +78,14 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$oldHashIconImages=DBhash($sqlIconImages);
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
 		$this->zbxTestClickLinkText($icon_name['name']);
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Name', 'Upload', 'Image']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('update'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('delete'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
+		$this->zbxTestAssertElementPresentId('update');
+		$this->zbxTestAssertElementPresentId('delete');
+		$this->zbxTestAssertElementPresentId('cancel');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Image updated');
 
@@ -104,13 +104,13 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$oldHashBgImages=DBhash($sqlBgImages);
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickLinkText($bgimage_name['name']);
 		$this->zbxTestTextPresent(['Name', 'Upload', 'Image']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('update'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('delete'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
+		$this->zbxTestAssertElementPresentId('update');
+		$this->zbxTestAssertElementPresentId('delete');
+		$this->zbxTestAssertElementPresentId('cancel');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Image updated');
 

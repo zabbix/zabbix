@@ -40,6 +40,6 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_NoHostNames() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

@@ -31,16 +31,16 @@ class testFormAdministrationUserCreate extends CWebTest {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestClick('form');
-		$this->input_type('alias', 'User alias');
-		$this->input_type('name', 'User name');
-		$this->input_type('surname', 'User surname');
+		$this->zbxTestInputType('alias', 'User alias');
+		$this->zbxTestInputType('name', 'User name');
+		$this->zbxTestInputType('surname', 'User surname');
 		$this->zbxTestClick('add_group');
-		$this->zbxWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestCheckboxSelect('new_groups_7');
 		$this->zbxTestClick('select');
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestInputTypeWait('password1', '123');
-		$this->input_type('password2', '123');
+		$this->zbxTestInputType('password2', '123');
 		$this->zbxTestClick('add');
 		$this->zbxTestTextPresent('User added');
 

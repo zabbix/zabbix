@@ -33,6 +33,6 @@ class testPageOverview extends CWebTest {
 	public function testPageOverview_NoHostNames() {
 		$this->zbxTestLogin('overview.php');
 		$this->zbxTestCheckTitle('Overview [refreshed every 30 sec.]');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

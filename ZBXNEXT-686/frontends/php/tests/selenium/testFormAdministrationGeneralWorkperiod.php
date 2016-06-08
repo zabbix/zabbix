@@ -32,14 +32,14 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 	public function testFormAdministrationGeneralWorkperiod_CheckLayout($WorkingTime) {
 
 		$this->zbxTestLogin('adm.workingtime.php');
-		$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
+		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxAssertElementPresent(WebDriverBy::id('work_period'));
-		$this->zbxAssertAttribute("//input[@id='work_period']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='work_period']", "size", 20);
-		$this->zbxAssertAttribute("//input[@id='work_period']", "value", $WorkingTime['work_period']);
+		$this->zbxTestAssertElementPresentId('work_period');
+		$this->zbxTestAssertAttribute("//input[@id='work_period']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='work_period']", "size", 20);
+		$this->zbxTestAssertAttribute("//input[@id='work_period']", "value", $WorkingTime['work_period']);
 
 	}
 
@@ -48,7 +48,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestLogin('adm.workingtime.php');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
+		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDrowpdownAssertSelected('configDropDown', 'Working time');
 
 
@@ -64,7 +64,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 				' FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
 
-		$this->input_type('work_period', '1-7,09:00-20:00');
+		$this->zbxTestInputType('work_period', '1-7,09:00-20:00');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 
@@ -80,7 +80,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->input_type('work_period', '1-8,09:00-25:00');
+		$this->zbxTestInputType('work_period', '1-8,09:00-25:00');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Page received incorrect data', 'Field "Working time" is not correct: Incorrect time period "1-8,09:00-25:00".']);
 
@@ -88,7 +88,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Working time');
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
-		$this->input_type('work_period', '');
+		$this->zbxTestInputType('work_period', '');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Page received incorrect data', 'ield "Working time" is not correct: Empty time period.']);
 	}

@@ -36,6 +36,6 @@ class testPageStatusOfTriggers extends CWebTest {
 	public function testPageStatusOfTriggers_NoHostNames() {
 		$this->zbxTestLogin('tr_status.php');
 		$this->zbxTestCheckTitle('Status of triggers [refreshed every 30 sec.]');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

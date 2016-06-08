@@ -75,12 +75,12 @@ class testZBX6648 extends CWebTest {
 			case 'disabled' :
 				$hostgroup = $zbx_data['hostgroup'];
 				$host = $zbx_data['host'];
-				$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//select[@id='groupid']/option[text()='$hostgroup']"));
-				$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//select[@id='hostid']/option[text()='$host']"));
+				$this->zbxTestAssertElementNotPresentXpath("//select[@id='groupid']/option[text()='$hostgroup']");
+				$this->zbxTestAssertElementNotPresentXpath("//select[@id='hostid']/option[text()='$host']");
 				break;
 			case 'no triggers' :
 				$hostgroup = $zbx_data['hostgroup'];
-				$this->zbxAssertElementNotPresent(WebDriverBy::xpath("//select[@id='groupid']/option[text()='$hostgroup']"));
+				$this->zbxTestAssertElementNotPresentXpath("//select[@id='groupid']/option[text()='$hostgroup']");
 				break;
 		}
 	}

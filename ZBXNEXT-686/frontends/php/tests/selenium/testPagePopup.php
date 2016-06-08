@@ -50,12 +50,12 @@ class testPagePopup extends CWebTest {
 		$this->zbxTestCheckHeader('Applications');
 		$this->zbxTestTextPresent(['Group', 'Host']);
 		$this->zbxTestTextPresent('Name');
-		$this->zbxAssertElementPresent(WebDriverBy::id('groupid'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('hostid'));
+		$this->zbxTestAssertElementPresentId('groupid');
+		$this->zbxTestAssertElementPresentId('hostid');
 		$this->zbxTestDropdownSelect('groupid', 'Templates');
 		$this->zbxTestDropdownSelectWait('hostid', 'Template OS Linux');
 
-		$ddGroups = $this->zbxGetDropDownElements('groupid');
+		$ddGroups = $this->zbxTestGetDropDownElements('groupid');
 		$dbGroups = [];
 
 		// checking order of dropdown entries

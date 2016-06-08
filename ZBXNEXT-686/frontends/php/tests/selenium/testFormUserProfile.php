@@ -52,8 +52,8 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', $pwd);
-		$this->input_type('password2', $pwd);
+		$this->zbxTestInputType('password1', $pwd);
+		$this->zbxTestInputType('password2', $pwd);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Copyright');
@@ -67,8 +67,8 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestOpen('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', PHPUNIT_LOGIN_PWD);
-		$this->input_type('password2', PHPUNIT_LOGIN_PWD);
+		$this->zbxTestInputType('password1', PHPUNIT_LOGIN_PWD);
+		$this->zbxTestInputType('password2', PHPUNIT_LOGIN_PWD);
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Copyright');
@@ -83,8 +83,8 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', '');
-		$this->input_type('password2', '');
+		$this->zbxTestInputType('password1', '');
+		$this->zbxTestInputType('password2', '');
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('ERROR: Password should not be empty');
@@ -100,8 +100,8 @@ class testFormUserProfile extends CWebTest {
 		$this->zbxTestLogin('profile.php');
 
 		$this->zbxTestClickWait('change_password');
-		$this->input_type('password1', 'abc');
-		$this->input_type('password2', 'def');
+		$this->zbxTestInputType('password1', 'abc');
+		$this->zbxTestInputType('password2', 'def');
 
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('ERROR: Cannot update user. Both passwords must be equal.');

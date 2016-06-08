@@ -78,40 +78,40 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->zbxTestCheckHeader('Scripts');
 
 		$this->zbxTestTextPresent(['Name']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('name'));
+		$this->zbxTestAssertElementPresentId('name');
 
 		$this->zbxTestTextPresent(['Type']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('type'));
+		$this->zbxTestAssertElementPresentId('type');
 		$this->zbxTestDropdownHasOptions('type', ['IPMI', 'Script']);
 
 		$this->zbxTestTextPresent(['Execute on', 'Zabbix agent', 'Zabbix server']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('execute_on_0'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('execute_on_1'));
+		$this->zbxTestAssertElementPresentId('execute_on_0');
+		$this->zbxTestAssertElementPresentId('execute_on_1');
 
 		$this->zbxTestTextPresent(['Commands']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('command'));
+		$this->zbxTestAssertElementPresentId('command');
 
 		$this->zbxTestTextPresent(['Description']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('description'));
+		$this->zbxTestAssertElementPresentId('description');
 
 		$this->zbxTestTextPresent(['User group']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('usrgrpid'));
+		$this->zbxTestAssertElementPresentId('usrgrpid');
 		$this->zbxTestDropdownHasOptions('usrgrpid', ['All', 'Disabled', 'Enabled debug mode', 'Guests', 'No access to the frontend', 'Zabbix administrators']);
 
 		$this->zbxTestTextPresent(['Host group']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('hgstype'));
+		$this->zbxTestAssertElementPresentId('hgstype');
 		$this->zbxTestDropdownHasOptions('hgstype', ['All', 'Selected']);
 
 		$this->zbxTestTextPresent(['Required host permissions']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('host_access'));
+		$this->zbxTestAssertElementPresentId('host_access');
 		$this->zbxTestDropdownHasOptions('host_access', ['Read', 'Write']);
 
 		$this->zbxTestTextPresent(['Enable confirmation']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('enable_confirmation'));
+		$this->zbxTestAssertElementPresentId('enable_confirmation');
 		$this->assertFalse($this->zbxTestCheckboxSelected('enable_confirmation'));
 
 		$this->zbxTestTextPresent(['Confirmation text']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('confirmation'));
+		$this->zbxTestAssertElementPresentId('confirmation');
 	}
 
 	public function testFormAdministrationScripts_backup() {
@@ -129,7 +129,7 @@ class testFormAdministrationScripts extends CWebTest {
 		foreach ($data as $field) {
 			switch ($field['type']) {
 				case 'text':
-					$this->input_type($field['name'], $field['value']);
+					$this->zbxTestInputType($field['name'], $field['value']);
 					break;
 				case 'select':
 					$this->zbxTestDropdownSelect($field['name'], $field['value']);

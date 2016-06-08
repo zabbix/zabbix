@@ -62,7 +62,7 @@ class testFormSysmap extends CWebTest {
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickWait('form');
-		$this->input_type('name', $mapName);
+		$this->zbxTestInputType('name', $mapName);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Network maps');
 		if ($successExpected) {
@@ -99,7 +99,7 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 
-		$this->input_type('name', $mapName);
+		$this->zbxTestInputType('name', $mapName);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Network maps');
 
@@ -140,7 +140,7 @@ class testFormSysmap extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestClickWait('//a[text()="'.$this->mapName.'"]/../../td/a[text()="Edit"]');
 		$this->zbxTestClick('clone');
-		$this->input_type('name', $mapName);
+		$this->zbxTestInputType('name', $mapName);
 		$this->zbxTestClickWait('add');
 		$this->zbxTestCheckTitle('Network maps');
 		$this->zbxTestTextPresent('Network map added');

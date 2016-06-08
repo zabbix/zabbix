@@ -67,14 +67,14 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_CheckLayout() {
 		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
-		$this->zbxAssertElementPresent(WebDriverBy::id('config'));
+		$this->zbxTestAssertElementPresentId('config');
 
 		$this->zbxTestCheckHeader('Audit log');
 		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details']);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('alias'));
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//input[@id='alias' and @maxlength='255']"));
-		$this->zbxAssertElementPresent(WebDriverBy::id('btn1'));
+		$this->zbxTestAssertElementPresentId('alias');
+		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
+		$this->zbxTestAssertElementPresentId('btn1');
 
 		$this->zbxTestDropdownHasOptions('action', $this->actions);
 		$this->zbxTestDropdownHasOptions('resourcetype', $this->resourcetypes);
@@ -169,9 +169,9 @@ class testPageAdministrationAudit extends CWebTest {
 	public function testPageAdministrationAudit_Filter($action, $resourcetype) {
 		$this->zbxTestLogin('auditlogs.php');
 		$this->zbxTestCheckTitle('Audit log');
-		$this->zbxAssertElementPresent(WebDriverBy::id('config'));
+		$this->zbxTestAssertElementPresentId('config');
 
-		$this->input_type('alias', '');
+		$this->zbxTestInputType('alias', '');
 		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
 

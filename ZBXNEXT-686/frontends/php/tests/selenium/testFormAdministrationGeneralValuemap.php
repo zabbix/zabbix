@@ -26,27 +26,27 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 	public function testFormAdministrationGeneralValuemap_Layout() {
 
 		$this->zbxTestLogin('adm.gui.php');
-		$this->zbxAssertElementPresent(WebDriverBy::id('configDropDown'));
+		$this->zbxTestAssertElementPresentId('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Value mapping');
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
-		$this->zbxAssertElementPresent(WebDriverBy::id('form'));
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestTextPresent('Name');
-		$this->zbxAssertElementPresent(WebDriverBy::id('name'));
-		$this->zbxAssertAttribute("//input[@id='name']", "maxlength", 64);
-		$this->zbxAssertAttribute("//input[@id='name']", "size", 20);
+		$this->zbxTestAssertElementPresentId('name');
+		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 64);
+		$this->zbxTestAssertAttribute("//input[@id='name']", "size", 20);
 
 		$this->zbxTestTextPresent(['Mappings', 'Value', 'Mapped to']);
-		$this->zbxAssertElementPresent(WebDriverBy::id('mappings_0_value'));
-		$this->zbxAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][value]']", "maxlength", 64);
-		$this->zbxAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][value]']", "size", 20);
+		$this->zbxTestAssertElementPresentId('mappings_0_value');
+		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][value]']", "maxlength", 64);
+		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][value]']", "size", 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('mappings_0_newvalue'));
-		$this->zbxAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][newvalue]']", "maxlength", 64);
-		$this->zbxAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][newvalue]']", "size", 20);
+		$this->zbxTestAssertElementPresentId('mappings_0_newvalue');
+		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][newvalue]']", "maxlength", 64);
+		$this->zbxTestAssertAttribute("//table[@id='mappings_table']//input[@name='mappings[0][newvalue]']", "size", 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('mapping_add'));
+		$this->zbxTestAssertElementPresentId('mapping_add');
 
 	}
 
@@ -77,14 +77,14 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->zbxTestTextPresent(['Name', 'Mappings', 'Value', 'Mapped to']);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('mapping_add'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('add'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('cancel'));
+		$this->zbxTestAssertElementPresentId('mapping_add');
+		$this->zbxTestAssertElementPresentId('add');
+		$this->zbxTestAssertElementPresentId('cancel');
 
-		$this->input_type('name', $mapname);
+		$this->zbxTestInputType('name', $mapname);
 
-		$this->input_type('mappings_0_value', $value);
-		$this->input_type('mappings_0_newvalue', $newvalue);
+		$this->zbxTestInputType('mappings_0_value', $value);
+		$this->zbxTestInputType('mappings_0_newvalue', $newvalue);
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Value map added');
@@ -122,16 +122,16 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->zbxTestTextPresent(['Name', 'Mappings', 'Value', 'Mapped to']);
 
-		$this->input_type('name', $this->valuemapWithMultipleMappings);
-		$this->input_type('mappings_0_value', $value1);
-		$this->input_type('mappings_0_newvalue', $newvalue1);
+		$this->zbxTestInputType('name', $this->valuemapWithMultipleMappings);
+		$this->zbxTestInputType('mappings_0_value', $value1);
+		$this->zbxTestInputType('mappings_0_newvalue', $newvalue1);
 		$this->zbxTestClick('mapping_add');
-		$this->input_type('mappings_1_value', $value2);
-		$this->input_type('mappings_1_newvalue', $newvalue2);
+		$this->zbxTestInputType('mappings_1_value', $value2);
+		$this->zbxTestInputType('mappings_1_newvalue', $newvalue2);
 		$this->zbxTestClick('mapping_add');
 
-		$this->input_type('mappings_2_value', $value3);
-		$this->input_type('mappings_2_newvalue', $newvalue3);
+		$this->zbxTestInputType('mappings_2_value', $value3);
+		$this->zbxTestInputType('mappings_2_newvalue', $newvalue3);
 
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent('Value map added');
@@ -149,7 +149,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of value mapping');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestClickLinkText($oldVmName);
-		$this->input_type("name", $newVmName);
+		$this->zbxTestInputType("name", $newVmName);
 		$this->zbxTestClickWait('update');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
@@ -164,11 +164,11 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickWait('form');
 		$this->zbxTestTextPresent(['Name', 'Mappings', 'Value', 'Mapped to']);
 
-		$this->input_type('name', 'incorrect_valuemap');
+		$this->zbxTestInputType('name', 'incorrect_valuemap');
 		// trying to create already existing valuemap
-		$this->input_type('name', $this->valuemapWithMultipleMappings);
-		$this->input_type('mappings_0_value', 6);
-		$this->input_type('mappings_0_newvalue', 'six');
+		$this->zbxTestInputType('name', $this->valuemapWithMultipleMappings);
+		$this->zbxTestInputType('mappings_0_value', 6);
+		$this->zbxTestInputType('mappings_0_newvalue', 'six');
 		$this->zbxTestClickWait('add');
 		$this->zbxTestTextPresent(['Cannot add value map', 'Value map "'.$this->valuemapWithMultipleMappings.'" already exists.']);
 	}
@@ -184,7 +184,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickLinkText($newVmName);
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$newVmName.'\'';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');
@@ -211,7 +211,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->zbxTestClickLinkText($this->valuemapWithMultipleMappings);
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
-		$this->zbxWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Value map deleted');
 
 		$sql = 'SELECT * FROM valuemaps WHERE name=\''.$this->valuemapWithMultipleMappings.'\'';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Value map with such name has not been deleted from the DB');

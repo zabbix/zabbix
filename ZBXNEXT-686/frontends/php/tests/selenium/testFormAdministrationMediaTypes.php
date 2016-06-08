@@ -76,27 +76,27 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying');
 		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP server port', 'SMTP helo', 'SMTP email', 'Connection security', 'Authentication']);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('description'));
-		$this->zbxAssertAttribute("//input[@id='description']", "maxlength", 100);
-		$this->zbxAssertAttribute("//input[@id='description']", "size", 20);
+		$this->zbxTestAssertElementPresentId('description');
+		$this->zbxTestAssertAttribute("//input[@id='description']", "maxlength", 100);
+		$this->zbxTestAssertAttribute("//input[@id='description']", "size", 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('type'));
+		$this->zbxTestAssertElementPresentId('type');
 		$this->zbxTestDropdownHasOptions('type', ['Email', 'Script', 'SMS', 'Jabber']);
-		$this->zbxAssertElementPresent(WebDriverBy::xpath("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']"));
+		$this->zbxTestAssertElementPresentXpath("//select[@id='type']/optgroup[@label='Commercial']/option[text()='Ez Texting']");
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('smtp_server'));
-		$this->zbxAssertAttribute("//input[@id='smtp_server']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='smtp_server']", "size", 20);
+		$this->zbxTestAssertElementPresentId('smtp_server');
+		$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='smtp_server']", "size", 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('smtp_helo'));
-		$this->zbxAssertAttribute("//input[@id='smtp_helo']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='smtp_helo']", "size", 20);
+		$this->zbxTestAssertElementPresentId('smtp_helo');
+		$this->zbxTestAssertAttribute("//input[@id='smtp_helo']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='smtp_helo']", "size", 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('smtp_email'));
-		$this->zbxAssertAttribute("//input[@id='smtp_email']", "maxlength", 255);
-		$this->zbxAssertAttribute("//input[@id='smtp_email']", "size", 20);
+		$this->zbxTestAssertElementPresentId('smtp_email');
+		$this->zbxTestAssertAttribute("//input[@id='smtp_email']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//input[@id='smtp_email']", "size", 20);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('status'));
+		$this->zbxTestAssertElementPresentId('status');
 		if ($allMediaTypes['status']) {
 			$this->assertFalse($this->zbxTestCheckboxSelected('status'));
 		}
@@ -123,32 +123,32 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		switch ($type) {
 			case 'Email':
 				$this->zbxTestDropdownSelect('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('smtp_server', $data['SMTP server']);
-				$this->input_type('smtp_helo', $data['SMTP helo']);
-				$this->input_type('smtp_email', $data['SMTP email']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('smtp_server', $data['SMTP server']);
+				$this->zbxTestInputType('smtp_helo', $data['SMTP helo']);
+				$this->zbxTestInputType('smtp_email', $data['SMTP email']);
 				break;
 			case 'Script':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('exec_path', $data['Script']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('exec_path', $data['Script']);
 				break;
 			case 'SMS':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('gsm_modem', $data['GSM modem']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('gsm_modem', $data['GSM modem']);
 				break;
 			case 'Jabber':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('jabber_username', $data['Jabber identifier']);
-				$this->input_type('passwd', $data['Password']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('jabber_username', $data['Jabber identifier']);
+				$this->zbxTestInputType('passwd', $data['Password']);
 				break;
 			case 'Ez Texting':
 				$this->zbxTestDropdownSelectWait('type', $type);
-				$this->input_type('description', $data['Description']);
-				$this->input_type('eztext_username', $data['Username']);
-				$this->input_type('passwd', $data['Password']);
+				$this->zbxTestInputType('description', $data['Description']);
+				$this->zbxTestInputType('eztext_username', $data['Username']);
+				$this->zbxTestInputType('passwd', $data['Password']);
 				break;
 		}
 

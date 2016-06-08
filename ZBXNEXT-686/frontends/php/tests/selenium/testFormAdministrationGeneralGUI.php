@@ -56,23 +56,23 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownHasOptions('default_theme', ['Blue', 'Dark']);
 		$this->zbxTestDropdownHasOptions('dropdown_first_entry', ['All', 'None']);
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('search_limit'));
-		$this->zbxAssertAttribute('//input[@id="search_limit"]', 'maxlength', '6');
-		$this->zbxAssertElementPresent(WebDriverBy::id('max_in_table'));
-		$this->zbxAssertAttribute('//input[@id="max_in_table"]','maxlength', '5');
-		$this->zbxAssertElementPresent(WebDriverBy::id('event_expire'));
-		$this->zbxAssertAttribute('//input[@id="event_expire"]', 'maxlength', '255');
-		$this->zbxAssertElementPresent(WebDriverBy::id('event_show_max'));
-		$this->zbxAssertAttribute('//input[@id="event_show_max"]', 'maxlength', '255');
+		$this->zbxTestAssertElementPresentId('search_limit');
+		$this->zbxTestAssertAttribute('//input[@id="search_limit"]', 'maxlength', '6');
+		$this->zbxTestAssertElementPresentId('max_in_table');
+		$this->zbxTestAssertAttribute('//input[@id="max_in_table"]','maxlength', '5');
+		$this->zbxTestAssertElementPresentId('event_expire');
+		$this->zbxTestAssertAttribute('//input[@id="event_expire"]', 'maxlength', '255');
+		$this->zbxTestAssertElementPresentId('event_show_max');
+		$this->zbxTestAssertAttribute('//input[@id="event_show_max"]', 'maxlength', '255');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('dropdown_first_remember'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('event_ack_enable'));
-		$this->zbxAssertElementPresent(WebDriverBy::id('server_check_interval'));
+		$this->zbxTestAssertElementPresentId('dropdown_first_remember');
+		$this->zbxTestAssertElementPresentId('event_ack_enable');
+		$this->zbxTestAssertElementPresentId('server_check_interval');
 
-		$this->zbxAssertElementPresent(WebDriverBy::id('update'));
+		$this->zbxTestAssertElementPresentId('update');
 
-		$this->zbxAssertAttribute("//select[@id='default_theme']/option[@selected='selected']", "value", $allValues['default_theme']);
-		$this->zbxAssertAttribute("//select[@id='dropdown_first_entry']/option[@selected='selected']", "value", $allValues['dropdown_first_entry']);
+		$this->zbxTestAssertAttribute("//select[@id='default_theme']/option[@selected='selected']", "value", $allValues['default_theme']);
+		$this->zbxTestAssertAttribute("//select[@id='dropdown_first_entry']/option[@selected='selected']", "value", $allValues['dropdown_first_entry']);
 
 		if ($allValues['dropdown_first_remember']) {
 			$this->assertTrue($this->zbxTestCheckboxSelected('dropdown_first_remember'));
@@ -95,10 +95,10 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 			$this->assertFalse($this->zbxTestCheckboxSelected('server_check_interval'));
 		}
 
-		$this->assertElementValue('search_limit', $allValues['search_limit']);
-		$this->assertElementValue('max_in_table', $allValues['max_in_table']);
-		$this->assertElementValue('event_expire', $allValues['event_expire']);
-		$this->assertElementValue('event_show_max', $allValues['event_show_max']);
+		$this->zbxTestAssertElementValue('search_limit', $allValues['search_limit']);
+		$this->zbxTestAssertElementValue('max_in_table', $allValues['max_in_table']);
+		$this->zbxTestAssertElementValue('event_expire', $allValues['event_expire']);
+		$this->zbxTestAssertElementValue('event_show_max', $allValues['event_show_max']);
 	}
 
 	public function testFormAdministrationGeneralGUI_ChangeTheme() {
@@ -174,7 +174,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
 
-		$this->input_type('search_limit', '1000');
+		$this->zbxTestInputType('search_limit', '1000');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
 
@@ -184,7 +184,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('search_limit', '1');
+		$this->zbxTestInputType('search_limit', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Search/Filter elements limit']);
 
@@ -205,7 +205,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('search_limit', '0');
+		$this->zbxTestInputType('search_limit', '0');
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Search/Filter elements limit']);
@@ -244,7 +244,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('max_in_table', '1');
+		$this->zbxTestInputType('max_in_table', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent([
 			'Configuration updated',
@@ -321,7 +321,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,event_show_max,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
 
-		$this->input_type('event_expire', '99999');
+		$this->zbxTestInputType('event_expire', '99999');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestTextPresent(['GUI', 'Show events not older than (in days)']);
@@ -332,7 +332,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('event_expire', '1');
+		$this->zbxTestInputType('event_expire', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
 		$this->zbxTestCheckHeader('GUI');
@@ -344,7 +344,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('event_expire', '100000');
+		$this->zbxTestInputType('event_expire', '100000');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "100000" for "Show events not older than (in days)" field: must be between 1 and 99999.']);
 		$this->zbxTestTextNotPresent('Configuration updated');
@@ -353,7 +353,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('event_expire', '0');
+		$this->zbxTestInputType('event_expire', '0');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "0" for "Show events not older than (in days)" field: must be between 1 and 99999.']);
 		$this->zbxTestTextNotPresent('Configuration updated');
@@ -364,7 +364,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 	public function testFormAdministrationGeneralGUI_EventShowMax() {
 		$this->zbxTestLogin('adm.gui.php');
-		$this->input_type('event_show_max', '99999');
+		$this->zbxTestInputType('event_show_max', '99999');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Max count of events per trigger to show']);
 
@@ -377,7 +377,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('event_show_max', '1');
+		$this->zbxTestInputType('event_show_max', '1');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Configuration updated', 'GUI', 'Max count of events per trigger to show']);
 
@@ -387,7 +387,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('event_show_max', '100000');
+		$this->zbxTestInputType('event_show_max', '100000');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "100000" for "Max count of events per trigger to show" field: must be between 1 and 99999.']);
 		$this->zbxTestTextNotPresent('Configuration updated');
@@ -396,7 +396,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
 		$this->zbxTestCheckHeader('GUI');
-		$this->input_type('event_show_max', '0');
+		$this->zbxTestInputType('event_show_max', '0');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "0" for "Max count of events per trigger to show" field: must be between 1 and 99999.']);
 		$this->zbxTestTextNotPresent('Configuration updated');

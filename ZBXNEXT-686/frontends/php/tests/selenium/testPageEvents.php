@@ -55,7 +55,7 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestDropdownSelectWait('source', 'Trigger');
 		$this->zbxTestCheckTitle('Latest events [refreshed every 30 sec.]');
 
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 
 	public function testPageEvents_Discovery_NoHostNames() {
@@ -63,6 +63,6 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestDropdownSelectWait('source', 'Discovery');
 		$this->zbxTestCheckTitle('Latest events [refreshed every 30 sec.]');
 
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

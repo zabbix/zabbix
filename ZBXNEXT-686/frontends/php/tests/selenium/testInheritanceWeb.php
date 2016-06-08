@@ -100,16 +100,16 @@ class testInheritanceWeb extends CWebTest {
 	public function testInheritanceWeb_SimpleCreate($data) {
 		$this->zbxTestLogin('httpconf.php?form=Create+web+scenario&hostid='.$this->templateid);
 
-		$this->input_type('name', $data['name']);
+		$this->zbxTestInputType('name', $data['name']);
 
 		$this->zbxTestClick('tab_stepTab');
 		foreach ($data['addStep'] as $step) {
 			$this->zbxTestLaunchPopup('add_step');
-			$this->input_type('name', $step['name']);
-			$this->input_type('url', $step['url']);
+			$this->zbxTestInputType('name', $step['name']);
+			$this->zbxTestInputType('url', $step['url']);
 			$this->zbxTestClick('add');
 			$this->webDriver->switchTo()->window('');
-			$this->zbxWaitUntilElementVisible(WebdriverBy::id('add'));
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add'));
 			$this->zbxTestTextPresent($data['name']);
 		}
 
