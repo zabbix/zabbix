@@ -912,7 +912,7 @@ function getItemFilterForm(&$items) {
 /**
  * Get data for item edit page.
  *
- * @param array	$item							item, item prototype or LLD rule to take the data from
+ * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
  * @param bool $options['is_discovery_rule']
  *
  * @return array
@@ -1218,8 +1218,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	// valuemapid
-	if ($data['limited']) {
+	if ($data['limited'] || ($item && $data['parent_discoveryid'] === null
+			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
 				'output' => ['name'],
@@ -1417,7 +1417,7 @@ function getTriggerMassupdateFormData() {
  * @return array
  */
 function getTriggerFormData(array $data) {
-	if (!empty($data['triggerid'])) {
+	if ($data['triggerid'] !== null) {
 		// Get trigger.
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
@@ -1429,9 +1429,13 @@ function getTriggerFormData(array $data) {
 			$options['selectTags'] = ['tag', 'value'];
 		}
 
-		$triggers = $data['parent_discoveryid']
-			? API::TriggerPrototype()->get($options)
-			: API::Trigger()->get($options);
+		if ($data['parent_discoveryid'] === null) {
+			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$triggers = API::Trigger()->get($options);
+		}
+		else {
+			$triggers = API::TriggerPrototype()->get($options);
+		}
 
 		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
 			['sources' => ['expression', 'recovery_expression']]
@@ -1473,6 +1477,7 @@ function getTriggerFormData(array $data) {
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
 		} while ($tmp_triggerid != 0);
+
 		$data['templates'] = array_reverse($data['templates']);
 		array_shift($data['templates']);
 
@@ -1514,6 +1519,19 @@ function getTriggerFormData(array $data) {
 		}
 	}
 
+	$readonly = false;
+	if ($data['triggerid'] !== null) {
+		$data['flags'] = $trigger['flags'];
+
+		if ($data['parent_discoveryid'] === null) {
+			$data['discoveryRule'] = $trigger['discoveryRule'];
+		}
+
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {
+			$readonly = true;
+		}
+	}
+
 	// Trigger expression constructor.
 	if ($data['expression_constructor'] == IM_TREE) {
 		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
@@ -1550,7 +1568,7 @@ function getTriggerFormData(array $data) {
 	elseif ($data['expression_constructor'] != IM_TREE) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
-		$data['expression_field_readonly'] = $data['limited'];
+		$data['expression_field_readonly'] = $readonly;
 	}
 
 	// Trigger recovery expression constructor.
@@ -1590,7 +1608,7 @@ function getTriggerFormData(array $data) {
 	elseif ($data['recovery_expression_constructor'] != IM_TREE) {
 		$data['recovery_expression_field_name'] = 'recovery_expression';
 		$data['recovery_expression_field_value'] = $data['recovery_expression'];
-		$data['recovery_expression_field_readonly'] = $data['limited'];
+		$data['recovery_expression_field_readonly'] = $readonly;
 	}
 
 	if ($data['dependencies']) {

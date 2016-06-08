@@ -333,23 +333,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
-	$groupHostDiscoveryRuleId = getRequest('g_hostdruleid');
-	$enable = (getRequest('action') == 'discoveryrule.massenable');
+	$itemids = getRequest('g_hostdruleid');
+	$status = (getRequest('action') == 'discoveryrule.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
-	DBstart();
-	$result = $enable ? activate_item($groupHostDiscoveryRuleId) : disable_item($groupHostDiscoveryRuleId);
-	$result = DBend($result);
+	$lld_rules = [];
+	foreach ($itemids as $itemid) {
+		$lld_rules[] = ['itemid' => $itemid, 'status' => $status];
+	}
+
+	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
 
-	$updated = count($groupHostDiscoveryRuleId);
+	$updated = count($itemids);
 
-	$messageSuccess = $enable
+	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
 		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
 		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
-	$messageFailed = $enable
+	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
 		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
 		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
 

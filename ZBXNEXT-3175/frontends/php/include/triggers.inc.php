@@ -333,7 +333,7 @@ function utf8RawUrlDecode($source) {
 /**
  * Copies the given triggers to the given hosts or templates.
  *
- * Without the $srcHostId parameter it will only be able to copy triggers that belong to only one host. If the
+ * Without the $src_hostid parameter it will only be able to copy triggers that belong to only one host. If the
  * $srcHostId parameter is not passed, and a trigger has multiple hosts, it will throw an error. If the
  * $srcHostId parameter is passed, the given host will be replaced with the destination host.
  *
@@ -344,25 +344,26 @@ function utf8RawUrlDecode($source) {
  * otherwise original dependency will be left.
  *
  *
- * @param int|array $srcTriggerIds triggers which will be copied to $dstHostIds
- * @param int|array $dstHostIds hosts and templates to whom add triggers, ids not present in DB (host table) will be ignored
- * @param int $srcHostId host id in which context trigger with multiple hosts will be treated
+ * @param array $src_triggerids		Triggers which will be copied to $dst_hostids
+ * @param array $dst_hostids		Hosts and templates to whom add triggers. IDs not present in DB (host table)
+ *									will be ignored.
+ * @param int	$src_hostid			Host ID in which context trigger with multiple hosts will be treated.
  *
  * @return bool
  */
-function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
+function copyTriggersToHosts($src_triggerids, $dst_hostids, $src_hostid = null) {
 	$options = [
-		'triggerids' => $srcTriggerIds,
 		'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
 			'recovery_mode', 'recovery_expression'
 		],
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-		'selectDependencies' => ['triggerid']
+		'selectDependencies' => ['triggerid'],
+		'triggerids' => $src_triggerids
 	];
-	if ($srcHostId) {
+
+	if ($src_hostid) {
 		$srcHost = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => $srcHostId,
+			'hostids' => $src_hostid,
 			'preservekeys' => true,
 			'templated_hosts' => true
 		]);
@@ -384,7 +385,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 
 	$dbDstHosts = API::Host()->get([
 		'output' => ['hostid', 'host'],
-		'hostids' => $dstHostIds,
+		'hostids' => $dst_hostids,
 		'preservekeys' => true,
 		'templated_hosts' => true
 	]);
@@ -395,9 +396,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	foreach ($dbDstHosts as $dstHost) {
 		foreach ($dbSrcTriggers as &$srcTrigger) {
 			// If $srcHostId provided, get host 'host' for triggerExpressionReplaceHost().
-			if ($srcHostId != 0) {
+			if ($src_hostid != 0) {
 				$host = $srcHost['host'];
-				$srcTriggerContextHostId = $srcHostId;
+				$srcTriggerContextHostId = $src_hostid;
 			}
 			// If $srcHostId not provided, use source trigger first host 'host'.
 			else {

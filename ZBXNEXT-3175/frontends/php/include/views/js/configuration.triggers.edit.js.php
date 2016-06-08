@@ -28,7 +28,8 @@
 
 		function changeRecoveryMode() {
 			// Used textarea selector by ID because there are ID duplicates on page.
-			if ($('input[name=recovery_mode]:checked').val() == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>) {
+			if ($('input[name=recovery_mode]:checked').val() == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>
+					|| $('input[name=recovery_mode_name]:checked').val() == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>) {
 				$('#recovery_expression_row, .recovery_expression_constructor_row').show();
 				$('#expression_row').find('label').html('<?= _('Problem expression') ?>');
 			}

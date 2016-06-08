@@ -2,6 +2,11 @@ Changes for 3.1.0
 
 New features:
 ..F.....S. [ZBXNEXT-3175] added filering for the list of templates and host groups (Alexei)
+A.F....... [ZBXNEXT-821] added possibility to view, copy, mass update and delete lld created elements (Gunars, Ivo, Sasha)
+....I...S. [ZBXNEXT-3193] added event_recovery table to link problem and recovery events, added problem table to cache active problem events (wiper)
+.......PS. [ZBXNEXT-3267] added one minute delay for repeated SNMP trap file error log entries (viktors)
+A.F.....S. [ZBXNEXT-3196] added action option to pause escalations during maintenance (Gunars, wiper)
+A.F....... [ZBXNEXT-178] implemented web scenarios import/export (Sasha)
 A.F.....S. [ZBXNEXT-2087] added trigger and event tags (Gunars, wiper)
 A.F.....S. [ZBXNEXT-1638] added macro functions to allow substring extraction from item value macros in triggers and notifications (wiper, Sasha)
 A.F.....S. [ZBXNEXT-2118] added support of trigger option "OK event generation" and recovery expression (Ivo, Oleg, Sasha, wiper)
@@ -16,6 +21,38 @@ A......... [ZBX-10030] fixed API action update method request with only "actioni
 A......... [ZBX-10049] fixed optional field validation in drule.update API method (Gunars)
 ..F....PS. [ZBX-10076] fixed text information containing non-ASCII characters being saved incorrectly to IBM DB2 database in case of system locale misconfiguration (gleb, Oleg)
 ..F....... [ZBX-9989] optimized SQL queries for graphs building (Gunars, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.4rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-10848] fixed applications getting unlinked from undiscovered items (wiper)
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
+A.F....... [ZBX-9455] fixed length limit for host prototype name (Gunars, Sasha)
+..F....... [ZBX-10806] fixed whitespace between elements in host, host mass update, host prototype and proxy forms (Sasha)
+..F....... [ZBXNEXT-3263] moved image type selection to top in administration->general->images (Cemeris)
+..F....... [ZBXNEXT-3263] added "No data found." message in administration->general->images (Cemeris)
+..F....... [ZBX-10731] fixed textarea visibility in monitoring->maps properties (Cemeris)
+........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
+..F....... [ZBX-10825] reverted table header capitalization. fixed calendar header (asaveljevs, Pavel)
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
+..F....... [ZBX-10794] fixed saving of "Show text as HTML" checkbox in Monitoring->Screens (Cemeris)
+..F....... [ZBX-10504] decreased padding and margins in tables and across the whole UI (Pavel)
+..F....... [ZBX-10504] added compression of generated CSS files to reduce size from 99K to around 56K (asaveljevs, Pavel)
+...GI..... [ZBX-10760] fixed agent, get and sender being erroneously linked against UnixODBC (gleb)
+..F....... [ZBX-10647] removed disabled status for "Export to CSV" button (Ivo)
+..F....... [ZBX-10679] fixed vertical scrollbar overlapping in messages (Pavel)
+..F....... [ZBX-10778] fixed users online status in users.php users table (Cemeris, Gunars)
+..F....... [ZBX-10605] fixed access_deny() message layout for not logged in page visitors (Cemeris)
+..F....... [ZBX-10605] fixed access to popup_media for Zabbix Admin user in profile->media (Cemeris)
+..F....... [ZBX-10806] fixed whitespace between elements in the IT services form (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.3
+
+3.0.3rc1 was released as 3.0.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 3.0.3rc1
@@ -1379,6 +1416,21 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.14rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
+........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
+.......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.13
+
+2.2.13rc1 was released as 2.2.13 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.13rc1
@@ -2789,6 +2841,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.19rc1
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.18
+
+2.0.18rc1 was released as 2.0.18 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.18rc1

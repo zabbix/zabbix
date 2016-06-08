@@ -44,6 +44,8 @@ class CImportReferencer {
 	protected $macros = [];
 	protected $proxies = [];
 	protected $hostPrototypes = [];
+	protected $httptests = [];
+	protected $httpsteps = [];
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -59,7 +61,8 @@ class CImportReferencer {
 	protected $macrosRefs;
 	protected $proxiesRefs;
 	protected $hostPrototypesRefs;
-
+	protected $httptestsRefs;
+	protected $httpstepsRefs;
 
 	/**
 	 * Get group id by name.
@@ -304,7 +307,7 @@ class CImportReferencer {
 	 */
 	public function resolveProxy($name) {
 		if ($this->proxiesRefs === null) {
-			$this->selectProxyes();
+			$this->selectProxies();
 		}
 
 		return isset($this->proxiesRefs[$name]) ? $this->proxiesRefs[$name] : false;
@@ -330,6 +333,53 @@ class CImportReferencer {
 		else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get httptestid by hostid and web scenario name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveHttpTest($hostid, $name) {
+		if ($this->httptestsRefs === null) {
+			$this->selectHttpTests();
+		}
+
+		return array_key_exists($hostid, $this->httptestsRefs) && array_key_exists($name, $this->httptestsRefs[$hostid])
+			? $this->httptestsRefs[$hostid][$name]
+			: false;
+	}
+
+	/**
+	 * Get httpstepid by hostid, httptestid and web scenario step name.
+	 *
+	 * @param string $hostid
+	 * @param string $httptestid
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveHttpStep($hostid, $httptestid, $name) {
+		if ($this->httpstepsRefs === null) {
+			$this->selectHttpSteps();
+		}
+
+		if (!array_key_exists($hostid, $this->httpstepsRefs)) {
+			return false;
+		}
+
+		if (!array_key_exists($httptestid, $this->httpstepsRefs[$hostid])) {
+			return false;
+		}
+
+		if (!array_key_exists($name, $this->httpstepsRefs[$hostid][$httptestid])) {
+			return false;
+		}
+
+		return $this->httpstepsRefs[$hostid][$httptestid][$name];
 	}
 
 	/**
@@ -634,6 +684,45 @@ class CImportReferencer {
 				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
 					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
 				);
+			}
+		}
+	}
+
+	/**
+	 * Add web scenario names that need association with a database httptestid.
+	 *
+	 * @param array  $httptests
+	 * @param string $httptests[<host>][]	web scenario name
+	 */
+	public function addHttpTests(array $httptests) {
+		foreach ($httptests as $host => $names) {
+			if (!array_key_exists($host, $this->httptests)) {
+				$this->httptests[$host] = [];
+			}
+
+			$this->httptests[$host] = array_unique(array_merge($this->httptests[$host], $names));
+		}
+	}
+
+	/**
+	 * Add web scenario step names that need association with a database httpstepid.
+	 *
+	 * @param array  $httpsteps
+	 * @param string $httpsteps[<host>][<httptest_name>][]	web scenario step name
+	 */
+	public function addHttpSteps(array $httpsteps) {
+		foreach ($httpsteps as $host => $httptests) {
+			if (!array_key_exists($host, $this->httpsteps)) {
+				$this->httpsteps[$host] = [];
+			}
+
+			foreach ($httptests as $httptest_name => $httpstep_names) {
+				if (!array_key_exists($httptest_name, $this->httpsteps[$host])) {
+					$this->httpsteps[$host][$httptest_name] = [];
+				}
+
+				$this->httpsteps[$host][$httptest_name] =
+					array_unique(array_merge($this->httpsteps[$host][$httptest_name], $httpstep_names));
 			}
 		}
 	}
@@ -973,7 +1062,7 @@ class CImportReferencer {
 	/**
 	 * Select proxy ids for previously added proxy names.
 	 */
-	protected function selectProxyes() {
+	protected function selectProxies() {
 		if (!empty($this->proxies)) {
 			$this->proxiesRefs = [];
 			$dbProxy = API::Proxy()->get([
@@ -1018,6 +1107,82 @@ class CImportReferencer {
 				);
 				while ($data = DBfetch($query)) {
 					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Select httptestids for previously added web scenario names.
+	 */
+	protected function selectHttpTests() {
+		if ($this->httptests) {
+			$this->httptestsRefs = [];
+
+			$sql_where = [];
+
+			foreach ($this->httptests as $host => $names) {
+				$hostid = $this->resolveHostOrTemplate($host);
+
+				if ($hostid !== false) {
+					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid).' AND '.dbConditionString('ht.name', $names).')';
+				}
+			}
+
+			if ($sql_where) {
+				$db_httptests = DBselect(
+					'SELECT ht.hostid,ht.name,ht.httptestid'.
+					' FROM httptest ht'.
+					' WHERE '.implode(' OR ', $sql_where)
+				);
+				while ($db_httptest = DBfetch($db_httptests)) {
+					$this->httptestsRefs[$db_httptest['hostid']][$db_httptest['name']] = $db_httptest['httptestid'];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Unset web scenario refs to make referencer select them from db again.
+	 */
+	public function refreshHttpTests() {
+		$this->httptestsRefs = null;
+	}
+
+	/**
+	 * Select httpstepids for previously added web scenario step names.
+	 */
+	protected function selectHttpSteps() {
+		if ($this->httpsteps) {
+			$this->httpstepsRefs = [];
+
+			$sql_where = [];
+
+			foreach ($this->httpsteps as $host => $httptests) {
+				$hostid = $this->resolveHostOrTemplate($host);
+
+				if ($hostid !== false) {
+					foreach ($httptests as $httptest_name => $httpstep_names) {
+						$httptestid = $this->resolveHttpTest($hostid, $httptest_name);
+
+						if ($httptestid !== false) {
+							$sql_where[] = '(hs.httptestid='.zbx_dbstr($httptestid).
+								' AND '.dbConditionString('hs.name', $httpstep_names).')';
+						}
+					}
+				}
+			}
+
+			if ($sql_where) {
+				$db_httpsteps = DBselect(
+					'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
+					' FROM httptest ht,httpstep hs'.
+					' WHERE ht.httptestid=hs.httptestid'.
+						' AND '.implode(' OR ', $sql_where)
+				);
+				while ($db_httpstep = DBfetch($db_httpsteps)) {
+					$this->httpstepsRefs[$db_httpstep['hostid']][$db_httpstep['httptestid']][$db_httpstep['name']] =
+						$db_httpstep['httpstepid'];
 				}
 			}
 		}

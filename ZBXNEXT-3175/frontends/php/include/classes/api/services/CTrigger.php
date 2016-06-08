@@ -613,36 +613,19 @@ class CTrigger extends CTriggerGeneral {
 	/**
 	 * Validates the input parameters for the delete() method.
 	 *
-	 * @throws APIException if the input is invalid
+	 * @param array		$triggerids			Trigger IDs.
+	 * @param bool		$nopermissions		If set to true permissions will not be checked.
 	 *
-	 * @param array     $triggerIds
-	 * @param boolean   $nopermissions  if set to true permissions will not be checked
-	 *
-	 * @return void
+	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateDelete(array $triggerIds, $nopermissions) {
-		if (!$triggerIds) {
+	protected function validateDelete(array $triggerids, $nopermissions) {
+		if (!$triggerids) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
 		if (!$nopermissions) {
-			$dbTriggers = $this->get([
-				'output' => ['triggerid', 'flags', 'description'],
-				'triggerids' => $triggerIds,
-				'editable' => true,
-				'filter' => ['flags' => null]
-			]);
-
-			foreach ($dbTriggers as $dbTrigger) {
-				if ($dbTrigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered trigger "%1$s".', $dbTrigger['description'])
-					);
-				}
-			}
-
-			$this->checkPermissions($triggerIds);
-			$this->checkNotInherited($triggerIds);
+			$this->checkPermissions($triggerids);
+			$this->checkNotInherited($triggerids);
 		}
 	}
 
@@ -713,6 +696,31 @@ class CTrigger extends CTriggerGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
+		$triggerids = array_unique(zbx_objectValues($triggersData, 'triggerid'));
+
+		$triggers = $this->get([
+			'output' => ['triggerid', 'description', 'flags'],
+			'triggerids' => $triggerids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($triggerids as $triggerid) {
+			if (!array_key_exists($triggerid, $triggers)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+
+		foreach ($triggers as $trigger) {
+			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update "%2$s" for a discovered trigger "%1$s".',
+					$trigger['description'], 'dependencies'
+				));
+			}
+		}
+
 		$depTtriggerIds = [];
 		$triggers = [];
 		foreach ($triggersData as $dep) {
@@ -748,13 +756,7 @@ class CTrigger extends CTriggerGeneral {
 	public function addDependencies(array $triggersData) {
 		$triggersData = zbx_toArray($triggersData);
 
-		$triggerIds = array_unique(zbx_objectValues($triggersData, 'triggerid'));
-		if (!$this->isWritable($triggerIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
 		$this->validateAddDependencies($triggersData);
-
 
 		foreach ($triggersData as $dep) {
 			$triggerId = $dep['triggerid'];
@@ -788,7 +790,7 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		return ['triggerids' => $triggerIds];
+		return ['triggerids' => array_unique(zbx_objectValues($triggersData, 'triggerid'))];
 	}
 
 	/**
@@ -801,6 +803,31 @@ class CTrigger extends CTriggerGeneral {
 	protected function validateDeleteDependencies(array $triggers) {
 		if (!$triggers) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$triggerids = array_unique(zbx_objectValues($triggers, 'triggerid'));
+
+		$triggers = $this->get([
+			'output' => ['triggerid', 'description', 'flags'],
+			'triggerids' => $triggerids,
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		foreach ($triggerids as $triggerid) {
+			if (!array_key_exists($triggerid, $triggers)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+		}
+
+		foreach ($triggers as $trigger) {
+			if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot update "%2$s" for a discovered trigger "%1$s".',
+					$trigger['description'], 'dependencies'
+				));
+			}
 		}
 	}
 
