@@ -29,71 +29,69 @@ $page['file'] = 'actionconf.php';
 $page['scripts'] = ['multiselect.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR							TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'actionid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
-	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
-	'eventsource' =>			[T_ZBX_INT, O_OPT, null,
-									IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION,
-										EVENT_SOURCE_INTERNAL
-									]),
-									null
-								],
-	'evaltype' =>				[T_ZBX_INT, O_OPT, null,
-									IN([CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
-										CONDITION_EVAL_TYPE_EXPRESSION
-									]),
-									'isset({add}) || isset({update})'
-								],
-	'formula' =>				[T_ZBX_STR, O_OPT, null,   null,		'isset({add}) || isset({update})'],
-	'esc_period' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null,
-									_('Default operation step duration')
-								],
-	'status' =>					[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]), null],
-	'def_shortdata' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'def_longdata' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'r_shortdata' =>			[T_ZBX_STR, O_OPT, null,	null,
-									'isset({add}) || isset({update})',
-									_('Recovery subject')
-								],
-	'r_longdata' =>				[T_ZBX_STR, O_OPT, null,	null,
-									'isset({add}) || isset({update})',
-									_('Recovery message')
-								],
-	'g_actionid' =>				[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'conditions' =>				[null,		O_OPT,	null,	null,		null],
-	'new_condition' =>			[null,		O_OPT,	null,	null,		'isset({add_condition})'],
-	'operations' =>				[null,		O_OPT,	null,	null,		'isset({add}) || isset({update})'],
-	'edit_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_operation' =>			[null,		O_OPT,	null,	null,		'isset({add_operation})'],
-	'opconditions' =>			[null,		O_OPT,	null,	null,		null],
-	'new_opcondition' =>		[null,		O_OPT,	null,	null,		'isset({add_opcondition})'],
+	'actionid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'name' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
+	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
+											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION,
+												EVENT_SOURCE_INTERNAL
+											]),
+											null
+										],
+'evaltype' =>							[T_ZBX_INT, O_OPT, null,
+											IN([CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
+												CONDITION_EVAL_TYPE_EXPRESSION
+											]),
+											'isset({add}) || isset({update})'
+										],
+	'formula' =>						[T_ZBX_STR, O_OPT, null,   null,		'isset({add}) || isset({update})'],
+	'esc_period' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null,
+											_('Default operation step duration')
+										],
+	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]), null],
+	'def_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'def_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'r_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'r_longdata' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'g_actionid' =>						[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'conditions' =>						[null,		O_OPT,	null,	null,		null],
+	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
+	'operations' =>						[null,		O_OPT,	null,	null,		'isset({add}) || isset({update})'],
+	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
+	'new_operation' =>					[null,		O_OPT,	null,	null,		'isset({add_operation})'],
+	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
+	'recovery_operations' =>			[null,		O_OPT,	null,	null,		null],
+	'new_recovery_operation' =>			[null,		O_OPT,	null,	null,		null],
+	'opconditions' =>					[null,		O_OPT,	null,	null,		null],
+	'new_opcondition' =>				[null,		O_OPT,	null,	null,		'isset({add_opcondition})'],
 	// actions
-	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-									IN('"action.massdelete","action.massdisable","action.massenable"'),
-									null
-								],
-	'add_condition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_condition' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_operation' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_opcondition' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel_new_opcondition' => [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'maintenance_mode' =>		[T_ZBX_STR, O_OPT, null,
-									IN([ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]),
-									null,
-									_('Pause operations while in maintenance')
-								],
-	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,		null,	null],
+	'action' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+											IN('"action.massdelete","action.massdisable","action.massenable"'),
+											null
+										],
+	'add_condition' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel_new_condition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_operation' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel_new_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_recovery_operation' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel_new_recovery_operation' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_opcondition' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel_new_opcondition' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'maintenance_mode' =>				[T_ZBX_STR, O_OPT, null,
+											IN([ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]),
+											null,
+											_('Pause operations while in maintenance')
+										],
+	'add' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>							[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form' =>							[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form_refresh' =>					[T_ZBX_INT, O_OPT, null,		null,	null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
+	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
 $dataValid = check_fields($fields);
@@ -122,6 +120,9 @@ if (isset($_REQUEST['cancel_new_operation'])) {
 elseif (isset($_REQUEST['cancel_new_opcondition'])) {
 	unset($_REQUEST['new_opcondition']);
 }
+elseif (isset($_REQUEST['cancel_new_recovery_operation'])) {
+	unset($_REQUEST['new_recovery_operation']);
+}
 elseif (hasRequest('add') || hasRequest('update')) {
 	$action = [
 		'name' => getRequest('name'),
@@ -131,7 +132,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'def_longdata' => getRequest('def_longdata', ''),
 		'r_shortdata' => getRequest('r_shortdata', ''),
 		'r_longdata' => getRequest('r_longdata', ''),
-		'operations' => getRequest('operations', [])
+		'operations' => getRequest('operations', []),
+		'recovery_operations' => getRequest('recovery_operations', [])
 	];
 
 	foreach ($action['operations'] as &$operation) {
@@ -164,6 +166,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 	unset($operation);
+
+	foreach ($action['recovery_operations'] as &$recovery_operations) {
+		if (array_key_exists('opmessage', $recovery_operations)
+				&& !array_key_exists('default_msg', $recovery_operations['opmessage'])) {
+			$recovery_operations['opmessage']['default_msg'] = 0;
+		}
+	}
+	unset($recovery_operations);
 
 	$filter = [
 		'conditions' => getRequest('conditions', []),
@@ -346,7 +356,12 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			break;
 	}
 
-	if (API::Action()->validateOperationsIntegrity($new_operation, ACTION_OPERATION)) {
+	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
+
+	$new_operation['recovery'] = ACTION_OPERATION;
+	$new_operation['eventsource'] = $eventsource;
+
+	if (API::Action()->validateOperationsIntegrity($new_operation)) {
 		$_REQUEST['operations'] = getRequest('operations', []);
 
 		$uniqOperations = [
@@ -373,10 +388,6 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 		}
 
 		if ($result) {
-			$eventsource = getRequest('eventsource',
-				CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
-			);
-
 			if (isset($_REQUEST['new_operation']['id'])) {
 				$_REQUEST['operations'][$_REQUEST['new_operation']['id']] = $_REQUEST['new_operation'];
 			}
@@ -390,7 +401,30 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 		unset($_REQUEST['new_operation']);
 	}
 }
-elseif (isset($_REQUEST['edit_operationid'])) {
+elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operation')) {
+	$new_recovery_operation = getRequest('new_recovery_operation');
+
+	$eventsource = getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS));
+
+	$new_recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+	$new_recovery_operation['eventsource'] = $eventsource;
+
+	if (API::Action()->validateOperationsIntegrity($new_recovery_operation)) {
+		$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
+
+		if (isset($_REQUEST['new_recovery_operation']['id'])) {
+			$_REQUEST['recovery_operations'][$_REQUEST['new_recovery_operation']['id']] = $_REQUEST['new_recovery_operation'];
+		}
+		else {
+			$_REQUEST['recovery_operations'][] = $_REQUEST['new_recovery_operation'];
+		}
+
+		sortOperations($eventsource, $_REQUEST['recovery_operations']);
+
+		unset($_REQUEST['new_recovery_operation']);
+	}
+}
+elseif (hasRequest('edit_operationid')) {
 	$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
 	$edit_operationid = $_REQUEST['edit_operationid'] = array_pop($_REQUEST['edit_operationid']);
 	$_REQUEST['operations'] = getRequest('operations', []);
@@ -398,6 +432,17 @@ elseif (isset($_REQUEST['edit_operationid'])) {
 	if (isset($_REQUEST['operations'][$edit_operationid])) {
 		$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
 		$_REQUEST['new_operation']['id'] = $edit_operationid;
+	}
+}
+elseif (hasRequest('edit_recovery_operationid')) {
+	$_REQUEST['edit_recovery_operationid'] = array_keys($_REQUEST['edit_recovery_operationid']);
+	$edit_recovery_operationid = array_pop($_REQUEST['edit_recovery_operationid']);
+	$_REQUEST['edit_recovery_operationid'] = $edit_recovery_operationid;
+	$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
+
+	if (isset($_REQUEST['recovery_operations'][$edit_recovery_operationid])) {
+		$_REQUEST['new_recovery_operation'] = $_REQUEST['operations'][$edit_recovery_operationid];
+		$_REQUEST['new_recovery_operation']['id'] = $edit_recovery_operationid;
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['action.massenable', 'action.massdisable']) && hasRequest('g_actionid')) {
@@ -467,6 +512,7 @@ if (hasRequest('form')) {
 		'actionid' => getRequest('actionid'),
 		'new_condition' => getRequest('new_condition', []),
 		'new_operation' => getRequest('new_operation'),
+		'new_recovery_operation' => getRequest('new_recovery_operation'),
 		'config' => $config
 	];
 
@@ -474,6 +520,7 @@ if (hasRequest('form')) {
 		$data['action'] = API::Action()->get([
 			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
+			'selectRecoveryOperations' => ['operationid', 'actionid', 'operationtype'],
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
@@ -516,12 +563,14 @@ if (hasRequest('form')) {
 
 	if (isset($data['action']['actionid']) && !hasRequest('form_refresh')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
+		sortOperations($data['eventsource'], $data['action']['recoveryOperations']);
 	}
 	else {
 		$data['action']['name'] = getRequest('name');
 		$data['action']['esc_period'] = getRequest('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
+		$data['action']['recoveryOperations'] = getRequest('recoveryOperations', []);
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
@@ -584,7 +633,7 @@ if (hasRequest('form')) {
 		);
 	}
 
-	// new condition
+	// New condition.
 	$data['new_condition'] = [
 		'conditiontype' => isset($data['new_condition']['conditiontype']) ? $data['new_condition']['conditiontype'] : CONDITION_TYPE_TRIGGER_NAME,
 		'operator' => isset($data['new_condition']['operator']) ? $data['new_condition']['operator'] : CONDITION_OPERATOR_LIKE,
@@ -595,8 +644,8 @@ if (hasRequest('form')) {
 		$data['new_condition']['conditiontype'] = $data['allowedConditions'][0];
 	}
 
-	// new operation
-	if (!empty($data['new_operation']) && !is_array($data['new_operation'])) {
+	// New operation.
+	if (!$data['new_operation'] && !is_array($data['new_operation'])) {
 		$data['new_operation'] = [
 			'operationtype' => 0,
 			'esc_period' => 0,
@@ -664,7 +713,12 @@ if (hasRequest('form')) {
 		}
 	}
 
-	// render view
+	// New recovery operation.
+	if (!$data['new_recovery_operation'] && !is_array($data['new_recovery_operation'])) {
+		$data['new_recovery_operation'] = ['operationtype' => 0];
+	}
+
+	// Render view.
 	$actionView = new CView('configuration.action.edit', $data);
 	$actionView->render();
 	$actionView->show();
