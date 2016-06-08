@@ -406,6 +406,13 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 	);
 }
 
+if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+	$operationFormList->addRow(_('Pause operations while in maintenance'),
+		(new CCheckBox('maintenance_mode', ACTION_MAINTENANCE_MODE_PAUSE))
+			->setChecked($data['action']['maintenance_mode'] == ACTION_MAINTENANCE_MODE_PAUSE)
+	);
+}
+
 // create operation table
 $operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {

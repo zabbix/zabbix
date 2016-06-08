@@ -3756,7 +3756,7 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
  *                                                                            *
  * Parameters: expr      - [IN] the function expression, starting with the    *
  *                             parameter to parse: p1,p2 ...                  *
- *             length    - [OUT] the parameter length excluding the trailing  *
+ *             length    - [OUT] the parameter length including trailing      *
  *                              whitespace                                    *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
@@ -3799,7 +3799,7 @@ out:
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
  *             length    - [OUT] the parameter length including trailing      *
- *                               whitespace                                   *
+ *                               whitespace for unquoted parameter            *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
  *                               0 if there are no more parameters to parse.  *

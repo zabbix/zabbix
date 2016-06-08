@@ -585,6 +585,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
 
+/* action maintenance mode */
+#define ACTION_MAINTENANCE_MODE_NORMAL	0	/* ignore maintenance */
+#define ACTION_MAINTENANCE_MODE_PAUSE	1	/* pause escalation while host is in maintenance */
+
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
 
@@ -920,7 +924,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
+#define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
+
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
