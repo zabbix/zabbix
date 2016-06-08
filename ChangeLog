@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+..F....... [ZBXNEXT-3175] added filering for the list of templates and host groups (Alexei)
 A.F....... [ZBXNEXT-821] added possibility to view, copy, mass update and delete lld created elements (Gunars, Ivo, Sasha)
 ....I...S. [ZBXNEXT-3193] added event_recovery table to link problem and recovery events, added problem table to cache active problem events (wiper)
 .......PS. [ZBXNEXT-3267] added one minute delay for repeated SNMP trap file error log entries (viktors)
