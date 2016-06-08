@@ -48,16 +48,24 @@ class CJsonRpc {
 		$this->_response = [];
 		$this->_jsonDecoded = $this->json->decode($jsonData, true);
 
-		if (!$this->_jsonDecoded) {
+		// TODO: Proper validation of JSON should be done in CJson.
+		if ($this->_jsonDecoded === null && $jsonData !== 'null') {
 			$this->jsonError(null, '-32700', null, null, true);
-			return;
+		}
+		elseif (!$this->_jsonDecoded) {
+			$this->jsonError(null, '-32600', null, null, true);
 		}
 	}
 
 	public function execute() {
+		if (!$this->_jsonDecoded) {
+			return $this->json->encode($this->_response[0]);
+		}
+
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
 			// notification
-			if (!isset($call['id'])) {
+			$call = is_array($call) ? $call : [$call];
+			if (!array_key_exists('id', $call)) {
 				$call['id'] = null;
 			}
 
@@ -74,8 +82,12 @@ class CJsonRpc {
 			$this->processResult($call, $result);
 		}
 
+		// TODO: Condition check that $this->_jsonDecoded is indexed array should be improved.
 		return $this->json->encode(
-			array_key_exists('jsonrpc', $this->_jsonDecoded) ? $this->_response[0] : $this->_response
+			(is_array($this->_jsonDecoded)
+					&& (array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)))
+				? $this->_response
+				: $this->_response[0]
 		);
 	}
 
