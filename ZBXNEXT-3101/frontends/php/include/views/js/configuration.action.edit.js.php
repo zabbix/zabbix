@@ -1,24 +1,24 @@
 <!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsgUsrgrpRowTPL">
-<tr id="opmsgUsrgrpRow_#{usrgrpid}">
+<tr id="#{row}#{usrgrpid}">
 	<td>
-		<input name="new_operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
+		<input name="#{field}[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{usrgrpid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opmsgUserRowTPL">
-<tr id="opmsgUserRow_#{id}">
+<tr id="#{row}#{id}">
 	<td>
-		<input name="new_operation[opmessage_usr][#{id}][userid]" type="hidden" value="#{id}" />
+		<input name="#{field}[opmessage_usr][#{id}][userid]" type="hidden" value="#{id}" />
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{id}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{id}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -26,13 +26,13 @@
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
 <tr id="opCmdGroupRow_#{groupid}">
 	<td>
-		<input name="new_operation[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
-		<input name="new_operation[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
+		<input name="#{field}[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+		<input name="#{field}[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('opCmdGroupRow_#{groupid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -40,13 +40,13 @@
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
 <tr id="opCmdHostRow_#{hostid}">
 	<td>
-		<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
-		<input name="new_operation[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
+		<input name="#{field}[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
+		<input name="#{field}[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('opCmdHostRow_#{hostid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -118,23 +118,42 @@
 
 			switch (list.object) {
 				case 'userid':
-					if (jQuery('#opmsgUserRow_' + value.id).length) {
+					if (list.parentId == 'opmsgUserListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opmsgUserRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpmsgUserRow_';
+					}
+
+					if (jQuery('#' + value.row + value.id).length) {
 						continue;
 					}
 
 					tpl = new Template(jQuery('#opmsgUserRowTPL').html());
-					container = jQuery('#opmsgUserListFooter');
+					container = jQuery('#' + list.parentId);
 					container.before(tpl.evaluate(value));
 					break;
 
 				case 'usrgrpid':
-					if (jQuery('#opmsgUsrgrpRow_' + value.usrgrpid).length) {
+					if (list.parentId == 'opmsgUsrgrpListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opmsgUsrgrpRow_';
+						value.type = <?= ACTION_OPERATION ?>;
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpmsgUsrgrpRow_';
+						value.type = <?= ACTION_RECOVERY_OPERATION ?>;
+					}
+
+					if (jQuery('#' + value.row + value.id).length) {
 						continue;
 					}
 
 					tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
-
-					container = jQuery('#opmsgUsrgrpListFooter');
+					container = jQuery('#' + list.parentId);
 					container.before(tpl.evaluate(value));
 					break;
 
@@ -143,7 +162,7 @@
 
 					value.objectCaption = <?= CJs::encodeJson(_('Host group').NAME_DELIMITER) ?>;
 
-					container = jQuery('#opCmdListFooter');
+					container = jQuery('#' + list.parentId);
 					if (jQuery('#opCmdGroupRow_' + value.groupid).length == 0) {
 						container.before(tpl.evaluate(value));
 					}
@@ -159,7 +178,7 @@
 						value.name = <?= CJs::encodeJson(_('Current host')) ?>;
 					}
 
-					container = jQuery('#opCmdListFooter');
+					container = jQuery('#' + list.parentId);
 					if (jQuery('#opCmdHostRow_' + value.hostid).length == 0) {
 						container.before(tpl.evaluate(value));
 					}
@@ -175,8 +194,14 @@
 		processTypeOfCalculation();
 	}
 
-	function removeOperation(index) {
-		var row = jQuery('#operations_' + index);
+	function removeOperation(index, type) {
+		if (type == <?= ACTION_OPERATION ?>) {
+			var row = jQuery('#operations_' + index);
+		}
+		else {
+			var row = jQuery('#recovery_operations_' + index);
+		}
+
 		var rowParent = row.parent();
 
 		row.find('*').remove();
@@ -190,18 +215,8 @@
 		processOperationTypeOfCalculation();
 	}
 
-	function removeOpmsgUsrgrpRow(usrgrpid) {
-		var row = jQuery('#opmsgUsrgrpRow_' + usrgrpid);
-		var rowParent = row.parent();
-
-		row.remove();
-	}
-
-	function removeOpmsgUserRow(userid) {
-		var row = jQuery('#opmsgUserRow_' + userid);
-		var rowParent = row.parent();
-
-		row.remove();
+	function removeRow(id) {
+		jQuery('#' + id).remove();
 	}
 
 	function removeOpGroupRow(groupid) {
@@ -210,15 +225,6 @@
 
 	function removeOpTemplateRow(tplid) {
 		jQuery('#opTemplateRow_' + tplid).remove();
-	}
-
-	function removeOpCmdRow(opCmdRowId, object) {
-		if (object == 'groupid') {
-			jQuery('#opCmdGroupRow_' + opCmdRowId).remove();
-		}
-		else {
-			jQuery('#opCmdHostRow_' + opCmdRowId).remove();
-		}
 	}
 
 	function showOpCmdForm(opCmdId) {
