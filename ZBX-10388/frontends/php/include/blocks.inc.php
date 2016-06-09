@@ -266,6 +266,23 @@ function getFavouriteScreens() {
 }
 
 function make_system_status($filter, $backurl) {
+	$config = select_config();
+
+	$table = new CTableInfo();
+
+	// set trigger severities as table header starting from highest severity
+	$header = [];
+
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		$header[] = ($filter['severity'] === null || isset($filter['severity'][$severity]))
+			? getSeverityName($severity, $config)
+			: null;
+	}
+	krsort($header);
+	array_unshift($header, _('Host group'));
+
+	$table->setHeader($header);
+
 	// get host groups
 	$groups = API::HostGroup()->get([
 		'groupids' => $filter['groupids'],
@@ -383,94 +400,62 @@ function make_system_status($filter, $backurl) {
 	}
 	unset($triggers);
 
-	$config = select_config();
-
-	// set trigger severities as table header starting from highest severity
-	$header = [];
-
-	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-		$header[] = ($filter['severity'] === null || isset($filter['severity'][$severity]))
-			? getSeverityName($severity, $config)
-			: null;
-	}
-	krsort($header);
-	array_unshift($header, _('Host group'));
-
-	$widget_data = ['header' => $header];
-
 	foreach ($groups as $group) {
+		$groupRow = new CRow();
+
 		$name = new CLink($group['name'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].'&hostid=0'.
 			'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 		);
 
-		$severities = [];
+		$groupRow->addItem($name);
 
 		foreach ($group['tab_priority'] as $severity => $data) {
 			if (!is_null($filter['severity']) && !isset($filter['severity'][$severity])) {
 				continue;
 			}
 
-			$all_triggers_popup_data = [];
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
-				$all_triggers_popup_data = makeTriggersPopupDataArray($data['triggers'], $backurl, $actions, $config);
+				$allTriggersNum = (new CSpan($allTriggersNum))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->setHint(makeTriggersPopup($data['triggers'], $backurl, $actions, $config));
 			}
 
-			$unack_triggers_popup_data = [];
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
-				$unack_triggers_popup_data = makeTriggersPopupDataArray($data['triggers_unack'], $backurl, $actions, $config);
+				$unackTriggersNum = (new CSpan($unackTriggersNum))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->setHint(makeTriggersPopup($data['triggers_unack'], $backurl, $actions, $config));
 			}
-
-			$cell_data = [];
 
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$cell_data = [
-						'count' => $allTriggersNum,
-						'popup' => $all_triggers_popup_data,
-						'style' => getSeverityStyle($severity, $data['count'] > 0)
-					];
+					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$cell_data = [
-						'count' => $allTriggersNum,
-						'popup' => $unack_triggers_popup_data,
-						'style' => getSeverityStyle($severity, $data['count_unack'] > 0)
-					];
+					$groupRow->addItem(getSeverityCell($severity, $config, $unackTriggersNum,
+						$data['count_unack'] == 0
+					));
 					break;
 
 				case EXTACK_OPTION_BOTH:
 					if ($data['count_unack'] != 0) {
-						$cell_data = [
-							'count' => $allTriggersNum,
-							'popup' => $all_triggers_popup_data,
-							'style' => getSeverityStyle($severity),
-							'count_unack' => $unackTriggersNum.' '._('of').' ',
-							'popup_unack' => $unack_triggers_popup_data
-						];
+						$groupRow->addItem(getSeverityCell($severity, $config, [
+							$unackTriggersNum, ' '._('of').' ', $allTriggersNum
+						]));
 					}
 					else {
-						$cell_data = [
-							'count' => $allTriggersNum,
-							'popup' => $all_triggers_popup_data,
-							'style' => getSeverityStyle($severity, $data['count'] > 0)
-						];
+						$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
 					}
 					break;
 			}
-
-			$severities[] = $cell_data;
 		}
 
-		$widget_data['groups'][] = [
-			'name' => $name,
-			'severities' => $severities
-		];
+		$table->addRow($groupRow);
 	}
 
-	return $widget_data;
+	return $table;
 }
 
 function make_status_of_zbx() {
@@ -789,7 +774,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 }
 
 /**
- * Generate data for dashboard triggers popup.
+ * Generate table for dashboard triggers popup.
  *
  * @see make_system_status
  *
@@ -798,10 +783,18 @@ function make_latest_issues(array $filter = [], $backurl) {
  * @param array $actions
  * @param array $config
  *
- * @return array
+ * @return CTableInfo
  */
-function makeTriggersPopupDataArray(array $triggers, $backurl, array $actions, array $config) {
-	$popup_data = [];
+function makeTriggersPopup(array $triggers, $backurl, array $actions, array $config) {
+	$popupTable = (new CTableInfo())
+		->setHeader([
+			_('Host'),
+			_('Issue'),
+			_('Age'),
+			_('Info'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		]);
 
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 
@@ -832,15 +825,15 @@ function makeTriggersPopupDataArray(array $triggers, $backurl, array $actions, a
 			? $actions[$trigger['event']['eventid']]
 			: '';
 
-		$popup_data[] = (new CRow([
-			'hostname' => $trigger['hosts'][0]['name'],
-			'issue' => getSeverityCell($trigger['priority'], $config, $description),
-			'age' => zbx_date2age($trigger['lastchange']),
-			'info' => $unknown,
-			'ack' => $ack,
-			'actions' => (new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
-		]))->toString();
+		$popupTable->addRow([
+			$trigger['hosts'][0]['name'],
+			getSeverityCell($trigger['priority'], $config, $description),
+			zbx_date2age($trigger['lastchange']),
+			$unknown,
+			$ack,
+			(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
+		]);
 	}
 
-	return $popup_data;
+	return $popupTable;
 }

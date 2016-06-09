@@ -20,7 +20,6 @@
 
 
 $this->addJSfile('js/class.pmaster.js');
-$this->includeJSfile('app/views/monitoring.widget.system.view.js.php');
 
 $dashboard = (new CWidget())
 	->setTitle(_('Dashboard'))
