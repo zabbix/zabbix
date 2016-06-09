@@ -584,7 +584,7 @@ else {
 		$templates = API::Template()->get([
 			'output' => ['templateid', $sortField],
 			'search' => [
-				'host' => ($filter['name'] === '' ? null : $filter['name'])
+				'name' => ($filter['name'] === '' ? null : $filter['name'])
 			],
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
