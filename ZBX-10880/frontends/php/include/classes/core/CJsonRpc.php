@@ -48,11 +48,7 @@ class CJsonRpc {
 		$this->_response = [];
 		$this->_jsonDecoded = $this->json->decode($data, true);
 
-		/**
-		 * TODO: CJson class should have lastError() method, that returns last error code
-		 * and lastError() should be used to check if decoded JSON is valid.
-		 */
-		if ($this->_jsonDecoded === null && $data !== 'null') {
+		if ($this->json->hasError()) {
 			$this->jsonError(null, '-32700', null, null, true);
 		}
 		elseif (!$this->_jsonDecoded) {
