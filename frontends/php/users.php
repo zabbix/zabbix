@@ -77,6 +77,12 @@ $fields = [
 	// form
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,			null,	null],
+	// filter
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_alias' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_name' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_surname' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -351,10 +357,29 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// filter
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.user.filter_alias', getRequest('filter_alias', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.user.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.user.filter_surname', getRequest('filter_surname', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.user.filter_alias');
+		CProfile::delete('web.user.filter_name');
+		CProfile::delete('web.user.filter_surname');
+	}
+
+	$filter = [
+		'alias' => CProfile::get('web.user.filter_alias', ''),
+		'name' => CProfile::get('web.user.filter_name', ''),
+		'surname' => CProfile::get('web.user.filter_surname', '')
+	];
+
 	$data = [
 		'config' => $config,
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'filter' => $filter
 	];
 
 	// get user groups
@@ -365,8 +390,13 @@ else {
 
 	// get users
 	$data['users'] = API::User()->get([
-		'usrgrpids' => ($_REQUEST['filter_usrgrpid'] > 0) ? $_REQUEST['filter_usrgrpid'] : null,
 		'output' => API_OUTPUT_EXTEND,
+		'search' => [
+			'alias' => ($filter['alias'] === '') ? null : $filter['alias'],
+			'name' => ($filter['name'] === '') ? null : $filter['name'],
+			'surname' => ($filter['surname'] === '') ? null : $filter['surname']
+		],
+		'usrgrpids' => ($_REQUEST['filter_usrgrpid'] > 0) ? $_REQUEST['filter_usrgrpid'] : null,
 		'selectUsrgrps' => API_OUTPUT_EXTEND,
 		'getAccess' => 1,
 		'limit' => $config['search_limit'] + 1

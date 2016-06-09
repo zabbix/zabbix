@@ -92,6 +92,10 @@ $fields = [
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,		null,	null],
+	// filter
+	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -685,15 +689,31 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// filter
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.action.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.action.filter_name');
+	}
+
+	$filter = [
+		'name' => CProfile::get('web.action.filter_name', ''),
+	];
+
 	$data = [
 		'eventsource' => getRequest('eventsource', CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
+		'filter' => $filter,
 		'config' => $config
 	];
 
 	$data['actions'] = API::Action()->get([
 		'output' => API_OUTPUT_EXTEND,
+		'search' => [
+			'name' => ($filter['name'] === '') ? null : $filter['name']
+		],
 		'filter' => ['eventsource' => [$data['eventsource']]],
 		'selectFilter' => ['formula', 'conditions', 'evaltype'],
 		'selectOperations' => API_OUTPUT_EXTEND,

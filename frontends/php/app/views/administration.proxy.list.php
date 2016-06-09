@@ -28,6 +28,12 @@ $widget = (new CWidget())
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit')))
+	)
+	->addItem((new CFilter('web.proxies.filter.state'))
+		->addVar('action', 'proxy.list')
+		->addColumn((new CFormList())->addRow(_('Name like'),
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
 	);
 
 // create form

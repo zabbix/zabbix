@@ -29,7 +29,10 @@ class CControllerProxyList extends CController {
 		$fields = [
 			'sort' =>		'in host',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1'
+			'uncheck' =>	'in 1',
+			'filter_set' =>	'in Filter',
+			'filter_rst' =>	'in 1',
+			'filter_name' =>''
 		];
 
 		$ret = $this->validateInput($fields);
@@ -52,12 +55,25 @@ class CControllerProxyList extends CController {
 		CProfile::update('web.proxies.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.proxies.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+		// filter
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.proxies.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::delete('web.proxies.filter_name');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.proxies.filter_name', '')
+		];
+
 		$config = select_config();
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
+			'filter' => $filter,
 			'config' => [
 				'max_in_table' => $config['max_in_table']
 			]
@@ -65,6 +81,9 @@ class CControllerProxyList extends CController {
 
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept'],
+			'search' => [
+				'host' => ($filter['name'] === '') ? null : $filter['name']
+			],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,

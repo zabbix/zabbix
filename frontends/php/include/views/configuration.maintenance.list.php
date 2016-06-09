@@ -25,7 +25,20 @@ $widget = (new CWidget())
 		->addItem((new CList())
 			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
 			->addItem(new CSubmit('form', _('Create maintenance period')))
-		));
+		))
+	->addItem((new CFilter('web.maintenance.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Name like'),
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
+		->addColumn((new CFormList())->addRow(_('State'),
+			(new CComboBox('filter_status', $data['filter']['status'], null, [
+				-1 => _('All'),
+				MAINTENANCE_STATUS_ACTIVE => _('Active'),
+				MAINTENANCE_STATUS_APPROACH => _('Approaching'),
+				MAINTENANCE_STATUS_EXPIRED => _('Expired')
+			]))
+		))
+	);
 
 // create form
 $maintenanceForm = (new CForm())->setName('maintenanceForm');
