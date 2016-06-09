@@ -281,9 +281,10 @@ if ($data['filter_search']) {
 			}
 
 			if ($item_values) {
-				CArrayHelper::sort($item_hystory, 'clock');
-				$from = date('Y-m-d H:i:s', $item_hystory[0]);
-				$to = date('Y-m-d H:i:s', end($item_hystory));
+				CArrayHelper::sort($item_values, ['clock']);
+				$from = date('Y-m-d H:i:s', $item_values[0]['clock']);
+				$to = end($item_values);
+				$to = date('Y-m-d H:i:s', $to['clock']);
 			}
 			else {
 				$from = '-';
