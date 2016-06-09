@@ -1137,11 +1137,12 @@ out:
  *                                                                            *
  * Parameters:                                                                *
  *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
- *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
+ *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for, *
+ *                               can be NULL.                                 *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *                                                                            *
  ******************************************************************************/
-static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
 	int	i;
 
@@ -1149,7 +1150,10 @@ static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_all
 		zbx_free((*logfiles)[i].filename);
 
 	*logfiles_num = 0;
-	*logfiles_alloc = 0;
+
+	if (NULL != logfiles_alloc)
+		*logfiles_alloc = 0;
+
 	zbx_free(*logfiles);
 }
 

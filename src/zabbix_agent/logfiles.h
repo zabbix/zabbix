@@ -44,6 +44,8 @@ typedef int (*zbx_process_value_func_t)(const char *, unsigned short, const char
 		unsigned char, zbx_uint64_t *, int *, unsigned long *, const char *, unsigned short *, unsigned long *,
 		unsigned char);
 
+void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
+
 int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, const int *logfiles_num_old,
