@@ -83,6 +83,7 @@ $fields = [
 	'filter_alias' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_surname' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_type' =>		[T_ZBX_STR, O_OPT, null,	IN([-1, USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -362,17 +363,20 @@ else {
 		CProfile::update('web.user.filter_alias', getRequest('filter_alias', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.user.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.user.filter_surname', getRequest('filter_surname', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.user.filter_type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
 		CProfile::delete('web.user.filter_alias');
 		CProfile::delete('web.user.filter_name');
 		CProfile::delete('web.user.filter_surname');
+		CProfile::delete('web.user.filter_type');
 	}
 
 	$filter = [
 		'alias' => CProfile::get('web.user.filter_alias', ''),
 		'name' => CProfile::get('web.user.filter_name', ''),
-		'surname' => CProfile::get('web.user.filter_surname', '')
+		'surname' => CProfile::get('web.user.filter_surname', ''),
+		'type' => CProfile::get('web.user.filter_type', -1)
 	];
 
 	$data = [
@@ -395,6 +399,9 @@ else {
 			'alias' => ($filter['alias'] === '') ? null : $filter['alias'],
 			'name' => ($filter['name'] === '') ? null : $filter['name'],
 			'surname' => ($filter['surname'] === '') ? null : $filter['surname']
+		],
+		'filter' => [
+			'type' => ($filter['type'] == -1) ? null : $filter['type']
 		],
 		'usrgrpids' => ($_REQUEST['filter_usrgrpid'] > 0) ? $_REQUEST['filter_usrgrpid'] : null,
 		'selectUsrgrps' => API_OUTPUT_EXTEND,
