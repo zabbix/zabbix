@@ -1032,28 +1032,6 @@ static int	global_regexp_exists(const char *name)
 	return (i == regexps.values_num ? FAIL : SUCCEED);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: destroy_logfile_list                                             *
- *                                                                            *
- * Purpose: release resources allocated to a logfile list                     *
- *                                                                            *
- * Parameters:                                                                *
- *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
- *     logfiles_num   - [IN/OUT] number of elements                           *
- *                                                                            *
- ******************************************************************************/
-static void     destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_num)
-{
-	int	i;
-
-	for (i = 0; i < *logfiles_num; i++)
-		zbx_free((*logfiles)[i].filename);
-
-	*logfiles_num = 0;
-	zbx_free(*logfiles);
-}
-
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
@@ -1206,7 +1184,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	{
 		/* for log[] and logrt[] items - switch to the new log file list */
 
-		destroy_logfile_list(&metric->logfiles, &metric->logfiles_num);
+		destroy_logfile_list(&metric->logfiles, NULL, &metric->logfiles_num);
 		metric->logfiles = logfiles_new;
 		metric->logfiles_num = logfiles_num_new;
 	}
@@ -1238,7 +1216,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 				*mtime_sent = metric->mtime;
 
 				/* switch to the new log file list */
-				destroy_logfile_list(&metric->logfiles, &metric->logfiles_num);
+				destroy_logfile_list(&metric->logfiles, NULL, &metric->logfiles_num);
 				metric->logfiles = logfiles_new;
 				metric->logfiles_num = logfiles_num_new;
 			}
