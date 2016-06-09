@@ -416,16 +416,34 @@ function make_system_status($filter, $backurl) {
 
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
+				$popup_table = makeTriggersPopup($data['triggers'], $backurl, $actions, $config);
+				$id = 't1_'.$group['groupid'].'_s'.$severity;
+				$popup_table->setId($id);
+
 				$allTriggersNum = (new CSpan($allTriggersNum))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint(makeTriggersPopup($data['triggers'], $backurl, $actions, $config));
+					->addItem(
+						(new CSpan($popup_table))
+						->setAttribute('style', 'display: none;')
+					)
+					->onMouseover('hintBox.HintWraper(event, this, jQuery("#'.$id.'"), "", "")')
+					->onClick('hintBox.showStaticHint(event, this, jQuery("#'.$id.'"), "", false, "")');
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
+				$popup_table = makeTriggersPopup($data['triggers_unack'], $backurl, $actions, $config);
+				$id = 't2_'.$group['groupid'].'_s'.$severity;
+				$popup_table->setId($id);
+
 				$unackTriggersNum = (new CSpan($unackTriggersNum))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint(makeTriggersPopup($data['triggers_unack'], $backurl, $actions, $config));
+					->addItem(
+						(new CSpan($popup_table))
+						->setAttribute('style', 'display: none;')
+					)
+					->onMouseover('hintBox.HintWraper(event, this, jQuery("#'.$id.'"), "", "")')
+					->onClick('hintBox.showStaticHint(event, this, jQuery("#'.$id.'"), "", false, "")');
 			}
 
 			switch ($filter['extAck']) {
