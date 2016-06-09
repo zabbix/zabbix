@@ -333,10 +333,17 @@ var CDoll = Class.create({
 			}
 			else
 			{
+				// Dashboard widget data comes in JSON
 				var debug = is_null(resp.responseJSON.debug) ? '' : resp.responseJSON.debug;
 
-				// Dashboard widget data comes in JSON
-				this._domobj.html(resp.responseJSON.body + debug);
+				if (is_null(resp.responseJSON.data)) {
+					this._domobj.html(resp.responseJSON.body);
+				}
+				else {
+					window[this._domid + 'Parser'](resp.responseJSON.data);
+				}
+
+				this._domobj.append(debug);
 				this._domobj_header.html(resp.responseJSON.header);
 				this._domobj_footer.html(resp.responseJSON.footer);
 			}

@@ -19,11 +19,12 @@
 **/
 
 
-$table = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
+$widget_data = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
 
 $output = [
 	'header' => _('System status'),
 	'body' => (new CDiv([getMessages(), $table]))->toString(),
+	'data' => $widget_data,
 	'footer' => (new CListItem(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))))->toString()
 ];
 
