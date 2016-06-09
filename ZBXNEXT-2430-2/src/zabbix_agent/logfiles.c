@@ -2086,7 +2086,6 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 
 	/* Searching forward did not find a newline. Now search backwards until 'min_size'. */
 
-	lastlogsize_tmp = lastlogsize_aligned;
 	seek_pos = lastlogsize_aligned;
 
 	for (;;)
