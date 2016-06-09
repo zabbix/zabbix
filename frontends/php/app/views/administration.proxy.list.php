@@ -34,6 +34,13 @@ $widget = (new CWidget())
 		->addColumn((new CFormList())->addRow(_('Name like'),
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))
+		->addColumn((new CFormList())->addRow(_('Mode'),
+			(new CComboBox('filter_status', $data['filter']['status'], null, [
+				-1 => _('All'),
+				HOST_STATUS_PROXY_ACTIVE => _('Active'),
+				HOST_STATUS_PROXY_PASSIVE => _('Passive')
+			]))
+		))
 	);
 
 // create form

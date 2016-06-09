@@ -44,6 +44,14 @@ $widget = (new CWidget())
 		->addColumn((new CFormList())->addRow(_('Surname like'),
 			(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))
+		->addColumn((new CFormList())->addRow(_('User type'),
+			(new CComboBox('filter_type', $data['filter']['type'], null, [
+				-1 => _('All'),
+				USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
+				USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
+				USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
+			]))
+		))
 	);
 
 // create form
