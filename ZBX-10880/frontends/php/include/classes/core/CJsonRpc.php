@@ -38,7 +38,7 @@ class CJsonRpc {
 	private $_zbx2jsonErrors;
 	private $_jsonDecoded;
 
-	public function __construct(CApiClient $apiClient, $jsonData) {
+	public function __construct(CApiClient $apiClient, $data) {
 		$this->apiClient = $apiClient;
 
 		$this->json = new CJson();
@@ -46,10 +46,13 @@ class CJsonRpc {
 
 		$this->_error = false;
 		$this->_response = [];
-		$this->_jsonDecoded = $this->json->decode($jsonData, true);
+		$this->_jsonDecoded = $this->json->decode($data, true);
 
-		// TODO: Proper validation of JSON should be done in CJson.
-		if ($this->_jsonDecoded === null && $jsonData !== 'null') {
+		/**
+		 * TODO: CJson class should have lastError() method, that returns last error code
+		 * and lastError() should be used to check if decoded JSON is valid.
+		 */
+		if ($this->_jsonDecoded === null && $data !== 'null') {
 			$this->jsonError(null, '-32700', null, null, true);
 		}
 		elseif (!$this->_jsonDecoded) {
@@ -73,19 +76,15 @@ class CJsonRpc {
 				continue;
 			}
 
-			$params = isset($call['params']) ? $call['params'] : null;
-			$auth = isset($call['auth']) ? $call['auth'] : null;
-
 			list($api, $method) = explode('.', $call['method']);
-			$result = $this->apiClient->callMethod($api, $method, $params, $auth);
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
 
 			$this->processResult($call, $result);
 		}
 
-		// TODO: Condition check that $this->_jsonDecoded is indexed array should be improved.
 		return $this->json->encode(
 			(is_array($this->_jsonDecoded)
-					&& (array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)))
+					&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1))
 				? $this->_response
 				: $this->_response[0]
 		);
