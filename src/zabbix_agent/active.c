@@ -1141,7 +1141,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 	}
 	else if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay = atof(max_delay_str)))
 	{
-		*error = zbx_strdup(*error, "Invalid seventh parameter.");
+		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
 		goto out;
 	}
 
