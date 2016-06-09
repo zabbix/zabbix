@@ -33,6 +33,17 @@ $widget = (new CWidget())
 			->addItem([_('User group'), SPACE, $userGroupComboBox])
 			->addItem(new CSubmit('form', _('Create user')))
 		)
+	)
+	->addItem((new CFilter('web.user.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Alias like'),
+			(new CTextBox('filter_alias', $data['filter']['alias']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
+		->addColumn((new CFormList())->addRow(_('Name like'),
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
+		->addColumn((new CFormList())->addRow(_('Surname like'),
+			(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
 	);
 
 // create form

@@ -54,6 +54,10 @@ $fields = [
 	'output' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'ajaxaction' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'ajaxdata' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	// filter
+	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_name' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
 	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -286,16 +290,32 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// filter
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.discovery.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.discovery.filter_name');
+	}
+
+	$filter = [
+		'name' => CProfile::get('web.discovery.filter_name', ''),
+	];
+
 	$config = select_config();
 
 	$data = [
 		'sort' => $sortField,
-		'sortorder' => $sortOrder
+		'sortorder' => $sortOrder,
+		'filter' => $filter
 	];
 
 	// get drules
 	$data['drules'] = API::DRule()->get([
 		'output' => ['proxy_hostid', 'name', 'status', 'iprange', 'delay'],
+		'search' => [
+			'name' => ($filter['name'] === '') ? null : $filter['name']
+		],
 		'selectDChecks' => ['type'],
 		'editable' => true,
 		'sortfield' => $sortField,
