@@ -1373,7 +1373,7 @@ elseif ($srctbl == 'applications') {
 	$data = [];
 	$parentId = $dstfld1 ? CJs::encodeJson($dstfld1) : 'null';
 
-	foreach ($apps as &$app) {
+	foreach ($apps as $app) {
 		$data[$app['applicationid']] = [
 			'id' => $app['applicationid'],
 			'name' => $app['name']
@@ -1385,17 +1385,19 @@ elseif ($srctbl == 'applications') {
 				: null,
 			(new CLink($app['name'], 'javascript:void(0);'))
 				->setId('spanid'.$app['applicationid'])
-				->onClick('javascript: addValue('.CJs::encodeJson($reference).', '.$app['applicationid'].', '.$parentId.');'
-			)
+				->onClick(
+					'javascript: addValue('.CJs::encodeJson($reference).', '.$app['applicationid'].', '.$parentId.');'
+				)
 		]);
 	}
-	unset($app);
 
 	if ($multiselect) {
 		$table->setFooter(
 			new CCol(
 				(new CButton('select', _('Select')))
-					->onClick("javascript: addSelectedValues('applications', ".CJs::encodeJson($reference).', '.$parentId.');')
+					->onClick(
+						"javascript: addSelectedValues('applications', ".CJs::encodeJson($reference).', '.$parentId.');'
+					)
 			)
 		);
 	}
