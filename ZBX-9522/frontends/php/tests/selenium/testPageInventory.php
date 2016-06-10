@@ -74,9 +74,4 @@ class testPageInventory extends CWebTest {
 		$this->checkTitle('Host inventories');
 		$this->zbxTestTextPresent('HOST INVENTORIES');
 	}
-
-	public function testPageHostInventory_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

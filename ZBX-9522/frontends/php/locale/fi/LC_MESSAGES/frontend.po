@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:13+0200\n"
-"PO-Revision-Date: 2013-01-23 18:56+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
+"PO-Revision-Date: 2013-01-23 18:56+0300\n"
 "Last-Translator: jeppe <jeppe@arabuusimiehet.com>\n"
 "Language-Team: none\n"
 "Language: fi\n"
@@ -11,7 +11,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
+"X-POOTLE-MTIME: 1358960167.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
@@ -2691,67 +2692,67 @@ msgstr ""
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr ""
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr ""
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr ""
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr ""
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr ""
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr ""
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr ""
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr ""
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr ""
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr ""
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
@@ -3870,7 +3871,7 @@ msgstr ""
 msgid "Download speed for scenario \"%s\"."
 msgstr ""
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -4059,7 +4060,7 @@ msgstr ""
 msgid "Empty macro."
 msgstr ""
 
-#: api/classes/CService.php:1108
+#: api/classes/CService.php:1110
 msgid "Empty name."
 msgstr ""
 
@@ -5768,7 +5769,7 @@ msgstr ""
 msgid "Include"
 msgstr ""
 
-#: api/classes/CService.php:1330
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr ""
@@ -5799,7 +5800,7 @@ msgstr ""
 msgid "Incorrect SNMP community."
 msgstr ""
 
-#: api/classes/CService.php:1160
+#: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr ""
@@ -5912,7 +5913,7 @@ msgstr ""
 msgid "Incorrect action operationid."
 msgstr ""
 
-#: api/classes/CService.php:1123
+#: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr ""
@@ -5931,7 +5932,7 @@ msgstr ""
 msgid "Incorrect arguments passed to method."
 msgstr ""
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr ""
@@ -6177,12 +6178,12 @@ msgstr ""
 msgid "Incorrect parameters for user group."
 msgstr ""
 
-#: api/classes/CService.php:1208
+#: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1213
 msgid "Incorrect parent service."
 msgstr ""
 
@@ -6224,12 +6225,12 @@ msgstr ""
 msgid "Incorrect service time type."
 msgstr ""
 
-#: api/classes/CService.php:1177
+#: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1231
+#: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr ""
@@ -6254,7 +6255,7 @@ msgstr ""
 msgid "Incorrect time period \"%1$s\"."
 msgstr ""
 
-#: api/classes/CService.php:1192
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr ""
@@ -6463,7 +6464,7 @@ msgstr ""
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1471 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr ""
@@ -8444,8 +8445,8 @@ msgstr ""
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
@@ -9007,7 +9008,7 @@ msgstr ""
 msgid "Operation \"%s\" already exists."
 msgstr ""
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr ""
 
@@ -9304,7 +9305,7 @@ msgstr ""
 msgid "PROBLEM"
 msgstr ""
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr ""
 
@@ -10076,7 +10077,7 @@ msgstr ""
 msgid "Response code"
 msgstr ""
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -10085,7 +10086,7 @@ msgstr ""
 msgid "Response time"
 msgstr ""
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr ""
@@ -10491,11 +10492,7 @@ msgstr ""
 msgid "Scenario disabled"
 msgstr ""
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr ""
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr ""
 
@@ -10525,7 +10522,8 @@ msgid "Screen \"%1$s\" added."
 msgstr ""
 
 #: api/classes/CTemplateScreen.php:818
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
+#, php-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
 msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
@@ -10853,27 +10851,27 @@ msgstr ""
 msgid "Service"
 msgstr ""
 
-#: api/classes/CService.php:1298
+#: api/classes/CService.php:1300
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr ""
 
-#: api/classes/CService.php:1319
+#: api/classes/CService.php:1321
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr ""
 
-#: api/classes/CService.php:1398
+#: api/classes/CService.php:1400
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr ""
 
-#: api/classes/CService.php:1373
+#: api/classes/CService.php:1375
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr ""
 
-#: api/classes/CService.php:1216
+#: api/classes/CService.php:1218
 msgid "Service cannot be parent and child at the same time."
 msgstr ""
 
@@ -10909,7 +10907,7 @@ msgstr ""
 msgid "Services"
 msgstr ""
 
-#: api/classes/CService.php:1449
+#: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
 msgstr ""
 
@@ -11337,7 +11335,7 @@ msgstr ""
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr ""
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr ""
@@ -12826,67 +12824,67 @@ msgstr ""
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr ""
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr ""
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr ""
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr ""
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr ""
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr ""
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr ""
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr ""
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr ""
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr ""
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr ""
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr ""
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr ""
@@ -12917,12 +12915,12 @@ msgstr ""
 msgid "Web checks"
 msgstr ""
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr ""
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr ""
@@ -13340,7 +13338,7 @@ msgstr ""
 msgid "Zabbix aggregate"
 msgstr ""
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr ""
 

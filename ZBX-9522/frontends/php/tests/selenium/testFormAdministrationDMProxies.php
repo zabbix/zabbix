@@ -268,16 +268,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 		}
 	}
 
-	public function testFormAdministrationDMProxies_UpdatePassive2Active() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testFormAdministrationDMProxies_UpdateActive2Passive() {
-		// TODO
-		$this->markTestIncomplete();
-	}
-
 	public static function dataUpdateProxyName() {
 		// Name, newname
 		return array(
@@ -397,7 +387,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 		$this->assertElementPresent('cancel');
 
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 
 		$this->checkTitle('Configuration of proxies');

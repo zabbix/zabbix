@@ -27,7 +27,7 @@ class testPageHistory extends CWebTest {
 			'SELECT i.itemid,i.value_type,i.key_'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
-				' AND h.host='.zbx_dbstr('testPageHistory_CheckLayout')
+				" AND h.host='testPageHistory_CheckLayout'"
 		);
 	}
 

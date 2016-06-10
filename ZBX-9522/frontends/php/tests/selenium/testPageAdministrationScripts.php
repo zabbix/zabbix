@@ -110,9 +110,4 @@ class testPageAdministrationScripts extends CWebTest {
 
 		DBrestore_tables('scripts');
 	}
-
-	public function testPageAdministrationScripts_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }

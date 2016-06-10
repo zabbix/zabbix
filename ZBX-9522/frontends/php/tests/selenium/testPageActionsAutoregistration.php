@@ -107,16 +107,6 @@ class testPageActionsAutoregistration extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsAutoregistration_Create() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageActionsAutoregistration_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allActions
 	*/
@@ -142,11 +132,6 @@ class testPageActionsAutoregistration extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsAutoregistration_MassEnableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allActions
 	*/
@@ -170,11 +155,6 @@ class testPageActionsAutoregistration extends CWebTest {
 
 		$sql = "select * from actions where actionid=$actionid and status=0";
 		$this->assertEquals(1, DBcount($sql));
-	}
-
-	public function testPageActionsAutoregistration_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
 	}
 
 	/**
@@ -207,10 +187,5 @@ class testPageActionsAutoregistration extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('actions');
-	}
-
-	public function testPageActionsAutoregistration_Sorting() {
-// TODO
-		$this->markTestIncomplete();
 	}
 }

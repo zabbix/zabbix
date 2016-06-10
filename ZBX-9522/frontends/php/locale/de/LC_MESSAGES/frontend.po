@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:13+0200\n"
+"POT-Creation-Date: 2016-04-22 16:12+0300\n"
 "PO-Revision-Date: 2013-10-01 08:35+0300\n"
 "Last-Translator: volter <volker27@gmx.at>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2723,67 +2723,67 @@ msgstr "Erstellt: Auslöser \"%1$s\" auf \"%2$s\"."
 msgid "Created: Trigger prototype \"%1$s\" on \"%2$s\"."
 msgstr "Erstellt: Auslöser-Prototyp \"%1$s\" auf \"%2$s\"."
 
-#: include/validate.inc.php:375
+#: include/validate.inc.php:367
 #, php-format
 msgid "Critical error. Field \"%1$s\" contains Multibyte chars."
 msgstr "Kritischer Fehler. Feld \"%1$s\" enthält Multibyte Characters."
 
-#: include/validate.inc.php:436
+#: include/validate.inc.php:428
 #, php-format
 msgid "Critical error. Field \"%1$s\" is mandatory."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist obligatorisch."
 
-#: include/validate.inc.php:315
+#: include/validate.inc.php:307
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP range."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist kein IP-Bereich."
 
-#: include/validate.inc.php:301
+#: include/validate.inc.php:293
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not IP."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist keine IP-Adresse."
 
-#: include/validate.inc.php:387
+#: include/validate.inc.php:379
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not a colour."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist keine Farbe."
 
-#: include/validate.inc.php:353
+#: include/validate.inc.php:345
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not decimal number."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist keine Dezimalzahl."
 
-#: include/validate.inc.php:329
+#: include/validate.inc.php:321
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer list or range."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist keine Liste oder Bereich von Ganzzahlen."
 
-#: include/validate.inc.php:342
+#: include/validate.inc.php:334
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not integer."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist kein Integer."
 
-#: include/validate.inc.php:364
+#: include/validate.inc.php:356
 #, php-format
 msgid "Critical error. Field \"%1$s\" is not string."
 msgstr "Kritischer Fehler. Feld \"%1$s\" ist kein String."
 
-#: include/validate.inc.php:453
+#: include/validate.inc.php:445
 #, php-format
 msgid "Critical error. Field \"%1$s\" must be missing."
 msgstr "Kritischer Fehler. Feld \"%1$s\" muss fehlen."
 
-#: include/validate.inc.php:507
+#: include/validate.inc.php:499
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field."
 msgstr "Kritischer Fehler. Falscher Wert \"%1$s\" für Feld \"%2$s\"."
 
-#: include/validate.inc.php:497
+#: include/validate.inc.php:489
 #, php-format
 msgid "Critical error. Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s."
 msgstr "Kritischer Fehler. Falscher Wert \"%1$s\" für Feld \"%2$s\": Muss zwischen %3$s and %4$s liegen."
 
-#: include/validate.inc.php:488
+#: include/validate.inc.php:480
 #, php-format
 msgid "Critical error. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Kritischer Fehler. Falscher Wert für Feld \"%1$s\": Darf nicht leer sein."
@@ -3907,7 +3907,7 @@ msgstr "Nicht erreichbar"
 msgid "Download speed for scenario \"%s\"."
 msgstr "Download-Geschwindigkeit für Szenario \"%s\"."
 
-#: api/classes/CWebCheck.php:718
+#: api/classes/CWebCheck.php:714
 #, php-format
 msgid "Download speed for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Download-Geschwindigkeit für Schritt \"%1$s\" des Szenarios \"%2$s\"."
@@ -4100,7 +4100,7 @@ msgstr "Leere Eingabe."
 msgid "Empty macro."
 msgstr "Leeres Makro."
 
-#: api/classes/CService.php:1108
+#: api/classes/CService.php:1110
 msgid "Empty name."
 msgstr "Leerer Name."
 
@@ -5034,7 +5034,7 @@ msgid "H.i"
 msgstr "H.i"
 
 # Ich weiß nicht, ob man das als Nicht-Programmierer versteht.
-# 
+#
 # http://php.net/manual/en/function.date.php
 #: include/classes/class.cchart.php:1235 include/classes/class.cchart.php:1294
 #: include/page_header.php:486
@@ -5819,7 +5819,7 @@ msgstr "In Bearbeitung"
 msgid "Include"
 msgstr "Einfügen"
 
-#: api/classes/CService.php:1330
+#: api/classes/CService.php:1332
 #, php-format
 msgid "Incorrect \"soft\" field value for dependency for service \"%1$s\"."
 msgstr "Falscher Wert im Feld \"weich\" für die Abhängigkeit von Dienst \"%1$s\"."
@@ -5850,7 +5850,7 @@ msgstr "Falsche SNMP-OID."
 msgid "Incorrect SNMP community."
 msgstr "Falsche SNMP-Community."
 
-#: api/classes/CService.php:1160
+#: api/classes/CService.php:1162
 #, php-format
 msgid "Incorrect acceptable SLA for service \"%1$s\"."
 msgstr "Falsche zulässige SLA für Dienst \"%1$s\"."
@@ -5963,7 +5963,7 @@ msgstr "Falscher Benutzer für Aktions-Operation. Benutzer existiert nicht oder 
 msgid "Incorrect action operationid."
 msgstr "Falsche \"operationid\" in Aktion."
 
-#: api/classes/CService.php:1123
+#: api/classes/CService.php:1125
 #, php-format
 msgid "Incorrect algorithm for service \"%1$s\"."
 msgstr "Falscher Algorithmus für Dienst \"%1$s\"."
@@ -5982,7 +5982,7 @@ msgstr "Falsche Argumente an Funktion übergeben."
 msgid "Incorrect arguments passed to method."
 msgstr "Methode erhielt falsche Argumente."
 
-#: api/classes/CService.php:1142
+#: api/classes/CService.php:1144
 #, php-format
 msgid "Incorrect calculate SLA value for service \"%1$s\"."
 msgstr "Unzulässiger Wert für berechnete SLA bei Service \"%1$s\"."
@@ -6229,12 +6229,12 @@ msgstr "Falsche Parameter für Wartung."
 msgid "Incorrect parameters for user group."
 msgstr "Falsche Parameter für Benutzer-Gruppe."
 
-#: api/classes/CService.php:1208
+#: api/classes/CService.php:1210
 #, php-format
 msgid "Incorrect parent for service \"%1$s\"."
 msgstr "Falscher übergeordneter Dienst für Dienst \"%1$s\"."
 
-#: api/classes/CService.php:1211
+#: api/classes/CService.php:1213
 msgid "Incorrect parent service."
 msgstr "Falscher übergeordneter Dienst."
 
@@ -6276,12 +6276,12 @@ msgstr "Falscher Startzeitpunkt für Dienst."
 msgid "Incorrect service time type."
 msgstr "Falscher Zeittyp für Dienst."
 
-#: api/classes/CService.php:1177
+#: api/classes/CService.php:1179
 #, php-format
 msgid "Incorrect sorder order for service \"%1$s\"."
 msgstr "Falsche Sortierreihenfolge für Dienst \"%1$s\"."
 
-#: api/classes/CService.php:1231
+#: api/classes/CService.php:1233
 #, php-format
 msgid "Incorrect status for service \"%1$s\"."
 msgstr "Falscher Status für Dienst \"%1$s\"."
@@ -6306,7 +6306,7 @@ msgstr "Ungültiger Zeitraum \"%1$s\"; Anfangszeit darf nicht nach der Endzeit l
 msgid "Incorrect time period \"%1$s\"."
 msgstr "Ungültiger Zeitraum \"%1$s\"."
 
-#: api/classes/CService.php:1192
+#: api/classes/CService.php:1194
 #, php-format
 msgid "Incorrect trigger ID for service \"%1$s\"."
 msgstr "Falsche Auslöser-ID für Dienst \"%1$s\"."
@@ -6515,7 +6515,7 @@ msgstr "Ungültiger Wartungszeitraum"
 
 #: api/classes/CScreenItem.php:148 api/classes/CScreenItem.php:228
 #: api/classes/CService.php:209 api/classes/CService.php:385
-#: api/classes/CService.php:1469 api/classes/CUserMacro.php:440
+#: api/classes/CService.php:1471 api/classes/CUserMacro.php:440
 #: api/classes/CUserMacro.php:573 api/rpc/class.cjsonrpc.php:197
 msgid "Invalid method parameters."
 msgstr "Ungültige Methoden-Parameter."
@@ -8499,8 +8499,8 @@ msgstr "Keine Berechtigung zum System-Zugang."
 #: api/classes/CMap.php:551 api/classes/CProxy.php:318
 #: api/classes/CProxy.php:332 api/classes/CScreenItem.php:330
 #: api/classes/CScreenItem.php:414 api/classes/CScreen.php:499
-#: api/classes/CScreen.php:578 api/classes/CService.php:1252
-#: api/classes/CService.php:1267 api/classes/CTemplateScreen.php:777
+#: api/classes/CScreen.php:578 api/classes/CService.php:1254
+#: api/classes/CService.php:1269 api/classes/CTemplateScreen.php:777
 #: api/classes/CTemplateScreen.php:798 api/classes/CTemplateScreen.php:804
 #: api/classes/CTrigger.php:1003 api/classes/CTrigger.php:1352
 #: api/classes/CTrigger.php:1376 api/classes/CTriggerPrototype.php:811
@@ -9066,7 +9066,7 @@ msgstr "Opera"
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" existiert bereits."
 
-#: include/validate.inc.php:469
+#: include/validate.inc.php:461
 msgid "Operation cannot be performed due to unauthorized request."
 msgstr "Operation kann wegen unautorisierter Anfrage nicht ausgeführt werden."
 
@@ -9366,7 +9366,7 @@ msgstr "POP"
 msgid "PROBLEM"
 msgstr "PROBLEM"
 
-#: include/validate.inc.php:561
+#: include/validate.inc.php:553
 msgid "Page received incorrect data"
 msgstr "Seite hat falsche Daten erhalten"
 
@@ -10142,7 +10142,7 @@ msgstr "Anzeigeelement"
 msgid "Response code"
 msgstr "Rückmeldungscode"
 
-#: api/classes/CWebCheck.php:732
+#: api/classes/CWebCheck.php:728
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "HTTP-Statuscode für Schritt \"%1$s\" in Szenario \"%2$s\"."
@@ -10151,7 +10151,7 @@ msgstr "HTTP-Statuscode für Schritt \"%1$s\" in Szenario \"%2$s\"."
 msgid "Response time"
 msgstr "Antwortzeit"
 
-#: api/classes/CWebCheck.php:725
+#: api/classes/CWebCheck.php:721
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
 msgstr "Antwortzeit für Schritt \"%1$s\" in Szenario \"%2$s\"."
@@ -10560,11 +10560,7 @@ msgstr "Szenario gelöscht"
 msgid "Scenario disabled"
 msgstr "Szenario deaktiviert"
 
-#: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
-msgid "Scenario step name should contain only printable characters."
-msgstr "Der Name des Szenario-Schritts sollte nur druckbare Zeichen enthalten."
-
-#: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
+#: api/classes/CWebCheck.php:704 api/classes/CWebCheck.php:801
 msgid "Scenario step number cannot be less than 1."
 msgstr "Nummer des Szenario-Schritts muss mindestens 1 sein."
 
@@ -10594,8 +10590,9 @@ msgid "Screen \"%1$s\" added."
 msgstr "Übersichtstafel \"%1$s\" angelegt."
 
 #: api/classes/CTemplateScreen.php:818
-msgid "Screen \"%1$s\" already exists on template \"%2$2\"."
-msgstr "Übersichtstafel \"%1$s\" existiert bereits in Vorlage \"%2$2\"."
+#, php-format
+msgid "Screen \"%1$s\" already exists on template \"%2$s\"."
+msgstr ""
 
 #: api/classes/CScreen.php:447 api/classes/CScreen.php:521
 #: api/classes/CTemplateScreen.php:713 api/classes/CTemplateScreen.php:764
@@ -10923,27 +10920,27 @@ msgstr "Serverzeit"
 msgid "Service"
 msgstr "Dienst"
 
-#: api/classes/CService.php:1298
+#: api/classes/CService.php:1300
 #, php-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
 msgstr "Dienst \"%1$s\" kann nicht gelöscht werden weil ein anderer Dienst von ihm abhängt."
 
-#: api/classes/CService.php:1319
+#: api/classes/CService.php:1321
 #, php-format
 msgid "Service \"%1$s\" cannot be dependent on itself."
 msgstr "Dienst \"%1$s\" kann nicht von sich selbst abhängen."
 
-#: api/classes/CService.php:1398
+#: api/classes/CService.php:1400
 #, php-format
 msgid "Service \"%1$s\" cannot be linked to a trigger and have children at the same time."
 msgstr "Dienst \"%1$s\" kann nicht gleichzeitig einem Auslöser zugeordnet werden und untergeordnete Dienste haben."
 
-#: api/classes/CService.php:1373
+#: api/classes/CService.php:1375
 #, php-format
 msgid "Service \"%1$s\" is already hardlinked to a different service."
 msgstr "Dienst \"%1$s\" ist bereits einem anderen Dienst fest zugeordnet. "
 
-#: api/classes/CService.php:1216
+#: api/classes/CService.php:1218
 msgid "Service cannot be parent and child at the same time."
 msgstr "Dienst kann nicht gleichzeitig über- und untergeordneter Dienst sein."
 
@@ -10979,7 +10976,7 @@ msgstr "Dienst geändert"
 msgid "Services"
 msgstr "Dienste"
 
-#: api/classes/CService.php:1449
+#: api/classes/CService.php:1451
 msgid "Services form a circular dependency."
 msgstr "Dienste bilden eine zirkläre Abhängigkeit."
 
@@ -11414,7 +11411,7 @@ msgstr "Schritt"
 msgid "Step \"%1$s\" [%2$s of %3$s] failed: %4$s"
 msgstr "Schritt \"%1$s\" [%2$s von %3$s] fehlgeschlagen: %4$s"
 
-#: api/classes/CWebCheck.php:702
+#: api/classes/CWebCheck.php:698
 #, php-format
 msgid "Step \"%s\" already exists."
 msgstr "Schritt \"%s\" existiert bereits."
@@ -12909,67 +12906,67 @@ msgstr "Warnung"
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Warnung: Kann nicht mehr als ein Element vom Typ \"Diagramm-Summe\" anzeigen."
 
-#: include/validate.inc.php:440
+#: include/validate.inc.php:432
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
 msgstr "Warnung. Feld \"%1$s\" ist ein Pflichtfeld."
 
-#: include/validate.inc.php:319
+#: include/validate.inc.php:311
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
 msgstr "Warnung. Feld \"%1$s\" ist kein IP-Adress-Bereich."
 
-#: include/validate.inc.php:305
+#: include/validate.inc.php:297
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
 msgstr "Warnung. Feld \"%1$s\" ist keine IP-Adresse."
 
-#: include/validate.inc.php:391
+#: include/validate.inc.php:383
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
 msgstr "Warnung. Feld \"%1$s\" ist keine Farbe."
 
-#: include/validate.inc.php:357
+#: include/validate.inc.php:349
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
 msgstr "Warnung. Feld \"%1$s\" ist keine Dezimalzahl."
 
-#: include/validate.inc.php:333
+#: include/validate.inc.php:325
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
 msgstr "Warnung. Feld \"%1$s\" ist keine Liste mit Ganzzahlen oder ein Bereich."
 
-#: include/validate.inc.php:346
+#: include/validate.inc.php:338
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
 msgstr "Warnung. Feld \"%1$s\" ist keine Ganzzahl."
 
-#: include/validate.inc.php:368
+#: include/validate.inc.php:360
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
 msgstr "Warnung. Feld \"%1$s\" ist kein String."
 
-#: include/validate.inc.php:379
+#: include/validate.inc.php:371
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
 msgstr "Warnung. Im Feld \"%1$s\" sind multibyte Chars nicht erlaubt."
 
-#: include/validate.inc.php:457
+#: include/validate.inc.php:449
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
 msgstr "Warnung. Feld \"%1$s\" muss fehlen."
 
-#: include/validate.inc.php:510
+#: include/validate.inc.php:502
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
 msgstr "Warnung: Unzulässiger Wert in Feld \"%1$s\"."
 
-#: include/validate.inc.php:491
+#: include/validate.inc.php:483
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
 msgstr "Warnung: Unzulässiger Wert in Feld \"%1$s\". Darf nicht leer sein."
 
-#: include/validate.inc.php:501
+#: include/validate.inc.php:493
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
 msgstr "Warnung: Unzulässiger Wert in Feld \"%1$s\". Muss zwischen %2$s und %3$s liegen."
@@ -13001,12 +12998,12 @@ msgstr "Web"
 msgid "Web checks"
 msgstr "Web-Prüfung"
 
-#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
+#: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:775
 #, php-format
 msgid "Web item \"%s\" created."
 msgstr "Web-Element \"%s\" erstellt."
 
-#: api/classes/CWebCheck.php:745
+#: api/classes/CWebCheck.php:741
 #, php-format
 msgid "Web item with key \"%s\" already exists."
 msgstr "Web-Element mit Schlüssel \"%s\" existiert bereits."
@@ -13424,7 +13421,7 @@ msgstr "Zabbix-Agent (aktiv)"
 msgid "Zabbix aggregate"
 msgstr "Zabbix Aggregat"
 
-#: include/validate.inc.php:521
+#: include/validate.inc.php:513
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix hat eine falsche Anfrage erhalten."
 

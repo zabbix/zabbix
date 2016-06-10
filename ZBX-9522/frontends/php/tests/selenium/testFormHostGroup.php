@@ -118,7 +118,7 @@ class testFormHostGroup extends CWebTest {
 
 		$this->chooseOkOnNextConfirmation();
 		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
+		$this->waitForConfirmation('glob:*');
 		$this->wait();
 		$this->zbxTestTextPresent('Group deleted');
 	}

@@ -83,7 +83,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 	private function saveGlobalMacros($confirmation = false, $wait = true) {
 		$this->zbxTestClick('save');
 		if ($confirmation) {
-			$this->waitForConfirmation();
+			$this->waitForConfirmation('glob:*');
 		}
 		if ($wait) {
 			$this->wait();

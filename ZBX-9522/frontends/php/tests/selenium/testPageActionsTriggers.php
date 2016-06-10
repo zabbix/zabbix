@@ -209,16 +209,6 @@ class testPageActionsTriggers extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsTriggers_Create() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageActionsTriggers_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allActions
 	*/
@@ -243,11 +233,6 @@ class testPageActionsTriggers extends CWebTest {
 		$this->assertEquals(1, DBcount($sql));
 	}
 
-	public function testPageActionsTriggers_MassEnableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
 	/**
 	* @dataProvider allActions
 	*/
@@ -270,11 +255,6 @@ class testPageActionsTriggers extends CWebTest {
 
 		$sql = "SELECT * FROM actions WHERE actionid=$actionid AND status=0";
 		$this->assertEquals(1, DBcount($sql));
-	}
-
-	public function testPageActionsTriggers_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
 	}
 
 	/**
@@ -306,10 +286,5 @@ class testPageActionsTriggers extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 
 		DBrestore_tables('actions');
-	}
-
-	public function testPageActionsTriggers_Sorting() {
-// TODO
-		$this->markTestIncomplete();
 	}
 }

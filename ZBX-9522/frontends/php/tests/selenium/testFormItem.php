@@ -282,7 +282,7 @@ class testFormItem extends CWebTest {
 				null,
 				array(
 						'ERROR: Page received incorrect data',
-						'Warning. Field "Custom multiplier" is mandatory.'
+						'Warning. Field "formula" is not decimal number.'
 					)
 			),
 			// Incorrect formula

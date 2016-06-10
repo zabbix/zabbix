@@ -68,48 +68,4 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->assertEquals($oldHashProxy, DBhash($sqlProxy), "Chuck Norris: no-change proxy update should not update data in table 'hosts'");
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: no-change proxy update should not update 'hosts.proxy_hostid'");
 	}
-
-	public function testPageAdministrationDMProxies_MassActivateAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageAdministrationDMProxies_MassActivate($proxy) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDisableAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageAdministrationDMProxies_MassDisable($proxy) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_MassDeleteAll() {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageAdministrationDMProxies_MassDelete($proxy) {
-// TODO
-		$this->markTestIncomplete();
-	}
-
-	public function testPageAdministrationDMProxies_Sorting() {
-// TODO
-		$this->markTestIncomplete();
-	}
 }
