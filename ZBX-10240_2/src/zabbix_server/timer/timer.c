@@ -404,10 +404,19 @@ static int	process_maintenance(void)
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(db_maintenanceid, row[0]);
+		db_every		= atoi(row[4]);
+
+		/* sanity check */
+		if (0 == db_every)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process maintenance maintenanceid:\"" ZBX_FS_UI64 "\":"
+					" time period field \"every\" is zero", db_maintenanceid);
+			continue;
+		}
+
 		db_maintenance_type	= atoi(row[1]);
 		db_active_since		= atoi(row[2]);
 		db_timeperiod_type	= atoi(row[3]);
-		db_every		= atoi(row[4]);
 		db_month		= atoi(row[5]);
 		db_dayofweek		= atoi(row[6]);
 		db_day			= atoi(row[7]);
