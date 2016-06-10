@@ -4264,35 +4264,35 @@ replace_key_param_data_t;
  * Comments: auxiliary function for substitute_key_macros()                   *
  *                                                                            *
  ******************************************************************************/
-static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+static int	replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+		char **param)
 {
 	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
 	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
-	int				macro_type = replace_key_param_data->macro_type;
-	char				*param;
+	int				macro_type = replace_key_param_data->macro_type, ret;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
-		return NULL;
+		return SUCCEED;
 
 	if (NULL == strchr(data, '{'))
-		return NULL;
+		return FAIL;
 
-	param = zbx_strdup(NULL, data);
+	*param = zbx_strdup(NULL, data);
 
 	if (0 != level)
-		unquote_key_param(param);
+		unquote_key_param(*param);
 
 	if (NULL == jp_row)
-		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, &param, macro_type, NULL, 0);
+		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, param, macro_type, NULL, 0);
 	else
-		substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	if (0 != level)
-		quote_key_param(&param, quoted);
+		ret = quote_key_param(param, quoted);
 
-	return param;
+	return ret;
 }
 
 /******************************************************************************
@@ -4306,6 +4306,7 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
  *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
  *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]            *
  *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
+ *           echo.sh[{$MACRO}]       |  a\         | echo.sh[{$MACRO}]        *
  *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
  *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
  *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *

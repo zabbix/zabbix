@@ -1573,16 +1573,25 @@ static int	DBpatch_2010101(void)
 			zbx_strncpy_alloc(&param, &param_alloc, &param_offset, row[1] + 15, key_len - 16);
 
 			if (1 != (nparam = num_param(param)))
-				quote_key_param(&param, 0);
-			quote_key_param(&dsn, 0);
+			{
+				if (FAIL == (ret = quote_key_param(&param, 0)))
+					error_message = zbx_dsprintf(error_message, "\"%s\" cannot be quoted", param);
+			}
+			if (FAIL == (ret = quote_key_param(&dsn, 0)))
+				error_message = zbx_dsprintf(error_message, "\"%s\" cannot be quoted", dsn);
 
-			key_offset = 0;
-			zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
+			if (FAIL == ret)
+				zbx_free(param);
+			else
+			{
+				key_offset = 0;
+				zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
 
-			zbx_free(param);
+				zbx_free(param);
 
-			if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
-				error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+				if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
+					error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
+			}
 		}
 
 		if (NULL == error_message)
@@ -2282,12 +2291,14 @@ static int	DBpatch_2010194(void)
  * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *
  ******************************************************************************/
-static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+static int	replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+			char **new_param)
 {
-	char	*param, *new_param;
+	char	*param;
+	int	ret = FAIL;
 
 	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
-		return NULL;
+		return ret;
 
 	param = zbx_strdup(NULL, data);
 
@@ -2296,16 +2307,16 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
 	if ('\0' == *param)
 	{
 		zbx_free(param);
-		return NULL;
+		return ret;
 	}
 
-	new_param = zbx_dsprintf(NULL, "^%s$", param);
+	*new_param = zbx_dsprintf(NULL, "^%s$", param);
 
 	zbx_free(param);
 
-	quote_key_param(&new_param, quoted);
+	ret = quote_key_param(new_param, quoted);
 
-	return new_param;
+	return ret;
 }
 
 static int	DBpatch_2010195(void)
