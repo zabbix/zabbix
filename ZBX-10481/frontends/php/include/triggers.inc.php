@@ -389,7 +389,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 
 	// Create each trigger for each host.
 	foreach ($dbDstHosts as $dstHost) {
-		foreach ($dbSrcTriggers as &$srcTrigger) {
+		foreach ($dbSrcTriggers as $srcTrigger) {
 			// If $srcHostId provided, get host 'host' for triggerExpressionReplaceHost().
 			if ($srcHostId != 0) {
 				$host = $srcHost['host'];
@@ -432,15 +432,15 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				return false;
 			}
 
-			$newTriggers[$srcTrigger['triggerid']] = [
+			$newTriggers[$srcTrigger['triggerid']][] = [
 				'newTriggerId' => reset($result['triggerids']),
+				'newTriggerExpression' => $srcTrigger['expression'],
 				'newTriggerHostId' => $dstHost['hostid'],
 				'newTriggerHost' => $dstHost['host'],
 				'srcTriggerContextHostId' => $srcTriggerContextHostId,
 				'srcTriggerContextHost' => $host
 			];
 		}
-		unset($srcTrigger);
 	}
 
 	$depids = [];
@@ -461,78 +461,96 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	// Map dependencies to the new trigger IDs and save.
 	if ($newTriggers) {
 		$dependencies = [];
+
 		foreach ($dbSrcTriggers as $srcTrigger) {
 			if ($srcTrigger['dependencies']) {
-				// Get corresponding created trigger id.
-				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
+				// Get corresponding created triggers.
+				$dst_triggers = $newTriggers[$srcTrigger['triggerid']];
 
-				foreach ($srcTrigger['dependencies'] as $depTrigger) {
-					// We have added $depTrigger trigger and we know corresponding trigger id for newly created trigger.
-					if (isset($newTriggers[$depTrigger['triggerid']])) {
-
+				foreach ($dst_triggers as $dst_trigger) {
+					foreach ($srcTrigger['dependencies'] as $depTrigger) {
 						/*
-						 * Dependency is within same host according to $srcHostId parameter or dep trigger has
-						 * single host.
+						 * We have added $depTrigger trigger and we know corresponding trigger ID for newly
+						 * created trigger.
 						 */
-						if ($newTrigger['srcTriggerContextHostId'] == $newTriggers[$depTrigger['triggerid']]['srcTriggerContextHostId']) {
-							$depTriggerId = $newTriggers[$depTrigger['triggerid']]['newTriggerId'];
+						if (array_key_exists($depTrigger['triggerid'], $newTriggers)) {
+							$dst_dep_triggers = $newTriggers[$depTrigger['triggerid']];
+
+							foreach ($dst_dep_triggers as $dst_dep_trigger) {
+								/*
+								 * Dependency is within same host according to $srcHostId parameter or dep trigger has
+								 * single host.
+								 */
+								if ($dst_trigger['srcTriggerContextHostId'] ==
+										$dst_dep_trigger['srcTriggerContextHostId']) {
+									$depTriggerId = $dst_dep_trigger['newTriggerId'];
+									break;
+								}
+								// Dependency is to trigger from another host.
+								else {
+									$depTriggerId = $depTrigger['triggerid'];
+								}
+							}
 						}
-						// Dependency is to trigger from another host.
+						// We need to search for $depTrigger trigger if target host is within dependency hosts.
+						elseif (in_array(['hostid' => $dst_trigger['srcTriggerContextHostId']],
+								$depTriggers[$depTrigger['triggerid']]['hosts'])) {
+							// Get all possible $depTrigger matching triggers by description.
+							$targetHostTriggersByDescription = API::Trigger()->get([
+								'hostids' => $dst_trigger['newTriggerHostId'],
+								'output' => ['hosts', 'triggerid', 'expression'],
+								'filter' => ['description' => $depTriggers[$depTrigger['triggerid']]['description']],
+								'preservekeys' => true
+							]);
+
+							$targetHostTriggersByDescription =
+								CMacrosResolverHelper::resolveTriggerExpressions($targetHostTriggersByDescription);
+
+							// Compare exploded expressions for exact match.
+							$expr1 = $depTriggers[$depTrigger['triggerid']]['expression'];
+							$depTriggerId = null;
+
+							foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
+								$expr2 = triggerExpressionReplaceHost($potentialTargetTrigger['expression'],
+									$dst_trigger['newTriggerHost'], $dst_trigger['srcTriggerContextHost']
+								);
+
+								if ($expr2 == $expr1) {
+									// Matching trigger has been found.
+									$depTriggerId = $potentialTargetTrigger['triggerid'];
+									break;
+								}
+							}
+
+							// If matching trigger wasn't found raise exception.
+							if ($depTriggerId === null) {
+								$expr2 = triggerExpressionReplaceHost($expr1, $dst_trigger['srcTriggerContextHost'],
+									$dst_trigger['newTriggerHost']
+								);
+
+								error(_s(
+									'Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
+									$srcTrigger['description'], $dst_trigger['newTriggerExpression'],
+									$depTriggers[$depTrigger['triggerid']]['description'], $expr2
+								));
+
+								return false;
+							}
+						}
+						// Leave original dependency.
 						else {
 							$depTriggerId = $depTrigger['triggerid'];
 						}
+
+						$dependencies[] = [
+							'triggerid' => $dst_trigger['newTriggerId'],
+							'dependsOnTriggerid' => $depTriggerId
+						];
 					}
-					// We need to search for $depTrigger trigger if target host is within dependency hosts.
-					elseif (in_array(['hostid'=>$newTrigger['srcTriggerContextHostId']], $depTriggers[$depTrigger['triggerid']]['hosts'])) {
-						// Get all possible $depTrigger matching triggers by description.
-						$targetHostTriggersByDescription = API::Trigger()->get([
-							'hostids' => $newTrigger['newTriggerHostId'],
-							'output' => ['hosts', 'triggerid', 'expression'],
-							'filter' => ['description' => $depTriggers[$depTrigger['triggerid']]['description']],
-							'preservekeys' => true
-						]);
-
-						$targetHostTriggersByDescription =
-							CMacrosResolverHelper::resolveTriggerExpressions($targetHostTriggersByDescription);
-
-						// Compare exploded expressions for exact match.
-						$expr1 = $depTriggers[$depTrigger['triggerid']]['expression'];
-						$depTriggerId = null;
-						foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
-							$expr2 = triggerExpressionReplaceHost($potentialTargetTrigger['expression'],
-								$newTrigger['newTriggerHost'], $newTrigger['srcTriggerContextHost']
-							);
-							if ($expr2 == $expr1) {
-								// Matching trigger has been found.
-								$depTriggerId = $potentialTargetTrigger['triggerid'];
-								break;
-							}
-						}
-
-						// If matching trigger wasn't found rise exception.
-						if (is_null($depTriggerId)) {
-							$expr2 = triggerExpressionReplaceHost($depTriggers[$depTrigger['triggerid']]['expression'],
-								$newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']
-							);
-							error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
-								$srcTrigger['description'], $srcTrigger['expression'],
-								$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
-
-							return false;
-						}
-					}
-					// Leave original dependency.
-					else {
-						$depTriggerId = $depTrigger['triggerid'];
-					}
-
-					$dependencies[] = [
-						'triggerid' => $newTrigger['newTriggerId'],
-						'dependsOnTriggerid' => $depTriggerId
-					];
 				}
 			}
 		}
+
 		if ($dependencies) {
 			if (!API::Trigger()->addDependencies($dependencies)) {
 				return false;
@@ -682,46 +700,6 @@ function implode_exp($expression, $triggerId, &$hostnames = []) {
 	return $expression;
 }
 
-/**
- * Get items from expression.
- *
- * @param CTriggerExpression $triggerExpression
- *
- * @return array
- */
-function getExpressionItems(CTriggerExpression $triggerExpression) {
-	$items = [];
-	$processedFunctions = [];
-	$processedItems = [];
-
-	foreach ($triggerExpression->expressions as $expression) {
-		if (isset($processedFunctions[$expression['expression']])) {
-			continue;
-		}
-
-		if (!isset($processedItems[$expression['host']][$expression['item']])) {
-			$dbItems = DBselect(
-				'SELECT i.itemid,i.flags'.
-				' FROM items i,hosts h'.
-				' WHERE i.key_='.zbx_dbstr($expression['item']).
-					' AND '.dbConditionInt('i.flags', [
-						ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_PROTOTYPE
-					]).
-					' AND h.host='.zbx_dbstr($expression['host']).
-					' AND h.hostid=i.hostid'
-			);
-			if ($dbItem = DBfetch($dbItems)) {
-				$items[] = $dbItem;
-				$processedItems[$expression['host']][$expression['item']] = true;
-			}
-		}
-
-		$processedFunctions[$expression['expression']] = true;
-	}
-
-	return $items;
-}
-
 function check_right_on_trigger_by_expression($permission, $expression) {
 	$expressionData = new CTriggerExpression();
 	if (!$expressionData->parse($expression)) {
@@ -792,10 +770,13 @@ function replace_template_dependencies($deps, $hostid) {
 function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode = null, $screenId = null) {
 	$data = [];
 	$hostNames = [];
+	$trcounter = [];
 
 	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers, true);
 
 	foreach ($triggers as $trigger) {
+		$trigger_name = $trigger['description'];
+
 		foreach ($trigger['hosts'] as $host) {
 			// triggers may belong to hosts that are filtered out and shouldn't be displayed, skip them
 			if (!isset($hosts[$host['hostid']])) {
@@ -804,25 +785,27 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 
 			$hostNames[$host['hostid']] = $host['name'];
 
-			// a little tricky check for attempt to overwrite active trigger (value=1) with
-			// inactive or active trigger with lower priority.
-			if (!isset($data[$trigger['description']][$host['name']])
-					|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-						|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-							&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
-				$data[$trigger['description']][$host['name']] = [
-					'groupid' => $trigger['groupid'],
-					'hostid' => $host['hostid'],
-					'triggerid' => $trigger['triggerid'],
-					'value' => $trigger['value'],
-					'lastchange' => $trigger['lastchange'],
-					'priority' => $trigger['priority'],
-					'flags' => $trigger['flags'],
-					'url' => $trigger['url'],
-					'hosts' => $trigger['hosts'],
-					'items' => $trigger['items']
-				];
+			if (!array_key_exists($host['name'], $trcounter)) {
+				$trcounter[$host['name']] = [];
 			}
+
+			if (!array_key_exists($trigger_name, $trcounter[$host['name']])) {
+				$trcounter[$host['name']][$trigger_name] = 0;
+			}
+
+			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = [
+				'groupid' => $trigger['groupid'],
+				'hostid' => $host['hostid'],
+				'triggerid' => $trigger['triggerid'],
+				'value' => $trigger['value'],
+				'lastchange' => $trigger['lastchange'],
+				'priority' => $trigger['priority'],
+				'flags' => $trigger['flags'],
+				'url' => $trigger['url'],
+				'hosts' => $trigger['hosts'],
+				'items' => $trigger['items']
+			];
+			$trcounter[$host['name']][$trigger_name]++;
 		}
 	}
 
@@ -846,26 +829,29 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$triggerTable->setHeader($header);
 
 		// data
-		foreach ($data as $description => $triggerHosts) {
-			$columns = [nbsp($description)];
+		foreach ($data as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$columns = [nbsp($trigger_name)];
 
-			foreach ($hostNames as $hostName) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+				foreach ($hostNames as $hostName) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
+				$triggerTable->addRow($columns);
 			}
-
-			$triggerTable->addRow($columns);
 		}
 	}
 	else {
 		// header
 		$header = [_('Host')];
 
-		foreach ($data as $description => $triggerHosts) {
-			$header[] = (new CColHeader($description))->addClass('vertical_rotation');
+		foreach ($data as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$header[] = (new CColHeader($trigger_name))->addClass('vertical_rotation');
+			}
 		}
 
 		$triggerTable->setHeader($header);
@@ -878,12 +864,14 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
-			foreach ($data as $triggerHosts) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+			foreach ($data as $trigger_data) {
+				foreach ($trigger_data as $trigger_hosts) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
 			}
 
 			$triggerTable->addRow($columns);

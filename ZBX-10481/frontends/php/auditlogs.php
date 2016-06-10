@@ -161,7 +161,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN);
+$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN, new CUrl('auditlogs.php'));
 
 // get timeline
 unset($sqlWhere['from'], $sqlWhere['till']);

@@ -62,11 +62,16 @@ foreach ($this->data['users'] as $user) {
 
 	// online time
 	if ($session['lastaccess']) {
-		$onlineTime = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout']) ? ZBX_USER_ONLINE_TIME : $user['autologout'];
+		$online_time = ($user['autologout'] == 0 || ZBX_USER_ONLINE_TIME < $user['autologout'])
+			? ZBX_USER_ONLINE_TIME
+			: $user['autologout'];
 
-		$online = (($session['lastaccess'] + $onlineTime) >= time())
-			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_GREEN)
-			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))->addClass(ZBX_STYLE_RED);
+		$online = ($session['status'] == ZBX_SESSION_ACTIVE && $user['users_status'] == GROUP_STATUS_ENABLED
+				&& ($session['lastaccess'] + $online_time) >= time())
+			? (new CCol(_('Yes').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
+				->addClass(ZBX_STYLE_GREEN)
+			: (new CCol(_('No').' ('.zbx_date2str(DATE_TIME_FORMAT_SECONDS, $session['lastaccess']).')'))
+				->addClass(ZBX_STYLE_RED);
 	}
 	else {
 		$online = (new CCol(_('No')))->addClass(ZBX_STYLE_RED);
@@ -102,7 +107,8 @@ foreach ($this->data['users'] as $user) {
 		$usersGroups[] = (new CLink(
 			$userGroup['name'],
 			'usergrps.php?form=update&usrgrpid='.$userGroup['usrgrpid']))
-			->addClass($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $userGroup['users_status'] == GROUP_STATUS_DISABLED
+			->addClass($userGroup['gui_access'] == GROUP_GUI_ACCESS_DISABLED
+					|| $userGroup['users_status'] == GROUP_STATUS_DISABLED
 				? ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_RED
 				: ZBX_STYLE_LINK_ALT . ' ' . ZBX_STYLE_GREEN);
 	}
@@ -132,7 +138,7 @@ foreach ($this->data['users'] as $user) {
 		($user['debug_mode'] == GROUP_DEBUG_MODE_ENABLED)
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_ORANGE)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_GREEN),
-		($user['users_status'] == 1)
+		($user['users_status'] == GROUP_STATUS_DISABLED)
 			? (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
 			: (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 	]);

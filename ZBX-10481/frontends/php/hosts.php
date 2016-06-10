@@ -994,7 +994,7 @@ elseif (hasRequest('form')) {
 			'output' => ['host'],
 			'preservekeys' => true
 		]);
-		order_result($proxies, 'host');
+		order_result($data['proxies'], 'host');
 	}
 
 	foreach ($data['proxies'] as &$proxy) {
@@ -1064,7 +1064,10 @@ else {
 	}
 	order_result($hosts, $sortField, $sortOrder);
 
-	$pagingLine = getPagingLine($hosts, $sortOrder);
+	$url = (new CUrl('hosts.php'))
+		->setArgument('groupid', $pageFilter->groupid);
+
+	$pagingLine = getPagingLine($hosts, $sortOrder, $url);
 
 	$hosts = API::Host()->get([
 		'hostids' => zbx_objectValues($hosts, 'hostid'),
