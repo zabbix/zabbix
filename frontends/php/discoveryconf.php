@@ -303,7 +303,7 @@ else {
 
 	$filter = [
 		'name' => CProfile::get('web.discovery.filter_name', ''),
-		'status' => CProfile::get('web.discovery.filter_status', '')
+		'status' => CProfile::get('web.discovery.filter_status', -1)
 	];
 
 	$config = select_config();

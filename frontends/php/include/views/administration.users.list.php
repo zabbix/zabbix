@@ -45,12 +45,12 @@ $widget = (new CWidget())
 			(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))
 		->addColumn((new CFormList())->addRow(_('User type'),
-			(new CComboBox('filter_type', $data['filter']['type'], null, [
-				-1 => _('All'),
-				USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
-				USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
-				USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
-			]))
+			(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
+				->addValue(_('Any'), -1)
+				->addValue(user_type2str(USER_TYPE_ZABBIX_USER), USER_TYPE_ZABBIX_USER)
+				->addValue(user_type2str(USER_TYPE_ZABBIX_ADMIN), USER_TYPE_ZABBIX_ADMIN)
+				->addValue(user_type2str(USER_TYPE_SUPER_ADMIN), USER_TYPE_SUPER_ADMIN)
+				->setModern(true)
 		))
 	);
 

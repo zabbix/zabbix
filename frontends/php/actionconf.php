@@ -96,7 +96,7 @@ $fields = [
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_status' =>			[T_ZBX_STR, O_OPT, null,	IN([-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),		null],
+	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
