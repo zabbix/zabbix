@@ -28,6 +28,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10872] fixed selection of application in application popup (Cemeris)
 ........S. [ZBX-10848] fixed applications getting unlinked from undiscovered items (wiper)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 A.F....... [ZBX-9455] fixed length limit for host prototype name (Gunars, Sasha)
