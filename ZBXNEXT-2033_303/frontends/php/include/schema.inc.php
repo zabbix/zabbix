@@ -6142,6 +6142,41 @@ return [
 			],
 		],
 	],
+	'ticket' => [
+		'key' => 'ticketid',
+		'fields' => [
+			'ticketid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'externalid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+			],
+			'eventid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			],
+			'new' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			],
+		],
+	],
 	'dbversion' => [
 		'key' => '',
 		'fields' => [

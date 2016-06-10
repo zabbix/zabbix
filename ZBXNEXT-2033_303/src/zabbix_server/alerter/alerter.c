@@ -134,6 +134,18 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 		zbx_free(cmd);
 	}
+	else if (MEDIA_TYPE_REMEDY == mediatype->type)
+	{
+		char	*error_dyn = NULL;
+
+		res = zbx_remedy_process_alert(alert, mediatype, &error_dyn);
+
+		if (NULL != error_dyn)
+		{
+			zbx_strlcpy(error, error_dyn, max_error_len);
+			zbx_free(error_dyn);
+		}
+	}
 	else
 	{
 		zbx_snprintf(error, max_error_len, "unsupported media type [%d]", mediatype->type);
@@ -190,7 +202,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 					"mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,"
 					"mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
 					"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,mt.exec_params,"
-					"a.retries"
+					"a.retries,a.eventid,a.userid"
 				" from alerts a,media_type mt"
 				" where a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
@@ -224,8 +236,9 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			ZBX_STR2UCHAR(mediatype.smtp_verify_peer, row[18]);
 			ZBX_STR2UCHAR(mediatype.smtp_verify_host, row[19]);
 			ZBX_STR2UCHAR(mediatype.smtp_authentication, row[20]);
-
 			alert.retries = atoi(row[22]);
+			ZBX_STR2UINT64(alert.eventid, row[23]);
+			ZBX_STR2UINT64(alert.userid, row[24]);
 
 			*error = '\0';
 			res = execute_action(&alert, &mediatype, error, sizeof(error));

@@ -213,6 +213,8 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 
 char	*CONFIG_USER			= NULL;
 
+int	CONFIG_REMEDY_SERVICE_TIMEOUT	= 20;
+
 /* web monitoring */
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
@@ -614,6 +616,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"VMwareTimeout",		&CONFIG_VMWARE_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			300},
+		{"RemedyServiceTimeout",	&CONFIG_REMEDY_SERVICE_TIMEOUT,		TYPE_INT,
+			PARM_OPT,	1,			SEC_PER_MIN},
 		{"AllowRoot",			&CONFIG_ALLOW_ROOT,			TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
@@ -832,6 +836,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Jabber notifications:      " JABBER_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Ez Texting notifications:  " LIBCURL_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "Remedy incident support:   " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH2 support:              " SSH2_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
