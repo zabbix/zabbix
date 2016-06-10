@@ -32,7 +32,8 @@ class CControllerMediatypeList extends CController {
 			'uncheck' =>	'in 1',
 			'filter_set' =>	'in Filter',
 			'filter_rst' =>	'in 1',
-			'filter_name' =>''
+			'filter_name' =>'',
+			'filter_status' =>'in -1,'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,13 +59,16 @@ class CControllerMediatypeList extends CController {
 		// filter
 		if (hasRequest('filter_set')) {
 			CProfile::update('web.media_types.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.media_types.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 		}
 		elseif (hasRequest('filter_rst')) {
 			CProfile::delete('web.media_types.filter_name');
+			CProfile::delete('web.media_types.filter_status');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.media_types.filter_name', '')
+			'name' => CProfile::get('web.media_types.filter_name', ''),
+			'status' => CProfile::get('web.media_types.filter_status', -1)
 		];
 
 		$config = select_config();
@@ -83,6 +87,9 @@ class CControllerMediatypeList extends CController {
 			],
 			'search' => [
 				'description' => ($filter['name'] === '') ? null : $filter['name']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
 			'limit' => $config['search_limit'] + 1,
 			'editable' => true,
