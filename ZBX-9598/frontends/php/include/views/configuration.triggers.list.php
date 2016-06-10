@@ -56,7 +56,6 @@ $widget = (new CWidget())
 	->setTitle(_('Triggers'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('hostid', $this->data['hostid'])
 		->addItem((new CList())
 			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
 			->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
@@ -89,7 +88,10 @@ $triggersTable = (new CTableInfo())
 		$this->data['showInfoColumn'] ? _('Info') : null
 	]);
 
-$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], ['html' => true]);
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], [
+	'html' => true,
+	'sources' => ['expression', 'recovery_expression']
+]);
 
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -124,14 +126,13 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 			'trigger_prototypes.php?parent_discoveryid='.$trigger['discoveryRule']['itemid']))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
-		$description[] = NAME_DELIMITER.$trigger['description'];
+		$description[] = NAME_DELIMITER;
 	}
-	else {
-		$description[] = new CLink(
-			CHtml::encode($trigger['description']),
-			'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
-		);
-	}
+
+	$description[] = new CLink(
+		CHtml::encode($trigger['description']),
+		'triggers.php?form=update&hostid='.$this->data['hostid'].'&triggerid='.$triggerid
+	);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -144,16 +145,11 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
 			);
 
-			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$triggerDependencies[] = (new CLink(
-					$depTriggerDescription,
-					'triggers.php?form=update&triggerid='.$depTrigger['triggerid']))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(triggerIndicatorStyle($depTrigger['status']));
-			}
-			else {
-				$triggerDependencies[] = $depTriggerDescription;
-			}
+			$triggerDependencies[] = (new CLink($depTriggerDescription,
+				'triggers.php?form=update&triggerid='.$depTrigger['triggerid']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(triggerIndicatorStyle($depTrigger['status']));
 
 			$triggerDependencies[] = BR();
 		}
@@ -161,7 +157,6 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 
 		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
 	}
-
 
 	// info
 	if ($this->data['showInfoColumn']) {
@@ -201,16 +196,22 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		}
 	}
 
-	// checkbox
-	$checkBox = (new CCheckBox('g_triggerid['.$triggerid.']', $triggerid))
-		->setEnabled(empty($trigger['discoveryRule']));
+	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+		$expression = [
+			_('Problem'), ': ', $trigger['expression'], BR(),
+			_('Recovery'), ': ', $trigger['recovery_expression']
+		];
+	}
+	else {
+		$expression = $trigger['expression'];
+	}
 
 	$triggersTable->addRow([
-		$checkBox,
+		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		$trigger['expression'],
+		$expression,
 		$status,
 		$info
 	]);

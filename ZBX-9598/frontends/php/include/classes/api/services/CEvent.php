@@ -112,6 +112,7 @@ class CEvent extends CApiService {
 			'selectRelatedObject'		=> null,
 			'select_alerts'				=> null,
 			'select_acknowledges'		=> null,
+			'selectTags'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -602,6 +603,19 @@ class CEvent extends CApiService {
 				}
 				unset($event);
 			}
+		}
+
+		// Adding event tags.
+		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
+			$tags = API::getApiService()->select('event_tag', [
+				'output' => $this->outputExtend($options['selectTags'], ['eventid']),
+				'filter' => ['eventid' => $eventIds],
+				'preservekeys' => true
+			]);
+
+			$relationMap = $this->createRelationMap($tags, 'eventid', 'eventtagid');
+			$tags = $this->unsetExtraFields($tags, ['eventtagid', 'eventid'], []);
+			$result = $relationMap->mapMany($result, $tags, 'tags');
 		}
 
 		return $result;

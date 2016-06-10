@@ -63,6 +63,8 @@ $triggers = API::Trigger()->get([
 ]);
 
 if ($data['filter']['extAck']) {
+	$hosts_with_unack_triggers = [];
+
 	$triggers_unack = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid'],
@@ -101,7 +103,7 @@ foreach ($triggers as $trigger) {
 			$host = $hosts[$trigger_host['hostid']];
 		}
 
-		if ($data['filter']['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])) {
+		if ($data['filter']['extAck'] && array_key_exists($host['hostid'], $hosts_with_unack_triggers)) {
 			if (!isset($lastUnack_host_list[$host['hostid']])) {
 				$lastUnack_host_list[$host['hostid']] = [];
 				$lastUnack_host_list[$host['hostid']]['host'] = $host['name'];

@@ -40,11 +40,6 @@ class CConfigurationImport {
 	protected $importedObjectContainer;
 
 	/**
-	 * @var CTriggerExpression
-	 */
-	protected $triggerExpression;
-
-	/**
 	 * @var array
 	 */
 	protected $options;
@@ -67,10 +62,9 @@ class CConfigurationImport {
 	 * @param array						$options					import options "createMissing", "updateExisting" and "deleteMissing"
 	 * @param CImportReferencer			$referencer					class containing all importable objects
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
-	 * @param CTriggerExpression		$triggerExpression			class to parse trigger expression
 	 */
 	public function __construct(array $options = [], CImportReferencer $referencer,
-			CImportedObjectContainer $importedObjectContainer, CTriggerExpression $triggerExpression) {
+			CImportedObjectContainer $importedObjectContainer) {
 		$this->options = [
 			'groups' => ['createMissing' => false],
 			'hosts' => ['updateExisting' => false, 'createMissing' => false],
@@ -82,6 +76,7 @@ class CConfigurationImport {
 			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'httptests' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 			'screens' => ['updateExisting' => false, 'createMissing' => false],
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
@@ -91,7 +86,6 @@ class CConfigurationImport {
 		$this->options = array_merge($this->options, $options);
 		$this->referencer = $referencer;
 		$this->importedObjectContainer = $importedObjectContainer;
-		$this->triggerExpression = $triggerExpression;
 	}
 
 	/**
@@ -112,6 +106,7 @@ class CConfigurationImport {
 		$this->processHosts();
 
 		// delete missing objects from processed hosts and templates
+		$this->deleteMissingHttpTests();
 		$this->deleteMissingDiscoveryRules();
 		$this->deleteMissingTriggers();
 		$this->deleteMissingGraphs();
@@ -129,6 +124,7 @@ class CConfigurationImport {
 		$this->processMaps();
 		$this->processTemplateScreens();
 		$this->processScreens();
+		$this->processHttpTests();
 
 		return true;
 	}
@@ -156,6 +152,8 @@ class CConfigurationImport {
 		$macrosRefs = [];
 		$proxyRefs = [];
 		$hostPrototypesRefs = [];
+		$httptestsRefs = [];
+		$httpstepsRefs = [];
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -246,12 +244,17 @@ class CConfigurationImport {
 				}
 
 				foreach ($discoveryRule['trigger_prototypes'] as $trigger) {
-					$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
+					$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] =
+						true;
 
-					// add found hosts and items to references from parsed trigger expressions
-					foreach ($trigger['parsedExpressions'] as $expression) {
-						$hostsRefs[$expression['host']] = $expression['host'];
-						$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
+					if (array_key_exists('dependencies', $trigger)) {
+						foreach ($trigger['dependencies'] as $dependency) {
+							$name = $dependency['name'];
+							$expression = $dependency['expression'];
+							$recovery_expression = $dependency['recovery_expression'];
+
+							$triggersRefs[$name][$expression][$recovery_expression] = true;
+						}
 					}
 				}
 
@@ -318,17 +321,12 @@ class CConfigurationImport {
 		}
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggersRefs[$trigger['description']][$trigger['expression']] = $trigger['expression'];
-
-			// add found hosts and items to references from parsed trigger expressions
-			foreach ($trigger['parsedExpressions'] as $expression) {
-				$hostsRefs[$expression['host']] = $expression['host'];
-				$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
-			}
+			$triggersRefs[$trigger['description']][$trigger['expression']][$trigger['recovery_expression']] = true;
 
 			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
-					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
+					$triggersRefs[$dependency['name']][$dependency['expression']][$dependency['recovery_expression']] =
+						true;
 				}
 			}
 		}
@@ -357,7 +355,7 @@ class CConfigurationImport {
 
 						case SYSMAP_ELEMENT_TYPE_TRIGGER:
 							$el = $selement['element'];
-							$triggersRefs[$el['description']][$el['expression']] = $el['expression'];
+							$triggersRefs[$el['description']][$el['expression']][$el['recovery_expression']] = true;
 							break;
 					}
 				}
@@ -368,7 +366,7 @@ class CConfigurationImport {
 					if (isset($link['linktriggers'])) {
 						foreach ($link['linktriggers'] as $linkTrigger) {
 							$t = $linkTrigger['trigger'];
-							$triggersRefs[$t['description']][$t['expression']] = $t['expression'];
+							$triggersRefs[$t['description']][$t['expression']][$t['recovery_expression']] = true;
 						}
 					}
 				}
@@ -463,6 +461,24 @@ class CConfigurationImport {
 			}
 		}
 
+		foreach ($this->getFormattedHttpTests() as $host => $httptests) {
+			foreach ($httptests as $httptest) {
+				$httptestsRefs[$host][$httptest['name']] = $httptest['name'];
+
+				if (array_key_exists('name', $httptest['application'])) {
+					$applicationsRefs[$host][$httptest['application']['name']] = $httptest['application']['name'];
+				}
+			}
+		}
+
+		foreach ($this->getFormattedHttpSteps() as $host => $httptests) {
+			foreach ($httptests as $httptest_name => $httpsteps) {
+				foreach ($httpsteps as $httpstep) {
+					$httpstepsRefs[$host][$httptest_name][$httpstep['name']] = $httpstep['name'];
+				}
+			}
+		}
+
 		$this->referencer->addGroups($groupsRefs);
 		$this->referencer->addTemplates($templatesRefs);
 		$this->referencer->addHosts($hostsRefs);
@@ -478,6 +494,8 @@ class CConfigurationImport {
 		$this->referencer->addMacros($macrosRefs);
 		$this->referencer->addProxies($proxyRefs);
 		$this->referencer->addHostPrototypes($hostPrototypesRefs);
+		$this->referencer->addHttpTests($httptestsRefs);
+		$this->referencer->addHttpSteps($httpstepsRefs);
 	}
 
 	/**
@@ -1006,24 +1024,9 @@ class CConfigurationImport {
 
 				// trigger prototypes
 				foreach ($item['trigger_prototypes'] as $trigger) {
-					// search for existing  items in trigger prototype expressions
-					foreach ($trigger['parsedExpressions'] as $expression) {
-						$hostId = $this->referencer->resolveHostOrTemplate($expression['host']);
-						$itemId = $hostId ? $this->referencer->resolveItem($hostId, $expression['item']) : false;
-
-						if (!$itemId) {
-							throw new Exception(_s(
-								'Cannot find item "%1$s" on "%2$s" used in trigger prototype "%3$s" of discovery rule "%4$s" on "%5$s".',
-								$expression['item'],
-								$expression['host'],
-								$trigger['description'],
-								$item['name'],
-								$host
-							));
-						}
-					}
-
-					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+					$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+						$trigger['recovery_expression']
+					);
 
 					$triggers[] = $trigger;
 					unset($trigger['dependencies']);
@@ -1115,7 +1118,9 @@ class CConfigurationImport {
 
 			foreach ($result['triggerids'] as $tnum => $triggerid) {
 				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerid);
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression'], $triggerid
+				);
 			}
 		}
 		if ($triggersToUpdate) {
@@ -1148,10 +1153,14 @@ class CConfigurationImport {
 			}
 
 			$deps = [];
-			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+				$trigger['recovery_expression']
+			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression'],
+					$dependency['recovery_expression']
+				);
 
 				if (!$dep_triggerid) {
 					throw new Exception(_s('Trigger prototype "%1$s" depends on trigger "%2$s", which does not exist.',
@@ -1172,6 +1181,83 @@ class CConfigurationImport {
 		if ($dependencies) {
 			API::TriggerPrototype()->update($dependencies);
 		}
+	}
+
+	/**
+	 * Import web scenarios.
+	 */
+	protected function processHttpTests() {
+		if (!$this->options['httptests']['createMissing'] && !$this->options['httptests']['updateExisting']) {
+			return;
+		}
+
+		$all_httptests = $this->getFormattedHttpTests();
+
+		if (!$all_httptests) {
+			return;
+		}
+
+		$httptests_to_create = [];
+		$httptests_to_update = [];
+
+		foreach ($all_httptests as $host => $httptests) {
+			$hostid = $this->referencer->resolveHostOrTemplate($host);
+
+			if (!$this->importedObjectContainer->isHostProcessed($hostid)
+					&& !$this->importedObjectContainer->isTemplateProcessed($hostid)) {
+				continue;
+			}
+
+			foreach ($httptests as $httptest) {
+				$httptest['hostid'] = $hostid;
+
+				if (array_key_exists('name', $httptest['application'])) {
+					$applicationid = $this->referencer->resolveApplication($hostid, $httptest['application']['name']);
+
+					if ($applicationid === false) {
+						throw new Exception(_s('Web scenario "%1$s" on "%2$s": application "%3$s" does not exist.',
+							$httptest['name'], $host, $httptest['application']['name']));
+					}
+
+					$httptest['applicationid'] = $applicationid;
+				}
+				else {
+					$httptest['applicationid'] = 0;
+				}
+
+				unset($httptest['application']);
+
+				$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
+
+				if ($httptestid !== false) {
+					foreach ($httptest['steps'] as &$httpstep) {
+						$httpstepid = $this->referencer->resolveHttpStep($hostid, $httptestid, $httpstep['name']);
+
+						if ($httpstepid !== false) {
+							$httpstep['httpstepid'] = $httpstepid;
+						}
+					}
+					unset($httpstep);
+
+					$httptest['httptestid'] = $httptestid;
+					$httptests_to_update[] = $httptest;
+				}
+				else {
+					$httptests_to_create[] = $httptest;
+				}
+			}
+		}
+
+		// create/update web scenarios and create a hash hostid->name->httptestid
+		if ($this->options['httptests']['createMissing'] && $httptests_to_create) {
+			API::HttpTest()->create($httptests_to_create);
+		}
+
+		if ($this->options['httptests']['updateExisting'] && $httptests_to_update) {
+			API::HttpTest()->update($httptests_to_update);
+		}
+
+		$this->referencer->refreshHttpTests();
 	}
 
 	/**
@@ -1286,21 +1372,9 @@ class CConfigurationImport {
 		$triggers = [];
 
 		foreach ($allTriggers as $trigger) {
-			// search for existing items in trigger expressions
-			foreach ($trigger['parsedExpressions'] as $expression) {
-				$hostId = $this->referencer->resolveHostOrTemplate($expression['host']);
-				$itemId = $hostId ? $this->referencer->resolveItem($hostId, $expression['item']) : false;
-
-				if (!$itemId) {
-					throw new Exception(_s('Cannot find item "%1$s" on "%2$s" used in trigger "%3$s".',
-						$expression['item'],
-						$expression['host'],
-						$trigger['description']
-					));
-				}
-			}
-
-			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+				$trigger['recovery_expression']
+			);
 
 			if ($triggerId) {
 				if ($this->options['triggers']['updateExisting']) {
@@ -1326,7 +1400,9 @@ class CConfigurationImport {
 
 			foreach ($result['triggerids'] as $tnum => $triggerid) {
 				$trigger = $triggersToCreate[$tnum];
-				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'], $triggerid);
+				$this->referencer->addTriggerRef($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression'], $triggerid
+				);
 			}
 		}
 
@@ -1356,10 +1432,14 @@ class CConfigurationImport {
 			}
 
 			$deps = [];
-			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+			$triggerid = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+				$trigger['recovery_expression']
+			);
 
 			foreach ($trigger['dependencies'] as $dependency) {
-				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression']);
+				$dep_triggerid = $this->referencer->resolveTrigger($dependency['name'], $dependency['expression'],
+					$dependency['recovery_expression']
+				);
 
 				if (!$dep_triggerid) {
 					throw new Exception(_s('Trigger "%1$s" depends on trigger "%2$s", which does not exist.',
@@ -1471,8 +1551,8 @@ class CConfigurationImport {
 			$screenImporter = new CTemplateScreenImporter($this->options, $this->referencer,
 				$this->importedObjectContainer
 			);
-			$screenImporter->import($screens);
 			$screenImporter->delete($screens);
+			$screenImporter->import($screens);
 		}
 	}
 
@@ -1614,7 +1694,9 @@ class CConfigurationImport {
 
 		if ($allTriggers) {
 			foreach ($allTriggers as $trigger) {
-				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression']);
+				$triggerId = $this->referencer->resolveTrigger($trigger['description'], $trigger['expression'],
+					$trigger['recovery_expression']
+				);
 
 				if ($triggerId) {
 					$triggersXML[$triggerId] = $triggerId;
@@ -1805,7 +1887,7 @@ class CConfigurationImport {
 					// gather trigger prototype IDs to delete
 					foreach ($discoveryRule['trigger_prototypes'] as $triggerPrototype) {
 						$triggerPrototypeId = $this->referencer->resolveTrigger($triggerPrototype['description'],
-							$triggerPrototype['expression']
+							$triggerPrototype['expression'], $triggerPrototype['recovery_expression']
 						);
 
 						if ($triggerPrototypeId) {
@@ -1898,6 +1980,59 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Deletes web scenarios from DB that are missing in XML.
+	 */
+	protected function deleteMissingHttpTests() {
+		if (!$this->options['httptests']['deleteMissing']) {
+			return;
+		}
+
+		$processed_hostids = array_merge(
+			$this->importedObjectContainer->getHostIds(),
+			$this->importedObjectContainer->getTemplateIds()
+		);
+
+		// no hosts or templates have been processed
+		if (!$processed_hostids) {
+			return;
+		}
+
+		$xml_httptestids = [];
+
+		$all_httptests = $this->getFormattedHttpTests();
+
+		if ($all_httptests) {
+			foreach ($all_httptests as $host => $httptests) {
+				$hostid = $this->referencer->resolveHostOrTemplate($host);
+
+				foreach ($httptests as $httptest) {
+					$httptestid = $this->referencer->resolveHttpTest($hostid, $httptest['name']);
+
+					if ($httptestid) {
+						$xml_httptestids[$httptestid] = true;
+					}
+				}
+			}
+		}
+
+		$db_httptestids = API::HttpTest()->get([
+			'output' => [],
+			'hostids' => $processed_hostids,
+			'inherited' => false,
+			'preservekeys' => true,
+			'nopermissions' => true
+		]);
+
+		$del_httptestids = array_diff_key($db_httptestids, $xml_httptestids);
+
+		if ($del_httptestids) {
+			API::HttpTest()->delete(array_keys($del_httptestids));
+		}
+
+		$this->referencer->refreshHttpTests();
+	}
+
+	/**
 	 * Get formatted groups.
 	 *
 	 * @return array
@@ -1983,20 +2118,35 @@ class CConfigurationImport {
 	protected function getFormattedDiscoveryRules() {
 		if (!isset($this->formattedData['discoveryRules'])) {
 			$this->formattedData['discoveryRules'] = $this->adapter->getDiscoveryRules();
-
-			foreach ($this->formattedData['discoveryRules'] as &$discoveryRules) {
-				foreach ($discoveryRules as &$discoveryRule) {
-					foreach ($discoveryRule['trigger_prototypes'] as &$triggerPrototype) {
-						$triggerPrototype['parsedExpressions'] = $this->parseTriggerExpression($triggerPrototype['expression']);
-					}
-					unset($triggerPrototype);
-				}
-				unset($discoveryRule);
-			}
-			unset($discoveryRules);
 		}
 
 		return $this->formattedData['discoveryRules'];
+	}
+
+	/**
+	 * Get formatted web scenarios.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedHttpTests() {
+		if (!array_key_exists('httptests', $this->formattedData)) {
+			$this->formattedData['httptests'] = $this->adapter->getHttpTests();
+		}
+
+		return $this->formattedData['httptests'];
+	}
+
+	/**
+	 * Get formatted web scenario steps.
+	 *
+	 * @return array
+	 */
+	protected function getFormattedHttpSteps() {
+		if (!array_key_exists('httpsteps', $this->formattedData)) {
+			$this->formattedData['httpsteps'] = $this->adapter->getHttpSteps();
+		}
+
+		return $this->formattedData['httpsteps'];
 	}
 
 	/**
@@ -2007,41 +2157,9 @@ class CConfigurationImport {
 	protected function getFormattedTriggers() {
 		if (!isset($this->formattedData['triggers'])) {
 			$this->formattedData['triggers'] = $this->adapter->getTriggers();
-
-			foreach ($this->formattedData['triggers'] as &$trigger) {
-				$trigger['parsedExpressions'] = $this->parseTriggerExpression($trigger['expression']);
-			}
-			unset($trigger);
 		}
 
 		return $this->formattedData['triggers'];
-	}
-
-	/**
-	 * Parses a trigger expression and returns an array of used hosts and items.
-	 *
-	 * @param string $expression
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
-	 */
-	protected function parseTriggerExpression($expression) {
-		$expressions = [];
-
-		$result = $this->triggerExpression->parse($expression);
-		if (!$result) {
-			throw new Exception($this->triggerExpression->error);
-		}
-
-		foreach ($result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) as $token) {
-			$expressions[] = [
-				'host' => $token['data']['host'],
-				'item' => $token['data']['item'],
-			];
-		}
-
-		return $expressions;
 	}
 
 	/**

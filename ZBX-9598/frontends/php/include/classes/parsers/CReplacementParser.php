@@ -1,3 +1,4 @@
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2016 Zabbix SIA
@@ -17,33 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_MACROCACHE_H
-#define ZABBIX_MACROCACHE_H
 
-#include "zbxtypes.h"
-#include "zbxalgo.h"
+/**
+ * A parser for reference macros like \1-\9.
+ */
+class CReplacementParser extends CParser {
 
-/* user macro structure used to store user macros in user macro cache */
-typedef struct
-{
-	char	*name;
-	char	*context;
-	char	*value;
+	/**
+	 * @param string    $source
+	 * @param int       $pos
+	 *
+	 * @return int
+	 */
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
+
+		$p = $pos;
+
+		if (!isset($source[$p]) || $source[$p] !== '\\') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		if (!isset($source[$p]) || $source[$p] < '1' || $source[$p] > '9') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
+
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
+	}
 }
-zbx_umc_macro_t;
-
-/* user macro cache object */
-typedef struct
-{
-	/* the object id, for example trigger id */
-	zbx_uint64_t		objectid;
-	/* the macro source hosts */
-	zbx_vector_uint64_t	hostids;
-	/* the macro:value pairs */
-	zbx_vector_ptr_t	macros;
-}
-zbx_umc_object_t;
-
-int	zbx_umc_compare_macro(const void *d1, const void *d2);
-
-#endif

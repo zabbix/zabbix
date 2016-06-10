@@ -25,6 +25,12 @@
 #include "dbcache.h"
 #include "sysinfo.h"
 
+#ifdef HAVE_NETSNMP
+#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
+#	include <net-snmp/net-snmp-config.h>
+#	include <net-snmp/net-snmp-includes.h>
+#endif
+
 extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TIMEOUT;
 

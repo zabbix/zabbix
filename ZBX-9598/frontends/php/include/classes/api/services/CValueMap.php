@@ -540,6 +540,11 @@ class CValueMap extends CApiService {
 					' GROUP BY m.valuemapid'
 				);
 
+				foreach ($result as &$valuemap) {
+					$valuemap['mappings'] = 0;
+				}
+				unset($valuemap);
+
 				while ($db_mapping = DBfetch($db_mappings)) {
 					$result[$db_mapping['valuemapid']]['mappings'] = $db_mapping['cnt'];
 				}
@@ -549,6 +554,11 @@ class CValueMap extends CApiService {
 					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
 					'filter' => ['valuemapid' => array_keys($result)]
 				]);
+
+				foreach ($result as &$valuemap) {
+					$valuemap['mappings'] = [];
+				}
+				unset($valuemap);
 
 				foreach ($db_mappings as $db_mapping) {
 					$valuemapid = $db_mapping['valuemapid'];

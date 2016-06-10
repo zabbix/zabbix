@@ -118,11 +118,15 @@ $graph_in = new CScreenBase([
 	'stime' => getRequest('stime')
 ]);
 
-$httptest_manager = new CHttpTestManager();
-$itemids = $httptest_manager->getHttpStepItems($httptest['httptestid']);
-$itemids = zbx_objectValues($itemids, 'itemid');
+$items = DBfetchArray(DBselect(
+	'SELECT i.itemid,i.value_type,i.history,i.trends'.
+	' FROM items i,httpstepitem hi,httpstep hs'.
+	' WHERE i.itemid=hi.itemid'.
+		' AND hi.httpstepid=hs.httpstepid'.
+		' AND hs.httptestid='.zbx_dbstr($httptest['httptestid'])
+));
 
-$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemids));
+$graph_in->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($items));
 
 $src = 'chart3.php?height=150'.
 	'&name='.$http_test_name.': '._('Speed').

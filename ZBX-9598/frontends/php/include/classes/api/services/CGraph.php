@@ -39,7 +39,6 @@ class CGraph extends CGraphGeneral {
 			self::ERROR_MISSING_GRAPH_NAME => _('Missing "name" field for graph.'),
 			self::ERROR_MISSING_GRAPH_ITEMS => _('Missing items for graph "%1$s".'),
 			self::ERROR_MISSING_REQUIRED_VALUE => _('No "%1$s" given for graph.'),
-			self::ERROR_TEMPLATED_ID => _('Cannot update "templateid" for graph "%1$s".'),
 			self::ERROR_GRAPH_SUM => _('Cannot add more than one item with type "Graph sum" on graph "%1$s".')
 		]);
 	}
@@ -547,12 +546,6 @@ class CGraph extends CGraphGeneral {
 
 				if ($delGraph['templateid'] != 0) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated graphs.'));
-				}
-
-				if ($delGraph['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot delete discovered graph "%1$s".', $delGraph['name']
-					));
 				}
 			}
 		}

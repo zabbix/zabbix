@@ -37,7 +37,6 @@
 
 #include "daemon.h"
 #include "../../libs/zbxcrypto/tls.h"
-#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
@@ -58,7 +57,8 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	ret = process_hist_data(sock, jp, 0, ts, &info);
+	if (SUCCEED != (ret = process_hist_data(sock, jp, 0, ts, &info)))
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
 	zbx_send_response(sock, ret, info, CONFIG_TIMEOUT);
 
@@ -90,9 +90,14 @@ static void	recv_proxyhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		goto out;
 	}
 
-	update_proxy_lastaccess(proxy_hostid);
+	if (SUCCEED != (ret = process_hist_data(sock, jp, proxy_hostid, ts, &error)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid history data from proxy \"%s\" at \"%s\": %s",
+				host, sock->peer, error);
+		goto out;
+	}
 
-	ret = process_hist_data(sock, jp, proxy_hostid, ts, &error);
+	update_proxy_lastaccess(proxy_hostid);
 out:
 	zbx_send_response(sock, ret, error, CONFIG_TIMEOUT);
 

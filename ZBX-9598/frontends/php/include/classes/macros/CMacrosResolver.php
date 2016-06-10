@@ -362,6 +362,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
 			],
+			'macro_funcs_n' => [
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
 			'references' => true,
 			'usermacros' => true
 		];
@@ -376,36 +379,39 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (!$options['references_only']) {
 				$functionids = $this->findFunctions($trigger['expression']);
 
-				foreach ($matched_macros['macros_n']['host'] as $macro => $f_nums) {
-					foreach ($f_nums as $f_num) {
-						$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] =
-							UNRESOLVED_MACRO_STRING;
+				foreach ($matched_macros['macros_n']['host'] as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-						if (array_key_exists($f_num, $functionids)) {
-							$macros['host'][$functionids[$f_num]][$macro][] = $f_num;
-						}
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 					}
 				}
 
-				foreach ($matched_macros['macros_n']['interface'] as $macro => $f_nums) {
-					foreach ($f_nums as $f_num) {
-						$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] =
-							UNRESOLVED_MACRO_STRING;
+				foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-						if (array_key_exists($f_num, $functionids)) {
-							$macros['interface'][$functionids[$f_num]][$macro][] = $f_num;
-						}
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 					}
 				}
 
-				foreach ($matched_macros['macros_n']['item'] as $macro => $f_nums) {
-					foreach ($f_nums as $f_num) {
-						$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] =
-							UNRESOLVED_MACRO_STRING;
+				foreach ($matched_macros['macros_n']['item'] as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-						if (array_key_exists($f_num, $functionids)) {
-							$macros['item'][$functionids[$f_num]][$macro][] = $f_num;
-						}
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+					}
+				}
+
+				foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
+							'token' => $token,
+							'function' => $data['function'],
+							'parameters' => $data['parameters']
+						];
 					}
 				}
 
@@ -428,7 +434,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		if (!$options['references_only']) {
 			// Get macro value.
 			$macro_values = $this->getHostMacros($macros['host'], $macro_values);
-			$macro_values = $this->getIpMacros($macros['interface'], $macro_values, true);
+			$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 			$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, $options['events']);
 
 			if ($usermacros) {
@@ -500,6 +506,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
 			],
+			'macro_funcs_n' => [
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
 			'usermacros' => true
 		];
 
@@ -509,33 +518,39 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			$matched_macros = $this->extractMacros([$trigger['comments']], $types);
 
-			foreach ($matched_macros['macros_n']['host'] as $macro => $f_nums) {
-				foreach ($f_nums as $f_num) {
-					$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($f_num, $functionids)) {
-						$macros['host'][$functionids[$f_num]][$macro][] = $f_num;
-					}
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 				}
 			}
 
-			foreach ($matched_macros['macros_n']['interface'] as $macro => $f_nums) {
-				foreach ($f_nums as $f_num) {
-					$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($f_num, $functionids)) {
-						$macros['interface'][$functionids[$f_num]][$macro][] = $f_num;
-					}
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 				}
 			}
 
-			foreach ($matched_macros['macros_n']['item'] as $macro => $f_nums) {
-				foreach ($f_nums as $f_num) {
-					$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($f_num, $functionids)) {
-						$macros['item'][$functionids[$f_num]][$macro][] = $f_num;
-					}
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
+			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
+						'token' => $token,
+						'function' => $data['function'],
+						'parameters' => $data['parameters']
+					];
 				}
 			}
 
@@ -546,7 +561,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
-		$macro_values = $this->getIpMacros($macros['interface'], $macro_values, true);
+		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
 
 		if ($usermacros) {
@@ -617,6 +632,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
 			],
+			'macro_funcs_n' => [
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+			],
 			'usermacros' => true
 		];
 
@@ -630,33 +648,39 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$macro_values[$triggerid][$macro] = $triggerid;
 			}
 
-			foreach ($matched_macros['macros_n']['host'] as $macro => $f_nums) {
-				foreach ($f_nums as $f_num) {
-					$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($f_num, $functionids)) {
-						$macros['host'][$functionids[$f_num]][$macro][] = $f_num;
-					}
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 				}
 			}
 
-			foreach ($matched_macros['macros_n']['interface'] as $macro => $f_nums) {
-				foreach ($f_nums as $f_num) {
-					$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($f_num, $functionids)) {
-						$macros['interface'][$functionids[$f_num]][$macro][] = $f_num;
-					}
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
 				}
 			}
 
-			foreach ($matched_macros['macros_n']['item'] as $macro => $f_nums) {
-				foreach ($f_nums as $f_num) {
-					$macro_values[$triggerid][$this->getFunctionMacroName($macro, $f_num)] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($f_num, $functionids)) {
-						$macros['item'][$functionids[$f_num]][$macro][] = $f_num;
-					}
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
+			}
+
+			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
+						'token' => $token,
+						'function' => $data['function'],
+						'parameters' => $data['parameters']
+					];
 				}
 			}
 
@@ -667,7 +691,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Get macro value.
 		$macro_values = $this->getHostMacros($macros['host'], $macro_values);
-		$macro_values = $this->getIpMacros($macros['interface'], $macro_values, true);
+		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 		$macro_values = $this->getItemMacros($macros['item'], $triggers, $macro_values, false);
 
 		if ($usermacros) {
@@ -714,11 +738,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Purpose: Translate {10}>10 to something like {localhost:system.cpu.load.last()}>10
 	 *
 	 * @param array  $triggers
-	 * @param string $triggers[]['expression']
+	 * @param string $triggers[][<sources>]			see options['source']
 	 * @param array  $options
 	 * @param bool   $options['html']				returns formatted trigger expression
 	 * @param bool   $options['resolve_usermacros']	resolve user macros
 	 * @param bool   $options['resolve_macros']		resolve macros in item keys and functions
+	 * @param array  $options['sources']			an array of the field names
 	 *
 	 * @return string|array
 	 */
@@ -738,7 +763,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find macros.
 		foreach ($triggers as $key => $trigger) {
-			$matched_macros = $this->extractMacros([$trigger['expression']], $types);
+			$texts = [];
+			foreach ($options['sources'] as $source) {
+				$texts[] = $trigger[$source];
+			}
+
+			$matched_macros = $this->extractMacros($texts, $types);
 
 			$macro_values[$key] = $matched_macros['functionids'];
 
@@ -860,8 +890,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								? ($function['state'] == ITEM_STATE_NORMAL) ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY
 								: $style = ZBX_STYLE_RED;
 
-							if ($function['flags'] == ZBX_FLAG_DISCOVERY_CREATED
-									|| $function['type'] == ITEM_TYPE_HTTPTEST) {
+							if ($function['type'] == ITEM_TYPE_HTTPTEST) {
 								$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
 							}
 							elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
@@ -922,32 +951,34 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value.
 		foreach ($triggers as $key => &$trigger) {
-			$matched_macros = $this->getMacroPositions($trigger['expression'], $types);
+			foreach ($options['sources'] as $source) {
+				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
 
-			if ($options['html']) {
-				$expression = [];
-				$pos_left = 0;
+				if ($options['html']) {
+					$expression = [];
+					$pos_left = 0;
 
-				foreach ($matched_macros as $pos => $macro) {
-					if (array_key_exists($macro, $macro_values[$key])) {
-						if ($pos_left != $pos) {
-							$expression[] = substr($trigger['expression'], $pos_left, $pos - $pos_left);
+					foreach ($matched_macros as $pos => $macro) {
+						if (array_key_exists($macro, $macro_values[$key])) {
+							if ($pos_left != $pos) {
+								$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
+							}
+
+							$expression[] = $macro_values[$key][$macro];
+
+							$pos_left = $pos + strlen($macro);
 						}
-
-						$expression[] = $macro_values[$key][$macro];
-
-						$pos_left = $pos + strlen($macro);
 					}
-				}
-				$expression[] = substr($trigger['expression'], $pos_left);
+					$expression[] = substr($trigger[$source], $pos_left);
 
-				$trigger['expression'] = $expression;
-			}
-			else {
-				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					if (array_key_exists($macro, $macro_values[$key])) {
-						$trigger['expression'] = substr_replace($trigger['expression'],
-							$macro_values[$key][$macro], $pos, strlen($macro));
+					$trigger[$source] = $expression;
+				}
+				else {
+					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						if (array_key_exists($macro, $macro_values[$key])) {
+							$trigger[$source] =
+								substr_replace($trigger[$source], $macro_values[$key][$macro], $pos, strlen($macro));
+						}
 					}
 				}
 			}

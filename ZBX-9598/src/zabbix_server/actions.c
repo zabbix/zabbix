@@ -24,6 +24,103 @@
 
 #include "actions.h"
 #include "operations.h"
+#include "events.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_condition_pattern_match                                    *
+ *                                                                            *
+ * Purpose: check if condition pattern matches the specified value            *
+ *                                                                            *
+ * Parameters: operator - [IN] the matching operator                          *
+ *             pattern  - [IN] the pattern to match                           *
+ *             value    - [IN] the value to match                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_condition_pattern_match(unsigned char operator, const char *pattern, const char *value)
+{
+	int	ret = FAIL;
+
+	switch (operator)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (0 == strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (0 != strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+
+		case CONDITION_OPERATOR_LIKE:
+			if (NULL != strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+
+		case CONDITION_OPERATOR_NOT_LIKE:
+			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_condition_event_tag                                        *
+ *                                                                            *
+ * Purpose: check event tag condition                                         *
+ *                                                                            *
+ * Parameters: event     - the event                                          *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *condition)
+{
+	int	i, ret = FAIL;
+
+	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	{
+		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+		ret = check_condition_pattern_match(condition->operator, condition->value, tag->tag);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_condition_event_tag_value                                  *
+ *                                                                            *
+ * Purpose: check event tag value condition                                   *
+ *                                                                            *
+ * Parameters: event     - the event                                          *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *condition)
+{
+	int	i, ret = FAIL;
+
+	for (i = 0; i < event->tags.values_num && SUCCEED != ret; i++)
+	{
+		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
+
+		if (0 == strcmp(condition->value2, tag->tag))
+			ret = check_condition_pattern_match(condition->operator, condition->value, tag->value);
+	}
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -223,7 +320,7 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 	{
 		tmp_str = zbx_strdup(tmp_str, event->trigger.description);
 
-		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
 				&tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		switch (condition->operator)
@@ -286,11 +383,11 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 		switch (condition->operator)
 		{
 			case CONDITION_OPERATOR_IN:
-				if (SUCCEED == check_time_period(condition->value, (time_t)0))
+				if (SUCCEED == check_time_period(condition->value, (time_t)event->clock))
 					ret = SUCCEED;
 				break;
 			case CONDITION_OPERATOR_NOT_IN:
-				if (FAIL == check_time_period(condition->value, (time_t)0))
+				if (FAIL == check_time_period(condition->value, (time_t)event->clock))
 					ret = SUCCEED;
 				break;
 			default:
@@ -406,6 +503,14 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 				ret = NOTSUPPORTED;
 		}
 		DBfree_result(result);
+	}
+	else if (CONDITION_TYPE_EVENT_TAG == condition->conditiontype)
+	{
+		ret = check_condition_event_tag(event, condition);
+	}
+	else if (CONDITION_TYPE_EVENT_TAG_VALUE == condition->conditiontype)
+	{
+		ret = check_condition_event_tag_value(event, condition);
 	}
 	else
 	{
@@ -1248,8 +1353,9 @@ int	check_action_condition(const DB_EVENT *event, DB_CONDITION *condition)
 	const char	*__function_name = "check_action_condition";
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'",
-			__function_name, condition->actionid, condition->conditionid, condition->value);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
+			" cond.value2:'%s'", __function_name, condition->actionid, condition->conditionid,
+			condition->value, condition->value2);
 
 	switch (event->source)
 	{
@@ -1309,12 +1415,18 @@ static int	check_action_conditions(const DB_EVENT *event, zbx_action_eval_t *act
 	{
 		condition = (DB_CONDITION *)action->conditions.values[i];
 
+		if (CONDITION_EVAL_TYPE_AND_OR == action->evaltype && old_type == condition->conditiontype &&
+				SUCCEED == ret)
+		{
+			continue;	/* short-circuit true OR condition block to the next AND condition */
+		}
+
 		condition_result = check_action_condition(event, condition);
 
 		switch (action->evaltype)
 		{
 			case CONDITION_EVAL_TYPE_AND_OR:
-				if (old_type == condition->conditiontype)
+				if (old_type == condition->conditiontype)	/* assume conditions are sorted by type */
 				{
 					if (SUCCEED == condition_result)
 						ret = SUCCEED;
@@ -1534,24 +1646,62 @@ static void	escalation_add_values(zbx_db_insert_t *db_insert, int escalations_nu
 
 /******************************************************************************
  *                                                                            *
+ * Function: is_recovery_event                                                *
+ *                                                                            *
+ * Purpose: checks if the event is recovery event                             *
+ *                                                                            *
+ * Parameters: event - [IN] the event to check                                *
+ *                                                                            *
+ * Return value: SUCCEED - the event is recovery event                        *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	is_recovery_event(const DB_EVENT *event)
+{
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_VALUE_OK == event->value)
+			return SUCCEED;
+	}
+	else if (EVENT_SOURCE_INTERNAL == event->source)
+	{
+		switch (event->object)
+		{
+			case EVENT_OBJECT_TRIGGER:
+				if (TRIGGER_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_ITEM:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				if (ITEM_STATE_NORMAL == event->value)
+					return SUCCEED;
+				break;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_actions                                                  *
  *                                                                            *
  * Purpose: process all actions of each event in a list                       *
  *                                                                            *
  * Parameters: events     - [IN] events to apply actions for                  *
  *             events_num - [IN] number of events                             *
+ *             event_recovery - [IN] a vector of (problem eventid, OK event)  *
+ *                                   pairs.                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const DB_EVENT *events, size_t events_num)
+void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t *event_recovery)
 {
 	const char			*__function_name = "process_actions";
 
-	DB_RESULT			result;
-	DB_ROW				row;
-	zbx_uint64_t			actionid;
 	size_t				i;
-	zbx_vector_uint64_t		rec_actionids;	/* actionids of possible recovery events */
-	zbx_vector_uint64_pair_t	rec_mapping;	/* which action is possibly recovered by which event */
 	const DB_EVENT			*event;
 	zbx_db_insert_t			db_insert;
 	int				escalations_num = 0, j;
@@ -1559,15 +1709,16 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
-	zbx_vector_uint64_create(&rec_actionids);
-	zbx_vector_uint64_pair_create(&rec_mapping);
-
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions);
 
 	for (i = 0; i < events_num; i++)
 	{
 		event = &events[i];
+
+		/* OK events can't start escalations - skip them */
+		if (SUCCEED == is_recovery_event(event))
+			continue;
 
 		for (j = 0; j < actions.values_num; j++)
 		{
@@ -1586,97 +1737,55 @@ void	process_actions(const DB_EVENT *events, size_t events_num)
 					execute_operations(event, action->actionid);
 				}
 			}
-			else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
-			{
-				/* Action conditions evaluated to false, but it could be a recovery */
-				/* event for this action. Remember this and check escalations later. */
-
-				zbx_uint64_pair_t	pair;
-
-				pair.first = action->actionid;
-				pair.second = (zbx_uint64_t)i;
-
-				zbx_vector_uint64_pair_append(&rec_mapping, pair);
-
-				zbx_vector_uint64_append(&rec_actionids, action->actionid);
-			}
 		}
 	}
 
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
 
-	if (0 != rec_actionids.values_num)
+	if (0 != event_recovery->values_num)
 	{
-		char		*sql = NULL;
-		size_t		sql_alloc = 0, sql_offset = 0;
-		zbx_uint64_t	triggerid, itemid;
+		char			*sql = NULL;
+		size_t			sql_alloc = 0, sql_offset = 0;
+		zbx_vector_uint64_t	eventids;
+		zbx_event_recovery_t	*recovery;
+		DB_ROW			row;
+		DB_RESULT		result;
+		zbx_uint64_t		actionid, eventid;
+		int			i, index;
 
-		zbx_vector_uint64_sort(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&rec_actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_create(&eventids);
 
-		/* list of ongoing escalations matching actionids collected before */
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				"select actionid,triggerid,itemid"
-				" from escalations"
-				" where eventid is not null"
-					" and");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid",
-				rec_actionids.values, rec_actionids.values_num);
+		for (i = 0; i < event_recovery->values_num; i++)
+		{
+			recovery = (zbx_event_recovery_t *)event_recovery->values[i];
+			zbx_vector_uint64_append(&eventids, recovery->eventid);
+		}
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid from escalations where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
+
 		result = DBselect("%s", sql);
-		zbx_free(sql);
-
 		while (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(actionid, row[0]);
-			ZBX_DBROW2UINT64(triggerid, row[1]);
-			ZBX_DBROW2UINT64(itemid, row[2]);
+			ZBX_STR2UINT64(eventid, row[1]);
 
-			for (j = 0; j < rec_mapping.values_num; j++)
+			if (FAIL == (index = zbx_vector_ptr_bsearch(event_recovery, &eventid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
-				if (actionid != rec_mapping.values[j].first)
-					continue;
-
-				event = &events[(int)rec_mapping.values[j].second];
-
-				/* only add recovery if it matches event */
-				switch (event->source)
-				{
-					case EVENT_SOURCE_TRIGGERS:
-						if (triggerid != event->objectid)
-							continue;
-						break;
-					case EVENT_SOURCE_INTERNAL:
-						switch (event->object)
-						{
-							case EVENT_OBJECT_TRIGGER:
-								if (triggerid != event->objectid)
-									continue;
-								break;
-							case EVENT_OBJECT_ITEM:
-							case EVENT_OBJECT_LLDRULE:
-								if (itemid != event->objectid)
-									continue;
-								break;
-							default:
-								THIS_SHOULD_NEVER_HAPPEN;
-						}
-
-						break;
-					default:
-						continue;
-				}
-
-				escalation_add_values(&db_insert, escalations_num++, actionid, event, 1);
-
-				break;
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
 			}
-		}
-		DBfree_result(result);
-	}
 
-	zbx_vector_uint64_pair_destroy(&rec_mapping);
-	zbx_vector_uint64_destroy(&rec_actionids);
+			recovery = event_recovery->values[index];
+			escalation_add_values(&db_insert, escalations_num++, actionid, recovery->r_event, 1);
+		}
+
+		DBfree_result(result);
+		zbx_free(sql);
+		zbx_vector_uint64_destroy(&eventids);
+	}
 
 	if (0 != escalations_num)
 	{

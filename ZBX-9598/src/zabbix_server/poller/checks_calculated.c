@@ -137,7 +137,7 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression:'%s'", __function_name, exp->exp);
 
-	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL, NULL,
+	if (FAIL == (ret = substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &dc_item->host, NULL, NULL,
 				&exp->exp, MACRO_TYPE_ITEM_EXPRESSION, error, max_error_len)))
 		ret = NOTSUPPORTED;
 
@@ -264,7 +264,17 @@ static int	calcitem_evaluate_expression(DC_ITEM *dc_item, expression_t *exp, cha
 			break;
 		}
 
-		f->value = zbx_realloc(f->value, strlen(f->value) + 1);
+		if (SUCCEED != is_double_suffix(f->value) || '-' == *f->value)
+		{
+			char	*wrapped;
+
+			wrapped = zbx_dsprintf(NULL, "(%s)", f->value);
+
+			zbx_free(f->value);
+			f->value = wrapped;
+		}
+		else
+			f->value = zbx_realloc(f->value, strlen(f->value) + 1);
 
 		zbx_snprintf(replace, sizeof(replace), "{%d}", f->functionid);
 		buf = string_replace(exp->exp, replace, f->value);

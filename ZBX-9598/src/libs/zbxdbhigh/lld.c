@@ -187,7 +187,7 @@ static int	lld_filter_load(lld_filter_t *filter, zbx_uint64_t lld_ruleid, char *
 		}
 		else
 		{
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &item, NULL,
 					&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
 		}
 	}
@@ -231,7 +231,10 @@ static int	filter_evaluate_and_or(lld_filter_t *filter, struct zbx_json_parse *j
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (rc = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			rc = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			rc = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		/* check if a new condition group has started */
 		if (NULL == lastmacro || 0 != strcmp(lastmacro, condition->macro))
@@ -286,7 +289,10 @@ static int	filter_evaluate_and(lld_filter_t *filter, struct zbx_json_parse *jp_r
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		/* if any of conditions are false the evaluation returns false */
 		if (SUCCEED != ret)
@@ -328,7 +334,10 @@ static int	filter_evaluate_or(lld_filter_t *filter, struct zbx_json_parse *jp_ro
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		/* if any of conditions are true the evaluation returns true */
 		if (SUCCEED == ret)
@@ -379,7 +388,10 @@ static int	filter_evaluate_expression(lld_filter_t *filter, struct zbx_json_pars
 		lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
 		if (SUCCEED == (ret = zbx_json_value_by_name_dyn(jp_row, condition->macro, &value, &value_alloc)))
-			ret = regexp_match_ex(&condition->regexps, value, condition->regexp, ZBX_CASE_SENSITIVE);
+		{
+			ret = (ZBX_REGEXP_MATCH == regexp_match_ex(&condition->regexps, value, condition->regexp,
+					ZBX_CASE_SENSITIVE) ? SUCCEED : FAIL);
+		}
 
 		zbx_free(value);
 
@@ -554,7 +566,7 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 		db_error = zbx_strdup(db_error, row[5]);
 
 		lifetime_str = zbx_strdup(NULL, row[6]);
-		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL,
 				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != is_ushort(lifetime_str, &lifetime))
 		{
@@ -592,8 +604,8 @@ void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_
 		zabbix_log(LOG_LEVEL_WARNING,  "discovery rule [" ZBX_FS_UI64 "][%s] became supported",
 				lld_ruleid, zbx_host_key_string(lld_ruleid));
 
-		add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
-				NULL, NULL, 0, 0);
+		add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_LLDRULE, lld_ruleid, ts, ITEM_STATE_NORMAL,
+				NULL, NULL, NULL, 0, 0, NULL);
 		process_events();
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sstate=%d", sql_start, ITEM_STATE_NORMAL);

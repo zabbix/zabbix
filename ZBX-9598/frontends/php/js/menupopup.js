@@ -462,7 +462,9 @@ function getMenuPopupMap(options) {
 				events.disabled = true;
 			}
 			else {
-				var url = new Curl('events.php?filter_set=1&source=0');
+				var url = new Curl('events.php?filter_set=1');
+
+				url.unsetArgument('sid');
 
 				jQuery.each(options.gotos.events, function(name, value) {
 					url.setArgument(name, value);
@@ -606,9 +608,10 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&source=0&groupid=' + options.groupid + '&hostid=' + options.hostid +
-		'&triggerid=' + options.triggerid
-	);
+	var url = new Curl('events.php?filter_set=1&triggerid=' + options.triggerid);
+
+	url.unsetArgument('sid');
+
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}

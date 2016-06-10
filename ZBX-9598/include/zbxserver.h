@@ -42,6 +42,7 @@
 #define MACRO_TYPE_HTTPTEST_FIELD	0x00004000
 #define MACRO_TYPE_LLD_FILTER		0x00008000
 #define MACRO_TYPE_ALERT		0x00010000
+#define MACRO_TYPE_TRIGGER_TAG		0x00020000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
@@ -51,19 +52,21 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 		char **error);
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
-		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ALERT *alert, zbx_hashset_t *macro_cache,
-		char **data, int macro_type, char *error, int maxerrlen);
+		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ALERT *alert, char **data, int macro_type,
+		char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
-#define ZBX_MACRO_ANY		0x00
-#define ZBX_MACRO_NUMERIC	0x01
-#define ZBX_MACRO_SIMPLE	0x02
-#define ZBX_MACRO_CONTEXT	0x04
-int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int flags,
+/* lld macro context */
+#define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_USER_MACRO)
+#define ZBX_MACRO_NUMERIC	(ZBX_MACRO_ANY | ZBX_TOKEN_NUMERIC)
+#define ZBX_MACRO_SIMPLE	(ZBX_MACRO_ANY | ZBX_TOKEN_SIMPLE_MACRO)
+#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
+
+int	substitute_lld_macros(char **data, struct zbx_json_parse *jp_row, int flags, const char **func_macros,
 		char *error, size_t max_error_len);
 int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, struct zbx_json_parse *jp_row,
 		int macro_type, char *error, size_t mexerrlen);

@@ -168,10 +168,8 @@ class CHostPrototype extends CHostBase {
 		return [
 			'validators' => [
 				'host' => new CLldMacroStringValidator([
-					'maxLength' => 64,
 					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
 					'messageEmpty' => _('Empty host.'),
-					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
 					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
 					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 				]),
@@ -870,7 +868,8 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'selectDiscoveryRule' => ['itemid']
+			'selectDiscoveryRule' => ['itemid'],
+			'selectInventory' => ['inventory_mode']
 		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
@@ -1014,12 +1013,44 @@ class CHostPrototype extends CHostBase {
 		return count($ids) == $count;
 	}
 
-	protected function link(array $templateIds, array $targetIds) {
-		if (!$this->isWritable($targetIds)) {
+	protected function link(array $templateids, array $targetids) {
+		if (!$this->isWritable($targetids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		return parent::link($templateIds, $targetIds);
+		$links = parent::link($templateids, $targetids);
+
+		foreach ($targetids as $targetid) {
+			$linked_templates = API::Template()->get([
+				'output' => [],
+				'hostids' => [$targetid],
+				'nopermissions' => true
+			]);
+
+			$result = DBselect(
+				'SELECT i.key_,count(*)'.
+				' FROM items i'.
+				' WHERE '.dbConditionInt('i.hostid', array_merge($templateids, array_keys($linked_templates))).
+				' GROUP BY i.key_'.
+				' HAVING count(*)>1',
+				1
+			);
+			if ($row = DBfetch($result)) {
+				$target_templates = API::HostPrototype()->get([
+					'output' => ['name'],
+					'hostids' => [$targetid],
+					'nopermissions' => true
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Item "%1$s" already exists on "%2$s", inherited from another template.', $row['key_'],
+						$target_templates[0]['name']
+					)
+				);
+			}
+		}
+
+		return $links;
 	}
 
 	/**

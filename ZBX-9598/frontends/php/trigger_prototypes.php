@@ -29,61 +29,72 @@ $page['file'] = 'trigger_prototypes.php';
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	VAR											TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'parent_discoveryid' => [T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
-	'triggerid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
-	'type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
-	'description' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
-	'expression' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
-	'priority' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
-	'comments' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'url' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
-	'status' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'input_method' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'],
-	'expr_temp' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
-	'expr_target_single' =>	[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
-	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
-	'new_dependency' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
-	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'parent_discoveryid' =>						[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
+	'triggerid' =>								[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'type' =>									[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'description' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
+	'expression' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
+	'recovery_expression' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add}) || isset({update})) && isset({recovery_mode}) && {recovery_mode} == '.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.'', _('Recovery expression')],
+	'recovery_mode' =>							[T_ZBX_INT, O_OPT, null,	IN(ZBX_RECOVERY_MODE_EXPRESSION.','.ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION.','.ZBX_RECOVERY_MODE_NONE),	'isset({add}) || isset({update})'],
+	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
+	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'url' =>									[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'status' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
+	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_expression_constructor})'],
+	'recovery_expression_constructor' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_recovery_expression_constructor})'],
+	'expr_temp' =>								[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
+	'expr_target_single' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'recovery_expr_temp' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({add_recovery_expression}) || isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))', _('Recovery expression')],
+	'recovery_expr_target_single' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,		'(isset({and_recovery_expression}) || isset({or_recovery_expression}) || isset({replace_recovery_expression}))'],
+	'dependencies' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'new_dependency' =>							[T_ZBX_INT, O_OPT, null,	DB_ID.NOT_ZERO, 'isset({add_dependency})'],
+	'g_triggerid' =>							[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'tags' =>									[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
-	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
-								IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
-									'"triggerprototype.massenable","triggerprototype.massupdate",'.
-									'"triggerprototype.massupdateform"'
-								),
-								null
-							],
-	'visible' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'toggle_input_method' =>[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_expression' => 	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'and_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'or_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'replace_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'remove_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'test_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_dependency' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'group_enable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'group_disable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'group_delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'copy' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'massupdate' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'action' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+													IN('"triggerprototype.massdelete","triggerprototype.massdisable",'.
+														'"triggerprototype.massenable","triggerprototype.massupdate",'.
+														'"triggerprototype.massupdateform"'
+													),
+													null
+												],
+	'visible' =>								[T_ZBX_STR, O_OPT, null,	null,		null],
+	'toggle_expression_constructor' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'toggle_recovery_expression_constructor' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_expression' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_recovery_expression' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'and_expression' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'and_recovery_expression' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'or_expression' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'or_recovery_expression' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'replace_expression' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'replace_recovery_expression' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'remove_expression' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'remove_recovery_expression' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'test_expression' =>						[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_dependency' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_enable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_disable' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_delete' =>							[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'copy' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'clone' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'massupdate' =>								[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>									[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form' =>									[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>							[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
-	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>									[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
+	'sortorder' =>								[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 
 check_fields($fields);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-$_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIGGER_MULT_EVENT_DISABLED;
 
 // validate permissions
 $discoveryRule = API::DiscoveryRule()->get([
@@ -115,108 +126,165 @@ if ($triggerPrototypeIds) {
 		'preservekeys' => true
 	]);
 
-	if ($triggerPrototypes) {
-		foreach ($triggerPrototypeIds as $triggerPrototypeId) {
-			if (!isset($triggerPrototypes[$triggerPrototypeId])) {
-				access_deny();
-			}
+	foreach ($triggerPrototypeIds as $triggerPrototypeId) {
+		if (!array_key_exists($triggerPrototypeId, $triggerPrototypes)) {
+			access_deny();
 		}
-	}
-	else {
-		access_deny();
 	}
 }
 
 /*
  * Actions
  */
-$exprAction = null;
-if (isset($_REQUEST['add_expression'])) {
-	$_REQUEST['expression'] = $_REQUEST['expr_temp'];
+$expression_action = '';
+if (hasRequest('add_expression')) {
+	$_REQUEST['expression'] = getRequest('expr_temp');
 	$_REQUEST['expr_temp'] = '';
 }
-elseif (isset($_REQUEST['and_expression'])) {
-	$exprAction = 'and';
+elseif (hasRequest('and_expression')) {
+	$expression_action = 'and';
 }
-elseif (isset($_REQUEST['or_expression'])) {
-	$exprAction = 'or';
+elseif (hasRequest('or_expression')) {
+	$expression_action = 'or';
 }
-elseif (isset($_REQUEST['replace_expression'])) {
-	$exprAction = 'r';
+elseif (hasRequest('replace_expression')) {
+	$expression_action = 'r';
 }
-elseif (getRequest('remove_expression')) {
-	$exprAction = 'R';
-	$_REQUEST['expr_target_single'] = $_REQUEST['remove_expression'];
+elseif (hasRequest('remove_expression')) {
+	$expression_action = 'R';
+	$_REQUEST['expr_target_single'] = getRequest('remove_expression');
 }
-elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
+
+$recovery_expression_action = '';
+if (hasRequest('add_recovery_expression')) {
+	$_REQUEST['recovery_expression'] = getRequest('recovery_expr_temp');
+	$_REQUEST['recovery_expr_temp'] = '';
+}
+elseif (hasRequest('and_recovery_expression')) {
+	$recovery_expression_action = 'and';
+}
+elseif (hasRequest('or_recovery_expression')) {
+	$recovery_expression_action = 'or';
+}
+elseif (hasRequest('replace_recovery_expression')) {
+	$recovery_expression_action = 'r';
+}
+elseif (hasRequest('remove_recovery_expression')) {
+	$recovery_expression_action = 'R';
+	$_REQUEST['recovery_expr_target_single'] = getRequest('remove_recovery_expression');
+}
+
+if (hasRequest('clone') && hasRequest('triggerid')) {
 	unset($_REQUEST['triggerid']);
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$trigger = [
-		'expression' => getRequest('expression'),
-		'description' => getRequest('description'),
-		'url' => getRequest('url'),
-		'status' => getRequest('status'),
-		'priority' => getRequest('priority'),
-		'comments' => getRequest('comments'),
-		'type' => getRequest('type'),
-		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid')
-	];
+	$tags = getRequest('tags', []);
+	$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
 
-	if (hasRequest('update')) {
-		// Update only changed fields.
-
-		$old_trigger_prototypes = API::TriggerPrototype()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
-			'selectDependencies' => ['triggerid'],
-			'triggerids' => getRequest('triggerid')
-		]);
-		if (!$old_trigger_prototypes) {
-			access_deny();
+	// Remove empty new tag lines.
+	foreach ($tags as $key => $tag) {
+		if ($tag['tag'] === '' && $tag['value'] === '') {
+			unset($tags[$key]);
 		}
-
-		$old_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($old_trigger_prototypes);
-
-		$old_trigger_prototype = reset($old_trigger_prototypes);
-		$old_trigger_prototype['dependencies'] = zbx_toHash(
-			zbx_objectValues($old_trigger_prototype['dependencies'], 'triggerid')
-		);
-
-		$newDependencies = $trigger['dependencies'];
-		$oldDependencies = $old_trigger_prototype['dependencies'];
-
-		unset($trigger['dependencies'], $old_trigger_prototype['dependencies']);
-
-		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger_prototype);
-		$triggerToUpdate['triggerid'] = getRequest('triggerid');
-
-		// dependencies
-		$updateDepencencies = false;
-		if (count($newDependencies) != count($oldDependencies)) {
-			$updateDepencencies = true;
-		}
-		else {
-			foreach ($newDependencies as $dependency) {
-				if (!isset($oldDependencies[$dependency['triggerid']])) {
-					$updateDepencencies = true;
-				}
-			}
-		}
-		if ($updateDepencencies) {
-			$triggerToUpdate['dependencies'] = $newDependencies;
-		}
-
-		$result = API::TriggerPrototype()->update($triggerToUpdate);
-
-		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
-	else {
-		$trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 
-		$result = API::TriggerPrototype()->create($trigger);
+	if (hasRequest('add')) {
+		$trigger = [
+			'description' => getRequest('description'),
+			'expression' => getRequest('expression'),
+			'recovery_mode' => getRequest('recovery_mode'),
+			'type' => getRequest('type'),
+			'url' => getRequest('url'),
+			'priority' => getRequest('priority'),
+			'comments' => getRequest('comments'),
+			'tags' => $tags,
+			'dependencies' => $dependencies,
+			'status' => getRequest('status')
+		];
+		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+			$trigger['recovery_expression'] = getRequest('recovery_expression');
+		}
+
+		$result = (bool) API::TriggerPrototype()->create($trigger);
 
 		show_messages($result, _('Trigger prototype added'), _('Cannot add trigger prototype'));
+	}
+	else {
+		$db_trigger_prototypes = API::TriggerPrototype()->get([
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
+				'recovery_mode', 'recovery_expression'
+			],
+			'selectDependencies' => ['triggerid'],
+			'selectTags' => ['tag', 'value'],
+			'triggerids' => getRequest('triggerid')
+		]);
+
+		$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		$db_trigger_prototype = reset($db_trigger_prototypes);
+
+		$trigger_prototype = [];
+
+		if ($db_trigger_prototype['templateid'] == 0) {
+			if ($db_trigger_prototype['description'] !== getRequest('description')) {
+				$trigger_prototype['description'] = getRequest('description');
+			}
+			if ($db_trigger_prototype['expression'] !== getRequest('expression')) {
+				$trigger_prototype['expression'] = getRequest('expression');
+			}
+			if ($db_trigger_prototype['recovery_mode'] != getRequest('recovery_mode')) {
+				$trigger_prototype['recovery_mode'] = getRequest('recovery_mode');
+			}
+			if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
+					&& $db_trigger_prototype['recovery_expression'] !== getRequest('recovery_expression')) {
+				$trigger_prototype['recovery_expression'] = getRequest('recovery_expression');
+			}
+		}
+
+		if ($db_trigger_prototype['type'] != getRequest('type')) {
+			$trigger_prototype['type'] = getRequest('type');
+		}
+		if ($db_trigger_prototype['url'] !== getRequest('url')) {
+			$trigger_prototype['url'] = getRequest('url');
+		}
+		if ($db_trigger_prototype['priority'] != getRequest('priority')) {
+			$trigger_prototype['priority'] = getRequest('priority');
+		}
+		if ($db_trigger_prototype['comments'] !== getRequest('comments')) {
+			$trigger_prototype['comments'] = getRequest('comments');
+		}
+
+		$db_tags = $db_trigger_prototype['tags'];
+		CArrayHelper::sort($db_tags, ['tag', 'value']);
+		CArrayHelper::sort($tags, ['tag', 'value']);
+		if (array_values($db_tags) !== array_values($tags)) {
+			$trigger_prototype['tags'] = $tags;
+		}
+
+		$db_dependencies = $db_trigger_prototype['dependencies'];
+		CArrayHelper::sort($db_dependencies, ['triggerid']);
+		CArrayHelper::sort($dependencies, ['triggerid']);
+		if (array_values($db_dependencies) !== array_values($dependencies)) {
+			$trigger_prototype['dependencies'] = $dependencies;
+		}
+
+		if ($db_trigger_prototype['status'] != getRequest('status')) {
+			$trigger_prototype['status'] = getRequest('status');
+		}
+
+		if ($trigger_prototype) {
+			$trigger_prototype['triggerid'] = getRequest('triggerid');
+
+			$result = (bool) API::TriggerPrototype()->update($trigger_prototype);
+		}
+		else {
+			$result = true;
+		}
+
+		show_messages($result, _('Trigger prototype updated'), _('Cannot update trigger prototype'));
 	}
 
 	if ($result) {
@@ -336,7 +404,34 @@ if (hasRequest('action') && getRequest('action') === 'triggerprototype.massupdat
 	$triggersView->show();
 }
 elseif (isset($_REQUEST['form'])) {
-	$data = getTriggerFormData($exprAction);
+	$data = getTriggerFormData([
+		'form' => getRequest('form'),
+		'form_refresh' => getRequest('form_refresh'),
+		'parent_discoveryid' => getRequest('parent_discoveryid'),
+		'dependencies' => getRequest('dependencies', []),
+		'db_dependencies' => [],
+		'triggerid' => getRequest('triggerid'),
+		'expression' => getRequest('expression', ''),
+		'recovery_expression' => getRequest('recovery_expression', ''),
+		'expr_temp' => getRequest('expr_temp', ''),
+		'recovery_expr_temp' => getRequest('recovery_expr_temp', ''),
+		'recovery_mode' => getRequest('recovery_mode', 0),
+		'description' => getRequest('description', ''),
+		'type' => getRequest('type', 0),
+		'priority' => getRequest('priority', 0),
+		'status' => getRequest('status', 0),
+		'comments' => getRequest('comments', ''),
+		'url' => getRequest('url', ''),
+		'expression_constructor' => getRequest('expression_constructor', IM_ESTABLISHED),
+		'recovery_expression_constructor' => getRequest('recovery_expression_constructor', IM_ESTABLISHED),
+		'limited' => false,
+		'templates' => [],
+		'hostid' => getRequest('hostid', 0),
+		'expression_action' => $expression_action,
+		'recovery_expression_action' => $recovery_expression_action,
+		'tags' => getRequest('tags', [])
+	]);
+
 	$data['hostid'] = $discoveryRule['hostid'];
 
 	$triggersView = new CView('configuration.trigger.prototype.edit', $data);
@@ -376,10 +471,15 @@ else {
 	order_result($data['triggers'], $sortField, $sortOrder);
 
 	// paging
-	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
+	$url = (new CUrl('trigger_prototypes.php'))
+		->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+
+	$data['paging'] = getPagingLine($data['triggers'], $sortOrder, $url);
 
 	$data['triggers'] = API::TriggerPrototype()->get([
-		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid'],
+		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid', 'recovery_mode',
+			'recovery_expression'
+		],
 		'selectHosts' => ['hostid', 'host'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')

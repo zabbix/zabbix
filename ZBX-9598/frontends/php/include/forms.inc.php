@@ -530,11 +530,11 @@ function getItemFilterForm(&$items) {
 						.', 0, 0, "application");')
 		]
 	);
-	$filterColumn2->addRow(_('SNMP community like'),
+	$filterColumn2->addRow(_('SNMP community'),
 		(new CTextBox('filter_snmp_community', $filter_snmp_community))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_community_row'
 	);
-	$filterColumn2->addRow(_('Security name like'),
+	$filterColumn2->addRow(_('Security name'),
 		(new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmpv3_securityname_row'
@@ -556,7 +556,7 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Name like'),
 		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn2->addRow(_('SNMP OID like'),
+	$filterColumn2->addRow(_('SNMP OID'),
 		(new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		'filter_snmp_oid_row'
 	);
@@ -576,7 +576,7 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Key like'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
-	$filterColumn2->addRow(_('Port like'),
+	$filterColumn2->addRow(_('Port'),
 		(new CNumericBox('filter_port', $filter_port, 5, false, true))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		'filter_port_row'
 	);
@@ -912,7 +912,7 @@ function getItemFilterForm(&$items) {
 /**
  * Get data for item edit page.
  *
- * @param array	$item							item, item prototype or LLD rule to take the data from
+ * @param array	$item							Item, item prototype, LLD rule or LLD item to take the data from.
  * @param bool $options['is_discovery_rule']
  *
  * @return array
@@ -1218,8 +1218,8 @@ function getItemFormData(array $item = [], array $options = []) {
 		'output' => API_OUTPUT_EXTEND
 	]);
 
-	// valuemapid
-	if ($data['limited']) {
+	if ($data['limited'] || ($item && $data['parent_discoveryid'] === null
+			&& $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED)) {
 		if ($data['valuemapid'] != 0) {
 			$valuemaps = API::ValueMap()->get([
 				'output' => ['name'],
@@ -1388,44 +1388,67 @@ function getTriggerMassupdateFormData() {
 /**
  * Generate data for the trigger configuration form.
  *
- * @param string $exprAction	expression constructor action, see remakeExpression() for a list of supported values
+ * @param array $data											Trigger data array.
+ * @param string $data['form']									Form action.
+ * @param string $data['form_refresh']							Form refresh.
+ * @param null|string $data['parent_discoveryid']					Parent discovery.
+ * @param array $data['dependencies']							Trigger dependencies.
+ * @param array $data['db_dependencies']						DB trigger dependencies.
+ * @param string $data['triggerid']								Trigger ID.
+ * @param string $data['expression']							Trigger expression.
+ * @param string $data['recovery_expression']					Trigger recovery expression.
+ * @param string $data['expr_temp']								Trigger temporary expression.
+ * @param string $data['recovery_expr_temp']					Trigger temporary recovery expression.
+ * @param string $data['recovery_mode']							Trigger recovery mode.
+ * @param string $data['description']							Trigger description.
+ * @param int $data['type']										Trigger problem event generation mode.
+ * @param string $data['priority']								Trigger severity.
+ * @param int $data['status']									Trigger status.
+ * @param string $data['comments']								Trigger description.
+ * @param string $data['url']									Trigger URL.
+ * @param string $data['expression_constructor']				Trigger expression constructor mode.
+ * @param string $data['recovery_expression_constructor']		Trigger recovery expression constructor mode.
+ * @param bool $data['limited']									Templated trigger.
+ * @param array $data['templates']								Trigger templates.
+ * @param string $data['hostid']								Host ID.
+ * @param string $data['expression_action']						Trigger expression action.
+ * @param string $data['recovery_expression_action']			Trigger recovery expression action.
  *
  * @return array
  */
-function getTriggerFormData($exprAction) {
-	$data = [
-		'form' => getRequest('form'),
-		'form_refresh' => getRequest('form_refresh'),
-		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'dependencies' => getRequest('dependencies', []),
-		'db_dependencies' => [],
-		'triggerid' => getRequest('triggerid'),
-		'expression' => getRequest('expression', ''),
-		'expr_temp' => getRequest('expr_temp', ''),
-		'description' => getRequest('description', ''),
-		'type' => getRequest('type', 0),
-		'priority' => getRequest('priority', 0),
-		'status' => getRequest('status', 0),
-		'comments' => getRequest('comments', ''),
-		'url' => getRequest('url', ''),
-		'input_method' => getRequest('input_method', IM_ESTABLISHED),
-		'limited' => false,
-		'templates' => [],
-		'hostid' => getRequest('hostid', 0)
-	];
-
-	if (!empty($data['triggerid'])) {
-		// get trigger
+function getTriggerFormData(array $data) {
+	if ($data['triggerid'] !== null) {
+		// Get trigger.
 		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
-		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
-		$data['trigger'] = reset($triggers);
 
-		// get templates
+		if (!hasRequest('form_refresh')) {
+			$options['selectTags'] = ['tag', 'value'];
+		}
+
+		if ($data['parent_discoveryid'] === null) {
+			$options['selectDiscoveryRule'] = ['itemid', 'name'];
+			$triggers = API::Trigger()->get($options);
+		}
+		else {
+			$triggers = API::TriggerPrototype()->get($options);
+		}
+
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		$trigger = reset($triggers);
+
+		if (!hasRequest('form_refresh')) {
+			$data['tags'] = $trigger['tags'];
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+		}
+
+		// Get templates.
 		$tmp_triggerid = $data['triggerid'];
 		do {
 			$db_triggers = DBfetch(DBselect(
@@ -1440,11 +1463,13 @@ function getTriggerFormData($exprAction) {
 			if (bccomp($data['triggerid'], $tmp_triggerid) != 0) {
 				// parent trigger prototype link
 				if ($data['parent_discoveryid']) {
-					$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
+					$link = 'trigger_prototypes.php?form=update&triggerid='.$db_triggers['triggerid'].
+						'&parent_discoveryid='.$db_triggers['parent_itemid'].'&hostid='.$db_triggers['hostid'];
 				}
 				// parent trigger link
 				else {
-					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
+					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].
+						'&hostid='.$db_triggers['hostid'];
 				}
 
 				$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
@@ -1452,13 +1477,14 @@ function getTriggerFormData($exprAction) {
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
 		} while ($tmp_triggerid != 0);
+
 		$data['templates'] = array_reverse($data['templates']);
 		array_shift($data['templates']);
 
-		$data['limited'] = ($data['trigger']['templateid'] != 0);
+		$data['limited'] = ($trigger['templateid'] != 0);
 
 		// select first host from triggers if gived not match
-		$hosts = $data['trigger']['hosts'];
+		$hosts = $trigger['hosts'];
 		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
@@ -1466,15 +1492,17 @@ function getTriggerFormData($exprAction) {
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = $data['trigger']['expression'];
+		$data['expression'] = $trigger['expression'];
+		$data['recovery_expression'] = $trigger['recovery_expression'];
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
-			$data['description'] = $data['trigger']['description'];
-			$data['type'] = $data['trigger']['type'];
-			$data['priority'] = $data['trigger']['priority'];
-			$data['status'] = $data['trigger']['status'];
-			$data['comments'] = $data['trigger']['comments'];
-			$data['url'] = $data['trigger']['url'];
+			$data['description'] = $trigger['description'];
+			$data['type'] = $trigger['type'];
+			$data['recovery_mode'] = $trigger['recovery_mode'];
+			$data['priority'] = $trigger['priority'];
+			$data['status'] = $trigger['status'];
+			$data['comments'] = $trigger['comments'];
+			$data['url'] = $trigger['url'];
 
 			$db_triggers = DBselect(
 				'SELECT t.triggerid,t.description'.
@@ -1482,36 +1510,50 @@ function getTriggerFormData($exprAction) {
 				' WHERE t.triggerid=d.triggerid_up'.
 					' AND d.triggerid_down='.zbx_dbstr($data['triggerid'])
 			);
-			while ($trigger = DBfetch($db_triggers)) {
-				if (uint_in_array($trigger['triggerid'], $data['dependencies'])) {
+			while ($db_trigger = DBfetch($db_triggers)) {
+				if (uint_in_array($db_trigger['triggerid'], $data['dependencies'])) {
 					continue;
 				}
-				array_push($data['dependencies'], $trigger['triggerid']);
+				array_push($data['dependencies'], $db_trigger['triggerid']);
 			}
 		}
 	}
 
-	if ($data['input_method'] == IM_TREE) {
-		$analyze = analyzeExpression($data['expression']);
+	$readonly = false;
+	if ($data['triggerid'] !== null) {
+		$data['flags'] = $trigger['flags'];
+
+		if ($data['parent_discoveryid'] === null) {
+			$data['discoveryRule'] = $trigger['discoveryRule'];
+		}
+
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {
+			$readonly = true;
+		}
+	}
+
+	// Trigger expression constructor.
+	if ($data['expression_constructor'] == IM_TREE) {
+		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 		if ($analyze !== false) {
-			list($data['outline'], $data['eHTMLTree']) = $analyze;
-			if ($exprAction !== null && $data['eHTMLTree'] != null) {
+			list($data['expression_formula'], $data['expression_tree']) = $analyze;
+			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
-					$exprAction, $data['expr_temp']
+					$data['expression_action'], $data['expr_temp']
 				);
 				if ($new_expr !== false) {
 					$data['expression'] = $new_expr;
-					$analyze = analyzeExpression($data['expression']);
+					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION);
 					if ($analyze !== false) {
-						list($data['outline'], $data['eHTMLTree']) = $analyze;
+						list($data['expression_formula'], $data['expression_tree']) = $analyze;
 					}
 					else {
-						show_messages(false, '', _('Expression Syntax Error.'));
+						show_messages(false, '', _('Expression syntax error.'));
 					}
 					$data['expr_temp'] = '';
 				}
 				else {
-					show_messages(false, '', _('Expression Syntax Error.'));
+					show_messages(false, '', _('Expression syntax error.'));
 				}
 			}
 			$data['expression_field_name'] = 'expr_temp';
@@ -1519,14 +1561,54 @@ function getTriggerFormData($exprAction) {
 			$data['expression_field_readonly'] = true;
 		}
 		else {
-			show_messages(false, '', _('Expression Syntax Error.'));
-			$data['input_method'] = IM_ESTABLISHED;
+			show_messages(false, '', _('Expression syntax error.'));
+			$data['expression_constructor'] = IM_ESTABLISHED;
 		}
 	}
-	if ($data['input_method'] != IM_TREE) {
+	elseif ($data['expression_constructor'] != IM_TREE) {
 		$data['expression_field_name'] = 'expression';
 		$data['expression_field_value'] = $data['expression'];
-		$data['expression_field_readonly'] = $data['limited'];
+		$data['expression_field_readonly'] = $readonly;
+	}
+
+	// Trigger recovery expression constructor.
+	if ($data['recovery_expression_constructor'] == IM_TREE) {
+		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+		if ($analyze !== false) {
+			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
+			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
+				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
+					$data['recovery_expression_action'], $data['recovery_expr_temp']
+				);
+
+				if ($new_expr !== false) {
+					$data['recovery_expression'] = $new_expr;
+					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION);
+					if ($analyze !== false) {
+						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
+					}
+					else {
+						show_messages(false, '', _('Recovery expression syntax error.'));
+					}
+					$data['recovery_expr_temp'] = '';
+				}
+				else {
+					show_messages(false, '', _('Recovery expression syntax error.'));
+				}
+			}
+			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
+			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
+			$data['recovery_expression_field_readonly'] = true;
+		}
+		else {
+			show_messages(false, '', _('Recovery expression syntax error.'));
+			$data['recovery_expression_constructor'] = IM_ESTABLISHED;
+		}
+	}
+	elseif ($data['recovery_expression_constructor'] != IM_TREE) {
+		$data['recovery_expression_field_name'] = 'recovery_expression';
+		$data['recovery_expression_field_value'] = $data['recovery_expression'];
+		$data['recovery_expression_field_readonly'] = $readonly;
 	}
 
 	if ($data['dependencies']) {
@@ -1558,6 +1640,10 @@ function getTriggerFormData($exprAction) {
 	unset($dependency);
 
 	order_result($data['db_dependencies'], 'description');
+
+	if (!$data['tags']) {
+		$data['tags'][] = ['tag' => '', 'value' => ''];
+	}
 
 	return $data;
 }

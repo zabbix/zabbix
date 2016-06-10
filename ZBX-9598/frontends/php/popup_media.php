@@ -27,13 +27,13 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 $page['title'] = _('Media');
 $page['file'] = 'popup_media.php';
 
-define('ZBX_PAGE_NO_MENU', 1);
-
-require_once dirname(__FILE__).'/include/page_header.php';
-
-if (CWebUser::$data['alias'] == ZBX_GUEST_USER) {
-	access_deny();
+if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN
+		|| (CWebUser::isGuest() && CWebUser::getType() < USER_TYPE_SUPER_ADMIN)) {
+	access_deny(ACCESS_DENY_PAGE);
 }
+
+define('ZBX_PAGE_NO_MENU', 1);
+require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
@@ -52,7 +52,6 @@ $fields = [
 	'form'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'form_refresh'=>[T_ZBX_INT, O_OPT, null,	null,	null]
 ];
-
 check_fields($fields);
 
 insert_js_function('add_media');
@@ -132,8 +131,8 @@ array_pop($frm_row);
 
 $frmMedia = (new CFormList(_('Media')))
 	->addRow(_('Type'), new CComboBox('mediatypeid', $mediatypeid, null, $mediatypes))
-	->addRow(_('Send to'), (new CTextBox('sendto', $sendto))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('When active'), (new CTextBox('period', $period))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Send to'), (new CTextBox('sendto', $sendto, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('When active'), (new CTextBox('period', $period, false, 100))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Use if severity'), $frm_row)
 	->addRow(_('Enabled'), (new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($active == MEDIA_STATUS_ACTIVE));
 

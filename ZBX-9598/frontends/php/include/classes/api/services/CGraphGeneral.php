@@ -30,7 +30,6 @@ abstract class CGraphGeneral extends CApiService {
 	const ERROR_MISSING_GRAPH_NAME = 'missingGraphName';
 	const ERROR_MISSING_GRAPH_ITEMS = 'missingGraphItems';
 	const ERROR_MISSING_REQUIRED_VALUE = 'missingRequiredValue';
-	const ERROR_TEMPLATED_ID = 'templatedId';
 	const ERROR_GRAPH_SUM = 'graphSum';
 
 	/**
@@ -470,12 +469,23 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateCreate(array $graphs) {
 		$colorValidator = new CColorValidator();
 
+		switch (get_class($this)) {
+			case 'CGraph':
+				$error_cannot_set = _('Cannot set "%1$s" for graph "%2$s".');
+				break;
+
+			case 'CGraphPrototype':
+				$error_cannot_set = _('Cannot set "%1$s" for graph prototype "%2$s".');
+				break;
+
+			default:
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
+		}
+
+		$read_only_fields = ['templateid', 'flags'];
+
 		foreach ($graphs as $graph) {
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $graph)) {
-				$error = _s($this->getErrorMsg(self::ERROR_TEMPLATED_ID), $graph['name']);
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
+			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_set, $graph['name']);
 
 			$templatedGraph = false;
 			if (isset($graph['gitems'])) {
@@ -593,13 +603,23 @@ abstract class CGraphGeneral extends CApiService {
 	protected function validateUpdate(array $graphs, array $dbGraphs) {
 		$colorValidator = new CColorValidator();
 
+		switch (get_class($this)) {
+			case 'CGraph':
+				$error_cannot_update = _('Cannot update "%1$s" for graph "%2$s".');
+				break;
+
+			case 'CGraphPrototype':
+				$error_cannot_update = _('Cannot update "%1$s" for graph prototype "%2$s".');
+				break;
+
+			default:
+				self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
+		}
+
+		$read_only_fields = ['templateid', 'flags'];
+
 		foreach ($graphs as $graph) {
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $graph)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s($this->getErrorMsg(self::ERROR_TEMPLATED_ID), $graph['name'])
-				);
-			}
+			$this->checkNoParameters($graph, $read_only_fields, $error_cannot_update, $graph['name']);
 
 			$templatedGraph = false;
 

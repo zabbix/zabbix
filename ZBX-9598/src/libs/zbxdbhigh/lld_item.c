@@ -856,7 +856,7 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 		{
 			size_t	tmp_len;
 
-			substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 			tmp_len = strlen(tmp);
 
 			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_len);
@@ -891,7 +891,7 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 
 			/* substitute LLD macros in the rest of the parameters (simple replacement) */
 			for (i = 1; i < funcdata.nparam; i++)
-				substitute_discovery_macros(&funcdata.params[i], jp_row, ZBX_MACRO_ANY, NULL, 0);
+				substitute_lld_macros(&funcdata.params[i], jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 		}
 
 		/* substitute the original function in the string with the new one (with substituted LLD macros) */
@@ -906,7 +906,7 @@ static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row
 	/* substitute the LLD macros in the remainder of the string that was jumped over */
 	if (0 != tmp_offset)
 	{
-		substitute_discovery_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&tmp, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
 	}
 
@@ -945,7 +945,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->name = zbx_strdup(NULL, item_prototype->name);
 	item->name_proto = NULL;
-	substitute_discovery_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	zbx_lrtrim(item->name, ZBX_WHITESPACE);
 
 	item->key = zbx_strdup(NULL, item_prototype->key);
@@ -954,7 +954,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->units = zbx_strdup(NULL, item_prototype->units);
 	item->units_orig = NULL;
-	substitute_discovery_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	zbx_lrtrim(item->units, ZBX_WHITESPACE);
 
 	item->params = zbx_strdup(NULL, item_prototype->params);
@@ -963,13 +963,13 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 		substitute_formula_macros(&item->params, jp_row);
 	else
-		substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 
 	zbx_lrtrim(item->params, ZBX_WHITESPACE);
 
 	item->ipmi_sensor = zbx_strdup(NULL, item_prototype->ipmi_sensor);
 	item->ipmi_sensor_orig = NULL;
-	substitute_discovery_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
 
 	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
@@ -979,7 +979,7 @@ static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_protot
 
 	item->description = zbx_strdup(NULL, item_prototype->description);
 	item->description_orig = NULL;
-	substitute_discovery_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	zbx_lrtrim(item->description, ZBX_WHITESPACE);
 
 	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
@@ -1012,7 +1012,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	buffer = zbx_strdup(buffer, item_prototype->name);
-	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->name, buffer))
 	{
@@ -1031,7 +1031,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->units);
-	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->units, buffer))
 	{
@@ -1046,7 +1046,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	if (ITEM_TYPE_CALCULATED == item_prototype->type)
 		substitute_formula_macros(&buffer, jp_row);
 	else
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
@@ -1059,7 +1059,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->ipmi_sensor);
-	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
 	if (0 != strcmp(item->ipmi_sensor, buffer))
 	{
@@ -1081,7 +1081,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	}
 
 	buffer = zbx_strdup(buffer, item_prototype->description);
-	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 	zbx_lrtrim(buffer, ZBX_WHITESPACE);
 	if (0 != strcmp(item->description, buffer))
 	{
@@ -1807,7 +1807,7 @@ out:
  * Return value: SUCCEED - item-application link should not be removed        *
  *               FAIL    - item-application link should be removed            *
  *                                                                            *
- * Comments: Item-application link should be removed if either the            *
+ * Comments: Undiscovered item-application link must be removed if either the *
  *           application was not discovered or item was discovered.           *
  *           The only case when undiscovered item-application link is not     *
  *           removed is when we have valid application and undiscovered item. *
@@ -1825,11 +1825,12 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 	if (FAIL == (index = zbx_vector_ptr_bsearch(applications, &item_application->application_ref.applicationid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
-		/* Applications vector contains only discovered applications and */
-		/* apparently the item was linked to non-discovered application. */
-		/* Item-application links to normal application must be removed  */
-		/* if not discovered.                                            */
-		return FAIL;
+		/* Applications vector contains only discovered applications and  */
+		/* apparently the item was linked to a normal application.        */
+		/* Undiscovered item-application links to normal application must */
+		/* be removed if item has been also discovered - this means that  */
+		/* the item prototype - application link was removed by frontend. */
+		goto check_item;
 	}
 
 	application = (zbx_lld_application_t *)applications->values[index];
@@ -1837,6 +1838,7 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 	if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
 		return FAIL;
 
+check_item:
 	if (FAIL == (index = zbx_vector_ptr_bsearch(items, &item_application->item_ref.itemid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
@@ -1846,7 +1848,7 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 
 	item = (zbx_lld_item_t *)items->values[index];
 
-	if (0 != (item->flags & ZBX_FLAG_LLD_APPLICATION_DISCOVERED))
+	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
 		return FAIL;
 
 	return SUCCEED;
@@ -2536,7 +2538,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		application->application_discoveryid = 0;
 
 		application->name = zbx_strdup(NULL, application_prototype->name);
-		substitute_discovery_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_lld_macros(&application->name, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 		zbx_lrtrim(application->name, ZBX_WHITESPACE);
 
 		application->name_proto = zbx_strdup(NULL, application_prototype->name);
@@ -2556,7 +2558,7 @@ static void	lld_application_make(const zbx_lld_application_prototype_t *applicat
 		if (0 == (application->flags & ZBX_FLAG_LLD_APPLICATION_UPDATE_NAME))
 		{
 			buffer = zbx_strdup(NULL, application_prototype->name);
-			substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 			if (0 != strcmp(application->name, buffer))
@@ -2610,7 +2612,7 @@ static void	lld_applications_make(const zbx_vector_ptr_t *application_prototypes
 			lld_row = (zbx_lld_row_t *)lld_rows->values[j];
 
 			buffer = zbx_strdup(buffer, application->name_proto);
-			substitute_discovery_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_ANY, NULL, 0);
+			substitute_lld_macros(&buffer, &lld_row->jp_row, ZBX_MACRO_ANY, NULL, NULL, 0);
 			zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 			if (0 == strcmp(application->name, buffer))

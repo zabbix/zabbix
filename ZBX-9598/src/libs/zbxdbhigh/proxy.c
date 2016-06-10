@@ -1447,8 +1447,11 @@ out:
  *                                                                            *
  * Purpose: update proxy hosts availability                                   *
  *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
  ******************************************************************************/
-void	process_host_availability(struct zbx_json_parse *jp)
+int	process_host_availability(struct zbx_json_parse *jp, char **error)
 {
 	const char		*__function_name = "process_host_availability";
 	zbx_uint64_t		hostid;
@@ -1458,14 +1461,13 @@ void	process_host_availability(struct zbx_json_parse *jp)
 	size_t			tmp_alloc = 129;
 	zbx_host_availability_t	*ha = NULL;
 	zbx_vector_ptr_t	hosts;
-	int			i;
+	int			i, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	/* "data" tag lists the hosts */
-	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
+		*error = zbx_strdup(*error, zbx_json_strerror());
 		goto out;
 	}
 
@@ -1478,17 +1480,22 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the host entries */
 	{
-		if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
+		if (SUCCEED != (ret = zbx_json_brackets_open(p, &jp_row)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
-			continue;
+			*error = zbx_strdup(*error, zbx_json_strerror());
+			goto clean;
 		}
 
-		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOSTID, &tmp, &tmp_alloc) ||
-				SUCCEED != is_uint64(tmp, &hostid))
+		if (SUCCEED != (ret = zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOSTID, &tmp, &tmp_alloc)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data: %s", zbx_json_strerror());
-			continue;
+			*error = zbx_strdup(*error, zbx_json_strerror());
+			goto clean;
+		}
+
+		if (SUCCEED != (ret = is_uint64(tmp, &hostid)))
+		{
+			*error = zbx_strdup(*error, "hostid is not a valid numeric");
+			goto clean;
 		}
 
 		ha = (zbx_host_availability_t *)zbx_malloc(NULL, sizeof(zbx_host_availability_t));
@@ -1512,13 +1519,14 @@ void	process_host_availability(struct zbx_json_parse *jp)
 			ha->agents[i].flags |= ZBX_FLAGS_AGENT_STATUS_ERROR;
 		}
 
-		if (SUCCEED != zbx_host_availability_is_set(ha))
+		if (SUCCEED != (ret = zbx_host_availability_is_set(ha)))
 		{
 			zbx_free(ha);
-			zabbix_log(LOG_LEVEL_WARNING, "invalid host availability data");
+			*error = zbx_dsprintf(*error, "no availability data for \"hostid\":" ZBX_FS_UI64, hostid);
+			goto clean;
 		}
-		else
-			zbx_vector_ptr_append(&hosts, ha);
+
+		zbx_vector_ptr_append(&hosts, ha);
 	}
 
 	if (0 < hosts.values_num && SUCCEED == DCset_hosts_availability(&hosts))
@@ -1534,7 +1542,9 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		for (i = 0; i < hosts.values_num; i++)
 		{
-			zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]);
+			if (SUCCEED == zbx_sql_add_host_availability(&sql, &sql_alloc, &sql_offset, hosts.values[i]))
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
@@ -1547,13 +1557,15 @@ void	process_host_availability(struct zbx_json_parse *jp)
 
 		zbx_free(sql);
 	}
-
+clean:
 	zbx_vector_ptr_clear_ext(&hosts, (zbx_mem_free_func_t)zbx_host_availability_free);
 	zbx_vector_ptr_destroy(&hosts);
 
 	zbx_free(tmp);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2094,7 +2106,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			char	*allowed_hosts;
 
 			allowed_hosts = zbx_strdup(NULL, items[i].trapper_hosts);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL,
 					&allowed_hosts, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 			security_check = zbx_tcp_check_security(sock, allowed_hosts, 1);
 			zbx_free(allowed_hosts);
@@ -2307,10 +2319,10 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 #define VALUES_MAX	256
 	const char		*__function_name = "process_hist_data";
 	struct zbx_json_parse	jp_data, jp_row;
-	const char		*p;
+	const char		*p = NULL;
 	char			*tmp = NULL;
 	size_t			tmp_alloc = 0, values_num = 0;
-	int			ret = FAIL, processed = 0, total_num = 0;
+	int			ret, processed = 0, total_num = 0;
 	double			sec;
 	zbx_timespec_t		proxy_timediff;
 	static AGENT_VALUE	*values = NULL, *av;
@@ -2341,22 +2353,22 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 		}
 	}
 
-	/* "data" tag lists the item keys */
-	if (NULL == (p = zbx_json_pair_by_name(jp, ZBX_PROTO_TAG_DATA)))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot find \"data\" pair");
-	else if (FAIL == zbx_json_brackets_open(p, &jp_data))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot process json request: %s", zbx_json_strerror());
-	else
-		ret = SUCCEED;
+	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
+	{
+		*info = zbx_strdup(*info, zbx_json_strerror());
+		goto out;
+	}
 
-	if (SUCCEED == ret && 0 != proxy_hostid)
+	if (0 != proxy_hostid)
 		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
 
-	p = NULL;
-	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
+	while (NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
+		{
+			*info = zbx_strdup(*info, zbx_json_strerror());
 			break;
+		}
 
 		total_num++;
 
@@ -2454,18 +2466,18 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
 		}
 	}
 
-	zbx_free(tmp);
-
 	if (0 < values_num)
 		process_mass_data(sock, proxy_hostid, values, values_num, &processed);
 
 	clean_agent_values(values, values_num);
 
-	if (NULL != info)
+	if (SUCCEED == ret)
 	{
 		*info = zbx_dsprintf(*info, "processed: %d; failed: %d; total: %d; seconds spent: " ZBX_FS_DBL,
 				processed, total_num - processed, total_num, zbx_time() - sec);
 	}
+out:
+	zbx_free(tmp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -2478,8 +2490,11 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_u
  *                                                                            *
  * Purpose: update discovery data, received from proxy                        *
  *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
  ******************************************************************************/
-void	process_dhis_data(struct zbx_json_parse *jp)
+int	process_dhis_data(struct zbx_json_parse *jp, char **error)
 {
 	const char		*__function_name = "process_dhis_data";
 	DB_RESULT		result;
@@ -2501,10 +2516,16 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 	now = time(NULL);
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
-		goto exit;
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-		goto exit;
+	{
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		goto out;
+	}
 
 	hosttime = atoi(tmp);
 
@@ -2515,8 +2536,8 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 	while (NULL != (p = zbx_json_next(&jp_data, p)))
 	{
-		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
-			break;
+		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+			goto json_parse_error;
 
 		memset(&dcheck, 0, sizeof(dcheck));
 		*key_ = '\0';
@@ -2528,22 +2549,32 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
 			goto json_parse_error;
+
 		itemtime = now - (hosttime - atoi(tmp));
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DRULE, tmp, sizeof(tmp)))
 			goto json_parse_error;
+
 		ZBX_STR2UINT64(drule.druleid, tmp);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TYPE, tmp, sizeof(tmp)))
 			goto json_parse_error;
+
 		dcheck.type = atoi(tmp);
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp)))
 			goto json_parse_error;
+
 		if ('\0' != *tmp)
+		{
 			ZBX_STR2UINT64(dcheck.dcheckid, tmp);
+		}
 		else if (-1 != dcheck.type)
-			goto json_parse_error;
+		{
+			*error = zbx_strdup(*error, "null service check ID");
+			ret = FAIL;
+			break;
+		}
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_IP, ip, sizeof(ip)))
 			goto json_parse_error;
@@ -2596,7 +2627,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 				zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64 " does not exist", drule.druleid);
 
-				goto next;
+				continue;
 			}
 
 			discovery_update_host(&dhost, ip, status, itemtime);
@@ -2610,25 +2641,26 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
 						" belong to druleid:" ZBX_FS_UI64, dcheck.dcheckid, drule.druleid);
 
-				goto next;
+				continue;
 			}
 
 			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
 		}
 
 		DBcommit();
-next:
+
 		continue;
 json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
+		*error = zbx_strdup(*error, zbx_json_strerror());
+		ret = FAIL;
+		break;
 	}
 
 	zbx_free(value);
-exit:
-	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2637,8 +2669,11 @@ exit:
  *                                                                            *
  * Purpose: update auto registration data, received from proxy                *
  *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occurred                                    *
+ *                                                                            *
  ******************************************************************************/
-void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
+int	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid, char **error)
 {
 	const char		*__function_name = "process_areg_data";
 
@@ -2656,10 +2691,10 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 	now = time(NULL);
 
 	if (SUCCEED != (ret = zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
-		goto exit;
+		goto out;
 
 	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-		goto exit;
+		goto out;
 
 	hosttime = atoi(tmp);
 
@@ -2670,12 +2705,13 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp)))
-			goto json_parse_error;
+		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, tmp, sizeof(tmp))))
+			break;
+
 		itemtime = now - (hosttime - atoi(tmp));
 
-		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
-			goto json_parse_error;
+		if (FAIL == (ret = zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host))))
+			break;
 
 		if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_HOST_METADATA,
 				&host_metadata, &host_metadata_alloc))
@@ -2698,18 +2734,16 @@ void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)
 		DBbegin();
 		DBregister_host(proxy_hostid, host, ip, dns, port, host_metadata, itemtime);
 		DBcommit();
-
-		continue;
-json_parse_error:
-		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 	}
-exit:
-	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_WARNING, "invalid auto registration data: %s", zbx_json_strerror());
 
 	zbx_free(host_metadata);
+out:
+	if (SUCCEED != ret)
+		*error = zbx_strdup(*error, zbx_json_strerror());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************

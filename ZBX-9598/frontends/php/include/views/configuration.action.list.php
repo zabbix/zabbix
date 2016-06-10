@@ -22,7 +22,6 @@ $widget = (new CWidget())
 	->setTitle(_('Actions'))
 	->setControls((new CForm('get'))
 		->cleanItems()
-		->addVar('eventsource', $data['eventsource'])
 		->addItem((new CList())
 			->addItem([_('Event source'), SPACE,
 				new CComboBox('eventsource', $data['eventsource'], 'submit()', [
@@ -64,7 +63,7 @@ if ($this->data['actions']) {
 
 		foreach ($action['filter']['conditions'] as $cIdx => $condition) {
 			$conditions[] = getConditionDescription($condition['conditiontype'], $condition['operator'],
-				$actionConditionStringValues[$aIdx][$cIdx]
+				$actionConditionStringValues[$aIdx][$cIdx], $condition['value2']
 			);
 			$conditions[] = BR();
 		}

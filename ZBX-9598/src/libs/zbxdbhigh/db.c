@@ -464,18 +464,18 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*                                                                                                */
 	/*   _          |                                                                                 */
 	/*    \__ to    |                                                                                 */
-	/*       \_____ |   OK           OK(?)        PROBLEM     PROBLEM(?)                              */
+	/*       \_____ |   OK           OK(?)        PROBLEM     PROBLEM(?)     NONE                     */
 	/*   from      \|                                                                                 */
 	/*              |                                                                                 */
-	/*  ------------+------------------------------------------------------                           */
+	/*  ------------+---------------------------------------------------------------------            */
 	/*              |                                                                                 */
-	/*  OK          |   no           T+I          T+E         I                                       */
+	/*  OK          |   no           T+I          T+E         I              no                       */
 	/*              |                                                                                 */
-	/*  OK(?)       |   T+I          T(e)         T+E+I       -                                       */
+	/*  OK(?)       |   T+I          T(e)         T+E+I       -              T+I                      */
 	/*              |                                                                                 */
-	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I                                     */
+	/*  PROBLEM     |   T+E          I            T(m)+E(m)   T+I            no                       */
 	/*              |                                                                                 */
-	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)                                    */
+	/*  PROBLEM(?)  |   T+E+I        -            T+E(m)+I    T(e)           T+I                      */
 	/*              |                                                                                 */
 	/*                                                                                                */
 	/* Legend:                                                                                        */
@@ -489,13 +489,18 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 	/*  (e) - if an error message has changed                                                         */
 	/*  I   - generate an internal event                                                              */
 	/*                                                                                                */
+	/*  NONE is a trigger value used internally to indicate that trigger value was calculated         */
+	/*  successfully, but should not affect trigger event generation (internal events still can       */
+	/*  be generated if the trigger was in unknown state.                                             */
+	/*                                                                                                */
 	/**************************************************************************************************/
 
 	new_error_local = (NULL == trigger->new_error ? "" : trigger->new_error);
 	new_lastchange = trigger->timespec.sec;
 
-	value_changed = (trigger->value != new_value ||
-			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state));
+	value_changed = ((trigger->value != new_value ||
+			(0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state)) &&
+			TRIGGER_VALUE_NONE != new_value);
 	state_changed = (trigger->state != new_state);
 	multiple_problem = (TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type && TRIGGER_VALUE_PROBLEM == new_value &&
 			TRIGGER_STATE_NORMAL == new_state);
@@ -518,9 +523,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
 						&new_lastchange);
 
-				add_event(0, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_value, trigger->description,
-						trigger->expression_orig, trigger->priority, trigger->type);
+						trigger->expression_orig, trigger->recovery_expression_orig,
+						trigger->priority, trigger->type, &trigger->tags);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "lastchange=%d,", new_lastchange);
 			}
@@ -535,9 +541,10 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 			if (0 != state_changed)
 			{
-				add_event(0, EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				add_event(EVENT_SOURCE_INTERNAL, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_state, trigger->description,
-						trigger->expression_orig, trigger->priority, trigger->type);
+						trigger->expression_orig, trigger->recovery_expression_orig,
+						trigger->priority, trigger->type, NULL);
 
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "state=%d,", new_state);
 			}
@@ -825,6 +832,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 					exit(EXIT_FAILURE);
 				}
 			}
+
 			DBfree_result(result);
 
 			dbres = DBexecute("insert into ids (table_name,field_name,nextid)"
@@ -861,12 +869,14 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 			if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
 			{
 				ZBX_STR2UINT64(ret2, row[0]);
-				DBfree_result(result);
+
 				if (ret1 + num == ret2)
 					found = SUCCEED;
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
+
+			DBfree_result(result);
 		}
 	}
 
@@ -878,9 +888,7 @@ static zbx_uint64_t	DBget_nextid(const char *tablename, int num)
 
 zbx_uint64_t	DBget_maxid_num(const char *tablename, int num)
 {
-	if (0 == strcmp(tablename, "history_log") ||
-			0 == strcmp(tablename, "history_text") ||
-			0 == strcmp(tablename, "events") ||
+	if (0 == strcmp(tablename, "events") ||
 			0 == strcmp(tablename, "dservices") ||
 			0 == strcmp(tablename, "dhosts") ||
 			0 == strcmp(tablename, "alerts") ||
@@ -919,7 +927,9 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	int		between_num = 0, in_num = 0, in_cnt;
 	zbx_uint64_t	value;
 	int		*seq_len = NULL;
-
+#if defined(HAVE_SQLITE3)
+	int		expr_num, expr_cnt = 0;
+#endif
 	if (0 == num)
 		return;
 
@@ -956,24 +966,51 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
 
+#if defined(HAVE_SQLITE3)
+	expr_num = between_num + (in_num + MAX_EXPRESSIONS - 1) / MAX_EXPRESSIONS;
+
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, '(');
+#endif
 	/* compose "between"s */
 	for (i = 0, first = 1, start = 0; i < seq_num; i++)
 	{
 		if (MIN_NUM_BETWEEN <= seq_len[i])
 		{
 			if (1 != first)
-				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			{
+#if defined(HAVE_SQLITE3)
+				if (MAX_EXPRESSIONS == ++expr_cnt)
+				{
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
+					expr_cnt = 0;
+				}
+				else
+#endif
+					zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+			}
+			else
+				first = 0;
 
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s between " ZBX_FS_UI64 " and " ZBX_FS_UI64,
 					fieldname, values[start], values[start + seq_len[i] - 1]);
-			first = 0;
 		}
 
 		start += seq_len[i];
 	}
 
 	if (0 < in_num && 0 < between_num)
-		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	{
+#if defined(HAVE_SQLITE3)
+		if (MAX_EXPRESSIONS == ++expr_cnt)
+		{
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ") or (");
+			expr_cnt = 0;
+		}
+		else
+#endif
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " or ");
+	}
 
 	if (1 < in_num)
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s in (", fieldname);
@@ -997,7 +1034,21 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 					{
 						in_cnt = 0;
 						(*sql_offset)--;
-						zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (", fieldname);
+#if defined(HAVE_SQLITE3)
+						if (MAX_EXPRESSIONS == ++expr_cnt)
+						{
+							zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ")) or (%s in (",
+									fieldname);
+							expr_cnt = 0;
+						}
+						else
+						{
+#endif
+							zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ") or %s in (",
+									fieldname);
+#if defined(HAVE_SQLITE3)
+						}
+#endif
 					}
 
 					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, ZBX_FS_UI64 ",", values[start++]);
@@ -1018,6 +1069,10 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 
 	zbx_free(seq_len);
 
+#if defined(HAVE_SQLITE3)
+	if (MAX_EXPRESSIONS < expr_num)
+		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+#endif
 	if (MAX_EXPRESSIONS < in_num || 1 < between_num || (0 < in_num && 0 < between_num))
 		zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
 
@@ -1294,8 +1349,8 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 		zbx_free(dns_esc);
 		zbx_free(ip_esc);
 
-		add_event(0, EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
-				TRIGGER_VALUE_PROBLEM, NULL, NULL, 0, 0);
+		add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
+				TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL);
 		process_events();
 	}
 
@@ -1979,9 +2034,6 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const ZBX_TABLE *table, co
  *             ...   - [IN] names of the fields to insert                     *
  *             NULL  - [IN] terminating NULL pointer                          *
  *                                                                            *
- * Return value: Returns SUCCEED if the operation completed successfully or   *
- *               FAIL otherwise.                                              *
- *                                                                            *
  * Comments: This is a convenience wrapper for zbx_db_insert_prepare_dyn()    *
  *           function.                                                        *
  *                                                                            *
@@ -2611,8 +2663,8 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		const zbx_host_availability_t *ha)
 {
 	const char	*field_prefix[ZBX_AGENT_MAX] = {"", "snmp_", "ipmi_", "jmx_"};
-	char	delim = ' ';
-	int	i;
+	char		delim = ' ';
+	int		i;
 
 	if (FAIL == zbx_host_availability_is_set(ha))
 		return FAIL;
@@ -2654,7 +2706,7 @@ int	zbx_sql_add_host_availability(char **sql, size_t *sql_alloc, size_t *sql_off
 		}
 	}
 
-	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64 "\n;", ha->hostid);
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where hostid=" ZBX_FS_UI64, ha->hostid);
 
 	return SUCCEED;
 }

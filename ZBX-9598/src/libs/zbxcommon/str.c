@@ -20,6 +20,10 @@
 #include "common.h"
 #include "threads.h"
 
+#ifdef HAVE_ICONV
+#	include <iconv.h>
+#endif
+
 static const char	copyright_message[] =
 	"Copyright (C) 2016 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
@@ -348,7 +352,8 @@ char	*string_replace(const char *str, const char *sub_str1, const char *sub_str2
 	/* count the number of occurrences of sub_str1 */
 	for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
-	if ( 0 == count )	return strdup(str);
+	if (0 == count)
+		return zbx_strdup(NULL, str);
 
 	diff = (long)strlen(sub_str2) - len;
 
@@ -3570,12 +3575,9 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 {
 	int		len, quotes = 0;
 	char		*buffer, *ptr_buffer;
-	const char	*ptr_context;
+	const char	*ptr_context = context;
 
-	for (ptr_context = context; ' ' == *ptr_context; ptr_context++)
-		;
-
-	if ('"' == *ptr_context)
+	if ('"' == *ptr_context || ' ' == *ptr_context)
 		force_quote = 1;
 
 	for (; '\0' != *ptr_context; ptr_context++)
@@ -3594,9 +3596,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
 	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
 
 	*ptr_buffer++ = '"';
-
-	while (' ' == *context)
-		*ptr_buffer++ = *context++;
 
 	while ('\0' != *context)
 	{
@@ -3757,7 +3756,7 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
  *                                                                            *
  * Parameters: expr      - [IN] the function expression, starting with the    *
  *                             parameter to parse: p1,p2 ...                  *
- *             length    - [OUT] the parameter length excluding the trailing  *
+ *             length    - [OUT] the parameter length including trailing      *
  *                              whitespace                                    *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
@@ -3784,10 +3783,6 @@ static int	function_parse_unquoted_param(const char *expr, size_t *length, size_
 		}
 	}
 out:
-	/* trim the trailing whitespace */
-	while (ptr > expr && ' ' == *(ptr - 1))
-		ptr--;
-
 	*length = ptr - expr;
 
 	return SUCCEED;
@@ -3803,8 +3798,8 @@ out:
  *                             parameter separator: (p1,p2 ... or ,p2,p3 ...  *
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
- *             length    - [OUT] the parameter length excluding trailing      *
- *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
  *                               0 if there are no more parameters to parse.  *
@@ -4151,6 +4146,641 @@ int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr
 out:
 	if (FAIL == ret)
 		zbx_free(*out);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strcmp_natural                                               *
+ *                                                                            *
+ * Purpose: performs natural comparison of two strings                        *
+ *                                                                            *
+ * Parameters: s1 - [IN] the first string                                     *
+ *             s2 - [IN] the second string                                    *
+ *                                                                            *
+ * Return value:  0: the strings are equal                                    *
+ *               <0: s1 < s2                                                  *
+ *               >0: s1 > s2                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_natural(const char *s1, const char *s2)
+{
+	int	ret, value1, value2;
+
+	for (;'\0' != *s1 && '\0' != *s2; s1++, s2++)
+	{
+		if (0 == isdigit(*s1) || 0 == isdigit(*s2))
+		{
+			if (0 != (ret = *s1 - *s2))
+				return ret;
+
+			continue;
+		}
+
+		value1 = 0;
+		while (0 != isdigit(*s1))
+			value1 = value1 * 10 + *s1++ - '0';
+
+		value2 = 0;
+		while (0 != isdigit(*s2))
+			value2 = value2 * 10 + *s2++ - '0';
+
+		if (0 != (ret = value1 - value2))
+			return ret;
+
+		if ('\0' == *s1 || '\0' == *s2)
+			break;
+	}
+
+	return *s1 - *s2;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_user_macro                                       *
+ *                                                                            *
+ * Purpose: parses user macro token                                           *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the user macro was parsed successfully             *
+ *               FAIL    - macro does not point at valid user macro           *
+ *                                                                            *
+ * Comments: If the macro points at valid user macro in the expression then   *
+ *           the generic token fields are set and the token->data.user_macro  *
+ *           structure is filled with user macro specific data.               *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	int			macro_r, context_l, context_r, offset;
+	zbx_token_user_macro_t	*data;
+
+	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r))
+		return FAIL;
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_USER_MACRO;
+	token->token.l = offset;
+	token->token.r = offset + macro_r;
+
+	/* initialize token data */
+	data = &token->data.user_macro;
+	data->name.l = offset + 2;
+
+	if (0 != context_l)
+	{
+		const char *ptr = macro + context_l;
+
+		/* find the context separator ':' by stripping spaces before context */
+		while (' ' == *(--ptr))
+			;
+
+		data->name.r = offset + (ptr - macro) - 1;
+
+		data->context.l = offset + context_l;
+		data->context.r = offset + context_r;
+	}
+	else
+	{
+		data->name.r = token->token.r - 1;
+		data->context.l = 0;
+		data->context.r = 0;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_lld_macro                                        *
+ *                                                                            *
+ * Purpose: parses lld macro token                                            *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the lld macro was parsed successfully              *
+ *               FAIL    - macro does not point at valid lld macro            *
+ *                                                                            *
+ * Comments: If the macro points at valid lld macro in the expression then    *
+ *           the generic token fields are set and the token->data.lld_macro   *
+ *           structure is filled with lld macro specific data.                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char		*ptr;
+	int			offset;
+	zbx_token_macro_t	*data;
+
+	/* find the end of lld macro by validating its name until the closing bracket } */
+	for (ptr = macro + 2; '}' != *ptr; ptr++)
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+
+		if (SUCCEED != is_macro_char(*ptr))
+			return FAIL;
+	}
+
+	/* empty macro name */
+	if (2 == ptr - macro)
+		return FAIL;
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_LLD_MACRO;
+	token->token.l = offset;
+	token->token.r = offset + (ptr - macro);
+
+	/* initialize token data */
+	data = &token->data.lld_macro;
+	data->name.l = offset + 2;
+	data->name.r = token->token.r - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_objectid                                         *
+ *                                                                            *
+ * Purpose: parses object id token                                            *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the object id was parsed successfully              *
+ *               FAIL    - macro does not point at valid object id            *
+ *                                                                            *
+ * Comments: If the macro points at valid object id in the expression then    *
+ *           the generic token fields are set and the token->data.objectid    *
+ *           structure is filled with object id specific data.                *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char		*ptr;
+	int			offset;
+	zbx_token_macro_t	*data;
+
+	/* find the end of object id by checking if it contains digits until the closing bracket } */
+	for (ptr = macro + 1; '}' != *ptr; ptr++)
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+
+		if (0 == isdigit(*ptr))
+			return FAIL;
+	}
+
+	/* empty object id */
+	if (1 == ptr - macro)
+		return FAIL;
+
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_OBJECTID;
+	token->token.l = offset;
+	token->token.r = offset + (ptr - macro);
+
+	/* initialize token data */
+	data = &token->data.objectid;
+	data->name.l = offset + 1;
+	data->name.r = token->token.r - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_macro                                            *
+ *                                                                            *
+ * Purpose: parses normal macro token                                         *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the simple macro was parsed successfully           *
+ *               FAIL    - macro does not point at valid macro                *
+ *                                                                            *
+ * Comments: If the macro points at valid macro in the expression then        *
+ *           the generic token fields are set and the token->data.macro       *
+ *           structure is filled with simple macro specific data.             *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char		*ptr;
+	int			offset;
+	zbx_token_macro_t	*data;
+
+	/* find the end of simple macro by validating its name until the closing bracket } */
+	for (ptr = macro + 1; '}' != *ptr; ptr++)
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+
+		if (SUCCEED != is_macro_char(*ptr))
+			return FAIL;
+	}
+
+	/* empty macro name */
+	if (1 == ptr - macro)
+		return FAIL;
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_MACRO;
+	token->token.l = offset;
+	token->token.r = offset + (ptr - macro);
+
+	/* initialize token data */
+	data = &token->data.macro;
+	data->name.l = offset + 1;
+	data->name.r = token->token.r - 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_function                                         *
+ *                                                                            *
+ * Purpose: parses function inside token                                      *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             func       - [IN] the beginning of the function                *
+ *             func_loc   - [OUT] the function location relative to the       *
+ *                                expression (including parameters)           *
+ *                                                                            *
+ * Return value: SUCCEED - the function was parsed successfully               *
+ *               FAIL    - func does not point at valid function              *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_function(const char *expression, const char *func, zbx_strloc_t *func_loc)
+{
+	size_t	len, next_pos, param_pos;
+	int	offset;
+
+	/* FAIL if the expression doesn't start with a function name */
+	if (FAIL == function_parse_name(func, &len, &next_pos))
+		return FAIL;
+
+	offset = func - expression;
+
+	/* parse the function parameters */
+	do
+	{
+		func += next_pos;
+
+		if (SUCCEED != function_parse_param(func, &param_pos, &len, &next_pos))
+			return FAIL;
+	}
+	while (')' != func[next_pos]);
+
+	func_loc->l = offset;
+	func_loc->r = (func - expression) + next_pos;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_func_macro                                       *
+ *                                                                            *
+ * Purpose: parses function macro token                                       *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             func       - [IN] the beginning of the macro function in the   *
+ *                               token                                        *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the function macro was parsed successfully         *
+ *               FAIL    - macro does not point at valid function macro       *
+ *                                                                            *
+ * Comments: If the macro points at valid function macro in the expression    *
+ *           then the generic token fields are set and the                    *
+ *           token->data.func_macro structure is filled with function macro   *
+ *           specific data.                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_func_macro(const char *expression, const char *macro, const char *func,
+		zbx_token_t *token)
+{
+	zbx_strloc_t		func_loc;
+	zbx_token_func_macro_t	*data;
+	const char		*ptr;
+	int			offset;
+
+	if ('\0' == *func)
+		return FAIL;
+
+	if (SUCCEED != zbx_token_parse_function(expression, func, &func_loc))
+		return FAIL;
+
+	ptr = expression + func_loc.r + 1;
+
+	/* skip trailing whitespace and verify that token ends with } */
+
+	while (' ' == *ptr)
+		ptr++;
+
+	if ('}' != *ptr)
+		return FAIL;
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_FUNC_MACRO;
+	token->token.l = offset;
+	token->token.r = ptr - expression;
+
+	/* initialize token data */
+	data = &token->data.func_macro;
+	data->macro.l = offset + 1;
+	data->macro.r = func_loc.l - 2;
+
+	data->func = func_loc;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_simple_macro_key                                 *
+ *                                                                            *
+ * Purpose: parses simple macro token with given key                          *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             key        - [IN] the beginning of host key inside the token   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the function macro was parsed successfully         *
+ *               FAIL    - macro does not point at valid simple macro         *
+ *                                                                            *
+ * Comments: Simple macros have format {<host>:<key>.<func>(<params>)}        *
+ *           {HOST.HOSTn} macro can be used for host name and {ITEM.KEYn}     *
+ *           macro can be used for item key.                                  *
+ *                                                                            *
+ *           If the macro points at valid simple macro in the expression      *
+ *           then the generic token fields are set and the                    *
+ *           token->data.simple_macro structure is filled with simple macro   *
+ *           specific data.                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_simple_macro_key(const char *expression, const char *macro, const char *key,
+		zbx_token_t *token)
+{
+	int				offset;
+	zbx_token_simple_macro_t	*data;
+	const char			*ptr;
+	zbx_strloc_t			key_loc, func_loc;
+
+	ptr = key;
+
+	if (SUCCEED != parse_key((char **)&ptr))
+	{
+		zbx_token_t	key_token;
+
+		if (SUCCEED != zbx_token_parse_macro(expression, key, &key_token))
+			return FAIL;
+
+		ptr = expression + key_token.token.r + 1;
+	}
+
+	/* If the key is without parameters, then parse_key() will move cursor past function name - */
+	/* at the start of its parameters. In this case move cursor back before function.           */
+	if ('(' == *ptr)
+	{
+		while ('.' != *(--ptr))
+			;
+	}
+
+	/* check for empty key */
+	if (0 == ptr - key)
+		return FAIL;
+
+	if (SUCCEED != zbx_token_parse_function(expression, ptr + 1, &func_loc))
+		return FAIL;
+
+	key_loc.l = key - expression;
+	key_loc.r = ptr - expression - 1;
+
+	ptr = expression + func_loc.r + 1;
+
+	/* skip trailing whitespace and verify that token ends with } */
+
+	while (' ' == *ptr)
+		ptr++;
+
+	if ('}' != *ptr)
+		return FAIL;
+
+	offset = macro - expression;
+
+	/* initialize token */
+	token->type = ZBX_TOKEN_SIMPLE_MACRO;
+	token->token.l = offset;
+	token->token.r = ptr - expression;
+
+	/* initialize token data */
+	data = &token->data.simple_macro;
+	data->host.l = offset + 1;
+	data->host.r = offset + (key - macro) - 2;
+
+	data->key = key_loc;
+	data->func = func_loc;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_simple_macro                                     *
+ *                                                                            *
+ * Purpose: parses simple macro token                                         *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the simple macro was parsed successfully           *
+ *               FAIL    - macro does not point at valid simple macro         *
+ *                                                                            *
+ * Comments: Simple macros have format {<host>:<key>.<func>(<params>)}        *
+ *           {HOST.HOSTn} macro can be used for host name and {ITEM.KEYn}     *
+ *           macro can be used for item key.                                  *
+ *                                                                            *
+ *           If the macro points at valid simple macro in the expression      *
+ *           then the generic token fields are set and the                    *
+ *           token->data.simple_macro structure is filled with simple macro   *
+ *           specific data.                                                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_simple_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char	*ptr;
+
+	/* Find the end of host name by validating its name until the closing bracket }.          */
+	/* {HOST.HOSTn} macro usage in the place of host name is handled by nested macro parsing. */
+	for (ptr = macro + 1; ':' != *ptr; ptr++)
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+
+		if (SUCCEED != is_hostname_char(*ptr))
+			return FAIL;
+	}
+
+	/* check for empty host name */
+	if (1 == ptr - macro)
+		return FAIL;
+
+	return zbx_token_parse_simple_macro_key(expression, macro, ptr + 1, token);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_parse_nested_macro                                     *
+ *                                                                            *
+ * Purpose: parses token with nested macros                                   *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             macro      - [IN] the beginning of the token                   *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the token was parsed successfully                  *
+ *               FAIL    - macro does not point at valid function or simple   *
+ *                         macro                                              *
+ *                                                                            *
+ * Comments: This function parses token with a macro inside it. There are two *
+ *           types of nested macros - function macros and a specific case     *
+ *           of simple macros where {HOST.HOSTn} macro is used as host name.  *
+ *           In both cases another macro is found at the beginning of token.  *
+ *                                                                            *
+ *           If the macro points at valid macro in the expression then        *
+ *           the generic token fields are set and either the                  *
+ *           token->data.func_macro or token->data.simple_macro (depending on *
+ *           token type) structure is filled with macro specific data.        *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_t *token)
+{
+	const char		*ptr;
+
+	/* find the end of the nested macro by validating its name until the closing bracket } */
+	for (ptr = macro + 2; '}' != *ptr; ptr++)
+	{
+		if ('\0' == *ptr)
+			return FAIL;
+
+		if (SUCCEED != is_macro_char(*ptr))
+			return FAIL;
+	}
+
+	/* empty macro name */
+	if (2 == ptr - macro)
+		return FAIL;
+
+	/* Determine the token type by checking the next character after nested macro. */
+	/* Function macros have format {{MACRO}.function()} while simple macros        */
+	/* have format {{MACRO}:key.function()}.                                       */
+	if ('.' == ptr[1])
+		return zbx_token_parse_func_macro(expression, macro, ptr + 2, token);
+	else if (':' == ptr[1])
+		return zbx_token_parse_simple_macro_key(expression, macro, ptr + 2, token);
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_token_find                                                   *
+ *                                                                            *
+ * Purpose: finds token {} inside expression starting at specified position   *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression                               *
+ *             pos        - [IN] the starting position                        *
+ *             token      - [OUT] the token data                              *
+ *                                                                            *
+ * Return value: SUCCEED - the token was parsed successfully                  *
+ *               FAIL    - expression does not contain valid token.           *
+ *                                                                            *
+ * Comments: The token field locations are specified as offsets from the      *
+ *           beginning of the expression.                                     *
+ *                                                                            *
+ *           Simply iterating through tokens can be done with:                *
+ *                                                                            *
+ *           zbx_token_t token = {0};                                         *
+ *                                                                            *
+ *           while (SUCCEED == zbx_token_find(expression, token.token.r + 1,  *
+ *                       &token))                                             *
+ *           {                                                                *
+ *                   process_token(expression, &token);                       *
+ *           }                                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token)
+{
+	int		ret = FAIL;
+	const char	*ptr = expression + pos;
+
+	while (SUCCEED != ret)
+	{
+		if (NULL == (ptr = strchr(ptr, '{')))
+			return FAIL;
+
+		if ('\0' == ptr[1])
+			return FAIL;
+
+		switch (ptr[1])
+		{
+			case '$':
+				ret = zbx_token_parse_user_macro(expression, ptr, token);
+				break;
+			case '#':
+				ret = zbx_token_parse_lld_macro(expression, ptr, token);
+				break;
+
+			case '{':
+				ret = zbx_token_parse_nested_macro(expression, ptr, token);
+				break;
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				if (SUCCEED == (ret = zbx_token_parse_objectid(expression, ptr, token)))
+					break;
+				/* break; is not missing here */
+			default:
+				if (SUCCEED != (ret = zbx_token_parse_macro(expression, ptr, token)))
+					ret = zbx_token_parse_simple_macro(expression, ptr, token);
+		}
+
+		ptr++;
+	}
 
 	return ret;
 }

@@ -44,6 +44,8 @@ class CImportReferencer {
 	protected $macros = [];
 	protected $proxies = [];
 	protected $hostPrototypes = [];
+	protected $httptests = [];
+	protected $httpsteps = [];
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -59,7 +61,8 @@ class CImportReferencer {
 	protected $macrosRefs;
 	protected $proxiesRefs;
 	protected $hostPrototypesRefs;
-
+	protected $httptestsRefs;
+	protected $httpstepsRefs;
 
 	/**
 	 * Get group id by name.
@@ -184,15 +187,20 @@ class CImportReferencer {
 	 *
 	 * @param string $name
 	 * @param string $expression
+	 * @param string $recovery_expression
 	 *
 	 * @return string|bool
 	 */
-	public function resolveTrigger($name, $expression) {
+	public function resolveTrigger($name, $expression, $recovery_expression) {
 		if ($this->triggersRefs === null) {
 			$this->selectTriggers();
 		}
 
-		return isset($this->triggersRefs[$name][$expression]) ? $this->triggersRefs[$name][$expression] : false;
+		return array_key_exists($name, $this->triggersRefs)
+				&& array_key_exists($expression, $this->triggersRefs[$name])
+				&& array_key_exists($recovery_expression, $this->triggersRefs[$name][$expression])
+			? $this->triggersRefs[$name][$expression][$recovery_expression]
+			: false;
 	}
 
 	/**
@@ -299,7 +307,7 @@ class CImportReferencer {
 	 */
 	public function resolveProxy($name) {
 		if ($this->proxiesRefs === null) {
-			$this->selectProxyes();
+			$this->selectProxies();
 		}
 
 		return isset($this->proxiesRefs[$name]) ? $this->proxiesRefs[$name] : false;
@@ -325,6 +333,53 @@ class CImportReferencer {
 		else {
 			return false;
 		}
+	}
+
+	/**
+	 * Get httptestid by hostid and web scenario name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveHttpTest($hostid, $name) {
+		if ($this->httptestsRefs === null) {
+			$this->selectHttpTests();
+		}
+
+		return array_key_exists($hostid, $this->httptestsRefs) && array_key_exists($name, $this->httptestsRefs[$hostid])
+			? $this->httptestsRefs[$hostid][$name]
+			: false;
+	}
+
+	/**
+	 * Get httpstepid by hostid, httptestid and web scenario step name.
+	 *
+	 * @param string $hostid
+	 * @param string $httptestid
+	 * @param string $name
+	 *
+	 * @return string|bool
+	 */
+	public function resolveHttpStep($hostid, $httptestid, $name) {
+		if ($this->httpstepsRefs === null) {
+			$this->selectHttpSteps();
+		}
+
+		if (!array_key_exists($hostid, $this->httpstepsRefs)) {
+			return false;
+		}
+
+		if (!array_key_exists($httptestid, $this->httpstepsRefs[$hostid])) {
+			return false;
+		}
+
+		if (!array_key_exists($name, $this->httpstepsRefs[$hostid][$httptestid])) {
+			return false;
+		}
+
+		return $this->httpstepsRefs[$hostid][$httptestid][$name];
 	}
 
 	/**
@@ -447,18 +502,30 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add trigger names/expressions that need association with a database trigger id.
-	 * Input array has format:
-	 * array('triggername1' => array('expr1', 'expr2'), 'triggername2' => array('expr1'), ...)
+	 * Add trigger description/expression/recovery_expression that need association with a database trigger id.
 	 *
 	 * @param array $triggers
+	 * @param array $triggers[<description>]
+	 * @param array $triggers[<description>][<expression>]
+	 * @param bool  $triggers[<description>][<expression>][<recovery_expression>]
 	 */
 	public function addTriggers(array $triggers) {
-		foreach ($triggers as $name => $expressions) {
-			if (!isset($this->triggers[$name])) {
-				$this->triggers[$name] = [];
+		foreach ($triggers as $description => $expressions) {
+			if (!array_key_exists($description, $this->triggers)) {
+				$this->triggers[$description] = [];
 			}
-			$this->triggers[$name] = array_unique(array_merge($this->triggers[$name], $expressions));
+
+			foreach ($expressions as $expression => $recovery_expressions) {
+				if (!array_key_exists($expression, $this->triggers[$description])) {
+					$this->triggers[$description][$expression] = [];
+				}
+
+				foreach ($recovery_expressions as $recovery_expression => $foo) {
+					if (!array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
+						$this->triggers[$description][$expression][$recovery_expression] = true;
+					}
+				}
+			}
 		}
 	}
 
@@ -483,10 +550,11 @@ class CImportReferencer {
 	 *
 	 * @param string $name
 	 * @param string $expression
-	 * @param string $triggerId
+	 * @param string $recovery_expression
+	 * @param string $triggerid
 	 */
-	public function addTriggerRef($name, $expression, $triggerId) {
-		$this->triggersRefs[$name][$expression] = $triggerId;
+	public function addTriggerRef($name, $expression, $recovery_expression, $triggerid) {
+		$this->triggersRefs[$name][$expression][$recovery_expression] = $triggerid;
 	}
 
 	/**
@@ -616,6 +684,45 @@ class CImportReferencer {
 				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
 					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
 				);
+			}
+		}
+	}
+
+	/**
+	 * Add web scenario names that need association with a database httptestid.
+	 *
+	 * @param array  $httptests
+	 * @param string $httptests[<host>][]	web scenario name
+	 */
+	public function addHttpTests(array $httptests) {
+		foreach ($httptests as $host => $names) {
+			if (!array_key_exists($host, $this->httptests)) {
+				$this->httptests[$host] = [];
+			}
+
+			$this->httptests[$host] = array_unique(array_merge($this->httptests[$host], $names));
+		}
+	}
+
+	/**
+	 * Add web scenario step names that need association with a database httpstepid.
+	 *
+	 * @param array  $httpsteps
+	 * @param string $httpsteps[<host>][<httptest_name>][]	web scenario step name
+	 */
+	public function addHttpSteps(array $httpsteps) {
+		foreach ($httpsteps as $host => $httptests) {
+			if (!array_key_exists($host, $this->httpsteps)) {
+				$this->httpsteps[$host] = [];
+			}
+
+			foreach ($httptests as $httptest_name => $httpstep_names) {
+				if (!array_key_exists($httptest_name, $this->httpsteps[$host])) {
+					$this->httpsteps[$host][$httptest_name] = [];
+				}
+
+				$this->httpsteps[$host][$httptest_name] =
+					array_unique(array_merge($this->httpsteps[$host][$httptest_name], $httpstep_names));
 			}
 		}
 	}
@@ -772,11 +879,11 @@ class CImportReferencer {
 	 * Select trigger ids for previously added trigger names/expressions.
 	 */
 	protected function selectTriggers() {
-		if (!empty($this->triggers)) {
+		if ($this->triggers) {
 			$this->triggersRefs = [];
 
 			$dbTriggers = API::Trigger()->get([
-				'output' => ['triggerid', 'expression', 'description'],
+				'output' => ['triggerid', 'expression', 'description', 'recovery_expression'],
 				'filter' => [
 					'description' => array_keys($this->triggers),
 					'flags' => [
@@ -787,11 +894,19 @@ class CImportReferencer {
 				]
 			]);
 
-			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
+			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers,
+				['sources' => ['expression', 'recovery_expression']]
+			);
 
 			foreach ($dbTriggers as $dbTrigger) {
-				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
-					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
+				$description = $dbTrigger['description'];
+				$expression = $dbTrigger['expression'];
+				$recovery_expression = $dbTrigger['recovery_expression'];
+
+				if (array_key_exists($description, $this->triggers)
+						&& array_key_exists($expression, $this->triggers[$description])
+						&& array_key_exists($recovery_expression, $this->triggers[$description][$expression])) {
+					$this->triggersRefs[$description][$expression][$recovery_expression] = $dbTrigger['triggerid'];
 				}
 			}
 		}
@@ -947,7 +1062,7 @@ class CImportReferencer {
 	/**
 	 * Select proxy ids for previously added proxy names.
 	 */
-	protected function selectProxyes() {
+	protected function selectProxies() {
 		if (!empty($this->proxies)) {
 			$this->proxiesRefs = [];
 			$dbProxy = API::Proxy()->get([
@@ -992,6 +1107,82 @@ class CImportReferencer {
 				);
 				while ($data = DBfetch($query)) {
 					$this->hostPrototypesRefs[$data['parent_hostid']][$data['parent_itemid']][$data['host']] = $data['hostid'];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Select httptestids for previously added web scenario names.
+	 */
+	protected function selectHttpTests() {
+		if ($this->httptests) {
+			$this->httptestsRefs = [];
+
+			$sql_where = [];
+
+			foreach ($this->httptests as $host => $names) {
+				$hostid = $this->resolveHostOrTemplate($host);
+
+				if ($hostid !== false) {
+					$sql_where[] = '(ht.hostid='.zbx_dbstr($hostid).' AND '.dbConditionString('ht.name', $names).')';
+				}
+			}
+
+			if ($sql_where) {
+				$db_httptests = DBselect(
+					'SELECT ht.hostid,ht.name,ht.httptestid'.
+					' FROM httptest ht'.
+					' WHERE '.implode(' OR ', $sql_where)
+				);
+				while ($db_httptest = DBfetch($db_httptests)) {
+					$this->httptestsRefs[$db_httptest['hostid']][$db_httptest['name']] = $db_httptest['httptestid'];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Unset web scenario refs to make referencer select them from db again.
+	 */
+	public function refreshHttpTests() {
+		$this->httptestsRefs = null;
+	}
+
+	/**
+	 * Select httpstepids for previously added web scenario step names.
+	 */
+	protected function selectHttpSteps() {
+		if ($this->httpsteps) {
+			$this->httpstepsRefs = [];
+
+			$sql_where = [];
+
+			foreach ($this->httpsteps as $host => $httptests) {
+				$hostid = $this->resolveHostOrTemplate($host);
+
+				if ($hostid !== false) {
+					foreach ($httptests as $httptest_name => $httpstep_names) {
+						$httptestid = $this->resolveHttpTest($hostid, $httptest_name);
+
+						if ($httptestid !== false) {
+							$sql_where[] = '(hs.httptestid='.zbx_dbstr($httptestid).
+								' AND '.dbConditionString('hs.name', $httpstep_names).')';
+						}
+					}
+				}
+			}
+
+			if ($sql_where) {
+				$db_httpsteps = DBselect(
+					'SELECT ht.hostid,hs.httptestid,hs.name,hs.httpstepid'.
+					' FROM httptest ht,httpstep hs'.
+					' WHERE ht.httptestid=hs.httptestid'.
+						' AND '.implode(' OR ', $sql_where)
+				);
+				while ($db_httpstep = DBfetch($db_httpsteps)) {
+					$this->httpstepsRefs[$db_httpstep['hostid']][$db_httpstep['httptestid']][$db_httpstep['name']] =
+						$db_httpstep['httpstepid'];
 				}
 			}
 		}

@@ -59,6 +59,7 @@ typedef struct
 	int		esc_period;
 	unsigned char	eventsource;
 	unsigned char	recovery_msg;
+	unsigned char	maintenance_mode;
 }
 DB_ACTION;
 
@@ -319,9 +320,9 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		subject_dyn = zbx_strdup(NULL, subject);
 		message_dyn = zbx_strdup(NULL, message);
 
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
 				&subject_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
-		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL, NULL,
+		substitute_simple_macros(&actionid, event, NULL, &userid, NULL, NULL, NULL, NULL,
 				&message_dyn, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 
 		add_user_msg(userid, mediatypeid, user_msg, subject_dyn, message_dyn);
@@ -587,7 +588,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 		if (ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT != script.type)
 		{
 			script.command = zbx_strdup(script.command, row[11]);
-			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&actionid, event, NULL, NULL, NULL, NULL, NULL, NULL,
 					&script.command, MACRO_TYPE_MESSAGE_NORMAL, NULL, 0);
 		}
 
@@ -900,7 +901,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 	{
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.operationid,m.default_msg,subject,message,mediatypeid"
+					"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
 				" from operations o"
 					" left join opmessage m"
 						" on m.operationid=o.operationid"
@@ -915,7 +916,7 @@ static void	execute_operations(DB_ESCALATION *escalation, DB_EVENT *event, DB_AC
 
 		result = DBselect(
 				"select o.operationid,o.operationtype,o.esc_period,o.evaltype,"
-					"m.operationid,m.default_msg,subject,message,mediatypeid"
+					"m.operationid,m.default_msg,m.subject,m.message,m.mediatypeid"
 				" from operations o"
 					" left join opmessage m"
 						" on m.operationid=o.operationid"
@@ -1080,9 +1081,9 @@ static void	process_recovery_msg(DB_ESCALATION *escalation, DB_EVENT *event, DB_
 			subject_dyn = zbx_strdup(NULL, action->r_shortdata);
 			message_dyn = zbx_strdup(NULL, action->r_longdata);
 
-			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
 					NULL, &subject_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
-			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL, NULL,
+			substitute_simple_macros(&action->actionid, event, r_event, &userid, NULL, NULL, NULL,
 					NULL, &message_dyn, MACRO_TYPE_MESSAGE_RECOVERY, NULL, 0);
 
 			escalation->esc_step = 0;
@@ -1136,7 +1137,7 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		res = FAIL;
+	int		ret = FAIL;
 
 	memset(event, 0, sizeof(DB_EVENT));
 
@@ -1145,43 +1146,66 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
 			" where eventid=" ZBX_FS_UI64,
 			eventid);
 
-	if (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(event->eventid, row[0]);
-		event->source = atoi(row[1]);
-		event->object = atoi(row[2]);
-		ZBX_STR2UINT64(event->objectid, row[3]);
-		event->clock = atoi(row[4]);
-		event->value = atoi(row[5]);
-		event->acknowledged = atoi(row[6]);
-		event->ns = atoi(row[7]);
+	if (NULL == (row = DBfetch(result)))
+		goto out;
 
-		res = SUCCEED;
+	ZBX_STR2UINT64(event->eventid, row[0]);
+	event->source = atoi(row[1]);
+	event->object = atoi(row[2]);
+	ZBX_STR2UINT64(event->objectid, row[3]);
+	event->clock = atoi(row[4]);
+	event->value = atoi(row[5]);
+	event->acknowledged = atoi(row[6]);
+	event->ns = atoi(row[7]);
+
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_create(&event->tags);
+
+		DBfree_result(result);
+
+		result = DBselect("select tag,value from event_tag where eventid=" ZBX_FS_UI64, eventid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			zbx_tag_t	*tag;
+
+			tag = zbx_malloc(NULL, sizeof(zbx_tag_t));
+			tag->tag = zbx_strdup(NULL, row[0]);
+			tag->value = zbx_strdup(NULL, row[1]);
+
+			zbx_vector_ptr_append(&event->tags, tag);
+		}
 	}
-	DBfree_result(result);
 
-	if (SUCCEED == res && EVENT_OBJECT_TRIGGER == event->object)
+	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
-		result = DBselect("select description,expression,priority,comments,url"
+		DBfree_result(result);
+
+		result = DBselect(
+				"select description,expression,priority,comments,url,recovery_expression,recovery_mode"
 				" from triggers"
 				" where triggerid=" ZBX_FS_UI64,
 				event->objectid);
 
-		if (NULL != (row = DBfetch(result)))
-		{
-			event->trigger.triggerid = event->objectid;
-			event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
-			event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
-			event->trigger.priority = (unsigned char)atoi(row[2]);
-			event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
-			event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
-		}
-		else
-			res = FAIL;
-		DBfree_result(result);
+		if (NULL == (row = DBfetch(result)))
+			goto out;
+
+		event->trigger.triggerid = event->objectid;
+		event->trigger.description = zbx_strdup(event->trigger.description, row[0]);
+		event->trigger.expression = zbx_strdup(event->trigger.expression, row[1]);
+		ZBX_STR2UCHAR(event->trigger.priority, row[2]);
+		event->trigger.comments = zbx_strdup(event->trigger.comments, row[3]);
+		event->trigger.url = zbx_strdup(event->trigger.url, row[4]);
+		event->trigger.recovery_expression = zbx_strdup(event->trigger.recovery_expression, row[5]);
+		ZBX_STR2UCHAR(event->trigger.recovery_mode, row[6]);
 	}
 
-	return res;
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1197,10 +1221,17 @@ static int	get_event_info(zbx_uint64_t eventid, DB_EVENT *event)
  ******************************************************************************/
 static void	free_event_info(DB_EVENT *event)
 {
+	if (EVENT_SOURCE_TRIGGERS == event->source)
+	{
+		zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
+		zbx_vector_ptr_destroy(&event->tags);
+	}
+
 	if (EVENT_OBJECT_TRIGGER == event->object)
 	{
 		zbx_free(event->trigger.description);
 		zbx_free(event->trigger.expression);
+		zbx_free(event->trigger.recovery_expression);
 		zbx_free(event->trigger.comments);
 		zbx_free(event->trigger.url);
 	}
@@ -1213,21 +1244,30 @@ static void	free_event_info(DB_EVENT *event)
  * Purpose: check whether the escalation trigger and related items, hosts are *
  *          not deleted or disabled.                                          *
  *                                                                            *
- * Parameters: triggerid - [IN] the id of trigger to check                    *
- *             source    - [IN] the esclation event source                    *
- *             error     - [OUT] message in case escalation is cancelled      *
+ * Parameters: triggerid   - [IN] the id of trigger to check                  *
+ *             source      - [IN] the escalation event source                 *
+ *             ignore      - [OUT] 1 - the escalation must be ignored because *
+ *                                     of dependent trigger being in PROBLEM  *
+ *                                     state,                                 *
+ *                                 0 - otherwise                              *
+ *             maintenance - [OUT] HOST_MAINTENANCE_STATUS_ON - if at least   *
+ *                                 one of hosts used in expression is in      *
+ *                                 maintenance mode,                          *
+ *                                 HOST_MAINTENANCE_STATUS_OFF - otherwise    *
+ *             error       - [OUT] message in case escalation is cancelled    *
  *                                                                            *
  * Return value: FAIL if dependent trigger is in PROBLEM state                *
  *               SUCCEED otherwise                                            *
  *                                                                            *
  ******************************************************************************/
-static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source, char **error)
+static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source, unsigned char *ignore,
+		unsigned char *maintenance, char **error)
 {
 	DC_TRIGGER		trigger;
 	zbx_vector_uint64_t	functionids, itemids;
 	DC_ITEM			*items = NULL;
 	DC_FUNCTION		*functions = NULL;
-	int			i, errcode, *errcodes = NULL, ret = SUCCEED;
+	int			i, errcode, *errcodes = NULL, ret = FAIL;
 
 	/* trigger disabled or deleted? */
 	DCconfig_get_triggers_by_triggerids(&trigger, &triggerid, &errcode, 1);
@@ -1244,7 +1284,11 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	}
 
 	if (EVENT_SOURCE_TRIGGERS != source)
+	{
+		/* don't check dependency for internal trigger events */
+		ret = SUCCEED;
 		goto out;
+	}
 
 	/* check items and hosts referenced by trigger expression */
 	zbx_vector_uint64_create(&functionids);
@@ -1274,10 +1318,15 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 
 	DCconfig_get_items_by_itemids(items, itemids.values, errcodes, itemids.values_num);
 
+	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
+
 	for (i = 0; i < itemids.values_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
-			continue;
+		{
+			*error = zbx_dsprintf(*error, "item id:" ZBX_FS_UI64 " deleted.", itemids.values[i]);
+			break;
+		}
 
 		if (ITEM_STATUS_DISABLED == items[i].status)
 		{
@@ -1289,6 +1338,9 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 			*error = zbx_dsprintf(*error, "host \"%s\" disabled.", items[i].host.host);
 			break;
 		}
+
+		if (HOST_MAINTENANCE_STATUS_ON == items[i].host.maintenance_status)
+			*maintenance = HOST_MAINTENANCE_STATUS_ON;
 	}
 
 	DCconfig_clean_items(items, errcodes, itemids.values_num);
@@ -1298,7 +1350,12 @@ static int	check_escalation_trigger(zbx_uint64_t triggerid, unsigned char source
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_uint64_destroy(&functionids);
 
-	ret = DCconfig_check_trigger_dependencies(trigger.triggerid);
+	if (NULL != *error)
+		goto out;
+
+	*ignore = (SUCCEED == DCconfig_check_trigger_dependencies(trigger.triggerid) ? 0 : 1);
+
+	ret = SUCCEED;
 out:
 	DCconfig_clean_triggers(&trigger, &errcode, 1);
 
@@ -1313,21 +1370,24 @@ out:
  *          hosts, and actions are still present and were not disabled)       *
  *                                                                            *
  * Parameters: escalation - [IN] escalation data                              *
- *             action     - [OUT] action data (optional)                      *
+ *             action     - [OUT] action data                                 *
+ *             skip       - [OUT] 1 if the escalation must be skipped,        *
+ *                                0 otherwise                                 *
  *             error      - [OUT] message in case escalation is cancelled     *
  *                                                                            *
- * Comments: If 'action' is not NULL, it gathers information about it. If     *
- *           information could not be gathered, its 'actionid' is set to 0.   *
+ * Comments: 'action' is filled with information about action. If information *
+ *           could not be gathered, 'action->actionid' is set to 0.           *
  *                                                                            *
  ******************************************************************************/
-static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, char **error)
+static int	check_escalation(const DB_ESCALATION *escalation, unsigned char *skip, unsigned char *maintenance,
+		char **error)
 {
 	const char	*__function_name = "check_escalation";
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	source = 0xff, object = 0xff;
 	DC_ITEM		item;
-	int		errcode, ret = SUCCEED;
+	int		errcode, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
@@ -1341,14 +1401,18 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 	else
 	{
 		*error = zbx_dsprintf(*error, "event id:" ZBX_FS_UI64 " deleted.", escalation->eventid);
+		goto out;
 	}
 
-	DBfree_result(result);
+	*skip = 0;
+	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
 
-	if (NULL == *error && EVENT_OBJECT_TRIGGER == object)
-		ret = check_escalation_trigger(escalation->triggerid, source, error);
-
-	if (NULL == *error && EVENT_SOURCE_INTERNAL == source)
+	if (EVENT_OBJECT_TRIGGER == object)
+	{
+		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, skip, maintenance, error))
+			goto out;
+	}
+	else if (EVENT_SOURCE_INTERNAL == source)
 	{
 		if (EVENT_OBJECT_ITEM == object || EVENT_OBJECT_LLDRULE == object)
 		{
@@ -1367,44 +1431,18 @@ static int	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action, 
 			{
 				*error = zbx_dsprintf(*error, "host \"%s\" disabled.", item.host.host);
 			}
+			else
+				*maintenance = item.host.maintenance_status;
 
 			DCconfig_clean_items(&item, &errcode, 1);
+
+			if (NULL != *error)
+				goto out;
 		}
 	}
 
-	result = DBselect(
-			"select actionid,name,status%s"
-			" from actions"
-			" where actionid=" ZBX_FS_UI64,
-			NULL == action ? "" : ",eventsource,esc_period"
-				",def_shortdata,def_longdata,r_shortdata,r_longdata,recovery_msg",
-			escalation->actionid);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		if (ACTION_STATUS_ACTIVE != atoi(row[2]))
-			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
-
-		if (NULL != action)
-		{
-			memset(action, 0, sizeof(*action));
-			ZBX_STR2UINT64(action->actionid, row[0]);
-			action->eventsource = atoi(row[3]);
-			action->esc_period = atoi(row[4]);
-			action->shortdata = zbx_strdup(NULL, row[5]);
-			action->longdata = zbx_strdup(NULL, row[6]);
-			action->r_shortdata = zbx_strdup(NULL, row[7]);
-			action->r_longdata = zbx_strdup(NULL, row[8]);
-			action->recovery_msg = atoi(row[9]);
-		}
-	}
-	else
-	{
-		if (NULL != action)
-			action->actionid = 0;
-
-		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", escalation->actionid);
-	}
+	ret = SUCCEED;
+out:
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error: '%s'", __function_name, zbx_result_string(ret),
@@ -1471,30 +1509,120 @@ static void	execute_escalation(DB_ESCALATION *escalation, DB_ACTION *action, con
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	free_db_action(DB_ACTION *action)
+/******************************************************************************
+ *                                                                            *
+ * Function: check_db_action                                                  *
+ *                                                                            *
+ * Purpose: read action from database and validates it                        *
+ *                                                                            *
+ * Parameters: actionid - [IN] the action identifier                          *
+ *             action   - [OUT] action data                                   *
+ *             error    - [OUT] message if action was disabled or deleted     *
+ *                                                                            *
+ * Return value: SUCEED - the action exists and is active                     *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_db_action(zbx_uint64_t actionid, DB_ACTION *action, char **error)
 {
-	zbx_free(action->shortdata);
-	zbx_free(action->longdata);
-	zbx_free(action->r_shortdata);
-	zbx_free(action->r_longdata);
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = SUCCEED;
+
+	result = DBselect(
+			"select actionid,name,status,eventsource,esc_period,def_shortdata,def_longdata,r_shortdata,"
+				"r_longdata,recovery_msg,maintenance_mode"
+			" from actions"
+			" where actionid=" ZBX_FS_UI64,
+			actionid);
+
+	if (NULL != (row = DBfetch(result)))
+	{
+		if (ACTION_STATUS_ACTIVE != atoi(row[2]))
+		{
+			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
+			ret = FAIL;
+		}
+
+		ZBX_STR2UINT64(action->actionid, row[0]);
+		ZBX_STR2UCHAR(action->eventsource, row[3]);
+		action->esc_period = atoi(row[4]);
+		action->shortdata = zbx_strdup(NULL, row[5]);
+		action->longdata = zbx_strdup(NULL, row[6]);
+		action->r_shortdata = zbx_strdup(NULL, row[7]);
+		action->r_longdata = zbx_strdup(NULL, row[8]);
+		ZBX_STR2UCHAR(action->recovery_msg, row[9]);
+		ZBX_STR2UCHAR(action->maintenance_mode, row[10]);
+	}
+	else
+	{
+		action->actionid = 0;
+		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", actionid);
+		ret = FAIL;
+	}
+
+	DBfree_result(result);
+
+	return ret;
 }
 
+static void	free_db_action(DB_ACTION *action)
+{
+	if (0 != action->actionid)
+	{
+		zbx_free(action->shortdata);
+		zbx_free(action->longdata);
+		zbx_free(action->r_shortdata);
+		zbx_free(action->r_longdata);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_escalations                                              *
+ *                                                                            *
+ * Purpose: execute escalations;                                              *
+ *          postpone escalations during maintenance;                          *
+ *          delete completed or superseded escalations from the database.     *
+ *                                                                            *
+ * Parameters: now               - [IN]  the current time                     *
+ *             nextcheck         - [OUT] time of the next invocation          *
+ *             escalation_source - [IN]  type of escalations to be handled    *
+ *                                                                            *
+ * Return value: the count of deleted escalations                             *
+ *                                                                            *
+ ******************************************************************************/
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
 {
 	const char		*__function_name = "process_escalations";
 	DB_RESULT		result;
 	DB_ROW			row;
+
 	DB_ESCALATION		escalation, last_escalation;
+
 	zbx_vector_uint64_t	escalationids;
+	int			res;
+
 	char			*sql = NULL, *filter = NULL;
 	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset, filter_alloc = 0, filter_offset = 0;
-	int			res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&escalationids);
 	sql = zbx_malloc(sql, sql_alloc);
 
+	/* Selection of escalations to be processed:                                                          */
+	/*                                                                                                    */
+	/* e - row in escalations table, E - escalations table, S - ordered* set of escalations to be proc.   */
+	/*                                                                                                    */
+	/* ZBX_ESCALATION_SOURCE_TRIGGER: S = {e in E | e.triggerid    mod process_num == 0}                  */
+	/* ZBX_ESCALATION_SOURCE_ITEM::   S = {e in E | e.itemid       mod process_num == 0}                  */
+	/* ZBX_ESCALATION_SOURCE_TRIGGER: S = {e in E | e.escalationid mod process_num == 0}                  */
+	/*                                                                                                    */
+	/* Note that each escalator always handles all escalations from the same triggers and items.          */
+	/* The rest of the escalations (e.g. not trigger or item based) are spread evenly between escalators. */
+	/*                                                                                                    */
+	/* * by e.actionid, e.triggerid, e.itemid, e.escalationid                                             */
 	switch (escalation_source)
 	{
 		case ZBX_ESCALATION_SOURCE_TRIGGER:
@@ -1537,13 +1665,20 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
 	memset(&escalation, 0, sizeof(escalation));
 
-	/* we read escalations into @last_escalation variable and process @escalation, which was previously read */
+	/* Some decisions can be made only by looking at the next escalation.           */
+	/*                                                                              */
+	/* cur_esc:  (i - 1)-th escalation in the ordered set of selected escalations.  */
+	/* next_esc: i-th escalation.                                                   */
+	/*                                                                              */
+	/* During the first iteration cur_esc is not defined.                           */
+	/* During the last iteration next_esc is not defined.                           */
 	do
 	{
 		unsigned char	esc_superseded = 0;
 
 		memset(&last_escalation, 0, sizeof(last_escalation));
 
+		/* not the last iteration */
 		if (NULL != (row = DBfetch(result)))
 		{
 			ZBX_STR2UINT64(last_escalation.escalationid, row[0]);
@@ -1561,22 +1696,23 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				last_escalation.status = ESCALATION_STATUS_COMPLETED;
 		}
 
+		/* first iteration, copy next_esc to cur_esc and continue */
 		if (0 == escalation.escalationid)
 			goto next;
 
 		if (ESCALATION_STATUS_COMPLETED == escalation.status)
 		{
-			/* delete a recovery record and skip all processing */
+			/* delete a recovery escalation and skip all processing */
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
 			goto next;
 		}
 
-		/* handle superseded escalations (multiple problem events) */
+		/* if there is a next escalation in the set then check if it supersedes the current one */
 		if (0 != last_escalation.escalationid)
 		{
 			esc_superseded = (escalation.actionid == last_escalation.actionid &&
-					escalation.triggerid == last_escalation.triggerid &&
-					escalation.itemid == last_escalation.itemid);
+				escalation.triggerid == last_escalation.triggerid &&
+				escalation.itemid == last_escalation.itemid);
 
 			if (0 != esc_superseded)
 			{
@@ -1594,28 +1730,68 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			}
 		}
 
+		/* if it is time to handle the cur_esc or if cur_esc is a recovery escalation */
 		if (escalation.nextcheck <= now || 0 != escalation.r_eventid)
 		{
 			DB_ACTION	action;
 			char		*error = NULL;
+			unsigned char	skip, maintenance;
+			int		escalation_rc;
+
+			if (SUCCEED == (escalation_rc = check_db_action(escalation.actionid, &action, &error)))
+				escalation_rc = check_escalation(&escalation, &skip, &maintenance, &error);
+
+			if (FAIL != escalation_rc)
+			{
+				if (EVENT_SOURCE_TRIGGERS == action.eventsource &&
+						ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
+						HOST_MAINTENANCE_STATUS_ON == maintenance)
+				{
+					/* remove paused escalations that were created and recovered/cancelled */
+					/* during maintenance period                                           */
+					if (0 == escalation.esc_step && 0 != escalation.r_eventid)
+					{
+						zbx_vector_uint64_append(&escalationids,
+								escalation.escalationid);
+						free_db_action(&action);
+						goto next;
+					}
+
+					/* skip paused escalations created before maintenance period */
+					/* until maintenance ends or the escalations are recovered     */
+					if (0 == escalation.r_eventid)
+					{
+						free_db_action(&action);
+						goto next;
+					}
+				}
+
+				if (0 != skip)
+				{
+					/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
+					/* it normally in order to send notification about the error otherwise we     */
+					/* skip the escalation until dependable trigger changes value to OK.          */
+					free_db_action(&action);
+					goto next;
+				}
+			}
+			else
+			{
+				/* remove not started and cancelled escalations */
+				if (0 == escalation.esc_step)
+				{
+					zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+					free_db_action(&action);
+					zbx_free(error);
+					goto next;
+				}
+			}
 
 			DBbegin();
 
 			sql_offset = 0;
 
-			if (SUCCEED != check_escalation(&escalation, &action, &error))
-			{
-				/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
-				/* it normally in order to send notification about the error otherwise we     */
-				/* skip the escalation until dependable trigger changes value to OK.          */
-				if (NULL == error)
-				{
-					DBrollback();
-					free_db_action(&action);
-					goto next;
-				}
-			}
-
+			/* process or postpone the escalation */
 			if (ESCALATION_STATUS_ACTIVE == escalation.status)
 			{
 				if (escalation.nextcheck <= now)
@@ -1635,15 +1811,17 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 				if (ESCALATION_STATUS_COMPLETED != escalation.status)
 				{
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"update escalations set status=%d", escalation.status);
+						"update escalations set status=%d", escalation.status);
+
 					if (ESCALATION_STATUS_ACTIVE == escalation.status)
 					{
 						zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 								",esc_step=%d,nextcheck=%d",
 								escalation.esc_step, escalation.nextcheck);
 					}
+
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							" where escalationid=" ZBX_FS_UI64, escalation.escalationid);
+						" where escalationid=" ZBX_FS_UI64, escalation.escalationid);
 				}
 				else
 				{
@@ -1652,7 +1830,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 							escalation.escalationid);
 				}
 			}
-			else	/* ESCALATION_STATUS_SLEEP == escalation.status */
+			else	/* ESCALATION_STATUS_SLEEP == cur_esc.status */
 			{
 				if (NULL != error)
 				{

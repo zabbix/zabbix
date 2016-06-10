@@ -160,7 +160,10 @@ class CXmlExportWriter extends CExportWriter {
 			'links' => 'link',
 			'linktriggers' => 'linktrigger',
 			'value_maps' => 'value_map',
-			'mappings' => 'mapping'
+			'mappings' => 'mapping',
+			'httptests' => 'httptest',
+			'steps' => 'step',
+			'tags' => 'tag'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

@@ -96,8 +96,6 @@ const char	*zbx_result_string(int result);
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
 
-#define ZBX_DM_DELIMITER	'\255'
-
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
 
@@ -107,6 +105,15 @@ typedef struct
 	int	ns;	/* nanoseconds */
 }
 zbx_timespec_t;
+
+/* time zone offset */
+typedef struct
+{
+	char	tz_sign;	/* '+' or '-' */
+	int	tz_hour;
+	int	tz_min;
+}
+zbx_timezone_t;
 
 #define zbx_timespec_compare(t1, t2)	\
 	((t1)->sec == (t2)->sec ? (t1)->ns - (t2)->ns : (t1)->sec - (t2)->sec)
@@ -317,6 +324,8 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_NAME		22
 #define CONDITION_TYPE_EVENT_TYPE		23
 #define CONDITION_TYPE_HOST_METADATA		24
+#define CONDITION_TYPE_EVENT_TAG		25
+#define CONDITION_TYPE_EVENT_TAG_VALUE		26
 
 /* condition operators */
 #define CONDITION_OPERATOR_EQUAL		0
@@ -537,6 +546,7 @@ zbx_maintenance_type_t;
 #define TRIGGER_VALUE_OK		0
 #define TRIGGER_VALUE_PROBLEM		1
 #define TRIGGER_VALUE_UNKNOWN		2	/* only in server code, never in DB */
+#define TRIGGER_VALUE_NONE		3	/* only in server code, never in DB */
 const char	*zbx_trigger_value_string(unsigned char value);
 
 /* trigger states */
@@ -552,6 +562,11 @@ const char	*zbx_trigger_state_string(unsigned char state);
 #define TRIGGER_SEVERITY_HIGH		4
 #define TRIGGER_SEVERITY_DISASTER	5
 #define TRIGGER_SEVERITY_COUNT		6	/* number of trigger severities */
+
+/* trigger recovery mode */
+#define TRIGGER_RECOVERY_MODE_EXPRESSION		0
+#define TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION	1
+#define TRIGGER_RECOVERY_MODE_NONE			2
 
 #define ITEM_LOGTYPE_INFORMATION	1
 #define ITEM_LOGTYPE_WARNING		2
@@ -569,6 +584,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* action statuses */
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
+
+/* action maintenance mode */
+#define ACTION_MAINTENANCE_MODE_NORMAL	0	/* ignore maintenance */
+#define ACTION_MAINTENANCE_MODE_PAUSE	1	/* pause escalation while host is in maintenance */
 
 /* max number of retries for alerts */
 #define ALERT_MAX_RETRIES	3
@@ -905,11 +924,16 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
+#define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
+
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
 double	zbx_current_time(void);
+void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
+int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
+int	zbx_day_in_month(int year, int mon);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -1146,5 +1170,95 @@ int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr
 unsigned int	zbx_alarm_on(unsigned int seconds);
 unsigned int	zbx_alarm_off(void);
 #endif
+
+#define zbx_bsearch(key, base, nmemb, size, compar)	(0 == (nmemb) ? NULL : bsearch(key, base, nmemb, size, compar))
+
+int	zbx_strcmp_natural(const char *s1, const char *s2);
+
+/* {} tokens used in expressions */
+#define ZBX_TOKEN_OBJECTID	0x0001
+#define ZBX_TOKEN_MACRO		0x0002
+#define ZBX_TOKEN_LLD_MACRO	0x0004
+#define ZBX_TOKEN_USER_MACRO	0x0008
+#define ZBX_TOKEN_FUNC_MACRO	0x0010
+#define ZBX_TOKEN_SIMPLE_MACRO	0x0020
+
+/* additional token flags */
+#define ZBX_TOKEN_NUMERIC	0x8000
+
+/* location of a substring */
+typedef struct
+{
+	/* left position */
+	size_t	l;
+	/* right position */
+	size_t	r;
+}
+zbx_strloc_t;
+
+/* data used by macros, ldd macros and objectid tokens */
+typedef struct
+{
+	zbx_strloc_t	name;
+}
+zbx_token_macro_t;
+
+/* data used by user macros */
+typedef struct
+{
+	/* macro name */
+	zbx_strloc_t	name;
+	/* macro context, for macros without context the context.l and context.r fields are set to 0 */
+	zbx_strloc_t	context;
+}
+zbx_token_user_macro_t;
+
+/* data used by macro functions */
+typedef struct
+{
+	/* the macro including the opening and closing brackets {}, for example: {ITEM.VALUE} */
+	zbx_strloc_t	macro;
+	/* function + parameters, for example: regsub("([0-9]+)", \1) */
+	zbx_strloc_t	func;
+}
+zbx_token_func_macro_t;
+
+/* data used by simple (host:key) macros */
+typedef struct
+{
+	/* host name, supporting simple macros as a host name, for example Zabbix server or {HOST.HOST} */
+	zbx_strloc_t	host;
+	/* key + parameters, supporting {ITEM.KEYn} macro, for example system.uname or {ITEM.KEY1}  */
+	zbx_strloc_t	key;
+	/* function + parameters, for example avg(5m) */
+	zbx_strloc_t	func;
+}
+zbx_token_simple_macro_t;
+
+/* the token type specific data */
+typedef union
+{
+	zbx_token_macro_t		objectid;
+	zbx_token_macro_t		macro;
+	zbx_token_macro_t		lld_macro;
+	zbx_token_user_macro_t		user_macro;
+	zbx_token_func_macro_t		func_macro;
+	zbx_token_simple_macro_t	simple_macro;
+}
+zbx_token_data_t;
+
+/* {} token data */
+typedef struct
+{
+	/* token type, see ZBX_TOKEN_ defines */
+	int			type;
+	/* the token location in expression including opening and closing brackets {} */
+	zbx_strloc_t		token;
+	/* the token type specific data */
+	zbx_token_data_t	data;
+}
+zbx_token_t;
+
+int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
 
 #endif

@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0rc2');
-define('ZABBIX_API_VERSION',	'3.0.0');
-define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		3000000);
+define('ZABBIX_VERSION',		'3.1.0');
+define('ZABBIX_API_VERSION',	'3.1.0');
+define('ZABBIX_EXPORT_VERSION',	'3.2');
+define('ZABBIX_DB_VERSION',		3010021);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -218,6 +218,8 @@ define('CONDITION_TYPE_DOBJECT',			21);
 define('CONDITION_TYPE_HOST_NAME',			22);
 define('CONDITION_TYPE_EVENT_TYPE',			23);
 define('CONDITION_TYPE_HOST_METADATA',		24);
+define('CONDITION_TYPE_EVENT_TAG',			25);
+define('CONDITION_TYPE_EVENT_TAG_VALUE',	26);
 
 define('CONDITION_OPERATOR_EQUAL',		0);
 define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -438,7 +440,7 @@ define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
 define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
 define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
-define('SERVICE_SLA', 99.05);
+define('SERVICE_SLA', '99.9000');
 
 define('SERVICE_SHOW_SLA_OFF',	0);
 define('SERVICE_SHOW_SLA_ON',	1);
@@ -447,6 +449,10 @@ define('SERVICE_STATUS_OK', 0);
 
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
+
+define('ZBX_RECOVERY_MODE_EXPRESSION',			0);
+define('ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION',	1);
+define('ZBX_RECOVERY_MODE_NONE',				2);
 
 define('TRIGGER_STATUS_ENABLED',	0);
 define('TRIGGER_STATUS_DISABLED',	1);
@@ -518,6 +524,9 @@ define('ACTION_DEFAULT_MSG_DISCOVERY', "Discovery rule: {DISCOVERY.RULE.NAME}\n\
 define('ACTION_STATUS_ENABLED',		0);
 define('ACTION_STATUS_DISABLED',	1);
 
+define('ACTION_MAINTENANCE_MODE_NORMAL',	0);
+define('ACTION_MAINTENANCE_MODE_PAUSE',		1);
+
 define('OPERATION_TYPE_MESSAGE',		0);
 define('OPERATION_TYPE_COMMAND',		1);
 define('OPERATION_TYPE_HOST_ADD',		2);
@@ -559,7 +568,9 @@ define('SCREEN_RESOURCE_CHART',				18);
 define('SCREEN_RESOURCE_LLD_SIMPLE_GRAPH',	19);
 define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 // used in Monitoring > Web > Details (httpdetails.php)
-define('SCREEN_RESOURCE_HTTPTEST_DETAILS',		21);
+define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
+// used in Monitoring > Discovery
+define('SCREEN_RESOURCE_DISCOVERY',			22);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -587,6 +598,9 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 define('SCREEN_SURROGATE_MAX_COLUMNS_MIN', 1);
 define('SCREEN_SURROGATE_MAX_COLUMNS_DEFAULT', 3);
 define('SCREEN_SURROGATE_MAX_COLUMNS_MAX', 100);
+
+define('SCREEN_MIN_SIZE', 1);
+define('SCREEN_MAX_SIZE', 100);
 
 define('DEFAULT_LATEST_ISSUES_CNT', 20);
 
@@ -795,6 +809,9 @@ define('IM_FORCED',			0);
 define('IM_ESTABLISHED',	1);
 define('IM_TREE',			2);
 
+define('TRIGGER_EXPRESSION',			0);
+define('TRIGGER_RECOVERY_EXPRESSION',	1);
+
 define('EXPRESSION_TYPE_INCLUDED',		0);
 define('EXPRESSION_TYPE_ANY_INCLUDED',	1);
 define('EXPRESSION_TYPE_NOT_INCLUDED',	2);
@@ -829,11 +846,10 @@ define('ZBX_BYTE_SUFFIXES', 'KMGT');
 define('ZBX_TIME_SUFFIXES', 'smhdw');
 
 // preg
-define('ZBX_PREG_PRINT', '^\x{00}-\x{1F}');
+define('ZBX_PREG_PRINT', '^\x00-\x1F');
 define('ZBX_PREG_MACRO_NAME', '([A-Z0-9\._]+)');
 define('ZBX_PREG_MACRO_NAME_LLD', '([A-Z0-9\._]+)');
 define('ZBX_PREG_INTERNAL_NAMES', '([0-9a-zA-Z_\. \-]+)'); // !!! Don't forget sync code with C !!!
-define('ZBX_PREG_PARAMS', '(['.ZBX_PREG_PRINT.']+?)?');
 define('ZBX_PREG_NUMBER', '([\-+]?[0-9]+[.]?[0-9]*['.ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES.']?)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
@@ -1257,3 +1273,6 @@ ini_set('precision', 14);
 if (function_exists('bcscale')) {
 	bcscale(7);
 }
+
+// Maximum number of tags to display in events list.
+define('EVENTS_LIST_TAGS_COUNT', 3);

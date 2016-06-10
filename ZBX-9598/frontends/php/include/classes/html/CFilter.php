@@ -135,15 +135,15 @@ class CFilter extends CTag {
 			return null;
 		}
 
-		$url = new CUrl();
-		$url->removeArgument('filter_set');
-		$url->removeArgument('ddreset');
-		$url->setArgument('filter_rst', 1);
+		$url = (new CUrl())
+			->removeArgument('filter_set')
+			->removeArgument('ddreset')
+			->setArgument('filter_rst', 1);
 
 		return (new CDiv())
 			->addClass(ZBX_STYLE_FILTER_FORMS)
 			->addItem(
-				(new CSubmit('filter_set', _('Filter')))
+				(new CSubmit('filter_set', _x('Filter', 'filter button')))
 					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 			)
 			->addItem(

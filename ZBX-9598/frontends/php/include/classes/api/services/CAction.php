@@ -498,7 +498,7 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Add actions
+	 * Add actions.
 	 *
 	 * @param array $actions multidimensional array with actions data
 	 * @param array $actions[0,...]['expression']
@@ -509,7 +509,9 @@ class CAction extends CApiService {
 	 * @param array $actions[0,...]['comments'] OPTIONAL
 	 * @param array $actions[0,...]['url'] OPTIONAL
 	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @return boolean
+	 * @param array $actions[0,...]['maintenance_mode'] OPTIONAL
+	 *
+	 * @return array
 	 */
 	public function create($actions) {
 		$actions = zbx_toArray($actions);
@@ -571,7 +573,7 @@ class CAction extends CApiService {
 	}
 
 	/**
-	 * Update actions
+	 * Update actions.
 	 *
 	 * @param array $actions multidimensional array with actions data
 	 * @param array $actions[0,...]['actionid']
@@ -583,7 +585,9 @@ class CAction extends CApiService {
 	 * @param array $actions[0,...]['comments'] OPTIONAL
 	 * @param array $actions[0,...]['url'] OPTIONAL
 	 * @param array $actions[0,...]['filter'] OPTIONAL
-	 * @return boolean
+	 * @param array $actions[0,...]['maintenance_mode'] OPTIONAL
+	 *
+	 * @return array
 	 */
 	public function update($actions) {
 		$actions = zbx_toArray($actions);
@@ -653,7 +657,9 @@ class CAction extends CApiService {
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+			if ($actionUpdateValues) {
+				$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
+			}
 		}
 
 		if ($actionsUpdateData) {
@@ -688,7 +694,7 @@ class CAction extends CApiService {
 		$actionConditions = [];
 		if ($newActionConditions !== null) {
 			$existingConditions = DBfetchArray(DBselect(
-				'SELECT conditionid,actionid,conditiontype,operator,value'.
+				'SELECT conditionid,actionid,conditiontype,operator,value,value2'.
 				' FROM conditions'.
 				' WHERE '.dbConditionInt('actionid', $actionIds).
 				' ORDER BY conditionid'
@@ -1536,7 +1542,7 @@ class CAction extends CApiService {
 
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
 				$conditions = API::getApiService()->select('conditions', [
-						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value'],
+						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value', 'value2'],
 						'filter' => ['actionid' => $actionIds],
 					'preservekeys' => true
 				]);
@@ -1557,6 +1563,7 @@ class CAction extends CApiService {
 						$sortFields = [
 							['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
 							['field' => 'operator', 'order' => ZBX_SORT_DOWN],
+							['field' => 'value2', 'order' => ZBX_SORT_DOWN],
 							['field' => 'value', 'order' => ZBX_SORT_DOWN]
 						];
 						CArrayHelper::sort($conditions, $sortFields);
@@ -1862,7 +1869,8 @@ class CAction extends CApiService {
 			CONDITION_TYPE_DSTATUS, CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_TEMPLATE,
 			CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_APPLICATION, CONDITION_TYPE_MAINTENANCE,
 			CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT,
-			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA
+			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA, CONDITION_TYPE_EVENT_TAG,
+			CONDITION_TYPE_EVENT_TAG_VALUE
 		];
 
 		$operators = [
@@ -1878,6 +1886,9 @@ class CAction extends CApiService {
 					'messageInvalid' => _('Incorrect filter condition type for action "%1$s".')
 				]) ,
 				'value' => new CStringValidator([
+					'empty' => true
+				]),
+				'value2' => new CStringValidator([
 					'empty' => true
 				]),
 				'formulaid' => new CStringValidator([
@@ -1985,6 +1996,9 @@ class CAction extends CApiService {
 
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
+		$maintenance_mode_validator = new CLimitedSetValidator([
+			'values' => [ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]
+		]);
 
 		$conditionsToValidate = [];
 		$operationsToValidate = [];
@@ -1992,12 +2006,32 @@ class CAction extends CApiService {
 		// Validate "filter" sections and "conditions" in them, ensure that "operations" section
 		// is present and is not empty. Also collect conditions and operations for more validation.
 		foreach ($actions as $action) {
+			if ($action['eventsource'] != EVENT_SOURCE_TRIGGERS) {
+				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot set "%1$s" for action "%2$s".'),
+					$action['name']
+				);
+			}
+			elseif (array_key_exists('maintenance_mode', $action)
+					&& !$maintenance_mode_validator->validate($action['maintenance_mode'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $action['maintenance_mode'], 'maintenance_mode')
+				);
+			}
+
 			if (isset($action['filter'])) {
 				$filterValidator->setObjectName($action['name']);
 				$this->checkValidator($action['filter'], $filterValidator);
+				$filterConditionValidator->setObjectName($action['name']);
 
 				foreach ($action['filter']['conditions'] as $condition) {
-					$filterConditionValidator->setObjectName($action['name']);
+					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE &&
+							!array_key_exists('value2', $condition)) {
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s('No "%2$s" given for a filter condition of action "%1$s".', $action['name'], 'value2')
+						);
+					}
+
 					$this->checkValidator($condition, $filterConditionValidator);
 					$conditionsToValidate[] = $condition;
 				}
@@ -2042,6 +2076,10 @@ class CAction extends CApiService {
 		}
 		$actions = zbx_toHash($actions, 'actionid');
 
+		$maintenance_mode_validator = new CLimitedSetValidator([
+			'values' => [ACTION_MAINTENANCE_MODE_NORMAL, ACTION_MAINTENANCE_MODE_PAUSE]
+		]);
+
 		// check fields
 		$duplicates = [];
 		foreach ($actions as $action) {
@@ -2070,6 +2108,18 @@ class CAction extends CApiService {
 				_('Cannot update "%1$s" for action "%2$s".'),
 				$actionName
 			);
+
+			if ($actionsDb[$action['actionid']]['eventsource'] != EVENT_SOURCE_TRIGGERS) {
+				$this->checkNoParameters($action, ['maintenance_mode'], _('Cannot update "%1$s" for action "%2$s".'),
+					$actionName
+				);
+			}
+			elseif (array_key_exists('maintenance_mode', $action)
+					&& !$maintenance_mode_validator->validate($action['maintenance_mode'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value "%1$s" for "%2$s" field.', $action['maintenance_mode'], 'maintenance_mode')
+				);
+			}
 
 			if (!isset($action['name'])) {
 				continue;
@@ -2128,6 +2178,14 @@ class CAction extends CApiService {
 				$this->checkValidator($actionFilter, $filterValidator);
 
 				foreach ($actionFilter['conditions'] as $condition) {
+					if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE &&
+							!array_key_exists('value2', $condition)) {
+						self::exception(
+							ZBX_API_ERROR_PARAMETERS,
+							_s('No "%2$s" given for a filter condition of action "%1$s".', $actionName, 'value2')
+						);
+					}
+
 					$this->checkValidator($condition, $filterConditionValidator);
 					$conditionsToValidate[] = $condition;
 				}

@@ -477,12 +477,12 @@ $functions = [
 		'allowed_types' => $allowedTypesAny
 	],
 	'fuzzytime[=]' => [
-		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N = 1, 0 - otherwise'),
+		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N = 0, 1 - otherwise'),
 		'params' => $param1Sec,
 		'allowed_types' => $allowedTypesAny
 	],
 	'fuzzytime[<>]' => [
-		'description' =>  _('Timestamp not different from Zabbix server time for more than T seconds, then N NOT 1, 0 - otherwise'),
+		'description' =>  _('Difference between item timestamp value and Zabbix server timestamp is over T seconds, then N NOT 0, 1 - otherwise'),
 		'params' => $param1Sec,
 		'allowed_types' => $allowedTypesAny
 	],
@@ -663,7 +663,8 @@ $paramType = getRequest('paramtype');
 $exprType = getRequest('expr_type', 'last[=]');
 
 // opening the popup when editing an expression in the trigger constructor
-if (isset($_REQUEST['expression']) && $_REQUEST['dstfld1'] == 'expr_temp') {
+if ((getRequest('dstfld1') === 'expr_temp' || getRequest('dstfld1') === 'recovery_expr_temp')
+		&& hasRequest('expression')) {
 	$_REQUEST['expression'] = utf8RawUrlDecode($_REQUEST['expression']);
 
 	$expressionData = new CTriggerExpression();
