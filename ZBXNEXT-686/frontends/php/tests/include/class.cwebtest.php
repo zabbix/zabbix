@@ -166,6 +166,17 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
+	public function zbxTestTextNotPresent($strings) {
+		if (!is_array($strings)) {
+			$strings = [$strings];
+		}
+
+		foreach ($strings as $string) {
+			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			$this->assertTrue(count($elements) === 0, '"'.$string.'" must not exist.');
+		}
+	}
+
 	public function zbxTestTextVisibleOnPage($strings) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
@@ -182,14 +193,14 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function zbxTestTextNotPresent($strings) {
+	public function zbxTestTextNotVisibleOnPage($strings) {
 		if (!is_array($strings)) {
 			$strings = [$strings];
 		}
 
 		foreach ($strings as $string) {
-			$elements = $this->webDriver->findElements(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
-			$this->assertTrue(count($elements) === 0, '"'.$string.'" must not exist.');
+			$elements = $this->webDriver->findElement(WebDriverBy::xpath("//*[contains(text(),'".$string."')]"));
+			$this->assertFalse($elements->isDisplayed());
 		}
 	}
 
@@ -294,7 +305,15 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		}
 	}
 
-	public function zbxTestAssertElementPresentId($id) {
+	public function zbxTestDropdownAssertSelected($name, $text) {
+		$this->zbxTestAssertElementPresentXpath("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
+	}
+
+	public function zbxTestGetSelectedLabel ($id) {
+		return $this->webDriver->findElement(WebDriverBy::xpath("//select[@id='".$id."']/option[@selected='selected']"))->getText();
+	}
+
+		public function zbxTestAssertElementPresentId($id) {
 		$elements = $this->webDriver->findElements(WebDriverBy::id($id));
 
 		if (count($elements) === 0) {
@@ -356,10 +375,6 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->wait(10)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
 	}
 
-	public function zbxTestDrowpdownAssertSelected($name, $text) {
-		$this->zbxTestAssertElementPresentXpath("//select[@name='".$name."']//option[text()='".$text."' and @selected]");
-	}
-
 //	public function wait() {
 //		$this->waitForPageToLoad();
 //		$this->zbxTestCheckFatalErrors();
@@ -367,8 +382,8 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestTabSwitch($tab) {
 		// switches tab by receiving tab title text
-		$this->zbxTestClickXpath("xpath=//div[@id='tabs']/ul/li/a[text()='$tab']");
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("xpath=//li[contains(@class, 'ui-tabs-selected')]/a[text()='$tab']"));
+		$this->zbxTestClickXpath("//div[@id='tabs']/ul/li/a[text()='$tab']");
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
 		$this->zbxTestCheckFatalErrors();
 	}
 
@@ -416,8 +431,9 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestAssertElementText($xpath, $text){
-		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath));
-		$this->assertEquals($text, $element->getText());
+		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getText();
+		$element_text = trim(preg_replace('/\s+/', ' ', $element));
+		$this->assertEquals($text, $element_text);
 	}
 
 	public function zbxTestAssertNotVisibleId($id){

@@ -59,9 +59,7 @@ require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageTemplates.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testPageUsers.php';
-/*
 require_once dirname(__FILE__).'/testFormAction.php';
- */
 require_once dirname(__FILE__).'/testFormAdministrationDMProxies.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralHousekeeper.php';
@@ -158,8 +156,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageWeb');
-/*		$suite->addTestSuite('testFormAction');
- */
+		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
