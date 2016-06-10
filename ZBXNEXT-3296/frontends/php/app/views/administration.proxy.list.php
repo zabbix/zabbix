@@ -35,11 +35,11 @@ $widget = (new CWidget())
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))
 		->addColumn((new CFormList())->addRow(_('Mode'),
-			(new CComboBox('filter_status', $data['filter']['status'], null, [
-				-1 => _('All'),
-				HOST_STATUS_PROXY_ACTIVE => _('Active'),
-				HOST_STATUS_PROXY_PASSIVE => _('Passive')
-			]))
+			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+				->addValue(_('Any'), -1)
+				->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
+				->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+				->setModern(true)
 		))
 	);
 

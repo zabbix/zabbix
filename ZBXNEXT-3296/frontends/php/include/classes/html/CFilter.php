@@ -143,7 +143,7 @@ class CFilter extends CTag {
 		return (new CDiv())
 			->addClass(ZBX_STYLE_FILTER_FORMS)
 			->addItem(
-				(new CSubmit('filter_set', _x('Filter', 'filter button')))
+				(new CSubmitButton(_('Apply'), 'filter_set', 1))
 					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
 			)
 			->addItem(

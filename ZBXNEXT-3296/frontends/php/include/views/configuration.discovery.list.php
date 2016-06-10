@@ -29,11 +29,11 @@ $widget = (new CWidget())
 			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 		))
 		->addColumn((new CFormList())->addRow(_('Status'),
-			(new CComboBox('filter_status', $data['filter']['status'], null, [
-				-1 => _('All'),
-				DRULE_STATUS_ACTIVE => _('Enabled'),
-				DRULE_STATUS_DISABLED => _('Disabled')
-			]))
+			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+				->addValue(_('Any'), -1)
+				->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
+				->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
+				->setModern(true)
 		))
 	);
 
