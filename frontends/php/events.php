@@ -337,7 +337,9 @@ else {
 		$filterColumn->addRow(
 			_('Trigger'),
 			[
-				(new CTextBox('trigger', $trigger, true))->setWidth(ZBX_TEXTAREA_FILTER_BIG_WIDTH),
+				(new CTextBox('trigger', $trigger, true))
+					->setWidth(ZBX_TEXTAREA_FILTER_BIG_WIDTH)
+					->setAttribute('autofocus', 'autofocus'),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('btn1', _('Select')))
 					->addClass(ZBX_STYLE_BTN_GREY)

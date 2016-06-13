@@ -104,6 +104,9 @@ class CFilter extends CTag {
 			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-up") ? 1 : 0);
 			if (jQuery(".multiselect").length > 0 && jQuery("#filter-arrow").hasClass("arrow-up")) {
 				jQuery(".multiselect").multiSelect("resize");
+			}
+			if (jQuery("#filter-arrow").hasClass("arrow-up")) {
+				jQuery("#filter-space [autofocus=autofocus]").focus();
 			}'
 		);
 

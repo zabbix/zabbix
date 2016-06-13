@@ -35,7 +35,9 @@ $widget = (new CWidget())
 	)
 	->addItem((new CFilter('web.templates.filter.state'))
 		->addColumn((new CFormList())->addRow(_('Name like'),
-			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			(new CTextBox('filter_name', $data['filter']['name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
 		))
 	);
 
