@@ -32,7 +32,9 @@ $widget = (new CWidget())
 	->addItem((new CFilter('web.proxies.filter.state'))
 		->addVar('action', 'proxy.list')
 		->addColumn((new CFormList())->addRow(_('Name like'),
-			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			(new CTextBox('filter_name', $data['filter']['name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
 		))
 		->addColumn((new CFormList())->addRow(_('Mode'),
 			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))

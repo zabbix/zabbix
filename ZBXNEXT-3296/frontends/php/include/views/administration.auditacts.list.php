@@ -25,7 +25,9 @@ $filterForm = new CFilter('web.auditacts.filter.state');
 
 $filterColumn = new CFormList();
 $filterColumn->addRow(_('Recipient'), [
-	(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+	(new CTextBox('alias', $this->data['alias']))
+		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
