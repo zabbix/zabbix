@@ -62,8 +62,9 @@ class CJsonRpc {
 		}
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
-			// notification
 			$call = is_array($call) ? $call : [$call];
+
+			// notification
 			if (!array_key_exists('id', $call)) {
 				$call['id'] = null;
 			}
@@ -72,7 +73,7 @@ class CJsonRpc {
 				continue;
 			}
 
-			list($api, $method) = explode('.', $call['method']);
+			list($api, $method) = array_merge(explode('.', $call['method']), [null, null]);
 			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
 
 			$this->processResult($call, $result);
