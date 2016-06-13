@@ -28,6 +28,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10852] fixed agent compilation on AIX 5.2, AIX 5.3 (wiper)
 ..F....... [ZBX-10457] fixed copying triggers to groups with multiple hosts or templates (Ivo)
 ..F....... [ZBX-10872] fixed selection of application in application popup (Cemeris)
 ........S. [ZBX-10848] fixed applications getting unlinked from undiscovered items (wiper)
