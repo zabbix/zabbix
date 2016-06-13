@@ -967,13 +967,40 @@ define('RSM_SLV_RDDS_AVAIL',				'rsm.slv.rdds.avail');
 define('RSM_SLV_EPP_AVAIL',					'rsm.slv.epp.avail');
 define('RSM_SLV_DNSSEC_AVAIL',				'rsm.slv.dnssec.avail');
 
-define('RSM_SLA_GRAPH_DNS_SERVICE_AVAILABILITY',	'DNS Service Availability');
-define('RSM_SLA_GRAPH_DNS_TCP_RTT_PFAILED_GRAPH1',	'Per test cycle, average expressed in ms');
-define('RSM_SLA_GRAPH_DNS_TCP_RTT_PFAILED_GRAPH2',	'Maximum expected number of tests per month');
+// SLA reports graph names
+define('DNS_SERVICE_AVAILABILITY_GRAPH_1',		'DNS Service Availability graph 1');
+define('DNS_NS_AVAILABILITY_GRAPH_1',			'DNS NS availability graph 1 Service Availability');
+define('DNS_NS_AVAILABILITY_GRAPH_2',			'DNS NS availability graph 2');
+define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_1',	'TCP DNS Resolution RTT TCP graph 1');
+define('TCP_DNS_RESOLUTION_RTT_TCP_GRAPH_2',	'TCP DNS Resolution RTT TCP graph 2');
+define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_1',	'UDP DNS Resolution RTT UDP graph 1');
+define('UDP_DNS_RESOLUTION_RTT_UDP_GRAPH_2',	'UDP DNS Resolution RTT UDP graph 2');
+define('DNS_UPDATE_TIME_GRAPH_1',				'DNS Update Time graph 1');
+define('DNS_UPDATE_TIME_GRAPH_2',				'DNS Update Time graph 2');
+define('RDDS_AVAILABILITY_GRAPH_1',				'RDDS Availability graph 1');
+define('RDDS_QUERY_RTT_GRAPH_1',				'RDDS Query RTT graph 1');
+define('RDDS_QUERY_RTT_GRAPH_2',				'RDDS Query RTT graph 2');
+define('RDDS_43_QUERY_RTT_GRAPH_1',				'RDDS 43 Query RTT graph 1');
+define('RDDS_43_QUERY_RTT_GRAPH_2',				'RDDS 43 Query RTT graph 2');
+define('RDDS_80_QUERY_RTT_GRAPH_1',				'RDDS 80 Query RTT graph 1');
+define('RDDS_80_QUERY_RTT_GRAPH_2',				'RDDS 80 Query RTT graph 2');
+define('RDDS_UPDATE_TIME_GRAPH_1',				'RDDS Update Time graph 1');
+define('RDDS_UPDATE_TIME_GRAPH_2',				'RDDS Update Time graph 2');
+define('EPP_SERVICE_AVAILABILITY_GRAPH_1',		'EPP Service Availability graph 1');
+define('EPP_SESSION_COMMAND_RTT_GRAPH_1',		'EPP Session-Command RTT graph 1');
+define('EPP_SESSION_COMMAND_RTT_GRAPH_2',		'EPP Session-Command RTT graph 2');
+define('EPP_TRANSFORM_COMMAND_RTT_GRAPH_1',		'EPP Transform-Command RTT graph 1');
+define('EPP_TRANSFORM_COMMAND_RTT_GRAPH_2',		'EPP Transform-Command RTT graph 2');
+define('EPP_QUERY_COMMAND_RTT_GRAPH_1',			'EPP Query-Command RTT graph 1');
+define('EPP_QUERY_COMMAND_RTT_GRAPH_2',			'EPP Query-Command RTT graph 2');
 
-define('RSM_SLA_SCREEN_TYPE_GRAPH1',		0);
-define('RSM_SLA_SCREEN_TYPE_GRAPH2',		1);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_1',		0);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_2',		1);
 define('RSM_SLA_SCREEN_TYPE_SCREEN',		2);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_3',		3);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_4',		4);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_5',		5);
+define('RSM_SLA_SCREEN_TYPE_GRAPH_6',		6);
 
 // SLA monitoring incident status
 define('INCIDENT_ACTIVE',			0);
