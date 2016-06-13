@@ -76,6 +76,15 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_DRSS	7
 #define ZBX_TRSS	8
 
+/* The pi_???_l2psize fields are described as: log2 of a proc's ??? pg sz */
+/* Basically it's bits per page, so define 12 bits (4kb) for earlier AIX  */
+/* versions that do not support those fields.                             */
+#ifdef _AIX61
+#	define ZBX_L2PSIZE(field) 	field
+#else
+#	define ZBX_L2PSIZE(field)	12
+#endif
+
 	char			*param, *procname, *proccomm, *mem_type = NULL;
 	struct passwd		*usrinfo;
 	struct procentry64	procentry;
@@ -184,8 +193,8 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				break;
 			case ZBX_RSS:
 				/* try to be compatible with "ps -o rssize" */
-				byte_value = ((zbx_uint64_t)procentry.pi_drss << procentry.pi_data_l2psize) +
-						((zbx_uint64_t)procentry.pi_trss << procentry.pi_text_l2psize);
+				byte_value = ((zbx_uint64_t)procentry.pi_drss << ZBX_L2PSIZE(procentry.pi_data_l2psize)) +
+						((zbx_uint64_t)procentry.pi_trss << ZBX_L2PSIZE(procentry.pi_text_l2psize));
 				break;
 			case ZBX_PMEM:
 				/* try to be compatible with "ps -o pmem" */
@@ -193,7 +202,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				break;
 			case ZBX_SIZE:
 				/* try to be compatible with "ps gvw" SIZE column */
-				byte_value = (zbx_uint64_t)procentry.pi_dvm << procentry.pi_data_l2psize;
+				byte_value = (zbx_uint64_t)procentry.pi_dvm << ZBX_L2PSIZE(procentry.pi_data_l2psize);
 				break;
 			case ZBX_DSIZE:
 				byte_value = procentry.pi_dsize;
@@ -206,10 +215,10 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				byte_value = procentry.pi_sdsize;
 				break;
 			case ZBX_DRSS:
-				byte_value = (zbx_uint64_t)procentry.pi_drss << procentry.pi_data_l2psize;
+				byte_value = (zbx_uint64_t)procentry.pi_drss << ZBX_L2PSIZE(procentry.pi_data_l2psize);
 				break;
 			case ZBX_TRSS:
-				byte_value = (zbx_uint64_t)procentry.pi_trss << procentry.pi_text_l2psize;
+				byte_value = (zbx_uint64_t)procentry.pi_trss << ZBX_L2PSIZE(procentry.pi_text_l2psize);
 				break;
 		}
 
@@ -259,6 +268,8 @@ out:
 	}
 
 	return SYSINFO_RET_OK;
+
+#undef ZBX_L2PSIZE
 
 #undef ZBX_SIZE
 #undef ZBX_RSS
