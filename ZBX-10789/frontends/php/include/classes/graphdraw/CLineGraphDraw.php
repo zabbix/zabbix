@@ -2662,6 +2662,7 @@ class CLineGraphDraw extends CGraphDraw {
 						break;
 					}
 				}
+
 				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER || ($has_scheduling && $delay == 0)) {
 					$draw = true;
 				}
