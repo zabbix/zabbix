@@ -1575,10 +1575,14 @@ static int	DBpatch_2010101(void)
 			if (1 != (nparam = num_param(param)))
 			{
 				if (FAIL == (ret = quote_key_param(&param, 0)))
-					error_message = zbx_dsprintf(error_message, "\"%s\" cannot be quoted", param);
+					error_message = zbx_dsprintf(error_message,
+							"\"%s\" contains invalid symbols and cannot be quoted", param);
 			}
 			if (FAIL == (ret = quote_key_param(&dsn, 0)))
-				error_message = zbx_dsprintf(error_message, "\"%s\" cannot be quoted", dsn);
+			{
+				error_message = zbx_dsprintf(error_message,
+						"\"%s\" contains invalid symbols and cannot be quoted", dsn);
+			}
 
 			if (FAIL == ret)
 				zbx_free(param);
@@ -2295,10 +2299,10 @@ static int	replace_key_param(const char *data, int key_type, int level, int num,
 			char **new_param)
 {
 	char	*param;
-	int	ret = FAIL;
+	int	ret;
 
 	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
-		return ret;
+		return FAIL;
 
 	param = zbx_strdup(NULL, data);
 
@@ -2307,14 +2311,15 @@ static int	replace_key_param(const char *data, int key_type, int level, int num,
 	if ('\0' == *param)
 	{
 		zbx_free(param);
-		return ret;
+		return SUCCEED;
 	}
 
 	*new_param = zbx_dsprintf(NULL, "^%s$", param);
 
 	zbx_free(param);
 
-	ret = quote_key_param(new_param, quoted);
+	if (FAIL == (ret = quote_key_param(new_param, quoted)))
+		zbx_free(new_param);
 
 	return ret;
 }

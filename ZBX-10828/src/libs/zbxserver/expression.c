@@ -4271,13 +4271,13 @@ static int	replace_key_param(const char *data, int key_type, int level, int num,
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
 	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
-	int				macro_type = replace_key_param_data->macro_type, ret;
+	int				macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
-		return SUCCEED;
+		return ret;
 
 	if (NULL == strchr(data, '{'))
-		return FAIL;
+		return ret;
 
 	*param = zbx_strdup(NULL, data);
 
@@ -4290,7 +4290,10 @@ static int	replace_key_param(const char *data, int key_type, int level, int num,
 		substitute_discovery_macros(param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	if (0 != level)
-		ret = quote_key_param(param, quoted);
+	{
+		if (FAIL == (ret = quote_key_param(param, quoted)))
+			zbx_free(*param);
+	}
 
 	return ret;
 }

@@ -1693,14 +1693,14 @@ static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int
 	ret = cb(*data + l, key_type, level, num, quoted, cb_data, &param);
 	(*data)[*r] = c;
 
-	if (FAIL != ret && NULL != param)
+	if (NULL != param)
 	{
 		(*r)--;
 		zbx_replace_string(data, l, r, param);
 		(*r)++;
-	}
 
-	zbx_free(param);
+		zbx_free(param);
+	}
 
 	return ret;
 }
