@@ -440,7 +440,7 @@ static int	DBpatch_3010024(void)
  * Function: DBpatch_3010025_validate_action                                  *
  *                                                                            *
  * Purpose: checks if the action must be disabled or its operations converted *
- *          to recovery operations                        b                    *
+ *          to recovery operations                                            *
  *                                                                            *
  * Return value: ZBX_3010025_ACTION_NOTHING - do nothing                      *
  *               ZBX_3010025_ACTION_DISABLE - disable action                  *
@@ -706,7 +706,7 @@ static size_t	DBpatch_3010026_expression_skip_whitespace(const char *expression,
  *                                                                            *
  * Return value: the token type (see ZBX_3010026_TOKEN_* defines)             *
  *                                                                            *
- * Comments: The recognized tokens are '(', ')', 'and', 'or' and '{<id>}'.    *                                                                           *
+ * Comments: The recognized tokens are '(', ')', 'and', 'or' and '{<id>}'.    *
  *                                                                            *
  ******************************************************************************/
 static int	DBpatch_3010026_expression_get_token(const char *expression, int offset, zbx_strloc_t *token)
