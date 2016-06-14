@@ -429,29 +429,38 @@ static int	DBpatch_3010024(void)
 	return DBdrop_field("actions", "recovery_msg");
 }
 
+/* patch 3010025 */
+
+#define	ZBX_3010025_ACTION_NOTHING	0
+#define	ZBX_3010025_ACTION_DISABLE	1
+#define	ZBX_3010025_ACTION_CONVERT	2
+
 /******************************************************************************
  *                                                                            *
  * Function: DBpatch_3010025_validate_action                                  *
  *                                                                            *
- * Purpose: checks if the action might match success event                    *
+ * Purpose: checks if the action must be disabled or its operations converted *
+ *          to recovery operations                        b                    *
  *                                                                            *
- * Return value: SUCCEED - action can't match success event                   *
- *               FAIL    - otherwise                                          *
+ * Return value: ZBX_3010025_ACTION_NOTHING - do nothing                      *
+ *               ZBX_3010025_ACTION_DISABLE - disable action                  *
+ *               ZBX_3010025_ACTION_CONVERT - convert action operations to    *
+ *                                            recovery operations             *
  *                                                                            *
- * Comments: This function does not analyze expressions so it might fail also *
- *           actions that can't match success event. However correct analysis *
- *           is not easy to do, so to be safe failure is returned.            *
+ * Comments: This function does not analyze expressions so it might ask to    *
+ *           disable actions that can't match success event. However correct  *
+ *           analysis is not easy to do, so to be safe failure is returned.   *
  *                                                                            *
  ******************************************************************************/
 static int	DBpatch_3010025_validate_action(zbx_uint64_t actionid, int eventsource, int evaltype)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
-	int		conditiontype, ret = FAIL, value;
+	int		conditiontype, ret = ZBX_3010025_ACTION_DISABLE, value;
 
 	/* evaltype: 0 - CONDITION_EVAL_TYPE_AND_OR, 1 - CONDITION_EVAL_TYPE_AND */
 	if (evaltype != 0 && evaltype != 1)
-		return FAIL;
+		return ret;
 
 	result = DBselect("select conditiontype,value from conditions where actionid=" ZBX_FS_UI64, actionid);
 
@@ -468,13 +477,29 @@ static int	DBpatch_3010025_validate_action(zbx_uint64_t actionid, int eventsourc
 
 			value = atoi(row[1]);
 
-			/* condition 'Trigger value = OK' found, fail validation */
+			/* condition 'Trigger value = OK' */
 			if (0 == value)
-				goto out;
+			{
+				if (ZBX_3010025_ACTION_NOTHING == ret)
+				{
+					ret = ZBX_3010025_ACTION_DISABLE;
+					break;
+
+				}
+				ret = ZBX_3010025_ACTION_CONVERT;
+			}
 
 			/* condition 'Trigger value = PROBLEM' */
 			if (1 == value)
-				ret = SUCCEED;
+			{
+				if (ZBX_3010025_ACTION_CONVERT == ret)
+				{
+					ret = ZBX_3010025_ACTION_DISABLE;
+					break;
+
+				}
+				ret = ZBX_3010025_ACTION_NOTHING;
+			}
 		}
 		else if (3 == eventsource)
 		{
@@ -489,17 +514,32 @@ static int	DBpatch_3010025_validate_action(zbx_uint64_t actionid, int eventsourc
 			/*            3 - Low-level discovery rule in "normal" state             */
 			/*            5 - Trigger in "normal" state                              */
 			if (1 == value || 3 == value || 5 == value)
-				goto out;
+			{
+				if (ZBX_3010025_ACTION_NOTHING == ret)
+				{
+					ret = ZBX_3010025_ACTION_DISABLE;
+					break;
+
+				}
+				ret = ZBX_3010025_ACTION_CONVERT;
+			}
 
 			/* event types:                                                          */
 			/*            0 - Event type:  Item in "not supported" state             */
 			/*            2 - Low-level discovery rule in "not supported" state      */
 			/*            4 - Trigger in "unknown" state                             */
 			if (0 == value || 2 == value || 4 == value)
-				ret = SUCCEED;
+			{
+				if (ZBX_3010025_ACTION_CONVERT == ret)
+				{
+					ret = ZBX_3010025_ACTION_DISABLE;
+					break;
+
+				}
+				ret = ZBX_3010025_ACTION_NOTHING;
+			}
 		}
 	}
-out:
 	DBfree_result(result);
 
 	return ret;
@@ -509,11 +549,12 @@ static int	DBpatch_3010025(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
-	zbx_vector_uint64_t	actionids;
-	int			ret = SUCCEED, evaltype, eventsource;
+	zbx_vector_uint64_t	actionids_disable, actionids_convert;
+	int			ret, evaltype, eventsource;
 	zbx_uint64_t		actionid;
 
-	zbx_vector_uint64_create(&actionids);
+	zbx_vector_uint64_create(&actionids_disable);
+	zbx_vector_uint64_create(&actionids_convert);
 
 	/* status: 0 - ACTION_STATUS_ACTIVE */
 	result = DBselect("select actionid,name,eventsource,evaltype from actions where status=0");
@@ -524,24 +565,52 @@ static int	DBpatch_3010025(void)
 		eventsource = atoi(row[2]);
 		evaltype = atoi(row[3]);
 
-		if (FAIL == DBpatch_3010025_validate_action(actionid, eventsource, evaltype))
+		ret = DBpatch_3010025_validate_action(actionid, eventsource, evaltype);
+
+		if (ZBX_3010025_ACTION_DISABLE == ret)
 		{
-			zbx_vector_uint64_append(&actionids, actionid);
+			zbx_vector_uint64_append(&actionids_disable, actionid);
 			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" was disabled during database upgrade:"
 					" conditions might have matched success event which is not supported anymore.",
 					row[1]);
 		}
+		else if (ZBX_3010025_ACTION_CONVERT == ret)
+		{
+			zbx_vector_uint64_append(&actionids_convert, actionid);
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" operations were converted to recovery operations"
+					" during database upgrade.", row[1]);
+		}
 	}
+	DBfree_result(result);
 
-	if (0 != actionids.values_num)
+	ret = SUCCEED;
+
+	if (0 != actionids_disable.values_num || 0 != actionids_convert.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = 0, sql_offset = 0;
-		/* status: 1 - ACTION_STATUS_DISABLED */
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=1 where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
-				actionids.values_num);
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (0 != actionids_disable.values_num)
+		{
+			/* status: 1 - ACTION_STATUS_DISABLED */
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=1 where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids_disable.values,
+					actionids_disable.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		}
+
+		if (0 != actionids_convert.values_num)
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update operations set recovery=1 where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids_convert.values,
+					actionids_convert.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (ZBX_DB_OK > DBexecute("%s", sql))
 			ret = FAIL;
@@ -549,8 +618,8 @@ static int	DBpatch_3010025(void)
 		zbx_free(sql);
 	}
 
-	DBfree_result(result);
-	zbx_vector_uint64_destroy(&actionids);
+	zbx_vector_uint64_destroy(&actionids_convert);
+	zbx_vector_uint64_destroy(&actionids_disable);
 
 	return ret;
 }
