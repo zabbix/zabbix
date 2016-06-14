@@ -3357,7 +3357,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertEmpty($parser->getError());
 		$this->assertEquals($result_all, $parser->getIntervals());
 		$this->assertEquals($result, $parser->getFlexibleIntervals());
-		$this->assertEmpty($parser->getSchedulingIntervals());
+		$this->assertEmpty($this->getSchedulingIntervals($parser->getIntervals()));
 	}
 
 	/**
@@ -3386,7 +3386,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertTrue($parser->isValid());
 		$this->assertEmpty($parser->getError());
 		$this->assertEquals($result_all, $parser->getIntervals());
-		$this->assertEquals($result, $parser->getSchedulingIntervals());
+		$this->assertEquals($result, $this->getSchedulingIntervals($parser->getIntervals()));
 		$this->assertEmpty($parser->getFlexibleIntervals());
 	}
 
@@ -3402,4 +3402,24 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 		$this->assertFalse($parser->isValid());
 		$this->assertEquals($error, $parser->getError());
 	}
+
+	/**
+	 * Get array of scheduling intervals.
+	 *
+	 * @param array $intervals
+	 *
+	 * @return array
+	 */
+	protected function getSchedulingIntervals($intervals) {
+		$scheduling_intervals = [];
+
+		foreach ($intervals as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
+				$scheduling_intervals[] = $interval['interval'];
+			}
+		}
+
+		return $scheduling_intervals;
+	}
+
 }
