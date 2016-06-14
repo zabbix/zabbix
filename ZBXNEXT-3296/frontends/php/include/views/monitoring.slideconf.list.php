@@ -36,7 +36,7 @@ $widget->setControls($createForm);
 // filter
 $widget->addItem(
 	(new CFilter('web.slideconf.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name like'),
+		->addColumn((new CFormList())->addRow(_('Name'),
 			(new CTextBox('filter_name', $data['filter']['name']))
 				->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
