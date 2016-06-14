@@ -75,6 +75,7 @@ require_once dirname(__FILE__).'/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/testFormAdministrationScripts.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserCreate.php';
 require_once dirname(__FILE__).'/testFormConfigTriggerSeverity.php';
+require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
 /*
 require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
@@ -88,7 +89,6 @@ require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
-require_once dirname(__FILE__).'/testFormDiscoveryRule.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormGraphPrototype.php';
@@ -172,6 +172,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationScripts');
 		$suite->addTestSuite('testFormAdministrationUserCreate');
 		$suite->addTestSuite('testFormConfigTriggerSeverity');
+		$suite->addTestSuite('testFormDiscoveryRule');
 /*
 		$suite->addTestSuite('testFormHost');
 		$suite->addTestSuite('testFormHostGroup');
@@ -184,7 +185,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormTemplate');
-		$suite->addTestSuite('testFormDiscoveryRule');
 		$suite->addTestSuite('testFormItemPrototype');
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormGraphPrototype');

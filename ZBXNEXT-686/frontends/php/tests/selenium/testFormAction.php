@@ -1853,9 +1853,9 @@ class testFormAction extends CWebTest {
 		}
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-			$i = 2;
+			$conditionCount = 2;
 		} else {
-			$i = 0;
+			$conditionCount = 0;
 		}
 
 		if (isset($data['conditions'])) {
@@ -1871,20 +1871,20 @@ class testFormAction extends CWebTest {
 						$this->zbxTestClickWait('add_condition');
 						switch($condition['type']){
 							case 'Application':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$i."']/td[2]", 'Application = '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Application = '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Host name':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$i.'"]/td[2]', 'Host name like '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host name like '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Host metadata':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$i.'"]/td[2]', 'Host metadata like '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Host metadata like '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Trigger name':
-								$this->zbxTestAssertElementText("//tr[@id='conditions_".$i."']/td[2]", 'Trigger name like '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText("//tr[@id='conditions_".$conditionCount."']/td[2]", 'Trigger name like '.$condition['value']);
+								$conditionCount++;
 								break;
 						}
 						break;
@@ -1895,16 +1895,16 @@ class testFormAction extends CWebTest {
 						$this->zbxTestClickWait('add_condition');
 						switch($condition['type']){
 							case 'Trigger severity':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$i.'"]/td[2]', 'Trigger severity = '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Trigger severity = '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Service type':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$i.'"]/td[2]', 'Service type = '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Service type = '.$condition['value']);
+								$conditionCount++;
 								break;
 							case 'Event type':
-								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$i.'"]/td[2]', 'Event type = '.$condition['value']);
-								$i++;
+								$this->zbxTestAssertElementText('//tr[@id="conditions_'.$conditionCount.'"]/td[2]', 'Event type = '.$condition['value']);
+								$conditionCount++;
 								break;
 						}
 						break;

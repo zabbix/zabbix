@@ -430,6 +430,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getAttribute('value');
 	}
 
+	public function zbxTestGetText($xpath) {
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getText();
+	}
+
 	public function zbxTestAssertElementText($xpath, $text){
 		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getText();
 		$element_text = trim(preg_replace('/\s+/', ' ', $element));
