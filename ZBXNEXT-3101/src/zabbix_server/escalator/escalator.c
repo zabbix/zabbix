@@ -1198,16 +1198,16 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, DB
 			switch (operationtype)
 			{
 				case OPERATION_TYPE_MESSAGE:
-					if (SUCCEED == DBis_null(row[4]))
+					if (SUCCEED == DBis_null(row[3]))
 						break;
 
-					default_msg = (unsigned char)atoi(row[5]);
-					ZBX_DBROW2UINT64(mediatypeid, row[8]);
+					default_msg = (unsigned char)atoi(row[4]);
+					ZBX_DBROW2UINT64(mediatypeid, row[7]);
 
 					if (0 == default_msg)
 					{
-						subject = row[6];
-						message = row[7];
+						subject = row[5];
+						message = row[6];
 					}
 					else
 					{
@@ -1219,10 +1219,10 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, DB
 							message, r_event);
 					break;
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (SUCCEED != DBis_null(row[4]))
+					if (SUCCEED != DBis_null(row[3]))
 					{
-						subject = row[6];
-						message = row[7];
+						subject = row[5];
+						message = row[6];
 					}
 					else
 					{
