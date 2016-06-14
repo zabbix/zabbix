@@ -68,9 +68,10 @@ extern int	CONFIG_LISTEN_PORT;
 /* NB! Next list must fit in unsigned char (see ZBX_ACTIVE_METRIC "flags" field below). */
 #define ZBX_METRIC_FLAG_PERSISTENT	0x01	/* do not overwrite old values when adding to the buffer */
 #define ZBX_METRIC_FLAG_NEW		0x02	/* new metric, just added */
-#define ZBX_METRIC_FLAG_LOG_LOG		0x04	/* log[ */
-#define ZBX_METRIC_FLAG_LOG_LOGRT	0x08	/* logrt[ */
+#define ZBX_METRIC_FLAG_LOG_LOG		0x04	/* log[ or log.count[, depending on ZBX_METRIC_FLAG_LOG_COUNT */
+#define ZBX_METRIC_FLAG_LOG_LOGRT	0x08	/* logrt[ or logrt.count[, depending on ZBX_METRIC_FLAG_LOG_COUNT */
 #define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x10	/* eventlog[ */
+#define ZBX_METRIC_FLAG_LOG_COUNT	0x20	/* log.count[ or logrt.count[ */
 #define ZBX_METRIC_FLAG_LOG			/* item for log file monitoring, one of the above */	\
 		(ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_EVENTLOG)
 
@@ -93,7 +94,11 @@ typedef struct
 						/* on a file system */
 	int			error_count;	/* number of file reading errors in consecutive checks */
 	int			logfiles_num;
-	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[] items */
+	struct st_logfile	*logfiles;	/* for handling of logfile rotation for logrt[], logrt.count[] items */
+	double			start_time;	/* Start time of check for log[], log.count[], logrt[], logrt.count[] */
+						/* items. Used for measuring duration of checks. */
+	zbx_uint64_t		processed_bytes;	/* number of processed bytes for log[], log.count[], logrt[], */
+							/* logrt.count[] items */
 }
 ZBX_ACTIVE_METRIC;
 
