@@ -363,11 +363,11 @@ class CHelpItems {
 					'description' => _('Log file monitoring with log rotation support. Returns log')
 				],
 				[
-					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>',
+					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
 					'description' => _('Number of matching lines since the last check of the item. Returns integer')
 				],
 				[
-					'key' => 'logrt.count[<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
+					'key' => 'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
 					'description' => _('Number of matching lines since the last check of the item with log rotation support. Returns integer')
 				],
 				[
