@@ -2295,7 +2295,7 @@ static int	DBpatch_2010194(void)
  * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *
  ******************************************************************************/
-static int	replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+static int	DBpatch_2010195_replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
 			char **new_param)
 {
 	char	*param;
@@ -2337,8 +2337,8 @@ static int	DBpatch_2010195(void)
 	{
 		key = zbx_strdup(key, row[1]);
 
-		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, replace_key_param, NULL,
-				error, sizeof(error)))
+		if (SUCCEED != replace_key_params_dyn(&key, ZBX_KEY_TYPE_ITEM, DBpatch_2010195_replace_key_param_cb,
+				NULL, error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\": %s", row[1], error);
 			continue;
