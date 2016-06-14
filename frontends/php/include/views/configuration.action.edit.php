@@ -600,7 +600,14 @@ if (!empty($data['new_operation'])) {
 				->setHeader([_('User group'), _('Action')]);
 
 			$addUsrgrpBtn = (new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")')
+				->onClick('return PopUp("popup.php?'.
+					'dstfrm=action.edit'.
+					'&srctbl=usrgrp'.
+					'&srcfld1=usrgrpid'.
+					'&srcfld2=name'.
+					'&multiselect=1'.
+					'&dstfld1=opmsgUsrgrpListFooter")'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$usrgrpList->addRow(
 				(new CRow(
@@ -613,7 +620,14 @@ if (!empty($data['new_operation'])) {
 				->setHeader([_('User'), _('Action')]);
 
 			$addUserBtn = (new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")')
+				->onClick('return PopUp("popup.php?'.
+					'dstfrm=action.edit'.
+					'&srctbl=users'.
+					'&srcfld1=userid'.
+					'&srcfld2=fullname'.
+					'&multiselect=1'.
+					'&dstfld1=opmsgUserListFooter")'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$userList->addRow(
 				(new CRow(
@@ -1252,7 +1266,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->setHeader([_('User group'), _('Action')]);
 
 				$addUsrgrpBtn = (new CButton(null, _('Add')))
-					->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1&dstfld1=recOpmsgUsrgrpListFooter")')
+					->onClick('return PopUp("popup.php?'.
+						'dstfrm=action.edit'.
+						'&srctbl=usrgrp'.
+						'&srcfld1=usrgrpid'.
+						'&srcfld2=name'.
+						'&multiselect=1'.
+						'&dstfld1=recOpmsgUsrgrpListFooter")'
+					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$usrgrpList->addRow(
 					(new CRow(
@@ -1265,7 +1286,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->setHeader([_('User'), _('Action')]);
 
 				$addUserBtn = (new CButton(null, _('Add')))
-					->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1&dstfld1=recOpmsgUserListFooter")')
+					->onClick('return PopUp("popup.php?'.
+						'dstfrm=action.edit'.
+						'&srctbl=users'.
+						'&srcfld1=userid'.
+						'&srcfld2=fullname'.
+						'&multiselect=1'.
+						'&dstfld1=recOpmsgUserListFooter")'
+					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$userList->addRow(
 					(new CRow(
