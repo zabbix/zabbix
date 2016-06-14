@@ -208,6 +208,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 			zbx_free(metric->logfiles);
 			metric->logfiles_num = 0;
+			metric->start_time = 0.0;
+			metric->processed_bytes = 0;
 		}
 
 		/* replace metric */
@@ -222,6 +224,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			/* Currently receiving list of active checks works as a signal to refresh unsupported */
 			/* items. Hopefully in the future this will be controlled by server (ZBXNEXT-2633). */
 			metric->refresh_unsupported = 1;
+			metric->start_time = 0.0;
+			metric->processed_bytes = 0;
 		}
 
 		goto out;
@@ -238,7 +242,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->refresh_unsupported = 0;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
-	/* existing log[] and eventlog[] data can be skipped */
+	/* existing log[], log.count[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
 	metric->use_ino = 0;
@@ -247,12 +251,22 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->logfiles = NULL;
 	metric->flags = ZBX_METRIC_FLAG_NEW;
 
-	if (0 == strncmp(metric->key, "log[", 4))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_LOG;
-	else if (0 == strncmp(metric->key, "logrt[", 6))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
+	if ('l' == metric->key[0] && 'o' == metric->key[1] && 'g' == metric->key[2])
+	{
+		if ('[' == metric->key[3])					/* log[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOG;
+		else if (0 == strncmp(metric->key + 3, "rt[", 3))		/* logrt[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT;
+		else if (0 == strncmp(metric->key + 3, ".count[", 7))		/* log.count[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_COUNT;
+		else if (0 == strncmp(metric->key + 3, "rt.count[", 9))		/* logrt.count[ */
+			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_COUNT;
+	}
 	else if (0 == strncmp(metric->key, "eventlog[", 9))
 		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+
+	metric->start_time = 0.0;
+	metric->processed_bytes = 0;
 
 	zbx_vector_ptr_append(&active_metrics, metric);
 out:
@@ -1021,10 +1035,19 @@ static int	global_regexp_exists(const char *name)
 static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error)
 {
-	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
-	char		*encoding_uc = NULL;
-	int		rate, ret = FAIL, s_count, p_count;
+	AGENT_REQUEST		request;
+	const char		*filename, *pattern, *encoding, *maxlines_persec, *skip, *template;
+	char			*encoding_uc = NULL, *max_delay_str;
+	int			rate, ret = FAIL, s_count, p_count, s_count_orig, is_count_item, max_delay_par_nr,
+				mtime_orig, big_rec_orig, logfiles_num_new = 0, jumped = 0;
+	zbx_uint64_t		lastlogsize_orig;
+	float			max_delay;
+	struct st_logfile	*logfiles_new = NULL;
+
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
+		is_count_item = 1;
+	else
+		is_count_item = 0;
 
 	init_request(&request);
 
@@ -1040,7 +1063,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	if (6 < get_rparams_num(&request))
+	if (7 < get_rparams_num(&request) || (1 == is_count_item && 6 < get_rparams_num(&request)))
 	{
 		*error = zbx_strdup(*error, "Too many parameters.");
 		goto out;
@@ -1073,11 +1096,18 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		encoding = encoding_uc;
 	}
 
+	/* parameter 3 is <maxlines> for log[], logrt[], but <maxproclines> for log.count[], logrt.count[] */
+
 	if (NULL == (maxlines_persec = get_rparam(&request, 3)) || '\0' == *maxlines_persec)
 	{
-		rate = CONFIG_MAX_LINES_PER_SECOND;
+		if (0 == is_count_item)
+			rate = CONFIG_MAX_LINES_PER_SECOND;	/* log[], logrt[] */
+		else
+			rate = 4 * CONFIG_MAX_LINES_PER_SECOND;	/* log.count[], logrt.count[] */
 	}
-	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
+	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) ||
+			(0 == is_count_item && MAX_VALUE_LINES < rate) ||
+			(1 == is_count_item && 4 * MAX_VALUE_LINES < rate))
 	{
 		*error = zbx_strdup(*error, "Invalid fourth parameter.");
 		goto out;
@@ -1093,23 +1123,115 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		goto out;
 	}
 
-	if (NULL == (template = get_rparam(&request, 5)))
+	/* parameter 5 is <output> for log[], logrt[], but <maxdelay> for log.count[], logrt.count[] */
+
+	if (1 == is_count_item || (NULL == (template = get_rparam(&request, 5))))
 		template = "";
+
+	/* <maxdelay> is parameter 6 for log[], logrt[], but parameter 5 for log.count[], logrt.count[] */
+
+	if (0 == is_count_item)
+		max_delay_par_nr = 6;				/* log[], logrt[] */
+	else
+		max_delay_par_nr = 5;				/* log.count[], logrt.count[] */
+
+	if (NULL == (max_delay_str = get_rparam(&request, max_delay_par_nr)) || '\0' == *max_delay_str)
+	{
+		max_delay = 0.0f;
+	}
+	else if (SUCCEED != is_double(max_delay_str) || 0.0f > (max_delay = atof(max_delay_str)))
+	{
+		*error = zbx_dsprintf(*error, "Invalid %s parameter.", (5 == max_delay_par_nr) ? "sixth" : "seventh");
+		goto out;
+	}
 
 	/* do not flood Zabbix server if file grows too fast */
 	s_count = rate * metric->refresh;
 
 	/* do not flood local system if file grows too fast */
-	p_count = 4 * s_count;
+	if (0 == is_count_item)
+	{
+		p_count = 4 * s_count;				/* log[], logrt[] */
+	}
+	else
+	{
+		/* In log.count[] and logrt.count[] items the variable 's_count' (max number of lines allowed to be */
+		/* sent to server) is used for counting matching lines in logfile(s). 's_count' is counted from max */
+		/* value down towards 0. */
+
+		p_count = s_count_orig = s_count;
+
+		/* remember current state, we may need to restore it if log.count[] or logrt.count[] result cannot */
+		/* be sent to server */
+
+		lastlogsize_orig = metric->lastlogsize;
+		mtime_orig = metric->mtime;
+		big_rec_orig = metric->big_rec;
+
+		/* process_logrt() may modify old log file list 'metric->logfiles' but currently modifications are */
+		/* limited to 'retry' flag in existing list elements. We do not preserve original 'retry' flag values */
+		/* as there is no need to "rollback" their modifications if log.count[] or logrt.count[] result can */
+		/* not be sent to server. */
+	}
 
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
-			&metric->logfiles_num, encoding, &regexps, pattern, template, &p_count, &s_count, process_value,
-			server, port, CONFIG_HOSTNAME, metric->key_orig);
+			&metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, &regexps, pattern, template,
+			&p_count, &s_count, process_value, server, port, CONFIG_HOSTNAME, metric->key_orig, &jumped,
+			max_delay, &metric->start_time, &metric->processed_bytes);
+
+	if (0 == is_count_item && NULL != logfiles_new)
+	{
+		/* for log[] and logrt[] items - switch to the new log file list */
+
+		destroy_logfile_list(&metric->logfiles, NULL, &metric->logfiles_num);
+		metric->logfiles = logfiles_new;
+		metric->logfiles_num = logfiles_num_new;
+	}
 
 	if (SUCCEED == ret)
 	{
 		metric->error_count = 0;
+
+		if (1 == is_count_item)
+		{
+			/* send log.count[] or logrt.count[] item value to server */
+
+			int	match_count;			/* number of matching lines */
+			char	buf[ZBX_MAX_UINT64_LEN];
+
+			match_count = s_count_orig - s_count;
+
+			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
+
+			if (SUCCEED == process_value(server, port, CONFIG_HOSTNAME, metric->key_orig, buf,
+					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT) || 0 != jumped)
+			{
+				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
+				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */
+				/* after jump */
+
+				*lastlogsize_sent = metric->lastlogsize;
+				*mtime_sent = metric->mtime;
+
+				/* switch to the new log file list */
+				destroy_logfile_list(&metric->logfiles, NULL, &metric->logfiles_num);
+				metric->logfiles = logfiles_new;
+				metric->logfiles_num = logfiles_num_new;
+			}
+			else
+			{
+				/* unable to send data and no jump took place, restore original state to try again */
+				/* during the next check */
+
+				metric->lastlogsize = lastlogsize_orig;
+				metric->mtime =  mtime_orig;
+				metric->big_rec = big_rec_orig;
+
+				/* the old log file list 'metric->logfiles' stays in its place */
+			}
+		}
 	}
 	else
 	{
@@ -1118,7 +1240,7 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 		/* suppress first two errors */
 		if (3 > metric->error_count)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt) processing error #%d: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "suppressing log(rt)(.count) processing error #%d: %s",
 					metric->error_count, NULL != *error ? *error : "unknown error");
 
 			zbx_free(*error);
@@ -1535,6 +1657,8 @@ static void	process_active_checks(char *server, unsigned short port)
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->refresh_unsupported = 0;
 			metric->error_count = 0;
+			metric->start_time = 0.0;
+			metric->processed_bytes = 0;
 
 			zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", metric->key, perror);
 
