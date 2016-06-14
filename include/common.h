@@ -924,7 +924,9 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...);
 #define ZBX_MAX_RECV_DATA_SIZE	(128 * ZBX_MEBIBYTE)
 
 /* max length of base64 data */
-#define ZBX_MAX_B64_LEN	(16 * ZBX_KIBIBYTE)
+#define ZBX_MAX_B64_LEN		(16 * ZBX_KIBIBYTE)
+
+#define ZBX_SNMP_TRAPFILE_MAX_SIZE	__UINT64_C(2) * ZBX_GIBIBYTE
 
 double	zbx_time(void);
 void	zbx_timespec(zbx_timespec_t *ts);
