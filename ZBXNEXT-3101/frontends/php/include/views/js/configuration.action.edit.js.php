@@ -24,7 +24,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
-<tr id="opCmdGroupRow_#{groupid}">
+<tr id="#{row}#{groupid}">
 	<td>
 		<input name="#{field}[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
 		<input name="#{field}[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
@@ -32,13 +32,13 @@
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('opCmdGroupRow_#{groupid}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{groupid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
-<tr id="opCmdHostRow_#{hostid}">
+<tr id="{row}#{hostid}">
 	<td>
 		<input name="#{field}[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
 		<input name="#{field}[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
@@ -46,7 +46,7 @@
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('opCmdHostRow_#{hostid}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('{row}#{hostid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -140,12 +140,10 @@
 					if (list.parentId == 'opmsgUsrgrpListFooter') {
 						value.field = 'new_operation';
 						value.row = 'opmsgUsrgrpRow_';
-						value.type = <?= ACTION_OPERATION ?>;
 					}
 					else {
 						value.field = 'new_recovery_operation';
 						value.row = 'recOpmsgUsrgrpRow_';
-						value.type = <?= ACTION_RECOVERY_OPERATION ?>;
 					}
 
 					if (jQuery('#' + value.row + value.id).length) {
@@ -158,17 +156,35 @@
 					break;
 
 				case 'groupid':
+					if (list.parentId == 'opmsgUsrgrpListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opCmdGroupRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpCmdGroupRow_';
+					}
+
 					tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
 					value.objectCaption = <?= CJs::encodeJson(_('Host group').NAME_DELIMITER) ?>;
 
 					container = jQuery('#' + list.parentId);
-					if (jQuery('#opCmdGroupRow_' + value.groupid).length == 0) {
+					if (jQuery('#' + value.row + value.groupid).length == 0) {
 						container.before(tpl.evaluate(value));
 					}
 					break;
 
 				case 'hostid':
+					if (list.parentId == 'opmsgUsrgrpListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opCmdHostRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpCmdHostRow_';
+					}
+
 					tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
 					if (value.hostid.toString() != '0') {
@@ -179,7 +195,7 @@
 					}
 
 					container = jQuery('#' + list.parentId);
-					if (jQuery('#opCmdHostRow_' + value.hostid).length == 0) {
+					if (jQuery('#' + value.row + value.hostid).length == 0) {
 						container.before(tpl.evaluate(value));
 					}
 					break;
@@ -219,15 +235,7 @@
 		jQuery('#' + id).remove();
 	}
 
-	function removeOpGroupRow(groupid) {
-		jQuery('#opGroupRow_' + groupid).remove();
-	}
-
-	function removeOpTemplateRow(tplid) {
-		jQuery('#opTemplateRow_' + tplid).remove();
-	}
-
-	function showOpCmdForm(opCmdId) {
+	function showOpCmdForm(opCmdId, type) {
 		var objectTPL = {
 				opcmdid: 'new',
 				objectid: 0,

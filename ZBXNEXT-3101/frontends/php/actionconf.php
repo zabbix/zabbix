@@ -39,7 +39,7 @@ $fields = [
 											]),
 											null
 										],
-'evaltype' =>							[T_ZBX_INT, O_OPT, null,
+	'evaltype' =>						[T_ZBX_INT, O_OPT, null,
 											IN([CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
 												CONDITION_EVAL_TYPE_EXPRESSION
 											]),
@@ -59,7 +59,7 @@ $fields = [
 	'new_condition' =>					[null,		O_OPT,	null,	null,		'isset({add_condition})'],
 	'operations' =>						[null,		O_OPT,	null,	null,		'isset({add}) || isset({update})'],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
-	'new_operation' =>					[null,		O_OPT,	null,	null,		'isset({add_operation})'],
+	'new_operation' =>					[null,		O_OPT,	null,	null,		null],
 	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'recovery_operations' =>			[null,		O_OPT,	null,	null,		null],
 	'new_recovery_operation' =>			[null,		O_OPT,	null,	null,		null],
@@ -645,7 +645,7 @@ if (hasRequest('form')) {
 	}
 
 	// New operation.
-	if (!$data['new_operation'] && !is_array($data['new_operation'])) {
+	if ($data['new_operation'] && !is_array($data['new_operation'])) {
 		$data['new_operation'] = [
 			'operationtype' => 0,
 			'esc_period' => 0,
@@ -714,7 +714,7 @@ if (hasRequest('form')) {
 	}
 
 	// New recovery operation.
-	if (!$data['new_recovery_operation'] && !is_array($data['new_recovery_operation'])) {
+	if ($data['new_recovery_operation'] && !is_array($data['new_recovery_operation'])) {
 		$data['new_recovery_operation'] = ['operationtype' => 0];
 	}
 

@@ -791,7 +791,7 @@ if (!empty($data['new_operation'])) {
 							(new CRow(
 								(new CCol(
 									(new CButton('add', _('New')))
-										->onClick('javascript: showOpCmdForm(0);')
+										->onClick('javascript: showOpCmdForm(0, '.ACTION_OPERATION.');')
 										->addClass(ZBX_STYLE_BTN_LINK)
 								))->setColSpan(3)
 							))->setId('opCmdListFooter')
@@ -1457,7 +1457,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 								(new CRow(
 									(new CCol(
 										(new CButton('add', _('New')))
-											->onClick('javascript: showOpCmdForm(0);')
+											->onClick('javascript: showOpCmdForm(0, '.ACTION_RECOVERY_OPERATION.');')
 											->addClass(ZBX_STYLE_BTN_LINK)
 									))->setColSpan(3)
 								))->setId('recOpCmdListFooter')
@@ -1558,7 +1558,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 		$recovery_tab->addRow(_('Operation details'),
 			(new CDiv([
-				$new_operation_vars,
+				$new_recovery_operation_vars,
 				$new_operation_formlist,
 				new CHorList([
 					(new CSubmit('add_operation', (isset($data['new_recovery_operation']['id'])) ? _('Update') : _('Add')))
