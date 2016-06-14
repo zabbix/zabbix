@@ -48,7 +48,7 @@ $table = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Templates'), 'name', $data['sortField'], $data['sortOrder']),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
