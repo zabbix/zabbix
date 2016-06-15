@@ -1575,18 +1575,16 @@ static int	DBpatch_2010101(void)
 			if (1 != (nparam = num_param(param)))
 			{
 				if (FAIL == (ret = quote_key_param(&param, 0)))
-					error_message = zbx_dsprintf(error_message,
-							"\"%s\" contains invalid symbols and cannot be quoted", param);
+					error_message = zbx_dsprintf(error_message, "unique description"
+							" \"%s\" contains invalid symbols and cannot be quoted", param);
 			}
 			if (FAIL == (ret = quote_key_param(&dsn, 0)))
 			{
-				error_message = zbx_dsprintf(error_message,
-						"\"%s\" contains invalid symbols and cannot be quoted", dsn);
+				error_message = zbx_dsprintf(error_message, "data source name"
+						" \"%s\" contains invalid symbols and cannot be quoted", dsn);
 			}
 
-			if (FAIL == ret)
-				zbx_free(param);
-			else
+			if (SUCCEED == ret)
 			{
 				key_offset = 0;
 				zbx_snprintf_alloc(&key, &key_alloc, &key_offset, "db.odbc.select[%s,%s]", param, dsn);
@@ -1596,6 +1594,8 @@ static int	DBpatch_2010101(void)
 				if (255 /* ITEM_KEY_LEN */ < zbx_strlen_utf8(key))
 					error_message = zbx_dsprintf(error_message, "key \"%s\" is too long", row[1]);
 			}
+
+			zbx_free(param);
 		}
 
 		if (NULL == error_message)
