@@ -419,8 +419,6 @@ elseif (hasRequest('add_recovery_operation') && hasRequest('new_recovery_operati
 			$_REQUEST['recovery_operations'][] = $_REQUEST['new_recovery_operation'];
 		}
 
-		sortOperations($eventsource, $_REQUEST['recovery_operations']);
-
 		unset($_REQUEST['new_recovery_operation']);
 	}
 }
@@ -527,6 +525,9 @@ if (hasRequest('form')) {
 		]);
 		$data['action'] = reset($data['action']);
 
+		$data['action']['recovery_operations'] = $data['action']['recoveryOperations'];
+		unset($data['action']['recoveryOperations']);
+
 		foreach ($data['action']['operations'] as &$operation) {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_GROUP_ADD:
@@ -563,14 +564,13 @@ if (hasRequest('form')) {
 
 	if (isset($data['action']['actionid']) && !hasRequest('form_refresh')) {
 		sortOperations($data['eventsource'], $data['action']['operations']);
-		sortOperations($data['eventsource'], $data['action']['recoveryOperations']);
 	}
 	else {
 		$data['action']['name'] = getRequest('name');
 		$data['action']['esc_period'] = getRequest('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
-		$data['action']['recoveryOperations'] = getRequest('recoveryOperations', []);
+		$data['action']['recovery_perations'] = getRequest('recovery_operations', []);
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');
