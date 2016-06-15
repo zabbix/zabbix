@@ -51,25 +51,32 @@ foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
 		case MEDIA_TYPE_EMAIL:
 			$details =
-				_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
-				_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
-				_('SMTP email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
+				_('SMTP server').': "'.$mediaType['smtp_server'].'", '.
+				_('SMTP helo').': "'.$mediaType['smtp_helo'].'", '.
+				_('SMTP email').': "'.$mediaType['smtp_email'].'"';
 			break;
 
 		case MEDIA_TYPE_EXEC:
-			$details = _('Script name').NAME_DELIMITER.'"'.$mediaType['exec_path'].'"';
+			$details = _('Script name').': "'.$mediaType['exec_path'].'"';
 			break;
 
 		case MEDIA_TYPE_SMS:
-			$details = _('GSM modem').NAME_DELIMITER.'"'.$mediaType['gsm_modem'].'"';
+			$details = _('GSM modem').': "'.$mediaType['gsm_modem'].'"';
 			break;
 
 		case MEDIA_TYPE_JABBER:
-			$details = _('Jabber identifier').NAME_DELIMITER.'"'.$mediaType['username'].'"';
+			$details = _('Jabber identifier').': "'.$mediaType['username'].'"';
 			break;
 
 		case MEDIA_TYPE_EZ_TEXTING:
-			$details = _('Username').NAME_DELIMITER.'"'.$mediaType['username'].'"';
+			$details = _('Username').': "'.$mediaType['username'].'"';
+			break;
+
+		case MEDIA_TYPE_REMEDY:
+			$details =
+				_('Remedy Service URL').': "'.$mediaType['smtp_server'].'", '.
+				_('Username').': "'.$mediaType['username'].'", '.
+				_('Company name').': "'.$mediaType['exec_path'].'"';
 			break;
 
 		default:

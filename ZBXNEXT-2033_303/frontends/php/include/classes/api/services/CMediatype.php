@@ -71,6 +71,7 @@ class CMediatype extends CApiService {
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
+			'selectMedia'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
 			'preservekeys'				=> null,
@@ -83,9 +84,9 @@ class CMediatype extends CApiService {
 		// permission check
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 		}
-		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
+		elseif ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
-		elseif (!is_null($options['editable']) || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		elseif ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_ZABBIX_ADMIN) {
 			return [];
 		}
 
@@ -344,6 +345,18 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
+
+				case MEDIA_TYPE_REMEDY:
+					foreach (['smtp_server', 'exec_path', 'username', 'passwd'] as $field) {
+						if ($mediatype[$field] === '' || $mediatype[$field] === null) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Field "%1$s" is missing a value for media type "%2$s".',
+								$field,
+								$mediatype['description']
+							));
+						}
+					}
+					break;
 			}
 
 			// Validate optional 'status' field.
@@ -392,7 +405,8 @@ class CMediatype extends CApiService {
 		// Check value map names.
 		$db_mediatypes = API::getApiService()->select('media_type', [
 			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'status', 'smtp_port', 'smtp_verify_peer',
-				'smtp_verify_host', 'smtp_authentication'],
+				'smtp_verify_host', 'smtp_authentication'
+			],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
@@ -455,19 +469,20 @@ class CMediatype extends CApiService {
 		foreach ($mediatypes as $mediatype) {
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
 
+			$optional_fields_by_type = [
+				MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
+				MEDIA_TYPE_EXEC => ['exec_path'],
+				MEDIA_TYPE_SMS => ['gsm_modem'],
+				MEDIA_TYPE_JABBER => ['username'],
+				MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username'],
+				MEDIA_TYPE_REMEDY => ['smtp_server', 'smtp_email', 'exec_path', 'username', 'passwd']
+			];
+
 			// Recheck mandatory fields if type changed.
 			if (array_key_exists('type', $mediatype) && $db_mediatype['type'] != $mediatype['type']) {
 				$this->checkRequiredFieldsByType($mediatype);
 			}
 			else {
-				$optional_fields_by_type = [
-					MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
-					MEDIA_TYPE_EXEC => ['exec_path'],
-					MEDIA_TYPE_SMS => ['gsm_modem'],
-					MEDIA_TYPE_JABBER => ['username'],
-					MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username']
-				];
-
 				foreach ($optional_fields_by_type[$db_mediatype['type']] as $field) {
 					if (array_key_exists($field, $mediatype)
 							&& ($mediatype[$field] === '' || $mediatype[$field] === null)) {
@@ -659,23 +674,23 @@ class CMediatype extends CApiService {
 	/**
 	 * Add Media types.
 	 *
-	 * @param array		$mediatypes							multidimensional array with media types data
-	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['description']			description
-	 * @param string	$mediatypes['smtp_server']			SMTP server
-	 * @param int		$mediatypes['smtp_port']			SMTP port
-	 * @param string	$mediatypes['smtp_helo']			SMTP hello
-	 * @param string	$mediatypes['smtp_email']			SMTP email
-	 * @param int		$mediatypes['smtp_security']		SMTP connection security
-	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
-	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
+	 * @param array		$mediatypes							Multidimensional array with media types data.
+	 * @param int		$mediatypes['type']					E-mail, Script, SMS, Jabber, Ez Texting and Remedy Service.
+	 * @param string	$mediatypes['description']			Name of the media type.
+	 * @param string	$mediatypes['smtp_server']			Used for e-mail and Remedy Service URL.
+	 * @param int		$mediatypes['smtp_port']			Used for e-mail only.
+	 * @param string	$mediatypes['smtp_helo']			Used for e-mail and Remedy Service Proxy.
+	 * @param string	$mediatypes['smtp_email']			Used for e-mail and Remedy Service mapping.
+	 * @param int		$mediatypes['smtp_security']		SMTP connection security.
+	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer.
+	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host.
 	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
-	 * @param string	$mediatypes['exec_path']			script name/message text limit
-	 * @param string	$mediatypes['exec_params']			script parameters
-	 * @param string	$mediatypes['gsm_modem']			GSM modem
-	 * @param string	$mediatypes['username']				username
-	 * @param string	$mediatypes['passwd']				password
-	 * @param int		$mediatypes['status']				media type status
+	 * @param string	$mediatypes['exec_path']			Used for scripts, Ez Texting, Remedy Service company name.
+	 * @param string	$mediatypes['exec_params']			Script parameters.
+	 * @param string	$mediatypes['gsm_modem']			Used for SMS only.
+	 * @param string	$mediatypes['username']				Used for Jabber, Ez Texting and Remedy Service.
+	 * @param string	$mediatypes['passwd']				Used for Jabber, Ez Texting and Remedy Service.
+	 * @param int		$mediatypes['status']				Status of the media type (enabled/disabled).
 	 *
 	 * @return array
 	 */
@@ -692,24 +707,24 @@ class CMediatype extends CApiService {
 	/**
 	 * Update Media types.
 	 *
-	 * @param array		$mediatypes							multidimensional array with media types data
-	 * @param int		$mediatypes['mediatypeid']			id
-	 * @param int		$mediatypes['type']					type
-	 * @param string	$mediatypes['description']			description
-	 * @param string	$mediatypes['smtp_server']			SMTP server
-	 * @param int		$mediatypes['smtp_port']			SMTP port
-	 * @param string	$mediatypes['smtp_helo']			SMTP hello
-	 * @param string	$mediatypes['smtp_email']			SMTP email
+	 * @param array		$mediatypes							Multidimensional array with media types data.
+	 * @param int		$mediatypes['mediatypeid']			ID of the media type.
+	 * @param int		$mediatypes['type']					E-mail, Script, SMS, Jabber, Ez Texting and Remedy Service.
+	 * @param string	$mediatypes['description']			Name of the media type.
+	 * @param string	$mediatypes['smtp_server']			Used for e-mail and Remedy Service URL.
+	 * @param int		$mediatypes['smtp_port']			Used for e-mail only.
+	 * @param string	$mediatypes['smtp_helo']			Used for e-mail and Remedy Service Proxy.
+	 * @param string	$mediatypes['smtp_email']			Used for e-mail and Remedy Service mapping.
 	 * @param int		$mediatypes['smtp_security']		SMTP connection security
 	 * @param int		$mediatypes['smtp_verify_peer']		SMTP verify peer
 	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
 	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
-	 * @param string	$mediatypes['exec_path']			script name/message text limit
-	 * @param string	$mediatypes['exec_params']			script parameters
-	 * @param string	$mediatypes['gsm_modem']			GSM modem
-	 * @param string	$mediatypes['username']				username
-	 * @param string	$mediatypes['passwd']				password
-	 * @param int		$mediatypes['status']				media type status
+	 * @param string	$mediatypes['exec_path']			Used for scripts, Ez Texting, Remedy Service company name.
+	 * @param string	$mediatypes['exec_params']			Script parameters.
+	 * @param string	$mediatypes['gsm_modem']			Used for SMS only.
+	 * @param string	$mediatypes['username']				Used for Jabber, Ez Texting and Remedy Service.
+	 * @param string	$mediatypes['passwd']				Used for Jabber, Ez Texting and Remedy Service.
+	 * @param int		$mediatypes['status']				Status of the media type (enabled/disabled).
 	 *
 	 * @return array
 	 */
@@ -769,7 +784,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @param array		$mediatype							An array of media type data.
 	 * @param string	$mediatype['description']			Name of the media type.
-	 * @param string	$mediatype['type']					E-mail, Script, SMS, Jabber and Ez Texting.
+	 * @param string	$mediatype['type']					E-mail, Script, SMS, Jabber, Ez Texting and Remedy Service.
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
@@ -792,8 +807,13 @@ class CMediatype extends CApiService {
 			MEDIA_TYPE_EXEC => ['exec_path'],
 			MEDIA_TYPE_SMS => ['gsm_modem'],
 			MEDIA_TYPE_JABBER => ['username'],
-			MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username']
+			MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username'],
+			MEDIA_TYPE_REMEDY => ['smtp_server', 'smtp_email', 'exec_path', 'username', 'passwd']
 		];
+
+		$message_text_limit_validator = new CLimitedSetValidator(array(
+			'values' => array(EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA)
+		));
 
 		foreach ($required_fields_by_type[$mediatype['type']] as $field) {
 			// Check if fields set on Create method. For update method they are checked when type is changed.
@@ -807,6 +827,17 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['description'])
 				);
+			}
+			elseif (array_key_exists($field, $mediatype)
+					&& $mediatype['type'] == MEDIA_TYPE_EZ_TEXTING
+					&& $field === 'exec_path'
+					&&!$message_text_limit_validator->validate($mediatype[$field])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+					$mediatype['exec_path'],
+					'exec_path',
+					$mediatype['description']
+				));
 			}
 		}
 	}
@@ -823,6 +854,17 @@ class CMediatype extends CApiService {
 				'preservekeys' => true
 			]);
 			$result = $relationMap->mapMany($result, $users, 'users');
+		}
+
+		// adding media
+		if ($options['selectMedia'] !== null && $options['selectMedia'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'mediaid', 'media');
+			$media = API::UserMedia()->get(array(
+				'output' => $options['selectMedia'],
+				'mediaids' => $relationMap->getRelatedIds(),
+				'preservekeys' => true
+			));
+			$result = $relationMap->mapMany($result, $media, 'media');
 		}
 
 		return $result;

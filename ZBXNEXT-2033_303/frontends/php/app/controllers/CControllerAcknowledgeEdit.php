@@ -29,6 +29,7 @@ class CControllerAcknowledgeEdit extends CController {
 		$fields = [
 			'eventids' =>			'required|array_db acknowledges.eventid',
 			'message' =>			'db acknowledges.message',
+			'ticket_status' =>		'in 1,0',
 			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
 			'backurl' =>			'string'
 		];
@@ -85,18 +86,29 @@ class CControllerAcknowledgeEdit extends CController {
 
 		if (count($this->getInput('eventids')) == 1) {
 			$events = API::Event()->get([
-				'output' => [],
+				'output' => ['eventid', 'value'],
+				'select_acknowledges' => ['clock', 'message', 'alias', 'name', 'surname'],
+				'selectRelatedObject' => ['priority'],
 				'eventids' => $this->getInput('eventids'),
 				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'select_acknowledges' => ['clock', 'message', 'alias', 'name', 'surname']
+				'object' => EVENT_OBJECT_TRIGGER
 			]);
 
 			if ($events) {
 				$data['event'] = [
-					'acknowledges' => $events[0]['acknowledges']
+					'acknowledges' => $events[0]['acknowledges'],
+					'value' => $events[0]['value']
 				];
 				order_result($data['acknowledges'], 'clock', ZBX_SORT_DOWN);
+
+				CRemedyService::init(['triggerSeverity' => $events[0]['relatedObject']['priority']]);
+
+				if (CRemedyService::$enabled) {
+					$data['ticket'] = CRemedyService::mediaQuery($events[0]['eventid']);
+					$data['ticket_status'] = $this->hasInput('ticket_status')
+						? $this->getInput('ticket_status')
+						: false;
+				}
 			}
 		}
 

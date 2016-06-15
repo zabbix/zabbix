@@ -25,6 +25,7 @@ class CControllerAcknowledgeCreate extends CController {
 		$fields = [
 			'eventids' =>			'required|array_db acknowledges.eventid',
 			'message' =>			'db acknowledges.message',
+			'ticket_status' =>		'in 1,0',
 			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
 			'backurl' =>			'string'
 		];
@@ -113,7 +114,29 @@ class CControllerAcknowledgeCreate extends CController {
 		}
 
 		if ($result && $eventids) {
-			$result = API::Event()->acknowledge([
+			if (count($eventids) == 1 && $this->hasInput('ticket_status')) {
+				$events = API::Event()->get([
+					'output' => ['eventid'],
+					'selectRelatedObject' => ['priority', 'description', 'expression'],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'eventids' => $eventids
+				]);
+
+				CRemedyService::init(['triggerSeverity' => $events[0]['relatedObject']['priority']]);
+
+				if (CRemedyService::$enabled) {
+					$event_trigger_name = CMacrosResolverHelper::resolveTriggerName($events[0]['relatedObject']);
+
+					$result = (bool) CRemedyService::mediaAcknowledge([
+						'eventid' => $events[0]['eventid'],
+						'message' => $this->getInput('message', ''),
+						'subject' => $event_trigger_name
+					]);
+				}
+			}
+
+			$result = $result && API::Event()->acknowledge([
 				'eventids' => $eventids,
 				'message' => $this->getInput('message', '')
 			]);

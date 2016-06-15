@@ -41,6 +41,11 @@ class CControllerMediatypeCreate extends CController {
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',
 			'smtp_username' =>			'db media_type.username',
+			'remedy_username' =>		'db media_type.username',
+			'remedy_url' =>				'db media_type.smtp_server',
+			'remedy_proxy' =>			'db media_type.smtp_helo',
+			'remedy_mapping' =>			'db media_type.smtp_email',
+			'remedy_company' =>			'db media_type.exec_path',
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		];
@@ -120,6 +125,30 @@ class CControllerMediatypeCreate extends CController {
 
 				if ($this->hasInput('eztext_limit')) {
 					$mediatype['exec_path'] = $this->getInput('eztext_limit');
+				}
+				break;
+
+			case MEDIA_TYPE_REMEDY:
+				$this->getInputs($mediatype, ['passwd']);
+
+				if ($this->hasInput('remedy_url')) {
+					$mediatype['smtp_server'] = $this->getInput('remedy_url');
+				}
+
+				if ($this->hasInput('remedy_proxy')) {
+					$mediatype['smtp_helo'] = $this->getInput('remedy_proxy');
+				}
+
+				if ($this->hasInput('remedy_mapping')) {
+					$mediatype['smtp_email'] = $this->getInput('remedy_mapping');
+				}
+
+				if ($this->hasInput('remedy_company')) {
+					$mediatype['exec_path'] = $this->getInput('remedy_company');
+				}
+
+				if ($this->hasInput('remedy_username')) {
+					$mediatype['username'] = $this->getInput('remedy_username');
 				}
 				break;
 		}

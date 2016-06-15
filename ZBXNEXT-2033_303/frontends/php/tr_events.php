@@ -94,6 +94,29 @@ $event = reset($events);
  */
 $config = select_config();
 
+// ticket details
+$ticket_details_widget = null;
+CRemedyService::init(['triggerSeverity' => $trigger['priority']]);
+
+if (CRemedyService::$enabled) {
+	$ticket = CRemedyService::mediaQuery($event['eventid']);
+
+	if ($ticket) {
+		$ticket_table = (new CTableInfo())->addRow([_('Ticket'), $ticket['link']]);
+
+		if ($ticket['assignee']) {
+			$ticket_table->addRow([_('Assignee'), $ticket['assignee']]);
+		}
+
+		$ticket_table
+			->addRow([_('Status'), $ticket['status']])
+			->addRow([_('Created'), $ticket['created']]);
+
+		$ticket_details_widget = (new CUIWidget(WIDGET_HAT_TICKETDETAILS, $ticket_table))
+			->setHeader(_('Ticket details'));
+	}
+}
+
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
@@ -103,7 +126,8 @@ $eventTab = (new CTable())
 				make_event_details($event, $trigger,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
 				)
-			))->setHeader(_('Event details'))
+			))->setHeader(_('Event details')),
+			$ticket_details_widget
 		]),
 		new CDiv([
 			$config['event_ack_enable']

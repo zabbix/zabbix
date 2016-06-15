@@ -44,7 +44,10 @@ $cmbType = new CComboBox('type', $data['type'], null, [
 	MEDIA_TYPE_SMS => _('SMS'),
 	MEDIA_TYPE_JABBER => _('Jabber')
 ]);
-$cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
+$cmbType->addItemsInGroup(_('Commercial'), [
+	MEDIA_TYPE_EZ_TEXTING => _('Ez Texting'),
+	MEDIA_TYPE_REMEDY => _('Remedy Service')
+]);
 $cmbTypeRow = [$cmbType];
 $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
 	->setId('eztext_link')
@@ -75,6 +78,12 @@ $mediaTypeFormList
 			->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
 			->addValue(_('Normal password'), SMTP_AUTHENTICATION_NORMAL)
 			->setModern(true)
+	)
+	->addRow(_('Remedy Service URL'),
+		(new CTextBox('remedy_url', $data['remedy_url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Username'),
+		(new CTextBox('remedy_username', $data['remedy_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
 	->addRow(_('Script name'), (new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
@@ -140,6 +149,17 @@ $mediaTypeFormList
 		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
 		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 	]))
+	// Remedy
+	->addRow(_('Proxy'), (new CTextBox('remedy_proxy', $data['remedy_proxy']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('placeholder', 'http://[username[:password]@]proxy.example.com[:port]')
+	)
+	->addRow(_('Company name'),
+		(new CTextBox('remedy_company', $data['remedy_company']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Services mapping'),
+		(new CTextBox('remedy_mapping', $data['remedy_mapping']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
 	);

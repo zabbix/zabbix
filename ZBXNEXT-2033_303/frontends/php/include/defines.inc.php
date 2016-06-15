@@ -485,6 +485,7 @@ define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_JABBER',		3);
 define('MEDIA_TYPE_EZ_TEXTING',	100);
+define('MEDIA_TYPE_REMEDY',		101);
 
 define('SMTP_CONNECTION_SECURITY_NONE',		0);
 define('SMTP_CONNECTION_SECURITY_STARTTLS',	1);
@@ -898,6 +899,7 @@ define('ZBX_HAVE_IPV6', 1);
 define('ZBX_DISCOVERER_IPRANGE_LIMIT', 65536);
 
 define('ZBX_SOCKET_TIMEOUT',        3);         // socket timeout limit
+define('ZBX_SOCKET_REMEDY_TIMEOUT',	40);
 define('ZBX_SOCKET_BYTES_LIMIT',    1048576);   // socket response size limit, 1048576 is 1MB in bytes
 
 // value is also used in servercheck.js file
@@ -999,6 +1001,7 @@ define('WIDGET_HAT_EVENTACK',			'hat_eventack');
 define('WIDGET_HAT_EVENTACTIONMSGS',	'hat_eventactionmsgs');
 define('WIDGET_HAT_EVENTACTIONMCMDS',	'hat_eventactionmcmds');
 define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
+define('WIDGET_HAT_TICKETDETAILS',		'hat_ticketdetails');
 // search widget
 define('WIDGET_SEARCH_HOSTS',			'search_hosts');
 define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');

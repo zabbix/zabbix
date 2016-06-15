@@ -1758,7 +1758,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		}
 		foreach ($messages as $message) {
 			foreach (explode("\n", $message['message']) as $message_part) {
-				$list->addItem($message_part);
+				if ($message_part !== '') {
+					$list->addItem($message_part);
+				}
 			}
 		}
 		$msg_details->addItem($list);

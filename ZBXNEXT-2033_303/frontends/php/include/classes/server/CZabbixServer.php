@@ -153,6 +153,40 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to return the last incidents related to the specified events.
+	 *
+	 * @param array $eventids
+	 * @param string $sid   user session ID
+	 *
+	 * @return bool|array
+	 */
+	public function mediaQuery(array $eventids, $sid) {
+		return $this->request([
+			'request' => 'media.query',
+			'sid' => $sid,
+			'eventids' => $eventids
+		]);
+	}
+
+	/**
+	 * Create a new incident or update an existing one based on the status of the last created incident.
+	 *
+	 * @param string $events['eventid']
+	 * @param string $events['subject']		short summary of the event
+	 * @param string $events['message']		detailed alert message
+	 * @param string $sid					user session ID
+	 *
+	 * @return bool|array
+	 */
+	public function mediaAcknowledge(array $events, $sid) {
+		return $this->request([
+			'request' => 'media.acknowledge',
+			'sid' => $sid,
+			'events' => $events
+		]);
+	}
+
+	/**
 	 * Returns true if the Zabbix server is running and false otherwise.
 	 *
 	 * @return bool

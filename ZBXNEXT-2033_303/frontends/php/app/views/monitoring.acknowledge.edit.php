@@ -23,11 +23,24 @@ $this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
 
 $form_list = (new CFormList())
 	->addRow(_('Message'),
-		(new CTextArea('message'))
+		(new CTextArea('message', $data['message']))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->setMaxLength(255)
 			->setAttribute('autofocus', 'autofocus')
 	);
+
+if (CRemedyService::$enabled && ((!$data['ticket'] && $data['event']['value'] == TRIGGER_VALUE_TRUE)
+		|| $data['ticket'])) {
+	$ticket_status_message = (!$data['ticket'] || $data['ticket']['status'] === 'Closed'
+			|| $data['ticket']['status'] === 'Cancelled'
+	)
+		? _('Create ticket')
+		: [_('Update ticket').' ', $data['ticket']['link']];
+
+	$form_list->addRow($ticket_status_message,
+		(new CCheckBox('ticket_status'))->setChecked($data['ticket_status'])
+	);
+}
 
 if (array_key_exists('event', $data)) {
 	$acknowledgesTable = (new CTable())
@@ -80,17 +93,39 @@ $footer_buttons = makeFormFooter(
 	[new CRedirectButton(_('Cancel'), $data['backurl'])]
 );
 
-(new CWidget())
-	->setTitle(_('Alarm acknowledgements'))
-	->addItem(
-		(new CForm())
+$form = (new CForm())
 			->setId('acknowledge_form')
 			->addVar('eventids', $data['eventids'])
-			->addVar('backurl', $data['backurl'])
-			->addItem(
-				(new CTabView())
-					->addTab('ackTab', null, $form_list)
-					->setFooter($footer_buttons)
-			)
-	)
+			->addVar('backurl', $data['backurl']);
+
+// Create a Remedy ticket block before the actual form.
+if (CRemedyService::$enabled && $data['ticket']) {
+	$widget = new CWidget();
+
+	$ticket = (new CFormList())->addRow(_('Ticket'), $data['ticket']['link']);
+
+	if ($data['ticket']['assignee']) {
+		$ticket->addRow(_('Assignee'), $data['ticket']['assignee']);
+	}
+
+	$ticket
+		->addRow(_('Status'), $data['ticket']['status'])
+		->addRow(_('Created'), $data['ticket']['created']);
+
+	$widget->addItem((new CDiv($ticket))->addClass(ZBX_STYLE_CELL));
+
+	$form->addItem(
+		(new CDiv((new CDiv($widget))->addClass(ZBX_STYLE_FILTER_FORMS)))->addClass(ZBX_STYLE_FILTER_CONTAINER)
+	);
+}
+
+$form->addItem(
+	(new CTabView())
+		->addTab('ackTab', null, $form_list)
+		->setFooter($footer_buttons)
+);
+
+(new CWidget())
+	->setTitle(_('Alarm acknowledgements'))
+	->addItem($form)
 	->show();
