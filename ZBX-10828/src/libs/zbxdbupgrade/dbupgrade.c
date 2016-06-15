@@ -2290,7 +2290,7 @@ static int	DBpatch_2010194(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: replace_key_param                                                *
+ * Function: DBpatch_2010195_replace_key_param_cb                             *
  *                                                                            *
  * Comments: auxiliary function for DBpatch_2010195()                         *
  *                                                                            *
@@ -2302,7 +2302,7 @@ static int	DBpatch_2010195_replace_key_param_cb(const char *data, int key_type, 
 	int	ret;
 
 	if (1 != level || 4 != num)	/* the fourth parameter on first level should be updated */
-		return FAIL;
+		return SUCCEED;
 
 	param = zbx_strdup(NULL, data);
 
