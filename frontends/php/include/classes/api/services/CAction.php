@@ -2322,10 +2322,11 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (!array_key_exists('operations', $action) || !$action['operations']) {
+			if ((!array_key_exists('operations', $action) || !$action['operations'])
+					&& (!array_key_exists('recovery_operations', $action) || !$action['recovery_operations'])) {
 				self::exception(
 					ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect parameter for action "%1$s".', $action['name'])
+					_s('Action "%1$s" no operations defined.', $action['name'])
 				);
 			}
 			else {
@@ -2486,10 +2487,14 @@ class CAction extends CApiService {
 				}
 			}
 
-			if (array_key_exists('operations', $action) && !$action['operations']) {
+			if (((array_key_exists('operations', $action) && !$action['operations'])
+					|| (!array_key_exists('operations', $action) && !$db_action['operations']))
+					&& ((array_key_exists('recovery_operations', $action) && !$action['recovery_operations'])
+						|| (!array_key_exists('recovery_operations', $action) && !$db_action['recoveryOperations']))) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" no operations defined.', $actionName));
 			}
-			elseif (isset($action['operations'])) {
+
+			if (array_key_exists('operations', $action) && $action['operations']) {
 				$db_operations = zbx_toHash($db_actions[$action['actionid']]['operations'], 'operationid');
 				foreach ($action['operations'] as $operation) {
 					if (!array_key_exists('operationid', $operation)
