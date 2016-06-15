@@ -243,14 +243,22 @@
 				target: 'current',
 				operationName: <?= CJs::encodeJson(_('Add')) ?>
 			},
-			tpl;
+			tpl,
+			parentId;
 
 		if (jQuery('#opcmdEditForm').length > 0) {
 			closeOpCmdForm();
 		}
 
+		if (type == <?= ACTION_OPERATION ?>) {
+			parentId = 'opCmdList';
+		}
+		else {
+			parentId = 'recOpCmdList';
+		}
+
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
-		jQuery('#opCmdList').closest('li').after(tpl.evaluate(objectTPL));
+		jQuery('#' + parentId).closest('li').after(tpl.evaluate(objectTPL));
 
 		// actions
 		jQuery('#opcmdEditForm')

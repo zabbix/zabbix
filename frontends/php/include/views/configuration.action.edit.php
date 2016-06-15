@@ -1134,7 +1134,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	$operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operationsTable->setHeader([_('Details'), _('Action')]);
 
-	if ($data['action']['recoveryOperations']) {
+	if ($data['action']['recovery_operations']) {
 		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']]);
 
 		$default_message = [
@@ -1561,7 +1561,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$new_recovery_operation_vars,
 				$new_operation_formlist,
 				new CHorList([
-					(new CSubmit('add_operation', (isset($data['new_recovery_operation']['id'])) ? _('Update') : _('Add')))
+					(new CSubmit('add_recovery_operation', (isset($data['new_recovery_operation']['id']))
+						? _('Update')
+						: _('Add')))
 						->addClass(ZBX_STYLE_BTN_LINK),
 					(new CSubmit('cancel_new_recovery_operation', _('Cancel')))
 						->addClass(ZBX_STYLE_BTN_LINK)
