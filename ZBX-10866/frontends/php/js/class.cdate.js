@@ -149,22 +149,14 @@ CDate.prototype = {
 	setZBXDate: function(strdate) {
 		this.server = 1;
 
-		var theDate = {
-			Y: strdate.toString().substr(0, 4),
-			m: strdate.toString().substr(4, 2),
-			d: strdate.toString().substr(6, 2),
-			H: strdate.toString().substr(8, 2),
-			i: strdate.toString().substr(10, 2),
-			s: strdate.toString().substr(12, 2)
-		};
-
-		this.serverDate.setFullYear(theDate.Y);
-		this.serverDate.setMonth(theDate.m - 1);
-		this.serverDate.setDate(theDate.d);
-		this.serverDate.setHours(theDate.H);
-		this.serverDate.setMinutes(theDate.i);
-		this.serverDate.setSeconds(theDate.s);
-		this.serverDate.setMilliseconds(0);
+		this.serverDate = new Date(
+			strdate.toString().substr(0, 4),
+			strdate.toString().substr(4, 2) - 1,
+			strdate.toString().substr(6, 2),
+			strdate.toString().substr(8, 2),
+			strdate.toString().substr(10, 2),
+			strdate.toString().substr(12, 2)
+		);
 		this.calcTZdiff();
 
 		return this.getTime();
