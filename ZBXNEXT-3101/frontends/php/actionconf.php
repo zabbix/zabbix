@@ -570,7 +570,7 @@ if (hasRequest('form')) {
 		$data['action']['esc_period'] = getRequest('esc_period', SEC_PER_HOUR);
 		$data['action']['status'] = getRequest('status', hasRequest('form_refresh') ? 1 : 0);
 		$data['action']['operations'] = getRequest('operations', []);
-		$data['action']['recovery_perations'] = getRequest('recovery_operations', []);
+		$data['action']['recovery_operations'] = getRequest('recovery_operations', []);
 
 		$data['action']['filter']['evaltype'] = getRequest('evaltype');
 		$data['action']['filter']['formula'] = getRequest('formula');

@@ -1142,8 +1142,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			'message' => $data['action']['r_longdata']
 		];
 
-		$actionOperationHints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
-
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
 				continue;
