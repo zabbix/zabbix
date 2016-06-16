@@ -210,7 +210,7 @@ void	free_request(AGENT_REQUEST *request);
 int	parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 
 void	unquote_key_param(char *param);
-void	quote_key_param(char **param, int forced);
+int	quote_key_param(char **param, int forced);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, int data_type, char *c);
 void	set_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
