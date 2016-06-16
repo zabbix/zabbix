@@ -379,25 +379,7 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 				else if (socket_error == WSAETIMEDOUT)
 					*error = zbx_strdup(*error, "A connection timeout occurred.");
 				else
-				{
-					wchar_t error_msg[ZBX_SOCKET_STRERROR_LEN];
-
-					if (0 != FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-						socket_error, 0, error_msg, _countof(error_msg), NULL))
-					{
-						char error_msg_oem[ZBX_SOCKET_STRERROR_LEN];
-
-						if (0 != WideCharToMultiByte(CP_OEMCP, 0, error_msg, -1,
-							error_msg_oem, _countof(error_msg_oem), NULL, NULL))
-						{
-							*error = zbx_strdup(*error, error_msg_oem);
-						}
-						else
-							*error = zbx_strdup(*error, "Unknown error.");
-					}
-					else
-						*error = zbx_strdup(*error, "Unknown error.");
-				}
+					*error = zbx_strdup(*error, strerror_from_system(socket_error));
 			}
 		}
 
