@@ -553,9 +553,9 @@ class CAction extends CApiService {
 					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
 						|| $action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
-					$operation['actionid'] = $actionid;
-					$operation['recovery'] = ACTION_RECOVERY_OPERATION;
-					$operations_to_create[] = $operation;
+					$recovery_operation['actionid'] = $actionid;
+					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+					$operations_to_create[] = $recovery_operation;
 				}
 			}
 		}
