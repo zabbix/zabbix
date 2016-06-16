@@ -543,10 +543,12 @@ class CAction extends CApiService {
 				}
 			}
 
-			foreach ($action['operations'] as $operation) {
-				$operation['actionid'] = $actionid;
-				$operation['recovery'] = ACTION_OPERATION;
-				$operations_to_create[] = $operation;
+			if (array_key_exists('operations', $action) && $action['operations']) {
+				foreach ($action['operations'] as $operation) {
+					$operation['actionid'] = $actionid;
+					$operation['recovery'] = ACTION_OPERATION;
+					$operations_to_create[] = $operation;
+				}
 			}
 
 			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
@@ -2330,10 +2332,12 @@ class CAction extends CApiService {
 				);
 			}
 			else {
-				foreach ($action['operations'] as $operation) {
-					$operation['recovery'] = ACTION_OPERATION;
-					$operation['eventsource'] = $action['eventsource'];
-					$operations_to_validate[] = $operation;
+				if (array_key_exists('operations', $action) && $action['operations']) {
+					foreach ($action['operations'] as $operation) {
+						$operation['recovery'] = ACTION_OPERATION;
+						$operation['eventsource'] = $action['eventsource'];
+						$operations_to_validate[] = $operation;
+					}
 				}
 			}
 
@@ -2352,7 +2356,9 @@ class CAction extends CApiService {
 		if ($conditionsToValidate) {
 			$this->validateConditionsPermissions($conditionsToValidate);
 		}
-		$this->validateOperationsIntegrity($operations_to_validate);
+		if ($operations_to_validate) {
+			$this->validateOperationsIntegrity($operations_to_validate);
+		}
 	}
 
 	/**
