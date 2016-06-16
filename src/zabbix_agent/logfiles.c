@@ -1136,10 +1136,10 @@ out:
  * Purpose: release resources allocated to a logfile list                     *
  *                                                                            *
  * Parameters:                                                                *
- *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
- *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for, *
- *                               can be NULL.                                 *
- *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
+ *     logfiles       - [IN/OUT] pointer to the list of logfiles, can be NULL *
+ *     logfiles_alloc - [IN/OUT] pointer to number of logfiles memory was     *
+ *                               allocated for, can be NULL.                  *
+ *     logfiles_num   - [IN/OUT] valid pointer to number of inserted logfiles *
  *                                                                            *
  ******************************************************************************/
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
