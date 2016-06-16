@@ -167,13 +167,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	unset($operation);
 
-	foreach ($action['recovery_operations'] as &$recovery_operations) {
-		if (array_key_exists('opmessage', $recovery_operations)
-				&& !array_key_exists('default_msg', $recovery_operations['opmessage'])) {
-			$recovery_operations['opmessage']['default_msg'] = 0;
+	foreach ($action['recovery_operations'] as &$recovery_operation) {
+		if (array_key_exists('opmessage', $recovery_operation)
+				&& !array_key_exists('default_msg', $recovery_operation['opmessage'])) {
+			$recovery_operation['opmessage']['default_msg'] = 0;
 		}
 	}
-	unset($recovery_operations);
+	unset($recovery_operation);
 
 	$filter = [
 		'conditions' => getRequest('conditions', []),
@@ -518,7 +518,9 @@ if (hasRequest('form')) {
 		$data['action'] = API::Action()->get([
 			'actionids' => $data['actionid'],
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectRecoveryOperations' => ['operationid', 'actionid', 'operationtype'],
+			'selectRecoveryOperations' => ['operationid', 'actionid', 'operationtype', 'opmessage', 'opmessage_grp',
+				'opmessage_usr', 'opcommand', 'opcommand_hst', 'opcommand_grp'
+			],
 			'selectFilter' => ['formula', 'conditions', 'evaltype'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true

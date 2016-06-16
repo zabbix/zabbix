@@ -410,7 +410,7 @@ if ($data['action']['operations']) {
 		'message' => $data['action']['def_longdata']
 	];
 
-	$actionOperationHints = getActionOperationHints($data['action']['operations'], $default_message);
+	$actiono_peration_hints = getActionOperationHints($data['action']['operations'], $default_message);
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
 		if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
@@ -424,7 +424,7 @@ if ($data['action']['operations']) {
 		}
 
 		$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-			->setHint($actionOperationHints[$operationid]);
+			->setHint($actiono_peration_hints[$operationid]);
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS
 				|| $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
@@ -1142,6 +1142,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			'message' => $data['action']['r_longdata']
 		];
 
+		$actiono_peration_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
+
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
 				continue;
@@ -1154,7 +1156,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			}
 
 			$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-				->setHint($actionOperationHints[$operationid]);
+				->setHint($actiono_peration_hints[$operationid]);
 
 			$operationRow = [
 				$details,
