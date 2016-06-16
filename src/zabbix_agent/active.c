@@ -1229,7 +1229,8 @@ static int	process_log_check(char *server, unsigned short port, ZBX_ACTIVE_METRI
 				metric->mtime =  mtime_orig;
 				metric->big_rec = big_rec_orig;
 
-				/* the old log file list 'metric->logfiles' stays in its place */
+				/* the old log file list 'metric->logfiles' stays in its place, drop the new list */
+				destroy_logfile_list(&logfiles_new, NULL, &logfiles_num_new);
 			}
 		}
 	}
