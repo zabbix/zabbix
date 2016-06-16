@@ -2331,13 +2331,11 @@ class CAction extends CApiService {
 					_s('Action "%1$s" no operations defined.', $action['name'])
 				);
 			}
-			else {
-				if (array_key_exists('operations', $action) && $action['operations']) {
-					foreach ($action['operations'] as $operation) {
-						$operation['recovery'] = ACTION_OPERATION;
-						$operation['eventsource'] = $action['eventsource'];
-						$operations_to_validate[] = $operation;
-					}
+			elseif (array_key_exists('operations', $action) && $action['operations']) {
+				foreach ($action['operations'] as $operation) {
+					$operation['recovery'] = ACTION_OPERATION;
+					$operation['eventsource'] = $action['eventsource'];
+					$operations_to_validate[] = $operation;
 				}
 			}
 
