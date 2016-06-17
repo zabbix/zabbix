@@ -56,7 +56,11 @@ static int	DBpatch_2050001(void)
 		size_t	oid_offset = 0;
 
 		param = zbx_strdup(NULL, row[1]);
-		quote_key_param(&param, 0);
+		if (FAIL == (ret = quote_key_param(&param, 0)))
+		{
+			zbx_free(param);
+			goto out;
+		}
 
 		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
 
