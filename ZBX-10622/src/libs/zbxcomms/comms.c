@@ -381,6 +381,11 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 				else
 					*error = zbx_strdup(*error, strerror_from_system(socket_error));
 			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "Cannot obtain error code: %s",
+						strerror_from_system(zbx_socket_last_error()));
+			}
 		}
 
 		return FAIL;
