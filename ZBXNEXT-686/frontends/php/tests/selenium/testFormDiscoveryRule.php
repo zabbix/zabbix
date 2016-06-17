@@ -307,7 +307,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='typename']", 'size', 20);
 			$this->zbxTestAssertAttribute("//input[@id='typename']", 'readonly');
 
-			$type = $this->zbxTestGetSelectedLabel('typename');
+			$type = $this->zbxTestGetValue("//input[@id='typename']");
 		}
 
 		$this->zbxTestTextPresent('Key');

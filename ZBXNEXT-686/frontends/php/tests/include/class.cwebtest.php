@@ -259,6 +259,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestInputTypeOverwrite($id, $str) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
 		$this->webDriver->findElement(WebDriverBy::id($id))->click();
 		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::CONTROL);
 		$this->webDriver->getKeyboard()->pressKey('a');
@@ -454,6 +455,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestAssertVisibleXpath($xpath){
 		$this->assertTrue($this->webDriver->findElement(WebDriverBy::xpath($xpath))->isDisplayed());
+	}
+
+	public function zbxTestIsEnabled($xpath){
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->isEnabled();
 	}
 
 	// check that page does not have real (not visible) host or template names

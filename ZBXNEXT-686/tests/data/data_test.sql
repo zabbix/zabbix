@@ -973,10 +973,10 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES (40014, 40001, 1, 4, 1, '127.0.5.4', '10054');
 
 -- testFormItem.LayoutCheck testFormItem.SimpleUpdate
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30000, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30001, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '');
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30000, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30001, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30002, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '', 1);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula) VALUES (30003, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '', 1);
 
 -- testFormTrigger.SimpleCreate
 INSERT INTO items (itemid, type, snmp_community, snmp_oid, hostid, name, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, multiplier, delta, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, formula, error, lastlogsize, logtimefmt, templateid, valuemapid, delay_flex, params, ipmi_sensor, data_type, authtype, username, password, publickey, privatekey, mtime, flags, interfaceid) VALUES (30004, 0, '', '', 40001, 'testFormItem', 'testFormItems','test-item-reuse', 30, 90, 365, 0, 0, '', '', 0, 0, '', 0, '', '', 1, '', 0, '', NULL, NULL, '', '', '', 0, 0, '', '', '', '', 0, 0, 40011);
