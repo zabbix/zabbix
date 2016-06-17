@@ -399,33 +399,54 @@
 		jQuery('#opcmdEditForm').closest('li').remove();
 	}
 
-	function showOpTypeForm() {
-		var currentOpType,
+	function showOpTypeForm(type) {
+		var current_op_type,
 			opTypeFieldIds,
 			fieldId,
 			f;
 
-		if (jQuery('#new_operation_opcommand_type').length == 0) {
+		if (type == <?= ACTION_OPERATION ?>) {
+			var opcommand_type = jQuery('#new_operation_opcommand_type'),
+				opcommand_script = '#new_operation_opcommand_script',
+				opcommand_execute_on = '#new_operation_opcommand_execute_on',
+				opcommand_port = '#new_operation_opcommand_port',
+				opcommand_command = '#new_operation_opcommand_command',
+				opcommand_command_ipmi = '#new_operation_opcommand_command_ipmi',
+				opcommand_authtype = '#new_operation_opcommand_authtype',
+				opcommand_username = '#new_operation_opcommand_username';
+		}
+		else {
+			var opcommand_type = jQuery('#new_recovery_operation_opcommand_type'),
+				opcommand_script = '#new_recovery_operation_opcommand_script',
+				opcommand_execute_on = '#new_recovery_operation_opcommand_execute_on',
+				opcommand_port = '#new_recovery_operation_opcommand_port',
+				opcommand_command = '#new_recovery_operation_opcommand_command',
+				opcommand_command_ipmi = '#new_recovery_operation_opcommand_command_ipmi',
+				opcommand_authtype = '#new_recovery_operation_opcommand_authtype',
+				opcommand_username = '#new_recovery_operation_opcommand_username';
+		}
+
+		if (opcommand_type.length == 0) {
 			return;
 		}
 
-		currentOpType = jQuery('#new_operation_opcommand_type').val();
+		current_op_type = opcommand_type.val();
 
 		opTypeFieldIds = {
-			'#new_operation_opcommand_script': [ZBX_SCRIPT_TYPES.userscript],
-			'#new_operation_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
-			'#new_operation_opcommand_port': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			'#new_operation_opcommand_command': [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			'#new_operation_opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
-			'#new_operation_opcommand_authtype': [ZBX_SCRIPT_TYPES.ssh],
-			'#new_operation_opcommand_username': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			'opcommand_script': [ZBX_SCRIPT_TYPES.userscript],
+			'opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
+			'opcommand_port': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			'opcommand_command': [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			'opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
+			'opcommand_authtype': [ZBX_SCRIPT_TYPES.ssh],
+			'opcommand_username': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
 		};
 
 		for (fieldId in opTypeFieldIds) {
 			var show = false;
 
 			for (f = 0; f < opTypeFieldIds[fieldId].length; f++) {
-				if (currentOpType == opTypeFieldIds[fieldId][f]) {
+				if (current_op_type == opTypeFieldIds[fieldId][f]) {
 					show = true;
 				}
 			}
@@ -437,30 +458,46 @@
 				.prop('disabled', !show);
 		}
 
-		showOpTypeAuth();
+		showOpTypeAuth(type);
 	}
 
-	function showOpTypeAuth() {
-		var currentOpType = parseInt(jQuery('#new_operation_opcommand_type').val(), 10),
-			show_password = false,
+	function showOpTypeAuth(type) {
+		var show_password = false,
 			show_publickey = false;
 
-		if (currentOpType === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
-			var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
+		if (type == <?= ACTION_OPERATION ?>) {
+			var current_op_type = parseInt(jQuery('#new_operation_opcommand_type').val(), 10),
+				opcommand_authtype = 'new_operation_opcommand_script',
+				opcommand_password = 'new_operation_opcommand_password',
+				opcommand_publickey = 'new_operation_opcommand_publickey',
+				opcommand_privatekey = 'new_operation_opcommand_privatekey',
+				opcommand_passphrase = 'new_operation_opcommand_passphrase';
+		}
+		else {
+			var current_op_type = parseInt(jQuery('#new_recovery_operation_opcommand_type').val(), 10),
+				opcommand_authtype = 'new_recovery_operation_opcommand_script',
+				opcommand_password = 'new_recovery_operation_opcommand_password',
+				opcommand_publickey = 'new_recovery_operation_opcommand_publickey',
+				opcommand_privatekey = 'new_recovery_operation_opcommand_privatekey',
+				opcommand_passphrase = 'new_recovery_operation_opcommand_passphrase';
+		}
 
-			show_password = (currentOpTypeAuth === <?= ITEM_AUTHTYPE_PASSWORD ?>);
+		if (current_op_type === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
+			var current_op_type_auth = parseInt(jQuery('#' + opcommand_authtype).val(), 10);
+
+			show_password = (current_op_type_auth === <?= ITEM_AUTHTYPE_PASSWORD ?>);
 			show_publickey = !show_password;
 		}
-		else if (currentOpType === <?= ZBX_SCRIPT_TYPE_TELNET ?>) {
+		else if (current_op_type === <?= ZBX_SCRIPT_TYPE_TELNET ?>) {
 			show_password = true;
 		}
 
-		jQuery('#new_operation_opcommand_password')
+		jQuery('#' + opcommand_password)
 			.closest('li')
 			.toggle(show_password)
 			.find(':input')
 			.prop('disabled', !show_password);
-		jQuery('#new_operation_opcommand_publickey,#new_operation_opcommand_privatekey,#new_operation_opcommand_passphrase')
+		jQuery('#' + opcommand_publickey + ', #' + opcommand_privatekey + ', #' + opcommand_passphrase)
 			.closest('li')
 			.toggle(show_publickey)
 			.find(':input')
@@ -545,7 +582,8 @@
 		});
 
 		// new operation form command type
-		showOpTypeForm();
+		showOpTypeForm(<?= ACTION_OPERATION ?>);
+		showOpTypeForm(<?= ACTION_RECOVERY_OPERATION ?>);
 
 		jQuery('#select_opcommand_script').click(function() {
 			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script');
