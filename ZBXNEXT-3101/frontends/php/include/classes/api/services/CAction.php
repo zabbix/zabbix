@@ -679,7 +679,7 @@ class CAction extends CApiService {
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					if (!array_key_exists('operationid', $recovery_operation)) {
-						$recovery_operation['actionid'] = $recovery_operation['actionid'];
+						$recovery_operation['actionid'] = $action['actionid'];
 						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 						$operations_to_create[] = $recovery_operation;
 					}
