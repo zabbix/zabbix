@@ -553,7 +553,7 @@ class CAction extends CApiService {
 
 			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
 					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
+						|| $action['eventsource'] == EVENT_SOURCE_INTERNAL)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					$recovery_operation['actionid'] = $actionid;
 					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
@@ -2341,7 +2341,7 @@ class CAction extends CApiService {
 
 			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
 					&& ($action['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
+						|| $action['eventsource'] == EVENT_SOURCE_INTERNAL)) {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 					$recovery_operation['eventsource'] = $action['eventsource'];
