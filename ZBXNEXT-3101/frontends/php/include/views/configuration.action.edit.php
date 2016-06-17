@@ -410,7 +410,7 @@ if ($data['action']['operations']) {
 		'message' => $data['action']['def_longdata']
 	];
 
-	$actiono_peration_hints = getActionOperationHints($data['action']['operations'], $default_message);
+	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
 		if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
@@ -424,7 +424,7 @@ if ($data['action']['operations']) {
 		}
 
 		$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-			->setHint($actiono_peration_hints[$operationid]);
+			->setHint($action_operation_hints[$operationid]);
 
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS
 				|| $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
@@ -805,7 +805,7 @@ if (!empty($data['new_operation'])) {
 			// type
 			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
 				$data['new_operation']['opcommand']['type'],
-				'showOpTypeForm()',
+				'showOpTypeForm('.ACTION_OPERATION.')',
 				[
 					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
@@ -1142,7 +1142,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			'message' => $data['action']['r_longdata']
 		];
 
-		$actiono_peration_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
+		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
 
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
 			if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
@@ -1156,7 +1156,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			}
 
 			$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
-				->setHint($actiono_peration_hints[$operationid]);
+				->setHint($action_operation_hints[$operationid]);
 
 			$operationRow = [
 				$details,
@@ -1172,7 +1172,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)
 			];
-			$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
+			$operationsTable->addRow($operationRow, null, 'recovery_operations_'.$operationid);
 
 			$operation['opmessage_grp'] = isset($operation['opmessage_grp'])
 				? zbx_toHash($operation['opmessage_grp'], 'usrgrpid')
@@ -1471,7 +1471,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				// type
 				$typeComboBox = new CComboBox('new_recovery_operation[opcommand][type]',
 					$data['new_recovery_operation']['opcommand']['type'],
-					'showOpTypeForm()',
+					'showOpTypeForm('.ACTION_RECOVERY_OPERATION.')',
 					[
 						ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 						ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),

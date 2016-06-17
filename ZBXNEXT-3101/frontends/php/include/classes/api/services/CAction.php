@@ -674,7 +674,7 @@ class CAction extends CApiService {
 
 			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
 					&& ($db_action['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $db_action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
+						|| $db_action['eventsource'] == EVENT_SOURCE_INTERNAL)) {
 				$db_recovery_operations = zbx_toHash($db_action['recoveryOperations'], 'operationid');
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
@@ -2516,7 +2516,7 @@ class CAction extends CApiService {
 			// Recovery operations.
 			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']
 					&& ($db_action['eventsource'] == EVENT_SOURCE_TRIGGERS
-						|| $db_action['eventsource'] = EVENT_SOURCE_INTERNAL)) {
+						|| $db_action['eventsource'] == EVENT_SOURCE_INTERNAL)) {
 				$db_recovery_operations = zbx_toHash($db_actions[$action['actionid']]['recoveryOperations'],
 					'operationid'
 				);
