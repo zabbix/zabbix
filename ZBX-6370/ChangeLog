@@ -29,6 +29,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-10622] fixed handling of socket connection error messages on Windows (viktors)
 .......PS. [ZBX-10828] fixed server/proxy crashes when performing Simple checks with invalid key parameters hidden in user macro (viktors)
 ..F....... [ZBX-10789] fixed drawing graphs with items that have scheduling intervals (Cemeris)
 ...G...... [ZBX-10852] fixed agent compilation on AIX 5.2, AIX 5.3 (wiper)
