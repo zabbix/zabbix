@@ -403,7 +403,7 @@ else {
 }
 
 if ($data['action']['operations']) {
-	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']]);
+	$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_OPERATION);
 
 	$default_message = [
 		'subject' => $data['action']['def_shortdata'],
@@ -1135,7 +1135,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 	$operationsTable->setHeader([_('Details'), _('Action')]);
 
 	if ($data['action']['recovery_operations']) {
-		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']]);
+		$actionOperationDescriptions = getActionOperationDescriptions([$data['action']], ACTION_RECOVERY_OPERATION);
 
 		$default_message = [
 			'subject' => $data['action']['r_shortdata'],
@@ -1162,12 +1162,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$details,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+						(new CSubmit('edit_recovery_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 						[
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_RECOVERY_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK),
-							new CVar('operations['.$operationid.']', $operation)
+							new CVar('recovery_operations['.$operationid.']', $operation)
 						]
 					])
 				))->addClass(ZBX_STYLE_NOWRAP)

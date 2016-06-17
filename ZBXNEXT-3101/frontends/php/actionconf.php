@@ -60,8 +60,8 @@ $fields = [
 	'operations' =>						[null,		O_OPT,	null,	null,		'isset({add}) || isset({update})'],
 	'edit_operationid' =>				[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'new_operation' =>					[null,		O_OPT,	null,	null,		null],
-	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'recovery_operations' =>			[null,		O_OPT,	null,	null,		null],
+	'edit_recovery_operationid' =>		[T_ZBX_STR, O_OPT,	P_ACT,	null,		null],
 	'new_recovery_operation' =>			[null,		O_OPT,	null,	null,		null],
 	'opconditions' =>					[null,		O_OPT,	null,	null,		null],
 	'new_opcondition' =>				[null,		O_OPT,	null,	null,		'isset({add_opcondition})'],
@@ -326,7 +326,7 @@ elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'
 		error($e->getMessage());
 	}
 }
-elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) {
+elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 	$new_operation = $_REQUEST['new_operation'];
 	$result = true;
 
@@ -438,7 +438,7 @@ elseif (hasRequest('edit_recovery_operationid')) {
 	$_REQUEST['edit_recovery_operationid'] = $edit_recovery_operationid;
 	$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
 
-	if (isset($_REQUEST['recovery_operations'][$edit_recovery_operationid])) {
+	if (array_key_exists([$edit_recovery_operationid], $_REQUEST['recovery_operations'])) {
 		$_REQUEST['new_recovery_operation'] = $_REQUEST['operations'][$edit_recovery_operationid];
 		$_REQUEST['new_recovery_operation']['id'] = $edit_recovery_operationid;
 	}
