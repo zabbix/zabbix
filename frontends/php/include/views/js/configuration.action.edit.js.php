@@ -566,9 +566,18 @@
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
-			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;
+			// Remove operations IDs
+			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=operations]').each(function() {
-				if ($(this).getAttribute('name').match(operationIdNameRegex)) {
+				if ($(this).getAttribute('name').match(operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
+			// Remove recovery operations IDs
+			var recovery_operationid_RegExp = /recovery_operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=recovery_operations]').each(function() {
+				if ($(this).getAttribute('name').match(recovery_operationid_RegExp)) {
 					$(this).remove();
 				}
 			});
