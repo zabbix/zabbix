@@ -147,9 +147,7 @@ CDate.prototype = {
 	},
 
 	setZBXDate: function(strdate) {
-		this.server = 1;
-
-		this.serverDate = new Date(
+		this.setTimeObject(
 			strdate.toString().substr(0, 4),
 			strdate.toString().substr(4, 2) - 1,
 			strdate.toString().substr(6, 2),
@@ -157,7 +155,6 @@ CDate.prototype = {
 			strdate.toString().substr(10, 2),
 			strdate.toString().substr(12, 2)
 		);
-		this.calcTZdiff();
 
 		return this.getTime();
 	},
@@ -261,15 +258,40 @@ CDate.prototype = {
 		this.calcTZdiff();
 	},
 
-	setMonth: function(arg) {
+	setTimeObject: function(y, m, d, h, i, s) {
 		this.server = 1;
-		this.serverDate.setMonth(arg);
-		this.calcTZdiff();
-	},
+		function hasAttr(arg) {
+			return (typeof(arg) !== 'undefined' && arg !== null);
+		}
 
-	setFullYear: function(arg) {
-		this.server = 1;
-		this.serverDate.setFullYear(arg);
+		if (hasAttr(y)) {
+			this.serverDate.setFullYear(y);
+		}
+
+		if (hasAttr(m) && hasAttr(d)) {
+			this.serverDate.setMonth(m, d);
+		}
+		else {
+			if (hasAttr(d)) {
+				this.serverDate.setDate(d);
+			}
+			if (hasAttr(m)) {
+				this.serverDate.setMonth(m);
+			}
+		}
+
+		if (hasAttr(m)) {
+			this.serverDate.setHours(h);
+		}
+
+		if (hasAttr(i)) {
+			this.serverDate.setMinutes(i);
+		}
+
+		if (hasAttr(s)) {
+			this.serverDate.setSeconds(s);
+		}
+
 		this.calcTZdiff();
 	},
 
