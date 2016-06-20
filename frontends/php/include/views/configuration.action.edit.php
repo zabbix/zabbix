@@ -662,8 +662,10 @@ if (!empty($data['new_operation'])) {
 			}
 			unset($user);
 
-			$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps]).');';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+			$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
+				'parentId' => 'opmsgUsrgrpListFooter']).');';
+			$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
+				'parentId' => 'opmsgUserListFooter']).');';
 			zbx_add_post_js($jsInsert);
 
 			$new_operation_formlist
@@ -1328,8 +1330,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				}
 				unset($user);
 
-				$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps]).');';
-				$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
+				$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
+					'parentId' => 'recOpmsgUsrgrpListFooter']).');';
+				$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
+					'parentId' => 'recOpmsgUserListFooter']).');';
 				zbx_add_post_js($jsInsert);
 
 				$new_operation_formlist

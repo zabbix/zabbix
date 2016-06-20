@@ -438,7 +438,7 @@ elseif (hasRequest('edit_recovery_operationid')) {
 	$_REQUEST['edit_recovery_operationid'] = $edit_recovery_operationid;
 	$_REQUEST['recovery_operations'] = getRequest('recovery_operations', []);
 
-	if (array_key_exists([$edit_recovery_operationid], $_REQUEST['recovery_operations'])) {
+	if (array_key_exists($edit_recovery_operationid, $_REQUEST['recovery_operations'])) {
 		$_REQUEST['new_recovery_operation'] = $_REQUEST['operations'][$edit_recovery_operationid];
 		$_REQUEST['new_recovery_operation']['id'] = $edit_recovery_operationid;
 	}
