@@ -261,7 +261,7 @@ CDate.prototype = {
 	setTimeObject: function(y, m, d, h, i, s) {
 		this.server = 1;
 		function hasAttr(arg) {
-			return (typeof(arg) !== 'undefined' && arg !== null);
+			return (typeof(arg) != 'undefined' && arg !== null);
 		}
 
 		if (hasAttr(y)) {

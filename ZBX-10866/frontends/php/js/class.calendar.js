@@ -257,35 +257,14 @@ calendar.prototype = {
 	},
 
 	setSDateDMY: function(d, m, y) {
-		d = parseInt(d,10);
-		m = parseInt(m,10);
-		y = parseInt(y,10);
+		var dateHolder = new Date(y, m - 1, d, 0, 0, 0);
 
-		var result = false;
-
-		if (m > 0 && m < 13) {
-			result = true;
-			m = m - 1;
-		}
-		else {
-			m = null;
+		if (y >= 1970 && dateHolder.getFullYear() == y && dateHolder.getMonth() == m - 1 && dateHolder.getDate() == d) {
+			this.sdt.setTime(dateHolder.getTime());
+			return true;
 		}
 
-		if (y > 1969) {
-			result = true;
-			y = null;
-		}
-
-		if (d > -1 && d < 29) {
-			result = true;
-		}
-		else if (d < 28 || !result || d > (new Date(this.sdt.getFullYear(), this.sdt.getMonth() + 1, 0)).getDate()) {
-			d = null;
-		}
-
-		this.sdt.setTimeObject(y, m, d, 0, 0, 0);
-
-		return result;
+		return false;
 	},
 
 	setDateToOuterObj: function() {
