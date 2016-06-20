@@ -557,7 +557,15 @@
 			jQuery('#new_operation_opmessage_message').closest('li').toggle(!default_message);
 		});
 
+		jQuery('#new_recovery_operation_opmessage_default_msg').on('change', function() {
+			var default_message = jQuery(this).is(':checked');
+
+			jQuery('#new_recovery_operation_opmessage_subject').closest('li').toggle(!default_message);
+			jQuery('#new_recovery_operation_opmessage_message').closest('li').toggle(!default_message);
+		});
+
 		jQuery('#new_operation_opmessage_default_msg').trigger('change');
+		jQuery('#new_recovery_operation_opmessage_default_msg').trigger('change');
 
 		// clone button
 		jQuery('#clone').click(function() {
