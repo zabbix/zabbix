@@ -635,6 +635,7 @@ class CAction extends CApiService {
 				$actionUpdateValues['actionid'],
 				$actionUpdateValues['filter'],
 				$actionUpdateValues['operations'],
+				$actionUpdateValues['recovery_operations'],
 				$actionUpdateValues['conditions'],
 				$actionUpdateValues['formula'],
 				$actionUpdateValues['evaltype']
