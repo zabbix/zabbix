@@ -78,15 +78,6 @@ class CJson {
 	const IN_CMT = 5;
 
 	/**
-	 * JSON errors.
-	 *
-	 * @constant
-	 */
-	const JSON_ERROR_NONE = 0;
-	const JSON_ERROR_SYNTAX = 4;
-
-
-	/**
 	 *
 	 * Nest level counter for determining correct behavior of decoding string
 	 * representations of numbers and boolean values.
@@ -96,6 +87,8 @@ class CJson {
 	protected $_level;
 
 	/**
+	 * Last error of $this->decode() method.
+	 *
 	 * @var int
 	 */
 	protected $last_error;
@@ -118,7 +111,7 @@ class CJson {
 		$this->_mapAscii();
 		$this->_setStateTransitionTable();
 
-		$this->last_error = self::JSON_ERROR_NONE;
+		$this->last_error = JSON_ERROR_NONE;
 	}
 
 	/**
@@ -242,16 +235,16 @@ class CJson {
 	 */
 	public function decode($encodedValue, $asArray = false) {
 		if (!$this->_config['bypass_ext'] && function_exists('json_decode')) {
-			$result = json_decode($encodedValue, (bool) $asArray);
+			$result = json_decode($encodedValue, $asArray);
 			$this->last_error = json_last_error();
 			return $result;
 		}
 
-		$this->last_error = self::JSON_ERROR_NONE;
+		$this->last_error = JSON_ERROR_NONE;
 
 		$first_char = substr(ltrim($encodedValue), 0, 1);
 		if ($first_char != '{' && $first_char != '[') {
-			$this->last_error = self::JSON_ERROR_SYNTAX;
+			$this->last_error = JSON_ERROR_SYNTAX;
 			return null;
 		}
 
@@ -262,18 +255,20 @@ class CJson {
 		$result = null;
 
 		if ($this->isValid($encodedValue)) {
-			$result = $this->_json_decode($encodedValue, (bool) $asArray);
+			$result = $this->_json_decode($encodedValue, $asArray);
 		}
 
-		$this->last_error = ($result === null) ? self::JSON_ERROR_SYNTAX : $result;
+		$this->last_error = ($result === null) ? JSON_ERROR_SYNTAX : $result;
 		return $result;
 	}
 
 	/**
+	 * Returns true if last $this->decode call was with error.
+	 *
 	 * @return bool
 	 */
 	public function hasError() {
-		return ($this->last_error != self::JSON_ERROR_NONE);
+		return ($this->last_error != JSON_ERROR_NONE);
 	}
 
 	/**
