@@ -29,6 +29,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10732] fixed default values for "Show", "Area type" and "Automatic icon selection" options in Map element popup (Cemeris)
 ...G...... [ZBX-10622] fixed handling of socket connection error messages on Windows (viktors)
 .......PS. [ZBX-10828] fixed server/proxy crashes when performing Simple checks with invalid key parameters hidden in user macro (viktors)
 ..F....... [ZBX-10789] fixed drawing graphs with items that have scheduling intervals (Cemeris)
