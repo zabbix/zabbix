@@ -665,6 +665,7 @@ class CAction extends CApiService {
 						$operationid = $operation['operationid'];
 
 						if (array_key_exists($operationid, $db_operations)) {
+							$operation['recovery'] = ACTION_OPERATION;
 							$operations_to_update[] = $operation;
 							unset($db_operations[$operationid]);
 						}
@@ -688,8 +689,9 @@ class CAction extends CApiService {
 						$recovery_operationid = $recovery_operation['operationid'];
 
 						if (array_key_exists($recovery_operationid, $db_recovery_operations)) {
-							$operations_to_update[] = $operation;
-							unset($db_recovery_operations[$operationid]);
+							$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+							$operations_to_update[] = $recovery_operation;
+							unset($db_recovery_operations[$recovery_operationid]);
 						}
 					}
 				}
@@ -968,7 +970,13 @@ class CAction extends CApiService {
 		$opInventoryToDeleteByOpId = [];
 
 		foreach ($operations as $operation) {
-			$operationsDb = zbx_toHash($db_actions[$operation['actionid']]['operations'], 'operationid');
+			if ($operation['recovery'] == ACTION_OPERATION) {
+				$operationsDb = zbx_toHash($db_actions[$operation['actionid']]['operations'], 'operationid');
+			}
+			else {
+				$operationsDb = zbx_toHash($db_actions[$operation['actionid']]['recoveryOperations'], 'operationid');
+			}
+
 			$operationDb = $operationsDb[$operation['operationid']];
 
 			$typeChanged = false;
