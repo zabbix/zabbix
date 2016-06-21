@@ -557,6 +557,9 @@ class CAction extends CApiService {
 				foreach ($action['recovery_operations'] as $recovery_operation) {
 					$recovery_operation['actionid'] = $actionid;
 					$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
+					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
+						$recovery_operation['esc_step_to']
+					);
 					$operations_to_create[] = $recovery_operation;
 				}
 			}
@@ -680,6 +683,10 @@ class CAction extends CApiService {
 				$db_recovery_operations = zbx_toHash($db_action['recoveryOperations'], 'operationid');
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
+					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
+						$recovery_operation['esc_step_to']
+					);
+
 					if (!array_key_exists('operationid', $recovery_operation)) {
 						$recovery_operation['actionid'] = $action['actionid'];
 						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
