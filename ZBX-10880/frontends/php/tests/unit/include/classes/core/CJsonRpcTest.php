@@ -31,11 +31,133 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 */
 	protected static $json;
 
+	/**
+	 * @var string
+	 */
+	protected static $auth;
+
+	/**
+	 * Set up static values before testing CJsonRpc.
+	 */
 	public static function setUpBeforeClass() {
-		self::$client = new CLocalApiClient();
 		self::$json = new CJson();
+
+		Z::getInstance()->run(ZBase::EXEC_MODE_API);
+		self::$client = API::getWrapper()->getClient();
+
+		$response = self::$json->decode(
+			(new CJsonRpc(
+				self::$client,
+				'{"jsonrpc": "2.0", "method": "user.login","params": {"user": "Admin", "password": "zabbix"}, "id": 0}'
+			)
+		)->execute());
+
+		self::$auth = $response->result;
 	}
 
+	/**
+	 * Logout user when all tests are finished.
+	 */
+	public static function tearDownAfterClass() {
+		Z::getInstance()->run(ZBase::EXEC_MODE_API);
+
+		$response = self::$json->decode(
+			(new CJsonRpc(
+				self::$client,
+				'{"jsonrpc": "2.0", "method": "user.logout", "params": [], "id": 0, "auth": "'.self::$auth.'"}'
+			)
+		)->execute());
+	}
+
+	/**
+	 * Provides valid requests for CJSonRpc()->execute() method.
+	 */
+	public function validRequestProvider() {
+		return [
+			['item.get', '{"itemids":[]}', 1],
+			['host.get', '{"hostids":[]}', 1]
+		];
+	}
+
+	/**
+	 * Test CJsonRpc()->execute() with valid request.
+	 *
+	 * @dataProvider validRequestProvider
+	 *
+	 * @param string $method
+	 * @param string $params
+	 * @param string $id
+	 */
+	public function testExecuteWithValidRequest($method, $params, $id) {
+		DBConnect();
+
+		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.self::$auth.'", "params": '.$params.', "id": '.$id.'}';
+
+		$response = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
+
+		//$this->assertTrue(false, json_encode($response));
+		$this->assertInternalType('array', $response);
+		$this->assertArrayHasKey('result', $response);
+	}
+
+	/**
+	 * Provides valid requests in batch for CJSonRpc()->execute() method.
+	 */
+	public function validRequestsBatchProvider() {
+		return [
+			[
+				// First batch.
+				[
+					// Requests (values of batch).
+					[
+						'method' => 'item.get', 'params' => '{"itemids":[]}', 'id' => 1
+					],
+					[
+						'method' => 'host.get', 'params' => '{"hostids":[]}', 'id' => 2
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test CJsonRpc()->execute() with batch of valid requests.
+	 *
+	 * @dataProvider validRequestsBatchProvider
+	 *
+	 * @param array $batch
+	 */
+	public function testExecuteWithBatchOfValidRequests($batch) {
+		DBConnect();
+
+		$length = count($batch);
+		$i = 1;
+
+		$data = '[';
+		foreach ($batch as $key => $attrs) {
+			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.self::$auth.'", "params": '.$attrs['params'].', "id": '.$attrs['id'].'}';
+			if ($length != $i) {
+				$data .= ', ';
+			}
+
+			$i++;
+		}
+		$data .= ']';
+
+		$response_array = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
+
+		$this->assertInternalType('array', $response_array);
+		$this->assertEquals($length, count($response_array));
+
+		foreach ($response_array as $response) {
+			$this->assertInternalType('array', $response);
+			$this->assertArrayHasKey('result', $response);
+		}
+	}
+
+	/**
+	 * Provides invalid requests for CJSonRpc()->execute() method.
+	 */
 	public function invalidRequestProvider() {
 		return [
 			['[]'],
@@ -44,17 +166,8 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 			['"bar"']
 		];
 	}
-
-	public function invalidRequestsBatchProvider() {
-		return [
-			['[1]'],
-			['["bar"]'],
-			['["bar", 1, null]']
-		];
-	}
-
 	/**
-	 * Test execute() with invalid request.
+	 * Test CJsonRpc()->execute() with invalid request.
 	 *
 	 * @dataProvider invalidRequestProvider
 	 *
@@ -69,13 +182,24 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test execute() with batch of invalid requests.
+	 * Provides invalid requests in batch for CJSonRpc()->execute() method.
+	 */
+	public function invalidRequestsBatchProvider() {
+		return [
+			['[1]'],
+			['["bar"]'],
+			['["bar", 1, null]']
+		];
+	}
+
+	/**
+	 * Test CJsonRpc()->execute() with batch of invalid requests.
 	 *
 	 * @dataProvider invalidRequestsBatchProvider
 	 *
 	 * @param string $data
 	 */
-	public function testExecuteWithInvalidRequestsBatch($data) {
+	public function testExecuteWithBatchOfInvalidRequests($data) {
 		$response_array = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
 
 		$this->assertInternalType('array', $response_array);
