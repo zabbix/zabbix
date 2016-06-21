@@ -271,16 +271,14 @@ CDate.prototype = {
 		if (hasAttr(m) && hasAttr(d)) {
 			this.serverDate.setMonth(m, d);
 		}
-		else {
-			if (hasAttr(d)) {
-				this.serverDate.setDate(d);
-			}
-			if (hasAttr(m)) {
-				this.serverDate.setMonth(m);
-			}
+		else if (hasAttr(m)) {
+			this.serverDate.setMonth(m);
+		}
+		else if(hasAttr(d)) {
+			this.serverDate.setDate(d);
 		}
 
-		if (hasAttr(m)) {
+		if (hasAttr(h)) {
 			this.serverDate.setHours(h);
 		}
 
