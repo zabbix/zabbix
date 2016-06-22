@@ -856,6 +856,7 @@ class CAction extends CApiService {
 						}
 					}
 					break;
+
 				case OPERATION_TYPE_COMMAND:
 					if (isset($operation['opcommand']) && !empty($operation['opcommand'])) {
 						$operation['opcommand']['operationid'] = $operationId;
@@ -878,6 +879,7 @@ class CAction extends CApiService {
 						}
 					}
 					break;
+
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					foreach ($operation['opgroup'] as $hostGroup) {
@@ -887,6 +889,7 @@ class CAction extends CApiService {
 						];
 					}
 					break;
+
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					foreach ($operation['optemplate'] as $template) {
@@ -896,16 +899,19 @@ class CAction extends CApiService {
 						];
 					}
 					break;
-				case OPERATION_TYPE_HOST_ADD:
-				case OPERATION_TYPE_HOST_REMOVE:
-				case OPERATION_TYPE_HOST_ENABLE:
-				case OPERATION_TYPE_HOST_DISABLE:
-					break;
+
 				case OPERATION_TYPE_HOST_INVENTORY:
 					$opInventoryToInsert[] = [
 						'operationid' => $operationId,
 						'inventory_mode' => $operation['opinventory']['inventory_mode']
 					];
+					break;
+
+				case OPERATION_TYPE_RECOVERY_MESSAGE:
+					if (array_key_exists('opmessage', $operation) && $operation['opmessage']) {
+						$operation['opmessage']['operationid'] = $operationId;
+						$opMessagesToInsert[] = $operation['opmessage'];
+					}
 					break;
 			}
 			if (isset($operation['opconditions'])) {
@@ -992,11 +998,13 @@ class CAction extends CApiService {
 						$opMessageGrpsToDeleteByOpId[] = $operationDb['operationid'];
 						$opMessageUsrsToDeleteByOpId[] = $operationDb['operationid'];
 						break;
+
 					case OPERATION_TYPE_COMMAND:
 						$opCommandsToDeleteByOpId[] = $operationDb['operationid'];
 						$opCommandHstsToDeleteByOpId[] = $operationDb['operationid'];
 						$opCommandGrpsToDeleteByOpId[] = $operationDb['operationid'];
 						break;
+
 					case OPERATION_TYPE_GROUP_ADD:
 						if ($operation['operationtype'] == OPERATION_TYPE_GROUP_REMOVE) {
 							break;
@@ -1007,6 +1015,7 @@ class CAction extends CApiService {
 						}
 						$opGroupsToDeleteByOpId[] = $operationDb['operationid'];
 						break;
+
 					case OPERATION_TYPE_TEMPLATE_ADD:
 						if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_REMOVE) {
 							break;
@@ -1017,8 +1026,13 @@ class CAction extends CApiService {
 						}
 						$opTemplatesToDeleteByOpId[] = $operationDb['operationid'];
 						break;
+
 					case OPERATION_TYPE_HOST_INVENTORY:
 						$opInventoryToDeleteByOpId[] = $operationDb['operationid'];
+						break;
+
+					case OPERATION_TYPE_RECOVERY_MESSAGE:
+						$opMessagesToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 				}
 			}
@@ -1083,6 +1097,7 @@ class CAction extends CApiService {
 						}
 					}
 					break;
+
 				case OPERATION_TYPE_COMMAND:
 					if (!isset($operation['opcommand_grp'])) {
 						$operation['opcommand_grp'] = [];
@@ -1162,6 +1177,7 @@ class CAction extends CApiService {
 						}
 					}
 					break;
+
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					if (!isset($operation['opgroup'])) {
@@ -1184,6 +1200,7 @@ class CAction extends CApiService {
 						]);
 					}
 					break;
+
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					if (!isset($operation['optemplate'])) {
@@ -1207,6 +1224,7 @@ class CAction extends CApiService {
 						]);
 					}
 					break;
+
 				case OPERATION_TYPE_HOST_INVENTORY:
 					if ($typeChanged) {
 						$operation['opinventory']['operationid'] = $operation['operationid'];
@@ -1216,6 +1234,19 @@ class CAction extends CApiService {
 						$opInventoryToUpdate[] = [
 							'values' => $operation['opinventory'],
 							'where' => ['operationid' => $operation['operationid']]
+						];
+					}
+					break;
+
+				case OPERATION_TYPE_RECOVERY_MESSAGE:
+					if ($typeChanged) {
+						$operation['opmessage']['operationid'] = $operation['operationid'];
+						$opMessagesToInsert[] = $operation['opmessage'];
+					}
+					else {
+						$opMessagesToUpdate[] = [
+							'values' => $operation['opmessage'],
+							'where' => ['operationid'=>$operation['operationid']]
 						];
 					}
 					break;
@@ -1366,8 +1397,10 @@ class CAction extends CApiService {
 				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
 			],
 			ACTION_RECOVERY_OPERATION => [
-				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND],
-				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE]
+				EVENT_SOURCE_TRIGGERS => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_COMMAND,
+					OPERATION_TYPE_RECOVERY_MESSAGE
+				],
+				EVENT_SOURCE_INTERNAL => [OPERATION_TYPE_MESSAGE, OPERATION_TYPE_RECOVERY_MESSAGE]
 			]
 		];
 
@@ -1999,6 +2032,7 @@ class CAction extends CApiService {
 
 			$opmessage = [];
 			$opcommand = [];
+			$op_recovery_message = [];
 
 			foreach ($recovery_operations as $recovery_operationid => $recovery_operation) {
 				switch ($recovery_operation['operationtype']) {
@@ -2007,6 +2041,9 @@ class CAction extends CApiService {
 						break;
 					case OPERATION_TYPE_COMMAND:
 						$opcommand[] = $recovery_operationid;
+						break;
+					case OPERATION_TYPE_RECOVERY_MESSAGE:
+						$op_recovery_message[] = $recovery_operationid;
 						break;
 				}
 			}
@@ -2103,6 +2140,24 @@ class CAction extends CApiService {
 					);
 					while ($opcommand_grp = DBfetch($db_opcommand_grp)) {
 						$recovery_operations[$opcommand_grp['operationid']]['opcommand_grp'][] = $opcommand_grp;
+					}
+				}
+			}
+
+			// get OPERATION_TYPE_RECOVERY_MESSAGE data
+			if ($op_recovery_message) {
+				if ($this->outputIsRequested('opmessage', $options['selectRecoveryOperations'])) {
+					foreach ($op_recovery_message as $operationid) {
+						$recovery_operations[$operationid]['opmessage'] = [];
+					}
+
+					$db_opmessages = DBselect(
+						'SELECT o.operationid,o.default_msg,o.subject,o.message,o.mediatypeid'.
+							' FROM opmessage o'.
+							' WHERE '.dbConditionInt('operationid', $op_recovery_message)
+					);
+					while ($db_opmessage = DBfetch($db_opmessages)) {
+						$recovery_operations[$db_opmessage['operationid']]['opmessage'] = $db_opmessage;
 					}
 				}
 			}

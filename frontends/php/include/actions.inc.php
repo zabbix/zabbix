@@ -803,6 +803,12 @@ function getActionOperationDescriptions(array $actions, $type) {
 							$result[$i][$j][] = [implode(', ', $host_group_list), BR()];
 						}
 						break;
+
+					case OPERATION_TYPE_RECOVERY_MESSAGE:
+						$result[$i][$j][] = bold(
+							_('Notify all who received any messages regarding the problem before')
+						);
+						break;
 				}
 			}
 		}
@@ -987,7 +993,8 @@ function get_opconditions_by_eventsource($eventsource) {
 function get_operations_by_eventsource($eventsource) {
 	$operations[EVENT_SOURCE_TRIGGERS] = [
 		OPERATION_TYPE_MESSAGE,
-		OPERATION_TYPE_COMMAND
+		OPERATION_TYPE_COMMAND,
+		OPERATION_TYPE_RECOVERY_MESSAGE
 	];
 	$operations[EVENT_SOURCE_DISCOVERY] = [
 		OPERATION_TYPE_MESSAGE,
@@ -1012,7 +1019,8 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_HOST_INVENTORY
 	];
 	$operations[EVENT_SOURCE_INTERNAL] = [
-		OPERATION_TYPE_MESSAGE
+		OPERATION_TYPE_MESSAGE,
+		OPERATION_TYPE_RECOVERY_MESSAGE
 	];
 
 	if (isset($operations[$eventsource])) {
@@ -1034,7 +1042,8 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
-		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode')
+		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
+		OPERATION_TYPE_RECOVERY_MESSAGE => _('Send recovery message')
 	];
 
 	if (is_null($type)) {
