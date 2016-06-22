@@ -257,35 +257,14 @@ calendar.prototype = {
 	},
 
 	setSDateDMY: function(d, m, y) {
-		d = parseInt(d,10);
-		m = parseInt(m,10);
-		y = parseInt(y,10);
+		var dateHolder = new Date(y, m - 1, d, 0, 0, 0);
 
-		var result = false;
-		if (m > 0 && m < 13) {
-			this.sdt.setMonth(m - 1);
-			result = true;
+		if (y >= 1970 && dateHolder.getFullYear() == y && dateHolder.getMonth() == m - 1 && dateHolder.getDate() == d) {
+			this.sdt.setTime(dateHolder.getTime());
+			return true;
 		}
 
-		if (y > 1969) {
-			this.sdt.setFullYear(y);
-			result = true;
-		}
-
-		if (d > -1 && d < 29) {
-			this.sdt.setDate(d);
-			result = true;
-		}
-		else if (d > 28 && result) {
-			if (d <= daysInMonth(this.sdt.getFullYear(), this.sdt.getMonth())) {
-				this.sdt.setDate(d);
-				result = true;
-			}
-		}
-		this.sdt.setHours(00);
-		this.sdt.setMinutes(00);
-		this.sdt.setSeconds(00);
-		return result;
+		return false;
 	},
 
 	setDateToOuterObj: function() {
@@ -334,7 +313,7 @@ calendar.prototype = {
 	},
 
 	setNow: function(timestamp) {
-		var now = (isNaN(timestamp)) ? new Date() : new Date(timestamp * 1000);
+		var now = (isNaN(timestamp)) ? new CDate() : new CDate(timestamp * 1000);
 		this.day = now.getDate();
 		this.month = now.getMonth();
 		this.year = now.getFullYear();
@@ -447,22 +426,6 @@ calendar.prototype = {
 		this.setCDate();
 	},
 
-	setSDT: function(d, m, y, h, i) {
-		this.sdt.setMinutes(i);
-		this.sdt.setHours(h);
-		this.sdt.setDate(d);
-		this.sdt.setMonth(m);
-		this.sdt.setFullYear(y);
-	},
-
-	setCDT: function(d, m, y, h, i) {
-		this.cdt.setMinutes(i);
-		this.cdt.setHours(h);
-		this.cdt.setDate(d);
-		this.cdt.setMonth(m);
-		this.cdt.setFullYear(y);
-	},
-
 	syncBSDateBySDT: function() {
 		this.minute = this.sdt.getMinutes();
 		this.hour = this.sdt.getHours();
@@ -472,11 +435,11 @@ calendar.prototype = {
 	},
 
 	syncSDT: function() {
-		this.setSDT(this.day, this.month, this.year, this.hour, this.minute);
+		this.sdt.setTimeObject(this.year, this.month, this.day, this.hour, this.minute);
 	},
 
 	syncCDT: function() {
-		this.setCDT(1, this.month, this.year, this.hour, this.minute);
+		this.cdt.setTimeObject(this.year, this.month, 1, this.hour, this.minute);
 	},
 
 	setCDate: function() {
