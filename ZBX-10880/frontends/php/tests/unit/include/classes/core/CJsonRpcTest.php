@@ -97,7 +97,8 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	public function testValidRequest($method, $params, $id) {
 		DBConnect();
 
-		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.self::$auth.'", "params": '.$params.', "id": '.$id.'}';
+		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.self::$auth.'", "params": '.$params.', "id": '.
+			$id.'}';
 
 		$response = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
 
@@ -136,7 +137,8 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 
 		$data = '[';
 		foreach ($batch as $key => $attrs) {
-			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.self::$auth.'", "params": '.$attrs['params'].', "id": '.$attrs['id'].'}';
+			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.self::$auth.'", "params": '
+				.$attrs['params'].', "id": '.$attrs['id'].'}';
 			if ($length != $i) {
 				$data .= ', ';
 			}
