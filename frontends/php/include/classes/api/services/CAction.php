@@ -675,7 +675,7 @@ class CAction extends CApiService {
 				$operationids_to_delete = array_merge($operationids_to_delete, array_keys($db_operations));
 			}
 
-			if (array_key_exists('recovery_operations', $action) && $action['recovery_operations']) {
+			if (array_key_exists('recovery_operations', $action)) {
 				$db_recovery_operations = zbx_toHash($db_action['recoveryOperations'], 'operationid');
 
 				foreach ($action['recovery_operations'] as $recovery_operation) {
