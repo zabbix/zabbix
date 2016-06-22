@@ -1245,14 +1245,6 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
 						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
 					}
-					elseif ($data['eventsource'] == EVENT_SOURCE_DISCOVERY) {
-						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_DISCOVERY;
-						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_DISCOVERY;
-					}
-					elseif ($data['eventsource'] == EVENT_SOURCE_AUTO_REGISTRATION) {
-						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_AUTOREG;
-						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_AUTOREG;
-					}
 					else {
 						$data['new_recovery_operation']['opmessage']['subject'] = '';
 						$data['new_recovery_operation']['opmessage']['message'] = '';
@@ -1557,6 +1549,44 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_recovery_operation_opcommand_command_ipmi')
 				);
+				break;
+
+			case OPERATION_TYPE_RECOVERY_MESSAGE:
+				if (!array_key_exists('opmessage', $data['new_recovery_operation'])) {
+					$data['new_recovery_operation']['opmessage_usr'] = [];
+					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1];
+
+					if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
+						$data['new_recovery_operation']['opmessage']['subject'] = ACTION_DEFAULT_SUBJ_TRIGGER;
+						$data['new_recovery_operation']['opmessage']['message'] = ACTION_DEFAULT_MSG_TRIGGER;
+					}
+					else {
+						$data['new_recovery_operation']['opmessage']['subject'] = '';
+						$data['new_recovery_operation']['opmessage']['message'] = '';
+					}
+				}
+
+				if (!array_key_exists('default_msg', $data['new_recovery_operation']['opmessage'])) {
+					$data['new_recovery_operation']['opmessage']['default_msg'] = 0;
+				}
+
+				$new_operation_formlist
+					->addRow(_('Default message'),
+						(new CCheckBox('new_recovery_operation[opmessage][default_msg]'))
+							->setChecked($data['new_recovery_operation']['opmessage']['default_msg'] == 1)
+					)
+					->addRow(_('Subject'),
+						(new CTextBox('new_recovery_operation[opmessage][subject]',
+								$data['new_recovery_operation']['opmessage']['subject']
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					)
+					->addRow(_('Message'),
+						(new CTextArea('new_recovery_operation[opmessage][message]',
+							$data['new_recovery_operation']['opmessage']['message']
+						))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					);
 				break;
 		}
 
