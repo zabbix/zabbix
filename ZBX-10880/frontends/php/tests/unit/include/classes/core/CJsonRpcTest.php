@@ -22,16 +22,22 @@
 class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 
 	/**
+	 * Local API client.
+	 *
 	 * @var CLocalApiClient
 	 */
 	protected static $client;
 
 	/**
+	 * CJson object.
+	 *
 	 * @var CJson
 	 */
 	protected static $json;
 
 	/**
+	 * User authentication token.
+	 *
 	 * @var string
 	 */
 	protected static $auth;
@@ -88,7 +94,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 * @param string $params
 	 * @param string $id
 	 */
-	public function testExecuteWithValidRequest($method, $params, $id) {
+	public function testValidRequest($method, $params, $id) {
 		DBConnect();
 
 		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.self::$auth.'", "params": '.$params.', "id": '.$id.'}';
@@ -108,13 +114,8 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 			[
 				// First batch.
 				[
-					// Requests (values of batch).
-					[
-						'method' => 'item.get', 'params' => '{"itemids":[]}', 'id' => 1
-					],
-					[
-						'method' => 'host.get', 'params' => '{"hostids":[]}', 'id' => 2
-					]
+					['method' => 'item.get', 'params' => '{"itemids":[]}', 'id' => 1],
+					['method' => 'host.get', 'params' => '{"hostids":[]}', 'id' => 2]
 				]
 			]
 		];
@@ -127,7 +128,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param array $batch
 	 */
-	public function testExecuteWithBatchOfValidRequests($batch) {
+	public function testValidRequestsBatch($batch) {
 		DBConnect();
 
 		$length = count($batch);
@@ -173,7 +174,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $data
 	 */
-	public function testExecuteWithInvalidRequest($data) {
+	public function testInvalidRequest($data) {
 		$response = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
 
 		$this->assertArrayHasKey('error', $response);
@@ -199,7 +200,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 *
 	 * @param string $data
 	 */
-	public function testExecuteWithBatchOfInvalidRequests($data) {
+	public function testInvalidRequestsBatch($data) {
 		$response_array = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
 
 		$this->assertInternalType('array', $response_array);
