@@ -29,6 +29,8 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10866] fixed calendar time for cases when local time zone differs from servers time zone (Cemeris)
+..F....... [ZBX-10866] fixed starting value of time selector for events, graphs and screens (Cemeris)
 ..F....... [ZBX-10732] fixed default values for "Show", "Area type" and "Automatic icon selection" options in Map element popup (Cemeris)
 ...G...... [ZBX-10622] fixed handling of socket connection error messages on Windows; thanks to Yuri Volkov for patch (viktors)
 .......PS. [ZBX-10828] fixed server/proxy crashes when performing Simple checks with invalid key parameters hidden in user macro (viktors)
