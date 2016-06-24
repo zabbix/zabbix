@@ -35,9 +35,9 @@ $widget = (new CWidget())
 		->addColumn((new CFormList())->addRow(_('State'),
 			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 				->addValue(_('Any'), -1)
-				->addValue(_('Active'), MAINTENANCE_STATUS_ACTIVE)
-				->addValue(_('Approaching'), MAINTENANCE_STATUS_APPROACH)
-				->addValue(_('Expired'), MAINTENANCE_STATUS_EXPIRED)
+				->addValue(_x('Active', 'maintenance status'), MAINTENANCE_STATUS_ACTIVE)
+				->addValue(_x('Approaching', 'maintenance status'), MAINTENANCE_STATUS_APPROACH)
+				->addValue(_x('Expired', 'maintenance status'), MAINTENANCE_STATUS_EXPIRED)
 				->setModern(true)
 		))
 	);

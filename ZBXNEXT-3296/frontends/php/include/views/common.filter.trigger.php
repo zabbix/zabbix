@@ -102,7 +102,7 @@ $application_name_url =
 
 // application
 $column2 = (new CFormList())
-	->addRow(_('Filter by application'), [
+	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
