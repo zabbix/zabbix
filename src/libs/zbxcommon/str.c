@@ -1598,13 +1598,14 @@ char	*get_param_dyn(const char *p, int num)
  * Comments: auxiliary function for replace_key_params_dyn()                  *
  *                                                                            *
  ******************************************************************************/
-static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
+static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
 		replace_key_param_f cb, void *cb_data)
 {
-	char	c = (*data)[*r], *param;
+	char	c = (*data)[*r], *param = NULL;
+	int	ret;
 
 	(*data)[*r] = '\0';
-	param = cb(*data + l, key_type, level, num, quoted, cb_data);
+	ret = cb(*data + l, key_type, level, num, quoted, cb_data, &param);
 	(*data)[*r] = c;
 
 	if (NULL != param)
@@ -1615,6 +1616,8 @@ static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, in
 
 		zbx_free(param);
 	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1669,9 +1672,9 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			;
 	}
 
-	replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
+	ret = replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
 
-	for (; '\0' != (*data)[i]; i++)
+	for (; '\0' != (*data)[i] && FAIL != ret; i++)
 	{
 		if (0 == level)
 		{
@@ -1690,7 +1693,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 					case ' ':
 						break;
 					case ',':
-						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
+						ret = replace_key_param(data, key_type, i, &i, level, num, 0, cb,
+								cb_data);
 						if (1 == level)
 							num++;
 						break;
@@ -1700,7 +1704,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case ']':
-						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
+						ret = replace_key_param(data, key_type, i, &i, level, num, 0, cb,
+								cb_data);
 						level--;
 						state = ZBX_STATE_END;
 						break;
@@ -1733,7 +1738,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
 				if (']' == (*data)[i] || ',' == (*data)[i])
 				{
-					replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
+					ret = replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
 
 					i--;
 					state = ZBX_STATE_END;
@@ -1742,7 +1747,9 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			case ZBX_STATE_QUOTED:	/* a quoted parameter */
 				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
 				{
-					i++; replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data); i--;
+					i++;
+					ret = replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data);
+					i--;
 
 					state = ZBX_STATE_END;
 				}
@@ -2651,11 +2658,10 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		return utf8_string;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding, codepage);
-
-	if (1200 != codepage)	/* UTF-16 */
+	if (1200 != codepage)	/* not UTF-16 */
 	{
 		wide_size = MultiByteToWideChar(codepage, 0, in, (int)in_size, NULL, 0);
+
 		if (wide_size > STATIC_SIZE)
 			wide_string = (wchar_t *)zbx_malloc(wide_string, (size_t)wide_size * sizeof(wchar_t));
 		else
@@ -2676,7 +2682,6 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	/* convert from wide_string to utf8_string */
 	WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, utf8_string, utf8_size, NULL, NULL);
 	utf8_string[utf8_size] = '\0';
-	zabbix_log(LOG_LEVEL_DEBUG, "convert_to_utf8() utf8_size:%d utf8_string:'%s'", utf8_size, utf8_string);
 
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
