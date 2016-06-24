@@ -317,13 +317,13 @@ else {
 	// get drules
 	$data['drules'] = API::DRule()->get([
 		'output' => ['proxy_hostid', 'name', 'status', 'iprange', 'delay'],
+		'selectDChecks' => ['type'],
 		'search' => [
 			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
 		'filter' => [
 			'status' => ($filter['status'] == -1) ? null : $filter['status']
 		],
-		'selectDChecks' => ['type'],
 		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1

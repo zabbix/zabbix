@@ -83,7 +83,7 @@ $fields = [
 	'filter_alias' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_name' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_surname' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_type' =>		[T_ZBX_STR, O_OPT, null,	IN([-1, USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),		null],
+	'filter_type' =>		[T_ZBX_STR, O_OPT, null,	IN([-1, USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),	null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -395,6 +395,7 @@ else {
 	// get users
 	$data['users'] = API::User()->get([
 		'output' => API_OUTPUT_EXTEND,
+		'selectUsrgrps' => API_OUTPUT_EXTEND,
 		'search' => [
 			'alias' => ($filter['alias'] === '') ? null : $filter['alias'],
 			'name' => ($filter['name'] === '') ? null : $filter['name'],
@@ -404,7 +405,6 @@ else {
 			'type' => ($filter['type'] == -1) ? null : $filter['type']
 		],
 		'usrgrpids' => ($_REQUEST['filter_usrgrpid'] > 0) ? $_REQUEST['filter_usrgrpid'] : null,
-		'selectUsrgrps' => API_OUTPUT_EXTEND,
 		'getAccess' => 1,
 		'limit' => $config['search_limit'] + 1
 	]);

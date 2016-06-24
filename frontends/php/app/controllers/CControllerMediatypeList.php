@@ -27,13 +27,13 @@ class CControllerMediatypeList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in description,type',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1',
-			'filter_set' =>	'in 1',
-			'filter_rst' =>	'in 1',
-			'filter_name' =>'',
-			'filter_status' =>'in 0,-1,'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'sort' =>			'in description,type',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		];
 
 		$ret = $this->validateInput($fields);

@@ -27,12 +27,12 @@ class CControllerScriptList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in name,command',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1',
-			'filter_set' =>	'in 1',
-			'filter_rst' =>	'in 1',
-			'filter_name' =>''
+			'sort' =>			'in name,command',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);

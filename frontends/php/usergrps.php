@@ -507,13 +507,13 @@ else {
 
 	$data['usergroups'] = API::UserGroup()->get([
 		'output' => API_OUTPUT_EXTEND,
+		'selectUsers' => API_OUTPUT_EXTEND,
 		'search' => [
 			'name' => ($filter['name'] === '') ? null : $filter['name']
 		],
 		'filter' => [
 			'users_status' => ($filter['users_status'] == -1) ? null : $filter['users_status']
 		],
-		'selectUsers' => API_OUTPUT_EXTEND,
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	]);

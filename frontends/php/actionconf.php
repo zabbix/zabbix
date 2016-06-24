@@ -719,7 +719,7 @@ else {
 			'name' => ($filter['name'] === '') ? null : $filter['name'],
 		],
 		'filter' => [
-			'eventsource' => [$data['eventsource']],
+			'eventsource' => $data['eventsource'],
 			'status' => ($filter['status'] == -1) ? null : $filter['status']
 		],
 		'selectFilter' => ['formula', 'conditions', 'evaltype'],
