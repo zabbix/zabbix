@@ -63,8 +63,10 @@ $filter = (new CFilter('web.overview.filter.state'))
 $column = new CFormList();
 
 // application
-$column->addRow(_('Filter by application'), [
-	(new CTextBox('application', $this->data['filter']['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+$column->addRow(_('Application'), [
+	(new CTextBox('application', $this->data['filter']['application']))
+		->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('application_name', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)

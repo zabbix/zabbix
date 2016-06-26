@@ -36,10 +36,12 @@ class CControllerProfileUpdate extends CController {
 			$mask = $this->hasInput('value_int') ? self::VALUE_INT : 0x00;
 			$mask |= $this->hasInput('value_str') ? self::VALUE_STR : 0x00;
 			switch ($this->getInput('idx')) {
+				case 'web.action.filter.state':
 				case 'web.auditacts.filter.state':
 				case 'web.auditlogs.filter.state':
 				case 'web.avail_report.filter.state':
 				case 'web.charts.filter.state':
+				case 'web.discovery.filter.state':
 				case 'web.events.filter.state':
 				case 'web.groups.filter.state':
 				case 'web.hostinventories.filter.state':
@@ -50,7 +52,11 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hosts.filter.state':
 				case 'web.items.filter.state':
 				case 'web.latest.filter.state':
+				case 'web.maintenance.filter.state':
+				case 'web.media_types.filter.state':
 				case 'web.overview.filter.state':
+				case 'web.proxies.filter.state':
+				case 'web.scripts.filter.state':
 				case 'web.templates.filter.state':
 				case 'web.toptriggers.filter.state':
 				case 'web.triggers.filter.state':
@@ -60,6 +66,8 @@ class CControllerProfileUpdate extends CController {
 				case 'web.slides.filter.state':
 				case 'web.slideconf.filter.state':
 				case 'web.sysmapconf.filter.state':
+				case 'web.user.filter.state':
+				case 'web.usergroup.filter.state':
 					$ret = ($mask == self::VALUE_INT && in_array($this->getInput('value_int'), [0, 1]));
 					break;
 				default:

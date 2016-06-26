@@ -112,7 +112,7 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 			$filterForm->addVar('itemids['.$itemId.']', $itemId);
 		}
 
-		$itemListbox = new CListBox('cmbitemlist[]');
+		$itemListbox = (new CListBox('cmbitemlist[]'))->setAttribute('autofocus', 'autofocus');
 		$itemsData = [];
 		foreach ($this->data['items'] as $itemid => $item) {
 			if (!isset($this->data['iv_string'][$item['value_type']])) {
@@ -144,7 +144,7 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 
 		$filterColumn1 = (new CFormList())
 			->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton])
-			->addRow(_('Select rows with value like'),
+			->addRow(_('Value'),
 				(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			);
 
