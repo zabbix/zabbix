@@ -32,13 +32,15 @@ $widget = (new CWidget())
 
 // filter
 $filter = (new CFilter('web.hosts.filter.state'))
-	->addColumn((new CFormList())->addRow(_('Name like'),
-		(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	->addColumn((new CFormList())->addRow(_('Name'),
+		(new CTextBox('filter_host', $data['filter']['host']))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
 	))
-	->addColumn((new CFormList())->addRow(_('DNS like'),
+	->addColumn((new CFormList())->addRow(_('DNS'),
 		(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	))
-	->addColumn((new CFormList())->addRow(_('IP like'),
+	->addColumn((new CFormList())->addRow(_('IP'),
 		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	))
 	->addColumn((new CFormList())->addRow(_('Port'),

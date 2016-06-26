@@ -553,7 +553,7 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 4
-	$filterColumn1->addRow(_('Name like'),
+	$filterColumn1->addRow(_('Name'),
 		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn2->addRow(_('SNMP OID'),
@@ -573,7 +573,7 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 5
-	$filterColumn1->addRow(_('Key like'),
+	$filterColumn1->addRow(_('Key'),
 		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 	$filterColumn2->addRow(_('Port'),

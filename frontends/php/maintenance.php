@@ -77,6 +77,11 @@ $fields = [
 	// form
 	'form' =>								[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>						[T_ZBX_INT, O_OPT, null,	null,		null],
+	// filter
+	'filter_set' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_name' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_status' =>						[T_ZBX_INT, O_OPT, null,	IN([-1, MAINTENANCE_STATUS_ACTIVE, MAINTENANCE_STATUS_APPROACH, MAINTENANCE_STATUS_EXPIRED]), null],
 	// sort and sortorder
 	'sort' =>								[T_ZBX_STR, O_OPT, P_SYS,
 												IN('"active_since","active_till","maintenance_type","name"'),
@@ -497,10 +502,28 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+	// filter
+	if (hasRequest('filter_set')) {
+		CProfile::update('web.maintenance.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.maintenance.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+	}
+	elseif (hasRequest('filter_rst')) {
+		CProfile::delete('web.maintenance.filter_name');
+		CProfile::delete('web.maintenance.filter_status');
+	}
+
+	$filter = [
+		'name' => CProfile::get('web.maintenance.filter_name', ''),
+		'status' => CProfile::get('web.maintenance.filter_status', -1)
+	];
+
 	$config = select_config();
 
-	$data['sort'] = $sortField;
-	$data['sortorder'] = $sortOrder;
+	$data = [
+		'sort' => $sortField,
+		'sortorder' => $sortOrder,
+		'filter' => $filter
+	];
 
 	$options = [
 		'output' => ['maintenanceid', $sortField],
@@ -528,6 +551,9 @@ else {
 	// get list of maintenances
 	$data['maintenances'] = API::Maintenance()->get([
 		'output' => API_OUTPUT_EXTEND,
+		'search' => [
+			'name' => ($filter['name'] === '') ? null : $filter['name']
+		],
 		'maintenanceids' => zbx_objectValues($data['maintenances'], 'maintenanceid')
 	]);
 
@@ -540,6 +566,15 @@ else {
 		}
 		else {
 			$data['maintenances'][$key]['status'] = MAINTENANCE_STATUS_ACTIVE;
+		}
+	}
+
+	// filter by status
+	if ($filter['status'] != -1) {
+		foreach ($data['maintenances'] as $key => $maintenance) {
+			if ($data['maintenances'][$key]['status'] != $filter['status']) {
+				unset($data['maintenances'][$key]);
+			}
 		}
 	}
 

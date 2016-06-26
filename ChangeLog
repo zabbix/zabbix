@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+..F....... [ZBXNEXT-3296] added basic filtering for several frontend pages (Alexei)
 ..FG...... [ZBXNEXT-2430] added new items log.count[] and logrt.count[], added option for monitoring fast-growing log files (Andris, Cemeris)
 ..F....... [ZBXNEXT-3175] added filtering for the list of templates and host groups (Alexei)
 A.F....... [ZBXNEXT-821] added possibility to view, copy, mass update and delete lld created elements (Gunars, Ivo, Sasha)
