@@ -31,11 +31,12 @@ $filterForm = (new CFilter($filter['filterid']))
 
 $column1 = (new CFormList())
 	->addRow(_('Triggers status'),
-		new CComboBox('show_triggers', $filter['showTriggers'], null, [
+		(new CComboBox('show_triggers', $filter['showTriggers'], null, [
 			TRIGGERS_OPTION_ALL => _('Any'),
 			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
 			TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
-		])
+		]))
+			->setAttribute('autofocus', 'autofocus')
 	);
 
 // ack status
@@ -92,7 +93,7 @@ $column1->addRow(_('Age less than'), [
 ]);
 
 // name
-$column1->addRow(_('Filter by name'),
+$column1->addRow(_('Name'),
 	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 
@@ -101,7 +102,7 @@ $application_name_url =
 
 // application
 $column2 = (new CFormList())
-	->addRow(_('Filter by application'), [
+	->addRow(_('Application'), [
 		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
@@ -144,7 +145,7 @@ $inventoryFilterTable->addRow(
 			->addClass('element-table-add')
 	))->setColSpan(2)
 );
-$column2->addRow(_('Filter by host inventory'), $inventoryFilterTable);
+$column2->addRow(_('Host inventory'), $inventoryFilterTable);
 
 // maintenance filter
 $column2->addRow(_('Show hosts in maintenance'),

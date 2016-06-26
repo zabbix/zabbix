@@ -23,6 +23,20 @@ $widget = (new CWidget())
 	->setControls((new CForm('get'))
 		->cleanItems()
 		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	)
+	->addItem((new CFilter('web.discovery.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Name'),
+			(new CTextBox('filter_name', $data['filter']['name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+		))
+		->addColumn((new CFormList())->addRow(_('Status'),
+			(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+				->addValue(_('Any'), -1)
+				->addValue(_('Enabled'), DRULE_STATUS_ACTIVE)
+				->addValue(_('Disabled'), DRULE_STATUS_DISABLED)
+				->setModern(true)
+		))
 	);
 
 // create form

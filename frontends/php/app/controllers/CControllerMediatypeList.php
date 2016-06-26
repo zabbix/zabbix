@@ -27,9 +27,13 @@ class CControllerMediatypeList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in description,type',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1'
+			'sort' =>			'in description,type',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		];
 
 		$ret = $this->validateInput($fields);
@@ -52,18 +56,40 @@ class CControllerMediatypeList extends CController {
 		CProfile::update('web.media_type.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.media_types.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+		// filter
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.media_types.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.media_types.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::delete('web.media_types.filter_name');
+			CProfile::delete('web.media_types.filter_status');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.media_types.filter_name', ''),
+			'status' => CProfile::get('web.media_types.filter_status', -1)
+		];
+
 		$config = select_config();
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'sortorder' => $sortOrder,
+			'filter' => $filter
 		];
 
 		// get media types
 		$data['mediatypes'] = API::Mediatype()->get([
 			'output' => ['mediatypeid', 'description', 'type', 'smtp_server', 'smtp_helo', 'smtp_email',
 				'exec_path', 'gsm_modem', 'username', 'status'
+			],
+			'search' => [
+				'description' => ($filter['name'] === '') ? null : $filter['name']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
 			'limit' => $config['search_limit'] + 1,
 			'editable' => true,
