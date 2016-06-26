@@ -93,7 +93,7 @@ $column1->addRow(_('Age less than'), [
 ]);
 
 // name
-$column1->addRow(_('Filter by name'),
+$column1->addRow(_('Name'),
 	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 
@@ -145,7 +145,7 @@ $inventoryFilterTable->addRow(
 			->addClass('element-table-add')
 	))->setColSpan(2)
 );
-$column2->addRow(_('Filter by host inventory'), $inventoryFilterTable);
+$column2->addRow(_('Host inventory'), $inventoryFilterTable);
 
 // maintenance filter
 $column2->addRow(_('Show hosts in maintenance'),
