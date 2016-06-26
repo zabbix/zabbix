@@ -36,7 +36,7 @@ class CControllerProfileUpdate extends CController {
 			$mask = $this->hasInput('value_int') ? self::VALUE_INT : 0x00;
 			$mask |= $this->hasInput('value_str') ? self::VALUE_STR : 0x00;
 			switch ($this->getInput('idx')) {
-				case 'web.action.filter.state':
+				case 'web.actionconf.filter.state':
 				case 'web.auditacts.filter.state':
 				case 'web.auditlogs.filter.state':
 				case 'web.avail_report.filter.state':
