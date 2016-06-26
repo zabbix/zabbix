@@ -303,7 +303,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			unset($triggerOptions['groupids']);
 		}
 
-		$filterColumn1->addRow(_('Filter by host group'), $hostGroupsComboBox);
+		$filterColumn1->addRow(_('Host group'), $hostGroupsComboBox);
 	}
 
 	// report by host
