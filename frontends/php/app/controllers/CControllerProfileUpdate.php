@@ -41,7 +41,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.auditlogs.filter.state':
 				case 'web.avail_report.filter.state':
 				case 'web.charts.filter.state':
-				case 'web.discovery.filter.state':
+				case 'web.discoveryconf.filter.state':
 				case 'web.events.filter.state':
 				case 'web.groups.filter.state':
 				case 'web.hostinventories.filter.state':
