@@ -692,17 +692,17 @@ else {
 
 	// filter
 	if (hasRequest('filter_set')) {
-		CProfile::update('web.action.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.action.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.actionconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.actionconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
-		CProfile::delete('web.action.filter_name');
-		CProfile::delete('web.action.filter_status');
+		CProfile::delete('web.actionconf.filter_name');
+		CProfile::delete('web.actionconf.filter_status');
 	}
 
 	$filter = [
-		'name' => CProfile::get('web.action.filter_name', ''),
-		'status' => CProfile::get('web.action.filter_status', -1)
+		'name' => CProfile::get('web.actionconf.filter_name', ''),
+		'status' => CProfile::get('web.actionconf.filter_status', -1)
 	];
 
 	$data = [
