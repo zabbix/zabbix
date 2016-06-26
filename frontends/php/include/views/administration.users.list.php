@@ -33,6 +33,27 @@ $widget = (new CWidget())
 			->addItem([_('User group'), SPACE, $userGroupComboBox])
 			->addItem(new CSubmit('form', _('Create user')))
 		)
+	)
+	->addItem((new CFilter('web.user.filter.state'))
+		->addColumn((new CFormList())->addRow(_('Alias'),
+			(new CTextBox('filter_alias', $data['filter']['alias']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+		))
+		->addColumn((new CFormList())->addRow(_('Name'),
+			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
+		->addColumn((new CFormList())->addRow(_('Surname'),
+			(new CTextBox('filter_surname', $data['filter']['surname']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		))
+		->addColumn((new CFormList())->addRow(_('User type'),
+			(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
+				->addValue(_('Any'), -1)
+				->addValue(user_type2str(USER_TYPE_ZABBIX_USER), USER_TYPE_ZABBIX_USER)
+				->addValue(user_type2str(USER_TYPE_ZABBIX_ADMIN), USER_TYPE_ZABBIX_ADMIN)
+				->addValue(user_type2str(USER_TYPE_SUPER_ADMIN), USER_TYPE_SUPER_ADMIN)
+				->setModern(true)
+		))
 	);
 
 // create form
