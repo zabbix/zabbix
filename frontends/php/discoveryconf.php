@@ -293,17 +293,17 @@ else {
 
 	// filter
 	if (hasRequest('filter_set')) {
-		CProfile::update('web.discovery.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
-		CProfile::update('web.discovery.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.discoveryconf.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.discoveryconf.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
 	}
 	elseif (hasRequest('filter_rst')) {
-		CProfile::delete('web.discovery.filter_name');
-		CProfile::delete('web.discovery.filter_status');
+		CProfile::delete('web.discoveryconf.filter_name');
+		CProfile::delete('web.discoveryconf.filter_status');
 	}
 
 	$filter = [
-		'name' => CProfile::get('web.discovery.filter_name', ''),
-		'status' => CProfile::get('web.discovery.filter_status', -1)
+		'name' => CProfile::get('web.discoveryconf.filter_name', ''),
+		'status' => CProfile::get('web.discoveryconf.filter_status', -1)
 	];
 
 	$config = select_config();
