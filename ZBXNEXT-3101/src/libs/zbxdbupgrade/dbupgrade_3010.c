@@ -405,7 +405,7 @@ static int	DBpatch_3010023(void)
 	int		ret;
 	zbx_uint64_t	actionid;
 
-	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", 0);
+	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", NULL);
 
 	result = DBselect("select actionid from actions where recovery_msg=1");
 
