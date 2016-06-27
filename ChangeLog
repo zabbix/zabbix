@@ -30,7 +30,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
-..F....... [ZBX-10895] fixed option URL value in step of web scenario popup (Cemeris)
+..F....... [ZBX-10895] fixed option URL value in step of web scenario popup; thanks to Fernando Schmitt for patch (Cemeris)
 ..F....... [ZBX-10931] fixed strings being untranslatable in Reports -> Triggers top 100 (zalex_ua)
 ..F....... [ZBX-10866] fixed calendar time for cases when local time zone differs from servers time zone (Cemeris)
 ..F....... [ZBX-10866] fixed starting value of time selector for events, graphs and screens (Cemeris)
