@@ -2261,11 +2261,16 @@ static void	DCcheck_ns(zbx_timespec_t *ts)
  ******************************************************************************/
 static void	dc_string_buffer_realloc(size_t len)
 {
-	while (string_values_alloc < string_values_offset + len)
+	if (string_values_alloc >= string_values_offset + len)
+		return;
+
+	do
 	{
 		string_values_alloc += ZBX_STRING_REALLOC_STEP;
-		string_values = zbx_realloc(string_values, string_values_alloc);
 	}
+	while (string_values_alloc < string_values_offset + len);
+
+	string_values = zbx_realloc(string_values, string_values_alloc);
 }
 
 static dc_item_value_t	*dc_local_get_history_slot()
@@ -2273,7 +2278,7 @@ static dc_item_value_t	*dc_local_get_history_slot()
 	if (ZBX_MAX_VALUES_LOCAL == item_values_num)
 		dc_flush_history();
 
-	while (item_values_alloc == item_values_num)
+	if (item_values_alloc == item_values_num)
 	{
 		item_values_alloc += ZBX_STRUCT_REALLOC_STEP;
 		item_values = zbx_realloc(item_values, item_values_alloc * sizeof(dc_item_value_t));

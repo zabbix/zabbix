@@ -56,12 +56,15 @@ static int	DBpatch_2050001(void)
 		size_t	oid_offset = 0;
 
 		param = zbx_strdup(NULL, row[1]);
-		quote_key_param(&param, 0);
-
 		zbx_snprintf_alloc(&oid, &oid_alloc, &oid_offset, "discovery[{#SNMPVALUE},%s]", param);
 
-		/* 255 - ITEM_SNMP_OID_LEN */
-		if (255 < oid_offset && 255 < zbx_strlen_utf8(oid))
+		if (FAIL == quote_key_param(&param, 0))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
+					" OID contains invalid character(s)", row[1]);
+			rc = ZBX_DB_OK;
+		}
+		else if (255 < oid_offset && 255 < zbx_strlen_utf8(oid)) /* 255 - ITEM_SNMP_OID_LEN */
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot convert SNMP discovery OID \"%s\":"
 					" resulting OID is too long", row[1]);

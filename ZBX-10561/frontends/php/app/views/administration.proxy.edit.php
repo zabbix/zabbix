@@ -102,11 +102,11 @@ $encryption_form_list = (new CFormList('encryption'))
 			->setModern(true)
 	)
 	->addRow(_('Connections from proxy'), [
-		[new CCheckBox('tls_in_none'), _('No encryption')],
+		new CLabel([new CCheckBox('tls_in_none'), _('No encryption')]),
 		BR(),
-		[new CCheckBox('tls_in_psk'), _('PSK')],
+		new CLabel([new CCheckBox('tls_in_psk'), _('PSK')]),
 		BR(),
-		[new CCheckBox('tls_in_cert'), _('Certificate')]
+		new CLabel([new CCheckBox('tls_in_cert'), _('Certificate')])
 	])
 	->addRow(_('PSK identity'),
 		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)

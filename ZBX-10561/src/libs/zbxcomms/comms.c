@@ -367,9 +367,26 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	if (0 == FD_ISSET(s->socket, &fdw))
 	{
 		if (0 != FD_ISSET(s->socket, &fde))
-			*error = zbx_strdup(*error, "Connection refused.");
-		else
-			*error = zbx_strdup(*error, "A connection timeout occurred.");
+		{
+			int socket_error = 0;
+			int socket_error_len = sizeof(int);
+
+			if (ZBX_PROTO_ERROR != getsockopt(s->socket, SOL_SOCKET,
+				SO_ERROR, (char *)&socket_error, &socket_error_len))
+			{
+				if (socket_error == WSAECONNREFUSED)
+					*error = zbx_strdup(*error, "Connection refused.");
+				else if (socket_error == WSAETIMEDOUT)
+					*error = zbx_strdup(*error, "A connection timeout occurred.");
+				else
+					*error = zbx_strdup(*error, strerror_from_system(socket_error));
+			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "Cannot obtain error code: %s",
+						strerror_from_system(zbx_socket_last_error()));
+			}
+		}
 
 		return FAIL;
 	}
@@ -621,6 +638,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, char *tls_arg1, char *tls_arg2)
 {
+	if (ZBX_TCP_SEC_UNENCRYPTED != tls_connect && ZBX_TCP_SEC_TLS_CERT != tls_connect &&
+			ZBX_TCP_SEC_TLS_PSK != tls_connect)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
