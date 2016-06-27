@@ -53,6 +53,9 @@ class CScreenHttpTest extends CScreenBase {
 		$sort_field = $this->data['sort'];
 		$sort_order = $this->data['sortorder'];
 
+		$httptests = [];
+		$paging = [];
+
 		if ($this->data['hosts_selected']) {
 			$config = select_config();
 
@@ -131,7 +134,7 @@ class CScreenHttpTest extends CScreenBase {
 				$hostname = null;
 			}
 
-			if (isset($httptest['lastfailedstep']) && $httptest['lastfailedstep'] !== null) {
+			if (array_key_exists('lastfailedstep', $httptest) && $httptest['lastfailedstep'] !== null) {
 				$lastcheck = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $httptest['lastcheck']);
 
 				if ($httptest['lastfailedstep'] != 0) {
