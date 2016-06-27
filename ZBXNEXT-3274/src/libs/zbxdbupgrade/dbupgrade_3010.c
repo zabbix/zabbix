@@ -390,6 +390,101 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3010022(void)
+{
+	const ZBX_FIELD	field = {"correlation_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010023(void)
+{
+	const ZBX_FIELD	field = {"correlation_tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010024(void)
+{
+	const ZBX_FIELD	field = {"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010025(void)
+{
+	const ZBX_FIELD	field = {"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010026(void)
+{
+	const ZBX_FIELD	field = {"r_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010027(void)
+{
+	const ZBX_FIELD	field = {"r_clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010028(void)
+{
+	const ZBX_FIELD	field = {"r_ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010029(void)
+{
+	return DBcreate_index("problem", "problem_2", "r_clock", 0);
+}
+
+static int	DBpatch_3010030(void)
+{
+	const ZBX_FIELD	field = {"r_eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("problem", 2, &field);
+}
+
+static int	DBpatch_3010031(void)
+{
+	const ZBX_TABLE table =
+			{"problem_tag", "problemtagid", 0,
+				{
+					{"problemtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010032(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_1", "eventid", 0);
+}
+
+static int	DBpatch_3010033(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_2", "tag,value", 0);
+}
+
+static int	DBpatch_3010034(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "problem", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("problem_tag", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -418,5 +513,18 @@ DBPATCH_ADD(3010018, 0, 1)
 DBPATCH_ADD(3010019, 0, 1)
 DBPATCH_ADD(3010020, 0, 1)
 DBPATCH_ADD(3010021, 0, 1)
+DBPATCH_ADD(3010022, 0, 1)
+DBPATCH_ADD(3010023, 0, 1)
+DBPATCH_ADD(3010024, 0, 1)
+DBPATCH_ADD(3010025, 0, 1)
+DBPATCH_ADD(3010026, 0, 1)
+DBPATCH_ADD(3010027, 0, 1)
+DBPATCH_ADD(3010028, 0, 1)
+DBPATCH_ADD(3010029, 0, 1)
+DBPATCH_ADD(3010030, 0, 1)
+DBPATCH_ADD(3010031, 0, 1)
+DBPATCH_ADD(3010032, 0, 1)
+DBPATCH_ADD(3010033, 0, 1)
+DBPATCH_ADD(3010034, 0, 1)
 
 DBPATCH_END()
