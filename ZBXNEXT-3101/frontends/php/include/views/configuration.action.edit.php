@@ -413,7 +413,7 @@ if ($data['action']['operations']) {
 	$action_operation_hints = getActionOperationHints($data['action']['operations'], $default_message);
 
 	foreach ($data['action']['operations'] as $operationid => $operation) {
-		if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
+		if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 			continue;
 		}
 		if (!isset($operation['opconditions'])) {
@@ -550,8 +550,8 @@ if (!empty($data['new_operation'])) {
 	}
 
 	// if only one operation is available - show only the label
-	if (count($data['allowedOperations']) == 1) {
-		$operation = $data['allowedOperations'][0];
+	if (count($data['allowedOperations'][ACTION_OPERATION]) == 1) {
+		$operation = $data['allowedOperations'][ACTION_OPERATION][0];
 		$new_operation_formlist->addRow(_('Operation type'),
 			[operation_type2str($operation), new CVar('new_operation[operationtype]', $operation)]
 		);
@@ -561,7 +561,7 @@ if (!empty($data['new_operation'])) {
 		$operationTypeComboBox = new CComboBox('new_operation[operationtype]',
 			$data['new_operation']['operationtype'], 'submit()'
 		);
-		foreach ($data['allowedOperations'] as $operation) {
+		foreach ($data['allowedOperations'][ACTION_OPERATION] as $operation) {
 			$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 		}
 		$new_operation_formlist->addRow(_('Operation type'), $operationTypeComboBox);
@@ -1147,7 +1147,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		$action_operation_hints = getActionOperationHints($data['action']['recovery_operations'], $default_message);
 
 		foreach ($data['action']['recovery_operations'] as $operationid => $operation) {
-			if (!str_in_array($operation['operationtype'], $data['allowedOperations'])) {
+			if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_RECOVERY_OPERATION])) {
 				continue;
 			}
 			if (!isset($operation['opconditions'])) {
@@ -1218,8 +1218,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		}
 
 		// if only one operation is available - show only the label
-		if (count($data['allowedOperations']) == 1) {
-			$operation = $data['allowedOperations'][0];
+		if (count($data['allowedOperations'][ACTION_RECOVERY_OPERATION]) == 1) {
+			$operation = $data['allowedOperations'][ACTION_RECOVERY_OPERATION][0];
 			$new_operation_formlist->addRow(_('Operation type'),
 				[operation_type2str($operation), new CVar('new_recovery_operation[operationtype]', $operation)]
 			);
@@ -1229,7 +1229,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			$operationTypeComboBox = new CComboBox('new_recovery_operation[operationtype]',
 				$data['new_recovery_operation']['operationtype'], 'submit()'
 			);
-			foreach ($data['allowedOperations'] as $operation) {
+			foreach ($data['allowedOperations'][ACTION_RECOVERY_OPERATION] as $operation) {
 				$operationTypeComboBox->addItem($operation, operation_type2str($operation));
 			}
 			$new_operation_formlist->addRow(_('Operation type'), $operationTypeComboBox);
