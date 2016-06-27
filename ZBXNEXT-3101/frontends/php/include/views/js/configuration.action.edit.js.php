@@ -433,13 +433,13 @@
 		current_op_type = opcommand_type.val();
 
 		opTypeFieldIds = {
-			'opcommand_script': [ZBX_SCRIPT_TYPES.userscript],
-			'opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
-			'opcommand_port': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			'opcommand_command': [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			'opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
-			'opcommand_authtype': [ZBX_SCRIPT_TYPES.ssh],
-			'opcommand_username': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			[opcommand_script]: [ZBX_SCRIPT_TYPES.userscript],
+			[opcommand_execute_on]: [ZBX_SCRIPT_TYPES.script],
+			[opcommand_port]: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			[opcommand_command]: [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			[opcommand_command_ipmi]: [ZBX_SCRIPT_TYPES.ipmi],
+			[opcommand_authtype]: [ZBX_SCRIPT_TYPES.ssh],
+			[opcommand_username]: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
 		};
 
 		for (fieldId in opTypeFieldIds) {
