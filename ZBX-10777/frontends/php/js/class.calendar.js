@@ -64,7 +64,6 @@ calendar.prototype = {
 		this.timeobjects = new Array();
 		if (!(this.status = this.checkOuterObj(timeobjects))) {
 			throw 'Calendar: constructor expects second parameter to be list of DOM nodes [d,M,Y,H,i].';
-			return false;
 		}
 		this.calendarcreate(parentNodeid);
 
@@ -249,7 +248,6 @@ calendar.prototype = {
 				break;
 			default:
 				return false;
-				break;
 		}
 
 		if (!is_null(this.clndr_utime_field)) {
@@ -259,35 +257,14 @@ calendar.prototype = {
 	},
 
 	setSDateDMY: function(d, m, y) {
-		d = parseInt(d,10);
-		m = parseInt(m,10);
-		y = parseInt(y,10);
+		var dateHolder = new Date(y, m - 1, d, 0, 0, 0);
 
-		var result = false;
-		if (m > 0 && m < 13) {
-			this.sdt.setMonth(m - 1);
-			result = true;
+		if (y >= 1970 && dateHolder.getFullYear() == y && dateHolder.getMonth() == m - 1 && dateHolder.getDate() == d) {
+			this.sdt.setTime(dateHolder.getTime());
+			return true;
 		}
 
-		if (y > 1969) {
-			this.sdt.setFullYear(y);
-			result = true;
-		}
-
-		if (d > -1 && d < 29) {
-			this.sdt.setDate(d);
-			result = true;
-		}
-		else if (d > 28 && result) {
-			if (d <= daysInMonth(this.sdt.getFullYear(), this.sdt.getMonth())) {
-				this.sdt.setDate(d);
-				result = true;
-			}
-		}
-		this.sdt.setHours(00);
-		this.sdt.setMinutes(00);
-		this.sdt.setSeconds(00);
-		return result;
+		return false;
 	},
 
 	setDateToOuterObj: function() {
@@ -336,7 +313,7 @@ calendar.prototype = {
 	},
 
 	setNow: function(timestamp) {
-		var now = (isNaN(timestamp)) ? new Date() : new Date(timestamp * 1000);
+		var now = (isNaN(timestamp)) ? new CDate() : new CDate(timestamp * 1000);
 		this.day = now.getDate();
 		this.month = now.getMonth();
 		this.year = now.getFullYear();
@@ -349,7 +326,6 @@ calendar.prototype = {
 	},
 
 	setDone: function() {
-		this.syncSDT();
 		this.syncBSDateBySDT();
 		this.ondateselected();
 	},
@@ -450,22 +426,6 @@ calendar.prototype = {
 		this.setCDate();
 	},
 
-	setSDT: function(d, m, y, h, i) {
-		this.sdt.setMinutes(i);
-		this.sdt.setHours(h);
-		this.sdt.setDate(d);
-		this.sdt.setMonth(m);
-		this.sdt.setFullYear(y);
-	},
-
-	setCDT: function(d, m, y, h, i) {
-		this.cdt.setMinutes(i);
-		this.cdt.setHours(h);
-		this.cdt.setDate(d);
-		this.cdt.setMonth(m);
-		this.cdt.setFullYear(y);
-	},
-
 	syncBSDateBySDT: function() {
 		this.minute = this.sdt.getMinutes();
 		this.hour = this.sdt.getHours();
@@ -475,11 +435,11 @@ calendar.prototype = {
 	},
 
 	syncSDT: function() {
-		this.setSDT(this.day, this.month, this.year, this.hour, this.minute);
+		this.sdt.setTimeObject(this.year, this.month, this.day, this.hour, this.minute);
 	},
 
 	syncCDT: function() {
-		this.setCDT(1, this.month, this.year, this.hour, this.minute);
+		this.cdt.setTimeObject(this.year, this.month, 1, this.hour, this.minute);
 	},
 
 	setCDate: function() {
@@ -493,21 +453,17 @@ calendar.prototype = {
 	},
 
 	createDaysTab: function() {
-		this.clndr_days.update('');
-		var table = document.createElement('table');
-		this.clndr_days.appendChild(table);
-
-		var tbody = document.createElement('tbody');
-		table.appendChild(tbody);
+		var tbody = this.clndr_days;
+		tbody.update('');
 
 		var cur_month = this.cdt.getMonth();
 
-		// make 0 - monday, not sunday(as default)
+		// make 0 - Monday, not Sunday (as default)
 		var prev_days = this.cdt.getDay() - 1;
 		if (prev_days < 0) {
 			prev_days = 6;
 		}
-		if(prev_days > 0) {
+		if (prev_days > 0) {
 			this.cdt.setTime(this.cdt.getTime() - prev_days * 86400000);
 		}
 
@@ -519,9 +475,6 @@ calendar.prototype = {
 				tr.appendChild(td);
 				Element.extend(td);
 
-				if (x > 4) {
-					td.className = 'holiday';
-				}
 				if (cur_month != this.cdt.getMonth()) {
 					td.addClassName('grey');
 				}
@@ -614,11 +567,11 @@ calendar.prototype = {
 		var table = document.createElement('table');
 		this.clndr_calendar.appendChild(table);
 
-		var tbody = document.createElement('thead');
-		table.appendChild(tbody);
+		var thead = document.createElement('thead');
+		table.appendChild(thead);
 
 		var tr = document.createElement('tr');
-		tbody.appendChild(tr);
+		thead.appendChild(tr);
 
 		var td = document.createElement('th');
 		tr.appendChild(td);
@@ -651,10 +604,9 @@ calendar.prototype = {
 		/*
 		 * Days calendar
 		 */
-		this.clndr_days = document.createElement('div');
+		this.clndr_days = document.createElement('tbody');
 		Element.extend(this.clndr_days);
-		this.clndr_calendar.appendChild(this.clndr_days);
-		this.clndr_days.className = 'calendar-day';
+		table.appendChild(this.clndr_days);
 
 		/*
 		 * Hours & minutes
