@@ -1758,6 +1758,14 @@ button {
 	&:active {
 		@extend .btn-link;
 	}
+
+	&[disabled] {
+		background-color: $transparent;
+
+		&:hover {
+			background-color: $transparent;
+		}
+	}
 }
 
 .btn-search {
@@ -3000,24 +3008,28 @@ a.blue {
 }
 
 .status-green {
+	color: $white;
 	border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
 
 .status-red {
+	color: $white;
 	border: 1px solid darken(desaturate($alt-red, 10%), 9%);
 	background-color: darken(desaturate($alt-red, 10%), 5%);
 	@extend %status;
 }
 
 .status-grey {
-	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
-	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
+	color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border: 1px solid $form-disabled-border-color;
 	@extend %status;
 }
 
 .status-yellow {
+	color: $white;
 	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
 	background-color: darken(desaturate($alt-yellow, 10%), 16%);
 	@extend %status;
@@ -3025,7 +3037,6 @@ a.blue {
 
 %status {
 	padding: 2px 3px 1px 3px;
-	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
