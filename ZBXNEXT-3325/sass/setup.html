@@ -13,13 +13,10 @@
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
-        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png">
         <meta name="msapplication-TileColor" content="#d40000">
 	</head>
 <body>
-	<!--<header role="banner">
-		<div><div class="signin-logo"></div></div>
-	</header>-->
 	<div class="article">
 
 		<form>
@@ -30,9 +27,7 @@
 		<li class="setup-left-current">Welcome</li>
 		<li>Check for pre-requisites</li>
 		<li>Configure DB connection</li>
-		<li>Zabbix server details</li>
-		<li>Pre-installation summary</li>
-		<li>Install</li>
+		<li>Enter Zabbix server details</li>
 		</ul>
 		</div>
 		<div class="setup-right">
@@ -40,7 +35,7 @@
 		<div class="setup-title"><span>Welcome to</span>Zabbix 3.0</div>
 		</div>
 		</div>
-	<div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
+	<div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left" disabled>Previous</button></div><button type="button" class="btn-alt float-left">Cancel</button>
 		 </div>
 	</div>
 	</form>
@@ -58,9 +53,7 @@
 		<li class="setup-left-current">Welcome</li>
 		<li class="setup-left-current">Check for pre-requisites</li>
 		<li>Configure DB connection</li>
-		<li>Zabbix server details</li>
-		<li>Pre-installation summary</li>
-		<li>Install</li>
+		<li>Enter Zabbix server details</li>
 		</ul>
 		</div>
 		<div class="setup-right">
@@ -218,7 +211,7 @@
 </table>
 </div>
 	</div>
-	<div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
+	<div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Previous</button></div><button type="button" class="btn-alt float-left">Cancel</button>
 		 </div>
 	</div>
 	</form>
@@ -238,26 +231,24 @@
 		<li class="setup-left-current">Welcome</li>
 		<li class="setup-left-current">Check for pre-requisites</li>
 		<li class="setup-left-current">Configure DB connection</li>
-		<li>Zabbix server details</li>
-		<li>Pre-installation summary</li>
-		<li>Install</li>
+		<li>Enter Zabbix server details</li>
 		</ul>
 		</div>
 		<div class="setup-right">
 		<h1>Configure DB connection</h1>
 		<div class="setup-right-body">
-		<p>Create database manually and set the configuration parameters for connection to this database.</p>
+		<!--<p>Create database manually and set the configuration parameters for connection to this database.</p>-->
 		<ul class="table-forms">
-		<li><div class="table-forms-td-left"><label for="DBType">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="DBType" value="localhost"></div></li>
+		<li><div class="table-forms-td-left"><label for="DBType">Database type</label></div><div class="table-forms-td-right"><select id="dbtype"><option>MySQL</option><option>Oracle</option><option>PostreSQL</option><option>Oracle</option><option>SQLite</option><option>IBM DB2</option></select></div></li>
 	    <li><div class="table-forms-td-left"><label for="DBHost">Database host</label></div><div class="table-forms-td-right"><input type="text" id="DBHost" value="localhost"></div></li>
-	    <li><div class="table-forms-td-left"><label for="DBPort">Database port</label></div><div class="table-forms-td-right"><input type="text" id="DBPort" value="0"> <span class="grey">0&ndash;use default port</span></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBPort">Database port</label></div><div class="table-forms-td-right"><ul class="list-check-radio"><li><input type="checkbox" id="DefaultPort" class="checkbox-radio" checked><label for="DefaultPort"><span></span>Use default</label></li><li><input type="text" id="DBPort" value="3306" disabled></li></ul><!-- <span class="grey">0&ndash;use default port</span>--></div></li>
 	    <li><div class="table-forms-td-left"><label for="DBName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="DBName" value="zabbix"></div></li>
 	    <li><div class="table-forms-td-left"><label for="User">User</label></div><div class="table-forms-td-right"><input type="text" id="User" value="root"></div></li>
 	    <li><div class="table-forms-td-left"><label for="Password">Password</label></div><div class="table-forms-td-right"><input type="password" id="Password"></div></li>
 	    </ul>
 	    </div>
 	    </div>
-	    <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
+	    <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Previous</button></div><button type="button" class="btn-alt float-left">Cancel</button>
 		 </div>
 	    </div>
 	</form>
@@ -276,15 +267,13 @@
 		<li class="setup-left-current">Welcome</li>
 		<li class="setup-left-current">Check for pre-requisites</li>
 		<li class="setup-left-current">Configure DB connection</li>
-		<li>Zabbix server details</li>
-		<li>Pre-installation summary</li>
-		<li>Install</li>
+		<li>Enter Zabbix server details</li>
 		</ul>
 		</div>
 		<div class="setup-right">
 		<h1>Configure DB connection</h1>
 		<div class="setup-right-body">
-		<p>Create database manually and set the configuration parameters for connection to this database.</p>
+		<!--<p>Create database manually and set the configuration parameters for connection to this database.</p>-->
 		<div class="msg-bad">
 	Oh snap! Check form fields and try submitting again.
 	<div class="msg-details"><a href="" class="link-action">Details</a>
@@ -295,16 +284,16 @@
 	</ul></div>
 	</div>
 		<ul class="table-forms">
-		<li><div class="table-forms-td-left"><label for="DBType">Databese type</label></div><div class="table-forms-td-right"><input type="text" id="DBType" value="localhost"></div></li>
+		<li><div class="table-forms-td-left"><label for="DBType">Database type</label></div><div class="table-forms-td-right"><select id="dbtype"><option>MySQL</option><option>Oracle</option><option>PostreSQL</option><option>Oracle</option><option>SQLite</option><option>IBM DB2</option></select></div></li>
 	    <li><div class="table-forms-td-left"><label for="DBHost">Database host</label></div><div class="table-forms-td-right"><input type="text" id="DBHost" value="localhost"></div></li>
-	    <li><div class="table-forms-td-left"><label for="DBPort">Database port</label></div><div class="table-forms-td-right"><input type="text" id="DBPort" value="0"> <span class="grey">0&ndash;use default port</span></div></li>
+	    <li><div class="table-forms-td-left"><label for="DBPort">Database port</label></div><div class="table-forms-td-right"><ul class="list-check-radio"><li><input type="checkbox" id="DefaultPort" class="checkbox-radio" checked><label for="DefaultPort"><span></span>Use default</label></li><li><input type="text" id="DBPort" value="3306" disabled></li></ul><!-- <span class="grey">0–use default port</span>--></div></li>
 	    <li><div class="table-forms-td-left"><label for="DBName">Database name</label></div><div class="table-forms-td-right"><input type="text" id="DBName" value="zabbix"></div></li>
 	    <li><div class="table-forms-td-left"><label for="User">User</label></div><div class="table-forms-td-right"><input type="text" id="User" value="root"></div></li>
 	    <li><div class="table-forms-td-left"><label for="Password">Password</label></div><div class="table-forms-td-right"><input type="password" id="Password"></div></li>
 	    </ul>
 	    </div>
 	    </div>
-	    <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
+	    <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Previous</button></div><button type="button" class="btn-alt float-left">Cancel</button>
 		 </div>
 	    </div>
 	</form>
@@ -322,137 +311,66 @@
 		<li class="setup-left-current">Welcome</li>
 		<li class="setup-left-current">Check for pre-requisites</li>
 		<li class="setup-left-current">Configure DB connection</li>
-		<li class="setup-left-current">Zabbix server details</li>
-		<li>Pre-installation summary</li>
-		<li>Install</li>
+		<li class="setup-left-current">Enter Zabbix server details</li>
 		</ul>
 		</div>
 		<div class="setup-right">
 		<h1>Zabbix server details</h1>
 		<div class="setup-right-body">
-		<p>Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).</p>
+		<!--<p>Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).</p>-->
        <ul class="table-forms">
        <li><div class="table-forms-td-left"><label for="ServerHost">Host name/IP address</label></div><div class="table-forms-td-right"><input type="text" id="ServerHost" value="localhost"></div></li>
        <li><div class="table-forms-td-left"><label for="ServerPort">Port number</label></div><div class="table-forms-td-right"><input type="text" id="ServerPort" value="10051"></div></li>
-       <li><div class="table-forms-td-left"><label for="ServerName">Name of installation</label></div><div class="table-forms-td-right"><input type="text" id="ServerName" value=""> <span class="grey">Optional</span></div></li>
+       <li><div class="table-forms-td-left"><label for="ServerName">Name of installation</label></div><div class="table-forms-td-right"><input type="text" id="ServerName" value=""><div class="grey">Optional</div></div></li>
        </ul>
        </div>
 	   </div>
-	   <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
-		 </div>
-	   </div>
-	</form>
-	<div class="signin-links">Licensed under <a href="" class="grey link-alt">GPL v2</a></div>
-
-	<br>
-
-
-<form>
-		<div class="setup-container">
-		<div class="setup-left">
-		<div class="signin-logo"></div>
-		<ul>
-		<li class="setup-left-current">Welcome</li>
-		<li class="setup-left-current">Check for pre-requisites</li>
-		<li class="setup-left-current">Configure DB connection</li>
-		<li class="setup-left-current">Zabbix server details</li>
-		<li class="setup-left-current">Pre-installation summary</li>
-		<li>Install</li>
-		</ul>
-		</div>
-		<div class="setup-right">
-		<h1>Pre-installation summary</h1>
-		<div class="setup-right-body">
-		<p>Please check configuration parameters.</p>
-       <ul class="table-forms">
-       <li><div class="table-forms-td-left grey"><label for="HostName">Database type</label></div><div class="table-forms-td-right">MySQL</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Database server</label></div><div class="table-forms-td-right">localhost</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Database port</label></div><div class="table-forms-td-right">default</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Database name</label></div><div class="table-forms-td-right">zabbix</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Database user</label></div><div class="table-forms-td-right">root</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Database password</label></div><div class="table-forms-td-right"></div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Zabbix server</label></div><div class="table-forms-td-right">localhost</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Zabbix server port</label></div><div class="table-forms-td-right">10051</div></li>
-	   <li><div class="table-forms-td-left grey"><label for="HostName">Zabbix server name</label></div><div class="table-forms-td-right"></div></li>
-       </ul>
-	   </div>
-	   </div>
-	   <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
+	   <div class="setup-footer"><div><button type="button">Continue to sign in</button><button type="button" class="btn-alt float-left">Previous</button></div><button type="button" class="btn-alt float-left">Cancel</button>
 		 </div>
 	   </div>
 	</form>
 	<div class="signin-links">Licensed under <a href="" class="grey link-alt">GPL v2</a></div>
 
 
-	<br>
+		<br>
 
 
-	<form>
-		<div class="setup-container">
-		<div class="setup-left">
-		<div class="signin-logo"></div>
-		<ul>
-		<li class="setup-left-current">Welcome</li>
-		<li class="setup-left-current">Check for pre-requisites</li>
-		<li class="setup-left-current">Configure DB connection</li>
-		<li class="setup-left-current">Zabbix server details</li>
-		<li class="setup-left-current">Pre-installation summary</li>
-		<li class="setup-left-current">Install</li>
-		</ul>
-		</div>
-		<div class="setup-right">
-		<h1>Install</h1>
-		<div class="setup-right-body">
-		<div class="msg-bad">Error creating configuration file
-	    <div class="msg-details"><a href="" class="link-action">Details</a>
-	    <ul>
-	    <li>/home/user/2.4.1/frontends/php/conf/zabbix.conf.php</li>
-	    <li>Unable to overwrite existing configuration file</li>
-	    </ul></div>
-	    </div>
-	    <p>For manual installation:</p>
-	    <ol>
-	    <li><a href="">Download the configuration file</a></li>
-	    <li>Save it as "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php"</li>
-	    </ol>
-		</div>
-		</div>
-	    <div class="setup-footer"><div><button type="button">Next step</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
-		 </div>
-	    </div>
-	</form>
-	<div class="signin-links">Licensed under <a href="" class="grey link-alt">GPL v2</a></div>
-
-
-	<br>
-
-
-	<form>
-		<div class="setup-container">
-		<div class="setup-left">
-		<div class="signin-logo"></div>
-		<ul>
-		<li class="setup-left-current">Welcome</li>
-		<li class="setup-left-current">Check for pre-requisites</li>
-		<li class="setup-left-current">Configure DB connection</li>
-		<li class="setup-left-current">Zabbix server details</li>
-		<li class="setup-left-current">Pre-installation summary</li>
-		<li class="setup-left-current">Install</li>
-		</ul>
-		</div>
-		<div class="setup-right">
-		<h1>Install</h1>
-		<div class="setup-right-body">
-		<h1 class="green">Nice! You've successfully installed Zabbix front end</h1>
-		<p>Configuration file "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php" created</p>
-		</div>
-		</div>
-		 <div class="setup-footer"><div><button type="button">Finish</button><button type="button" class="btn-alt float-left">Back</button></div><button type="button" class="btn-alt float-left">Cancel</button>
-		 </div>
-	    </div>
-	</form>
-	<div class="signin-links">Licensed under <a href="" class="grey link-alt">GPL v2</a></div>
-
+		<form>
+			<div class="setup-container">
+			<div class="setup-left">
+			<div class="signin-logo"></div>
+			<ul>
+			<li class="setup-left-current">Welcome</li>
+			<li class="setup-left-current">Check for pre-requisites</li>
+			<li class="setup-left-current">Configure DB connection</li>
+			<li class="setup-left-current">Enter Zabbix server details</li>
+			</ul>
+			</div>
+			<div class="setup-right">
+			<h1>Zabbix server details</h1>
+			<div class="setup-right-body">
+				<div class="msg-bad">Error creating configuration file
+					<div class="msg-details"><a href="" class="link-action">Details</a>
+						<ul>
+							<li>/home/user/2.4.1/frontends/php/conf/zabbix.conf.php</li>
+							<li>Unable to overwrite existing configuration file. For manual installation <a href="">download the configuration file</a> and save it as "/home/user/2.4.1/frontends/php/conf/zabbix.conf.php"
+							</li>
+						</ul>
+					</div>
+				</div>
+			<!--<p>Please enter host name or host IP address and port number of Zabbix server, as well as the name of the installation (optional).</p>-->
+	       <ul class="table-forms">
+	       <li><div class="table-forms-td-left"><label for="ServerHost">Host name/IP address</label></div><div class="table-forms-td-right"><input type="text" id="ServerHost" value="localhost"></div></li>
+	       <li><div class="table-forms-td-left"><label for="ServerPort">Port number</label></div><div class="table-forms-td-right"><input type="text" id="ServerPort" value="10051"></div></li>
+	       <li><div class="table-forms-td-left"><label for="ServerName">Name of installation</label></div><div class="table-forms-td-right"><input type="text" id="ServerName" value=""><div class="grey">Optional</div></div></li>
+	       </ul>
+	       </div>
+		   </div>
+		   <div class="setup-footer"><div><button type="button">Continue to sign in</button><button type="button" class="btn-alt float-left">Previous</button></div><button type="button" class="btn-alt float-left">Cancel</button>
+			 </div>
+		   </div>
+		</form>
+		<div class="signin-links">Licensed under <a href="" class="grey link-alt">GPL v2</a></div>
 	</div>
 	<div class="footer">
 	Zabbix 3.0. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
