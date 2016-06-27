@@ -63,13 +63,11 @@ class CJsonRpc {
 	public function execute() {
 		if ($this->json->hasError()) {
 			$this->jsonError(null, '-32700', null, null, true);
-
 			return $this->json->encode($this->_response[0]);
 		}
 
 		if ($this->_jsonDecoded === null || $this->_jsonDecoded == []) {
 			$this->jsonError(null, '-32600', null, null, true);
-
 			return $this->json->encode($this->_response[0]);
 		}
 
@@ -91,12 +89,12 @@ class CJsonRpc {
 			$this->processResult($call, $result);
 		}
 
-		return $this->json->encode(
-			(is_array($this->_jsonDecoded)
-					&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1))
-				? $this->_response
-				: $this->_response[0]
-		);
+		if (is_array($this->_jsonDecoded)
+				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
+			// Return response as encoded batch if $this->_jsonDecoded is associative array.
+			return $this->json->encode($this->_response);
+		}
+		return $this->json->encode($this->_response[0]);
 	}
 
 	public function validate($call) {
@@ -143,10 +141,6 @@ class CJsonRpc {
 
 			$this->_response[] = $formedResp;
 		}
-	}
-
-	public function isError() {
-		return $this->_error;
 	}
 
 	private function jsonError($id, $errno, $data = null, $debug = null, $force_err = false) {

@@ -51,14 +51,12 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 		Z::getInstance()->run(ZBase::EXEC_MODE_API);
 		self::$client = API::getWrapper()->getClient();
 
-		$response = self::$json->decode(
+		self::$auth = self::$json->decode(
 			(new CJsonRpc(
 				self::$client,
 				'{"jsonrpc": "2.0", "method": "user.login","params": {"user": "Admin", "password": "zabbix"}, "id": 0}'
-			)
-		)->execute());
-
-		self::$auth = $response->result;
+			))->execute()
+		)->result;
 	}
 
 	/**
@@ -67,12 +65,10 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	public static function tearDownAfterClass() {
 		Z::getInstance()->run(ZBase::EXEC_MODE_API);
 
-		$response = self::$json->decode(
-			(new CJsonRpc(
-				self::$client,
-				'{"jsonrpc": "2.0", "method": "user.logout", "params": [], "id": 0, "auth": "'.self::$auth.'"}'
-			)
-		)->execute());
+		(new CJsonRpc(
+			self::$client,
+			'{"jsonrpc": "2.0", "method": "user.logout", "params": [], "id": 0, "auth": "'.self::$auth.'"}'
+		))->execute();
 	}
 
 	/**
@@ -102,7 +98,6 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 
 		$response = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
 
-		//$this->assertTrue(false, json_encode($response));
 		$this->assertInternalType('array', $response);
 		$this->assertArrayHasKey('result', $response);
 	}
@@ -136,11 +131,11 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 		$i = 1;
 
 		$data = '[';
-		foreach ($batch as $key => $attrs) {
+		foreach ($batch as $attrs) {
 			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.self::$auth.'", "params": '.
 				$attrs['params'].', "id": '.$attrs['id'].'}';
 
-			if ($length != $i) {
+			if ($i < $length) {
 				$data .= ', ';
 			}
 
