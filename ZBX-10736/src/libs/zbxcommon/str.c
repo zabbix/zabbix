@@ -1597,13 +1597,14 @@ char	*get_param_dyn(const char *p, int num)
  * Comments: auxiliary function for replace_key_params_dyn()                  *
  *                                                                            *
  ******************************************************************************/
-static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
+static int	replace_key_param(char **data, int key_type, size_t l, size_t *r, int level, int num, int quoted,
 		replace_key_param_f cb, void *cb_data)
 {
-	char	c = (*data)[*r], *param;
+	char	c = (*data)[*r], *param = NULL;
+	int	ret;
 
 	(*data)[*r] = '\0';
-	param = cb(*data + l, key_type, level, num, quoted, cb_data);
+	ret = cb(*data + l, key_type, level, num, quoted, cb_data, &param);
 	(*data)[*r] = c;
 
 	if (NULL != param)
@@ -1614,6 +1615,8 @@ static void	replace_key_param(char **data, int key_type, size_t l, size_t *r, in
 
 		zbx_free(param);
 	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1668,9 +1671,9 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			;
 	}
 
-	replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
+	ret = replace_key_param(data, key_type, 0, &i, level, num, 0, cb, cb_data);
 
-	for (; '\0' != (*data)[i]; i++)
+	for (; '\0' != (*data)[i] && FAIL != ret; i++)
 	{
 		if (0 == level)
 		{
@@ -1689,7 +1692,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 					case ' ':
 						break;
 					case ',':
-						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
+						ret = replace_key_param(data, key_type, i, &i, level, num, 0, cb,
+								cb_data);
 						if (1 == level)
 							num++;
 						break;
@@ -1699,7 +1703,8 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 							num++;
 						break;
 					case ']':
-						replace_key_param(data, key_type, i, &i, level, num, 0, cb, cb_data);
+						ret = replace_key_param(data, key_type, i, &i, level, num, 0, cb,
+								cb_data);
 						level--;
 						state = ZBX_STATE_END;
 						break;
@@ -1732,7 +1737,7 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			case ZBX_STATE_UNQUOTED:	/* an unquoted parameter */
 				if (']' == (*data)[i] || ',' == (*data)[i])
 				{
-					replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
+					ret = replace_key_param(data, key_type, l, &i, level, num, 0, cb, cb_data);
 
 					i--;
 					state = ZBX_STATE_END;
@@ -1741,7 +1746,9 @@ int	replace_key_params_dyn(char **data, int key_type, replace_key_param_f cb, vo
 			case ZBX_STATE_QUOTED:	/* a quoted parameter */
 				if ('"' == (*data)[i] && '\\' != (*data)[i - 1])
 				{
-					i++; replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data); i--;
+					i++;
+					ret = replace_key_param(data, key_type, l, &i, level, num, 1, cb, cb_data);
+					i--;
 
 					state = ZBX_STATE_END;
 				}
@@ -3755,7 +3762,7 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
  *                                                                            *
  * Parameters: expr      - [IN] the function expression, starting with the    *
  *                             parameter to parse: p1,p2 ...                  *
- *             length    - [OUT] the parameter length excluding the trailing  *
+ *             length    - [OUT] the parameter length including trailing      *
  *                              whitespace                                    *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
@@ -3798,7 +3805,7 @@ out:
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
  *             length    - [OUT] the parameter length including trailing      *
- *                               whitespace                                   *
+ *                               whitespace for unquoted parameter            *
  *             sep_pos   - [OUT] the parameter separator character            *
  *                               (',' or ')') position.                       *
  *                               0 if there are no more parameters to parse.  *

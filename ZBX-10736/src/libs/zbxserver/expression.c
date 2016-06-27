@@ -4356,36 +4356,39 @@ replace_key_param_data_t;
  * Comments: auxiliary function for substitute_key_macros()                   *
  *                                                                            *
  ******************************************************************************/
-static char	*replace_key_param(const char *data, int key_type, int level, int num, int quoted, void *cb_data)
+static int	replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
+			char **param)
 {
 	replace_key_param_data_t	*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t			*hostid = replace_key_param_data->hostid;
 	DC_ITEM				*dc_item = replace_key_param_data->dc_item;
 	struct zbx_json_parse		*jp_row = replace_key_param_data->jp_row;
-	int				macro_type = replace_key_param_data->macro_type;
-	char				*param;
+	int				macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	if (ZBX_KEY_TYPE_ITEM == key_type && 0 == level)
-		return NULL;
+		return ret;
 
 	if (NULL == strchr(data, '{'))
-		return NULL;
+		return ret;
 
-	param = zbx_strdup(NULL, data);
+	*param = zbx_strdup(NULL, data);
 
 	if (0 != level)
-		unquote_key_param(param);
+		unquote_key_param(*param);
 
 	if (NULL == jp_row)
 		substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL,
-				&param, macro_type, NULL, 0);
+				param, macro_type, NULL, 0);
 	else
-		substitute_discovery_macros(&param, jp_row, ZBX_MACRO_ANY, NULL, 0);
+		substitute_discovery_macros(param, jp_row, ZBX_MACRO_ANY, NULL, 0);
 
 	if (0 != level)
-		quote_key_param(&param, quoted);
+	{
+		if (FAIL == (ret = quote_key_param(param, quoted)))
+			zbx_free(*param);
+	}
 
-	return param;
+	return ret;
 }
 
 /******************************************************************************
@@ -4397,7 +4400,9 @@ static char	*replace_key_param(const char *data, int key_type, int level, int nu
  * Example:  key                     | macro       | result                   *
  *          -------------------------+-------------+-----------------         *
  *           echo.sh[{$MACRO}]       | a           | echo.sh[a]               *
+ *           echo.sh[{$MACRO}]       |  a          | echo.sh[" a"]            *
  *           echo.sh["{$MACRO}"]     | a           | echo.sh["a"]             *
+ *           echo.sh[{$MACRO}]       |  a\         | echo.sh[{$MACRO}]        *
  *           echo.sh[{$MACRO}]       | "a"         | echo.sh["\"a\""]         *
  *           echo.sh["{$MACRO}"]     | "a"         | echo.sh["\"a\""]         *
  *           echo.sh[{$MACRO}]       | a,b         | echo.sh["a,b"]           *
@@ -4432,7 +4437,7 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 			exit(EXIT_FAILURE);
 	}
 
-	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
+	ret = replace_key_params_dyn(data, key_type, replace_key_param_cb, &replace_key_param_data, error, maxerrlen);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s data:'%s'", __function_name, zbx_result_string(ret), *data);
 
