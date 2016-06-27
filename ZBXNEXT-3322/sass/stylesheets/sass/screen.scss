@@ -112,8 +112,7 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid $ui-border-color;
-	padding: 0 0 5px 0;
+	display: inline-block;
 }
 
 h2 {
@@ -484,18 +483,19 @@ ul.top-nav-icons {
 .header-title {
 	position: relative;
 	margin: 0 0 10px 0;
+}
 
-	ul {
-		position: absolute;
-		right: 0;
-		bottom: 6px;
+.header-btns {
+	position: absolute;
+	right: 0;
+	//bottom: 6px;
+	bottom: -2px;
 
-		li {
-			display: block;
-			float: left;
-			position: relative;
-			padding: 0 0 0 10px;
-		}
+	li {
+		display: block;
+		float: left;
+		position: relative;
+		padding: 0 0 0 10px;
 	}
 }
 
@@ -2470,6 +2470,34 @@ $form-icon-btn: (
 			background-color: $action-hover-color;
 		}
 	}
+}
+
+.header-dropdown {
+	position: relative;
+
+	.link-action {
+		position: relative;
+
+		&::after {
+			content: '';
+			position: absolute;
+			top: 48%;
+			left: 103%;
+			border-top-color: $font-alt-color;
+			@extend .arrow-down;
+		}
+	}
+}
+
+.test-dropdown {
+	padding: 5px 10px;
+	font-size: $font-h4-size;
+
+	.action-menu-item {
+		padding: 0 10px;
+		margin: 0 -10px;
+	}
+	@extend .action-menu;
 }
 
 .overlay-dialogue {
