@@ -22,9 +22,9 @@
 class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * Local API client.
+	 * API client.
 	 *
-	 * @var CLocalApiClient
+	 * @var CApiClient
 	 */
 	protected static $client;
 
@@ -164,6 +164,8 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function invalidRequestProvider() {
 		return [
+			['5'],
+			['0'],
 			['[]'],
 			['""'],
 			['null'],

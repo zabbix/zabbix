@@ -38,6 +38,12 @@ class CJsonRpc {
 	private $_zbx2jsonErrors;
 	private $_jsonDecoded;
 
+	/**
+	 * Constructor.
+	 *
+	 * @param CApiClient $apiClient
+	 * @param string $data
+	 */
 	public function __construct(CApiClient $apiClient, $data) {
 		$this->apiClient = $apiClient;
 
@@ -47,17 +53,23 @@ class CJsonRpc {
 		$this->_error = false;
 		$this->_response = [];
 		$this->_jsonDecoded = $this->json->decode($data, true);
-
-		if ($this->json->hasError()) {
-			$this->jsonError(null, '-32700', null, null, true);
-		}
-		elseif (!$this->_jsonDecoded) {
-			$this->jsonError(null, '-32600', null, null, true);
-		}
 	}
 
+	/**
+	 * Executes API requests.
+	 *
+	 * @return string JSON encoded value
+	 */
 	public function execute() {
-		if (!$this->_jsonDecoded) {
+		if ($this->json->hasError()) {
+			$this->jsonError(null, '-32700', null, null, true);
+
+			return $this->json->encode($this->_response[0]);
+		}
+
+		if ($this->_jsonDecoded === null || $this->_jsonDecoded == []) {
+			$this->jsonError(null, '-32600', null, null, true);
+
 			return $this->json->encode($this->_response[0]);
 		}
 
