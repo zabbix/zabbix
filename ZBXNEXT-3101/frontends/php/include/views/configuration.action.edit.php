@@ -1211,10 +1211,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		$new_operation_formlist = (new CFormList())->setAttribute('style', 'width: 100%;');
 
 		if (isset($data['new_recovery_operation']['id'])) {
-			$new_recovery_operation_vars[] = new CVar('new_recovery_operation[id]', $data['new_recovery_operation']['id']);
+			$new_recovery_operation_vars[] = new CVar('new_recovery_operation[id]',
+				$data['new_recovery_operation']['id']
+			);
 		}
 		if (isset($data['new_recovery_operation']['operationid'])) {
-			$new_recovery_operation_vars[] = new CVar('new_recovery_operation[operationid]', $data['new_recovery_operation']['operationid']);
+			$new_recovery_operation_vars[] = new CVar('new_recovery_operation[operationid]',
+				$data['new_recovery_operation']['operationid']
+			);
 		}
 
 		// if only one operation is available - show only the label
@@ -1340,7 +1344,9 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					);
 
-				$mediaTypeComboBox = (new CComboBox('new_recovery_operation[opmessage][mediatypeid]', $data['new_recovery_operation']['opmessage']['mediatypeid']))
+				$mediaTypeComboBox = (new CComboBox('new_recovery_operation[opmessage][mediatypeid]',
+						$data['new_recovery_operation']['opmessage']['mediatypeid'])
+				)
 					->addItem(0, '- '._('All').' -');
 
 				$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
@@ -1358,11 +1364,15 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 							->setChecked($data['new_recovery_operation']['opmessage']['default_msg'] == 1)
 					)
 					->addRow(_('Subject'),
-						(new CTextBox('new_recovery_operation[opmessage][subject]', $data['new_recovery_operation']['opmessage']['subject']))
+						(new CTextBox('new_recovery_operation[opmessage][subject]',
+							$data['new_recovery_operation']['opmessage']['subject']
+						))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					)
 					->addRow(_('Message'),
-						(new CTextArea('new_recovery_operation[opmessage][message]', $data['new_recovery_operation']['opmessage']['message']))
+						(new CTextArea('new_recovery_operation[opmessage][message]',
+								$data['new_recovery_operation']['opmessage']['message']
+						))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					);
 				break;
@@ -1373,25 +1383,35 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				}
 
 				$data['new_recovery_operation']['opcommand']['type'] = isset($data['new_recovery_operation']['opcommand']['type'])
-					? $data['new_recovery_operation']['opcommand']['type'] : ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT;
+					? $data['new_recovery_operation']['opcommand']['type']
+					: ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT;
 				$data['new_recovery_operation']['opcommand']['scriptid'] = isset($data['new_recovery_operation']['opcommand']['scriptid'])
-					? $data['new_recovery_operation']['opcommand']['scriptid'] : '';
+					? $data['new_recovery_operation']['opcommand']['scriptid']
+					: '';
 				$data['new_recovery_operation']['opcommand']['execute_on'] = isset($data['new_recovery_operation']['opcommand']['execute_on'])
-					? $data['new_recovery_operation']['opcommand']['execute_on'] : ZBX_SCRIPT_EXECUTE_ON_AGENT;
+					? $data['new_recovery_operation']['opcommand']['execute_on']
+					: ZBX_SCRIPT_EXECUTE_ON_AGENT;
 				$data['new_recovery_operation']['opcommand']['publickey'] = isset($data['new_recovery_operation']['opcommand']['publickey'])
-					? $data['new_recovery_operation']['opcommand']['publickey'] : '';
+					? $data['new_recovery_operation']['opcommand']['publickey']
+					: '';
 				$data['new_recovery_operation']['opcommand']['privatekey'] = isset($data['new_recovery_operation']['opcommand']['privatekey'])
-					? $data['new_recovery_operation']['opcommand']['privatekey'] : '';
+					? $data['new_recovery_operation']['opcommand']['privatekey']
+					: '';
 				$data['new_recovery_operation']['opcommand']['authtype'] = isset($data['new_recovery_operation']['opcommand']['authtype'])
-					? $data['new_recovery_operation']['opcommand']['authtype'] : ITEM_AUTHTYPE_PASSWORD;
+					? $data['new_recovery_operation']['opcommand']['authtype']
+					: ITEM_AUTHTYPE_PASSWORD;
 				$data['new_recovery_operation']['opcommand']['username'] = isset($data['new_recovery_operation']['opcommand']['username'])
-					? $data['new_recovery_operation']['opcommand']['username'] : '';
+					? $data['new_recovery_operation']['opcommand']['username']
+					: '';
 				$data['new_recovery_operation']['opcommand']['password'] = isset($data['new_recovery_operation']['opcommand']['password'])
-					? $data['new_recovery_operation']['opcommand']['password'] : '';
+					? $data['new_recovery_operation']['opcommand']['password']
+					: '';
 				$data['new_recovery_operation']['opcommand']['port'] = isset($data['new_recovery_operation']['opcommand']['port'])
-					? $data['new_recovery_operation']['opcommand']['port'] : '';
+					? $data['new_recovery_operation']['opcommand']['port']
+					: '';
 				$data['new_recovery_operation']['opcommand']['command'] = isset($data['new_recovery_operation']['opcommand']['command'])
-					? $data['new_recovery_operation']['opcommand']['command'] : '';
+					? $data['new_recovery_operation']['opcommand']['command']
+					: '';
 
 				$data['new_recovery_operation']['opcommand']['script'] = '';
 				if (!zbx_empty($data['new_recovery_operation']['opcommand']['scriptid'])) {
@@ -1419,9 +1439,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					'editable' => true
 				]);
 
-				$data['new_recovery_operation']['opcommand_hst'] = array_values($data['new_recovery_operation']['opcommand_hst']);
+				$data['new_recovery_operation']['opcommand_hst'] = array_values(
+					$data['new_recovery_operation']['opcommand_hst']
+				);
+
 				foreach ($data['new_recovery_operation']['opcommand_hst'] as $ohnum => $cmd) {
-					$data['new_recovery_operation']['opcommand_hst'][$ohnum]['name'] = ($cmd['hostid'] > 0) ? $hosts[$cmd['hostid']]['name'] : '';
+					$data['new_recovery_operation']['opcommand_hst'][$ohnum]['name'] = ($cmd['hostid'] > 0)
+						? $hosts[$cmd['hostid']]['name']
+						: '';
 				}
 				order_result($data['new_recovery_operation']['opcommand_hst'], 'name');
 
@@ -1432,16 +1457,29 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					'editable' => true
 				]);
 
-				$data['new_recovery_operation']['opcommand_grp'] = array_values($data['new_recovery_operation']['opcommand_grp']);
+				$data['new_recovery_operation']['opcommand_grp'] = array_values(
+					$data['new_recovery_operation']['opcommand_grp']
+				);
+
 				foreach ($data['new_recovery_operation']['opcommand_grp'] as $ognum => $cmd) {
 					$data['new_recovery_operation']['opcommand_grp'][$ognum]['name'] = $groups[$cmd['groupid']]['name'];
 				}
 				order_result($data['new_recovery_operation']['opcommand_grp'], 'name');
 
 				// js add commands
-				$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'hostid', 'values' => $data['new_recovery_operation']['opcommand_hst']]).');';
-				$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'groupid', 'values' => $data['new_recovery_operation']['opcommand_grp']]).');';
-				zbx_add_post_js($jsInsert);
+				$host_values = zbx_jsvalue([
+					'object' => 'hostid',
+					'values' => $data['new_recovery_operation']['opcommand_hst']
+				]);
+
+				$js_insert = 'addPopupValues('.$host_values.');';
+				$group_values = zbx_jsvalue([
+					'object' => 'groupid',
+					'values' => $data['new_recovery_operation']['opcommand_grp']
+				]);
+
+				$js_insert .= 'addPopupValues('.$group_values.');';
+				zbx_add_post_js($js_insert);
 
 				// target list
 				$new_operation_formlist->addRow(_('Target list'),
@@ -1478,10 +1516,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				);
 
 				$userScript = [
-					new CVar('new_recovery_operation[opcommand][scriptid]', $data['new_recovery_operation']['opcommand']['scriptid']),
-					(new CTextBox(
-						'new_recovery_operation[opcommand][script]', $data['new_recovery_operation']['opcommand']['script'], true
-					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					new CVar('new_recovery_operation[opcommand][scriptid]',
+						$data['new_recovery_operation']['opcommand']['scriptid']
+					),
+					(new CTextBox('new_recovery_operation[opcommand][script]',
+						$data['new_recovery_operation']['opcommand']['script'], true
+					))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 				];
@@ -1511,41 +1552,57 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				$new_operation_formlist->addRow(_('Authentication method'), $authTypeComboBox);
 				$new_operation_formlist->addRow(_('User name'),
-					(new CTextBox('new_recovery_operation[opcommand][username]', $data['new_recovery_operation']['opcommand']['username']))
+					(new CTextBox('new_recovery_operation[opcommand][username]',
+						$data['new_recovery_operation']['opcommand']['username']
+					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Public key file'),
-					(new CTextBox('new_recovery_operation[opcommand][publickey]', $data['new_recovery_operation']['opcommand']['publickey']))
+					(new CTextBox('new_recovery_operation[opcommand][publickey]',
+						$data['new_recovery_operation']['opcommand']['publickey']
+					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Private key file'),
-					(new CTextBox('new_recovery_operation[opcommand][privatekey]', $data['new_recovery_operation']['opcommand']['privatekey']))
+					(new CTextBox('new_recovery_operation[opcommand][privatekey]',
+						$data['new_recovery_operation']['opcommand']['privatekey']
+					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Password'),
-					(new CTextBox('new_recovery_operation[opcommand][password]', $data['new_recovery_operation']['opcommand']['password']))
+					(new CTextBox('new_recovery_operation[opcommand][password]',
+						$data['new_recovery_operation']['opcommand']['password']
+					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 
 				// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
-				$passphraseCB = (new CTextBox('new_recovery_operation[opcommand][password]', $data['new_recovery_operation']['opcommand']['password']))
+				$passphraseCB = (new CTextBox('new_recovery_operation[opcommand][password]',
+					$data['new_recovery_operation']['opcommand']['password']
+				))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					->setId('new_recovery_operation_opcommand_passphrase');
 				$new_operation_formlist->addRow(_('Key passphrase'), $passphraseCB);
 
 				// ssh && telnet
 				$new_operation_formlist->addRow(_('Port'),
-					(new CTextBox('new_recovery_operation[opcommand][port]', $data['new_recovery_operation']['opcommand']['port']))
+					(new CTextBox('new_recovery_operation[opcommand][port]',
+						$data['new_recovery_operation']['opcommand']['port']
+					))
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 
 				// command
 				$new_operation_formlist->addRow(_('Commands'),
-					(new CTextArea('new_recovery_operation[opcommand][command]', $data['new_recovery_operation']['opcommand']['command']))
+					(new CTextArea('new_recovery_operation[opcommand][command]',
+						$data['new_recovery_operation']['opcommand']['command']
+					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Commands'),
-					(new CTextBox('new_recovery_operation[opcommand][command]', $data['new_recovery_operation']['opcommand']['command']))
+					(new CTextBox('new_recovery_operation[opcommand][command]',
+						$data['new_recovery_operation']['opcommand']['command']
+					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setId('new_recovery_operation_opcommand_command_ipmi')
 				);
