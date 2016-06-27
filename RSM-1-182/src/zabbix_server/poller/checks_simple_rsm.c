@@ -2703,14 +2703,13 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 	random_host = hosts_rdds43.values[i];
 
 	/* resolve host to ips */
-	if (SUCCEED != zbx_resolve_host(res, random_host, &ips_rdds43, 1, 1, log_fd, err, sizeof(err)))
+	if (SUCCEED != zbx_resolve_host(res, random_host, &ips_rdds43, ipv4_enabled, ipv6_enabled, log_fd, err,
+			sizeof(err)))
 	{
 		rtt_rdds43 = ZBX_EC_RDDS43_ERES;
 		zbx_rsm_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
 		goto test_rdds80;
 	}
-
-	zbx_delete_unsupported_ips(&ips_rdds43, ipv4_enabled, ipv6_enabled);
 
 	if (0 == ips_rdds43.values_num)
 	{
@@ -2810,8 +2809,6 @@ test_rdds80:
 		goto test_rdap;
 	}
 
-	zbx_delete_unsupported_ips(&ips_rdds80, ipv4_enabled, ipv6_enabled);
-
 	if (0 == ips_rdds80.values_num)
 	{
 		rtt_rdds80 = ZBX_EC_INTERNAL_IP_UNSUP;
@@ -2878,8 +2875,6 @@ test_rdap:
 		zbx_rsm_errf(log_fd, "RDAP \"%s\": %s", random_host, err);
 		goto out;
 	}
-
-	zbx_delete_unsupported_ips(&ips_rdap, ipv4_enabled, ipv6_enabled);
 
 	if (0 == ips_rdap.values_num)
 	{
