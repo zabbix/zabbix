@@ -62,6 +62,15 @@ typedef struct
 }
 zbx_ns_t;
 
+/* used in libcurl callback function to store webpage contents in memory */
+typedef struct
+{
+	char	*buf;
+	size_t	alloc;
+	size_t	offset;
+}
+curl_data_t;
+
 #define zbx_rsm_errf(log_fd, fmt, ...)	zbx_rsm_logf(log_fd, "Error", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #define zbx_rsm_warnf(log_fd, fmt, ...)	zbx_rsm_logf(log_fd, "Warning", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 #define zbx_rsm_infof(log_fd, fmt, ...)	zbx_rsm_logf(log_fd, "Info", ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -1696,7 +1705,10 @@ static size_t	zbx_get_rdds_items(const char *keyname, DC_ITEM *item, const char 
 
 		p = in_item->key + keypart_size;
 		if (0 != strncmp(p, "43.ip[", 6) && 0 != strncmp(p, "43.rtt[", 7) && 0 != strncmp(p, "43.upd[", 7) &&
-				0 != strncmp(p, "80.ip[", 6) && 0 != strncmp(p, "80.rtt[", 7))
+				0 != strncmp(p, "80.ip[", 6) && 0 != strncmp(p, "80.rtt[", 7) &&
+				0 != strncmp(p, "rdap.ip[", strlen("rdap.ip[")) &&
+				0 != strncmp(p, "rdap.rtt[", strlen("rdap.rtt[")) &&
+				0 != strncmp(p, "rdap.upd[", strlen("rdap.upd[")))
 		{
 			continue;
 		}
@@ -1731,6 +1743,7 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 	zbx_sock_t	s;
 	char		*recv_buf, send_buf[ZBX_SEND_BUF_SIZE];
 	zbx_timespec_t	start, now;
+	ssize_t		nbytes;
 	int		ret = FAIL;
 
 	memset(&s, 0, sizeof(s));
@@ -1738,6 +1751,7 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 
 	if (SUCCEED != zbx_tcp_connect(&s, NULL, ip, port, timeout))
 	{
+		*rtt = ZBX_EC_RDDS43_ECON;
 		zbx_strlcpy(err, "cannot connect to host", err_size);
 		goto out;
 	}
@@ -1746,19 +1760,30 @@ static int	zbx_rdds43_test(const char *request, const char *ip, short port, int 
 
 	if (SUCCEED != zbx_tcp_send_raw(&s, send_buf))
 	{
+		*rtt = ZBX_EC_RDDS43_ECON;
 		zbx_snprintf(err, err_size, "cannot send data: %s", zbx_tcp_strerror());
 		goto out;
 	}
 
 	timeout -= time(NULL) - start.sec;
 
-	if (SUCCEED != SUCCEED_OR_FAIL(zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE | ZBX_TCP_EXTERNAL,
-			timeout)))
+	if (0 < (nbytes = zbx_tcp_recv_ext(&s, &recv_buf, ZBX_TCP_READ_UNTIL_CLOSE | ZBX_TCP_EXTERNAL, timeout)))
 	{
-		if (EINTR == errno)
-			zbx_strlcpy(err, "timeout occured", err_size);
+		if (0 == nbytes)
+		{
+			*rtt = ZBX_EC_RDDS43_EMPTY;
+			zbx_strlcpy(err, "empty response received", err_size);
+		}
+		else if (EINTR == errno)
+		{
+			*rtt = ZBX_EC_RDDS43_TO;
+			zbx_strlcpy(err, "timeout occurred", err_size);
+		}
 		else
+		{
+			*rtt = ZBX_EC_RDDS43_ECON;
 			zbx_snprintf(err, err_size, "cannot receive data: %s", zbx_tcp_strerror());
+		}
 		goto out;
 	}
 
@@ -1896,8 +1921,11 @@ static int	zbx_validate_host_list(const char *list, char delim)
 
 	p = list;
 
-	while ('\0' != *p && (0 != isalnum(*p) || '.' == *p || '-' == *p || '_' == *p || ':' == *p || delim == *p))
+	while ('\0' != *p && (0 != isalnum(*p) || '.' == *p || '-' == *p || '_' == *p || ':' == *p || '/' == *p ||
+			delim == *p))
+	{
 		p++;
+	}
 
 	if ('\0' == *p)
 		return SUCCEED;
@@ -1943,28 +1971,289 @@ static void	zbx_get_strings_from_list(zbx_vector_str_t *strings, char *list, cha
 	while (NULL != p_end);
 }
 
-static void	zbx_set_rdds_values(const char *ip43, int rtt43, int upd43, const char *ip80, int rtt80,
-		int value_ts, size_t keypart_size, const DC_ITEM *items, size_t items_num)
+static int	zbx_get_hosts_from_parameter(const char *params, int num, const char *default_param,
+		zbx_vector_str_t *hosts, char *err, size_t err_size)
+{
+	char	*param;
+	int	ret = FAIL;
+
+	if (NULL == (param = get_param_dyn(params, num)) || '\0' == *param)
+	{
+		if (NULL != default_param)
+			zbx_vector_str_append(hosts, zbx_strdup(NULL, default_param));
+
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != zbx_validate_host_list(param, ','))
+	{
+		zbx_strlcpy(err, "invalid character in host list", err_size);
+		goto out;
+	}
+
+	zbx_get_strings_from_list(hosts, param, ',');
+
+	if (0 == hosts->values_num)
+	{
+		zbx_strlcpy(err, "cannot get hosts from key parameter", err_size);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(param);
+	return ret;
+}
+
+/* combines statuses of three independent services into one return code */
+static int	zbx_rdds_result(int rdds43, int rdds80, int rdds_rdap)
+{
+#define RDDS_DOWN		0
+#define RDDS_UP			1
+#define RDDS_ONLY_RDDS43	2
+#define RDDS_ONLY_RDDS80	3
+#define RDDS_ONLY_RDAP		4
+#define RDDS_MISS_RDDS43	5
+#define RDDS_MISS_RDDS80	6
+#define RDDS_MISS_RDAP		7
+
+	if (SUCCEED == rdds43)
+	{
+		if (SUCCEED == rdds80)
+		{
+			if (SUCCEED == rdds_rdap)
+				return RDDS_UP;
+
+			return RDDS_MISS_RDAP;
+		}
+
+		if (SUCCEED == rdds_rdap)
+			return RDDS_MISS_RDDS80;
+
+		return RDDS_ONLY_RDDS43;
+	}
+
+	if (SUCCEED == rdds80)
+	{
+		if (SUCCEED == rdds_rdap)
+			return RDDS_MISS_RDDS43;
+
+		return RDDS_ONLY_RDDS80;
+	}
+
+	if (SUCCEED == rdds_rdap)
+		return RDDS_ONLY_RDAP;
+
+	return RDDS_DOWN;
+
+#undef RDDS_DOWN
+#undef RDDS_UP
+#undef RDDS_ONLY_RDDS43
+#undef RDDS_ONLY_RDDS80
+#undef RDDS_ONLY_RDAP
+#undef RDDS_MISS_RDDS43
+#undef RDDS_MISS_RDDS80
+#undef RDDS_MISS_RDAP
+}
+
+/* helper function for zbx_set_rdds_values() */
+static void	zbx_set_rdds_value(const char *keypart, const DC_ITEM *item, int ts, const char *ip, int rtt, int upd)
+{
+	if (0 == strncmp(keypart, "ip[", strlen("ip[")) && NULL != ip)
+		zbx_add_value_str(item, ts, ip);
+	else if (0 == strncmp(keypart, "rtt[", strlen("rtt[")) && ZBX_NO_VALUE != rtt)
+		zbx_add_value_dbl(item, ts, rtt);
+	else if (0 == strncmp(keypart, "upd[", strlen("upd[")) && ZBX_NO_VALUE != upd)
+		zbx_add_value_dbl(item, ts, upd);
+}
+
+/* sets values of rsm.rdds[] supplementary items */
+static void	zbx_set_rdds_values(const char *ip_rdds43, int rtt_rdds43, int upd_rdds43, const char *ip_rdds80,
+		int rtt_rdds80, const char *ip_rdap, int rtt_rdap, int upd_rdap, size_t keypart_size, int ts,
+		const DC_ITEM *items, size_t items_num)
 {
 	size_t		i;
-	const DC_ITEM	*item;
 	const char	*p;
 
 	for (i = 0; i < items_num; i++)
 	{
-		item = &items[i];
-		p = item->key + keypart_size + 1;	/* skip "rsm.rdds." part */
+		p = items[i].key + keypart_size + 1;	/* skip "rsm.rdds." part */
 
-		if (NULL != ip43 && 0 == strncmp(p, "43.ip[", 6))
-			zbx_add_value_str(item, value_ts, ip43);
-		else if (0 == strncmp(p, "43.rtt[", 7))
-			zbx_add_value_dbl(item, value_ts, rtt43);
-		else if (ZBX_NO_VALUE != upd43 && 0 == strncmp(p, "43.upd[", 7))
-			zbx_add_value_dbl(item, value_ts, upd43);
-		else if (NULL != ip80 && 0 == strncmp(p, "80.ip[", 6))
-			zbx_add_value_str(item, value_ts, ip80);
-		else if (ZBX_NO_VALUE != rtt80 && 0 == strncmp(p, "80.rtt[", 7))
-			zbx_add_value_dbl(item, value_ts, rtt80);
+		if (0 == strncmp(p, "43.", strlen("43.")))
+			zbx_set_rdds_value(p + strlen("43."), &items[i], ts, ip_rdds43, rtt_rdds43, upd_rdds43);
+		else if (0 == strncmp(p, "80.", strlen("80.")))
+			zbx_set_rdds_value(p + strlen("80."), &items[i], ts, ip_rdds80, rtt_rdds80, ZBX_NO_VALUE);
+		else if (0 == strncmp(p, "rdap.", strlen("rdap.")))
+			zbx_set_rdds_value(p + strlen("rdap."), &items[i], ts, ip_rdap, rtt_rdap, upd_rdap);
+	}
+}
+
+/* maps HTTP status codes ommitting unassigned according to                  */
+/* http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml */
+static int	zbx_map_http_code(int http_code)
+{
+	switch (http_code)
+	{
+		case 100:	/* Continue */
+			return 0;
+		case 101:	/* Switching Protocols */
+			return 1;
+		case 102:	/* Processing */
+			return 2;
+		case 200:	/* OK */
+			return 3;
+		case 201:	/* Created */
+			return 4;
+		case 202:	/* Accepted */
+			return 5;
+		case 203:	/* Non-Authoritative Information */
+			return 6;
+		case 204:	/* No Content */
+			return 7;
+		case 205:	/* Reset Content */
+			return 8;
+		case 206:	/* Partial Content */
+			return 9;
+		case 207:	/* Multi-Status */
+			return 10;
+		case 208:	/* Already Reported */
+			return 11;
+		case 226:	/* IM Used */
+			return 12;
+		case 300:	/* Multiple Choices */
+			return 13;
+		case 301:	/* Moved Permanently */
+			return 14;
+		case 302:	/* Found */
+			return 15;
+		case 303:	/* See Other */
+			return 16;
+		case 304:	/* Not Modified */
+			return 17;
+		case 305:	/* Use Proxy */
+			return 18;
+		case 306:	/* (Unused) */
+			return 19;
+		case 307:	/* Temporary Redirect */
+			return 20;
+		case 308:	/* Permanent Redirect */
+			return 21;
+		case 400:	/* Bad Request */
+			return 22;
+		case 401:	/* Unauthorized */
+			return 23;
+		case 402:	/* Payment Required */
+			return 24;
+		case 403:	/* Forbidden */
+			return 25;
+		case 404:	/* Not Found */
+			return 26;
+		case 405:	/* Method Not Allowed */
+			return 27;
+		case 406:	/* Not Acceptable */
+			return 28;
+		case 407:	/* Proxy Authentication Required */
+			return 29;
+		case 408:	/* Request Timeout */
+			return 30;
+		case 409:	/* Conflict */
+			return 31;
+		case 410:	/* Gone */
+			return 32;
+		case 411:	/* Length Required */
+			return 33;
+		case 412:	/* Precondition Failed */
+			return 34;
+		case 413:	/* Payload Too Large */
+			return 35;
+		case 414:	/* URI Too Long */
+			return 36;
+		case 415:	/* Unsupported Media Type */
+			return 37;
+		case 416:	/* Range Not Satisfiable */
+			return 38;
+		case 417:	/* Expectation Failed */
+			return 39;
+		case 421:	/* Misdirected Request */
+			return 40;
+		case 422:	/* Unprocessable Entity */
+			return 41;
+		case 423:	/* Locked */
+			return 42;
+		case 424:	/* Failed Dependency */
+			return 43;
+		case 426:	/* Upgrade Required */
+			return 44;
+		case 428:	/* Precondition Required */
+			return 45;
+		case 429:	/* Too Many Requests */
+			return 46;
+		case 431:	/* Request Header Fields Too Large */
+			return 47;
+		case 451:	/* Unavailable For Legal Reasons */
+			return 48;
+		case 500:	/* Internal Server Error */
+			return 49;
+		case 501:	/* Not Implemented */
+			return 50;
+		case 502:	/* Bad Gateway */
+			return 51;
+		case 503:	/* Service Unavailable */
+			return 52;
+		case 504:	/* Gateway Timeout */
+			return 53;
+		case 505:	/* HTTP Version Not Supported */
+			return 54;
+		case 506:	/* Variant Also Negotiates */
+			return 55;
+		case 507:	/* Insufficient Storage */
+			return 56;
+		case 508:	/* Loop Detected */
+			return 57;
+		case 510:	/* Not Extended */
+			return 58;
+		case 511:	/* Network Authentication Required */
+			return 59;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+}
+
+/* maps generic HTTP errors to RDDS80 errors */
+static int	zbx_http_to_rdds80(int http_ec)
+{
+	switch (http_ec)
+	{
+		case ZBX_EC_INTERNAL:
+			return ZBX_EC_INTERNAL;
+		case ZBX_EC_HTTP_ECON:
+			return ZBX_EC_RDDS80_ECON;
+		case ZBX_EC_HTTP_EHTTP:
+			return ZBX_EC_RDDS80_EHTTP;
+		case ZBX_EC_HTTP_EHTTPS:
+			return ZBX_EC_RDDS80_EHTTPS;
+		default:
+			return ZBX_EC_RDDS80_HTTP_BASE + (http_ec - ZBX_EC_HTTP_BASE);
+	}
+}
+
+/* maps generic HTTP errors to RDAP errors */
+static int	zbx_http_to_rdap(int http_ec)
+{
+	switch (http_ec)
+	{
+		case ZBX_EC_INTERNAL:
+			return ZBX_EC_INTERNAL;
+		case ZBX_EC_HTTP_ECON:
+			return ZBX_EC_RDAP_ECON;
+		case ZBX_EC_HTTP_EHTTP:
+			return ZBX_EC_RDAP_EHTTP;
+		case ZBX_EC_HTTP_EHTTPS:
+			return ZBX_EC_RDAP_EHTTPS;
+		default:
+			return ZBX_EC_RDAP_HTTP_BASE + (http_ec - ZBX_EC_HTTP_BASE);
 	}
 }
 
@@ -1974,8 +2263,38 @@ static inline size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *us
 	return size * nmemb;
 }
 
-static int	zbx_rdds80_test(const char *host, const char *url, short port, int timeout, int maxredirs, int *rtt80,
-		char *err, size_t err_size)
+/* store the curl output in memory */
+static size_t	curl_memory(char *ptr, size_t size, size_t nmemb, void *userdata)
+{
+	size_t		r_size = size * nmemb;
+	curl_data_t	*data = (curl_data_t *)userdata;
+
+	if (NULL == data->buf)
+	{
+		data->alloc = r_size + 1;
+		data->offset = 0;
+		data->buf = zbx_malloc(data->buf, data->alloc);
+	}
+	else if (data->offset + r_size >= data->alloc)
+	{
+		while (data->offset + r_size >= data->alloc)
+			data->alloc *= 2;
+		data->buf = zbx_realloc(data->buf, data->alloc);
+	}
+
+	memcpy(data->buf + data->offset, ptr, r_size);
+	data->offset += r_size;
+	data->buf[data->offset] = '\0';
+
+	return r_size;
+}
+
+/* Helper function for Web-based RDDS80 and RDAP checks. Adds host to header, connects to URL, obeying timeout and   */
+/* max redirect settings, stores contents in provided using provided callback, checks for OK response and calculates */
+/* round-trip time. When function succeeds it returns RTT in milliseconds. When function fails it returns source of  */
+/* error in provided RTT parameter. Does not verify certificates.                                                    */
+static int	zbx_http_test(const char *host, const char *url, int timeout, int maxredirs, int *rtt, void *writedata,
+		size_t (*writefunction)(char *, size_t, size_t, void *), char *err, size_t err_size)
 {
 #ifdef HAVE_LIBCURL
 	int			curl_err, opt;
@@ -1990,7 +2309,7 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 #ifdef HAVE_LIBCURL
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
-		*rtt80 = ZBX_EC_INTERNAL;
+		*rtt = ZBX_EC_INTERNAL;
 		zbx_strlcpy(err, "cannot init cURL library", err_size);
 		goto out;
 	}
@@ -1998,7 +2317,7 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 	zbx_snprintf(host_buf, sizeof(host_buf), "Host: %s", host);
 	if (NULL == (slist = curl_slist_append(slist, host_buf)))
 	{
-		*rtt80 = ZBX_EC_INTERNAL;
+		*rtt = ZBX_EC_INTERNAL;
 		zbx_strlcpy(err, "cannot generate cURL list of HTTP headers", err_size);
 		goto out;
 	}
@@ -2010,30 +2329,35 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_HTTPHEADER, slist)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, curl_devnull)))
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEDATA, writedata)) ||
+			CURLE_OK != (curl_err = curl_easy_setopt(easyhandle, opt = CURLOPT_WRITEFUNCTION, writefunction)))
 	{
-		*rtt80 = ZBX_EC_INTERNAL;
+		*rtt = ZBX_EC_INTERNAL;
 		zbx_snprintf(err, err_size, "cannot set cURL option [%d] (%s)", opt, curl_easy_strerror(curl_err));
 		goto out;
 	}
 
 	if (CURLE_OK != (curl_err = curl_easy_perform(easyhandle)))
 	{
-		*rtt80 = ZBX_EC_RDDS80_NOREPLY;
+		*rtt = ZBX_EC_HTTP_ECON;
 		zbx_strlcpy(err, curl_easy_strerror(curl_err), err_size);
 		goto out;
 	}
 
 	if (CURLE_OK != (curl_err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
 	{
-		*rtt80 = ZBX_EC_RDDS80_NOHTTPCODE;
+		if (0 == strncmp(url, "https://", strlen("https://")))
+			*rtt = ZBX_EC_HTTP_EHTTPS;
+		else	/* if (0 == strncmp(url, "http://", strlen("http://"))) */
+			*rtt = ZBX_EC_HTTP_EHTTP;
+
 		zbx_snprintf(err, err_size, "cannot get HTTP response code (%s)", curl_easy_strerror(curl_err));
 		goto out;
 	}
 
 	if (ZBX_HTTP_RESPONSE_OK != (int)response_code)
 	{
-		*rtt80 = ZBX_EC_RDDS80_EHTTPCODE;
+		*rtt = ZBX_EC_HTTP_BASE - zbx_map_http_code((int)response_code);
 		zbx_snprintf(err, err_size, "invalid HTTP response code (%d), expected %d", (int)response_code,
 				ZBX_HTTP_RESPONSE_OK);
 		goto out;
@@ -2041,12 +2365,12 @@ static int	zbx_rdds80_test(const char *host, const char *url, short port, int ti
 
 	if (CURLE_OK != (curl_err = curl_easy_getinfo(easyhandle, CURLINFO_TOTAL_TIME, &total_time)))
 	{
-		*rtt80 = ZBX_EC_INTERNAL;
+		*rtt = ZBX_EC_INTERNAL;
 		zbx_snprintf(err, err_size, "cannot get HTTP request time (%s)", curl_easy_strerror(curl_err));
 		goto out;
 	}
 
-	*rtt80 = total_time * 1000;	/* expected in ms */
+	*rtt = total_time * 1000;	/* expected in ms */
 
 	ret = SUCCEED;
 out:
@@ -2056,23 +2380,10 @@ out:
 	if (NULL != easyhandle)
 		curl_easy_cleanup(easyhandle);
 #else
-	*rtt80 = ZBX_EC_INTERNAL;
+	*rtt = ZBX_EC_INTERNAL;
 	zbx_strlcpy(err, "zabbix is not compiled with libcurl support (--with-libcurl)", err_size);
 #endif
 	return ret;
-}
-
-#define RDDS_DOWN	0
-#define RDDS_UP		1
-#define RDDS_ONLY43	2
-#define RDDS_ONLY80	3
-
-static int	zbx_ec_noerror(int ec)
-{
-	if (0 < ec || ZBX_NO_VALUE == ec)
-		return SUCCEED;
-
-	return FAIL;
 }
 
 static void	zbx_vector_str_clean_and_destroy(zbx_vector_str_t *v)
@@ -2085,20 +2396,70 @@ static void	zbx_vector_str_clean_and_destroy(zbx_vector_str_t *v)
 	zbx_vector_str_destroy(v);
 }
 
+/* Splits provided URL into preceding "https://" or "http://", domain name and the rest, frees memory pointed by      */
+/* prefix, domain and postfix pointers and allocates new storage. It is caller responsibility to free them after use. */
+static int	zbx_split_url(const char *url, char **prefix, char **domain, char **postfix, char *err, size_t err_size)
+{
+	const char	*tmp;
+
+	if (0 == strncmp(url, "https://", strlen("https://")))
+	{
+		*prefix = zbx_strdup(*prefix, "https://");
+		url += strlen("https://");
+	}
+	else if (0 == strncmp(url, "http://", strlen("http://")))
+	{
+		*prefix = zbx_strdup(*prefix, "http://");
+		url += strlen("http://");
+	}
+	else
+	{
+		zbx_strlcpy(err, "unrecognized prefix in URL", err_size);
+		return FAIL;
+	}
+
+	if (NULL != (tmp = strchr(url, '/')))
+	{
+		size_t		len = tmp - url;
+
+		zbx_free(*domain);
+		*domain = zbx_malloc(*domain, len + 1);
+		memcpy(*domain, url, len);
+		(*domain)[len] = '\0';
+		*postfix = zbx_strdup(*postfix, tmp);
+	}
+	else
+	{
+		*domain = zbx_strdup(*domain, url);
+		*postfix = zbx_strdup(*postfix, "");
+	}
+
+	return SUCCEED;
+}
+
 int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
 				*rdds_ns_string = NULL, *answer = NULL, testname[ZBX_HOST_BUF_SIZE], is_ipv4, *random_ns,
+				*default_host = NULL, *prefix = NULL, *domain_part = NULL, *postfix = NULL,
 				err[ZBX_ERR_BUF_SIZE];
-	const char		*random_host, *ip43 = NULL, *ip80 = NULL;
-	zbx_vector_str_t	hosts43, hosts80, ips43, ips80, nss;
+	const char		*random_host, *ip_rdds43 = NULL, *ip_rdds80 = NULL, *ip_rdap = NULL;
+	zbx_vector_str_t	hosts_rdds43, ips_rdds43, nss_rdds43,
+				hosts_rdds80, ips_rdds80,
+				hosts_rdap, ips_rdap, nss_rdap;
+	struct zbx_json_parse	jp;
 	FILE			*log_fd = NULL;
 	ldns_resolver		*res = NULL;
+	curl_data_t		data = {NULL, 0, 0};
 	DC_ITEM			*items = NULL;
-	size_t			i, items_num = 0;
+	size_t			i, items_num = 0, value_alloc = 0;
 	time_t			ts, now;
-	int			rtt43 = ZBX_NO_VALUE, upd43 = ZBX_NO_VALUE, rtt80 = ZBX_NO_VALUE, rtt_limit,
-				ipv4_enabled, ipv6_enabled, rdds_enabled, epp_enabled, ret = SYSINFO_RET_FAIL, maxredirs;
+	int			rtt_rdds43 = ZBX_NO_VALUE, upd_rdds43 = ZBX_NO_VALUE, rtt_limit_rdds43,
+				rtt_rdds80 = ZBX_NO_VALUE, rtt_limit_rdds80, maxredirs_rdds80,
+				rtt_rdap = ZBX_NO_VALUE, upd_rdap = ZBX_NO_VALUE, rtt_limit_rdap, maxredirs_rdap,
+				ipv4_enabled, ipv6_enabled,
+				rdds43_enabled, rdds80_enabled, rdap_enabled, epp_enabled,
+				ret = SYSINFO_RET_FAIL;
 
 	/* first read the TLD */
 	if (SUCCEED != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
@@ -2114,115 +2475,111 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 		return SYSINFO_RET_FAIL;
 	}
 
-	zbx_vector_str_create(&hosts43);
-	zbx_vector_str_create(&hosts80);
-	zbx_vector_str_create(&ips43);
-	zbx_vector_str_create(&ips80);
-	zbx_vector_str_create(&nss);
+	zbx_vector_str_create(&hosts_rdds43);
+	zbx_vector_str_create(&hosts_rdds80);
+	zbx_vector_str_create(&hosts_rdap);
+	zbx_vector_str_create(&ips_rdds43);
+	zbx_vector_str_create(&ips_rdds80);
+	zbx_vector_str_create(&ips_rdap);
+	zbx_vector_str_create(&nss_rdds43);
+	zbx_vector_str_create(&nss_rdap);
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS_ENABLED, &rdds_enabled, 0, err, sizeof(err)) ||
-			0 == rdds_enabled)
+	/* check if interfaces are enabled for probe and TLD */
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS43_ENABLED, &rdds43_enabled, 0, err, sizeof(err)))
+		rdds43_enabled = 0;
+
+	if (0 != rdds43_enabled)
 	{
-		zbx_rsm_info(log_fd, "RDDS disabled on this probe");
-		ret = SYSINFO_RET_OK;
-		goto out;
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS43_ENABLED, &rdds43_enabled, 0, err,
+				sizeof(err)))
+		{
+			rdds43_enabled = 0;
+		}
+
+		if (0 == rdds43_enabled)
+			zbx_rsm_info(log_fd, "RDDS43 disabled on this TLD");
 	}
+	else
+		zbx_rsm_info(log_fd, "RDDS43 disabled on this probe");
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS_ENABLED, &rdds_enabled, 0,
-			err, sizeof(err)) || 0 == rdds_enabled)
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS80_ENABLED, &rdds80_enabled, 0, err, sizeof(err)))
+		rdds80_enabled = 0;
+
+	if (0 != rdds80_enabled)
 	{
-		zbx_rsm_info(log_fd, "RDDS disabled on this TLD");
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS80_ENABLED, &rdds80_enabled, 0, err,
+				sizeof(err)))
+		{
+			rdds80_enabled = 0;
+		}
+
+		if (0 == rdds80_enabled)
+			zbx_rsm_info(log_fd, "RDDS80 disabled on this TLD");
+	}
+	else
+		zbx_rsm_info(log_fd, "RDDS80 disabled on this probe");
+
+	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDAP_ENABLED, &rdap_enabled, 0, err, sizeof(err)))
+		rdap_enabled = 0;
+
+	if (0 != rdap_enabled)
+	{
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDAP_ENABLED, &rdap_enabled, 0, err,
+				sizeof(err)))
+		{
+			rdap_enabled = 0;
+		}
+
+		if (0 == rdap_enabled)
+			zbx_rsm_info(log_fd, "RDAP disabled on this TLD");
+	}
+	else
+		zbx_rsm_info(log_fd, "RDAP disabled on this probe");
+
+	/* nothing to do if all interfaces are disabled */
+	if (0 == rdds43_enabled && 0 == rdds80_enabled && 0 == rdap_enabled)
+	{
 		ret = SYSINFO_RET_OK;
 		goto out;
 	}
 
 	/* read rest of key parameters */
-	if (NULL == (value_str = get_param_dyn(params, 2)) || '\0' == *value_str)
+	/* For RDDS43 and Web-whois, if there is no FQDN/URL, the system should use whois.nic.<TLD>. */
+	if (0 != rdds43_enabled)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "second key parameter missing"));
-		goto out;
-	}
+		default_host = zbx_dsprintf(default_host, "whois.nic.%s", domain);
 
-	if (SUCCEED != zbx_validate_host_list(value_str, ','))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "invalid character in RDDS43 host list"));
-		goto out;
-	}
-
-	zbx_get_strings_from_list(&hosts43, value_str, ',');
-
-	if (0 == hosts43.values_num)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "cannot get RDDS43 hosts from key parameter"));
-		goto out;
-	}
-
-	zbx_free(value_str);
-
-	if (NULL == (value_str = get_param_dyn(params, 3)) || '\0' == *value_str)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "third key parameter missing"));
-		goto out;
-	}
-
-	if (SUCCEED != zbx_validate_host_list(value_str, ','))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "invalid character in RDDS80 host list"));
-		goto out;
-	}
-
-	zbx_get_strings_from_list(&hosts80, value_str, ',');
-
-	if (0 == hosts80.values_num)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "cannot get RDDS80 hosts from key parameter"));
-		goto out;
-	}
-
-	/* get rest of configuration */
-	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_DNS_RESOLVER, &res_ip, err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
-	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_RDDS_TESTPREFIX, &testprefix, err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
-	if (0 != epp_enabled && SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED, &epp_enabled, 0,
-			err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
-	if (0 == strcmp(testprefix, "*RANDOMTLD*"))
-	{
-		zbx_free(testprefix);
-
-		if (NULL == (testprefix = zbx_get_rr_tld(domain, err, sizeof(err))))
+		if (SUCCEED != zbx_get_hosts_from_parameter(params, 2, default_host, &hosts_rdds43, err, sizeof(err)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid RDDS43 host list: %s", err));
 			goto out;
 		}
 	}
 
-	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_RDDS_NS_STRING, &rdds_ns_string, err, sizeof(err)))
+	if (0 != rdds80_enabled)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
+		default_host = zbx_dsprintf(default_host, "http://whois.nic.%s/whois/", domain);
+
+		if (SUCCEED != zbx_get_hosts_from_parameter(params, 3, default_host, &hosts_rdds80, err, sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid RDDS80 host list: %s", err));
+			goto out;
+		}
 	}
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS_RTT, &rtt_limit, 1, err, sizeof(err)))
+	/* If there is no RDAP base URL configured for a TLD, RDAP should not be monitored, */
+	/* even if it is enabled in the SLA Monitoring system.                              */
+	if (0 != rdap_enabled)
+	{
+		if (SUCCEED != zbx_get_hosts_from_parameter(params, 4, NULL, &hosts_rdap, err, sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid RDAP host list: %s", err));
+			goto out;
+		}
+	}
+
+	/* get rest of configuration */
+	if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_DNS_RESOLVER, &res_ip, err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
 		goto out;
@@ -2234,10 +2591,90 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 		goto out;
 	}
 
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS_MAXREDIRS, &maxredirs, 1, err, sizeof(err)))
+	if (0 != rdds43_enabled || 0 != rdap_enabled)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_EPP_ENABLED, &epp_enabled, 0, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+
+		if (0 != epp_enabled && SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_EPP_ENABLED,
+				&epp_enabled, 0, err, sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+	}
+
+	if (0 != rdds43_enabled)
+	{
+		if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_RDDS_TESTPREFIX, &testprefix, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+
+		if (0 == strcmp(testprefix, "*RANDOMTLD*"))
+		{
+			zbx_free(testprefix);
+
+			if (NULL == (testprefix = zbx_get_rr_tld(domain, err, sizeof(err))))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+				goto out;
+			}
+		}
+
+		if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_RDDS_NS_STRING, &rdds_ns_string, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS43_RTT, &rtt_limit_rdds43, 1, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+	}
+
+	if (0 != rdds80_enabled)
+	{
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS80_RTT, &rtt_limit_rdds80, 1, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDDS80_MAXREDIRS, &maxredirs_rdds80, 1, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+	}
+
+	if (0 != rdap_enabled)
+	{
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDAP_RTT, &rtt_limit_rdap, 1, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
+
+		if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_RDAP_MAXREDIRS, &maxredirs_rdap, 1, err,
+				sizeof(err)))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, err));
+			goto out;
+		}
 	}
 
 	/* create resolver */
@@ -2258,189 +2695,325 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 	/* from this point item will not become NOTSUPPORTED */
 	ret = SYSINFO_RET_OK;
 
-	/* choose random host */
-	i = zbx_random(hosts43.values_num);
-	random_host = hosts43.values[i];
+	if (0 == rdds43_enabled)
+		goto test_rdds80;
 
-	/* start RDDS43 test, resolve host to ips */
-	if (SUCCEED != zbx_resolve_host(res, random_host, &ips43, 1, 1, log_fd, err, sizeof(err)))
+	/* start RDDS43 test, choose random host */
+	i = zbx_random(hosts_rdds43.values_num);
+	random_host = hosts_rdds43.values[i];
+
+	/* resolve host to ips */
+	if (SUCCEED != zbx_resolve_host(res, random_host, &ips_rdds43, 1, 1, log_fd, err, sizeof(err)))
 	{
-		rtt43 = ZBX_EC_RDDS_ERES;
+		rtt_rdds43 = ZBX_EC_RDDS43_ERES;
 		zbx_rsm_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
+		goto test_rdds80;
 	}
 
-	/* if RDDS43 fails we should still process RDDS80 */
+	zbx_delete_unsupported_ips(&ips_rdds43, ipv4_enabled, ipv6_enabled);
 
-	if (SUCCEED == zbx_ec_noerror(rtt43))
+	if (0 == ips_rdds43.values_num)
 	{
-		zbx_delete_unsupported_ips(&ips43, ipv4_enabled, ipv6_enabled);
-
-		if (0 == ips43.values_num)
-		{
-			rtt43 = ZBX_EC_INTERNAL_IP_UNSUP;
-			zbx_rsm_errf(log_fd, "RDDS43 \"%s\": IP address(es) of host not supported by this probe",
-					random_host);
-		}
+		rtt_rdds43 = ZBX_EC_INTERNAL_IP_UNSUP;
+		zbx_rsm_errf(log_fd, "RDDS43 \"%s\": IP address(es) of host not supported by this probe", random_host);
+		goto test_rdds80;
 	}
 
-	if (SUCCEED == zbx_ec_noerror(rtt43))
+	/* choose random IP */
+	i = zbx_random(ips_rdds43.values_num);
+	ip_rdds43 = ips_rdds43.values[i];
+
+	if (0 != strcmp(".", domain))
+		zbx_snprintf(testname, sizeof(testname), "%s.%s", testprefix, domain);
+	else
+		zbx_strlcpy(testname, testprefix, sizeof(testname));
+
+	zbx_rsm_infof(log_fd, "start RDDS43 test (ip %s, request \"%s\", expected prefix \"%s\")",
+			ip_rdds43, testname, rdds_ns_string);
+
+	if (SUCCEED != zbx_rdds43_test(testname, ip_rdds43, 43, ZBX_RSM_TCP_TIMEOUT, &answer, &rtt_rdds43, err,
+			sizeof(err)))
 	{
-		/* choose random IP */
-		i = zbx_random(ips43.values_num);
-		ip43 = ips43.values[i];
-
-		if (0 != strcmp(".", domain))
-			zbx_snprintf(testname, sizeof(testname), "%s.%s", testprefix, domain);
-		else
-			zbx_strlcpy(testname, testprefix, sizeof(testname));
-
-		zbx_rsm_infof(log_fd, "start RDDS43 test (ip %s, request \"%s\", expected prefix \"%s\")",
-				ip43, testname, rdds_ns_string);
-
-		if (SUCCEED != zbx_rdds43_test(testname, ip43, 43, ZBX_RSM_TCP_TIMEOUT, &answer, &rtt43,
-				err, sizeof(err)))
-		{
-			rtt43 = ZBX_EC_RDDS43_NOREPLY;
-			zbx_rsm_errf(log_fd, "RDDS43 of \"%s\" (%s) failed: %s", random_host, ip43, err);
-		}
+		zbx_rsm_errf(log_fd, "RDDS43 of \"%s\" (%s) failed: %s", random_host, ip_rdds43, err);
+		goto test_rdds80;
 	}
 
-	if (SUCCEED == zbx_ec_noerror(rtt43))
+	zbx_get_rdds43_nss(&nss_rdds43, answer, rdds_ns_string, log_fd);
+
+	if (0 == nss_rdds43.values_num)
 	{
-		zbx_get_rdds43_nss(&nss, answer, rdds_ns_string, log_fd);
-
-		if (0 == nss.values_num)
-		{
-			rtt43 = ZBX_EC_RDDS43_NONS;
-			zbx_rsm_errf(log_fd, "no Name Servers found in the output of RDDS43 server \"%s\""
-					" (%s) for query \"%s\" (expecting prefix \"%s\")",
-					random_host, ip43, testname, rdds_ns_string);
-		}
+		rtt_rdds43 = ZBX_EC_RDDS43_NONS;
+		zbx_rsm_errf(log_fd, "no Name Servers found in the output of RDDS43 server \"%s\""
+				" (%s) for query \"%s\" (expecting prefix \"%s\")",
+				random_host, ip_rdds43, testname, rdds_ns_string);
+		goto test_rdds80;
 	}
 
-	if (SUCCEED == zbx_ec_noerror(rtt43))
+	/* choose random NS from the output */
+	i = zbx_random(nss_rdds43.values_num);
+	random_ns = nss_rdds43.values[i];
+
+	zbx_rsm_infof(log_fd, "randomly selected Name Server server \"%s\"", random_ns);
+
+	if (0 != epp_enabled)
 	{
-		/* choose random NS from the output */
-		i = zbx_random(nss.values_num);
-		random_ns = nss.values[i];
-
-		zbx_rsm_infof(log_fd, "randomly selected Name Server server \"%s\"", random_ns);
-
-		if (0 != epp_enabled)
+		/* start RDDS UPD test, get timestamp from the host name */
+		if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
 		{
-			/* start RDDS UPD test, get timestamp from the host name */
-			if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
-			{
-				upd43 = ZBX_EC_RDDS43_NOTS;
-				zbx_rsm_errf(log_fd, "cannot extract Unix timestamp from Name Server \"%s\"", random_ns);
-			}
-
-			if (upd43 == ZBX_NO_VALUE)
-			{
-				now = time(NULL);
-
-				if (0 > now - ts)
-				{
-					zbx_rsm_errf(log_fd, "Unix timestamp of Name Server \"%s\" is in the future"
-							" (current: %lu)", random_ns, now);
-					upd43 = ZBX_EC_RDDS43_ETS;
-				}
-			}
-
-			if (upd43 == ZBX_NO_VALUE)
-			{
-				/* successful UPD */
-				upd43 = now - ts;
-			}
-
-			zbx_rsm_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d upd43:%d)",
-					ZBX_RDDS_PREVIEW_SIZE, answer, rtt43, upd43);
+			upd_rdds43 = ZBX_EC_RDDS43_NOTS;
+			zbx_rsm_errf(log_fd, "cannot extract Unix timestamp from Name Server \"%s\"", random_ns);
+			goto test_rdds80;
 		}
-		else
+
+		now = time(NULL);
+
+		if (0 > now - ts)
 		{
-			zbx_rsm_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)",
-					ZBX_RDDS_PREVIEW_SIZE, answer, rtt43);
+			zbx_rsm_errf(log_fd, "Unix timestamp of Name Server \"%s\" is in the future"
+					" (current: %lu)", random_ns, now);
+			upd_rdds43 = ZBX_EC_RDDS43_ETS;
+			goto test_rdds80;
 		}
+
+		/* successful UPD */
+		upd_rdds43 = now - ts;
+
+		zbx_rsm_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d upd43:%d)",
+				ZBX_RDDS_PREVIEW_SIZE, answer, rtt_rdds43, upd_rdds43);
 	}
+	else
+	{
+		zbx_rsm_infof(log_fd, "===>\n%.*s\n<=== end RDDS43 test (rtt:%d)",
+				ZBX_RDDS_PREVIEW_SIZE, answer, rtt_rdds43);
+	}
+test_rdds80:
+	if (0 == rdds80_enabled)
+		goto test_rdap;
+
+	/* start RDDS80 test, choose random host */
+	i = zbx_random(hosts_rdds80.values_num);
+	random_host = hosts_rdds80.values[i];
+
+	if (SUCCEED != zbx_split_url(random_host, &prefix, &domain_part, &postfix, err, sizeof(err)))
+	{
+		rtt_rdds80 = ZBX_EC_INTERNAL;
+		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": %s", random_host, err);
+		goto test_rdap;
+	}
+
+	/* resolve host to ips */
+	if (SUCCEED != zbx_resolve_host(res, domain_part, &ips_rdds80, ipv4_enabled, ipv6_enabled, log_fd, err,
+			sizeof(err)))
+	{
+		rtt_rdds80 = ZBX_EC_RDDS80_ERES;
+		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": %s", random_host, err);
+		goto test_rdap;
+	}
+
+	zbx_delete_unsupported_ips(&ips_rdds80, ipv4_enabled, ipv6_enabled);
+
+	if (0 == ips_rdds80.values_num)
+	{
+		rtt_rdds80 = ZBX_EC_INTERNAL_IP_UNSUP;
+		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": IP address(es) of host not supported by this probe", random_host);
+		goto test_rdap;
+	}
+
+	/* choose random IP */
+	i = zbx_random(ips_rdds80.values_num);
+	ip_rdds80 = ips_rdds80.values[i];
+
+	if (SUCCEED != zbx_validate_ip(ip_rdds80, ipv4_enabled, ipv6_enabled, NULL, &is_ipv4))
+	{
+		rtt_rdds80 = ZBX_EC_INTERNAL;
+		zbx_rsm_errf(log_fd, "internal error, selected unsupported IP of \"%s\": \"%s\"", random_host,
+				ip_rdds80);
+		goto test_rdap;
+	}
+
+	if (0 != is_ipv4)
+		zbx_snprintf(testname, sizeof(testname), "%s%s%s", prefix, ip_rdds80, postfix);
+	else
+		zbx_snprintf(testname, sizeof(testname), "%s[%s]%s", prefix, ip_rdds80, postfix);
 
 	zbx_rsm_infof(log_fd, "start RDDS80 test (url %s, host %s)", testname, random_host);
 
-	/* choose random host */
-	i = zbx_random(hosts80.values_num);
-	random_host = hosts80.values[i];
-
-	/* start RDDS80 test, resolve host to ips */
-	if (SUCCEED != zbx_resolve_host(res, random_host, &ips80, ipv4_enabled, ipv6_enabled, log_fd, err, sizeof(err)))
+	if (SUCCEED != zbx_http_test(domain_part, testname, ZBX_RSM_TCP_TIMEOUT, maxredirs_rdds80, &rtt_rdds80, NULL,
+			curl_devnull, err, sizeof(err)))
 	{
-		rtt80 = ZBX_EC_RDDS_ERES;
-		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": %s", random_host, err);
+		rtt_rdds80 = zbx_http_to_rdds80(rtt_rdds80);
+		zbx_rsm_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip_rdds80, err);
+		goto test_rdap;
+	}
+
+	zbx_rsm_infof(log_fd, "end RDDS80 test (rtt:%d)", rtt_rdds80);
+test_rdap:
+	if (0 == rdap_enabled)
+		goto out;
+
+	/* If there is no RDAP base URL configured for a TLD, RDAP should not be monitored, */
+	/* even if it is enabled in the SLA Monitoring system.                              */
+	if (0 == hosts_rdap.values_num)
+	{
+		zbx_rsm_info(log_fd, "RDAP base URL is not configured for this TLD");
 		goto out;
 	}
 
-	zbx_delete_unsupported_ips(&ips80, ipv4_enabled, ipv6_enabled);
+	/* start RDAP test, choose random host */
+	i = zbx_random(hosts_rdap.values_num);
+	random_host = hosts_rdap.values[i];
 
-	if (0 == ips80.values_num)
+	if (SUCCEED != zbx_split_url(random_host, &prefix, &domain_part, &postfix, err, sizeof(err)))
 	{
-		rtt80 = ZBX_EC_INTERNAL_IP_UNSUP;
-		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": IP address(es) of host not supported by this probe", random_host);
+		rtt_rdap = ZBX_EC_INTERNAL;
+		zbx_rsm_errf(log_fd, "RDAP \"%s\": %s", random_host, err);
+		goto out;
+	}
+
+	/* resolve host to ips */
+	if (SUCCEED != zbx_resolve_host(res, domain_part, &ips_rdap, ipv4_enabled, ipv6_enabled, log_fd, err,
+			sizeof(err)))
+	{
+		rtt_rdap = ZBX_EC_RDAP_ERES;
+		zbx_rsm_errf(log_fd, "RDAP \"%s\": %s", random_host, err);
+		goto out;
+	}
+
+	zbx_delete_unsupported_ips(&ips_rdap, ipv4_enabled, ipv6_enabled);
+
+	if (0 == ips_rdap.values_num)
+	{
+		rtt_rdap = ZBX_EC_INTERNAL_IP_UNSUP;
+		zbx_rsm_errf(log_fd, "RDAP \"%s\": IP address(es) of host not supported by this probe", random_host);
 		goto out;
 	}
 
 	/* choose random IP */
-	i = zbx_random(ips80.values_num);
-	ip80 = ips80.values[i];
+	i = zbx_random(ips_rdap.values_num);
+	ip_rdap = ips_rdap.values[i];
 
-	if (SUCCEED != zbx_validate_ip(ip80, ipv4_enabled, ipv6_enabled, NULL, &is_ipv4))
+	if (SUCCEED != zbx_validate_ip(ip_rdap, ipv4_enabled, ipv6_enabled, NULL, &is_ipv4))
 	{
-		rtt80 = ZBX_EC_INTERNAL;
-		zbx_rsm_errf(log_fd, "internal error, selected unsupported IP of \"%s\": \"%s\"", random_host, ip80);
+		rtt_rdap = ZBX_EC_INTERNAL;
+		zbx_rsm_errf(log_fd, "internal error, selected unsupported IP of \"%s\": \"%s\"", random_host, ip_rdap);
 		goto out;
 	}
 
 	if (0 != is_ipv4)
-		zbx_snprintf(testname, sizeof(testname), "http://%s", ip80);
+		zbx_snprintf(testname, sizeof(testname), "%s%s%sdomain/%s", prefix, ip_rdap, postfix, domain);
 	else
-		zbx_snprintf(testname, sizeof(testname), "http://[%s]", ip80);
+		zbx_snprintf(testname, sizeof(testname), "%s[%s]%sdomain/%s", prefix, ip_rdap, postfix, domain);
 
-	if (SUCCEED != zbx_rdds80_test(random_host, testname, 80, ZBX_RSM_TCP_TIMEOUT, maxredirs, &rtt80,
-			err, sizeof(err)))
+	zbx_rsm_infof(log_fd, "start RDAP test (url %s, host %s)", testname, random_host);
+
+	if (SUCCEED != zbx_http_test(domain_part, testname, ZBX_RSM_TCP_TIMEOUT, maxredirs_rdap, &rtt_rdap,
+		&data, curl_memory, err, sizeof(err)))
 	{
-		zbx_rsm_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip80, err);
+		rtt_rdap = zbx_http_to_rdap(rtt_rdap);
+		zbx_rsm_errf(log_fd, "RDAP of \"%s\" (%s) failed: %s", random_host, ip_rdap, err);
 		goto out;
 	}
 
-	zbx_rsm_infof(log_fd, "end RDDS80 test (rtt:%d)", rtt80);
+	if (NULL == data.buf || '\0' == *data.buf || SUCCEED != zbx_json_open(data.buf, &jp))
+	{
+		rtt_rdap = ZBX_EC_RDAP_EJSON;
+		zbx_rsm_errf(log_fd, "Invalid JSON format in RDAP response of \"%s\" (%s)", random_host, ip_rdap);
+		goto out;
+	}
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(&jp, "ldhName", &value_str, &value_alloc))
+	{
+		rtt_rdap = ZBX_EC_RDAP_NONAME;
+		zbx_rsm_errf(log_fd, "ldhName member not found in RDAP response of \"%s\" (%s)", random_host, ip_rdap);
+		goto out;
+	}
+
+	if (NULL == value_str || 0 != strcmp(value_str, domain))
+	{
+		rtt_rdap = ZBX_EC_RDAP_ENAME;
+		zbx_rsm_errf(log_fd, "ldhName member doesn't match query in RDAP response of \"%s\" (%s)", random_host,
+				ip_rdap);
+		goto out;
+	}
+
+	if (0 != epp_enabled)
+	{
+		struct zbx_json_parse	jp_nss, jp_ns;
+		const char		*p = NULL;
+
+		zbx_json_brackets_by_name(&jp, "nameservers", &jp_nss);
+
+		while (NULL != (p = zbx_json_next(&jp_nss, p)))
+		{
+			if (SUCCEED != zbx_json_brackets_open(p, &jp_ns) ||
+					SUCCEED != zbx_json_value_by_name_dyn(&jp_ns, "ldhName", &value_str,
+							&value_alloc))
+			{
+				rtt_rdap = ZBX_EC_RDAP_EJSON;
+				zbx_rsm_errf(log_fd, "Invalid JSON format in RDAP response of \"%s\" (%s)", random_host,
+						ip_rdap);
+				goto out;
+			}
+
+			zbx_vector_str_append(&nss_rdap, zbx_strdup(NULL, value_str));
+		}
+
+		if (0 == nss_rdap.values_num)
+		{
+			rtt_rdap = ZBX_EC_RDAP_NONS;
+			zbx_rsm_errf(log_fd, "Syntax valid Name server member not found in RDAP response of \"%s\" (%s)",
+					random_host, ip_rdap);
+			goto out;
+		}
+
+		/* choose random NS from the output */
+		i = zbx_random(nss_rdap.values_num);
+		random_ns = nss_rdap.values[i];
+
+		zbx_rsm_infof(log_fd, "randomly selected Name Server server \"%s\"", random_ns);
+
+		/* start RDDS UPD test, get timestamp from the host name */
+		if (SUCCEED != zbx_get_ts_from_host(random_ns, &ts))
+		{
+			upd_rdap = ZBX_EC_RDAP_NOTS;
+			zbx_rsm_errf(log_fd, "No Unix timestamp in RDAP response of \"%s\" (%s) from Name Server \"%s\"",
+					random_host, ip_rdap, random_ns);
+			goto out;
+		}
+
+		now = time(NULL);
+
+		if (0 > now - ts)
+		{
+			upd_rdap = ZBX_EC_RDAP_ETS;
+			zbx_rsm_errf(log_fd, "Invalid Unix timestamp in RDAP response of \"%s\" (%s) from Name Server "
+					"\"%s\" (current time: %lu)", random_host, ip_rdap, random_ns, now);
+			goto out;
+		}
+
+		/* successful UPD */
+		upd_rdap = now - ts;
+
+		zbx_rsm_infof(log_fd, "===>\n%.*s\n<=== end RDAP test (rtt:%d upd:%d)",
+				ZBX_RDDS_PREVIEW_SIZE, answer, rtt_rdap, upd_rdap);
+	}
+	else
+	{
+		zbx_rsm_infof(log_fd, "===>\n%.*s\n<=== end RDAP test (rtt:%d)",
+				ZBX_RDDS_PREVIEW_SIZE, answer, rtt_rdap);
+	}
 out:
 	if (0 != ISSET_MSG(result))
 		zbx_rsm_err(log_fd, result->msg);
 
 	if (SYSINFO_RET_OK == ret)
 	{
-		int	rdds_result, rdds43, rdds80;
-
-		zbx_set_rdds_values(ip43, rtt43, upd43, ip80, rtt80, item->nextcheck, strlen(keyname), items,
-				items_num);
-
-		rdds43 = rtt_result(rtt43, rtt_limit);
-		rdds80 = rtt_result(rtt80, rtt_limit);
-
-		if (SUCCEED == rdds43)
-		{
-			if (SUCCEED == rdds80)
-				rdds_result = RDDS_UP;
-			else
-				rdds_result = RDDS_ONLY43;
-		}
-		else
-		{
-			if (SUCCEED == rdds80)
-				rdds_result = RDDS_ONLY80;
-			else
-				rdds_result = RDDS_DOWN;
-		}
+		zbx_set_rdds_values(ip_rdds43, rtt_rdds43, upd_rdds43, ip_rdds80, rtt_rdds80, ip_rdap, rtt_rdap,
+				upd_rdap, strlen(keyname), item->nextcheck, items, items_num);
 
 		/* set the value of our item itself */
-		zbx_add_value_uint(item, item->nextcheck, rdds_result);
+		zbx_add_value_uint(item, item->nextcheck, zbx_rdds_result(rtt_result(rtt_rdds43, rtt_limit_rdds43),
+				rtt_result(rtt_rdds80, rtt_limit_rdds80), rtt_result(rtt_rdap, rtt_limit_rdap)));
 	}
 
 	free_items(items, items_num);
@@ -2460,13 +3033,21 @@ out:
 	zbx_free(rdds_ns_string);
 	zbx_free(testprefix);
 	zbx_free(res_ip);
+	zbx_free(default_host);
+	zbx_free(prefix);
+	zbx_free(domain_part);
+	zbx_free(postfix);
+	zbx_free(data.buf);
 	zbx_free(value_str);
 
-	zbx_vector_str_clean_and_destroy(&nss);
-	zbx_vector_str_clean_and_destroy(&ips80);
-	zbx_vector_str_clean_and_destroy(&ips43);
-	zbx_vector_str_clean_and_destroy(&hosts80);
-	zbx_vector_str_clean_and_destroy(&hosts43);
+	zbx_vector_str_clean_and_destroy(&nss_rdap);
+	zbx_vector_str_clean_and_destroy(&nss_rdds43);
+	zbx_vector_str_clean_and_destroy(&ips_rdap);
+	zbx_vector_str_clean_and_destroy(&ips_rdds80);
+	zbx_vector_str_clean_and_destroy(&ips_rdds43);
+	zbx_vector_str_clean_and_destroy(&hosts_rdap);
+	zbx_vector_str_clean_and_destroy(&hosts_rdds80);
+	zbx_vector_str_clean_and_destroy(&hosts_rdds43);
 
 	return ret;
 }
