@@ -627,7 +627,7 @@ if (hasRequest('form')) {
 	}
 
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
-	$data['allowedOperations'] = get_operations_by_eventsource($data['eventsource']);
+	$data['allowedOperations'] = getAllowedOperations($data['eventsource']);
 
 	if (!hasRequest('add_condition')) {
 		$data['action']['filter']['conditions'] = CConditionHelper::sortConditionsByFormulaId(
