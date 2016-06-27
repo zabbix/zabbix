@@ -168,10 +168,8 @@ class CHostPrototype extends CHostBase {
 		return [
 			'validators' => [
 				'host' => new CLldMacroStringValidator([
-					'maxLength' => 64,
 					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
 					'messageEmpty' => _('Empty host.'),
-					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
 					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
 					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
 				]),
@@ -870,7 +868,8 @@ class CHostPrototype extends CHostBase {
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
 			'selectTemplates' => ['templateid'],
-			'selectDiscoveryRule' => ['itemid']
+			'selectDiscoveryRule' => ['itemid'],
+			'selectInventory' => ['inventory_mode']
 		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
