@@ -158,7 +158,7 @@
 				// append existing step names
 				var stepNames = '';
 				form.find('input[name^=steps]').filter('input[name*=name]').each(function(i, stepName) {
-					stepNames += '&steps_names[]=' + $(stepName).val();
+					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
 				return PopUp('popup_httpstep.php?dstfrm=httpForm' + stepNames);
@@ -172,7 +172,7 @@
 				var stepNames = '';
 				var form = $(this).parents('form');
 				form.find('input[name^=steps]').filter('input[name*=name]').each(function(i, stepName) {
-					stepNames += '&steps_names[]=' + $(stepName).val();
+					stepNames += '&steps_names[]=' + encodeURIComponent($(stepName).val());
 				});
 
 				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?= $this->data['templated'] ?>'
