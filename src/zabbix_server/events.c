@@ -210,16 +210,23 @@ static void	save_events()
 
 		event_tag_local.eventid = events[i].eventid;
 
-		for (j = 0; j < events[i].tags.values_num; j++)
+		for (j = 0; j < events[i].tags.values_num;)
 		{
 			event_tag_local.tag = (zbx_tag_t *)events[i].tags.values[j];
 
-			/* remove tags containing invalid characters */
-			if (0 != strchr(event_tag_local.tag->tag, '/'))
+			/* remove invalid or duplicate tags */
+			if (0 != strchr(event_tag_local.tag->tag, '/') ||
+					NULL != zbx_hashset_search(&event_tags, &event_tag_local))
+			{
+				zbx_free_tag(events[i].tags.values[j]);
+				zbx_vector_ptr_remove_noorder(&events[i].tags, j);
 				continue;
+			}
 
 			if (NULL == (event_tag = zbx_hashset_search(&event_tags, &event_tag_local)))
 				zbx_hashset_insert(&event_tags, &event_tag_local, sizeof(event_tag_local));
+
+			j++;
 		}
 	}
 
@@ -258,7 +265,7 @@ static void	save_problems()
 {
 	size_t			i;
 	zbx_vector_ptr_t	problems;
-	int			j;
+	int			j, tags_num = 0;
 
 	zbx_vector_ptr_create(&problems);
 
@@ -294,6 +301,7 @@ static void	save_problems()
 		else
 			continue;
 
+		tags_num += event->tags.values_num;
 		zbx_vector_ptr_append(&problems, event);
 	}
 
@@ -301,18 +309,44 @@ static void	save_problems()
 	{
 		zbx_db_insert_t	db_insert;
 
-		zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", NULL);
+		zbx_db_insert_prepare(&db_insert, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
+				NULL);
 
 		for (j = 0; j < problems.values_num; j++)
 		{
 			const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
 
 			zbx_db_insert_add_values(&db_insert, event->eventid, event->source, event->object,
-					event->objectid);
+					event->objectid, event->clock, event->ns);
 		}
 
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+
+		if (0 != tags_num)
+		{
+			int	k;
+
+			zbx_db_insert_prepare(&db_insert, "problem_tag", "problemtagid", "eventid", "tag", "value",
+					NULL);
+
+			for (j = 0; j < problems.values_num; j++)
+			{
+				const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
+
+				for (k = 0; k < event->tags.values_num; k++)
+				{
+					zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[k];
+
+					zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event->eventid, tag->tag,
+							tag->value);
+				}
+			}
+
+			zbx_db_insert_autoincrement(&db_insert, "problemtagid");
+			zbx_db_insert_execute(&db_insert);
+			zbx_db_insert_clean(&db_insert);
+		}
 	}
 
 	zbx_vector_ptr_destroy(&problems);
