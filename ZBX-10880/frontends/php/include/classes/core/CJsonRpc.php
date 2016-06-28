@@ -94,6 +94,7 @@ class CJsonRpc {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
 			return $this->json->encode($this->_response);
 		}
+
 		return $this->json->encode($this->_response[0]);
 	}
 
