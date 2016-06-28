@@ -38,7 +38,13 @@ class CJsonRpc {
 	private $_zbx2jsonErrors;
 	private $_jsonDecoded;
 
-	public function __construct(CApiClient $apiClient, $jsonData) {
+	/**
+	 * Constructor.
+	 *
+	 * @param CApiClient $apiClient
+	 * @param string $data
+	 */
+	public function __construct(CApiClient $apiClient, $data) {
 		$this->apiClient = $apiClient;
 
 		$this->json = new CJson();
@@ -46,38 +52,50 @@ class CJsonRpc {
 
 		$this->_error = false;
 		$this->_response = [];
-		$this->_jsonDecoded = $this->json->decode($jsonData, true);
-
-		if (!$this->_jsonDecoded) {
-			$this->jsonError(null, '-32700', null, null, true);
-			return;
-		}
+		$this->_jsonDecoded = $this->json->decode($data, true);
 	}
 
-	public function execute($encoded = true) {
-		$call = $this->_jsonDecoded;
-
-		// notification
-		if (!isset($call['id'])) {
-			$call['id'] = null;
+	/**
+	 * Executes API requests.
+	 *
+	 * @return string JSON encoded value
+	 */
+	public function execute() {
+		if ($this->json->hasError()) {
+			$this->jsonError(null, '-32700', null, null, true);
+			return $this->json->encode($this->_response[0]);
 		}
 
-		if ($this->validate($call)) {
-			$params = isset($call['params']) ? $call['params'] : null;
-			$auth = isset($call['auth']) ? $call['auth'] : null;
+		if ($this->_jsonDecoded === null || $this->_jsonDecoded == []) {
+			$this->jsonError(null, '-32600', null, null, true);
+			return $this->json->encode($this->_response[0]);
+		}
 
-			list($api, $method) = explode('.', $call['method']);
-			$result = $this->apiClient->callMethod($api, $method, $params, $auth);
+		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
+			$call = is_array($call) ? $call : [$call];
+
+			// notification
+			if (!array_key_exists('id', $call)) {
+				$call['id'] = null;
+			}
+
+			if (!$this->validate($call)) {
+				continue;
+			}
+
+			list($api, $method) = array_merge(explode('.', $call['method']), [null, null]);
+			$result = $this->apiClient->callMethod($api, $method, $call['params'], $call['auth']);
 
 			$this->processResult($call, $result);
 		}
 
-		if (!$encoded) {
-			return $this->_response;
-		}
-		else {
+		if (is_array($this->_jsonDecoded)
+				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
+			// Return response as encoded batch if $this->_jsonDecoded is associative array.
 			return $this->json->encode($this->_response);
 		}
+
+		return $this->json->encode($this->_response[0]);
 	}
 
 	public function validate($call) {
@@ -122,12 +140,8 @@ class CJsonRpc {
 				'id' => $call['id']
 			];
 
-			$this->_response = $formedResp;
+			$this->_response[] = $formedResp;
 		}
-	}
-
-	public function isError() {
-		return $this->_error;
 	}
 
 	private function jsonError($id, $errno, $data = null, $debug = null, $force_err = false) {
@@ -159,7 +173,7 @@ class CJsonRpc {
 			'id' => $id
 		];
 
-		$this->_response = $formed_error;
+		$this->_response[] = $formed_error;
 	}
 
 	private function initErrors() {
