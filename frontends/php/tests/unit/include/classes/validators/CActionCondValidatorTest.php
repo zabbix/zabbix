@@ -135,10 +135,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
-				'value' => EVENT_TYPE_ITEM_NORMAL,
-			]],
-			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
 				'value' => 'abc',
 			]],

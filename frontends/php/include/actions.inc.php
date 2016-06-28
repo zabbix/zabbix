@@ -1532,11 +1532,8 @@ function makeEventsActions($eventids) {
 function eventType($type = null) {
 	$types = [
 		EVENT_TYPE_ITEM_NOTSUPPORTED => _('Item in "not supported" state'),
-		EVENT_TYPE_ITEM_NORMAL => _('Item in "normal" state'),
 		EVENT_TYPE_LLDRULE_NOTSUPPORTED => _('Low-level discovery rule in "not supported" state'),
-		EVENT_TYPE_LLDRULE_NORMAL => _('Low-level discovery rule in "normal" state'),
-		EVENT_TYPE_TRIGGER_UNKNOWN => _('Trigger in "unknown" state'),
-		EVENT_TYPE_TRIGGER_NORMAL => _('Trigger in "normal" state')
+		EVENT_TYPE_TRIGGER_UNKNOWN => _('Trigger in "unknown" state')
 	];
 
 	if (is_null($type)) {

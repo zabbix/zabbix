@@ -232,11 +232,8 @@ define('CONDITION_OPERATOR_REGEXP',		8);
 
 // event type action condition values
 define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);
-define('EVENT_TYPE_ITEM_NORMAL',			1);
 define('EVENT_TYPE_LLDRULE_NOTSUPPORTED',	2);
-define('EVENT_TYPE_LLDRULE_NORMAL',			3);
 define('EVENT_TYPE_TRIGGER_UNKNOWN',		4);
-define('EVENT_TYPE_TRIGGER_NORMAL',			5);
 
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
