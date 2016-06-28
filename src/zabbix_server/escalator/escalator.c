@@ -363,12 +363,13 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, DB
 		const char *subject, const char *message)
 {
 	const char	*__function_name = "add_sentusers_msg";
-	char		*subject_dyn, *message_dyn;
+	char		*subject_dyn, *message_dyn, *event_filter = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	userid, mediatypeid;
 	DB_EVENT	*c_event;
 	int		message_type;
+	size_t		event_filter_alloc = 0, event_filter_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -376,21 +377,26 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, DB
 	{
 		c_event = r_event;
 		message_type = MACRO_TYPE_MESSAGE_RECOVERY;
+		zbx_snprintf_alloc(&event_filter, &event_filter_alloc, &event_filter_offset,
+				"(eventid=" ZBX_FS_UI64 " or eventid=" ZBX_FS_UI64 ")", event->eventid,
+				r_event->eventid);
 	}
 	else
 	{
 		c_event = event;
 		message_type = MACRO_TYPE_MESSAGE_NORMAL;
+		zbx_snprintf_alloc(&event_filter, &event_filter_alloc, &event_filter_offset,
+				"eventid=" ZBX_FS_UI64, event->eventid);
 	}
 
 	result = DBselect(
 			"select distinct userid,mediatypeid"
 			" from alerts"
 			" where actionid=" ZBX_FS_UI64
-				" and eventid=" ZBX_FS_UI64
+				" and %s"
 				" and mediatypeid is not null"
 				" and alerttype=%d",
-				actionid, event->eventid, ALERT_TYPE_MESSAGE);
+				actionid, event_filter, ALERT_TYPE_MESSAGE);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -427,6 +433,8 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, DB
 		zbx_free(message_dyn);
 	}
 	DBfree_result(result);
+
+	zbx_free(event_filter);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -1229,6 +1237,10 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, DB
 						subject = action->r_shortdata;
 						message = action->r_longdata;
 					}
+
+					/* flush messages created by recovery operations so they are */
+					/* included in sent messages list                            */
+					flush_user_msg(&user_msg, escalation, event, r_event, action);
 
 					add_sentusers_msg(&user_msg, action->actionid, event, r_event, subject,
 							message);
