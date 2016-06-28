@@ -1588,9 +1588,6 @@ out:
 	if (NULL != keys)
 		ldns_rr_list_deep_free(keys);
 
-	if (NULL != log_fd)
-		fclose(log_fd);
-
 	if (NULL != res)
 	{
 		if (0 != ldns_resolver_nameserver_count(res))
@@ -1604,6 +1601,9 @@ out:
 
 	zbx_free(testprefix);
 	zbx_free(res_ip);
+
+	if (NULL != log_fd)
+		fclose(log_fd);
 
 	return ret;
 }
@@ -2453,9 +2453,6 @@ out:
 			ldns_resolver_free(res);
 	}
 
-	if (NULL != log_fd)
-		fclose(log_fd);
-
 	zbx_free(answer);
 	zbx_free(rdds_ns_string);
 	zbx_free(testprefix);
@@ -2467,6 +2464,9 @@ out:
 	zbx_vector_str_clean_and_destroy(&ips43);
 	zbx_vector_str_clean_and_destroy(&hosts80);
 	zbx_vector_str_clean_and_destroy(&hosts43);
+
+	if (NULL != log_fd)
+		fclose(log_fd);
 
 	return ret;
 }
@@ -3805,14 +3805,14 @@ out:
 
 	zbx_tcp_close(&sock);
 
-	if (NULL != log_fd)
-		fclose(log_fd);
-
 	zbx_free(value_str);
 	zbx_free(res_ip);
 
 	zbx_vector_str_clean_and_destroy(&epp_ips);
 	zbx_vector_str_clean_and_destroy(&epp_hosts);
+
+	if (NULL != log_fd)
+		fclose(log_fd);
 
 	return ret;
 }
@@ -4122,9 +4122,6 @@ out:
 			ldns_resolver_free(res);
 	}
 
-	if (NULL != log_fd)
-		fclose(log_fd);
-
 	zbx_free(value_str);
 
 	if (0 != ips6_init)
@@ -4135,6 +4132,9 @@ out:
 
 	if (NULL != query_rdf)
 		ldns_rdf_deep_free(query_rdf);
+
+	if (NULL != log_fd)
+		fclose(log_fd);
 
 	return ret;
 }
