@@ -1241,7 +1241,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 		switch ($data['new_recovery_operation']['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if (!isset($data['new_recovery_operation']['opmessage'])) {
+				if (!array_key_exists('opmessage', $data['new_recovery_operation'])
+						|| !array_key_exists('mediatypeid', $data['new_recovery_operation']['opmessage'])) {
 					$data['new_recovery_operation']['opmessage_usr'] = [];
 					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
 
@@ -1345,7 +1346,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					);
 
 				$mediaTypeComboBox = (new CComboBox('new_recovery_operation[opmessage][mediatypeid]',
-						$data['new_recovery_operation']['opmessage']['mediatypeid'])
+					$data['new_recovery_operation']['opmessage']['mediatypeid'])
 				)
 					->addItem(0, '- '._('All').' -');
 
