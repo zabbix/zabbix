@@ -33,9 +33,7 @@ if ($data['actionid']) {
 	$actionForm->addVar('actionid', $data['actionid']);
 }
 
-/*
- * Operation tab.
- */
+// Action tab.
 $action_tab = (new CFormList())
 	->addRow(_('Name'),
 		(new CTextBox('name', $data['action']['name']))
@@ -235,7 +233,8 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
-						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");')
+					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");'
+				)
 		];
 		break;
 
@@ -247,7 +246,8 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
-						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");')
+					'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");'
+				)
 		];
 		break;
 
@@ -258,9 +258,11 @@ switch ($data['new_condition']['conditiontype']) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
-						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
-						'");')
+				->onClick('return PopUp('.
+						'"popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
+						'&dstfld1=new_condition_value&dstfld2=proxy"'.
+					')'
+				)
 		];
 		break;
 
@@ -364,16 +366,15 @@ $action_tab->addRow(_('Enabled'),
 		->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED)
 );
 
-/*
- * Operation tab.
- */
+// Operations tab.
 $operation_tab = new CFormList('operationlist');
 
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operation_tab->addRow(_('Default operation step duration'), [
 		(new CNumericBox('esc_period', $data['action']['esc_period'], 6))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		' ('._('minimum 60 seconds').')']
+		' ('._('minimum 60 seconds').')'
+		]
 	);
 }
 
@@ -426,8 +427,7 @@ if ($data['action']['operations']) {
 		$details = (new CSpan($actionOperationDescriptions[0][$operationid]))
 			->setHint($action_operation_hints[$operationid]);
 
-		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS
-				|| $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
+		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 			$esc_steps_txt = null;
 			$esc_period_txt = null;
 			$esc_delay_txt = null;
@@ -455,8 +455,7 @@ if ($data['action']['operations']) {
 				$esc_period_txt,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-						[
+						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK), [
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK),
@@ -471,8 +470,7 @@ if ($data['action']['operations']) {
 				$details,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-						[
+						(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK), [
 							(new CButton('remove', _('Remove')))
 								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_OPERATION.');')
 								->addClass(ZBX_STYLE_BTN_LINK),
@@ -600,13 +598,10 @@ if (!empty($data['new_operation'])) {
 				->setHeader([_('User group'), _('Action')]);
 
 			$addUsrgrpBtn = (new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.php?'.
-					'dstfrm=action.edit'.
-					'&srctbl=usrgrp'.
-					'&srcfld1=usrgrpid'.
-					'&srcfld2=name'.
-					'&multiselect=1'.
-					'&dstfld1=opmsgUsrgrpListFooter")'
+				->onClick('return PopUp("'.
+						'popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1'.
+						'&dstfld1=opmsgUsrgrpListFooter"'.
+					')'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$usrgrpList->addRow(
@@ -620,13 +615,10 @@ if (!empty($data['new_operation'])) {
 				->setHeader([_('User'), _('Action')]);
 
 			$addUserBtn = (new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.php?'.
-					'dstfrm=action.edit'.
-					'&srctbl=users'.
-					'&srcfld1=userid'.
-					'&srcfld2=fullname'.
-					'&multiselect=1'.
-					'&dstfld1=opmsgUserListFooter")'
+				->onClick('return PopUp('.
+						'"popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1'.
+						'&dstfld1=opmsgUserListFooter"'.
+					')'
 				)
 				->addClass(ZBX_STYLE_BTN_LINK);
 			$userList->addRow(
@@ -662,10 +654,12 @@ if (!empty($data['new_operation'])) {
 			}
 			unset($user);
 
-			$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
-				'parentId' => 'opmsgUsrgrpListFooter']).');';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
-				'parentId' => 'opmsgUserListFooter']).');';
+			$jsInsert = 'addPopupValues('.
+				zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps, 'parentId' => 'opmsgUsrgrpListFooter']).
+			');';
+			$jsInsert .= 'addPopupValues('.
+				zbx_jsvalue(['object' => 'userid', 'values' => $users, 'parentId' => 'opmsgUserListFooter']).
+			');';
 			zbx_add_post_js($jsInsert);
 
 			$new_operation_formlist
@@ -807,8 +801,7 @@ if (!empty($data['new_operation'])) {
 			// type
 			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
 				$data['new_operation']['opcommand']['type'],
-				'showOpTypeForm('.ACTION_OPERATION.')',
-				[
+				'showOpTypeForm('.ACTION_OPERATION.')',	[
 					ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 					ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 					ZBX_SCRIPT_TYPE_SSH => _('SSH'),
@@ -842,8 +835,7 @@ if (!empty($data['new_operation'])) {
 			// ssh
 			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
 				$data['new_operation']['opcommand']['authtype'],
-				'showOpTypeAuth()',
-				[
+				'showOpTypeAuth()',	[
 					ITEM_AUTHTYPE_PASSWORD => _('Password'),
 					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 				]
@@ -987,8 +979,7 @@ if (!empty($data['new_operation'])) {
 				->addClass('label')
 				->setAttribute('data-conditiontype', $opcondition['conditiontype'])
 				->setAttribute('data-formulaid', $label);
-			$operationConditionsTable->addRow(
-				[
+			$operationConditionsTable->addRow([
 					$labelCol,
 					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
 						$operationConditionStringValues[$cIdx], ''
@@ -1008,14 +999,11 @@ if (!empty($data['new_operation'])) {
 			$i++;
 		}
 
-		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $data['new_operation']['evaltype'],
-			'submit()',
-			[
-				CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-				CONDITION_EVAL_TYPE_AND => _('And'),
-				CONDITION_EVAL_TYPE_OR => _('Or')
-			]
-		);
+		$calcTypeComboBox = new CComboBox('new_operation[evaltype]', $data['new_operation']['evaltype'], 'submit()', [
+			CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+			CONDITION_EVAL_TYPE_AND => _('And'),
+			CONDITION_EVAL_TYPE_OR => _('Or')
+		]);
 		$calcTypeComboBox->setId('operationEvaltype');
 
 		$new_operation_formlist->addRow(_('Type of calculation'), [
@@ -1024,7 +1012,7 @@ if (!empty($data['new_operation'])) {
 			(new CSpan())->setId('operationConditionLabel')
 		]);
 
-		if (!isset($_REQUEST['new_opcondition'])) {
+		if (!hasRequest('new_opcondition')) {
 			$operationConditionsTable->addRow((new CCol(
 				(new CSubmit('new_opcondition', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColspan(3));
@@ -1036,8 +1024,8 @@ if (!empty($data['new_operation'])) {
 		);
 	}
 
-	// append new operation condition to form list
-	if (isset($_REQUEST['new_opcondition'])) {
+	// Append new operation condition to form list.
+	if (hasRequest('new_opcondition')) {
 		$newOperationConditionTable = (new CTable())
 			->setAttribute('style', 'width: 100%;');
 
@@ -1118,13 +1106,9 @@ $action_tabs = (new CTabView())
 	->addTab('actionTab', _('Action'), $action_tab)
 	->addTab('operationTab', _('Operations'), $operation_tab);
 
-/*
- * Recovery operation tab.
- */
+// Recovery operation tab.
 if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$recovery_tab = new CFormList('operationlist');
-
-	$recovery_tab
+	$recovery_tab = (new CFormList('operationlist'))
 		->addRow(_('Default subject'),
 			(new CTextBox('r_shortdata', $data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
@@ -1132,7 +1116,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 			(new CTextArea('r_longdata', $data['action']['r_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
 
-	// create operation table
+	// Create operation table.
 	$operationsTable = (new CTable())->setAttribute('style', 'width: 100%;');
 	$operationsTable->setHeader([_('Details'), _('Action')]);
 
@@ -1164,10 +1148,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$details,
 				(new CCol(
 					new CHorList([
-						(new CSubmit('edit_recovery_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-						[
+						(new CSubmit('edit_recovery_operationid['.$operationid.']', _('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK), [
 							(new CButton('remove', _('Remove')))
-								->onClick('javascript: removeOperation('.$operationid.', '.ACTION_RECOVERY_OPERATION.');')
+								->onClick(
+									'javascript: removeOperation('.$operationid.', '.ACTION_RECOVERY_OPERATION.');'
+								)
 								->addClass(ZBX_STYLE_BTN_LINK),
 							new CVar('recovery_operations['.$operationid.']', $operation)
 						]
@@ -1265,13 +1251,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->setHeader([_('User group'), _('Action')]);
 
 				$addUsrgrpBtn = (new CButton(null, _('Add')))
-					->onClick('return PopUp("popup.php?'.
-						'dstfrm=action.edit'.
-						'&srctbl=usrgrp'.
-						'&srcfld1=usrgrpid'.
-						'&srcfld2=name'.
-						'&multiselect=1'.
-						'&dstfld1=recOpmsgUsrgrpListFooter")'
+					->onClick('return PopUp('.
+							'"popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name'.
+							'&multiselect=1&dstfld1=recOpmsgUsrgrpListFooter"'.
+						')'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$usrgrpList->addRow(
@@ -1285,13 +1268,10 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->setHeader([_('User'), _('Action')]);
 
 				$addUserBtn = (new CButton(null, _('Add')))
-					->onClick('return PopUp("popup.php?'.
-						'dstfrm=action.edit'.
-						'&srctbl=users'.
-						'&srcfld1=userid'.
-						'&srcfld2=fullname'.
-						'&multiselect=1'.
-						'&dstfld1=recOpmsgUserListFooter")'
+					->onClick('return PopUp('.
+							'"popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname'.
+							'&multiselect=1&dstfld1=recOpmsgUserListFooter"'.
+						')'
 					)
 					->addClass(ZBX_STYLE_BTN_LINK);
 				$userList->addRow(
@@ -1328,9 +1308,11 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				unset($user);
 
 				$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
-					'parentId' => 'recOpmsgUsrgrpListFooter']).');';
+					'parentId' => 'recOpmsgUsrgrpListFooter']).
+				');';
 				$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
-					'parentId' => 'recOpmsgUserListFooter']).');';
+					'parentId' => 'recOpmsgUserListFooter']).
+				');';
 				zbx_add_post_js($jsInsert);
 
 				$new_operation_formlist
@@ -1347,8 +1329,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				$mediaTypeComboBox = (new CComboBox('new_recovery_operation[opmessage][mediatypeid]',
 					$data['new_recovery_operation']['opmessage']['mediatypeid'])
-				)
-					->addItem(0, '- '._('All').' -');
+				)->addItem(0, '- '._('All').' -');
 
 				$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
 
@@ -1372,7 +1353,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					)
 					->addRow(_('Message'),
 						(new CTextArea('new_recovery_operation[opmessage][message]',
-								$data['new_recovery_operation']['opmessage']['message']
+							$data['new_recovery_operation']['opmessage']['message']
 						))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					);
@@ -1506,8 +1487,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				// type
 				$typeComboBox = new CComboBox('new_recovery_operation[opcommand][type]',
 					$data['new_recovery_operation']['opcommand']['type'],
-					'showOpTypeForm('.ACTION_RECOVERY_OPERATION.')',
-					[
+					'showOpTypeForm('.ACTION_RECOVERY_OPERATION.')', [
 						ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 						ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Custom script'),
 						ZBX_SCRIPT_TYPE_SSH => _('SSH'),
@@ -1543,9 +1523,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				// ssh
 				$authTypeComboBox = new CComboBox('new_recovery_operation[opcommand][authtype]',
-					$data['new_recovery_operation']['opcommand']['authtype'],
-					'showOpTypeAuth()',
-					[
+					$data['new_recovery_operation']['opcommand']['authtype'], 'showOpTypeAuth()', [
 						ITEM_AUTHTYPE_PASSWORD => _('Password'),
 						ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 					]
@@ -1677,8 +1655,7 @@ if (!hasRequest('form_refresh')) {
 $others = [];
 if ($data['actionid']) {
 	$action_tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[
+		new CSubmit('update', _('Update')), [
 			new CButton('clone', _('Clone')),
 			new CButtonDelete(
 				_('Delete current action?'),

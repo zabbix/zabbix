@@ -32,16 +32,18 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR							TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'actionid' =>						[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
-	'name' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
+	'name' =>							[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})',
+											_('Name')
+										],
 	'eventsource' =>					[T_ZBX_INT, O_OPT, null,
-											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION,
-												EVENT_SOURCE_INTERNAL
+											IN([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY,
+												EVENT_SOURCE_AUTO_REGISTRATION, EVENT_SOURCE_INTERNAL
 											]),
 											null
 										],
 	'evaltype' =>						[T_ZBX_INT, O_OPT, null,
-											IN([CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR,
-												CONDITION_EVAL_TYPE_EXPRESSION
+											IN([CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND,
+												CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION
 											]),
 											'isset({add}) || isset({update})'
 										],
@@ -49,7 +51,9 @@ $fields = [
 	'esc_period' =>						[T_ZBX_INT, O_OPT, null,	BETWEEN(60, 999999), null,
 											_('Default operation step duration')
 										],
-	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]), null],
+	'status' =>							[T_ZBX_INT, O_OPT, null,	IN([ACTION_STATUS_ENABLED, ACTION_STATUS_DISABLED]),
+											null
+										],
 	'def_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'def_longdata' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'r_shortdata' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
@@ -114,13 +118,13 @@ if (isset($_REQUEST['actionid'])) {
 /*
  * Actions
  */
-if (isset($_REQUEST['cancel_new_operation'])) {
+if (hasRequest('cancel_new_operation')) {
 	unset($_REQUEST['new_operation']);
 }
-elseif (isset($_REQUEST['cancel_new_opcondition'])) {
+elseif (hasRequest('cancel_new_opcondition')) {
 	unset($_REQUEST['new_opcondition']);
 }
-elseif (isset($_REQUEST['cancel_new_recovery_operation'])) {
+elseif (hasRequest('cancel_new_recovery_operation')) {
 	unset($_REQUEST['new_recovery_operation']);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -231,7 +235,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	show_messages($result, $messageSuccess, $messageFailed);
 }
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
+elseif (hasRequest('delete') && hasRequest('actionid')) {
 	$result = API::Action()->delete([getRequest('actionid')]);
 
 	if ($result) {
@@ -240,7 +244,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['actionid'])) {
 	}
 	show_messages($result, _('Action deleted'), _('Cannot delete action'));
 }
-elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) {
+elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 	$newCondition = getRequest('new_condition');
 
 	if ($newCondition) {
@@ -304,8 +308,8 @@ elseif (isset($_REQUEST['add_condition']) && isset($_REQUEST['new_condition'])) 
 		}
 	}
 }
-elseif (isset($_REQUEST['add_opcondition']) && isset($_REQUEST['new_opcondition'])) {
-	$new_opcondition = $_REQUEST['new_opcondition'];
+elseif (hasRequest('add_opcondition') && hasRequest('new_opcondition')) {
+	$new_opcondition = getRequest('new_opcondition');
 
 	try {
 		CAction::validateOperationConditions($new_opcondition);
@@ -371,8 +375,10 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 			OPERATION_TYPE_HOST_DISABLE => 0,
 			OPERATION_TYPE_HOST_INVENTORY => 0
 		];
+
 		if (array_key_exists($new_operation['operationtype'], $uniqOperations)) {
 			$uniqOperations[$new_operation['operationtype']]++;
+
 			foreach ($_REQUEST['operations'] as $operationId => $operation) {
 				if (array_key_exists($operation['operationtype'], $uniqOperations)
 					&& (!array_key_exists('id', $new_operation)
@@ -380,6 +386,7 @@ elseif (hasRequest('add_operation') && hasRequest('new_operation')) {
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
+
 			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
 				error(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
@@ -616,14 +623,12 @@ if (hasRequest('form')) {
 	}
 
 	if (!$data['actionid'] && !hasRequest('form_refresh') && $data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-		$data['action']['filter']['conditions'] = [
-			[
-				'formulaid' => 'A',
-				'conditiontype' => CONDITION_TYPE_MAINTENANCE,
-				'operator' => CONDITION_OPERATOR_NOT_IN,
-				'value' => ''
-			]
-		];
+		$data['action']['filter']['conditions'] = [[
+			'formulaid' => 'A',
+			'conditiontype' => CONDITION_TYPE_MAINTENANCE,
+			'operator' => CONDITION_OPERATOR_NOT_IN,
+			'value' => ''
+		]];
 	}
 
 	$data['allowedConditions'] = get_conditions_by_eventsource($data['eventsource']);
