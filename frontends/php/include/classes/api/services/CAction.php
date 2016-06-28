@@ -558,6 +558,11 @@ class CAction extends CApiService {
 					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
 						$recovery_operation['esc_step_to']
 					);
+
+					if ($recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
+						unset($recovery_operation['opmessage']['mediatypeid']);
+					}
+
 					$operations_to_create[] = $recovery_operation;
 				}
 			}
@@ -684,6 +689,10 @@ class CAction extends CApiService {
 					);
 
 					if (!array_key_exists('operationid', $recovery_operation)) {
+						if ($recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE) {
+							unset($recovery_operation['opmessage']['mediatypeid']);
+						}
+
 						$recovery_operation['actionid'] = $action['actionid'];
 						$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 						$operations_to_create[] = $recovery_operation;
@@ -692,6 +701,14 @@ class CAction extends CApiService {
 						$recovery_operationid = $recovery_operation['operationid'];
 
 						if (array_key_exists($recovery_operationid, $db_recovery_operations)) {
+							$db_operation_type = $db_recovery_operations[$recovery_operationid]['operationtype'];
+							if ((array_key_exists('operationtype', $recovery_operation)
+									&& $recovery_operation['operationtype'] == OPERATION_TYPE_RECOVERY_MESSAGE)
+									|| (!array_key_exists('operationtype', $recovery_operation)
+										&& $db_operation_type == OPERATION_TYPE_RECOVERY_MESSAGE)) {
+								unset($recovery_operation['opmessage']['mediatypeid']);
+							}
+
 							$recovery_operation['recovery'] = ACTION_RECOVERY_OPERATION;
 							$operations_to_update[] = $recovery_operation;
 							unset($db_recovery_operations[$recovery_operationid]);
