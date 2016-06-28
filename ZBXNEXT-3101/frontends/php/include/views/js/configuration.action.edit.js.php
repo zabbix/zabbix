@@ -553,19 +553,20 @@
 		jQuery('#new_operation_opmessage_default_msg').on('change', function() {
 			var default_message = jQuery(this).is(':checked');
 
-			jQuery('#new_operation_opmessage_subject').closest('li').toggle(!default_message);
-			jQuery('#new_operation_opmessage_message').closest('li').toggle(!default_message);
+			jQuery('#new_operation_opmessage_subject, #new_operation_opmessage_message')
+				.closest('li')
+				.toggle(!default_message);
 		});
 
 		jQuery('#new_recovery_operation_opmessage_default_msg').on('change', function() {
 			var default_message = jQuery(this).is(':checked');
 
-			jQuery('#new_recovery_operation_opmessage_subject').closest('li').toggle(!default_message);
-			jQuery('#new_recovery_operation_opmessage_message').closest('li').toggle(!default_message);
+			jQuery('#new_recovery_operation_opmessage_subject, #new_recovery_operation_opmessage_message')
+				.closest('li')
+				.toggle(!default_message);
 		});
 
-		jQuery('#new_operation_opmessage_default_msg').trigger('change');
-		jQuery('#new_recovery_operation_opmessage_default_msg').trigger('change');
+		jQuery('#new_operation_opmessage_default_msg, #new_recovery_operation_opmessage_default_msg').trigger('change');
 
 		// clone button
 		jQuery('#clone').click(function() {
@@ -574,9 +575,10 @@
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
-			// Remove operations IDs
+			// Remove operations IDs.
 			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=operations]').each(function() {
+				// Intentional usage of JS Prototype.
 				if ($(this).getAttribute('name').match(operationid_RegExp)) {
 					$(this).remove();
 				}
@@ -585,6 +587,7 @@
 			// Remove recovery operations IDs
 			var recovery_operationid_RegExp = /recovery_operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=recovery_operations]').each(function() {
+				// Intentional usage of JS Prototype.
 				if ($(this).getAttribute('name').match(recovery_operationid_RegExp)) {
 					$(this).remove();
 				}

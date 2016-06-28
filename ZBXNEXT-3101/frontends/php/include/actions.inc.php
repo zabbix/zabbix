@@ -375,9 +375,9 @@ function getConditionDescription($conditionType, $operator, $value, $value2) {
  * returns the HTML representation of action operation values according to action operation type.
  *
  * @param array $actions				Array of actions
- * @param string $type					Operations recovery type(operations or recovery operations)
+ * @param int $type						Operations recovery type (ACTION_OPERATION or ACTION_RECOVERY_OPERATION)
  *
- * @return array						returns an array of actions operation descriptions
+ * @return array						Returns an array of actions operation descriptions.
  */
 function getActionOperationDescriptions(array $actions, $type) {
 	$result = [];
@@ -561,7 +561,6 @@ function getActionOperationDescriptions(array $actions, $type) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$media_type = _('all media');
-
 						$media_typeid = $operation['opmessage']['mediatypeid'];
 
 						if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
@@ -704,6 +703,7 @@ function getActionOperationDescriptions(array $actions, $type) {
 
 						$result[$i][$j][] = [implode(', ', $template_list), BR()];
 						break;
+
 					case OPERATION_TYPE_HOST_INVENTORY:
 						$host_inventory_modes = getHostInventoryModes();
 						$result[$i][$j][] = bold(operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ');
@@ -720,7 +720,6 @@ function getActionOperationDescriptions(array $actions, $type) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
 						$media_type = _('all media');
-
 						$media_typeid = $operation['opmessage']['mediatypeid'];
 
 						if ($media_typeid != 0 && isset($media_types[$media_typeid])) {
@@ -820,23 +819,22 @@ function getActionOperationDescriptions(array $actions, $type) {
 /**
  * Gathers action operation script details and returns the HTML items representing action operation with hint.
  *
- * @param array  $operations								array of action operations
- * @param string $operation['operationtype']				action operation type.
+ * @param array  $operations								Array of action operations or recovery operations.
+ * @param string $operation['operationtype']				Action operation type.
  *															Possible values: OPERATION_TYPE_MESSAGE and OPERATION_TYPE_COMMAND
- * @param string $operation['opcommand']['type']			action operation command type.
+ * @param string $operation['opcommand']['type']			Action operation command type.
  *															Possible values: ZBX_SCRIPT_TYPE_IPMI, ZBX_SCRIPT_TYPE_SSH,
  *															ZBX_SCRIPT_TYPE_TELNET, ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
  *															and ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT
  * @param string $operation['opmessage']['default_msg']		'1' to show default message (optional)
- * @param array  $defaultMessage							array containing default subject and message set via action
- * @param string $defaultMessage['subject']					default subject
- * @param string $defaultMessage['message']					default message text
+ * @param array  $defaultMessage							Array containing default subject and message set via action.
+ * @param string $defaultMessage['subject']					Default subject.
+ * @param string $defaultMessage['message']					Default message text.
  *
- * @return array											returns an array of action operation hints
+ * @return array											Returns an array of action operation hints.
  */
 function getActionOperationHints(array $operations, array $defaultMessage) {
 	$result = [];
-
 	$scriptids = [];
 	$scripts = [];
 
