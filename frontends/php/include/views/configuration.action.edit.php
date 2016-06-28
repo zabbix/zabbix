@@ -1227,8 +1227,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 		switch ($data['new_recovery_operation']['operationtype']) {
 			case OPERATION_TYPE_MESSAGE:
-				if (!array_key_exists('opmessage', $data['new_recovery_operation'])
-						|| !array_key_exists('mediatypeid', $data['new_recovery_operation']['opmessage'])) {
+				if (!array_key_exists('opmessage', $data['new_recovery_operation'])) {
 					$data['new_recovery_operation']['opmessage_usr'] = [];
 					$data['new_recovery_operation']['opmessage'] = ['default_msg' => 1, 'mediatypeid' => 0];
 
@@ -1242,8 +1241,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					}
 				}
 
-				if (!isset($data['new_recovery_operation']['opmessage']['default_msg'])) {
+				if (!array_key_exists('default_msg', $data['new_recovery_operation']['opmessage'])) {
 					$data['new_recovery_operation']['opmessage']['default_msg'] = 0;
+				}
+
+				if (!array_key_exists('mediatypeid', $data['new_recovery_operation']['opmessage'])) {
+					$data['new_recovery_operation']['opmessage']['mediatypeid'] = 0;
 				}
 
 				$usrgrpList = (new CTable())
