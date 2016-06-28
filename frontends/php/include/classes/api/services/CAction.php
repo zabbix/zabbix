@@ -1455,7 +1455,9 @@ class CAction extends CApiService {
 
 			if (!array_key_exists($eventsource, $valid_operationtypes[$recovery])
 					|| !in_array($operationtype, $valid_operationtypes[$recovery][$eventsource])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation type.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect action operation type "%1$s" for event source "%2$s".', $operationtype, $eventsource)
+				);
 			}
 
 			switch ($operationtype) {
