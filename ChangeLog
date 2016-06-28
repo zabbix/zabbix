@@ -1437,6 +1437,8 @@ Changes for 2.2.14rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10866] fixed calendar time for cases when local time zone differs from servers time zone (Cemeris)
+..F....... [ZBX-10866] fixed starting value of time selector for events, graphs and screens (Cemeris)
 .......PS. [ZBX-10828] fixed server/proxy crashes when performing Simple checks with invalid key parameters hidden in user macro (viktors)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
