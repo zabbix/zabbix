@@ -111,6 +111,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$parser = new CItemDelayFlexParser($item['delay_flex']);
 		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $parser->getFlexibleIntervals());
+		$this->items[$this->num]['intervals'] = $parser->getIntervals();
 
 		if (strpos($item['units'], ',') === false) {
 			$this->items[$this->num]['unitsLong'] = '';
@@ -2646,26 +2647,35 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			// for each X
-			$draw = true;
 			$prevDraw = true;
 			for ($i = 1, $j = 0; $i < $maxX; $i++) { // new point
 				if ($data['count'][$i] == 0 && $i != ($maxX - 1)) {
 					continue;
 				}
 
-				$diff = abs($data['clock'][$i] - $data['clock'][$j]);
-				$cell = ($this->to_time - $this->from_time) / $this->sizeX;
 				$delay = $this->items[$item]['delay'];
 
-				if ($cell > $delay) {
-					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
-				}
-				else {
-					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
+				$has_scheduling = false;
+				foreach ($this->items[$item]['intervals'] as $interval) {
+					if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
+						$has_scheduling = true;
+						break;
+					}
 				}
 
-				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER) {
+				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER || ($has_scheduling && $delay == 0)) {
 					$draw = true;
+				}
+				else {
+					$diff = abs($data['clock'][$i] - $data['clock'][$j]);
+					$cell = ($this->to_time - $this->from_time) / $this->sizeX;
+
+					if ($cell > $delay) {
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_CELL * $cell));
+					}
+					else {
+						$draw = ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
+					}
 				}
 
 				if (!$draw && !$prevDraw) {

@@ -64,7 +64,7 @@ $filterColumn2->addRow(null, [
 ]);
 
 $filterColumn1->addRow(
-	'Host groups',
+	_('Host groups'),
 	(new CMultiSelect([
 		'name' => 'groupids[]',
 		'objectName' => 'hostGroup',
@@ -77,7 +77,7 @@ $filterColumn1->addRow(
 );
 
 $filterColumn1->addRow(
-	'Hosts',
+	_('Hosts'),
 	(new CMultiSelect([
 		'name' => 'hostids[]',
 		'objectName' => 'hosts',

@@ -261,7 +261,7 @@ double	zbx_current_time(void)
  ******************************************************************************/
 static int	is_leap_year(int year)
 {
-	return (0 == year % 4 && 0 != year % 100) || 0 == year % 400 ? SUCCEED : FAIL;
+	return 0 == year % 4 && (0 != year % 100 || 0 == year % 400) ? SUCCEED : FAIL;
 }
 
 /******************************************************************************
@@ -306,7 +306,7 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 #	define ZBX_UTC_OFF	tm->tm_gmtoff
 #else
 #	define ZBX_UTC_OFF	offset
-		int		offset;
+		long		offset;
 		struct tm	tm_utc;
 #ifdef _WINDOWS
 		tm_utc = *gmtime(&current_time.time);	/* gmtime() cannot return NULL if called with valid parameter */
@@ -323,9 +323,8 @@ void	zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz)
 			offset -= (SUCCEED == is_leap_year(--tm_utc.tm_year) ? SEC_PER_YEAR + SEC_PER_DAY : SEC_PER_YEAR);
 #endif
 		tz->tz_sign = (0 <= ZBX_UTC_OFF ? '+' : '-');
-		ZBX_UTC_OFF = abs(ZBX_UTC_OFF);
-		tz->tz_hour = ZBX_UTC_OFF / SEC_PER_HOUR;
-		tz->tz_min = (ZBX_UTC_OFF - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
+		tz->tz_hour = labs(ZBX_UTC_OFF) / SEC_PER_HOUR;
+		tz->tz_min = (labs(ZBX_UTC_OFF) - tz->tz_hour * SEC_PER_HOUR) / SEC_PER_MIN;
 		/* assuming no remaining seconds like in historic Asia/Riyadh87, Asia/Riyadh88 and Asia/Riyadh89 */
 #undef ZBX_UTC_OFF
 	}
@@ -359,7 +358,7 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
 	static const int	month_day[12] = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 	static const int	epoch_year = 1970;
 
-	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon - 1) &&
+	if (epoch_year <= year && 1 <= mon && mon <= 12 && 1 <= mday && mday <= zbx_day_in_month(year, mon) &&
 			0 <= hour && hour <= 23 && 0 <= min && min <= 59 && 0 <= sec && sec <= 61 &&
 			0 <= (*t = (year - epoch_year) * SEC_PER_YEAR +
 			(ZBX_LEAP_YEARS(2 < mon ? year + 1 : year) - ZBX_LEAP_YEARS(epoch_year)) * SEC_PER_DAY +
@@ -378,24 +377,25 @@ int	zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t
  *                                                                            *
  * Purpose: returns number of days in a month                                 *
  *                                                                            *
- * Parameters: year - year, month - month (0-11)                              *
+ * Parameters:                                                                *
+ *     year  - [IN] year                                                      *
+ *     mon   - [IN] month (1-12)                                              *
  *                                                                            *
- * Return value: 28-31 depending on number of days in the month               *
+ * Return value: 28-31 depending on number of days in the month, defaults to  *
+ *               30 if the month is outside of allowed range                  *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
- *                                                                            *
- * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_day_in_month(int year, int mon)
 {
-	unsigned char month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-	unsigned char month_leap[12] = { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	/* number of days in the month of a non-leap year */
+	static const unsigned char	month[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-	if (SUCCEED == is_leap_year(year))
-		return month_leap[mon];
-	else
-		return month[mon];
+	if (1 <= mon && mon <= 12)	/* add one day in February of a leap year */
+		return month[mon - 1] + (2 == mon && SUCCEED == is_leap_year(year) ? 1 : 0);
+
+	return 30;
 }
 
 /******************************************************************************
