@@ -62,5 +62,6 @@ $autoloader = new CAutoloader([
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',
 	__DIR__.'/include/classes/import/converters',
+	__DIR__.'/../../include/classes/json'
 ]);
 $autoloader->register();
