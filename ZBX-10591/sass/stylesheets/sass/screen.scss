@@ -112,8 +112,6 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	//border-bottom: 1px solid $ui-border-color;
-	//padding: 0 0 6px 0;
 }
 
 h2 {
@@ -482,7 +480,7 @@ ul.top-nav-icons {
 }
 
 .header-title {
-  position: relative;
+	position: relative;
 	width: 100%;
 	padding: 0 0 6px 0;
 	margin: 0 0 10px 0;
@@ -517,7 +515,7 @@ article {
 	@extend article;
 }
 
-// Obgect Group Navigation
+// Object Group Navigation
 .object-group {
 	margin: 0 0 10px 0;
 
