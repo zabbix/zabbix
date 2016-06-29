@@ -25,11 +25,11 @@
 class CScreenHttpTest extends CScreenBase {
 
 	/**
-	 * Data.
+	 * Screen data.
 	 *
 	 * @var array
 	 */
-	public $data;
+	protected $data = [];
 
 	/**
 	 * Init screen data.
@@ -40,7 +40,7 @@ class CScreenHttpTest extends CScreenBase {
 	public function __construct(array $options = []) {
 		parent::__construct($options);
 
-		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
+		$this->data = $options['data'];
 	}
 
 	/**
@@ -70,10 +70,10 @@ class CScreenHttpTest extends CScreenBase {
 			];
 
 			if ($this->hostid != 0) {
-				$options['hostids'] = $this->hostid;
+				$options['hostids'] = [$this->hostid];
 			}
 			elseif ($this->groupid != 0) {
-				$options['groupids'] = $this->groupid;
+				$options['groupids'] = [$this->groupid];
 			}
 
 			$httptests = API::HttpTest()->get($options);
@@ -97,7 +97,7 @@ class CScreenHttpTest extends CScreenBase {
 			$httptests = resolveHttpTestMacros($httptests, true, false);
 			order_result($httptests, $sort_field, $sort_order);
 
-			// fetch the latest results of the web scenario
+			// Fetch the latest results of the web scenario.
 			$last_httptest_data = Manager::HttpTest()->getLastData(array_keys($httptests));
 
 			foreach ($httptests as &$httptest) {
@@ -128,7 +128,7 @@ class CScreenHttpTest extends CScreenBase {
 
 				if ($httptest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
 					$hostname = (new CSpan($hostname))->addClass(ZBX_STYLE_RED);
-				};
+				}
 			}
 			else {
 				$hostname = null;
@@ -142,9 +142,8 @@ class CScreenHttpTest extends CScreenBase {
 					$error = ($httptest['error'] === null) ? _('Unknown error') : $httptest['error'];
 
 					if ($httpstep) {
-						$status = new CSpan(_s(
-							'Step "%1$s" [%2$s of %3$s] failed: %4$s',
-							$httpstep['name'], $httptest['lastfailedstep'], $httptest['steps'], $error
+						$status = new CSpan(_s('Step "%1$s" [%2$s of %3$s] failed: %4$s', $httpstep['name'],
+							$httptest['lastfailedstep'], $httptest['steps'], $error
 						));
 					}
 					else {

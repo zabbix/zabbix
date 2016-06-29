@@ -563,7 +563,7 @@ define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
 // used in Monitoring > Discovery
 define('SCREEN_RESOURCE_DISCOVERY',			22);
 // used in Monitoring > Web
-define('SCREEN_RESOURCE_HTTPTEST',	23);
+define('SCREEN_RESOURCE_HTTPTEST',			23);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
