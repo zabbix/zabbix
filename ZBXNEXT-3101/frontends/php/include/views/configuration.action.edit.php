@@ -362,8 +362,7 @@ $action_tab->addRow(_('New condition'),
 );
 
 $action_tab->addRow(_('Enabled'),
-	(new CCheckBox('status', ACTION_STATUS_ENABLED))
-		->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED)
+	(new CCheckBox('status', ACTION_STATUS_ENABLED))->setChecked($data['action']['status'] == ACTION_STATUS_ENABLED)
 );
 
 // Operations tab.
@@ -374,8 +373,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 		(new CNumericBox('esc_period', $data['action']['esc_period'], 6))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		' ('._('minimum 60 seconds').')'
-		]
-	);
+	]);
 }
 
 $operation_tab
@@ -1039,8 +1037,7 @@ if (!empty($data['new_operation'])) {
 
 	// Append new operation condition to form list.
 	if (hasRequest('new_opcondition')) {
-		$newOperationConditionTable = (new CTable())
-			->setAttribute('style', 'width: 100%;');
+		$newOperationConditionTable = (new CTable())->setAttribute('style', 'width: 100%;');
 
 		$allowedOpConditions = get_opconditions_by_eventsource($data['eventsource']);
 
@@ -1364,14 +1361,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->addRow(_('Subject'),
 						(new CTextBox('new_recovery_operation[opmessage][subject]',
 							$data['new_recovery_operation']['opmessage']['subject']
-						))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					)
 					->addRow(_('Message'),
 						(new CTextArea('new_recovery_operation[opmessage][message]',
 							$data['new_recovery_operation']['opmessage']['message']
-						))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					);
 				break;
 
@@ -1521,8 +1516,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					),
 					(new CTextBox('new_recovery_operation[opcommand][script]',
 						$data['new_recovery_operation']['opcommand']['script'], true
-					))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CButton('select_recovery_operation_opcommand_script', _('Select')))
 						->addClass(ZBX_STYLE_BTN_GREY)
@@ -1553,26 +1547,22 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$new_operation_formlist->addRow(_('User name'),
 					(new CTextBox('new_recovery_operation[opcommand][username]',
 						$data['new_recovery_operation']['opcommand']['username']
-					))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Public key file'),
 					(new CTextBox('new_recovery_operation[opcommand][publickey]',
 						$data['new_recovery_operation']['opcommand']['publickey']
-					))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Private key file'),
 					(new CTextBox('new_recovery_operation[opcommand][privatekey]',
 						$data['new_recovery_operation']['opcommand']['privatekey']
-					))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Password'),
 					(new CTextBox('new_recovery_operation[opcommand][password]',
 						$data['new_recovery_operation']['opcommand']['password']
-					))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 
 				// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
@@ -1587,16 +1577,14 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				$new_operation_formlist->addRow(_('Port'),
 					(new CTextBox('new_recovery_operation[opcommand][port]',
 						$data['new_recovery_operation']['opcommand']['port']
-					))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 
 				// command
 				$new_operation_formlist->addRow(_('Commands'),
 					(new CTextArea('new_recovery_operation[opcommand][command]',
 						$data['new_recovery_operation']['opcommand']['command']
-					))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				);
 				$new_operation_formlist->addRow(_('Commands'),
 					(new CTextBox('new_recovery_operation[opcommand][command]',
@@ -1634,14 +1622,12 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					->addRow(_('Subject'),
 						(new CTextBox('new_recovery_operation[opmessage][subject]',
 								$data['new_recovery_operation']['opmessage']['subject']
-						))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					)
 					->addRow(_('Message'),
 						(new CTextArea('new_recovery_operation[opmessage][message]',
 							$data['new_recovery_operation']['opmessage']['message']
-						))
-							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					);
 				break;
 		}
