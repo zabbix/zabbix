@@ -19,60 +19,41 @@
 **/
 
 
-class CJsonRpcTest extends PHPUnit_Framework_TestCase {
+require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
+require_once dirname(__FILE__).'/../../include/classes/json/CJson.php';
 
-	/**
-	 * API client.
-	 *
-	 * @var CApiClient
-	 */
-	protected static $client;
-
-	/**
-	 * CJson object.
-	 *
-	 * @var CJson
-	 */
-	protected static $json;
+class CJsonRpcTest extends CZabbixTest {
 
 	/**
 	 * User authentication token.
 	 *
 	 * @var string
 	 */
-	protected static $auth;
+	protected $auth;
 
 	/**
-	 * Set up static values before testing CJsonRpc.
+	 * Authenticate and set user authentication token.
 	 */
-	public static function setUpBeforeClass() {
-		self::$json = new CJson();
+	public function setUp() {
+		parent::setUp();
 
-		Z::getInstance()->run(ZBase::EXEC_MODE_API);
-		self::$client = API::getWrapper()->getClient();
+		$data = [
+			'jsonrpc' => '2.0',
+			'method' => 'user.login',
+			'params' => ['user' => 'Admin', 'password' => 'zabbix'],
+			'id' => '0'
+		];
 
-		self::$auth = self::$json->decode(
-			(new CJsonRpc(
-				self::$client,
-				'{"jsonrpc": "2.0", "method": "user.login","params": {"user": "Admin", "password": "zabbix"}, "id": 0}'
-			))->execute()
-		)->result;
+		$debug = null;
+
+		$this->auth = (new CJson)->decode(
+			$this->do_post_request($data, $debug),
+			true
+		)['result'];
 	}
 
 	/**
-	 * Logout user when all tests are finished.
-	 */
-	public static function tearDownAfterClass() {
-		Z::getInstance()->run(ZBase::EXEC_MODE_API);
-
-		(new CJsonRpc(
-			self::$client,
-			'{"jsonrpc": "2.0", "method": "user.logout", "params": [], "id": 0, "auth": "'.self::$auth.'"}'
-		))->execute();
-	}
-
-	/**
-	 * Provides valid requests for CJSonRpc()->execute() method.
+	 * Provides valid requests for JSON RPC.
 	 */
 	public function validRequestProvider() {
 		return [
@@ -82,7 +63,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test CJsonRpc()->execute() with valid request.
+	 * Test JSON RPC with valid request.
 	 *
 	 * @dataProvider validRequestProvider
 	 *
@@ -91,19 +72,18 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	 * @param string $id
 	 */
 	public function testValidRequest($method, $params, $id) {
-		DBConnect();
-
-		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.self::$auth.'", "params": '.$params.', "id": '.
+		$data = '{"jsonrpc": "2.0", "method": "'.$method.'", "auth": "'.$this->auth.'", "params": '.$params.', "id": '.
 			$id.'}';
 
-		$response = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
+		$debug = null;
+		$response = $this->api_call_raw($data, $debug);
 
 		$this->assertInternalType('array', $response);
 		$this->assertArrayHasKey('result', $response);
 	}
 
 	/**
-	 * Provides valid requests in batch for CJSonRpc()->execute() method.
+	 * Provides valid requests in batch for JSON RPC.
 	 */
 	public function validRequestsBatchProvider() {
 		return [
@@ -118,21 +98,19 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test CJsonRpc()->execute() with batch of valid requests.
+	 * Test JSON RPC with batch of valid requests.
 	 *
 	 * @dataProvider validRequestsBatchProvider
 	 *
 	 * @param array $batch
 	 */
 	public function testValidRequestsBatch($batch) {
-		DBConnect();
-
 		$length = count($batch);
 		$i = 1;
 
 		$data = '[';
 		foreach ($batch as $attrs) {
-			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.self::$auth.'", "params": '.
+			$data .= '{"jsonrpc": "2.0", "method": "'.$attrs['method'].'", "auth": "'.$this->auth.'", "params": '.
 				$attrs['params'].', "id": '.$attrs['id'].'}';
 
 			if ($i < $length) {
@@ -143,7 +121,8 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 		}
 		$data .= ']';
 
-		$response_array = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
+		$debug = null;
+		$response_array = $this->api_call_raw($data, $debug);
 
 		$this->assertInternalType('array', $response_array);
 		$this->assertEquals($length, count($response_array));
@@ -155,7 +134,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Provides invalid requests for CJSonRpc()->execute() method.
+	 * Provides invalid requests for JSON RPC.
 	 */
 	public function invalidRequestProvider() {
 		return [
@@ -168,14 +147,14 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 		];
 	}
 	/**
-	 * Test CJsonRpc()->execute() with invalid request.
+	 * Test JSON RPC with invalid request.
 	 *
 	 * @dataProvider invalidRequestProvider
 	 *
 	 * @param string $data
 	 */
 	public function testInvalidRequest($data) {
-		$response = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
+		$response = $this->api_call_raw($data, $debug);
 
 		$this->assertArrayHasKey('error', $response);
 		$this->assertArrayHasKey('code', $response['error']);
@@ -183,7 +162,7 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Provides invalid requests in batch for CJSonRpc()->execute() method.
+	 * Provides invalid requests in batch for JSON RPC.
 	 */
 	public function invalidRequestsBatchProvider() {
 		return [
@@ -194,14 +173,14 @@ class CJsonRpcTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Test CJsonRpc()->execute() with batch of invalid requests.
+	 * Test JSON RPC with batch of invalid requests.
 	 *
 	 * @dataProvider invalidRequestsBatchProvider
 	 *
 	 * @param string $data
 	 */
 	public function testInvalidRequestsBatch($data) {
-		$response_array = self::$json->decode((new CJsonRpc(self::$client, $data))->execute(), true);
+		$response_array = $this->api_call_raw($data, $debug);
 
 		$this->assertInternalType('array', $response_array);
 		$this->assertNotEmpty($response_array);
