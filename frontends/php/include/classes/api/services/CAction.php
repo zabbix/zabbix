@@ -2034,7 +2034,7 @@ class CAction extends CApiService {
 			if ($this->outputIsRequested('opconditions', $options['selectRecoveryOperations'])) {
 				foreach ($recovery_operations as &$recovery_operation) {
 					unset($recovery_operation['esc_period'], $recovery_operation['esc_step_from'],
-						$recovery_operation['esc_periesc_step_to']
+						$recovery_operation['esc_step_to']
 					);
 
 					$recovery_operation['opconditions'] = [];
