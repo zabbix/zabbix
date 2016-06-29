@@ -510,28 +510,8 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 			/*            5 - Trigger in "normal" state                              */
 			if (1 == value || 3 == value || 5 == value)
 			{
-				if (ZBX_3010024_ACTION_NOTHING == ret)
-				{
-					ret = ZBX_3010024_ACTION_DISABLE;
-					break;
-
-				}
-				ret = ZBX_3010024_ACTION_CONVERT;
-			}
-
-			/* event types:                                                          */
-			/*            0 - Event type:  Item in "not supported" state             */
-			/*            2 - Low-level discovery rule in "not supported" state      */
-			/*            4 - Trigger in "unknown" state                             */
-			if (0 == value || 2 == value || 4 == value)
-			{
-				if (ZBX_3010024_ACTION_CONVERT == ret)
-				{
-					ret = ZBX_3010024_ACTION_DISABLE;
-					break;
-
-				}
-				ret = ZBX_3010024_ACTION_NOTHING;
+				ret = ZBX_3010024_ACTION_DISABLE;
+				break;
 			}
 		}
 	}
