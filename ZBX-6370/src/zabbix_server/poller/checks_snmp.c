@@ -977,11 +977,6 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
 #undef ZBX_OIDS_MAX_NUM
 }
 
-static void	zbx_detect_loop_free(zbx_hashset_t *hs)
-{
-	zbx_hashset_destroy(hs);
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_snmp_walk                                                    *
@@ -1235,7 +1230,7 @@ next:
 	}
 
 	if (0 == check_oid_increase)
-		zbx_detect_loop_free(&oids_seen);
+		zbx_hashset_destroy(&oids_seen);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
