@@ -654,13 +654,13 @@ if (!empty($data['new_operation'])) {
 			}
 			unset($user);
 
-			$jsInsert = 'addPopupValues('.
+			$js_insert = 'addPopupValues('.
 				zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps, 'parentId' => 'opmsgUsrgrpListFooter']).
 			');';
-			$jsInsert .= 'addPopupValues('.
+			$js_insert .= 'addPopupValues('.
 				zbx_jsvalue(['object' => 'userid', 'values' => $users, 'parentId' => 'opmsgUserListFooter']).
 			');';
-			zbx_add_post_js($jsInsert);
+			zbx_add_post_js($js_insert);
 
 			$new_operation_formlist
 				->addRow(_('Send to User groups'),
@@ -773,9 +773,22 @@ if (!empty($data['new_operation'])) {
 			order_result($data['new_operation']['opcommand_grp'], 'name');
 
 			// js add commands
-			$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'hostid', 'values' => $data['new_operation']['opcommand_hst']]).');';
-			$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'groupid', 'values' => $data['new_operation']['opcommand_grp']]).');';
-			zbx_add_post_js($jsInsert);
+			$host_values = zbx_jsvalue([
+				'object' => 'hostid',
+				'values' => $data['new_operation']['opcommand_hst'],
+				'parentId' => 'opCmdListFooter'
+			]);
+
+			$js_insert = 'addPopupValues('.$host_values.');';
+
+			$group_values = zbx_jsvalue([
+				'object' => 'groupid',
+				'values' => $data['new_operation']['opcommand_grp'],
+				'parentId' => 'opCmdListFooter'
+			]);
+
+			$js_insert .= 'addPopupValues('.$group_values.');';
+			zbx_add_post_js($js_insert);
 
 			// target list
 			$new_operation_formlist->addRow(_('Target list'),
@@ -1310,13 +1323,13 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				}
 				unset($user);
 
-				$jsInsert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
+				$js_insert = 'addPopupValues('.zbx_jsvalue(['object' => 'usrgrpid', 'values' => $usrgrps,
 					'parentId' => 'recOpmsgUsrgrpListFooter']).
 				');';
-				$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
+				$js_insert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users,
 					'parentId' => 'recOpmsgUserListFooter']).
 				');';
-				zbx_add_post_js($jsInsert);
+				zbx_add_post_js($js_insert);
 
 				$new_operation_formlist
 					->addRow(_('Send to User groups'),
@@ -1454,13 +1467,16 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 				// js add commands
 				$host_values = zbx_jsvalue([
 					'object' => 'hostid',
-					'values' => $data['new_recovery_operation']['opcommand_hst']
+					'values' => $data['new_recovery_operation']['opcommand_hst'],
+					'parentId' => 'recOpCmdListFooter'
 				]);
 
 				$js_insert = 'addPopupValues('.$host_values.');';
+
 				$group_values = zbx_jsvalue([
 					'object' => 'groupid',
-					'values' => $data['new_recovery_operation']['opcommand_grp']
+					'values' => $data['new_recovery_operation']['opcommand_grp'],
+					'parentId' => 'recOpCmdListFooter'
 				]);
 
 				$js_insert .= 'addPopupValues('.$group_values.');';

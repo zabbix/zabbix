@@ -38,7 +38,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
-<tr id="{row}#{hostid}">
+<tr id="#{row}#{hostid}">
 	<td>
 		<input name="#{field}[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
 		<input name="#{field}[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
@@ -46,7 +46,7 @@
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('{row}#{hostid}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{hostid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -176,7 +176,7 @@
 					break;
 
 				case 'hostid':
-					if (list.parentId == 'opmsgUsrgrpListFooter') {
+					if (list.parentId == 'opmsgUsrgrpListFooter' || list.parentId == 'opCmdListFooter') {
 						value.field = 'new_operation';
 						value.row = 'opCmdHostRow_';
 					}
@@ -264,16 +264,26 @@
 		jQuery('#opcmdEditForm')
 			.find('#pCmdTargetSelect')
 			.toggle(objectTPL.target != 'current').end()
-			.find('button[name="save"]').click(saveOpCmdForm).end()
+			.find('button[name="save"]').click(function() {
+				saveOpCmdForm(type)
+			}).end()
 			.find('button[name="cancel"]').click(closeOpCmdForm).end()
 			.find('select[name="opCmdTarget"]').val(objectTPL.target).change(changeOpCmdTarget);
 	}
 
-	function saveOpCmdForm() {
+	function saveOpCmdForm(type) {
 		var objectForm = jQuery('#opcmdEditForm'),
-			object = {};
+			object = {},
+			parentId;
 
 		object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
+
+		if (type == <?= ACTION_OPERATION ?>) {
+			parentId = 'opCmdListFooter';
+		}
+		else {
+			parentId = 'recOpCmdListFooter';
+		}
 
 		// host group
 		if (object.target == 'hostGroup') {
@@ -301,7 +311,8 @@
 								opcommand_grpid: object.opcommand_grpid,
 								groupid: data.id,
 								name: data.name
-							}]
+							}],
+							parentId: parentId
 						});
 					}
 				}
@@ -334,7 +345,8 @@
 								opcommand_hstid: object.opcommand_hstid,
 								hostid: data.id,
 								name: data.name
-							}]
+							}],
+							parentId: parentId
 						});
 					}
 				}
@@ -347,12 +359,21 @@
 			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 			object.hostid = 0;
 			object.name = '';
+			object.parentId = parentId;
 
 			if (object.opcommand_hstid == 'new') {
 				delete(object['opcommand_hstid']);
 			}
 
-			addPopupValues({object: object.object, values: [object]});
+			addPopupValues({
+				object: 'hostid',
+				values: [{
+					opcommand_hstid: jQuery(objectForm).find('input[name="opCmdId"]').val(),
+					hostid: 0,
+					name: ''
+				}],
+				parentId: parentId
+			});
 		}
 
 		closeOpCmdForm();
