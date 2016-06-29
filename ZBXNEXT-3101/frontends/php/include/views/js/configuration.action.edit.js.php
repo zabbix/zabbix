@@ -156,7 +156,7 @@
 					break;
 
 				case 'groupid':
-					if (list.parentId == 'opmsgUsrgrpListFooter') {
+					if (list.parentId == 'opCmdListFooter') {
 						value.field = 'new_operation';
 						value.row = 'opCmdGroupRow_';
 					}
@@ -176,7 +176,7 @@
 					break;
 
 				case 'hostid':
-					if (list.parentId == 'opmsgUsrgrpListFooter' || list.parentId == 'opCmdListFooter') {
+					if (list.parentId == 'opCmdListFooter') {
 						value.field = 'new_operation';
 						value.row = 'opCmdHostRow_';
 					}
@@ -323,17 +323,12 @@
 		else if (object.target == 'host') {
 			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
-			object.opcommand_hostid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-
 			if (object.target != 'current' && empty(values)) {
 				alert(<?= CJs::encodeJson(_('You did not specify host for operation.')) ?>);
 
 				return true;
 			}
 			else {
-				if (object.opcommand_hostid == 'new') {
-					object['opcommand_grpid'] = null;
-				}
 				for (var key in values) {
 					var data = values[key];
 
@@ -342,7 +337,6 @@
 							object: 'hostid',
 							values: [{
 								target: object.target,
-								opcommand_hostid: object.opcommand_hostid,
 								hostid: data.id,
 								name: data.name
 							}],
@@ -355,19 +349,12 @@
 
 		// current
 		else {
-			var values = [{
-				opcommand_hostid: jQuery(objectForm).find('input[name="opCmdId"]').val(),
-				hostid: 0,
-				name: ''
-			}];
-
-			if (values.opcommand_hostid == 'new') {
-				delete(object['opcommand_hostid']);
-			}
-
 			addPopupValues({
 				object: 'hostid',
-				values: values,
+				values: [{
+					hostid: 0,
+					name: ''
+				}],
 				parentId: parentId
 			});
 		}
