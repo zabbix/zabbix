@@ -605,8 +605,16 @@
 		showOpTypeForm(<?= ACTION_OPERATION ?>);
 		showOpTypeForm(<?= ACTION_RECOVERY_OPERATION ?>);
 
-		jQuery('#select_opcommand_script').click(function() {
-			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script');
+		jQuery('#select_operation_opcommand_script').click(function() {
+			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
+				+ '&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script'
+			);
+		});
+
+		jQuery('#select_recovery_operation_opcommand_script').click(function() {
+			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
+				+ '&dstfld1=new_recovery_operation_opcommand_scriptid&dstfld2=new_recovery_operation_opcommand_script'
+			);
 		});
 
 		processTypeOfCalculation();
