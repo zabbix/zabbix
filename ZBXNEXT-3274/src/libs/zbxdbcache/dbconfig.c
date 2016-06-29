@@ -86,6 +86,7 @@ typedef struct
 	const char		*recovery_expression_ex;
 
 	const char		*error;
+	const char		*correlation_tag;
 	int			lastchange;
 	unsigned char		topoindex;
 	unsigned char		priority;
@@ -94,8 +95,9 @@ typedef struct
 	unsigned char		state;
 	unsigned char		locked;
 	unsigned char		status;
-	unsigned char		functional;	/* see TRIGGER_FUNCTIONAL_* defines */
-	unsigned char		recovery_mode;	/* TRIGGER_RECOVERY_MODE_* defines  */
+	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines */
+	unsigned char		recovery_mode;		/* TRIGGER_RECOVERY_MODE_* defines  */
+	unsigned char		correlation_mode;	/* ZBX_TRIGGER_CORRELATION_NONE_* defines */
 
 	zbx_vector_ptr_t	tags;
 }
@@ -659,6 +661,7 @@ static unsigned char	poller_by_item(zbx_uint64_t proxy_hostid, unsigned char typ
 
 				return ZBX_POLLER_TYPE_PINGER;
 			}
+			/* break; is not missing here */
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMPv1:
 		case ITEM_TYPE_SNMPv2c:
@@ -3042,10 +3045,12 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		DCstrpool_replace(found, &trigger->description, row[1]);
 		DCstrpool_replace(found, &trigger->expression, row[2]);
 		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
+		DCstrpool_replace(found, &trigger->correlation_tag, row[12]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
 		ZBX_STR2UCHAR(trigger->recovery_mode, row[10]);
+		ZBX_STR2UCHAR(trigger->correlation_mode, row[12]);
 
 		if (0 == found)
 		{
@@ -3108,6 +3113,7 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		zbx_strpool_release(trigger->description);
 		zbx_strpool_release(trigger->expression);
 		zbx_strpool_release(trigger->error);
+		zbx_strpool_release(trigger->correlation_tag);
 
 		if (NULL != trigger->expression_ex)
 			zbx_strpool_release(trigger->expression_ex);
@@ -3914,7 +3920,8 @@ void	DCsync_configuration(void)
 	sec = zbx_time();
 	if (NULL == (trig_result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
-				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression"
+				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
+				"t.correlation_mode,t.correlation_tag"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -5328,6 +5335,8 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->topoindex = src_trigger->topoindex;
 	dst_trigger->status = src_trigger->status;
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
+	dst_trigger->correlation_mode = src_trigger->correlation_mode;
+	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
 
 	dst_trigger->expression = NULL;
 	dst_trigger->recovery_expression = NULL;
@@ -5382,6 +5391,7 @@ static void	DCclean_trigger(DC_TRIGGER *trigger)
 	zbx_free(trigger->expression);
 	zbx_free(trigger->recovery_expression);
 	zbx_free(trigger->description);
+	zbx_free(trigger->correlation_tag);
 
 	zbx_vector_ptr_clear_ext(&trigger->tags, (zbx_clean_func_t)zbx_free_tag);
 	zbx_vector_ptr_destroy(&trigger->tags);

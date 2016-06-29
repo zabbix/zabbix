@@ -265,9 +265,11 @@ typedef struct
 	char		*recovery_expression;
 	char		*url;
 	char		*comments;
+	char		*correlation_tag;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	recovery_mode;
+	unsigned char	correlation_mode;
 }
 DB_TRIGGER;
 
