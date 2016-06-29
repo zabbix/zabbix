@@ -43,7 +43,7 @@ class testFormAdministrationGeneralOtherParams extends CWebTest {
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($allValues) {
 
 		$this->zbxTestLogin('adm.other.php');
-		$this->zbxTestDrowpdownAssertSelected('configDropDown', 'Other');
+		$this->zbxTestDropdownAssertSelected('configDropDown', 'Other');
 		$this->zbxTestCheckTitle('Other configuration parameters');
 		$this->zbxTestCheckHeader('Other configuration parameters');
 		$this->zbxTestAssertElementValue('refresh_unsupported', $allValues['refresh_unsupported']);

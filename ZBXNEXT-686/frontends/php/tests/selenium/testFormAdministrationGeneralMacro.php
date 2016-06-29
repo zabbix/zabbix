@@ -44,7 +44,7 @@ class testFormAdministrationGeneralMacro extends CWebTest {
 
 	private function openGlobalMacros() {
 		$this->zbxTestLogin('adm.macros.php');
-		$this->zbxTestDrowpdownAssertSelected('configDropDown', 'Macros');
+		$this->zbxTestDropdownAssertSelected('configDropDown', 'Macros');
 
 		$this->zbxTestCheckTitle('Configuration of macros');
 		$this->zbxTestCheckHeader('Macros');

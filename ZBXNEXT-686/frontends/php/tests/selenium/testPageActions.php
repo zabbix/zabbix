@@ -172,7 +172,7 @@ class testPageActions extends CWebTest {
 			EVENT_SOURCE_INTERNAL => 'Internal'
 		];
 
-		$this->zbxTestDrowpdownAssertSelected('eventsource', $eventsources[$eventsource]);
+		$this->zbxTestDropdownAssertSelected('eventsource', $eventsources[$eventsource]);
 		$this->zbxTestDropdownHasOptions('eventsource', $eventsources);
 
 		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);

@@ -35,7 +35,7 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestCheckHeader('Screens');
 		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent(sprintf('Displaying %1$s of %1$s found', count($screens)));
-		$this->zbxTestDrowpdownAssertSelected('config', 'Screens');
+		$this->zbxTestDropdownAssertSelected('config', 'Screens');
 
 		$this->zbxTestTextPresent(['Name', 'Dimension (cols x rows)', 'Actions']);
 

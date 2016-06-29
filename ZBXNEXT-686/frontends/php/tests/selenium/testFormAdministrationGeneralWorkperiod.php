@@ -49,8 +49,7 @@ class testFormAdministrationGeneralWorkperiod extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of working time');
 		$this->zbxTestCheckHeader('Working time');
 		$this->zbxTestAssertElementPresentId('configDropDown');
-		$this->zbxTestDrowpdownAssertSelected('configDropDown', 'Working time');
-
+		$this->zbxTestDropdownAssertSelected('configDropDown', 'Working time');
 
 		$sqlHash = 'SELECT configid,refresh_unsupported,alert_usrgrpid,'.
 				'event_ack_enable,event_expire,event_show_max,default_theme,authentication_type,'.

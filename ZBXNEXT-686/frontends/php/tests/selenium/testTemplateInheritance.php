@@ -281,7 +281,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementValue('name', 'Test LLD graph1');
 		$this->zbxTestAssertElementValue('width', '950');
 		$this->zbxTestAssertElementValue('height', '250');
-		$this->zbxTestDrowpdownAssertSelected('graphtype', 'Normal');
+		$this->zbxTestDropdownAssertSelected('graphtype', 'Normal');
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
@@ -289,8 +289,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementValue('percent_left', '4.00');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
 		$this->zbxTestAssertElementValue('percent_right', '5.00');
-		$this->zbxTestDrowpdownAssertSelected('ymin_type', 'Calculated');
-		$this->zbxTestDrowpdownAssertSelected('ymax_type', 'Calculated');
+		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
+		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent('Parent graphs');
 		$this->zbxTestTextPresent($this->hostName.': Test LLD item1');
 	}
@@ -513,7 +513,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementValue('name', 'Test LLD graph');
 		$this->zbxTestAssertElementValue('width', '950');
 		$this->zbxTestAssertElementValue('height', '250');
-		$this->zbxTestDrowpdownAssertSelected('graphtype', 'Normal');
+		$this->zbxTestDropdownAssertSelected('graphtype', 'Normal');
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_legend'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_work_period'));
 		$this->assertFalse($this->zbxTestCheckboxSelected('show_triggers'));
@@ -521,8 +521,8 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestAssertElementValue('percent_left', '4.00');
 		$this->assertTrue($this->zbxTestCheckboxSelected('visible_percent_right'));
 		$this->zbxTestAssertElementValue('percent_right', '5.00');
-		$this->zbxTestDrowpdownAssertSelected('ymin_type', 'Calculated');
-		$this->zbxTestDrowpdownAssertSelected('ymax_type', 'Calculated');
+		$this->zbxTestDropdownAssertSelected('ymin_type', 'Calculated');
+		$this->zbxTestDropdownAssertSelected('ymax_type', 'Calculated');
 		$this->zbxTestTextPresent($this->hostName.': Test LLD item');
 		$this->zbxTestTextPresent($this->hostName.': Test LLD item1');
 		$this->zbxTestTextPresent('Parent graphs');
