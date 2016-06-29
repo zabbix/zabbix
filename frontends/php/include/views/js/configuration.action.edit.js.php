@@ -323,7 +323,7 @@
 		else if (object.target == 'host') {
 			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
-			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
+			object.opcommand_hostid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
 			if (object.target != 'current' && empty(values)) {
 				alert(<?= CJs::encodeJson(_('You did not specify host for operation.')) ?>);
@@ -331,7 +331,7 @@
 				return true;
 			}
 			else {
-				if (object.opcommand_hstid == 'new') {
+				if (object.opcommand_hostid == 'new') {
 					object['opcommand_grpid'] = null;
 				}
 				for (var key in values) {
@@ -342,7 +342,7 @@
 							object: 'hostid',
 							values: [{
 								target: object.target,
-								opcommand_hstid: object.opcommand_hstid,
+								opcommand_hostid: object.opcommand_hostid,
 								hostid: data.id,
 								name: data.name
 							}],
@@ -355,23 +355,19 @@
 
 		// current
 		else {
-			object.object = 'hostid';
-			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-			object.hostid = 0;
-			object.name = '';
-			object.parentId = parentId;
+			var values = [{
+				opcommand_hostid: jQuery(objectForm).find('input[name="opCmdId"]').val(),
+				hostid: 0,
+				name: ''
+			}];
 
-			if (object.opcommand_hstid == 'new') {
-				delete(object['opcommand_hstid']);
+			if (values.opcommand_hostid == 'new') {
+				delete(object['opcommand_hostid']);
 			}
 
 			addPopupValues({
 				object: 'hostid',
-				values: [{
-					opcommand_hstid: jQuery(objectForm).find('input[name="opCmdId"]').val(),
-					hostid: 0,
-					name: ''
-				}],
+				values: values,
 				parentId: parentId
 			});
 		}
