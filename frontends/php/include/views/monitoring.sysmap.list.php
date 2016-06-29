@@ -29,8 +29,10 @@ $widget = (new CWidget())
 	)
 	->addItem(
 		(new CFilter('web.sysmapconf.filter.state'))
-			->addColumn((new CFormList())->addRow(_('Name like'),
-				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+			->addColumn((new CFormList())->addRow(_('Name'),
+				(new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
 			))
 	);
 

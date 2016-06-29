@@ -2303,3 +2303,21 @@ function get_color($image, $color, $alpha = 0) {
 
 	return imagecolorallocate($image, $red, $green, $blue);
 }
+
+/**
+ * Custom error handler for PHP errors.
+ *
+ * @param int     $errno Level of the error raised.
+ * @param string  $errstr Error message.
+ * @param string  $errfile Filename that the error was raised in.
+ * @param int     $errline Line number the error was raised in.
+ */
+function zbx_err_handler($errno, $errstr, $errfile, $errline) {
+	// Necessary to suppress errors when calling with error control operator like @function_name().
+	if (error_reporting() === 0) {
+		return true;
+	}
+
+	// Don't show the call to this handler function.
+	error($errstr.' ['.CProfiler::getInstance()->formatCallStack().']');
+}

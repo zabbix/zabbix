@@ -943,6 +943,14 @@ define('XML_ARRAY',			0x02);
 define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
 
+// JSON error codes.
+if (!defined('JSON_ERROR_NONE')) {
+	define('JSON_ERROR_NONE', 0);
+}
+if (!defined('JSON_ERROR_SYNTAX')) {
+	define('JSON_ERROR_SYNTAX', 4);
+}
+
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);

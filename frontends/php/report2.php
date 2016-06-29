@@ -215,7 +215,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		}
 
 		// filter template group
-		$groupsComboBox = new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();');
+		$groupsComboBox = (new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();'))
+				->setAttribute('autofocus', 'autofocus');
 		$groupsComboBox->addItem(0, _('all'));
 
 		$groups = API::HostGroup()->get([
@@ -302,13 +303,14 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			unset($triggerOptions['groupids']);
 		}
 
-		$filterColumn1->addRow(_('Filter by host group'), $hostGroupsComboBox);
+		$filterColumn1->addRow(_('Host group'), $hostGroupsComboBox);
 	}
 
 	// report by host
 	elseif ($availabilityReportMode == AVAILABILITY_REPORT_BY_HOST) {
 		// filter host group
-		$groupsComboBox = new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();');
+		$groupsComboBox = (new CComboBox('filter_groupid', $_REQUEST['filter_groupid'], 'javascript: submit();'))
+				->setAttribute('autofocus', 'autofocus');
 		$groupsComboBox->addItem(0, _('all'));
 
 		$groups = API::HostGroup()->get([
