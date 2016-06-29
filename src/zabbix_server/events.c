@@ -53,7 +53,8 @@ static size_t	events_alloc = 0, events_num = 0;
 void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags)
+		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
+		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag)
 {
 	int	i;
 
@@ -80,6 +81,8 @@ void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid
 		events[events_num].trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
 		events[events_num].trigger.priority = trigger_priority;
 		events[events_num].trigger.type = trigger_type;
+		events[events_num].trigger.correlation_mode = trigger_correlation_mode;
+		events[events_num].trigger.correlation_tag = zbx_strdup(NULL, trigger_correlation_tag);
 
 		zbx_vector_ptr_create(&events[events_num].tags);
 
@@ -562,6 +565,7 @@ static void	clean_events()
 		zbx_free(events[i].trigger.description);
 		zbx_free(events[i].trigger.expression);
 		zbx_free(events[i].trigger.recovery_expression);
+		zbx_free(events[i].trigger.correlation_tag);
 
 		zbx_vector_ptr_clear_ext(&events[i].tags, (zbx_clean_func_t)zbx_free_tag);
 		zbx_vector_ptr_destroy(&events[i].tags);
