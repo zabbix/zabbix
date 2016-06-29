@@ -1520,8 +1520,10 @@ class CTrigger extends CTriggerGeneral {
 			'nopermissions' => true
 		));
 
-		$descriptionChanged = $expressionChanged = false;
 		foreach ($triggers as &$trigger) {
+			$descriptionChanged = false;
+			$expressionChanged = false;
+
 			$dbTrigger = $dbTriggers[$trigger['triggerid']];
 			$hosts = zbx_objectValues($dbTrigger['hosts'], 'name');
 
