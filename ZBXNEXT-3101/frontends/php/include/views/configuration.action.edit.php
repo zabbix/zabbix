@@ -816,7 +816,7 @@ if (!empty($data['new_operation'])) {
 					'new_operation[opcommand][script]', $data['new_operation']['opcommand']['script'], true
 				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-				(new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
+				(new CButton('select_operation_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
 			];
 
 			$new_operation_formlist->addRow(_('Type'), $typeComboBox);
@@ -1508,7 +1508,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 					))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-					(new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
+					(new CButton('select_recovery_operation_opcommand_script', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
 				];
 
 				$new_operation_formlist->addRow(_('Type'), $typeComboBox);
