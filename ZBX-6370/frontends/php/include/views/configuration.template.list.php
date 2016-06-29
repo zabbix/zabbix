@@ -34,8 +34,10 @@ $widget = (new CWidget())
 		)
 	)
 	->addItem((new CFilter('web.templates.filter.state'))
-		->addColumn((new CFormList())->addRow(_('Name like'),
-			(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		->addColumn((new CFormList())->addRow(_('Name'),
+			(new CTextBox('filter_name', $data['filter']['name']))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
 		))
 	);
 
@@ -46,7 +48,7 @@ $table = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Templates'), 'name', $data['sortField'], $data['sortOrder']),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 		_('Applications'),
 		_('Items'),
 		_('Triggers'),
