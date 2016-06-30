@@ -31,6 +31,7 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10840] fixed selecting of group in popup page filter (Gunars)
 ..F....... [ZBX-10791] fixed web monitoring automatic refresh (Gunars)
 ..F....... [ZBX-10736] fixed overlapping of row and table borders (Pavel)
 A......... [ZBX-10880] fixed support of sending several Request object at the same time to JSON-RPC (Cemeris)
