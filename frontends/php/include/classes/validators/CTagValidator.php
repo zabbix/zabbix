@@ -39,6 +39,14 @@ class CTagValidator {
 		$this->macro_function_parser = new CMacroFunctionParser(['{ITEM.VALUE}'], ['allow_reference' => true]);
 	}
 
+	/**
+	 * Checks if the given trigger tag is a valid. If tag is invalid, sets an error and returns false.
+	 * Otherwise returns true.
+	 *
+	 * @param string $source
+	 *
+	 * @return bool
+	 */
 	public function validate($source) {
 		$p = 0;
 
