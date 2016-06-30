@@ -29,7 +29,7 @@ class CScreenDiscovery extends CScreenBase {
 	 *
 	 * @var array
 	 */
-	public $data;
+	protected $data = [];
 
 	/**
 	 * Init screen data.
@@ -40,7 +40,7 @@ class CScreenDiscovery extends CScreenBase {
 	public function __construct(array $options = []) {
 		parent::__construct($options);
 
-		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
+		$this->data = $options['data'];
 	}
 
 	/**
