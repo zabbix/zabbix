@@ -22,13 +22,6 @@
 class CScreenMap extends CScreenBase {
 
 	/**
-	 * Params for monitoring maps js.
-	 *
-	 * @var array
-	 */
-	private $data = [];
-
-	/**
 	 * Process screen.
 	 *
 	 * @return CDiv (screen inside container)
