@@ -29,7 +29,7 @@ class CScreenDiscovery extends CScreenBase {
 	 *
 	 * @var array
 	 */
-	public $data = [];
+	protected $data = [];
 
 	/**
 	 * Init screen data.
