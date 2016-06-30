@@ -273,6 +273,9 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_DISCOVERY:
 				return new CScreenDiscovery($options);
 
+			case SCREEN_RESOURCE_HTTPTEST:
+				return new CScreenHttpTest($options);
+
 			default:
 				return null;
 		}
