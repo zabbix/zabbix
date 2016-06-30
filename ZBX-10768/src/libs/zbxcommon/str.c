@@ -2638,6 +2638,16 @@ void	zbx_strupper(char *str)
 		*str = toupper(*str);
 }
 
+static size_t	zbx_iconv(iconv_t cd, char **in, size_t *in_size_left, char **p, size_t *out_size_left)
+{
+	size_t	ret;
+#if (__FreeBSD_version) > 500000
+	return ret = iconv(cd, (const char **)in, in_size_left, p, out_size_left);
+#else
+	return ret = iconv(cd, in, in_size_left, p, out_size_left);
+#endif
+}
+
 #ifdef _WINDOWS
 #include "log.h"
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
@@ -2709,7 +2719,7 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding)
 	in_size_left = in_size;
 	out_size_left = out_alloc - 1;
 
-	while ((size_t)(-1) == iconv(cd, &in, &in_size_left, &p, &out_size_left))
+	while ((size_t)(-1) == zbx_iconv(cd, &in, &in_size_left, &p, &out_size_left))
 	{
 		if (E2BIG != errno)
 			break;
