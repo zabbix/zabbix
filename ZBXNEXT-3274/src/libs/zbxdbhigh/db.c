@@ -520,8 +520,11 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 
 			if (0 != value_changed || 0 != multiple_problem)
 			{
-				DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
-						&new_lastchange);
+				if (TRIGGER_VALUE_OK != new_value || ZBX_TRIGGER_CORRELATION_NONE == trigger->correlation_mode)
+				{
+					DCconfig_set_trigger_value(trigger->triggerid, new_value, new_state, new_error_local,
+							&new_lastchange);
+				}
 
 				add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&trigger->timespec, new_value, trigger->description,
@@ -537,8 +540,11 @@ int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const str
 						NULL);
 			}
 
-			if (0 != value_changed)
+			if (0 != value_changed && (TRIGGER_VALUE_OK != new_value ||
+					ZBX_TRIGGER_CORRELATION_NONE == trigger->correlation_mode))
+			{
 				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "value=%d,", new_value);
+			}
 
 			if (0 != state_changed)
 			{
