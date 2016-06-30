@@ -3045,7 +3045,7 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		DCstrpool_replace(found, &trigger->description, row[1]);
 		DCstrpool_replace(found, &trigger->expression, row[2]);
 		DCstrpool_replace(found, &trigger->recovery_expression, row[11]);
-		DCstrpool_replace(found, &trigger->correlation_tag, row[12]);
+		DCstrpool_replace(found, &trigger->correlation_tag, row[13]);
 		ZBX_STR2UCHAR(trigger->priority, row[4]);
 		ZBX_STR2UCHAR(trigger->type, row[5]);
 		ZBX_STR2UCHAR(trigger->status, row[9]);
