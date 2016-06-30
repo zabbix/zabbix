@@ -513,6 +513,13 @@ static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsourc
 				ret = ZBX_3010024_ACTION_DISABLE;
 				break;
 			}
+
+			/* event types:                                                          */
+			/*            0 - Event type:  Item in "not supported" state             */
+			/*            2 - Low-level discovery rule in "not supported" state      */
+			/*            4 - Trigger in "unknown" state                             */
+			if (0 == value || 2 == value || 4 == value)
+				ret = ZBX_3010024_ACTION_NOTHING;
 		}
 	}
 	DBfree_result(result);
@@ -575,15 +582,15 @@ static int	DBpatch_3010024(void)
 		if (ZBX_3010024_ACTION_DISABLE == ret)
 		{
 			zbx_vector_uint64_append(&actionids_disable, actionid);
-			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" was disabled during database upgrade:"
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" will be disabled during database upgrade:"
 					" conditions might have matched success event which is not supported anymore.",
 					row[1]);
 		}
 		else if (ZBX_3010024_ACTION_CONVERT == ret)
 		{
 			zbx_vector_uint64_append(&actionids_convert, actionid);
-			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" operations were converted to recovery operations"
-					" during database upgrade.", row[1]);
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" operations will be converted to recovery"
+					" operations during database upgrade.", row[1]);
 		}
 	}
 	DBfree_result(result);
@@ -655,18 +662,33 @@ static int	DBpatch_3010025(void)
 #define ZBX_3010026_PARSE_VALUE		0
 #define ZBX_3010026_PARSE_OP		1
 
-static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, int eventsource,
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_get_conditionids                                 *
+ *                                                                            *
+ * Purpose: get success condition identifiers                                 *
+ *                                                                            *
+ * Parameters: actionid     - [IN] the action identifier                      *
+ *             name         - [IN] the action name                            *
+ *             eventsource  - [IN] the action event source                    *
+ *             conditionids - [OUT] the success condition identifiers         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, const char *name, int eventsource,
 		zbx_vector_uint64_t *conditionids)
 {
 	DB_ROW		row;
 	DB_RESULT	result;
 	zbx_uint64_t	conditionid;
+	char		*condition = NULL;
+	size_t		condition_alloc = 0, condition_offset = 0;
+	int		value;
 
 	/* eventsource: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL  */
 	if (0 == eventsource)
 	{
 		/* conditiontype: 5 - CONDITION_TYPE_TRIGGER_VALUE */
-		result = DBselect("select conditionid from conditions"
+		result = DBselect("select conditionid,value from conditions"
 				" where actionid=" ZBX_FS_UI64
 					" and conditiontype=5",
 				actionid);
@@ -674,7 +696,7 @@ static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, int eventsou
 	else if (3 == eventsource)
 	{
 		/* conditiontype: 23 -  CONDITION_TYPE_EVENT_TYPE */
-		result = DBselect("select conditionid from conditions"
+		result = DBselect("select conditionid,value from conditions"
 				" where actionid=" ZBX_FS_UI64
 					" and conditiontype=23"
 					" and value in ('1', '3', '5')",
@@ -687,8 +709,37 @@ static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, int eventsou
 	{
 		ZBX_STR2UINT64(conditionid, row[0]);
 		zbx_vector_uint64_append(conditionids, conditionid);
+
+		value = atoi(row[1]);
+
+		if (0 == eventsource)
+		{
+			/* value: 0 - TRIGGER_VALUE_OK, 1 - TRIGGER_VALUE_PROBLEM */
+			const char	*values[] = {"OK", "PROBLEM"};
+
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, "Trigger value = %s",
+					values[value]);
+		}
+		else
+		{
+			/* value: 1 - EVENT_TYPE_ITEM_NORMAL        */
+			/*        3 - EVENT_TYPE_LLDRULE_NORMAL     */
+			/*        5 - *EVENT_TYPE_TRIGGER_NORMAL    */
+			const char	*values[] = {NULL, "Item in 'normal' state",
+							NULL, "Low-level discovery rule in 'normal' state",
+							NULL, "Trigger in 'normal' state"};
+
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, "Event type = %s",
+					values[value]);
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" condition \"%s\" will be removed during database upgrade:"
+				" this type of condition is not supported anymore", name, condition);
+
+		condition_offset = 0;
 	}
 
+	zbx_free(condition);
 	DBfree_result(result);
 }
 
@@ -977,7 +1028,7 @@ static int	DBpatch_3010026(void)
 {
 	DB_ROW			row;
 	DB_RESULT		result;
-	zbx_vector_uint64_t	conditionids;
+	zbx_vector_uint64_t	conditionids, actionids;
 	int			ret = FAIL, evaltype, index, i, eventsource;
 	zbx_uint64_t		actionid;
 	char			*sql = NULL, *formula;
@@ -985,11 +1036,11 @@ static int	DBpatch_3010026(void)
 	zbx_vector_str_t	filter;
 
 	zbx_vector_uint64_create(&conditionids);
+	zbx_vector_uint64_create(&actionids);
 	zbx_vector_str_create(&filter);
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	/* status: 0 - ACTION_STATUS_ACTIVE */
-	result = DBselect("select actionid,eventsource,evaltype,formula from actions");
+	result = DBselect("select actionid,eventsource,evaltype,formula,name from actions");
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -998,7 +1049,7 @@ static int	DBpatch_3010026(void)
 		evaltype = atoi(row[2]);
 
 		index = conditionids.values_num;
-		DBpatch_3010026_get_conditionids(actionid, eventsource, &conditionids);
+		DBpatch_3010026_get_conditionids(actionid, row[4], eventsource, &conditionids);
 
 		/* evaltype: 3 - CONDITION_EVAL_TYPE_EXPRESSION */
 		if (3 != evaltype)
@@ -1015,14 +1066,8 @@ static int	DBpatch_3010026(void)
 
 		if (SUCCEED == DBpatch_3010026_expression_remove_values(formula, &filter))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set formula='%s'", formula);
-			if ('\0' == *formula)
-			{
-				/* evaltype: 0 = CONDITION_EVAL_TYPE_AND_OR */
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",evaltype=0");
-			}
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where actionid=" ZBX_FS_UI64 ";\n",
-					actionid);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set formula='%s'"
+					" where actionid=" ZBX_FS_UI64 ";\n", formula, actionid);
 		}
 
 		zbx_free(formula);
@@ -1051,12 +1096,47 @@ static int	DBpatch_3010026(void)
 			goto out;
 	}
 
+	/* reset action evaltype to AND/OR if it has no more conditions left */
+
+	DBfree_result(result);
+	result = DBselect("select a.actionid,a.name,a.evaltype,count(c.conditionid)"
+			" from actions a"
+			" left join conditions c"
+				" on a.actionid=c.actionid"
+			" group by a.actionid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		/* reset evaltype to AND/OR (0) if action has no more conditions and it's evaltype is not AND/OR */
+		if (0 == atoi(row[3]) && 0 != atoi(row[2]))
+		{
+			ZBX_STR2UINT64(actionid, row[0]);
+			zbx_vector_uint64_append(&actionids, actionid);
+
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" type of calculation will be changed to And/Or"
+					" during database upgrade: no action conditions found", row[1]);
+		}
+	}
+
+	if (0 != actionids.values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions set evaltype=0 where");
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
+				actionids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
 	ret = SUCCEED;
 
 out:
 	DBfree_result(result);
 	zbx_free(sql);
 	zbx_vector_str_destroy(&filter);
+	zbx_vector_uint64_destroy(&actionids);
 	zbx_vector_uint64_destroy(&conditionids);
 
 	return ret;
