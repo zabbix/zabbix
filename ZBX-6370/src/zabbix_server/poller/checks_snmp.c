@@ -940,8 +940,7 @@ static void	zbx_detect_loop_init(zbx_hashset_t *hs)
 {
 #define ZBX_OIDS_SEEN_INIT_SIZE	500		/* minimum initial number of slots in hashset */
 
-	zbx_hashset_create_ext(hs, ZBX_OIDS_SEEN_INIT_SIZE, __oids_seen_key_hash, __oids_seen_key_compare, NULL,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+	zbx_hashset_create(hs, ZBX_OIDS_SEEN_INIT_SIZE, __oids_seen_key_hash, __oids_seen_key_compare);
 
 #undef ZBX_OIDS_SEEN_INIT_SIZE
 }
@@ -1017,7 +1016,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	struct variable_list	*var;
 	int			status, level, running, num_vars, check_oid_increase = 1, ret = SUCCEED;
 	AGENT_RESULT		snmp_result;
-	zbx_hashset_t		oids_seen = {0};
+	zbx_hashset_t		oids_seen;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%d oid:'%s' bulk:%d", __function_name, (int)item->type, OID, bulk);
 
