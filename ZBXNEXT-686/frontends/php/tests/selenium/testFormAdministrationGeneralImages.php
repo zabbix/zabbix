@@ -90,7 +90,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestInputType('image', $this->file_path);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestTextPresent(['Images', 'Image updated']);
+		$this->zbxTestCheckHeader('Images');
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
@@ -103,6 +103,7 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestClick('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of images');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image deleted');
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);
 
 		$sql = 'SELECT * FROM images WHERE imagetype=1 AND name=\''.$this->icon_image_name2.'\'';

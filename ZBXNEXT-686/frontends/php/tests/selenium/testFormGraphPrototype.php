@@ -607,7 +607,7 @@ class testFormGraphPrototype extends CWebTest {
 				$this->zbxTestClickLinkTextWait($this->itemInheritance);
 			}
 
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 		}
 
 		if (isset($data['templatedHost'])) {
@@ -627,7 +627,7 @@ class testFormGraphPrototype extends CWebTest {
 				$this->zbxTestClickLinkTextWait($this->itemDiscovery);
 			}
 
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 		}
 
 		switch($ymin_type) {

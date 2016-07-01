@@ -318,7 +318,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Discovery rule created');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule created');
 
 		// check that the inherited rule matches the original
 		$this->zbxTestOpen('hosts.php');
@@ -372,7 +372,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Item prototype added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Item prototype added');
 		$this->zbxTestTextPresent('Test LLD item');
 
 		// check that the inherited item prototype matches the original
@@ -426,7 +426,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestCheckboxSelect('status', false);
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Trigger prototype added');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger prototype added');
 		$this->zbxTestTextPresent('Test LLD trigger');
 
 		$sql = "SELECT triggerid FROM triggers WHERE description='Test LLD trigger' AND status='1' AND templateid IS NULL";

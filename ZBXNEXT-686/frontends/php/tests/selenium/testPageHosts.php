@@ -73,7 +73,14 @@ class testPageHosts extends CWebTest {
 		$hostid = $host['hostid'];
 		$name = $host['name'];
 
-		$sqlHosts = "select * from hosts where hostid=$hostid";
+		$sqlHosts =
+			'SELECT hostid,proxy_hostid,host,status,error,available,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+			'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
+			'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
+			'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error,'.
+			'name,flags,templateid,description,tls_connect,tls_accept'.
+			' FROM hosts'.
+			' WHERE hostid='.$hostid;
 		$oldHashHosts = DBhash($sqlHosts);
 		$sqlItems = "select * from items where hostid=$hostid order by itemid";
 		$oldHashItems = DBhash($sqlItems);

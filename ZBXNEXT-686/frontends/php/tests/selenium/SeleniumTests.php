@@ -82,15 +82,15 @@ require_once dirname(__FILE__).'/testFormHost.php';
 require_once dirname(__FILE__).'/testFormHostGroup.php';
 require_once dirname(__FILE__).'/testFormItem.php';
 require_once dirname(__FILE__).'/testFormItemPrototype.php';
-/*
-require_once dirname(__FILE__).'/testFormTrigger.php';
-require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMap.php';
-require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
+require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
+/*
+require_once dirname(__FILE__).'/testFormWeb.php';
+require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 */
 require_once dirname(__FILE__).'/testPageApplications.php';
@@ -179,14 +179,15 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemPrototype');
-/*
-		$suite->addTestSuite('testFormTrigger');
-		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testFormLogin');
-		$suite->addTestSuite('testFormUserProfile');
-		$suite->addTestSuite('testFormScreen');
 		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormScreen');
+		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTemplate');
+		$suite->addTestSuite('testFormTrigger');
+/*
+		$suite->addTestSuite('testFormWeb');
+		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormTriggerPrototype');
 */
 		$suite->addTestSuite('testPageApplications');

@@ -1160,7 +1160,7 @@ class testFormAction extends CWebTest {
 					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_from\']', 'size', 20);
 					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_from\']', 'value', 1);
 
-					$this->zbxTestTextPresent (['To', '(0 - infinitely)']);
+					$this->zbxTestTextPresent ('(0 - infinitely)');
 					$this->zbxTestAssertVisibleId('new_operation_esc_step_to');
 					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_to\']', 'maxlength', 5);
 					$this->zbxTestAssertAttribute('//input[@id=\'new_operation_esc_step_to\']', 'size', 20);

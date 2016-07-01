@@ -395,11 +395,27 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitWindowAndSwitchToIt($id) {
-		$this->webDriver->wait(5)->until(function () use ($id) {
+		$this->webDriver->wait(10)->until(function () use ($id) {
 			try {
 				$handles = count($this->webDriver->getWindowHandles());
 					if ($handles > 1) {
 						return $this->webDriver->switchTo()->window($id);
+				}
+			}
+			catch (NoSuchElementException $ex) {
+				return false;
+			}
+		});
+
+		$this->zbxTestCheckFatalErrors();
+	}
+
+	public function zbxTestWaitWindowClose() {
+		$this->webDriver->wait(5)->until(function () {
+			try {
+				$handles = count($this->webDriver->getWindowHandles());
+					if ($handles == 1) {
+						return $this->webDriver->switchTo()->window('');
 				}
 			}
 			catch (NoSuchElementException $ex) {
@@ -429,6 +445,10 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 
 	public function zbxTestGetValue($xpath) {
 		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getAttribute('value');
+	}
+
+	public function zbxTestGetAttributeValue($xpath, $attribute) {
+		return $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getAttribute($attribute);
 	}
 
 	public function zbxTestGetText($xpath) {

@@ -61,18 +61,13 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickLinkText($name);
 
-//		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.gif'", 5000);
-
 		$this->zbxTestClickWait('edit');
 		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('sysmap_update');
 		$this->webDriver->switchTo()->alert()->accept();
 
-//		$this->waitForCondition("selenium.browserbot.getUserWindow().ZBX_SYSMAPS[0].map.saved == true", 3000);
-
-
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestTextPresent($name);
 		$this->zbxTestCheckHeader('Maps');
 
 		$this->assertEquals($oldHashMap, DBhash($sqlMap), "Chuck Norris: Map update changed data in table 'sysmaps'");
@@ -99,12 +94,12 @@ class testPageMaps extends CWebTest {
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestClickLinkText("Properties");
+		$this->zbxTestClickXpathWait("//a[text()='".$name."']/../..//a[text()='Properties']");
 		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestTextPresent("Network map updated");
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map updated');
+		$this->zbxTestTextPresent($name);
 		$this->zbxTestTextPresent('Configuration of network maps');
 
 		$this->assertEquals($oldHashMap, DBhash($sqlMap), "Chuck Norris: Map update changed data in table 'sysmaps'");

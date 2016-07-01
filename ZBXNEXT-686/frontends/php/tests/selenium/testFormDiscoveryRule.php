@@ -1511,13 +1511,14 @@ class testFormDiscoveryRule extends CWebTest {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('interval_add'));
 				$this->zbxTestClickWait('interval_add');
 
-					$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
-					$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
+				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
+				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
 
 				if (isset($period['remove'])) {
-					$this->zbxTestClick('delay_flex_'.($itemCount-1).'_remove');
+					$this->zbxTestClickWait('delay_flex_'.($itemCount-1).'_remove');
 				}
 			}
 		}
