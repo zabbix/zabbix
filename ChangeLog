@@ -17,6 +17,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
+...G...... [ZBX-10768] fixed compilation warining on FreeBSD (viktors)
 ..F....... [ZBX-10561] improved style consistency for disabled elements (Pavel)
 ........S. [ZBX-3823] improved validation and error messaging when history, discovery, autoregistration and host availability data sent by passive and active proxies are processed on server (gleb)
 A......... [ZBX-10030] fixed API action update method request with only "actionid" property (Cemeris)
