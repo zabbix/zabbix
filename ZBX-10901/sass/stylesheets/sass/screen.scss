@@ -25,7 +25,7 @@ a {
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		outline: 0;
+		//outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
@@ -35,6 +35,7 @@ a {
 	}
 
 	&:hover {
+		outline: 0;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
@@ -45,6 +46,7 @@ a {
 	}
 
 	&:active {
+		outline: 0;
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
@@ -293,6 +295,7 @@ nav {
 
 		&:focus {
 			color: $link-main-nav-active-color;
+			background-color: $ui-hover-color;
 		}
 
 		&:active {
@@ -334,6 +337,7 @@ ul.top-nav-icons {
 		color: $link-main-nav-active-color;
 		font-size: $font-h3-size;
 		text-decoration: none;
+		outline: 0;
 		@include opacity(0.75);
 		@include transition(opacity .2s ease-out);
 
@@ -342,6 +346,7 @@ ul.top-nav-icons {
 		}
 
 		&:focus {
+			background-color: $ui-hover-color;
 			@include opacity(1);
 		}
 	}
@@ -721,6 +726,7 @@ footer {
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $font-color;
+	outline: 0;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
@@ -1749,14 +1755,17 @@ button {
 	@include border-radius(0);
 
 	&:hover {
+		outline: 0;
 		@extend .btn-link;
 	}
 
 	&:focus {
+		outline: 1px solid #000;
 		@extend .btn-link;
 	}
 
 	&:active {
+		outline: 0;
 		@extend .btn-link;
 	}
 }
@@ -2391,6 +2400,7 @@ $form-icon-btn: (
 		color: $font-color;
 		text-decoration: none;
 		border: none;
+		outline: 0;
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
@@ -2398,6 +2408,10 @@ $form-icon-btn: (
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
+			background-color: $action-hover-color;
+		}
+
+		&:focus {
 			background-color: $action-hover-color;
 		}
 
