@@ -6346,33 +6346,10 @@ return [
 			],
 		],
 	],
-	'corr_condition_newtag' => [
-		'key' => 'corr_condition_newtagid',
+	'corr_condition_tag' => [
+		'key' => 'corr_condition_tagid',
 		'fields' => [
-			'corr_condition_newtagid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'corr_conditionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'corr_condition',
-				'ref_field' => 'corr_conditionid',
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-		],
-	],
-	'corr_condition_oldtag' => [
-		'key' => 'corr_condition_oldtagid',
-		'fields' => [
-			'corr_condition_oldtagid' => [
+			'corr_condition_tagid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -6422,10 +6399,10 @@ return [
 			],
 		],
 	],
-	'corr_condition_tag' => [
-		'key' => 'corr_condition_tagid',
+	'corr_condition_tagpair' => [
+		'key' => 'corr_condition_tagpairid',
 		'fields' => [
-			'corr_condition_tagid' => [
+			'corr_condition_tagpairid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -6451,45 +6428,10 @@ return [
 			],
 		],
 	],
-	'corr_condition_oldtagvalue' => [
-		'key' => 'corr_condition_oldtagvalueid',
+	'corr_condition_tagvalue' => [
+		'key' => 'corr_condition_tagvalueid',
 		'fields' => [
-			'corr_condition_oldtagvalueid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'corr_conditionid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'corr_condition',
-				'ref_field' => 'corr_conditionid',
-			],
-			'tag' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-			'operator' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'value' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-		],
-	],
-	'corr_condition_newtagvalue' => [
-		'key' => 'corr_condition_newtagvalueid',
-		'fields' => [
-			'corr_condition_newtagvalueid' => [
+			'corr_condition_tagvalueid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
