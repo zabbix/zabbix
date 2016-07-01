@@ -481,9 +481,9 @@ static int	DBpatch_3010032(void)
 static int	DBpatch_3010033(void)
 {
 	const ZBX_TABLE table =
-			{"corr_condition_newtag", "corr_condition_newtagid", 0,
+			{"corr_condition_tag", "corr_condition_tagid", 0,
 				{
-					{"corr_condition_newtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"corr_condition_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"corr_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
@@ -496,7 +496,7 @@ static int	DBpatch_3010033(void)
 
 static int	DBpatch_3010034(void)
 {
-	return DBcreate_index("corr_condition_newtag", "corr_condition_newtag_1", "corr_conditionid", 0);
+	return DBcreate_index("corr_condition_tag", "corr_condition_tag_1", "corr_conditionid", 0);
 }
 
 static int	DBpatch_3010035(void)
@@ -504,39 +504,10 @@ static int	DBpatch_3010035(void)
 	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("corr_condition_newtag", 1, &field);
+	return DBadd_foreign_key("corr_condition_tag", 1, &field);
 }
 
 static int	DBpatch_3010036(void)
-{
-	const ZBX_TABLE table =
-			{"corr_condition_oldtag", "corr_condition_oldtagid", 0,
-				{
-					{"corr_condition_oldtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"corr_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_3010037(void)
-{
-	return DBcreate_index("corr_condition_oldtag", "corr_condition_oldtag_1", "corr_conditionid", 0);
-}
-
-static int	DBpatch_3010038(void)
-{
-	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("corr_condition_oldtag", 1, &field);
-}
-
-static int	DBpatch_3010039(void)
 {
 	const ZBX_TABLE table =
 			{"corr_condition_newgrp", "corr_condition_newgrpid", 0,
@@ -553,17 +524,17 @@ static int	DBpatch_3010039(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3010040(void)
+static int	DBpatch_3010037(void)
 {
 	return DBcreate_index("corr_condition_newgrp", "corr_condition_newgrp_1", "corr_conditionid", 0);
 }
 
-static int	DBpatch_3010041(void)
+static int	DBpatch_3010038(void)
 {
 	return DBcreate_index("corr_condition_newgrp", "corr_condition_newgrp_2", "groupid", 0);
 }
 
-static int	DBpatch_3010042(void)
+static int	DBpatch_3010039(void)
 {
 	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -571,19 +542,19 @@ static int	DBpatch_3010042(void)
 	return DBadd_foreign_key("corr_condition_newgrp", 1, &field);
 }
 
-static int	DBpatch_3010043(void)
+static int	DBpatch_3010040(void)
 {
 	const ZBX_FIELD	field = {"groupid", NULL, "groups", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("corr_condition_newgrp", 2, &field);
 }
 
-static int	DBpatch_3010044(void)
+static int	DBpatch_3010041(void)
 {
 	const ZBX_TABLE table =
-			{"corr_condition_tag", "corr_condition_tagid", 0,
+			{"corr_condition_tagpair", "corr_condition_tagpairid", 0,
 				{
-					{"corr_condition_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"corr_condition_tagpairid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"corr_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"oldtag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"newtag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -595,9 +566,40 @@ static int	DBpatch_3010044(void)
 	return DBcreate_table(&table);
 }
 
+static int	DBpatch_3010042(void)
+{
+	return DBcreate_index("corr_condition_tagpair", "corr_condition_tagpair_1", "corr_conditionid", 0);
+}
+
+static int	DBpatch_3010043(void)
+{
+	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("corr_condition_tagpair", 1, &field);
+}
+
+static int	DBpatch_3010044(void)
+{
+	const ZBX_TABLE table =
+			{"corr_condition_tagvalue", "corr_condition_tagvalueid", 0,
+				{
+					{"corr_condition_tagvalueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"corr_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
 static int	DBpatch_3010045(void)
 {
-	return DBcreate_index("corr_condition_tag", "corr_condition_tag_1", "corr_conditionid", 0);
+	return DBcreate_index("corr_condition_tagvalue", "corr_condition_tagvalue_1", "corr_conditionid", 0);
 }
 
 static int	DBpatch_3010046(void)
@@ -605,74 +607,10 @@ static int	DBpatch_3010046(void)
 	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("corr_condition_tag", 1, &field);
+	return DBadd_foreign_key("corr_condition_tagvalue", 1, &field);
 }
 
 static int	DBpatch_3010047(void)
-{
-	const ZBX_TABLE table =
-			{"corr_condition_oldtagvalue", "corr_condition_oldtagvalueid", 0,
-				{
-					{"corr_condition_oldtagvalueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-							0},
-					{"corr_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_3010048(void)
-{
-	return DBcreate_index("corr_condition_oldtagvalue", "corr_condition_oldtagvalue_1", "corr_conditionid", 0);
-}
-
-static int	DBpatch_3010049(void)
-{
-	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("corr_condition_oldtagvalue", 1, &field);
-}
-
-static int	DBpatch_3010050(void)
-{
-	const ZBX_TABLE table =
-			{"corr_condition_newtagvalue", "corr_condition_newtagvalueid", 0,
-				{
-					{"corr_condition_newtagvalueid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL,
-							0},
-					{"corr_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{0}
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_3010051(void)
-{
-	return DBcreate_index("corr_condition_newtagvalue", "corr_condition_newtagvalue_1", "corr_conditionid", 0);
-}
-
-static int	DBpatch_3010052(void)
-{
-	const ZBX_FIELD	field = {"corr_conditionid", NULL, "corr_condition", "corr_conditionid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
-
-	return DBadd_foreign_key("corr_condition_newtagvalue", 1, &field);
-}
-
-static int	DBpatch_3010053(void)
 {
 	const ZBX_TABLE table =
 			{"corr_operation", "corr_operationid", 0,
@@ -688,12 +626,12 @@ static int	DBpatch_3010053(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_3010054(void)
+static int	DBpatch_3010048(void)
 {
 	return DBcreate_index("corr_operation", "corr_operation_1", "correlationid", 0);
 }
 
-static int	DBpatch_3010055(void)
+static int	DBpatch_3010049(void)
 {
 	const ZBX_FIELD	field = {"correlationid", NULL, "correlation", "correlationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
@@ -756,11 +694,5 @@ DBPATCH_ADD(3010046, 0, 1)
 DBPATCH_ADD(3010047, 0, 1)
 DBPATCH_ADD(3010048, 0, 1)
 DBPATCH_ADD(3010049, 0, 1)
-DBPATCH_ADD(3010050, 0, 1)
-DBPATCH_ADD(3010051, 0, 1)
-DBPATCH_ADD(3010052, 0, 1)
-DBPATCH_ADD(3010053, 0, 1)
-DBPATCH_ADD(3010054, 0, 1)
-DBPATCH_ADD(3010055, 0, 1)
 
 DBPATCH_END()

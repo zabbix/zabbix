@@ -1396,14 +1396,8 @@ FIELD		|correlationid	|t_id		|	|NOT NULL	|0			|1|correlation
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|correlationid
 
-TABLE|corr_condition_newtag|corr_condition_newtagid|ZBX_DATA
-FIELD		|corr_condition_newtagid|t_id	|	|NOT NULL	|0
-FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
-FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
-INDEX		|1		|corr_conditionid
-
-TABLE|corr_condition_oldtag|corr_condition_oldtagid|ZBX_DATA
-FIELD		|corr_condition_oldtagid|t_id	|	|NOT NULL	|0
+TABLE|corr_condition_tag|corr_condition_tagid|ZBX_DATA
+FIELD		|corr_condition_tagid|t_id	|	|NOT NULL	|0
 FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|corr_conditionid
@@ -1416,23 +1410,15 @@ FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|groups	|	|RESTRICT
 INDEX		|1		|corr_conditionid
 INDEX		|2		|groupid
 
-TABLE|corr_condition_tag|corr_condition_tagid|ZBX_DATA
-FIELD		|corr_condition_tagid|t_id	|	|NOT NULL	|0
+TABLE|corr_condition_tagpair|corr_condition_tagpairid|ZBX_DATA
+FIELD		|corr_condition_tagpairid|t_id	|	|NOT NULL	|0
 FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
 FIELD		|oldtag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|newtag		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|corr_conditionid
 
-TABLE|corr_condition_oldtagvalue|corr_condition_oldtagvalueid|ZBX_DATA
-FIELD		|corr_condition_oldtagvalueid|t_id|	|NOT NULL	|0
-FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
-FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
-INDEX		|1		|corr_conditionid
-
-TABLE|corr_condition_newtagvalue|corr_condition_newtagvalueid|ZBX_DATA
-FIELD		|corr_condition_newtagvalueid|t_id|	|NOT NULL	|0
+TABLE|corr_condition_tagvalue|corr_condition_tagvalueid|ZBX_DATA
+FIELD		|corr_condition_tagvalueid|t_id	|	|NOT NULL	|0
 FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
@@ -1448,4 +1434,4 @@ INDEX		|1		|correlationid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010055	|3010055
+ROW		|3010049	|3010049
