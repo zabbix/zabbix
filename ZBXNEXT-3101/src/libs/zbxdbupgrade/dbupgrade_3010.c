@@ -399,27 +399,45 @@ static int	DBpatch_3010022(void)
 
 static int	DBpatch_3010023(void)
 {
-	zbx_db_insert_t	db_insert;
+	zbx_db_insert_t	db_insert, db_insert_msg;
 	DB_ROW		row;
 	DB_RESULT	result;
-	int		ret;
-	zbx_uint64_t	actionid;
+	int		ret, actions_num;
+	zbx_uint64_t	actionid, operationid;
+
+	result = DBselect("select count(*) from actions where recovery_msg=1");
+	if (NULL == (row = DBfetch(result)) || 0 == (actions_num = atoi(row[0])))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	operationid = DBget_maxid_num("operations", actions_num);
 
 	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", NULL);
+	zbx_db_insert_prepare(&db_insert_msg, "opmessage", "operationid", "default_msg", "subject", "message", NULL);
 
-	result = DBselect("select actionid from actions where recovery_msg=1");
+	DBfree_result(result);
+	result = DBselect("select actionid,r_shortdata,r_longdata from actions where recovery_msg=1");
 
 	while (NULL != (row = DBfetch(result)))
 	{
 		ZBX_STR2UINT64(actionid, row[0]);
 		/* operationtype: 11 - OPERATION_TYPE_RECOVERY_MESSAGE */
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, 11, 1);
-	}
-	DBfree_result(result);
+		zbx_db_insert_add_values(&db_insert, operationid, actionid, 11, 1);
+		zbx_db_insert_add_values(&db_insert_msg, operationid, 1, row[1], row[2]);
 
-	zbx_db_insert_autoincrement(&db_insert, "operationid");
-	ret = zbx_db_insert_execute(&db_insert);
+		operationid++;
+	}
+
+	if (SUCCEED == (ret = zbx_db_insert_execute(&db_insert)))
+		ret = zbx_db_insert_execute(&db_insert_msg);
+
+	zbx_db_insert_clean(&db_insert_msg);
 	zbx_db_insert_clean(&db_insert);
+
+out:
+	DBfree_result(result);
 
 	return ret;
 }
