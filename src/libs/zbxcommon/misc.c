@@ -574,7 +574,7 @@ void	__zbx_zbx_setproctitle(const char *fmt, ...)
 #endif
 
 #if defined(HAVE_FUNCTION_SETPROCTITLE)
-	setproctitle(title);
+	setproctitle("%s", title);
 #elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
 	setproctitle_set_status(title);
 #endif
