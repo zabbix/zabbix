@@ -28,7 +28,7 @@ void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid
 {
 }
 
-int	process_events(void)
+int	process_events(zbx_vector_ptr_t *trigger_diff)
 {
 	return 0;
 }

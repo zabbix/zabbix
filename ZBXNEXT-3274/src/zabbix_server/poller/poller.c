@@ -50,15 +50,16 @@ extern int		server_num, process_num;
 static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type_t type, zbx_timespec_t *ts,
 		char *reason)
 {
-	const char	*__function_name = "update_triggers_status_to_unknown";
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		failed_type_buf[8];
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	DC_TRIGGER	trigger;
+	const char		*__function_name = "update_triggers_status_to_unknown";
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			failed_type_buf[8];
+	DC_TRIGGER		trigger;
+	zbx_vector_ptr_t	trigger_diff;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hostid:" ZBX_FS_UI64, __function_name, hostid);
+
+	zbx_vector_ptr_create(&trigger_diff);
 
 	/* determine failed item type */
 	switch (type)
@@ -169,22 +170,19 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 		trigger.new_error = reason;
 		trigger.timespec = *ts;
 
-		sql_offset = 0;
-
-		if (SUCCEED == process_trigger(&sql, &sql_alloc, &sql_offset, &trigger))
-		{
-			DBbegin();
-			DBexecute("%s", sql);
-			DBcommit();
-		}
+		zbx_process_trigger(&trigger, &trigger_diff);
 	}
 
-	zbx_free(sql);
 	DBfree_result(result);
 
 	DBbegin();
-	process_events();
+	process_events(NULL);
+	DCconfig_triggers_apply_changes(&trigger_diff);
+	zbx_save_trigger_changes(&trigger_diff);
 	DBcommit();
+
+	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+	zbx_vector_ptr_destroy(&trigger_diff);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
