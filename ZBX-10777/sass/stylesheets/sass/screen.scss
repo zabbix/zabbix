@@ -1649,7 +1649,7 @@ select {
 				left: 7px;
 				border-left: 2px solid $btn-bg-color;
 				border-bottom: 2px solid $btn-bg-color;
-				@include transform(translate3d(-50%,-50%,0) rotate(-45deg));
+				@include transform(translate3d(-50%, -50%, 0) rotate(-45deg));
 			}
 		}
 
@@ -1691,46 +1691,45 @@ select {
 %form-custom-check-radio-style {
 	position: absolute !important;
 	top: auto !important;
-  clip: rect(1px, 1px, 1px, 1px);
+	clip: rect(1px, 1px, 1px, 1px);
 
-  + label span {
-    display: inline-block;
-    width: 14px;
-    height: 14px;
-    margin: 0 4px -3px 0;
-    border: 1px solid $form-border-color;
-    background-color: $form-bg-color;
+	+ label span {
+		display: inline-block;
+		width: 14px;
+		height: 14px;
+		margin: 0 4px -3px 0;
+		border: 1px solid $form-border-color;
+		background-color: $form-bg-color;
 
-    &:active {
-      border-color: $form-border-color;
-    }
-  }
+		&:active {
+			border-color: $form-border-color;
+		}
+	}
 
-  &:focus + label span {
-    border-color: $form-border-focus-color;
-  }
+	&:focus + label span {
+		border-color: $form-border-focus-color;
+	}
 
-  &:checked + label span {
-    position: relative;
-    z-index: 1;
-  }
+	&:checked + label span {
+		position: relative;
+		z-index: 1;
+	}
 
-  &:checked:focus + label span {
-    border-color: $form-border-focus-color;
-  }
+	&:checked:focus + label span {
+		border-color: $form-border-focus-color;
+	}
 
-  &:checked[disabled] + label span {
-    &::after {
-      border-color: $form-border-color !important;
-    }
-    @include transition(none);
-  }
+	&:checked[disabled] + label span {
+		&::after {
+			border-color: $form-border-color !important;
+		}
+		@include transition(none);
+	}
 
-  &[disabled] + label span {
-    @include transition(none);
-    @extend %form-disabled;
-  }
-
+	&[disabled] + label span {
+		@include transition(none);
+		@extend %form-disabled;
+	}
 }
 
 %form-check-radio-style {
