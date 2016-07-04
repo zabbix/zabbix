@@ -43,6 +43,10 @@ class CScreenMap extends CScreenBase {
 			]);
 			$sysmap = reset($sysmap);
 
+			if (array_key_exists('severity_min', $this->screenitem)) {
+				$sysmap['severity_min'] = $this->screenitem['severity_min'];
+			}
+
 			$image->setSrc($image->getAttribute('src').'&severity_min='.$sysmap['severity_min']);
 
 			$action_map = getActionMapBySysmap($sysmap, ['severity_min' => $sysmap['severity_min']]);
