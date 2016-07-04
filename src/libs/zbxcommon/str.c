@@ -2395,8 +2395,6 @@ const char	*zbx_escalation_status_string(unsigned char status)
 	{
 		case ESCALATION_STATUS_ACTIVE:
 			return "active";
-		case ESCALATION_STATUS_RECOVERY:
-			return "recovery";
 		case ESCALATION_STATUS_SLEEP:
 			return "sleep";
 		case ESCALATION_STATUS_COMPLETED:

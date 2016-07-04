@@ -200,7 +200,7 @@ static int	DBpatch_3010020(void)
 	return DBadd_foreign_key("event_recovery", 2, &field);
 }
 
-/* DBpatch_301002 () */
+/* DBpatch_3010021 () */
 
 #define ZBX_OPEN_EVENT_WARNING_NUM	10000000
 
@@ -388,6 +388,776 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3010022(void)
+{
+	const ZBX_FIELD	field = {"recovery", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("operations", &field);
+}
+
+static int	DBpatch_3010023(void)
+{
+	zbx_db_insert_t	db_insert, db_insert_msg;
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret, actions_num;
+	zbx_uint64_t	actionid, operationid;
+
+	result = DBselect("select count(*) from actions where recovery_msg=1");
+	if (NULL == (row = DBfetch(result)) || 0 == (actions_num = atoi(row[0])))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	operationid = DBget_maxid_num("operations", actions_num);
+
+	zbx_db_insert_prepare(&db_insert, "operations", "operationid", "actionid", "operationtype", "recovery", NULL);
+	zbx_db_insert_prepare(&db_insert_msg, "opmessage", "operationid", "default_msg", "subject", "message", NULL);
+
+	DBfree_result(result);
+	result = DBselect("select actionid,r_shortdata,r_longdata from actions where recovery_msg=1");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[0]);
+		/* operationtype: 11 - OPERATION_TYPE_RECOVERY_MESSAGE */
+		zbx_db_insert_add_values(&db_insert, operationid, actionid, 11, 1);
+		zbx_db_insert_add_values(&db_insert_msg, operationid, 1, row[1], row[2]);
+
+		operationid++;
+	}
+
+	if (SUCCEED == (ret = zbx_db_insert_execute(&db_insert)))
+		ret = zbx_db_insert_execute(&db_insert_msg);
+
+	zbx_db_insert_clean(&db_insert_msg);
+	zbx_db_insert_clean(&db_insert);
+
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+/* patch 3010024 */
+
+#define	ZBX_3010024_ACTION_NOTHING	0
+#define	ZBX_3010024_ACTION_DISABLE	1
+#define	ZBX_3010024_ACTION_CONVERT	2
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010024_validate_action                                  *
+ *                                                                            *
+ * Purpose: checks if the action must be disabled or its operations converted *
+ *          to recovery operations                                            *
+ *                                                                            *
+ * Return value: ZBX_3010024_ACTION_NOTHING - do nothing                      *
+ *               ZBX_3010024_ACTION_DISABLE - disable action                  *
+ *               ZBX_3010024_ACTION_CONVERT - convert action operations to    *
+ *                                            recovery operations             *
+ *                                                                            *
+ * Comments: This function does not analyze expressions so it might ask to    *
+ *           disable actions that can't match success event. However correct  *
+ *           analysis is not easy to do, so to be safe failure is returned.   *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3010024_validate_action(zbx_uint64_t actionid, int eventsource, int evaltype, int recovery_msg)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		conditiontype, ret = ZBX_3010024_ACTION_DISABLE, value;
+
+	/* evaltype: 0 - CONDITION_EVAL_TYPE_AND_OR, 1 - CONDITION_EVAL_TYPE_AND */
+	if (evaltype != 0 && evaltype != 1)
+		return ret;
+
+	result = DBselect("select conditiontype,value from conditions where actionid=" ZBX_FS_UI64, actionid);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		conditiontype = atoi(row[0]);
+
+		/* eventsource: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL  */
+		if (0 == eventsource)
+		{
+			/* conditiontype: 5 - CONDITION_TYPE_TRIGGER_VALUE */
+			if (5 != conditiontype)
+				continue;
+
+			value = atoi(row[1]);
+
+			/* condition 'Trigger value = OK' */
+			if (0 == value)
+			{
+				if (ZBX_3010024_ACTION_NOTHING == ret)
+				{
+					ret = ZBX_3010024_ACTION_DISABLE;
+					break;
+
+				}
+				ret = ZBX_3010024_ACTION_CONVERT;
+			}
+
+			/* condition 'Trigger value = PROBLEM' */
+			if (1 == value)
+			{
+				if (ZBX_3010024_ACTION_CONVERT == ret)
+				{
+					ret = ZBX_3010024_ACTION_DISABLE;
+					break;
+
+				}
+				ret = ZBX_3010024_ACTION_NOTHING;
+			}
+		}
+		else if (3 == eventsource)
+		{
+			/* conditiontype: 23 -  CONDITION_TYPE_EVENT_TYPE */
+			if (23 != conditiontype)
+				continue;
+
+			value = atoi(row[1]);
+
+			/* event types:                                                          */
+			/*            1 - Event type:  Item in "normal" state                    */
+			/*            3 - Low-level discovery rule in "normal" state             */
+			/*            5 - Trigger in "normal" state                              */
+			if (1 == value || 3 == value || 5 == value)
+			{
+				ret = ZBX_3010024_ACTION_DISABLE;
+				break;
+			}
+
+			/* event types:                                                          */
+			/*            0 - Event type:  Item in "not supported" state             */
+			/*            2 - Low-level discovery rule in "not supported" state      */
+			/*            4 - Trigger in "unknown" state                             */
+			if (0 == value || 2 == value || 4 == value)
+				ret = ZBX_3010024_ACTION_NOTHING;
+		}
+	}
+	DBfree_result(result);
+
+	if (ZBX_3010024_ACTION_CONVERT == ret)
+	{
+		result = DBselect("select o.operationtype,o.esc_step_from,o.esc_step_to,count(oc.opconditionid)"
+					" from operations o"
+					" left join opconditions oc"
+						" on oc.operationid=o.operationid"
+					" where o.actionid=" ZBX_FS_UI64
+					" group by o.operationid",
+					actionid);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			/* cannot convert action if:                                                    */
+			/*   there are escalation steps that aren't executed at the escalation start    */
+			/*   there are conditions defined for action operations                         */
+			/*   there are operation to send message and action recovery message is enabled */
+			if (1 != atoi(row[1]) || 1 != atoi(row[1]) ||
+					0 != atoi(row[3]) ||
+					(0 == atoi(row[0]) && 0 != recovery_msg))
+			{
+				ret = ZBX_3010024_ACTION_DISABLE;
+				break;
+			}
+		}
+
+		DBfree_result(result);
+	}
+
+	return ret;
+}
+
+static int	DBpatch_3010024(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_vector_uint64_t	actionids_disable, actionids_convert;
+	int			ret, evaltype, eventsource, recovery_msg;
+	zbx_uint64_t		actionid;
+
+	zbx_vector_uint64_create(&actionids_disable);
+	zbx_vector_uint64_create(&actionids_convert);
+
+	/* eventsource: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL */
+	result = DBselect("select actionid,name,eventsource,evaltype,recovery_msg from actions"
+			" where eventsource in (0,3)");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[0]);
+		eventsource = atoi(row[2]);
+		evaltype = atoi(row[3]);
+		recovery_msg = atoi(row[4]);
+
+		ret = DBpatch_3010024_validate_action(actionid, eventsource, evaltype, recovery_msg);
+
+		if (ZBX_3010024_ACTION_DISABLE == ret)
+		{
+			zbx_vector_uint64_append(&actionids_disable, actionid);
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" will be disabled during database upgrade:"
+					" conditions might have matched success event which is not supported anymore.",
+					row[1]);
+		}
+		else if (ZBX_3010024_ACTION_CONVERT == ret)
+		{
+			zbx_vector_uint64_append(&actionids_convert, actionid);
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" operations will be converted to recovery"
+					" operations during database upgrade.", row[1]);
+		}
+	}
+	DBfree_result(result);
+
+	ret = SUCCEED;
+
+	if (0 != actionids_disable.values_num || 0 != actionids_convert.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset = 0;
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (0 != actionids_disable.values_num)
+		{
+			/* status: 1 - ACTION_STATUS_DISABLED */
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=1 where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids_disable.values,
+					actionids_disable.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		}
+
+		if (0 != actionids_convert.values_num)
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions"
+					" set r_shortdata=def_shortdata,"
+						"r_longdata=def_longdata"
+					" where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids_convert.values,
+					actionids_convert.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update operations set recovery=1 where");
+			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids_convert.values,
+					actionids_convert.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		}
+
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&actionids_convert);
+	zbx_vector_uint64_destroy(&actionids_disable);
+
+	return ret;
+}
+
+static int	DBpatch_3010025(void)
+{
+	return DBdrop_field("actions", "recovery_msg");
+}
+
+/* patch 3010026 */
+
+#define	ZBX_3010026_TOKEN_UNKNOWN	0
+#define	ZBX_3010026_TOKEN_OPEN		1
+#define	ZBX_3010026_TOKEN_CLOSE		2
+#define	ZBX_3010026_TOKEN_AND		3
+#define	ZBX_3010026_TOKEN_OR		4
+#define	ZBX_3010026_TOKEN_VALUE		5
+#define	ZBX_3010026_TOKEN_END		6
+
+#define ZBX_3010026_PARSE_VALUE		0
+#define ZBX_3010026_PARSE_OP		1
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_get_conditionids                                 *
+ *                                                                            *
+ * Purpose: get success condition identifiers                                 *
+ *                                                                            *
+ * Parameters: actionid     - [IN] the action identifier                      *
+ *             name         - [IN] the action name                            *
+ *             eventsource  - [IN] the action event source                    *
+ *             conditionids - [OUT] the success condition identifiers         *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_3010026_get_conditionids(zbx_uint64_t actionid, const char *name, int eventsource,
+		zbx_vector_uint64_t *conditionids)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	zbx_uint64_t	conditionid;
+	char		*condition = NULL;
+	size_t		condition_alloc = 0, condition_offset = 0;
+	int		value;
+
+	/* eventsource: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL  */
+	if (0 == eventsource)
+	{
+		/* conditiontype: 5 - CONDITION_TYPE_TRIGGER_VALUE */
+		result = DBselect("select conditionid,value from conditions"
+				" where actionid=" ZBX_FS_UI64
+					" and conditiontype=5",
+				actionid);
+	}
+	else if (3 == eventsource)
+	{
+		/* conditiontype: 23 -  CONDITION_TYPE_EVENT_TYPE */
+		result = DBselect("select conditionid,value from conditions"
+				" where actionid=" ZBX_FS_UI64
+					" and conditiontype=23"
+					" and value in ('1', '3', '5')",
+				actionid);
+	}
+	else
+		return;
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(conditionid, row[0]);
+		zbx_vector_uint64_append(conditionids, conditionid);
+
+		value = atoi(row[1]);
+
+		if (0 == eventsource)
+		{
+			/* value: 0 - TRIGGER_VALUE_OK, 1 - TRIGGER_VALUE_PROBLEM */
+			const char	*values[] = {"OK", "PROBLEM"};
+
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, "Trigger value = %s",
+					values[value]);
+		}
+		else
+		{
+			/* value: 1 - EVENT_TYPE_ITEM_NORMAL        */
+			/*        3 - EVENT_TYPE_LLDRULE_NORMAL     */
+			/*        5 - *EVENT_TYPE_TRIGGER_NORMAL    */
+			const char	*values[] = {NULL, "Item in 'normal' state",
+							NULL, "Low-level discovery rule in 'normal' state",
+							NULL, "Trigger in 'normal' state"};
+
+			zbx_snprintf_alloc(&condition, &condition_alloc, &condition_offset, "Event type = %s",
+					values[value]);
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" condition \"%s\" will be removed during database upgrade:"
+				" this type of condition is not supported anymore", name, condition);
+
+		condition_offset = 0;
+	}
+
+	zbx_free(condition);
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_skip_whitespace                       *
+ *                                                                            *
+ * Purpose: skips whitespace characters                                       *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to process                    *
+ *             offset     - [IN] the starting offset in expression            *
+ *                                                                            *
+ * Return value: the position of first non-whitespace character after offset  *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	DBpatch_3010026_expression_skip_whitespace(const char *expression, size_t offset)
+{
+	while (' ' == expression[offset])
+		offset++;
+
+	return offset;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_get_token                             *
+ *                                                                            *
+ * Purpose: gets the next expression token starting with offset               *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to process                    *
+ *             offset     - [IN] the starting offset in expression            *
+ *             token      - [OUT] the token location in expression            *
+ *                                                                            *
+ * Return value: the token type (see ZBX_3010026_TOKEN_* defines)             *
+ *                                                                            *
+ * Comments: The recognized tokens are '(', ')', 'and', 'or' and '{<id>}'.    *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3010026_expression_get_token(const char *expression, int offset, zbx_strloc_t *token)
+{
+	int	ret = ZBX_3010026_TOKEN_UNKNOWN;
+
+	offset = DBpatch_3010026_expression_skip_whitespace(expression, offset);
+	token->l = offset;
+
+	switch (expression[offset])
+	{
+		case '\0':
+			token->r = offset;
+			ret = ZBX_3010026_TOKEN_END;
+			break;
+		case '(':
+			token->r = offset;
+			ret = ZBX_3010026_TOKEN_OPEN;
+			break;
+		case ')':
+			token->r = offset;
+			ret = ZBX_3010026_TOKEN_CLOSE;
+			break;
+		case 'o':
+			if ('r' == expression[offset + 1])
+			{
+				token->r = offset + 1;
+				ret = ZBX_3010026_TOKEN_OR;
+			}
+			break;
+		case 'a':
+			if ('n' == expression[offset + 1] && 'd' == expression[offset + 2])
+			{
+				token->r = offset + 2;
+				ret = ZBX_3010026_TOKEN_AND;
+			}
+			break;
+		case '{':
+			while (0 != isdigit(expression[++offset]))
+				;
+			if ('}' == expression[offset])
+			{
+				token->r = offset;
+				ret = ZBX_3010026_TOKEN_VALUE;
+			}
+			break;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_validate_value                        *
+ *                                                                            *
+ * Purpose: checks if the value does not match any filter value               *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to process                    *
+ *             value      - [IN] the location of value in expression          *
+ *             filter     - [IN] a list of values to compare                  *
+ *                                                                            *
+ * Return value: SUCCEED - the value does not match any filter values         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3010026_expression_validate_value(const char *expression, zbx_strloc_t *value,
+		const zbx_vector_str_t *filter)
+{
+	int	i;
+
+	for (i = 0; i < filter->values_num; i++)
+	{
+		if (0 == strncmp(expression + value->l, filter->values[i], value->r - value->l + 1))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_cut_substring                         *
+ *                                                                            *
+ * Purpose: cuts substring from the expression                                *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to process                    *
+ *             cu         - [IN] the substring location                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_3010026_expression_cut_substring(char *expression, zbx_strloc_t *cut)
+{
+	if (cut->l <= cut->r)
+		memmove(expression + cut->l, expression + cut->r + 1, strlen(expression + cut->r + 1) + 1);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_move_location                         *
+ *                                                                            *
+ * Purpose: location by the specified offset                                  *
+ *                                                                            *
+ * Parameters: location  - [IN] the location to adjust                        *
+ *             offset    - [IN] the offset                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBpatch_3010026_expression_move_location(zbx_strloc_t *location, int offset)
+{
+	location->l += offset;
+	location->r += offset;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_remove_values_impl                    *
+ *                                                                            *
+ * Purpose: removes values specified in filter from the location              *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to process                    *
+ *             exp_token  - [IN] the current location in expression           *
+ *             filter     - [IN] a list of values                             *
+ *                                                                            *
+ * Return value: SUCCEED - the expression was processed successfully          *
+ *               FAIL    - failed to parse expression                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3010026_expression_remove_values_impl(char *expression, zbx_strloc_t *exp_token,
+		const zbx_vector_str_t *filter)
+{
+	zbx_strloc_t	token, cut_loc, op_token, value_token;
+	int		token_type, cut_value = 0, state = ZBX_3010026_PARSE_VALUE,
+			prevop_type = ZBX_3010026_TOKEN_UNKNOWN;
+
+	exp_token->r = exp_token->l;
+
+	while (ZBX_3010026_TOKEN_UNKNOWN != (token_type =
+			DBpatch_3010026_expression_get_token(expression, exp_token->r, &token)))
+	{
+		/* parse value */
+		if (ZBX_3010026_PARSE_VALUE == state)
+		{
+			state = ZBX_3010026_PARSE_OP;
+
+			if (ZBX_3010026_TOKEN_OPEN == token_type)
+			{
+				token.l = token.r + 1;
+
+				if (FAIL == DBpatch_3010026_expression_remove_values_impl(expression, &token, filter))
+					return FAIL;
+
+				if (')' != expression[token.r])
+					return FAIL;
+
+				if (token.r == DBpatch_3010026_expression_skip_whitespace(expression, token.l))
+					cut_value = 1;
+
+				/* include opening '(' into token */
+				token.l--;
+
+				value_token = token;
+				exp_token->r = token.r + 1;
+
+				continue;
+			}
+			else if (ZBX_3010026_TOKEN_VALUE != token_type)
+				return FAIL;
+
+			if (SUCCEED == DBpatch_3010026_expression_validate_value(expression, &token, filter))
+				cut_value = 1;
+
+			value_token = token;
+			exp_token->r = token.r + 1;
+
+			continue;
+		}
+
+		/* parse operator */
+		state = ZBX_3010026_PARSE_VALUE;
+
+		if (1 == cut_value)
+		{
+			if (ZBX_3010026_TOKEN_AND == prevop_type || (ZBX_3010026_TOKEN_OR == prevop_type &&
+					(ZBX_3010026_TOKEN_CLOSE == token_type || ZBX_3010026_TOKEN_END == token_type)))
+			{
+				cut_loc.l = op_token.l;
+				cut_loc.r = value_token.r;
+				DBpatch_3010026_expression_move_location(&token, -(cut_loc.r - cut_loc.l + 1));
+				prevop_type = token_type;
+				op_token = token;
+			}
+			else
+			{
+				cut_loc.l = value_token.l;
+
+				if (ZBX_3010026_TOKEN_CLOSE == token_type || ZBX_3010026_TOKEN_END == token_type)
+					cut_loc.r = token.l - 1;
+				else
+					cut_loc.r = token.r;
+
+				DBpatch_3010026_expression_move_location(&token, -(cut_loc.r - cut_loc.l + 1));
+			}
+			DBpatch_3010026_expression_cut_substring(expression, &cut_loc);
+			cut_value = 0;
+		}
+		else
+		{
+			prevop_type = token_type;
+			op_token = token;
+		}
+
+		if (ZBX_3010026_TOKEN_CLOSE == token_type || ZBX_3010026_TOKEN_END == token_type)
+		{
+			exp_token->r = token.r;
+			return SUCCEED;
+		}
+
+		if (ZBX_3010026_TOKEN_AND != token_type && ZBX_3010026_TOKEN_OR != token_type)
+			return FAIL;
+
+		exp_token->r = token.r + 1;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBpatch_3010026_expression_remove_values                         *
+ *                                                                            *
+ * Purpose: removes values specified in filter from the location              *
+ *                                                                            *
+ * Parameters: expression - [IN] the expression to process                    *
+ *             filter     - [IN] a list of values                             *
+ *                                                                            *
+ * Return value: SUCCEED - the expression was processed successfully          *
+ *               FAIL    - failed to parse expression                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBpatch_3010026_expression_remove_values(char *expression, const zbx_vector_str_t *filter)
+{
+	int		ret;
+	zbx_strloc_t	token = {0};
+
+	if (SUCCEED == (ret = DBpatch_3010026_expression_remove_values_impl(expression, &token, filter)))
+		zbx_lrtrim(expression, " ");
+
+	return ret;
+}
+
+static int	DBpatch_3010026(void)
+{
+	DB_ROW			row;
+	DB_RESULT		result;
+	zbx_vector_uint64_t	conditionids, actionids;
+	int			ret = FAIL, evaltype, index, i, eventsource;
+	zbx_uint64_t		actionid;
+	char			*sql = NULL, *formula;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_vector_str_t	filter;
+
+	zbx_vector_uint64_create(&conditionids);
+	zbx_vector_uint64_create(&actionids);
+	zbx_vector_str_create(&filter);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select actionid,eventsource,evaltype,formula,name from actions");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(actionid, row[0]);
+		eventsource = atoi(row[1]);
+		evaltype = atoi(row[2]);
+
+		index = conditionids.values_num;
+		DBpatch_3010026_get_conditionids(actionid, row[4], eventsource, &conditionids);
+
+		/* evaltype: 3 - CONDITION_EVAL_TYPE_EXPRESSION */
+		if (3 != evaltype)
+			continue;
+
+		/* no new conditions to remove, process next action */
+		if (index == conditionids.values_num)
+			continue;
+
+		formula = zbx_strdup(NULL, row[3]);
+
+		for (i = index; i < conditionids.values_num; i++)
+			zbx_vector_str_append(&filter, zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", conditionids.values[i]));
+
+		if (SUCCEED == DBpatch_3010026_expression_remove_values(formula, &filter))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set formula='%s'"
+					" where actionid=" ZBX_FS_UI64 ";\n", formula, actionid);
+		}
+
+		zbx_free(formula);
+		zbx_vector_str_clear_ext(&filter, zbx_ptr_free);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	if (0 != conditionids.values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from conditions where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "conditionid", conditionids.values,
+				conditionids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	/* reset action evaltype to AND/OR if it has no more conditions left */
+
+	DBfree_result(result);
+	result = DBselect("select a.actionid,a.name,a.evaltype,count(c.conditionid)"
+			" from actions a"
+			" left join conditions c"
+				" on a.actionid=c.actionid"
+			" group by a.actionid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		/* reset evaltype to AND/OR (0) if action has no more conditions and it's evaltype is not AND/OR */
+		if (0 == atoi(row[3]) && 0 != atoi(row[2]))
+		{
+			ZBX_STR2UINT64(actionid, row[0]);
+			zbx_vector_uint64_append(&actionids, actionid);
+
+			zabbix_log(LOG_LEVEL_WARNING, "Action \"%s\" type of calculation will be changed to And/Or"
+					" during database upgrade: no action conditions found", row[1]);
+		}
+	}
+
+	if (0 != actionids.values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update actions set evaltype=0 where");
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
+				actionids.values_num);
+
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+	zbx_vector_str_destroy(&filter);
+	zbx_vector_uint64_destroy(&actionids);
+	zbx_vector_uint64_destroy(&conditionids);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -416,5 +1186,10 @@ DBPATCH_ADD(3010018, 0, 1)
 DBPATCH_ADD(3010019, 0, 1)
 DBPATCH_ADD(3010020, 0, 1)
 DBPATCH_ADD(3010021, 0, 1)
+DBPATCH_ADD(3010022, 0, 1)
+DBPATCH_ADD(3010023, 0, 1)
+DBPATCH_ADD(3010024, 0, 1)
+DBPATCH_ADD(3010025, 0, 1)
+DBPATCH_ADD(3010026, 0, 1)
 
 DBPATCH_END()
