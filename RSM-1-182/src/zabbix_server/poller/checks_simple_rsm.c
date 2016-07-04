@@ -1449,8 +1449,8 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	DC_ITEM		*items = NULL;
 	zbx_ns_t	*nss = NULL;
 	size_t		i, j, items_num = 0, nss_num = 0;
-	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, rdds_enabled, res_ec = ZBX_EC_NOERROR,
-			rtt, upd = ZBX_NO_VALUE, rtt_limit, ret = SYSINFO_RET_FAIL;
+	int		ipv4_enabled, ipv6_enabled, dnssec_enabled, epp_enabled, res_ec = ZBX_EC_NOERROR, rtt,
+			upd = ZBX_NO_VALUE, rtt_limit, ret = SYSINFO_RET_FAIL;
 
 	if (0 != get_param(params, 1, domain, sizeof(domain)) || '\0' == *domain)
 	{
@@ -1466,13 +1466,6 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 	}
 
 	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_DNSSEC_ENABLED, &dnssec_enabled, 0,
-			err, sizeof(err)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-		goto out;
-	}
-
-	if (SUCCEED != zbx_conf_int(&item->host.hostid, ZBX_MACRO_TLD_RDDS_ENABLED, &rdds_enabled, 0,
 			err, sizeof(err)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, err));
@@ -1558,8 +1551,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 			if (ZBX_EC_NOERROR == res_ec)
 			{
 				if (SUCCEED != zbx_get_ns_ip_values(res, nss[i].name, nss[i].ips[j], keys, testprefix,
-						domain, log_fd, &rtt,
-						(ZBX_RSM_UDP == proto && 0 != rdds_enabled) ? &upd : NULL,
+						domain, log_fd, &rtt, (ZBX_RSM_UDP == proto) ? &upd : NULL,
 						ipv4_enabled, ipv6_enabled, epp_enabled, err, sizeof(err)))
 				{
 					zbx_rsm_err(log_fd, err);
