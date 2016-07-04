@@ -1913,12 +1913,6 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
-			'recovery_msg' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
 			'r_shortdata' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -1984,6 +1978,12 @@ return [
 				'default' => '1',
 			],
 			'evaltype' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'recovery' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
