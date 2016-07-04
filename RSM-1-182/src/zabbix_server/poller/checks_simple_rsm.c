@@ -2609,17 +2609,6 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 			goto out;
 		}
 
-		if (0 == strcmp(testprefix, "*RANDOMTLD*"))
-		{
-			zbx_free(testprefix);
-
-			if (NULL == (testprefix = zbx_get_rr_tld(domain, err, sizeof(err))))
-			{
-				SET_MSG_RESULT(result, zbx_strdup(NULL, err));
-				goto out;
-			}
-		}
-
 		if (SUCCEED != zbx_conf_str(&item->host.hostid, ZBX_MACRO_RDDS_NS_STRING, &rdds_ns_string, err,
 				sizeof(err)))
 		{
