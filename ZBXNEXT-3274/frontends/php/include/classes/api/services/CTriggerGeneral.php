@@ -961,6 +961,12 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($trigger['recovery_mode'] != $db_trigger['recovery_mode']) {
 				$upd_trigger['values']['recovery_mode'] = $trigger['recovery_mode'];
 			}
+			if ($trigger['correlation_mode'] != $db_trigger['correlation_mode']) {
+				$upd_trigger['values']['correlation_mode'] = $trigger['correlation_mode'];
+			}
+			if ($trigger['correlation_tag'] != $db_trigger['correlation_tag']) {
+				$upd_trigger['values']['correlation_tag'] = $trigger['correlation_tag'];
+			}
 			if (array_key_exists('url', $trigger) && $trigger['url'] !== $db_trigger['url']) {
 				$upd_trigger['values']['url'] = $trigger['url'];
 			}
