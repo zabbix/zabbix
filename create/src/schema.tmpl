@@ -605,6 +605,7 @@ FIELD		|recovery_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|recovery_expression|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|correlation_mode|t_integer	|'0'	|NOT NULL	|0
 FIELD		|correlation_tag|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|problem_count	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|status
 INDEX		|2		|value,lastchange
 INDEX		|3		|templateid
@@ -1395,4 +1396,4 @@ INDEX		|2		|tag,value
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010034	|3010034
+ROW		|3010036	|3010036
