@@ -81,33 +81,31 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
 	if (!empty($item['template_host'])) {
-		$description[] = (new CLink(
-			CHtml::encode($item['template_host']['name']),
-			'?hostid='.$item['template_host']['hostid'].'&filter_set=1'))
+		$description[] = (new CLink(CHtml::encode($item['template_host']['name']),
+			'?hostid='.$item['template_host']['hostid'].'&filter_set=1'
+		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
 	if (!empty($item['discoveryRule'])) {
-		$description[] = (new CLink(
-			CHtml::encode($item['discoveryRule']['name']),
-			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid']))
+		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
+			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid']
+		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
-		$description[] = NAME_DELIMITER.$item['name_expanded'];
+		$description[] = NAME_DELIMITER;
 	}
-	else {
-		$description[] = new CLink(
-			CHtml::encode($item['name_expanded']),
-			'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
-		);
-	}
+
+	$description[] = new CLink(CHtml::encode($item['name_expanded']),
+		'?form=update&hostid='.$item['hostid'].'&itemid='.$item['itemid']
+	);
 
 	// status
 	$status = new CCol((new CLink(
 		itemIndicator($item['status'], $item['state']),
-		'?group_itemid='.$item['itemid'].
+		'?group_itemid[]='.$item['itemid'].
 			'&hostid='.$item['hostid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -246,11 +244,8 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = '';
 	}
 
-	$checkBox = (new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))
-		->setEnabled(empty($item['discoveryRule']));
-
 	$itemTable->addRow([
-		$checkBox,
+		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$menuIcon,
 		empty($this->data['filter_hostid']) ? $item['host'] : null,
 		$description,

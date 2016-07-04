@@ -27,9 +27,13 @@ class CControllerProxyList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in host',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1'
+			'sort' =>			'in host',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE
 		];
 
 		$ret = $this->validateInput($fields);
@@ -52,12 +56,28 @@ class CControllerProxyList extends CController {
 		CProfile::update('web.proxies.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.proxies.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+		// filter
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.proxies.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.proxies.filter_status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::delete('web.proxies.filter_name');
+			CProfile::delete('web.proxies.filter_status');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.proxies.filter_name', ''),
+			'status' => CProfile::get('web.proxies.filter_status', -1)
+		];
+
 		$config = select_config();
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
+			'filter' => $filter,
 			'config' => [
 				'max_in_table' => $config['max_in_table']
 			]
@@ -65,6 +85,12 @@ class CControllerProxyList extends CController {
 
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept'],
+			'search' => [
+				'host' => ($filter['name'] === '') ? null : $filter['name']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status']
+			],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,

@@ -69,7 +69,9 @@ ZBX_METRIC	parameters_common[] =
 	{"system.users.num",	0,		SYSTEM_USERS_NUM,	NULL},
 
 	{"log",			CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},
+	{"log.count",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"logfile"},
 	{"logrt",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
+	{"logrt.count",		CF_HAVEPARAMS,	ONLY_ACTIVE,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	ONLY_ACTIVE, 		"system"},
 
 	{NULL}

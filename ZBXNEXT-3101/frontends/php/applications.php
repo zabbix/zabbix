@@ -210,44 +210,34 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 }
 elseif (hasRequest('applications')
 		&& str_in_array(getRequest('action'), ['application.massenable', 'application.massdisable'])) {
-	$enableApplicationItems = (getRequest('action') === 'application.massenable');
+	$status = (getRequest('action') === 'application.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
-	$applications = API::Application()->get([
-		'output' => [],
-		'applicationids' => getRequest('applications', []),
-		'selectItems' => ['itemid'],
-		'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null
+	$db_items = API::Item()->get([
+		'output' => ['itemid'],
+		'applicationids' => getRequest('applications', [])
 	]);
 
-	$actionSuccessful = true;
-	$updatedItemCount = 0;
-
-	DBstart();
-
-	foreach ($applications as $application) {
-		foreach($application['items'] as $item) {
-			$actionSuccessful &= $enableApplicationItems
-				? activate_item($item['itemid'])
-				: disable_item($item['itemid']);
-
-			$updatedItemCount++;
-		}
+	$items = [];
+	foreach ($db_items as $db_item) {
+		$items[] = ['itemid' => $db_item['itemid'], 'status' => $status];
 	}
 
-	$actionSuccessful = DBend($actionSuccessful);
+	$result = (bool) API::Item()->update($items);
 
-	if ($actionSuccessful) {
+	if ($result) {
 		uncheckTableRows($pageFilter->hostid);
 	}
 
-	$messageSuccess = $enableApplicationItems
-		? _n('Item enabled', 'Items enabled', $updatedItemCount)
-		: _n('Item disabled', 'Items disabled', $updatedItemCount);
-	$messageFailed = $enableApplicationItems
-		? _n('Cannot enable item', 'Cannot enable items', $updatedItemCount)
-		: _n('Cannot disable item', 'Cannot disable items', $updatedItemCount);
+	$updated = count($items);
 
-	show_messages($actionSuccessful, $messageSuccess, $messageFailed);
+	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
+		? _n('Item enabled', 'Items enabled', $updated)
+		: _n('Item disabled', 'Items disabled', $updated);
+	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
+		? _n('Cannot enable item', 'Cannot enable items', $updated)
+		: _n('Cannot disable item', 'Cannot disable items', $updated);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*

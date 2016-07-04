@@ -357,7 +357,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		$list->addItem(getHostAvailabilityTable($db_host));
 
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-			$list->addItem(getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']));
+			$lifetime_indicator = getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']);
+			$list->addItem((new CDiv($lifetime_indicator))->addClass(ZBX_STYLE_STATUS_CONTAINER));
 		}
 	}
 
@@ -653,6 +654,33 @@ function getHostLifetimeIndicator($current_time, $ts_delete) {
 	else {
 		$warning = _s(
 			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
+}
+
+/**
+ * Returns the discovered application lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the application
+ *
+ * @return CDiv
+ */
+function getApplicationLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The application is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 			zbx_date2age($ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)
