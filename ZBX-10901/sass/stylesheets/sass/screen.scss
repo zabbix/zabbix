@@ -1106,8 +1106,8 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $action-hover-color;
-	background-color: $action-hover-color;
+	border: 1px solid $table-border-color;
+	background-color: $table-border-color;
 	margin: 5px 0;
 	@include border-radius(2px);
 
