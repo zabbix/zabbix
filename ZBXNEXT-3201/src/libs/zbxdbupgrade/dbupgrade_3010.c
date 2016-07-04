@@ -541,6 +541,22 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3010037(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update config set ok_period=%d where ok_period>%d", SEC_PER_DAY, SEC_PER_DAY))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3010038(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update config set blink_period=%d where blink_period>%d", SEC_PER_DAY, SEC_PER_DAY))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -584,5 +600,7 @@ DBPATCH_ADD(3010033, 0, 1)
 DBPATCH_ADD(3010034, 0, 1)
 DBPATCH_ADD(3010035, 0, 1)
 DBPATCH_ADD(3010036, 0, 1)
+DBPATCH_ADD(3010037, 0, 1)
+DBPATCH_ADD(3010038, 0, 1)
 
 DBPATCH_END()
