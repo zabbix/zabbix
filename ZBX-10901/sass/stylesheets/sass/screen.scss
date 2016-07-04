@@ -25,7 +25,6 @@ a {
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		//outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
@@ -346,7 +345,7 @@ ul.top-nav-icons {
 		}
 
 		&:focus {
-			background-color: $ui-hover-color;
+			background-color: $ui-hover-color !important;
 			@include opacity(1);
 		}
 	}
@@ -1694,6 +1693,7 @@ button {
 	}
 
 	&:focus {
+		@include box-shadow(0 0 0 2px rgba($blue, .35));
 		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
@@ -1755,17 +1755,14 @@ button {
 	@include border-radius(0);
 
 	&:hover {
-		outline: 0;
 		@extend .btn-link;
 	}
 
 	&:focus {
-		outline: 1px solid #000;
 		@extend .btn-link;
 	}
 
 	&:active {
-		outline: 0;
 		@extend .btn-link;
 	}
 }
@@ -1875,6 +1872,7 @@ $icon-widget-btn: (
 	}
 
 	&:focus {
+		@include box-shadow(none);
 		@extend %btn-widget-hover-active;
 	}
 
