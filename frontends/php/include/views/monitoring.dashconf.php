@@ -104,7 +104,7 @@ array_pop($severities);
 
 $form_list->addRow(_('Triggers with severity'), $severities);
 
-$form_list->addRow(_('Trigger name like'),
+$form_list->addRow(_('Trigger name'),
 	(new CTextBox('trigger_name', $data['trigger_name']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setEnabled($data['isFilterEnable'])

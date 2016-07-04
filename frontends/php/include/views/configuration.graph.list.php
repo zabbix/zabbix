@@ -74,7 +74,7 @@ $graphTable = (new CTableInfo())
 		make_sorting_header(_('Graph type'), 'graphtype', $this->data['sort'], $this->data['sortorder'])
 	]);
 
-foreach ($this->data['graphs'] as $graph) {
+foreach ($data['graphs'] as $graph) {
 	$graphid = $graph['graphid'];
 
 	$hostList = null;
@@ -90,7 +90,6 @@ foreach ($this->data['graphs'] as $graph) {
 		$hostList = implode(', ', $hostList);
 	}
 
-	$isCheckboxEnabled = true;
 	$name = [];
 	if (!empty($graph['templateid'])) {
 		$realHosts = get_realhosts_by_graphid($graph['templateid']);
@@ -99,45 +98,26 @@ foreach ($this->data['graphs'] as $graph) {
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
-		$name[] = new CLink(
-			$graph['name'],
-			'graphs.php?'.
-				'form=update'.
-				'&graphid='.$graphid.url_param('parent_discoveryid').
-				'&hostid='.$this->data['hostid']
-		);
-
-		if ($graph['discoveryRule']) {
-			$isCheckboxEnabled = false;
-		}
 	}
 	elseif (!empty($graph['discoveryRule']) && empty($this->data['parent_discoveryid'])) {
-		$name[] = (new CLink(
-			$graph['discoveryRule']['name'],
+		$name[] = (new CLink($graph['discoveryRule']['name'],
 			'host_discovery.php?form=update&itemid='.$graph['discoveryRule']['itemid'])
-			)
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_ORANGE);
+		)
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
-		$name[] = new CSpan($graph['name']);
-
-		$isCheckboxEnabled = false;
-	}
-	else {
-		$name[] = new CLink(
-			$graph['name'],
-			'graphs.php?'.
-				'form=update'.
-				'&graphid='.$graphid.url_param('parent_discoveryid').
-				'&hostid='.$this->data['hostid']
-		);
 	}
 
-	$checkBox = (new CCheckBox('group_graphid['.$graphid.']', $graphid))
-		->setEnabled($isCheckboxEnabled);
+	$name[] = new CLink(
+		$graph['name'],
+		'graphs.php?'.
+			'form=update'.
+			'&graphid='.$graphid.url_param('parent_discoveryid').
+			'&hostid='.$this->data['hostid']
+	);
 
 	$graphTable->addRow([
-		$checkBox,
+		new CCheckBox('group_graphid['.$graphid.']', $graphid),
 		$hostList,
 		$name,
 		$graph['width'],

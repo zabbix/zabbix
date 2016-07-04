@@ -267,10 +267,12 @@ static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint
 
 	sql = zbx_malloc(NULL, sql_alloc);
 
+	/* source: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL */
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select source,object,objectid,eventid,value"
 			" from events"
 			" where eventid>" ZBX_FS_UI64
+				" and source in (0,3)"
 			" order by eventid",
 			*eventid);
 
@@ -284,10 +286,6 @@ static int	DBpatch_3010021_update_event_recovery(zbx_hashset_t *events, zbx_uint
 	{
 		object_events_local.source = atoi(row[0]);
 		object_events_local.object = atoi(row[1]);
-
-		/* source: 0 - EVENT_SOURCE_TRIGGERS, 3 - EVENT_SOURCE_INTERNAL */
-		if (0 != atoi(row[0]) && 3 != atoi(row[0]))
-			continue;
 
 		ZBX_STR2UINT64(object_events_local.objectid, row[2]);
 		ZBX_STR2UINT64(*eventid, row[3]);

@@ -32,7 +32,8 @@ $filterColumn = new CFormList();
 
 // getting inventory fields to make a drop down
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
-$inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
+$inventoryFieldsComboBox = (new CComboBox('filter_field', $this->data['filterField']))
+	->setAttribute('autofocus', 'autofocus');
 foreach ($inventoryFields as $inventoryField) {
 	$inventoryFieldsComboBox->addItem($inventoryField['db_field'], $inventoryField['title']);
 }

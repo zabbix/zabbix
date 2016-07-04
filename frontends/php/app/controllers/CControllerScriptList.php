@@ -27,9 +27,12 @@ class CControllerScriptList extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in name,command',
-			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>	'in 1'
+			'sort' =>			'in name,command',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -52,18 +55,34 @@ class CControllerScriptList extends CController {
 		CProfile::update('web.scripts.php.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.scripts.php.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
+		// filter
+		if (hasRequest('filter_set')) {
+			CProfile::update('web.scripts.filter_name', getRequest('filter_name', ''), PROFILE_TYPE_STR);
+		}
+		elseif (hasRequest('filter_rst')) {
+			CProfile::delete('web.scripts.filter_name');
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.scripts.filter_name', '')
+		];
+
 		$config = select_config();
 
 		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'sortorder' => $sortOrder,
+			'filter' => $filter
 		];
 
 		// list of scripts
 		$data['scripts'] = API::Script()->get([
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'type',
 				'execute_on'
+			],
+			'search' => [
+				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'editable' => true,
 			'limit' => $config['search_limit'] + 1

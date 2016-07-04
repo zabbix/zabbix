@@ -402,25 +402,29 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['itemprototype.massenable', 'itemprototype.massdisable']) && hasRequest('group_itemid')) {
-	$groupItemId = getRequest('group_itemid');
-	$enable = (getRequest('action') == 'itemprototype.massenable');
+	$itemids = getRequest('group_itemid');
+	$status = (getRequest('action') == 'itemprototype.massenable') ? ITEM_STATUS_ACTIVE : ITEM_STATUS_DISABLED;
 
-	DBstart();
-	$result = $enable ? activate_item($groupItemId) : disable_item($groupItemId);
-	$result = DBend($result);
+	$item_prototypes = [];
+	foreach ($itemids as $itemid) {
+		$item_prototypes[] = ['itemid' => $itemid, 'status' => $status];
+	}
 
-	$updated = count($groupItemId);
-
-	$messageSuccess = $enable
-		? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
-		: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
-		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+	$result = (bool) API::Itemprototype()->update($item_prototypes);
 
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
+
+	$updated = count($itemids);
+
+	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
+		? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
+		: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
+	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
+		? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
+		: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && getRequest('action') == 'itemprototype.massdelete' && hasRequest('group_itemid')) {
@@ -448,8 +452,8 @@ if (isset($_REQUEST['form'])) {
 				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
 				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
 				'formula', 'logtimefmt', 'templateid', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
-				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
-				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'interfaceid', 'port',
+				'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
 			]
 		]);
 		$itemPrototype = reset($itemPrototype);

@@ -2184,23 +2184,6 @@ class CItemDelayFlexParser {
 	}
 
 	/**
-	 * Get an array scheduling intervals.
-	 *
-	 * @return array
-	 */
-	public function getSchedulingIntervals() {
-		$intervals = [];
-
-		foreach ($this->intervals as $interval) {
-			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_SCHEDULING) {
-				$intervals[] = $interval['interval'];
-			}
-		}
-
-		return $intervals;
-	}
-
-	/**
 	 * Mark the interval string as invalid and set an error message.
 	 */
 	private function setError() {

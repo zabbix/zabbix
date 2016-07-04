@@ -367,9 +367,26 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	if (0 == FD_ISSET(s->socket, &fdw))
 	{
 		if (0 != FD_ISSET(s->socket, &fde))
-			*error = zbx_strdup(*error, "Connection refused.");
-		else
-			*error = zbx_strdup(*error, "A connection timeout occurred.");
+		{
+			int socket_error = 0;
+			int socket_error_len = sizeof(int);
+
+			if (ZBX_PROTO_ERROR != getsockopt(s->socket, SOL_SOCKET,
+				SO_ERROR, (char *)&socket_error, &socket_error_len))
+			{
+				if (socket_error == WSAECONNREFUSED)
+					*error = zbx_strdup(*error, "Connection refused.");
+				else if (socket_error == WSAETIMEDOUT)
+					*error = zbx_strdup(*error, "A connection timeout occurred.");
+				else
+					*error = zbx_strdup(*error, strerror_from_system(socket_error));
+			}
+			else
+			{
+				*error = zbx_dsprintf(*error, "Cannot obtain error code: %s",
+						strerror_from_system(zbx_socket_last_error()));
+			}
+		}
 
 		return FAIL;
 	}

@@ -61,6 +61,6 @@ $autoloader = new CAutoloader([
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',
-	__DIR__.'/include/classes/import/converters',
+	__DIR__.'/include/classes/import/converters'
 ]);
 $autoloader->register();

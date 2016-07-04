@@ -355,12 +355,20 @@ class CHelpItems {
 					'description' => _('Maximum number of processes supported by OS. Returns integer')
 				],
 				[
-					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>]',
+					'key' => 'log[file,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>]',
 					'description' => _('Log file monitoring. Returns log')
 				],
 				[
-					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>]',
+					'key' => 'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>]',
 					'description' => _('Log file monitoring with log rotation support. Returns log')
+				],
+				[
+					'key' => 'log.count[file,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
+					'description' => _('Number of matching lines since the last check of the item. Returns integer')
+				],
+				[
+					'key' => 'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>]',
+					'description' => _('Number of matching lines since the last check of the item with log rotation support. Returns integer')
 				],
 				[
 					'key' => 'net.dns[<ip>,zone,<type>,<timeout>,<count>,<protocol>]',
