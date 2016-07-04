@@ -6597,7 +6597,7 @@ static void	DCagent_set_availability(zbx_agent_availability_t *av,  unsigned cha
 
 /******************************************************************************
  *                                                                            *
- * Function: DChost_set_availability                                          *
+ * Function: DChost_set_agent_availability                                    *
  *                                                                            *
  * Purpose: set host availability data in configuration cache                 *
  *                                                                            *
@@ -6764,7 +6764,7 @@ static void	zbx_agent_availability_init(zbx_agent_availability_t *agent, unsigne
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_host_availability_init                                       *
+ * Function: zbx_host_availability_is_set                                     *
  *                                                                            *
  * Purpose: checks host availability if any agent availability field is set   *
  *                                                                            *
@@ -7179,27 +7179,42 @@ static void	DCconfig_sort_triggers_topologically(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DCconfig_set_trigger_value                                       *
+ * Function: DCconfig_triggers_apply_changes                                  *
  *                                                                            *
- * Purpose: set trigger value, value flags, and error                         *
- *                                                                            *
- * Author: Aleksandrs Saveljevs                                               *
+ * Purpose: apply trigger value,state,lastchange or error changes to          *
+ *          configuration cache                                               *
  *                                                                            *
  ******************************************************************************/
-void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange)
+void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 {
-	ZBX_DC_TRIGGER	*dc_trigger;
+	int			i;
+	zbx_trigger_diff_t	*diff;
+	ZBX_DC_TRIGGER		*dc_trigger;
 
 	LOCK_CACHE;
 
-	if (NULL != (dc_trigger = zbx_hashset_search(&config->triggers, &triggerid)))
+	for (i = 0; i < trigger_diff->values_num; i++)
 	{
-		DCstrpool_replace(1, &dc_trigger->error, error);
-		dc_trigger->value = value;
-		dc_trigger->state = state;
-		if (NULL != lastchange)
-			dc_trigger->lastchange = *lastchange;
+		diff = (zbx_trigger_diff_t *)trigger_diff->values[i];
+
+		if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &diff->triggerid)))
+			continue;
+
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE))
+			dc_trigger->lastchange = diff->lastchange;
+
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE))
+			dc_trigger->value = diff->value;
+
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE))
+			dc_trigger->state = diff->state;
+
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR))
+			DCstrpool_replace(1, &dc_trigger->error, diff->error);
+
+		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT))
+			dc_trigger->problem_count = diff->problem_count;
+
 	}
 
 	UNLOCK_CACHE;

@@ -24,6 +24,7 @@
 typedef struct
 {
 	zbx_uint64_t	eventid;
+	zbx_uint64_t	objectid;
 	DB_EVENT	*r_event;
 }
 zbx_event_recovery_t;
@@ -33,6 +34,6 @@ void	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag);
-int	process_events(void);
+int	process_events(zbx_vector_ptr_t *trigger_diff);
 
 #endif
