@@ -1667,7 +1667,7 @@ int	is_recovery_event(const DB_EVENT *event)
  *                                                                            *
  * Parameters: events     - [IN] events to apply actions for                  *
  *             events_num - [IN] number of events                             *
- *             event_recovery - [IN] a vector of (problem eventid, OK event)  *
+ *             event_recovery - [IN] a vector of (PROBLEM eventid, OK event)  *
  *                                   pairs.                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1686,6 +1686,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions);
 
+	/* 1. Start escalations for PROBLEM events (EVENT_SOURCE_TRIGGERS). */
+	/* 2. Execute operations (EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION). */
 	for (i = 0; i < events_num; i++)
 	{
 		event = &events[i];
@@ -1717,31 +1719,39 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
 
+	/* 3. Create recovery escalations from OK events that can be matched to existing escalations by corresponding PROBLEM events, */
 	if (0 != event_recovery->values_num)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 		zbx_vector_uint64_t	eventids;
-		zbx_event_recovery_t	*recovery;
 		DB_ROW			row;
 		DB_RESULT		result;
 		zbx_uint64_t		actionid, eventid;
-		int			i, index;
+		int			i;
 
 		zbx_vector_uint64_create(&eventids);
 
+		/* 3.1. Prepare eventids for use in DBadd_condition_alloc(). These are eventids from list of tuples (PROBLEM eventid, OK event). */
 		for (i = 0; i < event_recovery->values_num; i++)
 		{
+			zbx_event_recovery_t	*recovery;
+
 			recovery = (zbx_event_recovery_t *)event_recovery->values[i];
 			zbx_vector_uint64_append(&eventids, recovery->eventid);
 		}
 
+		/* 3.2. Get existing escalations that correspond to the OK events (see 3,1,). */
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
-
 		result = DBselect("%s", sql);
+
+		/* 3.3. For each found escalation add a recovery escalation. */
 		while (NULL != (row = DBfetch(result)))
 		{
+			zbx_event_recovery_t	*recovery;
+			int			index;
+
 			ZBX_STR2UINT64(actionid, row[0]);
 			ZBX_STR2UINT64(eventid, row[1]);
 
