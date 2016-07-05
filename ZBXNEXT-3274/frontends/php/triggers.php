@@ -262,6 +262,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 						&& $db_trigger['recovery_expression'] !== getRequest('recovery_expression')) {
 					$trigger['recovery_expression'] = getRequest('recovery_expression');
 				}
+				if ($db_trigger['correlation_mode'] != getRequest('correlation_mode')) {
+					$trigger['correlation_mode'] = getRequest('correlation_mode');
+				}
+				if ($db_trigger['correlation_tag'] !== getRequest('correlation_tag')) {
+					$trigger['correlation_tag'] = getRequest('correlation_tag');
+				}
 			}
 
 			if ($db_trigger['type'] != getRequest('type')) {
@@ -275,12 +281,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 			if ($db_trigger['comments'] !== getRequest('comments')) {
 				$trigger['comments'] = getRequest('comments');
-			}
-			if ($db_trigger['correlation_mode'] !== getRequest('correlation_mode')) {
-				$trigger['correlation_mode'] = getRequest('correlation_mode');
-			}
-			if ($db_trigger['correlation_tag'] !== getRequest('correlation_tag')) {
-				$trigger['correlation_tag'] = getRequest('correlation_tag');
 			}
 
 			$db_tags = $db_trigger['tags'];
