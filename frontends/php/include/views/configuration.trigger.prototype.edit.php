@@ -465,7 +465,7 @@ $triggersFormList
 			->addValue(_('All problems if tag values match'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern(true)
 	)
-	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
+	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
