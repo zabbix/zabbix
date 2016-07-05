@@ -663,6 +663,7 @@ static void	correlate_events_by_trigger_rules()
 		DBfree_result(result);
 	}
 
+	zbx_free(sql);
 	zbx_vector_str_destroy(&values);
 }
 
