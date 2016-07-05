@@ -113,9 +113,9 @@ use constant TLD_TYPE_OTHER => 'otherTLD';
 use constant TLD_TYPE_TEST => 'testTLD';
 
 use constant rsm_rdds_interfaces => {
-	'RDDS43' => {'option' => 'rdds43-servers', 'keypart' => '43', 'update' => 1},
-	'RDDS80' => {'option' => 'rdds80-servers', 'keypart' => '80', 'update' => 0},
-	'RDAP' => {'option' => 'rdap-servers', 'keypart' => 'rdap', 'update' => 1}
+	'RDDS43' => {'option' => 'rdds43-servers', 'keypart' => '43', 'update' => true},
+	'RDDS80' => {'option' => 'rdds80-servers', 'keypart' => '80', 'update' => false},
+	'RDAP' => {'option' => 'rdap-servers', 'keypart' => 'rdap', 'update' => true}
 };
 
 our @EXPORT_OK = qw(true false TIME_MINUTE TIME_HOUR TIME_DAY LINUX_TEMPLATEID VALUE_TYPE_AVAIL VALUE_TYPE_PERC VALUE_TYPE_NUM VALUE_TYPE_DOUBLE

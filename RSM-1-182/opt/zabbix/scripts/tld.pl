@@ -373,7 +373,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
     my $probe_templateid;
 
     if ($probe_status == HOST_STATUS_PROXY_ACTIVE) {
-	$probe_templateid = create_probe_template($probe_name, 0, 0, 0, 0);
+	$probe_templateid = create_probe_template($probe_name, 0, 0, 0, 0, 0, 0);
     }
     else {
 	$probe_templateid = create_probe_template($probe_name);
@@ -649,7 +649,7 @@ sub create_items_rdds
 
 	$is_new = false unless defined $is_new;
 
-	my $any_interface_enabled = 0;
+	my $any_interface_enabled = false;
 	my %hosts;
 	my $options;
 
@@ -660,7 +660,7 @@ sub create_items_rdds
 	{
 		if (defined($OPTS{$details->{'option'}}))
 		{
-			$any_interface_enabled ||= 1;
+			$any_interface_enabled ||= true;
 			$hosts{$interface} = $OPTS{$details->{'option'}};
 
 			unless (exists($applications->{$templateid}->{$interface}))
@@ -683,7 +683,7 @@ sub create_items_rdds
 			$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_result'};
 			create_item($options, $is_new);
 
-			if (0 != $details->{'update'} && defined($OPTS{'epp-servers'}))
+			if ($details->{'update'} && defined($OPTS{'epp-servers'}))
 			{
 				$options->{'name'} = $interface . ' update time';
 				$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.upd[{$RSM.TLD}]';
