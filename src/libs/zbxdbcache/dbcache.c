@@ -2168,7 +2168,7 @@ int	DCsync_history(int sync_type, int *total_num)
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
 			/*   DCflush_nextchecks() */
-			process_events(&trigger_diff);
+			process_events(&trigger_diff, &triggerids);
 
 			DCconfig_triggers_apply_changes(&trigger_diff);
 			zbx_save_trigger_changes(&trigger_diff);
