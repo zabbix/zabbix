@@ -213,6 +213,9 @@ static void	save_events()
 			if (0 == (events[i].flags & ZBX_FLAGS_DB_EVENT_CREATE))
 				continue;
 
+			if (EVENT_SOURCE_TRIGGERS != events[i].source)
+				continue;
+
 			for (j = 0; j < events[i].tags.values_num; j++)
 			{
 				zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
@@ -255,6 +258,8 @@ static void	save_problems()
 		{
 			if (EVENT_OBJECT_TRIGGER != event->object || TRIGGER_VALUE_PROBLEM != event->value)
 				continue;
+
+			tags_num += event->tags.values_num;
 		}
 		else if (EVENT_SOURCE_INTERNAL == event->source)
 		{
@@ -279,7 +284,6 @@ static void	save_problems()
 		else
 			continue;
 
-		tags_num += event->tags.values_num;
 		zbx_vector_ptr_append(&problems, event);
 	}
 
@@ -311,6 +315,9 @@ static void	save_problems()
 			for (j = 0; j < problems.values_num; j++)
 			{
 				const DB_EVENT	*event = (const DB_EVENT *)problems.values[j];
+
+				if (EVENT_SOURCE_TRIGGERS != event->source)
+					continue;
 
 				for (k = 0; k < event->tags.values_num; k++)
 				{
