@@ -7,11 +7,14 @@
 #								rsm.dns.udp.upd			-|-
 #
 # - RDDS availability test		(data collection)	rsm.rdds			(simple, every 5 minutes)
-#   (also RDDS43 and RDDS80					rsm.rdds.43.ip			(trapper, Proxy)
+#   (also RDDS43, RDDS80 and RDAP				rsm.rdds.43.ip			(trapper, Proxy)
 #   availability at a particular				rsm.rdds.43.rtt			-|-
 #   minute)							rsm.rdds.43.upd			-|-
 #								rsm.rdds.80.ip			-|-
 #								rsm.rdds.80.rtt			-|-
+#								rsm.rdds.rdap.ip		-|-
+#								rsm.rdds.rdap.rtt		-|-
+#								rsm.rdds.rdap.upd		-|-
 #
 # - EPP	availability test		(data collection)	rsm.epp				(simple, every 5 minutes)
 # - info RTT							rsm.epp.ip[{$RSM.TLD}]		(trapper, Proxy)
@@ -34,6 +37,7 @@
 # - RDDS rolling week			(rolling week)		rsm.slv.rdds.rollweek		-|-
 # - RDDS43 monthly resolution RTT	(monthly)		rsm.slv.rdds.43.rtt.month	-|-
 # - RDDS80 monthly resolution RTT	(monthly)		rsm.slv.rdds.80.rtt.month	-|-
+# - RDAP monthly resolution RTT		(monthly)		rsm.slv.rdds.rdap.rtt.month	-|-
 # - RDDS monthly update time		(monthly)		rsm.slv.rdds.upd.month		-|-
 #
 # - EPP availability			(given minute)		rsm.slv.epp.avail		-|-
@@ -94,6 +98,7 @@ my $rv = GetOptions(\%OPTS,
 		    "set-type!",
 		    "rdds43-servers=s",
 		    "rdds80-servers=s",
+		    "rdap-servers=s",
 		    "dns-test-prefix=s",
 		    "rdds-test-prefix=s",
 		    "ipv4!",
@@ -201,8 +206,9 @@ if (defined($OPTS{'list-services'})) {
 
     my $report;
 
-    my @columns = ('tld_type', '{$RSM.DNS.TESTPREFIX}', '{$RSM.RDDS.NS.STRING}', '{$RSM.RDDS.TESTPREFIX}',
-		    '{$RSM.TLD.DNSSEC.ENABLED}', '{$RSM.TLD.EPP.ENABLED}', '{$RSM.TLD.RDDS.ENABLED}');
+	my @columns = ('tld_type', '{$RSM.DNS.TESTPREFIX}', '{$RSM.RDDS.NS.STRING}', '{$RSM.RDDS.TESTPREFIX}',
+			'{$RSM.TLD.DNSSEC.ENABLED}', '{$RSM.TLD.EPP.ENABLED}', '{$RSM.TLD.RDDS43.ENABLED}',
+			'{$RSM.TLD.RDDS80.ENABLED}', '{$RSM.TLD.RDAP.ENABLED}');
 
     foreach my $tld (@tlds) {
 	my $services = get_services($tld);
@@ -635,93 +641,79 @@ sub create_items_dns {
     create_item($options, $is_new);
 }
 
-sub create_items_rdds {
-    my $templateid = shift;
-    my $template_name = shift;
-    my $is_new = shift;
+sub create_items_rdds
+{
+	my $templateid = shift;
+	my $template_name = shift;
+	my $is_new = shift;
 
-    $is_new = false unless defined $is_new;
+	$is_new = false unless defined $is_new;
 
-    unless (exists($applications->{$templateid}->{'RDDS43'})) {
-        $applications->{$templateid}->{'RDDS43'} = get_application_id('RDDS43', $templateid, $is_new)
-    }
+	my $any_interface_enabled = 0;
+	my %hosts;
+	my $options;
 
-    unless (exists($applications->{$templateid}->{'RDDS80'})) {
-        $applications->{$templateid}->{'RDDS80'} = get_application_id('RDDS80', $templateid, $is_new)
-    }
+	$options->{'hostid'} = $templateid;
+	$options->{'type'} = 2;
 
-    my $applicationid_43 = $applications->{$templateid}->{'RDDS43'};
-    my $applicationid_80 = $applications->{$templateid}->{'RDDS80'};
+	foreach my ($interface, $details) (each(%{$rsm_rdds_interfaces}))
+	{
+		if (defined($OPTS{$details->{'option'}}))
+		{
+			$any_interface_enabled ||= 1;
+			$hosts{$interface} = $OPTS{$details->{'option'}};
 
-    my $item_key = 'rsm.rdds.43.ip[{$RSM.TLD}]';
+			unless (exists($applications->{$templateid}->{$interface}))
+			{
+				$applications->{$templateid}->{$interface} =
+						get_application_id($interface, $templateid, $is_new);
+			}
 
-    my $options = {'name' => 'RDDS43 IP',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_43],
-                                              'type' => 2, 'value_type' => 1,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
-    create_item($options, $is_new);
+			$options->{'applications'} = [$applications->{$templateid}->{$interface}];
 
-    $item_key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
+			$options->{'name'} = $interface . ' IP';
+			$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.ip[{$RSM.TLD}]';
+			$options->{'value_type'} = 1;
+			delete($options->{'valuemapid'}) if (exists($options->{'valuemapid'}));
+			create_item($options, $is_new);
 
-    $options = {'name' => 'RDDS43 RTT',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_43],
-                                              'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
+			$options->{'name'} = $interface . ' RTT';
+			$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.rtt[{$RSM.TLD}]';
+			$options->{'value_type'} = 0;
+			$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_result'};
+			create_item($options, $is_new);
 
-    create_item($options, $is_new);
+			if (0 != $details->{'update'} && defined($OPTS{'epp-servers'}))
+			{
+				$options->{'name'} = $interface . ' update time';
+				$options->{'key_'} = 'rsm.rdds.' . $details->{'keypart'} . '.upd[{$RSM.TLD}]';
+				$options->{'value_type'} = 0;
+				$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_result'};
+				create_item($options, $is_new);
+			}
+		}
+	}
 
-    if (defined($OPTS{'epp-servers'})) {
-	$item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+	if ($any_interface_enabled)
+	{
+		unless (exists($applications->{$templateid}->{'RDDS'}))
+		{
+			$applications->{$templateid}->{'RDDS'} = get_application_id('RDDS', $templateid, $is_new);
+		}
 
-	$options = {'name' => 'RDDS43 update time of $1',
-		    'key_'=> $item_key,
-		    'hostid' => $templateid,
-		    'applications' => [$applicationid_43],
-		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_rttudp'},
-		    'status' => 0};
+		$options->{'applications'} = [$applications->{$templateid}->{'RDDS'}];
 
-	create_item($options, $is_new);
-    }
-
-    $item_key = 'rsm.rdds.80.ip[{$RSM.TLD}]';
-
-    $options = {'name' => 'RDDS80 IP',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_80],
-                                              'type' => 2, 'value_type' => 1};
-    create_item($options, $is_new);
-
-    $item_key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
-
-    $options = {'name' => 'RDDS80 RTT',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applicationid_80],
-                                              'type' => 2, 'value_type' => 0,
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'}};
-
-    create_item($options, $is_new);
-
-    $item_key = 'rsm.rdds[{$RSM.TLD},"'.$OPTS{'rdds43-servers'}.'","'.$OPTS{'rdds80-servers'}.'"]';
-
-    unless (exists($applications->{$templateid}->{'RDDS'})) {
-        $applications->{$templateid}->{'RDDS'} = get_application_id('RDDS', $templateid, $is_new)
-    }
-
-    $options = {'name' => 'RDDS test',
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applications->{$templateid}->{'RDDS'}],
-                                              'type' => 3, 'value_type' => 3,
-					      'delay' => $cfg_global_macros->{'{$RSM.RDDS.DELAY}'},
-                                              'valuemapid' => rsm_value_mappings->{'rsm_rdds_probe_result'}};
-    create_item($options, $is_new);
+		$options->{'name'} = 'RDDS test';
+		$options->{'key_'} = 'rsm.rdds[{$RSM.TLD},"' .
+				(exists($hosts{'RDDS43'}) ? $hosts{'RDDS43'} : '') . '","' .
+				(exists($hosts{'RDDS80'}) ? $hosts{'RDDS80'} : '') . '","' .
+				(exists($hosts{'RDAP'}) ? $hosts{'RDAP'} : '') . '"]';
+		$options->{'type'} = 3;
+		$options->{'value_type'} = 3;
+		$options->{'valuemapid'} = rsm_value_mappings->{'rsm_rdds_probe_result'};
+		$options->{'delay'} = $cfg_global_macros->{'{$RSM.RDDS.DELAY}'};
+		create_item($options, $is_new);
+	}
 }
 
 sub create_items_epp {
@@ -792,22 +784,6 @@ sub create_items_epp {
 		'valuemapid' => rsm_value_mappings->{'rsm_epp_result'}};
 
     create_item($options, $is_new);
-
-    if (defined($OPTS{'rdds43-servers'})) {
-        $item_key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-
-        my $applicationid_43 = get_application_id('RDDS43', $templateid);
-
-        $options = {'name' => 'RDDS43 update time',
-                    'key_'=> $item_key,
-		    'hostid' => $templateid,
-		    'applications' => [$applicationid_43],
-		    'type' => 2, 'value_type' => 0,
-		    'valuemapid' => rsm_value_mappings->{'rsm_rdds_result'},
-		    'status' => 0};
-
-	create_item($options);
-    }
 }
 
 sub trim
@@ -985,7 +961,7 @@ sub create_main_template {
     }
 
     create_items_dns($templateid, $template_name, $is_new);
-    create_items_rdds($templateid, $template_name, $is_new) if (defined($OPTS{'rdds43-servers'}));
+    create_items_rdds($templateid, $template_name, $is_new);
     create_epp_objects($templateid, $template_name, $tld, $is_new) if (defined($OPTS{'epp-servers'}));
 
     create_macro('{$RSM.TLD}', $tld, $templateid, undef, $is_new);
@@ -993,8 +969,13 @@ sub create_main_template {
     create_macro('{$RSM.RDDS.TESTPREFIX}', $OPTS{'rdds-test-prefix'}, $templateid, undef, $is_new) if (defined($OPTS{'rdds-test-prefix'}));
     create_macro('{$RSM.RDDS.NS.STRING}', defined($OPTS{'rdds-ns-string'}) ? $OPTS{'rdds-ns-string'} : cfg_default_rdds_ns_string, $templateid, undef, $is_new);
     create_macro('{$RSM.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid, true, $is_new);
-    create_macro('{$RSM.TLD.RDDS.ENABLED}', defined($OPTS{'rdds43-servers'}) ? 1 : 0, $templateid, true, $is_new);
     create_macro('{$RSM.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid, true, $is_new);
+
+	foreach my ($interface, $details) (each(%{$rsm_rdds_interfaces}))
+	{
+		create_macro('{$RSM.TLD.' . $interface . '.ENABLED}', (defined($OPTS{$details->{'option'}}) ? 1 : 0),
+				$templateid, true, $is_new);
+	}
 
     return $templateid;
 }
@@ -1406,7 +1387,7 @@ Other options
                 action with EPP only
 	--list-services
 		list services of each TLD, the output is comma-separated list:
-                <TLD>,<TLD-TYPE>,<RDDS.DNS.TESTPREFIX>,<RDDS.NS.STRING>,<RDDS.TESTPREFIX>,<TLD.DNSSEC.ENABLED>,<TLD.EPP.ENABLED>,<TLD.RDDS.ENABLED>
+                <TLD>,<TLD-TYPE>,<RDDS.DNS.TESTPREFIX>,<RDDS.NS.STRING>,<RDDS.TESTPREFIX>,<TLD.DNSSEC.ENABLED>,<TLD.EPP.ENABLED>,<TLD.RDDS43.ENABLED>,<TLD.RDDS80.ENABLED>,<TLD.RDAP.ENABLED>
 	--get-nsservers-list
 		CSV formatted list of NS + IP server pairs for specified TLD
 	--update-nsservers
@@ -1433,7 +1414,9 @@ Other options
         --rdds43-servers=STRING
                 list of RDDS43 servers separated by comma: "NAME1,NAME2,..."
         --rdds80-servers=STRING
-                list of RDDS80 servers separated by comma: "NAME1,NAME2,..."
+                list of RDDS80 server URLs separated by comma: "NAME1,NAME2,..."
+	--rdap-servers=STRING
+		list of RDAP server URLs separated by comma: "NAME1,NAME2,..."
         --epp-servers=STRING
                 list of EPP servers separated by comma: "NAME1,NAME2,..."
         --epp-user
@@ -1455,7 +1438,7 @@ Other options
                 name server prefix in the WHOIS output
 		(default: $cfg_default_rdds_ns_string)
         --rdds-test-prefix=STRING
-		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
+		domain test prefix for RDDS monitoring (needed only if RDDS43 servers specified)
         --setup-cron
 		create cron jobs and exit
 	--epp
@@ -1508,10 +1491,11 @@ sub validate_input {
     $msg .= "DNS test prefix must be specified (--dns-test-prefix)\n" if (!defined($OPTS{'delete'}) and !defined($OPTS{'disable'}) and !defined($OPTS{'only-epp'}) and !defined($OPTS{'dns-test-prefix'})
 									    and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'update-nsservers'})
 									    and !defined($OPTS{'list-services'}));
-    $msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds-test-prefix'})) or
-									    (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds-test-prefix'})));
-    $msg .= "none or both --rdds43-servers and --rdds80-servers must be specified\n" if ((defined($OPTS{'rdds43-servers'}) and !defined($OPTS{'rdds80-servers'})) or
-											 (defined($OPTS{'rdds80-servers'}) and !defined($OPTS{'rdds43-servers'})));
+
+	if ((defined($OPTS{$rsm_rdds_interfaces->{'RDDS43'}->{'option'}}) && !defined($OPTS{'rdds-test-prefix'})))
+	{
+		$msg .= "RDDS test prefix must be specified (--rdds-test-prefix)\n";
+	}
 
     if ($OPTS{'epp-servers'} or defined($OPTS{'only-epp'})) {
 	$msg .= "EPP user must be specified (--epp-user)\n" unless ($OPTS{'epp-user'});
@@ -1548,14 +1532,17 @@ sub validate_input {
     }
 }
 
-sub lc_options {
-    foreach my $key (keys(%OPTS))
-    {
-	foreach ("tld", "rdds43-servers", "rdds80-servers=s", "epp-servers", "ns-servers-v4", "ns-servers-v6")
+sub lc_options
+{
+	my @options_to_lowercase = ("tld", "epp-servers", "ns-servers-v4", "ns-servers-v6",
+			$rsm_rdds_interfaces->{'RDDS43'}->{'option'},
+			$rsm_rdds_interfaces->{'RDDS80'}->{'option'},
+			$rsm_rdds_interfaces->{'RDAP'}->{'option'},);
+
+	foreach my $option (@options_to_lowercase)
 	{
-	    $OPTS{$_} = lc($OPTS{$_}) if ($key eq $_);
+	    $OPTS{$option} = lc($OPTS{$option}) if (exists($OPTS{$option}));
 	}
-    }
 }
 
 sub add_default_actions() {
@@ -1584,12 +1571,15 @@ sub create_global_macros() {
         '{$RSM.DNS.ROLLWEEK.SLA}' => 60,
 
         '{$RSM.RDDS.RTT.LOW}' => 2000,
-        '{$RSM.RDDS.RTT.HIGH}' => 10000,
+        '{$RSM.RDDS43.RTT.HIGH}' => 10000,
+        '{$RSM.RDDS80.RTT.HIGH}' => 10000,
+        '{$RSM.RDAP.RTT.HIGH}' => 10000,
         '{$RSM.RDDS.DELAY}' => 60,
         '{$RSM.RDDS.UPDATE.TIME}' => 3600,
         '{$RSM.RDDS.PROBE.ONLINE}' => 2,
         '{$RSM.RDDS.ROLLWEEK.SLA}' => 60,
-        '{$RSM.RDDS.MAXREDIRS}' => 10,
+        '{$RSM.RDDS80.MAXREDIRS}' => 10,
+        '{$RSM.RDAP.MAXREDIRS}' => 10,
 
         '{$RSM.EPP.DELAY}' => 60,
         '{$RSM.EPP.LOGIN.RTT.LOW}' => 4000,
