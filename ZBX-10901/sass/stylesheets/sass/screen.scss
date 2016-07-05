@@ -3232,7 +3232,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $green;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3257,7 +3257,7 @@ td.inactive-bg {
 	}
 
 	.overlay-close-btn {
-		color: $red;
+		color: $font-alt-color;
 	}
 
 	ul {
@@ -3358,6 +3358,7 @@ td.inactive-bg {
 
 %close-icon {
 	display: block;
+	padding: 0;
 	width: 18px;
 	height: 18px;
 	line-height: 18px;
@@ -3377,16 +3378,22 @@ td.inactive-bg {
 	&:hover {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
+		background-color: $transparent;
 	}
 
 	&:focus {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
+		background-color: $transparent;
 	}
 
 	&:active {
 		@include opacity(1);
 		text-decoration: none;
+		color: $font-alt-color;
+		background-color: $transparent;
 	}
 }
 
@@ -3395,8 +3402,11 @@ td.inactive-bg {
 	z-index: 1000;
 	top: 0;
 	right: 0;
+	min-height: 18px;
+	border: none;
+	background-color: $transparent !important;
 	@extend %close-icon;
-	@include border-radius(0 0 0 2px);
+	@include border-radius(2px);
 }
 
 a.overlay-close-btn {
