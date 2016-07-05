@@ -1447,8 +1447,7 @@ footer {
 	}
 
 	input[type="radio"] {
-		position: absolute;
-		clip: rect(1px, 1px, 1px, 1px);
+		display: none;
 
 		+ label {
 			color: $font-color;
@@ -1689,9 +1688,7 @@ select {
 }
 
 %form-custom-check-radio-style {
-	position: absolute !important;
-	top: auto !important;
-	clip: rect(1px, 1px, 1px, 1px);
+	display: none;
 
 	+ label span {
 		display: inline-block;
