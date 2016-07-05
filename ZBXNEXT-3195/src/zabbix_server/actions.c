@@ -1685,13 +1685,9 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	const char			*__function_name = "process_actions";
 
 	size_t				i;
-	const DB_EVENT			*event;
-	int				j;
-	zbx_vector_ptr_t		actions, new_escalations;
+	zbx_vector_ptr_t		actions;
+	zbx_vector_ptr_t 		new_escalations;
 	zbx_hashset_t			rec_escalations;
-	zbx_escalation_new_t		*new_escalation;
-	zbx_escalation_rec_t		*rec_escalation;
-	zbx_uint64_t			escalationid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
@@ -1702,8 +1698,13 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions);
 
+	/* 1. Find escalations for PROBLEM events (EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL), add them to new_escalations list. */
+	/* 2. Execute operations (EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION). */
 	for (i = 0; i < events_num; i++)
 	{
+		int		j;
+		const DB_EVENT 	*event;
+
 		event = &events[i];
 
 		/* OK events can't start escalations - skip them */
@@ -1719,6 +1720,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 			if (SUCCEED == check_action_conditions(event, action))
 			{
+				zbx_escalation_new_t	*new_escalation;
+
 				new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
 				new_escalation->actionid = action->actionid;
 				new_escalation->event = event;
@@ -1736,12 +1739,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
 
+	/* 3. Add to rec_escalations set recovery escalations from OK events that can be matched to existing escalations by corresponding PROBLEM events, */
 	if (0 != event_recovery->values_num)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 		zbx_vector_uint64_t	eventids;
-		zbx_event_recovery_t	*recovery;
 		DB_ROW			row;
 		DB_RESULT		result;
 		zbx_uint64_t		actionid, eventid;
@@ -1749,18 +1752,28 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 		zbx_vector_uint64_create(&eventids);
 
+		/* 3.1. Prepare eventids for use in DBadd_condition_alloc(). These are eventids from list of tuples (PROBLEM eventid, OK event). */
 		for (i = 0; i < event_recovery->values_num; i++)
 		{
+			zbx_event_recovery_t	*recovery;
+
 			recovery = (zbx_event_recovery_t *)event_recovery->values[i];
 			zbx_vector_uint64_append(&eventids, recovery->eventid);
 		}
 
+		/* 3.2. Get existing escalations that correspond to the OK events (see 3,1,). */
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
-
 		result = DBselect("%s", sql);
+
+		/* 3.3. For each found escalation add (if it's not already added) a recovery escalation to the rec_escalations set. */
 		while (NULL != (row = DBfetch(result)))
 		{
+			const DB_EVENT	 	*event;
+			zbx_event_recovery_t	*recovery;
+			zbx_escalation_rec_t	*rec_escalation;
+			zbx_uint64_t		escalationid;
+
 			ZBX_STR2UINT64(actionid, row[0]);
 			ZBX_STR2UINT64(eventid, row[1]);
 
@@ -1793,6 +1806,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 		zbx_vector_uint64_destroy(&eventids);
 	}
 
+	/* 4. Create new escalations in DB. */
 	if (0 != new_escalations.values_num)
 	{
 		zbx_db_insert_t	db_insert;
@@ -1803,7 +1817,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 		for (i = 0; i < new_escalations.values_num; i++)
 		{
-			zbx_uint64_t	triggerid = 0, itemid = 0;
+			zbx_uint64_t		triggerid = 0, itemid = 0;
+			zbx_escalation_new_t	*new_escalation;
 
 			new_escalation = (zbx_escalation_new_t *)new_escalations.values[i];
 
@@ -1828,11 +1843,13 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 		zbx_db_insert_clean(&db_insert);
 	}
 
+	/* 5. Modify recovered escalations in DB. */
 	if (0 != rec_escalations.num_data)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 		zbx_hashset_iter_t	iter;
+		zbx_escalation_rec_t	*rec_escalation;
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
