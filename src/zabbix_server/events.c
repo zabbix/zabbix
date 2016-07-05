@@ -608,7 +608,8 @@ static void	correlate_events_by_trigger_rules()
 					" and p.eventid=pt.eventid"
 					" and pt.tag='%s'"
 					" and",
-					separator, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->objectid, tag_esc);
+					separator, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, event->objectid,
+					tag_esc);
 
 			DBadd_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "pt.value",
 					(const char **)values.values, values.values_num);
@@ -880,7 +881,6 @@ int	process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggeri
 
 		if (NULL != trigger_diff)
 			update_trigger_changes(trigger_diff);
-
 
 		clean_events();
 	}

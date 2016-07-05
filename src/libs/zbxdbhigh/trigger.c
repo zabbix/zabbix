@@ -47,7 +47,7 @@
  *                                                                            *
  * Comments: do not process if there are dependencies with value PROBLEM      *
  *                                                                            *
- * Event generation depending on trigger value/state changes:                 *                                                                           *
+ * Event generation depending on trigger value/state changes:                 *
  *                                                                            *
  * From \ To  | OK         | OK(?)      | PROBLEM    | PROBLEM(?) | NONE      *
  *----------------------------------------------------------------------------*
@@ -68,7 +68,7 @@
  ******************************************************************************/
 int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 {
-	const char	*__function_name = "process_trigger2";
+	const char	*__function_name = "zbx_process_trigger";
 
 	const char	*new_error;
 	int		new_state, new_value, ret = FAIL;
@@ -178,10 +178,14 @@ out:
  ******************************************************************************/
 void	zbx_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 {
+	const char			*__function_name = "zbx_save_trigger_changes";
+
 	int				i;
 	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
 	const zbx_trigger_diff_t	*diff;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -241,6 +245,8 @@ void	zbx_save_trigger_changes(const zbx_vector_ptr_t *trigger_diff)
 		DBexecute("%s", sql);
 
 	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 /******************************************************************************
@@ -276,7 +282,7 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_process_trigger                                              *
+ * Function: zbx_process_triggers                                             *
  *                                                                            *
  * Purpose: process triggers - calculates property changeset and generates    *
  *          events                                                            *
@@ -291,7 +297,7 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
  ******************************************************************************/
 void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *trigger_diff)
 {
-	const char		*__function_name = "process_triggers";
+	const char		*__function_name = "zbx_process_triggers";
 
 	int			i;
 
