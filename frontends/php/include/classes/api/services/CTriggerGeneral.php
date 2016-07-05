@@ -146,7 +146,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
-				'status', 'priority', 'comments', 'type', 'templateid'
+				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag'
 			],
 			'hostids' => $host['hostid'],
 			'filter' => ['templateid' => $trigger['templateid']],
@@ -963,10 +963,12 @@ abstract class CTriggerGeneral extends CApiService {
 			if ($trigger['recovery_mode'] != $db_trigger['recovery_mode']) {
 				$upd_trigger['values']['recovery_mode'] = $trigger['recovery_mode'];
 			}
-			if ($trigger['correlation_mode'] != $db_trigger['correlation_mode']) {
+			if (array_key_exists('correlation_mode', $trigger)
+					&& $trigger['correlation_mode'] != $db_trigger['correlation_mode']) {
 				$upd_trigger['values']['correlation_mode'] = $trigger['correlation_mode'];
 			}
-			if ($trigger['correlation_tag'] !== $db_trigger['correlation_tag']) {
+			if (array_key_exists('correlation_tag', $trigger)
+					&& $trigger['correlation_tag'] !== $db_trigger['correlation_tag']) {
 				$upd_trigger['values']['correlation_tag'] = $trigger['correlation_tag'];
 			}
 			if (array_key_exists('url', $trigger) && $trigger['url'] !== $db_trigger['url']) {
