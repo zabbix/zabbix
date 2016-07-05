@@ -632,7 +632,7 @@ else {
 
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state',
-			'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
+			'recovery_mode', 'recovery_expression'
 		],
 		'selectHosts' => ['hostid', 'host', 'name'],
 		'selectDependencies' => ['triggerid', 'description'],
