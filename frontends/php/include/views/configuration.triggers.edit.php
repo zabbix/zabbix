@@ -498,8 +498,8 @@ else {
 $triggersFormList->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode)
 	->addRow(_('OK event closes'), $ok_event_closes)
 	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append tags to form list.
 $tags_table = (new CTable())->setId('tbl_tags');
