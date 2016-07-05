@@ -176,7 +176,7 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 	DBfree_result(result);
 
 	DBbegin();
-	process_events(NULL);
+	process_events(NULL, NULL);
 	DCconfig_triggers_apply_changes(&trigger_diff);
 	zbx_save_trigger_changes(&trigger_diff);
 	DBcommit();
