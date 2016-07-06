@@ -232,6 +232,8 @@ abstract class CTriggerGeneral extends CApiService {
 			return $trigger;
 		}
 
+		$tag_validator = new CTagValidator();
+
 		foreach ($trigger['tags'] as &$tag) {
 			if (!array_key_exists('tag', $tag)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Field "%1$s" is mandatory.', 'tag'));
@@ -243,15 +245,9 @@ abstract class CTriggerGeneral extends CApiService {
 				);
 			}
 
-			if (trim($tag['tag']) === '') {
+			if (!$tag_validator->validate($tag['tag'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty'))
-				);
-			}
-
-			if (strpos($tag['tag'], '/') !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('unacceptable characters are used'))
+					_s('Incorrect value for field "%1$s": %2$s.', 'tag', $tag_validator->getError())
 				);
 			}
 

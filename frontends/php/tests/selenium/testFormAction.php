@@ -134,9 +134,6 @@ class testFormAction extends CWebTest {
 				]
 			],
 			[
-				['eventsource' => 'Triggers', 'recovery_msg' => true]
-			],
-			[
 				['eventsource' => 'Triggers', 'evaltype' => 'AND']
 			],
 			[
@@ -418,9 +415,6 @@ class testFormAction extends CWebTest {
 				['eventsource' => 'Internal']
 			],
 			[
-				['eventsource' => 'Internal', 'recovery_msg' => true]
-			],
-			[
 				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Application']
 			],
 			[
@@ -469,15 +463,6 @@ class testFormAction extends CWebTest {
 			default:
 				$this->zbxTestLogin('actionconf.php?eventsource='.EVENT_SOURCE_TRIGGERS.'&form=Create+action');
 				break;
-		}
-
-		if (isset($data['recovery_msg'])) {
-			$this->zbxTestCheckboxSelect('recovery_msg');
-			$this->wait();
-			$recovery_msg = true;
-		}
-		else {
-			$recovery_msg = false;
 		}
 
 		if (isset($data['new_condition_conditiontype'])) {
@@ -560,53 +545,7 @@ class testFormAction extends CWebTest {
 		}
 		$this->assertEquals($this->getText('def_longdata'), $def_longdata_val);
 
-		if ($eventsource == 'Triggers' || $eventsource == 'Internal') {
-			$this->zbxTestTextPresent('Recovery message');
-			$this->assertElementPresent('recovery_msg');
-			$this->assertElementPresent("//input[@type='checkbox' and @id='recovery_msg']");
-		}
-		else {
-			$this->zbxTestTextNotPresent('Recovery message');
-			$this->assertElementNotPresent('recovery_msg');
-			$this->assertElementNotPresent("//input[@type='checkbox' and @id='recovery_msg']");
-		}
-
-		if ($recovery_msg == true) {
-			$this->zbxTestTextPresent('Recovery subject');
-			$this->assertVisible('r_shortdata');
-			$this->assertAttribute("//input[@id='r_shortdata']/@maxlength", 255);
-			$this->assertAttribute("//input[@id='r_shortdata']/@size", 50);
-			switch ($eventsource) {
-				case 'Triggers':
-					$this->assertAttribute('//input[@id=\'r_shortdata\']/@value', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
-					break;
-				case 'Internal':
-					$this->assertEquals($this->getValue('r_shortdata'), "");
-					break;
-			}
-
-			$this->zbxTestTextPresent('Recovery message');
-			$this->assertVisible('r_longdata');
-			$this->assertAttribute("//textarea[@id='r_longdata']/@rows", 7);
-			switch ($eventsource) {
-				case 'Triggers':
-					$r_longdata_val = 'Trigger: {TRIGGER.NAME}'.
-						' Trigger status: {TRIGGER.STATUS}'.
-						' Trigger severity: {TRIGGER.SEVERITY}'.
-						' Trigger URL: {TRIGGER.URL}'.
-						' Item values:'.
-						' 1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}'.
-						' 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}'.
-						' 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}'.
-						' Original event ID: {EVENT.ID}';
-						break;
-				case 'Internal':
-					$r_longdata_val = "";
-					break;
-			}
-			$this->assertEquals($this->getText('r_longdata'), $r_longdata_val);
-		}
-		elseif ($eventsource == 'Triggers') {
+		if ($eventsource == 'Triggers') {
 			$this->assertNotVisible('r_shortdata');
 			$this->assertNotVisible('r_longdata');
 		}
