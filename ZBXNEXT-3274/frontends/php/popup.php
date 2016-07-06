@@ -572,19 +572,23 @@ if ($srctbl == 'usrgrp') {
 	$userGroups = API::UserGroup()->get($options);
 	order_result($userGroups, 'name');
 
+	$parentid = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
+
 	foreach ($userGroups as $userGroup) {
 		$name = (new CLink($userGroup['name'], 'javascript:void(0);'))
 			->setId('spanid'.$userGroup['usrgrpid']);
 
 		if ($multiselect) {
-			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($userGroup['usrgrpid']).');';
+			$js_action = "javascript: addValue(".zbx_jsvalue($reference).', '.zbx_jsvalue($userGroup['usrgrpid']).', '.
+				$parentid.');';
 		}
 		else {
 			$values = [
 				$dstfld1 => $userGroup[$srcfld1],
 				$dstfld2 => $userGroup[$srcfld2]
 			];
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
+			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).', '.
+				$parentid.'); close_window(); return false;';
 		}
 		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
@@ -600,7 +604,7 @@ if ($srctbl == 'usrgrp') {
 		$table->setFooter(
 			new CCol(
 				(new CButton('select', _('Select')))
-					->onClick("javascript: addSelectedValues('usrgrps', ".zbx_jsvalue($reference).');')
+					->onClick("javascript: addSelectedValues('usrgrps', ".zbx_jsvalue($reference).', '.$parentid.');')
 			)
 		);
 
