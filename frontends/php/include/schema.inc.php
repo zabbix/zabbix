@@ -6347,13 +6347,8 @@ return [
 		],
 	],
 	'corr_condition_tag' => [
-		'key' => 'corr_condition_tagid',
+		'key' => 'corr_conditionid',
 		'fields' => [
-			'corr_condition_tagid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'corr_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -6369,14 +6364,9 @@ return [
 			],
 		],
 	],
-	'corr_condition_newgrp' => [
-		'key' => 'corr_condition_newgrpid',
+	'corr_condition_group' => [
+		'key' => 'corr_conditionid',
 		'fields' => [
-			'corr_condition_newgrpid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'corr_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -6400,13 +6390,8 @@ return [
 		],
 	],
 	'corr_condition_tagpair' => [
-		'key' => 'corr_condition_tagpairid',
+		'key' => 'corr_conditionid',
 		'fields' => [
-			'corr_condition_tagpairid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'corr_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -6429,13 +6414,8 @@ return [
 		],
 	],
 	'corr_condition_tagvalue' => [
-		'key' => 'corr_condition_tagvalueid',
+		'key' => 'corr_conditionid',
 		'fields' => [
-			'corr_condition_tagvalueid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
 			'corr_conditionid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
