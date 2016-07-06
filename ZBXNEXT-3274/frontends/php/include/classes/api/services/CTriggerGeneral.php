@@ -641,7 +641,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$triggerDbFields = ['triggerid' => null];
 		$read_only_fields = ['value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
-		$read_only_fields_tmpl = ['description', 'expression', 'recovery_mode', 'recovery_expression'];
+		$read_only_fields_tmpl = ['description', 'expression', 'recovery_mode', 'recovery_expression',
+			'correlation_mode', 'correlation_tag'
+		];
 
 		foreach ($triggers as $trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
