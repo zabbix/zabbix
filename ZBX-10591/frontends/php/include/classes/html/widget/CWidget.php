@@ -75,11 +75,18 @@ class CWidget {
 	}
 
 	private function createTopHeader() {
-		$h1 = new CTag('h1', true, $this->title);
+		$divs = [];
 
-		$left = (new CDiv($h1))->addClass(ZBX_STYLE_CELL);
-		$right = (new CDiv($this->controls))->addClass(ZBX_STYLE_CELL);
+		if ($this->title !== null) {
+			$divs[] = (new CDiv(new CTag('h1', true, $this->title)))->addClass(ZBX_STYLE_CELL);
+		}
 
-		return (new CDiv([$left, $right]))->addClass(ZBX_STYLE_HEADER_TITLE)->addClass(ZBX_STYLE_TABLE);
+		if ($this->controls !== null) {
+			$divs[] = (new CDiv($this->controls))->addClass(ZBX_STYLE_CELL);
+		}
+
+		return (new CDiv($divs))
+			->addClass(ZBX_STYLE_HEADER_TITLE)
+			->addClass(ZBX_STYLE_TABLE);
 	}
 }
