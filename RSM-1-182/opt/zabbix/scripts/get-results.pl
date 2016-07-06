@@ -32,7 +32,7 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my ($key, $cfg_max_value, $service_type, $delay);
+my ($key, $service_type, $delay, $proto, $command);	# $proto is needed for DNS, $command for EPP
 
 my ($from, $till);
 
@@ -48,66 +48,59 @@ if (opt('till'))
 if (getopt('service') eq 'tcp-dns-rtt')
 {
 	$key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
-	$cfg_max_value = get_macro_dns_tcp_rtt_low();
 	$delay = get_macro_dns_tcp_delay();
 	$service_type = 'DNS';
+	$proto = PROTO_TCP;
 }
 elsif (getopt('service') eq 'udp-dns-rtt')
 {
 	$key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
-	$cfg_max_value = get_macro_dns_udp_rtt_low();
 	$delay = get_macro_dns_udp_delay();
 	$service_type = 'DNS';
+	$proto = PROTO_UDP;
 }
 elsif (getopt('service') eq 'dns-upd')
 {
 	$key = 'rsm.dns.udp.upd[{$RSM.TLD},';
-	$cfg_max_value = get_macro_dns_update_time();
 	$delay = get_macro_dns_udp_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'rdds43-rtt')
 {
 	$key = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
-	$cfg_max_value = get_macro_rdds_rtt_low();
 	$delay = get_macro_rdds_delay();
 	$service_type = 'RDDS';
 }
 elsif (getopt('service') eq 'rdds80-rtt')
 {
 	$key = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
-	$cfg_max_value = get_macro_rdds_rtt_low();
 	$delay = get_macro_rdds_delay();
 	$service_type = 'RDDS';
 }
 elsif (getopt('service') eq 'rdds-upd')
 {
 	$key = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-	$cfg_max_value = get_macro_rdds_rtt_low();
 	$delay = get_macro_rdds_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'epp-login-rtt')
 {
-	my $command = 'login';
+	$command = 'login';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
-	$cfg_max_value = get_macro_epp_rtt_low($command);
 	$delay = get_macro_epp_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'epp-info-rtt')
 {
-	my $command = 'info';
+	$command = 'info';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
-	$cfg_max_value = get_macro_epp_rtt_low($command);
 	$delay = get_macro_epp_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'epp-update-rtt')
 {
-	my $command = 'update';
+	$command = 'update';
 	$key = 'rsm.epp.rtt[{$RSM.TLD},' . $command . ']';
-	$cfg_max_value = get_macro_epp_rtt_low($command);
 	$delay = get_macro_epp_delay();
 	$service_type = 'EPP';
 }
@@ -125,11 +118,13 @@ my $probes_ref = get_probes($service_type);
 my $probe_times_ref = get_probe_times($from, $till, $probes_ref);
 my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
+my $rtt_low;	# used in __check_test()
+
 foreach (@$tlds_ref)
 {
 	$tld = $_;
 
-	my $items_ref;
+	my ($items_ref);
 
 	if ("," eq substr($key, -1))
 	{
@@ -140,6 +135,8 @@ foreach (@$tlds_ref)
 	{
 		$items_ref = get_all_items($key, $tld);
 	}
+
+	$rtt_low = get_rtt_low(lc($service_type), $proto, $command);	# used in __check_test()
 
 	my $result = get_results($tld, $probe_times_ref, $items_ref, \&__check_test);
 
@@ -170,7 +167,7 @@ sub __check_test
 {
 	my $value = shift;
 
-	return (is_service_error($value) == SUCCESS or $value > $cfg_max_value) ? E_FAIL : SUCCESS;
+	return (is_service_error($value) == SUCCESS or $value > $rtt_low) ? E_FAIL : SUCCESS;
 }
 
 sub __get_all_ns_items
