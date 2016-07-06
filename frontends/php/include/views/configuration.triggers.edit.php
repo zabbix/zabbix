@@ -465,38 +465,40 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 
-if ($readonly) {
-	$triggersFormList->addVar('type', (int) $data['type'])
-		->addVar('correlation_mode', (int) $data['correlation_mode']);
-
+if ($discovered_trigger || $readonly) {
+	$triggersFormList->addVar('type', (int) $data['type']);
 	$problem_event_generation_mode = (new CRadioButtonList('type_name', (int) $data['type']))
 		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 		->setModern(true)
 		->setEnabled(false);
-
-	$ok_event_closes = (new CRadioButtonList('correlation_mode',
-		(int) $data['correlation_mode']))
-			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
-			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
-			->setModern(true)
-			->setEnabled(false);
 }
 else {
 	$problem_event_generation_mode = (new CRadioButtonList('type', (int) $data['type']))
 		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 		->setModern(true);
-
-	$ok_event_closes = (new CRadioButtonList('correlation_mode',
-		(int) $data['correlation_mode']))
-			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
-			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
-			->setModern(true);
 }
 
-$triggersFormList->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode)
-	->addRow(_('OK event closes'), $ok_event_closes)
+$triggersFormList->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode);
+
+if ($readonly) {
+	$triggersFormList->addVar('correlation_mode', (int) $data['correlation_mode']);
+
+	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
+		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
+		->setModern(true)
+		->setEnabled(false);
+}
+else {
+	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
+		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
+		->setModern(true);
+}
+
+$triggersFormList->addRow(_('OK event closes'), $ok_event_closes)
 	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
