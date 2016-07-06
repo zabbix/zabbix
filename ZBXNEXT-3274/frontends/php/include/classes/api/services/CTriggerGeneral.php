@@ -542,7 +542,7 @@ abstract class CTriggerGeneral extends CApiService {
 						_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
 					);
 				}
-				elseif (stristr($trigger['correlation_tag'], '/')) {
+				elseif (strpos($trigger['correlation_tag'], '/') !== false) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 						'correlation_tag',
 						_('unacceptable characters are used')
@@ -732,7 +732,7 @@ abstract class CTriggerGeneral extends CApiService {
 					_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
 				);
 			}
-			elseif (stristr($trigger['correlation_tag'], '/')) {
+			elseif (strpos($trigger['correlation_tag'], '/') !== false) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 					'correlation_tag',
 					_('unacceptable characters are used')
