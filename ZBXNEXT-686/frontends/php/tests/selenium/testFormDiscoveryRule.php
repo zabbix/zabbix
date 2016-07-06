@@ -244,7 +244,7 @@ class testFormDiscoveryRule extends CWebTest {
 			}
 		}
 
-		$this->zbxTestClickLinkText('Discovery rules');
+		$this->zbxTestClickLinkTextWait('Discovery rules');
 
 		if (isset($data['form'])) {
 			$this->zbxTestClickLinkTextWait($data['form']);

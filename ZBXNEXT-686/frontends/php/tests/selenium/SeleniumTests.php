@@ -88,11 +88,9 @@ require_once dirname(__FILE__).'/testFormScreen.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTemplate.php';
-/*
-require_once dirname(__FILE__).'/testFormWeb.php';
-require_once dirname(__FILE__).'/testFormUserProfile.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
-*/
+require_once dirname(__FILE__).'/testFormUserProfile.php';
+require_once dirname(__FILE__).'/testFormWeb.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceItem.php';
@@ -185,11 +183,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testFormTrigger');
-/*
-		$suite->addTestSuite('testFormWeb');
-		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testFormTriggerPrototype');
-*/
+		$suite->addTestSuite('testFormUserProfile');
+		$suite->addTestSuite('testFormWeb');
 		$suite->addTestSuite('testPageApplications');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceItem');

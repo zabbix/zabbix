@@ -265,7 +265,7 @@ class testPageHosts extends CWebTest {
 		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of hosts');
-		$this->zbxTestTextPresent('Hosts disabled');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Hosts disabled');
 
 		$sql = "select * from hosts where status=".HOST_STATUS_MONITORED.
 			" and name NOT LIKE '%{#%'";

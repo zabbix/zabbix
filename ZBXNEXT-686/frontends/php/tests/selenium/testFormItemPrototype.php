@@ -2517,6 +2517,7 @@ class testFormItemPrototype extends CWebTest {
 				$this->zbxTestClickLinkTextWait($itemName);
 			}
 
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 			$this->zbxTestAssertElementValue('name', $itemName);
 			$this->zbxTestAssertElementValue('key', $keyName);
 			$this->zbxTestAssertElementPresentXpath("//select[@id='type']/option[text()='$type']");

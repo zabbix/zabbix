@@ -311,7 +311,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestGetSelectedLabel ($id) {
-		return $this->webDriver->findElement(WebDriverBy::xpath("//select[@id='".$id."']/option[@selected='selected']"))->getText();
+		return $this->webDriver->findElement(WebDriverBy::xpath("//select[@id='".$id."']//option[@selected='selected']"))->getText();
 	}
 
 		public function zbxTestAssertElementPresentId($id) {
@@ -376,13 +376,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->wait(10)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
 	}
 
-//	public function wait() {
-//		$this->waitForPageToLoad();
-//		$this->zbxTestCheckFatalErrors();
-//	}
-
 	public function zbxTestTabSwitch($tab) {
-		// switches tab by receiving tab title text
 		$this->zbxTestClickXpath("//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
 		$this->zbxTestCheckFatalErrors();
