@@ -314,6 +314,68 @@ zbx_config_t;
 
 typedef struct
 {
+	char	*tag;
+}
+zbx_corr_condition_tag_t;
+
+typedef struct
+{
+	char		*tag;
+	char		*value;
+	unsigned char	op;
+}
+zbx_corr_condition_tag_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	groupid;
+	unsigned char	op;
+}
+zbx_corr_condition_group_t;
+
+typedef struct
+{
+	char	*oldtag;
+	char	*newtag;
+}
+zbx_corr_condition_tag_pair_t;
+
+typedef union
+{
+	zbx_corr_condition_tag_t	tag;
+	zbx_corr_condition_tag_value_t	tag_value;
+	zbx_corr_condition_group_t	group;
+	zbx_corr_condition_tag_pair_t	tag_pair;
+}
+zbx_corr_condition_data_t;
+
+typedef struct
+{
+	int				type;
+	zbx_corr_condition_data_t	data;
+}
+zbx_corr_condition_t;
+
+typedef struct
+{
+	unsigned char	type;
+}
+zbx_corr_operation_t;
+
+typedef struct
+{
+	zbx_uint64_t		correlationid;
+	char			*name;
+	char			*formula;
+	unsigned char		evaltype;
+
+	zbx_vector_ptr_t	conditions;
+	zbx_vector_ptr_t	operations;
+}
+zbx_correlation_t;
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_timespec_t		timestamp;
 	history_value_t		value;
@@ -490,6 +552,8 @@ void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
 void	zbx_set_availability_diff_ts(int ts);
+
+void zbx_dc_correlation_get_rules(zbx_vector_ptr_t *rules, int *sync_ts);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
