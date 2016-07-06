@@ -827,8 +827,13 @@ footer {
 	display: inline-block;
 	width: 16px;
 	height: 18px;
+	min-height: auto;
 	line-height: 18px;
+	padding: 0;
+	cursor: auto;
 	text-align: center;
+	border: none;
+	background-color: $transparent;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -839,20 +844,16 @@ footer {
 		border-top-color: $font-alt-color;
 	}
 
-	&:hover .arrow-right {
-		border-left-color: $link-color;
-	}
+	&:hover, &:focus {
+		background-color: $transparent;
 
-	&:focus .arrow-right {
-		border-left-color: $link-color;
-	}
+		.arrow-right {
+			border-left-color: $link-color;
+		}
 
-	&:hover .arrow-down {
-		border-top-color: $link-color;
-	}
-
-	&:focus .arrow-down {
-		border-top-color: $link-color;
+		.arrow-down {
+			border-top-color: $link-color;
+		}
 	}
 }
 
@@ -3402,7 +3403,7 @@ td.inactive-bg {
 	z-index: 1000;
 	top: 0;
 	right: 0;
-	min-height: 18px;
+	min-height: auto;
 	border: none;
 	background-color: $transparent !important;
 	@extend %close-icon;
