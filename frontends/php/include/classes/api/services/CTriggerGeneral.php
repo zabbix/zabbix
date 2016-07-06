@@ -478,6 +478,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int    $triggers[]['priority']            [IN] (optional)
 	 * @param string $triggers[]['comments']            [IN] (optional)
 	 * @param int    $triggers[]['type']                [IN] (optional)
+	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
+	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
 	 *
 	 * @throws APIException if validation failed.
 	 */
@@ -533,12 +535,19 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			if (array_key_exists('correlation_mode', $trigger)
-					&& $trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG
-					&& (!array_key_exists('correlation_tag', $trigger) || $trigger['correlation_tag'] === ''
-						|| $trigger['correlation_tag'] === false || $trigger['correlation_tag'] === null)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
-				);
+					&& $trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG) {
+				if (!array_key_exists('correlation_tag', $trigger) || $trigger['correlation_tag'] === ''
+						|| $trigger['correlation_tag'] === false || $trigger['correlation_tag'] === null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
+					);
+				}
+				elseif (stristr($trigger['correlation_tag'], '/')) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'correlation_tag',
+						_('unacceptable characters are used')
+					));
+				}
 			}
 
 			if (!array_key_exists('recovery_mode', $trigger)) {
@@ -584,6 +593,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['expression']                   [IN/OUT] (optional)
 	 * @param int    $triggers[]['recovery_mode']                [IN/OUT] (optional)
 	 * @param string $triggers[]['recovery_expression']          [IN/OUT] (optional)
+	 * @param int    $triggers[]['correlation_mode']             [IN] (optional)
+	 * @param string $triggers[]['correlation_tag']              [IN] (optional)
 	 * @param string $triggers[]['url']                          [IN] (optional)
 	 * @param int    $triggers[]['status']                       [IN] (optional)
 	 * @param int    $triggers[]['priority']                     [IN] (optional)
@@ -721,6 +732,12 @@ abstract class CTriggerGeneral extends CApiService {
 					_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
 				);
 			}
+			elseif (stristr($trigger['correlation_tag'], '/')) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'correlation_tag',
+					_('unacceptable characters are used')
+				));
+			}
 
 			if ($class === 'CTrigger') {
 				$updateDiscoveredValidator->setObjectName($description);
@@ -799,6 +816,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['comments']            [IN] (optional)
 	 * @param int    $triggers[]['type']                [IN] (optional)
 	 * @param string $triggers[]['templateid']          [IN] (optional)
+	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
+	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
 	 *
 	 * @throws APIException
 	 */
@@ -900,6 +919,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
+	 * @param int    $db_triggers[<tnum>]['correlation_mode']        [IN]
+	 * @param string $db_triggers[<tnum>]['correlation_tag']         [IN]
 	 *
 	 * @throws APIException
 	 */
@@ -1542,7 +1563,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers = $this->get([
 			'output' => [
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type'
+				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag'
 			],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],
