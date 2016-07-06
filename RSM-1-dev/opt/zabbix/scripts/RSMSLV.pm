@@ -66,12 +66,20 @@ use constant JSON_INTERFACE_DNS		=> 'DNS';
 use constant JSON_INTERFACE_DNSSEC	=> 'DNSSEC';
 use constant JSON_INTERFACE_RDDS43	=> 'RDDS43';
 use constant JSON_INTERFACE_RDDS80	=> 'RDDS80';
+use constant JSON_INTERFACE_EPP		=> 'EPP';
 
 use constant JSON_TAG_TARGET_IP		=> 'targetIP';
 use constant JSON_TAG_CLOCK		=> 'clock';
 use constant JSON_TAG_RTT		=> 'rtt';
 use constant JSON_TAG_UPD		=> 'upd';
 use constant JSON_TAG_DESCRIPTION	=> 'description';
+
+use constant EPP_COMMAND_LOGIN		=> 'Session';
+use constant EPP_COMMAND_INFO		=> 'Query';
+use constant EPP_COMMAND_UPDATE		=> 'Transform';
+
+use constant PROTO_UDP	=> 0;
+use constant PROTO_TCP	=> 1;
 
 use constant SEC_PER_WEEK	=> 604800;
 
@@ -91,11 +99,13 @@ our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR
 		MIN_INFO_ERROR MAX_INFO_ERROR PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
 		PROBE_ONLINE_SHIFT AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43
-		JSON_INTERFACE_RDDS80
-		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION
+		JSON_INTERFACE_RDDS80 JSON_INTERFACE_EPP
+		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION EPP_COMMAND_LOGIN
+		EPP_COMMAND_INFO EPP_COMMAND_UPDATE PROTO_UDP PROTO_TCP
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
-		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
+		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_rtt_low get_macro_dns_udp_delay
+		get_macro_dns_tcp_delay
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
@@ -173,17 +183,52 @@ sub get_macro_dns_udp_rtt_high
 
 sub get_macro_dns_udp_rtt_low
 {
-	return __get_macro('{$RSM.DNS.UDP.RTT.LOW}');
+	return __get_macro('{$RSM.DNS.UDP.RTT.LOW}', 1);	# search TLD
 }
 
 sub get_macro_dns_tcp_rtt_low
 {
-	return __get_macro('{$RSM.DNS.TCP.RTT.LOW}');
+	return __get_macro('{$RSM.DNS.TCP.RTT.LOW}', 1);	# search TLD
 }
 
 sub get_macro_rdds_rtt_low
 {
-	return __get_macro('{$RSM.RDDS.RTT.LOW}');
+	return __get_macro('{$RSM.RDDS.RTT.LOW}', 1);	# search TLD
+}
+
+sub get_rtt_low
+{
+	my $service = shift;
+	my $proto = shift;	# for DNS
+	my $command = shift;	# for EPP: 'login', 'info' or 'update'
+
+	if ($service eq 'dns' || $service eq 'dnssec')
+	{
+		if ($proto == PROTO_UDP)
+		{
+			return get_macro_dns_udp_rtt_low();	# can be per TLD
+		}
+		elsif ($proto == PROTO_TCP)
+		{
+			return get_macro_dns_tcp_rtt_low();	# can be per TLD
+		}
+		else
+		{
+			fail("THIS SHOULD NEVER HAPPEN");
+		}
+	}
+
+	if ($service eq 'rdds')
+	{
+		return get_macro_rdds_rtt_low();
+	}
+
+	if ($service eq 'epp')
+	{
+		return get_macro_epp_rtt_low($command);	# can be per TLD
+	}
+
+	fail("THIS SHOULD NEVER HAPPEN");
 }
 
 sub __get_macro_delay
@@ -240,7 +285,7 @@ sub get_macro_epp_rollweek_sla
 
 sub get_macro_epp_rtt_low
 {
-	return __get_macro('{$RSM.EPP.'.uc(shift).'.RTT.LOW}');
+	return __get_macro('{$RSM.EPP.'.uc(shift).'.RTT.LOW}', 1);	# search TLD
 }
 
 sub get_macro_probe_avail_limit
@@ -1512,6 +1557,8 @@ sub probes2tldhostids
 
 	my $result;
 
+	return $result unless ($probe_times_ref);
+
 	my $hosts_str = '';
 	foreach my $probe (keys(%{$probe_times_ref}))
 	{
@@ -2154,7 +2201,8 @@ sub get_results
 	foreach my $probe (keys(%$probe_times_ref))
 	{
 		my $times_ref = $probe_times_ref->{$probe};
-		my $hostids_ref = probes2tldhostids($tld, [$probe]);
+
+		my $hostids_ref = probes2tldhostids($tld, {$probe => $probe_times_ref->{$probe}});
 		my $itemids_ref = get_itemids_by_hostids($hostids_ref, $items_ref);
 		my $values_ref = __get_nsip_values($itemids_ref, $times_ref, $items_ref);
 
@@ -2777,7 +2825,7 @@ sub get_rdds_test_values
 	my $valuemaps = shift;
 	my $delay = shift;
 
-	# generate list if itemids
+	# generate list of itemids
 	my @dbl_itemids;
 	foreach my $probe (keys(%$rdds_dbl_items_ref))
 	{
@@ -2907,61 +2955,54 @@ sub get_rdds_test_values
 	return $result;
 }
 
-# values are organized like this:
-# {
-#         'WashingtonDC' => {
-#                 '1418994206' => {
-#                               'ip' => '192.0.34.201',
-#                               'login' => '127.0000',
-#                               'update' => '366.0000'
-#                               'info' => '366.0000'
-#                 },
-#                 '1418994456' => {
-#                               'ip' => '192.0.34.202',
-#                               'login' => '121.0000',
-#                               'update' => '263.0000'
-#                               'info' => '321.0000'
-#                 },
-# ...
+sub __map_epp_command
+{
+	my $item_command = shift;
+
+	return EPP_COMMAND_LOGIN if ($item_command eq 'login');
+	return EPP_COMMAND_INFO if ($item_command eq 'info');
+	return EPP_COMMAND_UPDATE if ($item_command eq 'update');
+
+	fail('THIS SHOULD NEVER HAPPEN');
+}
+
 sub get_epp_test_values
 {
 	my $epp_dbl_items_ref = shift;
 	my $epp_str_items_ref = shift;
 	my $start = shift;
 	my $end = shift;
+	my $valuemaps = shift;
+	my $delay = shift;
 
 	my %result;
 
-	# generate list if itemids
-	my $dbl_itemids_str = '';
+	my @dbl_itemids;
 	foreach my $probe (keys(%$epp_dbl_items_ref))
 	{
-		my $itemids_ref = $epp_dbl_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
+		foreach my $itemid (keys(%{$epp_dbl_items_ref->{$probe}}))
 		{
-			$dbl_itemids_str .= ',' unless ($dbl_itemids_str eq '');
-			$dbl_itemids_str .= $itemid;
+			push(@dbl_itemids, $itemid);
 		}
 	}
 
-	my $str_itemids_str = '';
+	my @str_itemids;
 	foreach my $probe (keys(%$epp_str_items_ref))
 	{
-		my $itemids_ref = $epp_str_items_ref->{$probe};
-
-		foreach my $itemid (keys(%$itemids_ref))
+		foreach my $itemid (keys(%{$epp_str_items_ref->{$probe}}))
 		{
-			$str_itemids_str .= ',' unless ($str_itemids_str eq '');
-			$str_itemids_str .= $itemid;
+			push(@str_itemids, $itemid);
 		}
 	}
 
-	return \%result if ($dbl_itemids_str eq '' or $str_itemids_str eq '');
+	return undef if (scalar(@dbl_itemids) == 0 || scalar(@str_itemids) == 0);
 
-	my $dbl_rows_ref = db_select("select itemid,value,clock from history where itemid in ($dbl_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+	my $result;
+	my $target = '';
 
-	foreach my $row_ref (@$dbl_rows_ref)
+	my $dbl_rows_ref = db_select_binds("select itemid,value,clock from history where itemid=? and " . sql_time_condition($start, $end), \@dbl_itemids);
+
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$dbl_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
 		my $value = $row_ref->[1];
@@ -2969,19 +3010,33 @@ sub get_epp_test_values
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_dbl_items_ref);
 
-		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
+		fail("internal error: cannot get Probe-key pair by itemid:$itemid")
+			unless (defined($probe) and defined($key));
 
-		my $type = __get_epp_dbl_type($key);
+		my $command = __get_epp_dbl_type($key);
+		my $cycleclock = cycle_start($clock, $delay);
 
-		$result{$probe}->{$clock}->{$type} = $value;
+		my $test_ref = $result->{$cycleclock}->{JSON_INTERFACE_EPP}->{$probe}->{$target}->[0];
+
+		# TODO: EPP: it's not yet decided if 3 EPP RTTs
+		# (login, info, update) are coming in one metric or 3
+		# separate ones. Based on that decision in the future
+		# the $rtt_low must be fetched for each command and
+		# each of the metrics must be added by calling
+		# __add_csv_test() 3 times, for each RTT.
+		# NB! Sync with export.pl part that calls this function!
+
+		$test_ref->{$command} = $value;
+		$test_ref->{JSON_TAG_CLOCK()} = $clock;
+		$test_ref->{JSON_TAG_DESCRIPTION()} = get_detailed_result($valuemaps, $value);
 	}
 
-	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
+	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
 
-	foreach my $row_ref (@$str_rows_ref)
+	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
-		my $value = $row_ref->[1];
+		my $ip = $row_ref->[1];
 		my $clock = $row_ref->[2];
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $epp_str_items_ref);
@@ -2990,10 +3045,19 @@ sub get_epp_test_values
 
 		my $type = __get_epp_str_type($key);
 
-		$result{$probe}->{$clock}->{$type} = $value;
+		if ($type ne 'ip')
+		{
+			fail("internal error: unknown item key \"$key\", expected item key representing the IP involved in EPP test");
+		}
+
+		my $cycleclock = cycle_start($clock, $delay);
+
+		my $test_ref = $result->{$cycleclock}->{JSON_INTERFACE_EPP}->{$probe}->{$target}->[0];
+
+		$test_ref->{JSON_TAG_TARGET_IP()} = $ip;
 	}
 
-	return \%result;
+	return $result;
 }
 
 sub no_cycle_result
@@ -4605,6 +4669,16 @@ sub __log
 sub __get_macro
 {
 	my $m = shift;
+	my $search_tld = shift;
+
+	if ($tld && $search_tld)
+	{
+		my $hostid = get_hostid("Template $tld");
+
+		my $value = __get_host_macro($hostid, $m, 1);	# optional
+
+		return $value if ($value);
+	}
 
 	my $rows_ref = db_select("select value from globalmacro where macro='$m'");
 
@@ -4617,10 +4691,15 @@ sub __get_host_macro
 {
 	my $hostid = shift;
 	my $m = shift;
+	my $optional = shift;
 
 	my $rows_ref = db_select("select value from hostmacro where hostid=$hostid and macro='$m'");
 
-	fail("cannot find macro '$m'") unless (1 == scalar(@$rows_ref));
+	if (1 != scalar(@$rows_ref))
+	{
+		fail("cannot find macro '$m'") unless ($optional);
+		return undef;
+	}
 
 	return $rows_ref->[0]->[0];
 }

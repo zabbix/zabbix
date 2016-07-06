@@ -16,7 +16,7 @@ use Data::Dumper;
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n', 'now=n',
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n',
 	'base=s', 'tmp=s', 'start-maintenance!');
 
 # do not write any logs
@@ -651,6 +651,11 @@ foreach (keys(%$servicedata))
 				$tests_ref = get_rdds_test_values($rdds_dbl_items_ref, $rdds_str_items_ref,
 					$values_from, $values_till, $services->{$service}->{'valuemaps'}, $delay);
 			}
+			elsif ($service eq 'epp')
+			{
+				$tests_ref = get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref,
+					$values_from, $values_till, $services->{$service}->{'valuemaps'}, $delay);
+			}
 
 			# add results to appropriate cycles
 			foreach my $cycleclock (keys(%$tests_ref))
@@ -740,117 +745,6 @@ foreach (keys(%$servicedata))
 					}
 				}
 			}
-			# elsif ($service eq 'epp')
-			# {
-			# 	my $tests_ref = get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref, $values_from, $values_till);
-
-			# 	foreach my $probe (keys(%$tests_ref))
-			# 	{
-			# 		my $cycles_idx = 0;
-
-			# 		foreach my $clock (sort(keys(%{$tests_ref->{$probe}})))	# must be sorted by clock
-			# 		{
-			# 			if ($clock < $cycles[$cycles_idx]->{'start'})
-			# 			{
-			# 				no_cycle_result($service, $key_avail, $probe, $clock);
-			# 				next;
-			# 			}
-
-			# 			# move to corresponding test result
-			# 			$cycles_idx++ while ($cycles_idx < $cycles_count && $clock > $cycles[$cycles_idx]->{'end'});
-
-			# 			if ($cycles_idx == $cycles_count)
-			# 			{
-			# 				no_cycle_result($service, $key_avail, $probe, $clock);
-			# 				next;
-			# 			}
-
-			# 			my $cycle_ref = $cycles[$cycles_idx];
-
-			# 			$cycle_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
-
-			# 			if (probe_offline_at($probe_times_ref, $probe, $clock) == SUCCESS)
-			# 			{
-			# 				$cycle_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
-			# 			}
-			# 			else
-			# 			{
-			# 				foreach my $type (keys(%{$tests_ref->{$probe}->{$clock}}))
-			# 				{
-			# 					$tests_ref->{$probe}->{$clock}->{$type} = get_detailed_result($services->{$service}->{'valuemaps'}, $tests_ref->{$probe}->{$clock}->{$type});
-			# 				}
-
-			# 				$cycle_ref->{'probes'}->{$probe}->{'details'}->{$clock} = $tests_ref->{$probe}->{$clock};
-			# 			}
-			# 		}
-			# 	}
-
-			# 	# add probes that are missing results
-			# 	foreach my $probe (keys(%$all_probes_ref))
-			# 	{
-			# 		foreach my $cycle_ref (@cycles)
-			# 		{
-			# 			my $found = 0;
-
-			# 			foreach my $cycle_ref_probe (keys(%{$cycle_ref->{'probes'}}))
-			# 			{
-			# 				if ($cycle_ref_probe eq $probe)
-			# 				{
-			# 					dbg("\"$cycle_ref_probe\" found!");
-
-			# 					$found = 1;
-			# 					last;
-			# 				}
-			# 			}
-
-			# 			$cycle_ref->{'probes'}->{$probe}->{'status'} = PROBE_NORESULT_STR if ($found == 0);
-			# 		}
-			# 	}
-
-			# 	# get results from probes: EPP down (0) or up (1)
-			# 	my $itemids_ref = get_service_status_itemids($tld, $services->{$service}->{'key_status'});
-                        #         my $probe_results_ref = get_probe_results($itemids_ref, $values_from, $values_till);
-
-			# 	foreach my $cycle_ref (@cycles)
-                        #         {
-			# 		# set status
-			# 		my $cycle_start = $cycle_ref->{'start'};
-			# 		my $cycle_end = $cycle_ref->{'end'};
-
-			# 		delete($cycle_ref->{'start'});
-			# 		delete($cycle_ref->{'end'});
-
-			# 		foreach my $probe (keys(%{$cycle_ref->{'probes'}}))
-			# 		{
-			# 			foreach my $probe_result_ref (@{$probe_results_ref->{$probe}})
-			# 			{
-			# 				next if ($probe_result_ref->{'clock'} < $cycle_start);
-			# 				last if ($probe_result_ref->{'clock'} > $cycle_end);
-
-			# 				if (!defined($cycle_ref->{'probes'}->{$probe}->{'status'}))
-			# 				{
-			# 					$cycle_ref->{'probes'}->{$probe}->{'status'} = ($probe_result_ref->{'value'} == 1 ? "Up" : "Down");
-			# 				}
-			# 			}
-			# 		}
-
-			# 		if (opt('dry-run'))
-			# 		{
-			# 			__prnt_json($cycle_ref);
-			# 		}
-			# 		else
-			# 		{
-			# 			if (ah_save_incident_results($now, $readable_tld, $service, $eventid, $event_start, $cycle_ref, $cycle_ref->{'clock'}) != AH_SUCCESS)
-			# 			{
-			# 				fail("cannot save incident results: ", ah_get_error());
-			# 			}
-			# 		}
-			# 	}
-			# }
-			# else
-			# {
-			# 	fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
-			# }
 		}
 
 		# if we are here the service is enabled, check tld status
