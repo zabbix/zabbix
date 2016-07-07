@@ -1929,6 +1929,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			" order by actionid,triggerid,itemid,escalationid",
 			filter);
 
+	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
+
 	/*
 	 * 1. Process escalations (cancel, skip, execute operations).
 	 */
