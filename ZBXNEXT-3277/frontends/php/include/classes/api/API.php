@@ -130,6 +130,13 @@ class API {
 	}
 
 	/**
+	 * @return CCorrelation
+	 */
+	public static function Correlation() {
+		return self::getApi('correlation');
+	}
+
+	/**
 	 * @return CDCheck
 	 */
 	public static function DCheck() {
