@@ -28,7 +28,7 @@ class testPageDiscoveryRules extends CWebTest {
 			'SELECT h.hostid, i.itemid, i.name, h.host, h.status'.
 			' FROM hosts h, items i'.
 			' WHERE i.hostid=h.hostid'.
-				' AND h.host LIKE '.zbx_dbstr('%-layout-test%').
+				' AND h.host LIKE \'%-layout-test%\''.
 				' AND i.flags = '.ZBX_FLAG_DISCOVERY_RULE
 		);
 	}
@@ -36,18 +36,14 @@ class testPageDiscoveryRules extends CWebTest {
 	/**
 	* @dataProvider data
 	*/
-
 	public function testPageDiscoveryRules_CheckLayout($data) {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
-		// We are in the list of drules
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
-		$this->zbxTestTextPresent('Discovery rules');
+		$this->zbxTestCheckHeader('Discovery rules');
 		$this->zbxTestTextPresent('Displaying');
 
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-			$this->zbxTestTextPresent('Host list');
-			// Header
+			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
 				[
 					'Name',
@@ -58,13 +54,12 @@ class testPageDiscoveryRules extends CWebTest {
 					'Interval',
 					'Type',
 					'Status',
-					'Error'
+					'Info'
 				]
 			);
 		}
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->zbxTestTextPresent('Template list');
-			// Header
+			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
 				[
 					'Name',
@@ -77,14 +72,11 @@ class testPageDiscoveryRules extends CWebTest {
 					'Status'
 				]
 			);
-			$this->zbxTestTextNotPresent('Error');
+			$this->zbxTestTextNotPresent('Info');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestDropdownHasOptions('action', [
-				'Enable selected',
-				'Disable selected',
-				'Delete selected'
-		]);
+		$this->zbxTestTextPresent('Enable', 'Disable', 'Delete');
+		$this->zbxTestTextPresent('0 selected');
 	}
 
 	/**
@@ -99,20 +91,17 @@ class testPageDiscoveryRules extends CWebTest {
 	*/
 	public function testPageDiscoveryRules_SimpleDelete($data) {
 		$itemid = $data['itemid'];
-		$this->chooseOkOnNextConfirmation();
 
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$data['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('g_hostdruleid_'.$itemid);
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		sleep(1);
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('discoveryrule.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
-		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+		$this->zbxTestCheckHeader('Discovery rules');
 
 		$sql = "SELECT null FROM items WHERE itemid=$itemid";
 		$this->assertEquals(0, DBcount($sql));
@@ -136,7 +125,7 @@ class testPageDiscoveryRules extends CWebTest {
 	public static function rule() {
 		return DBdata(
 			'SELECT distinct h.hostid, h.host from hosts h, items i'.
-			' WHERE h.host LIKE ' .zbx_dbstr('%-layout-test-%').
+			' WHERE h.host LIKE \'%-layout-test%\'' .
 				' AND h.hostid = i.hostid'.
 				' AND i.flags = '.ZBX_FLAG_DISCOVERY_RULE
 		);
@@ -147,8 +136,6 @@ class testPageDiscoveryRules extends CWebTest {
 	* @dataProvider rule
 	*/
 	public function testPageDiscoveryRules_MassDelete($rule) {
-		$this->chooseOkOnNextConfirmation();
-
 		$hostids = DBdata(
 			'SELECT hostid'.
 			' FROM items'.
@@ -160,15 +147,13 @@ class testPageDiscoveryRules extends CWebTest {
 		$this->zbxTestLogin('host_discovery.php?&hostid='.$rule['hostid']);
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		sleep(1);
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestClickButton('discoveryrule.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of discovery rules');
 		$this->zbxTestTextPresent('Discovery rules deleted');
-		$this->zbxTestTextPresent('CONFIGURATION OF DISCOVERY RULES');
+		$this->zbxTestCheckHeader('Discovery rules');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('hostids', $hostids);
 		$this->assertEquals(0, DBcount($sql));
