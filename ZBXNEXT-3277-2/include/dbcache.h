@@ -370,10 +370,18 @@ typedef struct
 	char			*formula;
 	unsigned char		evaltype;
 
-	zbx_vector_ptr_t	conditions;
 	zbx_vector_ptr_t	operations;
 }
 zbx_correlation_t;
+
+typedef struct
+{
+	zbx_vector_ptr_t	correlations;
+	zbx_hashset_t		conditions;
+
+	int			sync_ts;
+}
+zbx_correlation_rules_t;
 
 typedef struct
 {
@@ -555,7 +563,11 @@ int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
 void	zbx_set_availability_diff_ts(int ts);
 
-void zbx_dc_correlation_get_rules(zbx_vector_ptr_t *rules, int *sync_ts);
+void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);
+void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules);
+void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
+
+
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1

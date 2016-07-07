@@ -34,3 +34,8 @@ int	process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggeri
 {
 	return 0;
 }
+
+int	get_queued_event_count()
+{
+	return 0;
+}

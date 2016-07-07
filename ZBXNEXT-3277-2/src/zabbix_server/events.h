@@ -20,12 +20,15 @@
 #ifndef ZABBIX_EVENTS_H
 #define ZABBIX_EVENTS_H
 
-/* problem eventid - OK event pair */
+/* event recovery data */
 typedef struct
 {
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
 	DB_EVENT	*r_event;
+	zbx_uint64_t	correlationid;
+	zbx_uint64_t	c_eventid;
+	zbx_timespec_t	ts;
 }
 zbx_event_recovery_t;
 
@@ -35,5 +38,6 @@ DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t obj
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag);
 int	process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
+int	get_queued_event_count();
 
 #endif

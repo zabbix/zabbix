@@ -1284,4 +1284,6 @@ zbx_token_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
 
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+
 #endif

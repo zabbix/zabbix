@@ -53,6 +53,7 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 	DC_TRIGGER		*trigger_info = NULL;
 	zbx_vector_ptr_t	trigger_order, trigger_diff;
 	zbx_vector_uint64_t	triggerids;
+	int			events_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -65,7 +66,24 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 		DCconfig_get_time_based_triggers(&trigger_info, &trigger_order, ZBX_TRIGGERS_MAX, process_num);
 
 		if (0 == trigger_order.values_num)
+		{
+			if (0 != get_queued_event_count())
+			{
+				if (0 != (events_num = process_events(&trigger_diff, &triggerids)))
+				{
+					*events_count += events_num;
+
+					DBbegin();
+					DCconfig_triggers_apply_changes(&trigger_diff);
+					zbx_save_trigger_changes(&trigger_diff);
+					DBcommit();
+
+					DCconfig_unlock_triggers(&triggerids);
+					zbx_vector_uint64_clear(&triggerids);
+				}
+			}
 			break;
+		}
 
 		*triggers_count += trigger_order.values_num;
 
@@ -83,6 +101,7 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 		DBcommit();
 
 		DCconfig_unlock_triggers(&triggerids);
+		zbx_vector_uint64_clear(&triggerids);
 	}
 
 	zbx_free(trigger_info);
@@ -595,6 +614,10 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
+
+		/* set minimal sleep time if there are queued correlation events */
+		if (1 < sleeptime && 0 != get_queued_event_count())
+			sleeptime = 1;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
