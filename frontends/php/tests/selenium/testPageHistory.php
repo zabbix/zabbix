@@ -24,10 +24,10 @@ class testPageHistory extends CWebTest {
 
 	public static function checkLayoutItems() {
 		return DBdata(
-			'SELECT i.itemid,i.value_type,i.key_'.
+			'SELECT i.itemid,i.value_type,i.key_,i.name'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
-				' AND h.host='.zbx_dbstr('testPageHistory_CheckLayout')
+				' AND h.host=\'testPageHistory_CheckLayout\''
 		);
 	}
 
@@ -36,7 +36,8 @@ class testPageHistory extends CWebTest {
 	*/
 	public function testPageHistory_CheckLayout($item) {
 		$this->zbxTestLogin('history.php?action=showvalues&itemids[]='.$item['itemid']);
-		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
+		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
+		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 		switch ($item['value_type']) {
 			case ITEM_VALUE_TYPE_LOG:
 				if (substr($item['key_'], 0, 9) === 'eventlog[') {
@@ -53,14 +54,18 @@ class testPageHistory extends CWebTest {
 		$this->zbxTestTextPresent($table_titles);
 
 		$this->zbxTestDropdownSelectWait('action', '500 latest values');
-		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
-		$this->zbxTestClickWait('plaintext');
+		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
+		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 
-		// there surely is a better way to get out of the plaintext page than just clicking 'back'...
-		$this->goBack();
-		$this->wait();
-		$this->zbxTestDropdownSelectWait('action', 'Values');
-		$this->zbxTestCheckTitle('History \[refreshed every 30 sec.\]');
 		$this->zbxTestClickWait('plaintext');
+		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
+
+		$this->zbxTestOpen('history.php?action=showvalues&itemids[]='.$item['itemid']);
+		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
+		$this->zbxTestDropdownSelectWait('action', 'Values');
+		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
+
+		$this->zbxTestClickWait('plaintext');
+		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
 	}
 }
