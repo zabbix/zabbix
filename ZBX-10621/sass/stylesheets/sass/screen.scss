@@ -2267,6 +2267,17 @@ $form-icon-btn: (
 }
 
 // Dashboard
+.dashbrd-widget-placeholder {
+	border-color: darken($body-bg-color, 6%) !important;
+	background-color: darken($body-bg-color, 6%) !important;
+}
+
+.dashbrd-widget-draggable {
+	border-color: $action-border-color !important;
+	border-bottom-color: darken($action-border-color, 1%) !important;
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
+}
+
 .dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
