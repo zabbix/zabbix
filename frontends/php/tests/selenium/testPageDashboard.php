@@ -24,7 +24,7 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestTextPresent('PERSONAL DASHBOARD');
+		$this->zbxTestCheckHeader('Dashboard');
 		$this->zbxTestTextPresent('Favourite graphs');
 		$this->zbxTestTextPresent('Favourite screens');
 		$this->zbxTestTextPresent('Favourite maps');
@@ -40,6 +40,6 @@ class testPageDashboard extends CWebTest {
 	public function testPageDashboard_NoHostNames() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }
