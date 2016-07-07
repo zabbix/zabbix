@@ -67,36 +67,35 @@ class testFormMap extends CWebTest {
 		// getting map options from DB as they are at the beginning of the test
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
 		$db_map = DBfetch($db_result);
-		$this->assertTrue(isset($db_map['sysmapid']), 'Chuck Norris: Could not fetch map with name "'.$map_name.'" from DB. Here is what I got: '.print_r($db_map, true));
+		$this->assertTrue(isset($db_map['sysmapid']));
 
 		$this->zbxTestLogin('sysmaps.php');
-		$this->zbxTestClickWait('link='.$map_name);
+		$this->zbxTestClickLinkTextWait($map_name);
+		$this->zbxTestClickWait('edit');
 
 		// checking if appropriate value for grid size is selected
-		$this->assertTrue(
-			$this->getSelectedValue('gridsize') == $db_map['grid_size'],
-			'Chuck Norris: I was expecting to see '.$db_map['grid_size'].' selected, but saw '.$this->getSelectedValue('gridsize')
-		);
+		$this->assertTrue($this->zbxTestGetValue("//select[@id='gridsize']//option[@selected]") == $db_map['grid_size']);
 
 		// grid should be shown by default
 		if ($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON) {
 			$this->zbxTestTextPresent('Shown');
+			$this->zbxTestTextNotPresent('Hidden');
 		}
 		else {
 			$this->zbxTestTextPresent('Hidden');
+			$this->zbxTestTextNotPresent('Shown');
 		}
 
 		// auto align should be on by default
 		if ($db_map['grid_align'] == SYSMAP_GRID_ALIGN_ON) {
-			$this->zbxTestTextPresent('On');
+			$this->zbxTestAssertElementText("//button[@id='gridautoalign']", 'On');
 		}
 		else {
-			$this->zbxTestTextPresent('Off');
+			$this->zbxTestAssertElementText("//button[@id='gridautoalign']", 'Off');
 		}
 
 		// selecting new grid size
 		$this->zbxTestDropdownSelect('gridsize', $gridSize);
-		sleep(1);
 
 		// changing other two options if they are not already set as needed
 		if (($db_map['grid_show'] == SYSMAP_GRID_SHOW_ON && $showGrid == 0) || ($db_map['grid_show'] == SYSMAP_GRID_SHOW_OFF && $showGrid == 1)) {
@@ -106,54 +105,42 @@ class testFormMap extends CWebTest {
 			$this->zbxTestClick('gridautoalign');
 		}
 
-		// clicking "Update"
-		$this->chooseOkOnNextConfirmation();
-		$this->zbxTestClickWait('update');
-		$this->getConfirmation();
+		$this->zbxTestClickWait('sysmap_update');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		// checking if DB was updated as expected
 		$db_result = DBSelect("SELECT * FROM sysmaps WHERE name = '$map_name'");
 		$db_map = DBfetch($db_result);
-		$this->assertTrue(isset($db_map['sysmapid']), 'Chuck Norris: Could not fetch map with name "'.$map_name.'" from DB, after it was updated');
+		$this->assertTrue(isset($db_map['sysmapid']));
 
 		$this->assertTrue(
 			$db_map['grid_size'] == substr($gridSize, 0, strpos($gridSize, 'x'))
 			&& $db_map['grid_show'] == $showGrid
-			&& $db_map['grid_align'] == $autoAlign,
-			'Chuck Norris: Database was not updated as expected. Here is what I got: '.print_r($db_map, true).'. Now compare it with data set provided.'
+			&& $db_map['grid_align'] == $autoAlign
 		);
 
-		// returning to the map
-		$this->zbxTestClickWait('link='.$map_name);
+		$this->zbxTestClickLinkTextWait($map_name);
+		$this->zbxTestClickWait('edit');
 
 		// checking if all options remain as they were set
 		$this->assertTrue(
-			$this->getSelectedValue('gridsize') == substr($gridSize, 0, strpos($gridSize, 'x')),
-			'Chuck Norris: When returning to map after update, I was expecting to see '.substr($gridSize, 0, strpos($gridSize, 'x')).' selected, but saw '.$this->getSelectedValue('gridsize')
-		);
+			$this->zbxTestGetValue("//select[@id='gridsize']//option[@selected]") == substr($gridSize, 0, strpos($gridSize, 'x'))
+			);
 
 		if ($showGrid) {
 			$this->zbxTestTextPresent('Shown');
+			$this->zbxTestTextNotPresent('Hidden');
 		}
 		else {
 			$this->zbxTestTextPresent('Hidden');
+			$this->zbxTestTextNotPresent('Shown');
 		}
 
 		if ($autoAlign) {
-			$this->zbxTestTextPresent('On');
+			$this->zbxTestAssertElementText("//button[@id='gridautoalign']", 'On');
 		}
 		else {
-			$this->zbxTestTextPresent('Off');
+			$this->zbxTestAssertElementText("//button[@id='gridautoalign']", 'Off');
 		}
-
-		// if we got until here, everything works as expected
 	}
 
-	/**
-	 * Testing regression of ZBX-6840
-	 */
-	public function testFormMap_testZBX6840() {
-		$this->zbxTestLogin('maps.php');
-		$this->zbxTestDropdownSelectWait('sysmapid', 'testZBX6840');
-	}
 }
