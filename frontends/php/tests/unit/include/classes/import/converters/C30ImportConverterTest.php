@@ -124,7 +124,9 @@ class C30ImportConverterTest extends CImportConverterTest {
 													'recovery_expression' => ''
 												]
 											],
-											'tags' => []
+											'tags' => [],
+											'correlation_mode' => 0,
+											'correlation_tag' => ''
 										]
 									]
 								]
@@ -148,7 +150,9 @@ class C30ImportConverterTest extends CImportConverterTest {
 													'recovery_expression' => ''
 												]
 											],
-											'tags' => []
+											'tags' => [],
+											'correlation_mode' => 0,
+											'correlation_tag' => ''
 										]
 									]
 								]
@@ -168,7 +172,9 @@ class C30ImportConverterTest extends CImportConverterTest {
 									'recovery_expression' => ''
 								]
 							],
-							'tags' => []
+							'tags' => [],
+							'correlation_mode' => 0,
+							'correlation_tag' => ''
 						]
 					],
 					'maps' => [
