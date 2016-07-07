@@ -93,9 +93,6 @@ static int	calcitem_parse_expression(DC_ITEM *dc_item, expression_t *exp, char *
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() expression:'%s'", __function_name, dc_item->params);
 
-	assert(dc_item);
-	assert(exp);
-
 	exp->exp = zbx_malloc(exp->exp, exp_alloc);
 
 	for (e = dc_item->params; '\0' != *e; e++)
