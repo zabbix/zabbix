@@ -862,6 +862,13 @@ footer {
 .cell {
 	display: table-cell;
 	vertical-align: top;
+
+	&:last-child {
+
+		.dashbrd-widget {
+			margin: 0 0 10px 0;
+		}
+	}
 }
 
 .adm-img {
@@ -2260,20 +2267,6 @@ $form-icon-btn: (
 }
 
 // Dashboard
-.widget-placeholder {
-
-	.cell {
-		min-width: 250px;
-
-		&:last-child {
-
-			.dashbrd-widget {
-				margin: 0 0 10px 0;
-			}
-		}
-	}
-}
-
 .dashbrd-widget {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
