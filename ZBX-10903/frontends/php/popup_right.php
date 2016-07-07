@@ -133,7 +133,7 @@ $hostGroupForm->show();
 			var obj = jQuery(this);
 
 			if (obj.attr('name') !== 'all_groups' && obj.prop('checked')) {
-				var id = obj.data('id');
+				var id = obj.attr('data-id');
 
 				add_variable('input', 'new_right[' + id + '][permission]', obj.data('permission'), formName,
 					parentDocument);
