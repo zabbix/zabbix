@@ -725,12 +725,17 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
  *                                                                            *
  * Parameters: condition - [IN] the correlation condition to check            *
  *             event     - [IN] the new event to match                        *
+ *             old_value - [IN] SUCCEED - the old event conditions always     *
+ *                                        match event                         *
+ *                              FAIL    - the old event conditions never      *
+ *                                        match event                         *
  *                                                                            *
  * Return value: SUCCEED - the correlation condition matches                  *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event)
+static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event,
+		int old_value)
 {
 	int		i, ret;
 	zbx_tag_t	*tag;
@@ -741,7 +746,7 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-			return SUCCEED;
+			return old_value;
 	}
 
 	switch (condition->type)
@@ -788,6 +793,11 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
  *                                                                            *
  * Parameters: correlation - [IN] the correlation rule to check               *
  *             event       - [IN] the new event to match                      *
+ *             old_value   - [IN] SUCCEED - the old event conditions always   *
+ *                                        match event                         *
+ *                              FAIL    - the old event conditions never      *
+ *                                        match event                         *
+ *                                                                            *
  *                                                                            *
  * Return value: SUCCEED - the correlation rule might match depending on old  *
  *                         events                                             *
@@ -795,7 +805,7 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
  *                         (no matter what the old events are)                *
  *                                                                            *
  ******************************************************************************/
-static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_EVENT *event)
+static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_EVENT *event, int old_value)
 {
 	char			*expression, *value;
 	zbx_token_t		token;
@@ -823,7 +833,7 @@ static int	correlation_match_new_event(zbx_correlation_t *correlation, const DB_
 		if (NULL == (condition = zbx_hashset_search(&correlation_rules.conditions, &conditionid)))
 			goto out;
 
-		if (SUCCEED == correlation_condition_match_new_event(condition, event))
+		if (SUCCEED == correlation_condition_match_new_event(condition, event, old_value))
 			value = "1";
 		else
 			value = "0";
@@ -838,6 +848,69 @@ out:
 	zbx_free(expression);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: correlation_has_old_event_filter                                 *
+ *                                                                            *
+ * Purpose: checks if correlation has conditions to match old events          *
+ *                                                                            *
+ * Parameters: correlation - [IN] the correlation to check                    *
+ *                                                                            *
+ * Return value: SUCCEED - correlation has conditions to match old events     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	correlation_has_old_event_filter(const zbx_correlation_t *correlation)
+{
+	int				i;
+	const zbx_corr_condition_t	*condition;
+
+	for (i = 0; i < correlation->conditions.values_num; i++)
+	{
+		condition = (zbx_corr_condition_t *)correlation->conditions.values[i];
+
+		switch (condition->type)
+		{
+			case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
+			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+				return SUCCEED;
+		}
+	}
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: correlation_has_old_event_operation                              *
+ *                                                                            *
+ * Purpose: checks if correlation has operations to change old events         *
+ *                                                                            *
+ * Parameters: correlation - [IN] the correlation to check                    *
+ *                                                                            *
+ * Return value: SUCCEED - correlation has operations to change old events    *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	correlation_has_old_event_operation(const zbx_correlation_t *correlation)
+{
+	int				i;
+	const zbx_corr_operation_t	*operation;
+
+	for (i = 0; i < correlation->operations.values_num; i++)
+	{
+		operation = (zbx_corr_operation_t *)correlation->operations.values[i];
+
+		switch (operation->type)
+		{
+			case ZBX_CORR_OPERATION_CLOSE_OLD:
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -900,7 +973,7 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 	{
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-			if (SUCCEED == correlation_condition_match_new_event(condition, event))
+			if (SUCCEED == correlation_condition_match_new_event(condition, event, SUCCEED))
 				filter = "1";
 			else
 				filter = "0";
@@ -1021,6 +1094,75 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: correlation_execute_operations                                   *
+ *                                                                            *
+ * Purpose: execute correlation operations for the new event and matched      *
+ *          old eventid                                                       *
+ *                                                                            *
+ * Parameters: correlation - [IN] the correlation to execute                  *
+ *             event       - [IN] the new event                               *
+ *             eventid     - [IN] the old eventid                             *
+ *             objectid    - [IN] the old event source objectid (triggerid)   *
+ *                                                                            *
+ ******************************************************************************/
+static void	correlation_execute_operations(zbx_correlation_t *correlation, const DB_EVENT *event,
+		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
+{
+	int			i;
+	zbx_corr_operation_t	*operation;
+	zbx_event_recovery_t	recovery_local, queue_local;
+	zbx_timespec_t		ts;
+	DB_EVENT		*r_event;
+
+	for (i = 0; i < correlation->operations.values_num; i++)
+	{
+		operation = (zbx_corr_operation_t *)correlation->operations.values[i];
+
+		switch (operation->type)
+		{
+			case ZBX_CORR_OPERATION_CLOSE_NEW:
+				/* generate OK event to close the new event */
+
+				/* check if this event was not been closed by another correlation rule */
+				if (NULL != zbx_hashset_search(&event_recovery, &event->eventid))
+					break;
+
+				ts.sec = event->clock;
+				ts.ns = event->ns;
+				r_event = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+						event->objectid, &ts, TRIGGER_VALUE_OK,
+						event->trigger.description, event->trigger.expression,
+						event->trigger.recovery_expression, event->trigger.priority,
+						event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
+
+				recovery_local.eventid = event->eventid;
+				recovery_local.objectid = event->objectid;
+				recovery_local.correlationid = correlation->correlationid;
+				recovery_local.c_eventid = event->eventid;
+				recovery_local.r_event = r_event;
+
+				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
+				break;
+			case ZBX_CORR_OPERATION_CLOSE_OLD:
+				/* queue closing of old events to lock them by triggerids */
+				if (0 != old_eventid)
+				{
+					queue_local.eventid = old_eventid;
+					queue_local.c_eventid = event->eventid;
+					queue_local.correlationid = correlation->correlationid;
+					queue_local.objectid = old_objectid;
+					queue_local.ts.sec = event->clock;
+					queue_local.ts.ns = event->ns;
+
+					zbx_hashset_insert(&event_queue, &queue_local, sizeof(queue_local));
+				}
+				break;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: correlate_event_by_global_rules                                  *
  *                                                                            *
  * Purpose: find problem events that must be recovered by global correlation  *
@@ -1040,113 +1182,91 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 {
 	int			i;
 	zbx_correlation_t	*correlation;
-	zbx_corr_operation_t	*operation;
-	zbx_event_recovery_t	queue_local, recovery_local;
-	zbx_vector_ptr_t	correlations;
+	zbx_vector_ptr_t	corr_old, corr_new;
 	char			*sql = NULL, *delim = "";
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		eventid, correlationid;
+	zbx_uint64_t		eventid, correlationid, objectid;
 	DB_RESULT		result;
 	DB_ROW			row;
-	zbx_timespec_t		ts;
-	DB_EVENT		*r_event;
 
-	zbx_vector_ptr_create(&correlations);
+	zbx_vector_ptr_create(&corr_old);
+	zbx_vector_ptr_create(&corr_new);
 
 	for (i = 0; i < correlation_rules.correlations.values_num; i++)
 	{
 		correlation = (zbx_correlation_t *)correlation_rules.correlations.values[i];
 
-		if (SUCCEED == correlation_match_new_event(correlation, event))
-			zbx_vector_ptr_append(&correlations, correlation);
-	}
-
-	if (0 == correlations.values_num)
-		goto out;
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select pt.eventid,p.objectid,c.correlationid"
-							" from correlation c,problem_tag pt"
-							" left join problem p on p.eventid=pt.eventid"
-							" where");
-
-	for (i = 0; i < correlations.values_num; i++)
-	{
-		correlation = (zbx_correlation_t *)correlations.values[i];
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
-		correlation_add_event_filter(&sql, &sql_alloc, &sql_offset, correlation, event);
-		delim = " or";
-	}
-
-	result = DBselect("%s", sql);
-
-	while (NULL != (row = DBfetch(result)))
-	{
-		ZBX_STR2UINT64(eventid, row[0]);
-
-		/* check if this event is not already recovered by another correlation rule */
-		if (NULL != zbx_hashset_search(&event_queue, &eventid))
-			continue;
-
-		ZBX_STR2UINT64(correlationid, row[2]);
-
-		if (FAIL == (i = zbx_vector_ptr_bsearch(&correlations, &correlationid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (SUCCEED == correlation_match_new_event(correlation, event, SUCCEED))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			continue;
-		}
-
-		correlation = (zbx_correlation_t *)correlations.values[i];
-
-		for (i = 0; i < correlation->operations.values_num; i++)
-		{
-			operation = (zbx_corr_operation_t *)correlation->operations.values[i];
-
-			switch (operation->type)
+			if (SUCCEED == correlation_has_old_event_filter(correlation) ||
+					SUCCEED == correlation_has_old_event_operation(correlation))
 			{
-				case ZBX_CORR_OPERATION_CLOSE_NEW:
-					/* generate OK event to close the new event */
-
-					/* check if this event was not been closed by another correlation rule */
-					if (NULL != zbx_hashset_search(&event_recovery, &recovery_local))
-						break;
-
-					ts.sec = event->clock;
-					ts.ns = event->ns;
-					r_event = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-							event->objectid, &ts, TRIGGER_VALUE_OK,
-							event->trigger.description, event->trigger.expression,
-							event->trigger.recovery_expression, event->trigger.priority,
-							event->trigger.type, NULL, ZBX_TRIGGER_CORRELATION_NONE, "");
-
-					recovery_local.eventid = event->eventid;
-					recovery_local.objectid = event->objectid;
-					recovery_local.correlationid = correlationid;
-					recovery_local.c_eventid = event->eventid;
-					recovery_local.r_event = r_event;
-
-					zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
-					break;
-				case ZBX_CORR_OPERATION_CLOSE_OLD:
-					/* queue closing of old events to lock them by triggerids */
-					queue_local.eventid = eventid;
-					queue_local.c_eventid = event->eventid;
-					queue_local.correlationid = correlationid;
-					ZBX_STR2UINT64(queue_local.objectid, row[1]);
-					queue_local.ts.sec = event->clock;
-					queue_local.ts.ns = event->ns;
-
-					zbx_hashset_insert(&event_queue, &queue_local, sizeof(queue_local));
-					break;
+				zbx_vector_ptr_append(&corr_old, correlation);
+			}
+			else
+			{
+				if (SUCCEED == correlation_match_new_event(correlation, event, FAIL))
+					zbx_vector_ptr_append(&corr_new, correlation);
 			}
 		}
 	}
 
-	DBfree_result(result);
-	zbx_free(sql);
+	if (0 != corr_new.values_num)
+	{
+		/* Process correlations that matches new event and does not use or affect old events. */
+		/* Those correlations can be executed directly, without checking database.            */
+		for (i = 0; i < corr_new.values_num; i++)
+			correlation_execute_operations(corr_new.values[i], event, 0, 0);
+	}
+
+	if (0 != corr_old.values_num)
+	{
+		/* Process correlations that matches new event and either uses old events in conditions */
+		/* or has operations involving old events.                                              */
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select pt.eventid,p.objectid,c.correlationid"
+								" from correlation c,problem_tag pt"
+								" left join problem p on p.eventid=pt.eventid"
+								" where");
+
+		for (i = 0; i < corr_old.values_num; i++)
+		{
+			correlation = (zbx_correlation_t *)corr_old.values[i];
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, delim);
+			correlation_add_event_filter(&sql, &sql_alloc, &sql_offset, correlation, event);
+			delim = " or";
+		}
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(eventid, row[0]);
+
+			/* check if this event is not already recovered by another correlation rule */
+			if (NULL != zbx_hashset_search(&event_queue, &eventid))
+				continue;
+
+			ZBX_STR2UINT64(correlationid, row[2]);
+
+			if (FAIL == (i = zbx_vector_ptr_bsearch(&corr_old, &correlationid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			ZBX_STR2UINT64(objectid, row[1]);
+			correlation_execute_operations(corr_old.values[i], event, eventid, objectid);
+		}
+
+		DBfree_result(result);
+		zbx_free(sql);
+	}
 out:
-	zbx_vector_ptr_destroy(&correlations);
+	zbx_vector_ptr_destroy(&corr_new);
+	zbx_vector_ptr_destroy(&corr_old);
 }
 
 /******************************************************************************

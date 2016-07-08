@@ -9538,8 +9538,6 @@ static void	corr_condition_clean(zbx_corr_condition_t *condition)
 			zbx_free(condition->data.tag_value.value);
 			break;
 	}
-
-	zbx_free(condition);
 }
 
 /******************************************************************************
@@ -9558,6 +9556,7 @@ static void	dc_correlation_free(zbx_correlation_t *correlation)
 
 	zbx_vector_ptr_clear_ext(&correlation->operations, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&correlation->operations);
+	zbx_vector_ptr_destroy(&correlation->conditions);
 
 	zbx_free(correlation);
 }
@@ -9781,6 +9780,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 		correlation->evaltype = dc_correlation->evaltype;
 		correlation->name = zbx_strdup(NULL, dc_correlation->name);
 		correlation->formula = dc_correlation_formula_dup(dc_correlation);
+		zbx_vector_ptr_create(&correlation->conditions);
 		zbx_vector_ptr_create(&correlation->operations);
 
 		for (i = 0; i < dc_correlation->conditions.values_num; i++)
@@ -9789,6 +9789,7 @@ void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 			condition_local.corr_conditionid = dc_condition->corr_conditionid;
 			condition = zbx_hashset_insert(&rules->conditions, &condition_local, sizeof(condition_local));
 			dc_corr_condition_copy(dc_condition, condition);
+			zbx_vector_ptr_append(&correlation->conditions, condition);
 		}
 
 		for (i = 0; i < dc_correlation->operations.values_num; i++)

@@ -370,6 +370,7 @@ typedef struct
 	char			*formula;
 	unsigned char		evaltype;
 
+	zbx_vector_ptr_t	conditions;
 	zbx_vector_ptr_t	operations;
 }
 zbx_correlation_t;
