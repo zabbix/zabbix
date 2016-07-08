@@ -1240,7 +1240,7 @@ class CCorrelation extends CApiService {
 		}
 
 		if ($corr_condition_hostgroups_to_create) {
-			DB::save('corr_condition_newgrp', $corr_condition_hostgroups_to_create);
+			DB::save('corr_condition_group', $corr_condition_hostgroups_to_create);
 		}
 
 		if ($corr_condition_tag_pairs_to_create) {
@@ -1299,11 +1299,11 @@ class CCorrelation extends CApiService {
 
 				if ($formula_requested || $eval_formula_requested || $conditions_requested) {
 					$sql = 'SELECT c.correlationid,c.corr_conditionid,c.type,ct.tag AS ct_tag,'.
-								'cng.operator AS cng_operator,cng.groupid,ctp.oldtag,ctp.newtag,ctv.tag AS ctv_tag,'.
+								'cg.operator AS cg_operator,cg.groupid,ctp.oldtag,ctp.newtag,ctv.tag AS ctv_tag,'.
 								'ctv.operator AS ctv_operator,ctv.value'.
 							' FROM corr_condition c'.
 							' LEFT JOIN corr_condition_tag ct ON ct.corr_conditionid = c.corr_conditionid'.
-							' LEFT JOIN corr_condition_newgrp cng ON cng.corr_conditionid = c.corr_conditionid'.
+							' LEFT JOIN corr_condition_group cg ON cg.corr_conditionid = c.corr_conditionid'.
 							' LEFT JOIN corr_condition_tagpair ctp ON ctp.corr_conditionid = c.corr_conditionid'.
 							' LEFT JOIN corr_condition_tagvalue ctv ON ctv.corr_conditionid = c.corr_conditionid'.
 							' WHERE '.dbConditionInt('c.correlationid', $correlationids);
@@ -1324,7 +1324,7 @@ class CCorrelation extends CApiService {
 								break;
 
 							case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
-								$fields['operator'] = $row['cng_operator'];
+								$fields['operator'] = $row['cg_operator'];
 								$fields['groupid'] = $row['groupid'];
 								break;
 
