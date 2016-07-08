@@ -1744,6 +1744,7 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 		{
 			*error = zbx_dsprintf(*error, "action '%s' disabled.", row[1]);
 			ret = FAIL;
+			goto out;
 		}
 
 		ZBX_STR2UCHAR(action->status, row[2]);
@@ -1769,8 +1770,10 @@ static int	get_active_db_action(zbx_uint64_t actionid, DB_ACTION *action, char *
 		action->actionid = 0;
 		*error = zbx_dsprintf(*error, "action id:" ZBX_FS_UI64 " deleted", actionid);
 		ret = FAIL;
+		goto out;
 	}
 
+out:
 	DBfree_result(result);
 
 	return ret;
@@ -1963,8 +1966,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		if (SUCCEED != get_active_db_action(escalation.actionid, &action, &error))
 		{
 			escalation_log_cancel_warning(&escalation, error);
+			escalation.status = ESCALATION_STATUS_COMPLETED;
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			free_db_action(&action);
 			zbx_free(error);
 			continue;
 		}
@@ -2044,16 +2047,18 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 		escalation_update_diff(&escalation, diff);
 		zbx_vector_ptr_append(&diffs, diff);
+
+		free_db_action(&action);
 	}
 
 	DBfree_result(result);
 
-	if (0 == diffs.values_num)
-		goto out;
-
 	/*
 	 * 2. Updated escalations in the DB.
 	 */
+	if (0 == diffs.values_num)
+		goto delete;
+
 	zbx_vector_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	DBbegin();
@@ -2103,7 +2108,14 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		DBexecute("%s", sql);
 
-	/* delete completed, cancelled escalations */
+	DBcommit();
+
+delete:
+	/*
+	 * 3. Delete cancelled, completed escalations.
+	 */
+	DBbegin();
+
 	if (0 != escalationids.values_num)
 		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
 

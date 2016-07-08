@@ -1771,7 +1771,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 				zbx_vector_uint64_create(&rec_escalation->escalationids);
 			}
 
-			ZBX_DBROW2UINT64(escalationid, row[3]);
+			ZBX_DBROW2UINT64(escalationid, row[2]);
 			zbx_vector_uint64_append(&rec_escalation->escalationids, escalationid);
 
 		}
@@ -1811,6 +1811,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), new_escalation->actionid,
 					(int)ESCALATION_STATUS_ACTIVE, triggerid, itemid,
 					new_escalation->event->eventid, __UINT64_C(0));
+
+			zbx_free(new_escalation);
 		}
 
 		zbx_db_insert_autoincrement(&db_insert, "escalationid");
@@ -1846,6 +1848,8 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 			DBexecute("%s", sql);
+
+		zbx_free(sql);
 	}
 
 	zbx_hashset_destroy(&rec_escalations);
