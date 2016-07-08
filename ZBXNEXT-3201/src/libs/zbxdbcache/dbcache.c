@@ -851,7 +851,7 @@ static void	DCsync_trends()
  * Author: Alexei Vladishev, Alexander Vladishev                              *
  *                                                                            *
  ******************************************************************************/
-static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
+static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *trigger_diff)
 {
 	const char		*__function_name = "DCmass_update_triggers";
 	int			i, item_num = 0;
@@ -894,7 +894,7 @@ static void	DCmass_update_triggers(ZBX_DC_HISTORY *history, int history_num)
 
 	evaluate_expressions(&trigger_order);
 
-	process_triggers(&trigger_order);
+	zbx_process_triggers(&trigger_order, trigger_diff);
 
 	DCfree_triggers(&trigger_order);
 clean_triggers:
@@ -2066,7 +2066,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	int			history_num, candidate_num, next_sync = 0;
 	time_t			sync_start, now;
 	zbx_vector_uint64_t	triggerids;
-	zbx_vector_ptr_t	history_items;
+	zbx_vector_ptr_t	history_items, trigger_diff;
 	zbx_binary_heap_t	tmp_history_queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __function_name, cache->history_num);
@@ -2125,6 +2125,7 @@ int	DCsync_history(int sync_type, int *total_num)
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+	zbx_vector_ptr_create(&trigger_diff);
 
 	do
 	{
@@ -2159,15 +2160,20 @@ int	DCsync_history(int sync_type, int *total_num)
 		{
 			DCmass_update_items(history, history_num);
 			DCmass_add_history(history, history_num);
-			DCmass_update_triggers(history, history_num);
+			DCmass_update_triggers(history, history_num, &trigger_diff);
 			DCmass_update_trends(history, history_num);
-			DCflush_nextchecks();
+			DCflush_nextchecks(&trigger_diff);
 
 			/* processing of events, generated in functions: */
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
 			/*   DCflush_nextchecks() */
-			process_events();
+			process_events(&trigger_diff, &triggerids);
+
+			DCconfig_triggers_apply_changes(&trigger_diff);
+			zbx_save_trigger_changes(&trigger_diff);
+
+			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		}
 		else
 		{
@@ -2219,6 +2225,7 @@ int	DCsync_history(int sync_type, int *total_num)
 	}
 	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
 
+	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_ptr_destroy(&history_items);
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		zbx_vector_uint64_destroy(&triggerids);
