@@ -2109,7 +2109,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 	}
 
-	if (0 == cache->history_num && 0 == get_queued_event_count())
+	if (0 == cache->history_num)
 		goto finish;
 
 	sync_start = time(NULL);
@@ -2150,25 +2150,7 @@ int	DCsync_history(int sync_type, int *total_num)
 		UNLOCK_CACHE;
 
 		if (0 == history_num)
-		{
-			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER) && 0 != get_queued_event_count())
-			{
-				if (0 != process_events(&trigger_diff, &triggerids))
-				{
-					DBbegin();
-					DCconfig_triggers_apply_changes(&trigger_diff);
-					zbx_save_trigger_changes(&trigger_diff);
-					DBcommit();
-
-					zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
-					DCconfig_unlock_triggers(&triggerids);
-				}
-
-				if (ZBX_SYNC_FULL == sync_type)
-					continue;
-			}
 			break;
-		}
 
 		hc_get_item_values(history, &history_items);
 
@@ -2186,10 +2168,11 @@ int	DCsync_history(int sync_type, int *total_num)
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
 			/*   DCflush_nextchecks() */
-			process_events(&trigger_diff, &triggerids);
-
-			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			if (0 != process_trigger_events(&trigger_diff, &triggerids))
+			{
+				DCconfig_triggers_apply_changes(&trigger_diff);
+				zbx_save_trigger_changes(&trigger_diff);
+			}
 
 			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		}
@@ -2258,6 +2241,9 @@ finish:
 		cache->history_queue = tmp_history_queue;
 
 		UNLOCK_CACHE;
+
+		while (0 != flush_correlated_events())
+			;
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}

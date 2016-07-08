@@ -1107,6 +1107,11 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 			{
 				case ZBX_CORR_OPERATION_CLOSE_NEW:
 					/* generate OK event to close the new event */
+
+					/* check if this event was not been closed by another correlation rule */
+					if (NULL != zbx_hashset_search(&event_recovery, &recovery_local))
+						break;
+
 					ts.sec = event->clock;
 					ts.ns = event->ns;
 					r_event = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
@@ -1256,6 +1261,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 				diff->flags = ZBX_FLAGS_TRIGGER_DIFF_UNSET;
 				diff->value = trigger->value;
 				diff->problem_count = trigger->problem_count;
+				diff->error = NULL;
 
 				zbx_vector_ptr_append(trigger_diff, diff);
 				/* TODO: should we store trigger diffs in hashset rather than vector? */
@@ -1319,6 +1325,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 				recovery_local.r_event = event;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
+
 				closed_num++;
 			}
 
@@ -1376,7 +1383,8 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 
 		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
 		diff->problem_count++;
-		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT;
+		diff->lastchange = event->clock;
+		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
 	}
 
 	/* update trigger problem_count for recovered events */
@@ -1481,9 +1489,62 @@ static void	clean_events()
 
 /******************************************************************************
  *                                                                            *
+ * Function: flush_events                                                     *
+ *                                                                            *
+ * Purpose: flushes local event cache to disk                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	flush_events()
+{
+	int	ret;
+
+	ret = save_events();
+	save_problems();
+	save_event_recovery();
+
+	process_actions(events, events_num, &event_recovery);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_events                                                   *
  *                                                                            *
  * Purpose: processes cached events                                           *
+ *                                                                            *
+ * Return value: The number of processed events                               *
+ *                                                                            *
+ * Comments: If event cache might contain trigger events then                 *
+ *           process_trigger_events() function must be used instead           *
+ *                                                                            *
+ ******************************************************************************/
+int	process_events()
+{
+	const char	*__function_name = "process_events";
+	int		processed_num;
+
+	initialize_events();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
+
+	if (0 != events_num)
+	{
+		correlate_events_by_default_rules();
+		processed_num = flush_events();
+		clean_events();
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return processed_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_trigger_events                                           *
+ *                                                                            *
+ * Purpose: processes cached trigger events                                   *
  *                                                                            *
  * Parameters: trigger_diff    - [IN/OUT] the changeset of triggers that      *
  *                               generated the events in local cache. When    *
@@ -1501,15 +1562,15 @@ static void	clean_events()
  * Return value: The number of processed events                               *
  *                                                                            *
  ******************************************************************************/
-int	process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
 {
-	const char	*__function_name = "process_events";
-	size_t		i, ret;
+	const char	*__function_name = "process_trigger_events";
+	size_t		i, processed_num;
 	zbx_uint64_t	eventid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
-
 	initialize_events();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:" ZBX_FS_SIZE_T, __function_name, (zbx_fs_size_t)events_num);
 
 	if (0 != events_num)
 	{
@@ -1519,53 +1580,67 @@ int	process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggeri
 			events[i].eventid = eventid++;
 
 		correlate_events_by_default_rules();
-
-		if (NULL != trigger_diff)
-			correlate_events_by_trigger_rules();
-	}
-
-	/* When correlating by global rules events may be taken from local  */
-	/* queue where they were waiting for trigger lock. Because of that  */
-	/* we are processing global correlation rules even if there are     */
-	/* events in cache - new OK events might be added to cache during   */
-	/* global correlation.                                              */
-	if (NULL != triggerids_lock)
+		correlate_events_by_trigger_rules();
 		correlate_events_by_global_rules(trigger_diff, triggerids_lock);
 
-	if (0 != events_num)
-	{
-		ret = save_events();
-		save_problems();
-		save_event_recovery();
-
-		process_actions(events, events_num, &event_recovery);
-
+		processed_num = flush_events();
 		DBupdate_itservices(events, events_num);
-
-		if (NULL != trigger_diff)
-			update_trigger_changes(trigger_diff);
-
+		update_trigger_changes(trigger_diff);
 		clean_events();
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __function_name, processed_num);
 
-	return ret;
+	return processed_num;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: get_queued_event_count                                           *
+ * Function: flush_correlated_events                                          *
  *                                                                            *
- * Purpose: get the number of events queued to be closed by global            *
- *          correlation rules                                                 *
+ * Purpose: flush the correlated events that were queued for closing          *
  *                                                                            *
- * Return value: The number of queued events                                  *
+ * Return value: The number of events left in correlation queue               *
  *                                                                            *
  ******************************************************************************/
-int	get_queued_event_count()
+int	flush_correlated_events()
 {
+	const char		*__function_name = "flush_correlated_events";
+	zbx_vector_ptr_t	trigger_diff;
+	zbx_vector_uint64_t	triggerids_lock;
+
+	initialize_events();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events_num:%d", __function_name, event_queue.num_data);
+
+	if (0 == event_queue.num_data)
+		goto out;
+
+	zbx_vector_ptr_create(&trigger_diff);
+	zbx_vector_uint64_create(&triggerids_lock);
+
+	correlate_events_by_global_rules(&trigger_diff, &triggerids_lock);
+
+	if (0 != events_num)
+	{
+		flush_events();
+		DBupdate_itservices(events, events_num);
+		update_trigger_changes(&trigger_diff);
+		clean_events();
+
+		DBbegin();
+		DCconfig_triggers_apply_changes(&trigger_diff);
+		zbx_save_trigger_changes(&trigger_diff);
+		DBcommit();
+	}
+
+	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+	DCconfig_unlock_triggers(&triggerids_lock);
+
+	zbx_vector_uint64_destroy(&triggerids_lock);
+	zbx_vector_ptr_destroy(&trigger_diff);
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() events_num:%d", __function_name, event_queue.num_data);
+
 	return event_queue.num_data;
 }
-
-
