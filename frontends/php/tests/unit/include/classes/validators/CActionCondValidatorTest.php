@@ -135,14 +135,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-				'value' => TRIGGER_VALUE_TRUE,
-			]],
-			[[], [
-				'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
-				'value' => EVENT_TYPE_ITEM_NORMAL,
-			]],
-			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
 				'value' => 'abc',
 			]],
@@ -369,20 +361,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 					'value' => 100,
 				],
 				'Incorrect action condition trigger severity.'
-			],
-			[[],
-				[
-					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-					'value' => '',
-				],
-				'Empty action condition.'
-			],
-			[[],
-				[
-					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
-					'value' => 100,
-				],
-				'Incorrect action condition trigger value.'
 			],
 			[[],
 				[
