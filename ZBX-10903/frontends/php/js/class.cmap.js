@@ -221,6 +221,7 @@ ZABBIX.apps.map = (function($) {
 						ln;
 
 					for (i = 0, ln = selected.length; i < ln; i++) {
+						// Intentional use of .attr() method. See https://bugs.jquery.com/ticket/7579.
 						ids.push($(selected[i]).attr('data-id'));
 
 						// remove ui-selected class, to not confuse next selection

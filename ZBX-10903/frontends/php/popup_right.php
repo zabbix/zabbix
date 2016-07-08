@@ -133,6 +133,7 @@ $hostGroupForm->show();
 			var obj = jQuery(this);
 
 			if (obj.attr('name') !== 'all_groups' && obj.prop('checked')) {
+				// Intentional use of .attr() method. See https://bugs.jquery.com/ticket/7579.
 				var id = obj.attr('data-id');
 
 				add_variable('input', 'new_right[' + id + '][permission]', obj.data('permission'), formName,

@@ -299,6 +299,7 @@ jQuery(function($) {
 							var availableActive = $('.available li.hover', obj);
 
 							if (availableActive.length > 0) {
+								// Intentional use of .attr() method. See https://bugs.jquery.com/ticket/7579.
 								select(availableActive.attr('data-id'), obj, values, options);
 							}
 
