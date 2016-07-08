@@ -1399,13 +1399,16 @@ sub get_probe_times
 			" where itemid=$itemid".
 				" and clock between $from and $till");
 
-		my $values_hash_ref;
+		next unless (scalar(@{$values_ref}));
+
+		my ($values_hash_ref, $min_clock);
 		foreach my $row_ref (sort {$a->[0] <=> $b->[0]} (@{$values_ref}))	# sort by clock
 		{
 			$values_hash_ref->{truncate_from($row_ref->[0])} = $row_ref->[1];
+			$min_clock = $row_ref->[0] if (!defined($min_clock) || $row_ref->[0] < $min_clock);
 		}
 
-		my $step_clock = $from;
+		my $step_clock = $min_clock;
 		my $step = 60;	# seconds
 		my $prev_value = DOWN;
 
@@ -2009,7 +2012,7 @@ sub process_slv_avail
 					}
 				}
 
-				dbg("i:$itemid (h:$hostid): ", (SUCCESS == $result ? "up" : "down"), " (values: ", join(', ', @{$values_ref->{$itemid}}), ")");
+				dbg("i:$itemid (h:$hostid): ", (SUCCESS == $result ? "up" : "down"), " (values: ", join(',', values(%{$values_ref->{$itemid}})), ")");
 			}
 		}
 	}
@@ -2100,6 +2103,13 @@ sub process_slv_ns_avail
 			$status_value = UP_INCONCLUSIVE;
 			$status_message = "not enough probes with reults, " .
 				$nsip_results->{$nsip}->{'probes_with_results'} . " while $cfg_minonline required";
+
+			$result->{$nsip}->{'alert'} = 1 if (alerts_enabled() == SUCCESS);
+		}
+		elsif ($nsip_results->{$nsip}->{'probes_with_results'} == 0)
+		{
+			$status_value = UP_INCONCLUSIVE;
+			$status_message = "no probes with reults found";
 
 			$result->{$nsip}->{'alert'} = 1 if (alerts_enabled() == SUCCESS);
 		}
