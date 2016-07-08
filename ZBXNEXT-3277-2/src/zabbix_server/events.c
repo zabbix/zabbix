@@ -1264,7 +1264,7 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 		DBfree_result(result);
 		zbx_free(sql);
 	}
-out:
+
 	zbx_vector_ptr_destroy(&corr_new);
 	zbx_vector_ptr_destroy(&corr_old);
 }
