@@ -1236,19 +1236,19 @@ class CCorrelation extends CApiService {
 		}
 
 		if ($corr_condition_tags_to_create) {
-			DB::save('corr_condition_tag', $corr_condition_tags_to_create);
+			DB::insert('corr_condition_tag', $corr_condition_tags_to_create, false);
 		}
 
 		if ($corr_condition_hostgroups_to_create) {
-			DB::save('corr_condition_group', $corr_condition_hostgroups_to_create);
+			DB::insert('corr_condition_group', $corr_condition_hostgroups_to_create, false);
 		}
 
 		if ($corr_condition_tag_pairs_to_create) {
-			DB::save('corr_condition_tagpair', $corr_condition_tag_pairs_to_create);
+			DB::insert('corr_condition_tagpair', $corr_condition_tag_pairs_to_create, false);
 		}
 
 		if ($corr_condition_tag_values_to_create) {
-			DB::save('corr_condition_tagvalue', $corr_condition_tag_values_to_create);
+			DB::insert('corr_condition_tagvalue', $corr_condition_tag_values_to_create, false);
 		}
 
 		return $conditions;
