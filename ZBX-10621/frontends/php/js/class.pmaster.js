@@ -302,9 +302,6 @@ var CDoll = Class.create({
 		url.setArgument('upd_counter', this.counter());
 		url.setArgument('pmasterid', this.pmasterid());
 
-		jQuery(window).off('resize');
-		jQuery(document).off('mousemove');
-
 		new Ajax.Request(url.getUrl(), {
 				'method': 'post',
 				'parameters': this._params,
@@ -395,7 +392,15 @@ var CDoll = Class.create({
 					handle: 'div.dashbrd-widget-head',
 					forcePlaceholderSize: true,
 					placeholder: 'dashbrd-widget',
-					opacity: '0.8',
+					tolerance: 'pointer',
+					start: function(e, ui) {
+						jQuery(ui.placeholder).addClass('dashbrd-widget-placeholder');
+						jQuery(ui.item).addClass('dashbrd-widget-draggable');
+					},
+					stop: function(e, ui) {
+						jQuery(ui.placeholder).removeClass('dashbrd-widget-placeholder');
+						jQuery(ui.item).removeClass('dashbrd-widget-draggable');
+					},
 					update: function(e, ui) {
 						// prevent duplicate save requests when moving a widget from one column to another
 						if (!ui.sender) {
@@ -414,10 +419,7 @@ var CDoll = Class.create({
 							});
 						}
 					}
-				})
-				.children('div')
-				.children('div.header')
-				.addClass('move');
+				});
 		}
 	}
 });
