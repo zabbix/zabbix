@@ -378,7 +378,6 @@
 
 	jQuery(function($) {
 		$('#exprTable').on('click', 'button.exprRemove', function() {
-			// Intentional use of .attr() method. See https://bugs.jquery.com/ticket/7579.
 			zabbixRegExp.removeExpression($(this).attr('data-id'));
 		});
 
