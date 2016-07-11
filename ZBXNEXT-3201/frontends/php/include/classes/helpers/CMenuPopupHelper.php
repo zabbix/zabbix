@@ -405,8 +405,6 @@ class CMenuPopupHelper {
 
 		$data = [
 			'type' => 'trigger',
-			'groupid' => $trigger['groupid'],
-			'hostid' => $trigger['hostid'],
 			'triggerid' => $trigger['triggerid'],
 			'items' => $items
 		];

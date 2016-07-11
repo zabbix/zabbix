@@ -720,8 +720,6 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			}
 
 			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = [
-				'groupid' => $trigger['groupid'],
-				'hostid' => $host['hostid'],
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
