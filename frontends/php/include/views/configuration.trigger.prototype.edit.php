@@ -469,7 +469,7 @@ if ($data['limited']) {
 		->setEnabled(false);
 }
 else {
-	$problem_event_generation_mode = (new CRadioButtonList('type_name', (int) $data['type']))
+	$problem_event_generation_mode = (new CRadioButtonList('type', (int) $data['type']))
 		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 		->setModern(true);
