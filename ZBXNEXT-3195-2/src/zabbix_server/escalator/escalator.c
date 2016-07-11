@@ -2114,12 +2114,13 @@ delete:
 	/*
 	 * 3. Delete cancelled, completed escalations.
 	 */
-	DBbegin();
-
 	if (0 != escalationids.values_num)
+	{
+		DBbegin();
 		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
+		DBcommit();
+	}
 
-	DBcommit();
 
 out:
 	zbx_free(filter);

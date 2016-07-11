@@ -1694,17 +1694,24 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 			if (SUCCEED == check_action_conditions(event, action))
 			{
-				zbx_escalation_new_t	*new_escalation;
+				if (EVENT_SOURCE_TRIGGERS == event->source ||
+						EVENT_SOURCE_INTERNAL == event->source)
+				{
+					zbx_escalation_new_t	*new_escalation;
 
-				new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
-				new_escalation->actionid = action->actionid;
-				new_escalation->event = event;
-				zbx_vector_ptr_append(&new_escalations, new_escalation);
-
-				if (EVENT_SOURCE_DISCOVERY == event->source ||
+					new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+					new_escalation->actionid = action->actionid;
+					new_escalation->event = event;
+					zbx_vector_ptr_append(&new_escalations, new_escalation);
+				}
+				else if (EVENT_SOURCE_DISCOVERY == event->source ||
 						EVENT_SOURCE_AUTO_REGISTRATION == event->source)
 				{
 					execute_operations(event, action->actionid);
+				}
+				else
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
 				}
 			}
 		}
