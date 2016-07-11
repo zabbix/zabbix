@@ -114,7 +114,9 @@ if ($data['filter_search']) {
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $template['templateid'],
 			'filter' => array(
-				'macro' => array(RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS_ENABLED)
+				'macro' => array(RSM_TLD_EPP_ENABLED, RSM_TLD_RDDS43_ENABLED, RSM_TLD_RDDS80_ENABLED,
+					RSM_TLD_RDAP_ENABLED
+				)
 			)
 		));
 
@@ -130,7 +132,9 @@ if ($data['filter_search']) {
 		$epp = false;
 
 		foreach ($template_macros as $template_macro) {
-			if ($template_macro['macro'] == RSM_TLD_RDDS_ENABLED && $template_macro['value'] == 1) {
+			if ($template_macro['value'] == 1 && ($template_macro['macro'] == RSM_TLD_RDDS43_ENABLED
+					|| $template_macro['macro'] == RSM_TLD_RDDS80_ENABLED
+					|| $template_macro['macro'] == RSM_TLD_RDAP_ENABLED)) {
 				$rdds = true;
 				$item_keys = array_merge($item_keys, array(RSM_SLV_RDDS_DOWNTIME, RSM_SLV_RDDS43_UPD_PFAILED));
 				$macro_keys = array_merge($macro_keys, array(RSM_SLV_MACRO_RDDS_AVAIL, RSM_SLV_RDDS_UPD,

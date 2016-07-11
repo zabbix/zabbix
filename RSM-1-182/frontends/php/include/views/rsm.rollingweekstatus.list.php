@@ -292,7 +292,25 @@ if (isset($this->data['tld'])) {
 				? new CLink('graph', 'history.php?action=showgraph&period='.$this->data['rollWeekSeconds'].'&itemid='.
 						$tld[RSM_RDDS]['itemid'], 'cell-value')
 				: null;
-			$rdds =  array(new CSpan($rddsValue, 'right'), $rddsStatus, $rddsGraph);
+
+			$ok_rdds_services = [];
+			if (array_key_exists(RSM_TLD_RDDS43_ENABLED, ($tld[RSM_RDDS]['subservices']))
+					&& $tld[RSM_RDDS]['subservices'][RSM_TLD_RDDS43_ENABLED] == 1) {
+				$ok_rdds_services[] = 'RDDS43';
+			}
+			if (array_key_exists(RSM_TLD_RDDS80_ENABLED, ($tld[RSM_RDDS]['subservices']))
+					&& $tld[RSM_RDDS]['subservices'][RSM_TLD_RDDS80_ENABLED] == 1) {
+				$ok_rdds_services[] = 'RDDS80';
+			}
+			if (array_key_exists(RSM_TLD_RDAP_ENABLED, ($tld[RSM_RDDS]['subservices']))
+					&& $tld[RSM_RDDS]['subservices'][RSM_TLD_RDAP_ENABLED] == 1) {
+				$ok_rdds_services[] = 'RDAP';
+			}
+
+			$rdds_services = implode('/', $ok_rdds_services);
+			$rdds =  array(new CSpan($rddsValue, 'right'), $rddsStatus, $rddsGraph, SPACE,
+				new CSpan($rdds_services, 'bold')
+			);
 		}
 		else {
 			$rdds = new CDiv(null, 'service-icon status_icon_extra iconrollingweekdisabled disabled-service');
