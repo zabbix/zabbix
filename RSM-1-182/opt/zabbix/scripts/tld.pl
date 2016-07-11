@@ -82,6 +82,8 @@ my $trigger_rollweek_thresholds = rsm_trigger_rollweek_thresholds;
 
 my $cfg_global_macros = cfg_global_macros;
 
+my $rsm_rdds_interfaces = rsm_rdds_interfaces;
+
 my ($rsm_groupid, $rsm_hostid);
 
 my ($ns_servers, $root_servers_macros, $applications);
@@ -656,7 +658,7 @@ sub create_items_rdds
 	$options->{'hostid'} = $templateid;
 	$options->{'type'} = 2;
 
-	foreach my ($interface, $details) (each(%{$rsm_rdds_interfaces}))
+	while (my ($interface, $details) = each(%{$rsm_rdds_interfaces}))
 	{
 		if (defined($OPTS{$details->{'option'}}))
 		{
@@ -971,7 +973,7 @@ sub create_main_template {
     create_macro('{$RSM.TLD.DNSSEC.ENABLED}', defined($OPTS{'dnssec'}) ? 1 : 0, $templateid, true, $is_new);
     create_macro('{$RSM.TLD.EPP.ENABLED}', defined($OPTS{'epp-servers'}) ? 1 : 0, $templateid, true, $is_new);
 
-	foreach my ($interface, $details) (each(%{$rsm_rdds_interfaces}))
+	while (my ($interface, $details) = each(%{$rsm_rdds_interfaces}))
 	{
 		create_macro('{$RSM.TLD.' . $interface . '.ENABLED}', (defined($OPTS{$details->{'option'}}) ? 1 : 0),
 				$templateid, true, $is_new);
