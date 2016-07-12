@@ -18,33 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $this->addJsFile('js/gtlc.js');
 $this->addJsFile('js/flickerfreescreen.js');
 
 (new CWidget())
-	->setTitle(_('Web monitoring'))
+	->setTitle(_('Problems'))
 	->setControls(
 		(new CForm('get'))
-			->setName('slideHeaderForm')
+			->addVar('action', 'problem.view')
 			->addVar('fullscreen', $data['fullscreen'])
-			->addVar('action', 'web.view')
-			->addItem((new CList())
-				->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
-				->addItem([_('Host'), SPACE, $data['pageFilter']->getHostsCB()])
-				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			->addItem(
+				(new CList())
+					->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 			)
 	)
 	->addItem(
 		CScreenBuilder::getScreen([
-			'resourcetype' => SCREEN_RESOURCE_HTTPTEST,
+			'resourcetype' => SCREEN_RESOURCE_PROBLEM,
 			'mode' => SCREEN_MODE_JS,
-			'dataId' => 'httptest',
-			'groupid' => $data['pageFilter']->groupid,
-			'hostid' => $data['pageFilter']->hostid,
-			'page' => $data['page'],
+			'dataId' => 'problem',
 			'data' => [
-				'hosts_selected' => $data['pageFilter']->hostsSelected,
 				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
 				'sortorder' => $data['sortorder']
@@ -52,3 +45,6 @@ $this->addJsFile('js/flickerfreescreen.js');
 		])->get()
 	)
 	->show();
+
+// activating blinking
+$this->addPostJS('jqBlink.blink();');

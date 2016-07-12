@@ -47,6 +47,12 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'sub_pages' => ['dashconf.php']
 				],
 				[
+					'url' => 'zabbix.php',
+					'action' => 'problem.view',
+					'active_if' => ['problem.view'],
+					'label' => _('Problems')
+				],
+				[
 					'url' => 'overview.php',
 					'label' => _('Overview')
 				],

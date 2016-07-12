@@ -2053,3 +2053,112 @@ function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
 	}
 	$triggers = $sortedTriggers;
 }
+
+/**
+ * Create the list of hosts for each trigger.
+ *
+ * @param array  $triggers
+ * @param string $triggers[]['triggerid']
+ * @param array  $triggers[]['hosts']
+ * @param string $triggers[]['hosts'][]['hostid']
+ *
+ * @return array
+ */
+function getTriggersHostList(array $triggers) {
+	$db_hosts = [];
+	$db_maintenances = [];
+	$scripts_by_hosts = [];
+
+	$hostids = [];
+
+	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $host) {
+			$hostids[$host['hostid']] = true;
+		}
+	}
+
+	if ($hostids) {
+		$hostids = array_keys($hostids);
+
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectScreens' => API_OUTPUT_COUNT,
+			'hostids' => $hostids,
+			'preservekeys' => true
+		]);
+
+		$maintenanceids = [];
+
+		foreach ($db_hosts as $db_host) {
+			if ($db_host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenanceids[$db_host['maintenanceid']] = true;
+			}
+		}
+
+		if ($maintenanceids) {
+			$db_maintenances = API::Maintenance()->get([
+				'output' => ['name', 'description'],
+				'maintenanceids' => array_keys($maintenanceids),
+				'preservekeys' => true
+			]);
+		}
+
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	}
+
+	$host_list = [];
+	foreach ($triggers as $trigger) {
+		$host_list[$trigger['triggerid']] = [];
+		$trigger_hosts = [];
+
+		foreach ($trigger['hosts'] as $host) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
+				continue;
+			}
+
+			$trigger_hosts[] = $db_hosts[$host['hostid']];
+		}
+		order_result($trigger_hosts, 'name');
+
+		foreach ($trigger_hosts as $host) {
+			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
+				? $scripts_by_hosts[$host['hostid']]
+				: [];
+
+			$host_name = (new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
+
+			// add maintenance icon with hint if host is in maintenance
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenance_icon = (new CSpan())
+					->addClass(ZBX_STYLE_ICON_MAINT)
+					->addClass(ZBX_STYLE_CURSOR_POINTER);
+
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$db_maintenance = $db_maintenances[$host['maintenanceid']];
+
+					$hint = $db_maintenance['name'].' ['.($host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
+
+					if ($db_maintenance['description'] !== '') {
+						$hint .= "\n".$db_maintenance['description'];
+					}
+
+					$maintenance_icon->setHint($hint);
+				}
+
+				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
+			}
+
+			if ($host_list[$trigger['triggerid']]) {
+				$host_list[$trigger['triggerid']][] = ', ';
+			}
+			$host_list[$trigger['triggerid']][] = $host_name;
+		}
+	}
+
+	return $host_list;
+}

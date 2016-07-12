@@ -737,6 +737,7 @@ else {
 
 			// actions
 			$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
+			$tags = makeEventsTags($events);
 
 			// events
 			foreach ($events as $event) {
@@ -796,26 +797,6 @@ else {
 							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
-					// tags
-					CArrayHelper::sort($event['tags'], ['tag', 'value']);
-
-					$tags = [];
-					$tags_count = 1;
-
-					foreach ($event['tags'] as $tag) {
-						if ($tags_count > EVENTS_LIST_TAGS_COUNT) {
-							$tags[] = new CSpan(bold('...'));
-							break;
-						}
-						else {
-							$tags[] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
-								->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-								->addClass(ZBX_STYLE_STATUS_GREY);
-						}
-
-						$tags_count++;
-					}
-
 					$table->addRow([
 						(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
@@ -827,7 +808,7 @@ else {
 						$event['duration'],
 						$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
 						(new CCol($action))->addClass(ZBX_STYLE_NOWRAP),
-						new CCol($tags)
+						$tags[$event['eventid']]
 					]);
 				}
 			}

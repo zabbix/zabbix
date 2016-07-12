@@ -95,6 +95,7 @@ jQuery(function($) {
 			}
 
 			// timeline params
+			// SCREEN_RESOURCE_HTTPTEST_DETAILS, SCREEN_RESOURCE_DISCOVERY, SCREEN_RESOURCE_HTTPTEST
 			if (jQuery.inArray(screen.resourcetype, [21, 22, 23]) === -1) {
 				ajaxUrl.setArgument('period', empty(screen.timeline.period) ? null : screen.timeline.period);
 				ajaxUrl.setArgument('stime', this.getCalculatedSTime(screen));
