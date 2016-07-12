@@ -42,6 +42,11 @@ extern int	CONFIG_ESCALATOR_FORKS;
 #define ZBX_ACTION_RECOVERY_NONE	0
 #define ZBX_ACTION_RECOVERY_OPERATIONS	1
 
+#define ZBX_ESCALATION_CANCEL		0
+#define ZBX_ESCALATION_DELETE		1
+#define ZBX_ESCALATION_SKIP		2
+#define ZBX_ESCALATION_PROCESS		3
+
 typedef struct
 {
 	zbx_uint64_t	userid;
@@ -1505,37 +1510,58 @@ out:
 	return ret;
 }
 
+static const char	*check_escalation_result_string(int result)
+{
+	switch (result)
+	{
+		case ZBX_ESCALATION_CANCEL:
+			return "cancel";
+		case ZBX_ESCALATION_DELETE:
+			return "delete";
+		case ZBX_ESCALATION_SKIP:
+			return "skip";
+		case ZBX_ESCALATION_PROCESS:
+			return "process";
+		default:
+			return "unknown";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: check_escalation                                                 *
  *                                                                            *
- * Purpose: check whether the escalation is still relevant (items, triggers,  *
- *          hosts are still present and were not disabled)                    *
+ * Purpose: check whether escalation must be cancelled, deleted, skipped or   *
+ *          processed.                                                        *
  *                                                                            *
- * Parameters: escalation - [IN] escalation data                              *
- *             action     - [OUT] action data                                 *
- *             skip       - [OUT] 1 if the escalation must be skipped,        *
- *                                0 otherwise                                 *
- *             error      - [OUT] message in case escalation is cancelled     *
+ * Parameters: escalation - [IN] escalation to check                          *
+ *             action     - [IN] action responsible for the escalation        *
  *                                                                            *
- * Return value: SUCCEED - the escalation is usable                           *
- *               FAIL    - otherwise                                          *
+ * Return value: ZBX_ESCALATION_CANCEL  - the relevant event, item, trigger   *
+ *                                        or host is disabled or deleted      *
+ *               ZBX_ESCALATION_DELETE  - escalations was created and         *
+ *                                        recovered during maintenance        *
+ *               ZBX_ESCALATION_SKIP    - escalation is paused during         *
+ *                                        maintenance or dependable trigger   *
+ *                                        in problem state                    *
+ *               ZBX_ESCALATION_PROCESS - otherwise                           *
  *                                                                            *
  ******************************************************************************/
-static int	check_escalation(const DB_ESCALATION *escalation, unsigned char *skip, unsigned char *maintenance,
-		char **error)
+static int	check_escalation(const DB_ESCALATION *escalation, const DB_ACTION *action, char **error)
 {
 	const char	*__function_name = "check_escalation";
 	DB_RESULT	result;
 	DB_ROW		row;
 	unsigned char	source = 0xff, object = 0xff;
 	DC_ITEM		item;
-	int		errcode, ret = FAIL;
+	int		errcode, ret = ZBX_ESCALATION_CANCEL;
+	unsigned char	maintenance = HOST_MAINTENANCE_STATUS_OFF, skip = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() escalationid:" ZBX_FS_UI64 " status:%s",
 			__function_name, escalation->escalationid, zbx_escalation_status_string(escalation->status));
 
 	result = DBselect("select source,object from events where eventid=" ZBX_FS_UI64, escalation->eventid);
+
 	if (NULL != (row = DBfetch(result)))
 	{
 		source = (unsigned char)atoi(row[0]);
@@ -1547,12 +1573,9 @@ static int	check_escalation(const DB_ESCALATION *escalation, unsigned char *skip
 		goto out;
 	}
 
-	*skip = 0;
-	*maintenance = HOST_MAINTENANCE_STATUS_OFF;
-
 	if (EVENT_OBJECT_TRIGGER == object)
 	{
-		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, skip, maintenance, error))
+		if (SUCCEED != check_escalation_trigger(escalation->triggerid, source, &skip, &maintenance, error))
 			goto out;
 	}
 	else if (EVENT_SOURCE_INTERNAL == source)
@@ -1575,7 +1598,7 @@ static int	check_escalation(const DB_ESCALATION *escalation, unsigned char *skip
 				*error = zbx_dsprintf(*error, "host \"%s\" disabled.", item.host.host);
 			}
 			else
-				*maintenance = item.host.maintenance_status;
+				maintenance = item.host.maintenance_status;
 
 			DCconfig_clean_items(&item, &errcode, 1);
 
@@ -1584,11 +1607,39 @@ static int	check_escalation(const DB_ESCALATION *escalation, unsigned char *skip
 		}
 	}
 
-	ret = SUCCEED;
+	if (EVENT_SOURCE_TRIGGERS == action->eventsource &&
+			ACTION_MAINTENANCE_MODE_PAUSE == action->maintenance_mode &&
+			HOST_MAINTENANCE_STATUS_ON == maintenance)
+	{
+		/* remove paused escalations that were created and recovered */
+		/* during maintenance period                                 */
+		if (0 == escalation->esc_step && 0 != escalation->r_eventid)
+		{
+			ret = ZBX_ESCALATION_DELETE;
+			goto out;
+		}
+
+		/* skip paused escalations created before maintenance period */
+		/* until maintenance ends or the escalations are recovered   */
+		if (0 == escalation->r_eventid)
+		{
+			ret = ZBX_ESCALATION_SKIP;
+			goto out;
+		}
+	}
+
+	if (0 != skip)
+	{
+		/* dependable trigger in PROBLEM state, process escalation later */
+		ret = ZBX_ESCALATION_SKIP;
+		goto out;
+	}
+
+	ret = ZBX_ESCALATION_PROCESS;
 out:
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error: '%s'", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error: '%s'", __function_name, check_escalation_result_string(ret),
 			ZBX_NULL2STR(*error));
 
 	return ret;
@@ -1934,12 +1985,11 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
 
-	/* 1. Process escalations (cancel, skip, execute operations). */
+	/* 1. Process escalations (cancel, delete, skip, execute operations). */
 	while (NULL != (row = DBfetch(result)))
 	{
 		DB_ACTION	action;
 		char		*error = NULL;
-		unsigned char	maintenance, skip;
 
 		escalation.nextcheck = atoi(row[5]);
 		ZBX_DBROW2UINT64(escalation.r_eventid, row[4]);
@@ -1961,50 +2011,28 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		if (SUCCEED != get_active_db_action(escalation.actionid, &action, &error))
 		{
 			escalation_log_cancel_warning(&escalation, error);
-			escalation.status = ESCALATION_STATUS_COMPLETED;
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
 			zbx_free(error);
 			continue;
 		}
 
-		if (SUCCEED != check_escalation(&escalation, &skip, &maintenance, &error))
+		switch (check_escalation(&escalation, &action, &error))
 		{
-			escalation_cancel(&escalation, &action, error);
-			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			free_db_action(&action);
-			zbx_free(error);
-			continue;
-		}
-
-		/* Maintenance. */
-		if (EVENT_SOURCE_TRIGGERS == action.eventsource &&
-				ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
-				HOST_MAINTENANCE_STATUS_ON == maintenance)
-		{
-			/* remove paused escalations that were created and recovered/cancelled */
-			/* during maintenance period                                           */
-			if (0 == escalation.esc_step && 0 != escalation.r_eventid)
-			{
+			case ZBX_ESCALATION_CANCEL:
+				escalation_cancel(&escalation, &action, error);
+				zbx_free(error);
+				/* deliberately falling through */
+			case ZBX_ESCALATION_DELETE:
 				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
+				/* deliberately falling through */
+			case ZBX_ESCALATION_SKIP:
 				free_db_action(&action);
 				continue;
-			}
-
-			/* skip paused escalations created before maintenance period */
-			/* until maintenance ends or the escalations are recovered   */
-			if (0 == escalation.r_eventid)
-			{
-				free_db_action(&action);
+			case ZBX_ESCALATION_PROCESS:
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
-			}
-		}
-
-		/* Trigger dependencies. */
-		if (0 != skip)
-		{
-			/* Dependable trigger in PROBLEM state. Skip the escalation until dependable trigger changes value to OK. */
-			free_db_action(&action);
-			continue;
 		}
 
 		/* Execute operations and recovery operations, mark changes in 'diffs' for batch saving in DB below. */
@@ -2106,8 +2134,6 @@ delete:
 		DBcommit();
 	}
 
-
-out:
 	zbx_free(filter);
 	zbx_free(sql);
 
