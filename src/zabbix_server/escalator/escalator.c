@@ -1934,9 +1934,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
 
-	/*
-	 * 1. Process escalations (cancel, skip, execute operations).
-	 */
+	/* 1. Process escalations (cancel, skip, execute operations). */
 	while (NULL != (row = DBfetch(result)))
 	{
 		DB_ACTION	action;
@@ -1959,10 +1957,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		escalation.status = atoi(row[7]);
 		ZBX_DBROW2UINT64(escalation.itemid, row[8]);
 
-		/*
-		 * Cancel escalation if configuration parameters deleted/disabled
-		 * (relevant action, items, triggers, hosts).
-		 */
+		/* Cancel escalation if configuration parameters deleted/disabled (relevant action, items, triggers, hosts). */
 		if (SUCCEED != get_active_db_action(escalation.actionid, &action, &error))
 		{
 			escalation_log_cancel_warning(&escalation, error);
@@ -1981,9 +1976,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			continue;
 		}
 
-		/*
-		 * Maintenance.
-		 */
+		/* Maintenance. */
 		if (EVENT_SOURCE_TRIGGERS == action.eventsource &&
 				ACTION_MAINTENANCE_MODE_PAUSE == action.maintenance_mode &&
 				HOST_MAINTENANCE_STATUS_ON == maintenance)
@@ -2006,9 +1999,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			}
 		}
 
-		/*
-		 * Trigger dependencies.
-		 */
+		/* Trigger dependencies. */
 		if (0 != skip)
 		{
 			/* Dependable trigger in PROBLEM state. Skip the escalation until dependable trigger changes value to OK. */
@@ -2016,9 +2007,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			continue;
 		}
 
-		/*
-		 * Execute operations and recovery operations, mark changes in 'diffs' for batch saving in DB below.
-		 */
+		/* Execute operations and recovery operations, mark changes in 'diffs' for batch saving in DB below. */
 		diff = escalation_create_diff(&escalation);
 
 		if (0 != escalation.r_eventid)
@@ -2053,9 +2042,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 	DBfree_result(result);
 
-	/*
-	 * 2. Updated escalations in the DB.
-	 */
+	/* 2. Update escalations in the DB. */
 	if (0 == diffs.values_num)
 		goto delete;
 
@@ -2111,9 +2098,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	DBcommit();
 
 delete:
-	/*
-	 * 3. Delete cancelled, completed escalations.
-	 */
+	/* 3. Delete cancelled, completed escalations. */
 	if (0 != escalationids.values_num)
 	{
 		DBbegin();
