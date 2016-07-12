@@ -1672,8 +1672,10 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions);
 
-	/* 1. EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL: match PROBLEM events to action conditions, add them to 'new_escalations' list. */
-	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations for events that match action conditions. */
+	/* 1. EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL: match PROBLEM events to action conditions, add them to    */
+	/*    'new_escalations' list.                                                                                 */
+	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations for events that match action */
+	/*    conditions.                                                                                             */
 	for (i = 0; i < events_num; i++)
 	{
 		int		j;

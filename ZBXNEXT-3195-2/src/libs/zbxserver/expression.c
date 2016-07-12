@@ -2575,7 +2575,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 		{
 			const DB_EVENT	*c_event;
 
-			c_event = (0 != (NULL != r_event) ? r_event : event);
+			c_event = ((NULL != r_event) ? r_event : event);
 
 			if (EVENT_SOURCE_TRIGGERS == c_event->source)
 			{
@@ -2600,7 +2600,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
-					if (0 != (NULL != r_event))
+					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
@@ -2862,7 +2862,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
-					if (0 != (NULL != r_event))
+					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
@@ -3242,7 +3242,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
-					if (0 != (NULL != r_event))
+					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
@@ -3351,7 +3351,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strncmp(m, MVAR_EVENT_RECOVERY, ZBX_CONST_STRLEN(MVAR_EVENT_RECOVERY)))
 				{
-					if (0 != (NULL != r_event))
+					if (NULL != r_event)
 						get_recovery_event_value(m, r_event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
