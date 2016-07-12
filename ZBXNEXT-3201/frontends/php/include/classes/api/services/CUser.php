@@ -1159,7 +1159,6 @@ class CUser extends CApiService {
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
-		$userData['userid'] = $userInfo['userid'];
 
 		if ($userInfo['attempt_failed']) {
 			DBexecute('UPDATE users SET attempt_failed=0 WHERE userid='.zbx_dbstr($userInfo['userid']));
