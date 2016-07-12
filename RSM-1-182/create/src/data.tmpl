@@ -948,31 +948,31 @@ ROW   |5550     |225          |23356 |
 ROW   |5551     |225          |23357 |
 
 TABLE |mappings
-FIELDS|mappingid|valuemapid|value|newvalue                                                  |
-ROW   |1        |1         |0    |Down                                                      |
-ROW   |2        |1         |1    |Up                                                        |
-ROW   |3        |2         |0    |Up                                                        |
-ROW   |4        |2         |2    |Unreachable                                               |
-ROW   |68       |10        |1    |Up                                                        |
-ROW   |74       |13        |-1   |Internal error                                            |
-ROW   |75       |13        |-205 |No reply from resolver                                    |
-ROW   |76       |13        |-206 |No AD bit in the answer from resolver                     |
-ROW   |78       |13        |-200 |No reply from Name Server                                 |
-ROW   |79       |13        |-201 |Invalid reply from Name Server                            |
-ROW   |80       |13        |-202 |No UNIX timestamp                                         |
-ROW   |81       |13        |-203 |Invalid UNIX timestamp                                    |
-ROW   |82       |13        |-204 |DNSSEC error                                              |
-ROW   |83       |14        |1    |Online                                                    |
-ROW   |84       |14        |0    |Offline                                                   |
-ROW   |85       |15        |-1   |Internal error                                            |
-ROW   |86       |15        |-200 |No reply from RDDS43 server                               |
+FIELDS|mappingid|valuemapid|value|newvalue                                                                          |
+ROW   |1        |1         |0    |Down                                                                              |
+ROW   |2        |1         |1    |Up                                                                                |
+ROW   |3        |2         |0    |Up                                                                                |
+ROW   |4        |2         |2    |Unreachable                                                                       |
+ROW   |68       |10        |1    |Up                                                                                |
+ROW   |74       |13        |-1   |Internal error                                                                    |
+ROW   |75       |13        |-205 |No reply from resolver                                                            |
+ROW   |76       |13        |-206 |No AD bit in the answer from resolver                                             |
+ROW   |78       |13        |-200 |No reply from Name Server                                                         |
+ROW   |79       |13        |-201 |Invalid reply from Name Server                                                    |
+ROW   |80       |13        |-202 |No UNIX timestamp                                                                 |
+ROW   |81       |13        |-203 |Invalid UNIX timestamp                                                            |
+ROW   |82       |13        |-204 |DNSSEC error                                                                      |
+ROW   |83       |14        |1    |Online                                                                            |
+ROW   |84       |14        |0    |Offline                                                                           |
+ROW   |85       |15        |-1   |Internal error                                                                    |
+ROW   |86       |15        |-200 |No reply from RDDS43 server                                                       |
 ROW   |87       |15        |-201 |RDDS43 - The output of the response does not match specification                  |
-ROW   |88       |15        |-202 |No Unix timestamp                                         |
-ROW   |89       |15        |-203 |Invalid Unix timestamp                                    |
-ROW   |90       |15        |-204 |No reply from RDDS80 server                               |
-ROW   |91       |15        |-205 |Cannot resolve a Whois host name                          |
-ROW   |92       |15        |-206 |no HTTP status code                                       |
-ROW   |93       |15        |-207 |invalid HTTP status code                                  |
+ROW   |88       |15        |-202 |No Unix timestamp                                                                 |
+ROW   |89       |15        |-203 |Invalid Unix timestamp                                                            |
+ROW   |90       |15        |-204 |No reply from RDDS80 server                                                       |
+ROW   |91       |15        |-205 |Cannot resolve a Whois host name                                                  |
+ROW   |92       |15        |-206 |no HTTP status code                                                               |
+ROW   |93       |15        |-207 |invalid HTTP status code                                                          |
 ROW   |114      |15        |-208 |RDDS43 - No reply from local resolver                                             |
 ROW   |115      |15        |-209 |RDDS43 - No AD bit from local resolver                                            |
 ROW   |116      |15        |-210 |RDDS43 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname  |
@@ -1129,30 +1129,30 @@ ROW   |266      |15        |-607 |RDAP - Expecting HTTP status code 200 but got 
 ROW   |267      |15        |-608 |RDAP - Expecting HTTP status code 200 but got 510                                 |
 ROW   |268      |15        |-609 |RDAP - Expecting HTTP status code 200 but got 511                                 |
 ROW   |269      |15        |-610 |RDAP - Expecting HTTP status code 200 but got unexpected                          |
-ROW   |94       |16        |0    |Down                                                      |
-ROW   |95       |16        |1    |Up                                                        |
-ROW   |113      |16        |2    |Up (inconclusive)                                         |
-ROW   |96       |18        |0    |Down                                                      |
-ROW   |97       |18        |1    |Up                                                        |
-ROW   |98       |18        |2    |RDDS43 only                                               |
-ROW   |99       |18        |3    |RDDS80 only                                               |
-ROW   |270      |18        |4    |RDAP only                                                 |
-ROW   |271      |18        |5    |RDDS43 is missing                                         |
-ROW   |272      |18        |6    |RDDS80 is missing                                         |
-ROW   |273      |18        |7    |RDAP is missing                                           |
-ROW   |100      |19        |-200 |IP is missing for EPP server                              |
-ROW   |101      |19        |-201 |Cannot connect to EPP server                              |
-ROW   |102      |19        |-202 |Invalid certificate or private key                        |
-ROW   |103      |19        |-203 |First message timeout                                     |
-ROW   |104      |19        |-204 |First message is invalid                                  |
-ROW   |105      |19        |-205 |LOGIN command timeout                                     |
-ROW   |106      |19        |-206 |Invalid reply to LOGIN command                            |
-ROW   |107      |19        |-207 |UPDATE command timeout                                    |
-ROW   |108      |19        |-208 |Invalid reply to UPDATE command                           |
-ROW   |109      |19        |-209 |INFO command timeout                                      |
-ROW   |110      |19        |-210 |Invalid reply to INFO command                             |
-ROW   |111      |19        |-1   |Internal error                                            |
-ROW   |112      |19        |-211 |Server certificate validation failed                      |
+ROW   |94       |16        |0    |Down                                                                              |
+ROW   |95       |16        |1    |Up                                                                                |
+ROW   |113      |16        |2    |Up (inconclusive)                                                                 |
+ROW   |96       |18        |0    |Down                                                                              |
+ROW   |97       |18        |1    |Up                                                                                |
+ROW   |98       |18        |2    |RDDS43 only                                                                       |
+ROW   |99       |18        |3    |RDDS80 only                                                                       |
+ROW   |270      |18        |4    |RDAP only                                                                         |
+ROW   |271      |18        |5    |RDDS43 is missing                                                                 |
+ROW   |272      |18        |6    |RDDS80 is missing                                                                 |
+ROW   |273      |18        |7    |RDAP is missing                                                                   |
+ROW   |100      |19        |-200 |IP is missing for EPP server                                                      |
+ROW   |101      |19        |-201 |Cannot connect to EPP server                                                      |
+ROW   |102      |19        |-202 |Invalid certificate or private key                                                |
+ROW   |103      |19        |-203 |First message timeout                                                             |
+ROW   |104      |19        |-204 |First message is invalid                                                          |
+ROW   |105      |19        |-205 |LOGIN command timeout                                                             |
+ROW   |106      |19        |-206 |Invalid reply to LOGIN command                                                    |
+ROW   |107      |19        |-207 |UPDATE command timeout                                                            |
+ROW   |108      |19        |-208 |Invalid reply to UPDATE command                                                   |
+ROW   |109      |19        |-209 |INFO command timeout                                                              |
+ROW   |110      |19        |-210 |Invalid reply to INFO command                                                     |
+ROW   |111      |19        |-1   |Internal error                                                                    |
+ROW   |112      |19        |-211 |Server certificate validation failed                                              |
 
 TABLE |regexps
 FIELDS|regexpid|name                              |test_string|
