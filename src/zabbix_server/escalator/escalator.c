@@ -1983,8 +1983,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			" order by actionid,triggerid,itemid,escalationid",
 			filter);
 
-	*nextcheck = now + CONFIG_ESCALATOR_FREQUENCY;
-
 	/* 1. Process escalations (cancel, delete, skip, execute operations). */
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -1997,7 +1995,14 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		/* Skip escalations that must be checked later and that are not recovered */
 		/* (corresponding OK event hasn't occured yet, see process_actions()).    */
 		if (escalation.nextcheck > now && 0 == escalation.r_eventid)
+		{
+			if (escalation.nextcheck < *nextcheck)
+			{
+				*nextcheck = escalation.nextcheck;
+			}
+
 			continue;
+		}
 
 		ZBX_STR2UINT64(escalation.escalationid, row[0]);
 		ZBX_STR2UINT64(escalation.actionid, row[1]);
@@ -2007,7 +2012,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		escalation.status = atoi(row[7]);
 		ZBX_DBROW2UINT64(escalation.itemid, row[8]);
 
-		/* Cancel escalation if configuration parameters deleted/disabled (relevant action, items, triggers, hosts). */
+		/* Cancel escalation if action is disabled/deleted. */
 		if (SUCCEED != get_active_db_action(escalation.actionid, &action, &error))
 		{
 			escalation_log_cancel_warning(&escalation, error);
@@ -2101,6 +2106,11 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck=%d", separator, diff->nextcheck);
 			separator = ',';
+
+			if (diff->nextcheck < *nextcheck)
+			{
+				*nextcheck = diff->nextcheck;
+			}
 		}
 
 		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP))
@@ -2199,6 +2209,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 		}
 
 		sec = zbx_time();
+		nextcheck = time(NULL) + CONFIG_ESCALATOR_FREQUENCY;
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_TRIGGER);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_ITEM);
 		escalations_count += process_escalations(time(NULL), &nextcheck, ZBX_ESCALATION_SOURCE_DEFAULT);
