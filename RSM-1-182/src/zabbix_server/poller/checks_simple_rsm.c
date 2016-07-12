@@ -2207,9 +2207,8 @@ static int	zbx_map_http_code(int http_code)
 			return 58;
 		case 511:	/* Network Authentication Required */
 			return 59;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
+		default:	/* catch-all for newly assigned HTTP status codes that may not have an association */
+			return 60;
 	}
 }
 
@@ -2687,7 +2686,7 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 	if (SUCCEED != zbx_resolve_host(res, random_host, &ips_rdds43, ipv4_enabled, ipv6_enabled, log_fd, err,
 			sizeof(err)))
 	{
-		rtt_rdds43 = ZBX_EC_RDDS43_ERES;
+		rtt_rdds43 = ZBX_EC_RDDS43_ERES_NOREPLY;
 		zbx_rsm_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
 		goto test_rdds80;
 	}
@@ -2785,7 +2784,7 @@ test_rdds80:
 	if (SUCCEED != zbx_resolve_host(res, domain_part, &ips_rdds80, ipv4_enabled, ipv6_enabled, log_fd, err,
 			sizeof(err)))
 	{
-		rtt_rdds80 = ZBX_EC_RDDS80_ERES;
+		rtt_rdds80 = ZBX_EC_RDDS80_ERES_NOREPLY;
 		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": %s", random_host, err);
 		goto test_rdap;
 	}
@@ -2852,7 +2851,7 @@ test_rdap:
 	if (SUCCEED != zbx_resolve_host(res, domain_part, &ips_rdap, ipv4_enabled, ipv6_enabled, log_fd, err,
 			sizeof(err)))
 	{
-		rtt_rdap = ZBX_EC_RDAP_ERES;
+		rtt_rdap = ZBX_EC_RDAP_ERES_NOREPLY;
 		zbx_rsm_errf(log_fd, "RDAP \"%s\": %s", random_host, err);
 		goto out;
 	}
