@@ -37,6 +37,7 @@ $this->addJsFile('js/flickerfreescreen.js');
 			'resourcetype' => SCREEN_RESOURCE_PROBLEM,
 			'mode' => SCREEN_MODE_JS,
 			'dataId' => 'problem',
+			'page' => $data['page'],
 			'data' => [
 				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],

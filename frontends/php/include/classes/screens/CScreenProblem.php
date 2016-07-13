@@ -51,9 +51,6 @@ class CScreenProblem extends CScreenBase {
 	public function get() {
 		$this->dataId = 'problem';
 
-		$sort_field = $this->data['sort'];
-		$sort_order = $this->data['sortorder'];
-
 		$config = select_config();
 
 		$db_problems = API::Problem()->get([
@@ -62,15 +59,19 @@ class CScreenProblem extends CScreenBase {
 			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
-//			'sortfield' => $sort_field,
-//			'sortorder' => $sort_order,
 			'preservekeys' => true
 		]);
 
 		$triggerids = [];
+		$ok_events_from = time() - $config['ok_period'];
 
-		foreach ($db_problems as $db_problem) {
-			$triggerids[$db_problem['objectid']] = true;
+		foreach ($db_problems as $eventid => $db_problem) {
+			if ($db_problem['r_clock'] != 0 && $db_problem['r_clock'] < $ok_events_from) {
+				unset($db_problems[$eventid]);
+			}
+			else {
+				$triggerids[$db_problem['objectid']] = true;
+			}
 		}
 
 		if ($triggerids) {
@@ -83,18 +84,65 @@ class CScreenProblem extends CScreenBase {
 			]);
 			$db_triggers = CMacrosResolverHelper::resolveTriggerUrls($db_triggers);
 
-			$triggers_host_list = getTriggersHostList($db_triggers);
+			foreach ($db_problems as $eventid => $db_problem) {
+				if (!array_key_exists($db_problem['objectid'], $db_triggers)) {
+					unset($db_problems[$eventid]);
+				}
+			}
+
+			$triggers_hosts = getTriggersHostsList($db_triggers);
 		}
+
+		$url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'problem.view')
+			->setArgument('fullscreen', $this->data['fullscreen']);
+
+		$sort_fields = [];
+
+		switch ($this->data['sort']) {
+			case 'host':
+				$triggers_hosts_list = [];
+				foreach ($triggers_hosts as $triggerid => $trigger_hosts) {
+					$triggers_hosts_list[$triggerid] = implode(', ', zbx_objectValues($trigger_hosts, 'name'));
+				}
+
+				foreach ($db_problems as &$db_problem) {
+					$db_problem['host'] = $triggers_hosts_list[$db_problem['objectid']];
+				}
+				unset($db_problem);
+
+				$sort_fields[] = ['field' => 'host', 'order' => $this->data['sortorder']];
+				break;
+
+			case 'priority':
+				$sort_fields[] = ['field' => 'priority', 'order' => $this->data['sortorder']];
+				break;
+
+			case 'problem':
+				foreach ($db_problems as &$db_problem) {
+					$db_problem['description'] = $db_triggers[$db_problem['objectid']]['description'];
+				}
+				unset($db_problem);
+
+				$sort_fields[] = ['field' => 'description', 'order' => $this->data['sortorder']];
+				break;
+		}
+		$sort_fields[] = ['field' => 'clock', 'order' => $this->data['sortorder']];
+
+		CArrayHelper::sort($db_problems, $sort_fields);
+
+		$paging = getPagingLine($db_problems, $this->data['sortorder'], $url);
 
 		// create table
 		$table = (new CTableInfo())
 			->setHeader([
-				_('Severity'),
-				_('Time'),
-				_('Recovery time'),
+				make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
+				make_sorting_header(_('Time'), 'clock', $this->data['sort'], $this->data['sortorder'])
+					->addClass(ZBX_STYLE_CELL_WIDTH),
+				(new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH),
 				_('Status'),
-				_('Host'),
-				_('Problem'),
+				make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder']),
+				make_sorting_header(_('Problem'), 'problem', $this->data['sort'], $this->data['sortorder']),
 				_('Duration'),
 				$config['event_ack_enable'] ? _('Ack') : null,
 				_('Actions'),
@@ -104,36 +152,41 @@ class CScreenProblem extends CScreenBase {
 		// actions
 		$actions = makeEventsActions(array_keys($db_problems));
 		if ($config['event_ack_enable']) {
-			$acknowledges = makeEventsAcknowledges($db_problems, 'zabbix.php?action=problem.view');
+			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
+		$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
 		foreach ($db_problems as $db_problem) {
-			if (!array_key_exists($db_problem['objectid'], $db_triggers)) {
-				continue;
-			}
-
 			$db_trigger = $db_triggers[$db_problem['objectid']];
 
-			$status_cell = new CSpan($db_problem['r_eventid'] != 0 ? _('RESOLVED') : _('PROBLEM'));
+			$cell_clock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['clock']);
+			$cell_r_clock = $db_problem['r_eventid'] != 0
+				? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['r_clock'])
+				: '';
+			$cell_status = new CSpan($db_problem['r_eventid'] != 0 ? _('RESOLVED') : _('PROBLEM'));
 
 			// add colors and blinking to span depending on configuration and trigger parameters
 			addTriggerValueStyle(
-				$status_cell,
+				$cell_status,
 				$db_problem['r_eventid'] != 0 ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE,
 				$db_problem['r_eventid'] != 0 ? $db_problem['r_clock'] : $db_problem['clock'],
 				$config['event_ack_enable'] ? (bool) $db_problem['acknowledges'] : false
 			);
 
+			$description = CMacrosResolverHelper::resolveEventDescription(
+				$db_trigger + ['clock' => $db_problem['clock'], 'ns' => $db_problem['ns']]
+			);
+
 			$table->addRow([
 				getSeverityCell($db_trigger['priority'], $config, null, $db_problem['r_eventid'] != 0),
-				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['clock']),
-				$db_problem['r_eventid'] != 0 ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['r_clock']) : '',
-				$status_cell,
-				$triggers_host_list[$db_trigger['triggerid']],
-				(new CSpan(CMacrosResolverHelper::resolveEventDescription($db_trigger + ['clock' => $db_problem['clock'], 'ns' => $db_problem['ns']])))
-					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setMenuPopup(CMenuPopupHelper::getTrigger($db_trigger)),
+				(new CCol($cell_clock))->addClass(ZBX_STYLE_NOWRAP),
+				(new CCol($cell_r_clock))->addClass(ZBX_STYLE_NOWRAP),
+				$cell_status,
+				$triggers_hosts[$db_trigger['triggerid']],
+				(new CSpan($description))
+					->setMenuPopup(CMenuPopupHelper::getTrigger($db_trigger))
+					->addClass(ZBX_STYLE_LINK_ACTION),
 				$db_problem['r_eventid'] != 0
 					? zbx_date2age($db_problem['clock'], $db_problem['r_clock'])
 					: zbx_date2age($db_problem['clock']),
@@ -145,6 +198,6 @@ class CScreenProblem extends CScreenBase {
 			]);
 		}
 
-		return $this->getOutput($table, true, $this->data);
+		return $this->getOutput([$table, $paging], true, $this->data);
 	}
 }

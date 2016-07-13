@@ -2064,11 +2064,7 @@ function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
  *
  * @return array
  */
-function getTriggersHostList(array $triggers) {
-	$db_hosts = [];
-	$db_maintenances = [];
-	$scripts_by_hosts = [];
-
+function getTriggersHostsList(array $triggers) {
 	$hostids = [];
 
 	foreach ($triggers as $trigger) {
@@ -2077,25 +2073,65 @@ function getTriggersHostList(array $triggers) {
 		}
 	}
 
-	if ($hostids) {
-		$hostids = array_keys($hostids);
-
-		$db_hosts = API::Host()->get([
+	$db_hosts = $hostids
+		? API::Host()->get([
 			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
 			'selectGraphs' => API_OUTPUT_COUNT,
 			'selectScreens' => API_OUTPUT_COUNT,
-			'hostids' => $hostids,
+			'hostids' => array_keys($hostids),
 			'preservekeys' => true
-		]);
+		])
+		: [];
 
-		$maintenanceids = [];
+	$triggers_hosts = [];
+	foreach ($triggers as $trigger) {
+		$triggers_hosts[$trigger['triggerid']] = [];
 
-		foreach ($db_hosts as $db_host) {
-			if ($db_host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-				$maintenanceids[$db_host['maintenanceid']] = true;
+		foreach ($trigger['hosts'] as $host) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
+				continue;
+			}
+
+			$triggers_hosts[$trigger['triggerid']][] = $db_hosts[$host['hostid']];
+		}
+		order_result($triggers_hosts[$trigger['triggerid']], 'name');
+	}
+
+	return $triggers_hosts;
+}
+
+/**
+ * Make the list of hosts for each trigger.
+ *
+ * @param array  $triggers_hosts
+ * @param string $triggers_hosts[<triggerid>][]['hostid']
+ * @param string $triggers_hosts[<triggerid>][]['name']
+ * @param int    $triggers_hosts[<triggerid>][]['status']
+ * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
+ * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
+ * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
+ * @param int    $triggers_hosts[<triggerid>][]['graphs']             the number of graphs
+ * @param int    $triggers_hosts[<triggerid>][]['screens']            the number of screens
+ *
+ * @return array
+ */
+function makeTriggersHostsList(array $triggers_hosts) {
+	$db_maintenances = [];
+	$scripts_by_hosts = [];
+
+	$hostids = [];
+	$maintenanceids = [];
+
+	foreach ($triggers_hosts as $hosts) {
+		foreach ($hosts as $host) {
+			$hostids[$host['hostid']] = true;
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenanceids[$host['maintenanceid']] = true;
 			}
 		}
+	}
 
+	if ($hostids) {
 		if ($maintenanceids) {
 			$db_maintenances = API::Maintenance()->get([
 				'output' => ['name', 'description'],
@@ -2107,21 +2143,10 @@ function getTriggersHostList(array $triggers) {
 		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
 	}
 
-	$host_list = [];
-	foreach ($triggers as $trigger) {
-		$host_list[$trigger['triggerid']] = [];
+	foreach ($triggers_hosts as &$hosts) {
 		$trigger_hosts = [];
 
-		foreach ($trigger['hosts'] as $host) {
-			if (!array_key_exists($host['hostid'], $db_hosts)) {
-				continue;
-			}
-
-			$trigger_hosts[] = $db_hosts[$host['hostid']];
-		}
-		order_result($trigger_hosts, 'name');
-
-		foreach ($trigger_hosts as $host) {
+		foreach ($hosts as $host) {
 			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
 				? $scripts_by_hosts[$host['hostid']]
 				: [];
@@ -2153,12 +2178,15 @@ function getTriggersHostList(array $triggers) {
 				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 
-			if ($host_list[$trigger['triggerid']]) {
-				$host_list[$trigger['triggerid']][] = ', ';
+			if ($trigger_hosts) {
+				$trigger_hosts[] = ', ';
 			}
-			$host_list[$trigger['triggerid']][] = $host_name;
+			$trigger_hosts[] = $host_name;
 		}
-	}
 
-	return $host_list;
+		$hosts = $trigger_hosts;
+	}
+	unset($hosts);
+
+	return $triggers_hosts;
 }

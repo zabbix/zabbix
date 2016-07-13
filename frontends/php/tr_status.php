@@ -496,7 +496,7 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 	$triggerIdsDown[$row['triggerid_up']][] = intval($row['triggerid_down']);
 }
 
-$triggers_host_list = getTriggersHostList($triggers);
+$triggers_hosts = getTriggersHostsList($triggers);
 
 foreach ($triggers as $trigger) {
 	$description = [];
@@ -657,7 +657,7 @@ foreach ($triggers as $trigger) {
 		($trigger['lastchange'] == 0) ? '' : zbx_date2age($trigger['lastchange']),
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
 		$ackColumn,
-		$triggers_host_list[$trigger['triggerid']],
+		$triggers_hosts[$trigger['triggerid']],
 		$description,
 		$comments
 	]);
