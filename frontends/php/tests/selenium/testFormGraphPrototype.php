@@ -1083,6 +1083,11 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['noItem'])) {
+			$this->zbxTestLaunchPopup('add_protoitem');
+
+			$this->zbxTestClickLinkTextWait($this->item);
+			$this->webDriver->switchTo()->window('');
+
 			$this->zbxTestLaunchPopup('add_item');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
@@ -1090,14 +1095,12 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 			$this->webDriver->switchTo()->window('');
 
-			$this->zbxTestLaunchPopup('add_protoitem');
-			$this->zbxTestClickLinkTextWait($this->item);
-			$this->webDriver->switchTo()->window('');
-
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
+				$this->zbxTestTextNotPresent($this->item);
 
 				$this->zbxTestClickWait('items_0_remove');
+				$this->zbxTestTextNotPresent($this->itemSimple);
 
 				$this->zbxTestLaunchPopup('add_item');
 
