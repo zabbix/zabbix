@@ -1037,6 +1037,8 @@ define('PROBE_RDDS43_RTT',			'rsm.rdds.43.rtt[{$RSM.TLD}]');
 define('PROBE_RDDS43_UPD',			'rsm.rdds.43.upd[{$RSM.TLD}]');
 define('PROBE_RDDS80_IP',			'rsm.rdds.80.ip[{$RSM.TLD}]');
 define('PROBE_RDDS80_RTT',			'rsm.rdds.80.rtt[{$RSM.TLD}]');
+define('PROBE_RDAP_IP',				'rsm.rdds.rdap.ip[{$RSM.TLD}]');
+define('PROBE_RDAP_RTT',			'rsm.rdds.rdap.rtt[{$RSM.TLD}]');
 
 // SLA monitoring NS names
 define('NS_NO_RESULT',	0);
