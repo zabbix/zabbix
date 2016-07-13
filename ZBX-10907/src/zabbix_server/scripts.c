@@ -141,10 +141,10 @@ static int	zbx_execute_script_on_terminal(DC_HOST *host, zbx_script_t *script, c
 		char *error, size_t max_error_len)
 {
 	const char	*__function_name = "zbx_execute_script_on_terminal";
-	int		ret = FAIL;
+	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	DC_ITEM		item;
-	int             (*function)(), i;
+	int             (*function)(DC_ITEM *, AGENT_RESULT *);
 
 #ifdef HAVE_SSH2
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
