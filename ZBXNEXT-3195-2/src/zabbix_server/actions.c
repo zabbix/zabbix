@@ -1843,11 +1843,13 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 		while (NULL != (rec_escalation = (zbx_escalation_rec_t *)zbx_hashset_iter_next(&iter)))
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set r_eventid= "
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set r_eventid="
 					ZBX_FS_UI64 " where", rec_escalation->r_eventid);
 			DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "escalationid",
 					rec_escalation->escalationids.values,
 					rec_escalation->escalationids.values_num);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
 			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 			zbx_vector_uint64_destroy(&rec_escalation->escalationids);
