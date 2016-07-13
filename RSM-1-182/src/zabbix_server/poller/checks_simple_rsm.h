@@ -32,11 +32,11 @@
 #define ZBX_EC_INTERNAL			-1	/* general internal error */
 #define ZBX_EC_INTERNAL_IP_UNSUP	-2	/* IP version not supported by Probe */
 /* auxiliary generic resolver error codes */
-#define ZBX_EC_ERES_NOREPLY		-3
-#define ZBX_EC_ERES_NOADBIT		-4
-#define ZBX_EC_ERES_SERVFAIL		-5
-#define ZBX_EC_ERES_NXDOMAIN		-6
-#define ZBX_EC_ERES_CATCHALL		-7
+#define ZBX_EC_RES_NOREPLY		-3
+#define ZBX_EC_RES_NOADBIT		-4
+#define ZBX_EC_RES_SERVFAIL		-5
+#define ZBX_EC_RES_NXDOMAIN		-6
+#define ZBX_EC_RES_CATCHALL		-7
 /* auxiliary generic HTTP error codes */
 #define ZBX_EC_HTTP_ECON		-8
 #define ZBX_EC_HTTP_EHTTP		-9
@@ -52,21 +52,21 @@
 #define ZBX_EC_DNS_RES_NOADBIT		-206	/* no AD bit in the answer from resolver */
 /* RDDS */
 #define ZBX_EC_RDDS43_NONS		-201	/* RDDS43 - The output of the response does not match specification */
-#define ZBX_EC_RDDS43_ERES_NOREPLY	-208	/* RDDS43 - No reply from local resolver */
-#define ZBX_EC_RDDS43_ERES_NOADBIT	-209	/* RDDS43 - No AD bit from local resolver */
-#define ZBX_EC_RDDS43_ERES_SERVFAIL	-210	/* RDDS43 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
-#define ZBX_EC_RDDS43_ERES_NXDOMAIN	-211	/* RDDS43 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
-#define ZBX_EC_RDDS43_ERES_CATCHALL	-212	/* RDDS43 - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
+#define ZBX_EC_RDDS43_RES_NOREPLY	-208	/* RDDS43 - No reply from local resolver */
+#define ZBX_EC_RDDS43_RES_NOADBIT	-209	/* RDDS43 - No AD bit from local resolver */
+#define ZBX_EC_RDDS43_RES_SERVFAIL	-210	/* RDDS43 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
+#define ZBX_EC_RDDS43_RES_NXDOMAIN	-211	/* RDDS43 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
+#define ZBX_EC_RDDS43_RES_CATCHALL	-212	/* RDDS43 - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
 #define ZBX_EC_RDDS43_TO		-213	/* RDDS43 - Timeout reply from server */
 #define ZBX_EC_RDDS43_ECON		-214	/* RDDS43 - Error opening connection to server */
 #define ZBX_EC_RDDS43_NOTS		-215	/* RDDS43 - No Unix timestamp in response */
 #define ZBX_EC_RDDS43_ETS		-216	/* RDDS43 - Invalid Unix timestamp in response */
 #define ZBX_EC_RDDS43_EMPTY		-217	/* RDDS43 - Empty response */
-#define ZBX_EC_RDDS80_ERES_NOREPLY	-250	/* RDDS80 - No reply from local resolver */
-#define ZBX_EC_RDDS80_ERES_NOADBIT	-251	/* RDDS80 - No AD bit from local resolver */
-#define ZBX_EC_RDDS80_ERES_SERVFAIL	-252	/* RDDS80 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
-#define ZBX_EC_RDDS80_ERES_NXDOMAIN	-253	/* RDDS80 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
-#define ZBX_EC_RDDS80_ERES_CATCHALL	-254	/* RDDS80 - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
+#define ZBX_EC_RDDS80_RES_NOREPLY	-250	/* RDDS80 - No reply from local resolver */
+#define ZBX_EC_RDDS80_RES_NOADBIT	-251	/* RDDS80 - No AD bit from local resolver */
+#define ZBX_EC_RDDS80_RES_SERVFAIL	-252	/* RDDS80 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
+#define ZBX_EC_RDDS80_RES_NXDOMAIN	-253	/* RDDS80 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
+#define ZBX_EC_RDDS80_RES_CATCHALL	-254	/* RDDS80 - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
 #define ZBX_EC_RDDS80_TO		-255	/* RDDS80 - Timeout reply from server */
 #define ZBX_EC_RDDS80_ECON		-256	/* RDDS80 - Error opening connection to server */
 #define ZBX_EC_RDDS80_EHTTP		-257	/* RDDS80 - Error in HTTP protocol */
@@ -74,11 +74,11 @@
 #define ZBX_EC_RDDS80_HTTP_BASE		-300
 /* Code ZBX_EC_RDDS80_HTTP_BASE - zbx_map_http_code(xxx) means */
 						/* RDDS80 - Expecting HTTP status code 200 but got xxx */
-#define ZBX_EC_RDAP_ERES_NOREPLY	-500	/* RDAP - No reply from local resolver */
-#define ZBX_EC_RDAP_ERES_NOADBIT	-501	/* RDAP - No AD bit from local resolver */
-#define ZBX_EC_RDAP_ERES_SERVFAIL	-502	/* RDAP - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
-#define ZBX_EC_RDAP_ERES_NXDOMAIN	-503	/* RDAP - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
-#define ZBX_EC_RDAP_ERES_CATCHALL	-504	/* RDAP - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
+#define ZBX_EC_RDAP_RES_NOREPLY	-500	/* RDAP - No reply from local resolver */
+#define ZBX_EC_RDAP_RES_NOADBIT	-501	/* RDAP - No AD bit from local resolver */
+#define ZBX_EC_RDAP_RES_SERVFAIL	-502	/* RDAP - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
+#define ZBX_EC_RDAP_RES_NXDOMAIN	-503	/* RDAP - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
+#define ZBX_EC_RDAP_RES_CATCHALL	-504	/* RDAP - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
 #define ZBX_EC_RDAP_TO			-505	/* RDAP - Timeout reply from server */
 #define ZBX_EC_RDAP_ECON		-506	/* RDAP - Error opening connection to server */
 #define ZBX_EC_RDAP_EJSON		-507	/* RDAP - Invalid JSON format in response */
