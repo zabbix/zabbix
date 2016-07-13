@@ -49,7 +49,7 @@ $filterFrom = array(
 	':'.SPACE,
 	new CNumericBox(
 		'filter_from_day',
-		((zbxDateToTime($this->data['filter_from']) > 0) ? date('d', zbxDateToTime($this->data['filter_from'])) : ''),
+		((zbxDateToTime($data['filter_from']) > 0) ? date('d', zbxDateToTime($data['filter_from'])) : ''),
 		2
 	),
 	SPACE,
@@ -57,7 +57,7 @@ $filterFrom = array(
 	SPACE,
 	new CNumericBox(
 		'filter_from_month',
-		((zbxDateToTime($this->data['filter_from']) > 0) ? date('m', zbxDateToTime($this->data['filter_from'])) : ''),
+		((zbxDateToTime($data['filter_from']) > 0) ? date('m', zbxDateToTime($data['filter_from'])) : ''),
 		2
 	),
 	SPACE,
@@ -65,19 +65,19 @@ $filterFrom = array(
 	SPACE,
 	new CNumericBox(
 		'filter_from_year',
-		((zbxDateToTime($this->data['filter_from']) > 0) ? date('Y', zbxDateToTime($this->data['filter_from'])) : ''),
+		((zbxDateToTime($data['filter_from']) > 0) ? date('Y', zbxDateToTime($data['filter_from'])) : ''),
 		4
 	),
 	SPACE,
 	new CNumericBox(
 		'filter_from_hour',
-		((zbxDateToTime($this->data['filter_from']) > 0) ? date('H', zbxDateToTime($this->data['filter_from'])) : ''),
+		((zbxDateToTime($data['filter_from']) > 0) ? date('H', zbxDateToTime($data['filter_from'])) : ''),
 		2
 	),
 	':',
 	new CNumericBox(
 		'filter_from_minute',
-		((zbxDateToTime($this->data['filter_from']) > 0) ? date('i', zbxDateToTime($this->data['filter_from'])) : ''),
+		((zbxDateToTime($data['filter_from']) > 0) ? date('i', zbxDateToTime($data['filter_from'])) : ''),
 		2
 	),
 	SPACE,
@@ -89,7 +89,7 @@ $filterTo = array(
 	':'.SPACE,
 	new CNumericBox(
 		'filter_to_day',
-		(zbxDateToTime($this->data['filter_to']) > 0) ? date('d', zbxDateToTime($this->data['filter_to'])) : '',
+		(zbxDateToTime($data['filter_to']) > 0) ? date('d', zbxDateToTime($data['filter_to'])) : '',
 		2
 	),
 	SPACE,
@@ -97,7 +97,7 @@ $filterTo = array(
 	SPACE,
 	new CNumericBox(
 		'filter_to_month',
-		(zbxDateToTime($this->data['filter_to']) > 0) ? date('m', zbxDateToTime($this->data['filter_to'])) : '',
+		(zbxDateToTime($data['filter_to']) > 0) ? date('m', zbxDateToTime($data['filter_to'])) : '',
 		2
 	),
 	SPACE,
@@ -105,19 +105,19 @@ $filterTo = array(
 	SPACE,
 	new CNumericBox(
 		'filter_to_year',
-		(zbxDateToTime($this->data['filter_to']) > 0) ? date('Y', zbxDateToTime($this->data['filter_to'])) : '',
+		(zbxDateToTime($data['filter_to']) > 0) ? date('Y', zbxDateToTime($data['filter_to'])) : '',
 		4
 	),
 	SPACE,
 	new CNumericBox(
 		'filter_to_hour',
-		(zbxDateToTime($this->data['filter_to']) > 0) ? date('H', zbxDateToTime($this->data['filter_to'])) : '',
+		(zbxDateToTime($data['filter_to']) > 0) ? date('H', zbxDateToTime($data['filter_to'])) : '',
 		2
 	),
 	':',
 	new CNumericBox(
 		'filter_to_minute',
-		(zbxDateToTime($this->data['filter_to']) > 0) ? date('i', zbxDateToTime($this->data['filter_to'])) : '',
+		(zbxDateToTime($data['filter_to']) > 0) ? date('i', zbxDateToTime($data['filter_to'])) : '',
 		2
 	),
 	SPACE,
@@ -153,7 +153,7 @@ $filterTable->addRow(array(
 		new CSpan(
 			array(
 				new CCheckBox('filter_failing_tests',
-					isset($this->data['filter_failing_tests']) ? $this->data['filter_failing_tests'] : null, null, 1),
+					isset($data['filter_failing_tests']) ? $data['filter_failing_tests'] : null, null, 1),
 				SPACE,
 				bold(_('Only failing tests'))
 			),
@@ -162,7 +162,7 @@ $filterTable->addRow(array(
 		new CSpan(
 			array(
 				new CCheckBox('filter_show_all',
-					isset($this->data['filter_show_all']) ? $this->data['filter_show_all'] : null, null, 1),
+					isset($data['filter_show_all']) ? $data['filter_show_all'] : null, null, 1),
 				SPACE,
 				bold(_('Show all'))
 			),
@@ -184,14 +184,14 @@ $filterTable->addRow(new CCol($divButtons, 'center'));
 $filterForm = new CForm('get');
 $filterForm->setAttribute('name', 'zbx_filter');
 $filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addVar('filter_from', zbxDateToTime($this->data['filter_from']));
-$filterForm->addVar('filter_to', zbxDateToTime($this->data['filter_to']));
-$filterForm->addVar('original_from', zbxDateToTime($this->data['filter_from']));
-$filterForm->addVar('original_to', zbxDateToTime($this->data['filter_to']));
-$filterForm->addVar('eventid', $this->data['eventid']);
-$filterForm->addVar('slvItemId', $this->data['slvItemId']);
-$filterForm->addVar('availItemId', $this->data['availItemId']);
-$filterForm->addVar('host', $this->data['host']);
+$filterForm->addVar('filter_from', zbxDateToTime($data['filter_from']));
+$filterForm->addVar('filter_to', zbxDateToTime($data['filter_to']));
+$filterForm->addVar('original_from', zbxDateToTime($data['filter_from']));
+$filterForm->addVar('original_to', zbxDateToTime($data['filter_to']));
+$filterForm->addVar('eventid', $data['eventid']);
+$filterForm->addVar('slvItemId', $data['slvItemId']);
+$filterForm->addVar('availItemId', $data['availItemId']);
+$filterForm->addVar('host', $data['host']);
 $filterForm->addItem($filterTable);
 $rsmWidget->addFlicker($filterForm, CProfile::get('web.rsm.incidentdetails.filter.state', 0));
 
@@ -209,7 +209,7 @@ $detailsInfoTable = new CTable(null, 'filter info-block');
 $detailsTable = new CTableInfo($noData);
 $detailsTable->setHeader($headers);
 
-foreach ($this->data['tests'] as $test) {
+foreach ($data['tests'] as $test) {
 	if (isset($test['startEvent']) && $test['startEvent']) {
 		$startEndIncident = _('Start time');
 	}
@@ -234,47 +234,73 @@ foreach ($this->data['tests'] as $test) {
 		isset($test['slv']) ? $test['slv'].'%' : '-',
 		new CLink(
 			_('details'),
-			'rsm.particulartests.php?slvItemId='.$this->data['slvItemId'].'&host='.$this->data['tld']['host'].
-				'&time='.$test['clock'].'&type='.$this->data['type']
+			'rsm.particulartests.php?slvItemId='.$data['slvItemId'].'&host='.$data['tld']['host'].
+				'&time='.$test['clock'].'&type='.$data['type']
 		)
 	);
 
 	$detailsTable->addRow($row);
 }
 
-if ($this->data['incidentType'] == INCIDENT_ACTIVE) {
+if ($data['incidentType'] == INCIDENT_ACTIVE) {
 	$incidentType = _('Active');
 	$changeIncidentType = INCIDENT_FALSE_POSITIVE;
 	$changeIncidentTypeName = _('Mark incident as false positive');
 }
-elseif ($this->data['incidentType'] == INCIDENT_RESOLVED) {
+elseif ($data['incidentType'] == INCIDENT_RESOLVED) {
 	$incidentType = _('Resolved');
 	$changeIncidentType = INCIDENT_FALSE_POSITIVE;
 	$changeIncidentTypeName = _('Mark incident as false positive');
 }
-elseif ($this->data['incidentType'] == INCIDENT_RESOLVED_NO_DATA) {
+elseif ($data['incidentType'] == INCIDENT_RESOLVED_NO_DATA) {
 	$incidentType = _('Resolved (no data)');
 	$changeIncidentType = INCIDENT_FALSE_POSITIVE;
 	$changeIncidentTypeName = _('Mark incident as false positive');
 }
 else {
 	$incidentType = _('False positive');
-	$changeIncidentType = $this->data['active'] ? INCIDENT_ACTIVE : INCIDENT_RESOLVED;
+	$changeIncidentType = $data['active'] ? INCIDENT_ACTIVE : INCIDENT_RESOLVED;
 	$changeIncidentTypeName = _('Unmark incident as false positive');
 }
 
 $details = array(
-	new CSpan(array(bold(_('TLD')), ':', SPACE, $this->data['tld']['name'])),
+	new CSpan(array(bold(_('TLD')), ':', SPACE, $data['tld']['name'])),
 	BR(),
-	new CSpan(array(bold(_('Service')), ':', SPACE, $this->data['slvItem']['name'])),
+	new CSpan(array(bold(_('Service')), ':', SPACE, $data['slvItem']['name'])),
 	BR(),
 	new CSpan(array(bold(_('Incident type')), ':', SPACE, $incidentType))
 );
 
+if ($data['type'] == RSM_RDDS) {
+	$ok_rdds_services = [];
+	if (array_key_exists(RSM_TLD_RDDS43_ENABLED, ($data['tld']['subservices']))
+			&& $data['tld']['subservices'][RSM_TLD_RDDS43_ENABLED] == 1) {
+		$ok_rdds_services[] = 'RDDS43';
+	}
+	if (array_key_exists(RSM_TLD_RDDS80_ENABLED, ($data['tld']['subservices']))
+			&& $data['tld']['subservices'][RSM_TLD_RDDS80_ENABLED] == 1) {
+		$ok_rdds_services[] = 'RDDS80';
+	}
+	if (array_key_exists(RSM_TLD_RDAP_ENABLED, ($data['tld']['subservices']))
+			&& $data['tld']['subservices'][RSM_TLD_RDAP_ENABLED] == 1) {
+		$ok_rdds_services[] = 'RDAP';
+	}
+
+	if ($ok_rdds_services) {
+		$subservices = implode('/', $ok_rdds_services);
+	}
+	else {
+		$subservices = _('None');
+	}
+
+	$details[] = BR();
+	$details[] = new CSpan(array(bold(_('Testing interface')), ':', SPACE, $subservices));
+}
+
 $rollingWeek = array(
-	new CSpan(_s('%1$s Rolling week status', $this->data['slv'].'%'), 'rolling-week-status'),
+	new CSpan(_s('%1$s Rolling week status', $data['slv'].'%'), 'rolling-week-status'),
 	BR(),
-	new CSpan(date('d.m.Y H:i', $this->data['slvTestTime']), 'floatright'),
+	new CSpan(date('d.m.Y H:i', $data['slvTestTime']), 'floatright'),
 );
 
 $detailsInfoTable->addRow(array($details, $rollingWeek));
@@ -288,7 +314,7 @@ if (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN || CWebUser::getType() == USER
 
 	$filter = new CButton('mark_incident', $changeIncidentTypeName,
 		'javascript: location.href = "rsm.incidents.php?mark_incident='.$changeIncidentType.
-		'&eventid='.$this->data['eventid'].'&host='.$this->data['tld']['host'].'&type='.$this->data['type'].'";'
+		'&eventid='.$data['eventid'].'&host='.$data['tld']['host'].'&type='.$data['type'].'";'
 	);
 	$filter->useJQueryStyle('main');
 
