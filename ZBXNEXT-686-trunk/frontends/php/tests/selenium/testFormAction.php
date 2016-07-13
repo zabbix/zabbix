@@ -161,9 +161,6 @@ class testFormAction extends CWebTest {
 				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger severity']
 			],
 			[
-				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger value']
-			],
-			[
 				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Time period']
 			],
 			[
@@ -466,16 +463,8 @@ class testFormAction extends CWebTest {
 				break;
 		}
 
-		if (isset($data['recovery_msg'])) {
-			$this->zbxTestCheckboxSelect('recovery_msg');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('r_shortdata'));
-		}
-		else {
-			$recovery_msg = false;
-		}
-
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent(['Action', 'Conditions', 'Operations']);
+		$this->zbxTestTextPresent(['Action', 'Operations']);
 
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertVisibleId('name');
@@ -483,129 +472,14 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'size', 20);
 		$this->zbxTestAssertAttribute("//input[@id='name']", 'autofocus');
 
-		$this->zbxTestTextPresent('Default subject');
-		$this->zbxTestAssertVisibleId('def_shortdata');
-		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'maxlength', 255);
-		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'size', 20);
-		switch ($eventsource) {
-			case 'Triggers':
-				$this->zbxTestAssertElementValue('def_shortdata', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
-				break;
-			case 'Discovery':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
-				break;
-			case 'Auto registration':
-				$this->zbxTestAssertElementValue('def_shortdata', 'Auto registration: {HOST.HOST}');
-				break;
-			case 'Internal':
-				$this->zbxTestAssertElementValue('def_shortdata', '');
-				break;
-		}
-		$this->zbxTestTextPresent('Default message');
-		$this->zbxTestAssertVisibleId('def_longdata');
-		$this->zbxTestAssertAttribute("//textarea[@id='def_longdata']", 'rows', 7);
-		switch ($eventsource) {
-			case 'Triggers':
-				$def_longdata_val = 'Trigger: {TRIGGER.NAME}'.
-					' Trigger status: {TRIGGER.STATUS}'.
-					' Trigger severity: {TRIGGER.SEVERITY}'.
-					' Trigger URL: {TRIGGER.URL}'.
-					' Item values:'.
-					' 1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}'.
-					' 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}'.
-					' 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}'.
-					' Original event ID: {EVENT.ID}';
-					break;
-			case 'Discovery':
-				$def_longdata_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
-					' Device IP:{DISCOVERY.DEVICE.IPADDRESS}'.
-					' Device DNS: {DISCOVERY.DEVICE.DNS}'.
-					' Device status: {DISCOVERY.DEVICE.STATUS}'.
-					' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
-					' Device service name: {DISCOVERY.SERVICE.NAME}'.
-					' Device service port: {DISCOVERY.SERVICE.PORT}'.
-					' Device service status: {DISCOVERY.SERVICE.STATUS}'.
-					' Device service uptime: {DISCOVERY.SERVICE.UPTIME}';
-				break;
-			case 'Auto registration':
-				$def_longdata_val = 'Host name: {HOST.HOST}'.
-					' Host IP: {HOST.IP}'.
-					' Agent port: {HOST.PORT}';
-				break;
-			case 'Internal':
-				$def_longdata_val = "";
-				break;
-		}
-		$this->zbxTestAssertElementText('//textarea[@id="def_longdata"]', $def_longdata_val);
-
-		if ($eventsource == 'Triggers' || $eventsource == 'Internal') {
-			$this->zbxTestTextPresent('Recovery message');
-			$this->zbxTestAssertElementPresentId('recovery_msg');
-			$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='recovery_msg']");
-		}
-		else {
-			$this->zbxTestTextNotPresent('Recovery message');
-			$this->zbxTestAssertElementNotPresentId('recovery_msg');
-			$this->zbxTestAssertElementNotPresentXpath("//input[@type='checkbox' and @id='recovery_msg']");
-		}
-
-		if ($recovery_msg == true) {
-			$this->zbxTestTextPresent('Recovery subject');
-			$this->zbxTestAssertVisibleId('r_shortdata');
-			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'size', 20);
-			switch ($eventsource) {
-				case 'Triggers':
-					$this->zbxTestAssertElementValue('r_shortdata', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
-					break;
-				case 'Internal':
-					$this->zbxTestAssertElementValue('r_shortdata', '');
-					break;
-			}
-
-			$this->zbxTestTextPresent('Recovery message');
-			$this->zbxTestAssertVisibleId('r_longdata');
-			$this->zbxTestAssertAttribute("//textarea[@id='r_longdata']", 'rows', 7);
-			switch ($eventsource) {
-				case 'Triggers':
-					$r_longdata_val = 'Trigger: {TRIGGER.NAME}'.
-						' Trigger status: {TRIGGER.STATUS}'.
-						' Trigger severity: {TRIGGER.SEVERITY}'.
-						' Trigger URL: {TRIGGER.URL}'.
-						' Item values:'.
-						' 1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}'.
-						' 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}'.
-						' 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}'.
-						' Original event ID: {EVENT.ID}';
-						break;
-				case 'Internal':
-					$r_longdata_val = "";
-					break;
-			}
-			$this->zbxTestAssertElementText('//textarea[@id="r_longdata"]', $r_longdata_val);
-		}
-		elseif ($eventsource == 'Triggers' || $eventsource == 'Internal') {
-			$this->zbxTestAssertNotVisibleId('r_shortdata');
-			$this->zbxTestAssertNotVisibleId('r_longdata');
-		}
-		else {
-			$this->zbxTestAssertElementNotPresentId('r_shortdata');
-			$this->zbxTestAssertElementNotPresentId('r_longdata');
-		}
-
 		$this->zbxTestTextPresent('Enabled');
 		$this->zbxTestAssertElementPresentId('status');
 		$this->zbxTestAssertElementPresentXpath("//input[@type='checkbox' and @id='status']");
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestTabSwitch('Conditions');
-
-		if (isset($data['new_condition_conditiontype'])) {
-			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
-		}
-		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('new_condition_conditiontype');
-
 		if ($eventsource == 'Triggers') {
+			$this->zbxTestInputTypeWait('new_condition_value', 'TEST');
+			$this->zbxTestClick('add_condition');
 			if (isset($data['evaltype'])) {
 				$this->zbxTestDropdownSelect('evaltype', $data['evaltype']);
 				$evaltype = $data['evaltype'];
@@ -625,7 +499,6 @@ class testFormAction extends CWebTest {
 					'Or',
 					'Custom expression'
 			]);
-
 			$this->zbxTestAssertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']', 'selected');
 			switch ($evaltype) {
 				case 'And/Or':
@@ -649,9 +522,9 @@ class testFormAction extends CWebTest {
 
 		if ($eventsource == 'Triggers') {
 			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Maintenance status not in maintenance');
-			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger value = PROBLEM');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name like TEST');
 			$this->zbxTestTextPresent([
-					'A', 'Maintenance status','B', 'Trigger value'
+					'A', 'Maintenance status','B', 'Trigger name'
 			]);
 			$this->zbxTestAssertElementPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(0);"]');
@@ -660,12 +533,17 @@ class testFormAction extends CWebTest {
 		}
 		else {
 			$this->zbxTestTextNotVisibleOnPage(['A', 'B']);
-			$this->zbxTestTextNotPresent(['Maintenance status', 'Trigger value']);
+			$this->zbxTestTextNotPresent(['Maintenance status', 'Trigger name']);
 			$this->zbxTestAssertElementNotPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(0);"]');
 			$this->zbxTestAssertElementNotPresentXpath('//button[@id="remove" and @name="remove" and @onclick="javascript:'.
 				' removeCondition(1);"]');
 		}
+
+		if (isset($data['new_condition_conditiontype'])) {
+			$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $data['new_condition_conditiontype']);
+		}
+		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('new_condition_conditiontype');
 
 		$this->zbxTestTextPresent('New condition');
 		$this->zbxTestAssertElementPresentId('new_condition_conditiontype');
@@ -679,7 +557,6 @@ class testFormAction extends CWebTest {
 						'Trigger',
 						'Trigger name',
 						'Trigger severity',
-						'Trigger value',
 						'Time period',
 						'Maintenance status'
 				]);
@@ -951,11 +828,8 @@ class testFormAction extends CWebTest {
 			case 'Event type':
 				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'Item in "not supported" state',
-						'Item in "normal" state',
 						'Low-level discovery rule in "not supported" state',
-						'Low-level discovery rule in "normal" state',
 						'Trigger in "unknown" state',
-						'Trigger in "normal" state'
 				]);
 				break;
 		}
@@ -1030,6 +904,62 @@ class testFormAction extends CWebTest {
 		$this->zbxTestAssertElementValue('add_condition','Add');
 
 		$this->zbxTestTabSwitch('Operations');
+
+		$this->zbxTestTextPresent('Default subject');
+		$this->zbxTestAssertVisibleId('def_shortdata');
+		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//input[@id='def_shortdata']", 'size', 20);
+		switch ($eventsource) {
+			case 'Triggers':
+				$this->zbxTestAssertElementValue('def_shortdata', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+				break;
+			case 'Discovery':
+				$this->zbxTestAssertElementValue('def_shortdata', 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}');
+				break;
+			case 'Auto registration':
+				$this->zbxTestAssertElementValue('def_shortdata', 'Auto registration: {HOST.HOST}');
+				break;
+			case 'Internal':
+				$this->zbxTestAssertElementValue('def_shortdata', '');
+				break;
+		}
+		$this->zbxTestTextPresent('Default message');
+		$this->zbxTestAssertVisibleId('def_longdata');
+		$this->zbxTestAssertAttribute("//textarea[@id='def_longdata']", 'rows', 7);
+		switch ($eventsource) {
+			case 'Triggers':
+				$def_longdata_val = 'Trigger: {TRIGGER.NAME}'.
+					' Trigger status: {TRIGGER.STATUS}'.
+					' Trigger severity: {TRIGGER.SEVERITY}'.
+					' Trigger URL: {TRIGGER.URL}'.
+					' Item values:'.
+					' 1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}'.
+					' 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}'.
+					' 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}'.
+					' Original event ID: {EVENT.ID}';
+					break;
+			case 'Discovery':
+				$def_longdata_val = 'Discovery rule: {DISCOVERY.RULE.NAME}'.
+					' Device IP:{DISCOVERY.DEVICE.IPADDRESS}'.
+					' Device DNS: {DISCOVERY.DEVICE.DNS}'.
+					' Device status: {DISCOVERY.DEVICE.STATUS}'.
+					' Device uptime: {DISCOVERY.DEVICE.UPTIME}'.
+					' Device service name: {DISCOVERY.SERVICE.NAME}'.
+					' Device service port: {DISCOVERY.SERVICE.PORT}'.
+					' Device service status: {DISCOVERY.SERVICE.STATUS}'.
+					' Device service uptime: {DISCOVERY.SERVICE.UPTIME}';
+				break;
+			case 'Auto registration':
+				$def_longdata_val = 'Host name: {HOST.HOST}'.
+					' Host IP: {HOST.IP}'.
+					' Agent port: {HOST.PORT}';
+				break;
+			case 'Internal':
+				$def_longdata_val = "";
+				break;
+		}
+		$this->zbxTestAssertElementText('//textarea[@id="def_longdata"]', $def_longdata_val);
+
 		if (isset($data['new_operation_operationtype'])) {
 			$new_operation_operationtype = $data['new_operation_operationtype'];
 			$this->zbxTestClickWait('new_operation');
@@ -1117,7 +1047,7 @@ class testFormAction extends CWebTest {
 				break;
 		}
 
-		$this->zbxTestTextPresent(['Action operations', 'Details', 'Action']);
+		$this->zbxTestTextPresent(['Operations', 'Details', 'Action']);
 
 		switch ($eventsource) {
 			case 'Triggers':
@@ -1616,6 +1546,66 @@ class testFormAction extends CWebTest {
 			$this->zbxTestAssertElementNotPresentXpath('cancel_new_operation');
 		}
 
+		if (isset($data['recovery_msg'])) {
+			$this->zbxTestTabSwitch('Recovery operations');
+			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('r_shortdata'));
+		}
+		else {
+			$recovery_msg = false;
+		}
+
+		if ($eventsource == 'Triggers' || $eventsource == 'Internal') {
+			$this->zbxTestAssertElementPresentId('tab_recoveryOperationTab');
+		}
+		else {
+			$this->zbxTestTextNotPresent('Recovery operations');
+			$this->zbxTestAssertElementNotPresentId('tab_recoveryOperationTab');
+		}
+
+		if ($recovery_msg == true) {
+			$this->zbxTestTextPresent('Default subject');
+			$this->zbxTestAssertVisibleId('r_shortdata');
+			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='r_shortdata']", 'size', 20);
+			switch ($eventsource) {
+				case 'Triggers':
+					$this->zbxTestAssertElementValue('r_shortdata', '{TRIGGER.STATUS}: {TRIGGER.NAME}');
+					break;
+				case 'Internal':
+					$this->zbxTestAssertElementValue('r_shortdata', '');
+					break;
+			}
+
+			$this->zbxTestTextPresent('Default message');
+			$this->zbxTestAssertVisibleId('r_longdata');
+			$this->zbxTestAssertAttribute("//textarea[@id='r_longdata']", 'rows', 7);
+			switch ($eventsource) {
+				case 'Triggers':
+					$r_longdata_val = 'Trigger: {TRIGGER.NAME}'.
+						' Trigger status: {TRIGGER.STATUS}'.
+						' Trigger severity: {TRIGGER.SEVERITY}'.
+						' Trigger URL: {TRIGGER.URL}'.
+						' Item values:'.
+						' 1. {ITEM.NAME1} ({HOST.NAME1}:{ITEM.KEY1}): {ITEM.VALUE1}'.
+						' 2. {ITEM.NAME2} ({HOST.NAME2}:{ITEM.KEY2}): {ITEM.VALUE2}'.
+						' 3. {ITEM.NAME3} ({HOST.NAME3}:{ITEM.KEY3}): {ITEM.VALUE3}'.
+						' Original event ID: {EVENT.ID}';
+						break;
+				case 'Internal':
+					$r_longdata_val = "";
+					break;
+			}
+			$this->zbxTestAssertElementText('//textarea[@id="r_longdata"]', $r_longdata_val);
+		}
+		elseif ($eventsource == 'Triggers' || $eventsource == 'Internal') {
+			$this->zbxTestAssertNotVisibleId('r_shortdata');
+			$this->zbxTestAssertNotVisibleId('r_longdata');
+		}
+		else {
+			$this->zbxTestAssertElementNotPresentId('r_shortdata');
+			$this->zbxTestAssertElementNotPresentId('r_longdata');
+		}
+
 		$this->zbxTestAssertVisibleId('add');
 		$this->zbxTestAssertAttribute("//button[@id='add' and @type='submit']", 'value', 'Add');
 
@@ -1668,7 +1658,6 @@ class testFormAction extends CWebTest {
 		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
 
-
 	public static function create() {
 		return [
 			[[
@@ -1713,7 +1702,6 @@ class testFormAction extends CWebTest {
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
-						'Field "operations" is mandatory.'
 				]
 			]],
 			[[
@@ -1748,7 +1736,6 @@ class testFormAction extends CWebTest {
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
-						'Field "operations" is mandatory.'
 				]
 			]],
 			[[
@@ -1783,7 +1770,6 @@ class testFormAction extends CWebTest {
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
-						'Field "operations" is mandatory.'
 				]
 			]],
 			[[
@@ -1820,7 +1806,6 @@ class testFormAction extends CWebTest {
 				'errors' => [
 						'Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
-						'Field "operations" is mandatory.'
 				]
 			]]
 		];
@@ -1837,22 +1822,13 @@ class testFormAction extends CWebTest {
 			$this->zbxTestInputType('name', $data['name']);
 		}
 
-		if (isset($data['def_shortdata'])){
-			$this->zbxTestInputType('def_shortdata', $data['def_shortdata']);
-		}
-
-		if (isset($data['def_longdata'])){
-			$this->zbxTestInputType('def_longdata', $data['def_longdata']);
-		}
-
 		if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS) {
-			$conditionCount = 2;
+			$conditionCount = 1;
 		} else {
 			$conditionCount = 0;
 		}
 
 		if (isset($data['conditions'])) {
-			$this->zbxTestTabSwitch('Conditions');
 			foreach ($data['conditions'] as $condition) {
 				$this->zbxTestDropdownSelectWait('new_condition_conditiontype', $condition['type']);
 				switch ($condition['type']) {
@@ -1907,6 +1883,15 @@ class testFormAction extends CWebTest {
 
 		if (isset($data['operations'])) {
 			$this->zbxTestTabSwitch('Operations');
+
+			if (isset($data['def_shortdata'])){
+				$this->zbxTestInputType('def_shortdata', $data['def_shortdata']);
+			}
+
+			if (isset($data['def_longdata'])){
+				$this->zbxTestInputType('def_longdata', $data['def_longdata']);
+			}
+
 			foreach ($data['operations'] as $operation) {
 				$this->zbxTestClickWait('new_operation');
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add_operation'));
@@ -1974,27 +1959,28 @@ class testFormAction extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of actions');
 
 		$this->zbxTestInputTypeWait('name', 'action test');
-		$this->zbxTestInputType('def_shortdata', 'subject');
-		$this->zbxTestInputType('def_longdata', 'message');
 
 // adding conditions
-		$this->zbxTestTabSwitch('Conditions');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Maintenance status not in maintenance');
+
 		$this->zbxTestInputTypeWait('new_condition_value', 'trigger');
 		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Trigger name like trigger');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_1']/td[2]", 'Trigger name like trigger');
 
 		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Trigger severity');
 		$this->zbxTestDropdownSelect('new_condition_value', 'Average');
 		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestAssertElementText("//tr[@id='conditions_3']/td[2]", 'Trigger severity = Average');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_2']/td[2]", 'Trigger severity = Average');
 
 		$this->zbxTestDropdownSelectWait('new_condition_conditiontype', 'Application');
 		$this->zbxTestInputTypeWait('new_condition_value', 'app');
 		$this->zbxTestClickWait('add_condition');
-		$this->zbxTestAssertElementText("//tr[@id='conditions_4']/td[2]", 'Application = app');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_3']/td[2]", 'Application = app');
 
 // adding operations
 		$this->zbxTestTabSwitch('Operations');
+		$this->zbxTestInputTypeWait('def_shortdata', 'subject');
+		$this->zbxTestInputType('def_longdata', 'message');
 		$this->zbxTestClickWait('new_operation');
 		$this->zbxTestClickXpathWait('//tr[@id="opmsgUsrgrpListFooter"]//button');
 		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');

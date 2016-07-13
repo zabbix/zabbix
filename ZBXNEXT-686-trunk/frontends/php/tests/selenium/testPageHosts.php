@@ -146,8 +146,8 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestInputType('filter_host', $host['name']);
-		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestInputTypeWait('filter_host', $host['name']);
+		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextPresent($host['name']);
 	}
 
@@ -157,13 +157,13 @@ class testPageHosts extends CWebTest {
 
 		$this->zbxTestClickButtonText('Reset');
 
-		$this->zbxTestInputType('filter_host', '1928379128ksdhksdjfh');
-		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestInputTypeWait('filter_host', '1928379128ksdhksdjfh');
+		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 		$this->zbxTestClickButtonText('Reset');
 
-		$this->zbxTestInputType('filter_host', '%');
-		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestInputTypeWait('filter_host', '%');
+		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
@@ -171,7 +171,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickButtonText('Reset');
-		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 

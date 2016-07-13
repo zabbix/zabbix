@@ -303,7 +303,7 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestAssertVisibleId('expr_temp');
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'readonly');
-			$this->zbxTestTextNotPresent('Expression constructor');
+			$this->zbxTestTextPresent('Close expression constructor');
 			$this->zbxTestAssertNotVisibleId('expression');
 
 			if (!isset($data['form'])) {
@@ -336,9 +336,10 @@ class testFormTriggerPrototype extends CWebTest {
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
 
-		$this->zbxTestTextPresent('Multiple PROBLEM events generation');
-		$this->zbxTestAssertVisibleId('type');
-		$this->zbxTestAssertAttribute("//input[@id='type']", 'type', 'checkbox');
+		$this->zbxTestTextPresent(['OK event generation', 'PROBLEM event generation mode']);
+		$this->zbxTestTextPresent(['Expression', 'Recovery expression', 'None']);
+		$this->zbxTestTextPresent(['Single', 'Multiple']);
+		$this->assertTrue($this->zbxTestCheckboxSelected('type_0'));
 
 		$this->zbxTestTextPresent('Description');
 		$this->zbxTestAssertVisibleId('comments');
@@ -585,7 +586,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:someItem.uptime.last(0)}<0',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Trigger prototype "MyTrigger" must contain at least one item prototype.'
+						'Incorrect item key "someItem.uptime" provided for trigger expression on "Simple form test host".'
 					]
 				]
 			],
@@ -596,7 +597,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:item-prototype-reuse.somefunc(0)}<0',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Cannot implode expression "{Simple form test host:item-prototype-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
+						'Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
 					]
 				]
 			],
@@ -658,7 +659,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host@:item-prototype-reuse.last(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:item-prototype-reuse.last(0)}".'],
 						]
 					]
@@ -671,7 +672,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'],
 						]
 					]
@@ -684,7 +685,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'],
 						]
 					]
@@ -697,7 +698,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => '{Simple form test host:item-prototype-reuse.lastA(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:item-prototype-reuse.lastA(0)}".'],
 						]
 					]
@@ -737,7 +738,7 @@ class testFormTriggerPrototype extends CWebTest {
 					'expression' => 'default',
 					'error_msg' => 'Cannot add trigger prototype',
 					'errors' => [
-						'Trigger "triggerName" already exists on "Simple form test host".'
+						'Trigger prototype "triggerName" already exists on "Simple form test host".'
 					]
 				]
 			]

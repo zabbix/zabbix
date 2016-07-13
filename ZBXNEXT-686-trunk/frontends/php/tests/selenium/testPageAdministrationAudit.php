@@ -175,7 +175,7 @@ class testPageAdministrationAudit extends CWebTest {
 		$this->zbxTestDropdownSelect('action', $this->actions[$action]);
 		$this->zbxTestDropdownSelect('resourcetype', $this->resourcetypes[$resourcetype]);
 
-		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestClickXpathWait("//form[@id='id']//button[@name='filter_set']");
 		$this->zbxTestCheckHeader('Audit log');
 	}
 

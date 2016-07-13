@@ -309,7 +309,7 @@ class testFormTemplate extends CWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
 		$this->zbxTestClickLinkTextWait($this->template);
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
 

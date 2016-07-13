@@ -252,7 +252,7 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestAssertVisibleId('expr_temp');
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
 			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'readonly');
-			$this->zbxTestTextNotPresent('Expression constructor');
+			$this->zbxTestTextPresent('Close expression constructor');
 			$this->zbxTestAssertNotVisibleId('expression');
 
 			if (!isset($data['form'])) {
@@ -285,9 +285,10 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestTextPresent('Close expression constructor');
 		}
 
-		$this->zbxTestTextPresent('Multiple PROBLEM events generation');
-		$this->zbxTestAssertVisibleId('type');
-		$this->zbxTestAssertAttribute("//input[@id='type']", 'type', 'checkbox');
+		$this->zbxTestTextPresent(['OK event generation', 'PROBLEM event generation mode']);
+		$this->zbxTestTextPresent(['Expression', 'Recovery expression', 'None']);
+		$this->zbxTestTextPresent(['Single', 'Multiple']);
+		$this->assertTrue($this->zbxTestCheckboxSelected('type_0'));
 
 		$this->zbxTestTextPresent('Description');
 		$this->zbxTestAssertVisibleId('comments');
@@ -353,6 +354,8 @@ class testFormTrigger extends CWebTest {
 			$this->zbxTestAssertElementValue('delete', 'Delete');
 			if (isset($data['templatedHost'])) {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
+				$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_name_0'));
+				$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_name_0'][@disabled]");
 			}
 		}
 		else {
@@ -609,7 +612,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:test-item-reuse.somefunc(0)}<0',
 					'error_msg' => 'Cannot add trigger',
 					'errors' => [
-						'Cannot implode expression "{Simple form test host:test-item-reuse.somefunc(0)}<0". Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
+						'Incorrect trigger function "somefunc(0)" provided in expression. Unknown function.'
 					]
 				]
 			],
@@ -682,7 +685,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host@:test-item-reuse.last(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host@:test-item-reuse.last(0)}".'],
 						]
 					]
@@ -695,7 +698,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'],
 						]
 					]
@@ -708,7 +711,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:system .uptime.last(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:system .uptime.last(0)}".'],
 						]
 					]
@@ -721,7 +724,7 @@ class testFormTrigger extends CWebTest {
 					'expression' => '{Simple form test host:test-item-reuse.lastA(0)}',
 					'constructor' => [[
 						'errors' => [
-							'Expression Syntax Error.',
+							'Expression syntax error.',
 							'Incorrect trigger expression. Check expression part starting from "{Simple form test host:test-item-reuse.lastA(0)}".'],
 						]
 					]
@@ -757,7 +760,7 @@ class testFormTrigger extends CWebTest {
 		$expression = $this->zbxTestGetValue("//textarea[@id='expression']");
 
 		if (isset($data['type'])) {
-			$this->zbxTestCheckboxSelect('type');
+			$this->zbxTestClickXpathWait("//label[@for='type_1']");
 			$type = 'checked';
 		}
 		else {
@@ -874,10 +877,10 @@ class testFormTrigger extends CWebTest {
 				$this->zbxTestAssertElementValue('expression', $expression);
 
 				if ($type == 'checked') {
-					$this->assertTrue($this->zbxTestCheckboxSelected('type'));
+					$this->assertTrue($this->zbxTestCheckboxSelected('type_1'));
 				}
 				else {
-					$this->assertFalse($this->zbxTestCheckboxSelected('type'));
+					$this->assertTrue($this->zbxTestCheckboxSelected('type_0'));
 				}
 
 				$this->zbxTestAssertElementValue('comments', $comments);
