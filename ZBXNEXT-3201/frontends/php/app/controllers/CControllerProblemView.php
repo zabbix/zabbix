@@ -29,9 +29,10 @@ class CControllerProblemView extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'sort' =>		'in ip',
+			'sort' =>		'in clock,host,priority,problem',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'fullscreen' =>	'in 0,1'
+			'fullscreen' =>	'in 0,1',
+			'page' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -63,8 +64,8 @@ class CControllerProblemView extends CController {
 	}
 
 	protected function doAction() {
-		$sortField = $this->getInput('sort', CProfile::get('web.problem.sort', 'ip'));
-		$sortOrder = $this->getInput('sortorder', CProfile::get('web.problem.sortorder', ZBX_SORT_UP));
+		$sortField = $this->getInput('sort', CProfile::get('web.problem.sort', 'clock'));
+		$sortOrder = $this->getInput('sortorder', CProfile::get('web.problem.sortorder', ZBX_SORT_DOWN));
 
 		CProfile::update('web.problem.sort', $sortField, PROFILE_TYPE_STR);
 		CProfile::update('web.problem.sortorder', $sortOrder, PROFILE_TYPE_STR);
@@ -75,7 +76,8 @@ class CControllerProblemView extends CController {
 		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'sort' => $sortField,
-			'sortorder' => $sortOrder
+			'sortorder' => $sortOrder,
+			'page' => $this->getInput('page', 1)
 		];
 
 		$response = new CControllerResponseData($data);
