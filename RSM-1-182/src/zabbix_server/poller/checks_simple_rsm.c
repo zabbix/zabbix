@@ -1898,75 +1898,6 @@ out:
 	return ret;
 }
 
-/* maps generic resolver errors to RDDS43 errors */
-static int	zbx_res_to_rdds43(int res_ec)
-{
-	switch (res_ec)
-	{
-		case ZBX_EC_INTERNAL:
-			return ZBX_EC_INTERNAL;
-		case ZBX_EC_RES_NOREPLY:
-			return ZBX_EC_RDDS43_RES_NOREPLY;
-		case ZBX_EC_RES_NOADBIT:
-			return ZBX_EC_RDDS43_RES_NOADBIT;
-		case ZBX_EC_RES_SERVFAIL:
-			return ZBX_EC_RDDS43_RES_SERVFAIL;
-		case ZBX_EC_RES_NXDOMAIN:
-			return ZBX_EC_RDDS43_RES_NXDOMAIN;
-		case ZBX_EC_RES_CATCHALL:
-			return ZBX_EC_RDDS43_RES_CATCHALL;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return ZBX_EC_INTERNAL;
-	}
-}
-
-/* maps generic resolver errors to RDDS80 errors */
-static int	zbx_res_to_rdds80(int res_ec)
-{
-	switch (res_ec)
-	{
-		case ZBX_EC_INTERNAL:
-			return ZBX_EC_INTERNAL;
-		case ZBX_EC_RES_NOREPLY:
-			return ZBX_EC_RDDS80_RES_NOREPLY;
-		case ZBX_EC_RES_NOADBIT:
-			return ZBX_EC_RDDS80_RES_NOADBIT;
-		case ZBX_EC_RES_SERVFAIL:
-			return ZBX_EC_RDDS80_RES_SERVFAIL;
-		case ZBX_EC_RES_NXDOMAIN:
-			return ZBX_EC_RDDS80_RES_NXDOMAIN;
-		case ZBX_EC_RES_CATCHALL:
-			return ZBX_EC_RDDS80_RES_CATCHALL;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return ZBX_EC_INTERNAL;
-	}
-}
-
-/* maps generic resolver errors to RDAP errors */
-static int	zbx_res_to_rdap(int res_ec)
-{
-	switch (res_ec)
-	{
-		case ZBX_EC_INTERNAL:
-			return ZBX_EC_INTERNAL;
-		case ZBX_EC_RES_NOREPLY:
-			return ZBX_EC_RDAP_RES_NOREPLY;
-		case ZBX_EC_RES_NOADBIT:
-			return ZBX_EC_RDAP_RES_NOADBIT;
-		case ZBX_EC_RES_SERVFAIL:
-			return ZBX_EC_RDAP_RES_SERVFAIL;
-		case ZBX_EC_RES_NXDOMAIN:
-			return ZBX_EC_RDAP_RES_NXDOMAIN;
-		case ZBX_EC_RES_CATCHALL:
-			return ZBX_EC_RDAP_RES_CATCHALL;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return ZBX_EC_INTERNAL;
-	}
-}
-
 static void	zbx_delete_unsupported_ips(zbx_vector_str_t *ips, char ipv4_enabled, char ipv6_enabled)
 {
 	size_t	i;
@@ -2295,42 +2226,6 @@ static int	zbx_map_http_code(int http_code)
 	}
 }
 
-/* maps generic HTTP errors to RDDS80 errors */
-static int	zbx_http_to_rdds80(int http_ec)
-{
-	switch (http_ec)
-	{
-		case ZBX_EC_INTERNAL:
-			return ZBX_EC_INTERNAL;
-		case ZBX_EC_HTTP_ECON:
-			return ZBX_EC_RDDS80_ECON;
-		case ZBX_EC_HTTP_EHTTP:
-			return ZBX_EC_RDDS80_EHTTP;
-		case ZBX_EC_HTTP_EHTTPS:
-			return ZBX_EC_RDDS80_EHTTPS;
-		default:
-			return ZBX_EC_RDDS80_HTTP_BASE + (http_ec - ZBX_EC_HTTP_BASE);
-	}
-}
-
-/* maps generic HTTP errors to RDAP errors */
-static int	zbx_http_to_rdap(int http_ec)
-{
-	switch (http_ec)
-	{
-		case ZBX_EC_INTERNAL:
-			return ZBX_EC_INTERNAL;
-		case ZBX_EC_HTTP_ECON:
-			return ZBX_EC_RDAP_ECON;
-		case ZBX_EC_HTTP_EHTTP:
-			return ZBX_EC_RDAP_EHTTP;
-		case ZBX_EC_HTTP_EHTTPS:
-			return ZBX_EC_RDAP_EHTTPS;
-		default:
-			return ZBX_EC_RDAP_HTTP_BASE + (http_ec - ZBX_EC_HTTP_BASE);
-	}
-}
-
 /* discard the curl output (using inline to hide "unused" compiler warning when -Wunused) */
 static inline size_t	curl_devnull(char *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -2513,6 +2408,46 @@ static int	zbx_split_url(const char *url, char **prefix, char **domain, char **p
 
 int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
+/* maps generic resolver errors to RDDS interface specific ones */
+#define ZBX_RES_TO(__rdds_interface, res_ec)				\
+									\
+do									\
+{									\
+	if (ZBX_EC_INTERNAL == res_ec)					\
+		;							\
+	else if (ZBX_EC_RES_NOREPLY == res_ec)				\
+		res_ec = ZBX_EC_ ## __rdds_interface ## _RES_NOREPLY;	\
+	else if (ZBX_EC_RES_NOADBIT == res_ec)				\
+		res_ec = ZBX_EC_ ## __rdds_interface ## _RES_NOADBIT;	\
+	else if (ZBX_EC_RES_SERVFAIL == res_ec)				\
+		res_ec = ZBX_EC_ ## __rdds_interface ## _RES_SERVFAIL;	\
+	else if (ZBX_EC_RES_NXDOMAIN == res_ec)				\
+		res_ec = ZBX_EC_ ## __rdds_interface ## _RES_NXDOMAIN;	\
+	else if (ZBX_EC_RES_CATCHALL == res_ec)				\
+		res_ec = ZBX_EC_ ## __rdds_interface ## _RES_CATCHALL;	\
+	else								\
+		THIS_SHOULD_NEVER_HAPPEN;				\
+}									\
+while (0)
+
+/* maps generic HTTP errors to RDDS interface specific ones */
+#define ZBX_HTTP_TO(__rdds_interface, http_ec)								\
+													\
+do													\
+{													\
+	if (ZBX_EC_INTERNAL == http_ec)									\
+		;											\
+	else if (ZBX_EC_HTTP_ECON == http_ec)								\
+		http_ec = ZBX_EC_ ## __rdds_interface ## _ECON;						\
+	else if (ZBX_EC_HTTP_EHTTP == http_ec)								\
+		http_ec = ZBX_EC_ ## __rdds_interface ## _EHTTP;					\
+	else if (ZBX_EC_HTTP_EHTTPS == http_ec)								\
+		http_ec = ZBX_EC_ ## __rdds_interface ## _EHTTPS;					\
+	else												\
+		http_ec = ZBX_EC_ ## __rdds_interface ## _HTTP_BASE + (http_ec - ZBX_EC_HTTP_BASE);	\
+}													\
+while (0)
+
 	char			domain[ZBX_HOST_BUF_SIZE], *value_str = NULL, *res_ip = NULL, *testprefix = NULL,
 				*rdds_ns_string = NULL, *answer = NULL, testname[ZBX_HOST_BUF_SIZE], is_ipv4, *random_ns,
 				*default_host = NULL, *prefix = NULL, *domain_part = NULL, *postfix = NULL,
@@ -2773,7 +2708,7 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 	/* resolve host to ips */
 	if (SUCCEED != zbx_resolve_host(res, random_host, &ips_rdds43, ipv_flags, log_fd, &rtt_rdds43, err, sizeof(err)))
 	{
-		rtt_rdds43 = zbx_res_to_rdds43(rtt_rdds43);
+		ZBX_RES_TO(RDDS43, rtt_rdds43);
 		zbx_rsm_errf(log_fd, "RDDS43 \"%s\": %s", random_host, err);
 		goto test_rdds80;
 	}
@@ -2870,7 +2805,7 @@ test_rdds80:
 	/* resolve host to ips */
 	if (SUCCEED != zbx_resolve_host(res, domain_part, &ips_rdds80, ipv_flags, log_fd, &rtt_rdds80, err, sizeof(err)))
 	{
-		rtt_rdds80 = zbx_res_to_rdds80(rtt_rdds80);
+		ZBX_RES_TO(RDDS80, rtt_rdds80);
 		zbx_rsm_errf(log_fd, "RDDS80 \"%s\": %s", random_host, err);
 		goto test_rdap;
 	}
@@ -2904,7 +2839,7 @@ test_rdds80:
 	if (SUCCEED != zbx_http_test(domain_part, testname, ZBX_RSM_TCP_TIMEOUT, maxredirs_rdds80, &rtt_rdds80, NULL,
 			curl_devnull, err, sizeof(err)))
 	{
-		rtt_rdds80 = zbx_http_to_rdds80(rtt_rdds80);
+		ZBX_HTTP_TO(RDDS80, rtt_rdds80);
 		zbx_rsm_errf(log_fd, "RDDS80 of \"%s\" (%s) failed: %s", random_host, ip_rdds80, err);
 		goto test_rdap;
 	}
@@ -2936,7 +2871,7 @@ test_rdap:
 	/* resolve host to ips */
 	if (SUCCEED != zbx_resolve_host(res, domain_part, &ips_rdap, ipv_flags, log_fd, &rtt_rdap, err, sizeof(err)))
 	{
-		rtt_rdap = zbx_res_to_rdap(rtt_rdap);
+		ZBX_RES_TO(RDAP, rtt_rdap);
 		zbx_rsm_errf(log_fd, "RDAP \"%s\": %s", random_host, err);
 		goto out;
 	}
@@ -2969,7 +2904,7 @@ test_rdap:
 	if (SUCCEED != zbx_http_test(domain_part, testname, ZBX_RSM_TCP_TIMEOUT, maxredirs_rdap, &rtt_rdap,
 		&data, curl_memory, err, sizeof(err)))
 	{
-		rtt_rdap = zbx_http_to_rdap(rtt_rdap);
+		ZBX_HTTP_TO(RDAP, rtt_rdap);
 		zbx_rsm_errf(log_fd, "RDAP of \"%s\" (%s) failed: %s", random_host, ip_rdap, err);
 		goto out;
 	}
@@ -3110,6 +3045,9 @@ out:
 		fclose(log_fd);
 
 	return ret;
+
+#undef ZBX_RES_TO
+#undef ZBX_HTTP_TO
 }
 
 static int	epp_recv_buf(SSL *ssl, void *buf, int num)
