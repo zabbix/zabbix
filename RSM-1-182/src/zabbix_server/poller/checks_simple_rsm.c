@@ -1277,8 +1277,11 @@ static void	zbx_clean_nss(zbx_ns_t *nss, size_t nss_num)
 
 static int	is_service_err(int ec)
 {
-	if (0 > ec && -200 >= ec && ec > ZBX_NO_VALUE)
+	if (-200 >= ec && ZBX_NO_VALUE != ec && ZBX_EC_RDDS43_RES_NOREPLY != ec && ZBX_EC_RDDS80_RES_NOREPLY != ec &&
+			ZBX_EC_RDAP_RES_NOREPLY != ec)
+	{
 		return SUCCEED;
+	}
 
 	/* not a service error */
 	return FAIL;

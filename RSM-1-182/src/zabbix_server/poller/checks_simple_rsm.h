@@ -26,7 +26,7 @@
 
 /* item values indicating an error code: */
 /* -1   .. -199    internal monitoring software errors */
-/* -200 .. -999    service errors (registry operator fault) */
+/* -200 .. -999    service errors (registry operator fault), except -208, -250 and -500 */
 
 /* internal */
 #define ZBX_EC_INTERNAL			-1	/* general internal error */
@@ -74,8 +74,8 @@
 #define ZBX_EC_RDDS80_HTTP_BASE		-300
 /* Code ZBX_EC_RDDS80_HTTP_BASE - zbx_map_http_code(xxx) means */
 						/* RDDS80 - Expecting HTTP status code 200 but got xxx */
-#define ZBX_EC_RDAP_RES_NOREPLY	-500	/* RDAP - No reply from local resolver */
-#define ZBX_EC_RDAP_RES_NOADBIT	-501	/* RDAP - No AD bit from local resolver */
+#define ZBX_EC_RDAP_RES_NOREPLY		-500	/* RDAP - No reply from local resolver */
+#define ZBX_EC_RDAP_RES_NOADBIT		-501	/* RDAP - No AD bit from local resolver */
 #define ZBX_EC_RDAP_RES_SERVFAIL	-502	/* RDAP - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname */
 #define ZBX_EC_RDAP_RES_NXDOMAIN	-503	/* RDAP - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname */
 #define ZBX_EC_RDAP_RES_CATCHALL	-504	/* RDAP - Expecting NOERROR RCODE but got unexpected when resolving server hostname */
