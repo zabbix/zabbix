@@ -1011,7 +1011,8 @@ sub create_epp_objects($$$$) {
     my $keysalt = get_global_macro_value($m);
     pfail('cannot get macro ', $m) unless defined($keysalt);
     trim($keysalt);
-    pfail("global macro $m must conatin |") unless ($keysalt =~ m/\|/);
+    pfail("the value of global macro $m is empty") unless ($keysalt);
+    pfail("the value of global macro $m must conatin | ($keysalt)") unless ($keysalt =~ m/\|/);
 
     if ($OPTS{'epp-commands'}) {
 	create_macro('{$RSM.EPP.COMMANDS}', $OPTS{'epp-commands'}, $templateid, true);

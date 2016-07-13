@@ -64,7 +64,6 @@ my $general_status_down = get_result_string($cfg_dns_statusmaps, DOWN);
 __get_delays($services);
 __get_keys($services);
 __get_valuemaps($services);
-__get_max_values($services);
 
 my $date = timelocal(0, 0, 0, $d, $m - 1, $y);
 
@@ -85,7 +84,6 @@ if (opt('debug'))
 # consider only tests that started within given period
 my $cfg_dns_minns;
 my $cfg_dns_minonline;
-my $cfg_dns_rtt_low;
 foreach my $service (keys(%{$services}))
 {
 	dbg("$service") if (opt('debug'));
@@ -96,12 +94,10 @@ foreach my $service (keys(%{$services}))
 		{
 			$cfg_dns_minns = get_macro_minns();
 			$cfg_dns_minonline = get_macro_dns_probe_online();
-			$cfg_dns_rtt_low = get_macro_dns_udp_rtt_low();
 		}
 
 		$services->{$service}->{'minns'} = $cfg_dns_minns;
 		$services->{$service}->{'minonline'} = get_macro_dns_probe_online();
-		$services->{$service}->{'rtt_low'} = get_macro_dns_udp_rtt_low();
 	}
 
 	if ($services->{$service}->{'from'} && $services->{$service}->{'from'} < $date)
@@ -425,34 +421,6 @@ sub __get_valuemaps
 	}
 }
 
-my $cfg_dns_max_value;
-
-sub __get_max_values
-{
-	my $services = shift;
-
-	foreach my $service (keys(%$services))
-	{
-		if ($service eq 'dns' || $service eq 'dnssec')
-		{
-			if (!$cfg_dns_max_value)
-			{
-				$cfg_dns_max_value = get_macro_dns_udp_rtt_low();
-			}
-
-			$services->{$service}->{'max_value'} = $cfg_dns_max_value;
-		}
-		elsif ($service eq 'rdds')
-		{
-			$services->{$service}->{'max_value'} = get_macro_rdds_rtt_low();
-		}
-		elsif ($service eq 'epp')
-		{
-			# TODO: max_value for EPP is based on the command
-		}
-	}
-}
-
 # CSV file	: nsTest
 # Columns	: probeID,nsFQDNID,tldID,cycleTimestamp,status,cycleID,tldType,nsTestProtocol
 #
@@ -513,18 +481,21 @@ sub __get_test_data
 			if (!$nsips_ref)
 			{
 				$nsips_ref = get_templated_nsips($tld, $services->{$service}->{'key_rtt'}, 1);	# templated
-				$dns_items_ref = __get_dns_itemids($nsips_ref, $services->{$service}->{'key_rtt'}, $tld, getopt('probe'));
+				$dns_items_ref = get_dns_itemids($nsips_ref, $services->{$service}->{'key_rtt'}, $tld, getopt('probe'));
 			}
 		}
 		elsif ($service eq 'rdds')
 		{
-			$rdds_dbl_items_ref = __get_rdds_dbl_itemids($tld, getopt('probe'));
-			$rdds_str_items_ref = __get_rdds_str_itemids($tld, getopt('probe'));
+			$rdds_dbl_items_ref = get_rdds_dbl_itemids($tld, getopt('probe'),
+				$services->{$service}->{'key_43_rtt'}, $services->{$service}->{'key_80_rtt'},
+				$services->{$service}->{'key_43_upd'});
+			$rdds_str_items_ref = get_rdds_str_itemids($tld, getopt('probe'),
+				$services->{$service}{'key_43_ip'}, $services->{$service}->{'key_80_ip'});
 		}
 		elsif ($service eq 'epp')
 		{
-			$epp_dbl_items_ref = __get_epp_dbl_itemids($tld, getopt('probe'));
-			$epp_str_items_ref = __get_epp_str_itemids($tld, getopt('probe'));
+			$epp_dbl_items_ref = get_epp_dbl_itemids($tld, getopt('probe'), $services->{$service}->{'key_rtt'});
+			$epp_str_items_ref = get_epp_str_itemids($tld, getopt('probe'), $services->{$service}->{'key_ip'});
 		}
 
 		my $incidents = get_incidents2($itemid_avail, $delay, $service_from, $service_till);
@@ -630,8 +601,8 @@ sub __get_test_data
 		}
 		elsif ($service eq 'epp')
 		{
-			wrn("EPP: not implemented yet");
-			next;
+			$tests_ref = get_epp_test_values($epp_dbl_items_ref, $epp_str_items_ref,
+				$service_from, $service_till, $services->{$service}->{'valuemaps'}, $delay);
 		}
 
 		# add tests to appropriate cycles
@@ -726,28 +697,31 @@ sub __get_test_data
 		{
 			my $service_ref = $services->{$service};
 
-			my $service_category_id;
-			my $protocol_id;
+			my ($service_category_id, $protocol_id, $proto);
 
 			if ($service eq 'dns')
 			{
 				$service_category_id = $dns_service_category_id;
 				$protocol_id = $udp_protocol_id;
+				$proto = PROTO_UDP;
 			}
 			elsif ($service eq 'dnssec')
 			{
 				$service_category_id = $dnssec_service_category_id;
 				$protocol_id = $udp_protocol_id;
+				$proto = PROTO_UDP;
 			}
 			elsif ($service eq 'rdds')
 			{
 				$service_category_id = $rdds_service_category_id;
 				$protocol_id = $tcp_protocol_id;
+				$proto = PROTO_TCP;
 			}
 			elsif ($service eq 'epp')
 			{
 				$service_category_id = $epp_service_category_id;
 				$protocol_id = $tcp_protocol_id;
+				$proto = PROTO_TCP;
 			}
 
 			my $incidents = $result->{$tld}->{$service}->{'incidents'};
@@ -812,7 +786,17 @@ sub __get_test_data
 							{
 								my $test_status;
 
-								if (__check_test($interface, $metric_ref->{JSON_TAG_RTT()}, $metric_ref->{JSON_TAG_DESCRIPTION()}, $service_ref->{'max_value'}) == SUCCESS)
+								# TODO: EPP: it's not yet decided if 3 EPP RTTs
+								# (login, info, update) are coming in one metric or 3
+								# separate ones. Based on that decision in the future
+								# the $rtt_low must be fetched for each command and
+								# each of the metrics must be added by calling
+								# __add_csv_test() 3 times, for each RTT.
+								# NB! Sync with RSMSLV.pm function get_epp_test_values()!
+
+								my $rtt_low = get_rtt_low($service, $proto);	# TODO: add third parameter (command) for EPP!
+
+								if (__check_test($interface, $metric_ref->{JSON_TAG_RTT()}, $metric_ref->{JSON_TAG_DESCRIPTION()}, $rtt_low) == SUCCESS)
 								{
 									$test_status = $general_status_up;
 								}
@@ -1062,60 +1046,6 @@ sub __get_tld_type
 	return $rows_ref->[0]->[0];
 }
 
-# return itemids grouped by Probes:
-#
-# {
-#    'Amsterdam' => {
-#         'itemid1' => 'ns2,2620:0:2d0:270::1:201',
-#         'itemid2' => 'ns1,192.0.34.201'
-#    },
-#    'London' => {
-#         'itemid3' => 'ns2,2620:0:2d0:270::1:201',
-#         'itemid4' => 'ns1,192.0.34.201'
-#    }
-# }
-sub __get_dns_itemids
-{
-	my $nsips_ref = shift; # array reference of NS,IP pairs
-	my $key = shift;
-	my $tld = shift;
-	my $probe = shift;
-
-	my @keys;
-	push(@keys, "'" . $key . $_ . "]'") foreach (@$nsips_ref);
-
-	my $keys_str = join(',', @keys);
-
-	my $host_value = ($probe ? "$tld $probe" : "$tld %");
-
-	my $rows_ref = db_select(
-		"select h.host,i.itemid,i.key_".
-		" from items i,hosts h".
-		" where i.hostid=h.hostid".
-			" and h.host like '$host_value'".
-			" and i.templateid is not null".
-			" and i.key_ in ($keys_str)");
-
-	my %result;
-
-	my $tld_length = length($tld) + 1; # white space
-	foreach my $row_ref (@$rows_ref)
-	{
-		my $host = $row_ref->[0];
-		my $itemid = $row_ref->[1];
-		my $key = $row_ref->[2];
-
-		# remove TLD from host name to get just the Probe name
-		my $_probe = ($probe ? $probe : substr($host, $tld_length));
-
-		$result{$_probe}->{$itemid} = get_nsip_from_key($key);
-	}
-
-	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
-
-	return \%result;
-}
-
 # $keys_str - list of complete keys
 sub __get_itemids_by_complete_key
 {
@@ -1152,48 +1082,6 @@ sub __get_itemids_by_complete_key
 	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
 
 	return \%result;
-}
-
-# return itemids of dbl items grouped by Probes:
-#
-# {
-#    'Amsterdam' => {
-#         'itemid1' => 'rsm.rdds.43.rtt...',
-#         'itemid2' => 'rsm.rdds.43.upd...',
-#         'itemid3' => 'rsm.rdds.80.rtt...'
-#    },
-#    'London' => {
-#         'itemid4' => 'rsm.rdds.43.rtt...',
-#         'itemid5' => 'rsm.rdds.43.upd...',
-#         'itemid6' => 'rsm.rdds.80.rtt...'
-#    }
-# }
-sub __get_rdds_dbl_itemids
-{
-	my $tld = shift;
-	my $probe = shift;
-
-	return __get_itemids_by_complete_key($tld, $probe, $services->{'rdds'}{'key_43_rtt'}, $services->{'rdds'}{'key_80_rtt'}, $services->{'rdds'}{'key_43_upd'});
-}
-
-# return itemids of string items grouped by Probes:
-#
-# {
-#    'Amsterdam' => {
-#         'itemid1' => 'rsm.rdds.43.ip...',
-#         'itemid2' => 'rsm.rdds.80.ip...'
-#    },
-#    'London' => {
-#         'itemid3' => 'rsm.rdds.43.ip...',
-#         'itemid4' => 'rsm.rdds.80.ip...'
-#    }
-# }
-sub __get_rdds_str_itemids
-{
-	my $tld = shift;
-	my $probe = shift;
-
-	return __get_itemids_by_complete_key($tld, $probe, $services->{'rdds'}{'key_43_ip'}, $services->{'rdds'}{'key_80_ip'});
 }
 
 # returns hash reference of Probe=>itemid of specified key
