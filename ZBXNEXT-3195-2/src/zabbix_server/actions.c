@@ -1467,11 +1467,15 @@ clean:
  *                                                                            *
  * Function: execute_operations                                               *
  *                                                                            *
- * Purpose: execute all operations linked to the action                       *
+ * Purpose: execute host, group, template operations linked to the action     *
  *                                                                            *
  * Parameters: action - action to execute operations for                      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: for message, command operations see                              *
+ *           escalation_execute_operations(),                                 *
+ *           escalation_execute_recovery_operations().                        *
  *                                                                            *
  ******************************************************************************/
 static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
@@ -1696,24 +1700,19 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 
 			if (SUCCEED == check_action_conditions(event, action))
 			{
-				if (EVENT_SOURCE_TRIGGERS == event->source ||
-						EVENT_SOURCE_INTERNAL == event->source)
-				{
-					zbx_escalation_new_t	*new_escalation;
+				zbx_escalation_new_t	*new_escalation;
 
-					new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
-					new_escalation->actionid = action->actionid;
-					new_escalation->event = event;
-					zbx_vector_ptr_append(&new_escalations, new_escalation);
-				}
-				else if (EVENT_SOURCE_DISCOVERY == event->source ||
+				/* command and message operations handled by escalators even for    */
+				/* EVENT_SOURCE_DISCOVERY and EVENT_SOURCE_AUTO_REGISTRATION events */
+				new_escalation = zbx_malloc(NULL, sizeof(zbx_escalation_new_t));
+				new_escalation->actionid = action->actionid;
+				new_escalation->event = event;
+				zbx_vector_ptr_append(&new_escalations, new_escalation);
+
+				if (EVENT_SOURCE_DISCOVERY == event->source ||
 						EVENT_SOURCE_AUTO_REGISTRATION == event->source)
 				{
 					execute_operations(event, action->actionid);
-				}
-				else
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
 				}
 			}
 		}

@@ -1877,15 +1877,22 @@ static void	escalation_update_diff(const DB_ESCALATION *escalation, zbx_escalati
  *                                                                            *
  * Function: process_escalations                                              *
  *                                                                            *
- * Purpose: execute escalations;                                              *
- *          postpone escalations during maintenance;                          *
- *          delete completed or superseded escalations from the database.     *
+ * Purpose: execute operations (command and message);                         *
+ *          postpone escalations during maintenance and due to trigger dep.;  *
+ *          delete completed escalations from the database;                   *
+ *          cancel escalations due to changed configuration, etc.             *
  *                                                                            *
  * Parameters: now               - [IN]  the current time                     *
  *             nextcheck         - [OUT] time of the next invocation          *
  *             escalation_source - [IN]  type of escalations to be handled    *
  *                                                                            *
  * Return value: the count of deleted escalations                             *
+ *                                                                            *
+ * Comments: process_actions() creates pseudo-escalations also for            *
+ *           EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION events,   *
+ *           this function handles message and command operations for these   *
+ *           events while host, group, template operations are handled        *
+ *           in process_actions().                                            *
  *                                                                            *
  ******************************************************************************/
 static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
@@ -1915,7 +1922,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	/*                                                                                                    */
 	/* ZBX_ESCALATION_SOURCE_TRIGGER: S = {e in E | e.triggerid    mod process_num == 0}                  */
 	/* ZBX_ESCALATION_SOURCE_ITEM::   S = {e in E | e.itemid       mod process_num == 0}                  */
-	/* ZBX_ESCALATION_SOURCE_TRIGGER: S = {e in E | e.escalationid mod process_num == 0}                  */
+	/* ZBX_ESCALATION_SOURCE_DEFAULT: S = {e in E | e.escalationid mod process_num == 0}                  */
 	/*                                                                                                    */
 	/* Note that each escalator always handles all escalations from the same triggers and items.          */
 	/* The rest of the escalations (e.g. not trigger or item based) are spread evenly between escalators. */
