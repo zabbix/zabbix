@@ -17,6 +17,7 @@ use Data::Dumper;
 use Time::HiRes qw(time);
 use Fcntl qw(:flock);
 use TLD_constants qw(:api);
+use ApiHelper;
 
 use constant SUCCESS	=> 0;
 use constant E_FAIL	=> -1;
