@@ -503,7 +503,7 @@ switch ($data['item']['key_']) {
 		break;
 
 	case RSM_SLV_EPP_DOWNTIME:
-		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1 || get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_2) {
+		if (get_request('type') == RSM_SLA_SCREEN_TYPE_GRAPH_1) {
 			$graphs = API::Graph()->get(array(
 				'output' => array('graphid'),
 				'hostids' => $data['tld']['hostid'],
