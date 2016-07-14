@@ -282,9 +282,7 @@ class CNewValidator {
 		}
 	}
 
-	private function is_array_id(array $values, $table, $field) {
-		$table_schema = DB::getSchema($table);
-
+	private function is_array_id(array $values) {
 		foreach ($values as $value) {
 			if (!is_string($value) || !$this->is_id($value)) {
 				return false;

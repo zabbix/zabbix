@@ -43,10 +43,10 @@ function getSeverityStyle($severity, $type = true) {
 }
 
 /**
- *	Get trigger severity name by given state and configuration.
+ * Get trigger severity name by given state and configuration.
  *
- * @param int	 $severity		trigger severity
- * @param array  $config		array containing configuration parameters containing severity names
+ * @param int   $severity trigger severity
+ * @param array $config   array containing configuration parameters containing severity names
  *
  * @return string
  */
