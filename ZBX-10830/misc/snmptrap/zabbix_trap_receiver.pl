@@ -87,6 +87,12 @@ sub zabbix_receiver
 	print OUTPUT_FILE "PDU INFO:\n";
 	foreach my $key(keys(%pdu_info))
 	{
+		if ( $key =~ /contextEngineID|securityEngineID/i ) 
+		{
+			my $HexAsText = unpack('H*',$pdu_info{$key}) ;  # convert hex to ascii string
+			$pdu_info{$key} = "0x$HexAsText" ;              # apply 0x header for consistency
+                }
+                
 		printf OUTPUT_FILE "  %-30s %s\n", $key, $pdu_info{$key};
 	}
 
