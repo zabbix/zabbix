@@ -1107,7 +1107,8 @@ sub __create_cycle_hash
 				$probe_ref->{'status'} = ($dnssec_success_ns >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
 			}
 
-			if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
+			if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 ||
+					$interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
 			{
 				$test_success_probes++ if ($probe_ref->{'status'} eq AH_STATUS_UP);
 
@@ -1117,7 +1118,8 @@ sub __create_cycle_hash
 			push(@{$interface_ref->{'probes'}}, $probe_ref);
 		}
 
-		if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
+		if ($interface eq JSON_INTERFACE_DNSSEC || $interface eq JSON_INTERFACE_RDDS43 ||
+				$interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
 		{
 			my $interface_status;
 
