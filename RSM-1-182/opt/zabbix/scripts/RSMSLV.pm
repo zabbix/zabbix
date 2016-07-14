@@ -100,7 +100,7 @@ our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL UP UP_INCONCLUSIVE DOWN SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR
 		MIN_INFO_ERROR MAX_INFO_ERROR PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR SEC_PER_WEEK
 		PROBE_ONLINE_SHIFT AVAIL_SHIFT_BACK JSON_INTERFACE_DNS JSON_INTERFACE_DNSSEC JSON_INTERFACE_RDDS43
-		JSON_INTERFACE_RDDS80 JSON_INTERFACE_EPP
+		JSON_INTERFACE_RDDS80 JSON_INTERFACE_RDAP JSON_INTERFACE_EPP
 		JSON_TAG_TARGET_IP JSON_TAG_CLOCK JSON_TAG_RTT JSON_TAG_UPD JSON_TAG_DESCRIPTION EPP_COMMAND_LOGIN
 		EPP_COMMAND_INFO EPP_COMMAND_UPDATE PROTO_UDP PROTO_TCP
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
@@ -123,7 +123,7 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_avail process_slv_ns_avail process_slv_downtime get_results uint_value_exists
 		dbl_value_exists get_dns_itemids get_rdds_dbl_itemids get_rdds_str_itemids get_epp_dbl_itemids
 		get_epp_str_itemids get_dns_test_values get_rdds_test_values get_epp_test_values no_cycle_result
-		get_service_status_itemids get_probe_results get_ip_version
+		get_service_status_itemids get_probe_results interface_status get_ip_version
 		sql_time_condition get_incidents get_incidents2 get_downtime get_downtime_prepare get_downtime_execute
 		avail_result_msg
 		get_current_value get_itemids_by_hostids get_valuemaps get_statusmaps get_detailed_result
@@ -3198,6 +3198,37 @@ sub get_probe_results
 	}
 
 	return \%result;
+}
+
+sub interface_status
+{
+	my $interface = shift;
+	my $value = shift;
+	my $service_ref = shift;
+
+	my $status;
+
+	if ($interface eq JSON_INTERFACE_DNS)
+	{
+		$status = ($value >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
+	}
+	elsif ($interface eq JSON_INTERFACE_DNSSEC)
+	{
+		# TODO: dnssec status on a particular probe is not supported currently,
+		# make this calculation in function __create_cycle_hash() for now.
+	}
+	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
+	{
+		my $rsm_rdds_probe_result = rsm_rdds_probe_result;
+
+		$status = (exists($rsm_rdds_probe_result->[$value]->{$interface}) ? AH_STATUS_UP : AH_STATUS_DOWN);
+	}
+	else
+	{
+		fail("$interface: unsupported interface");
+	}
+
+	return $status;
 }
 
 sub get_ip_version

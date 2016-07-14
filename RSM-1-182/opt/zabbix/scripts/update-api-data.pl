@@ -724,7 +724,7 @@ foreach (keys(%$servicedata))
 							if (!defined($cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'}))
 							{
 								$cycles->{$cycleclock}->{'interfaces'}->{$interface}->{'probes'}->{$probe}->{'status'} =
-									__interface_status($interface, $probe_result_ref->{'value'}, $services->{$service});
+									interface_status($interface, $probe_result_ref->{'value'}, $services->{$service});
 							}
 						}
 					}
@@ -1183,46 +1183,6 @@ sub __check_test
 	return E_FAIL unless ($value);
 
 	return (is_service_error($value) == SUCCESS or $value > $max_value) ? E_FAIL : SUCCESS;
-}
-
-sub __interface_status
-{
-	my $interface = shift;
-	my $value = shift;
-	my $service_ref = shift;
-
-	my $status;
-
-	if ($interface eq JSON_INTERFACE_DNS)
-	{
-		$status = ($value >= $service_ref->{'minns'} ? AH_STATUS_UP : AH_STATUS_DOWN);
-	}
-	elsif ($interface eq JSON_INTERFACE_DNSSEC)
-	{
-		# TODO: dnssec status on a particular probe is not supported currently,
-		# make this calculation in function __create_cycle_hash() for now.
-	}
-	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
-	{
-		my @rdds_probe_result = (
-			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 0},	# 0 - down
-			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 1},	# 1 - up
-			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 0},	# 2 - only 43
-			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 0},	# 3 - only 80
-			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 1},	# 4 - only RDAP
-			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 1},	# 5 - without 43
-			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 1},	# 6 - without 80
-			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 0}	# 7 - without RDAP
-		);
-
-		$status = (0 != $rdds_probe_result[$value]->{$interface} ? AH_STATUS_UP : AH_STATUS_DOWN);
-	}
-	else
-	{
-		fail("$interface: unsupported interface");
-	}
-
-	return $status;
 }
 
 __END__
