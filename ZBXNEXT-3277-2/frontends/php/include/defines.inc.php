@@ -231,8 +231,8 @@ define('CONDITION_OPERATOR_NOT_IN',		7);
 define('CONDITION_OPERATOR_REGEXP',		8);
 
 // correlation statuses
-define('ZBX_CORRELACTION_ENABLED',		0);
-define('ZBX_CORRELACTION_DISABLED',		1);
+define('ZBX_CORRELATION_ENABLED',		0);
+define('ZBX_CORRELATION_DISABLED',		1);
 
 // correlation condition types
 define('ZBX_CORR_CONDITION_OLD_EVENT_TAG',			0);
