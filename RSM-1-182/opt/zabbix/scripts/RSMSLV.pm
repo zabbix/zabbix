@@ -66,6 +66,7 @@ use constant JSON_INTERFACE_DNS		=> 'DNS';
 use constant JSON_INTERFACE_DNSSEC	=> 'DNSSEC';
 use constant JSON_INTERFACE_RDDS43	=> 'RDDS43';
 use constant JSON_INTERFACE_RDDS80	=> 'RDDS80';
+use constant JSON_INTERFACE_RDAP	=> 'RDAP';
 use constant JSON_INTERFACE_EPP		=> 'EPP';
 
 use constant JSON_TAG_TARGET_IP		=> 'targetIP';
@@ -2737,26 +2738,48 @@ sub __find_probe_key_by_itemid
 	return ($probe, $key);
 }
 
-sub __get_rdds_port
+sub __get_rdds_interface_n_type
 {
 	my $key = shift;
 
-	# rsm.rdds.43... <-- returns 43 or 80
-	return substr($key, 9, 2);
-}
+	my @keyparts = split(/./, substr($key, 0, index($key, '[')));
 
-sub __get_rdds_dbl_type
-{
-	my $key = shift;
+	my $interface;
+	my $type;
 
-	# rsm.rdds.43.rtt... rsm.rdds.43.upd[... <-- returns "rtt" or "upd"
-	return substr($key, 12, 3);
-}
+	if (defined($keyparts[2]))
+	{
+		if ($keyparts[2] eq '43')
+		{
+			$interface = JSON_INTERFACE_RDDS43;
+		}
+		elsif ($keyparts[2] eq '80')
+		{
+			$interface = JSON_INTERFACE_RDDS80;
+		}
+		elsif ($keyparts[2] eq 'rdap')
+		{
+			$interface = JSON_INTERFACE_RDAP;
+		}
+	}
 
-sub __get_rdds_str_type
-{
-	# NB! This is done for consistency, perhaps in the future there will be more string items, not just "ip".
-	return 'ip';
+	if (defined($keyparts[3]))
+	{
+		if ($keyparts[3] eq 'rtt')
+		{
+			$interface = JSON_TAG_RTT;
+		}
+		elsif ($keyparts[3] eq 'upd')
+		{
+			$interface = JSON_TAG_UPD;
+		}
+		elsif ($keyparts[3] eq 'ip')
+		{
+			$interface = JSON_TAG_TARGET_IP;
+		}
+	}
+
+	return ($interface, $type);
 }
 
 sub __get_epp_dbl_type
@@ -2872,53 +2895,32 @@ sub get_rdds_test_values
 		fail("internal error: cannot get Probe-key pair by itemid:$itemid")
 			unless (defined($probe) and defined($key));
 
-		my $port = __get_rdds_port($key);
-		my $type = __get_rdds_dbl_type($key);	# rtt (double) or upd (int, if EPP is enabled)
+		my ($interface, $type) = __get_rdds_interface_n_type($key);
+		my $description;
 
-		my $interface;
-		if ($port eq '43')
+		fail("unknown RDDS interface in item (id:$itemid)") if (!defined($interface));
+		fail("unknown $interface item key (itemid:$itemid)") if (!defined($type));
+
+		if ($type ne JSON_TAG_RTT && $type ne JSON_TAG_UPD)
 		{
-			$interface = JSON_INTERFACE_RDDS43;
-		}
-		elsif ($port eq '80')
-		{
-			$interface = JSON_INTERFACE_RDDS80;
-		}
-		else
-		{
-			fail("unknown RDDS port in item (id:$itemid)");
+			fail("internal error: unknown item key (itemid:$itemid), expected 'rtt' or 'upd' value involved in $interface test");
 		}
 
-		my ($new_value, $new_description, $value_tag, $set_idx);
+		$value = int($value);
 
-		if ($type eq 'rtt')
+		if ($value < 0)
 		{
-			$value_tag = JSON_TAG_RTT;
-			$new_value = $value;
-		}
-		elsif ($type eq 'upd')
-		{
-			$value_tag = JSON_TAG_UPD;
-			$new_value = int($value);
-		}
-		else
-		{
-			fail("unknown $interface item key (itemid:$itemid), expected 'rtt' or 'upd' value");
-		}
-
-		if ($new_value < 0)
-		{
-			$new_description = get_detailed_result($valuemaps, $new_value);
-			undef($new_value);
+			$description = get_detailed_result($valuemaps, $value);
+			undef($value);
 		}
 
 		my $cycleclock = cycle_start($clock, $delay);
 
 		my $test_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0];
 
-		$test_ref->{$value_tag} = $new_value;
+		$test_ref->{$type} = $value;
 		$test_ref->{JSON_TAG_CLOCK()} = $clock;
-		$test_ref->{JSON_TAG_DESCRIPTION()} = $new_description;
+		$test_ref->{JSON_TAG_DESCRIPTION()} = $description;
 	}
 
 	my $str_rows_ref = db_select_binds("select itemid,value,clock from history_str where itemid=? and " . sql_time_condition($start, $end), \@str_itemids);
@@ -2926,31 +2928,19 @@ sub get_rdds_test_values
 	foreach my $row_ref (sort { $a->[2] <=> $b->[2] } @$str_rows_ref)
 	{
 		my $itemid = $row_ref->[0];
-		my $ip = $row_ref->[1];
+		my $value = $row_ref->[1];
 		my $clock = $row_ref->[2];
 
 		my ($probe, $key) = __find_probe_key_by_itemid($itemid, $rdds_str_items_ref);
 
 		fail("internal error: cannot get Probe-key pair by itemid:$itemid") unless (defined($probe) and defined($key));
 
-		my $port = __get_rdds_port($key);
-		my $type = __get_rdds_str_type($key);
+		my ($interface, $type) = __get_rdds_interface_n_type($key);
 
-		my $interface;
-                if ($port eq '43')
-                {
-                        $interface = JSON_INTERFACE_RDDS43;
-                }
-                elsif ($port eq '80')
-                {
-                        $interface = JSON_INTERFACE_RDDS80;
-                }
-                else
-                {
-                        fail("unknown RDDS port in item (id:$itemid)");
-                }
+		fail("unknown RDDS interface in item (id:$itemid)") if (!defined($interface));
+		fail("unknown $interface item key (itemid:$itemid)") if (!defined($type));
 
-		if ($type ne 'ip')
+		if ($type ne JSON_TAG_TARGET_IP)
 		{
 			fail("internal error: unknown item key (itemid:$itemid), expected item key representing the IP involved in $interface test");
 		}
@@ -2959,7 +2949,7 @@ sub get_rdds_test_values
 
 		my $test_ref = $result->{$cycleclock}->{$interface}->{$probe}->{$target}->[0];
 
-		$test_ref->{JSON_TAG_TARGET_IP()} = $ip;
+		$test_ref->{$type} = $value;
 	}
 
 	return $result;

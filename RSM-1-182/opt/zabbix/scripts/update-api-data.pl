@@ -184,7 +184,7 @@ foreach my $service (keys(%{$services}))
 		$services->{$service}->{'valuemaps'} = get_valuemaps($service);
 		$services->{$service}->{'max_value'} = get_macro_rdds_rtt_low();
 		$services->{$service}->{'minonline'} = get_macro_rdds_probe_online();
-		$services->{$service}->{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
+		$services->{$service}->{'key_status'} = 'rsm.rdds[{$RSM.TLD}';	# 0 - down, 1 - up, 2 - only 43, 3 - only 80, 4 - only RDAP, 5 - without 43, 6 - without 80, 7 - without RDAP
 		$services->{$service}->{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
 		$services->{$service}->{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
 		$services->{$service}->{'key_43_upd'} = 'rsm.rdds.43.upd[{$RSM.TLD}]';
@@ -1202,11 +1202,20 @@ sub __interface_status
 		# TODO: dnssec status on a particular probe is not supported currently,
 		# make this calculation in function __create_cycle_hash() for now.
 	}
-	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80)
+	elsif ($interface eq JSON_INTERFACE_RDDS43 || $interface eq JSON_INTERFACE_RDDS80 || $interface eq JSON_INTERFACE_RDAP)
 	{
-		my $service_only = ($interface eq JSON_INTERFACE_RDDS43 ? 2 : 3);	# 0 - down, 1 - up, 2 - only 43, 3 - only 80
+		my @rdds_probe_result = (
+			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 0},	# 0 - down
+			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 1},	# 1 - up
+			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 0},	# 2 - only 43
+			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 0},	# 3 - only 80
+			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 1},	# 4 - only RDAP
+			{JSON_INTERFACE_RDDS43 => 0, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 1},	# 5 - without 43
+			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 0, JSON_INTERFACE_RDAP => 1},	# 6 - without 80
+			{JSON_INTERFACE_RDDS43 => 1, JSON_INTERFACE_RDDS80 => 1, JSON_INTERFACE_RDAP => 0}	# 7 - without RDAP
+		);
 
-		$status = (($value == 1 || $value == $service_only) ? AH_STATUS_UP : AH_STATUS_DOWN);
+		$status = (0 != $rdds_probe_result[$value]->{$interface} ? AH_STATUS_UP : AH_STATUS_DOWN);
 	}
 	else
 	{
