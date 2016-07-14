@@ -851,25 +851,25 @@ class CHttpTestManager {
 				}
 			}
 
-			if (!empty($insertItems)) {
-				$newStepItemIds = DB::insert('items', $insertItems);
-				$stepItemids = array_merge($stepItemids, $newStepItemIds);
+			if ($insertItems) {
+				$new_step_itemids = DB::insert('items', $insertItems);
+				$stepItemids = array_merge($stepItemids, $new_step_itemids);
+
+				$item_applications = array();
+				if ($httpTest['applicationid']) {
+					foreach ($new_step_itemids as $itemid) {
+						$item_applications[] = array(
+							'applicationid' => $httpTest['applicationid'],
+							'itemid' => $itemid
+						);
+					}
+				}
+				if (!empty($item_applications)) {
+					DB::insert('items_applications', $item_applications);
+				}
 			}
 			if (!empty($updateItems)) {
 				DB::update('items', $updateItems);
-			}
-
-			$itemApplications = array();
-			foreach ($stepItemids as $itemid) {
-				if (!empty($httpTest['applicationid'])) {
-					$itemApplications[] = array(
-						'applicationid' => $httpTest['applicationid'],
-						'itemid' => $itemid
-					);
-				}
-			}
-			if (!empty($itemApplications)) {
-				DB::insert('items_applications', $itemApplications);
 			}
 
 			$webstepitems = array();
