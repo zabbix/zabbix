@@ -53,20 +53,28 @@ class CScreenProblem extends CScreenBase {
 
 		$config = select_config();
 
-		$db_problems = API::Problem()->get([
-			'output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock'],
-			'selectAcknowledges' => $config['event_ack_enable'] ? ['userid', 'clock', 'message'] : null,
-			'selectTags' => ['tag', 'value'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'preservekeys' => true
-		]);
+		$db_problems = API::Problem()->get(
+			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
+			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
+			+ [
+				'selectTags' => ['tag', 'value'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER
+			]
+			+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
+			+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
+			+ ['preservekeys' => true]
+		);
 
 		$triggerids = [];
 		$ok_events_from = time() - $config['ok_period'];
 
 		foreach ($db_problems as $eventid => $db_problem) {
-			if ($db_problem['r_clock'] != 0 && $db_problem['r_clock'] < $ok_events_from) {
+			if ($db_problem['r_eventid'] != 0 && ($db_problem['r_clock'] < $ok_events_from
+					|| $this->data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM)) {
+				unset($db_problems[$eventid]);
+			}
+			elseif ($this->data['filter']['unacknowledged'] && $db_problem['acknowledges']) {
 				unset($db_problems[$eventid]);
 			}
 			else {
@@ -75,13 +83,16 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($triggerids) {
-			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid', 'description', 'expression', 'priority', 'url', 'flags'],
-				'selectHosts' => ['hostid', 'name', 'status'],
-				'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-				'triggerids' => array_keys($triggerids),
-				'preservekeys' => true
-			]);
+			$db_triggers = API::Trigger()->get(
+				[
+					'output' => ['triggerid', 'description', 'expression', 'priority', 'url', 'flags'],
+					'selectHosts' => ['hostid', 'name', 'status'],
+					'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+					'triggerids' => array_keys($triggerids)
+				]
+				+ ($this->data['filter']['severity'] != TRIGGER_SEVERITY_NOT_CLASSIFIED ? ['min_severity' => $this->data['filter']['severity']] : [])
+				+ ['preservekeys' => true]
+			);
 			$db_triggers = CMacrosResolverHelper::resolveTriggerUrls($db_triggers);
 
 			foreach ($db_problems as $eventid => $db_problem) {
@@ -125,9 +136,11 @@ class CScreenProblem extends CScreenBase {
 				unset($db_problem);
 
 				$sort_fields[] = ['field' => 'description', 'order' => $this->data['sortorder']];
+				$sort_fields[] = ['field' => 'objectid', 'order' => $this->data['sortorder']];
 				break;
 		}
 		$sort_fields[] = ['field' => 'clock', 'order' => $this->data['sortorder']];
+		$sort_fields[] = ['field' => 'eventid', 'order' => $this->data['sortorder']];
 
 		CArrayHelper::sort($db_problems, $sort_fields);
 
@@ -155,7 +168,9 @@ class CScreenProblem extends CScreenBase {
 			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
-		$triggers_hosts = makeTriggersHostsList($triggers_hosts);
+		if ($db_problems) {
+			$triggers_hosts = makeTriggersHostsList($triggers_hosts);
+		}
 
 		foreach ($db_problems as $db_problem) {
 			$db_trigger = $db_triggers[$db_problem['objectid']];
