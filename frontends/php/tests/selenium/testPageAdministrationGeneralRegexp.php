@@ -53,13 +53,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	public function testPageAdministrationGeneralRegexp_CheckLayout() {
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
-		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
-		$this->zbxTestTextPresent('Regular expressions');
+		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestDropdownHasOptions('configDropDown', [
 			'GUI', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
 			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
 		]);
-		$this->assertElementPresent('form');
+		$this->zbxTestAssertElementPresentId('form');
 
 		$this->zbxTestTextPresent(['Name', 'Expressions']);
 
@@ -69,23 +68,16 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$this->zbxTestTextPresent($dbRow['name']);
 		}
 
-		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
-		$this->assertElementValue('goButton', 'Go (0)');
-
-		$this->assertElementPresent("//select[@id='action' and @disabled]");
-		$this->assertElementPresent("//input[@id='goButton' and @disabled]");
+		$this->zbxTestAssertElementPresentXpath("//button[@value='regexp.massdelete' and @disabled]");
 	}
 
 	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {
 		$this->calculateHash();
 
-		$this->chooseCancelOnNextConfirmation();
-
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClick('goButton');
-		$this->getConfirmation();
+		$this->zbxTestClickButton('regexp.massdelete');
+		$this->webDriver->switchTo()->alert()->dismiss();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextNotPresent(['Regular expression deleted', 'Regular expressions deleted']);
 
@@ -102,13 +94,10 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('adm.regexps.php');
-		$this->zbxTestCheckboxSelect('regexpids['.$regexp['regexpid'].']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
-		$this->getConfirmation();
+		$this->zbxTestCheckboxSelect('regexpids_'.$regexp['regexpid']);
+		$this->zbxTestClickButton('regexp.massdelete');
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('Regular expression deleted');
 
@@ -126,13 +115,10 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('adm.regexps.php');
 		$this->zbxTestCheckboxSelect('all_regexps');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
-		$this->getConfirmation();
+		$this->zbxTestClickButton('regexp.massdelete');
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('Regular expressions deleted');
 

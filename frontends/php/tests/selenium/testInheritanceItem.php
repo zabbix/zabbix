@@ -90,15 +90,15 @@ class testInheritanceItem extends CWebTest {
 	public function testInheritanceItem_SimpleCreate($data) {
 		$this->zbxTestLogin('items.php?form=Create+item&hostid='.$this->templateid);
 
-		$this->input_type('name', $data['name']);
-		$this->input_type('key', $data['key']);
+		$this->zbxTestInputType('name', $data['name']);
+		$this->zbxTestInputType('key', $data['key']);
 
 		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
+				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestTextPresent('Item added');
 
 				$itemId = 0;
@@ -135,8 +135,8 @@ class testInheritanceItem extends CWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of items');
-				$this->zbxTestTextPresent('CONFIGURATION OF ITEMS');
-				$this->zbxTestTextPresent('ERROR: Cannot add item');
+				$this->zbxTestCheckHeader('Items');
+				$this->zbxTestTextPresent('Cannot add item');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

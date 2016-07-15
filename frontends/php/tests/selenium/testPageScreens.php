@@ -32,16 +32,17 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF SCREENS');
-		$this->zbxTestTextPresent('Screens');
-		$this->zbxTestTextPresent(sprintf('Displaying 1 to %1$s of %1$s found', count($screens)));
-		// header
-		$this->zbxTestTextPresent(['Name', 'Dimension (cols x rows)', 'Screen']);
-		// data
+		$this->zbxTestCheckHeader('Screens');
+		$this->zbxTestTextPresent('Filter');
+		$this->zbxTestTextPresent(sprintf('Displaying %1$s of %1$s found', count($screens)));
+		$this->zbxTestDropdownAssertSelected('config', 'Screens');
+
+		$this->zbxTestTextPresent(['Name', 'Dimension (cols x rows)', 'Actions']);
+
 		foreach ($screens as $screen) {
 			$this->zbxTestTextPresent($screen['name']);
 		}
-		$this->zbxTestDropdownHasOptions('action', ['Export selected', 'Delete selected']);
+		$this->zbxTestTextPresent(['Export', 'Delete']);
 	}
 
 	/**
@@ -50,19 +51,17 @@ class testPageScreens extends CWebTest {
 	public function testPageScreens_SimpleEdit($screen) {
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestClickWait('link='.$screen['name']);
-		$this->zbxTestCheckTitle('Configuration of screens');
+		$this->zbxTestClickLinkText($screen['name']);
+		$this->zbxTestCheckTitle('Custom screens [refreshed every 30 sec.]');
 		$this->zbxTestTextPresent($screen['name']);
-		$this->zbxTestTextPresent('Change');
-		$this->zbxTestTextPresent('CONFIGURATION OF SCREEN');
+		$this->zbxTestTextPresent('Edit screen');
+		$this->zbxTestCheckHeader('Screens');
 	}
 
 	/**
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_SimpleUpdate($screen) {
-		DBsave_tables('screens');
-
 		$sqlScreen = 'SELECT * FROM screens WHERE screenid='.$screen['screenid'];
 		$oldHashScreen = DBhash($sqlScreen);
 		$sqlScreenItems = 'SELECT * FROM screens_items WHERE screenid='.$screen['screenid'].' ORDER BY screenitemid';
@@ -72,11 +71,9 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestHrefClickWait('?form=update&screenid='.$screen['screenid']);
 
-		$this->zbxTestTextPresent('CONFIGURATION OF SCREENS');
-		$this->zbxTestTextPresent('Screen');
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestTextPresent('Columns');
-		$this->zbxTestTextPresent('Rows');
+		$this->zbxTestCheckHeader('Screens');
+		$this->zbxTestTextPresent(['Screen','Sharing']);
+		$this->zbxTestTextPresent(['Owner', 'Name', 'Columns', 'Rows']);
 
 		$this->zbxTestClickWait('update');
 
@@ -85,8 +82,6 @@ class testPageScreens extends CWebTest {
 
 		$this->assertEquals($oldHashScreen, DBhash($sqlScreen));
 		$this->assertEquals($oldHashScreenItems, DBhash($sqlScreenItems));
-
-		DBrestore_tables('screens');
 	}
 
 	public function testPageScreens_Create() {
@@ -95,36 +90,31 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestClickWait('form');
 
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestTextPresent('Screens');
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestTextPresent('Columns');
-		$this->zbxTestTextPresent('Rows');
+		$this->zbxTestTextPresent(['Owner', 'Name', 'Columns', 'Rows']);
 
 		$this->zbxTestClickWait('cancel');
 
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestTextNotPresent('Columns');
+		$this->zbxTestTextNotPresent(['Owner', 'Columns', 'Rows']);
+	}
+
+	public function testPageScreens_backup() {
+		DBsave_tables('screens');
 	}
 
 	/**
 	* @dataProvider allScreens
 	*/
 	public function testPageScreens_MassDelete($screen) {
-		DBsave_tables('screens');
-
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('screenconf.php');
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestCheckboxSelect('screens['.$screen['screenid'].']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
-
-		$this->getConfirmation();
+		$this->zbxTestCheckboxSelect('screens_'.$screen['screenid']);
+		$this->zbxTestClickButton('screen.massdelete');
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of screens');
 		$this->zbxTestTextPresent('Screen deleted');
-		$this->zbxTestTextPresent('CONFIGURATION OF SCREENS');
+		$this->zbxTestCheckHeader('Screens');
 
 		$sql = 'SELECT NULL FROM screens WHERE screenid='.$screen['screenid'];
 		$this->assertEquals(0, DBcount($sql));
@@ -132,8 +122,9 @@ class testPageScreens extends CWebTest {
 		$this->assertEquals(0, DBcount($sql));
 		$sql = 'SELECT NULL FROM slides WHERE screenid='.$screen['screenid'];
 		$this->assertEquals(0, DBcount($sql));
-
-		DBrestore_tables('screens');
 	}
 
+	public function testPageScreens_restore() {
+		DBrestore_tables('screens');
+	}
 }
