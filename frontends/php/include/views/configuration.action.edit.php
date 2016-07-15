@@ -846,7 +846,7 @@ if (!empty($data['new_operation'])) {
 			// ssh
 			$authTypeComboBox = new CComboBox('new_operation[opcommand][authtype]',
 				$data['new_operation']['opcommand']['authtype'],
-				'showOpTypeAuth()',	[
+				'showOpTypeAuth('.ACTION_OPERATION.')', [
 					ITEM_AUTHTYPE_PASSWORD => _('Password'),
 					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 				]
@@ -1537,7 +1537,8 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS || $data['eventsource'] == EVE
 
 				// ssh
 				$authTypeComboBox = new CComboBox('new_recovery_operation[opcommand][authtype]',
-					$data['new_recovery_operation']['opcommand']['authtype'], 'showOpTypeAuth()', [
+					$data['new_recovery_operation']['opcommand']['authtype'],
+					'showOpTypeAuth('.ACTION_RECOVERY_OPERATION.')', [
 						ITEM_AUTHTYPE_PASSWORD => _('Password'),
 						ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 					]
