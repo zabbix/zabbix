@@ -324,7 +324,7 @@ class CTemplateScreen extends CScreen {
 					$host = reset($graph['hosts']);
 					unset($graph['hosts']);
 
-					if (!isset($real_graph_prototypes[$host['hostid']])) {
+					if (!array_key_exists($host['hostid'], $real_graph_prototypes)) {
 						$real_graph_prototypes[$host['hostid']] = [];
 					}
 					$real_graph_prototypes[$host['hostid']][$graph['name']] = $graph;
@@ -378,7 +378,7 @@ class CTemplateScreen extends CScreen {
 				foreach ($db_item_prototypes as $item) {
 					unset($item['hosts']);
 
-					if (!isset($real_item_prototypes[$item['hostid']])) {
+					if (!array_key_exists($item['hostid'], $real_item_prototypes)) {
 						$real_item_prototypes[$item['hostid']] = [];
 					}
 					$real_item_prototypes[$item['hostid']][$item['key_']] = $item;
