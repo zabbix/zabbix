@@ -713,18 +713,14 @@ else {
 
 			$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
-			// fetch hosts
-			$hosts = [];
-			foreach ($triggers as &$trigger) {
-				$hosts[] = reset($trigger['hosts']);
-
-				// Add already filtered read and read-write 'groupid' and 'hostid' to pass to menu pop-up "Events" link.
-				$trigger['groupid'] = $pageFilter->groupid;
-				$trigger['hostid'] = $pageFilter->hostid;
+			$hostids = [];
+			foreach ($triggers as $trigger) {
+				foreach ($trigger['hosts'] as $host) {
+					$hostids[$host['hostid']] = true;
+				}
 			}
-			unset($trigger);
 
-			$hostids = zbx_objectValues($hosts, 'hostid');
+			$hostids = array_keys($hostids);
 
 			$hosts = API::Host()->get([
 				'output' => ['name', 'hostid', 'status'],
@@ -741,6 +737,7 @@ else {
 
 			// actions
 			$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
+			$tags = makeEventsTags($events);
 
 			// events
 			foreach ($events as $event) {
@@ -800,26 +797,6 @@ else {
 							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
-					// tags
-					CArrayHelper::sort($event['tags'], ['tag', 'value']);
-
-					$tags = [];
-					$tags_count = 1;
-
-					foreach ($event['tags'] as $tag) {
-						if ($tags_count > EVENTS_LIST_TAGS_COUNT) {
-							$tags[] = new CSpan(bold('...'));
-							break;
-						}
-						else {
-							$tags[] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
-								->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
-								->addClass(ZBX_STYLE_TAG);
-						}
-
-						$tags_count++;
-					}
-
 					$table->addRow([
 						(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
@@ -831,7 +808,7 @@ else {
 						$event['duration'],
 						$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
 						(new CCol($action))->addClass(ZBX_STYLE_NOWRAP),
-						new CCol($tags)
+						$tags[$event['eventid']]
 					]);
 				}
 			}
