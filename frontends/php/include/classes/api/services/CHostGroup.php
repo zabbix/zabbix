@@ -564,6 +564,21 @@ class CHostGroup extends CApiService {
 			}
 		}
 
+		$corr_condition_group = DBFetch(DBselect(
+			'SELECT cg.groupid'.
+			' FROM corr_condition_group cg'.
+			' WHERE '.dbConditionInt('cg.groupid', $groupids),
+			1
+		));
+
+		if ($corr_condition_group) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Group "%1$s" cannot be deleted, because it is used in a correlation condition.',
+					$delGroups[$corr_condition_group['groupid']]['name']
+				)
+			);
+		}
+
 		// delete screens items
 		$resources = [
 			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,

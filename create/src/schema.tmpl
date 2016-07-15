@@ -1377,13 +1377,9 @@ FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|r_eventid	|t_id		|	|NULL		|0			|2|events	|eventid
 FIELD		|r_clock	|t_time		|'0'	|NOT NULL	|0
 FIELD		|r_ns		|t_nanosec	|'0'	|NOT NULL	|0
+FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
 INDEX		|1		|source,object,objectid
 INDEX		|2		|r_clock
-
-TABLE|event_recovery|eventid|0
-FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
-FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
-INDEX		|1		|r_eventid
 
 TABLE|problem_tag|problemtagid|0
 FIELD		|problemtagid	|t_id		|	|NOT NULL	|0
@@ -1393,7 +1389,58 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|eventid
 INDEX		|2		|tag,value
 
+TABLE|event_recovery|eventid|0
+FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
+FIELD		|r_eventid	|t_id		|	|NOT NULL	|0			|2|events	|eventid
+FIELD		|c_eventid	|t_id		|	|NULL		|0			|3|events	|eventid
+FIELD		|correlationid	|t_id		|	|NULL		|0			|-|correlation
+INDEX		|1		|r_eventid
+INDEX		|2		|c_eventid
+
+TABLE|correlation|correlationid|ZBX_DATA
+FIELD		|correlationid	|t_id		|	|NOT NULL	|0
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|status
+UNIQUE		|2		|name
+
+TABLE|corr_condition|corr_conditionid|ZBX_DATA
+FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0
+FIELD		|correlationid	|t_id		|	|NOT NULL	|0			|1|correlation
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|correlationid
+
+TABLE|corr_condition_tag|corr_conditionid|ZBX_DATA
+FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+
+TABLE|corr_condition_group|corr_conditionid|ZBX_DATA
+FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
+FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|groups	|	|RESTRICT
+INDEX		|1		|groupid
+
+TABLE|corr_condition_tagpair|corr_conditionid|ZBX_DATA
+FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
+FIELD		|oldtag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|newtag		|t_varchar(255)	|''	|NOT NULL	|0
+
+TABLE|corr_condition_tagvalue|corr_conditionid|ZBX_DATA
+FIELD		|corr_conditionid|t_id		|	|NOT NULL	|0			|1|corr_condition
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+
+TABLE|corr_operation|corr_operationid|ZBX_DATA
+FIELD		|corr_operationid|t_id		|	|NOT NULL	|0
+FIELD		|correlationid	|t_id		|	|NOT NULL	|0			|1|correlation
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|correlationid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|3010043	|3010043
+ROW		|3010067	|3010067
