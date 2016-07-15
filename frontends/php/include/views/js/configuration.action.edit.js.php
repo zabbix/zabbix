@@ -471,7 +471,7 @@
 
 		if (type == <?= ACTION_OPERATION ?>) {
 			var current_op_type = parseInt(jQuery('#new_operation_opcommand_type').val(), 10),
-				opcommand_authtype = 'new_operation_opcommand_script',
+				opcommand_authtype = 'new_operation_opcommand_authtype',
 				opcommand_password = 'new_operation_opcommand_password',
 				opcommand_publickey = 'new_operation_opcommand_publickey',
 				opcommand_privatekey = 'new_operation_opcommand_privatekey',
@@ -479,7 +479,7 @@
 		}
 		else {
 			var current_op_type = parseInt(jQuery('#new_recovery_operation_opcommand_type').val(), 10),
-				opcommand_authtype = 'new_recovery_operation_opcommand_script',
+				opcommand_authtype = 'new_recovery_operation_opcommand_authtype',
 				opcommand_password = 'new_recovery_operation_opcommand_password',
 				opcommand_publickey = 'new_recovery_operation_opcommand_publickey',
 				opcommand_privatekey = 'new_recovery_operation_opcommand_privatekey',
