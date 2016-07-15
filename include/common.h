@@ -639,6 +639,10 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define PROXY_HISTORY_FLAG_META		0x01
 #define PROXY_HISTORY_FLAG_NOVALUE	0x02
 
+/* trigger correlation modes */
+#define ZBX_TRIGGER_CORRELATION_NONE	0
+#define ZBX_TRIGGER_CORRELATION_TAG	1
+
 /* user permissions */
 typedef enum
 {
