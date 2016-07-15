@@ -276,6 +276,9 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_HTTPTEST:
 				return new CScreenHttpTest($options);
 
+			case SCREEN_RESOURCE_PROBLEM:
+				return new CScreenProblem($options);
+
 			default:
 				return null;
 		}

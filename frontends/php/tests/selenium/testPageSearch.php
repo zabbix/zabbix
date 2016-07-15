@@ -24,35 +24,28 @@ class testPageSearch extends CWebTest {
 
 	public function testPageSearch_FindZabbixServer() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->input_type('search', 'ЗАББИКС Сервер');
-		$this->keyPress('search', "\\13");
-		$this->wait();
+		$this->zbxTestInputTypeWait('search', 'ЗАББИКС Сервер');
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Search');
-		$this->zbxTestTextPresent('Hosts');
+		$this->zbxTestCheckHeader('Search: ЗАББИКС Сервер');
+		$this->zbxTestTextPresent(['Hosts', 'Host groups', 'Templates']);
 		$this->zbxTestTextPresent('Displaying 1 of 1 found');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-		$this->zbxTestTextPresent('Host groups');
-		$this->zbxTestTextPresent('Templates');
+		$this->zbxTestTextPresent('No data found.');
 		$this->zbxTestTextPresent('ЗАББИКС Сервер');
-		$this->zbxTestTextNotPresent('Test server');
+		$this->zbxTestTextNotPresent('Zabbix server');
 		$this->zbxTestTextPresent('127.0.0.1');
-		$this->zbxTestTextPresent('Latest data');
-		$this->zbxTestTextPresent('Triggers');
-		$this->zbxTestTextPresent('Applications');
-		$this->zbxTestTextPresent('Items');
-		$this->zbxTestTextPresent('Triggers');
-		$this->zbxTestTextPresent('Graphs');
-		$this->zbxTestTextPresent('Events');
+		$this->zbxTestTextPresent(['Latest data', 'Triggers', 'Applications', 'Items', 'Triggers', 'Graphs', 'Events']);
 	}
 
 	public function testPageSearch_FindNone() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->input_type('search', '%');
-		$this->keyPress('search', "\\13");
-		$this->wait();
+		$this->zbxTestInputTypeWait('search', ' ');
+		$this->webDriver->getKeyboard()->pressKey(WebDriverKeys::ENTER);
 		$this->zbxTestCheckTitle('Search');
+		$this->zbxTestCheckHeader('Search: Search pattern is empty');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-		$this->zbxTestTextPresent(['No hosts found.', 'No host groups found.', 'No templates found.']);
+		$this->zbxTestTextPresent('No data found.');
+		$this->zbxTestTextNotPresent('Zabbix server');
 	}
 
 }

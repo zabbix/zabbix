@@ -1,6 +1,8 @@
 Changes for 3.1.0
 
 New features:
+A.F.I...S. [ZBXNEXT-3274] added event correlation on trigger level (Oleg, wiper)
+A.F.I...S. [ZBXNEXT-3201] added high-performance view of current problems, implemented problem.get() method (Sasha)
 ..F....... [ZBXNEXT-3296] added basic filtering for several frontend pages (Alexei)
 ..FG...... [ZBXNEXT-2430] added new items log.count[] and logrt.count[], added option for monitoring fast-growing log files (Andris, Cemeris)
 ..F....... [ZBXNEXT-3175] added filtering for the list of templates and host groups (Alexei)
@@ -17,6 +19,7 @@ A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, English 
 A.F.....S. [ZBXNEXT-3135] removed id field from history text and log tables (wiper, Sasha)
 
 Bug fixes:
+...G...... [ZBX-10768] fixed compilation warning on FreeBSD (viktors)
 ..F....... [ZBX-10561] improved style consistency for disabled elements (Pavel)
 ........S. [ZBX-3823] improved validation and error messaging when history, discovery, autoregistration and host availability data sent by passive and active proxies are processed on server (gleb)
 A......... [ZBX-10030] fixed API action update method request with only "actionid" property (Cemeris)
@@ -31,6 +34,9 @@ Changes for 3.0.4rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-10907] fixed remote command execution via SSH with no Zabbix agent interface (viktors)
+.......PS. [ZBX-6370] added ability to monitor SNMP devices returning OIDs in decreasing or mixed order (Andris)
+..F....... [ZBX-10918] fixed severity filter in map.view action (Cemeris, Gunars)
 ..F....... [ZBX-10840] fixed selecting of group in popup page filter (Gunars)
 ..F....... [ZBX-10791] fixed web monitoring automatic refresh (Gunars)
 ..F....... [ZBX-10736] fixed overlapping of row and table borders (Pavel)

@@ -36,6 +36,7 @@ class testInheritanceTrigger extends CWebTest {
 	}
 
 	// return list of triggers from a template
+/*
 	public static function update() {
 		return DBdata(
 			'SELECT t.triggerid'.
@@ -51,10 +52,11 @@ class testInheritanceTrigger extends CWebTest {
 				' AND t.flags=0'
 		);
 	}
-
-	/**
-	 * @dataProvider update
-	 */
+*/
+//	/**
+//	 * @dataProvider update
+//	 */
+/*
 	public function testInheritanceTrigger_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = DBhash($sqlTriggers);
@@ -66,7 +68,7 @@ class testInheritanceTrigger extends CWebTest {
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
-
+*/
 	public static function create() {
 		return [
 			[
@@ -74,6 +76,16 @@ class testInheritanceTrigger extends CWebTest {
 					'expected' => TEST_GOOD,
 					'description' => 'testInheritanceTrigger',
 					'expression' => '{Inheritance test template:test-inheritance-item1.last()}=0'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'testInheritanceTrigger1',
+					'expression' => '{Inheritance test template:key-item-inheritance-test.last()}=0',
+					'errors' => [
+						'Trigger "testInheritanceTrigger1" already exists on "Inheritance test template".'
+					]
 				]
 			]
 		];
@@ -85,21 +97,22 @@ class testInheritanceTrigger extends CWebTest {
 	public function testInheritanceTrigger_SimpleCreate($data) {
 		$this->zbxTestLogin('triggers.php?form=Create+trigger&hostid='.$this->templateid);
 
-		$this->input_type('description', $data['description']);
-		$this->input_type('expression', $data['expression']);
+		$this->zbxTestInputType('description', $data['description']);
+		$this->zbxTestInputType('expression', $data['expression']);
 
 		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of triggers');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
+				$this->zbxTestCheckHeader('Triggers');
 				$this->zbxTestTextPresent('Trigger added');
+				$this->zbxTestTextPresent($data['description']);
 				break;
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of triggers');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGERS');
-				$this->zbxTestTextPresent('ERROR: Cannot add trigger');
+				$this->zbxTestCheckHeader('Triggers');
+				$this->zbxTestTextPresent('Cannot add trigger');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

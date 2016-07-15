@@ -364,20 +364,6 @@ static int	check_trigger_condition(const DB_EVENT *event, DB_CONDITION *conditio
 				ret = NOTSUPPORTED;
 		}
 	}
-	else if (CONDITION_TYPE_TRIGGER_VALUE == condition->conditiontype)
-	{
-		int	condition_value_i = atoi(condition->value);
-
-		switch (condition->operator)
-		{
-			case CONDITION_OPERATOR_EQUAL:
-				if (event->value == condition_value_i)
-					ret = SUCCEED;
-				break;
-			default:
-				ret = NOTSUPPORTED;
-		}
-	}
 	else if (CONDITION_TYPE_TIME_PERIOD == condition->conditiontype)
 	{
 		switch (condition->operator)
@@ -1051,24 +1037,12 @@ static int	check_internal_condition(const DB_EVENT *event, DB_CONDITION *conditi
 
 		switch (condition_value)
 		{
-			case EVENT_TYPE_ITEM_NORMAL:
-				if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NORMAL == event->value)
-					ret = SUCCEED;
-				break;
 			case EVENT_TYPE_ITEM_NOTSUPPORTED:
 				if (EVENT_OBJECT_ITEM == event->object && ITEM_STATE_NOTSUPPORTED == event->value)
 					ret = SUCCEED;
 				break;
-			case EVENT_TYPE_TRIGGER_NORMAL:
-				if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_STATE_NORMAL == event->value)
-					ret = SUCCEED;
-				break;
 			case EVENT_TYPE_TRIGGER_UNKNOWN:
 				if (EVENT_OBJECT_TRIGGER == event->object && TRIGGER_STATE_UNKNOWN == event->value)
-					ret = SUCCEED;
-				break;
-			case EVENT_TYPE_LLDRULE_NORMAL:
-				if (EVENT_OBJECT_LLDRULE == event->object && ITEM_STATE_NORMAL == event->value)
 					ret = SUCCEED;
 				break;
 			case EVENT_TYPE_LLDRULE_NOTSUPPORTED:
@@ -1697,7 +1671,7 @@ int	is_recovery_event(const DB_EVENT *event)
  *                                   pairs.                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t *event_recovery)
+void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *event_recovery)
 {
 	const char			*__function_name = "process_actions";
 
@@ -1743,7 +1717,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_clear_ext(&actions, (zbx_clean_func_t)zbx_action_eval_free);
 	zbx_vector_ptr_destroy(&actions);
 
-	if (0 != event_recovery->values_num)
+	if (0 != event_recovery->num_data)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
@@ -1752,15 +1726,16 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 		DB_ROW			row;
 		DB_RESULT		result;
 		zbx_uint64_t		actionid, eventid;
-		int			i, index;
+		zbx_hashset_iter_t	iter;
 
 		zbx_vector_uint64_create(&eventids);
 
-		for (i = 0; i < event_recovery->values_num; i++)
-		{
-			recovery = (zbx_event_recovery_t *)event_recovery->values[i];
+		zbx_hashset_iter_reset(event_recovery, &iter);
+
+		while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 			zbx_vector_uint64_append(&eventids, recovery->eventid);
-		}
+
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid from escalations where");
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
@@ -1771,14 +1746,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 			ZBX_STR2UINT64(actionid, row[0]);
 			ZBX_STR2UINT64(eventid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(event_recovery, &eventid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (NULL == (recovery = zbx_hashset_search(event_recovery, &eventid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 
-			recovery = event_recovery->values[index];
 			escalation_add_values(&db_insert, escalations_num++, actionid, recovery->r_event, 1);
 		}
 

@@ -786,6 +786,24 @@ static int	housekeeping_events(int now)
 	return deleted;
 }
 
+static int	housekeeping_problems(int now)
+{
+	const char	*__function_name = "housekeeping_problems";
+
+	int		deleted = 0, rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
+
+	rc = DBexecute("delete from problem where r_clock<>0 and r_clock<%d", now - SEC_PER_DAY);
+
+	if (ZBX_DB_OK <= rc)
+		deleted = rc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __function_name, deleted);
+
+	return deleted;
+}
+
 static int	get_housekeeping_period(double time_slept)
 {
 	if (SEC_PER_HOUR > time_slept)
@@ -798,7 +816,7 @@ static int	get_housekeeping_period(double time_slept)
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
-	int	now, d_history_and_trends, d_cleanup, d_events, d_sessions, d_services, d_audit, sleeptime;
+	int	now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services, d_audit, sleeptime;
 	double	sec, time_slept;
 	char	sleeptext[25];
 
@@ -858,6 +876,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
 		d_events = housekeeping_events(now);
 
+		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
+		d_problems = housekeeping_problems(now);
+
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 		d_sessions = housekeeping_sessions(now);
 
@@ -869,10 +890,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms,"
-				" %d audit items in " ZBX_FS_DBL " sec, %s]",
+		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items, %d events, %d problems,"
+				" %d sessions, %d alarms, %d audit items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, sec, sleeptext);
+				d_problems, d_sessions, d_services, d_audit, sec, sleeptext);
 
 		zbx_config_clean(&cfg);
 

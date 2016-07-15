@@ -1,52 +1,52 @@
 <!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsgUsrgrpRowTPL">
-<tr id="opmsgUsrgrpRow_#{usrgrpid}">
+<tr id="#{row}#{usrgrpid}">
 	<td>
-		<input name="new_operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
+		<input name="#{field}[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{usrgrpid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opmsgUserRowTPL">
-<tr id="opmsgUserRow_#{id}">
+<tr id="#{row}#{id}">
 	<td>
-		<input name="new_operation[opmessage_usr][#{id}][userid]" type="hidden" value="#{id}" />
+		<input name="#{field}[opmessage_usr][#{id}][userid]" type="hidden" value="#{id}" />
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{id}');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{id}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdGroupRowTPL">
-<tr id="opCmdGroupRow_#{groupid}">
+<tr id="#{row}#{groupid}">
 	<td>
-		<input name="new_operation[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
-		<input name="new_operation[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
+		<input name="#{field}[opcommand_grp][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
+		<input name="#{field}[opcommand_grp][#{groupid}][name]" type="hidden" value="#{name}" />
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{groupid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opCmdHostRowTPL">
-<tr id="opCmdHostRow_#{hostid}">
+<tr id="#{row}#{hostid}">
 	<td>
-		<input name="new_operation[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
-		<input name="new_operation[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
+		<input name="#{field}[opcommand_hst][#{hostid}][hostid]" type="hidden" value="#{hostid}" />
+		<input name="#{field}[opcommand_hst][#{hostid}][name]" type="hidden" value="#{name}" />
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
 	<td class="<?= ZBX_STYLE_NOWRAP ?>">
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?= _('Remove') ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeRow('#{row}#{hostid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -118,38 +118,73 @@
 
 			switch (list.object) {
 				case 'userid':
-					if (jQuery('#opmsgUserRow_' + value.id).length) {
+					if (list.parentId == 'opmsgUserListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opmsgUserRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpmsgUserRow_';
+					}
+
+					if (jQuery('#' + value.row + value.id).length) {
 						continue;
 					}
 
 					tpl = new Template(jQuery('#opmsgUserRowTPL').html());
-					container = jQuery('#opmsgUserListFooter');
+					container = jQuery('#' + list.parentId);
 					container.before(tpl.evaluate(value));
 					break;
 
 				case 'usrgrpid':
-					if (jQuery('#opmsgUsrgrpRow_' + value.usrgrpid).length) {
+					if (list.parentId == 'opmsgUsrgrpListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opmsgUsrgrpRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpmsgUsrgrpRow_';
+					}
+
+					if (jQuery('#' + value.row + value.id).length) {
 						continue;
 					}
 
 					tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
-
-					container = jQuery('#opmsgUsrgrpListFooter');
+					container = jQuery('#' + list.parentId);
 					container.before(tpl.evaluate(value));
 					break;
 
 				case 'groupid':
+					if (list.parentId == 'opCmdListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opCmdGroupRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpCmdGroupRow_';
+					}
+
 					tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
 					value.objectCaption = <?= CJs::encodeJson(_('Host group').NAME_DELIMITER) ?>;
 
-					container = jQuery('#opCmdListFooter');
-					if (jQuery('#opCmdGroupRow_' + value.groupid).length == 0) {
+					container = jQuery('#' + list.parentId);
+					if (jQuery('#' + value.row + value.groupid).length == 0) {
 						container.before(tpl.evaluate(value));
 					}
 					break;
 
 				case 'hostid':
+					if (list.parentId == 'opCmdListFooter') {
+						value.field = 'new_operation';
+						value.row = 'opCmdHostRow_';
+					}
+					else {
+						value.field = 'new_recovery_operation';
+						value.row = 'recOpCmdHostRow_';
+					}
+
 					tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
 					if (value.hostid.toString() != '0') {
@@ -159,8 +194,8 @@
 						value.name = <?= CJs::encodeJson(_('Current host')) ?>;
 					}
 
-					container = jQuery('#opCmdListFooter');
-					if (jQuery('#opCmdHostRow_' + value.hostid).length == 0) {
+					container = jQuery('#' + list.parentId);
+					if (jQuery('#' + value.row + value.hostid).length == 0) {
 						container.before(tpl.evaluate(value));
 					}
 					break;
@@ -175,8 +210,14 @@
 		processTypeOfCalculation();
 	}
 
-	function removeOperation(index) {
-		var row = jQuery('#operations_' + index);
+	function removeOperation(index, type) {
+		if (type == <?= ACTION_OPERATION ?>) {
+			var row = jQuery('#operations_' + index);
+		}
+		else {
+			var row = jQuery('#recovery_operations_' + index);
+		}
+
 		var rowParent = row.parent();
 
 		row.find('*').remove();
@@ -190,38 +231,11 @@
 		processOperationTypeOfCalculation();
 	}
 
-	function removeOpmsgUsrgrpRow(usrgrpid) {
-		var row = jQuery('#opmsgUsrgrpRow_' + usrgrpid);
-		var rowParent = row.parent();
-
-		row.remove();
+	function removeRow(id) {
+		jQuery('#' + id).remove();
 	}
 
-	function removeOpmsgUserRow(userid) {
-		var row = jQuery('#opmsgUserRow_' + userid);
-		var rowParent = row.parent();
-
-		row.remove();
-	}
-
-	function removeOpGroupRow(groupid) {
-		jQuery('#opGroupRow_' + groupid).remove();
-	}
-
-	function removeOpTemplateRow(tplid) {
-		jQuery('#opTemplateRow_' + tplid).remove();
-	}
-
-	function removeOpCmdRow(opCmdRowId, object) {
-		if (object == 'groupid') {
-			jQuery('#opCmdGroupRow_' + opCmdRowId).remove();
-		}
-		else {
-			jQuery('#opCmdHostRow_' + opCmdRowId).remove();
-		}
-	}
-
-	function showOpCmdForm(opCmdId) {
+	function showOpCmdForm(opCmdId, type) {
 		var objectTPL = {
 				opcmdid: 'new',
 				objectid: 0,
@@ -229,29 +243,47 @@
 				target: 'current',
 				operationName: <?= CJs::encodeJson(_('Add')) ?>
 			},
-			tpl;
+			tpl,
+			parentId;
 
 		if (jQuery('#opcmdEditForm').length > 0) {
 			closeOpCmdForm();
 		}
 
+		if (type == <?= ACTION_OPERATION ?>) {
+			parentId = 'opCmdList';
+		}
+		else {
+			parentId = 'recOpCmdList';
+		}
+
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
-		jQuery('#opCmdList').closest('li').after(tpl.evaluate(objectTPL));
+		jQuery('#' + parentId).closest('li').after(tpl.evaluate(objectTPL));
 
 		// actions
 		jQuery('#opcmdEditForm')
 			.find('#pCmdTargetSelect')
 			.toggle(objectTPL.target != 'current').end()
-			.find('button[name="save"]').click(saveOpCmdForm).end()
+			.find('button[name="save"]').click(function() {
+				saveOpCmdForm(type)
+			}).end()
 			.find('button[name="cancel"]').click(closeOpCmdForm).end()
 			.find('select[name="opCmdTarget"]').val(objectTPL.target).change(changeOpCmdTarget);
 	}
 
-	function saveOpCmdForm() {
+	function saveOpCmdForm(type) {
 		var objectForm = jQuery('#opcmdEditForm'),
-			object = {};
+			object = {},
+			parentId;
 
 		object.target = jQuery(objectForm).find('select[name="opCmdTarget"]').val();
+
+		if (type == <?= ACTION_OPERATION ?>) {
+			parentId = 'opCmdListFooter';
+		}
+		else {
+			parentId = 'recOpCmdListFooter';
+		}
 
 		// host group
 		if (object.target == 'hostGroup') {
@@ -279,7 +311,8 @@
 								opcommand_grpid: object.opcommand_grpid,
 								groupid: data.id,
 								name: data.name
-							}]
+							}],
+							parentId: parentId
 						});
 					}
 				}
@@ -290,17 +323,12 @@
 		else if (object.target == 'host') {
 			var values = jQuery('#opCmdTargetObject').multiSelect('getData');
 
-			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-
 			if (object.target != 'current' && empty(values)) {
 				alert(<?= CJs::encodeJson(_('You did not specify host for operation.')) ?>);
 
 				return true;
 			}
 			else {
-				if (object.opcommand_hstid == 'new') {
-					object['opcommand_grpid'] = null;
-				}
 				for (var key in values) {
 					var data = values[key];
 
@@ -309,10 +337,10 @@
 							object: 'hostid',
 							values: [{
 								target: object.target,
-								opcommand_hstid: object.opcommand_hstid,
 								hostid: data.id,
 								name: data.name
-							}]
+							}],
+							parentId: parentId
 						});
 					}
 				}
@@ -321,16 +349,14 @@
 
 		// current
 		else {
-			object.object = 'hostid';
-			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
-			object.hostid = 0;
-			object.name = '';
-
-			if (object.opcommand_hstid == 'new') {
-				delete(object['opcommand_hstid']);
-			}
-
-			addPopupValues({object: object.object, values: [object]});
+			addPopupValues({
+				object: 'hostid',
+				values: [{
+					hostid: 0,
+					name: ''
+				}],
+				parentId: parentId
+			});
 		}
 
 		closeOpCmdForm();
@@ -377,33 +403,54 @@
 		jQuery('#opcmdEditForm').closest('li').remove();
 	}
 
-	function showOpTypeForm() {
-		var currentOpType,
+	function showOpTypeForm(type) {
+		var current_op_type,
 			opTypeFieldIds,
 			fieldId,
 			f;
 
-		if (jQuery('#new_operation_opcommand_type').length == 0) {
+		if (type == <?= ACTION_OPERATION ?>) {
+			var opcommand_type = jQuery('#new_operation_opcommand_type'),
+				opcommand_script = '#new_operation_opcommand_script',
+				opcommand_execute_on = '#new_operation_opcommand_execute_on',
+				opcommand_port = '#new_operation_opcommand_port',
+				opcommand_command = '#new_operation_opcommand_command',
+				opcommand_command_ipmi = '#new_operation_opcommand_command_ipmi',
+				opcommand_authtype = '#new_operation_opcommand_authtype',
+				opcommand_username = '#new_operation_opcommand_username';
+		}
+		else {
+			var opcommand_type = jQuery('#new_recovery_operation_opcommand_type'),
+				opcommand_script = '#new_recovery_operation_opcommand_script',
+				opcommand_execute_on = '#new_recovery_operation_opcommand_execute_on',
+				opcommand_port = '#new_recovery_operation_opcommand_port',
+				opcommand_command = '#new_recovery_operation_opcommand_command',
+				opcommand_command_ipmi = '#new_recovery_operation_opcommand_command_ipmi',
+				opcommand_authtype = '#new_recovery_operation_opcommand_authtype',
+				opcommand_username = '#new_recovery_operation_opcommand_username';
+		}
+
+		if (opcommand_type.length == 0) {
 			return;
 		}
 
-		currentOpType = jQuery('#new_operation_opcommand_type').val();
+		current_op_type = opcommand_type.val();
 
 		opTypeFieldIds = {
-			'#new_operation_opcommand_script': [ZBX_SCRIPT_TYPES.userscript],
-			'#new_operation_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
-			'#new_operation_opcommand_port': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			'#new_operation_opcommand_command': [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			'#new_operation_opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
-			'#new_operation_opcommand_authtype': [ZBX_SCRIPT_TYPES.ssh],
-			'#new_operation_opcommand_username': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			[opcommand_script]: [ZBX_SCRIPT_TYPES.userscript],
+			[opcommand_execute_on]: [ZBX_SCRIPT_TYPES.script],
+			[opcommand_port]: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			[opcommand_command]: [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			[opcommand_command_ipmi]: [ZBX_SCRIPT_TYPES.ipmi],
+			[opcommand_authtype]: [ZBX_SCRIPT_TYPES.ssh],
+			[opcommand_username]: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
 		};
 
 		for (fieldId in opTypeFieldIds) {
 			var show = false;
 
 			for (f = 0; f < opTypeFieldIds[fieldId].length; f++) {
-				if (currentOpType == opTypeFieldIds[fieldId][f]) {
+				if (current_op_type == opTypeFieldIds[fieldId][f]) {
 					show = true;
 				}
 			}
@@ -415,30 +462,46 @@
 				.prop('disabled', !show);
 		}
 
-		showOpTypeAuth();
+		showOpTypeAuth(type);
 	}
 
-	function showOpTypeAuth() {
-		var currentOpType = parseInt(jQuery('#new_operation_opcommand_type').val(), 10),
-			show_password = false,
+	function showOpTypeAuth(type) {
+		var show_password = false,
 			show_publickey = false;
 
-		if (currentOpType === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
-			var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
+		if (type == <?= ACTION_OPERATION ?>) {
+			var current_op_type = parseInt(jQuery('#new_operation_opcommand_type').val(), 10),
+				opcommand_authtype = 'new_operation_opcommand_script',
+				opcommand_password = 'new_operation_opcommand_password',
+				opcommand_publickey = 'new_operation_opcommand_publickey',
+				opcommand_privatekey = 'new_operation_opcommand_privatekey',
+				opcommand_passphrase = 'new_operation_opcommand_passphrase';
+		}
+		else {
+			var current_op_type = parseInt(jQuery('#new_recovery_operation_opcommand_type').val(), 10),
+				opcommand_authtype = 'new_recovery_operation_opcommand_script',
+				opcommand_password = 'new_recovery_operation_opcommand_password',
+				opcommand_publickey = 'new_recovery_operation_opcommand_publickey',
+				opcommand_privatekey = 'new_recovery_operation_opcommand_privatekey',
+				opcommand_passphrase = 'new_recovery_operation_opcommand_passphrase';
+		}
 
-			show_password = (currentOpTypeAuth === <?= ITEM_AUTHTYPE_PASSWORD ?>);
+		if (current_op_type === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
+			var current_op_type_auth = parseInt(jQuery('#' + opcommand_authtype).val(), 10);
+
+			show_password = (current_op_type_auth === <?= ITEM_AUTHTYPE_PASSWORD ?>);
 			show_publickey = !show_password;
 		}
-		else if (currentOpType === <?= ZBX_SCRIPT_TYPE_TELNET ?>) {
+		else if (current_op_type === <?= ZBX_SCRIPT_TYPE_TELNET ?>) {
 			show_password = true;
 		}
 
-		jQuery('#new_operation_opcommand_password')
+		jQuery('#' + opcommand_password)
 			.closest('li')
 			.toggle(show_password)
 			.find(':input')
 			.prop('disabled', !show_password);
-		jQuery('#new_operation_opcommand_publickey,#new_operation_opcommand_privatekey,#new_operation_opcommand_passphrase')
+		jQuery('#' + opcommand_publickey + ', #' + opcommand_privatekey + ', #' + opcommand_passphrase)
 			.closest('li')
 			.toggle(show_publickey)
 			.find(':input')
@@ -494,20 +557,20 @@
 		jQuery('#new_operation_opmessage_default_msg').on('change', function() {
 			var default_message = jQuery(this).is(':checked');
 
-			jQuery('#new_operation_opmessage_subject').closest('li').toggle(!default_message);
-			jQuery('#new_operation_opmessage_message').closest('li').toggle(!default_message);
+			jQuery('#new_operation_opmessage_subject, #new_operation_opmessage_message')
+				.closest('li')
+				.toggle(!default_message);
 		});
 
-		jQuery('#new_operation_opmessage_default_msg').trigger('change');
+		jQuery('#new_recovery_operation_opmessage_default_msg').on('change', function() {
+			var default_message = jQuery(this).is(':checked');
 
-		jQuery('#recovery_msg').on('change', function() {
-			var recovery_msg = jQuery(this).is(':checked');
-
-			jQuery('#r_shortdata').closest('li').toggle(recovery_msg);
-			jQuery('#r_longdata').closest('li').toggle(recovery_msg);
+			jQuery('#new_recovery_operation_opmessage_subject, #new_recovery_operation_opmessage_message')
+				.closest('li')
+				.toggle(!default_message);
 		});
 
-		jQuery('#recovery_msg').trigger('change');
+		jQuery('#new_operation_opmessage_default_msg, #new_recovery_operation_opmessage_default_msg').trigger('change');
 
 		// clone button
 		jQuery('#clone').click(function() {
@@ -516,9 +579,20 @@
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
-			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;
+			// Remove operations IDs.
+			var operationid_RegExp = /operations\[\d+\]\[operationid\]/;
 			jQuery('input[name^=operations]').each(function() {
-				if ($(this).getAttribute('name').match(operationIdNameRegex)) {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(operationid_RegExp)) {
+					$(this).remove();
+				}
+			});
+
+			// Remove recovery operations IDs
+			var recovery_operationid_RegExp = /recovery_operations\[\d+\]\[operationid\]/;
+			jQuery('input[name^=recovery_operations]').each(function() {
+				// Intentional usage of JS Prototype.
+				if ($(this).getAttribute('name').match(recovery_operationid_RegExp)) {
 					$(this).remove();
 				}
 			});
@@ -532,10 +606,19 @@
 		});
 
 		// new operation form command type
-		showOpTypeForm();
+		showOpTypeForm(<?= ACTION_OPERATION ?>);
+		showOpTypeForm(<?= ACTION_RECOVERY_OPERATION ?>);
 
-		jQuery('#select_opcommand_script').click(function() {
-			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script');
+		jQuery('#select_operation_opcommand_script').click(function() {
+			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
+				+ '&dstfld1=new_operation_opcommand_scriptid&dstfld2=new_operation_opcommand_script'
+			);
+		});
+
+		jQuery('#select_recovery_operation_opcommand_script').click(function() {
+			PopUp('popup.php?srctbl=scripts&srcfld1=scriptid&srcfld2=name&dstfrm=action.edit'
+				+ '&dstfld1=new_recovery_operation_opcommand_scriptid&dstfld2=new_recovery_operation_opcommand_script'
+			);
 		});
 
 		processTypeOfCalculation();
