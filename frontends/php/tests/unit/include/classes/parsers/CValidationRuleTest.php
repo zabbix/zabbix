@@ -118,6 +118,11 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'json' => true
 				]
 			],
+			['array', '',
+				[
+					'array' => true
+				]
+			],
 			['array_id', '',
 				[
 					'array_id' => true

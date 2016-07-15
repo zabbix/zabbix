@@ -277,6 +277,13 @@ class API {
 	}
 
 	/**
+	 * @return CProblem
+	 */
+	public static function Problem() {
+		return self::getApi('problem');
+	}
+
+	/**
 	 * @return CProxy
 	 */
 	public static function Proxy() {
