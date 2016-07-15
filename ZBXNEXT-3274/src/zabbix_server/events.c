@@ -351,7 +351,6 @@ static void	save_problems()
 static void	save_event_recovery()
 {
 	zbx_db_insert_t		db_insert;
-	zbx_vector_uint64_t	eventids;
 	zbx_event_recovery_t	*recovery;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -360,25 +359,36 @@ static void	save_event_recovery()
 	if (0 == event_recovery.num_data)
 		return;
 
-	zbx_vector_uint64_create(&eventids);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	zbx_db_insert_prepare(&db_insert, "event_recovery", "eventid", "r_eventid", NULL);
 
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 	{
 		zbx_db_insert_add_values(&db_insert, recovery->eventid, recovery->r_event->eventid);
-		zbx_vector_uint64_append(&eventids, recovery->eventid);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update problem set"
+			" r_eventid=" ZBX_FS_UI64 ","
+			" r_clock=%d,"
+			" r_ns=%d"
+			" where eventid=" ZBX_FS_UI64 ";\n",
+			recovery->r_event->eventid,
+			recovery->r_event->clock,
+			recovery->r_event->ns,
+			recovery->eventid);
 	}
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from problem where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
-	DBexecute("%s", sql);
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		DBexecute("%s", sql);
 
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&eventids);
 }
 
 /******************************************************************************
@@ -475,7 +485,8 @@ static void	correlate_events_by_default_rules()
 		goto out;
 	}
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select eventid,source,object,objectid from problem where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select eventid,source,object,objectid from problem where r_eventid is null and");
 
 	if (0 != trigger_triggerids.values_num)
 	{
@@ -575,7 +586,9 @@ static void	correlate_events_by_trigger_rules()
 	zbx_vector_str_create(&values);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select distinct p.eventid,p.objectid from problem p,problem_tag pt where");
+			"select distinct p.eventid,p.objectid from problem p,problem_tag pt"
+			" where r_eventid is null"
+				" and");
 
 	sql_offset_old = sql_offset;
 
