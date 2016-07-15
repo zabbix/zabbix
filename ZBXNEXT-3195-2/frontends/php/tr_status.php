@@ -374,9 +374,7 @@ $paging = getPagingLine($triggers, $sortOrder, $url);
 $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
-	'selectHosts' => [
-		'hostid', 'name', 'description', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'
-	],
+	'selectHosts' => ['hostid', 'name', 'status'],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 	'selectDependencies' => API_OUTPUT_EXTEND,
 	'selectLastEvent' => ['eventid', 'objectid', 'clock', 'ns'],
@@ -401,15 +399,7 @@ if ($showDetails) {
 
 order_result($triggers, $sortField, $sortOrder);
 
-// sort trigger hosts by name
-foreach ($triggers as &$trigger) {
-	if (count($trigger['hosts']) > 1) {
-		order_result($trigger['hosts'], 'name', ZBX_SORT_UP);
-	}
-}
-unset($trigger);
-
-$triggerIds = zbx_objectValues($triggers, 'triggerid');
+$triggerIds = array_keys($triggers);
 
 // get editable triggers
 $triggerEditable = API::Trigger()->get([
@@ -495,26 +485,6 @@ if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 	}
 }
 
-// get host ids
-$hostIds = [];
-foreach ($triggers as $tnum => $trigger) {
-	foreach ($trigger['hosts'] as $host) {
-		$hostIds[$host['hostid']] = $host['hostid'];
-	}
-}
-
-// get hosts
-$hosts = API::Host()->get([
-	'output' => ['hostid', 'status'],
-	'hostids' => $hostIds,
-	'preservekeys' => true,
-	'selectGraphs' => API_OUTPUT_COUNT,
-	'selectScreens' => API_OUTPUT_COUNT
-]);
-
-// get host scripts
-$scriptsByHosts = API::Script()->getScriptsByHosts($hostIds);
-
 // get trigger dependencies
 $dbTriggerDependencies = DBselect(
 	'SELECT triggerid_down,triggerid_up'.
@@ -526,32 +496,9 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 	$triggerIdsDown[$row['triggerid_up']][] = intval($row['triggerid_down']);
 }
 
-$maintenanceids = [];
+$triggers_hosts = getTriggersHostsList($triggers);
 
 foreach ($triggers as $trigger) {
-	foreach ($trigger['hosts'] as $host) {
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenanceids[$host['maintenanceid']] = true;
-		}
-	}
-}
-
-if ($maintenanceids) {
-	$maintenances = API::Maintenance()->get([
-		'maintenanceids' => array_keys($maintenanceids),
-		'output' => ['name', 'description'],
-		'preservekeys' => true
-	]);
-}
-
-foreach ($triggers as $trigger) {
-	/*
-	 * At this point "all" or one group is selected. And same goes for hosts. It is safe to pass 'groupid' and 'hostid'
-	 * to trigger menu pop-up, so it properly redirects to Events page. Mind that 'DDRemember' option will be ignored.
-	 */
-	$trigger['groupid'] = $pageFilter->groupid;
-	$trigger['hostid'] = $pageFilter->hostid;
-
 	$description = [];
 
 	if (!empty($trigger['dependencies'])) {
@@ -620,49 +567,6 @@ foreach ($triggers as $trigger) {
 			$description[] = $trigger['expression_html'];
 		}
 	}
-
-	// host js menu
-	$hostList = [];
-	foreach ($trigger['hosts'] as $host) {
-		// fetch scripts for the host js menu
-		$scripts = [];
-		if (isset($scriptsByHosts[$host['hostid']])) {
-			foreach ($scriptsByHosts[$host['hostid']] as $script) {
-				$scripts[] = $script;
-			}
-		}
-
-		$host_name = (new CSpan($host['name']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$host['hostid']], $scripts));
-
-		// add maintenance icon with hint if host is in maintenance
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenance_icon = (new CSpan())
-				->addClass(ZBX_STYLE_ICON_MAINT)
-				->addClass(ZBX_STYLE_CURSOR_POINTER);
-
-			if (array_key_exists($host['maintenanceid'], $maintenances)) {
-				$maintenance = $maintenances[$host['maintenanceid']];
-
-				$hint = $maintenance['name'].' ['.($host['maintenance_type']
-					? _('Maintenance without data collection')
-					: _('Maintenance with data collection')).']';
-
-				if ($maintenance['description']) {
-					$hint .= "\n".$maintenance['description'];
-				}
-
-				$maintenance_icon->setHint($hint);
-			}
-
-			$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
-		}
-
-		$hostList[] = $host_name;
-		$hostList[] = ', ';
-	}
-	array_pop($hostList);
 
 	// status
 	$statusSpan = new CSpan(trigger_value2str($trigger['value']));
@@ -753,7 +657,7 @@ foreach ($triggers as $trigger) {
 		($trigger['lastchange'] == 0) ? '' : zbx_date2age($trigger['lastchange']),
 		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
 		$ackColumn,
-		$hostList,
+		$triggers_hosts[$trigger['triggerid']],
 		$description,
 		$comments
 	]);

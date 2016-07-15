@@ -99,7 +99,7 @@ void	DCadd_nextcheck(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *
  * Purpose: update triggers to UNKNOWN and generate events                    *
  *                                                                            *
  ******************************************************************************/
-void	DCflush_nextchecks()
+void	DCflush_nextchecks(zbx_vector_ptr_t *trigger_diff)
 {
 	const char		*__function_name = "DCflush_nextchecks";
 
@@ -145,7 +145,7 @@ void	DCflush_nextchecks()
 		trigger->new_value = TRIGGER_VALUE_UNKNOWN;
 	}
 
-	process_triggers(&trigger_order);
+	zbx_process_triggers(&trigger_order, trigger_diff);
 
 	DCfree_triggers(&trigger_order);
 

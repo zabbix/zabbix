@@ -146,7 +146,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url',
-				'status', 'priority', 'comments', 'type', 'templateid'
+				'status', 'priority', 'comments', 'type', 'templateid', 'correlation_mode', 'correlation_tag'
 			],
 			'hostids' => $host['hostid'],
 			'filter' => ['templateid' => $trigger['templateid']],
@@ -478,6 +478,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param int    $triggers[]['priority']            [IN] (optional)
 	 * @param string $triggers[]['comments']            [IN] (optional)
 	 * @param int    $triggers[]['type']                [IN] (optional)
+	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
+	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
 	 *
 	 * @throws APIException if validation failed.
 	 */
@@ -513,6 +515,40 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_set, $trigger['description']);
+
+			if (array_key_exists('correlation_mode', $trigger)) {
+				$correlation_mode_validator = new CLimitedSetValidator([
+					'values' => [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]
+				]);
+
+				if (!$correlation_mode_validator->validate($trigger['correlation_mode'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'correlation_mode',
+						_s('unexpected value "%1$s"', $trigger['correlation_mode'])
+					));
+				}
+			}
+
+			if (!array_key_exists('correlation_mode', $trigger)
+					|| $trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_NONE) {
+				unset($trigger['correlation_tag']);
+			}
+
+			if (array_key_exists('correlation_mode', $trigger)
+					&& $trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG) {
+				if (!array_key_exists('correlation_tag', $trigger) || $trigger['correlation_tag'] === ''
+						|| $trigger['correlation_tag'] === false || $trigger['correlation_tag'] === null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
+					);
+				}
+				elseif (strpos($trigger['correlation_tag'], '/') !== false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+						'correlation_tag',
+						_('unacceptable characters are used')
+					));
+				}
+			}
 
 			if (!array_key_exists('recovery_mode', $trigger)) {
 				$trigger['recovery_mode'] = ZBX_RECOVERY_MODE_EXPRESSION;
@@ -557,6 +593,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['expression']                   [IN/OUT] (optional)
 	 * @param int    $triggers[]['recovery_mode']                [IN/OUT] (optional)
 	 * @param string $triggers[]['recovery_expression']          [IN/OUT] (optional)
+	 * @param int    $triggers[]['correlation_mode']             [IN] (optional)
+	 * @param string $triggers[]['correlation_tag']              [IN] (optional)
 	 * @param string $triggers[]['url']                          [IN] (optional)
 	 * @param int    $triggers[]['status']                       [IN] (optional)
 	 * @param int    $triggers[]['priority']                     [IN] (optional)
@@ -603,7 +641,9 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$triggerDbFields = ['triggerid' => null];
 		$read_only_fields = ['value', 'lastchange', 'error', 'templateid', 'state', 'flags'];
-		$read_only_fields_tmpl = ['description', 'expression', 'recovery_mode', 'recovery_expression'];
+		$read_only_fields_tmpl = ['description', 'expression', 'recovery_mode', 'recovery_expression',
+			'correlation_mode', 'correlation_tag'
+		];
 
 		foreach ($triggers as $trigger) {
 			if (!check_db_fields($triggerDbFields, $trigger)) {
@@ -613,7 +653,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 		$options = [
 			'output' => ['triggerid', 'description', 'expression', 'url', 'status', 'priority', 'comments', 'type',
-				'templateid', 'recovery_mode', 'recovery_expression'
+				'templateid', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
 			],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -664,6 +704,41 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->checkNoParameters($trigger, $read_only_fields, $error_cannot_update, $description);
 			if ($_db_trigger['templateid'] != 0) {
 				$this->checkNoParameters($trigger, $read_only_fields_tmpl, $error_cannot_update_tmpl, $description);
+			}
+
+			$trigger['correlation_mode'] = array_key_exists('correlation_mode', $trigger)
+				? $trigger['correlation_mode']
+				: $_db_trigger['correlation_mode'];
+
+			$trigger['correlation_tag'] = array_key_exists('correlation_tag', $trigger)
+				? $trigger['correlation_tag']
+				: $_db_trigger['correlation_tag'];
+
+			$correlation_mode_validator = new CLimitedSetValidator([
+				'values' => [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]
+			]);
+
+			if (!$correlation_mode_validator->validate($trigger['correlation_mode'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'correlation_mode',
+					_s('unexpected value "%1$s"', $trigger['correlation_mode'])
+				));
+			}
+
+			if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_NONE) {
+				$trigger['correlation_tag'] = '';
+			}
+			elseif ($trigger['correlation_tag'] === '' || $trigger['correlation_tag'] === false
+					|| $trigger['correlation_tag'] === null) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', 'correlation_tag', _('cannot be empty'))
+				);
+			}
+			elseif (strpos($trigger['correlation_tag'], '/') !== false) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
+					'correlation_tag',
+					_('unacceptable characters are used')
+				));
 			}
 
 			if ($class === 'CTrigger') {
@@ -743,6 +818,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param string $triggers[]['comments']            [IN] (optional)
 	 * @param int    $triggers[]['type']                [IN] (optional)
 	 * @param string $triggers[]['templateid']          [IN] (optional)
+	 * @param int    $triggers[]['correlation_mode']    [IN] (optional)
+	 * @param string $triggers[]['correlation_tag']     [IN] (optional)
 	 *
 	 * @throws APIException
 	 */
@@ -844,6 +921,8 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @param array  $db_triggers[<tnum>]['tags']                    [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['tag']           [IN]
 	 * @param string $db_triggers[<tnum>]['tags'][]['value']         [IN]
+	 * @param int    $db_triggers[<tnum>]['correlation_mode']        [IN]
+	 * @param string $db_triggers[<tnum>]['correlation_tag']         [IN]
 	 *
 	 * @throws APIException
 	 */
@@ -902,6 +981,14 @@ abstract class CTriggerGeneral extends CApiService {
 			}
 			if ($trigger['recovery_mode'] != $db_trigger['recovery_mode']) {
 				$upd_trigger['values']['recovery_mode'] = $trigger['recovery_mode'];
+			}
+			if (array_key_exists('correlation_mode', $trigger)
+					&& $trigger['correlation_mode'] != $db_trigger['correlation_mode']) {
+				$upd_trigger['values']['correlation_mode'] = $trigger['correlation_mode'];
+			}
+			if (array_key_exists('correlation_tag', $trigger)
+					&& $trigger['correlation_tag'] !== $db_trigger['correlation_tag']) {
+				$upd_trigger['values']['correlation_tag'] = $trigger['correlation_tag'];
 			}
 			if (array_key_exists('url', $trigger) && $trigger['url'] !== $db_trigger['url']) {
 				$upd_trigger['values']['url'] = $trigger['url'];
@@ -1478,7 +1565,7 @@ abstract class CTriggerGeneral extends CApiService {
 		$triggers = $this->get([
 			'output' => [
 				'triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'url', 'status',
-				'priority', 'comments', 'type'
+				'priority', 'comments', 'type', 'correlation_mode', 'correlation_tag'
 			],
 			'selectTags' => ['tag', 'value'],
 			'hostids' => $data['templateids'],

@@ -21,9 +21,14 @@
 	jQuery(document).ready(function($) {
 		// Refresh field visibility on document load.
 		changeRecoveryMode();
+		changeCorrelationMode();
 
 		$('input[name=recovery_mode]').change(function() {
 			changeRecoveryMode();
+		});
+
+		$('input[name=correlation_mode]').change(function() {
+			changeCorrelationMode();
 		});
 
 		function changeRecoveryMode() {
@@ -36,6 +41,15 @@
 			else {
 				$('#recovery_expression_row, .recovery_expression_constructor_row').hide();
 				$('#expression_row').find('label').html('<?= _('Expression') ?>');
+			}
+		}
+
+		function changeCorrelationMode() {
+			if ($('input[name=correlation_mode]:checked').val() == <?= ZBX_TRIGGER_CORRELATION_TAG ?>) {
+				$('#correlation_tag').closest('li').show();
+			}
+			else {
+				$('#correlation_tag').closest('li').hide();
 			}
 		}
 

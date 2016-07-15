@@ -1658,7 +1658,7 @@ int	is_recovery_event(const DB_EVENT *event)
  *                                   pairs.                                   *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t *event_recovery)
+void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *event_recovery)
 {
 	const char			*__function_name = "process_actions";
 
@@ -1722,51 +1722,46 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_vector_ptr_t
 	zbx_vector_ptr_destroy(&actions);
 
 	/* 3. Find recovered escalations and store escalationids in 'rec_escalation' by OK eventids. */
-	if (0 != event_recovery->values_num)
+	if (0 != event_recovery->num_data)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
 		zbx_vector_uint64_t	eventids;
+		zbx_event_recovery_t	*recovery;
 		DB_ROW			row;
 		DB_RESULT		result;
 		zbx_uint64_t		actionid, eventid;
-		int			i;
+		zbx_hashset_iter_t	iter;
 
 		zbx_vector_uint64_create(&eventids);
 
 		/* 3.1. Store PROBLEM eventids of recovered escalations in 'eventids'. */
-		for (i = 0; i < event_recovery->values_num; i++)
-		{
-			zbx_event_recovery_t	*recovery;
+		zbx_hashset_iter_reset(event_recovery, &iter);
 
-			recovery = (zbx_event_recovery_t *)event_recovery->values[i];
+		while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 			zbx_vector_uint64_append(&eventids, recovery->eventid);
-		}
 
 		/* 3.2. Select escalations that must be recovered. */
+		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid,escalationid from escalations where");
+
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
 		result = DBselect("%s", sql);
 
 		/* 3.3. Store the escalationids corresponding to the OK events in 'rec_escalations'. */
 		while (NULL != (row = DBfetch(result)))
 		{
-			zbx_event_recovery_t	*recovery;
 			zbx_escalation_rec_t	*rec_escalation;
 			zbx_uint64_t		escalationid;
-			int			index;
 
 			ZBX_STR2UINT64(actionid, row[0]);
 			ZBX_STR2UINT64(eventid, row[1]);
 
-			if (FAIL == (index = zbx_vector_ptr_bsearch(event_recovery, &eventid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			if (NULL == (recovery = zbx_hashset_search(event_recovery, &eventid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
-
-			recovery = event_recovery->values[index];
 
 			if (NULL == (rec_escalation = zbx_hashset_search(&rec_escalations, &recovery->r_event->eventid)))
 			{

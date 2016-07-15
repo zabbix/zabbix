@@ -43,10 +43,10 @@ function getSeverityStyle($severity, $type = true) {
 }
 
 /**
- *	Get trigger severity name by given state and configuration.
+ * Get trigger severity name by given state and configuration.
  *
- * @param int	 $severity		trigger severity
- * @param array  $config		array containing configuration parameters containing severity names
+ * @param int   $severity trigger severity
+ * @param array $config   array containing configuration parameters containing severity names
  *
  * @return string
  */
@@ -720,8 +720,6 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			}
 
 			$data[$trigger_name][$trcounter[$host['name']][$trigger_name]][$host['name']] = [
-				'groupid' => $trigger['groupid'],
-				'hostid' => $host['hostid'],
 				'triggerid' => $trigger['triggerid'],
 				'value' => $trigger['value'],
 				'lastchange' => $trigger['lastchange'],
@@ -2054,4 +2052,141 @@ function orderTriggersByStatus(array &$triggers, $sortorder = ZBX_SORT_UP) {
 		$sortedTriggers[$key] = $triggers[$key];
 	}
 	$triggers = $sortedTriggers;
+}
+
+/**
+ * Create the list of hosts for each trigger.
+ *
+ * @param array  $triggers
+ * @param string $triggers[]['triggerid']
+ * @param array  $triggers[]['hosts']
+ * @param string $triggers[]['hosts'][]['hostid']
+ *
+ * @return array
+ */
+function getTriggersHostsList(array $triggers) {
+	$hostids = [];
+
+	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $host) {
+			$hostids[$host['hostid']] = true;
+		}
+	}
+
+	$db_hosts = $hostids
+		? API::Host()->get([
+			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
+			'selectGraphs' => API_OUTPUT_COUNT,
+			'selectScreens' => API_OUTPUT_COUNT,
+			'hostids' => array_keys($hostids),
+			'preservekeys' => true
+		])
+		: [];
+
+	$triggers_hosts = [];
+	foreach ($triggers as $trigger) {
+		$triggers_hosts[$trigger['triggerid']] = [];
+
+		foreach ($trigger['hosts'] as $host) {
+			if (!array_key_exists($host['hostid'], $db_hosts)) {
+				continue;
+			}
+
+			$triggers_hosts[$trigger['triggerid']][] = $db_hosts[$host['hostid']];
+		}
+		order_result($triggers_hosts[$trigger['triggerid']], 'name');
+	}
+
+	return $triggers_hosts;
+}
+
+/**
+ * Make the list of hosts for each trigger.
+ *
+ * @param array  $triggers_hosts
+ * @param string $triggers_hosts[<triggerid>][]['hostid']
+ * @param string $triggers_hosts[<triggerid>][]['name']
+ * @param int    $triggers_hosts[<triggerid>][]['status']
+ * @param string $triggers_hosts[<triggerid>][]['maintenanceid']
+ * @param int    $triggers_hosts[<triggerid>][]['maintenance_status']
+ * @param int    $triggers_hosts[<triggerid>][]['maintenance_type']
+ * @param int    $triggers_hosts[<triggerid>][]['graphs']             the number of graphs
+ * @param int    $triggers_hosts[<triggerid>][]['screens']            the number of screens
+ *
+ * @return array
+ */
+function makeTriggersHostsList(array $triggers_hosts) {
+	$db_maintenances = [];
+	$scripts_by_hosts = [];
+
+	$hostids = [];
+	$maintenanceids = [];
+
+	foreach ($triggers_hosts as $hosts) {
+		foreach ($hosts as $host) {
+			$hostids[$host['hostid']] = true;
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenanceids[$host['maintenanceid']] = true;
+			}
+		}
+	}
+
+	if ($hostids) {
+		if ($maintenanceids) {
+			$db_maintenances = API::Maintenance()->get([
+				'output' => ['name', 'description'],
+				'maintenanceids' => array_keys($maintenanceids),
+				'preservekeys' => true
+			]);
+		}
+
+		$scripts_by_hosts = API::Script()->getScriptsByHosts($hostids);
+	}
+
+	foreach ($triggers_hosts as &$hosts) {
+		$trigger_hosts = [];
+
+		foreach ($hosts as $host) {
+			$scripts_by_host = array_key_exists($host['hostid'], $scripts_by_hosts)
+				? $scripts_by_hosts[$host['hostid']]
+				: [];
+
+			$host_name = (new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts_by_host));
+
+			// add maintenance icon with hint if host is in maintenance
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenance_icon = (new CSpan())
+					->addClass(ZBX_STYLE_ICON_MAINT)
+					->addClass(ZBX_STYLE_CURSOR_POINTER);
+
+				if (array_key_exists($host['maintenanceid'], $db_maintenances)) {
+					$db_maintenance = $db_maintenances[$host['maintenanceid']];
+
+					$hint = $db_maintenance['name'].' ['.($host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
+
+					if ($db_maintenance['description'] !== '') {
+						$hint .= "\n".$db_maintenance['description'];
+					}
+
+					$maintenance_icon->setHint($hint);
+				}
+
+				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
+			}
+
+			if ($trigger_hosts) {
+				$trigger_hosts[] = ', ';
+			}
+			$trigger_hosts[] = $host_name;
+		}
+
+		$hosts = $trigger_hosts;
+	}
+	unset($hosts);
+
+	return $triggers_hosts;
 }
