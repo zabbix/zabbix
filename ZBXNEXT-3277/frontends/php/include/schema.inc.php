@@ -6260,13 +6260,6 @@ return [
 				'length' => 20,
 				'default' => '0',
 			],
-			'correlationid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'correlation',
-				'ref_field' => 'correlationid',
-			],
 			'clock' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -6297,6 +6290,13 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0',
+			],
+			'correlationid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'correlation',
+				'ref_field' => 'correlationid',
 			],
 		],
 	],
