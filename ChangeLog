@@ -1,6 +1,7 @@
 Changes for 3.1.0
 
 New features:
+........S. [ZBXNEXT-3195] implemented independent escalations for each problem event (wiper, Sandis)
 A.F.I...S. [ZBXNEXT-3277] added global event correlation (Ivo, wiper)
 A.F.I...S. [ZBXNEXT-3274] added event correlation on trigger level (Oleg, wiper)
 A.F.I...S. [ZBXNEXT-3201] added high-performance view of current problems, implemented problem.get() method (Sasha)
