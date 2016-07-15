@@ -39,11 +39,10 @@ class testPageAdministrationScripts extends CWebTest {
 	}
 
 	public function testPageAdministrationScripts_CheckLayout() {
-		$this->zbxTestLogin('scripts.php');
+		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF SCRIPTS');
-		$this->zbxTestTextPresent('Scripts');
+		$this->zbxTestCheckHeader('Scripts');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(
 				['Name', 'Type', 'Execute on', 'Commands', 'User group', 'Host group', 'Host access']
@@ -52,11 +51,9 @@ class testPageAdministrationScripts extends CWebTest {
 		$dbResult = DBselect('SELECT name,command FROM scripts');
 
 		while ($dbRow = DBfetch($dbResult)) {
-			$this->zbxTestTextPresent([$dbRow['name'], $dbRow['command']]);
+			$command= str_replace('>&', '&gt;&amp;', $dbRow['command']);
+			$this->zbxTestTextPresent([$dbRow['name'], $command]);
 		}
-
-		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
-		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
 	/**
@@ -65,8 +62,8 @@ class testPageAdministrationScripts extends CWebTest {
 	public function testPageAdministrationScripts_SimpleUpdate($script) {
 		$this->calculateHash($script['scriptid']);
 
-		$this->zbxTestLogin('scripts.php');
-		$this->zbxTestClickWait('link='.$script['name']);
+		$this->zbxTestLogin('zabbix.php?action=script.list');
+		$this->zbxTestClickLinkText($script['name']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Script updated');
@@ -78,15 +75,12 @@ class testPageAdministrationScripts extends CWebTest {
 	public function testPageAdministrationScripts_MassDeleteAll() {
 		DBsave_tables('scripts');
 
-		$this->chooseOkOnNextConfirmation();
-
-		$this->zbxTestLogin('scripts.php');
+		$this->zbxTestLogin('zabbix.php?action=script.list');
 		$this->zbxTestCheckboxSelect('all_scripts');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
-		$this->getConfirmation();
+		$this->zbxTestClickButton('script.delete');
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of scripts');
-		$this->zbxTestTextPresent('Script deleted');
+		$this->zbxTestTextPresent('Scripts deleted');
 
 		$this->assertEquals(0, DBcount('SELECT NULL FROM scripts'));
 
@@ -101,13 +95,10 @@ class testPageAdministrationScripts extends CWebTest {
 	* @dataProvider allScripts
 	*/
 	public function testPageAdministrationScripts_MassDelete($script) {
-		$this->chooseOkOnNextConfirmation();
-
-		$this->zbxTestLogin('scripts.php');
-		$this->zbxTestCheckboxSelect('scripts['.$script['scriptid'].']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
-		$this->getConfirmation();
+		$this->zbxTestLogin('zabbix.php?action=script.list');
+		$this->zbxTestCheckboxSelect('scriptids_'.$script['scriptid']);
+		$this->zbxTestClickButton('script.delete');
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of scripts');
 		$this->zbxTestTextPresent('Script deleted');
 
@@ -115,7 +106,7 @@ class testPageAdministrationScripts extends CWebTest {
 	}
 
 	public function testPageAdministrationScripts_restore() {
-		DBsave_tables('scripts');
+		DBrestore_tables('scripts');
 	}
 
 }

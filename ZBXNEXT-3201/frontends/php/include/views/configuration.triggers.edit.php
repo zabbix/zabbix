@@ -493,7 +493,8 @@ else {
 		->setModern(true);
 }
 
-$triggersFormList->addRow(_('OK event closes'), $ok_event_closes)
+$triggersFormList->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode)
+	->addRow(_('OK event closes'), $ok_event_closes)
 	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);

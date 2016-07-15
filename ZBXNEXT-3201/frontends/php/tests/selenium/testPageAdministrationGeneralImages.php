@@ -21,97 +21,73 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationGeneralImages extends CWebTest {
 
-	public static function allIcons() {
-		return DBdata('SELECT name FROM images WHERE imagetype=1 ORDER BY imageid limit 5');
+	public static function allImages() {
+		return DBdata('SELECT imageid,imagetype,name FROM images LIMIT 5');
 	}
 
-	public static function allBgImages() {
-		return DBdata('SELECT name FROM images WHERE imagetype=2 ORDER BY imageid limit 5');
-	}
-
-	/**
-	* @dataProvider allIcons
-	*/
-	public function testPageAdministrationGeneralImages_CheckLayoutIcons($icon_name) {
+	public function testPageAdministrationGeneralImages_CheckLayoutIcons() {
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->assertElementPresent('configDropDown');
-		$this->assertElementPresent('form');
+		$this->zbxTestAssertElementPresentId('configDropDown');
+		$this->zbxTestAssertElementPresentId('form');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestTextPresent(['CONFIGURATION OF IMAGES', 'Images', 'Type']);
-		$this->assertElementPresent('imagetype');
-		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
-		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
-		$this->zbxTestTextPresent([$icon_name['name']]);
-	}
+		$this->zbxTestCheckHeader('Images');
+		$this->zbxTestTextPresent('Type');
+		$this->zbxTestDropdownHasOptions('imagetype', ['Icon', 'Background']);
 
-	/**
-	* @dataProvider allBgImages
-	*/
-	public function testPageAdministrationGeneralImages_CheckLayoutBgImages($bgimage) {
-
-		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2 ORDER BY imageid');
-
-		if ($BgImagesCount==0) {
-				$this->zbxTestTextPresent(['No images defined.']);
+		$db_images = DBfetchArray(DBselect('SELECT name FROM images WHERE imagetype=1 LIMIT 5'));
+		if (!$db_images) {
+			$this->zbxTestTextPresent('No data found.');
 		}
 		else {
-				$this->zbxTestLogin('adm.images.php');
-				$this->assertElementPresent('configDropDown');
-				$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-				$this->assertElementPresent('form');
-				$this->zbxTestCheckTitle('Configuration of Zabbix');
-				$this->zbxTestTextPresent(['CONFIGURATION OF IMAGES', 'Images', 'Type']);
-				$this->assertElementPresent('imagetype');
-				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
-				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
-				$this->assertElementPresent("//form[@name='imageForm']//table//a[text()='".$bgimage['name']."']");
+			foreach ($db_images as $db_image) {
+				$this->zbxTestAssertElementPresentXpath("//div[@id='image']//a[text()='".$db_image['name']."']");
+			}
+		}
+	}
+
+// TODO: need background images
+	public function testPageAdministrationGeneralImages_CheckLayoutBgImages() {
+
+		$this->zbxTestLogin('adm.images.php');
+		$this->zbxTestAssertElementPresentId('configDropDown');
+		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
+		$this->zbxTestAssertElementPresentId('form');
+		$this->zbxTestCheckTitle('Configuration of images');
+		$this->zbxTestCheckHeader('Images');
+		$this->zbxTestDropdownHasOptions('imagetype', ['Icon', 'Background']);
+
+		$db_images = DBfetchArray(DBselect('SELECT name FROM images WHERE imagetype=2 LIMIT 5'));
+		if (!$db_images) {
+			$this->zbxTestTextPresent('No data found.');
+		}
+		else {
+			foreach ($db_images as $db_image) {
+				$this->zbxTestAssertElementPresentXpath("//div[@id='image']//a[text()='".$db_image['name']."']");
+			}
 		}
 	}
 
 	/**
-	* @dataProvider allIcons
+	* @dataProvider allImages
 	*/
-	public function testPageAdministrationGeneralImages_IconSimpleUpdate($icon_name) {
-
-		$sqlIconImages = 'SELECT * FROM images WHERE imagetype=1 ORDER BY imageid limit 5';
-		$oldHashIconImages=DBhash($sqlIconImages);
+	public function testPageAdministrationGeneralImages_IconSimpleUpdate($image) {
+		$sql_image = 'SELECT * FROM images WHERE imageid='.$image['imageid'];
+		$old_image_hash = DBhash($sql_image);
 
 		$this->zbxTestLogin('adm.images.php');
-		$this->assertElementPresent('form');
-		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
-		$this->zbxTestClickWait('link='.$icon_name['name']);
-		$this->zbxTestTextPresent(['Name', 'Type', 'Upload', 'Image']);
-		$this->assertElementPresent('update');
-		$this->assertElementPresent('delete');
-		$this->assertElementPresent('cancel');
+		$this->zbxTestAssertElementPresentId('form');
+		$this->zbxTestDropdownSelectWait('imagetype', $image['imagetype'] == IMAGE_TYPE_ICON ? 'Icon' : 'Background');
+		$this->zbxTestClickLinkTextWait($image['name']);
+		$this->zbxTestCheckHeader('Images');
+		$this->zbxTestTextPresent(['Name', 'Upload', 'Image']);
+		$this->zbxTestAssertElementPresentId('update');
+		$this->zbxTestAssertElementPresentId('delete');
+		$this->zbxTestAssertElementPresentId('cancel');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Image updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
-		$newHashIconImages = DBhash($sqlIconImages);
-		$this->assertEquals($oldHashIconImages, $newHashIconImages, "Chuck Norris: no-change icon image update should not update data in table 'images'");
+		$this->assertEquals($old_image_hash, DBhash($sql_image));
 	}
 
-	/**
-	* @dataProvider allBgImages
-	*/
-	public function testPageAdministrationGeneralImages_BgImageSimpleUpdate($bgimage_name) {
-
-		$sqlBgImages = 'SELECT * FROM images WHERE imagetype=2 ORDER BY imageid limit 5';
-		$oldHashBgImages=DBhash($sqlBgImages);
-
-		$this->zbxTestLogin('adm.images.php');
-		$this->assertElementPresent('form');
-		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-		$this->zbxTestClickWait('link='.$bgimage_name['name']);
-		$this->zbxTestTextPresent(['Name', 'Type', 'Upload', 'Image']);
-		$this->assertElementPresent('update');
-		$this->assertElementPresent('delete');
-		$this->assertElementPresent('cancel');
-		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Image updated');
-
-		$newHashBgImages = DBhash($sqlBgImages);
-		$this->assertEquals($oldHashBgImages, $newHashBgImages, "Chuck Norris: no-change background image update should not update data in table 'images'");
-	}
 }

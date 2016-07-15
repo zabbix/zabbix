@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageMaps extends CWebTest {
-	// Returns all maps
 	public static function allMaps() {
 		return DBdata('select * from sysmaps');
 	}
@@ -33,14 +32,13 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 
-		$this->zbxTestTextPresent('Maps');
+		$this->zbxTestCheckHeader('Maps');
 
-		$this->zbxTestTextPresent('CONFIGURATION OF NETWORK MAPS');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
-		$this->zbxTestTextPresent(['Name', 'Width', 'Height', 'Edit']);
+		$this->zbxTestTextPresent(['Name', 'Width', 'Height', 'Actions']);
 		$this->zbxTestTextPresent([$map['name'], $map['width'], $map['height']]);
-		$this->zbxTestDropdownHasOptions('action', ['Delete selected', 'Export selected']);
+		$this->zbxTestTextPresent(['Delete', 'Export']);
 	}
 
 	/**
@@ -49,8 +47,6 @@ class testPageMaps extends CWebTest {
 	public function testPageMaps_SimpleEdit($map) {
 		$name = $map['name'];
 		$sysmapid = $map['sysmapid'];
-
-		$this->chooseOkOnNextConfirmation();
 
 		$sqlMap = "select * from sysmaps where name='$name' order by sysmapid";
 		$oldHashMap = DBhash($sqlMap);
@@ -63,19 +59,16 @@ class testPageMaps extends CWebTest {
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickLinkText($name);
 
-//		$this->waitForCondition("selenium.browserbot.getUserWindow().jQuery('img[name=sysmap]').attr('src') != 'images/general/tree/zero.gif'", 5000);
-
+		$this->zbxTestClickWait('edit');
+		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('sysmap_update');
-
-//		$this->waitForCondition("selenium.browserbot.getUserWindow().ZBX_SYSMAPS[0].map.saved == true", 3000);
-
-		$txt = $this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('Configuration of network maps');
+		$this->zbxTestTextPresent($name);
+		$this->zbxTestCheckHeader('Maps');
 
 		$this->assertEquals($oldHashMap, DBhash($sqlMap), "Chuck Norris: Map update changed data in table 'sysmaps'");
 		$this->assertEquals($oldHashElements, DBhash($sqlElements), "Chuck Norris: Map update changed data in table 'sysmaps_elements'");
@@ -90,8 +83,6 @@ class testPageMaps extends CWebTest {
 		$name = $map['name'];
 		$sysmapid = $map['sysmapid'];
 
-		$this->chooseOkOnNextConfirmation();
-
 		$sqlMap = "select * from sysmaps where name='$name' order by sysmapid";
 		$oldHashMap = DBhash($sqlMap);
 		$sqlElements = "select * from sysmaps_elements where sysmapid=$sysmapid order by selementid";
@@ -103,12 +94,12 @@ class testPageMaps extends CWebTest {
 
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->href_click("sysmaps.php?form=update&sysmapid=$sysmapid#form&sid=");
-		$this->wait();
+		$this->zbxTestClickXpathWait("//a[text()='".$name."']/../..//a[text()='Properties']");
+		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestTextPresent("Network map updated");
-		$this->zbxTestTextPresent("$name");
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Network map updated');
+		$this->zbxTestTextPresent($name);
 		$this->zbxTestTextPresent('Configuration of network maps');
 
 		$this->assertEquals($oldHashMap, DBhash($sqlMap), "Chuck Norris: Map update changed data in table 'sysmaps'");
@@ -125,15 +116,12 @@ class testPageMaps extends CWebTest {
 
 		DBsave_tables('sysmaps');
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('sysmaps.php');
 		$this->zbxTestCheckTitle('Configuration of network maps');
-		$this->zbxTestCheckboxSelect('maps['.$sysmapid.']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('maps_'.$sysmapid);
+		$this->zbxTestClickButton('map.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent('Network map deleted');
 
@@ -156,6 +144,7 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestClickWait('form');
 		$this->zbxTestTextPresent('Map');
+		$this->zbxTestCheckHeader('Network maps');
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestCheckTitle('Configuration of network maps');
 		$this->zbxTestTextPresent('Configuration of network maps');
