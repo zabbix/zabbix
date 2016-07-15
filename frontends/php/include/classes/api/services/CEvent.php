@@ -445,8 +445,25 @@ class CEvent extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if ($options['countOutput'] === null) {
-			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
+			if ($this->outputIsRequested('r_eventid', $options['output'])
+					|| $this->outputIsRequested('c_eventid', $options['output'])
+					|| $this->outputIsRequested('correlationid', $options['output'])) {
+				// Select fields from event_recovery table using LEFT JOIN.
 
+				if ($this->outputIsRequested('r_eventid', $options['output'])) {
+					$sqlParts['select']['r_eventid'] = 'er.r_eventid';
+				}
+				if ($this->outputIsRequested('c_eventid', $options['output'])) {
+					$sqlParts['select']['c_eventid'] = 'er.c_eventid';
+				}
+				if ($this->outputIsRequested('correlationid', $options['output'])) {
+					$sqlParts['select']['correlationid'] = 'er.correlationid';
+				}
+
+				$sqlParts['left_join'][] = ['from' => 'event_recovery er', 'on' => 'er.eventid=e.eventid'];
+			}
+
+			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
 				$sqlParts = $this->addQuerySelect('e.object', $sqlParts);
 				$sqlParts = $this->addQuerySelect('e.objectid', $sqlParts);
 			}
