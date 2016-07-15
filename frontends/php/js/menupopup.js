@@ -590,8 +590,6 @@ function getMenuPopupRefresh(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
- * @param string options['groupid']					group id
- * @param string options['hostid']					host id
  * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")

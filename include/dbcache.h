@@ -202,8 +202,10 @@ typedef struct _DC_TRIGGER
 
 	char			*error;
 	char			*new_error;
+	char			*correlation_tag;
 	zbx_timespec_t		timespec;
 	int			lastchange;
+	int			problem_count;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -212,6 +214,7 @@ typedef struct _DC_TRIGGER
 	unsigned char		new_value;
 	unsigned char		status;
 	unsigned char		recovery_mode;
+	unsigned char		correlation_mode;
 
 	zbx_vector_ptr_t	tags;
 }
@@ -408,8 +411,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
-void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange);
+void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 

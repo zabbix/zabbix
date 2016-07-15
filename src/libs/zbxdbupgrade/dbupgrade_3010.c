@@ -1158,6 +1158,173 @@ out:
 	return ret;
 }
 
+static int	DBpatch_3010027(void)
+{
+	const ZBX_FIELD	field = {"correlation_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010028(void)
+{
+	const ZBX_FIELD	field = {"correlation_tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010029(void)
+{
+	const ZBX_FIELD	field = {"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010030(void)
+{
+	const ZBX_FIELD	field = {"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010031(void)
+{
+	const ZBX_FIELD	field = {"r_eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010032(void)
+{
+	const ZBX_FIELD	field = {"r_clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010033(void)
+{
+	const ZBX_FIELD	field = {"r_ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("problem", &field);
+}
+
+static int	DBpatch_3010034(void)
+{
+	return DBcreate_index("problem", "problem_2", "r_clock", 0);
+}
+
+static int	DBpatch_3010035(void)
+{
+	const ZBX_FIELD	field = {"r_eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("problem", 2, &field);
+}
+
+static int	DBpatch_3010036(void)
+{
+	const ZBX_TABLE table =
+			{"problem_tag", "problemtagid", 0,
+				{
+					{"problemtagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_3010037(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_1", "eventid", 0);
+}
+
+static int	DBpatch_3010038(void)
+{
+	return DBcreate_index("problem_tag", "problem_tag_2", "tag,value", 0);
+}
+
+static int	DBpatch_3010039(void)
+{
+	const ZBX_FIELD	field = {"eventid", NULL, "problem", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("problem_tag", 1, &field);
+}
+
+static int	DBpatch_3010040(void)
+{
+	const ZBX_FIELD	field = {"problem_count", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("triggers", &field);
+}
+
+static int	DBpatch_3010041(void)
+{
+	DB_ROW		row;
+	DB_RESULT	result;
+	int		ret = FAIL, value, problem_count;
+	char		*sql = NULL;
+	size_t		sql_alloc = 4096, sql_offset = 0;
+
+	sql = zbx_malloc(NULL, sql_alloc);
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = DBselect("select t.triggerid,count(p.objectid) from triggers t"
+				" left join problem p on p.source=0"
+					" and p.object=0"
+					" and p.objectid=t.triggerid"
+				" group by t.triggerid");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		problem_count = atoi(row[1]);
+		value = (0 == problem_count ? 0 : 1);
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update triggers"
+					" set value=%d,"
+					"problem_count=%d"
+				" where triggerid=%s;\n",
+				value, problem_count, row[0]);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+			goto out;
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_3010042(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update config set ok_period=%d where ok_period>%d", SEC_PER_DAY, SEC_PER_DAY))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_3010043(void)
+{
+	if (ZBX_DB_OK <= DBexecute("update config set blink_period=%d where blink_period>%d", SEC_PER_DAY, SEC_PER_DAY))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(3010)
@@ -1191,5 +1358,22 @@ DBPATCH_ADD(3010023, 0, 1)
 DBPATCH_ADD(3010024, 0, 1)
 DBPATCH_ADD(3010025, 0, 1)
 DBPATCH_ADD(3010026, 0, 1)
+DBPATCH_ADD(3010027, 0, 1)
+DBPATCH_ADD(3010028, 0, 1)
+DBPATCH_ADD(3010029, 0, 1)
+DBPATCH_ADD(3010030, 0, 1)
+DBPATCH_ADD(3010031, 0, 1)
+DBPATCH_ADD(3010032, 0, 1)
+DBPATCH_ADD(3010033, 0, 1)
+DBPATCH_ADD(3010034, 0, 1)
+DBPATCH_ADD(3010035, 0, 1)
+DBPATCH_ADD(3010036, 0, 1)
+DBPATCH_ADD(3010037, 0, 1)
+DBPATCH_ADD(3010038, 0, 1)
+DBPATCH_ADD(3010039, 0, 1)
+DBPATCH_ADD(3010040, 0, 1)
+DBPATCH_ADD(3010041, 0, 1)
+DBPATCH_ADD(3010042, 0, 1)
+DBPATCH_ADD(3010043, 0, 1)
 
 DBPATCH_END()
