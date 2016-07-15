@@ -1642,7 +1642,7 @@ static int	flush_events()
 int	process_events()
 {
 	const char	*__function_name = "process_events";
-	int		processed_num;
+	int		processed_num = 0;
 
 	initialize_events();
 
@@ -1685,7 +1685,7 @@ int	process_events()
 int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
 {
 	const char	*__function_name = "process_trigger_events";
-	size_t		i, processed_num;
+	size_t		i, processed_num = 0;
 	zbx_uint64_t	eventid;
 
 	initialize_events();
