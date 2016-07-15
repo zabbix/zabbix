@@ -113,41 +113,21 @@ $filterForm
 $topTriggers->addItem($filterForm);
 
 // table
-$table = (new CTableInfo())
-	->setHeader([
-		_('Host'),
-		_('Trigger'),
-		_('Severity'),
-		_('Number of status changes')
-	]);
+$table = (new CTableInfo())->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of status changes')]);
 
 foreach ($this->data['triggers'] as $trigger) {
-	foreach ($trigger['hosts'] as $host) {
-		if ($host['status'] == HOST_STATUS_MONITORED) {
-			// Pass a monitored 'hostid' and corresponding first 'groupid' to menu pop-up "Events" link.
-			$trigger['hostid'] = $host['hostid'];
-			$trigger['groupid'] = $data['monitored_hosts'][$trigger['hostid']]['groups'][0]['groupid'];
-			break;
-		}
-		else {
-			// Unmonitored will have disabled "Events" link and there is no 'groupid' or 'hostid'.
-			$trigger['hostid'] = 0;
-			$trigger['groupid'] = 0;
-		}
-	}
-
 	$hostId = $trigger['hosts'][0]['hostid'];
 
 	$hostName = (new CSpan($trigger['hosts'][0]['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]))
 		->addClass(ZBX_STYLE_LINK_ACTION);
 	if ($this->data['hosts'][$hostId]['status'] == HOST_STATUS_NOT_MONITORED) {
 		$hostName->addClass(ZBX_STYLE_RED);
 	}
-	$hostName->setMenuPopup(CMenuPopupHelper::getHost($this->data['hosts'][$hostId], $this->data['scripts'][$hostId]));
 
 	$triggerDescription = (new CSpan($trigger['description']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger))
+		->addClass(ZBX_STYLE_LINK_ACTION);
 
 	$table->addRow([
 		$hostName,

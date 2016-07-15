@@ -79,17 +79,15 @@ $statusChangeDays = (new CNumericBox('status_change_days', $filter['statusChange
 if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
-$statusChangeDays->addStyle('vertical-align: middle;');
 
 $column1->addRow(_('Age less than'), [
 	(new CCheckBox('status_change'))
 		->setChecked($filter['statusChange'] == 1)
-		->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()')
-		->addStyle('vertical-align: middle;'),
+		->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()'),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$statusChangeDays,
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CSpan(_('days')))->addStyle('vertical-align: middle;')
+	_('days')
 ]);
 
 // name

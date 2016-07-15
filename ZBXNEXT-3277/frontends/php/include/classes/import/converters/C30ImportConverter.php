@@ -89,6 +89,8 @@ class C30ImportConverter extends CConverter {
 		foreach ($triggers as &$trigger) {
 			$trigger['recovery_mode'] = ZBX_RECOVERY_MODE_EXPRESSION;
 			$trigger['recovery_expression'] = '';
+			$trigger['correlation_mode'] = ZBX_TRIGGER_CORRELATION_NONE;
+			$trigger['correlation_tag'] = '';
 			$trigger['tags'] = [];
 
 			if (array_key_exists('dependencies', $trigger)) {

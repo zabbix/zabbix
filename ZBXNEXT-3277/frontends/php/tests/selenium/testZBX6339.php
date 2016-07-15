@@ -52,22 +52,22 @@ class testZBX6339 extends CWebTest {
 
 		$host = $screen['host_name'];
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('templates.php');
-		$this->zbxTestClickWait('link='.$host);
+		$this->zbxTestClickLinkText($host);
 
-		$this->zbxTestClickWait("//div[@class='w']//a[text()='Screens']");
+		$this->zbxTestCheckHeader('Templates');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//ul[@class='object-group']//a[text()='Screens']"));
+		$this->zbxTestClickXpath("//ul[@class='object-group']//a[text()='Screens']");
 		$this->zbxTestCheckTitle('Configuration of screens');
 
-		$this->zbxTestCheckboxSelect('screens['.$screenid.']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckboxSelect('screens_'.$screenid);
+		$this->zbxTestClickButton('screen.massdelete');
 
-		$this->getConfirmation();
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestTextPresent(['Screen deleted', 'CONFIGURATION OF SCREENS', $host]);
+		$this->zbxTestCheckHeader('Screens');
+		$this->zbxTestTextPresent(['Screen deleted', $host]);
 	}
 
 	/**

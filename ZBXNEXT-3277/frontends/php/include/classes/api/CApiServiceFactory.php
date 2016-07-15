@@ -47,6 +47,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'hostprototype' => 'CHostPrototype',
 			'history' => 'CHistory',
 			'hostinterface' => 'CHostInterface',
+			'httptest' => 'CHttpTest',
 			'image' => 'CImage',
 			'iconmap' => 'CIconMap',
 			'item' => 'CItem',
@@ -54,6 +55,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'maintenance' => 'CMaintenance',
 			'map' => 'CMap',
 			'mediatype' => 'CMediatype',
+			'problem' => 'CProblem',
 			'proxy' => 'CProxy',
 			'service' => 'CService',
 			'screen' => 'CScreen',
@@ -69,8 +71,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'usergroup' => 'CUserGroup',
 			'usermacro' => 'CUserMacro',
 			'usermedia' => 'CUserMedia',
-			'valuemap' => 'CValueMap',
-			'httptest' => 'CHttpTest'
+			'valuemap' => 'CValueMap'
 		], $objects));
 	}
 }

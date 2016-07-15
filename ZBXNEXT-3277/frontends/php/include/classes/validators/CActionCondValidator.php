@@ -169,15 +169,6 @@ class CActionCondValidator extends CValidator {
 				}
 				break;
 
-			case CONDITION_TYPE_TRIGGER_VALUE:
-				if (zbx_empty($conditionValue)) {
-					$this->setError(_('Empty action condition.'));
-				}
-				elseif (!$triggerValueValidator->validate($conditionValue)) {
-					$this->setError(_('Incorrect action condition trigger value.'));
-				}
-				break;
-
 			case CONDITION_TYPE_EVENT_TYPE:
 				if (zbx_empty($conditionValue)) {
 					$this->setError(_('Empty action condition.'));
