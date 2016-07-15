@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.1.0');
 define('ZABBIX_API_VERSION',	'3.1.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3010043);
+define('ZABBIX_DB_VERSION',		3010067);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -229,6 +229,22 @@ define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
 define('CONDITION_OPERATOR_REGEXP',		8);
+
+// correlation statuses
+define('ZBX_CORRELATION_ENABLED',		0);
+define('ZBX_CORRELATION_DISABLED',		1);
+
+// correlation condition types
+define('ZBX_CORR_CONDITION_OLD_EVENT_TAG',			0);
+define('ZBX_CORR_CONDITION_NEW_EVENT_TAG',			1);
+define('ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP',	2);
+define('ZBX_CORR_CONDITION_EVENT_TAG_PAIR',			3);
+define('ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE',	4);
+define('ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE',	5);
+
+// correlation operation types
+define('ZBX_CORR_OPERATION_CLOSE_OLD',	0);
+define('ZBX_CORR_OPERATION_CLOSE_NEW',	1);
 
 // event type action condition values
 define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);

@@ -94,13 +94,22 @@ $event = reset($events);
  */
 $config = select_config();
 
+$correlation = [];
+if ($event['correlationid'] != 0) {
+	$correlation = API::Correlation()->get([
+		'output' => ['correlationid', 'name'],
+		'correlationids' => [$event['correlationid']]
+	]);
+	$correlation = $correlation[0];
+}
+
 $eventTab = (new CTable())
 	->addRow([
 		new CDiv([
 			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
 				->setHeader(_('Event source details')),
 			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
-				make_event_details($event, $trigger,
+				make_event_details($event, $correlation, $trigger,
 					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
 				)
 			))->setHeader(_('Event details'))
