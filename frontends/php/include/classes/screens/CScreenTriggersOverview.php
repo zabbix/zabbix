@@ -66,15 +66,6 @@ class CScreenTriggersOverview extends CScreenBase {
 
 		$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
-		/*
-		 * Each screen cell with "Triggers overview" depends on one specific group which in this case is 'resourceid'.
-		 * Pass it as 'groupid' to menu pop-up "Events" link.
-		 */
-		foreach ($triggers as &$trigger) {
-			$trigger['groupid'] = $this->screenitem['resourceid'];
-		}
-		unset($trigger);
-
 		$groups = API::HostGroup()->get([
 			'output' => ['name'],
 			'groupids' => [$this->screenitem['resourceid']]

@@ -20,7 +20,11 @@
 
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
-class testTriggerDependenciesFromHost extends CWebTest {
+class testTriggerDependencies extends CWebTest {
+
+	public function testTriggerDependenciesFromHost_backup() {
+		DBsave_tables('trigger_depends');
+	}
 
 	/**
 	* @dataProvider testTriggerDependenciesFromHost_SimpleTestProvider
@@ -29,19 +33,16 @@ class testTriggerDependenciesFromHost extends CWebTest {
 
 		$this->zbxTestLogin('triggers.php?groupid=1&hostid='.$hostId);
 
-		$this->zbxTestClickWait("link=/etc/inetd.conf has been changed on server {HOST.NAME}");
-		$this->zbxTestClick("id=tab_dependenciesTab");
-		$this->zbxTestClick("id=bnt1");
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->select("id=hostid", "label=Template_Linux");
-		$this->wait();
-		$this->zbxTestClick("triggers_'10015'");
-		$this->zbxTestClick("select");
-		$this->selectWindow("Configuration of triggers");
-		$this->wait();
-		$this->zbxTestTextPresent('Template_Linux: /boot/vmlinuz has been changed on server {HOST.NAME}');
-		$this->zbxTestClickWait("save");
+		$this->zbxTestClickLinkText('{HOST.NAME} has just been restarted');
+		$this->zbxTestClickWait('tab_dependenciesTab');
+		$this->zbxTestClickWait('bnt1');
+		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
+		$this->zbxTestDropdownSelect('hostid', 'Template OS FreeBSD');
+		$this->zbxTestClickLinkText('/etc/passwd has been changed on Template OS FreeBSD');
+		$this->webDriver->switchTo()->window('');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
+		$this->zbxTestTextPresent('Template OS FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
+		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent($expected);
 
 
@@ -49,8 +50,12 @@ class testTriggerDependenciesFromHost extends CWebTest {
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
 		return [
-			['10054', 'Cannot add dependency from template to host'],
-			['10001', 'Trigger updated']
+			['10001', 'Cannot add dependency from a host to a template.'],
+			['10081', 'Trigger updated']
 		];
+	}
+
+	public function testTriggerDependenciesFromHost_restore() {
+		DBrestore_tables('trigger_depends');
 	}
 }

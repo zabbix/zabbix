@@ -79,9 +79,9 @@ struct	_DC_TRIGGER;
 #else
 #	define TRIGGER_COMMENTS_LEN	65535
 #endif
-
 #define TRIGGER_TAG_LEN			255
 #define TRIGGER_TAG_VALUE_LEN		255
+#define TRIGGER_CORRELATION_TAG_LEN	TRIGGER_TAG_LEN
 
 #define GROUP_NAME_LEN			64
 
@@ -265,9 +265,11 @@ typedef struct
 	char		*recovery_expression;
 	char		*url;
 	char		*comments;
+	char		*correlation_tag;
 	unsigned char	priority;
 	unsigned char	type;
 	unsigned char	recovery_mode;
+	unsigned char	correlation_mode;
 }
 DB_TRIGGER;
 
@@ -284,6 +286,10 @@ typedef struct
 	int			ns;
 
 	zbx_vector_ptr_t	tags;
+
+#define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
+#define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
+	zbx_uint64_t		flags;
 }
 DB_EVENT;
 
@@ -480,8 +486,33 @@ typedef struct
 }
 ZBX_GRAPH_ITEMS;
 
-void	process_triggers(zbx_vector_ptr_t *triggers);
-int	process_trigger(char **sql, size_t *sql_alloc, size_t *sql_offset, const struct _DC_TRIGGER *trigger);
+typedef struct
+{
+	zbx_uint64_t	triggerid;
+	unsigned char	value;
+	unsigned char	state;
+	int		lastchange;
+	int		problem_count;
+	char		*error;
+
+#define ZBX_FLAGS_TRIGGER_DIFF_UNSET			0x0000
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE		0x0001
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE	0x0002
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE		0x0004
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR		0x0008
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT	0x0010
+#define ZBX_FLAGS_TRIGGER_DIFF_UPDATE										\
+		(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE | 		\
+		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR |			\
+		ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT)
+	zbx_uint64_t			flags;
+}
+zbx_trigger_diff_t;
+
+void	zbx_process_triggers(zbx_vector_ptr_t *triggers, zbx_vector_ptr_t *diffs);
+int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs);
+void	zbx_save_trigger_changes(const zbx_vector_ptr_t *diffs);
+void	zbx_trigger_diff_free(zbx_trigger_diff_t *diff);
 
 int	DBupdate_item_status_to_notsupported(DB_ITEM *item, int clock, const char *error);
 int	DBget_row_count(const char *table_name);

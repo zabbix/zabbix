@@ -74,6 +74,16 @@ $triggersFormList->addRow(_('Name'),
 		->setAttribute('autofocus', 'autofocus')
 );
 
+if ($discovered_trigger) {
+	$triggersFormList->addVar('priority', (int) $data['priority']);
+	$severity = new CSeverity(['name' => 'priority_names', 'value' => (int) $data['priority']], false);
+}
+else {
+	$severity = new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]);
+}
+
+$triggersFormList->addRow(_('Severity'), $severity);
+
 // Append expression to form list.
 if ($data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $data['expression']);
@@ -455,12 +465,19 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 
-// Append problem event generation mode to form list.
-if ($discovered_trigger) {
-	$triggersFormList->addVar('type', (int) $data['type']);
+if ($readonly) {
+	$triggersFormList->addVar('type', (int) $data['type'])
+		->addVar('correlation_mode', (int) $data['correlation_mode']);
+
 	$problem_event_generation_mode = (new CRadioButtonList('type_name', (int) $data['type']))
 		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
+		->setModern(true)
+		->setEnabled(false);
+
+	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
+		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 		->setModern(true)
 		->setEnabled(false);
 }
@@ -469,26 +486,18 @@ else {
 		->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 		->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 		->setModern(true);
+
+	$ok_event_closes = (new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+		->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
+		->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
+		->setModern(true);
 }
 
-$triggersFormList
-	->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode)
-	->addRow(_('Description'),
-		(new CTextArea('comments', $data['comments']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($discovered_trigger)
-	)
-	->addRow(_('URL'), (new CTextBox('url', $data['url'], $discovered_trigger))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-
-if ($discovered_trigger) {
-	$triggersFormList->addVar('priority', (int) $data['priority']);
-	$severity = new CSeverity(['name' => 'priority_names', 'value' => (int) $data['priority']], false);
-}
-else {
-	$severity = new CSeverity(['name' => 'priority', 'value' => (int) $data['priority']]);
-}
-
-$triggersFormList->addRow(_('Severity'), $severity);
+$triggersFormList->addRow(_('PROBLEM event generation mode'), $problem_event_generation_mode)
+	->addRow(_('OK event closes'), $ok_event_closes)
+	->addRow(_('Tag for matching'), (new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // Append tags to form list.
 $tags_table = (new CTable())->setId('tbl_tags');
@@ -535,7 +544,15 @@ if (empty($data['triggerid']) && empty($data['form_refresh'])) {
 else {
 	$status = ($data['status'] == 0);
 }
-$triggersFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
+
+$triggersFormList
+	->addRow(_('URL'), (new CTextBox('url', $data['url'], $discovered_trigger))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Description'),
+		(new CTextArea('comments', $data['comments']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($discovered_trigger)
+	)
+	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // Append tabs to form.
 $triggersTab = new CTabView();

@@ -1,5 +1,103 @@
 <?php
 return [
+	'users' => [
+		'key' => 'userid',
+		'fields' => [
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'alias' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 100,
+				'default' => '',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 100,
+				'default' => '',
+			],
+			'surname' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 100,
+				'default' => '',
+			],
+			'passwd' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '',
+			],
+			'url' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'autologin' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'autologout' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '900',
+			],
+			'lang' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 5,
+				'default' => 'en_GB',
+			],
+			'refresh' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '30',
+			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'theme' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => 'default',
+			],
+			'attempt_failed' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			],
+			'attempt_ip' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 39,
+				'default' => '',
+			],
+			'attempt_clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+			],
+			'rows_per_page' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => 50,
+			],
+		],
+	],
 	'maintenances' => [
 		'key' => 'maintenanceid',
 		'fields' => [
@@ -1643,104 +1741,6 @@ return [
 			],
 		],
 	],
-	'users' => [
-		'key' => 'userid',
-		'fields' => [
-			'userid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-			],
-			'alias' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
-				'default' => '',
-			],
-			'name' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
-				'default' => '',
-			],
-			'surname' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 100,
-				'default' => '',
-			],
-			'passwd' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => '',
-			],
-			'url' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => '',
-			],
-			'autologin' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-			'autologout' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '900',
-			],
-			'lang' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 5,
-				'default' => 'en_GB',
-			],
-			'refresh' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '30',
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1',
-			],
-			'theme' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
-				'default' => 'default',
-			],
-			'attempt_failed' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-			],
-			'attempt_ip' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 39,
-				'default' => '',
-			],
-			'attempt_clock' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-			],
-			'rows_per_page' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => 50,
-			],
-		],
-	],
 	'usrgrp' => [
 		'key' => 'usrgrpid',
 		'fields' => [
@@ -2794,6 +2794,24 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => '',
+			],
+			'correlation_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'correlation_tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'problem_count' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
@@ -6242,6 +6260,37 @@ return [
 				'length' => 20,
 				'default' => '0',
 			],
+			'clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ns' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'r_eventid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'events',
+				'ref_field' => 'eventid',
+			],
+			'r_clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'r_ns' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'event_recovery' => [
@@ -6260,6 +6309,35 @@ return [
 				'length' => 20,
 				'ref_table' => 'events',
 				'ref_field' => 'eventid',
+			],
+		],
+	],
+	'problem_tag' => [
+		'key' => 'problemtagid',
+		'fields' => [
+			'problemtagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'eventid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'problem',
+				'ref_field' => 'eventid',
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
 			],
 		],
 	],
