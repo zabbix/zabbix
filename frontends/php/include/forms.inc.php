@@ -1499,6 +1499,8 @@ function getTriggerFormData(array $data) {
 			$data['description'] = $trigger['description'];
 			$data['type'] = $trigger['type'];
 			$data['recovery_mode'] = $trigger['recovery_mode'];
+			$data['correlation_mode'] = $trigger['correlation_mode'];
+			$data['correlation_tag'] = $trigger['correlation_tag'];
 			$data['priority'] = $trigger['priority'];
 			$data['status'] = $trigger['status'];
 			$data['comments'] = $trigger['comments'];

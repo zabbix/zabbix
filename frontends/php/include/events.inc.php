@@ -355,6 +355,8 @@ function make_popup_eventlist($trigger, $backurl) {
  * @param mixed			$event['acknowledges']
  * @param string		$backurl  add url param to link with current page file name
  *
+ * @deprecated use makeEventsAcknowledges instead
+ *
  * @return CLink
  */
 function getEventAckState($event, $backurl) {
@@ -380,6 +382,125 @@ function getEventAckState($event, $backurl) {
 	}
 
 	return $ack;
+}
+
+/**
+ * Create element with event acknowledges info.
+ *
+ * @param array  $events
+ * @param int    $events[]['eventid']
+ * @param int    $events[]['objectid']
+ * @param array  $events[]['acknowledges']
+ * @param string $events[]['acknowledges'][]['userid']
+ * @param int    $events[]['acknowledges'][]['clock']
+ * @param string $events[]['acknowledges'][]['message']
+ * @param string $backurl  add url param to link with current page file name
+ *
+ * @return array
+ */
+function makeEventsAcknowledges($events, $backurl) {
+	$db_users = [];
+	$userids = [];
+
+	foreach ($events as &$event) {
+		foreach ($event['acknowledges'] as $acknowledge) {
+			$userids[$acknowledge['userid']] = true;
+		}
+		CArrayHelper::sort($event['acknowledges'], [['field' => 'clock', 'order' => ZBX_SORT_DOWN]]);
+	}
+	unset($event);
+
+	if ($userids) {
+		$db_users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => array_keys($userids),
+			'preservekeys' => true
+		]);
+	}
+
+	$acknowledges = [];
+
+	foreach ($events as $event) {
+		$link = 'zabbix.php?action=acknowledge.edit&eventids[]='.$event['eventid'].'&backurl='.urlencode($backurl);
+
+		if ($event['acknowledges']) {
+			$hint = makeAcknowledgesTable(array_slice($event['acknowledges'], 0, ZBX_WIDGET_ROWS), $db_users);
+			$ack = (new CLink(_('Yes'), $link))
+				->setHint($hint, '', false)
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREEN);
+			$acknowledges[$event['eventid']] = [$ack, CViewHelper::showNum(count($event['acknowledges']))];
+		}
+		else {
+			$acknowledges[$event['eventid']] = (new CLink(_('No'), $link))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_RED);
+		}
+	}
+
+	return $acknowledges;
+}
+
+/**
+ * Get acknowledgement table.
+ *
+ * @param array  $acknowledges
+ * @param string $acknowledges[]['userid']
+ * @param int    $acknowledges[]['clock']
+ * @param string $acknowledges[]['message']
+ *
+ * @return CTableInfo
+ */
+function makeAcknowledgesTable($acknowledges, $users) {
+	$table = (new CTableInfo())->setHeader([_('Time'), _('User'), _('Message')]);
+
+	foreach ($acknowledges as $acknowledge) {
+		$table->addRow([
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
+			array_key_exists($acknowledge['userid'], $users)
+				? getUserFullname($users[$acknowledge['userid']])
+				: _('Inaccessible user'),
+			zbx_nl2br($acknowledge['message'])
+		]);
+	}
+
+	return $table;
+}
+
+/**
+ * Create element with event tags.
+ *
+ * @param array  $events
+ * @param string $events[]['eventid']
+ * @param array  $events[]['tags']
+ * @param string $events[]['tags']['tag']
+ * @param string $events[]['tags']['value']
+ *
+ * @return CTableInfo
+ */
+function makeEventsTags($events) {
+	$tags = [];
+
+	foreach ($events as $event) {
+		CArrayHelper::sort($event['tags'], ['tag', 'value']);
+
+		$tags[$event['eventid']] = [];
+		$tags_count = 0;
+
+		foreach ($event['tags'] as $tag) {
+			if ($tags_count++ == EVENTS_LIST_TAGS_COUNT) {
+				$tags[$event['eventid']][] = '&hellip;';
+				break;
+			}
+			else {
+				$tags[$event['eventid']][] = (new CSpan($tag['tag'].($tag['value'] === '' ? '' : ': '.$tag['value'])))
+					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+					->addClass(ZBX_STYLE_TAG);
+			}
+		}
+	}
+
+	return $tags;
 }
 
 function getLastEvents($options) {

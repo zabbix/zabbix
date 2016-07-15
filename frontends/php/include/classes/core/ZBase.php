@@ -153,7 +153,7 @@ class ZBase {
 			$router = new CRouter(getRequest('action'));
 			if ($router->getController() !== null) {
 				CProfiler::getInstance()->start();
-				$this->processRequest();
+				$this->processRequest($router);
 				exit;
 			}
 		}
@@ -368,9 +368,7 @@ class ZBase {
 	/**
 	 * Process request and generate response. Main entry for all processing.
 	 */
-	private function processRequest() {
-		$router = new CRouter(getRequest('action'));
-
+	private function processRequest($router) {
 		$controller = $router->getController();
 
 		$controller = new $controller();

@@ -78,12 +78,12 @@ class CArrayHelper {
 	 * Renames array elements keys according to given map.
 	 *
 	 * @param array $array
-	 * @param array $fieldMap
+	 * @param array $field_map
 	 *
 	 * @return array
 	 */
-	public static function renameKeys(array $array, array $fieldMap) {
-		foreach ($fieldMap as $old_key => $new_key) {
+	public static function renameKeys(array $array, array $field_map) {
+		foreach ($field_map as $old_key => $new_key) {
 			if (array_key_exists($old_key, $array)) {
 				$array[$new_key] = $array[$old_key];
 				unset($array[$old_key]);
@@ -92,6 +92,27 @@ class CArrayHelper {
 
 		return $array;
 	}
+
+	/**
+	 * Renames keys according to given map for given array of the objects.
+	 *
+	 * @param array $array
+	 * @param array $field_map
+	 *
+	 * @return array
+	 */
+	public static function renameObjectsKeys(array $array, array $field_map) {
+		foreach ($array as &$object) {
+			foreach ($field_map as $old_key => $new_key) {
+				$object[$new_key] = $object[$old_key];
+				unset($object[$old_key]);
+			}
+		}
+		unset($object);
+
+		return $array;
+	}
+
 	/**
 	 * Sort array by multiple fields.
 	 *
