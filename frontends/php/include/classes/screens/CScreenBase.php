@@ -255,7 +255,7 @@ class CScreenBase {
 					'profileIdx'		=> false,
 					'profileIdx2'		=> false,
 					'updateProfile'		=> false,
-					'timeline'			=> false,
+					'timeline'			=> true,
 					'page'				=> true
 				];
 				break;

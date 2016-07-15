@@ -68,6 +68,11 @@ jQuery(function($) {
 					ajaxParams = ['mode', 'groupid', 'hostid', 'resourcetype', 'data', 'page'];
 					break;
 
+				case 24:
+					// SCREEN_RESOURCE_PROBLEM
+					ajaxParams = ['mode', 'resourcetype', 'data', 'page'];
+					break;
+
 				default:
 					ajaxParams = ['mode', 'screenid', 'groupid', 'hostid', 'pageFile', 'profileIdx', 'profileIdx2',
 						'updateProfile', 'screenitemid'

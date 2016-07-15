@@ -41,6 +41,25 @@ class CScreenProblem extends CScreenBase {
 		parent::__construct($options);
 
 		$this->data = array_key_exists('data', $options) ? $options['data'] : null;
+
+		if (!array_key_exists('groupids', $this->data['filter'])) {
+			$this->data['filter']['groupids'] = [];
+		}
+		if (!array_key_exists('groups', $this->data['filter'])) {
+			$this->data['filter']['groups'] = [];
+		}
+		if (!array_key_exists('hostids', $this->data['filter'])) {
+			$this->data['filter']['hostids'] = [];
+		}
+		if (!array_key_exists('hosts', $this->data['filter'])) {
+			$this->data['filter']['hosts'] = [];
+		}
+		if (!array_key_exists('inventory', $this->data['filter'])) {
+			$this->data['filter']['inventory'] = [];
+		}
+		if (!array_key_exists('tags', $this->data['filter'])) {
+			$this->data['filter']['tags'] = [];
+		}
 	}
 
 	/**

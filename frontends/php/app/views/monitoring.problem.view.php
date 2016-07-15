@@ -204,11 +204,11 @@ $filter_column2
 			'resourcetype' => SCREEN_RESOURCE_PROBLEM,
 			'mode' => SCREEN_MODE_JS,
 			'dataId' => 'problem',
+			'page' => $data['page'],
 			'data' => [
 				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
 				'sortorder' => $data['sortorder'],
-				'page' => $data['page'],
 				'filter' => $data['filter']
 			]
 		])->get()
