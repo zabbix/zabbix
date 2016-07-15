@@ -47,6 +47,12 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 					'sub_pages' => ['dashconf.php']
 				],
 				[
+					'url' => 'zabbix.php',
+					'action' => 'problem.view',
+					'active_if' => ['problem.view'],
+					'label' => _('Problems')
+				],
+				[
 					'url' => 'overview.php',
 					'label' => _('Overview')
 				],
@@ -227,6 +233,11 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				[
 					'url' => 'actionconf.php',
 					'label' => _('Actions')
+				],
+				[
+					'user_type' => USER_TYPE_SUPER_ADMIN,
+					'url' => 'correlation.php',
+					'label' => _('Event correlation')
 				],
 				[
 					'url' => 'discoveryconf.php',

@@ -140,7 +140,7 @@ class CScreenBase {
 	 *
 	 * @var array
 	 */
-	public $required_parameters;
+	private $required_parameters;
 
 	/**
 	 * Init screen data.
@@ -240,6 +240,22 @@ class CScreenBase {
 					'profileIdx2'		=> false,
 					'updateProfile'		=> false,
 					'timeline'			=> false,
+					'page'				=> true
+				];
+				break;
+
+			case SCREEN_RESOURCE_PROBLEM:
+				$this->required_parameters += [
+					'isTemplatedScreen'	=> false,
+					'screenid'			=> false,
+					'action'			=> false,
+					'groupid'			=> false,
+					'hostid'			=> false,
+					'pageFile'			=> false,
+					'profileIdx'		=> false,
+					'profileIdx2'		=> false,
+					'updateProfile'		=> false,
+					'timeline'			=> true,
 					'page'				=> true
 				];
 				break;
