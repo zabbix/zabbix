@@ -299,6 +299,7 @@ sass/img_source/icons-sprite.ai -text
 sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/touch-icon-192x192.png -text svneol=unset#image/png
+src/libs/zbxdbhigh/trigger.c -text
 src/libs/zbxserver/macrofunc.c -text
 src/libs/zbxserver/macrofunc.h -text
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text svneol=unset#application/java-archive

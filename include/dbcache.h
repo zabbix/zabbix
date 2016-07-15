@@ -202,8 +202,10 @@ typedef struct _DC_TRIGGER
 
 	char			*error;
 	char			*new_error;
+	char			*correlation_tag;
 	zbx_timespec_t		timespec;
 	int			lastchange;
+	int			problem_count;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -212,6 +214,7 @@ typedef struct _DC_TRIGGER
 	unsigned char		new_value;
 	unsigned char		status;
 	unsigned char		recovery_mode;
+	unsigned char		correlation_mode;
 
 	zbx_vector_ptr_t	tags;
 }
@@ -308,6 +311,68 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		0x00000008
 #define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		0x00000010
 #define ZBX_CONFIG_FLAGS_HOUSEKEEPER			0x00000020
+
+typedef struct
+{
+	char	*tag;
+}
+zbx_corr_condition_tag_t;
+
+typedef struct
+{
+	char		*tag;
+	char		*value;
+	unsigned char	op;
+}
+zbx_corr_condition_tag_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	groupid;
+	unsigned char	op;
+}
+zbx_corr_condition_group_t;
+
+typedef struct
+{
+	char	*oldtag;
+	char	*newtag;
+}
+zbx_corr_condition_tag_pair_t;
+
+typedef union
+{
+	zbx_corr_condition_tag_t	tag;
+	zbx_corr_condition_tag_value_t	tag_value;
+	zbx_corr_condition_group_t	group;
+	zbx_corr_condition_tag_pair_t	tag_pair;
+}
+zbx_corr_condition_data_t;
+
+typedef struct
+{
+	int				type;
+	zbx_corr_condition_data_t	data;
+}
+zbx_corr_condition_t;
+
+typedef struct
+{
+	unsigned char	type;
+}
+zbx_corr_operation_t;
+
+typedef struct
+{
+	zbx_uint64_t		correlationid;
+	char			*name;
+	char			*formula;
+	unsigned char		evaltype;
+
+	zbx_vector_ptr_t	conditions;
+	zbx_vector_ptr_t	operations;
+}
+zbx_correlation_t;
 
 typedef struct
 {
@@ -408,8 +473,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
-void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange);
+void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
@@ -488,6 +552,8 @@ void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
 void	zbx_set_availability_diff_ts(int ts);
+
+void zbx_dc_correlation_get_rules(zbx_vector_ptr_t *rules, int *sync_ts);
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1
