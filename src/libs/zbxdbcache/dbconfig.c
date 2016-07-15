@@ -98,7 +98,7 @@ typedef struct
 	unsigned char		status;
 	unsigned char		functional;		/* see TRIGGER_FUNCTIONAL_* defines */
 	unsigned char		recovery_mode;		/* TRIGGER_RECOVERY_MODE_* defines  */
-	unsigned char		correlation_mode;	/* ZBX_TRIGGER_CORRELATION_NONE_* defines */
+	unsigned char		correlation_mode;	/* ZBX_TRIGGER_CORRELATION_* defines */
 
 	zbx_vector_ptr_t	tags;
 }
