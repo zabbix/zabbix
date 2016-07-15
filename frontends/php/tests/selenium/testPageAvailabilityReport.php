@@ -24,7 +24,7 @@ class testPageAvailabilityReport extends CWebTest {
 	public function testPageAvailabilityReport_ByHost_CheckLayout() {
 		$this->zbxTestLogin('report2.php?config=0');
 		$this->zbxTestCheckTitle('Availability report');
-		$this->zbxTestTextPresent('AVAILABILITY REPORT');
+		$this->zbxTestCheckHeader('Availability report');
 		$this->zbxTestTextPresent('Mode');
 		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent(['Host', 'Name', 'Problems', 'Ok', 'Graph']);
@@ -34,13 +34,13 @@ class testPageAvailabilityReport extends CWebTest {
 	public function testPageAvailabilityReport_ByHost_NoHostNames() {
 		$this->zbxTestLogin('report2.php?config=0');
 		$this->zbxTestCheckTitle('Availability report');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 
 	public function testPageAvailabilityReport_ByTriggerTemplate_CheckLayout() {
 		$this->zbxTestLogin('report2.php?config=1');
 		$this->zbxTestCheckTitle('Availability report');
-		$this->zbxTestTextPresent('AVAILABILITY REPORT');
+		$this->zbxTestCheckHeader('Availability report');
 		$this->zbxTestTextPresent('Mode');
 		$this->zbxTestTextPresent('Filter');
 		$this->zbxTestTextPresent(['Host', 'Name', 'Problems', 'Ok', 'Graph']);
@@ -49,6 +49,6 @@ class testPageAvailabilityReport extends CWebTest {
 // Check that no real host or template names displayed
 	public function testPageAvailabilityReport_ByTriggerTemplate_NoHostNames() {
 		$this->zbxTestLogin('report2.php?config=1');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }
