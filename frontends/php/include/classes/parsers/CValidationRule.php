@@ -125,7 +125,7 @@ class CValidationRule {
 	 * 'fatal' => true
 	 */
 	private function parseFatal($buffer, &$pos, &$rule) {
-		if (0 != strncmp(substr($buffer, $pos), 'fatal', 5)) {
+		if (strncmp(substr($buffer, $pos), 'fatal', 5) != 0) {
 			return false;
 		}
 
@@ -141,7 +141,7 @@ class CValidationRule {
 	 * 'string' => true
 	 */
 	private function parseString($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'string', 6)) {
+		if (strncmp(substr($buffer, $pos), 'string', 6) != 0) {
 			return false;
 		}
 
@@ -157,7 +157,7 @@ class CValidationRule {
 	 * 'required' => true
 	 */
 	private function parseRequired($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'required', 8)) {
+		if (strncmp(substr($buffer, $pos), 'required', 8) != 0) {
 			return false;
 		}
 
@@ -173,7 +173,7 @@ class CValidationRule {
 	 * 'not_empty' => true
 	 */
 	private function parseNotEmpty($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'not_empty', 9)) {
+		if (strncmp(substr($buffer, $pos), 'not_empty', 9) != 0) {
 			return false;
 		}
 
@@ -189,7 +189,7 @@ class CValidationRule {
 	 * 'json' => true
 	 */
 	private function parseJson($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'json', 4)) {
+		if (strncmp(substr($buffer, $pos), 'json', 4) != 0) {
 			return false;
 		}
 
@@ -205,7 +205,7 @@ class CValidationRule {
 	 * 'int32' => true
 	 */
 	private function parseInt32($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'int32', 5)) {
+		if (strncmp(substr($buffer, $pos), 'int32', 5) != 0) {
 			return false;
 		}
 
@@ -223,7 +223,7 @@ class CValidationRule {
 	private function parseIn($buffer, &$pos, &$rules) {
 		$i = $pos;
 
-		if (0 != strncmp(substr($buffer, $i), 'in ', 3)) {
+		if (strncmp(substr($buffer, $i), 'in ', 3) != 0) {
 			return false;
 		}
 
@@ -251,7 +251,7 @@ class CValidationRule {
 	 * 'id' => true
 	 */
 	private function parseId($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'id', 2)) {
+		if (strncmp(substr($buffer, $pos), 'id', 2) != 0) {
 			return false;
 		}
 
@@ -272,7 +272,7 @@ class CValidationRule {
 	private function parseDB($buffer, &$pos, &$rules) {
 		$i = $pos;
 
-		if (0 != strncmp(substr($buffer, $i), 'db ', 3)) {
+		if (strncmp(substr($buffer, $i), 'db ', 3) != 0) {
 			return false;
 		}
 
@@ -309,35 +309,12 @@ class CValidationRule {
 	 * 'array' => true
 	 */
 	private function parseArray($buffer, &$pos, &$rules) {
-		$i = $pos;
-		if (strncmp(substr($buffer, $pos), 'array ', 6) != 0) {
+		if (strncmp(substr($buffer, $pos), 'array', 5) != 0) {
 			return false;
 		}
 
-		$i += 6;
-
-		while (isset($buffer[$i]) && $buffer[$i] === ' ') {
-			$i++;
-		}
-
-		$table = '';
-
-		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] !== '.') {
-			return false;
-		}
-
-		$field = '';
-
-		if (!$this->parseField($buffer, $i, $field)) {
-			return false;
-		}
-
-		$pos = $i;
-
-		$rules['array'] = [
-			'table' => $table,
-			'field' => $field
-		];
+		$pos += 5;
+		$rules['array'] = true;
 
 		return true;
 	}
@@ -348,7 +325,7 @@ class CValidationRule {
 	 * 'array_id' => true
 	 */
 	private function parseArrayId($buffer, &$pos, &$rules) {
-		if (0 != strncmp(substr($buffer, $pos), 'array_id', 8)) {
+		if (strncmp(substr($buffer, $pos), 'array_id', 8) != 0) {
 			return false;
 		}
 
@@ -369,7 +346,7 @@ class CValidationRule {
 	private function parseArrayDB($buffer, &$pos, &$rules) {
 		$i = $pos;
 
-		if (0 != strncmp(substr($buffer, $i), 'array_db ', 9)) {
+		if (strncmp(substr($buffer, $i), 'array_db ', 9) != 0) {
 			return false;
 		}
 

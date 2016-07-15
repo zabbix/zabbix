@@ -42,7 +42,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
 			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
-			'exec_params' =>			'array media_type.exec_params',
+			'exec_params' =>			'array',
 			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
@@ -53,6 +53,16 @@ class CControllerMediatypeEdit extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->hasInput('exec_params')) {
+			foreach ($this->getInput('exec_params') as $exec_param) {
+				if (count($exec_param) != 1
+						|| !array_key_exists('exec_param', $exec_param) || !is_string($exec_param['exec_param'])) {
+					$ret = false;
+					break;
+				}
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
