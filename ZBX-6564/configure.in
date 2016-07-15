@@ -871,6 +871,16 @@ linux*)
 	;;
 aix*)
 	ARCH="aix"
+	dnl Forcing a 64-bit application for a 64-bit AIX
+	AC_MSG_CHECKING(for -maix64 compilation flag)
+	saved_CFLAGS="$CFLAGS"
+	CFLAGS="-maix64"
+	AC_TRY_RUN(
+	[int main(void) {return 0;}],
+	CFLAGS="-maix64 $saved_CFLAGS"
+	AC_MSG_RESULT(yes),
+	CFLAGS="$saved_CFLAGS"
+	AC_MSG_RESULT(no))	
 	;;
 darwin*|rhapsody*)
 	ARCH="osx"
