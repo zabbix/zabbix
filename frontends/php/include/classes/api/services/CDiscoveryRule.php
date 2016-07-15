@@ -1234,10 +1234,13 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyGraphPrototypes(array $srcDiscovery, array $dstDiscovery) {
 		// fetch source graphs
 		$srcGraphs = API::GraphPrototype()->get([
-			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => API_OUTPUT_EXTEND,
-			'selectGraphItems' => API_OUTPUT_EXTEND,
+			'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period',
+				'show_triggers', 'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right',
+				'ymin_type', 'ymax_type', 'ymin_itemid', 'ymax_itemid'
+			],
+			'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
 			'selectHosts' => ['hostid'],
+			'discoveryids' => $srcDiscovery['itemid'],
 			'preservekeys' => true
 		]);
 
@@ -1306,14 +1309,11 @@ class CDiscoveryRule extends CItemGeneral {
 		$dstGraphs = $srcGraphs;
 		foreach ($dstGraphs as &$graph) {
 			unset($graph['graphid']);
-			unset($graph['templateid']);
 
 			foreach ($graph['gitems'] as &$gitem) {
 				// replace the old item with the new one with the same key
 				$item = $srcItems[$gitem['itemid']];
 				$gitem['itemid'] = $dstItems[$item['key_']]['itemid'];
-
-				unset($gitem['gitemid'], $gitem['graphid']);
 			}
 			unset($gitem);
 
