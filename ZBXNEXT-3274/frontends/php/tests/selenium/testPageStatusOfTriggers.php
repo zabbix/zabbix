@@ -23,18 +23,19 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 class testPageStatusOfTriggers extends CWebTest {
 	public function testPageStatusOfTriggers_CheckLayout() {
 		$this->zbxTestLogin('tr_status.php');
-		$this->zbxTestCheckTitle('Status of triggers \[refreshed every 30 sec.\]');
-		$this->zbxTestTextPresent('STATUS OF TRIGGERS');
-		$this->zbxTestTextPresent('Triggers');
+		$this->zbxTestCheckTitle('Status of triggers [refreshed every 30 sec.]');
+		$this->zbxTestCheckHeader('Status of triggers');
+		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextPresent(['Group', 'Host']);
-		$this->zbxTestTextPresent(['Severity', 'Status', 'Info', 'Last change', 'Age', 'Acknowledged', 'Host', 'Name', 'Description']);
+		$this->zbxTestTextPresent(['Severity', 'Status', 'Info', 'Last change', 'Age', 'Ack', 'Host', 'Name', 'Description']);
+		$this->zbxTestTextPresent('Filter');
 	}
 
 // Check that no real host or template names displayed
 	public function testPageStatusOfTriggers_NoHostNames() {
 		$this->zbxTestLogin('tr_status.php');
-		$this->zbxTestCheckTitle('Status of triggers \[refreshed every 30 sec.\]');
-		$this->checkNoRealHostnames();
+		$this->zbxTestCheckTitle('Status of triggers [refreshed every 30 sec.]');
+		$this->zbxTestCheckNoRealHostnames();
 	}
 }

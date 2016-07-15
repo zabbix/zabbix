@@ -2985,7 +2985,7 @@ a.blue {
 .status-container {
 	display: inline-block;
 	white-space: nowrap;
-	margin: 2px 3px 2px 0;
+	margin: 1px 3px 1px 0;
 
 	&:last-child {
 		margin: 0;
@@ -3034,6 +3034,21 @@ a.blue {
 	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
 	background-color: darken(desaturate($alt-yellow, 10%), 16%);
 	@extend %status;
+}
+
+.tag {
+	display: inline-block;
+	color: $font-selected-color;
+	background-color: $ui-bg-selected-color;
+	margin: 1px 3px 1px 0;
+	padding: 2px 3px;
+	text-align: center;
+	line-height: 1em;
+	@include border-radius(2px);
+
+	&:last-child {
+		margin: 0;
+	}
 }
 
 %status {

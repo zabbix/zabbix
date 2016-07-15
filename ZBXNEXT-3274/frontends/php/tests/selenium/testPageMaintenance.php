@@ -32,17 +32,15 @@ class testPageMaintenance extends CWebTest {
 	public function testPageMaintenance_CheckLayout($maintenance) {
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 
-		$this->zbxTestTextPresent('Maintenance');
-		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
+		$this->zbxTestCheckHeader('Maintenance periods');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
-		$this->zbxTestTextPresent(['Name', 'Type', 'State', 'Description']);
+		$this->zbxTestTextPresent(['Name', 'Type', 'Active since', 'Active till', 'State', 'Description']);
 		$this->zbxTestTextPresent($maintenance['name']);
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->zbxTestTextPresent('With data collection');
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->zbxTestTextPresent('No data collection');
-		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
 	}
 
 	/**
@@ -65,13 +63,13 @@ class testPageMaintenance extends CWebTest {
 
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
+		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestTextPresent('Maintenance updated');
 		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
+		$this->zbxTestTextPresent('Maintenance periods');
 
 		$this->assertEquals($oldHashMaintenance, DBhash($sqlMaintenance), "Chuck Norris: Maintenance update changed data in table 'maintenances'");
 		$this->assertEquals($oldHashHosts, DBhash($sqlHosts), "Chuck Norris: Maintenance update changed data in table 'maintenances_hosts'");
@@ -88,17 +86,14 @@ class testPageMaintenance extends CWebTest {
 
 		DBsave_tables('maintenances');
 
-		$this->chooseOkOnNextConfirmation();
-
 		$this->zbxTestLogin('maintenance.php');
 		$this->zbxTestDropdownSelectWait('groupid', 'all');
-		$this->zbxTestCheckTitle('Configuration of maintenance');
-		$this->zbxTestCheckboxSelect('maintenanceids['.$maintenanceid.']');
-		$this->zbxTestDropdownSelect('action', 'Delete selected');
-		$this->zbxTestClickWait('goButton');
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
+		$this->zbxTestCheckboxSelect('maintenanceids_'.$maintenanceid);
+		$this->zbxTestClickButton('maintenance.massdelete');
 
-		$this->getConfirmation();
-		$this->zbxTestCheckTitle('Configuration of maintenance');
+		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestCheckTitle('Configuration of maintenance periods');
 		$this->zbxTestTextPresent('Maintenance deleted');
 
 		$sql = "select * from maintenances where maintenanceid=$maintenanceid";
