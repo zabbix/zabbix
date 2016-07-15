@@ -52,45 +52,105 @@ class CScreenProblem extends CScreenBase {
 		$this->dataId = 'problem';
 
 		$config = select_config();
+		$now = time();
 
 		$db_problems = API::Problem()->get(
 			['output' => ['eventid', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock']]
 			+ ($config['event_ack_enable'] ? ['selectAcknowledges' => ['userid', 'clock', 'message']] : [])
-			+ [
-				'selectTags' => ['tag', 'value'],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER
-			]
+			+ ['selectTags' => ['tag', 'value']]
+			+ ['source' => EVENT_SOURCE_TRIGGERS]
+			+ ['object' => EVENT_OBJECT_TRIGGER]
 			+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
 			+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
+			+ ($this->data['filter']['age_state'] == 1
+				? ['time_from' => $now - $this->data['filter']['age'] * SEC_PER_DAY + 1]
+				: []
+			)
 			+ ['preservekeys' => true]
 		);
 
 		$triggerids = [];
-		$ok_events_from = time() - $config['ok_period'];
+		$ok_events_from = $now - $config['ok_period'];
 
 		foreach ($db_problems as $eventid => $db_problem) {
 			if ($db_problem['r_eventid'] != 0 && ($db_problem['r_clock'] < $ok_events_from
 					|| $this->data['filter']['show'] == TRIGGERS_OPTION_IN_PROBLEM)) {
 				unset($db_problems[$eventid]);
+				continue;
 			}
-			elseif ($this->data['filter']['unacknowledged'] && $db_problem['acknowledges']) {
+
+			if ($this->data['filter']['unacknowledged'] && $db_problem['acknowledges']) {
 				unset($db_problems[$eventid]);
+				continue;
 			}
-			else {
-				$triggerids[$db_problem['objectid']] = true;
+
+			if ($this->data['filter']['tags']) {
+				$match = 0;
+				foreach ($this->data['filter']['tags'] as $filter_tag) {
+					foreach ($db_problem['tags'] as $problem_tag) {
+						if ($problem_tag['tag'] === $filter_tag['tag'] && ($filter_tag['value'] === '' ||
+								mb_stripos($problem_tag['value'], $filter_tag['value']) !== false)) {
+							$match++;
+							break;
+						}
+					}
+				}
+				if ($match != count($this->data['filter']['tags'])) {
+					unset($db_problems[$eventid]);
+					continue;
+				}
 			}
+
+			$triggerids[$db_problem['objectid']] = true;
 		}
 
 		if ($triggerids) {
+			if ($this->data['filter']['application'] !== '') {
+				$db_applications = API::Application()->get(
+					['output' => []]
+					+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
+					+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
+					+ ['search' => ['name' => $this->data['filter']['application']]]
+					+ ['preservekeys' => true]
+				);
+			}
+
+			if ($this->data['filter']['inventory']) {
+				$inventory = [];
+				foreach ($this->data['filter']['inventory'] as $field) {
+					$inventory[$field['field']][] = $field['value'];
+				}
+
+				$db_hosts = API::Host()->get(
+					['output' => []]
+					+ ($this->data['filter']['groupids'] ? ['groupids' => $this->data['filter']['groupids']] : [])
+					+ ($this->data['filter']['hostids'] ? ['hostids' => $this->data['filter']['hostids']] : [])
+					+ ['searchInventory' => $inventory]
+					+ ['preservekeys' => true]
+				);
+			}
+
 			$db_triggers = API::Trigger()->get(
-				[
-					'output' => ['triggerid', 'description', 'expression', 'priority', 'url', 'flags'],
-					'selectHosts' => ['hostid', 'name', 'status'],
-					'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
-					'triggerids' => array_keys($triggerids)
-				]
-				+ ($this->data['filter']['severity'] != TRIGGER_SEVERITY_NOT_CLASSIFIED ? ['min_severity' => $this->data['filter']['severity']] : [])
+				['output' => ['triggerid', 'description', 'expression', 'priority', 'url', 'flags']]
+				+ ['selectHosts' => ['hostid', 'name', 'status']]
+				+ ['selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type']]
+				+ ['triggerids' => array_keys($triggerids)]
+				+ ($this->data['filter']['inventory'] ? ['hostids' => array_keys($db_hosts)] : [])
+				+ ['monitored' => true]
+				+ ['skipDependent' => true]
+				+ ($this->data['filter']['problem'] !== ''
+					? ['search' => ['description' => $this->data['filter']['problem']]]
+					: []
+				)
+				+ ($this->data['filter']['application'] !== ''
+					? ['applicationids' => array_keys($db_applications)]
+					: []
+				)
+				+ ($this->data['filter']['severity'] != TRIGGER_SEVERITY_NOT_CLASSIFIED
+					? ['min_severity' => $this->data['filter']['severity']]
+					: []
+				)
+				+ ($this->data['filter']['maintenance'] == 0 ? ['maintenance' => false] : [])
 				+ ['preservekeys' => true]
 			);
 			$db_triggers = CMacrosResolverHelper::resolveTriggerUrls($db_triggers);

@@ -158,10 +158,7 @@ class CNewValidator {
 					break;
 
 				/*
-				 * 'array_db' => array(
-				 *     'table' => <table_name>,
-				 *     'field' => <field_name>
-				 * )
+				 * 'array' => true
 				 */
 				case 'array':
 					if (array_key_exists($field, $this->input) && !is_array($this->input[$field])) {
