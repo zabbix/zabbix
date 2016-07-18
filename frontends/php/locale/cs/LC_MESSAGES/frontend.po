@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:25+0300\n"
+"POT-Creation-Date: 2016-07-15 17:29+0300\n"
 "PO-Revision-Date: 2015-08-11 08:35+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1300,7 +1300,7 @@ msgstr "Není možné přidat podmínku akce"
 msgid "Cannot add application"
 msgstr "Nelze přidat aplikaci"
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1413
 msgid "Cannot add dependency from a host to a template."
 msgstr "Šablona nemůže záviset na hostiteli."
 
@@ -1511,11 +1511,11 @@ msgstr "Není možné vytvořit prototyp grafu pro objeveného hosta \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Nelze otevřít další připojení k databázi."
 
-#: api/classes/CTrigger.php:1446
+#: api/classes/CTrigger.php:1447
 msgid "Cannot create circular dependencies."
 msgstr "Není možné vytvořit zacyklené závislosti."
 
-#: api/classes/CTrigger.php:1418
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create dependency on trigger itself."
 msgstr "Není možné vytvořit závislost spouštěče na sebe sama."
 
@@ -1720,7 +1720,7 @@ msgstr "Není možné smazat aplikaci patřící šabloně."
 msgid "Cannot delete templated graphs."
 msgstr "Není možné smazat grafy patřící šabloně."
 
-#: api/classes/CHostPrototype.php:1076
+#: api/classes/CHostPrototype.php:1077
 msgid "Cannot delete templated host prototype."
 msgstr "Není možné smazat prototyp hosta patřícího šabloně."
 
@@ -1736,7 +1736,7 @@ msgstr "Není možné smazat položky patřící šabloně"
 msgid "Cannot delete templated items."
 msgstr "Není možné smazat položky patřící šabloně."
 
-#: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:635
+#: api/classes/CTrigger.php:1936 api/classes/CTriggerPrototype.php:635
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Není možné smazat spouštěč \"%1$s:%2$s\" patřící šabloně."
@@ -2116,7 +2116,7 @@ msgstr "Nelze formátovat strom."
 msgid "Cannot have empty visible template name"
 msgstr "Zobrazované jméno šablony nemůže být prázdné"
 
-#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2143,7 +2143,7 @@ msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2
 msgid "Cannot include view file \"%s\"."
 msgstr "Není možné vložit view soubor \"%s\"."
 
-#: popup_trexpr.php:778
+#: popup_trexpr.php:780
 msgid "Cannot insert trigger expression"
 msgstr "Není možné vložit výraz spouštěče"
 
@@ -4118,7 +4118,7 @@ msgstr "Smazané: Graf \"%1$s\" na \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Smazané: Host \"%1$s\"."
 
-#: api/classes/CHostPrototype.php:971
+#: api/classes/CHostPrototype.php:972
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Smazané: Prototyp hosta \"%1$s\" na \"%2$s\"."
@@ -4630,7 +4630,7 @@ msgstr "První položka z rozbalovacího seznamu \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Zapamatovat označený výběr \"%1$s\"."
 
-#: api/classes/CTrigger.php:1588
+#: api/classes/CTrigger.php:1589
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Kopírovat závislosti ve spouštěči \"%1$s\"."
@@ -4782,7 +4782,7 @@ msgstr "Prázdný host."
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
-#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
@@ -5468,7 +5468,7 @@ msgstr "Celá obrazovka"
 msgid "Function"
 msgstr "Funkce"
 
-#: popup_trexpr.php:699
+#: popup_trexpr.php:701
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 msgstr "Funkce \"%1$s\" nemůže být použitá s vybranou položkou \"%2$s\""
@@ -6320,22 +6320,22 @@ msgstr[2] "Prototypy hosta povolené"
 msgid "Host prototype updated"
 msgstr "Prototyp hosta aktualizovaný"
 
-#: api/classes/CHostPrototype.php:1100
+#: api/classes/CHostPrototype.php:1101
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Prototyp hosta se jménem \"%1$s\" už existuje v objevovacím pravidle \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1096
+#: api/classes/CHostPrototype.php:1097
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "Prototyp hosta se jménem \"%1$s\" již existuje."
 
-#: api/classes/CHostPrototype.php:1108
+#: api/classes/CHostPrototype.php:1109
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Prototyp hosta s viditelným názvem \"%1$s\" již existuje ve zjišťovacím pravidle \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1105
+#: api/classes/CHostPrototype.php:1106
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "Prototyp hosta se zobrazovaným jménem \"%1$s\" již existuje."
@@ -7098,11 +7098,11 @@ msgstr "Neplatné ID pravidla objevování pro prototyp hosta \"%1$s\"."
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "Neplatný objekt události \"%1$s\" (%2$s) pro zdroj události \"%3$s\" (%4$s), jen následující objekty jsou podporované: %5$s."
 
-#: api/classes/CAlert.php:348
+#: api/classes/CAlert.php:363
 msgid "Incorrect eventobject value."
 msgstr "Neplatná hodnota eventobject."
 
-#: api/classes/CAlert.php:341
+#: api/classes/CAlert.php:356
 msgid "Incorrect eventsource value."
 msgstr "Neplatná hodnota eventsource."
 
@@ -7123,12 +7123,12 @@ msgstr "Neplatné pole pro spouštěč."
 msgid "Incorrect file upload."
 msgstr "Nahraný neplatný soubor."
 
-#: api/classes/CItemGeneral.php:855
+#: api/classes/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Neplatný flexibilní interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:844
+#: api/classes/CItemGeneral.php:830
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Neplatný flexibilní interval u položky \"%1$s\". Flexibilní interval musí být řetězec."
@@ -7888,7 +7888,7 @@ msgstr "Položka je v \"normal\" stavu"
 msgid "Item in \"not supported\" state"
 msgstr "Položka je v \"not supported\" stavu"
 
-#: popup_trexpr.php:773
+#: popup_trexpr.php:775
 msgid "Item not selected"
 msgstr "Položka nevybraná"
 
@@ -7988,7 +7988,7 @@ msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako položka."
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako neznámy element položky."
 
-#: api/classes/CItemGeneral.php:821
+#: api/classes/CItemGeneral.php:807
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\"."
@@ -9990,9 +9990,9 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
 #: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
@@ -10012,7 +10012,7 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
-#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
+#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10258,7 +10258,7 @@ msgstr "Nepotvrzeno"
 msgid "Not Templated items"
 msgstr "Položky bez šablony"
 
-#: api/classes/CTrigger.php:1491
+#: api/classes/CTrigger.php:1492
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Né všechny šablony jsou připojené k \"%s\"."
@@ -13785,7 +13785,7 @@ msgstr "Spouštěč \"%1$s\" závisí na jiném spouštěči \"%2$s\", který ne
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Spouštěč \"%1$s\" přeskočený - uživatelské pravidlo."
 
-#: api/classes/CTrigger.php:1630
+#: api/classes/CTrigger.php:1631
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Spouštěč \"%s\" patří k šablonám s různými spojeními."
@@ -13794,7 +13794,7 @@ msgstr "Spouštěč \"%s\" patří k šablonám s různými spojeními."
 msgid "Trigger added"
 msgstr "Spouštěč byl přidán"
 
-#: api/classes/CTrigger.php:1534
+#: api/classes/CTrigger.php:1535
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Spouštěč nemůže záviset na spouštěči, který je z něho zděděný."
 
@@ -14265,7 +14265,7 @@ msgstr "Neznáma chyba"
 msgid "Unknown function."
 msgstr "Neznáma funkce."
 
-#: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1732 popup_trexpr.php:594 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Zadaná položka ve vybraném hostiteli neexistuje"
 
@@ -14466,7 +14466,7 @@ msgstr "Aktualizované: Položka \"%1$s\" na \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Aktualizované: Prototyp položky \"%1$s\" na \"%2$s\"."
 
-#: api/classes/CTrigger.php:1279
+#: api/classes/CTrigger.php:1280
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Aktualizované: spouštěč \"%1$s\" na \"%2$s\"."

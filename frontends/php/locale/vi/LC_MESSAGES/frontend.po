@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:25+0300\n"
+"POT-Creation-Date: 2016-07-15 17:29+0300\n"
 "PO-Revision-Date: 2016-03-24 09:34+0300\n"
 "Last-Translator: Đào <nadao@monre.gov.vn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1280,7 +1280,7 @@ msgstr "Không thể thêm điều kiện hoạt động"
 msgid "Cannot add application"
 msgstr "Không thể thêm ứng dụng"
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1413
 msgid "Cannot add dependency from a host to a template."
 msgstr "Không thể thêm quan hệ phụ thuộc từ máy chủ đến mẫu."
 
@@ -1491,11 +1491,11 @@ msgstr "Không thể tạo một kiểu máy chủ trên một máy chủ 
 msgid "Cannot create another database connection."
 msgstr "Không thể tạo sự kết nối cơ sở dữ liệu khác."
 
-#: api/classes/CTrigger.php:1446
+#: api/classes/CTrigger.php:1447
 msgid "Cannot create circular dependencies."
 msgstr "Không thể tạo quan hệ phụ thuộc vòng tròn."
 
-#: api/classes/CTrigger.php:1418
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create dependency on trigger itself."
 msgstr "Không thể tạo quan hệ phụ thuộc trên bản thân trigger."
 
@@ -1698,7 +1698,7 @@ msgstr "Không thể xóa ứng dụng mẫu."
 msgid "Cannot delete templated graphs."
 msgstr "Không thể xóa các biểu đồ mẫu."
 
-#: api/classes/CHostPrototype.php:1076
+#: api/classes/CHostPrototype.php:1077
 msgid "Cannot delete templated host prototype."
 msgstr "Không thể xóa kiểu máy chủ mẫu."
 
@@ -1714,7 +1714,7 @@ msgstr "Không thể xóa các item mẫu."
 msgid "Cannot delete templated items."
 msgstr "Không thể xóa các item mẫu."
 
-#: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:635
+#: api/classes/CTrigger.php:1936 api/classes/CTriggerPrototype.php:635
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Không thể xóa trigger mẫu \"%1$s:%2$s\"."
@@ -2056,7 +2056,7 @@ msgstr "Không thể tìm thấy dạng thức cây."
 msgid "Cannot have empty visible template name"
 msgstr "Không thể để tên mẫu trống"
 
-#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2079,7 +2079,7 @@ msgstr[0] "Không thể nhập mẫu \"%1$s\", mẫu được liên kết \"%
 msgid "Cannot include view file \"%s\"."
 msgstr "Không thể xem gộp tập tin \"%s\"."
 
-#: popup_trexpr.php:778
+#: popup_trexpr.php:780
 msgid "Cannot insert trigger expression"
 msgstr "Không thể chèn biểu thức trigger"
 
@@ -4052,7 +4052,7 @@ msgstr "Đã xoá: đồ thị \"%1$s\" trên \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Đã xóa: máy chủ \"%1$s\"."
 
-#: api/classes/CHostPrototype.php:971
+#: api/classes/CHostPrototype.php:972
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Đã xóa: Kiểu máy chủ \"%1$s\" trên \"%2$s\"."
@@ -4560,7 +4560,7 @@ msgstr "Mục Dropdown \"%1$s\" đầu tiên."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Dropdown nhớ \"%1$s\" được chọn."
 
-#: api/classes/CTrigger.php:1588
+#: api/classes/CTrigger.php:1589
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Bản sao quan hệ phụ thuộc trong trigger \"%1$s\"."
@@ -4712,7 +4712,7 @@ msgstr "Không có máy chủ."
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
-#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
@@ -5398,7 +5398,7 @@ msgstr "Toàn màn hình"
 msgid "Function"
 msgstr "Hàm"
 
-#: popup_trexpr.php:699
+#: popup_trexpr.php:701
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 msgstr "Hàm \"%1$s\" không thể được sử dụng với item được chọn \"%2$s\""
@@ -6250,22 +6250,22 @@ msgstr[0] ""
 msgid "Host prototype updated"
 msgstr "Kiểu máy chủ được cập nhật"
 
-#: api/classes/CHostPrototype.php:1100
+#: api/classes/CHostPrototype.php:1101
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Kiểu máy chủ với tên máy chủ \"%1$s\" đã tồn tại trong quy tắc phát hiện \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1096
+#: api/classes/CHostPrototype.php:1097
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "Kiểu máy chủ với tên máy chủ \"%1$s\" đã tồn tại."
 
-#: api/classes/CHostPrototype.php:1108
+#: api/classes/CHostPrototype.php:1109
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Kiểu máy chủ với tên hiển thị \"%1$s\" đã tồn tại trong quy tắc phát hiện \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1105
+#: api/classes/CHostPrototype.php:1106
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "Kiểu máy chủ với tên hiển thị \"%1$s\" đã tồn tại."
@@ -7028,11 +7028,11 @@ msgstr "ID quy tắc phát hiện cho kiểu máy chủ \"%1$s\" không chi
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "Đối tượng sự kiện \"%1$s\" (\"%2$s\") không chính xác đối với nguồn sự kiện \"%3$s\" (\"%4$s\"), Chỉ những đối tượng đang theo dõi được hỗ trợ: \"%5$s\"."
 
-#: api/classes/CAlert.php:348
+#: api/classes/CAlert.php:363
 msgid "Incorrect eventobject value."
 msgstr "Giá trị đối tượng sự kiện không chính xác."
 
-#: api/classes/CAlert.php:341
+#: api/classes/CAlert.php:356
 msgid "Incorrect eventsource value."
 msgstr "Giá trị nguồn sự kiện không chính xác."
 
@@ -7053,12 +7053,12 @@ msgstr "Các trường cho trigger không chính xác."
 msgid "Incorrect file upload."
 msgstr "Tải lên tập tin không chính xác."
 
-#: api/classes/CItemGeneral.php:855
+#: api/classes/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Khoảng thời gian biến thiên \"%1$s\" không chính xác."
 
-#: api/classes/CItemGeneral.php:844
+#: api/classes/CItemGeneral.php:830
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Khoảng thời gian biến thiên trong item \"%1$s\" không chính xác. Khoảng thời gian biến thiên phải là một chuỗi."
@@ -7814,7 +7814,7 @@ msgstr "Item trong trạng thái \"bình thường\""
 msgid "Item in \"not supported\" state"
 msgstr "Item trong trạng thái \"không được hỗ trợ\""
 
-#: popup_trexpr.php:773
+#: popup_trexpr.php:775
 msgid "Item not selected"
 msgstr "Item không được lựa chọn"
 
@@ -7910,7 +7910,7 @@ msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là mô
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\" như là phần tử item chưa biết"
 
-#: api/classes/CItemGeneral.php:821
+#: api/classes/CItemGeneral.php:807
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item với key \"%1$s\" đã tồn tại trên \"%2$s\"."
@@ -9894,9 +9894,9 @@ msgstr "Không có quyền truy cập hệ thống."
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
 #: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
@@ -9916,7 +9916,7 @@ msgstr "Không có quyền truy cập hệ thống."
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
-#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
+#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10162,7 +10162,7 @@ msgstr "Không báo nhận"
 msgid "Not Templated items"
 msgstr "Không có mẫu item"
 
-#: api/classes/CTrigger.php:1491
+#: api/classes/CTrigger.php:1492
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Không phải tất cả mẫu đều được kết nối đến \"%s\"."
@@ -13681,7 +13681,7 @@ msgstr "Trigger \"%1$s\" phụ thuộc vào \"%2$s\", mà không tồn tại
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" được bỏ qua - quy tắc người dùng."
 
-#: api/classes/CTrigger.php:1630
+#: api/classes/CTrigger.php:1631
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Trigger \"%s\" thuộc về các mẫu với các liên kết khác nhau."
@@ -13690,7 +13690,7 @@ msgstr "Trigger \"%s\" thuộc về các mẫu với các liên kết kha
 msgid "Trigger added"
 msgstr "Trigger được thêm vào"
 
-#: api/classes/CTrigger.php:1534
+#: api/classes/CTrigger.php:1535
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Trigger không thể phụ thuộc vào một trigger mà được kế thừa từ nó."
 
@@ -14153,7 +14153,7 @@ msgstr "Lỗi không rõ"
 msgid "Unknown function."
 msgstr "Hàm không rõ"
 
-#: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1732 popup_trexpr.php:594 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "item máy chủ không rõ, không có item trong máy chủ được lựa chọn"
 
@@ -14354,7 +14354,7 @@ msgstr "Đã cập nhật: Item \"%1$s\" trên \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Đã cập nhật: Kiểu item \"%1$s\" trên \"%2$s\"."
 
-#: api/classes/CTrigger.php:1279
+#: api/classes/CTrigger.php:1280
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Đã cập nhật: Trigger \"%1$s\" trên \"%2$s\"."

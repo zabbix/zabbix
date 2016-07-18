@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:25+0300\n"
+"POT-Creation-Date: 2016-07-15 17:29+0300\n"
 "PO-Revision-Date: 2015-11-26 18:04+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1300,7 +1300,7 @@ msgstr "Не удалось добавить условие действия"
 msgid "Cannot add application"
 msgstr "Не удалось добавить группу элементов данных"
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1413
 msgid "Cannot add dependency from a host to a template."
 msgstr "Не удалось добавить зависимость от узла сети к шаблону."
 
@@ -1511,11 +1511,11 @@ msgstr "Не удалось создать прототип узлов сети 
 msgid "Cannot create another database connection."
 msgstr "Не удалось создать другое подключение к базе данных."
 
-#: api/classes/CTrigger.php:1446
+#: api/classes/CTrigger.php:1447
 msgid "Cannot create circular dependencies."
 msgstr "Невозможно создать закольцованные зависимости."
 
-#: api/classes/CTrigger.php:1418
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create dependency on trigger itself."
 msgstr "Невозможно создать зависимость триггера от самого себя."
 
@@ -1720,7 +1720,7 @@ msgstr "Не удалось удалить группу элементов да�
 msgid "Cannot delete templated graphs."
 msgstr "Невозможно удалить графики унаследованные из шаблонов."
 
-#: api/classes/CHostPrototype.php:1076
+#: api/classes/CHostPrototype.php:1077
 msgid "Cannot delete templated host prototype."
 msgstr "Невозможно удалить прототип узлов сети унаследованный из шаблона."
 
@@ -1736,7 +1736,7 @@ msgstr "Невозможно удалить элементы данных уна
 msgid "Cannot delete templated items."
 msgstr "Невозможно удалить элементы данных унаследованные из шаблонов."
 
-#: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:635
+#: api/classes/CTrigger.php:1936 api/classes/CTriggerPrototype.php:635
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Невозможно удалить триггер \"%1$s:%2$s\" унаследованный из шаблона."
@@ -2116,7 +2116,7 @@ msgstr "Не удалось построить дерево."
 msgid "Cannot have empty visible template name"
 msgstr "Видимое имя шаблона не может быть пустым"
 
-#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2143,7 +2143,7 @@ msgstr[2] "Не удалось импортировать шаблон \"%1$s\",
 msgid "Cannot include view file \"%s\"."
 msgstr "Не удалось включить файл представления \"%s\"."
 
-#: popup_trexpr.php:778
+#: popup_trexpr.php:780
 msgid "Cannot insert trigger expression"
 msgstr "Не удалось вставить выражение триггера"
 
@@ -4118,7 +4118,7 @@ msgstr "Удалено: График \"%1$s\" из \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Удалено: Узел сети \"%1$s\"."
 
-#: api/classes/CHostPrototype.php:971
+#: api/classes/CHostPrototype.php:972
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Удалено: Прототип узлов сети \"%1$s\" из \"%2$s\"."
@@ -4630,7 +4630,7 @@ msgstr "Первая запись в выпадающем меню \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Запоминание выбранного в выпадающем списке \"%1$s\"."
 
-#: api/classes/CTrigger.php:1588
+#: api/classes/CTrigger.php:1589
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Дублирующиеся зависимости в триггере \"%1$s\"."
@@ -4782,7 +4782,7 @@ msgstr "Пустое имя узла сети."
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
-#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
@@ -5468,7 +5468,7 @@ msgstr "Во весь экран"
 msgid "Function"
 msgstr "Функция"
 
-#: popup_trexpr.php:699
+#: popup_trexpr.php:701
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 msgstr "Функция \"%1$s\" не может быть использована с выбранным элементом данных \"%2$s\""
@@ -6320,22 +6320,22 @@ msgstr[2] "Прототипы узлов сети активированы"
 msgid "Host prototype updated"
 msgstr "Прототип узлов сети обновлен"
 
-#: api/classes/CHostPrototype.php:1100
+#: api/classes/CHostPrototype.php:1101
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1096
+#: api/classes/CHostPrototype.php:1097
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "Прототип узла сети с именем узла сети \"%1$s\" уже существует."
 
-#: api/classes/CHostPrototype.php:1108
+#: api/classes/CHostPrototype.php:1109
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1105
+#: api/classes/CHostPrototype.php:1106
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует."
@@ -7098,11 +7098,11 @@ msgstr "Некорректный ID правила обнаружения для
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "Некорректный \"%1$s\" (%2$s) объект события для \"%3$s\" (%4$s) источника события, поддерживаются только следующие объекты: %5$s."
 
-#: api/classes/CAlert.php:348
+#: api/classes/CAlert.php:363
 msgid "Incorrect eventobject value."
 msgstr "Некорректное значение eventobject."
 
-#: api/classes/CAlert.php:341
+#: api/classes/CAlert.php:356
 msgid "Incorrect eventsource value."
 msgstr "Некорректное значение eventsource."
 
@@ -7123,12 +7123,12 @@ msgstr "Некорректные поля для триггера."
 msgid "Incorrect file upload."
 msgstr "Некорректный загружаемый файл."
 
-#: api/classes/CItemGeneral.php:855
+#: api/classes/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Некорректный переменный интервал \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:844
+#: api/classes/CItemGeneral.php:830
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Некорректный переменный интервал у элемента данных \"%1$s\". Переменный интервал должен быть строкой."
@@ -7888,7 +7888,7 @@ msgstr "Элемент данных в \"нормальном\" состояни
 msgid "Item in \"not supported\" state"
 msgstr "Элемент данных в \"неподдерживаемом\" состоянии"
 
-#: popup_trexpr.php:773
+#: popup_trexpr.php:775
 msgid "Item not selected"
 msgstr "Элемент данных не выбран"
 
@@ -7988,7 +7988,7 @@ msgstr "Элемент данных с ключем \"%1$s\" уже сущест
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
 
-#: api/classes/CItemGeneral.php:821
+#: api/classes/CItemGeneral.php:807
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
@@ -9991,9 +9991,9 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
 #: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
@@ -10013,7 +10013,7 @@ msgstr "Нет прав доступа в систему."
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
-#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
+#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10259,7 +10259,7 @@ msgstr "Не подтверждено"
 msgid "Not Templated items"
 msgstr "Без элементов данных из шаблона"
 
-#: api/classes/CTrigger.php:1491
+#: api/classes/CTrigger.php:1492
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Не все шаблоны соединены с \"%s\"."
@@ -13787,7 +13787,7 @@ msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", �
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Триггер \"%1$s\" пропущен - правило пользователя."
 
-#: api/classes/CTrigger.php:1630
+#: api/classes/CTrigger.php:1631
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Триггер \"%s\" принадлежит шаблонам с разными связями."
@@ -13796,7 +13796,7 @@ msgstr "Триггер \"%s\" принадлежит шаблонам с раз�
 msgid "Trigger added"
 msgstr "Триггер добавлен"
 
-#: api/classes/CTrigger.php:1534
+#: api/classes/CTrigger.php:1535
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Триггер не может зависеть от триггера, который наследуется от него."
 
@@ -14267,7 +14267,7 @@ msgstr "Неизвестная ошибка"
 msgid "Unknown function."
 msgstr "Неизвестная функция."
 
-#: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1732 popup_trexpr.php:594 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Неизвестный элемент данных узла сети, такого элемента данных нет у выбранного узла сети"
 
@@ -14468,7 +14468,7 @@ msgstr "Обновлено: Элемент данных \"%1$s\" в \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Прототип элементов данных \"%1$s\" в \"%2$s\"."
 
-#: api/classes/CTrigger.php:1279
+#: api/classes/CTrigger.php:1280
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Обновлено: Триггер \"%1$s\" в \"%2$s\"."

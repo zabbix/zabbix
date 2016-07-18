@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:25+0300\n"
+"POT-Creation-Date: 2016-07-15 17:29+0300\n"
 "PO-Revision-Date: 2015-09-01 10:09+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1290,7 +1290,7 @@ msgstr "Impossibile aggiungere condizione dell'azione."
 msgid "Cannot add application"
 msgstr "Impossibile aggiungere l'applicazione"
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1413
 msgid "Cannot add dependency from a host to a template."
 msgstr "Impossibile aggiungere dipendenza da un host a un template"
 
@@ -1501,11 +1501,11 @@ msgstr "Impossibile creare prototipo host per un host discoverato \"%1$s\"."
 msgid "Cannot create another database connection."
 msgstr "Impossibile creare un'altra connessione database."
 
-#: api/classes/CTrigger.php:1446
+#: api/classes/CTrigger.php:1447
 msgid "Cannot create circular dependencies."
 msgstr "Impossibile creare dipendenze circolari."
 
-#: api/classes/CTrigger.php:1418
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create dependency on trigger itself."
 msgstr "Impossibile creare dipendenza nel trigger stesso."
 
@@ -1709,7 +1709,7 @@ msgstr "Impossibile rimuovere applicazioni con template."
 msgid "Cannot delete templated graphs."
 msgstr "Impossibile rimuovere i grafici basati su template."
 
-#: api/classes/CHostPrototype.php:1076
+#: api/classes/CHostPrototype.php:1077
 msgid "Cannot delete templated host prototype."
 msgstr "Impossibile rimuovere prototipo host con template."
 
@@ -1725,7 +1725,7 @@ msgstr "Impossibile rimuovere gli item basati su template"
 msgid "Cannot delete templated items."
 msgstr "Impossibile rimuovere gli item basati su template."
 
-#: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:635
+#: api/classes/CTrigger.php:1936 api/classes/CTriggerPrototype.php:635
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "Impossibile rimuovere i trigger \"%1$s:%2$s\" basati su template."
@@ -2081,7 +2081,7 @@ msgstr "Impossibile formattare albero."
 msgid "Cannot have empty visible template name"
 msgstr "Impossibile avere template visibile con nome vuoto"
 
-#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2106,7 +2106,7 @@ msgstr[1] "Non e' possibile importare il template \"%1$s\", template collegati \
 msgid "Cannot include view file \"%s\"."
 msgstr "Impossibile includere file vista \"%s\"."
 
-#: popup_trexpr.php:778
+#: popup_trexpr.php:780
 msgid "Cannot insert trigger expression"
 msgstr "Impossibile inserire espressione trigger"
 
@@ -4080,7 +4080,7 @@ msgstr "Rimosso: Grafico \"%1$s\" su \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "Rimosso: Host \"%1$s\"."
 
-#: api/classes/CHostPrototype.php:971
+#: api/classes/CHostPrototype.php:972
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "Rimosso: Prototipo host \"%1$s\" su \"%2$s\"."
@@ -4590,7 +4590,7 @@ msgstr "Prima voce menù a discesa \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "Ricorda selezionato \"%1$s\" nel menù a discesa."
 
-#: api/classes/CTrigger.php:1588
+#: api/classes/CTrigger.php:1589
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "Dipendenze duplicate nel trigger \"%1$s\"."
@@ -4742,7 +4742,7 @@ msgstr "Host vuoto."
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
-#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
@@ -5428,7 +5428,7 @@ msgstr "Schermo intero"
 msgid "Function"
 msgstr "Funzione"
 
-#: popup_trexpr.php:699
+#: popup_trexpr.php:701
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 msgstr "Funzione \"%1$s\" non utilizzabile per l'item selezionato \"%2$s\""
@@ -6276,22 +6276,22 @@ msgstr[1] "Prototipi Host abilitati"
 msgid "Host prototype updated"
 msgstr "Prototipo host aggiornato"
 
-#: api/classes/CHostPrototype.php:1100
+#: api/classes/CHostPrototype.php:1101
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Il prototipo host con nome host \"%1$s\" esiste già nella regola discovery \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1096
+#: api/classes/CHostPrototype.php:1097
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "Il prototipo host con nome host \"%1$s\" esiste già."
 
-#: api/classes/CHostPrototype.php:1108
+#: api/classes/CHostPrototype.php:1109
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Il prototipo host con nome visibile \"%1$s\" esiste già nella regola discovery \"%2$s\"."
 
-#: api/classes/CHostPrototype.php:1105
+#: api/classes/CHostPrototype.php:1106
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "Il protipo host con nome visibile \"%1$s\" esiste già."
@@ -7054,11 +7054,11 @@ msgstr "ID regola discovery errato per il prototipo host \"%1$s\"."
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "Oggetto dell'evento \"%1$s\" (%2$s) errato per la sorgente dell'evento \"%3$s\" (%4$s), solo i seguenti oggetti sono supportati: %5$s."
 
-#: api/classes/CAlert.php:348
+#: api/classes/CAlert.php:363
 msgid "Incorrect eventobject value."
 msgstr "Valore eventobject errato."
 
-#: api/classes/CAlert.php:341
+#: api/classes/CAlert.php:356
 msgid "Incorrect eventsource value."
 msgstr "Valore eventsource errato."
 
@@ -7079,12 +7079,12 @@ msgstr "Campi errati per il trigger."
 msgid "Incorrect file upload."
 msgstr "Caricamento file errato."
 
-#: api/classes/CItemGeneral.php:855
+#: api/classes/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Intervallo flessibile \"%1$s\" errato."
 
-#: api/classes/CItemGeneral.php:844
+#: api/classes/CItemGeneral.php:830
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Intervallo flessibile errato nell'item \"%1$s\". L'intervallo flessibile deve essere una stringa."
@@ -7842,7 +7842,7 @@ msgstr "Item in stato \"normale\""
 msgid "Item in \"not supported\" state"
 msgstr "Item in stato \"non supportato\""
 
-#: popup_trexpr.php:773
+#: popup_trexpr.php:775
 msgid "Item not selected"
 msgstr "Item non selezionato"
 
@@ -7940,7 +7940,7 @@ msgstr "Item con chiave \"%1$s\" esiste già su \"%2$s\" come item."
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item con chiave \"%1$s\" esiste già su \"%2$s\" come elemento item sconosciuto."
 
-#: api/classes/CItemGeneral.php:821
+#: api/classes/CItemGeneral.php:807
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item con chiave \"%1$s\" esiste già su \"%2$s\"."
@@ -9933,9 +9933,9 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
 #: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
@@ -9955,7 +9955,7 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
-#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
+#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10201,7 +10201,7 @@ msgstr "Senza Ack"
 msgid "Not Templated items"
 msgstr "Item senza template"
 
-#: api/classes/CTrigger.php:1491
+#: api/classes/CTrigger.php:1492
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "Non tutti i template sono collegati a \"%s\"."
@@ -13724,7 +13724,7 @@ msgstr "Il trigger \"%1$s\" dipende dal trigger \"%2$s\", il quale non esiste."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "Trigger \"%1$s\" saltato - regola utente."
 
-#: api/classes/CTrigger.php:1630
+#: api/classes/CTrigger.php:1631
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "Il trigger \"%s\" appartiene a template con differenti collegamenti."
@@ -13733,7 +13733,7 @@ msgstr "Il trigger \"%s\" appartiene a template con differenti collegamenti."
 msgid "Trigger added"
 msgstr "Trigger aggiunto"
 
-#: api/classes/CTrigger.php:1534
+#: api/classes/CTrigger.php:1535
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "Un trigger non può dipendere da un trigger che deriva da esso."
 
@@ -14200,7 +14200,7 @@ msgstr "Errore sconosciuto"
 msgid "Unknown function."
 msgstr "Funzione sconosciuta."
 
-#: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1732 popup_trexpr.php:594 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "Item host sconosciuto, nessun item di questo tipo nell'host selezionato"
 
@@ -14401,7 +14401,7 @@ msgstr "Aggiornato: Item \"%1$s\" su \"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "Aggiornato: Prototipo di item \"%1$s\" su \"%2$s\"."
 
-#: api/classes/CTrigger.php:1279
+#: api/classes/CTrigger.php:1280
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "Aggiornato: Trigger \"%1$s\" su \"%2$s\"."

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:25+0300\n"
+"POT-Creation-Date: 2016-07-15 17:29+0300\n"
 "PO-Revision-Date: 2015-11-26 03:07+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1283,7 +1283,7 @@ msgstr "不能添加动作条件"
 msgid "Cannot add application"
 msgstr "无法添加应用集"
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1413
 msgid "Cannot add dependency from a host to a template."
 msgstr "无法添加自主机到模板的相依关係"
 
@@ -1494,11 +1494,11 @@ msgstr "在自动发现的主机\"%1$s\"上不能创建主机样板"
 msgid "Cannot create another database connection."
 msgstr "无法创建另外资料库连线."
 
-#: api/classes/CTrigger.php:1446
+#: api/classes/CTrigger.php:1447
 msgid "Cannot create circular dependencies."
 msgstr "不能创建循环依赖关系。"
 
-#: api/classes/CTrigger.php:1418
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create dependency on trigger itself."
 msgstr "不能创建触发器本身的依赖."
 
@@ -1701,7 +1701,7 @@ msgstr "无法删除模板的应用程序."
 msgid "Cannot delete templated graphs."
 msgstr "无法删除模板图形."
 
-#: api/classes/CHostPrototype.php:1076
+#: api/classes/CHostPrototype.php:1077
 msgid "Cannot delete templated host prototype."
 msgstr "无法删除模板上的主机样板"
 
@@ -1717,7 +1717,7 @@ msgstr "无法删除模板的监控项"
 msgid "Cannot delete templated items."
 msgstr "无法删除模板项目."
 
-#: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:635
+#: api/classes/CTrigger.php:1936 api/classes/CTriggerPrototype.php:635
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "无法删除模板化触发器 \"%1$s:%2$s\"."
@@ -2049,7 +2049,7 @@ msgstr "无法形成树状格式"
 msgid "Cannot have empty visible template name"
 msgstr "不能有空白的可见模板名称"
 
-#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2072,7 +2072,7 @@ msgstr[0] "无法导入模板 \"%1$s\",被关联的模板\"%2$s\"不存在."
 msgid "Cannot include view file \"%s\"."
 msgstr "不能包含检视档桉\"%s\"."
 
-#: popup_trexpr.php:778
+#: popup_trexpr.php:780
 msgid "Cannot insert trigger expression"
 msgstr "无法插入触发器表达式"
 
@@ -4045,7 +4045,7 @@ msgstr "已删除: 图表 \"%1$s\" 于 \"%2$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "已删除: 主机 \"%1$s\"."
 
-#: api/classes/CHostPrototype.php:971
+#: api/classes/CHostPrototype.php:972
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "已删除：主机样板\"%1$s\" 于 \"%2$s\"."
@@ -4553,7 +4553,7 @@ msgstr "下拉的第一个输入项 \"%1$s\"."
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "下拉记住所选的 \"%1$s\"."
 
-#: api/classes/CTrigger.php:1588
+#: api/classes/CTrigger.php:1589
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "重复依赖关系在触发器 \"%1$s\" 中."
@@ -4705,7 +4705,7 @@ msgstr "空主机"
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
-#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
@@ -5391,7 +5391,7 @@ msgstr "全屏"
 msgid "Function"
 msgstr "功能"
 
-#: popup_trexpr.php:699
+#: popup_trexpr.php:701
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 msgstr "在所选中的监控项目 \"%2$s\"中不可以使用函数 \"%1$s\""
@@ -6236,22 +6236,22 @@ msgstr[0] "主机样板已启用"
 msgid "Host prototype updated"
 msgstr "主机样板已更新"
 
-#: api/classes/CHostPrototype.php:1100
+#: api/classes/CHostPrototype.php:1101
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "主机名称为 \"%1$s\" 的主机样板已经存在于自动发现规则 \"%2$s\"中."
 
-#: api/classes/CHostPrototype.php:1096
+#: api/classes/CHostPrototype.php:1097
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "主机名称为\"%1$s\"的主机样板已存在"
 
-#: api/classes/CHostPrototype.php:1108
+#: api/classes/CHostPrototype.php:1109
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "显示名称为\"%1$s\"的主机样板已存在于自动发现规则\"%2$s\"中."
 
-#: api/classes/CHostPrototype.php:1105
+#: api/classes/CHostPrototype.php:1106
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "显示名称为\"%1$s\"的主机样板已存在"
@@ -7014,11 +7014,11 @@ msgstr "主机样板 \"%1$s\"的自动发现规则ID不正确."
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "错误的事件对象 \"%1$s\" (%2$s)对于事件源\"%3$s\" (%4$s),只有以下对象的支持:%5$s."
 
-#: api/classes/CAlert.php:348
+#: api/classes/CAlert.php:363
 msgid "Incorrect eventobject value."
 msgstr "错误的事件对象值."
 
-#: api/classes/CAlert.php:341
+#: api/classes/CAlert.php:356
 msgid "Incorrect eventsource value."
 msgstr "错误的事件源值."
 
@@ -7039,12 +7039,12 @@ msgstr "不正确的触发器栏位."
 msgid "Incorrect file upload."
 msgstr "不正确的档桉上传."
 
-#: api/classes/CItemGeneral.php:855
+#: api/classes/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "不正确的弹性间隔\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:844
+#: api/classes/CItemGeneral.php:830
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在项目\"%1$s\"中不正确的弹性间隔. 弹性间隔必须是一个字串."
@@ -7800,7 +7800,7 @@ msgstr "项目在“正常”状态"
 msgid "Item in \"not supported\" state"
 msgstr "项目在“不支持”的状态"
 
-#: popup_trexpr.php:773
+#: popup_trexpr.php:775
 msgid "Item not selected"
 msgstr "项目未被选择"
 
@@ -7896,7 +7896,7 @@ msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为项目."
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" 为未知的项目组件."
 
-#: api/classes/CItemGeneral.php:821
+#: api/classes/CItemGeneral.php:807
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "键值为 \"%1$s\"的项目已存在于\"%2$s\" ."
@@ -9880,9 +9880,9 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
 #: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
@@ -9902,7 +9902,7 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
-#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
+#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10148,7 +10148,7 @@ msgstr "非知悉"
 msgid "Not Templated items"
 msgstr "非模板项目"
 
-#: api/classes/CTrigger.php:1491
+#: api/classes/CTrigger.php:1492
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "并非所有的模板都连结到\"%s\"."
@@ -13667,7 +13667,7 @@ msgstr "触发器\"%1$s\"相依于一个不存在的触发器\"%2$s\"."
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "略过触发器\"%1$s\"-用户规则."
 
-#: api/classes/CTrigger.php:1630
+#: api/classes/CTrigger.php:1631
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "触发器\"%s\"属于有不同连结的模板."
@@ -13676,7 +13676,7 @@ msgstr "触发器\"%s\"属于有不同连结的模板."
 msgid "Trigger added"
 msgstr "触发器已添加"
 
-#: api/classes/CTrigger.php:1534
+#: api/classes/CTrigger.php:1535
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "触发器不能依赖从它继承的一个触发器."
 
@@ -14139,7 +14139,7 @@ msgstr "未知错误"
 msgid "Unknown function."
 msgstr "未知的方程式."
 
-#: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1732 popup_trexpr.php:594 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "未知的主机项目, 在所选的主机中没有这样的项目"
 
@@ -14340,7 +14340,7 @@ msgstr "已更新: 项目\"%1$s\"于\"%2$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 项目原型\"%1$s\"于\"%2$s\"."
 
-#: api/classes/CTrigger.php:1279
+#: api/classes/CTrigger.php:1280
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "已更新: 触发器\"%1$s\"于\"%2$s\"."
