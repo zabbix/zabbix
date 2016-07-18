@@ -37,7 +37,6 @@ class CControllerMediatypeUpdate extends CController {
 			'exec_path' =>				'db media_type.exec_path',
 			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array',
-			'exec_params_count' =>		'ge 0',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',

@@ -43,7 +43,6 @@ class CControllerMediatypeEdit extends CController {
 			'exec_path' =>				'db media_type.exec_path',
 			'eztext_limit' =>			'in '.EZ_TEXTING_LIMIT_USA.','.EZ_TEXTING_LIMIT_CANADA,
 			'exec_params' =>			'array',
-			'exec_params_count' =>		'ge 0',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',
@@ -112,7 +111,6 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host' => '0',
 			'smtp_authentication' => '0',
 			'exec_params' => [],
-			'exec_params_count' => '0',
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
 			'jabber_username' => 'user@server',
@@ -144,8 +142,6 @@ class CControllerMediatypeEdit extends CController {
 			}
 			// Remove last empty new line param.
 			array_pop($data['exec_params']);
-
-			$data['exec_params_count'] = count($data['exec_params']);
 
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
@@ -180,7 +176,6 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host',
 			'smtp_authentication',
 			'exec_params',
-			'exec_params_count',
 			'exec_path',
 			'eztext_limit',
 			'gsm_modem',
