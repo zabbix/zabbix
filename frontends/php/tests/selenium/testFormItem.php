@@ -274,23 +274,9 @@ class testFormItem extends CWebTest {
 			[
 				[
 					'type' => 'Zabbix agent',
-					'host' => 'Template inheritance test host',
-					'key' => 'test-inheritance-item1'
-				]
-			],
-			[
-				[
-					'type' => 'Zabbix agent',
 					'value_type' => 'Numeric (unsigned)',
 					'data_type' => 'Hexadecimal',
 					'host' => 'Inheritance test template'
-				]
-			],
-			[
-				[
-					'type' => 'Zabbix agent',
-					'host' => 'Template inheritance test host',
-					'key' => 'test-inheritance-item1'
 				]
 			],
 			[
@@ -567,12 +553,12 @@ class testFormItem extends CWebTest {
 			}
 		}
 		else {
-			$this->zbxTestAssertVisibleId('typename');
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'maxlength', 255);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'size', 20);
-			$this->zbxTestAssertAttribute("//input[@id='typename']", 'readonly');
+			$this->zbxTestAssertVisibleId('type_name');
+			$this->zbxTestAssertAttribute("//input[@id='type_name']", 'maxlength', 255);
+			$this->zbxTestAssertAttribute("//input[@id='type_name']", 'size', 20);
+			$this->zbxTestAssertAttribute("//input[@id='type_name']", 'readonly');
 
-			$type = $this->zbxTestGetValue("//input[@id='typename']");
+			$type = $this->zbxTestGetValue("//input[@id='type_name']");
 		}
 
 		$this->zbxTestTextPresent('Key');
@@ -1253,6 +1239,9 @@ class testFormItem extends CWebTest {
 			$this->zbxTestAssertElementValue('delete', 'Delete');
 			$this->zbxTestAssertVisibleId('update');
 			$this->zbxTestAssertElementValue('update', 'Update');
+		}
+		elseif (isset($templateid)) {
+			$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
 		}
 		else {
 			$this->zbxTestAssertElementNotPresentId('delete');

@@ -82,11 +82,11 @@ class testTemplateInheritance extends CWebTest {
 				'Test LLD item1',
 				'test-general-item',
 				[
-						'Cannot add item',
-						'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
-							'another template.'
-						]
-				],
+					'Cannot add item',
+					'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
+					'another template.'
+				]
+			],
 			// Item added to Template inheritance test host
 			[
 				TEST_GOOD,
@@ -154,9 +154,10 @@ class testTemplateInheritance extends CWebTest {
 				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
 				$this->zbxTestClickLinkText($itemName);
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
 				$this->zbxTestAssertElementValue('name', $itemName);
 				$this->zbxTestAssertElementValue('key', $keyName);
-				$this->zbxTestAssertElementValue('typename', 'Simple check');
+				$this->zbxTestAssertElementValue('type_name', 'Simple check');
 				$this->zbxTestAssertElementValue('value_type_name', 'Numeric (unsigned)');
 				$this->zbxTestAssertElementValue('data_type_name', 'Octal');
 				$this->zbxTestAssertElementValue('units', 'units');
@@ -228,7 +229,8 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestAssertElementValue('description', 'Test LLD trigger1');
 		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:test-general-item.last(0)}=0');
-		$this->assertTrue($this->zbxTestCheckboxSelected('type'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_name_0'));
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_name_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'url');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
@@ -447,7 +449,8 @@ class testTemplateInheritance extends CWebTest {
 
 		$this->zbxTestAssertElementValue('description', 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', '{Template inheritance test host:test-lld-item.last(0)}=0');
-		$this->assertTrue($this->zbxTestCheckboxSelected('type'));
+		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'url');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
