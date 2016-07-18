@@ -7,7 +7,7 @@ if [ -n "$PID_FILE" ]; then
 	if [ -f "$PID_FILE" ]; then
 		PID=`cat "$PID_FILE"`
 		if ps -p "$PID" > /dev/null 2>&1; then
-			kill `cat $PID_FILE`
+			kill "$PID"
 			for i in 1 2 3 4 5; do
 				sleep 1
 				ps -p "$PID" > /dev/null 2>&1
