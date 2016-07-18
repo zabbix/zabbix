@@ -110,16 +110,6 @@
 			}
 		}
 
-		// When adding and removing dynamic rows, store counter in hidden field.
-		$('#exec_params_table').dynamicRows({
-			template: '#exec_params_row',
-			dataCallback: function() {
-				$('#exec_params_count').val(parseInt($('#exec_params_count').val()) + 1);
-			}
-		});
-
-		$('#exec_params_table').on('click', 'button.element-table-remove', function() {
-			$('#exec_params_count').val($('#exec_params_table .form_row input[type="text"]').length);
-		});
+		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
 	});
 </script>
