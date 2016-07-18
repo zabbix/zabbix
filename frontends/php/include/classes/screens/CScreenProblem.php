@@ -254,9 +254,11 @@ class CScreenProblem extends CScreenBase {
 		foreach ($db_problems as $db_problem) {
 			$db_trigger = $db_triggers[$db_problem['objectid']];
 
-			$cell_clock = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['clock']);
+			$cell_clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['clock']),
+					'tr_events.php?triggerid='.$db_problem['objectid'].'&eventid='.$db_problem['eventid']);
 			$cell_r_clock = $db_problem['r_eventid'] != 0
-				? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['r_clock'])
+				? new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $db_problem['r_clock']),
+					'tr_events.php?triggerid='.$db_problem['objectid'].'&eventid='.$db_problem['r_eventid'])
 				: '';
 			$cell_status = new CSpan($db_problem['r_eventid'] != 0 ? _('RESOLVED') : _('PROBLEM'));
 
