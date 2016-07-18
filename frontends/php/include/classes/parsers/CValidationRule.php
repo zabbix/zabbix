@@ -63,6 +63,7 @@ class CValidationRule {
 									&& !$this->parseInt32($buffer, $pos, $rule)			// int32
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
 									&& !$this->parseId($buffer, $pos, $rule)			// id
+									&& !$this->parseGE($buffer, $pos, $rule)			// ge
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
@@ -257,6 +258,35 @@ class CValidationRule {
 
 		$pos += 2;
 		$rules['id'] = true;
+
+		return true;
+	}
+
+	/**
+	 * ge <value1>
+	 *
+	 * 'ge' => '<value1>'
+	 */
+	private function parseGE($buffer, &$pos, &$rules) {
+		$i = $pos;
+
+		if (0 != strncmp(substr($buffer, $i), 'ge ', 3)) {
+			return false;
+		}
+
+		$i += 3;
+		$value = '';
+
+		while (isset($buffer[$i]) && $buffer[$i] != '|') {
+			$value .= $buffer[$i++];
+		}
+
+		if (!CNewValidator::is_int32($value)) {
+			return false;
+		}
+
+		$pos = $i;
+		$rules['ge'] = $value;
 
 		return true;
 	}
