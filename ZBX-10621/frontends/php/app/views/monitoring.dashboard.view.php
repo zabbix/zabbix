@@ -170,9 +170,7 @@ $dashboardRow = (new CDiv(
 	]))
 	->addClass('row');
 
-$dashboardTable = (new CDiv($dashboardRow))
-	->addClass('table')
-	->addClass('widget-placeholder');
+$dashboardTable = (new CDiv($dashboardRow))->addClass('table');
 
 $dashboard->addItem($dashboardTable)->show();
 
