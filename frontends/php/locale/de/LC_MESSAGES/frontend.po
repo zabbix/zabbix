@@ -3,17 +3,17 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-15 17:09+0300\n"
-"PO-Revision-Date: 2014-10-10 10:32+0300\n"
-"Last-Translator: maxhq <jens@jebecs.de>\n"
+"PO-Revision-Date: 2016-06-07 15:15+0300\n"
+"Last-Translator: Sugarman <timo@twowheels.ch>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.5.0\n"
+"X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1412929936.0\n"
+"X-POOTLE-MTIME: 1465305323.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -21,7 +21,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:896
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" wird erwartet"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -36,7 +36,7 @@ msgstr "\"%s\" muss zwischen 01.01.1970 und 18.01.2038 liegen."
 #: include/classes/import/validators/C10XmlValidator.php:415
 #: include/classes/import/validators/C10XmlValidator.php:436
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" Paar wird erwartet"
 
 #: include/func.inc.php:452
 #, c-format
@@ -68,7 +68,7 @@ msgstr[1] "%1$s Datenpunkte"
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Linie: %2$s | Spalte: %3$s]"
 
 #: include/views/configuration.item.edit.php:336
 #: include/views/configuration.item.edit.php:357
@@ -84,15 +84,15 @@ msgstr[1] "%1$s Tage"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
+msgstr[0] "%1$s Ereignis"
 msgstr[1] ""
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Element"
+msgstr[1] "%1$s Elemente"
 
 #: jsLoader.php:219 jsLoader.php:220 jsLoader.php:221 jsLoader.php:222
 #, c-format
@@ -138,7 +138,7 @@ msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:532
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - unendlich)"
 
 #: include/views/configuration.host.edit.php:96
 #: include/views/configuration.hostgroups.list.php:26
@@ -159,7 +159,7 @@ msgstr "(kein Proxy)"
 
 #: include/classes/setup/CSetupWizard.php:237
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - nutze Standard Port"
 
 #: include/triggers.inc.php:1819 include/triggers.inc.php:1821
 #: include/triggers.inc.php:1822 include/triggers.inc.php:1824
@@ -179,7 +179,7 @@ msgstr "10 Sekunden"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 meist beschäftigte Trigger"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -245,7 +245,7 @@ msgstr "Akzeptable SLA"
 
 #: include/func.inc.php:1678
 msgid "Access denied"
-msgstr ""
+msgstr "Zugriff verweigert"
 
 #: sysmap.php:74
 msgid "Access denied!"
@@ -380,11 +380,11 @@ msgstr[1] "Aktionen deaktiviert"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Aktion deaktiviert da Benutzergruppe gelöscht wurde."
 
 #: include/classes/api/services/CUser.php:1434
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Aktion deaktiviert da Benutzer gelöscht wurde."
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -616,16 +616,16 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:339
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Überprüfung Betreuer Verfügbarkeit. Kein Resultat - nicht verfügbar; 1 - verfügbar"
 
 #: include/views/configuration.host.list.php:69
 msgid "Agent encryption"
-msgstr ""
+msgstr "Betreuer Verschlüsselung"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Betreuer Rechnername. Gibt String zurück"
 
 #: include/views/configuration.host.edit.php:141
 #: include/views/configuration.host.edit.php:226
@@ -645,7 +645,7 @@ msgstr "Aggregierte Prüfungen benötigen keinen Agent auf dem überwachten Host
 #: app/controllers/CControllerAcknowledgeEdit.php:147
 #: app/views/monitoring.acknowledge.edit.php:84
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "Alarm Quittierung"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:629 users.php:43
@@ -675,7 +675,7 @@ msgstr "Alle"
 
 #: include/html.inc.php:352
 msgid "All hosts"
-msgstr ""
+msgstr "Alle Rechner"
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -683,7 +683,7 @@ msgstr "Alle Verknüpfungen sollten Angaben für \"Name\" und \"URL\" haben"
 
 #: include/html.inc.php:521
 msgid "All maps"
-msgstr ""
+msgstr "Alle Karten"
 
 #: include/views/monitoring.screen.php:27
 msgid "All screens"
@@ -1159,17 +1159,17 @@ msgstr "KONFIGURATION AUSLÖSER"
 #: include/classes/items/CHelpItems.php:205
 #: include/classes/items/CHelpItems.php:487
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Prozessor Information. Gibt String oder Ganzzahl zurück"
 
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:463
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "Prozessorlast. Gibt Fliesskomma-Zahl zurück"
 
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Prozessor Auslastung in Prozent. Gibt Fliesskomma-Zahl zurück"
 
 # Normalerweise würde man von "garantierter SLA" sprechen.
 #: include/views/configuration.services.edit.php:69 services.php:43
@@ -1229,7 +1229,7 @@ msgstr[1] "Kann Ereignis nicht bestätigen"
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
-msgstr ""
+msgstr "Kann entdeckte Anwendung \"%1$s\" nicht zu einem Web-Szenario hinzufügen."
 
 #: include/classes/api/services/CGraph.php:725
 #: include/classes/api/services/CGraph.php:739
@@ -1405,7 +1405,7 @@ msgstr "Kann Web-Szenario nicht hinzufügen"
 #: include/classes/api/clients/CLocalApiClient.php:87
 #, c-format
 msgid "Cannot call method \"%1$s.%2$s\" without parameters."
-msgstr ""
+msgstr "Kann Methode \"%1$s.%2$s\"  nicht ohne Parameter aufrufen."
 
 #: authentication.php:148
 msgid "Cannot change authentication"
@@ -1446,19 +1446,19 @@ msgstr "Kann Auslöser-Vorlagen nicht klonen."
 
 #: include/classes/setup/CSetupWizard.php:263
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Kann nicht mit Datenbank verbinden."
 
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kann Schaubild nicht kopieren"
+msgstr[1] "Kann Schaubilder nicht kopieren"
 
 #: items.php:823
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kann Element nicht kopieren"
+msgstr[1] "Kann Elemente nicht kopieren"
 
 #: triggers.php:361
 msgid "Cannot copy trigger"
@@ -1837,11 +1837,10 @@ msgstr[0] "Kann Nutzergruppe nicht deaktivieren"
 msgstr[1] "Kann Nutzergruppen nicht deaktivieren"
 
 #: httpconf.php:405
-#, fuzzy
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] "Kann Web-Szenario nicht deaktivieren"
-msgstr[1] "Kann Web-Szenario nicht deaktivieren"
+msgstr[1] "Kann Web-Szenarien nicht deaktivieren"
 
 #: queue.php:60
 msgid "Cannot display item queue."
@@ -1889,11 +1888,10 @@ msgstr[0] "Kann Datenpunktprototyp nicht aktivieren"
 msgstr[1] "Kann Datenpunktprototypen nicht aktivieren"
 
 #: app/controllers/CControllerMediatypeEnable.php:71
-#, fuzzy
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Kann Medientyp nicht aktivieren"
-msgstr[1] "Kann Medientyp nicht aktivieren"
+msgstr[1] "Kann Medientypen nicht aktivieren"
 
 #: triggers.php:317
 msgid "Cannot enable trigger"
@@ -1921,7 +1919,7 @@ msgstr[1] "Kann Webszenarios nicht aktivieren"
 
 #: scripts_exec.php:90
 msgid "Cannot execute script"
-msgstr ""
+msgstr "Kann Skript nicht ausführen"
 
 #: include/classes/import/importers/CMapImporter.php:318
 #, c-format
@@ -1977,9 +1975,9 @@ msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Symbolzuordnung \"%1$s\" nicht finden, die in Karte \"%2$s\" verwendet wird."
 
 #: include/classes/import/CConfigurationImport.php:1225
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
-msgstr ""
+msgstr "Kann Element \"%1$s\" nicht finden. Genutzt auf \"%2$s\" als Y-Achse, MAX Wert des Graphen \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1076
 #, c-format
