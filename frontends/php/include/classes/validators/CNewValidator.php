@@ -191,6 +191,22 @@ class CNewValidator {
 					break;
 
 				/*
+				 * 'ge' => <value>
+				 */
+				case 'ge':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])
+								|| $this->input[$field] < $params) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+							);
+
+							return false;
+						}
+					}
+					break;
+
+				/*
 				 * 'db' => array(
 				 *     'table' => <table_name>,
 				 *     'field' => <field_name>

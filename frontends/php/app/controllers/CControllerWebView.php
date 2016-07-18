@@ -32,7 +32,7 @@ class CControllerWebView extends CController {
 			'hostid' =>		'db hosts.hostid',
 			'sort' =>		'in hostname,name',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'page' =>		'int32'
+			'page' =>		'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
