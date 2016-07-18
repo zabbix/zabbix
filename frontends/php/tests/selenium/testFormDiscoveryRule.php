@@ -1614,7 +1614,7 @@ class testFormDiscoveryRule extends CWebTest {
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
 			$this->webDriver->switchTo()->alert()->accept();
-			$this->zbxTestTextPresent('Discovery rules deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, DBcount($sql), 'Discovery rule has not been deleted from DB.');

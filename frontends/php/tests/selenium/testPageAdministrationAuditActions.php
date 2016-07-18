@@ -33,7 +33,7 @@ class testPageAdministrationAuditActions extends CWebTest {
 		$this->zbxTestAssertElementPresentId('alias');
 		$this->zbxTestAssertElementPresentXpath("//input[@id='alias' and @maxlength='255']");
 		$this->zbxTestAssertElementPresentId('btn1');
-		$this->zbxTestAssertElementPresentId('filter_set');
+		$this->zbxTestAssertElementPresentXpath("//button[@name='filter_set']");
 		$this->zbxTestAssertElementPresentXpath("//button[contains(text(),'Reset')]");
 		$this->zbxTestTextPresent(['Time', 'Action','Type', 'Status', 'Recipient(s)', 'Message', 'Status', 'Info']);
 
@@ -100,8 +100,8 @@ class testPageAdministrationAuditActions extends CWebTest {
 				]
 		);
 
-		$this->zbxTestInputType('alias', 'guest');
-		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestInputTypeWait('alias', 'guest');
+		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestTextPresent('No data found.');
 
 		$this->zbxTestClickButtonText('Reset');

@@ -46,7 +46,7 @@ class testFormUserProfile extends CWebTest {
 	public function testFormProfile_PasswordChange() {
 		$pwd="'\'$\"\"!$@$#^%$+-=~`\`\\";
 
-		$sqlHashUsers = 'select * from users where alias<>'.PHPUNIT_LOGIN_NAME.' order by userid';
+		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
@@ -111,7 +111,7 @@ class testFormUserProfile extends CWebTest {
 	}
 
 	public function testFormProfile_ThemeChange() {
-		$sqlHashUsers = 'select * from users where alias<>'.PHPUNIT_LOGIN_NAME.' order by userid';
+		$sqlHashUsers = "select * from users where alias<>'".PHPUNIT_LOGIN_NAME."' order by userid";
 		$oldHashUsers = DBhash($sqlHashUsers);
 
 		$this->zbxTestLogin('profile.php');
