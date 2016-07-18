@@ -966,7 +966,7 @@ ROW   |83       |14        |1    |Online                                        
 ROW   |84       |14        |0    |Offline                                                                           |
 ROW   |85       |15        |-1   |Internal error                                                                    |
 ROW   |86       |15        |-200 |No reply from RDDS43 server (obsolete)                                            |
-ROW   |87       |15        |-201 |RDDS43 - The output of the response does not match specification                  |
+ROW   |87       |15        |-201 |RDDS43 - The response's output does not match specification   |
 ROW   |88       |15        |-202 |No Unix timestamp (obsolete)                                                      |
 ROW   |89       |15        |-203 |Invalid Unix timestamp (obsolete)                                                 |
 ROW   |90       |15        |-204 |No reply from RDDS80 server (obsolete)                                            |
@@ -975,9 +975,9 @@ ROW   |92       |15        |-206 |no HTTP status code (obsolete)                
 ROW   |93       |15        |-207 |invalid HTTP status code (obsolete)                                               |
 ROW   |114      |15        |-208 |RDDS43 - No reply from local resolver                                             |
 ROW   |115      |15        |-209 |RDDS43 - No AD bit from local resolver                                            |
-ROW   |116      |15        |-210 |RDDS43 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname  |
-ROW   |117      |15        |-211 |RDDS43 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname  |
-ROW   |118      |15        |-212 |RDDS43 - Expecting NOERROR RCODE but got unexpected when resolving server hostname|
+ROW   |116      |15        |-210 |RDDS43 - Hostname - Expecting NOERROR RCODE but got SERVFAIL  |
+ROW   |117      |15        |-211 |RDDS43 - Hostname - Expecting NOERROR RCODE but got NXDOMAIN  |
+ROW   |118      |15        |-212 |RDDS43 - Hostname - Expecting NOERROR RCODE but got unexpected|
 ROW   |119      |15        |-213 |RDDS43 - Timeout reply from server                                                |
 ROW   |120      |15        |-214 |RDDS43 - Error opening connection to server                                       |
 ROW   |121      |15        |-215 |RDDS43 - No Unix timestamp in response                                            |
@@ -985,9 +985,9 @@ ROW   |122      |15        |-216 |RDDS43 - Invalid Unix timestamp in response   
 ROW   |123      |15        |-217 |RDDS43 - Empty response                                                           |
 ROW   |124      |15        |-250 |RDDS80 - No reply from local resolver                                             |
 ROW   |125      |15        |-251 |RDDS80 - No AD bit from local resolver                                            |
-ROW   |126      |15        |-252 |RDDS80 - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname  |
-ROW   |127      |15        |-253 |RDDS80 - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname  |
-ROW   |128      |15        |-254 |RDDS80 - Expecting NOERROR RCODE but got unexpected when resolving server hostname|
+ROW   |126      |15        |-252 |RDDS80 - Hostname - Expecting NOERROR RCODE but got SERVFAIL  |
+ROW   |127      |15        |-253 |RDDS80 - Hostname - Expecting NOERROR RCODE but got NXDOMAIN  |
+ROW   |128      |15        |-254 |RDDS80 - Hostname - Expecting NOERROR RCODE but got unexpected|
 ROW   |129      |15        |-255 |RDDS80 - Timeout reply from server                                                |
 ROW   |130      |15        |-256 |RDDS80 - Error opening connection to server                                       |
 ROW   |131      |15        |-257 |RDDS80 - Error in HTTP protocol                                                   |
@@ -1055,9 +1055,9 @@ ROW   |192      |15        |-359 |RDDS80 - Expecting HTTP status code 200 but go
 ROW   |193      |15        |-360 |RDDS80 - Expecting HTTP status code 200 but got unexpected                        |
 ROW   |194      |15        |-500 |RDAP - No reply from local resolver                                               |
 ROW   |195      |15        |-501 |RDAP - No AD bit from local resolver                                              |
-ROW   |196      |15        |-502 |RDAP - Expecting NOERROR RCODE but got SERVFAIL when resolving server hostname    |
-ROW   |197      |15        |-503 |RDAP - Expecting NOERROR RCODE but got NXDOMAIN when resolving server hostname    |
-ROW   |198      |15        |-504 |RDAP - Expecting NOERROR RCODE but got unexpected when resolving server hostname  |
+ROW   |196      |15        |-502 |RDAP - Hostname - Expecting NOERROR RCODE but got SERVFAIL    |
+ROW   |197      |15        |-503 |RDAP - Hostname - Expecting NOERROR RCODE but got NXDOMAIN    |
+ROW   |198      |15        |-504 |RDAP - Hostname - Expecting NOERROR RCODE but got unexpected  |
 ROW   |199      |15        |-505 |RDAP - Timeout reply from server                                                  |
 ROW   |200      |15        |-506 |RDAP - Error opening connection to server                                         |
 ROW   |201      |15        |-507 |RDAP - Invalid JSON format in RDAP response                                       |
