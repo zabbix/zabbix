@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-22 16:25+0300\n"
+"POT-Creation-Date: 2016-07-15 17:29+0300\n"
 "PO-Revision-Date: 2016-02-09 14:15+0300\n"
 "Last-Translator: JONGKWON <jkkim.photo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1280,7 +1280,7 @@ msgstr "액션의 실행조건을 추가할 수 없습니다."
 msgid "Cannot add application"
 msgstr "애플리케이션을 추가할 수 없습니다"
 
-#: api/classes/CTrigger.php:1412
+#: api/classes/CTrigger.php:1413
 msgid "Cannot add dependency from a host to a template."
 msgstr "호스트에서 템플릿에 의존관계는 작성할 수 없습니다."
 
@@ -1491,11 +1491,11 @@ msgstr "발견된 호스트 \"%1$s\"에 호스트 프로토타입은 작성할 �
 msgid "Cannot create another database connection."
 msgstr "데이터베이스에 커넥션을 작성할 수 없습니다."
 
-#: api/classes/CTrigger.php:1446
+#: api/classes/CTrigger.php:1447
 msgid "Cannot create circular dependencies."
 msgstr "모순된 의존관계는 작성할 수 없습니다."
 
-#: api/classes/CTrigger.php:1418
+#: api/classes/CTrigger.php:1419
 msgid "Cannot create dependency on trigger itself."
 msgstr "자신에 대한 의존관계는 작성할 수 없습니다."
 
@@ -1698,7 +1698,7 @@ msgstr "템플릿 어플리케이션을 삭제할 수 없습니다."
 msgid "Cannot delete templated graphs."
 msgstr "템플릿 그래프를 삭제할 수 없습니다."
 
-#: api/classes/CHostPrototype.php:1076
+#: api/classes/CHostPrototype.php:1077
 msgid "Cannot delete templated host prototype."
 msgstr "템플릿 호스트 프로토타입을 삭제할 수 없습니다."
 
@@ -1714,7 +1714,7 @@ msgstr "템플릿 아이템을 삭제할 수 없습니다"
 msgid "Cannot delete templated items."
 msgstr "템플릿 아이템을 삭제할 수 없습니다."
 
-#: api/classes/CTrigger.php:1935 api/classes/CTriggerPrototype.php:635
+#: api/classes/CTrigger.php:1936 api/classes/CTriggerPrototype.php:635
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
 msgstr "템플릿 트리거 \"%1$s:%2$s\"를 삭제할 수 없습니다"
@@ -2046,7 +2046,7 @@ msgstr "트리를 포맷할 수 없습니다."
 msgid "Cannot have empty visible template name"
 msgstr "템플릿 이름을 공백으로 설정할 수 없습니다"
 
-#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1241
+#: api/classes/CTrigger.php:1106 api/classes/CTrigger.php:1242
 #: api/classes/CTriggerPrototype.php:716 api/classes/CTriggerPrototype.php:769
 #, c-format
 msgid "Cannot implode expression \"%s\"."
@@ -2069,7 +2069,7 @@ msgstr[0] "템플릿 \"%1$s\"를 임포트 할 수 없습니다. 링크되어 �
 msgid "Cannot include view file \"%s\"."
 msgstr "뷰 파일 \"%s\"을 읽을 수 없습니다."
 
-#: popup_trexpr.php:778
+#: popup_trexpr.php:780
 msgid "Cannot insert trigger expression"
 msgstr "트리거조건식을 추가할 수 없습니다"
 
@@ -4042,7 +4042,7 @@ msgstr "삭제: \"%2$s\" 그래프\"%1$s\"."
 msgid "Deleted: Host \"%1$s\"."
 msgstr "삭제: 호스트\"%1$s\"."
 
-#: api/classes/CHostPrototype.php:971
+#: api/classes/CHostPrototype.php:972
 #, c-format
 msgid "Deleted: Host prototype \"%1$s\" on \"%2$s\"."
 msgstr "삭제: \"%2$s\" 호스트 프로토타입\"%1$s\"."
@@ -4551,7 +4551,7 @@ msgstr "드롭다운의 1번째의 항목 \"%1$s\""
 msgid "Dropdown remember selected \"%1$s\"."
 msgstr "드롭다운의 선택을 보존한다 \"%1$s\""
 
-#: api/classes/CTrigger.php:1588
+#: api/classes/CTrigger.php:1589
 #, c-format
 msgid "Duplicate dependencies in trigger \"%1$s\"."
 msgstr "트리거\"%1$s\"의 의존관계가 중복되어 있습니다."
@@ -4703,7 +4703,7 @@ msgstr "호스트가 공백입니다."
 #: api/classes/CGraph.php:541 api/classes/CGraphPrototype.php:558
 #: api/classes/CHostGroup.php:496 api/classes/CHostGroup.php:573
 #: api/classes/CHostInterface.php:465 api/classes/CHost.php:1437
-#: api/classes/CHostPrototype.php:906 api/classes/CIconMap.php:316
+#: api/classes/CHostPrototype.php:907 api/classes/CIconMap.php:316
 #: api/classes/CItem.php:672 api/classes/CItemPrototype.php:490
 #: api/classes/CProxy.php:487 api/classes/CService.php:341
 #: api/classes/CService.php:377 api/classes/CService.php:443
@@ -5389,7 +5389,7 @@ msgstr "풀스크린"
 msgid "Function"
 msgstr "기능"
 
-#: popup_trexpr.php:699
+#: popup_trexpr.php:701
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
 msgstr "함수\"%1$s\"는 선택된 아이템 \"%2$s\"와 함께 사용할 수 없습니다"
@@ -6233,22 +6233,22 @@ msgstr[0] "호스트 프로토타입을 활성화 하였습니다"
 msgid "Host prototype updated"
 msgstr "호스트 프로토타입을 갱신하였습니다."
 
-#: api/classes/CHostPrototype.php:1100
+#: api/classes/CHostPrototype.php:1101
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
-#: api/classes/CHostPrototype.php:1096
+#: api/classes/CHostPrototype.php:1097
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists."
 msgstr "호스트명 \"%1$s\"을 가진 호스트 프로토타입은 이미 존재합니다."
 
-#: api/classes/CHostPrototype.php:1108
+#: api/classes/CHostPrototype.php:1109
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "호스트의 표시명 \"%1$s\"를 가진 호스트 프로토타입은 디스커버리 규칙 \"%2$s\"에 이미 존재합니다."
 
-#: api/classes/CHostPrototype.php:1105
+#: api/classes/CHostPrototype.php:1106
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists."
 msgstr "호스트의 표시명 \"%1$s\"을 가진 호스트 프로토타입은 이미 존재합니다."
@@ -7011,11 +7011,11 @@ msgstr "호스트 프로토타입 \"%1$s\"의 디스커버리 규칙 ID가 올�
 msgid "Incorrect event object \"%1$s\" (%2$s) for event source \"%3$s\" (%4$s), only the following objects are supported: %5$s."
 msgstr "이벤트 소스 \"%3$s\" (%4$s)에 대한 이벤트 오브젝트 \"%1$s\" (%2$s)가 올바르지 않습니다. 다음 오브젝트만 지원됩니다 : %5$s."
 
-#: api/classes/CAlert.php:348
+#: api/classes/CAlert.php:363
 msgid "Incorrect eventobject value."
 msgstr "이벤트 오브젝트의 값이 올바르지 않습니다."
 
-#: api/classes/CAlert.php:341
+#: api/classes/CAlert.php:356
 msgid "Incorrect eventsource value."
 msgstr "이벤트 소스의 값이 올바르지 않습니다."
 
@@ -7036,12 +7036,12 @@ msgstr "트리거의 설정이 올바르지 않습니다."
 msgid "Incorrect file upload."
 msgstr "업로드된 파일이 올바르지 않습니다."
 
-#: api/classes/CItemGeneral.php:855
+#: api/classes/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "예외의 갱신간격 \"%1$s\"의 설정이 올바르지 않습니다."
 
-#: api/classes/CItemGeneral.php:844
+#: api/classes/CItemGeneral.php:830
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "아이템 \"%1$s\"의 예외 갱신간격 설정이 올바르지 않습니다. 예외 갱신간격의 설정은 문자열로만 가능합니다."
@@ -7797,7 +7797,7 @@ msgstr "아이템이 \"일반\" 상태"
 msgid "Item in \"not supported\" state"
 msgstr "아이템이 \"습득불가\" 상태"
 
-#: popup_trexpr.php:773
+#: popup_trexpr.php:775
 msgid "Item not selected"
 msgstr "아이템이 선택되어 있지 않습니다"
 
@@ -7893,7 +7893,7 @@ msgstr "키\"%1$s\"가 설정된 아이템은 호스트\"%2$s\"에 이미 존재
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "키\"%1$s\"가 설정된 아이템은 호스트\"%2$s\"에 알 수 없는 아이템으로서 이미 존재합니다."
 
-#: api/classes/CItemGeneral.php:821
+#: api/classes/CItemGeneral.php:807
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "키\"%1$s\"가 설정된 아이템은 지정한 호스트 \"%2$s\"에 이미 존재합니다."
@@ -9877,9 +9877,9 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
-#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1020
-#: api/classes/CHostPrototype.php:1035 api/classes/CHostPrototype.php:1048
-#: api/classes/CHostPrototype.php:1061 api/classes/CHttpTest.php:395
+#: api/classes/CHost.php:1824 api/classes/CHostPrototype.php:1021
+#: api/classes/CHostPrototype.php:1036 api/classes/CHostPrototype.php:1049
+#: api/classes/CHostPrototype.php:1062 api/classes/CHttpTest.php:395
 #: api/classes/CHttpTest.php:605 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
@@ -9899,7 +9899,7 @@ msgstr "시스템 액세스 권한이 없습니다."
 #: api/classes/CTemplateScreen.php:575 api/classes/CTemplateScreen.php:626
 #: api/classes/CTemplateScreen.php:678 api/classes/CTemplateScreen.php:684
 #: api/classes/CTrigger.php:629 api/classes/CTrigger.php:967
-#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1914
+#: api/classes/CTrigger.php:988 api/classes/CTrigger.php:1915
 #: api/classes/CTriggerPrototype.php:545 api/classes/CTriggerPrototype.php:630
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
@@ -10145,7 +10145,7 @@ msgstr "코멘트없음"
 msgid "Not Templated items"
 msgstr "템플릿이 아닌 아이템"
 
-#: api/classes/CTrigger.php:1491
+#: api/classes/CTrigger.php:1492
 #, c-format
 msgid "Not all templates are linked to \"%s\"."
 msgstr "모든 템플릿은 \"%s\"에 링크되어 있지 않습니다."
@@ -13664,7 +13664,7 @@ msgstr "트리거 \"%1$s\"는 존재하지않는 트리거\"%2$s\"에 의존하�
 msgid "Trigger \"%1$s\" skipped - user rule."
 msgstr "트리거 \"%1$s\"는 스킵되었습니다 - 사용자 지정."
 
-#: api/classes/CTrigger.php:1630
+#: api/classes/CTrigger.php:1631
 #, c-format
 msgid "Trigger \"%s\" belongs to templates with different linkages."
 msgstr "트리거\"%s\"는 링크되어있는 다른 템플릿에 포함되어 있습니다"
@@ -13673,7 +13673,7 @@ msgstr "트리거\"%s\"는 링크되어있는 다른 템플릿에 포함되어 �
 msgid "Trigger added"
 msgstr "트리거를 추가하였습니다"
 
-#: api/classes/CTrigger.php:1534
+#: api/classes/CTrigger.php:1535
 msgid "Trigger cannot be dependent on a trigger that is inherited from it."
 msgstr "트리거는 자신을 계승한 트리거와 의존관계를 지닐 수 없습니다."
 
@@ -14136,7 +14136,7 @@ msgstr "알 수 없는 에러"
 msgid "Unknown function."
 msgstr "알 수 없는 함수."
 
-#: include/triggers.inc.php:1732 popup_trexpr.php:592 tr_testexpr.php:34
+#: include/triggers.inc.php:1732 popup_trexpr.php:594 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "알 수 없는 아이템. 선택한 호스트에 그런 아이템은 존재하지 않습니다"
 
@@ -14337,7 +14337,7 @@ msgstr "갱신: \"%2$s\"의 아이템\"%1$s\"."
 msgid "Updated: Item prototype \"%1$s\" on \"%2$s\"."
 msgstr "갱신: \"%2$s\"의 아이템 프로토타입\"%1$s\"."
 
-#: api/classes/CTrigger.php:1279
+#: api/classes/CTrigger.php:1280
 #, c-format
 msgid "Updated: Trigger \"%1$s\" on \"%2$s\"."
 msgstr "갱신: \"%2$s\"의 트리거 \"%1$s\"."
