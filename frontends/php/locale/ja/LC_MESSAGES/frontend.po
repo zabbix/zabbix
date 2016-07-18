@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-07-15 17:09+0300\n"
-"PO-Revision-Date: 2016-04-23 01:55+0300\n"
-"Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
+"PO-Revision-Date: 2016-05-28 09:35+0300\n"
+"Last-Translator: Kodai <kodai74@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.1.3\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1461369306.000000\n"
+"X-POOTLE-MTIME: 1464420943.000000\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:358
 #: include/classes/import/validators/C10XmlValidator.php:375
@@ -1425,17 +1425,17 @@ msgstr "データベースに接続できません。"
 #: graphs.php:375
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
+msgstr[0] "グラフをコピーできません"
 
 #: items.php:823
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
+msgstr[0] "アイテムをコピーできません"
 
 #: triggers.php:361
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
+msgstr[0] "トリガーをコピーできません"
 
 #: include/triggers.inc.php:406
 #, c-format
@@ -2110,7 +2110,7 @@ msgstr "異なるホストまたはテンプレートのアプリケーション
 #: include/classes/import/readers/CJsonImportReader.php:35
 #, c-format
 msgid "Cannot read JSON: %1$s."
-msgstr ""
+msgstr "JSON: %1$sが読み込めません。"
 
 #: include/classes/import/readers/CXmlImportReader.php:35
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -5554,7 +5554,7 @@ msgstr "フィルター"
 #: include/classes/html/CFilter.php:146
 msgctxt "filter button"
 msgid "Filter"
-msgstr "フィルタリング"
+msgstr "フィルター"
 
 #: include/views/common.filter.trigger.php:104
 #: include/views/monitoring.overview.items.php:66
@@ -5863,7 +5863,7 @@ msgstr "グラフを追加しました"
 #: graphs.php:374
 msgid "Graph copied"
 msgid_plural "Graphs copied"
-msgstr[0] ""
+msgstr[0] "グラフをコピーしました"
 
 #: graphs.php:295
 msgid "Graph deleted"
@@ -8325,7 +8325,7 @@ msgstr "2つ目のパラメータが正しくありません。"
 #: include/classes/import/validators/CXmlValidator.php:63
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "タグ\"%1$s\": %2$sが正しくありません。"
 
 #: include/classes/validators/CFunctionValidator.php:295
 msgid "Invalid third parameter."
@@ -8437,7 +8437,7 @@ msgstr "アイテムを追加しました"
 #: items.php:822
 msgid "Item copied"
 msgid_plural "Items copied"
-msgstr[0] ""
+msgstr[0] "アイテムをコピーしました"
 
 #: app/views/administration.proxy.list.php:48
 msgid "Item count"
@@ -14223,7 +14223,7 @@ msgstr "トリガーは自身を継承したトリガーと依存関係を持つ
 #: triggers.php:360
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
-msgstr[0] ""
+msgstr[0] "トリガーをコピーしました"
 
 #: include/views/administration.general.housekeeper.edit.php:38
 msgid "Trigger data storage period (in days)"
@@ -16235,7 +16235,7 @@ msgstr "数値で指定してください"
 
 #: include/forms.inc.php:593
 msgid "affects only filtered data"
-msgstr "フィルタリングしたデータにのみ影響があります"
+msgstr "フィルターしたデータにのみ影響があります"
 
 #: include/hosts.inc.php:462
 msgid "agent"
@@ -16749,7 +16749,7 @@ msgstr "テキスト\"%1$s\"が間違っています"
 #: include/classes/api/services/CProxy.php:654
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "値\"%1$s\"が間違っています。"
 
 #: include/classes/setup/CFrontendSetup.php:225
 #: include/classes/setup/CFrontendSetup.php:407
