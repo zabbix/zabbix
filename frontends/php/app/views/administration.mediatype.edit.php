@@ -27,8 +27,7 @@ $widget = (new CWidget())->setTitle(_('Media types'));
 $mediaTypeForm = (new CForm())
 	->setId('media_type_form')
 	->addVar('form', 1)
-	->addVar('mediatypeid', $data['mediatypeid'])
-	->addVar('exec_params_count', $data['exec_params_count']);
+	->addVar('mediatypeid', $data['mediatypeid']);
 
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
@@ -84,18 +83,16 @@ $exec_params_table = (new CTable())
 	->setHeader([_('Parameter'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
-if ($data['exec_params_count'] != 0) {
-	foreach ($data['exec_params'] as $i => $exec_param) {
-		$exec_params_table->addRow([
-			(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param'], false, 255))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			(new CButton('exec_params['.$i.'][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-			],
-			'form_row'
-		);
-	}
+foreach ($data['exec_params'] as $i => $exec_param) {
+	$exec_params_table->addRow([
+		(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CButton('exec_params['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+		],
+		'form_row'
+	);
 }
 
 $exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
