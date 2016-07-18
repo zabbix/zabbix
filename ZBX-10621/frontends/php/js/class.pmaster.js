@@ -402,6 +402,7 @@ var CDoll = Class.create({
 						jQuery(ui.placeholder).removeClass('dashbrd-widget-placeholder');
 						jQuery(ui.item).removeClass('dashbrd-widget-draggable');
 						jQuery('.cell').css('min-width', '');
+						jQuery('.cell[style=""]').removeAttr('style');
 					},
 					update: function(e, ui) {
 						// prevent duplicate save requests when moving a widget from one column to another
