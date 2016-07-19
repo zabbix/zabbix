@@ -87,7 +87,7 @@ sub zabbix_receiver
 	print OUTPUT_FILE "PDU INFO:\n";
 	foreach my $key(keys(%pdu_info))
 	{
-		if (( $pdu_info{$key} !~ m/^[0-9A-Za-z]/i ) && ( $pdu_info{$key} ne "" ))
+		if (( $pdu_info{$key} !~ /^[0-9A-Za-z]/i ) && ( $pdu_info{$key} ne "" ))
 		{
 			my $OctalAsHex = unpack('H*',$pdu_info{$key}) ;	# convert octal string to hex
 			$pdu_info{$key} = "0x$OctalAsHex" ;		# apply 0x header for consistency
