@@ -4787,3 +4787,43 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strmatch                                                     *
+ *                                                                            *
+ * Purpose: check if pattern matches the specified value                      *
+ *                                                                            *
+ * Parameters: value    - [IN] the value to match                             *
+ *             pattern  - [IN] the pattern to match                           *
+ *             op - [IN] the matching operator                                *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op)
+{
+	int	ret = FAIL;
+
+	switch (op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (0 == strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (0 != strcmp(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_LIKE:
+			if (NULL != strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_LIKE:
+			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}
