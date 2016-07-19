@@ -82,6 +82,17 @@ class testInheritanceTriggerPrototype extends CWebTest {
 					'expression' => '{Inheritance test template:item-discovery-prototype.last(0)}<0'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'testInheritanceTriggerPrototype1',
+					'expression' => '{Inheritance test template:key-item-inheritance-test.last()}=0',
+					'errors' => [
+						'Cannot add trigger prototype',
+						'Trigger prototype "testInheritanceTriggerPrototype1" must contain at least one item prototype.'
+					]
+				]
+			]
 		];
 	}
 
@@ -92,21 +103,22 @@ class testInheritanceTriggerPrototype extends CWebTest {
 
 		$this->zbxTestLogin('trigger_prototypes.php?form=Create+trigger+prototype&parent_discoveryid='.$this->discoveryRuleId);
 
-		$this->input_type('description', $data['description']);
-		$this->input_type('expression', $data['expression']);
+		$this->zbxTestInputType('description', $data['description']);
+		$this->zbxTestInputType('expression', $data['expression']);
 
 		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+				$this->zbxTestCheckHeader('Trigger prototypes');
 				$this->zbxTestTextPresent('Trigger prototype added');
+				$this->zbxTestTextPresent($data['description']);
 				break;
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
-				$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER PROTOTYPES');
+				$this->zbxTestCheckHeader('Trigger prototypes');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

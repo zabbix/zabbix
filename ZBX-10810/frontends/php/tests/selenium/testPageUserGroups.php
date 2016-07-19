@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageUserGroups extends CWebTest {
-	// Returns all user groups
 	public static function allGroups() {
 		return DBdata("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
@@ -32,14 +31,13 @@ class testPageUserGroups extends CWebTest {
 	public function testPageUserGroups_CheckLayout($group) {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('CONFIGURATION OF USER GROUPS');
+		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestTextPresent('Displaying');
-		// Header
-		$this->zbxTestTextPresent(['Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode']);
-		// Data
+
+		$this->zbxTestTextPresent(['Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode', 'Status']);
+
 		$this->zbxTestTextPresent([$group['name']]);
-		$this->zbxTestDropdownHasOptions('action',
-				['Enable selected', 'Disable selected', 'Enable DEBUG', 'Disable DEBUG', 'Delete selected']);
+		$this->zbxTestTextPresent('Enable', 'Disable', 'Enable debug mode', 'Disable debug mode', 'Delete');
 	}
 
 	/**
@@ -56,43 +54,15 @@ class testPageUserGroups extends CWebTest {
 
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestClickLinkText($name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Group updated');
 		$this->zbxTestTextPresent("$name");
-		$this->zbxTestTextPresent('CONFIGURATION OF USER GROUPS');
+		$this->zbxTestCheckHeader('User groups');
 
 		$this->assertEquals($oldHashGroup, DBhash($sqlHashGroup));
 		$this->assertEquals($oldHashUsersGroups, DBhash($sqlHashUsersGroups));
-	}
-
-	/**
-	* @dataProvider allGroups
-	*/
-	public function testPageUserGroups_MassEnable($group) {
-		$usrgrpid = $group['usrgrpid'];
-		$name = $group['name'];
-
-		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
-		$oldHashGroups = DBhash($sqlHashGroups);
-
-		$this->zbxTestLogin('usergrps.php');
-		$this->zbxTestCheckTitle('Configuration of user groups');
-
-		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('action', 'Enable selected');
-		$this->zbxTestClick('goButton');
-
-		$this->getConfirmation();
-		$this->wait();
-		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestTextPresent('User group enabled');
-
-		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
-		$this->assertEquals(1, DBcount($sql));
-
-		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
 	}
 
 	/**
@@ -110,15 +80,14 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
-		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('action', 'Disable selected');
-		$this->zbxTestClick('goButton');
+		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
+		$this->zbxTestClickButton('usergroup.massdisable');
 
-		$this->getConfirmation();
-		$this->wait();
+		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
-			$this->zbxTestTextPresent('ERROR: Cannot disable user group');
+			$this->zbxTestTextPresent('Cannot disable user group');
+			$this->zbxTestTextPresent('User cannot change status of himself.');
 		}
 		else {
 			$this->zbxTestTextPresent('User group disabled');
@@ -138,6 +107,32 @@ class testPageUserGroups extends CWebTest {
 	/**
 	* @dataProvider allGroups
 	*/
+	public function testPageUserGroups_MassEnable($group) {
+		$usrgrpid = $group['usrgrpid'];
+		$name = $group['name'];
+
+		$sqlHashGroups = "select * from usrgrp where usrgrpid<>$usrgrpid order by usrgrpid";
+		$oldHashGroups = DBhash($sqlHashGroups);
+
+		$this->zbxTestLogin('usergrps.php');
+		$this->zbxTestCheckTitle('Configuration of user groups');
+
+		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
+		$this->zbxTestClickButton('usergroup.massenable');
+
+		$this->webDriver->switchTo()->alert()->accept();
+		$this->zbxTestCheckTitle('Configuration of user groups');
+		$this->zbxTestTextPresent('User group enabled');
+
+		$sql="select * from usrgrp where usrgrpid=$usrgrpid and users_status=".GROUP_STATUS_ENABLED;
+		$this->assertEquals(1, DBcount($sql));
+
+		$this->assertEquals($oldHashGroups, DBhash($sqlHashGroups));
+	}
+
+	/**
+	* @dataProvider allGroups
+	*/
 	public function testPageUserGroups_MassEnableDEBUG($group) {
 		$usrgrpid = $group['usrgrpid'];
 		$name = $group['name'];
@@ -148,12 +143,10 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
-		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('action', 'Enable DEBUG');
-		$this->zbxTestClick('goButton');
+		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
+		$this->zbxTestClickButton('usergroup.massenabledebug');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
-		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Debug mode updated');
 
@@ -176,12 +169,10 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestLogin('usergrps.php');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 
-		$this->zbxTestCheckboxSelect('group_groupid['.$usrgrpid.']');
-		$this->zbxTestDropdownSelect('action', 'Disable DEBUG');
-		$this->zbxTestClick('goButton');
+		$this->zbxTestCheckboxSelect('group_groupid_'.$usrgrpid);
+		$this->zbxTestClickButton('usergroup.massdisabledebug');
+		$this->webDriver->switchTo()->alert()->accept();
 
-		$this->getConfirmation();
-		$this->wait();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestTextPresent('Debug mode updated');
 

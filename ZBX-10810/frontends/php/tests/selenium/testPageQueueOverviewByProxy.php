@@ -21,7 +21,6 @@
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageQueueOverviewByProxy extends CWebTest {
-	// Returns all proxies
 	public static function allProxies() {
 		return DBdata("select * from hosts where status in (".HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.") order by hostid");
 	}
@@ -31,10 +30,11 @@ class testPageQueueOverviewByProxy extends CWebTest {
 	*/
 	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
 		$this->zbxTestLogin('queue.php?config=1');
-		$this->zbxTestCheckTitle('Queue \[refreshed every 30 sec.\]');
-		$this->zbxTestTextPresent('Queue');
-		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
-		// Header
+		$this->zbxTestCheckTitle('Queue [refreshed every 30 sec.]');
+		$this->zbxTestTextNotPresent('Cannot display item queue.');
+		$this->zbxTestCheckHeader('Queue of items to be updated');
+		$this->zbxTestDropdownSelectWait('config', 'Overview by proxy');
+		$this->zbxTestDropdownHasOptions('config', ['Overview', 'Overview by proxy', 'Details']);
 		$this->zbxTestTextPresent(
 			[
 				'Proxy',
@@ -46,7 +46,6 @@ class testPageQueueOverviewByProxy extends CWebTest {
 				'More than 10 minutes'
 			]
 		);
-		// Data
 		$this->zbxTestTextPresent($proxy['host']);
 		$this->zbxTestTextPresent('Server');
 	}

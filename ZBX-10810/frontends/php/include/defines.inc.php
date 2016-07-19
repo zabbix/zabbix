@@ -562,6 +562,8 @@ define('SCREEN_RESOURCE_LLD_GRAPH',			20);
 define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
 // used in Monitoring > Discovery
 define('SCREEN_RESOURCE_DISCOVERY',			22);
+// used in Monitoring > Web
+define('SCREEN_RESOURCE_HTTPTEST',			23);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -930,6 +932,14 @@ define('XML_STRING',		0x01);
 define('XML_ARRAY',			0x02);
 define('XML_INDEXED_ARRAY',	0x04);
 define('XML_REQUIRED',		0x08);
+
+// JSON error codes.
+if (!defined('JSON_ERROR_NONE')) {
+	define('JSON_ERROR_NONE', 0);
+}
+if (!defined('JSON_ERROR_SYNTAX')) {
+	define('JSON_ERROR_SYNTAX', 4);
+}
 
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);

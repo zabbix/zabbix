@@ -1,8 +1,21 @@
+Changes for 3.0.4
+
+New features:
+A.F....... [ZBX-1357] updated Chinese (China), Czech, French, German, Italian, Japanese, Polish, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (zalex_ua)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.4rc1
 
 New features:
 
 Bug fixes:
+........S. [ZBX-10907] fixed remote command execution via SSH with no Zabbix agent interface (viktors)
+.......PS. [ZBX-6370] added ability to monitor SNMP devices returning OIDs in decreasing or mixed order (Andris)
+..F....... [ZBX-10918] fixed severity filter in map.view action (Cemeris, Gunars)
+..F....... [ZBX-10840] fixed selecting of group in popup page filter (Gunars)
+..F....... [ZBX-10791] fixed web monitoring automatic refresh (Gunars)
+..F....... [ZBX-10736] fixed overlapping of row and table borders (Pavel)
+A......... [ZBX-10880] fixed support of sending several Request object at the same time to JSON-RPC (Cemeris)
 ..F....... [ZBX-10895] fixed option URL value in step of web scenario popup; thanks to Fernando Schmitt for patch (Cemeris)
 ..F....... [ZBX-10931] fixed strings being untranslatable in Reports -> Triggers top 100 (zalex_ua)
 ..F....... [ZBX-10866] fixed calendar time for cases when local time zone differs from servers time zone (Cemeris)
@@ -1409,6 +1422,9 @@ Changes for 2.2.14rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-10933] fixed unexpected overwriting of trigger expressions for unchanged triggers when updating multiple triggers simultaneously via the API trigger.update method (Gunars)
+..F....... [ZBX-10866] fixed calendar time for cases when local time zone differs from servers time zone (Cemeris)
+..F....... [ZBX-10866] fixed starting value of time selector for events, graphs and screens (Cemeris)
 .......PS. [ZBX-10828] fixed server/proxy crashes when performing Simple checks with invalid key parameters hidden in user macro (viktors)
 .......PS. [ZBX-10819] fixed server/proxy compilation error on Solaris 10 (viktors)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)

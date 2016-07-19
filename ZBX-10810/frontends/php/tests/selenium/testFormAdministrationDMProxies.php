@@ -33,57 +33,69 @@ class testFormAdministrationDMProxies extends CWebTest {
 	private $passive_proxy_host = 'H1';
 	private $passive_proxy_name = 'passive_proxy_name1';
 
+	public function testFormAdministrationDMProxies_backup() {
+		DBsave_tables('hosts');
+	}
+
 	public function testFormAdministrationDMProxies_CheckLayout() {
 
-		$this->zbxTestLogin('proxies.php');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
+		$this->zbxTestCheckHeader('Proxies');
+		$this->zbxTestTextPresent('Name');
+		$this->zbxTestTextPresent('Mode');
+		$this->zbxTestTextPresent('Encryption');
+		$this->zbxTestTextPresent('Last seen (age)');
+		$this->zbxTestTextPresent('Host count');
+		$this->zbxTestTextPresent('Item count');
+		$this->zbxTestTextPresent('Required performance (vps)');
+		$this->zbxTestTextPresent('Hosts');
 
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButtonText('Create proxy');
 		$this->zbxTestTextPresent('Proxy name');
 		$this->zbxTestTextPresent('Proxy mode');
 		$this->zbxTestTextPresent('Hosts');
 		$this->zbxTestTextPresent('Proxy hosts');
 		$this->zbxTestTextPresent('Other hosts');
+		$this->zbxTestTextPresent('Description');
 
-		$this->assertElementPresent('host');
+		$this->zbxTestAssertElementPresentId('host');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
-		$this->assertAttribute("//input[@id='host']/@maxlength", '64');
-		$this->assertElementPresent('status');
-		$this->assertElementPresent("//select[@id='status']/option[text()='Active']");
-		$this->assertElementPresent("//select[@id='status']/option[text()='Passive']");
-		$this->assertElementPresent('hosts_left');
-		$this->assertElementPresent('hosts_right');
-		$this->assertElementPresent('add');
-		$this->assertElementPresent('cancel');
+		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
+		$this->zbxTestAssertElementPresentId('status');
+		$this->zbxTestDropdownHasOptions('status', ['Active', 'Passive']);
+		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
+		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
+		$this->zbxTestAssertElementPresentId('add');
+		$this->zbxTestAssertElementPresentId('remove');
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.create']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		// Switch to passive mode
 		$this->zbxTestDropdownSelectWait('status', 'Passive');
 		$this->zbxTestTextPresent('Proxy name');
 		$this->zbxTestTextPresent('Proxy mode');
 		$this->zbxTestTextPresent('Interface');
-		$this->zbxTestTextPresent('IP address');
-		$this->zbxTestTextPresent('DNS name');
-		$this->zbxTestTextPresent('Connect to');
-		$this->zbxTestTextPresent('Port');
+		$this->zbxTestTextPresent(['IP address', 'DNS name', 'Connect to', 'Port']);
 		$this->zbxTestTextPresent('Hosts');
 		$this->zbxTestTextPresent('Proxy hosts');
 		$this->zbxTestTextPresent('Other hosts');
+		$this->zbxTestTextPresent('Description');
 
-		$this->assertElementPresent('host');
+		$this->zbxTestAssertElementPresentId('host');
 		// this check will fail in case of incorrect maxlength value for this "host" element!!!
-		$this->assertAttribute("//input[@id='host']/@maxlength", '64');
-		$this->assertElementPresent('status');
-		$this->assertElementPresent('interface_ip');
-		$this->assertAttribute("//input[@id='interface_ip']/@maxlength", '64');
-		$this->assertElementPresent('interface_dns');
-		$this->assertAttribute("//input[@id='interface_dns']/@maxlength", '64');
-		$this->assertElementPresent('interface_port');
-		$this->assertAttribute("//input[@id='interface_port']/@maxlength", '64');
-		$this->assertElementPresent('hosts_left');
-		$this->assertElementPresent('hosts_right');
-		$this->assertElementPresent('add');
-		$this->assertElementPresent('cancel');
+		$this->zbxTestAssertAttribute('//input[@id=\'host\']', 'maxlength', '128');
+		$this->zbxTestAssertElementPresentId('status');
+		$this->zbxTestAssertElementPresentId('ip');
+		$this->zbxTestAssertAttribute('//input[@id=\'ip\']', 'maxlength', '64');
+		$this->zbxTestAssertElementPresentId('dns');
+		$this->zbxTestAssertAttribute('//input[@id=\'dns\']', 'maxlength', '64');
+		$this->zbxTestAssertElementPresentId('port');
+		$this->zbxTestAssertAttribute('//input[@id=\'port\']', 'maxlength', '64');
+		$this->zbxTestAssertElementPresentId('proxy_hostids_left');
+		$this->zbxTestAssertElementPresentId('proxy_hostids_right');
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.create']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 	}
 
 
@@ -115,7 +127,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				['Cannot add proxy', 'Incorrect interface IP parameter "wrong ip" provided.']
+				['Cannot add proxy', 'Invalid IP address "wrong ip".']
 			],
 			[
 				PROXY_BAD,
@@ -126,7 +138,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				11051,
 				0,
-				['Cannot add proxy', 'Incorrect characters used for proxy name "%^&".']
+				['Cannot add proxy', 'Incorrect characters used for proxy name']
 			],
 			[
 				PROXY_BAD,
@@ -148,7 +160,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				0,
 				'port',
-				['Cannot add proxy', 'Incorrect interface port "port" provided']
+				['Cannot add proxy', 'Incorrect interface port "port" provided.']
 			],
 			[PROXY_BAD,
 				'New active proxy 1',
@@ -168,7 +180,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				0,
 				'$PROXY_PORT',
-				['Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided']
+				['Cannot add proxy', 'Incorrect interface port "$PROXY_PORT" provided.']
 			],
 			[PROXY_BAD,
 				'New passive proxy with wrong IP macro',
@@ -178,7 +190,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 				'proxy123.zabbix.com',
 				0,
 				11051,
-				['Cannot add proxy', 'Incorrect interface IP parameter "$PROXY_IP" provided.']
+				['Cannot add proxy', 'Invalid IP address "$PROXY_IP".']
 			]
 		];
 	}
@@ -188,29 +200,16 @@ class testFormAdministrationDMProxies extends CWebTest {
 	 */
 	public function testFormAdministrationDMProxies_Create($expected, $name, $mode, $hosts, $ip, $dns, $connect_to, $port, $errormsgs) {
 
-		$this->zbxTestLogin('proxies.php');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
-		$this->zbxTestTextPresent('Name');
-		$this->zbxTestTextPresent('Mode');
-		$this->zbxTestTextPresent('Last seen (age)');
-		$this->zbxTestTextPresent('Host count');
-		$this->zbxTestTextPresent('Item count');
-		$this->zbxTestTextPresent('Required performance (vps)');
-		$this->zbxTestTextPresent('Hosts');
+		$this->zbxTestCheckHeader('Proxies');
 
 		// create proxy
-		$this->zbxTestClickWait('form');
+		$this->zbxTestClickButtonText('Create proxy');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('Proxy');
+		$this->zbxTestCheckHeader('Proxies');
 
-		$this->input_type('host', $name);
-
-		// checking possible values of the "status" drop-down element
-		$this->assertElementPresent("//select[@id='status']/option[text()='Active']");
-		$this->assertElementPresent("//select[@id='status']/option[text()='Passive']");
+		$this->zbxTestInputType('host', $name);
 		switch ($mode) {
 			case HOST_STATUS_PROXY_ACTIVE:
 				$this->zbxTestDropdownSelectWait('status', 'Active');
@@ -218,26 +217,25 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 			case HOST_STATUS_PROXY_PASSIVE:
 				$this->zbxTestDropdownSelectWait('status', 'Passive');
-				$this->input_type('interface_ip', $ip);
-				$this->input_type('interface_dns', $dns);
+				$this->zbxTestInputType('ip', $ip);
+				$this->zbxTestInputType('dns', $dns);
 // TODO connect_to is not supported yet
-				$this->input_type('interface_port', $port);
+				$this->zbxTestInputType('port', $port);
 				break;
 		}
 
 		// adding host that will be monitored by this proxy
 		foreach ($hosts as $host) {
-			$this->zbxTestDropdownSelect('hosts_right', $host);
+			$this->zbxTestDropdownSelect('proxy_hostids_right', $host);
 			$this->zbxTestClick('add');
 		}
-		$this->zbxTestClickWait('add');
+		$this->zbxTestClickButton('proxy.create');
 		switch ($expected) {
 			case PROXY_GOOD:
 				$this->zbxTestTextPresent('Proxy added');
 				$this->zbxTestCheckTitle('Configuration of proxies');
-				$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-				$this->zbxTestTextPresent('PROXIES');
-				$this->zbxTestTextPresent(['Mode', 'Name', 'Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts']);
+				$this->zbxTestCheckHeader('Proxies');
+				$this->zbxTestTextPresent(['Mode', 'Name', 'Encryption','Last seen (age)', 'Host count', 'Required performance (vps)', 'Hosts']);
 				$this->zbxTestTextPresent($name);
 
 				switch ($mode) {
@@ -258,8 +256,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 
 			case PROXY_BAD:
 				$this->zbxTestCheckTitle('Configuration of proxies');
-				$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-				$this->zbxTestTextPresent('PROXIES');
+				$this->zbxTestCheckHeader('Proxies');
 				$this->zbxTestTextPresent('Proxy name');
 				foreach ($errormsgs as $msg) {
 					$this->zbxTestTextPresent($msg);
@@ -282,32 +279,37 @@ class testFormAdministrationDMProxies extends CWebTest {
 	 */
 	public function testFormAdministrationDMProxies_UpdateProxyName($name, $newname) {
 
-		$this->zbxTestLogin('proxies.php');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestCheckHeader('Proxies');
+		$this->zbxTestClickLinkText($name);
+		$this->zbxTestCheckHeader('Proxies');
 
 		// check presence of buttons
-		$this->assertElementPresent('update');
-		$this->assertElementPresent('clone');
-		$this->assertElementPresent('delete');
-		$this->assertElementPresent('cancel');
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
+		$this->zbxTestAssertElementPresentId('clone');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
-		$sqlHash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash = DBhash($sqlHash);
+		$sql=
+			'SELECT hostid,proxy_hostid,status,error,available,errors_from,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,'.
+				'maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,'.
+				'snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error'.
+			' FROM hosts'.
+			' ORDER BY hostid';
+
+		$oldHash = DBhash($sql);
 
 		// update proxy name
-		$this->input_type('host', $newname);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestInputType('host', $newname);
+		$this->zbxTestClickButton('proxy.update');
 		$this->zbxTestTextPresent('Proxy updated');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
+		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
 
-		$newHash = DBhash($sqlHash);
-		$this->assertEquals($oldHash, $newHash, "Values in some other DB fields also changed, but shouldn't.");
+		$this->assertEquals($oldHash, DBhash($sql));
 
 		// check that proxy name has been updated in the DB
 		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
@@ -315,7 +317,7 @@ class testFormAdministrationDMProxies extends CWebTest {
 	}
 
 	public static function dataClone() {
-		// Name, newname
+		// Name, clone name
 		return [
 			['Active proxy 1', 'Active proxy 1 cloned'],
 			['Active proxy 2', 'Active proxy 2 cloned'],
@@ -329,30 +331,26 @@ class testFormAdministrationDMProxies extends CWebTest {
 	 */
 	public function testFormAdministrationDMProxies_Clone($name, $newname) {
 
-		$this->zbxTestLogin('proxies.php');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestCheckHeader('Proxies');
+		$this->zbxTestClickLinkText($name);
+		$this->zbxTestCheckHeader('Proxies');
 
 		// check presence of buttons
-		$this->assertElementPresent('update');
-		$this->assertElementPresent('clone');
-		$this->assertElementPresent('delete');
-		$this->assertElementPresent('cancel');
-
-		$sqlHash = "SELECT hostid,proxy_hostid,status,disable_until,error,available,errors_from,lastaccess,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,ipmi_disable_until,ipmi_available,snmp_disable_until,snmp_available,maintenanceid,maintenance_status,maintenance_type,maintenance_from,ipmi_errors_from,snmp_errors_from,ipmi_error,snmp_error,jmx_disable_until,jmx_available,jmx_errors_from,jmx_error FROM hosts ORDER BY hostid";
-		$oldHash = DBhash($sqlHash);
+		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
+		$this->zbxTestAssertElementPresentId('clone');
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
+		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
 
 		// update proxy name
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestTextPresent('Proxy');
-		$this->input_type('host', $newname);
-		$this->zbxTestClickWait('add');
+		$this->zbxTestInputType('host', $newname);
+		$this->zbxTestClickButton('proxy.create');
 		$this->zbxTestTextPresent('Proxy added');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
+		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);
 
 		// checking that proxy name has been updated in the DB
@@ -361,7 +359,6 @@ class testFormAdministrationDMProxies extends CWebTest {
 	}
 
 	public static function dataDelete() {
-		// Name, newname
 		return [
 			['Active proxy 2'],
 			['Passive proxy 2']
@@ -372,34 +369,26 @@ class testFormAdministrationDMProxies extends CWebTest {
 	 * @dataProvider dataDelete
 	 */
 	public function testFormAdministrationDMProxies_Delete($name) {
-		$this->chooseOkOnNextConfirmation();
-
-		$this->zbxTestLogin('proxies.php');
+		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
+		$this->zbxTestCheckHeader('Proxies');
+		$this->zbxTestClickLinkText($name);
 
-		$this->zbxTestClickWait('link='.$name);
+		$this->zbxTestTextPresent(['Update', 'Clone', 'Delete', 'Cancel']);
 
-		$this->assertElementPresent('update');
-		$this->assertElementPresent('clone');
-		$this->assertElementPresent('delete');
-		$this->assertElementPresent('cancel');
-
-		$this->zbxTestClick('delete');
-		$this->waitForConfirmation();
-		$this->wait();
+		$this->zbxTestClickButtonText('Delete');
+		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('Proxy deleted');
+		$this->zbxTestCheckHeader('Proxies');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Proxy deleted');
+		$this->zbxTestAssertElementNotPresentXpath("//a[text()='".$name."']");
 
 		$sql = "SELECT * FROM hosts WHERE host='$name'";
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Proxy has not been deleted');
+	}
 
-		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('CONFIGURATION OF PROXIES');
-		$this->zbxTestTextPresent('PROXIES');
-
+	public function testFormAdministrationDMProxies_restore() {
+		DBrestore_tables('hosts');
 	}
 }
