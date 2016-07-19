@@ -845,7 +845,7 @@ class CHttpTestManager {
 						throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
 					}
 					$stepItemids[] = $dbItem['itemid'];
-					$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
+					$updateItems[] = $dbItem;
 				}
 				else {
 					$insertItems[] = $item;
