@@ -162,6 +162,7 @@ var CDoll = Class.create({
 		this.counter(obj4update.counter);
 		this.params(obj4update.params);
 		this.ready(obj4update.ready);
+		this.updateSortable();
 	},
 
 	startDoll: function() {
@@ -315,7 +316,6 @@ var CDoll = Class.create({
 
 	onSuccess: function(resp) {
 		this.rmwDarken();
-		this.updateSortable();
 
 		var headers = resp.getAllResponseHeaders();
 
@@ -397,6 +397,7 @@ var CDoll = Class.create({
 						jQuery(ui.placeholder).addClass('dashbrd-widget-placeholder');
 						jQuery(ui.item).addClass('dashbrd-widget-draggable');
 						jQuery('.cell').css('min-width', '250px');
+						jQuery('.cell').sortable('refreshPositions');
 					},
 					stop: function(e, ui) {
 						jQuery(ui.placeholder).removeClass('dashbrd-widget-placeholder');
