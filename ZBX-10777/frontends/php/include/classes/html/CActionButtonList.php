@@ -105,13 +105,7 @@ class CActionButtonList extends CObject {
 		zbx_add_post_js('chkbxRange.pageGoName = '.CJs::encodeJson($this->checkboxesName).';');
 		zbx_add_post_js('chkbxRange.prefix = '.CJs::encodeJson($this->cookieNamePrefix).';');
 
-		$items = [];
-
-		foreach ($this->buttons as $button) {
-			$items[] = $button;
-		}
-
-		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $items]))
+		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $this->buttons]))
 			->setId('action_buttons')
 			->addClass(ZBX_STYLE_ACTION_BUTTONS);
 
