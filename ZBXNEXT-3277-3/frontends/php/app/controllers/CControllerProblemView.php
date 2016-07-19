@@ -37,7 +37,7 @@ class CControllerProblemView extends CController {
 			'sort' =>					'in clock,host,priority,problem',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'fullscreen' =>				'in 0,1',
-			'page' =>					'int32',
+			'page' =>					'ge 1',
 			'filter_set' =>				'in 1',
 			'filter_rst' =>				'in 1',
 			'filter_show' =>			'in '.TRIGGERS_OPTION_RECENT_PROBLEM.','.TRIGGERS_OPTION_IN_PROBLEM,
