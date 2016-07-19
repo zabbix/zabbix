@@ -2095,7 +2095,7 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	DBbegin();
 
 	/* 2. Update escalations in the DB. */
-	if (0 == diffs.values_num)
+	if (0 != diffs.values_num)
 	{
 		char	*sql = NULL;
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
