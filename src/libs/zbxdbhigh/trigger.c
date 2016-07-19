@@ -49,15 +49,15 @@
  *                                                                            *
  * Event generation depending on trigger value/state changes:                 *
  *                                                                            *
- * From \ To  | OK         | OK(?)      | PROBLEM    | PROBLEM(?) | NONE      *
- *----------------------------------------------------------------------------*
- * OK         | .          | I          | E          | I          | .         *
+ * From \ To  | OK         | OK(?)      | PROBLEM    | PROBLEM(?) |           *
+ *-----------------------------------------------------------------           *
+ * OK         | .          | I          | E          | I          |           *
  *            |            |            |            |            |           *
- * OK(?)      | I          | .          | E,I        | -          | I         *
+ * OK(?)      | I          | .          | E,I        | -          |           *
  *            |            |            |            |            |           *
- * PROBLEM    | E          | I          | E(m)       | I          | .         *
+ * PROBLEM    | E          | I          | E(m)       | I          |           *
  *            |            |            |            |            |           *
- * PROBLEM(?) | E,I        | -          | E(m),I     | .          | I         *
+ * PROBLEM(?) | E,I        | -          | E(m),I     | .          |           *
  *                                                                            *
  * Legend:                                                                    *
  *        'E' - trigger event                                                 *
