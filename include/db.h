@@ -289,6 +289,7 @@ typedef struct
 
 #define ZBX_FLAGS_DB_EVENT_UNSET		0x0000
 #define ZBX_FLAGS_DB_EVENT_CREATE		0x0001
+#define ZBX_FLAGS_DB_EVENT_NO_ACTION		0x0002
 	zbx_uint64_t		flags;
 }
 DB_EVENT;
