@@ -89,8 +89,8 @@ sub zabbix_receiver
 	{
 		if (( $pdu_info{$key} !~ /^[0-9A-Za-z]/i ) && ( $pdu_info{$key} ne "" ))
 		{
-			my $OctalAsHex = unpack('H*',$pdu_info{$key}) ;	# convert octal string to hex
-			$pdu_info{$key} = "0x$OctalAsHex" ;		# apply 0x header for consistency
+			my $OctetAsHex = unpack('H*',$pdu_info{$key}) ;	# convert octet string to hex
+			$pdu_info{$key} = "0x$OctetAsHex" ;		# apply 0x prefix for consistency
 		}
 
 		printf OUTPUT_FILE "  %-30s %s\n", $key, $pdu_info{$key};
