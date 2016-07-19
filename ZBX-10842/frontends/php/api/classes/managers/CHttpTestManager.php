@@ -198,6 +198,7 @@ class CHttpTestManager {
 					elseif (!isset($webstep['httpstepid'])) {
 						$stepsCreate[] = $webstep;
 					}
+					// TODO: Exception should be thrown if incorrect httpstepid is provided.
 				}
 				$stepidsDelete = array_keys($dbSteps);
 
@@ -852,24 +853,11 @@ class CHttpTestManager {
 			}
 
 			if ($insertItems) {
-				$new_step_itemids = DB::insert('items', $insertItems);
-				$stepItemids = array_merge($stepItemids, $new_step_itemids);
-
-				$item_applications = array();
-				if ($httpTest['applicationid']) {
-					foreach ($new_step_itemids as $itemid) {
-						$item_applications[] = array(
-							'applicationid' => $httpTest['applicationid'],
-							'itemid' => $itemid
-						);
-					}
-				}
-				if (!empty($item_applications)) {
-					DB::insert('items_applications', $item_applications);
-				}
+				$result = API::Item()->create($insertItems);
+				$stepItemids = array_merge($stepItemids, $result['itemids']);
 			}
-			if (!empty($updateItems)) {
-				DB::update('items', $updateItems);
+			if ($updateItems) {
+				API::Item()->update($updateItems);
 			}
 
 			$webstepitems = array();
@@ -951,7 +939,9 @@ class CHttpTestManager {
 					);
 				}
 			}
-			DB::update('items', $stepitemsUpdate);
+			if ($stepitemsUpdate) {
+				DB::update('items', $stepitemsUpdate);
+			}
 
 			if (isset($httpTest['applicationid'])) {
 				$this->updateItemsApplications($itemids, $httpTest['applicationid']);
