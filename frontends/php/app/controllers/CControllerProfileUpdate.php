@@ -41,6 +41,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.auditlogs.filter.state':
 				case 'web.avail_report.filter.state':
 				case 'web.charts.filter.state':
+				case 'web.correlation.filter.state':
 				case 'web.discoveryconf.filter.state':
 				case 'web.events.filter.state':
 				case 'web.groups.filter.state':
@@ -55,6 +56,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.maintenance.filter.state':
 				case 'web.media_types.filter.state':
 				case 'web.overview.filter.state':
+				case 'web.problem.filter.state':
 				case 'web.proxies.filter.state':
 				case 'web.scripts.filter.state':
 				case 'web.templates.filter.state':

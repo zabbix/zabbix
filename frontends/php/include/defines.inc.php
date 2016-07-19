@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'3.1.0');
 define('ZABBIX_API_VERSION',	'3.1.0');
 define('ZABBIX_EXPORT_VERSION',	'3.2');
-define('ZABBIX_DB_VERSION',		3010026);
+define('ZABBIX_DB_VERSION',		3010067);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2016');
@@ -229,6 +229,22 @@ define('CONDITION_OPERATOR_MORE_EQUAL',	5);
 define('CONDITION_OPERATOR_LESS_EQUAL',	6);
 define('CONDITION_OPERATOR_NOT_IN',		7);
 define('CONDITION_OPERATOR_REGEXP',		8);
+
+// correlation statuses
+define('ZBX_CORRELATION_ENABLED',		0);
+define('ZBX_CORRELATION_DISABLED',		1);
+
+// correlation condition types
+define('ZBX_CORR_CONDITION_OLD_EVENT_TAG',			0);
+define('ZBX_CORR_CONDITION_NEW_EVENT_TAG',			1);
+define('ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP',	2);
+define('ZBX_CORR_CONDITION_EVENT_TAG_PAIR',			3);
+define('ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE',	4);
+define('ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE',	5);
+
+// correlation operation types
+define('ZBX_CORR_OPERATION_CLOSE_OLD',	0);
+define('ZBX_CORR_OPERATION_CLOSE_NEW',	1);
 
 // event type action condition values
 define('EVENT_TYPE_ITEM_NOTSUPPORTED',		0);
@@ -446,6 +462,9 @@ define('SERVICE_STATUS_OK', 0);
 define('TRIGGER_MULT_EVENT_DISABLED',	0);
 define('TRIGGER_MULT_EVENT_ENABLED',	1);
 
+define('ZBX_TRIGGER_CORRELATION_NONE',	0);
+define('ZBX_TRIGGER_CORRELATION_TAG',	1);
+
 define('ZBX_RECOVERY_MODE_EXPRESSION',			0);
 define('ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION',	1);
 define('ZBX_RECOVERY_MODE_NONE',				2);
@@ -573,6 +592,8 @@ define('SCREEN_RESOURCE_HTTPTEST_DETAILS',	21);
 define('SCREEN_RESOURCE_DISCOVERY',			22);
 // used in Monitoring > Web
 define('SCREEN_RESOURCE_HTTPTEST',			23);
+// used in Monitoring > Problems
+define('SCREEN_RESOURCE_PROBLEM',			24);
 
 define('SCREEN_SORT_TRIGGERS_DATE_DESC',			0);
 define('SCREEN_SORT_TRIGGERS_SEVERITY_DESC',		1);
@@ -1234,6 +1255,7 @@ define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABLE_PAGING', 'table-paging');
 define('ZBX_STYLE_TABLE_STATS', 'table-stats');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
+define('ZBX_STYLE_TAG', 'tag');
 define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TIME_ZONE', 'time-zone');

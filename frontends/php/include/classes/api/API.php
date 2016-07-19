@@ -130,6 +130,13 @@ class API {
 	}
 
 	/**
+	 * @return CCorrelation
+	 */
+	public static function Correlation() {
+		return self::getApi('correlation');
+	}
+
+	/**
 	 * @return CDCheck
 	 */
 	public static function DCheck() {
@@ -274,6 +281,13 @@ class API {
 	 */
 	public static function MediaType() {
 		return self::getApi('mediatype');
+	}
+
+	/**
+	 * @return CProblem
+	 */
+	public static function Problem() {
+		return self::getApi('problem');
 	}
 
 	/**

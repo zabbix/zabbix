@@ -26,14 +26,14 @@ $this->addJsFile('js/flickerfreescreen.js');
 	->setTitle(_('Web monitoring'))
 	->setControls(
 		(new CForm('get'))
-		->setName('slideHeaderForm')
-		->addVar('fullscreen', $data['fullscreen'])
-		->addVar('action', 'web.view')
-		->addItem((new CList())
-			->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
-			->addItem([_('Host'), SPACE, $data['pageFilter']->getHostsCB()])
-			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
-		)
+			->setName('slideHeaderForm')
+			->addVar('fullscreen', $data['fullscreen'])
+			->addVar('action', 'web.view')
+			->addItem((new CList())
+				->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
+				->addItem([_('Host'), SPACE, $data['pageFilter']->getHostsCB()])
+				->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
+			)
 	)
 	->addItem(
 		CScreenBuilder::getScreen([
