@@ -28,49 +28,6 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: check_condition_pattern_match                                    *
- *                                                                            *
- * Purpose: check if condition pattern matches the specified value            *
- *                                                                            *
- * Parameters: operator - [IN] the matching operator                          *
- *             pattern  - [IN] the pattern to match                           *
- *             value    - [IN] the value to match                             *
- *                                                                            *
- * Return value: SUCCEED - matches, FAIL - otherwise                          *
- *                                                                            *
- ******************************************************************************/
-static int	check_condition_pattern_match(unsigned char operator, const char *pattern, const char *value)
-{
-	int	ret = FAIL;
-
-	switch (operator)
-	{
-		case CONDITION_OPERATOR_EQUAL:
-			if (0 == strcmp(value, pattern))
-				ret = SUCCEED;
-			break;
-
-		case CONDITION_OPERATOR_NOT_EQUAL:
-			if (0 != strcmp(value, pattern))
-				ret = SUCCEED;
-			break;
-
-		case CONDITION_OPERATOR_LIKE:
-			if (NULL != strstr(value, pattern))
-				ret = SUCCEED;
-			break;
-
-		case CONDITION_OPERATOR_NOT_LIKE:
-			if (NULL == strstr(value, pattern))
-				ret = SUCCEED;
-			break;
-	}
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: check_condition_event_tag                                        *
  *                                                                            *
  * Purpose: check event tag condition                                         *
@@ -89,7 +46,7 @@ static int	check_condition_event_tag(const DB_EVENT *event, const DB_CONDITION *
 	{
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
-		ret = check_condition_pattern_match(condition->operator, condition->value, tag->tag);
+		ret = zbx_strmatch_condition(tag->tag, condition->value, condition->operator);
 	}
 
 	return ret;
@@ -116,7 +73,7 @@ static int	check_condition_event_tag_value(const DB_EVENT *event, DB_CONDITION *
 		zbx_tag_t	*tag = (zbx_tag_t *)event->tags.values[i];
 
 		if (0 == strcmp(condition->value2, tag->tag))
-			ret = check_condition_pattern_match(condition->operator, condition->value, tag->value);
+			ret = zbx_strmatch_condition(tag->value, condition->value, condition->operator);
 	}
 
 	return ret;
@@ -1690,6 +1647,12 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *e
 		/* OK events can't start escalations - skip them */
 		if (SUCCEED == is_recovery_event(event))
 			continue;
+
+		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION) ||
+				0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+		{
+			continue;
+		}
 
 		for (j = 0; j < actions.values_num; j++)
 		{
