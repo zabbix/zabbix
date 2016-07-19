@@ -158,10 +158,7 @@ class CNewValidator {
 					break;
 
 				/*
-				 * 'array_db' => array(
-				 *     'table' => <table_name>,
-				 *     'field' => <field_name>
-				 * )
+				 * 'array' => true
 				 */
 				case 'array':
 					if (array_key_exists($field, $this->input) && !is_array($this->input[$field])) {
@@ -188,6 +185,22 @@ class CNewValidator {
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
 								// TODO: stringify($this->input[$field]) ???
 							);
+							return false;
+						}
+					}
+					break;
+
+				/*
+				 * 'ge' => <value>
+				 */
+				case 'ge':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])
+								|| $this->input[$field] < $params) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+							);
+
 							return false;
 						}
 					}
@@ -282,9 +295,7 @@ class CNewValidator {
 		}
 	}
 
-	private function is_array_id(array $values, $table, $field) {
-		$table_schema = DB::getSchema($table);
-
+	private function is_array_id(array $values) {
 		foreach ($values as $value) {
 			if (!is_string($value) || !$this->is_id($value)) {
 				return false;

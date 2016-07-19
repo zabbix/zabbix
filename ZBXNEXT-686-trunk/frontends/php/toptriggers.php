@@ -214,25 +214,6 @@ $data['hosts'] = API::Host()->get([
 
 $data['scripts'] = API::Script()->getScriptsByHosts($hostIds);
 
-$monitored_hostids = [];
-
-foreach ($data['triggers'] as $trigger) {
-	foreach ($trigger['hosts'] as $host) {
-		if ($host['status'] == HOST_STATUS_MONITORED) {
-			$monitored_hostids[$host['hostid']] = true;
-		}
-	}
-}
-
-if ($monitored_hostids) {
-	$data['monitored_hosts'] = API::Host()->get([
-		'output' => ['hostid'],
-		'selectGroups' => ['groupid'],
-		'hostids' => array_keys($monitored_hostids),
-		'preservekeys' => true
-	]);
-}
-
 // render view
 $historyView = new CView('reports.toptriggers', $data);
 $historyView->render();

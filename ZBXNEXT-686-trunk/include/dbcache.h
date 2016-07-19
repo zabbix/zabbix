@@ -202,8 +202,10 @@ typedef struct _DC_TRIGGER
 
 	char			*error;
 	char			*new_error;
+	char			*correlation_tag;
 	zbx_timespec_t		timespec;
 	int			lastchange;
+	int			problem_count;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -212,6 +214,7 @@ typedef struct _DC_TRIGGER
 	unsigned char		new_value;
 	unsigned char		status;
 	unsigned char		recovery_mode;
+	unsigned char		correlation_mode;
 
 	zbx_vector_ptr_t	tags;
 }
@@ -311,6 +314,78 @@ zbx_config_t;
 
 typedef struct
 {
+	char	*tag;
+}
+zbx_corr_condition_tag_t;
+
+typedef struct
+{
+	char		*tag;
+	char		*value;
+	unsigned char	op;
+}
+zbx_corr_condition_tag_value_t;
+
+typedef struct
+{
+	zbx_uint64_t	groupid;
+	unsigned char	op;
+}
+zbx_corr_condition_group_t;
+
+typedef struct
+{
+	char	*oldtag;
+	char	*newtag;
+}
+zbx_corr_condition_tag_pair_t;
+
+typedef union
+{
+	zbx_corr_condition_tag_t	tag;
+	zbx_corr_condition_tag_value_t	tag_value;
+	zbx_corr_condition_group_t	group;
+	zbx_corr_condition_tag_pair_t	tag_pair;
+}
+zbx_corr_condition_data_t;
+
+typedef struct
+{
+	zbx_uint64_t			corr_conditionid;
+	int				type;
+	zbx_corr_condition_data_t	data;
+}
+zbx_corr_condition_t;
+
+typedef struct
+{
+	unsigned char	type;
+}
+zbx_corr_operation_t;
+
+typedef struct
+{
+	zbx_uint64_t		correlationid;
+	char			*name;
+	char			*formula;
+	unsigned char		evaltype;
+
+	zbx_vector_ptr_t	conditions;
+	zbx_vector_ptr_t	operations;
+}
+zbx_correlation_t;
+
+typedef struct
+{
+	zbx_vector_ptr_t	correlations;
+	zbx_hashset_t		conditions;
+
+	int			sync_ts;
+}
+zbx_correlation_rules_t;
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_timespec_t		timestamp;
 	history_value_t		value;
@@ -380,6 +455,7 @@ void	DCconfig_get_functions_by_functionids(DC_FUNCTION *functions,
 void	DCconfig_clean_functions(DC_FUNCTION *functions, int *errcodes, size_t num);
 void	DCconfig_clean_triggers(DC_TRIGGER *triggers, int *errcodes, size_t num);
 int	DCconfig_lock_triggers_by_history_items(zbx_vector_ptr_t *history_items, zbx_vector_uint64_t *triggerids);
+void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zbx_vector_uint64_t *triggerids_out);
 void	DCconfig_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	DCconfig_unlock_all_triggers();
 void	DCconfig_get_triggers_by_itemids(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
@@ -408,8 +484,7 @@ int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
 int	DCconfig_check_trigger_dependencies(zbx_uint64_t triggerid);
 
-void	DCconfig_set_trigger_value(zbx_uint64_t triggerid, unsigned char value,
-		unsigned char state, const char *error, int *lastchange);
+void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff);
 void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int maintenance_status,
 		int maintenance_type, int maintenance_from);
 
@@ -488,6 +563,12 @@ void	zbx_host_availability_free(zbx_host_availability_t *availability);
 int	zbx_host_availability_is_set(const zbx_host_availability_t *ha);
 
 void	zbx_set_availability_diff_ts(int ts);
+
+void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);
+void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules);
+void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
+
+
 
 #define ZBX_HC_ITEM_STATUS_NORMAL	0
 #define ZBX_HC_ITEM_STATUS_BUSY		1

@@ -44,6 +44,8 @@ $fields = [
 	'priority' =>								[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
 	'comments' =>								[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'url' =>									[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'correlation_mode' =>						[T_ZBX_STR, O_OPT, null,	IN(ZBX_TRIGGER_CORRELATION_NONE.','.ZBX_TRIGGER_CORRELATION_TAG),	'isset({add}) || isset({update})'],
+	'correlation_tag' =>						[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
 	'status' =>									[T_ZBX_STR, O_OPT, null,	null,			null],
 	'expression_constructor' =>					[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_expression_constructor})'],
 	'recovery_expression_constructor' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,		'isset({toggle_recovery_expression_constructor})'],
@@ -215,7 +217,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'comments' => getRequest('comments'),
 			'tags' => $tags,
 			'dependencies' => $dependencies,
-			'status' => getRequest('status')
+			'status' => getRequest('status'),
+			'correlation_mode' => getRequest('correlation_mode'),
+			'correlation_tag' => getRequest('correlation_tag')
 		];
 		if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 			$trigger['recovery_expression'] = getRequest('recovery_expression');
@@ -228,7 +232,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	else {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'templateid', 'type',
-				'flags', 'recovery_mode', 'recovery_expression'
+				'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag'
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
@@ -257,6 +261,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				if (getRequest('recovery_mode') == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
 						&& $db_trigger['recovery_expression'] !== getRequest('recovery_expression')) {
 					$trigger['recovery_expression'] = getRequest('recovery_expression');
+				}
+				if ($db_trigger['correlation_mode'] != getRequest('correlation_mode')) {
+					$trigger['correlation_mode'] = getRequest('correlation_mode');
+				}
+				if ($db_trigger['correlation_tag'] !== getRequest('correlation_tag')) {
+					$trigger['correlation_tag'] = getRequest('correlation_tag');
 				}
 			}
 
@@ -502,7 +512,9 @@ elseif (isset($_REQUEST['form'])) {
 		'hostid' => getRequest('hostid', 0),
 		'expression_action' => $expression_action,
 		'recovery_expression_action' => $recovery_expression_action,
-		'tags' => getRequest('tags', [])
+		'tags' => getRequest('tags', []),
+		'correlation_mode' => getRequest('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE),
+		'correlation_tag' => getRequest('correlation_tag', '')
 	];
 
 	$triggersView = new CView('configuration.triggers.edit', getTriggerFormData($data));

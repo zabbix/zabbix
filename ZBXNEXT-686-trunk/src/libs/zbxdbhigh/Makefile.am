@@ -17,6 +17,7 @@ libzbxdbhigh_a_SOURCES = \
 	lld_host.c \
 	itservices.c \
 	template_item.c \
-	template.h
+	template.h \
+	trigger.c
 
 libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/ @UNIXODBC_CFLAGS@

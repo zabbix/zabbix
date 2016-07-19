@@ -174,27 +174,27 @@ class testTemplateInheritance extends CWebTest {
 				break;
 		}
 	}
-//
-//	public function testFormItem_unlinkHost(){
-//
-//		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
-//		$this->assertEquals(1, DBcount($sql));
-//		$row = DBfetch(DBselect($sql));
-//		$hostid = $row['hostid'];
-//
-//		$this->zbxTestLogin('hosts.php');
-//		$this->zbxTestClickLinkText($this->hostName);
-//
-//		$this->zbxTestClickWait('tab_templateTab');
-//		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('unlink_and_clear_'.$hostid));
-//		$this->zbxTestTextPresent('Template App Zabbix Agent');
-//		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
-//		$this->zbxTestTextNotPresent('Template App Zabbix Agent');
-//
-//		$this->zbxTestClickWait('update');
-//		$this->zbxTestTextPresent('Host updated');
-//	}
-//
+
+	public function testFormItem_unlinkHost(){
+
+		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
+		$this->assertEquals(1, DBcount($sql));
+		$row = DBfetch(DBselect($sql));
+		$hostid = $row['hostid'];
+
+		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestClickLinkText($this->hostName);
+
+		$this->zbxTestClickWait('tab_templateTab');
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('unlink_and_clear_'.$hostid));
+		$this->zbxTestTextPresent('Template App Zabbix Agent');
+		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
+		$this->zbxTestTextNotPresent('Template App Zabbix Agent');
+
+		$this->zbxTestClickWait('update');
+		$this->zbxTestTextPresent('Host updated');
+	}
+
 	/**
 	 * Creates a new trigger on the template and checks that the inherited trigger matches the original.
 	 *

@@ -51,11 +51,15 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 {
 	const char		*__function_name = "process_time_functions";
 	DC_TRIGGER		*trigger_info = NULL;
-	zbx_vector_ptr_t	trigger_order;
+	zbx_vector_ptr_t	trigger_order, trigger_diff;
+	zbx_vector_uint64_t	triggerids;
+	int			events_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_ptr_create(&trigger_order);
+	zbx_vector_ptr_create(&trigger_diff);
+	zbx_vector_uint64_create(&triggerids);
 
 	while (1)
 	{
@@ -70,14 +74,26 @@ static void	process_time_functions(int *triggers_count, int *events_count)
 
 		DBbegin();
 
-		process_triggers(&trigger_order);
+		zbx_process_triggers(&trigger_order, &trigger_diff);
 
-		*events_count += process_events();
+		if (0 != (events_num = process_trigger_events(&trigger_diff, &triggerids)))
+		{
+			*events_count += events_num;
+
+			DCconfig_triggers_apply_changes(&trigger_diff);
+			zbx_save_trigger_changes(&trigger_diff);
+		}
 
 		DBcommit();
+
+		DCconfig_unlock_triggers(&triggerids);
+		zbx_vector_uint64_clear(&triggerids);
 	}
 
 	zbx_free(trigger_info);
+	zbx_vector_uint64_destroy(&triggerids);
+	zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
+	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_ptr_destroy(&trigger_order);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -584,6 +600,10 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		now = time(NULL);
 		nextcheck = now + TIMER_DELAY - (now % TIMER_DELAY);
 		sleeptime = nextcheck - now;
+
+		/* flush correlated event queue and set minimal sleep time if queue is not empty */
+		if (0 != flush_correlated_events() && 1 < sleeptime)
+			sleeptime = 1;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{

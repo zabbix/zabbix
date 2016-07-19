@@ -639,6 +639,24 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define PROXY_HISTORY_FLAG_META		0x01
 #define PROXY_HISTORY_FLAG_NOVALUE	0x02
 
+/* global correlation constants */
+#define ZBX_CORRELATION_ENABLED				0
+#define ZBX_CORRELATION_DISABLED			1
+
+#define ZBX_CORR_CONDITION_OLD_EVENT_TAG		0
+#define ZBX_CORR_CONDITION_NEW_EVENT_TAG		1
+#define ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP		2
+#define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
+#define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
+#define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
+
+#define ZBX_CORR_OPERATION_CLOSE_OLD			0
+#define ZBX_CORR_OPERATION_CLOSE_NEW			1
+
+/* trigger correlation modes */
+#define ZBX_TRIGGER_CORRELATION_NONE	0
+#define ZBX_TRIGGER_CORRELATION_TAG	1
+
 /* user permissions */
 typedef enum
 {
@@ -1265,5 +1283,7 @@ typedef struct
 zbx_token_t;
 
 int	zbx_token_find(const char *expression, int pos, zbx_token_t *token);
+
+int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
 
 #endif
