@@ -497,6 +497,7 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 $triggers_hosts = getTriggersHostsList($triggers);
+$triggers_hosts = makeTriggersHostsList($triggers_hosts);
 
 foreach ($triggers as $trigger) {
 	$description = [];
