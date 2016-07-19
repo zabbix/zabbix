@@ -1434,7 +1434,7 @@ footer {
 
 	input[type="checkbox"] {
 		position: absolute;
-		clip: rect(1px, 1px, 1px, 1px);
+		display: none;
 
 		&:checked + label {
 			border-color: darken(desaturate($alt-green, 10%), 16%);
@@ -1548,7 +1548,7 @@ footer {
 
 	input[type="radio"] {
 		position: absolute;
-		clip: rect(1px, 1px, 1px, 1px);
+		display: none;
 
 		+ label {
 			color: $font-color;
