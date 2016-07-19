@@ -1107,7 +1107,7 @@ void	DBregister_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip
 
 		add_event(EVENT_SOURCE_AUTO_REGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE, autoreg_hostid, &ts,
 				TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0, 0, NULL, 0, NULL);
-		process_events(NULL, NULL);
+		process_events();
 	}
 
 	zbx_free(host_esc);

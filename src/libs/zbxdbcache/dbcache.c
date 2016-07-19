@@ -2121,11 +2121,11 @@ int	DCsync_history(int sync_type, int *total_num)
 	{
 		zbx_vector_uint64_create(&triggerids);
 		zbx_vector_uint64_reserve(&triggerids, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
+		zbx_vector_ptr_create(&trigger_diff);
 	}
 
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, MIN(cache->history_num, ZBX_HC_SYNC_MAX) + 32);
-	zbx_vector_ptr_create(&trigger_diff);
 
 	do
 	{
@@ -2168,10 +2168,11 @@ int	DCsync_history(int sync_type, int *total_num)
 			/*   DCmass_update_items() */
 			/*   DCmass_update_triggers() */
 			/*   DCflush_nextchecks() */
-			process_events(&trigger_diff, &triggerids);
-
-			DCconfig_triggers_apply_changes(&trigger_diff);
-			zbx_save_trigger_changes(&trigger_diff);
+			if (0 != process_trigger_events(&trigger_diff, &triggerids))
+			{
+				DCconfig_triggers_apply_changes(&trigger_diff);
+				zbx_save_trigger_changes(&trigger_diff);
+			}
 
 			zbx_vector_ptr_clear_ext(&trigger_diff, (zbx_clean_func_t)zbx_trigger_diff_free);
 		}
@@ -2225,10 +2226,12 @@ int	DCsync_history(int sync_type, int *total_num)
 	}
 	while ((ZBX_HC_SYNC_TIME_MAX >= now - sync_start && 0 != next_sync) || sync_type == ZBX_SYNC_FULL);
 
-	zbx_vector_ptr_destroy(&trigger_diff);
 	zbx_vector_ptr_destroy(&history_items);
 	if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_vector_ptr_destroy(&trigger_diff);
 		zbx_vector_uint64_destroy(&triggerids);
+	}
 finish:
 	if (ZBX_SYNC_FULL == sync_type)
 	{
@@ -2238,6 +2241,9 @@ finish:
 		cache->history_queue = tmp_history_queue;
 
 		UNLOCK_CACHE;
+
+		while (0 != flush_correlated_events())
+			;
 
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data done");
 	}

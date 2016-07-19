@@ -3853,6 +3853,25 @@ static void	corr_condition_free_data(zbx_dc_corr_condition_t *condition)
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_compare_corr_conditions_by_type                               *
+ *                                                                            *
+ * Purpose: compare two correlation conditions by their type                  *
+ *                                                                            *
+ * Comments: This function is used to sort correlation conditions by type.    *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_compare_corr_conditions_by_type(const void *d1, const void *d2)
+{
+	zbx_dc_corr_condition_t	*c1 = *(zbx_dc_corr_condition_t **)d1;
+	zbx_dc_corr_condition_t	*c2 = *(zbx_dc_corr_condition_t **)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(c1->type, c2->type);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCsync_corr_conditions                                           *
  *                                                                            *
  * Purpose: Updates correlation conditions configuration cache                *
@@ -3930,6 +3949,16 @@ static void	DCsync_corr_conditions(DB_RESULT result)
 
 		corr_condition_free_data(condition);
 		zbx_hashset_iter_remove(&iter);
+	}
+
+	/* sort conditions by type */
+
+	zbx_hashset_iter_reset(&config->correlations, &iter);
+
+	while (NULL != (correlation = zbx_hashset_iter_next(&iter)))
+	{
+		if (CONDITION_EVAL_TYPE_AND_OR == correlation->evaltype)
+			zbx_vector_ptr_sort(&correlation->conditions, dc_compare_corr_conditions_by_type);
 	}
 
 	zbx_vector_uint64_destroy(&syncids);
@@ -6192,6 +6221,42 @@ next:;
 	UNLOCK_CACHE;
 
 	return history_items->values_num - locked_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCconfig_lock_triggers_by_triggerids                             *
+ *                                                                            *
+ * Purpose: Lock triggersso that multiple processes do not process one        *
+ *          trigger simultaneously.                                           *
+ *                                                                            *
+ * Parameters: triggerids_in  - [IN] ids of triggers to lock                  *
+ *             triggerids_out - [OUT] ids of locked triggers                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCconfig_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_in, zbx_vector_uint64_t *triggerids_out)
+{
+	int		i;
+	ZBX_DC_TRIGGER	*dc_trigger;
+
+	if (0 == triggerids_in->values_num)
+		return;
+
+	LOCK_CACHE;
+
+	for (i = 0; i < triggerids_in->values_num; i++)
+	{
+		if (NULL == (dc_trigger = zbx_hashset_search(&config->triggers, &triggerids_in->values[i])))
+			continue;
+
+		if (1 == dc_trigger->locked)
+			continue;
+
+		dc_trigger->locked = 1;
+		zbx_vector_uint64_append(triggerids_out, dc_trigger->triggerid);
+	}
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -9446,14 +9511,14 @@ void	zbx_set_availability_diff_ts(int ts)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_corr_condition_free                                          *
+ * Function: corr_condition_clean                                             *
  *                                                                            *
  * Purpose: frees correlation condition                                       *
  *                                                                            *
  * Parameter: condition - [IN] the condition to free                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_corr_condition_free(zbx_corr_condition_t *condition)
+static void	corr_condition_clean(zbx_corr_condition_t *condition)
 {
 	switch (condition->type)
 	{
@@ -9473,48 +9538,43 @@ static void	zbx_corr_condition_free(zbx_corr_condition_t *condition)
 			zbx_free(condition->data.tag_value.value);
 			break;
 	}
-
-	zbx_free(condition);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_correlation_free                                             *
+ * Function: dc_correlation_free                                              *
  *                                                                            *
  * Purpose: frees global correlation rule                                     *
  *                                                                            *
  * Parameter: condition - [IN] the condition to free                          *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_correlation_free(zbx_correlation_t *correlation)
+static void	dc_correlation_free(zbx_correlation_t *correlation)
 {
 	zbx_free(correlation->name);
 	zbx_free(correlation->formula);
 
-	zbx_vector_ptr_clear_ext(&correlation->conditions, (zbx_clean_func_t)zbx_corr_condition_free);
-	zbx_vector_ptr_destroy(&correlation->conditions);
 	zbx_vector_ptr_clear_ext(&correlation->operations, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&correlation->operations);
+	zbx_vector_ptr_destroy(&correlation->conditions);
 
 	zbx_free(correlation);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dc_corr_condition_dup                                        *
+ * Function: dc_corr_condition_copy                                           *
  *                                                                            *
- * Purpose: clones cached correlation condition to memory                     *
+ * Purpose: copies cached correlation condition to memory                     *
  *                                                                            *
- * Parameter: condition - [IN] the condition to clone                         *
+ * Parameter: dc_condition - [IN] the condition to copy                       *
+ *            condition    - [OUT] the destination condition                  *
  *                                                                            *
  * Return value: The cloned correlation condition.                            *
  *                                                                            *
  ******************************************************************************/
-static zbx_corr_condition_t	*zbx_dc_corr_condition_dup(zbx_dc_corr_condition_t *dc_condition)
+static void	dc_corr_condition_copy(const zbx_dc_corr_condition_t *dc_condition, zbx_corr_condition_t *condition)
 {
-	zbx_corr_condition_t	*condition;
-
-	condition = (zbx_corr_condition_t *)zbx_malloc(NULL, sizeof(zbx_corr_condition_t));
 	condition->type = dc_condition->type;
 
 	switch (condition->type)
@@ -9540,15 +9600,13 @@ static zbx_corr_condition_t	*zbx_dc_corr_condition_dup(zbx_dc_corr_condition_t *
 			condition->data.group.op = dc_condition->data.group.op;
 			break;
 	}
-
-	return condition;
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: zbx_dc_corr_operation_dup                                        *
  *                                                                            *
- * Purpose: clones cached correlation oepration to memory                     *
+ * Purpose: clones cached correlation operation to memory                     *
  *                                                                            *
  * Parameter: operation - [IN] the operation to clone                         *
  *                                                                            *
@@ -9567,6 +9625,120 @@ static zbx_corr_operation_t	*zbx_dc_corr_operation_dup(zbx_dc_corr_operation_t *
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_correlation_formula_dup                                       *
+ *                                                                            *
+ * Purpose: clones cached correlation formula, generating it if necessary     *
+ *                                                                            *
+ * Parameter: correlation - [IN] the correlation                              *
+ *                                                                            *
+ * Return value: The cloned correlation formula.                              *
+ *                                                                            *
+ ******************************************************************************/
+static char	*dc_correlation_formula_dup(const zbx_dc_correlation_t *dc_correlation)
+{
+#define ZBX_OPERATION_TYPE_UNKNOWN	0
+#define ZBX_OPERATION_TYPE_OR		1
+#define ZBX_OPERATION_TYPE_AND		2
+
+	char				*formula = NULL, *op = NULL;
+	size_t				formula_alloc = 0, formula_offset = 0;
+	int				i, last_type = -1, last_op = ZBX_OPERATION_TYPE_UNKNOWN;
+	const zbx_dc_corr_condition_t	*dc_condition;
+	zbx_uint64_t			last_id;
+
+	if (CONDITION_EVAL_TYPE_EXPRESSION == dc_correlation->evaltype || 0 == dc_correlation->conditions.values_num)
+		return zbx_strdup(NULL, dc_correlation->formula);
+
+	dc_condition = (const zbx_dc_corr_condition_t *)dc_correlation->conditions.values[0];
+
+	switch (dc_correlation->evaltype)
+	{
+		case CONDITION_EVAL_TYPE_OR:
+			op = " or";
+			break;
+		case CONDITION_EVAL_TYPE_AND:
+			op = " and";
+			break;
+	}
+
+	if (NULL != op)
+	{
+		zbx_snprintf_alloc(&formula, &formula_alloc, &formula_offset, "{" ZBX_FS_UI64 "}",
+				dc_condition->corr_conditionid);
+
+		for (i = 1; i < dc_correlation->conditions.values_num; i++)
+		{
+			dc_condition = (const zbx_dc_corr_condition_t *)dc_correlation->conditions.values[i];
+
+			zbx_strcpy_alloc(&formula, &formula_alloc, &formula_offset, op);
+			zbx_snprintf_alloc(&formula, &formula_alloc, &formula_offset, " {" ZBX_FS_UI64 "}",
+					dc_condition->corr_conditionid);
+		}
+
+		return formula;
+	}
+
+	last_id = dc_condition->corr_conditionid;
+	last_type = dc_condition->type;
+
+	for (i = 1; i < dc_correlation->conditions.values_num; i++)
+	{
+		dc_condition = (const zbx_dc_corr_condition_t *)dc_correlation->conditions.values[i];
+
+		if (last_type == dc_condition->type)
+		{
+			if (last_op != ZBX_OPERATION_TYPE_OR)
+				zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, '(');
+
+			zbx_snprintf_alloc(&formula, &formula_alloc, &formula_offset, "{" ZBX_FS_UI64 "} or ", last_id);
+			last_op = ZBX_OPERATION_TYPE_OR;
+		}
+		else
+		{
+			zbx_snprintf_alloc(&formula, &formula_alloc, &formula_offset, "{" ZBX_FS_UI64 "}", last_id);
+
+			if (last_op == ZBX_OPERATION_TYPE_OR)
+				zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ')');
+
+			zbx_strcpy_alloc(&formula, &formula_alloc, &formula_offset, " and ");
+
+			last_op = ZBX_OPERATION_TYPE_AND;
+		}
+
+		last_type = dc_condition->type;
+		last_id = dc_condition->corr_conditionid;
+	}
+
+	zbx_snprintf_alloc(&formula, &formula_alloc, &formula_offset, "{" ZBX_FS_UI64 "}", last_id);
+
+	if (last_op == ZBX_OPERATION_TYPE_OR)
+		zbx_chrcpy_alloc(&formula, &formula_alloc, &formula_offset, ')');
+
+	return formula;
+
+#undef ZBX_OPERATION_TYPE_UNKNOWN
+#undef ZBX_OPERATION_TYPE_OR
+#undef ZBX_OPERATION_TYPE_AND
+}
+
+void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules)
+{
+	zbx_vector_ptr_create(&rules->correlations);
+	zbx_hashset_create_ext(&rules->conditions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
+			(zbx_clean_func_t)corr_condition_clean, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	rules->sync_ts = 0;
+}
+
+void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules)
+{
+	zbx_vector_ptr_clear_ext(&rules->correlations, (zbx_clean_func_t)dc_correlation_free);
+	zbx_hashset_clear(&rules->conditions);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dc_correlation_get_rules                                     *
  *                                                                            *
  * Purpose: gets correlation rules from configuration cache                   *
@@ -9581,19 +9753,24 @@ static zbx_corr_operation_t	*zbx_dc_corr_operation_dup(zbx_dc_corr_operation_t *
  *           allows to locally cache the correlation rules.                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_dc_correlation_get_rules(zbx_vector_ptr_t *rules, int *sync_ts)
+void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules)
 {
 	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_dc_correlation_t	*dc_correlation;
+	zbx_dc_corr_condition_t	*dc_condition;
 	zbx_correlation_t	*correlation;
+	zbx_corr_condition_t	*condition, condition_local;
 
 	LOCK_CACHE;
 
-	if (config->sync_ts == *sync_ts)
-		goto out;
+	if (config->sync_ts == rules->sync_ts)
+	{
+		UNLOCK_CACHE;
+		return;
+	}
 
-	zbx_vector_ptr_clear_ext(rules, (zbx_clean_func_t)zbx_correlation_free);
+	zbx_dc_correlation_rules_clean(rules);
 
 	zbx_hashset_iter_reset(&config->correlations, &iter);
 	while (NULL != (dc_correlation = zbx_hashset_iter_next(&iter)))
@@ -9602,14 +9779,17 @@ void zbx_dc_correlation_get_rules(zbx_vector_ptr_t *rules, int *sync_ts)
 		correlation->correlationid = dc_correlation->correlationid;
 		correlation->evaltype = dc_correlation->evaltype;
 		correlation->name = zbx_strdup(NULL, dc_correlation->name);
-		correlation->formula = zbx_strdup(NULL, dc_correlation->formula);
+		correlation->formula = dc_correlation_formula_dup(dc_correlation);
 		zbx_vector_ptr_create(&correlation->conditions);
 		zbx_vector_ptr_create(&correlation->operations);
 
 		for (i = 0; i < dc_correlation->conditions.values_num; i++)
 		{
-			zbx_vector_ptr_append(&correlation->conditions,
-					zbx_dc_corr_condition_dup(dc_correlation->conditions.values[i]));
+			dc_condition = (zbx_dc_corr_condition_t *)dc_correlation->conditions.values[i];
+			condition_local.corr_conditionid = dc_condition->corr_conditionid;
+			condition = zbx_hashset_insert(&rules->conditions, &condition_local, sizeof(condition_local));
+			dc_corr_condition_copy(dc_condition, condition);
+			zbx_vector_ptr_append(&correlation->conditions, condition);
 		}
 
 		for (i = 0; i < dc_correlation->operations.values_num; i++)
@@ -9618,10 +9798,12 @@ void zbx_dc_correlation_get_rules(zbx_vector_ptr_t *rules, int *sync_ts)
 					zbx_dc_corr_operation_dup(dc_correlation->operations.values[i]));
 		}
 
-		zbx_vector_ptr_append(rules, correlation);
+		zbx_vector_ptr_append(&rules->correlations, correlation);
 	}
 
-	*sync_ts = config->sync_ts;
-out:
+	rules->sync_ts = config->sync_ts;
+
 	UNLOCK_CACHE;
+
+	zbx_vector_ptr_sort(&rules->correlations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 }
