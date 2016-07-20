@@ -1086,7 +1086,7 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestLaunchPopup('add_protoitem');
 
 			$this->zbxTestClickLinkTextWait($this->item);
-			$this->webDriver->switchTo()->window('');
+			$this->zbxTestWaitWindowClose();
 
 			$this->zbxTestLaunchPopup('add_item');
 
@@ -1143,7 +1143,7 @@ class testFormGraphPrototype extends CWebTest {
 					if (!isset($data['noAxisItem'])) {
 						$this->zbxTestLaunchPopup('yaxis_min_prototype', 'zbx_popup_item');
 						$this->zbxTestClickLinkTextWait($this->item);
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 					}
 					break;
 				case 'Calculated':
@@ -1158,14 +1158,13 @@ class testFormGraphPrototype extends CWebTest {
 					if (!isset($data['noAxisItem'])) {
 						$this->zbxTestLaunchPopup('yaxis_max_prototype', 'zbx_popup_item');
 						$this->zbxTestClickLinkTextWait($this->item);
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 					}
 					break;
 				case 'Calculated':
 					break;
 			}
 		}
-
 
 		$this->zbxTestClickWait('add');
 

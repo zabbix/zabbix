@@ -30,7 +30,17 @@ DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t obj
 	return NULL;
 }
 
-int	process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+int	process_events()
+{
+	return 0;
+}
+
+int	process_trigger_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock)
+{
+	return 0;
+}
+
+int	flush_correlated_events()
 {
 	return 0;
 }
