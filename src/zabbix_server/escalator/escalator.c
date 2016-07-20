@@ -1216,7 +1216,7 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 					if (SUCCEED == DBis_null(row[3]))
 						break;
 
-					default_msg = (unsigned char)atoi(row[4]);
+					ZBX_STR2UCHAR(default_msg, row[4]);
 					ZBX_DBROW2UINT64(mediatypeid, row[7]);
 
 					if (0 == default_msg)
@@ -1234,7 +1234,12 @@ static void	escalation_execute_recovery_operations(DB_ESCALATION *escalation, co
 							message, r_event);
 					break;
 				case OPERATION_TYPE_RECOVERY_MESSAGE:
-					if (SUCCEED != DBis_null(row[3]))
+					if (SUCCEED == DBis_null(row[3]))
+						break;
+
+					ZBX_STR2UCHAR(default_msg, row[4]);
+
+					if (0 == default_msg)
 					{
 						subject = row[5];
 						message = row[6];
@@ -1877,18 +1882,18 @@ static void	escalation_update_diff(const DB_ESCALATION *escalation, zbx_escalati
  *                                                                            *
  * Function: process_escalations                                              *
  *                                                                            *
- * Purpose: execute operations (command and message);                         *
+ * Purpose: execute escalation steps and recovery operations;                 *
  *          postpone escalations during maintenance and due to trigger dep.;  *
  *          delete completed escalations from the database;                   *
  *          cancel escalations due to changed configuration, etc.             *
  *                                                                            *
- * Parameters: now               - [IN]  the current time                     *
- *             nextcheck         - [OUT] time of the next invocation          *
- *             escalation_source - [IN]  type of escalations to be handled    *
+ * Parameters: now               - [IN] the current time                      *
+ *             nextcheck         - [IN/OUT] time of the next invocation       *
+ *             escalation_source - [IN] type of escalations to be handled     *
  *                                                                            *
  * Return value: the count of deleted escalations                             *
  *                                                                            *
- * Comments: process_actions() creates pseudo-escalations also for            *
+ * Comments: actions.c:process_actions() creates pseudo-escalations also for  *
  *           EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION events,   *
  *           this function handles message and command operations for these   *
  *           events while host, group, template operations are handled        *
@@ -1905,8 +1910,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 	zbx_vector_uint64_t	escalationids;
 	int			res, i;
 
-	char			*sql = NULL, *filter = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset = 0, filter_alloc = 0, filter_offset = 0;
+	char			*filter = NULL;
+	size_t			filter_alloc = 0, filter_offset = 0;
 	zbx_escalation_diff_t	*diff;
 	zbx_vector_ptr_t	diffs;
 
@@ -1914,7 +1919,6 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 
 	zbx_vector_uint64_create(&escalationids);
 	zbx_vector_ptr_create(&diffs);
-	sql = zbx_malloc(sql, sql_alloc);
 
 	/* Selection of escalations to be processed:                                                          */
 	/*                                                                                                    */
@@ -2022,8 +2026,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			escalation_cancel(&escalation, &action, &event, error);
 			zbx_free(error);
 			zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-			free_db_action(&action);
 			free_event_info(&event);
+			free_db_action(&action);
 			continue;
 		}
 
@@ -2034,11 +2038,14 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 			case ZBX_ESCALATION_CANCEL:
 				escalation_cancel(&escalation, &action, &event, error);
 				zbx_free(error);
-				/* deliberately falling through */
+				/* break; is not missing here */
 			case ZBX_ESCALATION_DELETE:
 				zbx_vector_uint64_append(&escalationids, escalation.escalationid);
-				/* deliberately falling through */
+				/* break; is not missing here */
 			case ZBX_ESCALATION_SKIP:
+				if (0 != escalation.r_eventid)
+					free_event_info(&r_event);
+				free_event_info(&event);
 				free_db_action(&action);
 				continue;
 			case ZBX_ESCALATION_PROCESS:
@@ -2078,86 +2085,95 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		escalation_update_diff(&escalation, diff);
 		zbx_vector_ptr_append(&diffs, diff);
 
-		free_db_action(&action);
-		free_event_info(&event);
-
 		if (0 != escalation.r_eventid)
 			free_event_info(&r_event);
+		free_event_info(&event);
+		free_db_action(&action);
+
 	}
 
 	DBfree_result(result);
 
-	/* 2. Update escalations in the DB. */
-	if (0 == diffs.values_num)
-		goto delete;
-
-	zbx_vector_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	if (0 == diffs.values_num && 0 == escalationids.values_num)
+		goto out;
 
 	DBbegin();
 
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	for (i = 0; i < diffs.values_num; i++)
+	/* 2. Update escalations in the DB. */
+	if (0 != diffs.values_num)
 	{
-		char	separator = ' ';
+		char	*sql = NULL;
+		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 
-		diff = (zbx_escalation_diff_t *)diffs.values[i];
+		sql = zbx_malloc(sql, sql_alloc);
 
-		if (ESCALATION_STATUS_COMPLETED == diff->status)
+		zbx_vector_ptr_sort(&diffs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		for (i = 0; i < diffs.values_num; i++)
 		{
-			zbx_vector_uint64_append(&escalationids, diff->escalationid);
-			continue;
-		}
+			char	separator = ' ';
 
-		if (0 == (diff->flags & ZBX_DIFF_ESCALATION_UPDATE))
-			continue;
+			diff = (zbx_escalation_diff_t *)diffs.values[i];
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set");
-
-		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck=%d", separator, diff->nextcheck);
-			separator = ',';
-
-			if (diff->nextcheck < *nextcheck)
+			if (ESCALATION_STATUS_COMPLETED == diff->status)
 			{
-				*nextcheck = diff->nextcheck;
+				zbx_vector_uint64_append(&escalationids, diff->escalationid);
+				continue;
 			}
+
+			if (0 == (diff->flags & ZBX_DIFF_ESCALATION_UPDATE))
+				continue;
+
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update escalations set");
+
+			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_NEXTCHECK))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cnextcheck=%d", separator,
+						diff->nextcheck);
+				separator = ',';
+
+				if (diff->nextcheck < *nextcheck)
+				{
+					*nextcheck = diff->nextcheck;
+				}
+			}
+
+			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cesc_step=%d", separator,
+						diff->esc_step);
+				separator = ',';
+			}
+
+			if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_STATUS))
+			{
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%d", separator,
+						diff->status);
+			}
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where escalationid=" ZBX_FS_UI64 ";\n",
+					diff->escalationid);
+
+			DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 		}
 
-		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_ESC_STEP))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cesc_step=%d", separator, diff->esc_step);
-			separator = ',';
-		}
+		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (0 != (diff->flags & ZBX_DIFF_ESCALATION_UPDATE_STATUS))
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%d", separator, diff->status);
+		if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+			DBexecute("%s", sql);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where escalationid=" ZBX_FS_UI64 ";\n",
-				diff->escalationid);
-
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		zbx_free(sql);
 	}
 
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
-		DBexecute("%s", sql);
-
-	DBcommit();
-
-delete:
 	/* 3. Delete cancelled, completed escalations. */
 	if (0 != escalationids.values_num)
-	{
-		DBbegin();
 		DBexecute_multiple_query("delete from escalations where", "escalationid", &escalationids);
-		DBcommit();
-	}
 
+	DBcommit();
+out:
 	zbx_free(filter);
-	zbx_free(sql);
 
 	res = escalationids.values_num;		/* performance metric */
 

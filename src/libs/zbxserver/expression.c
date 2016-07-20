@@ -2165,7 +2165,7 @@ static void	get_event_tags(const DB_EVENT *event, char **replace_to)
  * Purpose: request recovery event value by macro                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_recovery_event_value(const char *macro, DB_EVENT *r_event, char **replace_to)
+static void	get_recovery_event_value(const char *macro, const DB_EVENT *r_event, char **replace_to)
 {
 	if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_DATE))
 	{
