@@ -221,7 +221,7 @@ class testPageActions extends CWebTest {
 
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
-				$this->zbxTestClickXpath("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
+				$this->zbxTestClickXpathWait("//a[contains(@onclick,'actionid[]=".$action['actionid']."')]");
 				$this->zbxTestTextPresent('Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
@@ -324,7 +324,7 @@ class testPageActions extends CWebTest {
 		$this->webDriver->switchTo()->alert()->accept();
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent('Selected actions deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Selected actions deleted');
 
 		$this->assertEquals(0, DBcount('SELECT * FROM actions WHERE actionid='.$action['actionid']));
 

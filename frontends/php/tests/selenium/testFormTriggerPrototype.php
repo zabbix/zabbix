@@ -75,7 +75,6 @@ class testFormTriggerPrototype extends CWebTest {
 	 */
 	protected $itemKey = 'item-prototype-reuse';
 
-
 	/**
 	 * Backup the tables that will be modified during the tests.
 	 */
@@ -339,7 +338,9 @@ class testFormTriggerPrototype extends CWebTest {
 		$this->zbxTestTextPresent(['OK event generation', 'PROBLEM event generation mode']);
 		$this->zbxTestTextPresent(['Expression', 'Recovery expression', 'None']);
 		$this->zbxTestTextPresent(['Single', 'Multiple']);
-		$this->assertTrue($this->zbxTestCheckboxSelected('type_0'));
+		if (!isset($data['templatedHost'])) {
+			$this->assertTrue($this->zbxTestCheckboxSelected('type_0'));
+		}
 
 		$this->zbxTestTextPresent('Description');
 		$this->zbxTestAssertVisibleId('comments');
