@@ -425,11 +425,22 @@ class CCorrelation extends CApiService {
 								);
 							}
 						}
+						else {
+							/*
+							 * The evaluation method has not been changed, but it has been set and it's a custom
+							 * expression. The formula needs to be updated in this case.
+							 */
+							if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+								$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
+									$conditions_for_correlations[$correlation['correlationid']]
+								);
+							}
+						}
 					}
 					elseif ($db_correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 						/*
-						 * The evaluation method has not been changed, but it's still a custom expression. The formula
-						 * needs to be updated anyway, because of the new conditions.
+						 * The evaluation method has not been changed and was not set. It's read from DB, but it's still
+						 * a custom expression and there are new conditions, so the formula needs to be updated.
 						 */
 						$this->updateFormula($correlation['correlationid'], $correlation['filter']['formula'],
 							$conditions_for_correlations[$correlation['correlationid']]
