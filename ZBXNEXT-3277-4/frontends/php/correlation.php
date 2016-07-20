@@ -105,7 +105,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	$correlation = [
 		'name' => getRequest('name'),
 		'description' => getRequest('description'),
-		'status' => getRequest('status', ZBX_CORRELATION_ENABLED),
+		'status' => getRequest('status', ZBX_CORRELATION_DISABLED),
 		'operations' => getRequest('operations', [])
 	];
 
