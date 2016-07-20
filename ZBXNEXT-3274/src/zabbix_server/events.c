@@ -486,7 +486,7 @@ static void	correlate_events_by_default_rules()
 	}
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select eventid,source,object,objectid from problem where r_eventid is null and");
+			"select eventid,source,object,objectid from problem where r_eventid is null and (");
 
 	if (0 != trigger_triggerids.values_num)
 	{
@@ -527,6 +527,7 @@ static void	correlate_events_by_default_rules()
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 	}
 
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 	result = DBselect("%s", sql);
 
 	while (NULL != (row = DBfetch(result)))
@@ -587,8 +588,8 @@ static void	correlate_events_by_trigger_rules()
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select distinct p.eventid,p.objectid from problem p,problem_tag pt"
-			" where r_eventid is null"
-				" and");
+			" where p.r_eventid is null"
+				" and (");
 
 	sql_offset_old = sql_offset;
 
@@ -645,6 +646,7 @@ static void	correlate_events_by_trigger_rules()
 
 	if (sql_offset_old != sql_offset)
 	{
+		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
 		result = DBselect("%s", sql);
 
 		while (NULL != (row = DBfetch(result)))
