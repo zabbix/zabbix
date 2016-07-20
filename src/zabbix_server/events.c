@@ -38,22 +38,21 @@ static zbx_correlation_rules_t	correlation_rules;
  ******************************************************************************/
 static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
 {
-	int		i, whitespace = 1;
+	int		i;
 	const char	*ptr;
 
 	/* check if the tag is valid - has characters other than whitespace */
 	/* and doesn't contain '/' character                                */
-	for (ptr = tag->tag; '\0' != *ptr; ptr++)
+	for (ptr = tag->tag; ; ptr++)
 	{
-		if ('/' == *ptr)
+		if ('\0' == *ptr || '/' == *ptr)
 			return FAIL;
 
-		if (' ' != *ptr)
-			whitespace = 0;
-	}
+		if (' ' == *ptr)
+			continue;
 
-	if (1 == whitespace)
-		return FAIL;
+		break;
+	}
 
 	/* check for duplicated tags */
 	for (i = 0; i < event->tags.values_num; i++)
