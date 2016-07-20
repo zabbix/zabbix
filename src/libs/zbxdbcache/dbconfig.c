@@ -6226,7 +6226,7 @@ next:;
  *                                                                            *
  * Function: DCconfig_lock_triggers_by_triggerids                             *
  *                                                                            *
- * Purpose: Lock triggersso that multiple processes do not process one        *
+ * Purpose: Lock triggers so that multiple processes do not process one       *
  *          trigger simultaneously.                                           *
  *                                                                            *
  * Parameters: triggerids_in  - [IN] ids of triggers to lock                  *
