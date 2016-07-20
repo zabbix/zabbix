@@ -103,7 +103,7 @@ class testPageUsers extends CWebTest {
 
 			$this->webDriver->switchTo()->alert()->accept();
 			$this->zbxTestCheckTitle('Configuration of users');
-			$this->zbxTestTextPresent('User deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'User deleted');
 
 			$sql = "select * from users where userid=$id";
 			$this->assertEquals(0, DBcount($sql), "Chuck Norris: user $id deleted but still exists in table users");
