@@ -58,7 +58,7 @@ class CTag extends CObject {
 	}
 
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
-	public function startToString() {
+	protected function startToString() {
 		$res = '<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
 			if ($value === null) {
@@ -76,11 +76,11 @@ class CTag extends CObject {
 		return $res;
 	}
 
-	public function bodyToString() {
+	protected function bodyToString() {
 		return parent::toString(false);
 	}
 
-	public function endToString() {
+	protected function endToString() {
 		$res = ($this->paired) ? '</'.$this->tagname.'>' : '';
 
 		return $res;
