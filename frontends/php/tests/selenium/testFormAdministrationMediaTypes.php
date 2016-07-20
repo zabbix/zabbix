@@ -225,7 +225,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of media types');
 		if ($used_by_operations) {
 				$this->zbxTestTextNotPresent('Media type deleted');
-				$this->zbxTestTextPresent('Cannot delete media type');
+				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete media type');
 				$this->zbxTestTextPresent('Media types used by action');
 		}
 		else {

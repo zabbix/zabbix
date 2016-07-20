@@ -214,6 +214,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestClickButtonText($button_text) {
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"));
 		$this->webDriver->findElement(WebDriverBy::xpath("//button[contains(text(),'$button_text')]"))->click();
 	}
 
@@ -239,14 +240,16 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 		$this->webDriver->findElement(WebDriverBy::xpath("//a[contains(@href,'$href')]"))->click();
 	}
 
-	public function zbxTestCheckboxSelect($a, $select = true) {
-		$checkbox = $this->webDriver->findElement(WebDriverBy::id($a));
+	public function zbxTestCheckboxSelect($id, $select = true) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
+		$checkbox = $this->webDriver->findElement(WebDriverBy::id($id));
 		if ($select != $checkbox->isSelected()) {
 			$checkbox->click();
 		}
 	}
 
 	public function zbxTestCheckboxSelected($id) {
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id));
 		return $this->webDriver->findElement(WebDriverBy::id($id))->isSelected();
 	}
 
@@ -364,20 +367,25 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitUntil($condition, $message) {
-		$this->webDriver->wait(10)->until($condition, $message);
+		$this->webDriver->wait(30)->until($condition, $message);
 		$this->zbxTestCheckFatalErrors();
 	}
 
 	public function zbxTestWaitUntilElementVisible($by) {
-		$this->webDriver->wait(10)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 10 sec element still not visible');
+		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::visibilityOfElementLocated($by), 'after 30 sec element still not visible');
+	}
+
+	public function zbxTestWaitUntilElementPresent($by) {
+		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::presenceOfElementLocated($by));
 	}
 
 	public function zbxTestWaitUntilMessageTextPresent($css, $string) {
-		$this->webDriver->wait(10)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::className($css));
+		$this->webDriver->wait(30)->until(WebDriverExpectedCondition::textToBePresentInElement(WebDriverBy::className($css), $string));
 	}
 
 	public function zbxTestTabSwitch($tab) {
-		$this->zbxTestClickXpath("//div[@id='tabs']/ul/li/a[text()='$tab']");
+		$this->zbxTestClickXpathWait("//div[@id='tabs']/ul/li/a[text()='$tab']");
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//li[contains(@class, 'ui-tabs-active')]/a[text()='$tab']"));
 		$this->zbxTestCheckFatalErrors();
 	}
@@ -389,7 +397,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitWindowAndSwitchToIt($id) {
-		$this->webDriver->wait(10)->until(function () use ($id) {
+		$this->webDriver->wait(31)->until(function () use ($id) {
 			try {
 				$handles = count($this->webDriver->getWindowHandles());
 					if ($handles > 1) {
@@ -405,7 +413,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestWaitWindowClose() {
-		$this->webDriver->wait(5)->until(function () {
+		$this->webDriver->wait(10)->until(function () {
 			try {
 				$handles = count($this->webDriver->getWindowHandles());
 					if ($handles == 1) {
@@ -433,6 +441,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestAssertElementValue($id, $value) {
+		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id($id));
 		$element = $this->webDriver->findElement(WebDriverBy::id($id));
 		$this->assertEquals($value, $element->getAttribute('value'));
 	}
@@ -450,6 +459,7 @@ class CWebTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function zbxTestAssertElementText($xpath, $text){
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 		$element = $this->webDriver->findElement(WebDriverBy::xpath($xpath))->getText();
 		$element_text = trim(preg_replace('/\s+/', ' ', $element));
 		$this->assertEquals($text, $element_text);
