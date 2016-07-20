@@ -169,11 +169,11 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 
 		// Check existing conditions and remove duplicate condition values.
 		$valid_conditions = [];
-		foreach ($conditions as &$condition) {
+		foreach ($conditions as $condition) {
 			$valid_conditions[] = $condition;
 
-			// Check only if type is the same.
-			if ($new_condition['type'] == $condition['type']) {
+			// Check if still exists in loop and if type is the same. Remove same values.
+			if (isset($new_condition) && $new_condition['type'] == $condition['type']) {
 				switch ($new_condition['type']) {
 					case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 					case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
@@ -212,7 +212,6 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 				}
 			}
 		}
-		unset($condition);
 
 		// Check if new condition is valid (tags cannot be empty) and host group IDs must be valid.
 		if (isset($new_condition)) {
