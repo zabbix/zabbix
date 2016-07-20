@@ -36,12 +36,12 @@ my ($key, $service_type, $delay);
 if (getopt('service') eq 'dns')
 {
 	$key = 'rsm.slv.dns.avail';
-	$delay = get_macro_dns_udp_delay();
+	$delay = get_macro_dns_delay();
 }
 elsif (getopt('service') eq 'dns-ns')
 {
 	$key = 'rsm.slv.dns.ns.avail[';
-	$delay = get_macro_dns_udp_delay();
+	$delay = get_macro_dns_delay();
 }
 elsif (getopt('service') eq 'rdds')
 {

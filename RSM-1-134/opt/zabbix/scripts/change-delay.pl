@@ -18,13 +18,13 @@ usage() unless (__validate_input() == SUCCESS);
 my ($key_part, $macro, $sql);
 if (getopt('type') == 1)
 {
-	$key_part = 'rsm.dns.udp[%';
-	$macro = '{$RSM.DNS.UDP.DELAY}';
+	$key_part = 'rsm.dns[%';
+	$macro = '{$RSM.DNS.DELAY}';
 }
 elsif (getopt('type') == 2)
 {
-	$key_part = 'rsm.dns.tcp[%';
-	$macro = '{$RSM.DNS.TCP.DELAY}';
+	print("DNS TCP test is obsoleted, it is now part of DNS UDP, use \"type\"=1");
+	exit;
 }
 elsif (getopt('type') == 3)
 {

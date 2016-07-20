@@ -48,21 +48,21 @@ if (opt('till'))
 if (getopt('service') eq 'tcp-dns-rtt')
 {
 	$key = 'rsm.dns.tcp.rtt[{$RSM.TLD},';
-	$delay = get_macro_dns_tcp_delay();
+	$delay = get_macro_dns_delay();
 	$service_type = 'DNS';
 	$proto = PROTO_TCP;
 }
 elsif (getopt('service') eq 'udp-dns-rtt')
 {
 	$key = 'rsm.dns.udp.rtt[{$RSM.TLD},';
-	$delay = get_macro_dns_udp_delay();
+	$delay = get_macro_dns_delay();
 	$service_type = 'DNS';
 	$proto = PROTO_UDP;
 }
 elsif (getopt('service') eq 'dns-upd')
 {
 	$key = 'rsm.dns.udp.upd[{$RSM.TLD},';
-	$delay = get_macro_dns_udp_delay();
+	$delay = get_macro_dns_delay();
 	$service_type = 'EPP';
 }
 elsif (getopt('service') eq 'rdds43-rtt')

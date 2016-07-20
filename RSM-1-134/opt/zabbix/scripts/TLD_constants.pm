@@ -99,7 +99,7 @@ use constant rsm_trigger_rollweek_thresholds => { '1' => {'threshold' => '10', '
                                     '5' => {'threshold' => '100', 'priority' => 5}
                                   };
 
-use constant cfg_global_macros => {'{$RSM.DNS.UDP.DELAY}' => '', '{$RSM.DNS.TCP.DELAY}' => '', '{$RSM.RDDS.DELAY}' => '', '{$RSM.EPP.DELAY}' => ''};
+use constant cfg_global_macros => {'{$RSM.DNS.DELAY}' => '', '{$RSM.RDDS.DELAY}' => '', '{$RSM.EPP.DELAY}' => ''};
 
 use constant cfg_probe_status_delay => 60;
 

@@ -499,14 +499,14 @@ sub create_item_dns_rtt {
 
     my $item_key = 'rsm.dns.'.$proto_lc.'.rtt[{$RSM.TLD},'.$ns_name.','.$ip.']';
 
-    unless (exists($applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'})) {
-	$applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'} = get_application_id('DNS RTT ('.$proto_uc.')', $templateid, $is_new);
+    unless (exists($applications->{$templateid}->{'DNS ('.$proto_uc.')'})) {
+	$applications->{$templateid}->{'DNS ('.$proto_uc.')'} = get_application_id('DNS ('.$proto_uc.')', $templateid, $is_new);
     }
 
     my $options = {'name' => 'DNS RTT of $2 ($3) ('.$proto_uc.')',
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
-                                              'applications' => [$applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'}],
+                                              'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
                                               'type' => 2, 'value_type' => 0,
 					      'status' => ITEM_STATUS_ACTIVE,
                                               'valuemapid' => rsm_value_mappings->{'rsm_dns_result'}};
@@ -574,23 +574,26 @@ sub create_item_dns_udp_upd {
     my $ipv = shift;
     my $is_new = shift;
 
-    my $proto_uc = 'UDP';
-
     $is_new = false unless defined $is_new;
 
-    unless (exists($applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'})) {
-        $applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'} = get_application_id('DNS RTT ('.$proto_uc.')', $templateid, $is_new);
-    }
+    foreach my $proto_uc ('UDP', 'TCP')
+    {
+	    my $proto_lc = lc($proto_uc);
 
-    my $options = {'name' => 'DNS update time of $2 ($3)',
-                                              'key_'=> 'rsm.dns.udp.upd[{$RSM.TLD},'.$ns_name.','.$ip.']',
+	    unless (exists($applications->{$templateid}->{'DNS ('.$proto_uc.')'})) {
+		    $applications->{$templateid}->{'DNS ('.$proto_uc.')'} = get_application_id('DNS ('.$proto_uc.')', $templateid, $is_new);
+	    }
+
+	    my $options = {'name' => 'DNS update time of $2 ($3) ('.$proto_uc.')',
+                                              'key_'=> 'rsm.dns.'.$proto_lc.'.upd[{$RSM.TLD},'.$ns_name.','.$ip.']',
                                               'hostid' => $templateid,
-                                              'applications' => [$applications->{$templateid}->{'DNS RTT ('.$proto_uc.')'}],
+                                              'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
                                               'type' => 2, 'value_type' => 0,
                                               'valuemapid' => rsm_value_mappings->{'rsm_dns_result'},
 		                              'status' => (defined($OPTS{'epp-servers'}) ? 0 : 1)};
 
-    create_item($options, $is_new);
+	    create_item($options, $is_new);
+    }
 }
 
 sub create_items_dns {
@@ -600,37 +603,18 @@ sub create_items_dns {
 
     $is_new = false unless defined $is_new;
 
-    my $proto = 'tcp';
-    my $proto_uc = uc($proto);
-    my $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
+    my $item_key = 'rsm.dns[{$RSM.TLD}]';
 
-    unless (exists($applications->{$templateid}->{'DNS ('.$proto_uc.')'})) {
-        $applications->{$templateid}->{'DNS ('.$proto_uc.')'} = get_application_id('DNS ('.$proto_uc.')', $templateid, $is_new)
+    unless (exists($applications->{$templateid}->{'DNS'})) {
+        $applications->{$templateid}->{'DNS'} = get_application_id('DNS', $templateid, $is_new)
     }
 
-    my $options = {'name' => "DNS $proto_uc test",
+    my $options = {'name' => "DNS test",
                                               'key_'=> $item_key,
                                               'hostid' => $templateid,
-                                              'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
+                                              'applications' => [$applications->{$templateid}->{'DNS'}],
                                               'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.TCP.DELAY}'}};
-
-    create_item($options, $is_new);
-
-    $proto = 'udp';
-    $proto_uc = uc($proto);
-    $item_key = 'rsm.dns.'.$proto.'[{$RSM.TLD}]';
-
-    unless (exists($applications->{$templateid}->{'DNS ('.$proto_uc.')'})) {
-        $applications->{$templateid}->{'DNS ('.$proto_uc.')'} = get_application_id('DNS ('.$proto_uc.')', $templateid, $is_new)
-    }
-
-    $options = {'name' => "DNS $proto_uc test",
-                                              'key_'=> $item_key,
-                                              'hostid' => $templateid,
-                                              'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
-                                              'type' => 3, 'value_type' => 3,
-                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.UDP.DELAY}'}};
+                                              'delay' => $cfg_global_macros->{'{$RSM.DNS.DELAY}'}};
 
     create_item($options, $is_new);
 }
@@ -1339,7 +1323,7 @@ sub create_rsm_items {
 		        'RSM.INCIDENT.RDDS.RECOVER',
 		        'RSM.INCIDENT.EPP.FAIL',
 		        'RSM.INCIDENT.EPP.RECOVER',
-		        'RSM.DNS.UDP.DELAY',
+		        'RSM.DNS.DELAY',
 		        'RSM.RDDS.DELAY',
 		        'RSM.EPP.DELAY',
 		        'RSM.DNS.UDP.RTT.HIGH',
@@ -1577,8 +1561,7 @@ sub create_global_macros() {
         '{$RSM.DNS.TCP.RTT.HIGH}' => 7500,
         '{$RSM.DNS.UDP.RTT.LOW}' => 500,
         '{$RSM.DNS.UDP.RTT.HIGH}' => 2500,
-        '{$RSM.DNS.UDP.DELAY}' => 60,
-        '{$RSM.DNS.TCP.DELAY}' => 60,
+        '{$RSM.DNS.DELAY}' => 60,
         '{$RSM.DNS.UPDATE.TIME}' => 3600,
         '{$RSM.DNS.PROBE.ONLINE}' => 2,
         '{$RSM.DNS.AVAIL.MINNS}' => 2,

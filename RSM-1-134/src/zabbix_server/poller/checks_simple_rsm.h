@@ -115,7 +115,7 @@
 #define ZBX_EPP_LOG_PREFIX		"epp"		/* file will be <LOGDIR>/<DOMAIN>-ZBX_EPP_LOG_PREFIX.log */
 #define ZBX_PROBESTATUS_LOG_PREFIX	"probestatus"	/* file will be <LOGDIR>/probestatus.log */
 
-int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result, char proto);
+int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);
 int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);
 int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);
 int	check_rsm_probe_status(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result);

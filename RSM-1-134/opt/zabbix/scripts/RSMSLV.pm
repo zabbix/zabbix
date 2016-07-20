@@ -104,8 +104,7 @@ our @EXPORT = qw($result $dbh $tld
 		EPP_COMMAND_INFO EPP_COMMAND_UPDATE PROTO_UDP PROTO_TCP
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
-		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_rtt_low get_macro_dns_udp_delay
-		get_macro_dns_tcp_delay
+		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_rtt_low get_macro_dns_delay
 		get_macro_rdds_delay get_macro_epp_delay get_macro_epp_probe_online get_macro_epp_rollweek_sla
 		get_macro_dns_update_time get_macro_rdds_update_time get_items_by_hostids get_tld_items get_hostid
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
@@ -243,14 +242,9 @@ sub __get_macro_delay
 	return __get_macro('{$' . $m_name . '}');
 }
 
-sub get_macro_dns_udp_delay
+sub get_macro_dns_delay
 {
-	return __get_macro_delay('RSM.DNS.UDP.DELAY', shift);
-}
-
-sub get_macro_dns_tcp_delay
-{
-	return __get_macro_delay('RSM.DNS.TCP.DELAY', shift);
+	return __get_macro_delay('RSM.DNS.DELAY', shift);
 }
 
 sub get_macro_rdds_delay
@@ -864,13 +858,16 @@ sub get_items_by_hostids
 	my $hostids_ref = shift;
 	my $cfg_key = shift;
 	my $complete = shift;
+	my $with_keys = shift;
 
 	my $hostids = join(',', @$hostids_ref);
 
 	my $rows_ref;
 
 	my $pre_sql =
-		"select itemid,hostid".
+		"select itemid,hostid";
+	$pre_sql .= ",key_" if ($with_keys);
+	$pre_sql .=
 		" from items".
 		" where hostid in ($hostids)".
 			" and status<>".ITEM_STATUS_DISABLED;
@@ -890,6 +887,7 @@ sub get_items_by_hostids
 		my %hash;
 		$hash{'itemid'} = $row_ref->[0];
 		$hash{'hostid'} = $row_ref->[1];
+		$hash{'key'} = $row_ref->[2] if ($with_keys);
 		push(@items, \%hash);
 	}
 

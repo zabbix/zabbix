@@ -24,7 +24,6 @@ set_slv_config(get_rsm_config());
 db_connect();
 
 my ($from, $till, $value_ts) = get_rollweek_bounds(getopt('from'));
-my $interval = get_macro_dns_udp_delay($from);
 my $cfg_sla = get_macro_dns_rollweek_sla();
 
 dbg("selecting period ", selected_period($from, $till), " (value_ts:", ts_str($value_ts), ")");

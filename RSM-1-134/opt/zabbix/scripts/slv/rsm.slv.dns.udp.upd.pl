@@ -41,7 +41,7 @@ set_slv_config(get_rsm_config());
 db_connect();
 
 my $cfg_max_value = get_macro_dns_update_time();
-my $delay = get_macro_dns_udp_delay($now);
+my $delay = get_macro_dns_delay($now);
 
 my ($from, $month_till, $value_ts) = get_month_bounds($now, $delay);
 my $cycle_till = cycle_end($value_ts, $delay);

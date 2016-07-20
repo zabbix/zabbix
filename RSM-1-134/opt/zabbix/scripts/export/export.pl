@@ -350,7 +350,7 @@ sub __get_delays
 		{
 			if (!$cfg_dns_delay)
 			{
-				$cfg_dns_delay = get_macro_dns_udp_delay();
+				$cfg_dns_delay = get_macro_dns_delay();
 			}
 
 			$services->{$service}->{'delay'} = $cfg_dns_delay;

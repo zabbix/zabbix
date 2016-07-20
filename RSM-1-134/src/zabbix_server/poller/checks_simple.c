@@ -46,22 +46,10 @@ int	get_value_simple(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		const char	*kp = key + tmp_len;	/* move forward */
 
-		tmp = "dns.";
-		tmp_len = strlen(tmp);
-		if (0 == strncmp(kp, tmp, tmp_len))
+		if (0 == strcmp(kp, "dns"))
 		{
-			kp += tmp_len;	/* move forward */
-
-			if (0 == strcmp(kp, "udp"))
-			{
-				if (SYSINFO_RET_OK == check_rsm_dns(item, key, params, result, ZBX_RSM_UDP))
-					ret = SUCCEED;
-			}
-			else if (0 == strcmp(kp, "tcp"))
-			{
-				if (SYSINFO_RET_OK == check_rsm_dns(item, key, params, result, ZBX_RSM_TCP))
-					ret = SUCCEED;
-			}
+			if (SYSINFO_RET_OK == check_rsm_dns(item, key, params, result))
+				ret = SUCCEED;
 		}
 		else if (0 == strcmp(kp, "rdds"))
 		{

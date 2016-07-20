@@ -1106,8 +1106,11 @@ static size_t	zbx_get_dns_items(const char *keyname, DC_ITEM *item, const char *
 		}
 
 		p = in_item->key + keypart_size;
-		if (0 != strncmp(p, "rtt[", 4) && 0 != strncmp(p, "upd[", 4))
+		if (0 != strncmp(p, "udp.rtt[", 8) && 0 != strncmp(p, "tcp.rtt[", 8)
+				&& 0 != strncmp(p, "udp.upd[", 8) && 0 != strncmp(p, "tcp.upd[", 8))
+		{
 			continue;
+		}
 
 		if (0 == out_items_num)
 		{
@@ -1430,10 +1433,10 @@ out:
 	return tld;
 }
 
-int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result, char proto)
+int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_RESULT *result)
 {
 	char		err[ZBX_ERR_BUF_SIZE], domain[ZBX_HOST_BUF_SIZE], ok_nss_num = 0, *res_ip = NULL,
-			*testprefix = NULL;
+			*testprefix = NULL, proto = ZBX_RSM_UDP;
 	ldns_resolver	*res = NULL;
 	ldns_rr_list	*keys = NULL;
 	FILE		*log_fd;
