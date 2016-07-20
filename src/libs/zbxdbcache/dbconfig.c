@@ -3658,9 +3658,8 @@ static void	DCsync_actions(DB_RESULT result)
  * Comments: The result contains the following fields:                        *
  *           0 - correlationid                                                *
  *           1 - name                                                         *
- *           2 - description                                                  *
- *           3 - evaltype                                                     *
- *           4 - formula                                                      *
+ *           2 - evaltype                                                     *
+ *           3 - formula                                                      *
  *                                                                            *
  ******************************************************************************/
 static void	DCsync_correlations(DB_RESULT result)
