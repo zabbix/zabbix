@@ -218,8 +218,6 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 			switch ($new_condition['type']) {
 				case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 				case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
 					if ($new_condition['tag'] === '') {
 						error(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
 						show_error_message(_('Cannot add correlation condition'));
@@ -266,6 +264,20 @@ elseif (hasRequest('add_condition') && hasRequest('new_condition')) {
 					}
 					else {
 						$valid_conditions[] = $new_condition;
+						unset($_REQUEST['new_condition']['oldtag']);
+						unset($_REQUEST['new_condition']['newtag']);
+					}
+					break;
+
+				case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+				case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+					if ($new_condition['tag'] === '') {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'tag', _('cannot be empty')));
+						show_error_message(_('Cannot add correlation condition'));
+					}
+					else {
+						$valid_conditions[] = $new_condition;
+						unset($_REQUEST['new_condition']['value']);
 					}
 					break;
 			}
@@ -407,7 +419,27 @@ if (hasRequest('form')) {
 		);
 	}
 
-	if (!$data['new_condition']) {
+	if ($data['new_condition']) {
+		switch ($data['new_condition']['type']) {
+			case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+				if (!array_key_exists('oldtag', $data['new_condition'])) {
+					$data['new_condition']['oldtag'] = '';
+				}
+
+				if (!array_key_exists('newtag', $data['new_condition'])) {
+					$data['new_condition']['newtag'] = '';
+				}
+				break;
+
+			case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
+			case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
+				if (!array_key_exists('value', $data['new_condition'])) {
+					$data['new_condition']['value'] = '';
+				}
+				break;
+		}
+	}
+	else {
 		$data['new_condition'] = [
 			'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
 			'operator' => CONDITION_OPERATOR_EQUAL,
