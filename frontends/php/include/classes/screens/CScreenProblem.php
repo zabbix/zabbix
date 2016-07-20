@@ -205,6 +205,11 @@ class CScreenProblem extends CScreenBase {
 				break;
 
 			case 'priority':
+				foreach ($db_problems as &$db_problem) {
+					$db_problem['priority'] = $db_triggers[$db_problem['objectid']]['priority'];
+				}
+				unset($db_problem);
+
 				$sort_fields[] = ['field' => 'priority', 'order' => $this->data['sortorder']];
 				break;
 
