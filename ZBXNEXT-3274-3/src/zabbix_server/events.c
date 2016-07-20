@@ -165,7 +165,7 @@ static int	save_events()
 {
 	size_t			i;
 	zbx_db_insert_t		db_insert, db_insert_tags;
-	int			j, tags_num = 0, num = 0;
+	int			j, num = 0, insert_tags = 0;
 	zbx_uint64_t		eventid;
 
 	for (i = 0; i < events_num; i++)
@@ -197,33 +197,30 @@ static int	save_events()
 		if (EVENT_SOURCE_TRIGGERS != events[i].source)
 			continue;
 
-		tags_num += events[i].tags.values_num;
+		if (0 == events[i].tags.values_num)
+			continue;
+
+		if (0 == insert_tags)
+		{
+			zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value",
+					NULL);
+			insert_tags = 1;
+		}
+
+		for (j = 0; j < events[i].tags.values_num; j++)
+		{
+			zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
+
+			zbx_db_insert_add_values(&db_insert_tags, __UINT64_C(0), events[i].eventid, tag->tag,
+					tag->value);
+		}
 	}
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 
-	if (0 != tags_num)
+	if (0 != insert_tags)
 	{
-		zbx_db_insert_prepare(&db_insert_tags, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
-
-		for (i = 0; i < events_num; i++)
-		{
-			if (0 == (events[i].flags & ZBX_FLAGS_DB_EVENT_CREATE))
-				continue;
-
-			if (EVENT_SOURCE_TRIGGERS != events[i].source)
-				continue;
-
-			for (j = 0; j < events[i].tags.values_num; j++)
-			{
-				zbx_tag_t	*tag = (zbx_tag_t *)events[i].tags.values[j];
-
-				zbx_db_insert_add_values(&db_insert_tags, __UINT64_C(0), events[i].eventid, tag->tag,
-						tag->value);
-			}
-		}
-
 		zbx_db_insert_autoincrement(&db_insert_tags, "eventtagid");
 		zbx_db_insert_execute(&db_insert_tags);
 		zbx_db_insert_clean(&db_insert_tags);
