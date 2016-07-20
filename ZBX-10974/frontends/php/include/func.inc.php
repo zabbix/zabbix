@@ -1497,7 +1497,7 @@ function getPagingLine(&$items, $sortorder, CUrl $url) {
 			CProfile::update('web.paging.page', $currentPage, PROFILE_TYPE_INT);
 		}
 
-		// viewed pages (better to use not odd)
+		// viewed pages (better to use odd)
 		$pagingNavRange = 11;
 
 		$endPage = $currentPage + floor($pagingNavRange / 2);
@@ -1668,7 +1668,7 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 	}
 	// deny access to a page
 	else {
-		// url to redirect the user to after he loggs in
+		// url to redirect the user to after he logs in
 		$url = (new CUrl(!empty($_REQUEST['request']) ? $_REQUEST['request'] : ''))->removeArgument('sid');
 		$url = urlencode($url->toString());
 

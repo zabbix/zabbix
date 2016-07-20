@@ -366,8 +366,7 @@ $url = (new CUrl('tr_status.php'))
 	->setArgument('fullscreen', getRequest('fullscreen'))
 	->setArgument('groupid', $pageFilter->groupid)
 	->setArgument('hostid', $pageFilter->hostid)
-	->setArgument('show_triggers', getRequest('show_triggers'))
-	->setArgument('filter_set', getRequest('filter_set'));
+	->setArgument('show_triggers', getRequest('show_triggers'));
 
 $paging = getPagingLine($triggers, $sortOrder, $url);
 
