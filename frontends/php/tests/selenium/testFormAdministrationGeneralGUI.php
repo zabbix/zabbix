@@ -209,7 +209,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestClickWait('update');
 
 		$this->zbxTestTextPresent(['GUI', 'Search/Filter elements limit']);
-		$this->zbxTestTextPresent(['Page received incorrect data', 'Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Page received incorrect data');
+		$this->zbxTestTextPresent('Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 
 		// Check to enter -1 value
