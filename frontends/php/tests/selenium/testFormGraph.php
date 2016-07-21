@@ -635,13 +635,13 @@ class testFormGraph extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'graphSaveCheck',
+					'name' => 'testFormGraph1',
 					'addItems' => [
 						['itemName' => 'testFormItem']
 					],
 					'error-msg' => 'Cannot add graph',
 					'errors' => [
-						'Graph with name "graphSaveCheck" already exists in graphs or graph prototypes.'
+						'Graph with name "testFormGraph1" already exists in graphs or graph prototypes.'
 					]
 				]
 			],
@@ -863,10 +863,13 @@ class testFormGraph extends CWebTest {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$link."']");
 				$this->zbxTestClickLinkTextWait($link);
 
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
+				$this->zbxTestTextPresent($this->host . ': ' . $link);
 
 				if(isset($item['remove'])) {
 					$this->zbxTestClickWait('items_0_remove');
+					$this->zbxTestTextNotPresent($link);
 				}
 			}
 		}

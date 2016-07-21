@@ -1165,7 +1165,7 @@ class testFormGraphPrototype extends CWebTest {
 					break;
 			}
 		}
-
+		$this->zbxTestCheckFatalErrors();
 		$this->zbxTestClickWait('add');
 
 		switch ($data['expected']) {
