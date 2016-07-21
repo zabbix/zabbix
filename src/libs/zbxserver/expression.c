@@ -4336,7 +4336,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 
 		if (TRIGGER_RECOVERY_MODE_NONE == tr->recovery_mode)
 		{
-			tr->new_value = TRIGGER_VALUE_OK;
+			tr->new_value = TRIGGER_VALUE_NONE;
 			continue;
 		}
 

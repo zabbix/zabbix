@@ -49,15 +49,15 @@
  *                                                                            *
  * Event generation depending on trigger value/state changes:                 *
  *                                                                            *
- * From \ To  | OK         | OK(?)      | PROBLEM    | PROBLEM(?) |           *
- *-----------------------------------------------------------------           *
- * OK         | .          | I          | E          | I          |           *
+ * From \ To  | OK         | OK(?)      | PROBLEM    | PROBLEM(?) | NONE      *
+ *----------------------------------------------------------------------------*
+ * OK         | .          | I          | E          | I          | .         *
  *            |            |            |            |            |           *
- * OK(?)      | I          | .          | E,I        | -          |           *
+ * OK(?)      | I          | .          | E,I        | -          | I         *
  *            |            |            |            |            |           *
- * PROBLEM    | E          | I          | E(m)       | I          |           *
+ * PROBLEM    | E          | I          | E(m)       | I          | .         *
  *            |            |            |            |            |           *
- * PROBLEM(?) | E,I        | -          | E(m),I     | .          |           *
+ * PROBLEM(?) | E,I        | -          | E(m),I     | .          | I         *
  *                                                                            *
  * Legend:                                                                    *
  *        'E' - trigger event                                                 *
@@ -89,6 +89,12 @@ int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 	}
 	new_error = (NULL == trigger->new_error ? "" : trigger->new_error);
 
+	if (TRIGGER_VALUE_NONE != new_value)
+	{
+		if (trigger->value != new_value || (0 == trigger->lastchange && TRIGGER_STATE_UNKNOWN != new_state))
+			event_flags |= ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT;
+	}
+
 	if (trigger->state != new_state)
 	{
 		flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_STATE;
@@ -98,21 +104,10 @@ int	zbx_process_trigger(struct _DC_TRIGGER *trigger, zbx_vector_ptr_t *diffs)
 	if (0 != strcmp(trigger->error, new_error))
 		flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR;
 
-	if (TRIGGER_STATE_UNKNOWN != new_state)
+	if (TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type && TRIGGER_VALUE_PROBLEM == trigger->value &&
+			TRIGGER_STATE_NORMAL == new_state)
 	{
-		if (TRIGGER_VALUE_PROBLEM == new_value)
-		{
-			if (TRIGGER_VALUE_OK == trigger->value || TRIGGER_TYPE_MULTIPLE_TRUE == trigger->type)
-				event_flags |= ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT;
-		}
-		else
-		{
-			if ((TRIGGER_VALUE_PROBLEM == trigger->value || 0 == trigger->lastchange) &&
-					TRIGGER_RECOVERY_MODE_NONE != trigger->recovery_mode)
-			{
-				event_flags |= ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT;
-			}
-		}
+		event_flags |= ZBX_FLAGS_TRIGGER_CREATE_TRIGGER_EVENT;
 	}
 
 	/* check if there is something to be updated */
