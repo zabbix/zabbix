@@ -1512,6 +1512,7 @@ class testFormDiscoveryRule extends CWebTest {
 				}
 				$itemCount ++;
 				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('interval_add'));
+				$this->zbxTestCheckFatalErrors();
 				$this->zbxTestClickWait('interval_add');
 
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
