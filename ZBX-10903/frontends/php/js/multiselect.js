@@ -317,8 +317,9 @@ jQuery(function($) {
 								if ($('.selected li', obj).length > 0) {
 									if ($('.selected li.pressed', obj).length > 0) {
 										if (e.which == KEY.BACKSPACE || e.which == KEY.DELETE) {
-											removeSelected($('.selected li.pressed', obj)
-												.attr('data-id'), obj, values, options);
+											removeSelected($('.selected li.pressed', obj).attr('data-id'), obj, values,
+												options
+											);
 										}
 										else {
 											var prev = $('.selected li.pressed', obj).removeClass('pressed').prev();

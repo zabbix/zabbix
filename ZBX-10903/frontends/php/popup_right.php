@@ -107,12 +107,12 @@ if ($availableNodeIds && $nodeId === null) {
 order_result($hostGroups, 'name');
 
 foreach ($hostGroups as $hostGroup) {
-	$host_group_check_box = new CCheckBox();
-	$host_group_check_box->setAttribute('data-host-group',
-		'{"id":"' . $hostGroup['groupid'] . '", "name":"' . $hostGroup['name'] . '","permission":' . $permission . '}'
+	$host_group_checkbox = new CCheckBox();
+	$host_group_checkbox->setAttribute('data-host-group',
+		'{"id":"'.$hostGroup['groupid'].'","name":"'.$hostGroup['name'].'","permission":'.$permission.'}'
 	);
 
-	$hostGroupTable->addRow(new CCol(array($host_group_check_box, $hostGroup['name'])));
+	$hostGroupTable->addRow(new CCol(array($host_group_checkbox, $hostGroup['name'])));
 }
 
 $hostGroupTable->setFooter(new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")'), 'right'));
@@ -136,7 +136,8 @@ $hostGroupForm->show();
 				var group = obj.data('hostGroup');
 
 				add_variable('input', 'new_right[' + group.id + '][permission]', group.permission, formName,
-					parentDocument);
+					parentDocument
+				);
 				add_variable('input', 'new_right[' + group.id + '][name]', group.name, formName, parentDocument);
 			}
 		});
