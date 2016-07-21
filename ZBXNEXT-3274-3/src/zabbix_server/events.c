@@ -1509,12 +1509,6 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		if (EVENT_SOURCE_TRIGGERS != event->source)
 			continue;
 
-		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-			continue;
-
-		if (TRIGGER_VALUE_PROBLEM != event->value)
-			continue;
-
 		if (FAIL == (index = zbx_vector_ptr_bsearch(trigger_diff, &event->objectid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -1523,6 +1517,17 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 		}
 
 		diff = (zbx_trigger_diff_t *)trigger_diff->values[index];
+
+		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
+		{
+			diff->flags &= ~(zbx_uint64_t)(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT |
+					ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE);
+			continue;
+		}
+
+		if (TRIGGER_VALUE_PROBLEM != event->value)
+			continue;
+
 		diff->problem_count++;
 		diff->lastchange = event->clock;
 		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT | ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
