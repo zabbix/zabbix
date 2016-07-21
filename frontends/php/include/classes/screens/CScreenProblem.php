@@ -187,8 +187,6 @@ class CScreenProblem extends CScreenBase {
 			->setArgument('action', 'problem.view')
 			->setArgument('fullscreen', $this->data['fullscreen']);
 
-		$sort_fields = [];
-
 		switch ($this->data['sort']) {
 			case 'host':
 				$triggers_hosts_list = [];
@@ -201,7 +199,11 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($db_problem);
 
-				$sort_fields[] = ['field' => 'host', 'order' => $this->data['sortorder']];
+				$sort_fields = [
+					['field' => 'host', 'order' => $this->data['sortorder']],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				];
 				break;
 
 			case 'priority':
@@ -210,7 +212,11 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($db_problem);
 
-				$sort_fields[] = ['field' => 'priority', 'order' => $this->data['sortorder']];
+				$sort_fields = [
+					['field' => 'priority', 'order' => $this->data['sortorder']],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				];
 				break;
 
 			case 'problem':
@@ -219,12 +225,20 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($db_problem);
 
-				$sort_fields[] = ['field' => 'description', 'order' => $this->data['sortorder']];
-				$sort_fields[] = ['field' => 'objectid', 'order' => $this->data['sortorder']];
+				$sort_fields = [
+					['field' => 'description', 'order' => $this->data['sortorder']],
+					['field' => 'objectid', 'order' => $this->data['sortorder']],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				];
 				break;
+
+			default:
+				$sort_fields = [
+					['field' => 'clock', 'order' => $this->data['sortorder']],
+					['field' => 'ns', 'order' => $this->data['sortorder']]
+				];
 		}
-		$sort_fields[] = ['field' => 'clock', 'order' => $this->data['sortorder']];
-		$sort_fields[] = ['field' => 'eventid', 'order' => $this->data['sortorder']];
 
 		CArrayHelper::sort($db_problems, $sort_fields);
 
