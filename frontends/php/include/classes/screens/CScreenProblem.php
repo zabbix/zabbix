@@ -240,6 +240,8 @@ class CScreenProblem extends CScreenBase {
 				];
 		}
 
+		$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1);
+
 		CArrayHelper::sort($db_problems, $sort_fields);
 
 		$paging = getPagingLine($db_problems, $this->data['sortorder'], $url);
