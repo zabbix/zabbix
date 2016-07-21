@@ -38,10 +38,14 @@ if (defined($zabbix->{'error'}) && $zabbix->{'error'} ne '')
 set_slv_config($config);
 db_connect();
 
+my $rows_ref;
+my $dns_valuemapid = 20;
+my $epp_valuemapid = 21;
+
 info("fixing items...");
 db_exec("update items set name='DNS test',key_='rsm.dns[{\$RSM.TLD}]' where key_='rsm.dns.udp[{\$RSM.TLD}]'");
 db_exec("delete from items where key_='rsm.dns.tcp[{\$RSM.TLD}]'");
-my $rows_ref = db_select("select 1 from applications where name='DNS' limit 1");
+$rows_ref = db_select("select 1 from applications where name='DNS' limit 1");
 if (0 == @{$rows_ref})
 {
 	info("fixing applications...");
@@ -50,6 +54,7 @@ if (0 == @{$rows_ref})
 	db_exec("update applications set name='DNS (UDP)' where name='DNS RTT (UDP)'");
 	db_exec("update applications set name='DNS (TCP)' where name='DNS RTT (TCP)'");
 }
+
 info("fixing global macros...");
 db_exec("update globalmacro set macro='{\$RSM.DNS.DELAY}' where macro='{\$RSM.DNS.UDP.DELAY}'");
 db_exec("delete from globalmacro where macro='{\$RSM.DNS.TCP.DELAY}'");
@@ -71,7 +76,7 @@ my $items_ref = get_items_by_hostids(\@hostids, 'rsm.dns.udp.upd[', 0, 1);	# inc
 
 foreach my $item_ref (@{$items_ref})
 {
-	my $proto_uc = 'TCP';
+	my $proto_uc = 'UDP';
 	my $proto_lc = lc($proto_uc);
 
 	my $templateid = $item_ref->{'hostid'};
@@ -84,32 +89,103 @@ foreach my $item_ref (@{$items_ref})
 		$applications->{$templateid}->{'DNS ('.$proto_uc.')'} = __get_application_id($templateid, 'DNS ('.$proto_uc.')');
 	}
 
-	my $options = {'name' => 'DNS update time of $2 ($3) ('.$proto_uc.')',
-		       'key_'=> 'rsm.dns.'.$proto_lc.'.upd[{$RSM.TLD},'.$nsip.']',
-		       'hostid' => $templateid,
-		       'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
-		       'type' => 2, 'value_type' => 0,
-		       'valuemapid' => rsm_value_mappings->{'rsm_dns_result'},
-		       'status' => 0};
-	push(@items_to_create, $options);
+	my $name = 'DNS update time of $2 ($3) ('.$proto_uc.')';
 
-	$proto_uc = 'UDP';
+	$rows_ref = db_select("select name from items where itemid=$itemid");
+
+	last if ($rows_ref->[0]->[0] eq $name);
+
+	my $options = {'itemid' => $itemid,
+		       'name' => 'DNS update time of $2 ($3) ('.$proto_uc.')'};
+	push(@items_to_update, $options);
+
+	$proto_uc = 'TCP';
 	$proto_lc = lc($proto_uc);
 
 	unless (exists($applications->{$templateid}->{'DNS ('.$proto_uc.')'})) {
 		$applications->{$templateid}->{'DNS ('.$proto_uc.')'} = __get_application_id($templateid, 'DNS ('.$proto_uc.')');
 	}
 
-	my $options = {'itemid' => $itemid,
-		       'name' => 'DNS update time of $2 ($3) ('.$proto_uc.')'};
-
-	push(@items_to_update, $options);
+	$options = {'name' => $name,
+		       'key_'=> 'rsm.dns.'.$proto_lc.'.upd[{$RSM.TLD},'.$nsip.']',
+		       'hostid' => $templateid,
+		       'applications' => [$applications->{$templateid}->{'DNS ('.$proto_uc.')'}],
+		       'type' => 2, 'value_type' => 0,
+		       'valuemapid' => rsm_value_mappings->{'dns_test'},
+		       'status' => 0};
+	push(@items_to_create, $options);
 }
 
-info("updating \"DNS UDP Update Time\" items...");
-__update_items(\@items_to_update);
-info("creating \"DNS TCP Update Time\" items...");
-__create_items(\@items_to_create);
+if (scalar(@items_to_update) != 0)
+{
+	info("updating \"DNS UDP Update Time\" items...");
+	__update_items(\@items_to_update);
+}
+
+if (scalar(@items_to_create) != 0)
+{
+	info("creating \"DNS TCP Update Time\" items...");
+	__create_items(\@items_to_create);
+}
+
+$rows_ref = db_select("select 1 from mappings where newvalue='Down (UDP:down, TCP:down)'");
+if (scalar(@{$rows_ref}) == 0)
+{
+	info("fixing value map names...");
+	db_exec("update valuemaps set name='DNS Test' where valuemapid=13");
+	db_exec("update valuemaps set name='RDDS Test' where valuemapid=15");
+	db_exec("update valuemaps set name='EPP Test' where valuemapid=19");
+	db_exec("update valuemaps set name='RDDS Test result' where valuemapid=18");
+	db_exec("update valuemaps set name='Service availability' where valuemapid=16");
+	db_exec("update valuemaps set name='Probe status' where valuemapid=14");
+	db_exec("insert into valuemaps (valuemapid,name) values ($dns_valuemapid,'DNS Test result')");
+	my $mappingid = 273;
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'2','Up (UDP:up)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'3','Up (TCP:up)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'4','Up (UDP:up, TCP:up)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'5','Down (UDP:down)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'6','Down (TCP:down)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'7','Down (UDP:up, TCP:down)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'8','Down (UDP:down, TCP:up)')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$dns_valuemapid,'9','Down (UDP:down, TCP:down)')");
+
+	db_exec("insert into valuemaps (valuemapid,name) values ($epp_valuemapid,'EPP Test result')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$epp_valuemapid,'0','Down')");
+	db_exec("insert into mappings (mappingid,valuemapid,value,newvalue) values (".++$mappingid.",$epp_valuemapid,'1','Up')");
+}
+
+$rows_ref = db_select("select itemid from items where key_='rsm.dns[{\$RSM.TLD}]' and templateid is null");
+my @dns_items_to_update;
+foreach my $row_ref (@{$rows_ref})
+{
+	my $options =
+	{
+		'itemid' => $row_ref->[0],
+		'valuemapid' => $dns_valuemapid
+	};
+	push(@dns_items_to_update, $options);
+}
+if (scalar(@dns_items_to_update) != 0)
+{
+	info("setting value map for DNS Test items...");
+	__update_items(\@dns_items_to_update);
+}
+$rows_ref = db_select("select itemid from items where key_ like 'rsm.epp[{\$RSM.TLD}%]' and templateid is null");
+my @epp_items_to_update;
+foreach my $row_ref (@{$rows_ref})
+{
+	my $options =
+	{
+		'itemid' => $row_ref->[0],
+		'valuemapid' => $epp_valuemapid
+	};
+	push(@epp_items_to_update, $options);
+}
+if (scalar(@epp_items_to_update) != 0)
+{
+	info("setting value map for EPP Test items...");
+	__update_items(\@epp_items_to_update);
+}
 info("done!");
 
 sub __create_item

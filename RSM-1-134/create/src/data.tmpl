@@ -81,14 +81,16 @@ ROW   |1          |10057 |1   |1   |1    |127.0.0.1|   |10050|
 TABLE |valuemaps
 FIELDS|valuemapid|name                    |
 ROW   |2         |Host status             |
-ROW   |16        |RSM Service availability|
-ROW   |13        |RSM DNS result          |
-ROW   |19        |RSM EPP result          |
-ROW   |14        |RSM Probe               |
-ROW   |18        |RSM RDDS probe result   |
-ROW   |15        |RSM RDDS result         |
+ROW   |16        |Service availability    |
+ROW   |13        |DNS Test                |
+ROW   |19        |EPP test                |
+ROW   |14        |Probe status            |
+ROW   |18        |RDDS test result        |
+ROW   |15        |RDDS test               |
 ROW   |1         |Service state           |
 ROW   |10        |Zabbix agent ping status|
+ROW   |20        |DNS Test result         |
+ROW   |21        |EPP Test result         |
 
 TABLE |items
 FIELDS|itemid|type|snmp_community|snmp_oid|hostid|name                                        |key_                                         |delay|history|trends|status|value_type|trapper_hosts|units   |multiplier|delta|snmpv3_securityname|snmpv3_securitylevel|snmpv3_authpassphrase|snmpv3_privpassphrase|formula|logtimefmt|templateid|valuemapid|delay_flex|params|ipmi_sensor|data_type|authtype|username|password|publickey|privatekey|flags|filter                                     |interfaceid|port|description                                                                                                                      |inventory_link|lifetime|
@@ -993,6 +995,16 @@ ROW   |109      |19        |-209 |INFO command timeout                 |
 ROW   |110      |19        |-210 |Invalid reply to INFO command        |
 ROW   |111      |19        |-1   |Internal error                       |
 ROW   |112      |19        |-211 |Server certificate validation failed |
+ROW   |274      |20        |2    |Up (UDP:up)                          |
+ROW   |275      |20        |3    |Up (TCP:up)                          |
+ROW   |276      |20        |4    |Up (UDP:up, TCP:up)                  |
+ROW   |277      |20        |5    |Down (UDP:down)                      |
+ROW   |278      |20        |6    |Down (TCP:down)                      |
+ROW   |279      |20        |7    |Down (UDP:up, TCP:down)              |
+ROW   |280      |20        |8    |Down (UDP:down, TCP:up)              |
+ROW   |281      |20        |9    |Down (UDP:down, TCP:down)            |
+ROW   |282      |21        |0    |Down                                 |
+ROW   |283      |21        |1    |Up                                   |
 
 TABLE |regexps
 FIELDS|regexpid|name                              |test_string|

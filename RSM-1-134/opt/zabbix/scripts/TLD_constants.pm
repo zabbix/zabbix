@@ -85,12 +85,17 @@ use constant cfg_default_rdds_ns_string => 'Name Server:';
 use constant rsm_host => 'rsm'; # global config history
 use constant rsm_group => 'rsm';
 
-use constant rsm_value_mappings => {'rsm_dns_result' => 13,
-                                'rsm_probe' => 14,
-                                'rsm_rdds_result' => 15,
-                                'rsm_avail' => 16,
-                                'rsm_rdds_probe_result' => 18,
-                                'rsm_epp_result' => 19};
+use constant rsm_value_mappings =>
+{
+	'dns_test' => 13,		# DNS Test (-1, -200, ...)
+	'rdds_test' => 15,		# RDDS Test (-1, -200, ...)
+	'epp_test' => 19,		# EPP Test (-1, -200, ...)
+	'rdds_test_result' => 18,	# RDDS Test result (Down, Up, RDDS43 only, ...)
+	'rsm_avail' => 16,		# Service availability (Down, Up, Up (inconclusive))
+	'rsm_probe' => 14,		# Probe status (online/offline)
+	'dns_test_result' => 20,	# DNS Test result (Down (UDP:down), Up (UDP:up), ...)
+	'epp_test_result' => 21		# EPP Test result (Down, Up)
+};
 
 use constant rsm_trigger_rollweek_thresholds => { '1' => {'threshold' => '10', 'priority' => 2},
                                     '2' => {'threshold' => '25', 'priority' => 3},
