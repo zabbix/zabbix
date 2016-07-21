@@ -758,9 +758,14 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 	/* return SUCCEED for conditions using old events */
 	switch (condition->type)
 	{
+		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+			/* If old event condition never matches event we can return FAIL.  */
+			/* Otherwise we must check if the new event has the requested tag. */
+			if (SUCCEED != old_value)
+				return FAIL;
+			break;
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
 			return old_value;
 	}
 
@@ -795,6 +800,15 @@ static int	correlation_condition_match_new_event(zbx_corr_condition_t *condition
 				ret = (SUCCEED == ret ? FAIL : SUCCEED);
 
 			return ret;
+
+		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+			for (i = 0; i < event->tags.values_num; i++)
+			{
+				tag = (zbx_tag_t *)event->tags.values[i];
+				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
+					return SUCCEED;
+			}
+			return FAIL;
 	}
 
 	return FAIL;
@@ -978,10 +992,11 @@ static void	correlation_condition_add_string_match(char **sql, size_t *sql_alloc
  ******************************************************************************/
 static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condition, const DB_EVENT *event)
 {
-	int		i;
-	zbx_tag_t	*tag;
-	char		*tag_esc, *value_esc, *filter = NULL;
-	size_t		filter_alloc = 0, filter_offset = 0;
+	int			i;
+	zbx_tag_t		*tag;
+	char			*tag_esc, *value_esc, *filter = NULL;
+	size_t			filter_alloc = 0, filter_offset = 0;
+	zbx_vector_str_t	values;
 
 	/* replace new event dependent condition with precalculated value */
 	switch (condition->type)
@@ -1006,24 +1021,34 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 			return filter;
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
+			zbx_vector_str_create(&values);
+
 			for (i = 0; i < event->tags.values_num; i++)
 			{
 				tag = (zbx_tag_t *)event->tags.values[i];
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
-					break;
+					zbx_vector_str_append(&values, DBdyn_escape_string(tag->value));
 			}
 
-			if (i == event->tags.values_num)
+			if (0 == values.values_num)
 			{
 				/* no new tag found, substitute condition with failure expression */
-				return zbx_strdup(NULL, "0");
+				filter = zbx_strdup(NULL, "0");
+			}
+			else
+			{
+				tag_esc = DBdyn_escape_string(condition->data.tag_pair.oldtag);
+				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset, "pt.tag='%s' and",
+						tag_esc);
+				zbx_free(tag_esc);
+
+				DBadd_str_condition_alloc(&filter, &filter_alloc, &filter_offset, "pt.value",
+						(const char **)values.values, values.values_num);
+
+				zbx_vector_str_clear_ext(&values, zbx_ptr_free);
 			}
 
-			tag_esc = DBdyn_escape_string(condition->data.tag_pair.oldtag);
-			value_esc = DBdyn_escape_string(tag->value);
-			filter = zbx_dsprintf(NULL, "pt.tag='%s' and pt.value='%s'", tag_esc, value_esc);
-			zbx_free(value_esc);
-			zbx_free(tag_esc);
+			zbx_vector_str_destroy(&values);
 			return filter;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
