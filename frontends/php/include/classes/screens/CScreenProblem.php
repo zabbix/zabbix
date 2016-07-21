@@ -244,7 +244,7 @@ class CScreenProblem extends CScreenBase {
 
 		CArrayHelper::sort($db_problems, $sort_fields);
 
-		$paging = getPagingLine($db_problems, $this->data['sortorder'], $url);
+		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
 
 		// create table
 		$table = (new CTableInfo())
@@ -265,6 +265,7 @@ class CScreenProblem extends CScreenBase {
 		// actions
 		$actions = makeEventsActions(array_keys($db_problems));
 		if ($config['event_ack_enable']) {
+			$url->setArgument('page', $this->data['page']);
 			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
