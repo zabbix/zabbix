@@ -634,12 +634,14 @@ function rm4favorites(object, objectid) {
  *
  * @param {idx} 	idx					User profile index
  * @param {int} 	value_int			Integer value
+ * @param {array} 	idx2				ids
  */
-function updateUserProfile(idx, value_int) {
+function updateUserProfile(idx, value_int, idx2) {
 	sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
 			idx: idx,
-			value_int: value_int
+			value_int: value_int,
+			idx2: idx2
 		}
 	});
 }
