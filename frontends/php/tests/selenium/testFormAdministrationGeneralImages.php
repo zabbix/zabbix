@@ -131,11 +131,11 @@ class testFormAdministrationGeneralImages extends CWebTest {
 		$this->zbxTestTextPresent('Type');
 		$this->zbxTestWaitUntilElementVisible(WebdriverBy::xpath("//div[@class='cell']"));
 		$this->zbxTestClickLinkText($this->bg_image_name);
-		$this->zbxTestInputType('name', $this->bg_image_name2);
-		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputTypeOverwrite('name', $this->bg_image_name2);
+		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestTextPresent(['Images', 'Image updated']);
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Image updated');
 
 		$sql = 'SELECT * FROM images WHERE imagetype=2 AND name=\''.$this->bg_image_name2.'\'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Image with such name does not exist in the DB');
@@ -145,8 +145,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
-		$this->zbxTestClickLinkText($this->bg_image_name2);
-		$this->zbxTestClick('delete');
+		$this->zbxTestClickLinkTextWait($this->bg_image_name2);
+		$this->zbxTestClickWait('delete');
 		$this->webDriver->switchTo()->alert()->accept();
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Images', 'Image deleted']);
