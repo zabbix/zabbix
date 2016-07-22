@@ -209,6 +209,7 @@ $filter_column2
 				'fullscreen' => $data['fullscreen'],
 				'sort' => $data['sort'],
 				'sortorder' => $data['sortorder'],
+				'page' => $data['page'],
 				'filter' => $data['filter']
 			]
 		])->get()
