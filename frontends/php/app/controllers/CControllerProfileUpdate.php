@@ -21,20 +21,16 @@
 
 class CControllerProfileUpdate extends CController {
 
-	const VALUE_INT = 0x01;
-	const VALUE_STR = 0x02;
-
 	protected function checkInput() {
 		$fields = [
-			'idx' =>		'fatal|required',
-			'value_int' =>	'int32'
+			'idx' =>		'required|string',
+			'value_int' =>	'required|in 0,1',
+			'idx2' =>		'array_id'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$mask = $this->hasInput('value_int') ? self::VALUE_INT : 0x00;
-			$mask |= $this->hasInput('value_str') ? self::VALUE_STR : 0x00;
 			switch ($this->getInput('idx')) {
 				case 'web.auditacts.filter.state':
 				case 'web.auditlogs.filter.state':
@@ -58,11 +54,16 @@ class CControllerProfileUpdate extends CController {
 				case 'web.slides.filter.state':
 				case 'web.slideconf.filter.state':
 				case 'web.sysmapconf.filter.state':
-					$ret = ($mask == self::VALUE_INT && in_array($this->getInput('value_int'), [0, 1]));
+					$ret = true;
 					break;
+
+				case 'web.latest.toggle':
+				case 'web.latest.toggle_other':
+					$ret = $this->hasInput('idx2');
+					break;
+
 				default:
 					$ret = false;
-					break;
 			}
 		}
 
@@ -81,19 +82,30 @@ class CControllerProfileUpdate extends CController {
 		$idx = $this->getInput('idx');
 		$value_int = $this->getInput('value_int');
 
-		$data = [];
-
 		DBstart();
-		CProfile::update($idx, $value_int, PROFILE_TYPE_INT);
-		$result = DBend();
+		switch ($idx) {
+			case 'web.latest.toggle':
+			case 'web.latest.toggle_other':
+				if ($value_int == 1) { // default value
+					CProfile::delete($idx, $this->getInput('idx2'));
+				}
+				else {
+					foreach ($this->getInput('idx2') as $idx2) {
+						CProfile::update($idx, $value_int, PROFILE_TYPE_INT, $idx2);
+					}
+				}
+				break;
 
-		if ($result) {
-			$data['main_block'] = '';
+			default:
+				if ($value_int == 1) { // default value
+					CProfile::delete($idx);
+				}
+				else {
+					CProfile::update($idx, $value_int, PROFILE_TYPE_INT);
+				}
 		}
-		else {
-			$data['main_block'] = '';
-		}
+		DBend();
 
-		$this->setResponse(new CControllerResponseData($data));
+		$this->setResponse(new CControllerResponseData(['main_block' => '']));
 	}
 }
