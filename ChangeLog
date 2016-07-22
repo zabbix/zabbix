@@ -1450,9 +1450,13 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.14rc1
+Changes for 2.2.14
 
-New features:
+Bug fixes:
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.14rc1
 
 Bug fixes:
 A......... [ZBX-10933] fixed unexpected overwriting of trigger expressions for unchanged triggers when updating multiple triggers simultaneously via the API trigger.update method (Gunars)
