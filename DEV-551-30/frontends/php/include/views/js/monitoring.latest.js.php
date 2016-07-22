@@ -5,7 +5,7 @@
 			var open_state_all = '0';
 
 			$('.app-list-toggle').each(function() {
-				var	open_state = $(this).data('open-state');
+				var open_state = $(this).data('open-state');
 
 				$('span', this)
 					.addClass(open_state == '0' ? '<?= ZBX_STYLE_ARROW_RIGHT ?>' : '<?= ZBX_STYLE_ARROW_DOWN ?>');
@@ -109,7 +109,7 @@
 				$('.app-list-toggle-all').data('open-state', open_state_all);
 				$('.app-list-toggle-all span')
 					.removeClass(del_class)
-					.addClass(add_class)
+					.addClass(add_class);
 			}
 
 			var hostid = $(this).attr('data-host-id');

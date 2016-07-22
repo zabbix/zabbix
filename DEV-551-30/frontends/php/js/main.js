@@ -628,13 +628,12 @@ function rm4favorites(object, objectid) {
 	});
 }
 
-
 /**
  * Toggles filter state and updates title and icons accordingly.
  *
- * @param {idx} 	idx					User profile index
- * @param {int} 	value_int			Integer value
- * @param {array} 	idx2				ids
+ * @param {string} 	idx					User profile index
+ * @param {string} 	value_int			Integer value
+ * @param {object} 	idx2				An array of IDs
  */
 function updateUserProfile(idx, value_int, idx2) {
 	sendAjaxData('zabbix.php?action=profile.update', {
