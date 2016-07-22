@@ -90,7 +90,6 @@ typedef struct
 	const char		*error;
 	const char		*correlation_tag;
 	int			lastchange;
-	int			problem_count;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;
@@ -3133,7 +3132,6 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 			ZBX_STR2UCHAR(trigger->state, row[7]);
 			trigger->lastchange = atoi(row[8]);
 			trigger->locked = 0;
-			trigger->problem_count = atoi(row[14]);
 
 			zbx_vector_ptr_create_ext(&trigger->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
@@ -4394,7 +4392,7 @@ void	DCsync_configuration(void)
 	if (NULL == (trig_result = DBselect(
 			"select distinct t.triggerid,t.description,t.expression,t.error,t.priority,t.type,t.value,"
 				"t.state,t.lastchange,t.status,t.recovery_mode,t.recovery_expression,"
-				"t.correlation_mode,t.correlation_tag,t.problem_count"
+				"t.correlation_mode,t.correlation_tag"
 			" from hosts h,items i,functions f,triggers t"
 			" where h.hostid=i.hostid"
 				" and i.itemid=f.itemid"
@@ -5883,7 +5881,6 @@ static void	DCget_trigger(DC_TRIGGER *dst_trigger, ZBX_DC_TRIGGER *src_trigger, 
 	dst_trigger->recovery_mode = src_trigger->recovery_mode;
 	dst_trigger->correlation_mode = src_trigger->correlation_mode;
 	dst_trigger->correlation_tag = zbx_strdup(NULL, src_trigger->correlation_tag);
-	dst_trigger->problem_count = src_trigger->problem_count;
 
 	dst_trigger->expression = NULL;
 	dst_trigger->recovery_expression = NULL;
@@ -7791,10 +7788,6 @@ void	DCconfig_triggers_apply_changes(zbx_vector_ptr_t *trigger_diff)
 
 		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_ERROR))
 			DCstrpool_replace(1, &dc_trigger->error, diff->error);
-
-		if (0 != (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT))
-			dc_trigger->problem_count = diff->problem_count;
-
 	}
 
 	UNLOCK_CACHE;

@@ -205,7 +205,6 @@ typedef struct _DC_TRIGGER
 	char			*correlation_tag;
 	zbx_timespec_t		timespec;
 	int			lastchange;
-	int			problem_count;
 	unsigned char		topoindex;
 	unsigned char		priority;
 	unsigned char		type;

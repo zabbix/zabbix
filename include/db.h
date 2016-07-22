@@ -493,6 +493,7 @@ typedef struct
 	unsigned char	state;
 	int		lastchange;
 	int		problem_count;
+	int		correlated;
 	char		*error;
 
 #define ZBX_FLAGS_TRIGGER_DIFF_UNSET			0x0000
