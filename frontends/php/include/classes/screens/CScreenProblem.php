@@ -187,8 +187,6 @@ class CScreenProblem extends CScreenBase {
 			->setArgument('action', 'problem.view')
 			->setArgument('fullscreen', $this->data['fullscreen']);
 
-		$sort_fields = [];
-
 		switch ($this->data['sort']) {
 			case 'host':
 				$triggers_hosts_list = [];
@@ -201,11 +199,24 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($db_problem);
 
-				$sort_fields[] = ['field' => 'host', 'order' => $this->data['sortorder']];
+				$sort_fields = [
+					['field' => 'host', 'order' => $this->data['sortorder']],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				];
 				break;
 
 			case 'priority':
-				$sort_fields[] = ['field' => 'priority', 'order' => $this->data['sortorder']];
+				foreach ($db_problems as &$db_problem) {
+					$db_problem['priority'] = $db_triggers[$db_problem['objectid']]['priority'];
+				}
+				unset($db_problem);
+
+				$sort_fields = [
+					['field' => 'priority', 'order' => $this->data['sortorder']],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				];
 				break;
 
 			case 'problem':
@@ -214,16 +225,26 @@ class CScreenProblem extends CScreenBase {
 				}
 				unset($db_problem);
 
-				$sort_fields[] = ['field' => 'description', 'order' => $this->data['sortorder']];
-				$sort_fields[] = ['field' => 'objectid', 'order' => $this->data['sortorder']];
+				$sort_fields = [
+					['field' => 'description', 'order' => $this->data['sortorder']],
+					['field' => 'objectid', 'order' => $this->data['sortorder']],
+					['field' => 'clock', 'order' => ZBX_SORT_DOWN],
+					['field' => 'ns', 'order' => ZBX_SORT_DOWN]
+				];
 				break;
+
+			default:
+				$sort_fields = [
+					['field' => 'clock', 'order' => $this->data['sortorder']],
+					['field' => 'ns', 'order' => $this->data['sortorder']]
+				];
 		}
-		$sort_fields[] = ['field' => 'clock', 'order' => $this->data['sortorder']];
-		$sort_fields[] = ['field' => 'eventid', 'order' => $this->data['sortorder']];
+
+		$db_problems = array_slice($db_problems, 0, $config['search_limit'] + 1);
 
 		CArrayHelper::sort($db_problems, $sort_fields);
 
-		$paging = getPagingLine($db_problems, $this->data['sortorder'], $url);
+		$paging = getPagingLine($db_problems, $this->data['sortorder'], clone $url);
 
 		// create table
 		$table = (new CTableInfo())
@@ -244,6 +265,7 @@ class CScreenProblem extends CScreenBase {
 		// actions
 		$actions = makeEventsActions(array_keys($db_problems));
 		if ($config['event_ack_enable']) {
+			$url->setArgument('page', $this->data['page']);
 			$acknowledges = makeEventsAcknowledges($db_problems, $url->getUrl());
 		}
 		$tags = makeEventsTags($db_problems);
