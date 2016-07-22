@@ -245,15 +245,16 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 }
 
 #if defined(HAVE_MYSQL)
-static int	is_recoverable_mysql_error(unsigned int err)
+static int	is_recoverable_mysql_error()
 {
-	switch (err)
+	switch (mysql_errno(conn))
 	{
 		case CR_CONN_HOST_ERROR:
 		case CR_SERVER_GONE_ERROR:
 		case CR_CONNECTION_ERROR:
 		case CR_SERVER_LOST:
 		case CR_UNKNOWN_HOST:
+		case CR_COMMANDS_OUT_OF_SYNC:
 		case ER_SERVER_SHUTDOWN:
 		case ER_ACCESS_DENIED_ERROR:		/* wrong user or password */
 		case ER_ILLEGAL_GRANT_FOR_TABLE:	/* user without any privileges */
@@ -280,7 +281,6 @@ static int	is_recoverable_mysql_error(unsigned int err)
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
-	unsigned int	err;
 #if defined(HAVE_IBM_DB2)
 	char		*connect = NULL;
 #elif defined(HAVE_MYSQL)
@@ -394,8 +394,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	err = mysql_errno(conn);
-
 	/* The RECONNECT option setting is placed here, AFTER the connection	*/
 	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
 	/* reset the options value to the default, regardless of what it was	*/
@@ -415,7 +413,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err))
+	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error())
 		ret = ZBX_DB_DOWN;
 
 #elif defined(HAVE_ORACLE)
@@ -1155,7 +1153,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 
-			ret = (SUCCEED == is_recoverable_mysql_error(mysql_errno(conn)) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+			ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
 		else
 		{
@@ -1173,7 +1171,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				if (0 < (status = mysql_next_result(conn)))
 				{
 					zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
-					ret = (SUCCEED == is_recoverable_mysql_error(mysql_errno(conn)) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+					ret = (SUCCEED == is_recoverable_mysql_error() ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
 			}
 			while (0 == status);
@@ -1382,7 +1380,7 @@ error:
 			zabbix_errlog(ERR_Z3005, mysql_errno(conn), mysql_error(conn), sql);
 
 			DBfree_result(result);
-			result = (SUCCEED == is_recoverable_mysql_error(mysql_errno(conn)) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
+			result = (SUCCEED == is_recoverable_mysql_error() ? (DB_RESULT)ZBX_DB_DOWN : NULL);
 		}
 		else
 			result->result = mysql_store_result(conn);
