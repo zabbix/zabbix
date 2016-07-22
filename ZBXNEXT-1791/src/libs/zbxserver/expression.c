@@ -4328,19 +4328,15 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 			continue;
 		}
 
+		/* trigger expression evaluates to true, set PROBLEM value */
 		if (SUCCEED != zbx_double_compare(expr_result, 0))
 		{
 			tr->new_value = TRIGGER_VALUE_PROBLEM;
 			continue;
 		}
 
-		if (TRIGGER_RECOVERY_MODE_NONE == tr->recovery_mode)
-		{
-			tr->new_value = TRIGGER_VALUE_NONE;
-			continue;
-		}
-
-		if (TRIGGER_VALUE_PROBLEM == tr->value)
+		/* otherwise try to recover trigger by setting OK value */
+		if (TRIGGER_VALUE_PROBLEM == tr->value && TRIGGER_RECOVERY_MODE_NONE != tr->recovery_mode)
 		{
 			if (TRIGGER_RECOVERY_MODE_EXPRESSION == tr->recovery_mode)
 			{
@@ -4364,7 +4360,7 @@ void	evaluate_expressions(zbx_vector_ptr_t *triggers)
 		}
 
 		/* no changes, keep the old value */
-		tr->new_value = tr->value;
+		tr->new_value = TRIGGER_VALUE_NONE;
 	}
 
 	for (i = 0; i < triggers->values_num; i++)
