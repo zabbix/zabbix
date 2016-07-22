@@ -245,7 +245,7 @@ static DB_RESULT	__zbx_zbx_db_select(const char *fmt, ...)
 }
 
 #if defined(HAVE_MYSQL)
-static int	is_recoverable_mysql_error()
+static int	is_recoverable_mysql_error(void)
 {
 	switch (mysql_errno(conn))
 	{
