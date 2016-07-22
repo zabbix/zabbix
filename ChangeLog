@@ -6,8 +6,6 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, French, German, Italian, J
 --------------------------------------------------------------------------------
 Changes for 3.0.4rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-10907] fixed remote command execution via SSH with no Zabbix agent interface (viktors)
 .......PS. [ZBX-6370] added ability to monitor SNMP devices returning OIDs in decreasing or mixed order (Andris)
