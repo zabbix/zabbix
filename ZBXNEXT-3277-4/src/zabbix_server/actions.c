@@ -1633,10 +1633,9 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *e
 	zbx_vector_ptr_create(&actions);
 	zbx_dc_get_actions_eval(&actions);
 
-	/* 1. EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL: match PROBLEM events to action conditions, add them to    */
-	/*    'new_escalations' list.                                                                                 */
-	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations for events that match action */
-	/*    conditions.                                                                                             */
+	/* 1. All event sources: match PROBLEM events to action conditions, add them to 'new_escalations' list.      */
+	/* 2. EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTO_REGISTRATION: execute operations (except command and message */
+	/*    operations) for events that match action conditions.                                                   */
 	for (i = 0; i < events_num; i++)
 	{
 		int		j;
@@ -1698,7 +1697,7 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *e
 
 		zbx_vector_uint64_create(&eventids);
 
-		/* 3.1. Store PROBLEM eventids of recovered escalations in 'eventids'. */
+		/* 3.1. Store PROBLEM eventids of recovered events in 'eventids'. */
 		zbx_hashset_iter_reset(event_recovery, &iter);
 
 		while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
@@ -1706,7 +1705,10 @@ void	process_actions(const DB_EVENT *events, size_t events_num, zbx_hashset_t *e
 
 		/* 3.2. Select escalations that must be recovered. */
 		zbx_vector_uint64_sort(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select actionid,eventid,escalationid from escalations where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select actionid,eventid,escalationid"
+				" from escalations"
+				" where");
 
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
 		result = DBselect("%s", sql);
