@@ -123,6 +123,7 @@ function corrConditionValueToString(array $correlations) {
 					break;
 
 				case ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP:
+					$result[$i][$j] = ['group' => _('Unknown')];
 					$groupids[$condition['groupid']] = true;
 					break;
 
