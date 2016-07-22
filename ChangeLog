@@ -36,10 +36,11 @@ Changes for 3.0.4
 New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, German, Italian, Japanese, Polish, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (zalex_ua)
 
+Bug fixes:
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+
 --------------------------------------------------------------------------------
 Changes for 3.0.4rc1
-
-New features:
 
 Bug fixes:
 ........S. [ZBX-10907] fixed remote command execution via SSH with no Zabbix agent interface (viktors)
