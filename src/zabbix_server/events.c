@@ -385,7 +385,10 @@ static void	save_event_recovery()
 			recovery->r_event->ns);
 
 		if (0 != recovery->correlationid)
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",correlationid=" ZBX_FS_UI64);
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",correlationid=" ZBX_FS_UI64,
+					recovery->correlationid);
+		}
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where eventid=" ZBX_FS_UI64 ";\n",
 				recovery->eventid);
@@ -951,38 +954,58 @@ static int	correlation_has_old_event_operation(const zbx_correlation_t *correlat
 
 /******************************************************************************
  *                                                                            *
- * Function: correlation_condition_add_string_match                           *
+ * Function: correlation_condition_add_tag_match                              *
  *                                                                            *
- * Purpose: adds sql statement to match string according to the defined       *
+ * Purpose: adds sql statement to match tag according to the defined          *
  *          matching operation                                                *
  *                                                                            *
  * Parameters: sql         - [IN/OUT]                                         *
  *             sql_alloc   - [IN/OUT]                                         *
  *             sql_offset  - [IN/OUT]                                         *
- *             field       - [IN] the field name                              *
- *             value       - [IN] the value to match                          *
+ *             tag         - [IN] the tag to match                            *
+ *             value       - [IN] the tag value to match                      *
  *             op          - [IN] the matching operation (CONDITION_OPERATOR_)*
  *                                                                            *
  ******************************************************************************/
-static void	correlation_condition_add_string_match(char **sql, size_t *sql_alloc, size_t *sql_offset,
-		const char *field, const char *value, unsigned char op)
+static void	correlation_condition_add_tag_match(char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *tag, const char *value, unsigned char op)
 {
+	char	*tag_esc, *value_esc;
+
+	tag_esc = DBdyn_escape_string(tag);
+	value_esc = DBdyn_escape_string(value);
+
+	switch (op)
+	{
+		case CONDITION_OPERATOR_NOT_EQUAL:
+		case CONDITION_OPERATOR_NOT_LIKE:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, "not ");
+			break;
+	}
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset,
+			"exists (select null from problem_tag pt where p.eventid=pt.eventid and ");
+
 	switch (op)
 	{
 		case CONDITION_OPERATOR_EQUAL:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s='%s'", field, value);
-			break;
 		case CONDITION_OPERATOR_NOT_EQUAL:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s<>'%s'", field, value);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value='%s'", tag_esc,
+					value_esc);
 			break;
 		case CONDITION_OPERATOR_LIKE:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s like '%%%s%%'", field, value);
-			break;
 		case CONDITION_OPERATOR_NOT_LIKE:
-			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s not like '%%%s%%'", field, value);
+			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "pt.tag='%s' and pt.value like '%%%s%%'",
+					tag_esc, value_esc);
 			break;
 	}
+
+	zbx_chrcpy_alloc(sql, sql_alloc, sql_offset, ')');
+
+	zbx_free(value_esc);
+	zbx_free(tag_esc);
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -1022,7 +1045,11 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 	{
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG:
 			tag_esc = DBdyn_escape_string(condition->data.tag.tag);
-			filter = zbx_dsprintf(NULL, "pt.tag='%s'", tag_esc);
+			zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+					"exists (select null from problem_tag pt"
+						" where p.eventid=pt.eventid"
+							" and pt.tag='%s')",
+					tag_esc);
 			zbx_free(tag_esc);
 			return filter;
 
@@ -1042,19 +1069,20 @@ static char	*correlation_condition_get_event_filter(zbx_corr_condition_t *condit
 
 			tag_esc = DBdyn_escape_string(condition->data.tag_pair.oldtag);
 			value_esc = DBdyn_escape_string(tag->value);
-			filter = zbx_dsprintf(NULL, "pt.tag='%s' and pt.value='%s'", tag_esc, value_esc);
+			zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+					"exists (select null from problem_tag pt"
+						" where p.eventid=pt.eventid"
+							" and pt.tag='%s'"
+							" and pt.value='%s')",
+					tag_esc, value_esc);
 			zbx_free(value_esc);
 			zbx_free(tag_esc);
 			return filter;
 
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
-			tag_esc = DBdyn_escape_string(condition->data.tag_value.tag);
-			value_esc = DBdyn_escape_string(condition->data.tag_value.value);
-			zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset, "pt.tag='%s' and", tag_esc);
-			correlation_condition_add_string_match(&filter, &filter_alloc, &filter_offset, " pt.value",
-					value_esc, condition->data.tag_value.op);
-			zbx_free(value_esc);
-			zbx_free(tag_esc);
+			correlation_condition_add_tag_match(&filter, &filter_alloc, &filter_offset,
+					condition->data.tag_value.tag, condition->data.tag_value.value,
+					condition->data.tag_value.op);
 			return filter;
 	}
 
@@ -1260,9 +1288,8 @@ static void	correlate_event_by_global_rules(DB_EVENT *event)
 		/* Process correlations that matches new event and either uses old events in conditions */
 		/* or has operations involving old events.                                              */
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select pt.eventid,p.objectid,c.correlationid"
-								" from correlation c,problem_tag pt"
-								" left join problem p on p.eventid=pt.eventid"
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select p.eventid,p.objectid,c.correlationid"
+								" from correlation c,problem p"
 								" where p.r_eventid is null"
 								" and (");
 
