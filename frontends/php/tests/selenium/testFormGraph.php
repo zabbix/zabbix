@@ -635,13 +635,13 @@ class testFormGraph extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'graphSaveCheck',
+					'name' => 'testFormGraph1',
 					'addItems' => [
 						['itemName' => 'testFormItem']
 					],
 					'error-msg' => 'Cannot add graph',
 					'errors' => [
-						'Graph with name "graphSaveCheck" already exists in graphs or graph prototypes.'
+						'Graph with name "testFormGraph1" already exists in graphs or graph prototypes.'
 					]
 				]
 			],
@@ -839,6 +839,8 @@ class testFormGraph extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraph_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
+
 		$this->zbxTestLogin('graphs.php?hostid=40001&form=Create+graph');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 
@@ -863,10 +865,13 @@ class testFormGraph extends CWebTest {
 				$this->zbxTestAssertElementPresentXpath("//a[text()='".$link."']");
 				$this->zbxTestClickLinkTextWait($link);
 
-				$this->webDriver->switchTo()->window('');
+				$this->zbxTestWaitWindowClose();
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('items_0_name'));
+				$this->zbxTestTextPresent($this->host . ': ' . $link);
 
 				if(isset($item['remove'])) {
 					$this->zbxTestClickWait('items_0_remove');
+					$this->zbxTestTextNotPresent($link);
 				}
 			}
 		}
@@ -985,6 +990,8 @@ class testFormGraph extends CWebTest {
 			$this->zbxTestAssertElementValue('width', $width);
 			$this->zbxTestAssertElementValue('height', $height);
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**

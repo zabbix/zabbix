@@ -47,7 +47,7 @@ class testTemplateInheritance extends CWebTest {
 		DBsave_tables('items');
 	}
 
-	public function testFormItem_linkHost(){
+	public function testTemplateInheritance_linkHost(){
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
 
@@ -101,7 +101,7 @@ class testTemplateInheritance extends CWebTest {
 	/**
 	 * @dataProvider dataCreate
 	 */
-	public function testFormItem_Create($result, $template, $itemName, $keyName, $errorMsgs) {
+	public function testTemplateInheritance_Create($result, $template, $itemName, $keyName, $errorMsgs) {
 		$this->zbxTestLogin('templates.php');
 
 		$this->zbxTestClickLinkText($template);
@@ -174,7 +174,7 @@ class testTemplateInheritance extends CWebTest {
 		}
 	}
 
-	public function testFormItem_unlinkHost(){
+	public function testTemplateInheritance_unlinkHost(){
 
 		$sql = "select hostid from hosts where host='Template App Zabbix Agent';";
 		$this->assertEquals(1, DBcount($sql));
@@ -184,7 +184,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkText($this->hostName);
 
-		$this->zbxTestClickWait('tab_templateTab');
+		$this->zbxTestTabSwitch('Templates');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('unlink_and_clear_'.$hostid));
 		$this->zbxTestTextPresent('Template App Zabbix Agent');
 		$this->zbxTestClickWait('unlink_and_clear_'.$hostid);
@@ -490,7 +490,7 @@ class testTemplateInheritance extends CWebTest {
 		$this->webDriver->switchTo()->window('');
 		$this->zbxTestTextPresent($this->templateName.': Test LLD item');
 
-		$this->zbxTestClick('add_item');
+		$this->zbxTestClickWait('add_item');
 		$this->zbxTestWaitWindowAndSwitchToIt('zbx_popup');
 		$this->zbxTestClickLinkTextWait('Test LLD item1');
 		$this->webDriver->switchTo()->window('');
