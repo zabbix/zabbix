@@ -36,6 +36,7 @@ Changes for 3.0.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-10591] fixed header widget being broken by selects with long values (asaveljevs, Pavel)
 ..F....... [ZBX-10987] fixed table header line not being visible in dark theme (Pavel)
 ........S. [ZBX-10797] fixed evaluation of user macros in calculated items (Andris)
 
@@ -78,7 +79,7 @@ A.F....... [ZBX-9455] fixed length limit for host prototype name (Gunars, Sasha)
 ..F....... [ZBXNEXT-3263] added "No data found." message in administration->general->images (Cemeris)
 ..F....... [ZBX-10731] fixed textarea visibility in monitoring->maps properties (Cemeris)
 ........S. [ZBX-10723] forced quoting of item key parameter if macro resolution resulted in unquoted parameter with leading spaces (gleb)
-..F....... [ZBX-10825] reverted table header capitalization. fixed calendar header (asaveljevs, Pavel)
+..F....... [ZBX-10825] reverted table header capitalization, fixed calendar header (asaveljevs, Pavel)
 .......PS. [ZBX-8096] allowed "noSuchName" to be returned for SNMPv2 and SNMPv3 (asaveljevs)
 ..F....... [ZBX-10794] fixed saving of "Show text as HTML" checkbox in Monitoring->Screens (Cemeris)
 ..F....... [ZBX-10504] decreased padding and margins in tables and across the whole UI (Pavel)
