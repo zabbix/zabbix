@@ -1062,6 +1062,8 @@ class testFormGraphPrototype extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormGraphPrototype_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
+
 		$itemName = $this->item;
 		$this->zbxTestLogin('graphs.php?parent_discoveryid=33800&form=Create+graph+prototype');
 
@@ -1083,6 +1085,11 @@ class testFormGraphPrototype extends CWebTest {
 		}
 
 		if (!isset($data['noItem'])) {
+			$this->zbxTestLaunchPopup('add_protoitem');
+
+			$this->zbxTestClickLinkTextWait($this->item);
+			$this->zbxTestWaitWindowClose();
+
 			$this->zbxTestLaunchPopup('add_item');
 
 			$this->zbxTestDropdownSelect('groupid', 'Zabbix servers');
@@ -1090,14 +1097,12 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestClickLinkTextWait($this->itemSimple);
 			$this->webDriver->switchTo()->window('');
 
-			$this->zbxTestLaunchPopup('add_protoitem');
-			$this->zbxTestClickLinkTextWait($this->item);
-			$this->webDriver->switchTo()->window('');
-
 			if (isset($data['removeItem'])) {
 				$this->zbxTestClickWait('items_0_remove');
+				$this->zbxTestTextNotPresent($this->item);
 
 				$this->zbxTestClickWait('items_0_remove');
+				$this->zbxTestTextNotPresent($this->itemSimple);
 
 				$this->zbxTestLaunchPopup('add_item');
 
@@ -1140,7 +1145,7 @@ class testFormGraphPrototype extends CWebTest {
 					if (!isset($data['noAxisItem'])) {
 						$this->zbxTestLaunchPopup('yaxis_min_prototype', 'zbx_popup_item');
 						$this->zbxTestClickLinkTextWait($this->item);
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 					}
 					break;
 				case 'Calculated':
@@ -1155,14 +1160,13 @@ class testFormGraphPrototype extends CWebTest {
 					if (!isset($data['noAxisItem'])) {
 						$this->zbxTestLaunchPopup('yaxis_max_prototype', 'zbx_popup_item');
 						$this->zbxTestClickLinkTextWait($this->item);
-						$this->webDriver->switchTo()->window('');
+						$this->zbxTestWaitWindowClose();
 					}
 					break;
 				case 'Calculated':
 					break;
 			}
 		}
-
 
 		$this->zbxTestClickWait('add');
 
@@ -1223,6 +1227,8 @@ class testFormGraphPrototype extends CWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graph prototypes deleted');
 			$this->zbxTestTextNotPresent($this->template.": $graphName");
 		}
+
+		DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 	}
 
 	/**
