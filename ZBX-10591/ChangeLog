@@ -1,12 +1,23 @@
+Changes for 3.0.5rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-10591] fixed header widget being broken by selects with long values (asaveljevs, Pavel)
+..F....... [ZBX-10987] fixed table header line not being visible in dark theme (Pavel)
+........S. [ZBX-10797] fixed evaluation of user macros in calculated items (Andris)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.4
 
 New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, German, Italian, Japanese, Polish, Portuguese (Brazil), Russian, Slovak translations; thanks to Zabbix translators (zalex_ua)
 
+Bug fixes:
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+
 --------------------------------------------------------------------------------
 Changes for 3.0.4rc1
-
-New features:
 
 Bug fixes:
 ..F....... [ZBX-10591] fixed header widget layout to look better with long host and group names (asaveljevs, Pavel)
@@ -1418,9 +1429,20 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
-Changes for 2.2.14rc1
+Changes for 2.2.15rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.14
+
+Bug fixes:
+..F....... [ZBX-11023] fixed SQL injection vulnerability in "Latest data" page (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.14rc1
 
 Bug fixes:
 A......... [ZBX-10933] fixed unexpected overwriting of trigger expressions for unchanged triggers when updating multiple triggers simultaneously via the API trigger.update method (Gunars)
