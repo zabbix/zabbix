@@ -89,7 +89,7 @@ static int	validate_event_tag(const DB_EVENT* event, const zbx_tag_t *tag)
  *             trigger_tags                - [IN] trigger tags                *
  *                                                                            *
  ******************************************************************************/
-DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
@@ -159,7 +159,7 @@ DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t obj
 		}
 	}
 
-	return &events[events_num++];
+	return events_num++;
 }
 
 /******************************************************************************
@@ -372,6 +372,8 @@ static void	save_event_recovery()
 	zbx_hashset_iter_reset(&event_recovery, &iter);
 	while (NULL != (recovery = zbx_hashset_iter_next(&iter)))
 	{
+		recovery->r_event = &events[recovery->r_event_index];
+
 		zbx_db_insert_add_values(&db_insert, recovery->eventid, recovery->r_event->eventid,
 				recovery->correlationid, recovery->c_eventid);
 
@@ -407,18 +409,18 @@ static void	save_event_recovery()
 
 /******************************************************************************
  *                                                                            *
- * Function: get_event_by_source_object_id                                    *
+ * Function: get_event_index_by_source_object_id                              *
  *                                                                            *
- * Purpose: find event by its source object                                   *
+ * Purpose: find event index by its source object                             *
  *                                                                            *
  * Parameters: source   - [IN] the event source                               *
  *             object   - [IN] the object type                                *
  *             objectid - [IN] the object id                                  *
  *                                                                            *
- * Return value: the event or NULL                                            *
+ * Return value: the event index or FAIL                                      *
  *                                                                            *
  ******************************************************************************/
-static DB_EVENT	*get_event_by_source_object_id(int source, int object, zbx_uint64_t objectid)
+static int	get_event_index_by_source_object_id(int source, int object, zbx_uint64_t objectid)
 {
 	size_t		i;
 	DB_EVENT	*event;
@@ -428,10 +430,10 @@ static DB_EVENT	*get_event_by_source_object_id(int source, int object, zbx_uint6
 		event = &events[i];
 
 		if (event->source == source && event->object == object && event->objectid == objectid)
-			return event;
+			return i;
 	}
 
-	return NULL;
+	return FAIL;
 }
 
 /******************************************************************************
@@ -549,11 +551,13 @@ static void	correlate_events_by_default_rules()
 
 	while (NULL != (row = DBfetch(result)))
 	{
+		int	index;
+
 		source = atoi(row[1]);
 		object = atoi(row[2]);
 		ZBX_STR2UINT64(objectid, row[3]);
 
-		if (NULL == (event = get_event_by_source_object_id(source, object, objectid)))
+		if (FAIL == (index = get_event_index_by_source_object_id(source, object, objectid)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -568,7 +572,8 @@ static void	correlate_events_by_default_rules()
 		}
 
 		recovery_local.objectid = objectid;
-		recovery_local.r_event = event;
+		recovery_local.r_event = NULL;
+		recovery_local.r_event_index = index;
 		recovery_local.correlationid = 0;
 		recovery_local.c_eventid = 0;
 		zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
@@ -678,8 +683,8 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 		{
 			ZBX_STR2UINT64(objectid, row[1]);
 
-			if (NULL == (event = get_event_by_source_object_id(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
-					objectid)))
+			if (FAIL == (index = get_event_index_by_source_object_id(EVENT_SOURCE_TRIGGERS,
+					EVENT_OBJECT_TRIGGER, objectid)))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
@@ -704,10 +709,11 @@ static void	correlate_events_by_trigger_rules(zbx_vector_ptr_t *trigger_diff)
 				continue;
 			}
 
-			event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
+			events[index].flags = ZBX_FLAGS_DB_EVENT_CREATE;
 
 			recovery_local.objectid = objectid;
-			recovery_local.r_event = event;
+			recovery_local.r_event = NULL;
+			recovery_local.r_event_index = index;
 			recovery_local.correlationid = 0;
 			recovery_local.c_eventid = 0;
 			zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
@@ -1172,11 +1178,10 @@ out:
 static void	correlation_execute_operations(zbx_correlation_t *correlation, const DB_EVENT *event,
 		zbx_uint64_t old_eventid, zbx_uint64_t old_objectid)
 {
-	int			i;
+	int			i, index;
 	zbx_corr_operation_t	*operation;
 	zbx_event_recovery_t	recovery_local, queue_local;
 	zbx_timespec_t		ts;
-	DB_EVENT		*r_event;
 
 	for (i = 0; i < correlation->operations.values_num; i++)
 	{
@@ -1193,7 +1198,7 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, const
 
 				ts.sec = event->clock;
 				ts.ns = event->ns;
-				r_event = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
+				index = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER,
 						event->objectid, &ts, TRIGGER_VALUE_OK,
 						event->trigger.description, event->trigger.expression,
 						event->trigger.recovery_expression, event->trigger.priority,
@@ -1203,7 +1208,8 @@ static void	correlation_execute_operations(zbx_correlation_t *correlation, const
 				recovery_local.objectid = event->objectid;
 				recovery_local.correlationid = correlation->correlationid;
 				recovery_local.c_eventid = event->eventid;
-				recovery_local.r_event = r_event;
+				recovery_local.r_event = NULL;
+				recovery_local.r_event_index = index;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 				break;
@@ -1352,7 +1358,6 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 	zbx_hashset_iter_t	iter;
 	zbx_event_recovery_t	*queue;
 	int			j, closed_num = 0;
-	DB_EVENT		*event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() events:%d", __function_name, event_queue.num_data);
 
@@ -1488,6 +1493,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 		while (NULL != (queue = zbx_hashset_iter_next(&iter)))
 		{
 			zbx_event_recovery_t	recovery_local;
+			int			index;
 
 			if (FAIL == (index = zbx_vector_uint64_bsearch(&triggerids, queue->objectid,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
@@ -1501,7 +1507,7 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 			{
 				trigger = &triggers[index];
 
-				event = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
+				index = add_event(EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, trigger->triggerid,
 						&queue->ts, TRIGGER_VALUE_OK, trigger->description,
 						trigger->expression_orig, trigger->recovery_expression_orig,
 						trigger->priority, trigger->type, &trigger->tags,
@@ -1511,7 +1517,8 @@ static void	correlate_events_by_global_rules(zbx_vector_ptr_t *trigger_diff, zbx
 				recovery_local.objectid = queue->objectid;
 				recovery_local.correlationid = queue->correlationid;
 				recovery_local.c_eventid = queue->c_eventid;
-				recovery_local.r_event = event;
+				recovery_local.r_event = NULL;
+				recovery_local.r_event_index = index;
 
 				zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 

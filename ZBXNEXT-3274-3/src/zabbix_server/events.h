@@ -26,13 +26,14 @@ typedef struct
 	zbx_uint64_t	eventid;
 	zbx_uint64_t	objectid;
 	DB_EVENT	*r_event;
+	int		r_event_index;
 	zbx_uint64_t	correlationid;
 	zbx_uint64_t	c_eventid;
 	zbx_timespec_t	ts;
 }
 zbx_event_recovery_t;
 
-DB_EVENT	*add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+int	add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
 		unsigned char trigger_type, const zbx_vector_ptr_t *trigger_tags,
