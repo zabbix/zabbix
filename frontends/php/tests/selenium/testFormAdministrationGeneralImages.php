@@ -72,8 +72,8 @@ class testFormAdministrationGeneralImages extends CWebTest {
 
 		$this->zbxTestLogin('adm.images.php');
 		$this->zbxTestClickLinkText($this->icon_image_name);
-		$this->zbxTestInputType('name', $this->icon_image_name2);
-		$this->zbxTestInputType('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
+		$this->zbxTestInputTypeWait('name', $this->icon_image_name2);
+		$this->zbxTestInputTypeWait('image', PHPUNIT_BASEDIR.'/tests/images/image.png');
 		$this->zbxTestClick('cancel');
 
 		// checking that image has not been changed after clicking on the "Cancel" button in the confirm dialog box

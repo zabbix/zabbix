@@ -2218,6 +2218,8 @@ class testFormItem extends CWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItem_SimpleCreate($data) {
+		DBexecute("UPDATE config SET server_check_interval = 0 WHERE configid = 1");
+
 		$this->zbxTestLogin('hosts.php');
 		$this->zbxTestClickLinkTextWait($this->host);
 		$this->zbxTestClickXpathWait("//ul[@class='object-group']//a[text()='Items']");
@@ -2429,6 +2431,8 @@ class testFormItem extends CWebTest {
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
 				}
 			}
+
+			DBexecute("UPDATE config SET server_check_interval = 10 WHERE configid = 1");
 		}
 
 	public function testFormItem_HousekeeperUpdate() {

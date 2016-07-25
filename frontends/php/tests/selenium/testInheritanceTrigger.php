@@ -36,7 +36,6 @@ class testInheritanceTrigger extends CWebTest {
 	}
 
 	// return list of triggers from a template
-/*
 	public static function update() {
 		return DBdata(
 			'SELECT t.triggerid'.
@@ -52,11 +51,11 @@ class testInheritanceTrigger extends CWebTest {
 				' AND t.flags=0'
 		);
 	}
-*/
-//	/**
-//	 * @dataProvider update
-//	 */
-/*
+
+	/**
+	 * @dataProvider update
+	 */
+
 	public function testInheritanceTrigger_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = DBhash($sqlTriggers);
@@ -64,11 +63,11 @@ class testInheritanceTrigger extends CWebTest {
 		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid']);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of triggers');
-		$this->zbxTestTextPresent('Trigger updated');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger updated');
 
 		$this->assertEquals($oldHashTriggers, DBhash($sqlTriggers));
 	}
-*/
+
 	public static function create() {
 		return [
 			[
