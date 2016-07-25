@@ -3389,21 +3389,18 @@ td.inactive-bg {
 		@include opacity(1);
 		text-decoration: none;
 		color: $font-alt-color;
-		background-color: $transparent;
 	}
 
 	&:focus {
 		@include opacity(1);
 		text-decoration: none;
 		color: $font-alt-color;
-		background-color: $transparent;
 	}
 
 	&:active {
 		@include opacity(1);
 		text-decoration: none;
 		color: $font-alt-color;
-		background-color: $transparent;
 	}
 }
 
